@@ -5,9 +5,9 @@ open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -29,6 +29,7 @@ module FSharpErrors =
     let [<Literal>] UpcastUnnecessary = 66
     let [<Literal>] TypeTestUnnecessary = 67
     let [<Literal>] EnumMatchIncomplete = 104
+    let [<Literal>] NamespaceCannotContainValues = 201
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
     let [<Literal>] NoImplementationGiven = 365
@@ -207,6 +208,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
             let expr = getUnusedExpr expr
             FunctionValueUnexpectedWarning(expr, error.Message) :> _
+
+        | NamespaceCannotContainValues ->
+            createHighlightingFromNode NamespaceCannotContainValuesError range
 
         | _ -> createGenericHighlighting error range
 

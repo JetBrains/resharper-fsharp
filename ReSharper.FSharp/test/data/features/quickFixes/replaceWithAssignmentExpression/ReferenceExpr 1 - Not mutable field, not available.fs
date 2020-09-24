@@ -1,5 +1,3 @@
-module Module
-
 type MyType =
     val Field: int
     new() = {Field = 0}

@@ -1,5 +1,4 @@
-﻿module Module
-do
+﻿do
     let rec f x = (){caret}
     and h x = ()
 

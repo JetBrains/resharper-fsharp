@@ -1,5 +1,3 @@
-module Module
-
 type MyType() =
     member val Member = 1 with get, set
 

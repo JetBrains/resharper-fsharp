@@ -7,6 +7,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Rider.Model
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 
 module FSharpRegistryUtil =
     [<AbstractClass>]
@@ -23,7 +24,8 @@ module FSharpRegistryUtil =
             member _.Dispose() =
                 enabled.Pop() |> ignore
 
-    type AllowExperimentalFeaturesCookie() = inherit EnabledCookieBase<AllowExperimentalFeaturesCookie>()
+    type EnableInlineVarRefactoringCookie() = inherit EnabledCookieBase<EnableInlineVarRefactoringCookie>()
+    type EnableRedundantParenAnalysisCookie() = inherit EnabledCookieBase<EnableRedundantParenAnalysisCookie>()
     type AllowFormatterCookie() = inherit EnabledCookieBase<AllowFormatterCookie>()
 
 [<AbstractClass; Sealed; Extension>]
@@ -36,24 +38,30 @@ type ProtocolSolutionExtensions =
 [<AbstractClass; Sealed; Extension>]
 type FSharpExperimentalFeaturesEx =
     [<Extension>]
-    static member FSharpExperimentalFeaturesEnabled(solution: ISolution) =
-        if FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Enabled then true else
+    static member FSharpInlineVarRefactoringEnabled(solution: ISolution) =
+        if FSharpRegistryUtil.EnableInlineVarRefactoringCookie.Enabled then true else
 
-        match solution.RdFSharpModel() with
-        | null -> false
-        | fsModel -> fsModel.EnableExperimentalFeatures.Value
+        let settingsProvider = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
+        settingsProvider.EnableInlineVarRefactoring.Value
 
     [<Extension>]
-    static member FSharpExperimentalFeaturesEnabled(node: ITreeNode) =
-        FSharpExperimentalFeaturesEx.FSharpExperimentalFeaturesEnabled(node.GetSolution())
+    static member FSharpPostfixTemplatesEnabled(solution: ISolution) =
+        let settingsProvider = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
+        settingsProvider.EnablePostfixTemplates.Value
+
+    [<Extension>]
+    static member FSharpRedundantParenAnalysisEnabled(solution: ISolution) =
+        if FSharpRegistryUtil.EnableRedundantParenAnalysisCookie.Enabled then true else
+
+        let settingsProvider = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
+        settingsProvider.RedundantParensAnalysis.Value
 
     [<Extension>]
     static member FSharpFormatterEnabled(solution: ISolution) =
         if FSharpRegistryUtil.AllowFormatterCookie.Enabled then true else
 
-        match solution.RdFSharpModel() with
-        | null -> false
-        | fsModel -> fsModel.EnableFormatter.Value
+        let settingsProvider = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
+        settingsProvider.Formatter.Value
 
     [<Extension>]
     static member FSharpFormatterEnabled(node: ITreeNode) =

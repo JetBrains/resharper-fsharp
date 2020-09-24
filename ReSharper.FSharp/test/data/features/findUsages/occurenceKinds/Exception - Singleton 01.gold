@@ -1,10 +1,10 @@
 ﻿Pattern
 ---
-TO: [O] let |e| = Exn RANGE: (38,39) @ Exception - Singleton 01.fs
+UsageOther TO: [O] let |e| = Exn RANGE: (38,39) @ Exception - Singleton 01.fs
 
 
 New instance creation
 ---
-TO: [O] let e = |Exn| RANGE: (42,45) @ Exception - Singleton 01.fs
+UsageInstanceCreation TO: [O] let e = |Exn| RANGE: (42,45) @ Exception - Singleton 01.fs
 
 

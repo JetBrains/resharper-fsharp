@@ -31,14 +31,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         var attributes = Attributes;
 
-        var letModuleDecl = LetModuleDeclNavigator.GetByBinding(this);
-        if (letModuleDecl == null)
+        var letBindings = LetBindingsDeclarationNavigator.GetByBinding(this);
+        if (letBindings == null)
           return attributes;
 
-        if (letModuleDecl.BindingsEnumerable.FirstOrDefault() != this)
+        if (letBindings.BindingsEnumerable.FirstOrDefault() != this)
           return attributes;
 
-        var letAttributes = letModuleDecl.Attributes;
+        var letAttributes = letBindings.Attributes;
         if (letAttributes.IsEmpty)
           return attributes;
 

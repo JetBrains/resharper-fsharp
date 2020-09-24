@@ -1,18 +1,17 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
-    IDo
+    IDoStatement
       IChameleonExpression
         ILambdaExpr
           FSharpTokenType+FunTokenElement(type:FUN, text:fun)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IParenPat
-            IConstPat
+          ILambdaParametersList
+            IUnitPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IParenPat
-            IConstPat
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IUnitPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

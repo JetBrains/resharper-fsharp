@@ -18,7 +18,7 @@ IFSharpImplFile
         IMemberConstructorDeclaration
           FSharpTokenType+NewTokenElement(type:NEW, text:new)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IMemberParamsDeclaration
+          IParametersPatternDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               ITuplePat

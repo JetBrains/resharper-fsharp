@@ -7,7 +7,7 @@ IFSharpImplFile
       IObjectTypeDeclaration
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
         IImplicitConstructorDeclaration
-          IMemberParamsDeclaration
+          IParametersPatternDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
@@ -25,7 +25,7 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+NewTokenElement(type:NEW, text:new)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IMemberParamsDeclaration
+          IParametersPatternDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               IWildPat

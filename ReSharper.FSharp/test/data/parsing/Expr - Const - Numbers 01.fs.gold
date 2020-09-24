@@ -1,7 +1,7 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
-    IDo
+    IDoStatement
       IChameleonExpression
         ILiteralExpr
           FSharpToken(type:INT32, text:123)

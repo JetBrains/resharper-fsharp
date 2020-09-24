@@ -1,5 +1,4 @@
-﻿module Module
-do
+﻿do
     for _ in [] do
         let x = ()
         {caret}

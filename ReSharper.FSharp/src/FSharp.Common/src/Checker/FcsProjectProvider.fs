@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Annotations
+open JetBrains.Application.Settings
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
 open JetBrains.DataFlow
@@ -17,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
@@ -48,7 +50,7 @@ type FcsProjectProvider
         (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, checkerService: FSharpCheckerService,
          fcsProjectBuilder: FcsProjectBuilder, scriptFcsProjectProvider: IScriptFcsProjectProvider,
          scheduler: ISolutionLoadTasksScheduler, fsFileService: IFSharpFileService, psiModules: IPsiModules,
-         locks: IShellLocks, logger: ILogger) as this =
+         locks: IShellLocks, logger: ILogger, fileExtensions: IProjectFileExtensions) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let locker = JetFastSemiReenterableRWLock()
@@ -96,11 +98,11 @@ type FcsProjectProvider
         use lock = locker.UsingWriteLock()
         if dirtyModules.IsEmpty() then () else
 
-        logger.Verbose("Start invalidating dirty projects")
+        logger.Trace("Start invalidating dirty modules")
         let modulesToInvalidate = List(dirtyModules)
         for psiModule in modulesToInvalidate do
             invalidateFcsProject psiModule
-        logger.Verbose("Done invalidating dirty projects")
+        logger.Trace("Done invalidating dirty modules")
 
     do
         // Start listening for the changes after project model is updated.
@@ -184,12 +186,18 @@ type FcsProjectProvider
             | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectOptions
             | _ -> None
 
-        elif psiModule :? FSharpScriptPsiModule || psiModule :? SandboxPsiModule then
+        elif psiModule :? FSharpScriptPsiModule then
+            scriptFcsProjectProvider.GetScriptOptions(sourceFile)
+
+        elif psiModule :? SandboxPsiModule then
+            let settings = sourceFile.GetSettingsStore()
+            if not (settings.GetValue(fun (s: FSharpExperimentalFeatures) -> s.FsiInteractiveEditor)) then None else
+
             scriptFcsProjectProvider.GetScriptOptions(sourceFile)
 
         else
             None
-    
+
     member x.FcsProjectInvalidated = fcsProjectInvalidated
 
     member private x.ProcessChange(obj: ChangeEventArgs) =
@@ -215,7 +223,7 @@ type FcsProjectProvider
             let changeType = fileChange.Type
             if changeType <> PsiModuleChange.ChangeType.Invalidated then
                 let sourceFile = fileChange.Item
-                let projectFileType = sourceFile.LanguageType
+                let projectFileType = fileExtensions.GetFileType(sourceFile.GetLocation().ExtensionWithDot)
                 if not (projectFileType.Is<FSharpProjectFileType>()) then () else
 
                 // todo: make it possible to distinguish fsi sandbox files from sandbox in diffs 

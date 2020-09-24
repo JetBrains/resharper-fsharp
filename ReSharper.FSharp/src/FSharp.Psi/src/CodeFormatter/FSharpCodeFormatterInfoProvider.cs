@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("NestedModuleDeclaration", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.MODULE_MEMBER),
         ("TopBinding", ElementType.TOP_BINDING, TopBinding.CHAMELEON_EXPR),
         ("LocalBinding", ElementType.LOCAL_BINDING, LocalBinding.EXPR),
-        ("LetModuleDeclBinding", ElementType.LET_MODULE_DECL, LetModuleDecl.BINDING),
+        ("LetModuleDeclBinding", ElementType.LET_BINDINGS_DECLARATION, LetBindingsDeclaration.BINDING),
         ("LetExprBinding", ElementType.LET_OR_USE_EXPR, LetOrUseExpr.BINDING),
         ("NestedModuleDeclName", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.IDENTIFIER),
         ("NamedModuleDeclName", ElementType.NAMED_MODULE_DECLARATION, NamedModuleDeclaration.IDENTIFIER),
@@ -75,7 +75,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("EnumDeclaration", ElementType.ENUM_DECLARATION, EnumDeclaration.ENUM_REPR),
         ("UnionDeclarationCases", ElementType.UNION_DECLARATION, UnionDeclaration.UNION_REPR),
         ("TypeAbbreviation", ElementType.TYPE_ABBREVIATION_DECLARATION, TypeAbbreviationDeclaration.TYPE_OR_UNION_CASE),
-        ("ModuleAbbreviation", ElementType.MODULE_ABBREVIATION, ModuleAbbreviation.TYPE_REFERENCE),
+        ("ModuleAbbreviationDeclaration", ElementType.MODULE_ABBREVIATION_DECLARATION, ModuleAbbreviationDeclaration.TYPE_REFERENCE),
         ("RecordDeclaration", ElementType.RECORD_DECLARATION, RecordDeclaration.RECORD_REPR),
       };
 
@@ -151,9 +151,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Name("DoDeclIndent")
         .Where(
           Parent()
-            .HasType(ElementType.DO)
-            .Satisfies((node, context) => !((IDo) node).IsImplicit),
-          Node().HasRole(Do.CHAMELEON_EXPR))
+            .HasType(ElementType.DO_STATEMENT)
+            .Satisfies((node, context) => !((IDoStatement) node).IsImplicit),
+          Node().HasRole(DoStatement.CHAMELEON_EXPR))
         .Return(IndentType.External)
         .Build();
 

@@ -1,5 +1,3 @@
-﻿module Module
-
-open System
+﻿open System
 
 let s: String{caret} = ""

@@ -2,7 +2,7 @@
 +++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
 Occurrences provided for OccurrenceUtil:
 Occurrence's dump:
-DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractSlot], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractSlot], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
+DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
 Menu Item presentation: 
 Text: Module.IA | (in Module.IA)
 Shortcut text: TestProject
@@ -40,7 +40,7 @@ type IB =
 ------------------
 
 Occurrence's dump:
-DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractSlot], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractSlot], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
+DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
 Menu Item presentation: 
 Text: Module.IB | (in Module.IB)
 Shortcut text: TestProject

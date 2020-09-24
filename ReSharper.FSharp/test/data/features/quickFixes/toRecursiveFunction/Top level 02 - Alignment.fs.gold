@@ -1,4 +1,2 @@
-﻿module Module
-
-let rec f x = ()
+﻿let rec f x = ()
               {caret}f x

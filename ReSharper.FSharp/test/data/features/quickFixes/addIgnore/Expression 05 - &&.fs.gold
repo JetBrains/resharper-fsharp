@@ -1,5 +1,3 @@
-﻿module Module
-
-let x =
+﻿let x =
     (true && true) |> ignore{caret}
     ()

@@ -1,15 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpModulesUtil
 
 [<ContextAction(Name = "ToModuleNamespace", Group = "F#", Description = "To module/namespace")>]
 type ToModuleNamespaceDeclarationAction(dataProvider: FSharpContextActionDataProvider) =
@@ -17,12 +13,6 @@ type ToModuleNamespaceDeclarationAction(dataProvider: FSharpContextActionDataPro
 
     let isNamespace (declaration: IModuleLikeDeclaration) =
         declaration :? INamespaceDeclaration
-    
-    let getNewNodeTypes decl =
-        if isNamespace decl then
-            FSharpTokenType.MODULE, ElementType.NAMED_MODULE_DECLARATION
-        else
-            FSharpTokenType.NAMESPACE, ElementType.NAMED_NAMESPACE_DECLARATION
 
     override x.Text =
         if isNamespace (dataProvider.GetSelectedElement()) then "To module" else "To namespace"
@@ -38,9 +28,7 @@ type ToModuleNamespaceDeclarationAction(dataProvider: FSharpContextActionDataPro
         use writeCookie = WriteLockCookie.Create(moduleDeclaration.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let tokenType, nodeType = getNewNodeTypes moduleDeclaration
-        replaceWithToken moduleDeclaration.ModuleOrNamespaceKeyword tokenType
-        let newModuleDeclaration = ModificationUtil.ReplaceChild(moduleDeclaration, nodeType.Create())
-        LowLevelModificationUtil.AddChild(newModuleDeclaration, moduleDeclaration.Children().AsArray())
+        if isNamespace moduleDeclaration then convertNamespaceToModule moduleDeclaration
+        else convertModuleToNamespace moduleDeclaration
 
         null

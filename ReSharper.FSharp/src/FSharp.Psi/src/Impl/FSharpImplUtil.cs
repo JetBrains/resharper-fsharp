@@ -8,6 +8,7 @@ using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
@@ -796,5 +797,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static IList<ITypeParameter> GetAllTypeParametersReversed(this ITypeElement typeElement) =>
       typeElement.GetAllTypeParameters().ResultingList().Reverse();
+
+    [CanBeNull]
+    public static IDeclaredElement TryCreateOperator<TDeclaration>([NotNull] this TDeclaration decl)
+      where TDeclaration : FSharpDeclarationBase, IModifiersOwnerDeclaration, ITypeMemberDeclaration
+    {
+      var name = decl.DeclaredName;
+      if (!name.StartsWith("op_", StringComparison.Ordinal))
+        return null;
+
+      switch (name)
+      {
+        case StandardOperatorNames.Explicit:
+          return new FSharpConversionOperator<TDeclaration>(decl, true);
+        case StandardOperatorNames.Implicit:
+          return new FSharpConversionOperator<TDeclaration>(decl, false);
+        default:
+          return new FSharpSignOperator<TDeclaration>(decl);
+      }
+    }
   }
 }

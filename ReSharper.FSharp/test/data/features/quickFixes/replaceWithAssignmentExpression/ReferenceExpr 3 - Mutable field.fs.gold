@@ -1,6 +1,4 @@
-﻿module Module
-
-type MyType() =
+﻿type MyType() =
     [<DefaultValue>] val mutable Field: int
 
 let f() =

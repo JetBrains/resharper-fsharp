@@ -41,7 +41,7 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
     let rec isLiteralBinding (binding: IBinding): bool =
         if hasLiteralAttribute binding.AttributesEnumerable then true else
 
-        let letBindings = LetModuleDeclNavigator.GetByBinding(binding)
+        let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
         if isNull letBindings || letBindings.Bindings.[0] != binding then false else
 
         hasLiteralAttribute letBindings.AttributesEnumerable

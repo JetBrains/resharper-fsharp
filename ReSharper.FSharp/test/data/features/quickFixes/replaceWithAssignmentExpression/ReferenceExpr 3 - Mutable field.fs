@@ -1,5 +1,3 @@
-module Module
-
 type MyType() =
     [<DefaultValue>] val mutable Field: int
 

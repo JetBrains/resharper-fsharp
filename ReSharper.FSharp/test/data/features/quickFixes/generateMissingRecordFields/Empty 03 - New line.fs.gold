@@ -1,6 +1,4 @@
-﻿module Module
-
-type R = { A: int; B: int }
+﻿type R = { A: int; B: int }
 
 let r: R = { A = {selstart}failwith "todo"{selend}
              B = failwith "todo" }

@@ -1,4 +1,2 @@
-﻿module Module
-
-do
+﻿do
     {caret}1 + 1

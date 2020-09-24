@@ -10,7 +10,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class NewUnionCaseMethod : FSharpGeneratedMethodBase, IFSharpGeneratedFromOtherElement
+  public class NewUnionCaseMethod : FSharpGeneratedMethodBase, IFSharpGeneratedFromUnionCase
   {
     [NotNull] internal IUnionCase UnionCase { get; }
 

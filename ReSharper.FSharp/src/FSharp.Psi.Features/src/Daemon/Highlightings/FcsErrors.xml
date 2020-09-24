@@ -1,0 +1,289 @@
+<Errors language="F#">
+
+  <Usings>
+    JetBrains.ReSharper.Intentions.QuickFixes;
+    JetBrains.ReSharper.Plugins.FSharp.Psi;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+  </Usings>
+
+  <StaticSeverityGroups>
+    <Group name="F# Errors" key="FSharpErrors"/>
+  </StaticSeverityGroups>
+
+  <Warning staticGroup="FSharpErrors" name="UseBindingsIllegalInModules">
+    <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
+    <Message value="'use' bindings are treated as 'let' bindings in modules"/>
+    <Range>letBindings.BindingKeyword.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceUseWithLetFix</QuickFix>
+  </Warning>
+
+  <Error staticGroup="FSharpErrors" name="UseKeywordIllegalInPrimaryCtor">
+    <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
+    <Message value="'use' bindings are not permitted in primary constructors"/>
+    <Range>letBindings.BindingKeyword.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceUseWithLetFix</QuickFix>
+  </Error>
+
+  <Warning staticGroup="FSharpErrors" name="MatchIncomplete">
+    <Parameter type="IMatchExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.Expression.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddMatchAllClauseFix</QuickFix>
+    <QuickFix>AddDiscriminatedUnionAllClauses</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="EnumMatchIncomplete">
+    <Parameter type="IMatchExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.Expression.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddMatchAllClauseFix</QuickFix>
+  </Warning>
+  
+  <Warning staticGroup="FSharpErrors" name="RuleNeverMatched">
+    <Parameter type="IMatchClause" name="matchClause"/>
+    <Message value="This rule will never be matched"/>
+    <Range>matchClause.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveNeverMatchingRuleFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="UnusedThisVariable">
+    <Parameter type="ICtorSelfId" name="selfId"/>
+    <Message value="The self reference is unused and adds runtime initialization checks to members in this and derived types"/>
+    <Range>selfId.Identifier.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveUnusedSelfIdVariableFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="UnusedValue">
+    <Parameter type="INamedPat" name="pat"/>
+    <Message value="The value '{0}' is unused">
+      <Argument>pat.SourceName</Argument>
+    </Message>
+    <Range>pat.GetNavigationRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithWildPatFix</QuickFix>
+    <QuickFix>AddUnderscorePrefixFix</QuickFix>
+    <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
+    <QuickFix>RemoveUnusedNamedAsPatFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddIgnoreFix</QuickFix>
+    <QuickFix>IntroduceVarFix</QuickFix>
+    <QuickFix>RemoveSubsequentFix</QuickFix>
+    <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="FunctionValueUnexpected">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddIgnoreFix</QuickFix>
+    <QuickFix>IntroduceVarFix</QuickFix>
+    <QuickFix>RemoveSubsequentFix</QuickFix>
+  </Warning>
+  
+  <Error staticGroup="FSharpErrors" name="UnitTypeExpected">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddIgnoreFix</QuickFix>
+    <QuickFix>IntroduceVarFix</QuickFix>
+  </Error>
+
+  <Warning staticGroup="FSharpErrors" name="TypeTestUnnecessary">
+    <Parameter type="IDowncastExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ToUpcastFix</QuickFix>
+  </Warning>
+
+  <Error staticGroup="FSharpErrors" name="FieldRequiresAssignment">
+    <Parameter type="IRecordExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateMissingRecordFieldsFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="EmptyRecordInvalid">
+    <Parameter type="IRecordExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateMissingRecordFieldsFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="LetAndForNonRecBindings">
+    <Parameter type="ILetBindings" name="letBindings"/>
+    <Range>(letBindings.Separators |> Seq.tryHead |> Option.defaultWith (fun _ -> letBindings.BindingKeyword)).GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings"/>
+    <QuickFix>ToRecursiveLetBindingsFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="LocalClassBindingsCannotBeInline">
+    <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
+    <Range>letBindings.InlineKeyword.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Class local bindings cannot be inline"/>
+    <QuickFix>RemoveInlineFix</QuickFix>
+  </Error>
+  
+  <Warning staticGroup="FSharpErrors" name="UpcastUnnecessary">
+    <Parameter type="IUpcastExpr" name="upcastExpr"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Range>getUpcastRange upcastExpr</Range>
+    <Message value="Upcast is unnecessary"/>
+    <QuickFix>RemoveUnnecessaryUpcastFix</QuickFix>
+  </Warning>
+
+  <Error staticGroup="FSharpErrors" name="VarBoundTwice">
+    <Parameter type="INamedPat" name="pat"/>
+    <Message value="'{0}' is bound multiple times">
+      <Argument>pat.SourceName</Argument>
+    </Message>
+    <Range>pat.GetNavigationRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithWildPatFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="UndefinedName">
+    <Parameter type="FSharpSymbolReference" name="reference"/> <!-- todo: change to IReference? -->
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <!--todo: identifier null check-->
+    <Range>reference.GetElement().FSharpIdentifier.GetHighlightingRange()</Range>
+    <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
+    <QuickFix>ToRecursiveFunctionFix</QuickFix>
+    <QuickFix arguments="h.Reference">ImportTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">ReferenceModuleAndTypeFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="UndefinedIndexer">
+    <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
+    <Range>getIndexerArgListRange indexerExpr</Range>
+    <Message value="Cannot apply indexing to an expression"/>
+    <Behavour overlapResolvePolicy="NONE"/>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="SuccessiveArgsShouldBeSpacedOrTupled">
+    <Parameter type="IPrefixAppExpr" name="expr"/>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Message value="Successive arguments should be separated by spaces, tupled, or parenthesized"/>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddParensFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
+    <Range>letExpr.BindingKeyword.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="'{0}' is missing expression">
+      <Argument>getLetTokenText letExpr.BindingKeyword</Argument>
+    </Message>
+    <QuickFix>ReplaceLetWithExpressionFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="NotAFunction">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="IPrefixAppExpr" name="prefixApp"/>
+    <Message value="{0}">
+      <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
+    </Message>
+    <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression.GetHighlightingRange()</Range>
+    <SecondaryRanges>getAllExpressionArgs expr |> Seq.tail |> getExpressionsRanges</SecondaryRanges>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddParensToApplicationFix</QuickFix>
+    <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="FieldOrValueNotMutable">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message value="{0} is not mutable">
+      <Argument>refExpr.Identifier.GetSourceName()</Argument>
+    </Message>
+    <Range>getRefExprNameRange refExpr</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ToMutableFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="NoImplementationGiven">
+    <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>typeDecl.GetNameDocumentRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ToAbstractFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression">
+    <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
+    <Message value="`return` may only be used within computation expressions"/>
+    <Range>yieldExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveYieldFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="YieldRequiresSeqExpression">
+    <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
+    <Message value="`yield` may only be used within list, array, and sequence expressions"/>
+    <Range>yieldExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveYieldFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="NamespaceCannotContainValues">
+    <Parameter type="IFSharpIdentifier" name="identifier"/>
+    <Message value="Namespaces cannot contain values or functions"/>
+    <Range>identifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>NamespaceToModuleFix</QuickFix>
+  </Error>
+
+</Errors>

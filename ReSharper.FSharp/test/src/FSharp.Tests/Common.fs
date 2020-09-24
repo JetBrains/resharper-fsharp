@@ -50,6 +50,10 @@ type FSharpTestAttribute(extension) =
         member x.GetProjectProperties(targetFrameworkIds, _) =
             FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
+    interface ITestProjectOutputTypeProvider with
+        member x.Priority = -1
+        member x.ProjectOutputType = ProjectOutputType.CONSOLE_EXE
+
     interface ITestProjectFilePropertiesProvider with
         member x.Process(path, properties, projectDescriptor) =
             if FSharpTestAttribute.extensions.Contains(path.ExtensionWithDot) then

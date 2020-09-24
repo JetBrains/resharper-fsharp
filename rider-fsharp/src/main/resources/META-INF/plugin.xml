@@ -82,8 +82,6 @@
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
     </intentionAction>
 
-    <registryKey key="rider.fsharp.experimental" description="Enable experimental F# features" defaultValue="false" restartRequired="false"/>
-    <registryKey key="rider.fsharp.formatter" description="Enable F# code formatter" defaultValue="false" restartRequired="false"/>
     <registryKey key="rider.fsharp.fcsBusyDelay.ms" description="Number of milliseconds that the FCS reactor must be busy for before showing a background task" defaultValue="5000" restartRequired="false"/>
 
     <rdclient.traceScenarioHolder implementation="com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios"/>

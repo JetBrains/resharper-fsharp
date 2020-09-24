@@ -1,15 +1,15 @@
 ﻿Pattern
 ---
-TO: [O] let mutable |aaa| = 123 RANGE: (29,32) @ Write - Expr 02 - Paren.fs
+UsageOther TO: [O] let mutable |aaa| = 123 RANGE: (29,32) @ Write - Expr 02 - Paren.fs
 
 
 Write access
 ---
-TO: [W] (|aaa|) <- aaa + 1 RANGE: (41,44) @ Write - Expr 02 - Paren.fs
+UsageWrite TO: [W] (|aaa|) <- aaa + 1 RANGE: (41,44) @ Write - Expr 02 - Paren.fs
 
 
 Read access
 ---
-TO: [R] (aaa) <- |aaa| + 1 RANGE: (49,52) @ Write - Expr 02 - Paren.fs
+UsageRead TO: [R] (aaa) <- |aaa| + 1 RANGE: (49,52) @ Write - Expr 02 - Paren.fs
 
 

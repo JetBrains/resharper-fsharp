@@ -13,14 +13,10 @@ class FSharpHost(project: Project) : LifetimedProjectComponent(project) {
     private val fSharpModel = project.solution.rdFSharpModel
 
     companion object {
-        const val experimentalFeaturesRegistryKey = "rider.fsharp.experimental"
-        const val formatterRegistryKey = "rider.fsharp.formatter"
         const val fcsBusyDelayRegistryKey = "rider.fsharp.fcsBusyDelay.ms"
     }
 
     init {
-        initRegistryValue(experimentalFeaturesRegistryKey, RegistryValue::asBoolean, fSharpModel.enableExperimentalFeatures)
-        initRegistryValue(formatterRegistryKey, RegistryValue::asBoolean, fSharpModel.enableFormatter)
         initRegistryValue(fcsBusyDelayRegistryKey, RegistryValue::asInteger, fSharpModel.fcsBusyDelayMs)
     }
 

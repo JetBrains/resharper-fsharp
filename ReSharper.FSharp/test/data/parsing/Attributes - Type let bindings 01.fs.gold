@@ -7,7 +7,7 @@ IFSharpImplFile
       IObjectTypeDeclaration
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
         IImplicitConstructorDeclaration
-          IMemberParamsDeclaration
+          IParametersPatternDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
@@ -15,7 +15,7 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        ILetModuleDecl
+        ILetBindingsDeclaration
           IAttributeList
             FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
             IAttribute

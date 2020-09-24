@@ -1,5 +1,3 @@
-module Module
-
 open System
 
 type {caret}System.String with
