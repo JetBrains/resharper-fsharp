@@ -1,31 +1,32 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
-    IDo
+    IDoStatement
       IChameleonExpression
         ILambdaExpr
           FSharpTokenType+FunTokenElement(type:FUN, text:fun)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IParenPat
-            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            IAttribPat
-              IAttributeList
-                FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
-                IAttribute
-                  ITypeReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-                FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              ITypedPat
-                ILocalReferencePat
-                  IExpressionReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:a)
-                FSharpTokenType+ColonTokenElement(type:COLON, text::)
+          ILambdaParametersList
+            IParenPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IAttribPat
+                IAttributeList
+                  FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+                  IAttribute
+                    ITypeReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+                  FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                INamedTypeUsage
-                  ITypeReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
-            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                ITypedPat
+                  ILocalReferencePat
+                    IExpressionReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:a)
+                  FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  INamedTypeUsage
+                    ITypeReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

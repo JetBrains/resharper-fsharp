@@ -1,0 +1,3 @@
+﻿module Module
+
+let f{caret} (a: int) (b: string): string = sprintf "%s %d" a b

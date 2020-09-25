@@ -21,7 +21,7 @@ IFSharpImplFile
           FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpIdentifierToken(type:IDENTIFIER, text:M)
-          IMemberParamsDeclaration
+          IParametersPatternDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               ITypedPat

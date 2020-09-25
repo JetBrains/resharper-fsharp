@@ -1,15 +1,15 @@
 ﻿Other
 ---
-TO: [O] abstract M: |int| RANGE: (46,49) @ Base Type - Object expressions 01 - Class.fs
+UsageOther TO: [O] abstract M: |int| RANGE: (46,49) @ Base Type - Object expressions 01 - Class.fs
 
 
 Pattern
 ---
-TO: [O] let |t| = { RANGE: (80,81) @ Base Type - Object expressions 01 - Class.fs
+UsageOther TO: [O] let |t| = { RANGE: (80,81) @ Base Type - Object expressions 01 - Class.fs
 
 
 Base type
 ---
-TO: [O] new |Ta|() with RANGE: (95,97) @ Base Type - Object expressions 01 - Class.fs
+UsageExtendedType TO: [O] new |Ta|() with RANGE: (95,97) @ Base Type - Object expressions 01 - Class.fs
 
 

@@ -1,10 +1,10 @@
 ﻿Pattern
 ---
-TO: [O] let |e|: Exn = () RANGE: (38,39) @ Exception - Singleton 02 - Type specification.fs
+UsageOther TO: [O] let |e|: Exn = () RANGE: (38,39) @ Exception - Singleton 02 - Type specification.fs
 
 
 Type specification
 ---
-TO: [O] let e: |Exn| = () RANGE: (41,44) @ Exception - Singleton 02 - Type specification.fs
+UsageOther TO: [O] let e: |Exn| = () RANGE: (41,44) @ Exception - Singleton 02 - Type specification.fs
 
 

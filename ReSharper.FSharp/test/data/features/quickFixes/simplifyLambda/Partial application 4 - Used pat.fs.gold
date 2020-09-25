@@ -1,0 +1,3 @@
+﻿let f x y z = ()
+
+fun _ (a, b) ->{caret} f a (a, b)

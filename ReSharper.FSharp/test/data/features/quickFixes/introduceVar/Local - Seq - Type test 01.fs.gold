@@ -1,5 +1,3 @@
-﻿module Module
-
-do
+﻿do
     let {selstart}boolean{selend} = "" :? string
     ()

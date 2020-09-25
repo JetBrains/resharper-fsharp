@@ -1,11 +1,11 @@
 ﻿Pattern
 ---
-TO: [O] let { |Foo| = { Bar.Baz = 1 } } = () RANGE: (6,9) @ Pattern - Record 02 - Nested.fs
-TO: [O] let { Foo = { Bar.|Baz| = 1 } } = () RANGE: (18,21) @ Pattern - Record 02 - Nested.fs
+UsageOther TO: [O] let { |Foo| = { Bar.Baz = 1 } } = () RANGE: (6,9) @ Pattern - Record 02 - Nested.fs
+UsageOther TO: [O] let { Foo = { Bar.|Baz| = 1 } } = () RANGE: (18,21) @ Pattern - Record 02 - Nested.fs
 
 
 Other
 ---
-TO: [O] let { Foo = { |Bar|.Baz = 1 } } = () RANGE: (14,17) @ Pattern - Record 02 - Nested.fs
+UsageOther TO: [O] let { Foo = { |Bar|.Baz = 1 } } = () RANGE: (14,17) @ Pattern - Record 02 - Nested.fs
 
 

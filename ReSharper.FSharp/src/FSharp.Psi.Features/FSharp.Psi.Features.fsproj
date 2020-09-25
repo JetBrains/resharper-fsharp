@@ -17,6 +17,10 @@
     <Compile Include="src\Util\FSharpMethodInvocationUtil.fs" />
     <Compile Include="src\Util\FSharpVisualElementFactory.fs" />
     <Compile Include="src\Util\FSharpResolveUtil.fs" />
+    <Compile Include="src\Util\FcsTypesUtil.fs" />
+    <Compile Include="src\Util\FSharpModulesUtil.fs" />
+    <Compile Include="src\Util\FSharpNamingService.fs" />
+    <Compile Include="src\Util\FSharpLambdaUtil.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
@@ -27,13 +31,22 @@
     <Compile Include="src\Daemon\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
-    <Compile Include="src\Daemon\Highlightings\CommonErrors.Generated.fs">
-      <DependentUpon>CommonErrors.xml</DependentUpon>
+    <Compile Include="src\Daemon\Highlightings\Errors.Generated.fs">
+      <DependentUpon>Errors.xml</DependentUpon>
     </Compile>
-    <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
+    <ErrorsGen Include="src\Daemon\Highlightings\Errors.xml">
       <Mode>ERRORS</Mode>
-      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.CommonErrors</Namespace>
-      <OutputFile>src\Daemon\Highlightings\CommonErrors.Generated.fs</OutputFile>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors</Namespace>
+      <OutputFile>src\Daemon\Highlightings\Errors.Generated.fs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
+    <Compile Include="src\Daemon\Highlightings\FcsErrors.Generated.fs">
+      <DependentUpon>FcsErrors.xml</DependentUpon>
+    </Compile>
+    <ErrorsGen Include="src\Daemon\Highlightings\FcsErrors.xml">
+      <Mode>ERRORS</Mode>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FcsErrors</Namespace>
+      <OutputFile>src\Daemon\Highlightings\FcsErrors.Generated.fs</OutputFile>
       <SubType>Designer</SubType>
     </ErrorsGen>
     <Compile Include="src\Daemon\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
@@ -59,12 +72,17 @@
     <Compile Include="src\Daemon\Analyzers\RedundantBackticksAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantNew.fs" />
     <Compile Include="src\Daemon\Analyzers\LetDisposableAnalyzer.fs" />
-    <Compile Include="src\Daemon\Analyzers\RedundantParenAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\RedundantParenExprAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\RedundantParenPatAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\InactivePreprocessorBranchAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantAttributeParensAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantAttributeSuffixAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\ColorReferenceAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantQualifierAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\RedundantUnionCaseFieldPatsAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\ListConsPatAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\AppExpressionAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\LambdaAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
@@ -95,7 +113,6 @@
     <Compile Include="src\Parsing\FSharpImplTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpSigTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpParser.fs" />
-    <Compile Include="src\Refactorings\FSharpNamingService.fs" />
     <Compile Include="src\Refactorings\Rename.fs" />
     <Compile Include="src\Refactorings\IntroduceVariable.fs" />
     <Compile Include="src\Refactorings\FSharpInlineVariable.fs" />
@@ -111,14 +128,21 @@
     <Compile Include="src\Intentions\IfToElifAction.fs" />
     <Compile Include="src\Intentions\NegateConditionActions.fs" />
     <Compile Include="src\Intentions\ToMutableAction.fs" />
+    <Compile Include="src\Intentions\FunctionAnnotationAction.fs" />
     <Compile Include="src\Intentions\ToLiteralAction.fs" />
     <Compile Include="src\Intentions\GenerateMissingInterfaceImplementation.fs" />
     <Compile Include="src\Intentions\SetNameAction.fs" />
     <Compile Include="src\Intentions\LetToUseAction.fs" />
-    <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
+    <ErrorsGen Include="src\Daemon\Highlightings\Errors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
       <OutputFile>src\QuickFixes\CommonQuickFixes.Generated.fs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
+    <ErrorsGen Include="src\Daemon\Highlightings\FcsErrors.xml">
+      <Mode>QUICKFIX</Mode>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
+      <OutputFile>src\QuickFixes\FcsErrorsQuickFixes.Generated.fs</OutputFile>
       <SubType>Designer</SubType>
     </ErrorsGen>
     <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
@@ -155,7 +179,14 @@
     <Compile Include="src\QuickFixes\RemoveRedundantQualifierFix.fs" />
     <Compile Include="src\QuickFixes\AddParensToApplicationFix.fs" />
     <Compile Include="src\QuickFixes\AddExtensionAttributeFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithInnerExpressionFixBase.fs" />
     <Compile Include="src\QuickFixes\RemoveRedundantParenExprFix.fs" />
+    <Compile Include="src\QuickFixes\NamespaceToModuleFix.fs" />
+    <Compile Include="src\QuickFixes\SimplifyListConsPatFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceAppExprWithArgFix.fs" />
+    <Compile Include="src\QuickFixes\SimplifyLambdaFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLambdaWithInnerExpressionFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceExpressionWithIdFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />
@@ -183,9 +214,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Daemon.FSharp\Daemon.FSharp.csproj" />
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
-    <ProjectReference Include="..\Services.FSharp\Services.FSharp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

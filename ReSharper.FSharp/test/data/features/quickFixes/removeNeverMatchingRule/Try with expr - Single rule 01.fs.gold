@@ -1,6 +1,4 @@
-﻿module Module
-
-do        
+﻿do        
     try
         ()
     with

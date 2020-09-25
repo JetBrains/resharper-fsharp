@@ -32,7 +32,7 @@ type LetToUseAction(dataProvider: FSharpContextActionDataProvider) =
         use writeCookie = WriteLockCookie.Create(letExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let tokenType = getTokenType letExpr.LetOrUseToken
+        let tokenType = getTokenType letExpr.BindingKeyword
         let tokenType = if tokenType == FSharpTokenType.LET_BANG then FSharpTokenType.USE_BANG else FSharpTokenType.USE
 
-        ModificationUtil.ReplaceChild(letExpr.LetOrUseToken, tokenType.CreateLeafElement()) |> ignore
+        ModificationUtil.ReplaceChild(letExpr.BindingKeyword, tokenType.CreateLeafElement()) |> ignore

@@ -1,6 +1,4 @@
-﻿module Module
-
-async {
+﻿async {
     {caret}()
     ()
 }

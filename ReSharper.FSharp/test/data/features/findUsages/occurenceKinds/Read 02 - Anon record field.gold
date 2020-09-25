@@ -1,16 +1,16 @@
 ﻿Pattern
 ---
-TO: [O] let |ar| = {| F = 1 |} RANGE: (21,23) @ Read 02 - Anon record field.fs
+UsageOther TO: [O] let |ar| = {| F = 1 |} RANGE: (21,23) @ Read 02 - Anon record field.fs
 
 
 Write access
 ---
-TO: [W] let ar = {| |F| = 1 |} RANGE: (29,30) @ Read 02 - Anon record field.fs
+UsageWrite TO: [W] let ar = {| |F| = 1 |} RANGE: (29,30) @ Read 02 - Anon record field.fs
 
 
 Read access
 ---
-TO: [R] ar.|F| RANGE: (42,43) @ Read 02 - Anon record field.fs
-TO: [R] |ar|.F RANGE: (39,41) @ Read 02 - Anon record field.fs
+UsageRead TO: [R] ar.|F| RANGE: (42,43) @ Read 02 - Anon record field.fs
+UsageRead TO: [R] |ar|.F RANGE: (39,41) @ Read 02 - Anon record field.fs
 
 

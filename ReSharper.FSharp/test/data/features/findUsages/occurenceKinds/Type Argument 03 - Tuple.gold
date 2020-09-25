@@ -1,21 +1,21 @@
 ﻿Pattern
 ---
-TO: [O] let |l| = List<string * string>() RANGE: (21,22) @ Type Argument 03 - Tuple.fs
+UsageOther TO: [O] let |l| = List<string * string>() RANGE: (21,22) @ Type Argument 03 - Tuple.fs
 
 
 Other
 ---
-TO: [O] let l = |List|<string * string>() RANGE: (25,29) @ Type Argument 03 - Tuple.fs
+UsageOther TO: [O] let l = |List|<string * string>() RANGE: (25,29) @ Type Argument 03 - Tuple.fs
 
 
 New instance creation
 ---
-TO: [O] let l = |List|<string * string>() RANGE: (25,29) @ Type Argument 03 - Tuple.fs
+UsageInstanceCreation TO: [O] let l = |List|<string * string>() RANGE: (25,29) @ Type Argument 03 - Tuple.fs
 
 
 Type argument
 ---
-TO: [O] let l = List<|string| * string>() RANGE: (30,36) @ Type Argument 03 - Tuple.fs
-TO: [O] let l = List<string * |string|>() RANGE: (39,45) @ Type Argument 03 - Tuple.fs
+UsageTypeArgument TO: [O] let l = List<|string| * string>() RANGE: (30,36) @ Type Argument 03 - Tuple.fs
+UsageTypeArgument TO: [O] let l = List<string * |string|>() RANGE: (39,45) @ Type Argument 03 - Tuple.fs
 
 

@@ -1,0 +1,56 @@
+﻿-------------- offset 64 line 5 col 17 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [I] U u = U.|NewA|(123); RANGE: (60,64) @ Union case 01 - Fields.cs
+Menu Item presentation: 
+Text: Class1.Class1      |U u = U.|NewA|(123);| (5)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: U u = U.NewA(123);
+
+Occurrence's navigation result. Opened file: Union case 01 - Fields.cs
+------------------
+  public Class1()
+  {
+    U u = U.NewA|CARET|(123);
+    var isA = u.IsA;
+  }
+------------------
+
+Occurrence's dump:
+TO: [R] var isA = u.|IsA|; RANGE: (88,91) @ Union case 01 - Fields.cs
+Menu Item presentation: 
+Text: Class1.Class1      |var isA = u.|IsA|;| (6)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: var isA = u.IsA;
+
+Occurrence's navigation result. Opened file: Union case 01 - Fields.cs
+------------------
+  {
+    U u = U.NewA(123);
+    var isA = u.|CARET|IsA;
+  }
+}
+------------------
+
+Occurrence's dump:
+TO: [O] let a = |A|(123) RANGE: (86,87) @ Union case 01 - Fields.fs
+Menu Item presentation: 
+Text: Module.a      |let a = |A|(123)| (8)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: let a = A(123)
+
+Occurrence's navigation result. Opened file: Union case 01 - Fields.fs
+------------------
+
+module Module =
+    let a = |CARET|A(123)
+
+------------------
+

@@ -1,15 +1,12 @@
-using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class ModuleValue : FSharpPropertyBase<TopPatternDeclarationBase>, IMutableModifierOwner
   {
-    public ModuleValue([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+    public ModuleValue([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
@@ -27,5 +24,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetDeclaration() is IMutableModifierOwner mutableModifierOwner && mutableModifierOwner.CanBeMutable;
 
     public override bool IsStatic => true;
+
+    public override bool IsReadable => true;
+    public override bool IsWritable => Mfv?.IsMutable ?? false;
   }
 }

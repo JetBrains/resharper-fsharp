@@ -1,4 +1,2 @@
-﻿module Module
-
-let _ =
+﻿let _ =
     {caret}()

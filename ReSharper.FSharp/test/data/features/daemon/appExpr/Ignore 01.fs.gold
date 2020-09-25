@@ -1,0 +1,22 @@
+﻿ignore 1
+|ignore|(0) ()
+
+|ignore|(1) (ignore 1)
+|ignore|(2) (|ignore|(3) ())
+1 |> ignore ||> ignore|(4)
+() ||> ignore|(5) ||> ignore|(6)
+
+|ignore <||(7) (ignore <| 1)
+|ignore <||(8) (|ignore <||(9) ())
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant application
+(1): ReSharper Dead Code: Redundant application
+(2): ReSharper Dead Code: Redundant application
+(3): ReSharper Dead Code: Redundant application
+(4): ReSharper Dead Code: Redundant application
+(5): ReSharper Dead Code: Redundant application
+(6): ReSharper Dead Code: Redundant application
+(7): ReSharper Dead Code: Redundant application
+(8): ReSharper Dead Code: Redundant application
+(9): ReSharper Dead Code: Redundant application

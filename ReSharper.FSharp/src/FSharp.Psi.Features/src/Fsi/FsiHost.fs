@@ -39,7 +39,11 @@ type FsiHost
             else
                 fsiDetector.GetActiveTool(solution, fsiOptions)
 
-        let fsiPath = fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
+        let fsiPath =
+            if fsiOptions.IsCustomTool.Value then
+                fsiOptions.FsiPathAsPath
+            else
+                fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
 
         let args =
             [| yield! stringArrayArgs fsiOptions.FsiArgs.Value

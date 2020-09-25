@@ -1,20 +1,20 @@
 ﻿Field declaration
 ---
-TO: [O] type R = { mutable F: |int| } RANGE: (39,42) @ Write - Record 01.fs
+UsageFieldTypeDeclaration TO: [O] type R = { mutable F: |int| } RANGE: (39,42) @ Write - Record 01.fs
 
 
 Pattern
 ---
-TO: [O] let |r| = { F = 123 } RANGE: (50,51) @ Write - Record 01.fs
+UsageOther TO: [O] let |r| = { F = 123 } RANGE: (50,51) @ Write - Record 01.fs
 
 
 New instance creation
 ---
-TO: [O] let r = |{ F = 123 }| RANGE: (54,65) @ Write - Record 01.fs
+UsageInstanceCreation TO: [O] let r = |{ F = 123 }| RANGE: (54,65) @ Write - Record 01.fs
 
 
 Write access
 ---
-TO: [W] let r = { |F| = 123 } RANGE: (56,57) @ Write - Record 01.fs
+UsageWrite TO: [W] let r = { |F| = 123 } RANGE: (56,57) @ Write - Record 01.fs
 
 

@@ -66,6 +66,11 @@ type FSharpRenameTest() =
     [<Test>] member x.``Module binding - Record pat 03 - nested named pat``() = x.DoNamedTest()
     [<Test>] member x.``Module binding - Record pat 04 - nested named pat 2``() = x.DoNamedTest()
 
+    [<Test>] member x.``Literal pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Literal pattern 02``() = x.DoNamedTest()
+    [<Test>] member x.``Literal pattern 03``() = x.DoNamedTest()
+    [<Test>] member x.``Literal pattern 04 - Qualified``() = x.DoNamedTest()
+
     [<Test>] member x.``Params - Declaration``() = x.DoNamedTest()
     [<Test>] member x.``Params - Use``() = x.DoNamedTest()
     [<Test>] member x.``Params - Or``() = x.DoNamedTest()

@@ -1,4 +1,3 @@
-import com.jetbrains.rider.model.RdFcsHost
 import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
 import com.jetbrains.rider.projectView.solution
@@ -18,8 +17,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
     override val restoreNuGetPackages: Boolean
         get() = true
 
-    private val fcsHost: RdFcsHost
-        get() = project.solution.rdFSharpModel.fcsHost
+    private val fcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
 
     private fun moveItem(from: Array<Array<String>>, to: Array<String>, orderType: ActionOrderType? = null) {
         // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.

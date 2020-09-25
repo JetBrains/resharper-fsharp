@@ -1,10 +1,10 @@
 ﻿Type checking
 ---
-TO: [O] | :? |IList|<string> -> () RANGE: (37,42) @ Type Argument 02 - Pattern.fs
+UsagePatternChecking TO: [O] | :? |IList|<string> -> () RANGE: (37,42) @ Type Argument 02 - Pattern.fs
 
 
 Type argument
 ---
-TO: [O] | :? IList<|string|> -> () RANGE: (43,49) @ Type Argument 02 - Pattern.fs
+UsageTypeArgument TO: [O] | :? IList<|string|> -> () RANGE: (43,49) @ Type Argument 02 - Pattern.fs
 
 

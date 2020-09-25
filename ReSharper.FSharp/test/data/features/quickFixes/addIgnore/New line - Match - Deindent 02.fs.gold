@@ -1,6 +1,4 @@
-﻿module Module
-
-while true do
+﻿while true do
     match () with
     | _ -> [
     ]

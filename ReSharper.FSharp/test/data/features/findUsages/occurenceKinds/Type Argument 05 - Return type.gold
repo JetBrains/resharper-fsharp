@@ -1,15 +1,15 @@
 ﻿Pattern
 ---
-TO: [O] let |l|: List<string> = () RANGE: (21,22) @ Type Argument 05 - Return type.fs
+UsageOther TO: [O] let |l|: List<string> = () RANGE: (21,22) @ Type Argument 05 - Return type.fs
 
 
 Type specification
 ---
-TO: [O] let l: |List|<string> = () RANGE: (24,28) @ Type Argument 05 - Return type.fs
+UsageOther TO: [O] let l: |List|<string> = () RANGE: (24,28) @ Type Argument 05 - Return type.fs
 
 
 Type argument
 ---
-TO: [O] let l: List<|string|> = () RANGE: (29,35) @ Type Argument 05 - Return type.fs
+UsageTypeArgument TO: [O] let l: List<|string|> = () RANGE: (29,35) @ Type Argument 05 - Return type.fs
 
 

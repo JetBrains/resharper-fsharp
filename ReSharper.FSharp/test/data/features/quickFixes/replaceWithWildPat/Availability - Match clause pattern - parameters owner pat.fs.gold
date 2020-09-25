@@ -1,0 +1,15 @@
+﻿module Module
+
+match Some((1, 2)) with
+| Some(|x|(0), y) when y > 5 -> ()
+| _ -> ()
+
+------------------------------------------------
+0: The value 'x' is unused
+QUICKFIXES:
+Replace with '_'
+--Replace unused values with '_' in 'Some' pattern
+--Replace unused values with '_' in file
+--Replace unused values with '_' in project
+--Replace unused values with '_' in solution
+Rename to '_x'

@@ -1,4 +1,2 @@
-﻿module Module
-
-type T() =
+﻿type T() =
     let{caret} foo x = 1

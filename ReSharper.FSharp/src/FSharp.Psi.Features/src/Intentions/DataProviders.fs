@@ -58,7 +58,7 @@ let isAtTreeNode (dataProvider: IContextActionDataProvider) (node: ITreeNode) =
 let isAtLetExprKeywordOrNamedPat (dataProvider: IContextActionDataProvider) (letBindings: ILetBindings) =
     if isNull letBindings then false else
 
-    let letToken = letBindings.LetOrUseToken
+    let letToken = letBindings.BindingKeyword
     if isNull letToken then false else
 
     let ranges = DisjointedTreeTextRange.From(letToken)

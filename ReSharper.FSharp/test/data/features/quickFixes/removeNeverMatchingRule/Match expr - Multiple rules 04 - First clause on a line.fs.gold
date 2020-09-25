@@ -1,6 +1,4 @@
-﻿module Module
-
-do
+﻿do
     match 0 with
     | a -> ()
     {caret}| c -> ()

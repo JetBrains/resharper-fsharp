@@ -1,5 +1,3 @@
-module Module
-
 let g = (id 2) // first comment
                // second comment
                {caret}5

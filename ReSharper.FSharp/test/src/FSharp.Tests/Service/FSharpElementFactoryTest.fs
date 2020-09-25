@@ -45,4 +45,3 @@ type FSharpElementFactoryTest() =
             Assert.AreEqual(1, wildPat.Children().Count())
             Assert.AreEqual(FSharpTokenType.UNDERSCORE, wildPat.FirstChild.GetTokenType())
             Assert.AreEqual("_", wildPat.GetText()))
-        

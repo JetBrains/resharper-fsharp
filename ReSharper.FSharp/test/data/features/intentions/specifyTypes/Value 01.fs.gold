@@ -1,0 +1,3 @@
+﻿module Module
+
+let v: string * int{caret} = ("foo", 1)

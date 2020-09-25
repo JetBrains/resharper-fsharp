@@ -1,5 +1,4 @@
-﻿module Module
-do
+﻿do
     let rec g x = (){caret}
 
     g ()

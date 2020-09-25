@@ -308,7 +308,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             for f in fields do x.ProcessField f fieldElementType
             not fields.IsEmpty
 
-        | UnionCaseFullType(_) ->
+        | UnionCaseFullType _ ->
             true // todo: used in FSharp.Core only, otherwise warning
 
     member x.ProcessSimpleTypeRepresentation(repr) =
@@ -460,7 +460,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | _ -> ()
 
         x.Done(range, parenPatMark, ElementType.PAREN_PAT)
-        x.Done(range, paramMark, ElementType.MEMBER_PARAMS_DECLARATION)
+        x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
 
     member x.ProcessImplicitCtorParam(pat: SynSimplePat) =
         match pat with

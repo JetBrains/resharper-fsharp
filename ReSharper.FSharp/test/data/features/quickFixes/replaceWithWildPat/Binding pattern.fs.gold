@@ -1,0 +1,2 @@
+﻿//${RUN:1}
+let f _{caret} _ z = z

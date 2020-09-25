@@ -67,8 +67,8 @@ type FSharpCodeStructureProvider() =
             for memberDecl in interfaceImpl.TypeMembers do
                 processNode memberDecl parent
 
-        | :? ILetModuleDecl as letDecl ->
-            for binding in Seq.cast<ITopBinding> letDecl.Bindings do
+        | :? ILetBindingsDeclaration as letBindings ->
+            for binding in Seq.cast<ITopBinding> letBindings.Bindings do
                 FSharpDeclarationCodeStructureElement(parent, binding) |> ignore
 
         | :? ITypeDeclarationGroup as declarationGroup ->
@@ -104,7 +104,7 @@ type FSharpDeclarationCodeStructureElement(parentElement, declaration: IDeclarat
 
     let language = declaration.Language
     let declarationPointer = declaration.GetPsiServices().Pointers.CreateTreeElementPointer(declaration)
-    let textRange = declaration.GetDocumentRange().TextRange
+    let textRange = declaration.GetDocumentRange()
     let aspects = CodeStructureDeclarationAspects(declaration)
 
     let getDeclaration () = declarationPointer.GetTreeNode()
@@ -180,7 +180,7 @@ type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconI
         member x.Remove() = raise (NotSupportedException())
         member x.CanRename() = false
         member x.InitialName() = raise (NotSupportedException())
-        member x.Rename(_) = ()
+        member x.Rename _ = ()
 
     interface IMemberNavigationAspect with
         member x.GetNavigationRanges() = [| navigationRange |]
@@ -193,8 +193,8 @@ type NamedIdentifierOwner(treeNode: INameIdentifierOwner, parent, iconId) =
 
     let textRange =
         match treeNode.NameIdentifier with
-        | null -> treeNode.GetNavigationRange().TextRange
-        | ident -> ident.GetDocumentRange().TextRange
+        | null -> treeNode.GetNavigationRange()
+        | ident -> ident.GetDocumentRange()
 
     override x.TreeNode = treeNodePointer.GetTreeNode() :> _
     override x.Language = FSharpLanguage.Instance :> _

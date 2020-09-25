@@ -1,5 +1,3 @@
-module Module
-
 type Record = {Field: int}
 
 let f() =

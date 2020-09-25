@@ -1,0 +1,4 @@
+﻿module Module
+
+let v: int -> unit{caret} =
+    fun (a: int) -> ()
