@@ -122,9 +122,9 @@ type VsFsiProvider() =
         member x.GetFsiTools _ =
             if not PlatformUtil.IsRunningUnderWindows then [] :> _ else
 
-            DevenvHostDiscovery.EnumInstalledVs()
+            DevenvHostDiscovery.EnumInstalledVs(DevenvHostDiscovery.EnumInstalledVsFlags.IncludeAllInstancesSinceVs15)
             |> Seq.choose (fun vs ->
-                let fsiDir = vs.InstallDir / "CommonExtensions" / "Microsoft" / "FSharp"
+                let fsiDir = vs.ProductRootDir / "Common7"/ "IDE" / "CommonExtensions" / "Microsoft" / "FSharp"
                 let fsiPath = fsiDir / defaultFsiName
 
                 if fsiPath.ExistsFile then
