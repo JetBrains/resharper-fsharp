@@ -15,3 +15,4 @@ type RedundantUnionCaseFieldPatsTest() =
         highlighting :? RedundantUnionCaseFieldPatternsWarning
 
     [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Nested pattern 01``() = x.DoNamedTest()

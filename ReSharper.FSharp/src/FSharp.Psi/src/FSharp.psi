@@ -221,6 +221,7 @@ interface fSharpPattern:
   optionalValPat |
   isInstPat |
   listPat |
+  listConsPat |
   wildPat |
   constPat |
   fieldPat |
