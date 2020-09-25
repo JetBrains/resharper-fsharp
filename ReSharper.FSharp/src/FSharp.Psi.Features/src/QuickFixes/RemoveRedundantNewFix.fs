@@ -16,7 +16,7 @@ type RemoveRedundantNewFix(warning: RedundantNewWarning) =
 
     override x.TryGetContextTreeNode() = newExpr :> _
 
-    override x.ExecutePsiTransaction(_) =
+    override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(newExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 

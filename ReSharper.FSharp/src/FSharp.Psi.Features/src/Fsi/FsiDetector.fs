@@ -119,7 +119,7 @@ type IFsiDirectoryProvider =
 
 type VsFsiProvider() =
     interface IFsiDirectoryProvider with
-        member x.GetFsiTools(_) =
+        member x.GetFsiTools _ =
             if not PlatformUtil.IsRunningUnderWindows then [] :> _ else
 
             DevenvHostDiscovery.EnumInstalledVs()
@@ -135,7 +135,7 @@ type VsFsiProvider() =
 
 type LegacyVsFsiProvider() =
     interface IFsiDirectoryProvider with
-        member x.GetFsiTools(_) =
+        member x.GetFsiTools _ =
             if not PlatformUtil.IsRunningUnderWindows then [] :> _ else
 
             let legacySdkPath = PlatformUtils.GetProgramFiles86() / "Microsoft SDKs" / "F#"
@@ -253,7 +253,7 @@ type CustomFsiProvider() =
     let tools = [| customTool |]
 
     interface IFsiDirectoryProvider with
-        member x.GetFsiTools(_) =
+        member x.GetFsiTools _ =
             tools :> _
 
 

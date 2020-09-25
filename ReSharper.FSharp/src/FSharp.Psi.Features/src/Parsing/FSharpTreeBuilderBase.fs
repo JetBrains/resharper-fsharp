@@ -308,7 +308,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             for f in fields do x.ProcessField f fieldElementType
             not fields.IsEmpty
 
-        | UnionCaseFullType(_) ->
+        | UnionCaseFullType _ ->
             true // todo: used in FSharp.Core only, otherwise warning
 
     member x.ProcessSimpleTypeRepresentation(repr) =

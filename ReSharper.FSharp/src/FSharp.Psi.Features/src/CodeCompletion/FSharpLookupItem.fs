@@ -26,7 +26,7 @@ type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocServ
     interface ICandidate with
         member x.GetSignature(_, _, _, _, _) = RichText(description)
         member x.GetDescription() = xmlDocService.GetXmlDoc(xmlDoc)
-        member x.Matches(_) = true
+        member x.Matches _ = true
 
         member x.GetParametersInfo(_, _) = ()
         member x.PositionalParameterCount = 0

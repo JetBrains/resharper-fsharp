@@ -180,7 +180,7 @@ type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconI
         member x.Remove() = raise (NotSupportedException())
         member x.CanRename() = false
         member x.InitialName() = raise (NotSupportedException())
-        member x.Rename(_) = ()
+        member x.Rename _ = ()
 
     interface IMemberNavigationAspect with
         member x.GetNavigationRanges() = [| navigationRange |]
