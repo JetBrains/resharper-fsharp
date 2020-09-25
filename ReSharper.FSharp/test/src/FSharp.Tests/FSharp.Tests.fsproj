@@ -82,15 +82,12 @@
     <Compile Include="QuickFixes\AddExtensionAttributeTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantParenExprTest.fs" />
     <Compile Include="QuickFixes\AddParensToApplicationTest.fs" />
-<<<<<<< HEAD
     <Compile Include="QuickFixes\AddDiscriminatedUnionAllClausesTest.fs" />
-=======
     <Compile Include="QuickFixes\NamespaceToModuleTest.fs" />
     <Compile Include="QuickFixes\SimplifyListConsPatTest.fs" />
     <Compile Include="QuickFixes\SimplifyLambdaTest.fs" />
     <Compile Include="QuickFixes\ReplaceLambdaWithInnerExpressionTest.fs" />
     <Compile Include="QuickFixes\ReplaceExpressionWithIdTest.fs" />
->>>>>>> net203
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

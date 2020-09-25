@@ -4,10 +4,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open FSharp.Compiler.SourceCodeServices
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
 type AddDiscriminatedUnionAllClauses(warning: MatchIncompleteWarning) =
     inherit FSharpQuickFixBase()
@@ -15,21 +15,13 @@ type AddDiscriminatedUnionAllClauses(warning: MatchIncompleteWarning) =
     override x.Text = "Autogenerate all discriminated union cases"
 
     override x.IsAvailable _ =
-        let refExpr = warning.Expr.Expression.As<IReferenceExpr>()
-        if isNull refExpr then false else
-        let symbol = refExpr.Reference.GetFSharpSymbol()
-        let typeValidForFix =
-            match symbol with
-            | :? FSharpMemberOrFunctionOrValue as mfv ->
-                mfv.FullType.HasTypeDefinition
-                && mfv.FullType.TypeDefinition.IsFSharpUnion
-            | _ -> false
-            
+        let fsharpType = warning.Expr.Expression.TryGetFcsType()
         
-        // TODO: In future could be made to handle partially complete cases, but for now just handle the simple empty case
         isValid warning.Expr
+        && (isNotNull fsharpType)
+        && fsharpType.HasTypeDefinition
         && warning.Expr.Clauses.IsEmpty
-        && typeValidForFix
+        && fsharpType.TypeDefinition.IsFSharpUnion
 
     override x.ExecutePsiTransaction _ =
         let expr = warning.Expr
@@ -37,12 +29,7 @@ type AddDiscriminatedUnionAllClauses(warning: MatchIncompleteWarning) =
         let factory = expr.CreateElementFactory()
         use enableFormatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
 
-        let refExpr = warning.Expr.Expression.As<IReferenceExpr>()
-        let symbol = refExpr.Reference.GetFSharpSymbol()
-        let entity =
-            match symbol with
-            | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.FullType.TypeDefinition
-            | _ -> failwith "FSharpMemberOrFunctionOrValue"
+        let entity = warning.Expr.Expression.TryGetFcsType().TypeDefinition
             
         let nodesToAdd =
             entity.UnionCases
