@@ -1,4 +1,4 @@
-type IPrintable<'a> =
+﻿type IPrintable<'a> =
    abstract member Print1 : unit -> unit
    abstract member Print2 : 'a -> unit
    abstract member Print3 : ('a * int) -> unit
@@ -9,4 +9,4 @@ type SomeClass1(y: float) =
      member this.Print1 () = failwith "todo"
      member this.Print2 var0 = failwith "todo"
      member this.Print3 var1 = failwith "todo"
-     member this.Print4<'b,'c> var2 namedInt = failwith "todo"{caret}
+     member this.Print4<'b, 'c> var2 namedInt = failwith "todo"{caret}

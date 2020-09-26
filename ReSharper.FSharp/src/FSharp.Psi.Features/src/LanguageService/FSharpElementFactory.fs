@@ -41,6 +41,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let moduleDeclaration = getModuleDeclaration source
         moduleDeclaration.Members.First()
 
+    let getTypeDecl memberSource =
+        let source = "type T =\n  " + memberSource
+        let moduleMember = getModuleMember source
+        moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations.[0] :?> IObjectTypeDeclaration
+
     let getDoDecl source =
         let moduleMember = getModuleMember source
         moduleMember.As<IDoStatement>().NotNull()
@@ -58,19 +63,16 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let source = sprintf "do (let %s = ())" bindingName
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
-        
-    let createMemberBinding bindingName typeParameters argsSource =
-        let typeArgsSource =
+
+    let createMemberDecl name typeParameters parameters =
+        let typeParametersSource =
             match typeParameters with
             | [] -> ""
-            | parameters -> sprintf "<%s>" (parameters |> List.map(sprintf "'%s") |> String.concat ",")
-        let source = sprintf "type DummyType() = \n member this.%s%s %s= failwith \"todo\"" bindingName typeArgsSource argsSource
-        let moduleMember = getModuleMember source
-        let typeDecl = moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations |> Seq.exactlyOne
-        let objectTypeDecl = typeDecl.As<IObjectTypeDeclaration>()
-        (objectTypeDecl.TypeMembers
-         |> Seq.where (function | :? IMemberDeclaration -> true | _ -> false)
-         |> Seq.exactlyOne).As<IMemberDeclaration>()
+            | parameters -> parameters |> List.map ((+) "'") |> String.concat ", " |> sprintf "<%s>"
+
+        let memberSource = sprintf "member this.%s%s %s = failwith \"todo\"" name typeParametersSource parameters
+        let typeDecl = getTypeDecl memberSource
+        typeDecl.TypeMembers.[0] :?> IMemberDeclaration
 
     let createAttributeList attrName: IAttributeList =
             let source = sprintf "[<%s>] ()" attrName
@@ -145,46 +147,48 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateLetModuleDecl(bindingName) =
             let source = sprintf "let %s = ()" bindingName
             getModuleMember source :?> ILetBindingsDeclaration
-            
-        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma) : IParametersPatternDeclaration list =
-            let spaceAfterComma = if isSpaceAfterComma then " " else ""
-            let argsSource =
+
+        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma) =
+            let parametersSource =
                 curriedParameterNames
-                |> List.fold (fun state parameters ->
-                    let paramGroupString =
-                        match parameters with
-                        | [] -> "()" // No arguments case
-                        | [singleParam] -> singleParam
-                        | multipleParams -> multipleParams |> String.concat ("," + spaceAfterComma) |> sprintf "(%s)"
-                    state  + " " + paramGroupString
-                    ) ""
-            let memberBinding = createMemberBinding "fakeBindingName" List.empty argsSource
-            memberBinding.ParametersPatternsEnumerable |> Seq.toList
-            
-        member x.CreateMemberBindingExpr(bindingName, typeParameters, args) : IMemberDeclaration =
-            let fakeArgsNames = "dummy " |> String.replicate (args.Length)
-            let memberBinding = createMemberBinding bindingName typeParameters fakeArgsNames
-            for realArg, fakeArg in Seq.zip args memberBinding.ParametersPatterns do
+                |> List.map (function
+                    | [] -> "()" // No arguments case
+                    | [singleParam] -> singleParam
+                    | parameters ->
+                        let sep = if isSpaceAfterComma then ", " else ","
+                        parameters |> String.concat sep |> sprintf "(%s)")
+                |> String.concat " "
+
+            let memberBinding = createMemberDecl "P" List.empty parametersSource
+            memberBinding.ParametersPatterns |> Seq.toList
+
+        member x.CreateMemberBindingExpr(name, typeParameters, parameters) =
+            let parsedParams = "_" |> List.replicate parameters.Length |> String.concat " "
+            let memberDecl = createMemberDecl name typeParameters parsedParams
+
+            for realArg, fakeArg in Seq.zip parameters memberDecl.ParametersPatterns do
                 ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
-            memberBinding
-            
-        member x.CreateInterfaceImplementation(typeReferenceName, memberDeclarations, baseIndent) : IInterfaceImplementation =
-            let memberIndent = baseIndent + typeReferenceName.FSharpFile.GetIndentSize()
-            let dummyMembers = "  member this.DummyMember() = ()" |> String.replicate (memberDeclarations.Length)
-            let source = sprintf "type DummyType() =\n  interface DummyInterface with %s" dummyMembers
-            
-            let moduleMember = getModuleMember source
-            let typeDecl = moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations |> Seq.exactlyOne
-            let objectTypeDecl = typeDecl.As<IObjectTypeDeclaration>()
-            let interfaceImplementation = objectTypeDecl.TypeMembers.OfType<IInterfaceImplementation>() |> Seq.exactlyOne
-            
-            ModificationUtil.ReplaceChild(interfaceImplementation.TypeName, typeReferenceName) |> ignore
-            for dummyMember, realMember in Seq.zip interfaceImplementation.TypeMembers memberDeclarations do 
-                let inPlaceMember = ModificationUtil.ReplaceChild(dummyMember, realMember)
-                let whitespace = ModificationUtil.ReplaceChild(inPlaceMember.PrevSibling, Whitespace(memberIndent))
-                ModificationUtil.AddChildBefore(whitespace, NewLine(typeReferenceName.GetLineEnding())) |> ignore
-            
-            interfaceImplementation
+            memberDecl
+
+        member x.CreateInterfaceImplementation(typeReferenceName, memberDeclarations, baseIndent) =
+            let lineEnding = typeReferenceName.GetLineEnding()
+            let memberIndent = baseIndent + typeReferenceName.GetIndentSize()
+
+            let memberSource = "interface I with\n    member _.P = ()"
+            let typeDecl = getTypeDecl memberSource
+            let interfaceImpl = typeDecl.TypeMembers.[0] :?> IInterfaceImplementation
+
+            ModificationUtil.ReplaceChild(interfaceImpl.TypeName, typeReferenceName) |> ignore
+            ModificationUtil.DeleteChildRange(interfaceImpl.WithKeyword.NextSibling, interfaceImpl.LastChild)
+
+            seq { for d in memberDeclarations do
+                      yield NewLine(lineEnding) :> ITreeNode
+                      yield Whitespace(memberIndent) :> _
+                      yield d :> _ }
+            |> addNodesAfter interfaceImpl.WithKeyword
+            |> ignore
+
+            interfaceImpl
 
         member x.CreateConstExpr(text) =
             getExpression text :?> _
