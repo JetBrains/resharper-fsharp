@@ -1,6 +1,5 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -25,37 +24,20 @@ type GenerateMissingInterfaceMembersFix(error: NoImplementationGivenInterfaceErr
     override x.Text = "Generate interface implementation"
 
     override x.IsAvailable _ =
-        let typeName = impl.TypeName
-        if isNull typeName then false else
+        let fcsEntity = impl.FcsEntity
+        if isNull fcsEntity || not fcsEntity.IsInterface then false else
 
-        let reference = typeName.Reference
-        if isNull reference then false else
-
-        let symbol = reference.GetFSharpSymbol()
-        let entity =
-            match symbol with
-            | :? FSharpEntity as entity -> Some entity
-            | _ -> None
-            |> Option.defaultWith (fun _ -> failwith "ExpectedFSharpEntity")
-
-        let isNotImplemented = impl.TypeMembersEnumerable |> Seq.map (fun x -> x.SourceName) |> Seq.isEmpty
-        entity.IsInterface && isNotImplemented
+        impl.TypeMembersEnumerable |> Seq.map (fun x -> x.SourceName) |> Seq.isEmpty
 
     override x.ExecutePsiTransaction(_, _) =
         let factory = impl.CreateElementFactory()
-        use _writeCookie = WriteLockCookie.Create(impl.IsPhysical())
-        use _disableFormatter = new DisableCodeFormatter()
+        use writeCookie = WriteLockCookie.Create(impl.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
 
         let settingsStore = impl.FSharpFile.GetSettingsStoreWithEditorConfig()
         let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
 
-        let symbol = impl.TypeName.Reference.GetFSharpSymbol()
-
-        let entity =
-            match symbol with
-            | :? FSharpEntity as entity -> Some entity
-            | _ -> None
-            |> Option.defaultWith (fun _ -> failwith "ExpectedFSharpEntity")
+        let entity = impl.FcsEntity
 
         let memberDeclarations =
             entity.MembersFunctionsAndValues
