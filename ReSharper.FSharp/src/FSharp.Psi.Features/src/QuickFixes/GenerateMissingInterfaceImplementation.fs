@@ -45,7 +45,8 @@ type GenerateMissingInterfaceMembersFix(error: NoImplementationGivenInterfaceErr
         let factory = impl.CreateElementFactory()
         use _writeCookie = WriteLockCookie.Create(impl.IsPhysical())
         use _disableFormatter = new DisableCodeFormatter()
-        let settingsStore = impl.FSharpFile.GetSettingsStore()
+
+        let settingsStore = impl.FSharpFile.GetSettingsStoreWithEditorConfig()
         let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
 
         let symbol = impl.TypeName.Reference.GetFSharpSymbol()
