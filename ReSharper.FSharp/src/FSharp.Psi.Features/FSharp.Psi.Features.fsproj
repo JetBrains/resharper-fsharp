@@ -130,7 +130,6 @@
     <Compile Include="src\Intentions\ToMutableAction.fs" />
     <Compile Include="src\Intentions\FunctionAnnotationAction.fs" />
     <Compile Include="src\Intentions\ToLiteralAction.fs" />
-    <Compile Include="src\Intentions\GenerateMissingInterfaceImplementation.fs" />
     <Compile Include="src\Intentions\SetNameAction.fs" />
     <Compile Include="src\Intentions\LetToUseAction.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\Errors.xml">
@@ -187,6 +186,7 @@
     <Compile Include="src\QuickFixes\SimplifyLambdaFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceLambdaWithInnerExpressionFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceExpressionWithIdFix.fs" />
+    <Compile Include="src\QuickFixes\GenerateMissingInterfaceImplementation.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

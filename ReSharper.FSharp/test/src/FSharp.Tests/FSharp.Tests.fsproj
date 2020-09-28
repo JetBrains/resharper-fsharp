@@ -87,6 +87,7 @@
     <Compile Include="QuickFixes\SimplifyLambdaTest.fs" />
     <Compile Include="QuickFixes\ReplaceLambdaWithInnerExpressionTest.fs" />
     <Compile Include="QuickFixes\ReplaceExpressionWithIdTest.fs" />
+    <Compile Include="QuickFixes\GenerateMissingInterfaceImplementationTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
@@ -99,7 +100,6 @@
     <Compile Include="Intentions\ToMutableTest.fs" />
     <Compile Include="Intentions\SpecifyTypesTest.fs" />
     <Compile Include="Intentions\ToLiteralTest.fs" />
-    <Compile Include="Intentions\GenerateMissingInterfaceImplementationTest.fs" />
     <Compile Include="Intentions\LetToUseTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />

@@ -1,22 +1,23 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
-open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-[<ContextAction(Name = "GenerateInterfaceImplementation", Group = "F#", Description = "Generates skeleton interface implementation")>]
-type GenerateMissingInterfaceImplementation(dataProvider: FSharpContextActionDataProvider) =
-    inherit FSharpContextActionBase(dataProvider)
+type GenerateMissingInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
+    inherit FSharpQuickFixBase()
+
+    let impl = error.Impl
 
     let mutable nextUnnamedVariableNumber = 0
-    let getUnnamedVariableName() =
+    let getUnnamedVariableName () =
         let name = sprintf "var%d" nextUnnamedVariableNumber
         nextUnnamedVariableNumber <- nextUnnamedVariableNumber + 1
         name
@@ -24,10 +25,7 @@ type GenerateMissingInterfaceImplementation(dataProvider: FSharpContextActionDat
     override x.Text = "Generate interface implementation"
 
     override x.IsAvailable _ =
-        let declaration = dataProvider.GetSelectedElement<IInterfaceImplementation>()
-        if isNull declaration then false else
-
-        let typeName = declaration.TypeName
+        let typeName = impl.TypeName
         if isNull typeName then false else
 
         let reference = typeName.Reference
@@ -40,18 +38,17 @@ type GenerateMissingInterfaceImplementation(dataProvider: FSharpContextActionDat
             | _ -> None
             |> Option.defaultWith (fun _ -> failwith "ExpectedFSharpEntity")
 
-        let isNotImplemented = declaration.TypeMembersEnumerable |> Seq.map (fun x -> x.SourceName) |> Seq.isEmpty
+        let isNotImplemented = impl.TypeMembersEnumerable |> Seq.map (fun x -> x.SourceName) |> Seq.isEmpty
         entity.IsInterface && isNotImplemented
 
     override x.ExecutePsiTransaction(_, _) =
-        let initialInterfaceImpl = dataProvider.GetSelectedElement<IInterfaceImplementation>()
-        let factory = initialInterfaceImpl.CreateElementFactory()
-        use _writeCookie = WriteLockCookie.Create(initialInterfaceImpl.IsPhysical())
+        let factory = impl.CreateElementFactory()
+        use _writeCookie = WriteLockCookie.Create(impl.IsPhysical())
         use _disableFormatter = new DisableCodeFormatter()
-        let settingsStore = initialInterfaceImpl.FSharpFile.GetSettingsStore()
+        let settingsStore = impl.FSharpFile.GetSettingsStore()
         let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
 
-        let symbol = initialInterfaceImpl.TypeName.Reference.GetFSharpSymbol()
+        let symbol = impl.TypeName.Reference.GetFSharpSymbol()
 
         let entity =
             match symbol with
@@ -73,7 +70,7 @@ type GenerateMissingInterfaceImplementation(dataProvider: FSharpContextActionDat
                 factory.CreateMemberBindingExpr(memberName, typeParams, paramDeclarationGroups)
             ) |> Seq.toList
 
-        let newInterfaceImpl = factory.CreateInterfaceImplementation(initialInterfaceImpl.TypeName, memberDeclarations, initialInterfaceImpl.Indent)
-        ModificationUtil.ReplaceChild(initialInterfaceImpl, newInterfaceImpl) |> ignore
+        let newInterfaceImpl = factory.CreateInterfaceImplementation(impl.TypeName, memberDeclarations, impl.Indent)
+        ModificationUtil.ReplaceChild(impl, newInterfaceImpl) |> ignore
 
         null
