@@ -140,6 +140,7 @@ fun createFSharpSandbox(additionalText: String = "", isNonUserCode: Boolean = fa
             FSharpScriptLanguage.toRdLanguageOrThrow(),
             addSemicolon = false,
             disableTypingActions = true,
-            disableTypingAssists = disableTypingAssists
+            disableTypingAssists = disableTypingAssists,
+            extraVariables = null
     )
 }
