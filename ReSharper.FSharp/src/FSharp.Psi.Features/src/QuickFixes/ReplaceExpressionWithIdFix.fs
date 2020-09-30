@@ -4,8 +4,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpLambdaUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
@@ -50,6 +53,15 @@ type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
             if replaceBody then
                 let paren = ParenExprNavigator.GetByInnerExpression(lambda)
                 let nodeToReplace = if isNotNull paren then paren :> IFSharpExpression else expr
+
+                let prevToken = nodeToReplace.GetPreviousToken()
+                let nextToken = nodeToReplace.GetNextToken()
+
+                if isNotNull prevToken && not (isWhitespace prevToken) then
+                    ModificationUtil.AddChildBefore(nodeToReplace, Whitespace(1)) |> ignore
+                if isNotNull nextToken && not (isWhitespace nextToken) then
+                    ModificationUtil.AddChildAfter(nodeToReplace, Whitespace(1)) |> ignore
+
                 replace nodeToReplace (factory.CreateReferenceExpr("id"))
             else
                 deletePatternsFromEnd lambda 1

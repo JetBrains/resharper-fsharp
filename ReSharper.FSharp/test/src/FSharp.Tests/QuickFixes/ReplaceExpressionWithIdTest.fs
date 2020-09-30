@@ -10,7 +10,8 @@ type ReplaceExpressionWithIdTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceExpressionWithId"
 
-    [<Test>] member x.``Lambda``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda 1``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda 2 - add whitespaces``() = x.DoNamedTest()
     [<Test>] member x.``Lambda body 1``() = x.DoNamedTest()
     [<Test>] member x.``Lambda body 2 - add whitespace``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Lambda - Names collision - not available 1``() = x.DoNamedTest()
