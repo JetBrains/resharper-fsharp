@@ -2,7 +2,6 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiFile
 
 class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunner) {
@@ -10,7 +9,7 @@ class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunner) {
         val selectionModel = editor.selectionModel
         val hasSelection = selectionModel.hasSelection()
         val visibleText = getVisibleText(editor, hasSelection)
-        if (!visibleText.isEmpty()) {
+        if (visibleText.isNotEmpty()) {
             val fsiText = "\n" +
                     "# silentCd @\"${file.containingDirectory.virtualFile.path}\" ;; \n" +
                     (if (debug) "# dbgbreak\n" else "") +

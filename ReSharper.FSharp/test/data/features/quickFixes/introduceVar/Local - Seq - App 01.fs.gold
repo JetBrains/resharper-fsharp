@@ -1,6 +1,4 @@
-﻿module Module
-
-let getName _ = ""
+﻿let getName _ = ""
 
 do
     let {selstart}name{selend} = (getName 123)

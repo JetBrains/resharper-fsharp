@@ -9,5 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public ModuleFunction([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
+
+    public override bool IsStatic => true;
   }
 }

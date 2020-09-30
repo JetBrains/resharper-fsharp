@@ -23,9 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       binding.SetIsMutable(true);
     }
 
-    public bool CanBeMutable => Binding != null;
-
-    public IBinding Binding => this.GetBinding();
+    public override IBinding Binding => this.GetBinding();
   }
 
   internal partial class LocalReferencePat
@@ -110,6 +108,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public TreeNodeCollection<IAttribute> Attributes =>
       this.GetBinding()?.AllAttributes ??
       TreeNodeCollection<IAttribute>.Empty;
+
+    public bool IsMutable => Binding?.IsMutable ?? false;
+
+    public void SetIsMutable(bool value)
+    {
+      var binding = Binding;
+      Assertion.Assert(binding != null, "GetBinding() != null");
+      binding.SetIsMutable(true);
+    }
+
+    public override IBinding Binding => this.GetBinding();
   }
 
   internal partial class LocalAsPat
@@ -117,6 +126,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
     public bool IsDeclaration => true;
     public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
+    
+    public bool IsMutable => Binding?.IsMutable ?? false;
+
+    public void SetIsMutable(bool value)
+    {
+      var binding = Binding;
+      Assertion.Assert(binding is LocalBinding, "GetBinding() is LocalBinding");
+      binding.SetIsMutable(true);
+    }
+
+    public bool CanBeMutable => Binding is LocalBinding;
+
+    private IBinding Binding => this.GetBinding();
   }
 
   internal partial class OrPat
@@ -146,6 +168,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       IsDeclaration
         ? new[] {this}
         : Parameters.SelectMany(param => param.Declarations);
+
+    public override IBinding Binding => this.GetBinding();
   }
 
   internal partial class ArrayPat
@@ -196,14 +220,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Pattern.Declarations;
   }
 
-  internal partial class ConsPat
+  internal partial class ListConsPat
   {
     public override IEnumerable<IDeclaration> Declarations
     {
       get
       {
-        var pattern1Decls = Pattern1?.Declarations ?? EmptyList<IDeclaration>.Instance;
-        var pattern2Decls = Pattern2?.Declarations ?? EmptyList<IDeclaration>.Instance;
+        var pattern1Decls = HeadPattern?.Declarations ?? EmptyList<IDeclaration>.Instance;
+        var pattern2Decls = TailPattern?.Declarations ?? EmptyList<IDeclaration>.Instance;
         return pattern2Decls.Prepend(pattern1Decls);
       }
     }

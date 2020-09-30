@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
 open System.Collections.Generic
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.DataContext
 open JetBrains.Application.UI.Actions.ActionManager
 open JetBrains.Diagnostics
@@ -12,6 +13,7 @@ open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpNamingService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -21,10 +23,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Naming.Elements
-open JetBrains.ReSharper.Psi.Naming.Extentions
-open JetBrains.ReSharper.Psi.Naming.Impl
-open JetBrains.ReSharper.Psi.Naming.Settings
 open JetBrains.ReSharper.Psi.Pointers
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -42,25 +40,23 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     /// Producing incomplete expression adds error but is easier to edit code immediately afterwards.
     let alwaysGenerateCompleteBindingExpr = false
 
-    let getNames (expr: IFSharpExpression) =
-        let language = expr.Language
-        let sourceFile = expr.GetSourceFile()
+    static let needsSpaceAfterIdentNodeTypes =
+        NodeTypeSet(
+           ElementType.RECORD_EXPR,
+           ElementType.ANON_RECORD_EXPR,
+           ElementType.ARRAY_OR_LIST_EXPR,
+           ElementType.PAREN_EXPR,
+           ElementType.LAMBDA_EXPR,
+           ElementType.MATCH_LAMBDA_EXPR,
+           ElementType.COMPUTATION_EXPR,
+           ElementType.QUOTE_EXPR,
+           ElementType.OBJ_EXPR,
+           ElementType.ADDRESS_OF_EXPR)
 
-        let namingManager = solution.GetPsiServices().Naming
-        let namesCollection =
-            namingManager.Suggestion.CreateEmptyCollection(PluralityKinds.Unknown, language, true, sourceFile)
-
-        let entryOptions = EntryOptions(subrootPolicy = SubrootPolicy.Decompose, prefixPolicy = PredefinedPrefixPolicy.Remove)
-        namesCollection.Add(expr, entryOptions)
-
-        let settingsStore = expr.GetSettingsStoreWithEditorConfig()
-        let elementKind = NamedElementKinds.Locals
-        let descriptor = ElementKindOfElementType.LOCAL_VARIABLE
-        let namingRule =
-            namingManager.Policy.GetDefaultRule(sourceFile, language, settingsStore, elementKind, descriptor)
-
-        let suggestionOptions = SuggestionOptions(null, DefaultName = "foo")
-        namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
+    let getNames (usedNames: ISet<string>) (expr: IFSharpExpression) =
+        createEmptyNamesCollection expr
+        |> addNamesForExpression expr
+        |> prepareNamesCollection usedNames expr
 
     let getReplaceRanges (contextExpr: IFSharpExpression) removeSourceExpr =
         let sequentialExpr = SequentialExprNavigator.GetByExpression(contextExpr)
@@ -107,12 +103,16 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         | :? IBinding as binding when
                 binding.Expression == expr && isNotNull (LetOrUseExprNavigator.GetByBinding(binding)) &&
 
+                // Don't escape bindings with expressions on separate lines
+                let equalsToken = binding.EqualsToken
+                isNotNull equalsToken && equalsToken.StartLine = expr.StartLine &&
+
                 // Don't escape function declarations
                 not (binding.HeadPattern :? IParametersOwnerPat) ->
             LetOrUseExprNavigator.GetByBinding(binding) :> _
 
-        | :? IRecordExprBinding as fieldBinding ->
-            let recordExpr = RecordLikeExprNavigator.GetByExprBinding(fieldBinding)
+        | :? IRecordFieldBinding as fieldBinding ->
+            let recordExpr = RecordLikeExprNavigator.GetByFieldBinding(fieldBinding)
             getExprToInsertBefore recordExpr
 
         | :? ILetOrUseExpr as letExpr ->
@@ -150,13 +150,13 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
     let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
         let binding = BindingNavigator.GetByExpression(contextExpr)
-        if isNull binding || binding.HeadPattern :? IParametersOwnerPat then null else
+        if isNotNull binding && binding.HeadPattern :? IParametersOwnerPat then null else
 
-        let letDecl = LetModuleDeclNavigator.GetByBinding(binding)
-        if isNotNull letDecl then letDecl :> _ else
+        let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
+        if isNotNull letBindings then letBindings :> _ else
 
-        let doDecl = DoNavigator.GetByExpression(contextExpr)
-        if isNotNull doDecl && doDecl.IsImplicit then doDecl :> _ else null
+        let doStmt = DoStatementNavigator.GetByExpression(contextExpr)
+        if isNotNull doStmt && doStmt.IsImplicit then doStmt :> _ else null
 
     let createBinding (context: IFSharpExpression) (contextDecl: IModuleMember) name: ILetBindings =
         let elementFactory = context.CreateElementFactory()
@@ -186,7 +186,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     let getMoveToNewLineInfo (contextExpr: IFSharpExpression) =
         let requiresMultilineExpr (parent: ITreeNode) =
             match parent with
-            | :? IMemberDeclaration | :? IAutoProperty -> false
+            | :? IMemberDeclaration | :? IAutoPropertyDeclaration -> false
             | _ -> true
 
         let contextExprParent = contextExpr.Parent
@@ -198,7 +198,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             match contextParent with
             | :? IBinding as binding when isNotNull binding.Parent -> binding.EqualsToken
             | :? IMemberDeclaration as memberDeclaration -> memberDeclaration.EqualsToken
-            | :? IAutoProperty as autoProperty -> autoProperty.EqualsToken
+            | :? IAutoPropertyDeclaration as autoProperty -> autoProperty.EqualsToken
             | :? IMatchClause as matchClause -> matchClause.RArrow
             | :? IWhenExprClause as whenExpr -> whenExpr.WhenKeyword
             | :? ILambdaExpr as lambdaExpr -> lambdaExpr.RArrow
@@ -243,7 +243,16 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let contextExpr = getExprToInsertBefore commonParentExpr
         let contextDecl = getContextDeclaration contextExpr
 
+        let containingTypeElement =
+            if isNull contextDecl then null else
+
+            let typeDeclaration = contextDecl.GetContainingTypeDeclaration()
+            if isNull typeDeclaration then null else
+
+            typeDeclaration.DeclaredElement
+
         let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
+        let contextIsImplicitDo = sourceExpr == contextExpr && contextDecl :? IDoStatement
         let isInSingleLineContext = isNull contextDecl && isSingleLineContext contextExpr
 
         let isInSeqExpr =
@@ -262,11 +271,15 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             | Some indent -> indent
             | _ -> contextExpr.Indent
 
-        let names = getNames sourceExpr
+        let addSpaceNearIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
+
+        let usedNames = getUsedNames contextExpr data.Usages containingTypeElement true
+        let names = getNames usedNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
 
         let removeSourceExpr =
             if data.SourceExpression.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey) then true else
+            if contextIsImplicitDo then true else
             if not contextIsSourceExpr then false else
             if data.Usages.Count = 1 then true else
 
@@ -291,7 +304,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         setBindingExpression sourceExpr contextIndent letBindings
 
         let replacedUsages, sourceExpr =
-            data.Usages |> Seq.fold (fun ((replacedUsages, sourceExpr) as acc) usage ->
+            data.Usages |> Seq.fold (fun ((replacedUsages, sourceExpr: IFSharpExpression) as acc) usage ->
                 if not (isValid usage) then acc else
 
                 let usageIsSourceExpr = usage == sourceExpr
@@ -302,6 +315,13 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
                 let refExpr = elementFactory.CreateReferenceExpr(name) :> IFSharpExpression
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
+
+                if addSpaceNearIdents then
+                    if replacedUsage.GetPreviousToken().IsIdentifier() then
+                        ModificationUtil.AddChildBefore(replacedUsage, Whitespace()) |> ignore
+
+                    if replacedUsage.GetNextToken().IsIdentifier() then
+                        ModificationUtil.AddChildAfter(replacedUsage, Whitespace()) |> ignore
 
                 let sourceExpr =
                     if usageIsSourceExpr && contextIsSourceExpr && isInSeqExpr then replacedUsage else sourceExpr
@@ -366,18 +386,31 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                     let anchor = ModificationUtil.AddChildBefore(replaced.First, NewLine(lineEnding))
                     ModificationUtil.AddChildAfter(anchor, Whitespace(contextIndent)) |> ignore
 
-                ModificationUtil.DeleteChildRange(letBindings.NextSibling, letBindings.Parent.LastChild)
+                ModificationUtil.DeleteChildRange(ranges.ReplaceRange)
                 letBindings
 
-            | :? ILetModuleDecl ->
-                addNodesBefore contextDecl [
+            | :? ILetBindingsDeclaration ->
+                if removeSourceExpr then
+                    ModificationUtil.ReplaceChild(contextDecl, letBindings)
+                else
+                    let letBindings = ModificationUtil.AddChildBefore(contextDecl, letBindings)
+                    addNodesAfter letBindings [
+                        NewLine(lineEnding)
+                        Whitespace(contextIndent)
+                    ] |> ignore
                     letBindings
-                    NewLine(lineEnding)
-                    Whitespace(contextIndent)
-                ] |> ignore
-                letBindings
 
             | _ -> failwithf "Unexpected let node type"
+
+        let binding = letBindings.As<ILetBindings>().Bindings.[0]
+
+        match binding.Expression.IgnoreInnerParens() with
+        | :? ILambdaExpr as lambdaExpr when not lambdaExpr.IsSingleLine ->
+            // Use better indent for extracted lambda
+            let bodyExpr = lambdaExpr.Expression
+            let shift = lambdaExpr.Indent - bodyExpr.Indent + contextExpr.GetIndentSize()
+            shiftWithWhitespaceBefore shift bodyExpr
+        | _ -> ()
 
         let nodes =
             let replacedNodes =
@@ -385,7 +418,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 |> Seq.choose (fun pointer -> pointer.GetTreeNode() |> Option.ofObj)
                 |> Seq.toArray
 
-            [| letBindings.As<ILetBindings>().Bindings.[0].HeadPattern :> ITreeNode |]
+            [| binding.HeadPattern :> ITreeNode |]
             |> Array.append replacedNodes 
 
         let nameExpression = NameSuggestionsExpression(names)
@@ -432,6 +465,11 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
             match expr with
             | :? IReferenceExpr as refExpr ->
+                let shortName = refExpr.ShortName
+                if shortName = SharedImplUtil.MISSING_DECLARATION_NAME then false else
+
+                if PrettyNaming.IsOperatorName shortName then false else
+
                 let declaredElement = refExpr.Reference.Resolve().DeclaredElement
                 not (declaredElement :? ITypeElement || declaredElement :? INamespace)
 
@@ -462,15 +500,10 @@ type FSharpIntroduceVarHelper() =
 
     override x.CheckAvailability(node) =
         let expr = node.As<IFSharpExpression>()
-        if isNull expr then false else
+        if isNull expr || expr :? IFromErrorExpr then false else
 
-        if expr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey) then true else
-
-        if not (expr.FSharpExperimentalFeaturesEnabled()) then false else
+        expr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey) ||
         FSharpIntroduceVariable.CanIntroduceVar(expr)
 
     override x.CheckOccurrence(expr, occurrence) =
-        if isExpressionToRemove occurrence then true else
-
-        if isExpressionToRemove expr then false else
-        expr.FSharpExperimentalFeaturesEnabled()
+        isExpressionToRemove occurrence || not (isExpressionToRemove expr)

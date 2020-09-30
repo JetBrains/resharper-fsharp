@@ -2,11 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 type ConvertToUseFix(warning: ConvertToUseBindingWarning) =
     inherit FSharpQuickFixBase()
@@ -16,10 +12,7 @@ type ConvertToUseFix(warning: ConvertToUseBindingWarning) =
     override x.Text = "Convert to 'use' binding"
 
     override x.IsAvailable _ =
-        isValid letExpr && isValid letExpr.LetOrUseToken
+        isValid letExpr && isValid letExpr.BindingKeyword
 
     override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(letExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-        let tokenType = if letExpr :? ILetOrUseExpr then FSharpTokenType.USE else FSharpTokenType.USE_BANG
-        ModificationUtil.ReplaceChild(letExpr.LetOrUseToken, tokenType.CreateLeafElement()) |> ignore
+        LetToUseAction.Execute(letExpr)

@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public IList<ITypeOwner> GetFields()
     {
-      var fieldDeclarations = Fields;
+      var fieldDeclarations = FieldDeclarations;
       var result = new ITypeOwner[fieldDeclarations.Count];
       for (var i = 0; i < fieldDeclarations.Count; i++)
         if (fieldDeclarations[i].DeclaredElement is ITypeOwner field)
@@ -29,6 +29,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         : PartKind.Class;
 
     public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
-      base.MemberDeclarations.Prepend(Fields).AsIReadOnlyList();
+      base.MemberDeclarations.Prepend(FieldDeclarations).AsIReadOnlyList();
   }
 }

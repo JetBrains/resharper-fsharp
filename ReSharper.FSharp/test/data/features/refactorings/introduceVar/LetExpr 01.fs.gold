@@ -1,5 +1,5 @@
-﻿Suggested names: foo
+﻿Suggested names: unit
 do
-  let foo = 
+  let unit = 
     let x = 1 + 1
     ()

@@ -1,5 +1,3 @@
-module Module
-
 open System.Collections
 {caret}open System
 open System.Linq

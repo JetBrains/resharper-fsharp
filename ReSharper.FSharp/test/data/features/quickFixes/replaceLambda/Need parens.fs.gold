@@ -1,0 +1,3 @@
+﻿let f x y = ()
+
+(f {caret}1)

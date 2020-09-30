@@ -93,13 +93,14 @@ type CSharpResolveTest() =
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 03 - extension methods 01``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 04 - extension methods 02``() = x.DoNamedTest()
-
     [<Test>] member x.``Module bindings 05 - Generic function``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 06 - Type function``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 07 - extension methods 03 - Two params``() = x.DoNamedTest()
+    [<Test>] member x.``Module bindings 08 - Mutable``() = x.DoNamedTest()
 
     [<Test>] member x.``Module bindings - Compiled name 01``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings - Compiled name 02 - Nested pat``() = x.DoNamedTest()
+    [<Test>] member x.``Module bindings - Compiled name 03 - Overloads``() = x.DoNamedTest()
 
     [<Test>] member x.``Nested module 01``() = x.DoNamedTest()
 
@@ -133,6 +134,8 @@ type CSharpResolveTest() =
     [<Test>] member x.``Type Extension 12 - Optional extension``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 13 - C# extension 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 14 - C# extension 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 15 - Compiled name``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 16 - Compiled name - Static``() = x.DoNamedTest()
 
     [<Test>] member x.``Generics - Methods 01``() = x.DoNamedTest()
 

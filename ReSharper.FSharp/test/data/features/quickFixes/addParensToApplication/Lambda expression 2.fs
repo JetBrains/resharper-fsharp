@@ -1,0 +1,2 @@
+let multiply (a: int) (b: int) = a * b
+multiply 1 (fun x -> fun y -> x + y) {caret}3 4

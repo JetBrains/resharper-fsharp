@@ -1,0 +1,7 @@
+﻿do
+    match () with
+    | a -> (){caret}
+
+    try () with
+    | a -> ()
+    ()

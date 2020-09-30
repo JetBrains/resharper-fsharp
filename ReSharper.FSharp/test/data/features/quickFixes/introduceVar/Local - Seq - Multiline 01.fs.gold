@@ -1,7 +1,5 @@
-﻿module Module
-
-do
-    let {selstart}foo{selend} = 
+﻿do
+    let {selstart}i{selend} = 
       1 +
       1
     ()

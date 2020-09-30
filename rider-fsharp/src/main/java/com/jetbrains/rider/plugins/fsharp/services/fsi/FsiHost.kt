@@ -91,7 +91,7 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
 
     private fun tryCreateConsoleRunner(forceOptimizeForDebug: Boolean, attach: Boolean = false): Promise<FsiConsoleRunner> {
         val result = AsyncPromise<FsiConsoleRunner>()
-        rdFsiHost.requestNewFsiSessionInfo.start(Unit).result.advise(componentLifetime) {
+        rdFsiHost.requestNewFsiSessionInfo.start(componentLifetime, Unit).result.advise(componentLifetime) {
             val consoleRunner = createConsoleRunner(it.unwrap(), forceOptimizeForDebug, attach)
             if (consoleRunner != null)
                 result.setResult(consoleRunner)

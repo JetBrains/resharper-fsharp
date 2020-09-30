@@ -10,7 +10,7 @@ IFSharpImplFile
         IImplicitConstructorDeclaration
           FSharpTokenType+InternalTokenElement(type:INTERNAL, text:internal)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IMemberParamsDeclaration
+          IParametersPatternDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))

@@ -1,5 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
+open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
@@ -13,6 +15,19 @@ type RemoveRedundantQualifierFix(warning: RedundantQualifierWarning) =
     inherit FSharpQuickFixBase()
 
     let treeNode = warning.TreeNode
+
+    let removeQualifiers (qualifierOwner: ITreeNode) =
+        let (qualifier: ITreeNode), delimiter =
+            match qualifierOwner with
+            | :? IReferenceExpr as referenceExpr -> referenceExpr.Qualifier :> _, referenceExpr.Delimiter
+            | :? IReferenceName as referenceName -> referenceName.Qualifier :> _, referenceName.Delimiter
+
+            | :? ITypeExtensionDeclaration as typeExtension ->
+                typeExtension.QualifierReferenceName :> _, typeExtension.Delimiter
+
+            | _ -> failwithf "Unexpected qualifier owner: %O" qualifierOwner
+
+        ModificationUtil.DeleteChildRange(qualifier, getLastMatchingNodeAfter isInlineSpace delimiter)
     
     override x.Text = "Remove redundant qualifier"
 
@@ -22,15 +37,19 @@ type RemoveRedundantQualifierFix(warning: RedundantQualifierWarning) =
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(treeNode.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
+        removeQualifiers treeNode
 
-        let (qualifier: ITreeNode), delimiter =
-            match treeNode with
-            | :? IReferenceExpr as referenceExpr -> referenceExpr.Qualifier :> _, referenceExpr.Delimiter
-            | :? IReferenceName as referenceName -> referenceName.Qualifier :> _, referenceName.Delimiter
+    interface IHighlightingsSetScopedAction with
+        member x.ScopedText = "Remove redundant qualifiers"
+        member x.FileCollectorInfo = FileCollectorInfo.Default
 
-            | :? ITypeExtensionDeclaration as typeExtension ->
-                typeExtension.QualifierReferenceName :> _, typeExtension.Delimiter
+        member x.ExecuteAction(highlightingInfos, _, _) =
+            for highlightingInfo in highlightingInfos do
+                match highlightingInfo.Highlighting.As<RedundantQualifierWarning>() with
+                | null -> ()
+                | warning ->
+                    let clause = warning.TreeNode
+                    use writeLock = WriteLockCookie.Create(clause.IsPhysical())
+                    removeQualifiers clause
 
-            | _ -> failwithf "Unexpected qualifier owner: %O" treeNode
-
-        ModificationUtil.DeleteChildRange(qualifier, getLastMatchingNodeAfter isInlineSpace delimiter)
+            null

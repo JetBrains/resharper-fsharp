@@ -3,10 +3,8 @@ using System.Linq;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -81,17 +79,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public IList<IArgument> ParameterArguments => myParameterArguments.GetValue(this,
       () => FSharpArgumentsOwnerUtil.CalculateParameterArguments(this, AppliedExpressions));
-
-    public override IType Type()
-    {
-      var reference = InvokedFunctionReference;
-      if (reference == null)
-        return TypeFactory.CreateUnknownType(GetPsiModule());
-
-      var mfv = (FSharpMemberOrFunctionOrValue) reference.GetFSharpSymbol();
-      return !mfv.IsConstructor && mfv.CurriedParameterGroups.Count == Arguments.Count
-        ? mfv.ReturnParameter.Type.MapType(reference.GetElement())
-        : TypeFactory.CreateUnknownType(GetPsiModule());
-    }
   }
 }

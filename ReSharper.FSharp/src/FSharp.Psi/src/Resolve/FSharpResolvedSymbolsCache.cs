@@ -10,6 +10,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
+using JetBrains.ReSharper.Psi.Files.SandboxFiles;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -43,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       lock (myLock)
       {
-        myPsiModules.Remove(psiModule);
+        PsiModulesCaches.Remove(psiModule);
         if (psiModule.IsValid())
           InvalidateReferencingModules(psiModule);
       }
@@ -51,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private void InvalidateReferencingModules(IPsiModule psiModule)
     {
-      if (myPsiModules.IsEmpty())
+      if (PsiModulesCaches.IsEmpty())
         return;
 
       // todo: reuse FcsProjectProvider references
@@ -59,12 +60,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       {
         var resolveContext = CompilationContextCookie.GetContext();
         foreach (var psiModuleReference in PsiModules.GetReverseModuleReferences(psiModule, resolveContext))
-          if (myPsiModules.TryGetValue(psiModuleReference.Module, out var moduleSymbols))
+          if (PsiModulesCaches.TryGetValue(psiModuleReference.Module, out var moduleSymbols))
             moduleSymbols.Invalidate();
       }
     }
 
-    private void Invalidate(IPsiSourceFile sourceFile)
+    protected virtual void Invalidate(IPsiSourceFile sourceFile)
     {
       var psiModule = sourceFile.PsiModule;
       if (!psiModule.IsValid())
@@ -73,7 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return;
       }
 
-      if (myPsiModules.TryGetValue(psiModule, out var moduleResolvedSymbols))
+      if (PsiModulesCaches.TryGetValue(psiModule, out var moduleResolvedSymbols))
         moduleResolvedSymbols.Invalidate(sourceFile);
 
       InvalidateReferencingModules(psiModule);
@@ -114,7 +115,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       lock (myLock)
       {
-        if (myPsiModules.IsEmpty())
+        if (PsiModulesCaches.IsEmpty())
           return;
 
         Invalidate(sourceFile);
@@ -163,7 +164,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       }
     }
 
-    private readonly IDictionary<IPsiModule, FSharpModuleResolvedSymbols> myPsiModules =
+    protected readonly IDictionary<IPsiModule, FSharpModuleResolvedSymbols> PsiModulesCaches =
       new Dictionary<IPsiModule, FSharpModuleResolvedSymbols>();
 
     private IFSharpFileResolvedSymbols GetOrCreateResolvedSymbols(IPsiSourceFile sourceFile) =>
@@ -173,15 +174,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private IFSharpModuleResolvedSymbols GetModuleResolvedSymbols(IPsiSourceFile sourceFile)
     {
       var psiModule = sourceFile.PsiModule;
-      if (psiModule.IsMiscFilesProjectModule())
+      if (psiModule.IsMiscFilesProjectModule() && !(psiModule is SandboxPsiModule))
         return FSharpMiscModuleResolvedSymbols.Instance;
+
+      FcsProjectProvider.InvalidateDirty();
 
       lock (myLock)
       {
         if (HasDirtyFiles)
           InvalidateDirty();
 
-        if (myPsiModules.TryGetValue(psiModule, out var symbols))
+        if (PsiModulesCaches.TryGetValue(psiModule, out var symbols))
           return symbols;
 
         var parsingOptions = FcsProjectProvider.GetParsingOptions(sourceFile);
@@ -189,7 +192,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
         var moduleResolvedSymbols =
           new FSharpModuleResolvedSymbols(psiModule, filesCount, CheckerService, FcsProjectProvider);
-        myPsiModules[psiModule] = moduleResolvedSymbols;
+        PsiModulesCaches[psiModule] = moduleResolvedSymbols;
         return moduleResolvedSymbols;
       }
     }

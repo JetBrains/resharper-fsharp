@@ -7,7 +7,7 @@ IFSharpImplFile
       IDelegateDeclaration
         FSharpIdentifierToken(type:IDENTIFIER, text:D)
         IImplicitConstructorDeclaration
-          IMemberParamsDeclaration
+          IParametersPatternDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               ITypedPat

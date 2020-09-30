@@ -1,0 +1,23 @@
+﻿open |System|(0)
+
+let |func|(1) |f|(2) |g|(3) (|x|(4) : |string|(5)) =
+    let |eq|(6) = |Object|(7).|ReferenceEquals|(8)(|x|(9), null)
+    let mutable |mf|(10) = |f|(11)
+    |g|(12) (|mf|(13) |x|(14)) |eq|(15)
+---------------------------------------------------------
+(0): ReSharper F# Namespace Identifier: 
+(1): ReSharper F# Function Identifier: 
+(2): ReSharper F# Function Identifier: 
+(3): ReSharper F# Function Identifier: 
+(4): ReSharper F# Value Identifier: 
+(5): ReSharper F# Class Identifier: 
+(6): ReSharper F# Value Identifier: 
+(7): ReSharper F# Class Identifier: 
+(8): ReSharper F# Method Identifier: 
+(9): ReSharper F# Value Identifier: 
+(10): ReSharper F# Mutable Function Identifier: 
+(11): ReSharper F# Function Identifier: 
+(12): ReSharper F# Function Identifier: 
+(13): ReSharper F# Mutable Function Identifier: 
+(14): ReSharper F# Value Identifier: 
+(15): ReSharper F# Value Identifier: 

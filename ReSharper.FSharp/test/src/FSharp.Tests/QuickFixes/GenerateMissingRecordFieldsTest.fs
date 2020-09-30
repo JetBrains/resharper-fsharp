@@ -1,13 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
-open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
 type GenerateMissingRecordFieldsTest() =
-    inherit QuickFixTestBase<GenerateMissingRecordFieldsFix>()
+    inherit FSharpQuickFixTestBase<GenerateMissingRecordFieldsFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/generateMissingRecordFields"
 
@@ -24,3 +23,9 @@ type GenerateMissingRecordFieldsTest() =
 
     [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Empty function``() = x.DoNamedTest()
+
+    // The quickfix should apply if the empty record is the final statement of a function binding, as that's what the
+    // annotated return type pertains to.
+    [<Test; NotAvailable>] member x.``Empty function statement no-op``() = x.DoNamedTest()

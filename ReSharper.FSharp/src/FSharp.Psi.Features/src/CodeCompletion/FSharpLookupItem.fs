@@ -9,8 +9,8 @@ open JetBrains.ReSharper.Host.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -26,7 +26,7 @@ type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocServ
     interface ICandidate with
         member x.GetSignature(_, _, _, _, _) = RichText(description)
         member x.GetDescription() = xmlDocService.GetXmlDoc(xmlDoc)
-        member x.Matches(_) = true
+        member x.Matches _ = true
 
         member x.GetParametersInfo(_, _) = ()
         member x.PositionalParameterCount = 0

@@ -1,4 +1,3 @@
-module Module
 do
     let a = ()
     let b{caret} = ()

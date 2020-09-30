@@ -103,6 +103,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 70 - After parens on new line 2``() = x.DoNamedTest()
     [<Test>] member x.``Enter 71 - After double semi``() = x.DoNamedTest()
     [<Test>] member x.``Enter 72 - Semicolon inside attribute list``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 73 - Enter in parens``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 74 - Enter in parens``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
     
@@ -196,6 +198,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Pair quotes 12 - At eof, unfinished triple quote``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 13 - After quote``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 14 - After char``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 15 - File start``() = x.DoNamedTest()
 
     [<Test>] member x.``Quotes - Skip end 01 - Char``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 02 - String``() = x.DoNamedTest()
@@ -222,6 +225,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Skip right 02 - After code``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 03 - After code and space``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 04 - Angle``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip right 05 - Multiplication decl``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Skip 01 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip 02 - Array``() = x.DoNamedTest()
@@ -241,6 +245,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Attributes 02 - Type left angle before spaces``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Attributes 03 - Type right angle``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Attributes 04 - Type right angle, left bracket``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Attributes 05 - File start``() = x.DoNamedTest()
       
     [<Test>] member x.``Brackets - Arrays 01 - Type left bar``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Arrays 02 - Type left bar before space``() = x.DoNamedTest()

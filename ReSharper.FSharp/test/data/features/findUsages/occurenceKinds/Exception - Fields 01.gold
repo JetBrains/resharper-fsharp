@@ -1,16 +1,16 @@
 ﻿Field declaration
 ---
-TO: [O] exception Exn of |int| RANGE: (34,37) @ Exception - Fields 01.fs
+UsageFieldTypeDeclaration TO: [O] exception Exn of |int| RANGE: (34,37) @ Exception - Fields 01.fs
 
 
 Pattern
 ---
-TO: [O] let |e| = Exn(123) RANGE: (45,46) @ Exception - Fields 01.fs
+UsageOther TO: [O] let |e| = Exn(123) RANGE: (45,46) @ Exception - Fields 01.fs
 
 
 New instance creation
 ---
-TO: [O] let e = |Exn|(123) RANGE: (49,52) @ Exception - Fields 01.fs
-TO: [O] let e = |Exn|(123) RANGE: (49,52) @ Exception - Fields 01.fs
+UsageInstanceCreation TO: [O] let e = |Exn|(123) RANGE: (49,52) @ Exception - Fields 01.fs
+UsageInstanceCreation TO: [O] let e = |Exn|(123) RANGE: (49,52) @ Exception - Fields 01.fs
 
 

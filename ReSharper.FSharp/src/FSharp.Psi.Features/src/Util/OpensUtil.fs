@@ -1,9 +1,9 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 
-open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Host.Features.Documents
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -12,7 +12,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.Util
 
 let toQualifiedList (declaredElement: IClrDeclaredElement) =
     let rec loop acc (declaredElement: IClrDeclaredElement) =
@@ -60,6 +62,21 @@ let tryGetFirstOpensGroup (moduleDecl: IModuleLikeDeclaration) =
 
     if opens.IsEmpty then None else Some opens
 
+let tryGetOpen (moduleDecl: IModuleLikeDeclaration) namespaceName =
+    moduleDecl.MembersEnumerable
+    |> Seq.filter (fun m -> m :? IOpenStatement)
+    |> Seq.cast<IOpenStatement>
+    |> Seq.tryFind (fun x -> x.ReferenceName.QualifiedName = namespaceName)
+
+let removeOpen (openStatement: IOpenStatement) =
+    let first = getFirstMatchingNodeBefore isInlineSpaceOrComment openStatement
+    let last =
+        openStatement
+        |> skipSemicolonsAndWhiteSpacesAfter
+        |> getThisOrNextNewLine
+
+    deleteChildRange first last
+
 let isSystemNs ns =
     ns = "System" || startsWith "System." ns
 
@@ -81,13 +98,13 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
         addNodesBefore moduleMember [
             // todo: add setting for adding space before first module member
             // Add space before new opens group.
-            if not (moduleMember :? IOpenStatement) && (not (isAfterEmptyLine moduleMember)) then
+            if not (moduleMember :? IOpenStatement) && not (isFirstChildOrAfterEmptyLine moduleMember) then
                 NewLine(lineEnding)
 
-            if indent > 0 then
-                Whitespace(indent)
             elementFactory.CreateOpenStatement(ns)
             NewLine(lineEnding)
+            if indent > 0 then
+                Whitespace(indent)
 
             // Add space after new opens group.
             if not (moduleMember :? IOpenStatement) && not (isFollowedByEmptyLineOrComment moduleMember) then
@@ -123,6 +140,15 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
     | Some opens -> addOpenToOpensGroup opens
     | _ ->
 
+    match moduleDecl with
+    | :? IAnonModuleDeclaration when (fsFile.GetPsiModule() :? SandboxPsiModule) ->
+        moduleDecl.MembersEnumerable
+        |> Seq.skipWhile (fun m -> not (m :? IDoStatement))
+        |> Seq.tail
+        |> Seq.tryHead
+        |> Option.iter insertBeforeModuleMember
+    | _ ->
+
     match Seq.tryHead moduleDecl.MembersEnumerable with
     | None -> failwith "Expecting any module member"
     | Some firstModuleMember ->
@@ -148,9 +174,24 @@ let isInOpen (referenceName: IReferenceName) =
     | null -> false
     | node -> node.Parent :? IOpenStatement
 
-type OpenedModulesProvider(fsFile: IFSharpFile) =
-    let map = HashSet()
 
+[<RequireQualifiedAccess>]
+type OpenScope =
+    | Global
+    | Range of range: TreeTextRange
+
+[<RequireQualifiedAccess>]
+module OpenScope =
+    let includesOffset (offset: TreeOffset) (scope: OpenScope) =
+        match scope with
+        | OpenScope.Range range -> range.Contains(offset)
+        | _ -> true
+
+
+type OpenedModulesProvider(fsFile: IFSharpFile) =
+    let map = OneToListMap<string, OpenScope>()
+
+    let document = fsFile.GetSourceFile().Document
     let psiModule = fsFile.GetPsiModule()
     let symbolScope = getModuleOnlySymbolScope psiModule
 
@@ -159,20 +200,22 @@ type OpenedModulesProvider(fsFile: IFSharpFile) =
 //        | [] -> "global"
 //        | names -> names |> List.map (fun el -> el.GetSourceName()) |> String.concat "."
 
-    let import (element: IClrDeclaredElement) =
-        map.Add(element.GetSourceName()) |> ignore
+    let import scope (element: IClrDeclaredElement) =
+        map.Add(element.GetSourceName(), scope) |> ignore
         for autoImportedModule in getNestedAutoImportedModules element symbolScope do
-            map.Add(autoImportedModule.GetSourceName()) |> ignore
+            map.Add(autoImportedModule.GetSourceName(), scope) |> ignore
 
     do
-        import symbolScope.GlobalNamespace
+        import OpenScope.Global symbolScope.GlobalNamespace
 
         for moduleDecl in fsFile.ModuleDeclarationsEnumerable do
             let topLevelModuleDecl = moduleDecl.As<ITopLevelModuleLikeDeclaration>()
             if isNotNull topLevelModuleDecl then
+                // todo: use inner range only
+                let scope = OpenScope.Range(topLevelModuleDecl.GetTreeTextRange())
                 match topLevelModuleDecl.DeclaredElement with
-                | :? INamespace as ns -> import ns
-                | :? ITypeElement as ty -> import (ty.GetContainingNamespace())
+                | :? INamespace as ns -> import scope ns
+                | :? ITypeElement as ty -> import scope (ty.GetContainingNamespace())
                 | _ -> ()
 
         match fsFile.GetParseAndCheckResults(true, "OpenedModulesProvider") with
@@ -180,9 +223,10 @@ type OpenedModulesProvider(fsFile: IFSharpFile) =
         | Some results ->
 
         for fcsOpenDecl in results.CheckResults.OpenDeclarations do
+            let scope = OpenScope.Range(getTreeTextRange document fcsOpenDecl.AppliedScope)
             for fcsEntity in fcsOpenDecl.Modules do
                 let declaredElement = fcsEntity.GetDeclaredElement(psiModule).As<IClrDeclaredElement>()
                 if isNotNull declaredElement then
-                    import declaredElement
+                    import scope declaredElement
 
     member x.GetOpenedModuleNames = map

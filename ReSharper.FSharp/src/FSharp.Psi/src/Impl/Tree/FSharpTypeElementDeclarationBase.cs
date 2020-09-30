@@ -49,7 +49,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        var result = new LocalList<ITypeMemberDeclaration>();
+        static void ProcessBinding(IBinding binding, ICollection<ITypeMemberDeclaration> result)
+        {
+          var headPattern = binding.HeadPattern;
+          if (headPattern == null)
+            return;
+
+          foreach (var declaration in headPattern.Declarations)
+          {
+            if (declaration is ITypeMemberDeclaration typeMemberDeclaration)
+              result.Add(typeMemberDeclaration);
+          }
+        }
+
+        var result = new List<ITypeMemberDeclaration>();
         foreach (var child in this.Children())
         {
           if (child is ITypeMemberDeclaration m)
@@ -69,22 +82,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                 result.Add(typeDeclaration);
             }
 
-          if (child is ILetModuleDecl let)
+          if (child is ILetBindingsDeclaration let)
             foreach (var binding in let.Bindings)
-            {
-              var headPattern = binding.HeadPattern;
-              if (headPattern == null)
-                continue;
+              ProcessBinding(binding, result);
 
-              foreach (var declaration in headPattern.Declarations)
-              {
-                if (declaration is ITypeMemberDeclaration typeMemberDeclaration)
-                  result.Add(typeMemberDeclaration);
-              }
-            }
+          if (child is IBindingSignature bindingSignature) 
+            ProcessBinding(bindingSignature, result);
         }
 
-        return result.ReadOnlyList();
+        return result.AsReadOnly();
       }
     }
 

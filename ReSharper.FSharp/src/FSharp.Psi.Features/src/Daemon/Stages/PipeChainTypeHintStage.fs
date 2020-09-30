@@ -2,23 +2,23 @@
 
 open System
 open System.Collections.Generic
+open FSharp.Compiler.Layout
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.Stages
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open FSharp.Compiler.SourceCodeServices
-open FSharp.Compiler.Layout
 open JetBrains.Util.Logging
 
 [<RequireQualifiedAccess>]

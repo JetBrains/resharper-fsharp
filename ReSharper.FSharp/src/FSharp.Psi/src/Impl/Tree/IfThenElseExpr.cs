@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IType Type() =>
       ElseExpr != null
-        ? ThenExpr?.Type() ?? TypeFactory.CreateUnknownType(GetPsiModule())
+        ? ThenExpr?.Type() ?? base.Type()
         : GetPsiModule().GetPredefinedType().Void;
   }
 }

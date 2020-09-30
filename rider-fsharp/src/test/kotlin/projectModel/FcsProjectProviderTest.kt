@@ -23,7 +23,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
         ProjectViewTestUtil.setupImpl(project, true)
     }
 
-    @Test
+    @Test(enabled = false)
     @TestEnvironment(solution = "ProjectReferencesFSharp")
     fun projectReferencesFSharp() {
         assertAllProjectsWereLoaded(project)
@@ -45,7 +45,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     @TestEnvironment(solution = "ProjectReferencesCSharp")
     fun projectReferencesCSharp() {
         assertAllProjectsWereLoaded(project)

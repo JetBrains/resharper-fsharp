@@ -27,14 +27,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override ReferenceCollection GetFirstClassReferences() =>
       new ReferenceCollection(Reference);
-
-    public override IType Type()
-    {
-      var resolveResult = Reference.Resolve().Result;
-      return resolveResult.DeclaredElement is ITypeElement typeElement
-        ? TypeFactory.CreateType(typeElement)
-        : TypeFactory.CreateUnknownType(GetPsiModule());
-    }
   }
 
   public class RecordCtorReference : FSharpSymbolReference
@@ -48,13 +40,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override bool HasMultipleNames => true;
 
     public override HybridCollection<string> GetAllNames() =>
-      new HybridCollection<string>(RecordExpr.ExprBindings.Select(b => b.ReferenceName?.ShortName).WhereNotNull());
+      new HybridCollection<string>(RecordExpr.FieldBindings.Select(b => b.ReferenceName?.ShortName).WhereNotNull());
 
     public override TreeOffset SymbolOffset
     {
       get
       {
-        foreach (var binding in RecordExpr.ExprBindings)
+        foreach (var binding in RecordExpr.FieldBindings)
           if (binding.ReferenceName?.Identifier is ITokenNode token)
             return token.GetTreeStartOffset();
 
@@ -69,16 +61,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return field.DeclaringEntity?.Value;
 
       // todo: cover other contexts
-      var binding = BindingNavigator.GetByExpression(RecordExpr.IgnoreParentParens());
+      var sequentialExpr = SequentialExprNavigator.GetByExpression(RecordExpr.IgnoreParentParens());
+      if (sequentialExpr != null && sequentialExpr.Expressions.Last() != RecordExpr)
+        return null;
+      var exprToGetBy = sequentialExpr ?? RecordExpr.IgnoreParentParens();
+
+      var binding = BindingNavigator.GetByExpression(exprToGetBy);
       if (binding == null || !(binding.HeadPattern is INamedPat namedPat))
         return null;
 
       var mfv = namedPat.GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
-      var fsType = mfv?.FullType;
-      if (fsType == null || !fsType.HasTypeDefinition)
+      var returnParameterType = mfv?.ReturnParameter.Type;
+      if (returnParameterType == null || !returnParameterType.HasTypeDefinition)
         return null;
 
-      var entity = fsType.TypeDefinition;
+      var entity = returnParameterType.TypeDefinition;
       return entity.IsFSharpRecord ? entity : null;
     }
 

@@ -3,11 +3,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.FileTypes
 open JetBrains.ReSharper.Feature.Services.CodeStructure
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Files
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
@@ -31,12 +31,12 @@ type FSharpStructureTest() =
     [<Test>] member x.``Class bindings 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 01``() = x.DoNamedTest()
 
-    override x.DoTest(lifetime: Lifetime, project: IProject) =
+    override x.DoTest(_: Lifetime, project: IProject) =
         let items = project.GetSubItems(x.TestName)
         let projectFile = items.FirstOrDefault().As<IProjectFile>().NotNull()
         let sourceFile = projectFile.ToSourceFile().NotNull()
-        let fsFile = sourceFile.GetDominantPsiFile<FSharpLanguage>().NotNull()
 
-        let structureProvider = x.LanguageManager.TryGetService<IPsiFileCodeStructureProvider>(fsFile.Language)
-        let root = structureProvider.Build(fsFile, CodeStructureOptions.Default)
+        let services = Shell.Instance.GetComponent<IProjectFileTypeServices>()
+        let structureProvider = services.TryGetService<IProjectFileCodeStructureProvider>(sourceFile.LanguageType)
+        let root = structureProvider.Build(sourceFile, CodeStructureOptions.Default)
         x.ExecuteWithGold(projectFile, fun writer -> root.Dump(writer))

@@ -1,0 +1,46 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDoStatement
+      IChameleonExpression
+        IMatchExpr
+          FSharpTokenType+MatchTokenElement(type:MATCH, text:match)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IUnitExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+WithTokenElement(type:WITH, text:with)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          IMatchClause
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ILocalParametersOwnerPat
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:Some)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IParenPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                ITuplePat
+                  IListConsPat
+                    ILocalReferencePat
+                      IExpressionReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:x)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    FSharpTokenType+ColonColonTokenElement(type:COLON_COLON, text:::)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    IWildPat
+                      FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+                  FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  IWildPat
+                    FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IUnitExpr
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

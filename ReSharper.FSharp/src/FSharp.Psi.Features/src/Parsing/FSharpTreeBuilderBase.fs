@@ -308,15 +308,23 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             for f in fields do x.ProcessField f fieldElementType
             not fields.IsEmpty
 
-        | UnionCaseFullType(_) ->
+        | UnionCaseFullType _ ->
             true // todo: used in FSharp.Core only, otherwise warning
 
     member x.ProcessSimpleTypeRepresentation(repr) =
         match repr with
         | SynTypeDefnSimpleRepr.Record(_, fields, range) ->
             let mark = x.Mark(range)
-            for field in fields do
-                x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+
+            if not fields.IsEmpty then
+                let (Field(_, _, _, _, _, _, _, firstFieldRange)) = fields.Head
+                let (Field(_, _, _, _, _, _, _, lastFieldRange)) = List.last fields
+
+                let fieldListMark = x.Mark(firstFieldRange)
+                for field in fields do
+                    x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+                x.Done(lastFieldRange, fieldListMark, ElementType.RECORD_FIELD_DECLARATION_LIST)
+
             x.Done(range, mark, ElementType.RECORD_REPRESENTATION)
             ElementType.RECORD_DECLARATION
 
@@ -402,8 +410,9 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
         x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
-    member x.ProcessEnumCase(EnumCase(_, _, _, _, range)) =
+    member x.ProcessEnumCase(EnumCase(attrs, _, _, _, range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
+        x.ProcessAttributeLists(attrs)
         x.Done(range, mark, ElementType.ENUM_MEMBER_DECLARATION)
 
     member x.ProcessField(Field(attrs, _, id, synType, _, _, _, range)) elementType =
@@ -451,7 +460,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | _ -> ()
 
         x.Done(range, parenPatMark, ElementType.PAREN_PAT)
-        x.Done(range, paramMark, ElementType.MEMBER_PARAMS_DECLARATION)
+        x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
 
     member x.ProcessImplicitCtorParam(pat: SynSimplePat) =
         match pat with

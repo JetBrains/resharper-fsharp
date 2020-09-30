@@ -6,11 +6,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -40,7 +38,7 @@ type FSharpPostfixTemplateContextFactory() =
             if isNull treeNode then null else
 
             let solution = executionContext.Solution
-            if not (solution.FSharpExperimentalFeaturesEnabled()) then null else
+            if not (solution.FSharpPostfixTemplatesEnabled()) then null else
 
             FSharpPostfixTemplateContext(treeNode, executionContext) :> _
 
@@ -54,7 +52,7 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
         let context = fsCompletionContext.BasicContext
         let solution = context.Solution
 
-        if not (solution.FSharpExperimentalFeaturesEnabled()) then null else
+        if not (solution.FSharpPostfixTemplatesEnabled()) then null else
 
         let settings = context.ContextBoundSettingsStore
         let executionContext = PostfixTemplateExecutionContext(solution, context.TextControl, settings, "__")

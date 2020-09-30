@@ -1,0 +1,43 @@
+﻿open System
+open System.Reflection
+
+module M =
+    let [<Literal>] X = ""
+
+let [<Literal>] Y = ""
+
+
+[<assembly: AssemblyTitle(M.X)>]
+do()
+
+[<assembly: AssemblyTitle(Y)>]
+do()
+
+[<assembly: AssemblyTitle|(|(0)"Foo"|)|(1)>]
+do()
+
+
+[<AttributeUsage(AttributeTargets.All, AllowMultiple = true)>]
+type A(a: int[]) =
+    inherit Attribute()
+
+[<assembly: A [||]>]
+do()
+
+[<assembly: A|(|(2)[||]|)|(3)>]
+do()
+
+
+[<assembly: AssemblyDelaySign true>]
+do()
+
+[<assembly: AssemblyDelaySign|(|(4)true|)|(5)>]
+do()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses

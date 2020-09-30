@@ -1,8 +1,6 @@
-module Module
-
 do
     match () with
-    | _ -> ()
-    | deleted -> (){caret}
-    | _ -> ()
+    | a -> ()
+    | b -> (){caret}
+    | c -> ()
     ()

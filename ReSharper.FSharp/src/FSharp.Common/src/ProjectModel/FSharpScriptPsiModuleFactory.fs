@@ -303,7 +303,7 @@ type FSharpScriptPsiModulesProvider
         member x.Modules = psiModulesCollection
 
     interface IChangeProvider with
-        member x.Execute(_) = null
+        member x.Execute _ = null
 
 
 /// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc). 

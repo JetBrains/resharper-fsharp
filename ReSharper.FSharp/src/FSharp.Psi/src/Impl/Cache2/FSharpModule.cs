@@ -15,8 +15,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
     }
 
-    protected override IList<IDeclaredType> CalcSuperTypes() =>
-      new[] {Module.GetPredefinedType().Object};
+    protected override LocalList<IDeclaredType> CalcSuperTypes() =>
+      new LocalList<IDeclaredType>(new[] {Module.GetPredefinedType().Object});
 
     private IModulePart ModulePart =>
       this.GetPart<IModulePart>().NotNull();

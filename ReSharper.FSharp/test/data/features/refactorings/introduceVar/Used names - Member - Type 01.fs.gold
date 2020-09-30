@@ -1,0 +1,4 @@
+﻿Suggested names: i1
+type T() =
+    let i1 = 123
+    let i = i1

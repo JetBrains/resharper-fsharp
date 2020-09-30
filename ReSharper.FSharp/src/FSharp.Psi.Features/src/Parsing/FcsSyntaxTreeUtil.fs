@@ -74,8 +74,8 @@ let rec skipGeneratedLambdas expr =
 
 and skipGeneratedMatch expr =
     match expr with
-    | SynExpr.Match(_, _, [ Clause(_, _, innerExpr, clauseRange, _) ], matchRange) when
-            matchRange.Start = clauseRange.Start ->
+    | SynExpr.Match(_, _, [ Clause(_, _, innerExpr, _, _) as clause ], matchRange) when
+            matchRange.Start = clause.Range.Start ->
         skipGeneratedMatch innerExpr
     | _ -> expr
 

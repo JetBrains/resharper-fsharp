@@ -1,0 +1,8 @@
+﻿module Test
+
+let _ = |fun x -> (fun _ -> ()) x|(0)
+
+------------------------------------------------
+0: Lambda can be simplified
+QUICKFIXES:
+Simplify lambda

@@ -1,7 +1,7 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
-    IDo
+    IDoStatement
       IChameleonExpression
         ITryWithExpr
           FSharpTokenType+TryTokenElement(type:TRY, text:try)

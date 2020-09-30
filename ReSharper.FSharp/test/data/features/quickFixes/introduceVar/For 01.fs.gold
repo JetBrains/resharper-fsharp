@@ -1,4 +1,2 @@
-﻿module Module
-
-for _ in [] do
+﻿for _ in [] do
     let {selstart}i{selend} = 123

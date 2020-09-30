@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
         var typeParameters = AllTypeParameters;
         var methodParams = new List<IParameter>(paramsCount);
-        if (isFsExtension)
+        if (isFsExtension && mfv.IsInstanceMember)
         {
           var typeElement = mfv.ApparentEnclosingEntity.GetTypeElement(Module);
 

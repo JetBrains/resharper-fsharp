@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Psi.Resolve;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class UnionCaseTag : FSharpGeneratedMemberBase, IField, IFSharpGeneratedFromOtherElement
+  public class UnionCaseTag : FSharpGeneratedMemberBase, IField, IFSharpGeneratedFromUnionCase
   {
     private IUnionCase UnionCase { get; }
 

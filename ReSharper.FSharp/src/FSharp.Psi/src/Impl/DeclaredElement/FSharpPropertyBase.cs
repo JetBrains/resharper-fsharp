@@ -9,10 +9,11 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpPropertyBase<TDeclaration> : FSharpMemberBase<TDeclaration>, IProperty
+  
+  internal abstract class FSharpPropertyMemberBase<TDeclaration> : FSharpPropertyBase<TDeclaration>
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpPropertyBase([NotNull] ITypeMemberDeclaration declaration,
+    protected FSharpPropertyMemberBase([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
     {
       var prop = GetProperty(mfv);
@@ -23,6 +24,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       IsWritable = prop.IsMutable || prop.HasSetterMethod || prop.IsPropertySetterMethod;
     }
 
+    public override bool IsReadable { get; }
+    public override bool IsWritable { get; }
+
     [NotNull]
     private FSharpMemberOrFunctionOrValue GetProperty([NotNull] FSharpMemberOrFunctionOrValue prop)
     {
@@ -32,6 +36,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       var propertyName = prop.LogicalName;
       return entity?.MembersFunctionsAndValues.FirstOrDefault(m => m.LogicalName == propertyName) ?? prop;
     }
+  }
+
+  internal abstract class FSharpPropertyBase<TDeclaration> : FSharpMemberBase<TDeclaration>, IProperty
+    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
+  {
+    protected FSharpPropertyBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
+    {
+    }
+
 
     protected override FSharpSymbol GetActualSymbol(FSharpSymbol symbol)
     {
@@ -68,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public InvocableSignature GetSignature(ISubstitution substitution) =>
       new InvocableSignature(this, substitution);
-    
+
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.PROPERTY;
 
@@ -76,8 +89,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public IAccessor Getter => IsReadable ? new ImplicitAccessor(this, AccessorKind.GETTER) : null;
     public IAccessor Setter => IsWritable ? new ImplicitAccessor(this, AccessorKind.SETTER) : null;
-    public bool IsReadable { get; }
-    public bool IsWritable { get; }
+
+    public abstract bool IsReadable { get; }
+    public abstract bool IsWritable { get; }
+
     public bool IsAuto => false;
     public bool IsDefault => false;
   }

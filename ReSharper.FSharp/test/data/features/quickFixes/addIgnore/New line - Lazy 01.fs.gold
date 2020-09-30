@@ -1,6 +1,4 @@
-﻿module Module
-
-let a =
+﻿let a =
     lazy{caret}
         1
     |> ignore

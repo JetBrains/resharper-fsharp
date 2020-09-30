@@ -1,0 +1,14 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    Module.F(1);
+    Module.F("");
+  }
+}
+
+---------------------------------------------------------
+M:Module.F(System.Int32)
+M:Module.F(System.Int32)
+M:Module.F(System.String)
+M:Module.F(System.String)

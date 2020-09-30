@@ -1,4 +1,2 @@
-﻿module Module
-
-if true then
+﻿if true then
     "" |> ignore{caret}

@@ -1,0 +1,4 @@
+module Module
+
+let r = { A = 0
+          B = 0 }

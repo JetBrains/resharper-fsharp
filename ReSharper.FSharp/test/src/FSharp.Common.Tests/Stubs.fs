@@ -1,9 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Common.Tests.Stubs
 
+open JetBrains.Application
 open JetBrains.Application.Components
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 
-[<SolutionComponent>]
+[<ShellComponent>]
 type TestFcsReactorMonitor() =
+    inherit FcsReactorMonitorStub()
+
     interface IHideImplementation<FcsReactorMonitor>

@@ -43,8 +43,5 @@ and NotPostfixTemplateBehavior(info) =
             let appExpr = elementFactory.CreateAppExpr("not", refExpr)
             let appExpr = ModificationUtil.ReplaceChild(refExpr, appExpr)
 
-            let expr = appExpr.ArgumentExpression
-            if not (needsParens expr) then appExpr :> ITreeNode else
-
-            addParens expr |> ignore
+            addParensIfNeeded appExpr.ArgumentExpression |> ignore
             appExpr :> ITreeNode)
