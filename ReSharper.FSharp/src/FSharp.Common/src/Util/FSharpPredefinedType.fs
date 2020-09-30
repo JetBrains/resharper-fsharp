@@ -1,6 +1,7 @@
 [<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 
+open System.Collections.Generic
 open JetBrains.Metadata.Reader.API
 open JetBrains.Metadata.Reader.Impl
 open JetBrains.ReSharper.Psi
@@ -68,12 +69,18 @@ let languagePrimitivesModuleTypeName = clrTypeName "Microsoft.FSharp.Core.Langua
 [<CompiledName("IntrinsicTypeName")>]
 let intrinsicOperatorsTypeName = clrTypeName "Microsoft.FSharp.Core.LanguagePrimitives+IntrinsicOperators"
 
+[<CompiledName("UnitTypeName")>]
+let unitTypeName = clrTypeName "Microsoft.FSharp.Core.Unit"
+
+
 let predefinedFunctionTypes =
-    [| operatorsModuleTypeName, [| "not"; "|>"; "<|"; "<>"; "="; "typeof" |]
+    [| operatorsModuleTypeName, [| "not"; "id"; "ignore"; "|>"; "<|"; "<>"; "="; "typeof" |]
        intrinsicOperatorsTypeName, [| "||"; "&&" |] |]
     |> Array.collect (fun (typeName, names) -> [| for name in names -> name, typeName |])
     |> dict
 
+[<CompiledName("PipeOperatorNames")>]
+let pipeOperatorNames = [| "|>"; "||>"; "|||>"; "<|"; "<||"; "<|||" |] |> HashSet
 
 /// This map is used in Find Usages to get source name of element without having FSharpSymbol element.
 /// It should be removed when it's possible to get abbreviation definitions from assemblies.

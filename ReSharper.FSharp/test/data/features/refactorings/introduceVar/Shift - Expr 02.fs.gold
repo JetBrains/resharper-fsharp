@@ -1,7 +1,7 @@
-﻿Suggested names: foo
+﻿Suggested names: i
 do
-  let foo = 
+  let i = 
     id
       id
         1
-  ignore (foo)
+  ignore (i)

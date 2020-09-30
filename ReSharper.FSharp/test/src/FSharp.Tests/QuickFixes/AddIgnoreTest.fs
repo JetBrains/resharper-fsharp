@@ -4,12 +4,12 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
 type AddIgnoreTest() =
-    inherit QuickFixTestBase<AddIgnoreFix>()
+    inherit FSharpQuickFixTestBase<AddIgnoreFix>()
 
     let [<Literal>] OccurrenceName = "OCCURRENCE"
 
@@ -47,7 +47,7 @@ type AddIgnoreTest() =
         let occurrenceName = QuickFixTestBase.GetSetting(textControl, OccurrenceName)
         if isNotNull occurrenceName then
             let workflowPopupMenu = x.Solution.GetComponent<TestWorkflowPopupMenu>()
-            workflowPopupMenu.SetTestData(x.TestLifetime, fun _ occurrences _ _ ->
+            workflowPopupMenu.SetTestData(x.TestLifetime, fun _ occurrences _ _ _ ->
                 occurrences
                 |> Array.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
                 |> Option.defaultWith (fun _ -> failwithf "Could not find %s occurrence" occurrenceName))

@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Compile Include="src\Util\FSharpGlobalUtil.fs" />
-    <Compile Include="src\Util\RegistryUtil.fs" />
     <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\Util\FSharpPredefinedType.fs" />
     <Compile Include="src\Util\FSharpRangeUtil.fs" />
@@ -24,11 +23,16 @@
     <Compile Include="src\ProjectModel\FSharpProjectModelUtil.fs" />
     <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
     <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
+    <Compile Include="src\Settings\FSharpOptionsPageBase.fs" />
+    <Compile Include="src\Settings\FSharpOptions.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
     <Compile Include="src\Util\FSharpXmlDocService.fs" />
     <Compile Include="src\Util\CacheUtil.fs" />
     <Compile Include="src\Util\FSharpHighlightingAttributeIds.fs" />
+    <Compile Include="src\Util\FcsExpressionUtil.fs" />
+    <Compile Include="src\Util\RegistryUtil.fs" />
+    <Compile Include="src\Util\FcsReactorMonitor.fs" />
     <Compile Include="src\Settings\FSharpOptionsPageBase.fs" />
     <Compile Include="src\Settings\FSharpOptions.fs" />
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
@@ -39,8 +43,9 @@
     <Compile Include="src\ProjectModel\FSharpFileService.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
     <Compile Include="src\ProjectModel\ProjectLoadDiagnostics.fs" />
-    <Compile Include="src\Checker\FSharpProjectOptionsBuilder.fs" />
-    <Compile Include="src\Checker\FSharpProjectOptionsProvider.fs" />
+    <Compile Include="src\Checker\ScriptFcsProjectProvider.fs" />
+    <Compile Include="src\Checker\FcsProjectBuilder.fs" />
+    <Compile Include="src\Checker\FcsProjectProvider.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
   </ItemGroup>
 

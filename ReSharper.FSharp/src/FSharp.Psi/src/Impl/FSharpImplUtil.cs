@@ -8,6 +8,7 @@ using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
@@ -15,7 +16,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -45,6 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public const string Class = "Class";
     public const string Sealed = "Sealed";
     public const string Struct = "Struct";
+    public const string AutoOpen = "AutoOpen";
 
     [NotNull] public static string GetShortName([NotNull] this IAttribute attr) =>
       attr.ReferenceName?.ShortName.GetAttributeShortName() ?? SharedImplUtil.MISSING_DECLARATION_NAME;
@@ -281,8 +282,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           return typeDeclaration.AllAttributes;
         case IMemberDeclaration memberDeclaration:
           return memberDeclaration.Attributes;
-        case ISynPat pat:
-          return pat.Attributes;
+        case IFSharpPattern fsPattern:
+          return fsPattern.Attributes;
         case IDeclaredModuleDeclaration moduleDeclaration:
           return moduleDeclaration.Attributes;
         default: return TreeNodeCollection<IAttribute>.Empty;
@@ -389,7 +390,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       Assertion.Assert(moduleTypeElement.IsCompiledModule(), "moduleTypeElement.IsCompiledModule()");
 
       bool IsAssociatedType(ITypeElement t) =>
-        !t.Equals(moduleTypeElement) && t.TypeParameters.Count == 0 && t.GetSourceName() == sourceName;
+        !t.Equals(moduleTypeElement) && t.TypeParameters.Count == 0 && 
+        !t.IsCompiledModule() && t.GetSourceName() == sourceName;
 
       var containingType = moduleTypeElement.GetContainingType();
       if (containingType != null)
@@ -624,6 +626,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return null;
     }
 
+    public static bool HasAttribute([NotNull] this TypeElement typeElement, string attrShortName)
+    {
+      foreach (var part in typeElement.EnumerateParts())
+        if (part.AttributeClassNames.Contains(attrShortName))
+          return true;
+      return false;
+    }
+
+    public static bool HasAutoOpenAttribute([NotNull] this ITypeElement typeElement) =>
+      typeElement switch
+      {
+        FSharpModule fsModule => HasAttribute(fsModule, AutoOpen),
+        IFSharpTypeElement _ => false,
+        _ => typeElement.HasAttributeInstance(FSharpPredefinedType.AutoOpenAttrTypeName, false)
+      };
+
     public static bool IsRecord([NotNull] this ITypeElement typeElement) =>
       typeElement switch
       {
@@ -650,7 +668,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     public static bool IsModule(this ITypeElement typeElement) =>
-      typeElement is IModule ||
+      typeElement is IFSharpModule ||
       typeElement is ICompiledElement compiledElement && compiledElement.IsCompiledModule();
 
     public static ModuleMembersAccessKind GetAccessType([NotNull] this ITypeElement typeElement)
@@ -658,7 +676,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       Assertion.Assert(typeElement.IsModule(), "typeElement.IsModule()");
       return typeElement switch
       {
-        IModule module => module.AccessKind,
+        IFSharpModule module => module.AccessKind,
         ICompiledElement _ =>
           typeElement.HasRequireQualifiedAccessAttribute()
             ? ModuleMembersAccessKind.RequiresQualifiedAccess
@@ -667,8 +685,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       };
     }
 
-    public static IFSharpExpression IgnoreParentParens([NotNull] this IFSharpExpression fsExpr)
+    public static bool RequiresQualifiedAccess([NotNull] this ITypeElement typeElement) => 
+      typeElement.GetAccessType() == ModuleMembersAccessKind.RequiresQualifiedAccess;
+
+    [CanBeNull]
+    public static IFSharpExpression IgnoreParentParens([CanBeNull] this IFSharpExpression fsExpr)
     {
+      if (fsExpr == null) return null;
+
       while (fsExpr.Parent is IParenExpr parenExpr)
         fsExpr = parenExpr;
       return fsExpr;
@@ -690,24 +714,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return fsExpr;
     }
     
-    public static ISynPat IgnoreParentParens([CanBeNull] this ISynPat synPat)
+    public static IFSharpPattern IgnoreParentParens([CanBeNull] this IFSharpPattern fsPattern)
     {
-      if (synPat == null)
+      if (fsPattern == null)
         return null;
 
-      while (synPat.Parent is IParenPat parenPat)
-        synPat = parenPat;
-      return synPat;
+      while (fsPattern.Parent is IParenPat parenPat)
+        fsPattern = parenPat;
+      return fsPattern;
     }
 
-    public static ISynPat IgnoreInnerParens([CanBeNull] this ISynPat synPat)
+    public static IFSharpPattern IgnoreInnerParens([CanBeNull] this IFSharpPattern fsPattern)
     {
-      if (synPat == null)
+      if (fsPattern == null)
         return null;
 
-      while (synPat is IParenPat parenPat && parenPat.Pattern != null)
-        synPat = parenPat.Pattern;
-      return synPat;
+      while (fsPattern is IParenPat parenPat && parenPat.Pattern != null)
+        fsPattern = parenPat.Pattern;
+      return fsPattern;
     }
     
     [NotNull]
@@ -718,17 +742,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));
 
       return referenceOwner;
-    }
-
-    [NotNull]
-    public static string GetQualifiedName([NotNull] this IReferenceName referenceName)
-    {
-      var qualifier = referenceName.Qualifier;
-      var shortName = referenceName.ShortName;
-
-      return qualifier == null
-        ? shortName
-        : qualifier.QualifiedName + "." + shortName;
     }
 
     [NotNull]
@@ -746,22 +759,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : qualifier.QualifiedName;
     }
 
-    public static IList<string> GetNames([CanBeNull] this IReferenceName referenceName)
+    public static IList<string> GetNames([CanBeNull] this IReferenceExpr referenceExpr)
     {
       var result = new List<string>();
-      while (referenceName != null)
+      while (referenceExpr != null)
       {
-        var shortName = referenceName.ShortName;
+        var shortName = referenceExpr.ShortName;
         if (shortName.IsEmpty() || shortName == SharedImplUtil.MISSING_DECLARATION_NAME)
           break;
 
         result.Insert(0, shortName);
-        referenceName = referenceName.Qualifier;
+        referenceExpr = referenceExpr.Qualifier as IReferenceExpr;
       }
 
       return result;
     }
 
+    
     public static ModuleMembersAccessKind GetAccessType([NotNull] this IDeclaredModuleDeclaration moduleDeclaration)
     {
       var autoOpen = false;
@@ -781,26 +795,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : ModuleMembersAccessKind.Normal;
     }
 
-    [CanBeNull]
-    public static IReferenceName GetFirstQualifier([NotNull] this IReferenceName referenceName)
-    {
-      var qualifier = referenceName.Qualifier;
-      while (qualifier != null)
-      {
-        referenceName = qualifier;
-        qualifier = referenceName.Qualifier;
-      }
-
-      return referenceName;
-    }
-
-    public static IReferenceName GetFirstName([NotNull] this IReferenceName referenceName)
-    {
-      var firstQualifier = referenceName.GetFirstQualifier();
-      return firstQualifier ?? referenceName;
-    }
-    
     public static IList<ITypeParameter> GetAllTypeParametersReversed(this ITypeElement typeElement) =>
       typeElement.GetAllTypeParameters().ResultingList().Reverse();
+
+    [CanBeNull]
+    public static IDeclaredElement TryCreateOperator<TDeclaration>([NotNull] this TDeclaration decl)
+      where TDeclaration : FSharpDeclarationBase, IModifiersOwnerDeclaration, ITypeMemberDeclaration
+    {
+      var name = decl.DeclaredName;
+      if (!name.StartsWith("op_", StringComparison.Ordinal))
+        return null;
+
+      switch (name)
+      {
+        case StandardOperatorNames.Explicit:
+          return new FSharpConversionOperator<TDeclaration>(decl, true);
+        case StandardOperatorNames.Implicit:
+          return new FSharpConversionOperator<TDeclaration>(decl, false);
+        default:
+          return new FSharpSignOperator<TDeclaration>(decl);
+      }
+    }
   }
 }

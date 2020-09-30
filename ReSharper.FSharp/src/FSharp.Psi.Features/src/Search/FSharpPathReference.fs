@@ -48,7 +48,7 @@ type FSharpPathReference(owner, sourceFile) =
         let fsFile = owner.GetContainingFile() :?> IFSharpFile
         let document = sourceFile.Document
         let tokenStartOffset = owner.Parent.GetTreeStartOffset()
-        fsFile.CheckerService.OptionsProvider.GetProjectOptions(sourceFile)
+        fsFile.CheckerService.FcsProjectProvider.GetProjectOptions(sourceFile)
         |> Option.bind (fun options ->
             options.OriginalLoadReferences
             |> List.tryFind (fun (range, _, _) -> getTreeStartOffset document range = tokenStartOffset)
@@ -69,6 +69,6 @@ type FSharpPathReference(owner, sourceFile) =
      override x.GetAccessContext() = DefaultAccessContext(owner) :> _
      override x.GetName() = SharedImplUtil.MISSING_DECLARATION_NAME
 
-     override x.GetReferenceSymbolTable(_) = failwith "not implemented"
+     override x.GetReferenceSymbolTable _ = failwith "not implemented"
      override x.BindTo(_, _) = failwith "not implemented"
-     override x.BindTo(_) = failwith "not implemented"
+     override x.BindTo _ = failwith "not implemented"

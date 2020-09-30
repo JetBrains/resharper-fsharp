@@ -1,48 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TopReferencePat
-  {
-    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
-    public override TreeTextRange GetNameRange() => NameIdentifier.GetNameRange();
-
-    public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
-
-    public override TreeTextRange GetNameIdentifierRange() =>
-      NameIdentifier.GetMemberNameIdentifierRange();
-
-    public TreeNodeCollection<IAttribute> Attributes =>
-      this.GetBinding()?.AllAttributes ??
-      TreeNodeCollection<IAttribute>.Empty;
-  }
-
-  internal partial class TopParametersOwnerPat
-  {
-    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
-    public override string SourceName => IsDeclaration ? base.SourceName : SharedImplUtil.MISSING_DECLARATION_NAME;
-    public override TreeTextRange GetNameRange() => IsDeclaration ? base.GetNameRange() : TreeTextRange.InvalidRange;
-
-    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
-
-    protected override IDeclaredElement CreateDeclaredElement() =>
-      IsDeclaration ? base.CreateDeclaredElement() : null;
-
-    public TreeNodeCollection<IAttribute> Attributes =>
-      this.GetBinding()?.AllAttributes ??
-      TreeNodeCollection<IAttribute>.Empty;
-  }
-  
   internal abstract class TopPatternDeclarationBase : FSharpProperTypeMemberDeclarationBase, IFunctionDeclaration
   {
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
@@ -53,66 +20,106 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (typeDeclaration == null)
         return null;
 
-      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
+      if (TryCreateDeclaredElementFast(typeDeclaration) is var declaredElement && declaredElement != null)
+        return declaredElement;
+
+      return GetFSharpSymbol() is { } fcsSymbol
+        ? CreateDeclaredElement(fcsSymbol)
+        : null;
+    }
+
+    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol) =>
+      CreateBindingDeclaredElement(fcsSymbol, this);
+
+    public static IDeclaredElement CreateBindingDeclaredElement([NotNull] FSharpSymbol fcsSymbol,
+      [NotNull] TopPatternDeclarationBase declaration)
+    {
+      if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv))
+        return null;
+
+      var typeDeclaration = declaration.GetContainingNode<ITypeDeclaration>();
+      if (typeDeclaration == null)
         return null;
 
       if (typeDeclaration is IFSharpTypeDeclaration)
       {
         if ((!mfv.CurriedParameterGroups.IsEmpty() || !mfv.GenericParameters.IsEmpty()) && !mfv.IsMutable)
-          return new FSharpTypePrivateMethod(this);
+          return new FSharpTypePrivateMethod(declaration);
 
         if (mfv.LiteralValue != null)
-          return new FSharpLiteral(this);
+          return new FSharpLiteral(declaration);
 
-        return new FSharpTypePrivateField(this); 
+        return new FSharpTypePrivateField(declaration);
       }
 
       if (mfv.LiteralValue != null)
-        return new FSharpLiteral(this);
+        return new FSharpLiteral(declaration);
 
       if (!mfv.IsValCompiledAsMethod())
-        return new ModuleValue(this, mfv);
+        return new ModuleValue(declaration);
 
       return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
-        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this)
-        : new ModuleFunction(this);
+        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(declaration)
+        : new ModuleFunction(declaration);
     }
-  }
 
-  internal abstract class SynPatternBase : FSharpCompositeElement
-  {
-    public virtual bool IsDeclaration => false;
-
-    public virtual IEnumerable<IDeclaration> Declarations =>
-      EmptyList<IDeclaration>.Instance;
-    
-    public TreeNodeCollection<IAttribute> Attributes => TreeNodeCollection<IAttribute>.Empty;
-  }
-
-  public static class NamedPatEx
-  {
     [CanBeNull]
-    public static IBinding GetBinding([CanBeNull] this INamedPat pat)
+    private IDeclaredElement TryCreateDeclaredElementFast(ITypeDeclaration typeDeclaration)
     {
-      if (pat == null)
+      var binding = TopBindingNavigator.GetByHeadPattern((IFSharpPattern) this);
+      if (binding == null)
         return null;
 
-      var node = pat.Parent;
-      while (node != null)
+      if (binding.IsMutable)
+        return CreateValue(typeDeclaration);
+
+      if (this is IParametersOwnerPat)
       {
-        switch (node)
-        {
-          case IBinding binding:
-            return binding;
-          case ITopParametersOwnerPat parametersOwner when parametersOwner.IsDeclaration:
-            return null;
-          default:
-            node = node.Parent;
-            break;
-        }
+        if (this.TryCreateOperator() is var opDeclaredElement && opDeclaredElement != null)
+          return opDeclaredElement;
+
+        return typeDeclaration is IFSharpTypeDeclaration
+          ? (IDeclaredElement) new FSharpTypePrivateMethod(this)
+          : new ModuleFunction(this);
       }
+
+      var chameleonExpr = binding.ChameleonExpression;
+
+      // No expression in signatures or parse error.
+      if (chameleonExpr == null)
+        return null;
+
+      if (TryCreateLiteral(binding, chameleonExpr) is var literal && literal != null)
+        return literal;
+
+      if (chameleonExpr.IsSimpleValueExpression())
+        return CreateValue(typeDeclaration);
 
       return null;
     }
+
+    [CanBeNull]
+    private IDeclaredElement TryCreateLiteral([NotNull] IBinding binding, [NotNull] IChameleonExpression chameleonExpr)
+    {
+      if (!binding.AllAttributes.HasAttribute("Literal"))
+        return null;
+
+      return chameleonExpr.IsLiteralExpression()
+        ? new FSharpLiteral(this)
+        : null;
+    }
+
+    [NotNull]
+    private IDeclaredElement CreateValue(ITypeDeclaration typeDeclaration) =>
+      typeDeclaration is IFSharpTypeDeclaration
+        ? (IDeclaredElement) new FSharpTypePrivateField(this)
+        : new ModuleValue(this);
+
+    public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
+
+    [CanBeNull] public abstract IBinding Binding { get; }
+
+    public bool CanBeMutable => Binding != null;
+    public override bool IsStatic => LetBindingsDeclarationNavigator.GetByBinding(Binding)?.StaticKeyword != null;
   }
 }

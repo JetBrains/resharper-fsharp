@@ -9,7 +9,7 @@
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access private method 'Dispose' here
+(0): ReSharper Underlined Error Highlighting: Cannot access explicit implementation of 'IDisposable.Dispose'
 M:Module.T.#ctor
-M:Module.T.Dispose
-M:Module.T.Dispose
+M:Module.T.System#IDisposable#Dispose
+M:Module.T.System#IDisposable#Dispose

@@ -72,7 +72,7 @@ type FSharpCodeFoldingProcess(logger: ILogger) =
 
     interface ICodeFoldingProcessor with
         member x.InteriorShouldBeProcessed(_,_) = false
-        member x.IsProcessingFinished(_) = processingFinished
+        member x.IsProcessingFinished _ = processingFinished
         member x.ProcessAfterInterior(_,_) = ()
         member x.ProcessBeforeInterior(element, context) =
             processingFinished <- true

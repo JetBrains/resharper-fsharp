@@ -14,7 +14,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     bool CanNavigateTo { get; }
 
     bool IsExtensionMember { get; }
-    bool IsFSharpMember { get; }
   }
 
   public interface IFSharpMember : IFSharpTypeMember
@@ -31,5 +30,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   {
     [NotNull] IClrDeclaredElement OriginElement { get; }
     IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer();
+  }
+
+  public interface IFSharpGeneratedFromUnionCase : IFSharpGeneratedFromOtherElement
+  {
   }
 }

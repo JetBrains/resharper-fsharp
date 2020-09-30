@@ -3,7 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Naming.Extentions
 open JetBrains.ReSharper.Psi.Naming.Impl
@@ -44,6 +44,12 @@ type FSharpNamingTest() =
     [<Test>] member x.``Pipe - Right 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Pipe - Left 01``() = x.DoNamedTest()
     [<Test>] member x.``Pipe - Left 02 - Nested``() = x.DoNamedTest()
+
+    [<Test>] member x.``Wild - Let - Top 01``() = x.DoNamedTest()
+    [<Test>] member x.``Wild - Let - Top 02 - StringBuilder``() = x.DoNamedTest()
+    [<Test>] member x.``Wild - Let - Top 03 - Method``() = x.DoNamedTest()
+
+    [<Test>] member x.``Wild - Match 01``() = x.DoNamedTest()
 
     override x.DoTest(lifetime, _) =
         let textControl = x.OpenTextControl(lifetime)

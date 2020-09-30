@@ -1,0 +1,11 @@
+﻿Suggested names: instance, i
+module Module
+
+let getOneInstance () = 1
+let oneInstance = 1
+
+let f i =
+    i
+    let instance = (getOneInstance ())
+    let _ = id instance
+    oneInstance

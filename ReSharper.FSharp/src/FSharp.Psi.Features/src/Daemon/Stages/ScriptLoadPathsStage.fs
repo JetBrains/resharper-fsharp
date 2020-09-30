@@ -3,8 +3,8 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 open System.Collections.Generic
 open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -52,7 +52,7 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
         fsFile.Accept(visitor)
         if allDirectives.IsEmpty() then () else
 
-        match fsFile.CheckerService.OptionsProvider.GetProjectOptions(daemonProcess.SourceFile) with
+        match fsFile.CheckerService.FcsProjectProvider.GetProjectOptions(daemonProcess.SourceFile) with
         | Some options when not options.OriginalLoadReferences.IsEmpty ->
             let document = daemonProcess.Document
             let linesCount = document.GetLineCount() |> int

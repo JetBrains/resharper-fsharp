@@ -1,0 +1,10 @@
+﻿module M
+
+type A(x: int) = class end
+
+type B() =
+    inherit A|(|(0)(1)|)|(1)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

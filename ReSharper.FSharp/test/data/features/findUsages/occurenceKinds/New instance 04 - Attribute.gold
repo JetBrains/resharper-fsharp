@@ -1,15 +1,15 @@
 ﻿Other
 ---
-TO: [O] [<|CompiledName|("X")] RANGE: (19,31) @ New instance 04 - Attribute.fs
+UsageOther TO: [O] [<|CompiledName|("X")] RANGE: (19,31) @ New instance 04 - Attribute.fs
 
 
 Attribute reference
 ---
-TO: [O] [<|CompiledName|("X")] RANGE: (19,31) @ New instance 04 - Attribute.fs
+UsageAttribute TO: [O] [<|CompiledName|("X")] RANGE: (19,31) @ New instance 04 - Attribute.fs
 
 
 Pattern
 ---
-TO: [O] let |x| = 123 RANGE: (43,44) @ New instance 04 - Attribute.fs
+UsageOther TO: [O] let |x| = 123 RANGE: (43,44) @ New instance 04 - Attribute.fs
 
 

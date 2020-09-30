@@ -1,9 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -22,8 +22,8 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         FSharpAttributesUtil.addAttributesList binding false
         binding.AttributeLists.[0]
 
-    let rec isSimplePattern (pat: ISynPat): bool =
-        match pat with
+    let rec isSimplePattern (fsPattern: IFSharpPattern): bool =
+        match fsPattern with
         | :? IReferencePat as refPat ->
             let referenceName = refPat.ReferenceName
             isNotNull referenceName && isNull referenceName.Qualifier
@@ -41,7 +41,7 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
     let rec isLiteralBinding (binding: IBinding): bool =
         if hasLiteralAttribute binding.AttributesEnumerable then true else
 
-        let letBindings = LetModuleDeclNavigator.GetByBinding(binding)
+        let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
         if isNull letBindings || letBindings.Bindings.[0] != binding then false else
 
         hasLiteralAttribute letBindings.AttributesEnumerable
@@ -59,7 +59,8 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         if not (isSimplePattern binding.HeadPattern) then false else
         if isLiteralBinding binding then false else
 
-        binding.Expression.IsConstantValue()
+        let expr = binding.Expression
+        isNotNull expr && expr.IsConstantValue()
 
     override x.ExecutePsiTransaction(_, _) =
         let binding = dataProvider.GetSelectedElement<IBinding>()

@@ -2,12 +2,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
+open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
@@ -28,7 +29,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let document = createDocument source
         let parser = languageService.CreateParser(document)
 
-        let fsFile = parser.ParseFSharpFile(StandaloneDocument = document)
+        let fsFile = parser.ParseFSharpFile(noCache = true, StandaloneDocument = document)
         SandBox.CreateSandBoxFor(fsFile, psiModule)
         fsFile
 
@@ -42,7 +43,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
     let getDoDecl source =
         let moduleMember = getModuleMember source
-        moduleMember.As<IDo>().NotNull()
+        moduleMember.As<IDoStatement>().NotNull()
 
     let getExpression source =
         let doDecl = getDoDecl source
@@ -58,15 +59,14 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
-    let createParenExpr (expr: IFSharpExpression) =
-        let parenExpr = getExpression "(())" :?> IParenExpr
-        ModificationUtil.ReplaceChild(parenExpr.InnerExpression, expr.Copy()) |> ignore
-        parenExpr
-    
     let createAttributeList attrName: IAttributeList =
             let source = sprintf "[<%s>] ()" attrName
             let doDecl = getDoDecl source
             doDecl.AttributeLists.[0]
+            
+    let createTypeUsage usage: ITypeUsage =
+        let expr = createLetBinding (sprintf "(a: %s)" usage)
+        expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().Type
 
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
@@ -80,8 +80,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = "let _ = ()"
             let moduleDeclaration = getModuleDeclaration source
 
-            let letModuleDecl = moduleDeclaration.Members.First().As<ILetModuleDecl>()
-            let binding = letModuleDecl.Bindings.First()
+            let letBindings = moduleDeclaration.Members.First().As<ILetBindingsDeclaration>()
+            let binding = letBindings.Bindings.First()
             binding.HeadPattern :?> _
 
         member x.CreateIgnoreApp(expr, newLine) =
@@ -102,7 +102,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             binaryAppExpr
 
-        member x.CreateRecordExprBinding(field, addSemicolon) =
+        member x.CreateRecordFieldBinding(field, addSemicolon) =
             let field = namingService.MangleNameIfNecessary(field)
             let semicolon = if addSemicolon then ";" else ""
 
@@ -111,7 +111,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             match newExpr.As<IRecordExpr>() with
             | null -> failwith "Could not get record expr"
-            | recordExpr -> recordExpr.ExprBindings.First()
+            | recordExpr -> recordExpr.FieldBindings.First()
 
         member x.CreateAppExpr(funcName, argExpr) =
             let source = sprintf "%s ()" funcName
@@ -119,9 +119,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let newArg = newExpr.SetArgumentExpression(argExpr.Copy())
             addParensIfNeeded newArg |> ignore
             newExpr
-
-        member x.CreateAppExpr(addSpace) =
-            createAppExpr addSpace
 
         member x.CreateAppExpr(funExpr, argExpr, addSpace) =
             let appExpr = createAppExpr addSpace
@@ -134,7 +131,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateLetModuleDecl(bindingName) =
             let source = sprintf "let %s = ()" bindingName
-            getModuleMember source :?> ILetModuleDecl
+            getModuleMember source :?> ILetBindingsDeclaration
 
         member x.CreateConstExpr(text) =
             getExpression text :?> _
@@ -168,9 +165,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateParenExpr() =
             getExpression "(())" :?> _
-
-        member x.CreateParenExpr(expr) =
-            createParenExpr expr
 
         member x.AsReferenceExpr(typeReference: ITypeReferenceName) =
             getExpression (typeReference.GetText()) :?> _
@@ -208,6 +202,31 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
 
+        member x.CreateParenPat() =
+            let expr = createLetBinding "(())"
+            expr.Bindings.[0].HeadPattern.As<IParenPat>()
+
+        member x.CreateTypedPat(pattern, typeUsage: ITypeUsage) =
+            let settingsStore = typeUsage.GetSettingsStoreWithEditorConfig()
+            let spaceBeforeColon = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon)
+            let preColonSpace = if spaceBeforeColon then " " else ""
+
+            let expr = createLetBinding (sprintf "(_%s: _)" preColonSpace)
+            let typedPat = expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>()
+
+            ModificationUtil.ReplaceChild(typedPat.Pattern, pattern.Copy()) |> ignore
+            ModificationUtil.ReplaceChild(typedPat.Type, typeUsage) |> ignore
+            typedPat
+
+        member x.CreateReturnTypeInfo(typeUsage: ITypeUsage): IReturnTypeInfo =
+            let expr = createLetBinding "_: _"
+            let returnTypeInfo = expr.Bindings.[0].ReturnTypeInfo
+            ModificationUtil.ReplaceChild(returnTypeInfo.ReturnType, typeUsage) |> ignore
+            returnTypeInfo
+
+        member x.CreateTypeUsage(typeUsage: string) : ITypeUsage =
+            createTypeUsage typeUsage
+    
         member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"
             let expr = getExpression source
@@ -221,6 +240,16 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
   
+        member x.CreateExpressionReferenceName(name) =
+            let source = sprintf "let %s = ()" name
+            let letBindings = getModuleMember source :?> ILetBindingsDeclaration
+            letBindings.Bindings.[0].HeadPattern.As<IReferencePat>().ReferenceName
+
+        member x.CreateTypeReferenceName(name) =
+            let source = sprintf "type T = %s" name
+            let typeDeclarationGroup = getModuleMember source :?> ITypeDeclarationGroup
+            let typeAbbreviation = typeDeclarationGroup.TypeDeclarations.[0].As<ITypeAbbreviationDeclaration>()
+            typeAbbreviation.AbbreviatedType.As<INamedTypeUsage>().ReferenceName
 
         member x.CreateEmptyAttributeList() =
             let attributeList = createAttributeList "Foo"

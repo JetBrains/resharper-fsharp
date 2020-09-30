@@ -26,6 +26,5 @@ type IntroduceVarFix(expr: IFSharpExpression) =
     override x.Execute(solution, textControl) =
         base.Execute(solution, textControl)
 
-        use cookie = FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Create()
         textControl.Selection.SetRange(expr.GetDocumentRange().TextRange)
         FSharpIntroduceVariable.IntroduceVar(expr, textControl, true)

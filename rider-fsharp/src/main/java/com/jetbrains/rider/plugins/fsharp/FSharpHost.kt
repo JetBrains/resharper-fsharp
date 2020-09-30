@@ -13,21 +13,19 @@ class FSharpHost(project: Project) : LifetimedProjectComponent(project) {
     private val fSharpModel = project.solution.rdFSharpModel
 
     companion object {
-        const val experimentalFeaturesRegistryKey = "rider.fsharp.experimental"
-        const val formatterRegistryKey = "rider.fsharp.formatter"
+        const val fcsBusyDelayRegistryKey = "rider.fsharp.fcsBusyDelay.ms"
     }
 
     init {
-        initRegistryValue(experimentalFeaturesRegistryKey, fSharpModel.enableExperimentalFeatures)
-        initRegistryValue(formatterRegistryKey, fSharpModel.enableFormatter)
+        initRegistryValue(fcsBusyDelayRegistryKey, RegistryValue::asInteger, fSharpModel.fcsBusyDelayMs)
     }
 
-    private fun initRegistryValue(registryKey: String, property: IOptProperty<Boolean>) {
+    private fun <T : Any> initRegistryValue(registryKey: String, registryToValue: (registryValue: RegistryValue) -> T, property: IOptProperty<T>) {
         val registryValue = Registry.get(registryKey)
-        property.set(registryValue.asBoolean())
+        property.set(registryToValue(registryValue))
         registryValue.addListener(object : RegistryValueListener.Adapter() {
             override fun afterValueChanged(value: RegistryValue) {
-                property.set(value.asBoolean())
+                property.set(registryToValue(value))
             }
         }, project)
     }

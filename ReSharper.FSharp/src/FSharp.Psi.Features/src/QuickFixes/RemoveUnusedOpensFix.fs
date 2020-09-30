@@ -27,16 +27,5 @@ type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
             for highlightingInfo in highlightingInfos do
                 match highlightingInfo.Highlighting.As<UnusedOpenWarning>() with
                 | null -> ()
-                | warning ->
-
-                let openStatement = warning.OpenStatement
-
-                let first = getFirstMatchingNodeBefore isInlineSpaceOrComment openStatement
-                let last =
-                    openStatement
-                    |> skipSemicolonsAndWhiteSpacesAfter
-                    |> getThisOrNextNewLine
-
-                deleteChildRange first last
-
+                | warning -> OpensUtil.removeOpen warning.OpenStatement
             null

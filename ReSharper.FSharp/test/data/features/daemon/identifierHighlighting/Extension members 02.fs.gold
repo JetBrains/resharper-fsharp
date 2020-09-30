@@ -1,0 +1,27 @@
+﻿open |System|(0)
+open |System|(1).|Linq|(2)
+
+type |Char|(3) with
+    static member |IsZero|(4) |x|(5) = |x|(6) |=|(7) |char|(8) 0
+
+let |linq|(9) (|x|(10) : |string|(11)) =
+    |x|(12).|Select|(13)(|Char|(14).|IsZero|(15)).|ToArray|(16)()
+
+---------------------------------------------------------
+(0): ReSharper F# Namespace Identifier: 
+(1): ReSharper F# Namespace Identifier: 
+(2): ReSharper F# Namespace Identifier: 
+(3): ReSharper F# Struct Identifier: 
+(4): ReSharper F# Extension Method Identifier: 
+(5): ReSharper F# Value Identifier: 
+(6): ReSharper F# Value Identifier: 
+(7): ReSharper F# Operator Identifier: 
+(8): ReSharper F# Function Identifier: 
+(9): ReSharper F# Function Identifier: 
+(10): ReSharper F# Value Identifier: 
+(11): ReSharper F# Class Identifier: 
+(12): ReSharper F# Value Identifier: 
+(13): ReSharper F# Extension Method Identifier: 
+(14): ReSharper F# Struct Identifier: 
+(15): ReSharper F# Extension Method Identifier: 
+(16): ReSharper F# Extension Method Identifier: 

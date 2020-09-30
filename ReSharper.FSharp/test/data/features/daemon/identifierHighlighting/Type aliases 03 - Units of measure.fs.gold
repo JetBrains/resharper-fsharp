@@ -1,0 +1,21 @@
+﻿[<|Measure|(0)>] type |m|(1)
+
+type |IntMeasure|(2) = |int|(3)<|m|(4)>
+
+type |MeasureClass|(5)<[<|Measure|(6)>] |'a|(7)>() = class end
+
+let _: |MeasureClass|(8)<|m|(9)> = |MeasureClass|(10)<|m|(11)>()
+
+---------------------------------------------------------
+(0): ReSharper F# Class Identifier: 
+(1): ReSharper F# Unit Of Measure Identifier: 
+(2): ReSharper F# Struct Identifier: 
+(3): ReSharper F# Struct Identifier: 
+(4): ReSharper F# Unit Of Measure Identifier: 
+(5): ReSharper F# Class Identifier: 
+(6): ReSharper F# Class Identifier: 
+(7): ReSharper F# Type Parameter Identifier: 
+(8): ReSharper F# Class Identifier: 
+(9): ReSharper F# Unit Of Measure Identifier: 
+(10): ReSharper F# Class Identifier: 
+(11): ReSharper F# Unit Of Measure Identifier: 

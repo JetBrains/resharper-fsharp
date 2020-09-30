@@ -1,0 +1,8 @@
+﻿module Test
+
+let _ = |fun _ y -> y|(0)
+
+------------------------------------------------
+0: Lambda body can be replaced with 'id'
+QUICKFIXES:
+Replace lambda body with 'id'

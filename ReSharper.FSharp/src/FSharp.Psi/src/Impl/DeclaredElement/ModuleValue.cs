@@ -1,29 +1,31 @@
-using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class ModuleValue : FSharpPropertyBase<TopPatternDeclarationBase>, IMutableModifierOwner
   {
-    public ModuleValue([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+    public ModuleValue([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
     public bool IsMutable =>
-      GetDeclaration() is ITopReferencePat referencePat && referencePat.IsMutable;
+      GetDeclaration() is IMutableModifierOwner mutableModifierOwner && mutableModifierOwner.IsMutable;
 
     public void SetIsMutable(bool value)
     {
       foreach (var declaration in GetDeclarations())
-        if (declaration is ITopReferencePat referencePat)
-          referencePat.SetIsMutable(true);
+        if (declaration is IMutableModifierOwner mutableModifierOwner)
+          mutableModifierOwner.SetIsMutable(true);
     }
 
     public bool CanBeMutable =>
-      GetDeclaration() is ITopReferencePat referencePat && referencePat.CanBeMutable;
+      GetDeclaration() is IMutableModifierOwner mutableModifierOwner && mutableModifierOwner.CanBeMutable;
+
+    public override bool IsStatic => true;
+
+    public override bool IsReadable => true;
+    public override bool IsWritable => Mfv?.IsMutable ?? false;
   }
 }

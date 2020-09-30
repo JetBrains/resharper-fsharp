@@ -1,6 +1,4 @@
-﻿module Module
-
-let x =
+﻿let x =
     1
     |> id |> ignore{caret}
     ()

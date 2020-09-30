@@ -33,21 +33,25 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         property("copyRecentToEditor", bool).readonly
     }
 
-    private val RdFSharpCompilerServiceHost = aggregatedef("RdFSharpCompilerServiceHost") {
+    private val RdFSharpTestHost = aggregatedef("RdFSharpTestHost") {
         sink("fileChecked", string).async
         sink("projectChecked", string).async
+        sink("fcsProjectInvalidated", structdef("RdFcsProject") {
+            field("projectName", string)
+            field("targetFramework", string)
+        })
         call("getLastModificationStamp", string, dateTime)
         call("getSourceCache", string, structdef("RdFSharpSource") {
             field("source", string)
             field("timestamp", dateTime)
         }.nullable)
         call("dumpSingleProjectMapping", void, string)
+        call("dumpSingleProjectLocalReferences", void, immutableList(string))
     }
 
     init {
         field("fSharpInteractiveHost", RdFSharpInteractiveHost)
-        field("fSharpCompilerServiceHost", RdFSharpCompilerServiceHost)
-        property("enableExperimentalFeatures", bool)
-        property("enableFormatter", bool)
+        field("fsharpTestHost", RdFSharpTestHost)
+        property("fcsBusyDelayMs", int)
     }
 }

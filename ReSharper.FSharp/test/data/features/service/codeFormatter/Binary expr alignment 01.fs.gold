@@ -1,4 +1,12 @@
-﻿module Module
+﻿OutdentBinaryOperators = True
+module Module
+
+let foo = 1
+        + 2
+        + 3
+================
+OutdentBinaryOperators = False
+module Module
 
 let foo = 1
           + 2

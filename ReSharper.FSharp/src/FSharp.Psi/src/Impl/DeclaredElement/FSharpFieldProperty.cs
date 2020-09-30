@@ -26,9 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   {
     private readonly bool myIsMutable;
 
-    internal FSharpRecordField([NotNull] IRecordFieldDeclaration declaration, [NotNull] FSharpField field) :
-      base(declaration) =>
-      myIsMutable = field.IsMutable;
+    internal FSharpRecordField([NotNull] IRecordFieldDeclaration declaration) : base(declaration) =>
+      myIsMutable = declaration.IsMutable;
 
     public bool IsMutable =>
       myIsMutable || GetContainingType().IsCliMutableRecord();
@@ -36,8 +35,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public void SetIsMutable(bool value)
     {
       foreach (var declaration in GetDeclarations())
-        if (declaration is IRecordFieldDeclaration fieldDeclaration)
-          fieldDeclaration.SetIsMutable(value);
+        if (declaration is IRecordFieldDeclaration valFieldDeclaration)
+          valFieldDeclaration.SetIsMutable(value);
     }
 
     public bool CanBeMutable => true;
@@ -64,7 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override AccessRights GetAccessRights() =>
       GetContainingType().GetRepresentationAccessRights();
 
-    public IParameter GetParameter() =>
+    public IParameter GetGeneratedParameter() =>
       new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this);
   }
 

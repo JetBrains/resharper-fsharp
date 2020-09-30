@@ -1,0 +1,18 @@
+﻿let f a b = ()
+
+|fun x () -> f x ()|(0)
+|fun () () -> f () ()|(1)
+
+|fun x -> id x|(2)
+|fun x -> (fun x -> 5) x|(3)
+
+|fun (a, b) c -> f (a, b) c|(4)
+|fun (a, b) (c, d, e) -> f (a, b) (c, d, e)|(5)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Lambda can be replaced with 'f'
+(1): ReSharper Warning: Lambda can be replaced with 'f'
+(2): ReSharper Warning: Lambda can be replaced with 'id'
+(3): ReSharper Warning: Lambda can be simplified
+(4): ReSharper Warning: Lambda can be replaced with 'f'
+(5): ReSharper Warning: Lambda can be replaced with 'f'

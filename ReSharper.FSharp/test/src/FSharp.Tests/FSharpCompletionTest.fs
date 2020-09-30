@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp.Settings
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
@@ -36,6 +36,15 @@ type FSharpCompletionTest() =
 
     [<Test>] member x.``Open 07 - After System``() = x.DoNamedTest()
     [<Test>] member x.``Open 08 - Before other System``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Open - Indent - Nested - After 01``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Open - Indent - Nested - Before 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Open - Indent - Top - After 01``() = x.DoNamedTest()
+    [<Test>] member x.``Open - Indent - Top - Before 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Import - Anon module 01 - First line``() = x.DoNamedTest()
     [<Test>] member x.``Import - Anon module 02 - Before open``() = x.DoNamedTest()

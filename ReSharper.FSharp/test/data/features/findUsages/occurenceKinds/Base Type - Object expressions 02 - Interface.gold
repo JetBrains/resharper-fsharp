@@ -1,15 +1,15 @@
 ﻿Pattern
 ---
-TO: [O] let |t| = { RANGE: (21,22) @ Base Type - Object expressions 02 - Interface.fs
+UsageOther TO: [O] let |t| = { RANGE: (21,22) @ Base Type - Object expressions 02 - Interface.fs
 
 
 Base type
 ---
-TO: [O] new System.|IDisposable| with RANGE: (43,54) @ Base Type - Object expressions 02 - Interface.fs
+UsageExtendedType TO: [O] new System.|IDisposable| with RANGE: (43,54) @ Base Type - Object expressions 02 - Interface.fs
 
 
 Other
 ---
-TO: [O] new |System|.IDisposable with RANGE: (36,42) @ Base Type - Object expressions 02 - Interface.fs
+UsageOther TO: [O] new |System|.IDisposable with RANGE: (36,42) @ Base Type - Object expressions 02 - Interface.fs
 
 

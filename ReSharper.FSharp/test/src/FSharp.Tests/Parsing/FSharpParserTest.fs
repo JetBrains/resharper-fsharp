@@ -28,9 +28,10 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl - Extension 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Delegate - Ctor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Delegate - Ctor 02``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate 02``() = x.DoNamedTest()
-    [<Test>] member x.``Type decl - Delegate 03 - Ctor``() = x.DoNamedTest()
 
     [<Test>] member x.``Type parameters - Constraints 01 - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 02 - Member``() = x.DoNamedTest()
@@ -39,14 +40,25 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl - Attributes 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Attributes 02``() = x.DoNamedTest()
-    
+
+    [<Test>] member x.``Type decl - Let binding - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Let binding - Value 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Let binding - Value 02 - Upper``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Enum 01 - With first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Without first bar``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 03 - Case attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 02 - Modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 03 - No first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 04 - No first bar with modifier``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union 05 - Case attributes``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Record 01 - Single line``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record 03 - Multiline, semicolons``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record 04 - Attribute``() = x.DoNamedTest()
 
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
@@ -77,14 +89,19 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - Typed 01 - Simple``() = x.DoNamedTest()
 
-    [<Test>] member x.``Expr - Anon record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Anon record 01 - Single line``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Anon record 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Anon record 03 - With copy info``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Record - Inherit 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 01 - Single Line``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 02 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 03 - Multiline, semicolons``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 04 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 05 - Single Line with end semicolon``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 06 - With qualifier``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 07 - With copy info``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 08 - Spaces before semicolon``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - While 01 - Simple``() = x.DoNamedTest()
 
@@ -122,6 +139,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Lambda 21 - Nested types``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 22 - Attribute``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 23 - Attribute, Typed``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Expr - Lambda 24 - Unit in nested parens``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 25 - Multiple matches``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 26 - Multiple matches``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 27 - Multiple matches, nested``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Match 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 02 - Simple pat``() = x.DoNamedTest()
@@ -142,6 +163,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - TryFinally 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lazy 01 - Simple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - If 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - IfThenElse - Elif 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - IfThenElse - Elif 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - IfThenElse 01 - Simple``() = x.DoNamedTest()
@@ -171,6 +193,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - App - Precedence 05 - High - Multiple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Precedence 06 - High - Multiple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - App - Prefix op - Binary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Prefix op - Binary 02 - Spaces``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Prefix op 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - App - List 01``() = x.DoNamedTest()
@@ -184,6 +208,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - DotIndexerGet 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerGet 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerGet 04 - Multiple args``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - DotIndexerGet 05 - Typed``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - DotIndexerSet 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerSet 02 - Record``() = x.DoNamedTest()
@@ -286,11 +311,20 @@ type FSharpParserTest() =
     [<Test>] member x.``Types - Constraints - Comparison 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Constraints - Equality 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Ctor - Primary - Parameters 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Primary - Parameters 02 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Primary - Parameters 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Primary - Parameters 04 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Primary - Parameters 05 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary 02 - Modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary 03 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Secondary - Parameters 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Secondary - Parameters 02``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Secondary 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Secondary 02 - Modifier``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Secondary 03 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Secondary 04 - Self id``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Inherit - Type 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit - Type 02 - Qualified``() = x.DoNamedTest()
@@ -298,17 +332,36 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Inherit - Type 04 - Type parameters 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Do 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Let bindings - Static 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Let bindings - Static 02 - Rec``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Let bindings 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Let bindings 02 - Rec``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Member 01 - Wild self id``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Member - Method - Parameters 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Method - Parameters 02``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Method 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Method 02 - Static``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Method 03 - Wild param``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Method 04 - Curried``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Member - Operator 01 - Add``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Operator 02 - Multiply``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Operator 03 - Subtract``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Operator 04 - Divide``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Auto Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Auto Property 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Auto Property 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Auto Property 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Member - Property - Accessors 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Property - Accessors 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Property - Accessors 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Property 02 - Static``() = x.DoNamedTest()
 
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 02 - Qualifier``() = x.DoNamedTest()
@@ -318,7 +371,19 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Pattern - As - Wild 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Record field 01 - Attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Named args 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Named args 02 - Multiple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Reference 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Reference 02 - Upper``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Reference 03 - Qualified``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Parameters owner 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Parameters owner 02 - Qualified``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Parameters owner 03 - Tuple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - ListCons 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - ListCons 02 - Nested``() = x.DoNamedTest()
 
 
 [<FSharpSignatureTest>]
@@ -328,6 +393,9 @@ type FSharpSignatureParserTest() =
     override x.RelativeTestDataPath = "parsing/signatures"
 
     [<Test>] member x.``Val - Value 01``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Value 02 - Return attrs``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Value 03 - Type func``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Value 04 - Literal``() = x.DoNamedTest()
 
     [<Test>] member x.``Val - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Val - Function 02 - Named param``() = x.DoNamedTest()
@@ -373,3 +441,6 @@ type FSharpErrorsParserTest() =
 
     [<Test>] member x.``Expr - If 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - If 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - New 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 01``() = x.DoNamedTest()

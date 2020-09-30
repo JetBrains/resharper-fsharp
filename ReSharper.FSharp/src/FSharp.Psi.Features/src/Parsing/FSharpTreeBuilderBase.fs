@@ -6,6 +6,7 @@ open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.Range
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -82,6 +83,12 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     member x.MarkAndDone(range: range, elementType) =
         let mark = x.Mark(range)
         x.Done(range, mark, elementType)
+
+    member x.MarkAndDone(range: range, elementType1, elementType2) =
+        let mark1 = x.Mark(range)
+        let mark2 = x.Mark()
+        x.Done(range, mark2, elementType2)
+        x.Done(mark1, elementType1)
 
     member x.MarkToken(elementType) =
         let caseMark = x.Mark()
@@ -301,15 +308,23 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             for f in fields do x.ProcessField f fieldElementType
             not fields.IsEmpty
 
-        | UnionCaseFullType(_) ->
+        | UnionCaseFullType _ ->
             true // todo: used in FSharp.Core only, otherwise warning
 
     member x.ProcessSimpleTypeRepresentation(repr) =
         match repr with
         | SynTypeDefnSimpleRepr.Record(_, fields, range) ->
             let mark = x.Mark(range)
-            for field in fields do
-                x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+
+            if not fields.IsEmpty then
+                let (Field(_, _, _, _, _, _, _, firstFieldRange)) = fields.Head
+                let (Field(_, _, _, _, _, _, _, lastFieldRange)) = List.last fields
+
+                let fieldListMark = x.Mark(firstFieldRange)
+                for field in fields do
+                    x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+                x.Done(lastFieldRange, fieldListMark, ElementType.RECORD_FIELD_DECLARATION_LIST)
+
             x.Done(range, mark, ElementType.RECORD_REPRESENTATION)
             ElementType.RECORD_DECLARATION
 
@@ -395,8 +410,9 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
         x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
-    member x.ProcessEnumCase(EnumCase(_, _, _, _, range)) =
+    member x.ProcessEnumCase(EnumCase(attrs, _, _, _, range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
+        x.ProcessAttributeLists(attrs)
         x.Done(range, mark, ElementType.ENUM_MEMBER_DECLARATION)
 
     member x.ProcessField(Field(attrs, _, id, synType, _, _, _, range)) elementType =
@@ -422,34 +438,46 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         x.MarkAndDone(range, ElementType.LOCAL_DECLARATION)
 
     member x.ProcessImplicitCtorSimplePats(pats: SynSimplePats) =
+        let range = pats.Range
+        let paramMark = x.Mark(range)
+        let parenPatMark = x.Mark()
+
         match pats with
-        | SynSimplePats.SimplePats(pats, range) ->
-            let mark = x.Mark(range)
+        | SynSimplePats.SimplePats([pat], _) ->
+            x.ProcessImplicitCtorParam(pat)
+
+        | SynSimplePats.SimplePats(headPat :: _ as pats, _) ->
+            let tupleMark = x.Mark(headPat.Range)
             for pat in pats do
                 x.ProcessImplicitCtorParam(pat)
-            x.Done(range, mark, ElementType.MEMBER_PARAM_DECLARATION_GROUP)
+            x.Done(tupleMark, ElementType.TUPLE_PAT)
 
-        | SynSimplePats.Typed(pats, synType, range) ->
-            let mark = x.Mark(range)
+        | SynSimplePats.Typed(pats, synType, _) ->
+            failwith "foo"
             x.ProcessImplicitCtorSimplePats(pats)
             x.ProcessType(synType)
-            x.Done(range, mark, ElementType.MEMBER_PARAM_DECLARATION_GROUP)
+
+        | _ -> ()
+
+        x.Done(range, parenPatMark, ElementType.PAREN_PAT)
+        x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
 
     member x.ProcessImplicitCtorParam(pat: SynSimplePat) =
         match pat with
-        | SynSimplePat.Id(id, _, _, _, _, range) ->
-            let mark = x.Mark(range)
-            x.ProcessLocalId(id)
-            x.Done(range, mark,ElementType.MEMBER_PARAM_DECLARATION)
+        | SynSimplePat.Id(ident = IdentRange range) ->
+            x.MarkAndDone(range, ElementType.LOCAL_REFERENCE_PAT, ElementType.EXPRESSION_REFERENCE_NAME)
 
-        // todo: check isCompilerGenerated?
-        | SynSimplePat.Typed(SynSimplePat.Id(id, _, _, _, _, _), synType, range) ->
+        | SynSimplePat.Typed(pat, synType, range) ->
             let mark = x.Mark(range)
-            x.ProcessLocalId(id)
+            x.ProcessImplicitCtorParam(pat)
             x.ProcessType(synType)
-            x.Done(range, mark,ElementType.MEMBER_PARAM_DECLARATION)
+            x.Done(range, mark, ElementType.TYPED_PAT)
 
-        | _ -> ()
+        | SynSimplePat.Attrib(pat, attrs, range) ->
+            let mark = x.Mark(range)
+            x.ProcessAttributeLists(attrs)
+            x.ProcessImplicitCtorParam(pat)
+            x.Done(range, mark, ElementType.ATTRIB_PAT)
 
     member x.ProcessTypeMemberTypeParams(SynValTyparDecls(typeParams, _, _)) =
         for param in typeParams do
@@ -562,6 +590,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | SynType.Var(typeParameter, _) ->
             x.ProcessTypeParameter(typeParameter)
 
+        | SynType.Anon _ ->
+            // Produced on error
+            ()
+
         | _ -> failwithf "unexpected type: %O" synType
 
     member x.ProcessType(TypeRange range as synType) =
@@ -640,6 +672,11 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
         | SynType.Anon _ ->
             x.MarkAndDone(range, ElementType.ANON_TYPE_USAGE)
+
+        | SynType.Paren(innerType, range) ->
+            let mark = x.Mark(range)
+            x.ProcessType(innerType)
+            x.Done(range, mark, ElementType.PAREN_TYPE_USAGE)
 
     member x.ProcessTypeConstraint(typeConstraint: SynTypeConstraint) =
         match typeConstraint with

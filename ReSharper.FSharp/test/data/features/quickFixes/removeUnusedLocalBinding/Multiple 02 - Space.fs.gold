@@ -1,5 +1,4 @@
-﻿module Module
-do
+﻿do
     let a = ()
 
     let {caret}c = ()

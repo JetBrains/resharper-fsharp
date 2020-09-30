@@ -12,15 +12,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public FSharpMethod([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
+
+    public override bool IsStatic => GetContainingType() is IFSharpModule || base.IsStatic;
   }
 
-  internal class FSharpTypePrivateMethod : FSharpMethodBase<TopPatternDeclarationBase>
+  internal class FSharpTypePrivateMethod : FSharpMethodBase<FSharpProperTypeMemberDeclarationBase>, ITypePrivateMember
   {
     public FSharpTypePrivateMethod([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
     public override AccessRights GetAccessRights() => AccessRights.INTERNAL;
-    public override bool IsStatic => false;
+
+    public override bool IsStatic =>
+      GetDeclaration() is var decl && decl != null && decl.IsStatic;
   }
 }

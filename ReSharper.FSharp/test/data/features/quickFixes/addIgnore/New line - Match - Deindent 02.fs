@@ -1,5 +1,3 @@
-module Module
-
 while true do
     match () with
     | _ -> [

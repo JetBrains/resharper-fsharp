@@ -1,33 +1,48 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.FSharpProjectModelUtil
 
-open System.Collections.Generic
 open JetBrains.ProjectModel
-open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ReSharper.Psi.Modules
 
-let getReferencePaths assemblyFilter (psiModule: IPsiModule) =
+let getResolveContext (resolveContextManager: PsiModuleResolveContextManager) project psiModule =
+    resolveContextManager.GetOrCreateModuleResolveContext(project, psiModule, psiModule.TargetFrameworkId)
+
+let getModuleResolveContext (resolveContextManager: PsiModuleResolveContextManager) (psiModule: IPsiModule) =
+    let project = psiModule.ContainingProjectModule :?> IProject
+    getResolveContext resolveContextManager project psiModule
+
+
+let getReferencedModules (psiModule: IPsiModule) =
     let project = psiModule.ContainingProjectModule :?> _
     let solution = psiModule.GetSolution()
 
     let psiModules = solution.PsiModules()
-    let resolveContextManager = solution.GetComponent<ResolveContextManager>()
+    let resolveContextManager = solution.GetComponent<PsiModuleResolveContextManager>()
 
-    let result = List()
-    let resolveContext = resolveContextManager.GetOrCreateProjectResolveContext(project, psiModule.TargetFrameworkId)
-    for reference in psiModules.GetModuleReferences(psiModule, resolveContext) do
+    let resolveContext = getResolveContext resolveContextManager project psiModule
+    psiModules.GetModuleReferences(psiModule, resolveContext)
+    |> Seq.filter (fun reference ->
         match reference.Module with
-        | :? IAssemblyPsiModule as assemblyPsiModule ->
-            let assembly = assemblyPsiModule.Assembly
+        | :? IProjectPsiModule as projectPsiModule -> projectPsiModule != project
+        | _ -> true)
+    |> Seq.map (fun reference -> reference.Module)
 
-            if assemblyFilter assembly then
-                result.Add(assembly.Location.FullPath)
+let getModulePath (psiModule: IPsiModule) =
+    match psiModule with
+    | :? IAssemblyPsiModule as assemblyPsiModule ->
+        assemblyPsiModule.Assembly.Location
 
-        | :? IProjectPsiModule as projectPsiModule ->
-            let referencedProject = projectPsiModule.Project
-            if referencedProject <> project then
-                result.Add(referencedProject.GetOutputFilePath(projectPsiModule.TargetFrameworkId).FullPath)
+    | :? IProjectPsiModule as projectPsiModule ->
+        projectPsiModule.Project.GetOutputFilePath(projectPsiModule.TargetFrameworkId)
 
-        | _ -> ()
+    | _ -> FileSystemPath.Empty
 
-    result
+let getModuleFullPath (psiModule: IPsiModule) =
+    let path = getModulePath psiModule
+    path.FullPath
+
+
+let getOutputPath (psiModule: IPsiModule) =
+    match psiModule.ContainingProjectModule with
+    | :? IProject as project -> project.GetOutputFilePath(psiModule.TargetFrameworkId)
+    | _ -> FileSystemPath.Empty

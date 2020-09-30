@@ -6,6 +6,8 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
@@ -218,6 +220,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       return ParameterKind.VALUE;
+    }
+
+    [CanBeNull]
+    public static FSharpType TryGetFcsType([NotNull] this IFSharpTreeNode fsTreeNode)
+    {
+      var checkResults = fsTreeNode.FSharpFile.GetParseAndCheckResults(true, "TryGetFcsType")?.Value?.CheckResults;
+      if (checkResults == null) return null;
+
+      var sourceFile = fsTreeNode.GetSourceFile();
+      if (sourceFile == null) return null;
+
+      var range = fsTreeNode.GetDocumentRange().ToDocumentRange(sourceFile.GetLocation());
+      return checkResults.GetTypeOfExpression(range)?.Value;
+    }
+
+    [NotNull]
+    public static IType GetExpressionTypeFromFcs([NotNull] this IFSharpTreeNode fsTreeNode)
+    {
+      var fsharpType = TryGetFcsType(fsTreeNode);
+      return fsharpType != null
+        ? fsharpType.MapType(fsTreeNode)
+        : TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
     }
   }
 }

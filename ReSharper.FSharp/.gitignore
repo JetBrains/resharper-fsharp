@@ -4,6 +4,9 @@ RiderSdkPackageVersion.props
 *Generated.cs
 *Generated.fs
 
+# Rider-specific files
+.idea
+
 # Build results
 [Dd]ebug/
 [Rr]elease/

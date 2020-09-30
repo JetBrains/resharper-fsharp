@@ -49,7 +49,7 @@ type FSharpKeywordsProvider() =
 
     member x.LookupItems = lookupItems.Value
 
-    override x.IsAvailable(_) = true
+    override x.IsAvailable _ = true
 
     override x.AddLookupItems(context, collector) =
         match context.TokenBeforeCaret with

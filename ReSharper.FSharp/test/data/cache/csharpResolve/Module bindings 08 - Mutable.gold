@@ -1,0 +1,15 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+  	Module.a = Module.b;
+  	Module.|c|(0) = Module.b;
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The property 'Module.c' has no setter
+P:Module.a
+P:Module.b
+P:Module.c
+P:Module.b

@@ -1,4 +1,3 @@
-import com.jetbrains.rider.model.RdFSharpCompilerServiceHost
 import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
 import com.jetbrains.rider.projectView.solution
@@ -7,9 +6,9 @@ import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.framework.TestProjectModelContext
 import com.jetbrains.rider.test.framework.waitBackend
-import com.jetbrains.rider.test.scriptingApi.cutItem2
-import com.jetbrains.rider.test.scriptingApi.pasteItem2
-import com.jetbrains.rider.test.scriptingApi.renameItem2
+import com.jetbrains.rider.test.scriptingApi.cutItem
+import com.jetbrains.rider.test.scriptingApi.pasteItem
+import com.jetbrains.rider.test.scriptingApi.renameItem
 import org.testng.annotations.Test
 
 @Test
@@ -18,14 +17,13 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
     override val restoreNuGetPackages: Boolean
         get() = true
 
-    private val fcsHost: RdFSharpCompilerServiceHost
-        get() = project.solution.rdFSharpModel.fSharpCompilerServiceHost
+    private val fcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
 
     private fun moveItem(from: Array<Array<String>>, to: Array<String>, orderType: ActionOrderType? = null) {
         // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
         waitBackend(project) {
-            cutItem2(project, from)
-            pasteItem2(project, to, orderType = orderType)
+            cutItem(project, from)
+            pasteItem(project, to, orderType = orderType)
         }
     }
 
@@ -36,7 +34,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
     private fun renameItem(path: Array<String>, newName: String) {
         // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
         waitBackend(project) {
-            renameItem2(project, path, newName)
+            renameItem(project, path, newName)
         }
     }
 

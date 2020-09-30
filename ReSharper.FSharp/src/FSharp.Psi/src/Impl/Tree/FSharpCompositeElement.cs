@@ -1,4 +1,5 @@
 ﻿using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -8,8 +9,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public abstract class FSharpCompositeElement : CompositeElement, IFSharpTreeNode
   {
-    public IFSharpFile FSharpFile =>
-      (this.GetContainingFile() as IFSharpFile).NotNull();
+    public IFSharpFile FSharpFile => (this.GetContainingFile() as IFSharpFile).NotNull();
+    public FSharpCheckerService CheckerService => FSharpFile.CheckerService;
 
     public override PsiLanguageType Language => FSharpLanguage.Instance;
     public virtual void Accept(TreeNodeVisitor visitor) => visitor.VisitNode(this);

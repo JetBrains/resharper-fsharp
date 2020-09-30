@@ -1,9 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Navigation
 
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Navigation.ContextNavigation
 open JetBrains.ReSharper.Features.Navigation.Features.FindDeclarations
 open JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration
 open JetBrains.ReSharper.IntentionsTests.Navigation
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
@@ -18,6 +20,12 @@ type FSharpContextSearchTestBase(extraPath) =
 
 type FSharpGoToUsagesTest() =
     inherit FSharpContextSearchTestBase("usages")
+
+    member x.DoNamedTestFiles() =
+        let testName = x.TestMethodName
+        let csExtension = CSharpProjectFileType.CS_EXTENSION
+        let fsExtension = FSharpProjectFileType.FsExtension
+        x.DoTestSolution([| testName + csExtension; testName + fsExtension |])
 
     override x.CreateContextAction(solution, textControl) =
         base.CreateContextAction(solution, textControl)
@@ -37,6 +45,13 @@ type FSharpGoToUsagesTest() =
 
     [<Test>] member x.``Module suffix 01 - Compiled``() = x.DoNamedTest()
 
+    [<Test>] member x.``Wild pat 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Operator 01 - Pipe``() = x.DoNamedTest()
+    [<Test; Explicit("Not implemented")>] member x.``Operator 02 - =``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union case 01 - Fields``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Union case 02 - Singleton``() = x.DoNamedTestFiles()
 
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")
@@ -53,6 +68,9 @@ type FSharpGoToInheritorsTest() =
     [<Test>] member x.``Interface 02 - Member``() = x.DoNamedTest()
     [<Test>] member x.``Interface 03 - Internal type impl``() = x.DoNamedTest()
     [<Test>] member x.``Interface 04 - Overloads``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 05 - Inherit``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 06 - Implement multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 07 - Implement multiple``() = x.DoNamedTest()
 
     [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Interface 02 - Dispose``() = x.DoNamedTest()
@@ -73,6 +91,10 @@ type FSharpGoToBaseTest() =
     [<Test>] member x.``Exception 01``() = x.DoNamedTest()
     [<Test>] member x.``Enum 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 02 - Inherit``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 03 - Implement multiple``() = x.DoNamedTest()
+
     [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Interface 02 - Dispose``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Override 01 - ToString``() = x.DoNamedTest()
@@ -90,6 +112,10 @@ type FSharpGoToDeclarationTest() =
         |> Seq.filter (fun p -> p :? IGotoDeclarationProvider)
 
     [<Test>] member x.``Own member vs interface``() = x.DoNamedTest()
+    [<Test>] member x.``Ctor 01 - Modifier``() = x.DoNamedTest()
+
+    [<Test>] member x.``Signature 01``() = x.DoTestSolution("Signature 01.fsi", "Signature 01.fs")
+    [<Test>] member x.``Signature 02 - Same range``() = x.DoTestSolution("Signature 02 - Same range.fsi", "Signature 02 - Same range.fs")
 
     [<TestReferences("Library1.dll", "Library2.dll")>]
     [<Test>] member x.``Same type from different assemblies``() = x.DoNamedTest()
@@ -106,3 +132,5 @@ type FSharpGoToTypeTest() =
 
     [<Test; Explicit("Support external type parameters")>]
     member x.``Anon record field 02 - Substitution``() = x.DoNamedTest()
+
+    [<Test>] member x.``Wild pat 01``() = x.DoNamedTest()

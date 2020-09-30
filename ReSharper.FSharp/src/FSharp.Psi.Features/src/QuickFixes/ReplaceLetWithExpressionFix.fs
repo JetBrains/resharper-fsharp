@@ -1,8 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -24,7 +24,7 @@ type ReplaceLetWithExpressionFix(error: ExpectedExpressionAfterLetError) =
             removeDanglingIn node.Parent
 
     override x.Text =
-        let tokenText = getLetTokenText letExpr.LetOrUseToken
+        let tokenText = getLetTokenText letExpr.BindingKeyword
         sprintf "Replace '%s' with expression" tokenText
 
     override x.IsAvailable _ =

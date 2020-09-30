@@ -1,0 +1,164 @@
+<Errors language="F#">
+
+  <Usings>
+    JetBrains.ReSharper.Intentions.QuickFixes;
+    JetBrains.ReSharper.Plugins.FSharp.Psi;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+  </Usings>
+
+  <StaticSeverityGroups>
+    <Group name="F# Errors" key="FSharpErrors"/>
+  </StaticSeverityGroups>
+
+  <Warning staticGroup="FSharpErrors" name="UnusedOpen">
+    <Parameter type="IOpenStatement" name="openStatement"/>
+    <Message value="Open directive is not required by the code and can be safely removed"/>
+    <Range>openStatement.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveUnusedOpensFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ExtensionMemberInNonExtensionType">
+    <Parameter type="IAttribute" name="attr"/>
+    <Range>attr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Extension member in non-extension type looks suspicious"/>
+    <QuickFix>AddExtensionAttributeFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ExtensionTypeWithNoExtensionMembers">
+    <Parameter type="IAttribute" name="attr"/>
+    <Range>attr.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <Message value="Extension type doesn't have any extension members"/>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ExtensionMemberShouldBeStatic">
+    <Parameter type="IAttribute" name="attr"/>
+    <Range>attr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Extension member should be static"/>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantBackticks">
+    <Parameter type="FSharpIdentifierToken" name="identifier"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant identifier quotation"/>
+    <QuickFix>RemoveRedundantBackticksFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantNew">
+    <Parameter type="INewExpr" name="newExpr"/>
+    <Range>newExpr.NewKeyword.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <Message value="'new' keyword is redundant"/>
+    <QuickFix>RemoveRedundantNewFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ConvertToUseBinding">
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
+    <Range>letExpr.BindingKeyword.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Convert to 'use' binding"/>
+    <QuickFix>ConvertToUseFix</QuickFix>
+  </Warning>
+  
+  <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" isSuppressedInTests="true">
+    <Parameter type="IParenExpr" name="parenExpr"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant parentheses"/>
+    <QuickFix>RemoveRedundantParenExprFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantParenPat" isSuppressedInTests="true">
+    <Parameter type="IParenPat" name="parenPat"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant parentheses"/>
+    <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantAttributeParens">
+    <Parameter type="IAttribute" name="attribute"/>
+    <Range>attribute.ArgExpression.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Parentheses are redundant if attribute has no arguments"/>
+    <QuickFix>RemoveRedundantAttributeParensFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantAttributeSuffix">
+    <Parameter type="IAttribute" name="attribute"/>
+    <Range>getAttributeSuffixRange attribute</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Attribute suffix is redundant"/>
+    <QuickFix>RemoveRedundantAttributeSuffixFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantQualifier">
+    <Parameter type="ITreeNode" name="treeNode"/>
+    <Range>getQualifierRange treeNode</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Qualifier is redundant"/>
+    <QuickFix>RemoveRedundantQualifierFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantUnionCaseFieldPatterns">
+    <Parameter type="IParenPat" name="parenPat"/>
+    <Range>parenPat.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Redundant union case fields matching"/>
+    <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ConsWithEmptyListPat">
+    <Parameter type="IListConsPat" name="listConsPat"/>
+    <Range>listConsPat.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Pattern can be simplified"/>
+    <QuickFix>SimplifyListConsPatFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantApplication">
+    <Parameter type="IAppExpr" name="appExpr"/>
+    <Parameter type="IFSharpExpression" name="argExpr"/>
+    <Range>getFunctionApplicationRange appExpr</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant application"/>
+    <QuickFix>ReplaceAppExprWithArgFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="LambdaCanBeSimplified">
+    <Parameter type="ILambdaExpr" name="lambdaExpr"/>
+    <Parameter type="IFSharpExpression" name="replaceCandidate"/>
+    <Range>lambdaExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Lambda can be simplified"/>
+    <QuickFix>SimplifyLambdaFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplaced">
+    <Parameter type="ILambdaExpr" name="lambdaExpr"/>
+    <Parameter type="IFSharpExpression" name="replaceCandidate"/>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Range>lambdaExpr.GetHighlightingRange()</Range>
+    <Message value="{0}">
+      <Argument>getLambdaCanBeReplacedWarningText replaceCandidate</Argument>
+    </Message>
+    <QuickFix>ReplaceLambdaWithInnerExpressionFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ExpressionCanBeReplacedWithId">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Message value="{0}">
+      <Argument>getExpressionCanBeReplacedWithIdWarningText expr</Argument>
+    </Message>
+    <QuickFix>ReplaceExpressionWithIdFix</QuickFix>
+  </Warning>
+
+</Errors>

@@ -2,6 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpCompilerAttributesUtil
 
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 
 [<Extension; CompiledName("GetCompilationMappingAttrInstanceFlag")>]
 let getCompilationMappingAttrInstanceFlag (attrInstance: IAttributeInstance) =
@@ -41,10 +42,6 @@ let isCompiledModule (property: IAttributesOwner) =
 let isCompiledException (property: IAttributesOwner) =
     getCompilationMappingFlag property = SourceConstructFlags.Exception
 
-
-[<Extension; CompiledName("HasAutoOpenAttribute")>]
-let hasAutoOpenAttribute (attrsOwner: IAttributesOwner) =
-    attrsOwner.HasAttributeInstance(autoOpenAttrTypeName, false)
 
 [<Extension; CompiledName("GetAutoOpenAttributes")>]
 let getAutoOpenAttributes (attributesSet: IAttributesSet) =

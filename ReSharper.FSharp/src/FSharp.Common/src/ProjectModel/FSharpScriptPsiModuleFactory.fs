@@ -36,7 +36,7 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 [<SolutionComponent>]
 type FSharpScriptPsiModulesProvider
         (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, documentManager: DocumentManager,
-         scriptOptionsProvider: IFSharpScriptProjectOptionsProvider, platformManager: PlatformManager,
+         scriptOptionsProvider: IScriptFcsProjectProvider, platformManager: PlatformManager,
          assemblyFactory: AssemblyFactory, projectFileExtensions, projectFileTypeCoordinator) as this =
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.
@@ -303,7 +303,7 @@ type FSharpScriptPsiModulesProvider
         member x.Modules = psiModulesCollection
 
     interface IChangeProvider with
-        member x.Execute(_) = null
+        member x.Execute _ = null
 
 
 /// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc). 
@@ -415,6 +415,10 @@ type FSharpScriptPsiModule
         projectHandlers.Remove(handler) |> ignore
         if projectHandlers.IsEmpty() then
             modulesProvider.RemoveProjectFilePsiModule(this)
+
+    override x.ToString() =
+        let typeName = this.GetType().Name
+        sprintf "%s(%s)" typeName path.FullPath
 
     interface IPsiModule with
         member x.Name = "F# script: " + path.Name

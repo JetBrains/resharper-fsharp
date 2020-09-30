@@ -1,16 +1,15 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers.RedundantQualifierAnalyzer
 
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.Impl.Reflection2
 
 let [<Literal>] OpName = "RedundantQualifierAnalyzer"
 
@@ -26,40 +25,46 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
     if qualifierName = SharedImplUtil.MISSING_DECLARATION_NAME then false else
 
     let opens = data.GetData(FSharpErrorsStage.openedModulesProvider).GetOpenedModuleNames
-    if not (opens.Contains(qualifierName)) then false else
+    let scopes = opens.GetValuesSafe(qualifierName)
+
+    let inAnyScope =
+        if scopes.Count = 0 then false else
+
+        let offset = referenceOwner.GetTreeStartOffset()
+        if scopes.Count = 1 then
+            OpenScope.includesOffset offset scopes.[0]
+        else
+            scopes |> Seq.exists (OpenScope.includesOffset offset)
+
+    if not inAnyScope then false else
+
 //    if not (opens.GetValuesSafe(shortName) |> Seq.exists (endsWith qualifierExpr.QualifiedName)) then () else
 
     let referenceName = referenceOwner.As<IReferenceName>()
     if isNotNull referenceName && isInOpen referenceName then false else
 
-    let declaredElement =
-        match reference.Resolve().DeclaredElement with
-        | :? IConstructor as ctor -> ctor.GetContainingType() :> IDeclaredElement
-        | declaredElement -> declaredElement
+    let fcsSymbol = reference.GetFSharpSymbol()
+    if isNull (box fcsSymbol) then false else
 
-    if isNull declaredElement then false else
+    let fcsSymbol: FSharpSymbol =
+        match fcsSymbol with
+        | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor ->
+            match mfv.DeclaringEntity with
+            | Some(fcsEntity) -> fcsEntity :> _
+            | _ -> Unchecked.defaultof<_>
+        | _ -> fcsSymbol
 
-    // Don't make namespace usages unqualified, e.g. don't remove `System` leaving `Collections.Generic.List`.
-    if declaredElement :? INamespace && qualifierName <> FSharpTokenType.GLOBAL.TokenRepresentation then false else
+    if isNull (box fcsSymbol) then false else
+
+    match fcsSymbol with
+    | :? FSharpEntity as fcsEntity when
+            fcsEntity.IsNamespace && qualifierName <> FSharpTokenType.GLOBAL.TokenRepresentation ->
+        // Don't make namespace usages unqualified, e.g. don't remove `System` leaving `Collections.Generic.List`.
+        false
+    | _ ->
 
     // todo: try to check next qualified names in case we got into multiple-result resolve, i.e. for module?
-    let shortName = reference.GetName()
-    match referenceOwner.CheckerService.ResolveNameAtLocation(referenceOwner, [shortName], OpName) with
-    | None -> false
-    | Some symbolUse ->
-
-    let unqualifiedElement = symbolUse.Symbol.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner)
-    if declaredElement.Equals(unqualifiedElement) then true else
-
-    // Workaround for case where unqualified resolve may return module with implicit suffix instead of type.
-    let compiledTypeElement = unqualifiedElement.As<CompiledTypeElement>()
-    if isNull compiledTypeElement then false else
-
-    if not (unqualifiedElement.ShortName.HasModuleSuffix() && not (shortName.HasModuleSuffix())) then false else
-    if not (isCompiledModule compiledTypeElement) then false else
-
-    let typeElement = FSharpImplUtil.TryGetAssociatedType(compiledTypeElement, shortName)
-    declaredElement.Equals(typeElement)
+    FSharpResolveUtil.resolvesToFcsSymbolUnqualified fcsSymbol reference OpName
 
 
 [<ElementProblemAnalyzer([| typeof<IReferenceExpr>; typeof<IReferenceName>; typeof<ITypeExtensionDeclaration> |],

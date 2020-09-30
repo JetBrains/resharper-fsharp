@@ -1,6 +1,5 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
-open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
@@ -8,7 +7,7 @@ open NUnit.Framework
 
 [<FSharpTest; TestPackages("FSharp.Core")>]
 type RemoveYieldTest() =
-    inherit QuickFixTestBase<RemoveYieldFix>()
+    inherit FSharpQuickFixTestBase<RemoveYieldFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/removeYield"
     

@@ -4,7 +4,7 @@ open FSharp.Compiler.ErrorLogger
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.Util
 
 [<DaemonStage(StagesBefore = [| typeof<SyntaxErrorsStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]

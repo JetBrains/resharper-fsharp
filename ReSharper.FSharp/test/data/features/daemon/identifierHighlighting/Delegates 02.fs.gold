@@ -1,0 +1,29 @@
+﻿open |System|(0)
+
+type |T1|(1) = |int|(2) -> |int|(3)
+
+let |f1|(4) (|f|(5) : |T1|(6)) = |f|(7) 1
+let |f2|(8) (|f|(9) : |int|(10) -> |int|(11)) = |f|(12) 1
+let |f3|(13) (|f|(14) : |Func|(15)<|int|(16), |int|(17)>) = |f|(18).|Invoke|(19)(1)
+
+---------------------------------------------------------
+(0): ReSharper F# Namespace Identifier: 
+(1): ReSharper F# Delegate Identifier: 
+(2): ReSharper F# Struct Identifier: 
+(3): ReSharper F# Struct Identifier: 
+(4): ReSharper F# Function Identifier: 
+(5): ReSharper F# Function Identifier: 
+(6): ReSharper F# Delegate Identifier: 
+(7): ReSharper F# Function Identifier: 
+(8): ReSharper F# Function Identifier: 
+(9): ReSharper F# Function Identifier: 
+(10): ReSharper F# Struct Identifier: 
+(11): ReSharper F# Struct Identifier: 
+(12): ReSharper F# Function Identifier: 
+(13): ReSharper F# Function Identifier: 
+(14): ReSharper F# Value Identifier: 
+(15): ReSharper F# Delegate Identifier: 
+(16): ReSharper F# Struct Identifier: 
+(17): ReSharper F# Struct Identifier: 
+(18): ReSharper F# Value Identifier: 
+(19): ReSharper F# Method Identifier: 

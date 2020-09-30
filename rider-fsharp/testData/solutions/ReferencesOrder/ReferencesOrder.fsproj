@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Library1">
+        <HintPath>Library1.dll</HintPath>
+      </Reference>
+      <Reference Include="Library2">
+        <HintPath>Library2.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

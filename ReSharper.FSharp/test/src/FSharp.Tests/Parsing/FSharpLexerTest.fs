@@ -28,6 +28,7 @@ type FSharpLexerTest() =
     [<Test>] member x.``Strings 05 - Escape characters 4 - Verbatim``() = x.DoNamedTest()
     [<Test>] member x.``Strings 06 - Keyword``() = x.DoNamedTest()
     [<Test>] member x.``Strings 07 - Backslash``() = x.DoNamedTest()
+    [<Test>] member x.``Strings 08 - Quotes``() = x.DoNamedTest()
 
     [<Test>] member x.``Multiline strings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Multiline strings 02 - Triple quoted``() = x.DoNamedTest()
@@ -72,6 +73,8 @@ type FSharpLexerTest() =
     [<Test>] member x.``Hash directives 01 - Reference``() = x.DoNamedTest()
     [<Test>] member x.``Hash directives 02 - Include``() = x.DoNamedTest()
     [<Test>] member x.``Hash directives 03 - Light``() = x.DoNamedTest()
+
+    [<Test>] member x.``Operators - Custom 3 - Multiplication decl``() = x.DoNamedTest()
 
     [<Test>] member x.``Operators 01 - Simple arithmetic``() = x.DoNamedTest()
     [<Test>] member x.``Operators 02 - Logic``() = x.DoNamedTest()

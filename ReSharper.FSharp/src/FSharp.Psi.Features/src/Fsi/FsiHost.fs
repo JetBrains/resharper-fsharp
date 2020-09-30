@@ -39,7 +39,11 @@ type FsiHost
             else
                 fsiDetector.GetActiveTool(solution, fsiOptions)
 
-        let fsiPath = fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
+        let fsiPath =
+            if fsiOptions.IsCustomTool.Value then
+                fsiOptions.FsiPathAsPath
+            else
+                fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
 
         let args =
             [| yield! stringArrayArgs fsiOptions.FsiArgs.Value
@@ -54,7 +58,8 @@ type FsiHost
                    yield stringArg "fsi-server-output-codepage" Encoding.UTF8.CodePage
                    yield stringArg "fsi-server-input-codepage"  Encoding.UTF8.CodePage
 
-               yield stringArg "fsi-server-lcid" Thread.CurrentThread.CurrentUICulture.LCID |]
+               if fsi.Runtime <> RdFsiRuntime.Core then
+                   yield stringArg "fsi-server-lcid" Thread.CurrentThread.CurrentUICulture.LCID |]
 
         RdFsiSessionInfo(fsiPath.FullPath, fsi.Runtime, fsi.IsCustom, List(args), fsiOptions.FixOptionsForDebug.Value)
 
@@ -69,14 +74,20 @@ type FsiHost
         let targetFrameworkId = project.GetCurrentTargetFrameworkId()
         let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
 
-        getReferencePaths assemblyFilter psiModule
+        getReferencedModules psiModule
+        |> Seq.filter (fun psiModule ->
+            match psiModule with
+            | :? IAssemblyPsiModule as assemblyModule -> assemblyFilter assemblyModule.Assembly
+            | _ -> true)
+        |> Seq.map getModuleFullPath
+        |> List
 
     do
         let rdFsiHost = solution.RdFSharpModel().FSharpInteractiveHost
         rdFsiHost.RequestNewFsiSessionInfo.Set(getNewFsiSessionInfo)
         rdFsiHost.GetProjectReferences.Set(getProjectReferences)
           
-        rdFsiHost.FsiTools.PrepareCommands.Set(FsiTools.prepareCommands)
+        rdFsiHost.FsiTools.PrepareCommands.Set(FsiSandboxUtil.prepareCommands)
 
         fsiOptions.MoveCaretOnSendLine.FlowInto(lifetime, rdFsiHost.MoveCaretOnSendLine)
         fsiOptions.ExecuteRecent.FlowInto(lifetime, rdFsiHost.CopyRecentToEditor)

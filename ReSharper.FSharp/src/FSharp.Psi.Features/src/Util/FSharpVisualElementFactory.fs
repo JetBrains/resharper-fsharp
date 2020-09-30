@@ -36,6 +36,8 @@ type FSharpVisualElementFactory() =
         if not (name = "FromArgb" || name = "FromName") then null else
 
         let appExpr = PrefixAppExprNavigator.GetByFunctionExpression(referenceExpr)
+        if isNull appExpr then null else
+
         let argExpression = appExpr.ArgumentExpression.IgnoreInnerParens().As<ITupleExpr>()
         if isNull argExpression then null else
 

@@ -1,0 +1,4 @@
+﻿open System.Collections.Generic
+
+let l1 = {caret}List()
+let l2 = List()

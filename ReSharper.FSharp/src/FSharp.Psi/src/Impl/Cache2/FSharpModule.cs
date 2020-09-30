@@ -9,14 +9,14 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  internal class FSharpModule : FSharpClass, IModule
+  internal class FSharpModule : FSharpClass, IFSharpModule
   {
     public FSharpModule([NotNull] IModulePart part) : base(part)
     {
     }
 
-    protected override IList<IDeclaredType> CalcSuperTypes() =>
-      new[] {Module.GetPredefinedType().Object};
+    protected override LocalList<IDeclaredType> CalcSuperTypes() =>
+      new LocalList<IDeclaredType>(new[] {Module.GetPredefinedType().Object});
 
     private IModulePart ModulePart =>
       this.GetPart<IModulePart>().NotNull();

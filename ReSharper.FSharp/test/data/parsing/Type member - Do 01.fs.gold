@@ -7,14 +7,15 @@ IFSharpImplFile
       IObjectTypeDeclaration
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
         IImplicitConstructorDeclaration
-          IMemberParamDeclarationGroup
-            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IParametersPatternDeclaration
+            IParenPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        IDo
+        IDoStatement
           FSharpTokenType+DoTokenElement(type:DO, text:do)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IChameleonExpression

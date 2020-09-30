@@ -1,0 +1,9 @@
+﻿let |asyncCex|(0) = |async|(1) { return 1 }
+
+let |seqCex|(2) = |seq|(3) { 1 }
+
+---------------------------------------------------------
+(0): ReSharper F# Value Identifier: 
+(1): ReSharper F# Computation Expression Identifier: 
+(2): ReSharper F# Value Identifier: 
+(3): ReSharper F# Computation Expression Identifier: 
