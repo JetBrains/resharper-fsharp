@@ -18,7 +18,6 @@ open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
 
@@ -58,16 +57,16 @@ type LocalReferencePatternVisitor
 
         // v-- not evident
         // x::y::z
-        //    ^--^-- evident
-        let tuplePat = TuplePatNavigator.GetByPattern pattern
-        if isNotNull tuplePat then
-            let consPat = ConsPatNavigator.GetByPattern1 tuplePat
-            if isNull consPat then false else
+        //    ^--  evident
+        let listConsPat = ListConsPatNavigator.GetByHeadPattern pattern
+        if isNotNull listConsPat then
+            let enclosingList = ListConsPatNavigator.GetByTailPattern listConsPat
+            isNotNull enclosingList
 
-            // Are we nested inside another ConsPat?
-            let parentTuplePat = TuplePatNavigator.GetByPattern consPat
-            if isNull parentTuplePat then tuplePat.Patterns.IndexOf pattern <> 0 else
-            isNotNull (ConsPatNavigator.GetByPattern1 parentTuplePat)
+        // x::y::z
+        //       ^--  evident
+        elif isNotNull (ListConsPatNavigator.GetByTailPattern pattern) then
+            true
 
         else
 
@@ -144,13 +143,13 @@ type InferredTypeHintHighlightingProcess
         fsFile.ProcessThisAndDescendants(Processor(x, consumer))
         committer.Invoke(DaemonStageResult(consumer.Highlightings))
 
-    override x.VisitLetModuleDecl(moduleDecl, consumer) =
+    override x.VisitLetBindingsDeclaration(moduleDecl, consumer) =
         visitLetBindings moduleDecl consumer
 
     override x.VisitLetOrUseExpr(letOrUseExpr, consumer) =
         visitLetBindings letOrUseExpr consumer
 
-    override x.VisitMemberParamsDeclaration(paramDecl, consumer) =
+    override x.VisitParametersPatternDeclaration(paramDecl, consumer) =
         if highlightingContext.ShowTypeNameHintsForImplicitlyTypedVariables then
             match paramDecl.Pattern with
             | null -> ()
