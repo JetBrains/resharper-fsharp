@@ -56,8 +56,8 @@ type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
                 let prevToken = nodeToReplace.GetPreviousToken()
                 let nextToken = nodeToReplace.GetNextToken()
 
-                if not (isWhitespace prevToken) then addNodeBefore nodeToReplace (Whitespace())
-                if not (isWhitespace nextToken) then addNodeAfter nodeToReplace (Whitespace())
+                if isNotNull prevToken && not (isWhitespace prevToken) then addNodeBefore nodeToReplace (Whitespace())
+                if isNotNull nextToken && not (isWhitespace nextToken) then addNodeAfter nodeToReplace (Whitespace())
 
                 replace nodeToReplace (factory.CreateReferenceExpr("id"))
             else
