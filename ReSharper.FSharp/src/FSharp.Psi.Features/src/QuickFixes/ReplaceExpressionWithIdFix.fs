@@ -7,7 +7,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpLambdaUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -57,10 +56,8 @@ type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
                 let prevToken = nodeToReplace.GetPreviousToken()
                 let nextToken = nodeToReplace.GetNextToken()
 
-                if isNotNull prevToken && not (isWhitespace prevToken) then
-                    ModificationUtil.AddChildBefore(nodeToReplace, Whitespace()) |> ignore
-                if isNotNull nextToken && not (isWhitespace nextToken) then
-                    ModificationUtil.AddChildAfter(nodeToReplace, Whitespace()) |> ignore
+                if not (isWhitespace prevToken) then addNodeBefore nodeToReplace (Whitespace())
+                if not (isWhitespace nextToken) then addNodeAfter nodeToReplace (Whitespace())
 
                 replace nodeToReplace (factory.CreateReferenceExpr("id"))
             else
