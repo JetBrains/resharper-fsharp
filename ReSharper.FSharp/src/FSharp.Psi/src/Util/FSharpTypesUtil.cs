@@ -128,7 +128,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (entity.IsArrayType)
       {
         var argType = GetSingleTypeArgument(type, typeParams, psiModule, isFromMethod);
-        return TypeFactory.CreateArrayType(argType, type.TypeDefinition.ArrayRank);
+        return TypeFactory.CreateArrayType(argType, type.TypeDefinition.ArrayRank, NullableAnnotation.Unknown);
       }
 
       // e.g. byref<int>, we need int
@@ -150,7 +150,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           : TypeFactory.CreateUnknownType(psiModule);
       }
 
-      var declaredType = TypeFactory.CreateTypeByCLRName(clrName, psiModule);
+      var declaredType = clrName.CreateTypeByClrName(psiModule);
       var genericArgs = type.GenericArguments;
       if (genericArgs.IsEmpty())
         return declaredType;
@@ -243,5 +243,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         ? fsharpType.MapType(fsTreeNode)
         : TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
     }
+
+    [NotNull]
+    public static IDeclaredType CreateTypeByClrName([NotNull] this IClrTypeName clrTypeName,
+      [NotNull] IPsiModule psiModule) =>
+      TypeFactory.CreateTypeByCLRName(clrTypeName, NullableAnnotation.Unknown, psiModule);
   }
 }

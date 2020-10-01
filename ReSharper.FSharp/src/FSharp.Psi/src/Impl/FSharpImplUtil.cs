@@ -588,10 +588,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       var result = new List<ITypeElement>(names.Count);
       foreach (var clrTypeName in names)
       {
-        if (clrTypeName == null)
-          continue;
-
-        var typeElement = TypeFactory.CreateTypeByCLRName(clrTypeName, psiModule).GetTypeElement();
+        var typeElement = clrTypeName?.CreateTypeByClrName(psiModule).GetTypeElement();
         if (typeElement != null)
           result.Add(typeElement);
       }
