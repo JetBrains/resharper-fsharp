@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override string[] ExtendsListShortNames { get; }
 
-    public IDeclaredType GetBaseClassType() =>
+    public override IDeclaredType GetBaseClassType() =>
       TypeElement?.GetContainingType() is ITypeElement typeElement
         ? TypeFactory.CreateType(typeElement)
         : null;
@@ -54,12 +54,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
           ? ReSharper.Psi.Modifiers.INTERNAL
           : ReSharper.Psi.Modifiers.PUBLIC);
 
-    public MemberPresenceFlag GetMemberPresenceFlag()
-    {
-      return MemberPresenceFlag.INSTANCE_CTOR;
-    }
+    public override MemberPresenceFlag GetMemberPresenceFlag() =>
+      MemberPresenceFlag.INSTANCE_CTOR;
 
-    protected override byte SerializationTag => (byte) FSharpPartKind.UnionCase;
+    protected override byte SerializationTag => 
+      (byte) FSharpPartKind.UnionCase;
 
     public IList<FSharpUnionCaseField<UnionCaseFieldDeclaration>> CaseFields
     {
