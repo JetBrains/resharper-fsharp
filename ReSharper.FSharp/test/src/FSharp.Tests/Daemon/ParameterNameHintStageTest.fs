@@ -1,19 +1,18 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Feature.Services.ParameterNameHints
+open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<TestReferences("System.Drawing")>]
+[<HighlightOnly(typeof<ParameterNameHintHighlighting>)>]
 [<TestSettingsKey(typeof<ParameterNameHintsOptions>)>]
 type ParameterNameHintStageTest() =
     inherit FSharpHighlightingTestBase()
 
     override x.RelativeTestDataPath = "features/daemon/parameterNameHints"
-
-    override x.HighlightingPredicate(highlighting, _, _) =
-        highlighting :? ParameterNameHintHighlighting
 
     [<Test>] member x.``App 01 - Multiple literals``() = x.DoNamedTest()
     [<Test>] member x.``App 02 - Some literals``() = x.DoNamedTest()

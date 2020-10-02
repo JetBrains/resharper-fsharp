@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.InlayHints
@@ -15,12 +16,12 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Naming.Settings
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
+open JetBrains.Util.Logging
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpParameterNameHintsOptionStore(optionsStore: ManagedLanguageParameterNameHintsOptionsStore) =
@@ -130,8 +131,8 @@ type ParameterNameHintsHighlightingStrategy() =
         | _ -> false
 
 type ParameterNameHintHighlightingProcess
-        (fsFile, settings, daemonProcess, namingManager: NamingManager, nameParser: NameParser,
-         blackListMatcher: IParameterNameHintsBlackListMatcher,
+        (logger: ILogger, fsFile, settings, daemonProcess, namingManager: NamingManager,
+         nameParser: NameParser, blackListMatcher: IParameterNameHintsBlackListMatcher,
          strategy: ManagedLanguageParameterNameHintsHighlightingStrategy,
          parameterNameHintsHighlightingProvider: IManagedLanguageParameterNameHintsHighlightingProvider,
          customProviders: ICustomManagedLanguageParameterNameHintsHighlightingProvider seq) =
@@ -149,24 +150,35 @@ type ParameterNameHintHighlightingProcess
         if isNull refExpr then null else resolveParamOwner refExpr.Reference
 
     override x.Execute(committer) =
+        use _swc = logger.StopwatchCookie("Adorning parameter name hints", sprintf "sourceFile=%s" daemonProcess.SourceFile.Name)
         let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
         fsFile.ProcessThisAndDescendants(Processor(x, consumer))
         committer.Invoke(DaemonStageResult(consumer.Highlightings))
 
     override x.VisitPrefixAppExpr(prefixAppExpr, consumer) =
+        let mfv =
+            prefixAppExpr.Reference.TryGetFSharpSymbol()
+            |> Option.bind (function
+                | :? FSharpMemberOrFunctionOrValue as mfv -> Some mfv
+                | _ -> None)
+
+        match mfv with
+        | None -> ()
+        | Some mfv ->
+
         let method = resolveMethod prefixAppExpr
-        // todo: offset 1 for extension methods
-        let parametersOffset = 0
-        let argumentsOwner = prefixAppExpr :> IArgumentsOwner
+
+        let invokingExtensionMethod = mfv.IsExtensionMember && Some mfv.ApparentEnclosingEntity <> mfv.DeclaringEntity
+        let parametersOffset = if invokingExtensionMethod then 1 else 0
 
         let highlightingRange = prefixAppExpr.ArgumentExpression.GetHighlightingRange()
         let highlightings =
             // todo: is this necessary/does it make a difference?
             match method with
             | :? IConstructor as constructor ->
-                parameterNameHintsHighlightingProvider.GetHighlightingsForConstructor(context, argumentsOwner, constructor, highlightingRange, Action x.CheckForInterrupt)
+                parameterNameHintsHighlightingProvider.GetHighlightingsForConstructor(context, prefixAppExpr, constructor, highlightingRange, Action x.CheckForInterrupt)
             | _ ->
-                parameterNameHintsHighlightingProvider.GetHighlightingsForMethod(context, argumentsOwner, method, parametersOffset, highlightingRange, Action x.CheckForInterrupt)
+                parameterNameHintsHighlightingProvider.GetHighlightingsForMethod(context, prefixAppExpr, method, parametersOffset, highlightingRange, Action x.CheckForInterrupt)
 
         for highlighting in highlightings do
             consumer.AddHighlighting(highlighting)
@@ -185,8 +197,8 @@ type ParameterNameHintHighlightingProcess
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type ParameterNameHintStage
-        (languageManager: ILanguageManager, namingManager: NamingManager, nameParser: NameParser,
-         parameterNameHintsOptionsStore: IParameterNameHintsOptionsStore,
+        (logger: ILogger, languageManager: ILanguageManager, namingManager: NamingManager,
+         nameParser: NameParser, parameterNameHintsOptionsStore: IParameterNameHintsOptionsStore,
          blackListManager: IParameterNameHintsBlackListManager,
          parameterNameHintsHighlightingProvider: IManagedLanguageParameterNameHintsHighlightingProvider,
          customProviders: ICustomManagedLanguageParameterNameHintsHighlightingProvider seq) =
@@ -202,4 +214,4 @@ type ParameterNameHintStage
 
         let blackListMatcher = blackListManager.GetMatcher(FSharpLanguage.Instance, settings)
         let strategy = languageManager.GetService<ManagedLanguageParameterNameHintsHighlightingStrategy>(FSharpLanguage.Instance)
-        ParameterNameHintHighlightingProcess(fsFile, settings, daemonProcess, namingManager, nameParser, blackListMatcher, strategy, parameterNameHintsHighlightingProvider, customProviders) :> _
+        ParameterNameHintHighlightingProcess(logger, fsFile, settings, daemonProcess, namingManager, nameParser, blackListMatcher, strategy, parameterNameHintsHighlightingProvider, customProviders) :> _
