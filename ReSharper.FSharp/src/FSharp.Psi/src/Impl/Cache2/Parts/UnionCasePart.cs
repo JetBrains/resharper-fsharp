@@ -52,8 +52,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
           ? ReSharper.Psi.Modifiers.INTERNAL
           : ReSharper.Psi.Modifiers.PUBLIC);
 
-    public IUnionCaseWithFields UnionCase =>
-      (IUnionCaseWithFields) ((ITypeMemberDeclaration) GetDeclaration())?.DeclaredElement;
+    public IUnionCase UnionCase =>
+      (IUnionCase) ((ITypeMemberDeclaration) GetDeclaration())?.DeclaredElement;
 
     public override MemberPresenceFlag GetMemberPresenceFlag() =>
       MemberPresenceFlag.INSTANCE_CTOR;

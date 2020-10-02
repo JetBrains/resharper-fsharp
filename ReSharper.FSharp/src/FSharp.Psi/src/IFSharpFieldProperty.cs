@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
   public interface IGeneratedConstructorOwner
   {
-    [NotNull]
+    [CanBeNull]
     IParametersOwner GetConstructor();
   }
 }

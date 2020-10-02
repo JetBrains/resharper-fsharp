@@ -17,23 +17,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
   }
 
-  internal class FSharpHiddenUnionCaseProperty : FSharpUnionCasePropertyBase<INestedTypeUnionCaseDeclaration>,
-    IUnionCaseWithFields
+  internal class FSharpHiddenUnionCaseProperty : FSharpUnionCasePropertyBase<INestedTypeUnionCaseDeclaration>
   {
     internal FSharpHiddenUnionCaseProperty([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
-    public override AccessRights GetAccessRights() => 
+    public override AccessRights GetAccessRights() =>
       AccessRights.PRIVATE;
 
-    public IList<IUnionCaseField> CaseFields =>
+    public override bool HasFields => true;
+
+    public override IList<IUnionCaseField> CaseFields =>
       GetDeclaration()?.Fields.Select(d => (IUnionCaseField) d.DeclaredElement).ToIList();
 
-    public FSharpNestedTypeUnionCase NestedType =>
+    public override FSharpNestedTypeUnionCase NestedType =>
       GetDeclaration()?.NestedType;
 
-    public IParametersOwner GetConstructor() =>
+    public override IParametersOwner GetConstructor() =>
       new NewUnionCaseMethod(this);
   }
 
@@ -53,5 +54,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetContainingType() is var containingType && containingType != null
         ? TypeFactory.CreateType(containingType)
         : TypeFactory.CreateUnknownType(Module);
+
+    public virtual bool HasFields => false;
+    public virtual IList<IUnionCaseField> CaseFields => EmptyList<IUnionCaseField>.Instance;
+    public virtual FSharpNestedTypeUnionCase NestedType => null;
+
+    public virtual IParametersOwner GetConstructor() => null;
   }
 }

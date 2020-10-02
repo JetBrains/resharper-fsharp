@@ -57,13 +57,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           result.Add(new UnionTagProperty(typeElement));
           foreach (var unionCase in unionPart.Cases)
           {
-            if (unionCase is IUnionCaseWithFields typedCase)
+            if (unionCase.HasFields)
             {
-              result.Add(new NewUnionCaseMethod(typedCase));
+              result.Add(new NewUnionCaseMethod(unionCase));
 
               if (!unionPart.HasNestedTypes)
-                result.AddRange(typedCase.CaseFields);
-              else if (typedCase.NestedType is { } nestedType)
+                result.AddRange(unionCase.CaseFields);
+              else if (unionCase.NestedType is { } nestedType)
                 result.Add(nestedType);
             }
 
@@ -84,15 +84,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (!(unionCase.GetContainingType().GetPart<IUnionPart>() is var unionPart && unionPart != null))
         return EmptyList<IDeclaredElement>.Instance;
 
-      if (unionPart.IsSingleCase && !(unionCase is IUnionCaseWithFields))
+      if (unionPart.IsSingleCase && !unionCase.HasFields)
         return EmptyList<IDeclaredElement>.Instance;
 
       var result = new List<IDeclaredElement>();
-      if (unionCase is IUnionCaseWithFields unionCaseWithFields)
+      if (unionCase.HasFields)
       {
-        result.Add(new NewUnionCaseMethod(unionCaseWithFields));
+        result.Add(new NewUnionCaseMethod(unionCase));
 
-        if (unionCaseWithFields.NestedType is { } nestedType)
+        if (unionCase.NestedType is { } nestedType)
           result.Add(nestedType);
       }
 

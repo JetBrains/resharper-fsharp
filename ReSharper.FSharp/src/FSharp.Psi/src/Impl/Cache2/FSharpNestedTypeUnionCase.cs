@@ -21,13 +21,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       new FSharpNestedTypeUnionCasePointer(this);
   }
 
-  public class FSharpNestedTypeUnionCasePointer : FSharpGeneratedElementPointerBase<FSharpNestedTypeUnionCase, IUnionCaseWithFields>
+  public class FSharpNestedTypeUnionCasePointer : FSharpGeneratedElementPointerBase<FSharpNestedTypeUnionCase, IUnionCase>
   {
     public FSharpNestedTypeUnionCasePointer(FSharpNestedTypeUnionCase nestedType) : base(nestedType)
     {
     }
 
-    public override FSharpNestedTypeUnionCase CreateGenerated(IUnionCaseWithFields unionCase) =>
+    public override FSharpNestedTypeUnionCase CreateGenerated(IUnionCase unionCase) =>
       unionCase.NestedType;
   }
 }

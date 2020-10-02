@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (decl == null)
         return null;
 
-      var caseWithFields = decl.GetContainingNode<IDeclaration>()?.DeclaredElement as IUnionCaseWithFields;
+      var caseWithFields = decl.GetContainingNode<IDeclaration>()?.DeclaredElement as IUnionCase;
       var constructor = caseWithFields?.GetConstructor();
       return constructor != null
         ? new FSharpGeneratedParameter(constructor, this)

@@ -9,9 +9,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 {
   public class NewUnionCaseMethod : FSharpGeneratedMethodBase, IFSharpGeneratedFromUnionCase
   {
-    [NotNull] internal IUnionCaseWithFields UnionCase { get; }
+    [NotNull] internal IUnionCase UnionCase { get; }
 
-    public NewUnionCaseMethod([NotNull] IUnionCaseWithFields unionCase) =>
+    public NewUnionCaseMethod([NotNull] IUnionCase unionCase) =>
       UnionCase = unionCase;
 
     protected override ITypeElement ContainingType => UnionCase.GetContainingType();
