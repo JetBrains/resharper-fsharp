@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [CanBeNull]
     public static IDeclaredType MapBaseType([NotNull] this FSharpEntity entity, IList<ITypeParameter> typeParams,
       [NotNull] IPsiModule psiModule) =>
-      entity.BaseType?.Value is var baseType && baseType != null
+      entity.BaseType?.Value is { } baseType
         ? MapType(baseType, typeParams, psiModule) as IDeclaredType
         : TypeFactory.CreateUnknownType(psiModule);
 
@@ -136,7 +136,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return MapType(type.GenericArguments[0], typeParams, psiModule, isFromMethod, isFromReturn);
 
       if (entity.IsProvidedAndErased)
-        return entity.BaseType is var baseType && baseType != null
+        return entity.BaseType is { } baseType
           ? MapType(baseType.Value, typeParams, psiModule, isFromMethod, isFromReturn)
           : TypeFactory.CreateUnknownType(psiModule);
 

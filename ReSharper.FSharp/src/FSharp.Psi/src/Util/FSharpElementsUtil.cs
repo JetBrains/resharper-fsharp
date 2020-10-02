@@ -327,7 +327,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var typeElement = GetTypeElement(entity, psiModule);
       var patternName = pattern.Name?.Value;
-      if (typeElement == null || !(patternName is var name) || name == null)
+      if (typeElement == null || patternName == null)
         return null;
 
       if (typeElement.Module.ContainingProjectModule is IProject)

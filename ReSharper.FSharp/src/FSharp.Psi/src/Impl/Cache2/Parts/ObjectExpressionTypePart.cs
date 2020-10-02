@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override string[] ExtendsListShortNames { get; }
 
     public IDeclaredType GetBaseClassType() =>
-      GetSuperClass() is IClass baseClass
+      GetSuperClass() is { } baseClass
         ? TypeFactory.CreateType(baseClass)
         : null;
 
@@ -71,11 +71,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       var result = new LocalList<ITypeMember>();
       foreach (var memberDeclaration in declaration.MemberDeclarations)
-        if (memberDeclaration.DeclaredElement is var declaredElement && declaredElement != null)
+        if (memberDeclaration.DeclaredElement is { } declaredElement)
           result.Add(declaredElement);
 
       foreach (var memberDeclaration in declaration.InterfaceMembers)
-        if (memberDeclaration.DeclaredElement is var declaredElement && declaredElement != null)
+        if (memberDeclaration.DeclaredElement is { } declaredElement)
           result.Add(declaredElement);
 
       return result.ResultingList();

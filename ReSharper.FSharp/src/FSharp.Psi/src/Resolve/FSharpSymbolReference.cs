@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         : null;
 
     public virtual TreeOffset SymbolOffset =>
-      myOwner.FSharpIdentifier is var fsIdentifier && fsIdentifier != null
+      myOwner.FSharpIdentifier is { } fsIdentifier
         ? fsIdentifier.NameRange.StartOffset
         : myOwner.GetTreeStartOffset();
 

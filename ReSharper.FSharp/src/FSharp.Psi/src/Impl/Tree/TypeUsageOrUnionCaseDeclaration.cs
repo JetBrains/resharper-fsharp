@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       AbbreviatedType is INamedTypeUsage namedTypeUsage ? namedTypeUsage.ReferenceName : null;
 
     public override IFSharpIdentifierLikeNode NameIdentifier =>
-      NamedTypeReferenceName is var referenceName && TypeReferenceCanBeUnionCaseDeclaration(referenceName)
+      NamedTypeReferenceName is { } referenceName && TypeReferenceCanBeUnionCaseDeclaration(referenceName)
         ? referenceName.Identifier
         : null;
 

@@ -112,7 +112,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     member x.AdvanceToTokenOrRangeEnd(tokenType: TokenNodeType, range: range) =
         x.AdvanceToTokenOrOffset(tokenType, x.GetEndOffset(range), range)
 
-    member x.AdvanceToTokenOrOffset(tokenType: TokenNodeType, maxOffset: int, range: range) =
+    member x.AdvanceToTokenOrOffset(tokenType: TokenNodeType, maxOffset: int, _: range) =
         Assertion.Assert(isNotNull tokenType, "isNotNull tokenType")
 
 //        let offset = x.CurrentOffset
@@ -260,7 +260,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStart) else rangeStart
             x.Mark(startOffset)
 
-    member x.StartException(SynExceptionDefnRepr(_, UnionCase(_, id, unionCaseType, _, _, _), _, _, _, range)) =
+    member x.StartException(SynExceptionDefnRepr(_, UnionCase(caseType = unionCaseType), _, _, _, range)) =
         let mark = x.Mark(range)
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION) |> ignore
         mark
@@ -317,8 +317,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             let mark = x.Mark(range)
 
             if not fields.IsEmpty then
-                let (Field(_, _, _, _, _, _, _, firstFieldRange)) = fields.Head
-                let (Field(_, _, _, _, _, _, _, lastFieldRange)) = List.last fields
+                let (Field(range = firstFieldRange)) = fields.Head
+                let (Field(range = lastFieldRange)) = List.last fields
 
                 let fieldListMark = x.Mark(firstFieldRange)
                 for field in fields do
@@ -351,7 +351,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | SynTypeDefnSimpleRepr.TypeAbbrev(_, (TypeRange range as synType), _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType)
-            x.Done(mark, ElementType.ABBREVIATED_TYPE_OR_UNION_CASE_DECLARATION)
+            x.Done(mark, ElementType.TYPE_USAGE_OR_UNION_CASE_DECLARATION)
             ElementType.TYPE_ABBREVIATION_DECLARATION
 
         | SynTypeDefnSimpleRepr.None _ ->
@@ -603,12 +603,12 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.ProcessNamedTypeReference(lid.Lid)
             x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
-        | SynType.App(_, _, _, _, _, _, _) ->
+        | SynType.App _ ->
             let mark = x.Mark(range)
             x.ProcessTypeAsTypeReferenceName(synType)
             x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
-        | SynType.LongIdentApp(_, _, ltRange, typeArgs, _, gtRange, _) ->
+        | SynType.LongIdentApp _ ->
             let mark = x.Mark(range)
             x.ProcessTypeAsTypeReferenceName(synType)
             x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)

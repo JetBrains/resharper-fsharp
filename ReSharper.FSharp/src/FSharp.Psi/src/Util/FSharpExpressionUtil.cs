@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         ElementType.WHILE_EXPR);
 
     public static bool IsSimpleValueExpression([CanBeNull] this IFSharpExpression fsExpr) =>
-      fsExpr.IgnoreInnerParens() is var expr && expr != null && SimpleValueExpressionNodeTypes[expr.NodeType];
+      fsExpr.IgnoreInnerParens() is { } expr && SimpleValueExpressionNodeTypes[expr.NodeType];
 
     public static bool IsLiteralExpression([CanBeNull] this IFSharpExpression fsExpr) =>
       fsExpr.IgnoreInnerParens() is ILiteralExpr literalExpr && literalExpr.IsConstantValue();

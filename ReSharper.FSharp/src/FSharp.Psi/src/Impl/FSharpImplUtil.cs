@@ -730,7 +730,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static IFSharpReferenceOwner SetName([NotNull] this IFSharpReferenceOwner referenceOwner, 
       [NotNull] string name)
     {
-      if (referenceOwner.FSharpIdentifier?.IdentifierToken is var id && id != null)
+      if (referenceOwner.FSharpIdentifier?.IdentifierToken is { } id)
         LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));
 
       return referenceOwner;
