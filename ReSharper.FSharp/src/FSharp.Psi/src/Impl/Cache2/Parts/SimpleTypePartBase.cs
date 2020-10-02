@@ -57,11 +57,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return result;
     }
 
-    protected virtual IList<ITypeMember> GetGeneratedMembers() =>
-      GeneratedMembersUtil.GetGeneratedMembers(this);
-
     public override IEnumerable<ITypeMember> GetTypeMembers() =>
-      GetGeneratedMembers().Prepend(base.GetTypeMembers());
+      base.GetTypeMembers().Prepend(this.GetGeneratedMembers());
 
     public bool OverridesToString => true;
     public bool HasCompareTo => true;

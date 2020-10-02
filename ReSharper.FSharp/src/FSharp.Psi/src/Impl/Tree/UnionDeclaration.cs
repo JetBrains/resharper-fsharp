@@ -2,7 +2,6 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -11,8 +10,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(AllAttributes);
     public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
 
-    public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
-      base.MemberDeclarations.Prepend(UnionCases).AsIReadOnlyList();
+    private bool? myHasNestedTypes;
+
+    public bool HasNestedTypes
+    {
+      get
+      {
+        if (myHasNestedTypes != null)
+          return myHasNestedTypes.Value;
+
+        lock (this)
+          return myHasNestedTypes ??= !this.HasAttribute(FSharpImplUtil.Struct) && UnionCases.Count > 1;
+      }
+    }
+
+    public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations
+    {
+      get
+      {
+        var result = new List<ITypeMemberDeclaration>();
+        result.AddRange(base.MemberDeclarations);
+
+        foreach (var unionCaseDecl in UnionCases)
+        {
+          result.Add(unionCaseDecl);
+          if (!HasNestedTypes && unionCaseDecl is INestedTypeUnionCaseDeclaration decl)
+            result.AddRange(decl.Fields);
+        }
+
+        return result;
+      }
+    }
 
     public override PartKind TypePartKind =>
       FSharpImplUtil.GetTypeKind(AllAttributes, out var typeKind)

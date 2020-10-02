@@ -10,7 +10,7 @@ open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
-type SymbolCacheTest() =
+type FSharpSymbolCacheTest() =
     inherit BaseTestWithSingleProject()
 
     override x.RelativeTestDataPath = "cache/symbolCache"
@@ -59,9 +59,13 @@ type SymbolCacheTest() =
     [<Test>] member x.``Union 04 - Singletons``() = x.DoNamedTest()
     [<Test>] member x.``Union 05 - Nested types``() = x.DoNamedTest()
     [<Test>] member x.``Union 06 - Mixed cases``() = x.DoNamedTest()
-    [<Test>] member x.``Union 07 - Struct single case``() = x.DoNamedTest()
-    [<Test>] member x.``Union 08 - Struct singletons``() = x.DoNamedTest()
-    [<Test>] member x.``Union 09 - Struct multiple cases with fields``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union - Struct - Single case 01 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Struct - Single case 02 - Abbreviation``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Struct - Single case 03 - Fields``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Struct 01 - Empty cases``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Struct 02 - Cases with fields``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Struct 03 - Mixed``() = x.DoNamedTest()
 
     [<Test>] member x.``Abbreviations - Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Abbreviations - Module 02``() = x.DoNamedTest()

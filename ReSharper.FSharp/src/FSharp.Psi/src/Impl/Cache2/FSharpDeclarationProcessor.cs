@@ -200,24 +200,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitUnionDeclaration(IUnionDeclaration decl)
     {
       var unionCases = decl.UnionCases;
+      var isSingleCase = unionCases.Count == 1;
 
-      var casesWithFieldsCount = 0;
-      foreach (var unionCase in unionCases)
-        if (unionCase is INestedTypeUnionCaseDeclaration)
-          casesWithFieldsCount++;
+      if (decl.HasAttribute(FSharpImplUtil.Struct))
+      {
+        Builder.StartPart(new StructUnionPart(decl, Builder, isSingleCase));
+        foreach (var unionCase in unionCases)
+          if (unionCase is INestedTypeUnionCaseDeclaration caseWithFields)
+            ProcessTypeMembers(caseWithFields.Fields);
+      }
+      else
+      {
+        var hasNestedTypes = decl.HasNestedTypes;
+        Builder.StartPart(new UnionPart(decl, Builder, hasNestedTypes, isSingleCase));
 
-      var casesCount = unionCases.Count;
-      var hasPublicNestedTypes = casesWithFieldsCount > 0 && casesCount > 1;
-      var isSingleCase = casesCount == 1;
+        foreach (var unionCase in unionCases)
+          if (unionCase is INestedTypeUnionCaseDeclaration caseWithFields)
+            if (hasNestedTypes)
+              caseWithFields.Accept(this);
+            else
+              ProcessTypeMembers(caseWithFields.Fields);
+      }
 
-      var unionPart =
-        decl.HasAttribute(FSharpImplUtil.Struct)
-          ? (Part) new StructUnionPart(decl, Builder, isSingleCase)
-          : new UnionPart(decl, Builder, hasPublicNestedTypes, isSingleCase);
-
-      Builder.StartPart(unionPart);
-      foreach (var unionCase in unionCases)
-        unionCase.Accept(this);
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }

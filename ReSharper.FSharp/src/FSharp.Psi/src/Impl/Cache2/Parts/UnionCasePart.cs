@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -33,14 +31,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override string[] ExtendsListShortNames { get; }
 
     public override IDeclaredType GetBaseClassType() =>
-      TypeElement?.GetContainingType() is ITypeElement typeElement
+      TypeElement?.GetContainingType() is { } typeElement
         ? TypeFactory.CreateType(typeElement)
         : null;
 
     public IClass GetSuperClass() => TypeElement?.GetContainingType() as IClass;
 
     public override IEnumerable<IDeclaredType> GetSuperTypes() =>
-      GetBaseClassType() is IDeclaredType baseType
+      GetBaseClassType() is { } baseType
         ? new[] {baseType}
         : EmptyList<IDeclaredType>.InstanceList;
 
@@ -50,34 +48,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override MemberDecoration Modifiers =>
       MemberDecoration.FromModifiers(
         Parent is IUnionPart unionPart &&
-        (!unionPart.HasPublicNestedTypes || unionPart.RepresentationAccessRights != AccessRights.PUBLIC)
+        (!unionPart.HasNestedTypes || unionPart.RepresentationAccessRights != AccessRights.PUBLIC)
           ? ReSharper.Psi.Modifiers.INTERNAL
           : ReSharper.Psi.Modifiers.PUBLIC);
+
+    public IUnionCaseWithFields UnionCase =>
+      (IUnionCaseWithFields) ((ITypeMemberDeclaration) GetDeclaration())?.DeclaredElement;
 
     public override MemberPresenceFlag GetMemberPresenceFlag() =>
       MemberPresenceFlag.INSTANCE_CTOR;
 
-    protected override byte SerializationTag => 
+    protected override byte SerializationTag =>
       (byte) FSharpPartKind.UnionCase;
-
-    public IList<FSharpUnionCaseField<UnionCaseFieldDeclaration>> CaseFields
-    {
-      get
-      {
-        var declaration = GetDeclaration();
-        if (declaration == null)
-          return EmptyList<FSharpUnionCaseField<UnionCaseFieldDeclaration>>.Instance;
-
-        var result = new LocalList<FSharpUnionCaseField<UnionCaseFieldDeclaration>>();
-        foreach (var fieldDeclaration in declaration.Fields)
-        {
-          if (fieldDeclaration.DeclaredElement is FSharpUnionCaseField<UnionCaseFieldDeclaration> field)
-            result.Add(field);
-        }
-
-        return result.ResultingList();
-      }
-    }
 
     public AccessRights RepresentationAccessRights =>
       Parent is IUnionPart unionPart

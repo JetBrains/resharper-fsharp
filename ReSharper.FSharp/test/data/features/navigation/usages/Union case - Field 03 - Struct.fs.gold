@@ -1,0 +1,74 @@
+-------------- offset 54 line 5 col 13 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [O] U u = U.NewA(|a|: 123); RANGE: (65,66) @ Union case - Field 03 - Struct.cs
+Menu Item presentation: 
+Text: Class1.Class1      |U u = U.NewA(|a|: 123);| (5)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: U u = U.NewA(a: 123);
+
+Occurrence's navigation result. Opened file: Union case - Field 03 - Struct.cs
+------------------
+  public Class1()
+  {
+    U u = U.NewA(|CARET|a: 123);
+    var a = u.a;
+  }
+------------------
+
+Occurrence's dump:
+TO: [R] var a = u.|a|; RANGE: (89,90) @ Union case - Field 03 - Struct.cs
+Menu Item presentation: 
+Text: Class1.Class1      |var a = u.|a|;| (6)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: var a = u.a;
+
+Occurrence's navigation result. Opened file: Union case - Field 03 - Struct.cs
+------------------
+  {
+    U u = U.NewA(a: 123);
+    var a = u.|CARET|a;
+  }
+}
+------------------
+
+Occurrence's dump:
+TO: [R] | A (|a| = 123) -> () RANGE: (135,136) @ Union case - Field 03 - Struct.fs
+Menu Item presentation: 
+Text: Module      || A (|a| = 123) -> ()| (10)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: | A (a = 123) -> ()
+
+Occurrence's navigation result. Opened file: Union case - Field 03 - Struct.fs
+------------------
+module Module =
+    match A(a = 123) with
+    | A (|CARET|a = 123) -> ()
+
+------------------
+
+Occurrence's dump:
+TO: [R] match A(|a| = 123) with RANGE: (111,112) @ Union case - Field 03 - Struct.fs
+Menu Item presentation: 
+Text: Module      |match A(|a| = 123) with| (9)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: match A(a = 123) with
+
+Occurrence's navigation result. Opened file: Union case - Field 03 - Struct.fs
+------------------
+
+module Module =
+    match A(|CARET|a = 123) with
+    | A (a = 123) -> ()
+
+------------------
+

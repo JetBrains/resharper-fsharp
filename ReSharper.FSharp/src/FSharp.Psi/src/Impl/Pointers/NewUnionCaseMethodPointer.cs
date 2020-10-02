@@ -2,13 +2,13 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenera
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers
 {
-  public class NewUnionCaseMethodPointer : FSharpGeneratedElementPointerBase<NewUnionCaseMethod, IUnionCase>
+  public class NewUnionCaseMethodPointer : FSharpGeneratedElementPointerBase<NewUnionCaseMethod, IUnionCaseWithFields>
   {
     public NewUnionCaseMethodPointer(NewUnionCaseMethod newUnionCaseMethod) : base(newUnionCaseMethod)
     {
     }
 
-    public override NewUnionCaseMethod CreateGenerated(IUnionCase unionCase) =>
+    public override NewUnionCaseMethod CreateGenerated(IUnionCaseWithFields unionCase) =>
       new NewUnionCaseMethod(unionCase);
   }
 }

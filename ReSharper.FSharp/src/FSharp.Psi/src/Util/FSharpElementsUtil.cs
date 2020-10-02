@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -140,36 +141,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (symbol is FSharpUnionCase unionCase)
-      {
-        if (unionCase.IsUnresolved) return null;
-
-        var unionTypeElement = GetTypeElement(unionCase.ReturnType.TypeDefinition, psiModule);
-        if (unionTypeElement == null) return null;
-
-        var caseCompiledName = unionCase.CompiledName;
-        var caseMember = unionTypeElement.GetMembers().FirstOrDefault(m =>
-        {
-          var shortName = m.ShortName;
-          return shortName == caseCompiledName || shortName == "New" + caseCompiledName;
-        });
-
-        if (caseMember != null)
-          return caseMember;
-
-        var unionClrName = unionTypeElement.GetClrName();
-        var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + caseCompiledName, psiModule);
-        return caseDeclaredType.GetTypeElement();
-      }
+        return GetDeclaredElement(unionCase, psiModule);
 
       if (symbol is FSharpField field)
       {
         if (field.IsAnonRecordField)
           return new FSharpAnonRecordFieldProperty(referenceExpression.Reference);
 
-        if (field.IsUnionCaseField && field.DeclaringUnionCase?.Value is var fieldUnionCase)
+        if (field.IsUnionCaseField && field.DeclaringUnionCase?.Value is { } fieldUnionCase)
         {
-          var unionCaseTypeElement = GetDeclaredElement(fieldUnionCase, psiModule, referenceExpression) as ITypeElement;
-          return unionCaseTypeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
+          var unionEntity = fieldUnionCase.ReturnType.TypeDefinition;
+          var fieldOwnerTypeElement =
+            unionEntity.UnionCases.Count > 1 && !unionEntity.IsValueType
+              ? GetDeclaredElement(fieldUnionCase, psiModule, true) as ITypeElement
+              : GetTypeElement(unionEntity, psiModule);
+
+          return fieldOwnerTypeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
         }
 
         if (!field.IsUnresolved && field.DeclaringEntity?.Value is { } fieldEntity)
@@ -186,6 +173,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return parameter.GetOwner(referenceExpression.Reference); // todo: map to parameter
 
       return null;
+    }
+
+    private static IDeclaredElement GetDeclaredElement(FSharpUnionCase unionCase, IPsiModule psiModule,
+      bool preferType = false)
+    {
+      if (unionCase.IsUnresolved) return null;
+
+      var unionTypeElement = GetTypeElement(unionCase.ReturnType.TypeDefinition, psiModule);
+      if (unionTypeElement == null) return null;
+
+      var caseCompiledName = unionCase.CompiledName;
+      var caseMember = unionTypeElement.GetMembers().FirstOrDefault(m =>
+      {
+        if (preferType)
+        {
+          if (!(m is FSharpNestedTypeUnionCase))
+            return false;
+        }
+        else if (m is IFSharpGeneratedFromUnionCase)
+          return false;
+
+        var shortName = m.ShortName;
+        return shortName == caseCompiledName || shortName == "New" + caseCompiledName;
+      });
+
+      if (caseMember != null)
+        return caseMember;
+
+      var unionClrName = unionTypeElement.GetClrName();
+      var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + caseCompiledName, psiModule);
+      return caseDeclaredType.GetTypeElement();
     }
 
     private static IDeclaredElement GetTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
