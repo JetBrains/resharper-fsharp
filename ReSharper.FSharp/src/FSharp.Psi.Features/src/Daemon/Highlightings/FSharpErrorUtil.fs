@@ -96,9 +96,17 @@ let getReferenceExprName (expr: IFSharpExpression) =
     | :? IReferenceExpr as refExpr -> refExpr.ShortName
     | _ -> SharedImplUtil.MISSING_DECLARATION_NAME
 
+let rec isSimpleQualifiedName (expr: IReferenceExpr) =
+    if isNotNull expr.TypeArgumentList then false else
+    match expr.Qualifier with
+    | :? IReferenceExpr as expr -> isSimpleQualifiedName expr
+    | null -> true
+    | _ -> false
+
 let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
     match replaceCandidate with
-    | :? IReferenceExpr as x -> sprintf "Lambda can be replaced with '%s'" x.QualifiedName
+    | :? IReferenceExpr as x when isSimpleQualifiedName x ->
+        sprintf "Lambda can be replaced with '%s'" x.QualifiedName
     | _ -> "Lambda can be simplified"
 
 let getExpressionCanBeReplacedWithIdWarningText (expr: IFSharpExpression) =
