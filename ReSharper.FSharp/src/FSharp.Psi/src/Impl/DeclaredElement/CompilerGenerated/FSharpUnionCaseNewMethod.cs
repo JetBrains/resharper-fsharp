@@ -7,18 +7,18 @@ using JetBrains.ReSharper.Psi.Pointers;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class NewUnionCaseMethod : FSharpGeneratedMethodBase, IFSharpGeneratedFromUnionCase
+  public class FSharpUnionCaseNewMethod : FSharpGeneratedMethodBase, IFSharpGeneratedFromUnionCase
   {
     [NotNull] internal IUnionCase UnionCase { get; }
 
-    public NewUnionCaseMethod([NotNull] IUnionCase unionCase) =>
+    public FSharpUnionCaseNewMethod([NotNull] IUnionCase unionCase) =>
       UnionCase = unionCase;
 
     protected override ITypeElement ContainingType => UnionCase.GetContainingType();
     public IClrDeclaredElement OriginElement => UnionCase;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
-      new NewUnionCaseMethodPointer(this);
+      new FSharpUnionCaseNewMethodPointer(this);
 
     public override string ShortName => "New" + UnionCase.ShortName;
 
@@ -49,7 +49,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       OriginElement.IsValid();
 
     public override bool Equals(object obj) =>
-      obj is NewUnionCaseMethod other && Equals(OriginElement, other.OriginElement);
+      obj is FSharpUnionCaseNewMethod other && Equals(OriginElement, other.OriginElement);
 
     public override int GetHashCode() =>
       OriginElement.GetHashCode();

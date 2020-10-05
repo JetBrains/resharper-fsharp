@@ -8,9 +8,9 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpNestedTypeUnionCase : FSharpClass, IFSharpGeneratedFromUnionCase
+  public class FSharpUnionCaseClass : FSharpClass, IFSharpGeneratedFromUnionCase
   {
-    public FSharpNestedTypeUnionCase([NotNull] IClassPart part) : base(part)
+    public FSharpUnionCaseClass([NotNull] IClassPart part) : base(part)
     {
     }
 
@@ -18,16 +18,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       EnumerateParts().Select(part => (part as UnionCasePart)?.UnionCase).WhereNotNull().First();
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
-      new FSharpNestedTypeUnionCasePointer(this);
-  }
-
-  public class FSharpNestedTypeUnionCasePointer : FSharpGeneratedElementPointerBase<FSharpNestedTypeUnionCase, IUnionCase>
-  {
-    public FSharpNestedTypeUnionCasePointer(FSharpNestedTypeUnionCase nestedType) : base(nestedType)
-    {
-    }
-
-    public override FSharpNestedTypeUnionCase CreateGenerated(IUnionCase unionCase) =>
-      unionCase.NestedType;
+      new FSharpUnionCaseClassPointer(this);
   }
 }

@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
   public static class ModifiersUtil
   {
-    public static MemberDecoration GetDecoration(INestedTypeUnionCaseDeclaration caseDeclaration)
+    public static MemberDecoration GetDecoration(IUnionCaseDeclaration caseDeclaration)
     {
       if (caseDeclaration.FieldsEnumerable.IsEmpty())
         return MemberDecoration.FromModifiers(Modifiers.INTERNAL);

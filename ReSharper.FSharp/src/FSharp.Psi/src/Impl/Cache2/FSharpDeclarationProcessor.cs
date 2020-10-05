@@ -206,8 +206,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       {
         Builder.StartPart(new StructUnionPart(decl, Builder, isSingleCase));
         foreach (var unionCase in unionCases)
-          if (unionCase is INestedTypeUnionCaseDeclaration caseWithFields)
-            ProcessTypeMembers(caseWithFields.Fields);
+          ProcessTypeMembers(unionCase.Fields);
       }
       else
       {
@@ -215,18 +214,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         Builder.StartPart(new UnionPart(decl, Builder, hasNestedTypes, isSingleCase));
 
         foreach (var unionCase in unionCases)
-          if (unionCase is INestedTypeUnionCaseDeclaration caseWithFields)
-            if (hasNestedTypes)
-              caseWithFields.Accept(this);
-            else
-              ProcessTypeMembers(caseWithFields.Fields);
+          if (hasNestedTypes && unionCase.HasFields)
+            unionCase.Accept(this);
+          else
+            ProcessTypeMembers(unionCase.Fields);
       }
 
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
 
-    public override void VisitNestedTypeUnionCaseDeclaration(INestedTypeUnionCaseDeclaration decl)
+    public override void VisitUnionCaseDeclaration(IUnionCaseDeclaration decl)
     {
       Builder.StartPart(new UnionCasePart(decl, Builder));
       ProcessTypeMembers(decl.MemberDeclarations);

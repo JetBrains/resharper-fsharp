@@ -188,7 +188,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       {
         if (preferType)
         {
-          if (!(m is FSharpNestedTypeUnionCase))
+          if (!(m is FSharpUnionCaseClass))
             return false;
         }
         else if (m is IFSharpGeneratedFromUnionCase)

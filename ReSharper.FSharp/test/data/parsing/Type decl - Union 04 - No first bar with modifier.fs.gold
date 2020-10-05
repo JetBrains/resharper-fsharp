@@ -13,10 +13,10 @@ IFSharpImplFile
           FSharpTokenType+PrivateTokenElement(type:PRIVATE, text:private)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IUnionCaseList
-            ISingletonCaseDeclaration
+            IUnionCaseDeclaration
               FSharpIdentifierToken(type:IDENTIFIER, text:A)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ISingletonCaseDeclaration
+            IUnionCaseDeclaration
               FSharpTokenType+BarTokenElement(type:BAR, text:|)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpIdentifierToken(type:IDENTIFIER, text:B)

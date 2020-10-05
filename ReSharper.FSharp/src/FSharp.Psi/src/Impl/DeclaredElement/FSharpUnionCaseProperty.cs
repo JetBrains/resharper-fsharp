@@ -9,44 +9,30 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  /// A union case compiled to a static property.
-  internal class FSharpUnionCaseProperty : FSharpUnionCasePropertyBase<IUnionCaseDeclaration>
+  internal class FSharpUnionCaseProperty : FSharpCompiledPropertyBase<IUnionCaseLikeDeclaration>, IUnionCase
   {
-    public FSharpUnionCaseProperty([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-  }
-
-  internal class FSharpHiddenUnionCaseProperty : FSharpUnionCasePropertyBase<INestedTypeUnionCaseDeclaration>
-  {
-    internal FSharpHiddenUnionCaseProperty([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
+    internal FSharpUnionCaseProperty([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
     public override AccessRights GetAccessRights() =>
-      AccessRights.PRIVATE;
+      HasFields ? AccessRights.PRIVATE : GetContainingType().GetRepresentationAccessRights();
 
-    public override bool HasFields => true;
+    public AccessRights RepresentationAccessRights =>
+      GetContainingType().GetFSharpRepresentationAccessRights();
 
-    public override IList<IUnionCaseField> CaseFields =>
-      GetDeclaration()?.Fields.Select(d => (IUnionCaseField) d.DeclaredElement).ToIList();
+    public bool HasFields => GetDeclaration()?.HasFields ?? false;
 
-    public override FSharpNestedTypeUnionCase NestedType =>
+    public IList<IUnionCaseField> CaseFields =>
+      HasFields
+        ? GetDeclaration()?.Fields.Select(d => (IUnionCaseField) d.DeclaredElement).ToIList()
+        : EmptyList<IUnionCaseField>.Instance;
+
+    public FSharpUnionCaseClass NestedType =>
       GetDeclaration()?.NestedType;
 
-    public override IParametersOwner GetConstructor() =>
-      new NewUnionCaseMethod(this);
-  }
-
-  internal class FSharpUnionCasePropertyBase<T> : FSharpCompiledPropertyBase<T>, IUnionCase
-    where T : IUnionCaseDeclaration
-  {
-    internal FSharpUnionCasePropertyBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
-    public override AccessRights GetAccessRights() => GetContainingType().GetRepresentationAccessRights();
-    public AccessRights RepresentationAccessRights => GetContainingType().GetFSharpRepresentationAccessRights();
+    public IParametersOwner GetConstructor() =>
+      HasFields ? new FSharpUnionCaseNewMethod(this) : null;
 
     public override bool IsStatic => true;
 
@@ -54,11 +40,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetContainingType() is { } containingType
         ? TypeFactory.CreateType(containingType)
         : TypeFactory.CreateUnknownType(Module);
-
-    public virtual bool HasFields => false;
-    public virtual IList<IUnionCaseField> CaseFields => EmptyList<IUnionCaseField>.Instance;
-    public virtual FSharpNestedTypeUnionCase NestedType => null;
-
-    public virtual IParametersOwner GetConstructor() => null;
   }
 }

@@ -12,6 +12,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   {
     bool HasFields { get; }
     IList<IUnionCaseField> CaseFields { get; }
-    [CanBeNull] FSharpNestedTypeUnionCase NestedType { get; }
+    [CanBeNull] FSharpUnionCaseClass NestedType { get; }
   }
 }

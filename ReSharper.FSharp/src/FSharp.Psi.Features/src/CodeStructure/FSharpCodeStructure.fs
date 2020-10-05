@@ -44,7 +44,7 @@ type FSharpCodeStructureProvider() =
             let cases = Seq.cast unionDecl.UnionCases
             processTypeDeclaration unionDecl cases parent
 
-        | :? IUnionCaseDeclaration as caseDecl ->
+        | :? IUnionCaseLikeDeclaration as caseDecl ->
             FSharpDeclarationCodeStructureElement(parent, caseDecl) |> ignore
 
         | :? IRecordDeclaration as recordDecl ->

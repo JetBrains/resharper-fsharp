@@ -5,11 +5,11 @@ using JetBrains.ReSharper.Psi.Resolve;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class UnionCaseTag : FSharpGeneratedMemberBase, IField, IFSharpGeneratedFromUnionCase
+  public class FSharpUnionCaseTag : FSharpGeneratedMemberBase, IField, IFSharpGeneratedFromUnionCase
   {
     private IUnionCase UnionCase { get; }
 
-    public UnionCaseTag(IUnionCase unionCase) =>
+    public FSharpUnionCaseTag(IUnionCase unionCase) =>
       UnionCase = unionCase;
 
     public override string ShortName => UnionCase.ShortName;
@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     IClrDeclaredElement IFSharpGeneratedFromOtherElement.OriginElement => UnionCase;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
-      new UnionCaseTagPointer(this);
+      new FSharpUnionCaseTagPointer(this);
 
     public int Index => Union.GetSourceUnionCases().IndexOf(UnionCase);
 
@@ -52,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       UnionCase.IsValid();
 
     public override bool Equals(object obj) =>
-      obj is UnionCaseTag other && Equals(UnionCase, other.UnionCase);
+      obj is FSharpUnionCaseTag other && Equals(UnionCase, other.UnionCase);
 
     public override int GetHashCode() =>
       UnionCase.GetHashCode();

@@ -262,7 +262,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
     member x.StartException(SynExceptionDefnRepr(_, UnionCase(caseType = unionCaseType), _, _, _, range)) =
         let mark = x.Mark(range)
-        x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION) |> ignore
+        x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION)
         mark
 
     member x.StartType attrs typeParams constraints (lid: LongIdent) range =
@@ -305,11 +305,11 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     member x.ProcessUnionCaseType(caseType, fieldElementType) =
         match caseType with
         | UnionCaseFields(fields) ->
-            for f in fields do x.ProcessField f fieldElementType
-            not fields.IsEmpty
+            for f in fields do
+                x.ProcessField f fieldElementType
 
-        | UnionCaseFullType _ ->
-            true // todo: used in FSharp.Core only, otherwise warning
+        // todo: used in FSharp.Core only, otherwise warning
+        | UnionCaseFullType _ -> ()
 
     member x.ProcessSimpleTypeRepresentation(repr) =
         match repr with
@@ -362,10 +362,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     member x.ProcessUnionCase(UnionCase(attrs, _, caseType, _, _, range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
         x.ProcessAttributeLists(attrs)
-        let hasFields = x.ProcessUnionCaseType(caseType, ElementType.UNION_CASE_FIELD_DECLARATION)
-        let elementType = if hasFields then ElementType.NESTED_TYPE_UNION_CASE_DECLARATION
-                                       else ElementType.SINGLETON_CASE_DECLARATION
-        x.Done(range, mark, elementType)
+        x.ProcessUnionCaseType(caseType, ElementType.UNION_CASE_FIELD_DECLARATION)
+        x.Done(range, mark, ElementType.UNION_CASE_DECLARATION)
 
     member x.ProcessOuterAttrs(attrs: SynAttributeList list, range: range) =
         match attrs with

@@ -6,18 +6,18 @@ using JetBrains.ReSharper.Psi.Pointers;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class IsUnionCaseProperty : FSharpGeneratedPropertyBase, IFSharpGeneratedFromUnionCase
+  public class FSharpUnionCaseIsCaseProperty : FSharpGeneratedPropertyBase, IFSharpGeneratedFromUnionCase
   {
     [NotNull] internal IUnionCase UnionCase { get; }
 
-    internal IsUnionCaseProperty([NotNull] IUnionCase unionCase) =>
+    internal FSharpUnionCaseIsCaseProperty([NotNull] IUnionCase unionCase) =>
       UnionCase = unionCase;
 
     public override ITypeElement ContainingType => UnionCase.GetContainingType();
     public IClrDeclaredElement OriginElement => UnionCase;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
-      new IsUnionCasePropertyPointer(this);
+      new FSharpUnionCaseIsCasePropertyPointer(this);
 
     public override string ShortName =>
       OriginElement is IUnionCase unionCase
@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       OriginElement.IsValid();
 
     public override bool Equals(object obj) =>
-      obj is IsUnionCaseProperty other && Equals(OriginElement, other.OriginElement);
+      obj is FSharpUnionCaseIsCaseProperty other && Equals(OriginElement, other.OriginElement);
 
     public override int GetHashCode() =>
       OriginElement.GetHashCode();

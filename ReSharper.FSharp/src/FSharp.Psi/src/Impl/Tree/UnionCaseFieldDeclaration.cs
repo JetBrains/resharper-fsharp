@@ -19,9 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override bool UseBaseNameForSingleField => true;
 
     protected override TreeNodeCollection<ICaseFieldDeclaration> GetFields() =>
-      Parent is INestedTypeUnionCaseDeclaration unionCaseDeclaration
-        ? unionCaseDeclaration.Fields
-        : TreeNodeCollection<ICaseFieldDeclaration>.Empty;
+      UnionCaseDeclarationNavigator.GetByField(this)?.Fields ?? TreeNodeCollection<ICaseFieldDeclaration>.Empty;
 
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
       type is FSharpUnionCase unionCase ? unionCase.UnionCaseFields : null;
@@ -40,9 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override bool UseBaseNameForSingleField => false;
 
     protected override TreeNodeCollection<ICaseFieldDeclaration> GetFields() =>
-      Parent is IExceptionDeclaration exceptionDeclaration
-        ? exceptionDeclaration.Fields
-        : TreeNodeCollection<ICaseFieldDeclaration>.Empty;
+      ExceptionDeclarationNavigator.GetByField(this)?.Fields ?? TreeNodeCollection<ICaseFieldDeclaration>.Empty;
 
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
       type is FSharpEntity entity && entity.IsFSharpExceptionDeclaration ? entity.FSharpFields : null;

@@ -12,7 +12,7 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         IUnionRepresentation
           IUnionCaseList
-            ISingletonCaseDeclaration
+            IUnionCaseDeclaration
               FSharpTokenType+BarTokenElement(type:BAR, text:|)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IAttributeList

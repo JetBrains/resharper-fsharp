@@ -12,6 +12,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private bool? myHasNestedTypes;
 
+    protected override void ClearCachedData()
+    {
+      base.ClearCachedData();
+      myHasNestedTypes = null;
+    }
+
     public bool HasNestedTypes
     {
       get
@@ -34,8 +40,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         foreach (var unionCaseDecl in UnionCases)
         {
           result.Add(unionCaseDecl);
-          if (!HasNestedTypes && unionCaseDecl is INestedTypeUnionCaseDeclaration decl)
-            result.AddRange(decl.Fields);
+          if (!HasNestedTypes && unionCaseDecl.HasFields)
+            result.AddRange(unionCaseDecl.Fields);
         }
 
         return result;

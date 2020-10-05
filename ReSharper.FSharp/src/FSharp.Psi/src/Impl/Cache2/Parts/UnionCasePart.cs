@@ -8,10 +8,10 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class UnionCasePart : FSharpClassLikePart<INestedTypeUnionCaseDeclaration>, IFSharpClassPart,
+  internal class UnionCasePart : FSharpClassLikePart<IUnionCaseDeclaration>, IFSharpClassPart,
     IRepresentationAccessRightsOwner
   {
-    public UnionCasePart([NotNull] INestedTypeUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+    public UnionCasePart([NotNull] IUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration),
         TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty, cacheBuilder) =>
       ExtendsListShortNames =
@@ -43,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         : EmptyList<IDeclaredType>.InstanceList;
 
     public override TypeElement CreateTypeElement() =>
-      new FSharpNestedTypeUnionCase(this);
+      new FSharpUnionCaseClass(this);
 
     public override MemberDecoration Modifiers =>
       MemberDecoration.FromModifiers(
