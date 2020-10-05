@@ -88,6 +88,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
           if (child is IBindingSignature bindingSignature) 
             ProcessBinding(bindingSignature, result);
+
+          if (child is IUnionCaseFieldDeclarationList fieldDeclarationList)
+            result.AddRange(fieldDeclarationList.FieldsEnumerable);
         }
 
         return result.AsReadOnly();

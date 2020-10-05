@@ -305,8 +305,13 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     member x.ProcessUnionCaseType(caseType, fieldElementType) =
         match caseType with
         | UnionCaseFields(fields) ->
-            for f in fields do
-                x.ProcessField f fieldElementType
+            match fields with
+            | field :: _ ->
+                let fieldListMark = x.Mark(field.StartPos)
+                for f in fields do
+                    x.ProcessField f fieldElementType
+                x.Done(fieldListMark, ElementType.UNION_CASE_FIELD_DECLARATION_LIST)
+            | _ -> ()
 
         // todo: used in FSharp.Core only, otherwise warning
         | UnionCaseFullType _ -> ()

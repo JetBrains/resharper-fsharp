@@ -10,6 +10,16 @@ type SynBinding with
         let (Binding(headPat = headPat)) = x
         headPat.Range.Start
 
+type SynField with
+    member x.StartPos =
+        let (Field(attrs, _, id, _, _, _, _, range)) = x
+        let range =
+            match attrs, id with
+            | attrList :: _, _ -> attrList.Range
+            | _, Some id -> id.idRange
+            | _ -> range
+        range.Start
+
 type SynMemberDefn with
     member x.OuterAttributes =
         match x with
