@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="true">
   <name>F# Support</name>
   <id>com.jetbrains.rider.fsharp</id>
   <vendor url="https://jetbrains.com">JetBrains</vendor>
