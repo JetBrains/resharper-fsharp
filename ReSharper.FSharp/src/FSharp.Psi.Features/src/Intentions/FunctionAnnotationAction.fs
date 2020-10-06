@@ -90,11 +90,13 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     override x.Text = "Add type annotations"
 
     override x.IsAvailable _ =
-        let binding = dataProvider.GetSelectedElement<IBinding>()
-        if isNull binding then false else
+        let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
+        if isNull letBindings then false else
 
-        let namedPat = binding.HeadPattern.As<INamedPat>()
-        isNotNull namedPat && isNotNull namedPat.Identifier && not (isAnnotated binding)
+        let bindings = letBindings.Bindings
+        if bindings.Count <> 1 then false else
+
+        isAtLetExprKeywordOrNamedPat dataProvider letBindings && not (isAnnotated bindings.[0])
 
     override x.ExecutePsiTransaction _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
