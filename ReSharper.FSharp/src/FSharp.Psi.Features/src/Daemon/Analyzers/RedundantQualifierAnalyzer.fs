@@ -8,7 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 
 let [<Literal>] OpName = "RedundantQualifierAnalyzer"
@@ -44,7 +43,7 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
     if isNotNull referenceName && isInOpen referenceName then false else
 
     let fcsSymbol = reference.GetFSharpSymbol()
-    if isNull (box fcsSymbol) then false else
+    if isNull fcsSymbol then false else
 
     let fcsSymbol: FSharpSymbol =
         match fcsSymbol with
@@ -54,7 +53,7 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
             | _ -> Unchecked.defaultof<_>
         | _ -> fcsSymbol
 
-    if isNull (box fcsSymbol) then false else
+    if isNull fcsSymbol then false else
 
     match fcsSymbol with
     | :? FSharpEntity as fcsEntity when
