@@ -193,10 +193,10 @@ type FcsReactorMonitor
 and 
     [<SolutionComponent; AllowNullLiteral>]
     FcsReactorMonitorSettingsProvider
-        (lifetime: Lifetime, solution: ISolution, monitor: IFcsReactorMonitor, settingsStore: ISettingsStore) as this =
-
-    let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
-    let isEnabledProperty = settings.GetValueProperty(lifetime, fun (key: FSharpOptions) -> key.EnableReactorMonitor)
+        (lifetime, solution, monitor: IFcsReactorMonitor, settings, settingsSchema) as this =
+    inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
+    
+    let isEnabledProperty = base.GetValueProperty<bool>("EnableReactorMonitor")
 
     do
         match monitor with
