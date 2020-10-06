@@ -1,4 +1,4 @@
-<Errors language="F#">
+<Errors language="F#" implementationLanguage="F#">
 
   <Usings>
     JetBrains.ReSharper.Intentions.QuickFixes;
@@ -10,6 +10,15 @@
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   </Usings>
+
+  <SeverityConfiguration>
+    <Group name="HighlightingGroupIds.CodeRedundancy">
+      <Tag name="FSharpRedundantNameQualifier" default="WARNING">
+        <Title>Redundant name qualifier</Title>
+        <Description>Redundant use of qualifier for name.</Description>
+      </Tag>
+    </Group>
+  </SeverityConfiguration>
 
   <StaticSeverityGroups>
     <Group name="F# Errors" key="FSharpErrors"/>
@@ -67,7 +76,7 @@
     <Message value="Convert to 'use' binding"/>
     <QuickFix>ConvertToUseFix</QuickFix>
   </Warning>
-  
+
   <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" isSuppressedInTests="true">
     <Parameter type="IParenExpr" name="parenExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
@@ -98,7 +107,7 @@
     <QuickFix>RemoveRedundantAttributeSuffixFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantQualifier">
+  <Warning name="RedundantQualifier" configurableSeverity="FSharpRedundantNameQualifier">
     <Parameter type="ITreeNode" name="treeNode"/>
     <Range>getQualifierRange treeNode</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
