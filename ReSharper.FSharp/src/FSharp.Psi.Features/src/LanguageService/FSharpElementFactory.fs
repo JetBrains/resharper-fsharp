@@ -70,7 +70,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             | [] -> ""
             | parameters -> parameters |> List.map ((+) "'") |> String.concat ", " |> sprintf "<%s>"
 
-        let memberSource = sprintf "member this.%s%s %s = failwith \"todo\"" name typeParametersSource parameters
+        let memberSource = sprintf "member this.%s%s%s = failwith \"todo\"" name typeParametersSource parameters
         let typeDecl = getTypeDecl memberSource
         typeDecl.TypeMembers.[0] :?> IMemberDeclaration
 
@@ -153,7 +153,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
                 curriedParameterNames
                 |> List.map (function
                     | [] -> "()" // No arguments case
-                    | [singleParam] -> singleParam
+                    | [singleParam] -> sprintf "(%s)" singleParam
                     | parameters ->
                         let sep = if isSpaceAfterComma then ", " else ","
                         parameters |> String.concat sep |> sprintf "(%s)")
@@ -163,7 +163,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             memberBinding.ParametersPatterns |> Seq.toList
 
         member x.CreateMemberBindingExpr(name, typeParameters, parameters) =
-            let parsedParams = "_" |> List.replicate parameters.Length |> String.concat " "
+            let parsedParams = "()" |> List.replicate parameters.Length |> String.concat " "
             let memberDecl = createMemberDecl name typeParameters parsedParams
 
             for realArg, fakeArg in Seq.zip parameters memberDecl.ParametersPatterns do
@@ -228,8 +228,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateReferenceExpr(name) =
             let source = sprintf "do %s" name
-            let newExpr = getExpression source :?> IReferenceExpr
-            newExpr :> _
+            getExpression source :?> IReferenceExpr
 
         member x.CreateForEachExpr(expr) =
             let sourceFile = expr.GetSourceFile()

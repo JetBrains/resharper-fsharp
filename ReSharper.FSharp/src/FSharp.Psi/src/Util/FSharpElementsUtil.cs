@@ -379,7 +379,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    private static string GetXmlDocId([NotNull] FSharpMemberOrFunctionOrValue mfv)
+    public static string GetXmlDocId([NotNull] FSharpMemberOrFunctionOrValue mfv)
     {
       try
       {

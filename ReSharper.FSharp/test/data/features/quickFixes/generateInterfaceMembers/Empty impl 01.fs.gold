@@ -1,0 +1,6 @@
+﻿type I =
+  abstract member P: int
+
+type T() =
+  interface I with
+    member this.P = failwith "todo"{caret}

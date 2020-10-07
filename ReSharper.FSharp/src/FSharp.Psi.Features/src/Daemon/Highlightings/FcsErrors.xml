@@ -269,7 +269,7 @@
     </Message>
     <Range>impl.TypeName.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>GenerateMissingInterfaceMembersFix</QuickFix>
+    <QuickFix>GenerateInterfaceMembersFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression">
