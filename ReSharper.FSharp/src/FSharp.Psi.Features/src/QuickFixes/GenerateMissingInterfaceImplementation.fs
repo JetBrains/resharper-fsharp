@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open System.Collections.Generic
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -8,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -19,6 +21,11 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
     inherit FSharpQuickFixBase()
 
     let impl = error.Impl
+
+    let rec getInterfaces (fcsEntity: FSharpEntity) =
+        fcsEntity.AllInterfaces |> Seq.map (fun interfaceType -> 
+            let fcsType = getAbbreviatedType interfaceType
+            fcsType.TypeDefinition)
 
     let mutable nextUnnamedVariableNumber = 0
     let getUnnamedVariableName () =
@@ -48,15 +55,13 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             existingMemberDecls
             |> Seq.map (fun m ->
                 m.DeclaredElement.As<IOverridableMember>().ExplicitImplementations
-                |> Seq.choose (fun i ->
-                    i.Resolve()
-                    |> Option.ofObj
-                    |> Option.map (fun i -> i.Element.XMLDocId)))
+                |> Seq.choose (fun i -> i.Resolve() |> Option.ofObj |> Option.map (fun i -> i.Element.XMLDocId)))
             |> Seq.concat
             |> HashSet
 
         let membersToGenerate = 
-            entity.MembersFunctionsAndValues
+            getInterfaces entity
+            |> Seq.collect (fun fcsEntity -> fcsEntity.MembersFunctionsAndValues)
             |> Seq.filter (fun mfv ->
                 // todo: other accessors
                 not (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod) &&

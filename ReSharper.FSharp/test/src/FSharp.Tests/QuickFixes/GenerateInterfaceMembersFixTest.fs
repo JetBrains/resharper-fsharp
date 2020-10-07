@@ -33,3 +33,6 @@ type GenerateInterfaceMembersFixTest() =
 
     [<Test>] member x.``Escaped names 01 - Member``() = x.DoNamedTest()
     [<Test>] member x.``Escaped names 02 - Param``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nested interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Nested interface 02 - Multiple``() = x.DoNamedTest()

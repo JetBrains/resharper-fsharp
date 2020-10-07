@@ -147,11 +147,18 @@ let patternName (pattern: FSharpActivePatternGroup) =
     "|" + joinedNames + wildCase
     
 [<Extension; CompiledName("GetAbbreviatedEntity")>]
-let getAbbreviatedEntity (entity: FSharpEntity) =
-    let mutable baseTypeEntity = entity
-    while baseTypeEntity.IsFSharpAbbreviation && baseTypeEntity.AbbreviatedType.HasTypeDefinition do
-        baseTypeEntity <- baseTypeEntity.AbbreviatedType.TypeDefinition
-    baseTypeEntity
+let rec getAbbreviatedEntity (entity: FSharpEntity) =
+    if entity.IsFSharpAbbreviation && entity.AbbreviatedType.HasTypeDefinition then
+        getAbbreviatedEntity entity.AbbreviatedType.TypeDefinition
+    else
+        entity
+
+[<Extension; CompiledName("GetAbbreviatedType")>]
+let rec getAbbreviatedType (fcsType: FSharpType) =
+    if fcsType.HasTypeDefinition && fcsType.TypeDefinition.IsFSharpAbbreviation then
+        getAbbreviatedType fcsType.AbbreviatedType
+    else
+        fcsType
 
 [<Extension; CompiledName("HasMeasureParameter")>]
 let hasMeasureParameter(entity: FSharpEntity) =
