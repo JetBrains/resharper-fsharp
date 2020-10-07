@@ -263,7 +263,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (declarations.Count == 0)
         return GetTypeMember(mfv, typeElement);
 
-      var singleDeclaration = declarations.SingleOrDefault(decl =>
+      var singleDeclaration = declarations.SingleItem(decl =>
       {
         var range = decl.GetSourceFile().NotNull().Document.GetTreeTextRange(fcsRange);
         return range.Contains(decl.GetNameIdentifierRange());
