@@ -3,7 +3,6 @@
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -23,19 +22,10 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
     let qualifierName = qualifierExpr.GetName()
     if qualifierName = SharedImplUtil.MISSING_DECLARATION_NAME then false else
 
-    let opens = data.GetData(FSharpErrorsStage.openedModulesProvider).GetOpenedModuleNames
+    let opens = data.GetData(openedModulesProvider).OpenedModuleScopes
     let scopes = opens.GetValuesSafe(qualifierName)
 
-    let inAnyScope =
-        if scopes.Count = 0 then false else
-
-        let offset = referenceOwner.GetTreeStartOffset()
-        if scopes.Count = 1 then
-            OpenScope.includesOffset offset scopes.[0]
-        else
-            scopes |> Seq.exists (OpenScope.includesOffset offset)
-
-    if not inAnyScope then false else
+    if not (OpenScope.inAnyScope referenceOwner scopes) then false else
 
 //    if not (opens.GetValuesSafe(shortName) |> Seq.exists (endsWith qualifierExpr.QualifiedName)) then () else
 
@@ -63,8 +53,8 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
     | _ ->
 
     // todo: try to check next qualified names in case we got into multiple-result resolve, i.e. for module?
-    FSharpResolveUtil.resolvesToFcsSymbolUnqualified fcsSymbol reference OpName
-
+    FSharpResolveUtil.resolvesToFcsSymbolUnqualified fcsSymbol reference OpName &&
+    not (FSharpResolveUtil.mayShadowPartially referenceOwner data fcsSymbol)
 
 [<ElementProblemAnalyzer([| typeof<IReferenceExpr>; typeof<IReferenceName>; typeof<ITypeExtensionDeclaration> |],
                          HighlightingTypes = [| typeof<RedundantQualifierWarning> |])>]

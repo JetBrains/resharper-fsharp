@@ -41,3 +41,5 @@ type RedundantQualifiersTest() =
     [<Test>] member x.``Opens 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Attributes 01 - Top level module``() = x.DoNamedTest()
+
+    [<Test>] member x.``Delegate - Partially shadowed 01``() = x.DoNamedTest()
