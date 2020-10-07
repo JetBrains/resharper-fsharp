@@ -44,9 +44,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected override byte SerializationTag =>
       (byte) FSharpPartKind.StructUnion;
 
-    public MemberPresenceFlag GetMembersPresenceFlag() =>
-      GetMemberPresenceFlag();
-
     public bool HasHiddenInstanceFields => false;
     public bool IsReadonly => false;
     public bool IsByRefLike => false;

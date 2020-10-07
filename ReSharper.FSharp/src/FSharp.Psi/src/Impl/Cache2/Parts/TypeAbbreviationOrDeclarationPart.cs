@@ -35,8 +35,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override TypeElement CreateTypeElement() => new FSharpStruct(this);
     protected override byte SerializationTag => (byte) FSharpPartKind.StructAbbreviationOrSingleCaseUnion;
 
-    public MemberPresenceFlag GetMembersPresenceFlag() => GetMemberPresenceFlag();
-
     public bool HasHiddenInstanceFields => false;
     public bool IsReadonly => false;
     public bool IsByRefLike => false;

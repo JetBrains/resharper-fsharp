@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override TypeElement CreateTypeElement() =>
       new FSharpStruct(this);
 
-    public MemberPresenceFlag GetMembersPresenceFlag() =>
+    public override MemberPresenceFlag GetMemberPresenceFlag() =>
       MemberPresenceFlag.NONE;
 
     public bool HasHiddenInstanceFields => false;
