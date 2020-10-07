@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.Application.Settings
@@ -70,6 +71,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             | [] -> ""
             | parameters -> parameters |> List.map ((+) "'") |> String.concat ", " |> sprintf "<%s>"
 
+        let name = Keywords.QuoteIdentifierIfNeeded name
         let memberSource = sprintf "member this.%s%s%s = failwith \"todo\"" name typeParametersSource parameters
         let typeDecl = getTypeDecl memberSource
         typeDecl.TypeMembers.[0] :?> IMemberDeclaration
@@ -152,11 +154,13 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let parametersSource =
                 curriedParameterNames
                 |> List.map (function
-                    | [] -> "()" // No arguments case
-                    | [singleParam] -> sprintf "(%s)" singleParam
+                    | [] -> ""
+                    | [singleParam] -> singleParam |> Keywords.QuoteIdentifierIfNeeded
                     | parameters ->
-                        let sep = if isSpaceAfterComma then ", " else ","
-                        parameters |> String.concat sep |> sprintf "(%s)")
+                        parameters
+                        |> List.map Keywords.QuoteIdentifierIfNeeded
+                        |> String.concat (if isSpaceAfterComma then ", " else ","))
+                |> List.map (sprintf "(%s)")
                 |> String.concat " "
 
             let memberBinding = createMemberDecl "P" List.empty parametersSource
