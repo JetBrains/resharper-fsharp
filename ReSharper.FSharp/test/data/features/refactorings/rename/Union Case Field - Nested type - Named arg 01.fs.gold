@@ -1,0 +1,5 @@
+type U =
+    | A
+    | C of zzz: int
+
+C (zzz = 1)

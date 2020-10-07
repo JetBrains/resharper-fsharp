@@ -1,9 +1,9 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 
+open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
-open JetBrains.ReSharper.Host.Features.Documents
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -33,6 +33,11 @@ let toQualifiedList (declaredElement: IClrDeclaredElement) =
         | _ -> failwithf "Expecting namespace to type element"
 
     loop [] declaredElement
+
+let getContainingEntity (typeElement: ITypeElement): IClrDeclaredElement =
+    match typeElement.GetContainingType() with
+    | null -> typeElement.GetContainingNamespace() :> _
+    | containingType -> containingType :> _
 
 let rec getModuleToOpen (typeElement: ITypeElement): IClrDeclaredElement =
     match typeElement.GetContainingType() with
@@ -187,6 +192,14 @@ module OpenScope =
         | OpenScope.Range range -> range.Contains(offset)
         | _ -> true
 
+    let inAnyScope (treeNode: ITreeNode) (scopes: IList<OpenScope>) =
+        if scopes.Count = 0 then false else
+
+        let offset = treeNode.GetTreeStartOffset()
+        if scopes.Count = 1 then
+            includesOffset offset scopes.[0]
+        else
+            scopes |> Seq.exists (includesOffset offset)
 
 type OpenedModulesProvider(fsFile: IFSharpFile) =
     let map = OneToListMap<string, OpenScope>()
@@ -201,9 +214,9 @@ type OpenedModulesProvider(fsFile: IFSharpFile) =
 //        | names -> names |> List.map (fun el -> el.GetSourceName()) |> String.concat "."
 
     let import scope (element: IClrDeclaredElement) =
-        map.Add(element.GetSourceName(), scope) |> ignore
+        map.Add(element.GetSourceName(), scope)
         for autoImportedModule in getNestedAutoImportedModules element symbolScope do
-            map.Add(autoImportedModule.GetSourceName(), scope) |> ignore
+            map.Add(autoImportedModule.GetSourceName(), scope)
 
     do
         import OpenScope.Global symbolScope.GlobalNamespace
@@ -229,4 +242,6 @@ type OpenedModulesProvider(fsFile: IFSharpFile) =
                 if isNotNull declaredElement then
                     import scope declaredElement
 
-    member x.GetOpenedModuleNames = map
+    member x.OpenedModuleScopes = map
+
+let openedModulesProvider = Key<OpenedModulesProvider>("OpenedModulesProvider")

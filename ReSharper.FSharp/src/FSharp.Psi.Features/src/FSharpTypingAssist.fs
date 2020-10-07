@@ -230,7 +230,8 @@ type FSharpTypingAssist
 
            '@', [| FSharpTokenType.RQUOTE_TYPED, 0
                    FSharpTokenType.RQUOTE_UNTYPED, 0
-                   FSharpTokenType.RQUOTE_UNTYPED, 1 |] |]
+                   FSharpTokenType.RQUOTE_UNTYPED, 1 |]
+           ')', [| FSharpTokenType.LPAREN_STAR_RPAREN, 2 |] |]
         |> dict
 
 

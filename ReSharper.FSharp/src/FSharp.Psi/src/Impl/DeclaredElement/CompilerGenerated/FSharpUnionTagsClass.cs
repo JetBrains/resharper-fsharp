@@ -55,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       {
         var tags = new List<IField>();
         foreach (var unionCase in UnionPart.Cases)
-          tags.Add(new UnionCaseTag(unionCase));
+          tags.Add(new FSharpUnionCaseTag(unionCase));
 
         return tags;
       }

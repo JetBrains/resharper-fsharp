@@ -8,8 +8,9 @@ IFSharpImplFile
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       FSharpTokenType+OfTokenElement(type:OF, text:of)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      IExceptionFieldDeclaration
-        INamedTypeUsage
-          ITypeReferenceName
-            FSharpIdentifierToken(type:IDENTIFIER, text:int)
+      IUnionCaseFieldDeclarationList
+        IExceptionFieldDeclaration
+          INamedTypeUsage
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:int)
 

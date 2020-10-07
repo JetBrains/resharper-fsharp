@@ -1,0 +1,14 @@
+﻿module Module
+
+|open System|(0)
+
+type Delegate = delegate of int -> int
+
+new Delegate(fun _ -> 1) |> ignore
+
+------------------------------------------------
+0: Open directive is not required by the code and can be safely removed
+QUICKFIXES:
+Remove unused opens in file
+--Remove unused opens in project
+--Remove unused opens in solution

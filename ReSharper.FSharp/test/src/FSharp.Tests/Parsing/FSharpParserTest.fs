@@ -54,6 +54,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Union 03 - No first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 04 - No first bar with modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 05 - Case attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union 06 - Fields``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Record 01 - Single line``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record 02 - Multiline``() = x.DoNamedTest()

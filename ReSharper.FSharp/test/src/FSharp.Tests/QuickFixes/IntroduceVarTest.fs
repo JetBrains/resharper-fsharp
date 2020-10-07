@@ -30,3 +30,4 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``Module - Do 01 - Implicit``() = x.DoNamedTest()
     [<Test>] member x.``Module - Do 02 - Function``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Do 03 - Function``() = x.DoNamedTest()

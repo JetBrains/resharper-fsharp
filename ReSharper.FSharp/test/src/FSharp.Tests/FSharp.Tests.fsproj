@@ -23,7 +23,7 @@
     <Compile Include="Service\FSharpAssemblyAutoOpenTest.fs" />
     <Compile Include="Service\ArgumentsOwnerTest.fs" />
     <Compile Include="Cache\CSharpResolveTest.fs" />
-    <Compile Include="Cache\SymbolCacheTest.fs" />
+    <Compile Include="Cache\FSharpSymbolCacheTest.fs" />
     <Compile Include="Parsing\FSharpLexerTest.fs" />
     <Compile Include="Parsing\FSharpParserTest.fs" />
     <Compile Include="Daemon\FSharpHighlightingTestBase.fs" />

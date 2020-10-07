@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       CLRDeclaredElementType.ENUM_MEMBER;
 
     public IType Type =>
-      GetContainingType() is var typeElement && typeElement != null
+      GetContainingType() is { } typeElement
         ? TypeFactory.CreateType(typeElement)
         : TypeFactory.CreateUnknownType(Module);
 
@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public int? FixedBufferSize => null;
 
     public ConstantValue ConstantValue =>
-      Field?.LiteralValue?.Value is var literalValue && literalValue != null
+      Field?.LiteralValue?.Value is { } literalValue
         ? new ConstantValue(literalValue, Type)
         : ConstantValue.BAD_VALUE;
 

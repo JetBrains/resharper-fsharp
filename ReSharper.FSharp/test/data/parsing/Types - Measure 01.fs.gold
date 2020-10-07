@@ -9,7 +9,7 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        IAbbreviatedTypeOrUnionCaseDeclaration
+        ITypeUsageOrUnionCaseDeclaration
           INamedTypeUsage
             ITypeReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:float)

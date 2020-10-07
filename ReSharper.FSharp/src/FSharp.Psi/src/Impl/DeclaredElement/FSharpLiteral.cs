@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IType Type => GetType(Mfv?.FullType);
 
     public ConstantValue ConstantValue =>
-      Mfv is var mfv && mfv != null
+      Mfv is { } mfv
         ? new ConstantValue(mfv.LiteralValue.Value, Type)
         : ConstantValue.BAD_VALUE;
 

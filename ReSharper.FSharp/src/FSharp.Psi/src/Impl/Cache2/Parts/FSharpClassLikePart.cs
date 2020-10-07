@@ -44,6 +44,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public abstract IEnumerable<IDeclaredType> GetSuperTypes();
     public virtual IEnumerable<ITypeElement> GetSuperTypeElements() => GetSuperTypes().AsIList().ToTypeElements(); 
 
+    public virtual MemberPresenceFlag GetMemberPresenceFlag() =>
+      MemberPresenceFlag.SIGN_OP | MemberPresenceFlag.EXPLICIT_OP |
+      MemberPresenceFlag.MAY_EQUALS_OVERRIDE | MemberPresenceFlag.MAY_TOSTRING_OVERRIDE |
+
+      // RIDER-10263
+      (HasPublicDefaultCtor ? MemberPresenceFlag.PUBLIC_DEFAULT_CTOR : MemberPresenceFlag.NONE);
+
+    public virtual IDeclaredType GetBaseClassType() =>
+      ExtendsListShortNames.IsEmpty()
+        ? null
+        : GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
+
     public bool HasPublicDefaultCtor
     {
       get

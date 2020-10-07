@@ -45,12 +45,12 @@ public class Class1
 (0): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseA' here
 (1): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseB' here
 (2): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseC' here
-(3): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
-(4): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
-(5): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
-(6): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
-(7): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
-(8): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
+(3): ReSharper Error Highlighting: Cannot resolve symbol 'CaseA'
+(4): ReSharper Error Highlighting: Cannot resolve symbol 'CaseA'
+(5): ReSharper Error Highlighting: Cannot resolve symbol 'CaseB'
+(6): ReSharper Error Highlighting: Cannot resolve symbol 'CaseB'
+(7): ReSharper Error Highlighting: Cannot resolve symbol 'CaseC'
+(8): ReSharper Error Highlighting: Cannot resolve symbol 'CaseC'
 (9): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item' here
 (10): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item' here
 (11): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item' here
@@ -74,16 +74,16 @@ M:Module.U.NewCaseB(System.Int32)
 M:Module.U.NewCaseB(System.Int32)
 M:Module.U.NewCaseC(System.Int32,System.Double)
 M:Module.U.NewCaseC(System.Int32,System.Double)
-P:Module.U.CaseA.Item
-P:Module.U.CaseA.Item
-P:Module.U.CaseA.Item
-P:Module.U.CaseB.Named
-P:Module.U.CaseC.Item1
-P:Module.U.CaseC.Other
-P:Module.U.CaseA.Item
-P:Module.U.CaseB.Named
-P:Module.U.CaseC.Item1
-P:Module.U.CaseC.Other
+P:Module.U.Item
+P:Module.U.Item
+P:Module.U.Item
+P:Module.U.Named
+P:Module.U.Item1
+P:Module.U.Other
+P:Module.U.Item
+P:Module.U.Named
+P:Module.U.Item1
+P:Module.U.Other
 P:Module.U.IsCaseA
 P:Module.U.IsCaseB
 P:Module.U.IsCaseC

@@ -42,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public IEnumerable<AttributeValue> PositionParameters() => AttrConstructorArgs.Select(GetArgValue);
 
     public AttributeValue NamedParameter(string name) =>
-      AttrNamedArgs.FirstOrDefault(p => p.Item2 == name) is var param && param != null
+      AttrNamedArgs.FirstOrDefault(p => p.Item2 == name) is { } param
         ? new AttributeValue(new ConstantValue(param.Item4, type: null))
         : AttributeValue.BAD_VALUE;
 

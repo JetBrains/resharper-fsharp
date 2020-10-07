@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -42,8 +43,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         predefinedType.IComparable,
         predefinedType.GenericIComparable,
         predefinedType.GenericIEquatable,
-        TypeFactory.CreateTypeByCLRName(FSharpPredefinedType.StructuralComparableTypeName, psiModule),
-        TypeFactory.CreateTypeByCLRName(FSharpPredefinedType.StructuralEquatableTypeName, psiModule)
+        FSharpPredefinedType.StructuralComparableTypeName.CreateTypeByClrName(psiModule),
+        FSharpPredefinedType.StructuralEquatableTypeName.CreateTypeByClrName(psiModule)
       };
 
       var interfaces = base.GetSuperTypes().AsIList();
@@ -56,11 +57,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return result;
     }
 
-    protected virtual IList<ITypeMember> GetGeneratedMembers() =>
-      GeneratedMembersUtil.GetGeneratedMembers(this);
-
     public override IEnumerable<ITypeMember> GetTypeMembers() =>
-      GetGeneratedMembers().Prepend(base.GetTypeMembers());
+      base.GetTypeMembers().Prepend(this.GetGeneratedMembers());
 
     public bool OverridesToString => true;
     public bool HasCompareTo => true;

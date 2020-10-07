@@ -1,4 +1,4 @@
-<Errors language="F#">
+<Errors language="F#" implementationLanguage="F#">
 
   <Usings>
     JetBrains.ReSharper.Intentions.QuickFixes;
@@ -11,15 +11,56 @@
     JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   </Usings>
 
+  <SeverityConfiguration>
+    <Group name="HighlightingGroupIds.CodeRedundancy">
+      <Tag name="FSharpRedundantOpen" default="WARNING">
+        <Title>Redundant 'open' directive</Title>
+        <Description>Open directive is not required by the code and can be safely removed.</Description>
+      </Tag>
+      <Tag name="FSharpRedundantBackticks" default="WARNING">
+        <Title>Redundant identifier escaping</Title>
+        <Description>Redundant use of `` escaping sequences.</Description>
+      </Tag>
+      <Tag name="FSharpRedundantNameQualifier" default="WARNING">
+        <Title>Redundant name qualifier</Title>
+        <Description>Redundant use of qualifier for name.</Description>
+      </Tag>
+      <Tag name="FSharpRedundantNew" default="WARNING">
+        <Title>Redundant 'new' keyword</Title>
+        <Description>'new' keyword is not required and can be safely removed.</Description>
+      </Tag>
+      <Tag name="FSharpRedundantAttributeParens" default="WARNING">
+        <Title>Redundant attribute parentheses argument</Title>
+        <Description>Parentheses are redundant if attribute has no arguments.</Description>
+      </Tag>
+      <Tag name="FSharpRedundantAttributeSuffix" default="WARNING">
+        <Title>Redundant 'Attribute' suffix</Title>
+        <Description>Redundant 'Attribute' suffix.</Description>
+      </Tag>
+      <Tag name="FSharpRedundantUnionCaseFieldPatterns" default="WARNING">
+        <Title>Redundant union case fields matching</Title>
+        <Description>Explicit fields matching is redundant and can be replaced with '_'.</Description>
+      </Tag>
+      <Tag name="FSharpConsWithEmptyListPat" default="SUGGESTION">
+        <Title>Redundant concatenation with empty list</Title>
+        <Description>Redundant concatenation with empty list.</Description>
+      </Tag>
+      <Tag name="FSharpRedundantApplication" default="WARNING">
+        <Title>Redundant application</Title>
+        <Description>Application is redundant and can be replaced with its argument.</Description>
+      </Tag>
+    </Group>
+  </SeverityConfiguration>
+
   <StaticSeverityGroups>
     <Group name="F# Errors" key="FSharpErrors"/>
   </StaticSeverityGroups>
 
-  <Warning staticGroup="FSharpErrors" name="UnusedOpen">
+  <Warning name="UnusedOpen" configurableSeverity="FSharpRedundantOpen">
     <Parameter type="IOpenStatement" name="openStatement"/>
     <Message value="Open directive is not required by the code and can be safely removed"/>
     <Range>openStatement.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <Behavour attributeID="DEADCODE"/>
     <QuickFix>RemoveUnusedOpensFix</QuickFix>
   </Warning>
 
@@ -45,17 +86,17 @@
     <Message value="Extension member should be static"/>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantBackticks">
+  <Warning name="RedundantBackticks" configurableSeverity="FSharpRedundantBackticks">
     <Parameter type="FSharpIdentifierToken" name="identifier"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message value="Redundant identifier quotation"/>
+    <Message value="Redundant identifier escaping"/>
     <QuickFix>RemoveRedundantBackticksFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantNew">
+  <Warning name="RedundantNew" configurableSeverity="FSharpRedundantNew">
     <Parameter type="INewExpr" name="newExpr"/>
     <Range>newExpr.NewKeyword.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="'new' keyword is redundant"/>
     <QuickFix>RemoveRedundantNewFix</QuickFix>
   </Warning>
@@ -67,7 +108,7 @@
     <Message value="Convert to 'use' binding"/>
     <QuickFix>ConvertToUseFix</QuickFix>
   </Warning>
-  
+
   <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" isSuppressedInTests="true">
     <Parameter type="IParenExpr" name="parenExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
@@ -82,7 +123,7 @@
     <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantAttributeParens">
+  <Warning name="RedundantAttributeParens" configurableSeverity="FSharpRedundantAttributeParens">
     <Parameter type="IAttribute" name="attribute"/>
     <Range>attribute.ArgExpression.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
@@ -90,7 +131,7 @@
     <QuickFix>RemoveRedundantAttributeParensFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantAttributeSuffix">
+  <Warning name="RedundantAttributeSuffix" configurableSeverity="FSharpRedundantAttributeSuffix">
     <Parameter type="IAttribute" name="attribute"/>
     <Range>getAttributeSuffixRange attribute</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
@@ -98,7 +139,7 @@
     <QuickFix>RemoveRedundantAttributeSuffixFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantQualifier">
+  <Warning name="RedundantQualifier" configurableSeverity="FSharpRedundantNameQualifier">
     <Parameter type="ITreeNode" name="treeNode"/>
     <Range>getQualifierRange treeNode</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
@@ -106,23 +147,21 @@
     <QuickFix>RemoveRedundantQualifierFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantUnionCaseFieldPatterns">
+  <Warning name="RedundantUnionCaseFieldPatterns" configurableSeverity="FSharpRedundantUnionCaseFieldPatterns">
     <Parameter type="IParenPat" name="parenPat"/>
     <Range>parenPat.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Redundant union case fields matching"/>
     <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="ConsWithEmptyListPat">
+  <Warning name="ConsWithEmptyListPat" configurableSeverity="FSharpConsWithEmptyListPat">
     <Parameter type="IListConsPat" name="listConsPat"/>
     <Range>listConsPat.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Pattern can be simplified"/>
     <QuickFix>SimplifyListConsPatFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantApplication">
+  <Warning name="RedundantApplication" configurableSeverity="FSharpRedundantApplication">
     <Parameter type="IAppExpr" name="appExpr"/>
     <Parameter type="IFSharpExpression" name="argExpr"/>
     <Range>getFunctionApplicationRange appExpr</Range>
@@ -135,7 +174,6 @@
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Lambda can be simplified"/>
     <QuickFix>SimplifyLambdaFix</QuickFix>
   </Warning>
@@ -143,7 +181,6 @@
   <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplaced">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
-    <Behavour overlapResolvePolicy="NONE"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
     <Message value="{0}">
       <Argument>getLambdaCanBeReplacedWarningText replaceCandidate</Argument>
@@ -153,7 +190,6 @@
 
   <Warning staticGroup="FSharpErrors" name="ExpressionCanBeReplacedWithId">
     <Parameter type="IFSharpExpression" name="expr"/>
-    <Behavour overlapResolvePolicy="NONE"/>
     <Range>expr.GetHighlightingRange()</Range>
     <Message value="{0}">
       <Argument>getExpressionCanBeReplacedWithIdWarningText expr</Argument>

@@ -38,7 +38,7 @@ Occurrence's navigation result. Opened file: Union case 01 - Fields.cs
 ------------------
 
 Occurrence's dump:
-TO: [O] let a = |A|(123) RANGE: (86,87) @ Union case 01 - Fields.fs
+TO: [R] let a = |A|(123) RANGE: (86,87) @ Union case 01 - Fields.fs
 Menu Item presentation: 
 Text: Module.a      |let a = |A|(123)| (8)
 Shortcut text: in <Root Namespace>

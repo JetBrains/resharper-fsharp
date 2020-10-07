@@ -54,7 +54,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (mfv.IsProperty || !mfv.IsModuleValueOrMember)
         return mfv;
 
-      if (mfv.AccessorProperty?.Value is var prop && prop != null)
+      if (mfv.AccessorProperty?.Value is { } prop)
         return prop;
 
       var members = mfv.DeclaringEntity?.Value.MembersFunctionsAndValues;

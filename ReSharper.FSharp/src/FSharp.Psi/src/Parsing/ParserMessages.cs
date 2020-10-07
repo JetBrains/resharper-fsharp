@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_DECLARED_MODULE_DECLARATION = "";
     public const string IDS_MODULE_MEMBER = "";
     public const string IDS_F_SHARP_TYPE_DECLARATION = "";
-    public const string IDS_UNION_CASE_DECLARATION = "";
+    public const string IDS_UNION_CASE_LIKE_DECLARATION = "";
     public const string IDS_CASE_FIELD_DECLARATION = "";
     public const string IDS_F_SHARP_TYPE_MEMBER_DECLARATION = "";
     public const string IDS_OBJECT_MODEL_TYPE_DECLARATION = "";

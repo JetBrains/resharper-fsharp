@@ -57,7 +57,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             let mark = x.Mark(typeDefnGroupStartPos typeDefns range)
             match typeDefns with
             | [] -> ()
-            | TypeDefn(ComponentInfo(attrs, _, _, _, _, _, _, _), _, _, _) :: _ ->
+            | TypeDefn(ComponentInfo(attributes = attrs), _, _, _) :: _ ->
                 x.ProcessOuterAttrs(attrs, range)
 
             for typeDefn in typeDefns do
@@ -80,7 +80,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             let letMark = x.Mark(letBindingGroupStartPos bindings range)
             match bindings with
             | [] -> ()
-            | Binding(_, _, _, _, attrs, _, _, _, _, _, _ , _) :: _ ->
+            | Binding(attributes = attrs) :: _ ->
                 x.ProcessOuterAttrs(attrs, range)
 
             for binding in bindings do
@@ -241,7 +241,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 x.ProcessType(synType)
                 ElementType.ABSTRACT_MEMBER_DECLARATION
 
-            | SynMemberDefn.ValField(Field(_, _, _, synType, _, _, _, _), _) ->
+            | SynMemberDefn.ValField(Field(fieldType = synType), _) ->
                 x.ProcessType(synType)
                 ElementType.VAL_FIELD_DECLARATION
 
@@ -634,7 +634,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
     member x.ProcessExpression(ExprRange range as expr) =
         match expr with
-        | SynExpr.Paren(expr, _, _, _) ->
+        | SynExpr.Paren(expr = expr) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.PAREN_EXPR)
 
         | SynExpr.Quote(_, _, expr, _, _) ->
@@ -795,7 +795,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushExpression(argExpr)
             x.ProcessExpression(funcExpr)
 
-        | SynExpr.TypeApp(expr, _, _, _, _, _, _) as typeApp ->
+        | SynExpr.TypeApp(expr = expr) as typeApp ->
             // Process expression first, then inject type args into it in the processor.
             x.PushStep(typeApp, typeArgsInReferenceExprProcessor)
             x.ProcessExpression(expr)
@@ -1395,7 +1395,7 @@ type ObjectExpressionMemberListProcessor() =
     inherit StepListProcessorBase<SynBinding>()
 
     override x.Process(binding, builder) =
-        let (Binding(_, _, _, _, _, _, _, _, _, _, range, _)) = binding
+        let (Binding(range = range)) = binding
         let mark = builder.Mark(range)
         let elementType = builder.ProcessMemberBinding(mark, binding, range)
         builder.Done(range, mark, elementType)

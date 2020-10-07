@@ -5,13 +5,14 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal class UnionPart : UnionPartBase, Class.IClassPart
   {
-    public UnionPart([NotNull] IUnionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
-      bool hasPublicNestedTypes, bool isSingleCase) : base(declaration, cacheBuilder, hasPublicNestedTypes, isSingleCase)
+    public UnionPart([NotNull] IUnionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder, bool hasNestedTypes,
+      bool isSingleCase) : base(declaration, cacheBuilder, hasNestedTypes, isSingleCase)
     {
     }
 
@@ -43,9 +44,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected override byte SerializationTag =>
       (byte) FSharpPartKind.StructUnion;
 
-    public MemberPresenceFlag GetMembersPresenceFlag() =>
-      GetMemberPresenceFlag();
-
     public bool HasHiddenInstanceFields => false;
     public bool IsReadonly => false;
     public bool IsByRefLike => false;
@@ -53,30 +51,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
   internal abstract class UnionPartBase : SimpleTypePartBase, IUnionPart
   {
-    public bool HasPublicNestedTypes { get; }
-    public bool IsSingleCaseUnion { get; }
+    public bool HasNestedTypes { get; }
+    public bool IsSingleCase { get; }
     public AccessRights RepresentationAccessRights { get; }
 
     protected UnionPartBase([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
-      bool hasPublicNestedTypes, bool isSingleCaseUnion) : base(declaration, cacheBuilder)
+      bool hasNestedTypes, bool isSingleCase) : base(declaration, cacheBuilder)
     {
-      HasPublicNestedTypes = hasPublicNestedTypes;
+      HasNestedTypes = hasNestedTypes;
       RepresentationAccessRights = GetRepresentationAccessRights(declaration);
-      IsSingleCaseUnion = isSingleCaseUnion;
+      IsSingleCase = isSingleCase;
     }
 
     protected UnionPartBase(IReader reader) : base(reader)
     {
-      HasPublicNestedTypes = reader.ReadBool();
-      IsSingleCaseUnion = reader.ReadBool();
+      HasNestedTypes = reader.ReadBool();
+      IsSingleCase = reader.ReadBool();
       RepresentationAccessRights = (AccessRights) reader.ReadByte();
     }
 
     protected override void Write(IWriter writer)
     {
       base.Write(writer);
-      writer.WriteBool(HasPublicNestedTypes);
-      writer.WriteBool(IsSingleCaseUnion);
+      writer.WriteBool(HasNestedTypes);
+      writer.WriteBool(IsSingleCase);
       writer.WriteByte((byte) RepresentationAccessRights);
     }
 
@@ -89,7 +87,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
         var result = new LocalList<IUnionCase>();
         foreach (var memberDeclaration in unionDeclaration.UnionCases)
-          if (memberDeclaration.DeclaredElement is IUnionCase unionCase)
+          if (((ITypeMemberDeclaration) memberDeclaration).DeclaredElement is IUnionCase unionCase)
             result.Add(unionCase);
 
         return result.ResultingList();
@@ -106,6 +104,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       declaration is IUnionDeclaration unionDeclaration
         ? ModifiersUtil.GetAccessRights(unionDeclaration.UnionRepresentation.AccessModifier)
         : AccessRights.PUBLIC;
+
+
+    public override IEnumerable<ITypeMember> GetTypeMembers()
+    {
+      if (HasNestedTypes || !(GetDeclaration() is IUnionDeclaration declaration))
+        return base.GetTypeMembers();
+
+      var fields = new FrugalLocalList<ITypeMember>();
+
+      foreach (var caseDecl in declaration.UnionCasesEnumerable)
+        foreach (var fieldDeclaration in caseDecl.FieldsEnumerable)
+          if (fieldDeclaration.DeclaredElement is { } field)
+            fields.Add(field);
+
+      return fields.ResultingList().Prepend(base.GetTypeMembers());
+    }
   }
 
   public interface IRepresentationAccessRightsOwner
@@ -115,8 +129,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
   public interface IUnionPart : ISimpleTypePart, IRepresentationAccessRightsOwner
   {
-    bool HasPublicNestedTypes { get; }
-    bool IsSingleCaseUnion { get; }
+    bool HasNestedTypes { get; }
+    bool IsSingleCase { get; }
     IList<IUnionCase> Cases { get; }
     TreeNodeCollection<IUnionCaseDeclaration> CaseDeclarations { get; }
   }

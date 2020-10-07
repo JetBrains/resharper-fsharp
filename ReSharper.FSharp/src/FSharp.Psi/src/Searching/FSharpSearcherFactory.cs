@@ -88,15 +88,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public override IEnumerable<RelatedDeclaredElement> GetRelatedDeclaredElements(IDeclaredElement element)
     {
-      switch (element)
-      {
-        case IUnionCase unionCase:
-          return GetUnionCaseRelatedElements(unionCase);
-        case IGeneratedConstructorParameterOwner parameterOwner:
-          return new[] {new RelatedDeclaredElement(parameterOwner.GetGeneratedParameter())};
-        default:
-          return EmptyList<RelatedDeclaredElement>.Instance;
-      }
+      if (element is IUnionCase unionCase)
+        return GetUnionCaseRelatedElements(unionCase);
+
+      if (element is IGeneratedConstructorParameterOwner parameterOwner &&
+          parameterOwner.GetGeneratedParameter() is { } parameter)
+        return new[] {new RelatedDeclaredElement(parameter)};
+
+      return EmptyList<RelatedDeclaredElement>.Instance;
     }
 
     private static IEnumerable<RelatedDeclaredElement> GetUnionCaseRelatedElements([NotNull] IUnionCase unionCase) =>
@@ -129,7 +128,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
           return CreateTarget(pattern);
       }
 
-      if (element is IFSharpGeneratedFromOtherElement generated && generated.OriginElement is IDeclaredElement origin)
+      if (element is IFSharpGeneratedFromOtherElement generated && generated.OriginElement is { } origin)
         return CreateTarget(origin);
 
       if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.CanNavigateTo)

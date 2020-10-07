@@ -33,7 +33,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             let mark = x.Mark(typeSigGroupStartPos typeSigs range)
             match typeSigs with
             | [] -> ()
-            | TypeDefnSig(ComponentInfo(attrs, _, _, _, _, _, _, _), _, _, _) :: _ ->
+            | TypeDefnSig(ComponentInfo(attributes = attrs), _, _, _) :: _ ->
                 x.ProcessOuterAttrs(attrs, range)
 
             for typeSig in typeSigs do

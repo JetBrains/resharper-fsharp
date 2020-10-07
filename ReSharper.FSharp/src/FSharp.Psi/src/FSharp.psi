@@ -855,7 +855,7 @@ interface fSharpTypeDeclaration:
   typeExtensionDeclaration |
   delegateDeclaration |
   objectModelTypeDeclaration |
-  nestedTypeUnionCaseDeclaration;
+  unionCaseDeclaration;
 
 interface simpleTypeDeclaration:
   enumDeclaration |
@@ -982,29 +982,25 @@ unionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 
-interface unionCaseDeclaration:
-  singletonCaseDeclaration |
-  nestedTypeUnionCaseDeclaration |
-  abbreviatedTypeOrUnionCaseDeclaration;
+interface unionCaseLikeDeclaration:
+  unionCaseDeclaration |
+  exceptionDeclaration |
+  typeUsageOrUnionCaseDeclaration;
 
-singletonCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
-  get { methodName="Attributes" path=<singletonCaseDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-}:
-  attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  fSharpIdentifier<IDENTIFIER, Identifier>;
-
-nestedTypeUnionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
-  get { methodName="TypeParameters" path=<nestedTypeUnionCaseDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
-  get { methodName="Attributes" path=<nestedTypeUnionCaseDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+unionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<unionCaseDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<unionCaseDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="Fields" path=<unionCaseDeclaration:FIELD_DECLARATION_LIST/unionCaseFieldDeclarationList:FIELD_DECLARATION> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
-  caseFieldDeclaration<UNION_FIELD, Fields>*
+  unionCaseFieldDeclarationList<FIELD_DECLARATION_LIST, FieldList>?
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
+unionCaseFieldDeclarationList:
+  caseFieldDeclaration<FIELD_DECLARATION, Fields>*;
 
 interface caseFieldDeclaration:
   unionCaseFieldDeclaration |
@@ -1024,29 +1020,33 @@ exceptionFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
 exceptionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<exceptionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<exceptionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="Fields" path=<exceptionDeclaration:FIELD_DECLARATION_LIST/unionCaseFieldDeclarationList:FIELD_DECLARATION> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  caseFieldDeclaration<UNION_FIELD, Fields>*
+  unionCaseFieldDeclarationList<FIELD_DECLARATION_LIST, FieldList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 typeAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<typeAbbreviationDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<typeAbbreviationDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-  get { methodName="AbbreviatedType" path=<typeAbbreviationDeclaration:TYPE_OR_UNION_CASE/abbreviatedTypeOrUnionCaseDeclaration:TYPE> };
+  get { methodName="AbbreviatedType" path=<typeAbbreviationDeclaration:TYPE_OR_UNION_CASE/typeUsageOrUnionCaseDeclaration:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   EQUALS<FSHARP_EQUALS, EqualsToken>
-  abbreviatedTypeOrUnionCaseDeclaration<TYPE_OR_UNION_CASE, AbbreviatedTypeOrUnionCase>
+  typeUsageOrUnionCaseDeclaration<TYPE_OR_UNION_CASE, AbbreviatedTypeOrUnionCase>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
-abbreviatedTypeOrUnionCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  typeUsage<TYPE, AbbreviatedType>;
+typeUsageOrUnionCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="Fields" path=<typeUsageOrUnionCaseDeclaration:FIELD_DECLARATION_LIST/unionCaseFieldDeclarationList:FIELD_DECLARATION> };
+}:
+  typeUsage<TYPE, TypeUsage>
+  unionCaseFieldDeclarationList<FIELD_DECLARATION_LIST, FieldList>?; // for generating common interface
 
 moduleAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<moduleAbbreviationDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };

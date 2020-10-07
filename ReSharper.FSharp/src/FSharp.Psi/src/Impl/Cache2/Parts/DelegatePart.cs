@@ -34,14 +34,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       (byte) FSharpPartKind.Delegate;
 
     public IParameter[] Parameters =>
-      GetDeclaration() is IDelegateDeclaration declaration
+      GetDeclaration() is { } declaration
         ? GetParameters(declaration.DelegateSignature.DelegateArguments)
         : EmptyArray<IParameter>.Instance;
 
     internal IPsiModule Module => GetPsiModule();
 
     public IType ReturnType =>
-      GetDeclaration() is IDelegateDeclaration declaration
+      GetDeclaration() is { } declaration
         ? GetType(declaration.DelegateSignature.DelegateReturnType, true)
         : TypeFactory.CreateUnknownType(Module);
 
@@ -63,7 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     protected IType GetType([CanBeNull] FSharpType fsType, bool isReturn) =>
-      fsType != null && TypeElement is TypeElement typeElement
+      fsType != null && TypeElement is { } typeElement
         ? fsType.MapType(typeElement.TypeParameters, Module, true, isReturn)
         : TypeFactory.CreateUnknownType(Module);
 

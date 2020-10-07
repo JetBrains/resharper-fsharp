@@ -68,7 +68,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
         addOpen offset fsFile context.BasicContext.ContextBoundSettingsStore ns
 
     member x.Candidates =
-        match box candidates with
+        match candidates with
         | null ->
             let result = LocalList<ICandidate>()
             let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
@@ -83,7 +83,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
             candidates <- result.ResultingList()
             candidates
 
-        | candidates -> candidates :?> _
+        | candidates -> candidates
 
     override x.Image =
         try getIconId item.FSharpSymbol
@@ -107,7 +107,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
         let ns = item.NamespaceToOpen
         if ns.IsEmpty() then () else
 
-        let ns = ns |> Array.map (fun ns -> Keywords.QuoteIdentifierIfNeeded ns) |> String.concat "."
+        let ns = ns |> Array.map Keywords.QuoteIdentifierIfNeeded |> String.concat "."
 
         let solution = context.BasicContext.Solution
         solution.GetPsiServices().Files.CommitAllDocuments()    

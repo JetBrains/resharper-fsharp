@@ -18,10 +18,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override bool UseBaseNameForSingleField => true;
 
-    protected override TreeNodeCollection<ICaseFieldDeclaration> GetFields() =>
-      Parent is INestedTypeUnionCaseDeclaration unionCaseDeclaration
-        ? unionCaseDeclaration.Fields
-        : TreeNodeCollection<ICaseFieldDeclaration>.Empty;
+    protected override IUnionCaseLikeDeclaration FieldOwnerDeclaration => 
+      UnionCaseDeclarationNavigator.GetByField(this);
 
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
       type is FSharpUnionCase unionCase ? unionCase.UnionCaseFields : null;
@@ -39,10 +37,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override bool UseBaseNameForSingleField => false;
 
-    protected override TreeNodeCollection<ICaseFieldDeclaration> GetFields() =>
-      Parent is IExceptionDeclaration exceptionDeclaration
-        ? exceptionDeclaration.Fields
-        : TreeNodeCollection<ICaseFieldDeclaration>.Empty;
+    protected override IUnionCaseLikeDeclaration FieldOwnerDeclaration => 
+      ExceptionDeclarationNavigator.GetByField(this);
 
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
       type is FSharpEntity entity && entity.IsFSharpExceptionDeclaration ? entity.FSharpFields : null;
@@ -80,18 +76,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected abstract int BaseIndex { get; }
     protected abstract string BaseName { get; }
     protected abstract bool UseBaseNameForSingleField { get; }
-    protected abstract TreeNodeCollection<ICaseFieldDeclaration> GetFields();
+
+    protected abstract IUnionCaseLikeDeclaration FieldOwnerDeclaration { get; }
+
+    protected TreeNodeCollection<ICaseFieldDeclaration> GetFields() =>
+      FieldOwnerDeclaration?.Fields ?? TreeNodeCollection<ICaseFieldDeclaration>.Empty;
 
     public override FSharpSymbol GetFSharpSymbol()
     {
       if (base.GetFSharpSymbol() is FSharpField namedField) // todo: named params have type FSharpParameters
         return namedField;
 
-      var typeDeclaration = Parent as IFSharpTypeDeclaration;
-      var typeSymbol = typeDeclaration?.GetFSharpSymbol();
-      if (typeSymbol == null)
-        return null;
-
+      var typeSymbol = FieldOwnerDeclaration?.GetFSharpSymbol();
       var index = Index;
       var fields = GetTypeFields(typeSymbol);
       return fields != null && index <= fields.Count
@@ -100,7 +96,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     [CanBeNull]
-    protected abstract IList<FSharpField> GetTypeFields([NotNull] FSharpSymbol type);
+    protected abstract IList<FSharpField> GetTypeFields([CanBeNull] FSharpSymbol type);
 
     public bool IsNameGenerated => NameIdentifier != null;
   }

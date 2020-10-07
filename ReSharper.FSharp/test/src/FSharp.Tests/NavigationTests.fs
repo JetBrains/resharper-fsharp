@@ -53,6 +53,10 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Union case 01 - Fields``() = x.DoNamedTestFiles()
     [<Test>] member x.``Union case 02 - Singleton``() = x.DoNamedTestFiles()
 
+    [<Test>] member x.``Union case - Field 01``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Union case - Field 02 - Single case``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Union case - Field 03 - Struct``() = x.DoNamedTestFiles()
+
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")
 
@@ -119,6 +123,19 @@ type FSharpGoToDeclarationTest() =
 
     [<TestReferences("Library1.dll", "Library2.dll")>]
     [<Test>] member x.``Same type from different assemblies``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union - Case - Empty 01 - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Case - Empty 02 - Pattern``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union - Case - Fields 01 - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Case - Fields 02 - Pattern``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union - Case - Single - Fields 01 - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Case - Single - Fields 01 - Pattern``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union - Field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Field 02 - Single case``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Field 03 - Struct``() = x.DoNamedTest()
 
 
 type FSharpGoToTypeTest() =

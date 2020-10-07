@@ -1,7 +1,4 @@
-﻿CONFLICTS FOUND:
-Warning Union Case Field - Creation param 01.U.C.zzz will hide Union Case Field - Creation param 01.U.C.zzz
-==========
-type U =
+﻿type U =
     | C of zzz: int
 
 C (zzz = 1)

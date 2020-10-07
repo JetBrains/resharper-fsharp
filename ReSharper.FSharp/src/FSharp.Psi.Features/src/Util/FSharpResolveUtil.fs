@@ -1,12 +1,14 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 
 open FSharp.Compiler.SourceCodeServices
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Impl.Reflection2
+open JetBrains.ReSharper.Psi.Tree
 
 /// Workaround for case where unqualified resolve may return module with implicit suffix instead of type.
 let private resolvesToAssociatedModule (declaredElement: IDeclaredElement) (unqualifiedElement: IDeclaredElement) (reference: FSharpSymbolReference) =
@@ -54,3 +56,28 @@ let resolvesToFcsSymbolUnqualified (fcsSymbol: FSharpSymbol) (reference: FSharpS
     let resolvedElement = resolvedFcsSymbol.GetDeclaredElement(psiModule, referenceOwner)
 
     resolvesToAssociatedModule declaredElement resolvedElement reference
+
+/// Workaround check for compiler issue with delegates not fully shadowing other types, see dotnet/fsharp#10228.
+let mayShadowPartially (newExpr: ITreeNode) (data: ElementProblemAnalyzerData) (fcsSymbol: FSharpSymbol) =
+    let fcsEntity = fcsSymbol.As<FSharpEntity>()
+    if isNull fcsEntity || not fcsEntity.IsDelegate || not fcsEntity.IsFSharp then false else
+
+    let typeElement = fcsEntity.GetTypeElement(data.SourceFile.PsiModule)
+    if isNull typeElement then false else
+
+    let sourceName = typeElement.GetSourceName()
+    let symbolScope = getSymbolScope data.SourceFile.PsiModule
+    let typeElements =
+        symbolScope.GetElementsByShortName(sourceName) // todo: find by source name
+        |> Array.filter (fun e -> e :? ITypeElement && not (e.Equals(typeElement))) 
+
+    if Array.isEmpty typeElements then false else
+
+    let opens = data.GetData(openedModulesProvider).OpenedModuleScopes
+
+    typeElements
+    |> Seq.cast<ITypeElement>
+    |> Seq.map getContainingEntity
+    |> Seq.collect (fun element -> opens.GetValuesSafe(element.ShortName))
+    |> Seq.toArray
+    |> OpenScope.inAnyScope newExpr

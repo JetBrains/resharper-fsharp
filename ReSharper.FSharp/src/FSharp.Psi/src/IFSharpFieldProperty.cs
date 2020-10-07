@@ -9,13 +9,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
   public interface IGeneratedConstructorParameterOwner : ITypeOwner
   {
-    [NotNull]
+    [CanBeNull]
     IParameter GetGeneratedParameter();
   }
 
   public interface IGeneratedConstructorOwner
   {
-    [NotNull]
+    [CanBeNull]
     IParametersOwner GetConstructor();
   }
 }

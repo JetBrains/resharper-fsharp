@@ -23,7 +23,7 @@ open JetBrains.Util
 
 [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>, HelpKeyword = fsiHelpKeyword)>]
 type FsiOptionsPage
-        (lifetime: Lifetime, optionsPageContext, settings, fsiDetector: FsiDetector,
+        (lifetime: Lifetime, optionsPageContext, settings, settingsSchema, fsiDetector: FsiDetector,
          [<Optional; DefaultParameterValue(null: ISolution)>] solution: ISolution,
          dialogs: ICommonFileDialogs, iconHost: IconHostBase) as this =
     inherit FSharpOptionsPageBase(lifetime, optionsPageContext, settings)
@@ -32,7 +32,7 @@ type FsiOptionsPage
 
     let Not = Func<_,_>(not)
 
-    let fsiOptions = FsiOptionsProvider(lifetime, settings)
+    let fsiOptions = FsiOptionsProvider(lifetime, settings, settingsSchema)
 
     let tools = fsiDetector.GetFsiTools(solution)
     let autoDetectAllowed = tools.Length > 1
@@ -87,7 +87,7 @@ type FsiOptionsPage
         this.AddString(fsiArgsText, fun key -> key.FsiArgs)
 
         this.AddHeader(FSharpScriptOptions.languageVersion)
-        this.AddBool(FsiOptions.specifyLanguageVersion, fsiOptions.SpecifyLanguageVersion)
+        this.AddBool(specifyLanguageVersion, fsiOptions.SpecifyLanguageVersion)
 
         let languageVersion =
             this.AddComboEnum((fun (key: FsiOptions) -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString)
