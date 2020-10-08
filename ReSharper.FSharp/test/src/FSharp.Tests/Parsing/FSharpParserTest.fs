@@ -343,7 +343,11 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type member - Member - Method - Parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Method - Parameters 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Method - Parameters 03 - Optional``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Method - Parameters 04 - Optional``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member - Member - Method - Curried Parameters 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member - Member - Method 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Method 02 - Static``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Method 03 - Wild param``() = x.DoNamedTest()

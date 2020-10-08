@@ -29,6 +29,7 @@ module ReplaceWithWildPat =
 
         let pat = pat.IgnoreParentParens()
         if isNotNull (AttribPatNavigator.GetByPattern(pat)) then None else
+        if isNotNull (OptionalValPatNavigator.GetByPattern(pat)) then None else
 
         let typedPat = TypedPatNavigator.GetByPattern(pat).IgnoreParentParens()
         if isNotNull (AttribPatNavigator.GetByPattern(typedPat)) then None else
