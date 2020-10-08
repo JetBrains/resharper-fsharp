@@ -8,8 +8,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -22,10 +22,12 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
 
     let impl = error.Impl
 
-    let rec getInterfaces (fcsEntity: FSharpEntity) =
-        fcsEntity.AllInterfaces |> Seq.map (fun interfaceType -> 
-            let fcsType = getAbbreviatedType interfaceType
-            fcsType.TypeDefinition)
+    let getInterfaces (fcsType: FSharpType) =
+        fcsType.AllInterfaces
+        |> Seq.filter (fun t -> t.HasTypeDefinition)
+        |> Seq.map (fun t ->
+            let fcsEntity = t.TypeDefinition
+            fcsEntity, Seq.zip fcsEntity.GenericParameters fcsType.GenericArguments |> Seq.toList)
 
     let mutable nextUnnamedVariableNumber = 0
     let getUnnamedVariableName () =
@@ -47,7 +49,12 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
         let settingsStore = impl.GetSettingsStoreWithEditorConfig()
         let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
 
-        let entity = impl.FcsEntity
+        let interfaceType =
+            let typeDeclaration = ObjectTypeDeclarationNavigator.GetByTypeMember(impl)
+            let fcsEntity = typeDeclaration.GetFSharpSymbol() :?> FSharpEntity
+            fcsEntity.DeclaredInterfaces |> Seq.find (fun e ->
+                e.HasTypeDefinition && e.TypeDefinition.IsEffectivelySameAs(impl.FcsEntity))
+
         let displayContext = impl.TypeName.Reference.GetSymbolUse().DisplayContext
 
         let existingMemberDecls = impl.TypeMembers
@@ -61,19 +68,20 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             |> HashSet
 
         let allInterfaceMembers = 
-            getInterfaces entity
-            |> Seq.collect (fun fcsEntity -> fcsEntity.MembersFunctionsAndValues)
+            getInterfaces interfaceType
+            |> Seq.collect (fun (fcsEntity, substitution) ->
+                fcsEntity.MembersFunctionsAndValues |> Seq.map (fun mfv -> mfv, substitution))
             |> Seq.toList
 
         let needsTypesAnnotations = 
             let sameParamNumberMembersGroups = 
-                allInterfaceMembers |> Seq.groupBy (fun mfv ->
+                allInterfaceMembers |> Seq.groupBy (fun (mfv, _) ->
                     let parameterGroups = mfv.CurriedParameterGroups
                     (Seq.length parameterGroups), (Seq.map Seq.length parameterGroups |> Seq.toList))
                 |> Seq.toList
 
             let sameParamNumberMembers =
-                List.map (snd >> Seq.toList) sameParamNumberMembersGroups
+                List.map (snd >> (Seq.map fst) >> Seq.toList) sameParamNumberMembersGroups
 
             sameParamNumberMembers
             |> Seq.filter (Seq.length >> ((<) 1))
@@ -82,13 +90,13 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
 
         let membersToGenerate = 
             allInterfaceMembers
-            |> Seq.filter (fun mfv ->
+            |> Seq.filter (fun (mfv, _) ->
                 // todo: other accessors
                 not (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod) &&
 
                 let xmlDocId = FSharpElementsUtil.GetXmlDocId(mfv)
                 isNotNull xmlDocId && not (implementedMembers.Contains(xmlDocId)))
-            |> Seq.sortBy (fun mfv -> mfv.DisplayName) // todo: better sorting?
+            |> Seq.sortBy (fun (mfv, _) -> mfv.DisplayName) // todo: better sorting?
             |> Seq.toList
 
         let indent =
@@ -101,18 +109,19 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
 
         let generatedMembers =
             membersToGenerate
-            |> List.collect (fun mfv ->
+            |> List.collect (fun (mfv, substitution) ->
                 let argNames =
                     mfv.CurriedParameterGroups
                     |> Seq.map (Seq.map (fun x ->
                         let name = x.Name |> Option.defaultWith (fun _ -> getUnnamedVariableName ())
-                        name, x.Type) >> Seq.toList)
+                        name, x.Type.Instantiate(substitution)) >> Seq.toList)
                     |> Seq.toList
 
                 let typeParams = mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
                 let memberName = mfv.DisplayName
 
                 let addTypes = needsTypesAnnotations.Contains(mfv)
+
                 let paramGroups =
                     if mfv.IsProperty then [] else
                     factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, addTypes, displayContext)
@@ -123,8 +132,8 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
                     let lastParam = memberDeclaration.ParametersPatterns.LastOrDefault()
                     if isNull lastParam then () else
 
-                    let typeString = mfv.ReturnParameter.Type.Format(displayContext)
-                    let typeUsage = factory.CreateTypeUsage(typeString)
+                    let typeString = mfv.ReturnParameter.Type.Instantiate(substitution)
+                    let typeUsage = factory.CreateTypeUsage(typeString.Format(displayContext))
                     ModificationUtil.AddChildAfter(lastParam, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
 
                 [ NewLine(lineEnding) :> ITreeNode

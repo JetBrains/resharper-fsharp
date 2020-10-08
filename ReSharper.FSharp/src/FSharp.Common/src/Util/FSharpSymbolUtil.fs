@@ -153,13 +153,6 @@ let rec getAbbreviatedEntity (entity: FSharpEntity) =
     else
         entity
 
-[<Extension; CompiledName("GetAbbreviatedType")>]
-let rec getAbbreviatedType (fcsType: FSharpType) =
-    if fcsType.HasTypeDefinition && fcsType.TypeDefinition.IsFSharpAbbreviation then
-        getAbbreviatedType fcsType.AbbreviatedType
-    else
-        fcsType
-
 [<Extension; CompiledName("HasMeasureParameter")>]
 let hasMeasureParameter(entity: FSharpEntity) =
     entity.GenericParameters.Count > 0 && entity.GenericParameters.[0].IsMeasure;

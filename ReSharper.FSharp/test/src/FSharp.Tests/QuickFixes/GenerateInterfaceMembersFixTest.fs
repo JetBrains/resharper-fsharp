@@ -34,6 +34,12 @@ type GenerateInterfaceMembersFixTest() =
     [<Test>] member x.``Method - Type parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Type parameters 02 - Multiple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Method - Substitution 01 - Param``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Substitution 02 - Return``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Substitution 03 - Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Substitution 04 - Inherited interface``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Substitution 05 - Inherited interface``() = x.DoNamedTest()
+
     [<Test>] member x.``Escaped names 01 - Member``() = x.DoNamedTest()
     [<Test>] member x.``Escaped names 02 - Param``() = x.DoNamedTest()
 
