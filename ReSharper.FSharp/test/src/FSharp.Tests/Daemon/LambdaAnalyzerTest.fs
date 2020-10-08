@@ -15,9 +15,7 @@ type LambdaAnalyzerTest() =
         match highlighting with
         | :? LambdaCanBeSimplifiedWarning
         | :? LambdaCanBeReplacedWarning
-        | :? ExpressionCanBeReplacedWithIdWarning
-        | :? ExpressionCanBeReplacedWithFstWarning
-        | :? ExpressionCanBeReplacedWithSndWarning -> true
+        | :? LambdaCanBeReplacedWithOperatorWarning -> true
         | _ -> false
 
     [<Test>] member x.``Application``() = x.DoNamedTest()

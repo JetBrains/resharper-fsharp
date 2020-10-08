@@ -109,19 +109,9 @@ let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
         sprintf "Lambda can be replaced with '%s'" x.QualifiedName
     | _ -> "Lambda can be simplified"
 
-let getExpressionCanBeReplacedWithIdWarningText (expr: IFSharpExpression) =
-    match expr with
-    | :? ILambdaExpr as lambda ->
-        if lambda.PatternsEnumerable.CountIs(1) then "Lambda can be replaced with 'id'"
-        else "Lambda body can be replaced with 'id'"
-    | _ -> "Expression can be replaced with 'id'"
+let replaceLambdaBodyWithId (lambda: ILambdaExpr) opName =
+    opName = "id" && not (lambda.PatternsEnumerable.CountIs(1))
 
-let getExpressionCanBeReplacedWithFstWarningText (expr: IFSharpExpression) =
-    match expr with
-    | :? ILambdaExpr as lambda -> "Lambda can be replaced with 'fst'"
-    | _ -> "Expression can be replaced with 'fst'"
-
-let getExpressionCanBeReplacedWithSndWarningText (expr: IFSharpExpression) =
-    match expr with
-    | :? ILambdaExpr as lambda -> "Lambda can be replaced with 'snd'"
-    | _ -> "Expression can be replaced with 'snd'"
+let getLambdaCanBeReplacedWithOperatorWarningText (lambda: ILambdaExpr) opName =
+    if replaceLambdaBodyWithId lambda opName then "Lambda body can be replaced with 'id'"
+    else sprintf "Lambda can be replaced with '%s'" opName

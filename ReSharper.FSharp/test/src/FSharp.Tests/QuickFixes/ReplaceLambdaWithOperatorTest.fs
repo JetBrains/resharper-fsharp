@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 type ReplaceExpressionWithOperatorTest() =
-    inherit FSharpQuickFixTestBase<ReplaceExpressionWithOperatorFix>()
+    inherit FSharpQuickFixTestBase<ReplaceLambdaWithOperatorFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceExpressionWithOperator"
 

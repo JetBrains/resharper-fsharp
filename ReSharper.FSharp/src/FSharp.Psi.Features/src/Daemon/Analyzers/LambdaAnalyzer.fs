@@ -15,9 +15,7 @@ open JetBrains.Util
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
                          HighlightingTypes = [| typeof<LambdaCanBeSimplifiedWarning>
                                                 typeof<LambdaCanBeReplacedWarning>
-                                                typeof<ExpressionCanBeReplacedWithIdWarning>
-                                                typeof<ExpressionCanBeReplacedWithFstWarning>
-                                                typeof<ExpressionCanBeReplacedWithSndWarning> |])>]
+                                                typeof<LambdaCanBeReplacedWithOperatorWarning> |])>]
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
 
@@ -112,10 +110,10 @@ type LambdaAnalyzer() =
             | :? ITuplePat as pat when pat.PatternsEnumerable.CountIs(2) ->
                 let tuplePats = pat.Patterns
                 if compareArg (tuplePats.[0]) expr then
-                    consumer.AddHighlighting(ExpressionCanBeReplacedWithFstWarning(lambda))
+                    consumer.AddHighlighting(LambdaCanBeReplacedWithOperatorWarning(lambda, "fst"))
                 elif compareArg (tuplePats.[1]) expr then
-                    consumer.AddHighlighting(ExpressionCanBeReplacedWithSndWarning(lambda))
+                    consumer.AddHighlighting(LambdaCanBeReplacedWithOperatorWarning(lambda, "snd"))
             | _ -> ()
 
         if compareArg (pats.LastOrDefault()) expr then
-            consumer.AddHighlighting(ExpressionCanBeReplacedWithIdWarning(lambda))
+            consumer.AddHighlighting(LambdaCanBeReplacedWithOperatorWarning(lambda, "id"))

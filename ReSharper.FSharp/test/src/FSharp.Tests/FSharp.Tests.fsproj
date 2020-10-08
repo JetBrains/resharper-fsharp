@@ -86,7 +86,7 @@
     <Compile Include="QuickFixes\SimplifyListConsPatTest.fs" />
     <Compile Include="QuickFixes\SimplifyLambdaTest.fs" />
     <Compile Include="QuickFixes\ReplaceLambdaWithInnerExpressionTest.fs" />
-    <Compile Include="QuickFixes\ReplaceExpressionWithOperatorTest.fs" />
+    <Compile Include="QuickFixes\ReplaceLambdaWithOperatorTest.fs" />
     <Compile Include="QuickFixes\GenerateInterfaceMembersFixTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
