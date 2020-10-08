@@ -1,4 +1,6 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+﻿using System;
+using FSharp.Compiler.SourceCodeServices;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -45,7 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IAttributeList CreateEmptyAttributeList();
     IAttribute CreateAttribute(string attrName);
     
-    FSharpList<IParametersPatternDeclaration> CreateMemberParamDeclarations(FSharpList<FSharpList<string>> curriedParameterNames, bool isSpaceAfterComma);
+    FSharpList<IParametersPatternDeclaration> CreateMemberParamDeclarations(FSharpList<FSharpList<Tuple<string, FSharpType>>> curriedParameterNames, bool isSpaceAfterComma, bool addTypes, FSharpDisplayContext displayContext);
     IMemberDeclaration CreateMemberBindingExpr(string bindingName, FSharpList<string> typeParameters, FSharpList<IParametersPatternDeclaration> args); 
     IInterfaceImplementation CreateInterfaceImplementation(ITypeReferenceName typeReferenceName, FSharpList<IMemberDeclaration> memberDeclarations, int indent); 
   }

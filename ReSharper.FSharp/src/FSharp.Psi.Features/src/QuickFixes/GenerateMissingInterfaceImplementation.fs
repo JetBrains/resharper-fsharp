@@ -48,6 +48,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
         let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
 
         let entity = impl.FcsEntity
+        let displayContext = impl.TypeName.Reference.GetSymbolUse().DisplayContext
 
         let existingMemberDecls = impl.TypeMembers
 
@@ -59,9 +60,28 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             |> Seq.concat
             |> HashSet
 
-        let membersToGenerate = 
+        let allInterfaceMembers = 
             getInterfaces entity
             |> Seq.collect (fun fcsEntity -> fcsEntity.MembersFunctionsAndValues)
+            |> Seq.toList
+
+        let needsTypesAnnotations = 
+            let sameParamNumberMembersGroups = 
+                allInterfaceMembers |> Seq.groupBy (fun mfv ->
+                    let parameterGroups = mfv.CurriedParameterGroups
+                    (Seq.length parameterGroups), (Seq.map Seq.length parameterGroups |> Seq.toList))
+                |> Seq.toList
+
+            let sameParamNumberMembers =
+                List.map (snd >> Seq.toList) sameParamNumberMembersGroups
+
+            sameParamNumberMembers
+            |> Seq.filter (Seq.length >> ((<) 1))
+            |> Seq.concat
+            |> HashSet
+
+        let membersToGenerate = 
+            allInterfaceMembers
             |> Seq.filter (fun mfv ->
                 // todo: other accessors
                 not (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod) &&
@@ -84,19 +104,32 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             |> List.collect (fun mfv ->
                 let argNames =
                     mfv.CurriedParameterGroups
-                    |> Seq.map (Seq.map (fun x -> x.Name |> Option.defaultWith (fun _ -> getUnnamedVariableName ())) >> Seq.toList)
+                    |> Seq.map (Seq.map (fun x ->
+                        let name = x.Name |> Option.defaultWith (fun _ -> getUnnamedVariableName ())
+                        name, x.Type) >> Seq.toList)
                     |> Seq.toList
 
                 let typeParams = mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
                 let memberName = mfv.DisplayName
 
+                let addTypes = needsTypesAnnotations.Contains(mfv)
                 let paramGroups =
                     if mfv.IsProperty then [] else
-                    factory.CreateMemberParamDeclarations(argNames, spaceAfterComma)
+                    factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, addTypes, displayContext)
+
+                let memberDeclaration = factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups)
+
+                if addTypes then
+                    let lastParam = memberDeclaration.ParametersPatterns.LastOrDefault()
+                    if isNull lastParam then () else
+
+                    let typeString = mfv.ReturnParameter.Type.Format(displayContext)
+                    let typeUsage = factory.CreateTypeUsage(typeString)
+                    ModificationUtil.AddChildAfter(lastParam, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
 
                 [ NewLine(lineEnding) :> ITreeNode
                   Whitespace(indent) :> _
-                  factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups) :> _ ])
+                  memberDeclaration :> _ ])
 
         if isNull impl.WithKeyword then
             addNodesAfter impl.LastChild [

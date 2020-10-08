@@ -150,16 +150,17 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = sprintf "let %s = ()" bindingName
             getModuleMember source :?> ILetBindingsDeclaration
 
-        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma) =
+        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
+            let printParam (name, fcsType: FSharpType) =
+                let name = Keywords.QuoteIdentifierIfNeeded name
+                if not addTypes then name else
+
+                let fcsType = fcsType.Format(displayContext)
+                sprintf "%s: %s" name fcsType
+
             let parametersSource =
                 curriedParameterNames
-                |> List.map (function
-                    | [] -> ""
-                    | [singleParam] -> singleParam |> Keywords.QuoteIdentifierIfNeeded
-                    | parameters ->
-                        parameters
-                        |> List.map Keywords.QuoteIdentifierIfNeeded
-                        |> String.concat (if isSpaceAfterComma then ", " else ","))
+                |> List.map (List.map printParam >> String.concat (if isSpaceAfterComma then ", " else ","))
                 |> List.map (sprintf "(%s)")
                 |> String.concat " "
 
