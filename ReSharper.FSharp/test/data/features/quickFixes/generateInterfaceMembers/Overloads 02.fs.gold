@@ -1,0 +1,10 @@
+﻿module Module
+
+type I =
+  abstract M: int -> unit
+  abstract M: int * int -> unit
+
+type T() =
+  interface I with
+    member this.M(var0) = failwith "todo"
+    member this.M(var1, var2) = failwith "todo"{caret}

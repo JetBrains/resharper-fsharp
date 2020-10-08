@@ -631,7 +631,7 @@ objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   NEW
   typeReferenceName<TYPE_REFERENCE, TypeName>
   fSharpExpression<ARG_EXPR, ArgExpression>
-  WITH
+  WITH<WITH, WithKeyword>
   memberDeclaration<MEMBER_DECL, MemberDeclarations>*
   interfaceImplementation<INTERFACE_IMPL, InterfaceImplementations>*
   RBRACE;
@@ -1196,7 +1196,7 @@ interfaceImplementation:
   INTERFACE
   typeReferenceName<TYPE_REFERENCE, TypeName>
   (
-    WITH
+    WITH<WITH, WithKeyword>
     memberDeclaration<MEMBER_DECL, TypeMembers>*
   )?;
 

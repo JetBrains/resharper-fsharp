@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpAttributesUtil
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-type ToAbstractFix(error: NoImplementationGivenError) =
+type ToAbstractFix(error: NoImplementationGivenTypeError) =
     inherit FSharpQuickFixBase()
 
     let typeDecl = error.TypeDecl

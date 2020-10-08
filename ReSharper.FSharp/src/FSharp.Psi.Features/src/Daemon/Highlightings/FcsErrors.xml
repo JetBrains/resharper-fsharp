@@ -250,7 +250,7 @@
     <QuickFix>ToMutableFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="NoImplementationGiven">
+  <Error staticGroup="FSharpErrors" name="NoImplementationGivenType">
     <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -259,6 +259,17 @@
     <Range>typeDecl.GetNameDocumentRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ToAbstractFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="NoImplementationGivenInterface">
+    <Parameter type="IInterfaceImplementation" name="impl"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>impl.TypeName.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateInterfaceMembersFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression">

@@ -52,3 +52,5 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Upcast unnecessary 01``() = x.DoNamedTest()
     
     [<Test>] member x.``Value in namespace``() = x.DoNamedTest()
+
+    [<Test>] member x.``No implementation given 01``() = x.DoNamedTest()

@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.Application.Settings
@@ -41,6 +42,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let moduleDeclaration = getModuleDeclaration source
         moduleDeclaration.Members.First()
 
+    let getTypeDecl memberSource =
+        let source = "type T =\n  " + memberSource
+        let moduleMember = getModuleMember source
+        moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations.[0] :?> IObjectTypeDeclaration
+
     let getDoDecl source =
         let moduleMember = getModuleMember source
         moduleMember.As<IDoStatement>().NotNull()
@@ -58,6 +64,17 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let source = sprintf "do (let %s = ())" bindingName
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
+
+    let createMemberDecl name typeParameters parameters =
+        let typeParametersSource =
+            match typeParameters with
+            | [] -> ""
+            | parameters -> parameters |> List.map ((+) "'") |> String.concat ", " |> sprintf "<%s>"
+
+        let name = Keywords.QuoteIdentifierIfNeeded name
+        let memberSource = sprintf "member this.%s%s%s = failwith \"todo\"" name typeParametersSource parameters
+        let typeDecl = getTypeDecl memberSource
+        typeDecl.TypeMembers.[0] :?> IMemberDeclaration
 
     let createAttributeList attrName: IAttributeList =
             let source = sprintf "[<%s>] ()" attrName
@@ -133,6 +150,51 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = sprintf "let %s = ()" bindingName
             getModuleMember source :?> ILetBindingsDeclaration
 
+        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
+            let printParam (name, fcsType: FSharpType) =
+                let name = Keywords.QuoteIdentifierIfNeeded name
+                if not addTypes then name else
+
+                let fcsType = fcsType.Format(displayContext)
+                sprintf "%s: %s" name fcsType
+
+            let parametersSource =
+                curriedParameterNames
+                |> List.map (List.map printParam >> String.concat (if isSpaceAfterComma then ", " else ","))
+                |> List.map (sprintf "(%s)")
+                |> String.concat " "
+
+            let memberBinding = createMemberDecl "P" List.empty parametersSource
+            memberBinding.ParametersPatterns |> Seq.toList
+
+        member x.CreateMemberBindingExpr(name, typeParameters, parameters) =
+            let parsedParams = "()" |> List.replicate parameters.Length |> String.concat " "
+            let memberDecl = createMemberDecl name typeParameters parsedParams
+
+            for realArg, fakeArg in Seq.zip parameters memberDecl.ParametersPatterns do
+                ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
+            memberDecl
+
+        member x.CreateInterfaceImplementation(typeReferenceName, memberDeclarations, baseIndent) =
+            let lineEnding = typeReferenceName.GetLineEnding()
+            let memberIndent = baseIndent + typeReferenceName.GetIndentSize()
+
+            let memberSource = "interface I with\n    member _.P = ()"
+            let typeDecl = getTypeDecl memberSource
+            let interfaceImpl = typeDecl.TypeMembers.[0] :?> IInterfaceImplementation
+
+            ModificationUtil.ReplaceChild(interfaceImpl.TypeName, typeReferenceName) |> ignore
+            ModificationUtil.DeleteChildRange(interfaceImpl.WithKeyword.NextSibling, interfaceImpl.LastChild)
+
+            seq { for d in memberDeclarations do
+                      yield NewLine(lineEnding) :> ITreeNode
+                      yield Whitespace(memberIndent) :> _
+                      yield d :> _ }
+            |> addNodesAfter interfaceImpl.WithKeyword
+            |> ignore
+
+            interfaceImpl
+
         member x.CreateConstExpr(text) =
             getExpression text :?> _
 
@@ -171,8 +233,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateReferenceExpr(name) =
             let source = sprintf "do %s" name
-            let newExpr = getExpression source :?> IReferenceExpr
-            newExpr :> _
+            getExpression source :?> IReferenceExpr
 
         member x.CreateForEachExpr(expr) =
             let sourceFile = expr.GetSourceFile()

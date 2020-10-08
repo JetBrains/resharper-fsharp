@@ -359,7 +359,7 @@ type FSharpTreeNodeSelectionProvider() =
 
 
 let shouldEraseSemicolon (node: ITreeNode) =
-    let settingsStore = node.GetSettingsStore()
+    let settingsStore = node.GetSettingsStoreWithEditorConfig()
     not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine))
 
 let shiftWhitespaceBefore shift (whitespace: Whitespace) =
