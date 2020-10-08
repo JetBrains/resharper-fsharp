@@ -14,7 +14,7 @@ open JetBrains.Util
 type ReplaceExpressionWithOperatorFix(expr: IFSharpExpression, op: string, opFullName: string) =
     inherit FSharpQuickFixBase()
 
-    let replaceLambdaBody (lambda: ILambdaExpr) = op = "id" && not (lambda.PatternsEnumerable.CountIs(1))
+    let replaceLambdaBodyWithId (lambda: ILambdaExpr) = op = "id" && not (lambda.PatternsEnumerable.CountIs(1))
 
     let idIsShadowed =
         match expr with
@@ -27,7 +27,7 @@ type ReplaceExpressionWithOperatorFix(expr: IFSharpExpression, op: string, opFul
     override x.Text =
         match expr with
         | :? ILambdaExpr as lambda ->
-            if replaceLambdaBody lambda then "Replace lambda body with 'id'"
+            if replaceLambdaBodyWithId lambda then "Replace lambda body with 'id'"
             else sprintf "Replace lambda with '%s'" op
         | _ -> sprintf "Replace with '%s'" op
 
@@ -56,7 +56,7 @@ type ReplaceExpressionWithOperatorFix(expr: IFSharpExpression, op: string, opFul
         match expr with
         | :? ILambdaExpr as lambda ->
             let pats = lambda.Patterns
-            let replaceLambda = not (replaceLambdaBody lambda)
+            let replaceLambda = not (replaceLambdaBodyWithId lambda)
 
             if replaceLambda then
                 let paren = ParenExprNavigator.GetByInnerExpression(lambda)
