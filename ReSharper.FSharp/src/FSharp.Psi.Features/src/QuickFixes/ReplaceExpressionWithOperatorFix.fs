@@ -11,25 +11,34 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
-type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
+type ReplaceExpressionWithOperatorFix(expr: IFSharpExpression, op: string, opFullName: string) =
     inherit FSharpQuickFixBase()
+
+    let replaceLambdaBody (lambda: ILambdaExpr) = op = "id" && not (lambda.PatternsEnumerable.CountIs(1))
 
     let idIsShadowed =
         match expr with
         | :? ILambdaExpr as lambda ->
-            match lambda.CheckerService.ResolveNameAtLocation(lambda.RArrow, ["id"], "ReplaceExpressionWithIdFix") with
-            | Some symbolUse -> symbolUse.Symbol.FullName <> "Microsoft.FSharp.Core.Operators.id"
+            match lambda.CheckerService.ResolveNameAtLocation(lambda.RArrow, [op], "ReplaceExpressionWithOperatorFix") with
+            | Some symbolUse -> symbolUse.Symbol.FullName <> opFullName
             | None -> false
         | _ -> false
 
     override x.Text =
         match expr with
         | :? ILambdaExpr as lambda ->
-            if lambda.PatternsEnumerable.CountIs(1) then "Replace lambda with 'id'" else "Replace lambda body with 'id'"
-        | _ -> "Replace with 'id'"
+            if replaceLambdaBody lambda then "Replace lambda body with 'id'"
+            else sprintf "Replace lambda with '%s'" op
+        | _ -> sprintf "Replace with '%s'" op
 
     new (warning: ExpressionCanBeReplacedWithIdWarning) =
-        ReplaceExpressionWithIdFix(warning.Expr)
+        ReplaceExpressionWithOperatorFix(warning.Expr, "id", "Microsoft.FSharp.Core.Operators.id")
+
+    new (warning: ExpressionCanBeReplacedWithFstWarning) =
+        ReplaceExpressionWithOperatorFix(warning.Expr, "fst", "Microsoft.FSharp.Core.Operators.fst")
+    
+    new (warning: ExpressionCanBeReplacedWithSndWarning) =
+        ReplaceExpressionWithOperatorFix(warning.Expr, "snd", "Microsoft.FSharp.Core.Operators.snd")
 
     override x.IsAvailable _ =
         let isApplicable =
@@ -47,9 +56,9 @@ type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
         match expr with
         | :? ILambdaExpr as lambda ->
             let pats = lambda.Patterns
-            let replaceBody = pats.Count = 1
+            let replaceLambda = not (replaceLambdaBody lambda)
 
-            if replaceBody then
+            if replaceLambda then
                 let paren = ParenExprNavigator.GetByInnerExpression(lambda)
                 let nodeToReplace = if isNotNull paren then paren :> IFSharpExpression else expr
 
@@ -59,8 +68,8 @@ type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
                 if isNotNull prevToken && not (isWhitespace prevToken) then addNodeBefore nodeToReplace (Whitespace())
                 if isNotNull nextToken && not (isWhitespace nextToken) then addNodeAfter nodeToReplace (Whitespace())
 
-                replace nodeToReplace (factory.CreateReferenceExpr("id"))
+                replace nodeToReplace (factory.CreateReferenceExpr(op))
             else
                 deletePatternsFromEnd lambda 1
-                replace lambda.Expression (factory.CreateReferenceExpr("id"))
+                replace lambda.Expression (factory.CreateReferenceExpr(op))
         | _ -> ()

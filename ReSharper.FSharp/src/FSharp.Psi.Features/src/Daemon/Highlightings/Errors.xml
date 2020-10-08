@@ -194,7 +194,27 @@
     <Message value="{0}">
       <Argument>getExpressionCanBeReplacedWithIdWarningText expr</Argument>
     </Message>
-    <QuickFix>ReplaceExpressionWithIdFix</QuickFix>
+    <QuickFix>ReplaceExpressionWithOperatorFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ExpressionCanBeReplacedWithFst">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Message value="{0}">
+      <Argument>getExpressionCanBeReplacedWithFstWarningText expr</Argument>
+    </Message>
+    <QuickFix>ReplaceExpressionWithOperatorFix</QuickFix>
+  </Warning>
+  
+  <Warning staticGroup="FSharpErrors" name="ExpressionCanBeReplacedWithSnd">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Message value="{0}">
+      <Argument>getExpressionCanBeReplacedWithSndWarningText expr</Argument>
+    </Message>
+    <QuickFix>ReplaceExpressionWithOperatorFix</QuickFix>
   </Warning>
 
 </Errors>

@@ -115,3 +115,13 @@ let getExpressionCanBeReplacedWithIdWarningText (expr: IFSharpExpression) =
         if lambda.PatternsEnumerable.CountIs(1) then "Lambda can be replaced with 'id'"
         else "Lambda body can be replaced with 'id'"
     | _ -> "Expression can be replaced with 'id'"
+
+let getExpressionCanBeReplacedWithFstWarningText (expr: IFSharpExpression) =
+    match expr with
+    | :? ILambdaExpr as lambda -> "Lambda can be replaced with 'fst'"
+    | _ -> "Expression can be replaced with 'fst'"
+
+let getExpressionCanBeReplacedWithSndWarningText (expr: IFSharpExpression) =
+    match expr with
+    | :? ILambdaExpr as lambda -> "Lambda can be replaced with 'snd'"
+    | _ -> "Expression can be replaced with 'snd'"

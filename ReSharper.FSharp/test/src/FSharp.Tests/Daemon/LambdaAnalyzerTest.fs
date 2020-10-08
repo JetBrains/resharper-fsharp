@@ -15,12 +15,16 @@ type LambdaAnalyzerTest() =
         match highlighting with
         | :? LambdaCanBeSimplifiedWarning
         | :? LambdaCanBeReplacedWarning
-        | :? ExpressionCanBeReplacedWithIdWarning -> true
+        | :? ExpressionCanBeReplacedWithIdWarning
+        | :? ExpressionCanBeReplacedWithFstWarning
+        | :? ExpressionCanBeReplacedWithSndWarning -> true
         | _ -> false
 
     [<Test>] member x.``Application``() = x.DoNamedTest()
     [<Test>] member x.``Partial application``() = x.DoNamedTest()
     [<Test>] member x.``Id``() = x.DoNamedTest()
+    [<Test>] member x.``Fst``() = x.DoNamedTest()
+    [<Test>] member x.``Snd``() = x.DoNamedTest()
     [<Test>] member x.``Not available``() = x.DoNamedTest()
 
     [<Test>] member x.``Used names - Nested scope``() = x.DoNamedTest()
