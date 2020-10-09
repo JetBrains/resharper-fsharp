@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
+open FSharp.Compiler
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
@@ -65,13 +66,19 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
-    let createMemberDecl name typeParameters parameters =
+    let createMemberDecl logicalName typeParameters parameters =
         let typeParametersSource =
             match typeParameters with
             | [] -> ""
             | parameters -> parameters |> List.map ((+) "'") |> String.concat ", " |> sprintf "<%s>"
 
-        let name = Keywords.QuoteIdentifierIfNeeded name
+        let name =
+            let name = PrettyNaming.DecompileOpName logicalName
+            if PrettyNaming.IsMangledOpName logicalName then
+                sprintf "( %s )" name
+            else
+                Keywords.QuoteIdentifierIfNeeded name
+
         let memberSource = sprintf "member this.%s%s%s = failwith \"todo\"" name typeParametersSource parameters
         let typeDecl = getTypeDecl memberSource
         typeDecl.TypeMembers.[0] :?> IMemberDeclaration

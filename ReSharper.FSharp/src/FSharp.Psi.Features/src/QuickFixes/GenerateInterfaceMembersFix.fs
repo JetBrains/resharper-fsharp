@@ -77,7 +77,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             let sameParamNumberMembersGroups = 
                 allInterfaceMembers |> Seq.groupBy (fun (mfv, _) ->
                     let parameterGroups = mfv.CurriedParameterGroups
-                    mfv.DisplayName, (Seq.length parameterGroups), (Seq.map Seq.length parameterGroups |> Seq.toList))
+                    mfv.LogicalName, (Seq.length parameterGroups), (Seq.map Seq.length parameterGroups |> Seq.toList))
                 |> Seq.toList
 
             let sameParamNumberMembers =
@@ -96,7 +96,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
 
                 let xmlDocId = FSharpElementsUtil.GetXmlDocId(mfv)
                 isNotNull xmlDocId && not (implementedMembers.Contains(xmlDocId)))
-            |> Seq.sortBy (fun (mfv, _) -> mfv.DisplayName) // todo: better sorting?
+            |> Seq.sortBy (fun (mfv, _) -> mfv.LogicalName) // todo: better sorting?
             |> Seq.toList
 
         let indent =
@@ -118,7 +118,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
                     |> Seq.toList
 
                 let typeParams = mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
-                let memberName = mfv.DisplayName
+                let memberName = mfv.LogicalName
 
                 let addTypes = needsTypesAnnotations.Contains(mfv)
 
