@@ -77,7 +77,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             let sameParamNumberMembersGroups = 
                 allInterfaceMembers |> Seq.groupBy (fun (mfv, _) ->
                     let parameterGroups = mfv.CurriedParameterGroups
-                    (Seq.length parameterGroups), (Seq.map Seq.length parameterGroups |> Seq.toList))
+                    mfv.DisplayName, (Seq.length parameterGroups), (Seq.map Seq.length parameterGroups |> Seq.toList))
                 |> Seq.toList
 
             let sameParamNumberMembers =

@@ -30,6 +30,7 @@ type GenerateInterfaceMembersFixTest() =
 
     [<Test>] member x.``Overloads 01``() = x.DoNamedTest()
     [<Test>] member x.``Overloads 02``() = x.DoNamedTest()
+    [<Test>] member x.``Overloads 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Method - Type parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Type parameters 02 - Multiple``() = x.DoNamedTest()
