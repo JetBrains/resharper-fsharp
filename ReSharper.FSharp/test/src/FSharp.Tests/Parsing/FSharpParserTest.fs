@@ -29,7 +29,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Extension 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Delegate - Ctor 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type decl - Delegate - Ctor 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Delegate - Ctor 02 - Parameter``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate 02``() = x.DoNamedTest()
 
@@ -44,10 +44,16 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Let binding - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Let binding - Value 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Let binding - Value 02 - Upper``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Let bindings 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Empty 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Enum 01 - With first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Without first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 03 - Case attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 04 - Private repr``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 02 - Modifier``() = x.DoNamedTest()
@@ -60,6 +66,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Record 02 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record 03 - Multiline, semicolons``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record 04 - Attribute``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Struct 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
@@ -411,7 +419,7 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Val - Active pattern 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type repr - Record 01``() = x.DoNamedTest()
-    [<Test; Explicit("Needs FCS update")>] member x.``Type repr - Record 02 - Mutable field``() = x.DoNamedTest()
+    [<Test>] member x.``Type repr - Record 02 - Mutable field``() = x.DoNamedTest()
     [<Test>] member x.``Type repr - Record 03 - Field attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Inherit 01``() = x.DoNamedTest()

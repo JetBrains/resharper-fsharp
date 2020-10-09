@@ -26,12 +26,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       myCheckerService = checkerService;
     }
 
-    private static FSharpFileKind GetFSharpFileKind(IFSharpFile file)
-    {
-      if (file is IFSharpImplFile) return FSharpFileKind.ImplFile;
-      if (file is IFSharpSigFile) return FSharpFileKind.SigFile;
-      throw new ArgumentOutOfRangeException();
-    }
+    private static FSharpFileKind GetFSharpFileKind(IFSharpFile file) =>
+      file switch
+      {
+        IFSharpImplFile _ => FSharpFileKind.ImplFile,
+        IFSharpSigFile _ => FSharpFileKind.SigFile,
+        _ => throw new ArgumentOutOfRangeException()
+      };
 
     public override void VisitFSharpFile(IFSharpFile fsFile)
     {
@@ -142,15 +143,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
-    public override void VisitMemberDeclaration(IMemberDeclaration decl)
-    {
+    public override void VisitMemberDeclaration(IMemberDeclaration decl) => 
       Builder.AddDeclaredMemberName(decl.CompiledName);
-    }
 
     public override void VisitTypeDeclarationGroup(ITypeDeclarationGroup typeDeclarationGroupParam)
     {
-      foreach (var typeDeclaration in typeDeclarationGroupParam.TypeDeclarations) 
+      foreach (var typeDeclaration in typeDeclarationGroupParam.TypeDeclarationsEnumerable) 
         typeDeclaration.Accept(this);
+    }
+
+    public override void VisitFSharpTypeDeclaration(IFSharpTypeDeclaration decl)
+    {
+      var allMembers = decl.MemberDeclarations;
+
+      if (decl.TypeRepresentation is { } repr)
+        repr.Accept(this);
+      else
+      {
+        // todo: check "anon type" decl
+        Builder.StartPart(CreateObjectTypePart(decl, false));
+      }
+
+      ProcessTypeMembers(allMembers);
+      Builder.EndPart();
     }
 
     private void ProcessBinding(IBinding binding)
@@ -176,42 +191,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
-    public override void VisitEnumDeclaration(IEnumDeclaration decl)
-    {
-      Builder.StartPart(new EnumPart(decl, Builder));
-      foreach (var memberDecl in decl.EnumMembersEnumerable)
-        Builder.AddDeclaredMemberName(memberDecl.DeclaredName);
-      Builder.EndPart();
-    }
+    public override void VisitObjectModelTypeRepresentation(IObjectModelTypeRepresentation repr) =>
+      Builder.StartPart(CreateObjectTypePart(repr.TypeDeclaration, repr.TypePartKind, false));
 
-    public override void VisitRecordDeclaration(IRecordDeclaration decl)
+    public override void VisitEnumRepresentation(IEnumRepresentation repr) => 
+      Builder.StartPart(new EnumPart(repr.TypeDeclaration, Builder));
+
+    public override void VisitRecordRepresentation(IRecordRepresentation decl)
     {
       var recordPart =
-        decl.HasAttribute(FSharpImplUtil.Struct)
-          ? (Part) new StructRecordPart(decl, Builder)
-          : new RecordPart(decl, Builder);
+        decl.TypePartKind == PartKind.Struct
+          ? (Part) new StructRecordPart(decl.TypeDeclaration, Builder)
+          : new RecordPart(decl.TypeDeclaration, Builder);
 
       Builder.StartPart(recordPart);
-      ProcessTypeMembers(decl.MemberDeclarations);
-      ProcessTypeMembers(decl.FieldDeclarations);
-      Builder.EndPart();
     }
 
-    public override void VisitUnionDeclaration(IUnionDeclaration decl)
+    public override void VisitUnionRepresentation(IUnionRepresentation repr)
     {
-      var unionCases = decl.UnionCases;
+      var unionCases = repr.UnionCases;
       var isSingleCase = unionCases.Count == 1;
 
-      if (decl.HasAttribute(FSharpImplUtil.Struct))
+      if (repr.TypePartKind == PartKind.Struct)
       {
-        Builder.StartPart(new StructUnionPart(decl, Builder, isSingleCase));
+        Builder.StartPart(new StructUnionPart(repr.TypeDeclaration, Builder, isSingleCase));
         foreach (var unionCase in unionCases)
           ProcessTypeMembers(unionCase.Fields);
       }
       else
       {
-        var hasNestedTypes = decl.HasNestedTypes;
-        Builder.StartPart(new UnionPart(decl, Builder, hasNestedTypes, isSingleCase));
+        var hasNestedTypes = repr.HasNestedTypes;
+        Builder.StartPart(new UnionPart(repr.TypeDeclaration, Builder, hasNestedTypes, isSingleCase));
 
         foreach (var unionCase in unionCases)
           if (hasNestedTypes && unionCase.HasFields)
@@ -219,9 +229,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
           else
             ProcessTypeMembers(unionCase.Fields);
       }
-
-      ProcessTypeMembers(decl.MemberDeclarations);
-      Builder.EndPart();
     }
 
     public override void VisitUnionCaseDeclaration(IUnionCaseDeclaration decl)
@@ -231,36 +238,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
-    public override void VisitTypeAbbreviationDeclaration(ITypeAbbreviationDeclaration decl)
+    public override void VisitTypeAbbreviationRepresentation(ITypeAbbreviationRepresentation repr)
     {
-      var typePart = decl.TypePartKind == PartKind.Class
-        ? (TypePart) new TypeAbbreviationOrDeclarationPart(decl, Builder)
-        : new StructTypeAbbreviationOrDeclarationPart(decl, Builder);
-      ProcessPart(typePart);
+      var decl = repr.TypeDeclaration;
+      var typePart = decl.GetSimpleTypeKindFromAttributes() == PartKind.Struct
+        ? new StructTypeAbbreviationOrDeclarationPart(decl, Builder)
+        : (TypePart) new TypeAbbreviationOrDeclarationPart(decl, Builder);
+      Builder.StartPart(typePart);
 
-      var declaredName = decl.AbbreviatedTypeOrUnionCase?.GetSourceName();
+      var declaredName = repr.AbbreviatedTypeOrUnionCase?.GetSourceName();
       if (declaredName != SharedImplUtil.MISSING_DECLARATION_NAME)
         Builder.AddDeclaredMemberName(declaredName);
     }
 
-    public override void VisitModuleAbbreviationDeclaration(IModuleAbbreviationDeclaration decl) =>
-      ProcessHiddenTypeDeclaration(decl);
-
-    public override void VisitAbstractTypeDeclaration(IAbstractTypeDeclaration decl) =>
-      ProcessHiddenTypeDeclaration(decl);
-
-    private void ProcessHiddenTypeDeclaration(IFSharpTypeDeclaration decl) =>
-      ProcessPart(new HiddenTypePart(decl, Builder));
-
-    public override void VisitObjectModelTypeDeclaration(IObjectModelTypeDeclaration decl)
+    public override void VisitModuleAbbreviationDeclaration(IModuleAbbreviationDeclaration decl)
     {
-      Builder.StartPart(CreateObjectTypePart(decl, false));
-      ProcessTypeMembers(decl.MemberDeclarations);
+      Builder.StartPart(new HiddenTypePart(decl, Builder));
       Builder.EndPart();
     }
 
-    public override void VisitDelegateDeclaration(IDelegateDeclaration decl) =>
-      ProcessPart(new DelegatePart(decl, Builder));
+    public override void VisitDelegateRepresentation(IDelegateRepresentation repr) =>
+      Builder.StartPart(new DelegatePart(repr.TypeDeclaration, Builder));
 
     public override void VisitTypeExtensionDeclaration(ITypeExtensionDeclaration typeExtension)
     {
@@ -276,9 +274,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         ProcessTypeMembers(typeExtension.MemberDeclarations);
     }
 
-    private Part CreateObjectTypePart(IFSharpTypeDeclaration decl, bool isExtension)
+    private Part CreateObjectTypePart(IFSharpTypeOrExtensionDeclaration decl, bool isExtension) =>
+      CreateObjectTypePart(decl, decl.TypePartKind, isExtension);
+
+    private Part CreateObjectTypePart(IFSharpTypeOrExtensionDeclaration decl, PartKind partKind, bool isExtension)
     {
-      switch (decl.TypePartKind)
+      switch (partKind)
       {
         case PartKind.Class:
           return isExtension ? (Part) new ClassExtensionPart(decl, Builder) : new ClassPart(decl, Builder);
@@ -301,20 +302,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
-    private void ProcessPart([NotNull] Part part)
-    {
-      Builder.StartPart(part);
-      Builder.EndPart();
-    }
-    
-    private void ProcessTypeMembers(IEnumerable<IDeclaration> declarations)
+    private void ProcessTypeMembers(IEnumerable<ITreeNode> declarations)
     {
       foreach (var declaration in declarations)
       {
-        if (!(declaration is ITypeMemberDeclaration))
+        if (!(declaration is ITypeMemberDeclaration decl))
           continue;
 
-        var declaredName = declaration.DeclaredName;
+        var declaredName = decl.DeclaredName;
         if (declaredName != SharedImplUtil.MISSING_DECLARATION_NAME)
           Builder.AddDeclaredMemberName(declaredName);
       }

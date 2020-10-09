@@ -8,6 +8,7 @@ type PartKind =
     | Struct = 1
     | Interface = 2
     | Enum = 3
+    | Delegate = 4
 
 
 [<Struct>]

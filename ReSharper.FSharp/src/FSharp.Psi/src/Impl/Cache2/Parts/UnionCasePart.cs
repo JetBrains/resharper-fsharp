@@ -15,7 +15,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       : base(declaration, ModifiersUtil.GetDecoration(declaration),
         TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty, cacheBuilder) =>
       ExtendsListShortNames =
-        declaration.GetContainingNode<IUnionDeclaration>()?.CompiledName is { } unionName
+        UnionRepresentationNavigator.GetByUnionCase(declaration) is { } repr && 
+        FSharpTypeDeclarationNavigator.GetByTypeRepresentation(repr) is { } decl &&
+        decl.CompiledName is { } unionName
           ? new[] {cacheBuilder.Intern(unionName)}
           : EmptyArray<string>.Instance;
 

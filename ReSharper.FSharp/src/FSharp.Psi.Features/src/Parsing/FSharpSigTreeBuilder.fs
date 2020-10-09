@@ -90,30 +90,32 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
         | _ -> ()
 
-    member x.ProcessTypeSignature(TypeDefnSig(ComponentInfo(attrs, typeParams, constraints, lid, _, _, _, _), typeSig, memberSigs, range)) =
+    member x.ProcessTypeSignature(TypeDefnSig(info, repr, memberSigs, range)) =
+        let (ComponentInfo(attrs, typeParams, constraints, lid, _, _, _, _)) = info
+
         let mark = x.StartType attrs typeParams constraints lid range
-        let elementType =
-            match typeSig with
-            | SynTypeDefnSigRepr.Simple(simpleRepr, _) ->
-                x.ProcessSimpleTypeRepresentation(simpleRepr)
+        match repr with
+        | SynTypeDefnSigRepr.Simple(simpleRepr, _) ->
+            x.ProcessSimpleTypeRepresentation(simpleRepr)
 
-            | SynTypeDefnSigRepr.Exception _ ->
-                ElementType.EXCEPTION_DECLARATION
-
-            | SynTypeDefnSigRepr.ObjectModel(kind, members, _) ->
+        | SynTypeDefnSigRepr.ObjectModel(kind, members, _) ->
+            if x.AddObjectModelTypeReprNode(kind) then
+                let mark = x.Mark(range)
                 for memberSig in members do
                     x.ProcessTypeMemberSignature(memberSig)
 
-                match kind with
-                | TyconClass -> ElementType.CLASS_DECLARATION
-                | TyconInterface -> ElementType.INTERFACE_DECLARATION
-                | TyconStruct -> ElementType.STRUCT_DECLARATION
-                | TyconAugmentation -> ElementType.TYPE_EXTENSION_DECLARATION
-                | _ -> ElementType.OBJECT_TYPE_DECLARATION
+                let elementType = x.GetObjectModelTypeReprElementType(kind)
+                x.Done(range, mark, elementType)
+            else
+                for memberSig in members do
+                    x.ProcessTypeMemberSignature(memberSig)
+
+        | _ -> failwithf "Unexpected simple type representation: %A" repr
 
         for memberSig in memberSigs do
             x.ProcessTypeMemberSignature(memberSig)
-        x.Done(range, mark, elementType)
+
+        x.Done(range, mark, ElementType.F_SHARP_TYPE_DECLARATION)
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with

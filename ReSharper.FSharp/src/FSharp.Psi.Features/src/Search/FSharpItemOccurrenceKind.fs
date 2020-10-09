@@ -86,7 +86,7 @@ type FSharpItemOccurenceKindProvider() =
                 if isNotNull (CastExprNavigator.GetByTypeUsage(namedTypeUsage)) then
                     [| CSharpSpecificOccurrenceKinds.TypeConversions |] :> _ else
 
-                if isNotNull (TypeAbbreviationDeclarationNavigator.GetByAbbreviatedType(namedTypeUsage)) then
+                if isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(namedTypeUsage)) then
                     [| FSharpOccurrenceKinds.typeAbbreviation |] :> _ else
 
                 if isNotNull (TypeArgumentListNavigator.GetByType(namedTypeUsage)) ||

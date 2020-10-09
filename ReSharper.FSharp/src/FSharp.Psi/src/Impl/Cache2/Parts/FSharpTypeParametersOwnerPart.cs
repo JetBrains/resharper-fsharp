@@ -9,7 +9,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal abstract class FSharpTypeParametersOwnerPart<T> : FSharpTypePart<T> where T : class, IFSharpTypeDeclaration
+  internal abstract class FSharpTypeParametersOwnerPart<T> : FSharpTypePart<T> where T : class, IFSharpTypeOldDeclaration
   {
     private readonly string[] myTypeParameterNames;
 
@@ -67,7 +67,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public override IDeclaration GetTypeParameterDeclaration(int index) =>
-      index < TypeParameterNumber && GetDeclaration() is IFSharpTypeDeclaration declaration
+      index < TypeParameterNumber && GetDeclaration() is IFSharpTypeOldDeclaration declaration
         ? declaration.TypeParameters[index]
         : null;
 

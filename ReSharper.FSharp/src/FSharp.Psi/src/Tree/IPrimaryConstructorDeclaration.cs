@@ -2,7 +2,7 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IImplicitConstructorDeclaration : ITypeMemberDeclaration, IFSharpDeclaration
+  public partial interface IPrimaryConstructorDeclaration : ITypeMemberDeclaration, IFSharpDeclaration
   {
   }
 }

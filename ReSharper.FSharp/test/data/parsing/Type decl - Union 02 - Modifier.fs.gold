@@ -4,7 +4,7 @@ IFSharpImplFile
     ITypeDeclarationGroup
       FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      IUnionDeclaration
+      IFSharpTypeDeclaration
         FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)

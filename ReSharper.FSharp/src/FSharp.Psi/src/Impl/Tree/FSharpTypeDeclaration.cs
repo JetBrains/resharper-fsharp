@@ -2,17 +2,23 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class EnumDeclaration
+  internal partial class FSharpTypeDeclaration
   {
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(AllAttributes);
     public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
 
     public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
-      EnumMembers.Cast<ITypeMemberDeclaration, IEnumMemberDeclaration>();
+      TypeRepresentation is { } repr
+        ? base.MemberDeclarations.Prepend(repr.GetMemberDeclarations()).ToIReadOnlyList()
+        : base.MemberDeclarations;
 
-    public override PartKind TypePartKind => PartKind.Enum;
+    public override PartKind TypePartKind =>
+      TypeRepresentation is { } repr
+        ? repr.TypePartKind
+        : this.GetTypeKind();
   }
 }

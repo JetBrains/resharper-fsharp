@@ -16,8 +16,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (caseDeclaration.FieldsEnumerable.IsEmpty())
         return MemberDecoration.FromModifiers(Modifiers.INTERNAL);
 
-      return caseDeclaration.GetContainingTypeDeclaration() is IUnionDeclaration unionDeclaration
-        ? GetDecoration(unionDeclaration.AccessModifier, TreeNodeCollection<IAttribute>.Empty)
+      return UnionRepresentationNavigator.GetByUnionCase(caseDeclaration) is var repr &&
+             FSharpTypeDeclarationNavigator.GetByTypeRepresentation(repr) is { } decl
+        ? GetDecoration(decl.AccessModifier, TreeNodeCollection<IAttribute>.Empty)
         : MemberDecoration.DefaultValue;
     }
 

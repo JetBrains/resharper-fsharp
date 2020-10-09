@@ -10,7 +10,7 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal abstract class FSharpClassLikePart<T> : FSharpTypeParametersOwnerPart<T>, IFSharpClassLikePart
-    where T : class, IFSharpTypeDeclaration
+    where T : class, IFSharpTypeOldDeclaration
   {
     private bool? myHasPublicDefaultCtor;
 

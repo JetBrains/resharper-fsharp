@@ -221,7 +221,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       clrName.Append(declaration.CompiledName);
 
-      var typeDeclaration = declaration as IFSharpTypeDeclaration;
+      var typeDeclaration = declaration as IFSharpTypeOldDeclaration;
       if (typeDeclaration?.TypeParameters.Count > 0)
         clrName.Append("`" + typeDeclaration.TypeParameters.Count);
 
@@ -278,7 +278,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       switch (declaration)
       {
-        case IFSharpTypeDeclaration typeDeclaration:
+        case IFSharpTypeOldDeclaration typeDeclaration:
           return typeDeclaration.AllAttributes;
         case IMemberDeclaration memberDeclaration:
           return memberDeclaration.Attributes;
@@ -460,6 +460,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return AccessRights.PUBLIC;
     }
 
+    // todo: hidden by signature in fsi
+    public static AccessRights GetRepresentationAccessRights([NotNull] this IFSharpTypeDeclaration declaration) =>
+      declaration.TypeRepresentation is ISimpleTypeRepresentation repr
+        ? ModifiersUtil.GetAccessRights(repr.AccessModifier)
+        : AccessRights.PUBLIC;
+
+    public static PartKind GetSimpleTypeKindFromAttributes(this IFSharpTypeDeclaration decl) => 
+      GetTypeKind(decl.AllAttributes, out var kind) ? kind : PartKind.Class; // todo struct or class only
+
     public static bool GetTypeKind(TreeNodeCollection<IAttribute> attributes, out PartKind fSharpPartKind)
     {
       foreach (var attr in attributes)
@@ -490,13 +499,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return false;
     }
 
+    public static PartKind GetTypeKind([NotNull] this IFSharpTypeDeclaration declaration)
+    {
+      if (GetTypeKind(declaration.AllAttributes, out var typeKind))
+        return typeKind;
+
+      foreach (var member in declaration.TypeMembersEnumerable)
+        if (!(member is IInterfaceInherit) && !(member is IAbstractMemberDeclaration))
+          return PartKind.Class;
+
+      return PartKind.Interface;
+    }
+
     [NotNull]
     public static TypeAugmentation GetTypeAugmentationInfo([NotNull] ITypeExtensionDeclaration declaration)
     {
       var extensionNameInfo = new NameAndParametersCount(declaration.SourceName, declaration.TypeParameters.Count);
       var declaredTypeNames = new Dictionary<NameAndParametersCount, TypeAugmentation>();
 
-      void RecordName(IFSharpTypeDeclaration typeDeclaration)
+      void RecordName(IFSharpTypeOldDeclaration typeDeclaration)
       {
         var sourceName = typeDeclaration.SourceName;
         if (sourceName == SharedImplUtil.MISSING_DECLARATION_NAME)
@@ -551,7 +572,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return false;
     }
     
-    public static bool HasAttribute([NotNull] this IFSharpTypeDeclaration typeDeclaration, [NotNull] string shortName) =>
+    public static bool HasAttribute([NotNull] this IFSharpTypeOldDeclaration typeDeclaration, [NotNull] string shortName) =>
       HasAttribute(typeDeclaration.AllAttributes, shortName);
 
     public static void ReplaceIdentifier([CanBeNull] this IFSharpIdentifierLikeNode fsIdentifier, string name)

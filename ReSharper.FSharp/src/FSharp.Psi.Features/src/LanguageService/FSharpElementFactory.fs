@@ -46,7 +46,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
     let getTypeDecl memberSource =
         let source = "type T =\n  " + memberSource
         let moduleMember = getModuleMember source
-        moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations.[0] :?> IObjectTypeDeclaration
+        moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations.[0] :?> IFSharpTypeDeclaration
 
     let getDoDecl source =
         let moduleMember = getModuleMember source
@@ -316,7 +316,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateTypeReferenceName(name) =
             let source = sprintf "type T = %s" name
             let typeDeclarationGroup = getModuleMember source :?> ITypeDeclarationGroup
-            let typeAbbreviation = typeDeclarationGroup.TypeDeclarations.[0].As<ITypeAbbreviationDeclaration>()
+            let typeDeclaration = typeDeclarationGroup.TypeDeclarations.[0].As<IFSharpTypeDeclaration>()
+            let typeAbbreviation = typeDeclaration.TypeRepresentation.As<ITypeAbbreviationRepresentation>()
             typeAbbreviation.AbbreviatedType.As<INamedTypeUsage>().ReferenceName
 
         member x.CreateEmptyAttributeList() =

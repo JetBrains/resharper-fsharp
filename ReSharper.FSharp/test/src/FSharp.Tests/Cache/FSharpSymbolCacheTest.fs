@@ -36,6 +36,8 @@ type FSharpSymbolCacheTest() =
     [<Test>] member x.``Namespace 04 - Multiple``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 05 - Multiple qualifiers``() = x.DoNamedTest()
 
+    [<Test>] member x.``Class 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Interface 01 - Explicit``() = x.DoNamedTest()
     [<Test>] member x.``Interface 02 - Attribute``() = x.DoNamedTest()
 
@@ -66,13 +68,16 @@ type FSharpSymbolCacheTest() =
     [<Test>] member x.``Union - Struct 01 - Empty cases``() = x.DoNamedTest()
     [<Test>] member x.``Union - Struct 02 - Cases with fields``() = x.DoNamedTest()
     [<Test>] member x.``Union - Struct 03 - Mixed``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Struct 04 - Empty case``() = x.DoNamedTest()
 
     [<Test>] member x.``Abbreviations - Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Abbreviations - Module 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
 
-    override x.DoTest(lifetime: Lifetime, project: IProject) =
+    [<Test>] member x.``Extension 01``() = x.DoNamedTest()
+    
+    override x.DoTest(_: Lifetime, _: IProject) =
         let psiServices = x.Solution.GetPsiServices()
         psiServices.Files.CommitAllDocuments()
         x.ExecuteWithGold(fun writer ->

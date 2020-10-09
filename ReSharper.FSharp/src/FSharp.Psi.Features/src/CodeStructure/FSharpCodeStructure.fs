@@ -40,23 +40,33 @@ type FSharpCodeStructureProvider() =
             for memberDeclaration in moduleLikeDeclaration.Members do
                 processNode memberDeclaration parent
 
-        | :? IUnionDeclaration as unionDecl ->
-            let cases = Seq.cast unionDecl.UnionCases
-            processTypeDeclaration unionDecl cases parent
+        | :? IFSharpTypeDeclaration as typeDecl ->
+            match typeDecl.TypeRepresentation with
+            | :? IUnionRepresentation as unionDecl ->
+                let cases = Seq.cast unionDecl.UnionCases
+                processTypeDeclaration typeDecl cases parent
+
+            | :? IRecordRepresentation as recordDecl ->
+                let fields = Seq.cast recordDecl.FieldDeclarations 
+                processTypeDeclaration typeDecl fields parent
+
+            | _ ->
+                let ctor =
+                    match typeDecl.PrimaryConstructorDeclaration with
+                    | null -> Seq.empty
+                    | ctorDecl -> Seq.singleton ctorDecl |> Seq.cast
+
+                processTypeDeclaration typeDecl ctor parent
 
         | :? IUnionCaseLikeDeclaration as caseDecl ->
             FSharpDeclarationCodeStructureElement(parent, caseDecl) |> ignore
-
-        | :? IRecordDeclaration as recordDecl ->
-            let fields = Seq.cast recordDecl.FieldDeclarations 
-            processTypeDeclaration recordDecl fields parent
 
         | :? ITypeExtensionDeclaration as extensionDecl when not extensionDecl.IsTypePartDeclaration ->
             let parent = NamedIdentifierOwner(extensionDecl, parent, typeExtensionIconId)
             for memberDecl in  extensionDecl.TypeMembers do
                 processNode memberDecl parent
 
-        | :? IFSharpTypeDeclaration as decl ->
+        | :? IFSharpTypeOldDeclaration as decl ->
             processTypeDeclaration decl TreeNodeCollection.Empty parent
 
         | :? ITypeMemberDeclaration as typeMember ->
@@ -77,7 +87,7 @@ type FSharpCodeStructureProvider() =
 
         | _ -> ()
 
-    and processTypeDeclaration (typeDecl: IFSharpTypeDeclaration) (members: IDeclaration seq) parent =
+    and processTypeDeclaration (typeDecl: IFSharpTypeOldDeclaration) (members: IDeclaration seq) parent =
         let structureElement = FSharpDeclarationCodeStructureElement(parent, typeDecl)
         for memberDecl in members do
             processNode memberDecl structureElement

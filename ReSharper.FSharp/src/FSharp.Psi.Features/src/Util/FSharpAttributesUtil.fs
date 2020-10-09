@@ -49,7 +49,7 @@ let addAttributesList (decl: IFSharpTreeNode) addNewLine =
             Whitespace()
     ] |> ignore
 
-let getTypeDeclarationAttributeList typeDecl =
+let getTypeDeclarationAttributeList (typeDecl: #IFSharpTypeOrExtensionDeclaration) =
     let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl)
     if typeDeclarationGroup.TypeDeclarations.[0] == typeDecl then
         let attributeLists = typeDeclarationGroup.AttributeLists

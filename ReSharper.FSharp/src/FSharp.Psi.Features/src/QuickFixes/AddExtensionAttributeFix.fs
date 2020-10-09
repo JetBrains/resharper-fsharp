@@ -48,7 +48,7 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
                 addAttributesList m true
             addAttribute m.AttributeLists.[0] attribute
 
-        | :? IFSharpTypeDeclaration as t ->
+        | :? IFSharpTypeOrExtensionDeclaration as t ->
             let attributeList = getTypeDeclarationAttributeList t
             addAttribute attributeList attribute
         | _ -> ()

@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal class UnionPart : UnionPartBase, Class.IClassPart
   {
-    public UnionPart([NotNull] IUnionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder, bool hasNestedTypes,
+    public UnionPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder, bool hasNestedTypes,
       bool isSingleCase) : base(declaration, cacheBuilder, hasNestedTypes, isSingleCase)
     {
     }
@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
   internal class StructUnionPart : UnionPartBase, Struct.IStructPart
   {
-    public StructUnionPart([NotNull] IUnionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
+    public StructUnionPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
       bool isSingleCase) : base(declaration, cacheBuilder, false, isSingleCase)
     {
     }
@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       bool hasNestedTypes, bool isSingleCase) : base(declaration, cacheBuilder)
     {
       HasNestedTypes = hasNestedTypes;
-      RepresentationAccessRights = GetRepresentationAccessRights(declaration);
+      RepresentationAccessRights = declaration.GetRepresentationAccessRights();
       IsSingleCase = isSingleCase;
     }
 
@@ -82,11 +82,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       get
       {
-        if (!(GetDeclaration() is IUnionDeclaration unionDeclaration))
+        if (!(GetDeclaration() is IFSharpTypeDeclaration decl && decl.TypeRepresentation is IUnionRepresentation repr))
           return EmptyList<IUnionCase>.Instance;
 
         var result = new LocalList<IUnionCase>();
-        foreach (var memberDeclaration in unionDeclaration.UnionCases)
+        foreach (var memberDeclaration in repr.UnionCases)
           if (((ITypeMemberDeclaration) memberDeclaration).DeclaredElement is IUnionCase unionCase)
             result.Add(unionCase);
 
@@ -95,25 +95,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public TreeNodeCollection<IUnionCaseDeclaration> CaseDeclarations =>
-      GetDeclaration() is IUnionDeclaration declaration
-        ? declaration.UnionCases
+      GetDeclaration() is IFSharpTypeDeclaration decl && decl.TypeRepresentation is IUnionRepresentation repr
+        ? repr.UnionCases
         : TreeNodeCollection<IUnionCaseDeclaration>.Empty;
-
-    // todo: hidden by signature in fsi
-    private static AccessRights GetRepresentationAccessRights([NotNull] IFSharpTypeDeclaration declaration) =>
-      declaration is IUnionDeclaration unionDeclaration
-        ? ModifiersUtil.GetAccessRights(unionDeclaration.UnionRepresentation.AccessModifier)
-        : AccessRights.PUBLIC;
 
 
     public override IEnumerable<ITypeMember> GetTypeMembers()
     {
-      if (HasNestedTypes || !(GetDeclaration() is IUnionDeclaration declaration))
+      if (HasNestedTypes || !(GetDeclaration() is IFSharpTypeDeclaration decl && decl.TypeRepresentation is IUnionRepresentation repr))
         return base.GetTypeMembers();
 
       var fields = new FrugalLocalList<ITypeMember>();
 
-      foreach (var caseDecl in declaration.UnionCasesEnumerable)
+      foreach (var caseDecl in repr.UnionCasesEnumerable)
         foreach (var fieldDeclaration in caseDecl.FieldsEnumerable)
           if (fieldDeclaration.DeclaredElement is { } field)
             fields.Add(field);

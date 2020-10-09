@@ -50,7 +50,13 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
         let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
 
         let interfaceType =
-            let typeDeclaration = ObjectTypeDeclarationNavigator.GetByTypeMember(impl)
+            let typeDeclaration =
+                match FSharpTypeDeclarationNavigator.GetByTypeMember(impl) with
+                | null ->
+                    let repr = ObjectModelTypeRepresentationNavigator.GetByTypeMember(impl)
+                    FSharpTypeDeclarationNavigator.GetByTypeRepresentation(repr)
+                | decl -> decl
+
             let fcsEntity = typeDeclaration.GetFSharpSymbol() :?> FSharpEntity
             fcsEntity.DeclaredInterfaces |> Seq.find (fun e ->
                 e.HasTypeDefinition && e.TypeDefinition.IsEffectivelySameAs(impl.FcsEntity))

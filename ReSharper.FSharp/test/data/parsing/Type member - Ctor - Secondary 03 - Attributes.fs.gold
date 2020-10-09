@@ -4,9 +4,9 @@ IFSharpImplFile
     ITypeDeclarationGroup
       FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      IObjectTypeDeclaration
+      IFSharpTypeDeclaration
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
-        IImplicitConstructorDeclaration
+        IPrimaryConstructorDeclaration
           IParametersPatternDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()

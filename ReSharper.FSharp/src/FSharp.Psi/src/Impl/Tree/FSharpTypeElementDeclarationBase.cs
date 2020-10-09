@@ -126,7 +126,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        if (!(this is IFSharpTypeDeclaration typeDeclaration))
+        if (!(this is IFSharpTypeOrExtensionDeclaration typeDeclaration))
           return TreeNodeCollection<IAttribute>.Empty;
 
         var attributes = typeDeclaration.Attributes;
@@ -155,7 +155,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       var module =
         ModuleLikeDeclarationNavigator.GetByMember(
-          this as IModuleMember ?? TypeDeclarationGroupNavigator.GetByTypeDeclaration(this as IFSharpTypeDeclaration));
+          this as IModuleMember ?? 
+          TypeDeclarationGroupNavigator.GetByTypeDeclaration(this as IFSharpTypeOrExtensionDeclaration));
 
       if (module == null)
         return;

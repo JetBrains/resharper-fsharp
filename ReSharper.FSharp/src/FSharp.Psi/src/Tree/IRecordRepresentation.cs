@@ -3,7 +3,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IRecordDeclaration
+  public partial interface IRecordRepresentation
   {
     IList<ITypeOwner> GetFields();
   }
