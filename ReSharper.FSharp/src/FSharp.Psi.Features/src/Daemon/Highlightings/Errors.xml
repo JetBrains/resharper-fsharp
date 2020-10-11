@@ -178,7 +178,14 @@
     <QuickFix>SimplifyLambdaFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplaced">
+  <Warning staticGroup="FSharpErrors" name="LambdaBodyCanBeReplacedWithId">
+    <Parameter type="ILambdaExpr" name="lambda"/>
+    <Range>lambda.GetHighlightingRange()</Range>
+    <Message value="Lambda body can be replaced with 'id'"/>
+    <QuickFix>ReplaceLambdaBodyWithIdFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplacedWithInnerExpression">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
@@ -193,7 +200,7 @@
     <Parameter type="string" name="opName"/>
     <Range>lambda.GetHighlightingRange()</Range>
     <Message value="{0}">
-      <Argument>getLambdaCanBeReplacedWithOperatorWarningText lambda opName</Argument>
+      <Argument>sprintf "Lambda can be replaced with '%s'" opName</Argument>
     </Message>
     <QuickFix>ReplaceLambdaWithOperatorFix</QuickFix>
   </Warning>

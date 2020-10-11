@@ -8,7 +8,7 @@ open NUnit.Framework
 type ReplaceLambdaWithInnerExpressionTest() =
     inherit FSharpQuickFixTestBase<ReplaceLambdaWithInnerExpressionFix>()
 
-    override x.RelativeTestDataPath = "features/quickFixes/replaceLambda"
+    override x.RelativeTestDataPath = "features/quickFixes/replaceLambdaWithInnerExpression"
 
     [<Test>] member x.``Reference``() = x.DoNamedTest()
     [<Test>] member x.``Partial application``() = x.DoNamedTest()
@@ -21,7 +21,7 @@ type ReplaceLambdaWithInnerExpressionTest() =
 type ReplaceLambdaWithInnerExpressionAvailabilityTest() =
     inherit QuickFixAvailabilityTestBase()
 
-    override x.RelativeTestDataPath = "features/quickFixes/replaceLambda"
+    override x.RelativeTestDataPath = "features/quickFixes/replaceLambdaWithInnerExpression"
 
     [<Test>] member x.``Text - Replace lambda with reference``() = x.DoNamedTest()
     [<Test>] member x.``Text - Replace lambda with qualified reference``() = x.DoNamedTest()

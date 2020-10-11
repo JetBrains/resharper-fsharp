@@ -108,10 +108,3 @@ let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
     | :? IReferenceExpr as x when isSimpleQualifiedName x ->
         sprintf "Lambda can be replaced with '%s'" x.QualifiedName
     | _ -> "Lambda can be simplified"
-
-let replaceLambdaBodyWithId (lambda: ILambdaExpr) opName =
-    opName = "id" && not (lambda.PatternsEnumerable.CountIs(1))
-
-let getLambdaCanBeReplacedWithOperatorWarningText (lambda: ILambdaExpr) opName =
-    if replaceLambdaBodyWithId lambda opName then "Lambda body can be replaced with 'id'"
-    else sprintf "Lambda can be replaced with '%s'" opName

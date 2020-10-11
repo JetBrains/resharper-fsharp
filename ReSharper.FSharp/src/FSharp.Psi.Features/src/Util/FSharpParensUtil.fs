@@ -186,3 +186,8 @@ let addParens (expr: IFSharpExpression) =
 let addParensIfNeeded (expr: IFSharpExpression) =
     if not (needsParens expr expr) then expr else
     addParens expr
+
+
+let tryGetParentParens expr =
+    let paren = ParenExprNavigator.GetByInnerExpression(expr)
+    if isNotNull paren then paren :> IFSharpExpression else expr :> _
