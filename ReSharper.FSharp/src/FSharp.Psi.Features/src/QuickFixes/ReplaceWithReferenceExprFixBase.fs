@@ -12,8 +12,8 @@ type ReplaceWithReferenceExprFixBase(expr: IFSharpExpression, refExprName, refEx
     inherit FSharpQuickFixBase()
     
     abstract member ResolveContext: ITreeNode
-    abstract member AdditionalExecute: unit -> unit
-    default x.AdditionalExecute() = ()
+    abstract member BeforeReplaceExecute: unit -> unit
+    default x.BeforeReplaceExecute() = ()
     
     member x.ExprToReplace = expr
 
@@ -28,5 +28,5 @@ type ReplaceWithReferenceExprFixBase(expr: IFSharpExpression, refExprName, refEx
         use disableFormatter = new DisableCodeFormatter()
         let factory = expr.CreateElementFactory()
 
-        x.AdditionalExecute()
+        x.BeforeReplaceExecute()
         replace expr (factory.CreateReferenceExpr(refExprName))

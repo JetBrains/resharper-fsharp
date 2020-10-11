@@ -17,7 +17,7 @@ type ReplaceLambdaWithOperatorFix(warning: LambdaCanBeReplacedWithOperatorWarnin
     override x.ResolveContext = lambda.RArrow :> _
     override x.Text = sprintf "Replace lambda with '%s'" op
 
-    override x.AdditionalExecute() =
+    override x.BeforeReplaceExecute() =
         let prevToken = x.ExprToReplace.GetPreviousToken()
         let nextToken = x.ExprToReplace.GetNextToken()
 

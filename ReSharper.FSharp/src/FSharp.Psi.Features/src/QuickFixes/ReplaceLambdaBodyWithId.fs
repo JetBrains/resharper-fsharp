@@ -11,4 +11,4 @@ type ReplaceLambdaBodyWithIdFix(warning: LambdaBodyCanBeReplacedWithIdWarning) =
 
     override x.ResolveContext = lambda.RArrow :> _
     override x.Text = "Replace lambda body with 'id'"
-    override _.AdditionalExecute() = deletePatternsFromEnd lambda 1
+    override _.BeforeReplaceExecute() = deletePatternsFromEnd lambda 1
