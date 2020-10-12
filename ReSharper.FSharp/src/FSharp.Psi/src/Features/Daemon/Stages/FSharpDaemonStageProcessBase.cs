@@ -26,6 +26,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
       SeldomInterruptChecker = new SeldomInterruptCheckerWithCheckTime(InterruptCheckTime);
     }
 
+    public void CheckForInterrupt()
+    {
+      if (DaemonProcess.InterruptFlag)
+        throw new OperationCanceledException();
+    }
+
     public IDaemonProcess DaemonProcess { get; }
     public abstract void Execute(Action<DaemonStageResult> committer);
   }

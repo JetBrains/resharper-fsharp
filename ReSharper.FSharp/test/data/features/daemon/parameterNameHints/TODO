@@ -1,0 +1,28 @@
+!!! Are we annotating many times over?
+!!! (1) may be annotated several times in:
+    ((((f 1) 2) 3) 4)
+    When we hit the outer IPrefixAppExpr, are we still recursing?
+
+Extension methods
+Attributes
+Complex param groups, e.g:
+
+    m.Foo(1,2) "hi"
+
+    let x = (1,2)
+    m.Foo x "hi"
+
+## Settings
+
+JetBrains.ReSharper.Feature.Services.ParameterNameHints.ParameterNameHintsOptions
+- ShowParameterNameHints
+- HideForNonLiterals
+
+Constants/enum members [ShowForConstantsAndEnumMembers]
+?? Lambda expressions/anonymous methods [ShowForLambdaExpressions]
+?? Array/anonymous object creation expressions [ShowForUnclearCreationExpression]
+?? Method invocations (is this Foo.Invoke?) [ShowForMethodInvocations]
+
+Builder methods [HideForBuilderLikeMethods]
+Hide if intention of first parameter is clear from method name [HideIfIntentionOfFirstParameterIsClearFromMethodName]
+Hide if intention of argument is clear from usage [HideIfIntentionOfArgumentIsClearFromUsage]

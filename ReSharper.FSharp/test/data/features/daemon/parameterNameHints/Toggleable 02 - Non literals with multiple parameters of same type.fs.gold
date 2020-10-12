@@ -1,0 +1,29 @@
+﻿ShowForNonLiteralsInCaseOfMultipleParametersWithSameName = True
+module Mod
+
+let func (i: int, a: string, b: string, c: string, j: int, k: bool) = ()    
+let test () =
+    let i = 15
+    let b = true
+    let x, y, z = "", "", ""
+    func(i, ||(0)x, ||(1)y, ||(2)z, ||(3)12, b)
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: a, Mod.func
+(1): ReSharper Parameter Name Hint: b, Mod.func
+(2): ReSharper Parameter Name Hint: c, Mod.func
+(3): ReSharper Parameter Name Hint: j, Mod.func
+
+================
+ShowForNonLiteralsInCaseOfMultipleParametersWithSameName = False
+module Mod
+
+let func (i: int, a: string, b: string, c: string, j: int, k: bool) = ()    
+let test () =
+    let i = 15
+    let b = true
+    let x, y, z = "", "", ""
+    func(i, x, y, z, ||(0)12, b)
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: j, Mod.func
