@@ -195,14 +195,14 @@
     <QuickFix>ReplaceLambdaWithInnerExpressionFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplacedWithOperator">
+  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplacedWithBuiltinFunction">
     <Parameter type="ILambdaExpr" name="lambda"/>
-    <Parameter type="string" name="opName"/>
+    <Parameter type="string" name="funName"/>
     <Range>lambda.GetHighlightingRange()</Range>
     <Message value="{0}">
-      <Argument>sprintf "Lambda can be replaced with '%s'" opName</Argument>
+      <Argument>sprintf "Lambda can be replaced with '%s'" funName</Argument>
     </Message>
-    <QuickFix>ReplaceLambdaWithOperatorFix</QuickFix>
+    <QuickFix>ReplaceLambdaWithBuiltinFunctionFix</QuickFix>
   </Warning>
 
 </Errors>

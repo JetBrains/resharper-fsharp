@@ -16,7 +16,7 @@ type LambdaAnalyzerTest() =
         | :? LambdaCanBeSimplifiedWarning
         | :? LambdaCanBeReplacedWithInnerExpressionWarning
         | :? LambdaBodyCanBeReplacedWithIdWarning
-        | :? LambdaCanBeReplacedWithOperatorWarning -> true
+        | :? LambdaCanBeReplacedWithBuiltinFunctionWarning -> true
         | _ -> false
 
     [<Test>] member x.``Application``() = x.DoNamedTest()

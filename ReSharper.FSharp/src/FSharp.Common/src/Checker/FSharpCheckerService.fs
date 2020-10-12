@@ -155,6 +155,11 @@ type FSharpCheckerService
         let coords = offset.ToDocumentCoords()
         x.ResolveNameAtLocation(context.GetSourceFile(), List.ofSeq names, coords, opName)
 
+    member x.IsReferenceNotShadowed(context: ITreeNode, refName, refFullName, opName) =
+        match x.ResolveNameAtLocation(context, [refName], opName) with
+        | Some symbolUse -> symbolUse.Symbol.FullName = refFullName
+        | None -> true
+
 
 type FSharpParseAndCheckResults = 
     { ParseResults: FSharpParseFileResults

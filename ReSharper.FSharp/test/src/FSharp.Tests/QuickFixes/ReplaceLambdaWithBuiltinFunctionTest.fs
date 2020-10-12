@@ -5,10 +5,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-type ReplaceLambdaWithOperatorTest() =
-    inherit FSharpQuickFixTestBase<ReplaceLambdaWithOperatorFix>()
+type ReplaceLambdaWithBuiltinFunctionTest() =
+    inherit FSharpQuickFixTestBase<ReplaceLambdaWithBuiltinFunctionFix>()
 
-    override x.RelativeTestDataPath = "features/quickFixes/replaceLambdaWithOperator"
+    override x.RelativeTestDataPath = "features/quickFixes/replaceLambdaWithBuiltinFunction"
 
     [<Test>] member x.``Id 1``() = x.DoNamedTest()
     [<Test>] member x.``Id 2 - add whitespaces``() = x.DoNamedTest()
@@ -25,7 +25,7 @@ type ReplaceLambdaWithOperatorTest() =
 type ReplaceLambdaWithOperatorAvailabilityTest() =
     inherit QuickFixAvailabilityTestBase()
 
-    override x.RelativeTestDataPath = "features/quickFixes/replaceLambdaWithOperator"
+    override x.RelativeTestDataPath = "features/quickFixes/replaceLambdaWithBuiltinFunction"
 
     [<Test>] member x.``Text - Replace lambda with id``() = x.DoNamedTest()
     [<Test>] member x.``Text - Replace lambda with fst``() = x.DoNamedTest()
