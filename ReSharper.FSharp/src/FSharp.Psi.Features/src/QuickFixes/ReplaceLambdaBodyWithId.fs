@@ -16,8 +16,7 @@ type ReplaceLambdaBodyWithIdFix(warning: LambdaBodyCanBeReplacedWithIdWarning) =
 
     override x.IsAvailable _ =
         isValid expr &&
-        isReferenceNotShadowed (lambda.CheckerService, lambda.RArrow, "id",
-                                "Microsoft.FSharp.Core.Operators.id", "ReplaceLambdaBodyWithIdFix")
+        not (isPredefinedFunctionShadowed lambda.RArrow "id" "ReplaceLambdaBodyWithIdFix")
 
     override x.Text = "Replace lambda body with 'id'"
 

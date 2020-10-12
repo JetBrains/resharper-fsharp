@@ -2,8 +2,8 @@
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -83,7 +83,12 @@ let mayShadowPartially (newExpr: ITreeNode) (data: ElementProblemAnalyzerData) (
     |> Seq.toArray
     |> OpenScope.inAnyScope newExpr
 
-let isReferenceNotShadowed(checker: FSharpCheckerService, context, name, symbolFullName, opName) =
-    match checker.ResolveNameAtLocation(context, [name], opName) with
-    | Some symbolUse -> symbolUse.Symbol.FullName = symbolFullName
-    | None -> true
+let isPredefinedFunctionShadowed (context: ITreeNode) name opName =
+    let checkerService = context.GetContainingFile().As<IFSharpFile>().CheckerService
+    match checkerService.ResolveNameAtLocation(context, [name], opName) with
+    | Some symbolUse ->
+        let symbol = symbolUse.Symbol
+        match predefinedFunctionTypes.TryGetValue(symbol.DisplayName) with
+        | true, fullName -> (fullName.FullName + "." + symbol.DisplayName) <> symbol.FullName
+        | _ -> false
+    | None -> false

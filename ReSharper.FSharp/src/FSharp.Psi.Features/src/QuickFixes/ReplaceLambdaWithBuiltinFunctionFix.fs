@@ -19,8 +19,7 @@ type ReplaceLambdaWithBuiltinFunctionFix(warning: LambdaCanBeReplacedWithBuiltin
 
     override x.IsAvailable _ =
         isValid exprToReplace &&
-        isReferenceNotShadowed (lambda.CheckerService, lambda.RArrow, funName,
-                                sprintf "Microsoft.FSharp.Core.Operators.%s" funName, "ReplaceLambdaWithBuiltinFunctionFix")
+        not (isPredefinedFunctionShadowed lambda.RArrow funName "ReplaceLambdaWithBuiltinFunctionFix")
 
     override x.Text = sprintf "Replace lambda with '%s'" funName
 
