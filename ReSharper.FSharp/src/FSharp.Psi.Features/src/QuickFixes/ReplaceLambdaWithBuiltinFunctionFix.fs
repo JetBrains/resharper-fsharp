@@ -3,6 +3,7 @@
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -18,8 +19,8 @@ type ReplaceLambdaWithBuiltinFunctionFix(warning: LambdaCanBeReplacedWithBuiltin
 
     override x.IsAvailable _ =
         isValid exprToReplace &&
-        lambda.CheckerService.IsReferenceNotShadowed
-            (lambda.RArrow, funName, sprintf "Microsoft.FSharp.Core.Operators.%s" funName, "ReplaceLambdaWithBuiltinFunctionFix")
+        isReferenceNotShadowed (lambda.CheckerService, lambda.RArrow, funName,
+                                sprintf "Microsoft.FSharp.Core.Operators.%s" funName, "ReplaceLambdaWithBuiltinFunctionFix")
 
     override x.Text = sprintf "Replace lambda with '%s'" funName
 

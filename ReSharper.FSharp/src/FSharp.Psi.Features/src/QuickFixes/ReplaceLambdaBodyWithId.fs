@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpLambdaUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
@@ -15,8 +16,8 @@ type ReplaceLambdaBodyWithIdFix(warning: LambdaBodyCanBeReplacedWithIdWarning) =
 
     override x.IsAvailable _ =
         isValid expr &&
-        expr.CheckerService.IsReferenceNotShadowed
-            (lambda.RArrow, "id", sprintf "Microsoft.FSharp.Core.Operators.id", "ReplaceLambdaBodyWithIdFix")
+        isReferenceNotShadowed (lambda.CheckerService, lambda.RArrow, "id",
+                                "Microsoft.FSharp.Core.Operators.id", "ReplaceLambdaBodyWithIdFix")
 
     override x.Text = "Replace lambda body with 'id'"
 
