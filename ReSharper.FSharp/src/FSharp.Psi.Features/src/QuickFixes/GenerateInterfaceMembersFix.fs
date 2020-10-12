@@ -27,7 +27,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
         |> Seq.filter (fun t -> t.HasTypeDefinition)
         |> Seq.map (fun t ->
             let fcsEntity = t.TypeDefinition
-            fcsEntity, Seq.zip fcsEntity.GenericParameters fcsType.GenericArguments |> Seq.toList)
+            fcsEntity, Seq.zip fcsEntity.GenericParameters t.GenericArguments |> Seq.toList)
 
     let mutable nextUnnamedVariableNumber = 0
     let getUnnamedVariableName () =
