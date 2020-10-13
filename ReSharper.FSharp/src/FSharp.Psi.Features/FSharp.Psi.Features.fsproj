@@ -75,8 +75,7 @@
     <Compile Include="src\Daemon\Analyzers\RedundantParenExprAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantParenPatAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\InactivePreprocessorBranchAnalyzer.fs" />
-    <Compile Include="src\Daemon\Analyzers\RedundantAttributeParensAnalyzer.fs" />
-    <Compile Include="src\Daemon\Analyzers\RedundantAttributeSuffixAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\AttributeRedundanciesAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\ColorReferenceAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantQualifierAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantUnionCaseFieldPatsAnalyzer.fs" />
