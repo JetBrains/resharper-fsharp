@@ -1019,7 +1019,6 @@ type FSharpProjectItem =
         let (UnixSeparators path) = x.RelativePhysicalPath
         sprintf "%s (from %s)" name path
 
-[<RequireQualifiedAccess>]
 type FSharpProjectItemType =
     | File = 0
     | Folder = 1

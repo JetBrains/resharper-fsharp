@@ -69,6 +69,7 @@
     <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\AttributeTargetAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\ExtensionAttributeAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\RequireQualifiedAccessAttributeAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantBackticksAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantNew.fs" />
     <Compile Include="src\Daemon\Analyzers\LetDisposableAnalyzer.fs" />

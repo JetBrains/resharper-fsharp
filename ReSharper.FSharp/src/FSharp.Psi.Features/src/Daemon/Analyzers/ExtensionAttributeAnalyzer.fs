@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
@@ -18,18 +19,8 @@ type ExtensionAttributeAnalyzer() =
         typeElement.EnumerateParts()
         |> Seq.exists (fun p -> p.ExtensionMethodInfos.Length > 0)
 
-    let isExtension (attr: IAttribute) =
-        let reference = attr.ReferenceName.Reference
-        if isNull reference then false else
-
-        // todo: we should also account type abbreviations in future
-        let referenceName = reference.GetName()
-        if referenceName <> "Extension" && referenceName <> "ExtensionAttribute" then false else
-
-        let attributeTypeElement = reference.Resolve().DeclaredElement.As<ITypeElement>()
-        if isNull attributeTypeElement then false else
-
-        attributeTypeElement.GetClrName() = PredefinedType.EXTENSION_ATTRIBUTE_CLASS
+    let isExtension attr =
+        FSharpAttributesUtil.resolvesToType PredefinedType.EXTENSION_ATTRIBUTE_CLASS attr
 
     override x.Run(typeDeclaration, _, consumer) =
         match typeDeclaration.DeclaredElement.As<TypeElement>() with

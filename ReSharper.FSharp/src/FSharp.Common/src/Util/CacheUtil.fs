@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Util
 
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 
-[<RequireQualifiedAccess>]
 type PartKind =
     | Class = 0
     | Struct = 1

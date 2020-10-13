@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
+[<TestPackages("FSharp.Core")>]
 type ErrorsHighlightingTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -37,6 +38,8 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Undefined indexer 01``() = x.DoNamedTest()
     [<Test>] member x.``Undefined indexer 02 - Undefined id``() = x.DoNamedTest()
     [<Test>] member x.``Undefined indexer 03 - Item Id``() = x.DoNamedTest()
+
+    [<Test>] member x.``Enum Rqa analyzer 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Extension analyzer``() = x.DoNamedTest()
     

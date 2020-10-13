@@ -49,6 +49,10 @@
         <Title>Redundant application</Title>
         <Description>Application is redundant and can be replaced with its argument.</Description>
       </Tag>
+      <Tag name="FSharpRedundantRequireQualifiedAccessAttribute" default="WARNING">
+        <Title>Redundant RequireQualifiedAccess attribute</Title>
+        <Description>Enum type always requires qualified access.</Description>
+      </Tag>
     </Group>
   </SeverityConfiguration>
 
@@ -84,6 +88,13 @@
     <Range>attr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Extension member should be static"/>
+  </Warning>
+
+  <Warning name="RedundantRequireQualifiedAccessAttribute" configurableSeverity="FSharpRedundantRequireQualifiedAccessAttribute">
+    <Parameter type="IAttribute" name="attr"/>
+    <Range>attr.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant RequireQualifiedAccess attribute"/>
   </Warning>
 
   <Warning name="RedundantBackticks" configurableSeverity="FSharpRedundantBackticks">
