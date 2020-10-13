@@ -9,14 +9,12 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
 open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
-open JetBrains.Application.Settings
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
-open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Host.Features.BackgroundTasks
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.Util

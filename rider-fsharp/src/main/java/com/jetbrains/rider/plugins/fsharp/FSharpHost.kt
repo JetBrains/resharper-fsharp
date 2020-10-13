@@ -6,7 +6,7 @@ import com.intellij.openapi.util.registry.RegistryValue
 import com.intellij.openapi.util.registry.RegistryValueListener
 import com.jetbrains.rd.util.reactive.IOptProperty
 import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
-import com.jetbrains.rider.model.rdFSharpModel
+import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 
 class FSharpHost(project: Project) : LifetimedProjectComponent(project) {

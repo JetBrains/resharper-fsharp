@@ -19,7 +19,12 @@ import com.jetbrains.rdclient.util.idea.fromOffset
 import com.jetbrains.rider.editors.RiderTextControlHost
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
 import com.jetbrains.rider.model.*
+import com.jetbrains.rider.plugins.fsharp.RdFsiPrepareCommandsArgs
+import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rd.ide.model.*
+import com.jetbrains.rider.protocol.components.SolutionHost
+import com.jetbrains.rider.util.SolutionFilterExtensionWithDot
 import org.jetbrains.concurrency.AsyncPromise
 
 class FsiSandboxInfoUpdater(project: Project, private val consoleEditor: EditorEx, private val history: CommandHistory)

@@ -10,11 +10,11 @@ open JetBrains.ProjectModel.NuGet.Packaging
 open JetBrains.ProjectModel.Properties
 open JetBrains.ReSharper.Host.Features.Runtime
 open JetBrains.ReSharper.Host.Features.Toolset
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Rider.Model
 open JetBrains.Util
 open JetBrains.Util.DevEnv
 open NuGet.Versioning
