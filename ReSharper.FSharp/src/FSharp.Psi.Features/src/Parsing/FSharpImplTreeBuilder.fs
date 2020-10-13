@@ -124,7 +124,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
         match repr with
         | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation, _, _) ->
-            x.ProcessTypeExtensionDeclaration(typeDefn)
+            x.ProcessTypeExtensionDeclaration(typeDefn, attrs)
         | _ ->
 
         let mark = x.StartType attrs typeParams constraints lid range
@@ -175,10 +175,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
         x.Done(range, mark, ElementType.F_SHARP_TYPE_DECLARATION)
 
-    member x.ProcessTypeExtensionDeclaration(TypeDefn(info, _, members, range)) =
+    member x.ProcessTypeExtensionDeclaration(TypeDefn(info, _, members, range), attrs) =
         let (ComponentInfo(_, typeParams, constraints, lid , _, _, _, _)) = info
-        // todo: add test for attributes in augmentation declaration?
-        let mark = x.Mark(range)
+        let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
 
         // Skipping the last name to have the identifier out of qualifier reference name. 
         x.ProcessReferenceNameSkipLast(lid)
