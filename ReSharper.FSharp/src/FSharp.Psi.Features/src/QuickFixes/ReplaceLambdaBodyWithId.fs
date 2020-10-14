@@ -12,19 +12,18 @@ type ReplaceLambdaBodyWithIdFix(warning: LambdaBodyCanBeReplacedWithIdWarning) =
     inherit FSharpQuickFixBase()
 
     let lambda = warning.Lambda
-    let expr = lambda.Expression
 
     override x.IsAvailable _ =
-        isValid expr &&
-        not (isPredefinedFunctionShadowed lambda.RArrow "id" "ReplaceLambdaBodyWithIdFix")
+        isValid lambda &&
+        resolvesToPredefinedFunction lambda.RArrow "id" "ReplaceLambdaBodyWithIdFix"
 
     override x.Text = "Replace lambda body with 'id'"
 
     override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(lambda.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        let factory = expr.CreateElementFactory()
+        let factory = lambda.CreateElementFactory()
                 
         deletePatternsFromEnd lambda 1
 
-        replace expr (factory.CreateReferenceExpr("id"))
+        lambda.SetExpression(factory.CreateReferenceExpr("id")) |> ignore

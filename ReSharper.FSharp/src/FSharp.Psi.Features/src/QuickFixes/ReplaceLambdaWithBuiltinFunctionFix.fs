@@ -19,7 +19,7 @@ type ReplaceLambdaWithBuiltinFunctionFix(warning: LambdaCanBeReplacedWithBuiltin
 
     override x.IsAvailable _ =
         isValid exprToReplace &&
-        not (isPredefinedFunctionShadowed lambda.RArrow funName "ReplaceLambdaWithBuiltinFunctionFix")
+        resolvesToPredefinedFunction lambda.RArrow funName "ReplaceLambdaWithBuiltinFunctionFix"
 
     override x.Text = sprintf "Replace lambda with '%s'" funName
 

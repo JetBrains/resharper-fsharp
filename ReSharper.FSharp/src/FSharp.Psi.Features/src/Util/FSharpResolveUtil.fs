@@ -83,12 +83,14 @@ let mayShadowPartially (newExpr: ITreeNode) (data: ElementProblemAnalyzerData) (
     |> Seq.toArray
     |> OpenScope.inAnyScope newExpr
 
-let isPredefinedFunctionShadowed (context: ITreeNode) name opName =
+let resolvesToPredefinedFunction (context: ITreeNode) name opName =
     let checkerService = context.GetContainingFile().As<IFSharpFile>().CheckerService
     match checkerService.ResolveNameAtLocation(context, [name], opName) with
     | Some symbolUse ->
-        let symbol = symbolUse.Symbol
-        match predefinedFunctionTypes.TryGetValue(symbol.DisplayName) with
-        | true, fullName -> (fullName.FullName + "." + symbol.DisplayName) <> symbol.FullName
+        match symbolUse.Symbol with
+        | :? FSharpMemberOrFunctionOrValue as symbol ->
+            match predefinedFunctionTypes.TryGetValue(name), symbol.DeclaringEntity with
+            | (true, typeName), Some entity -> typeName.FullName = entity.FullName
+            | _ -> false
         | _ -> false
     | None -> false
