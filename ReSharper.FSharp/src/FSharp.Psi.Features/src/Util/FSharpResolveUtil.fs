@@ -3,6 +3,7 @@
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -81,3 +82,15 @@ let mayShadowPartially (newExpr: ITreeNode) (data: ElementProblemAnalyzerData) (
     |> Seq.collect (fun element -> opens.GetValuesSafe(element.ShortName))
     |> Seq.toArray
     |> OpenScope.inAnyScope newExpr
+
+let resolvesToPredefinedFunction (context: ITreeNode) name opName =
+    let checkerService = context.GetContainingFile().As<IFSharpFile>().CheckerService
+    match checkerService.ResolveNameAtLocation(context, [name], opName) with
+    | Some symbolUse ->
+        match symbolUse.Symbol with
+        | :? FSharpMemberOrFunctionOrValue as symbol ->
+            match predefinedFunctionTypes.TryGetValue(name), symbol.DeclaringEntity with
+            | (true, typeName), Some entity -> typeName.FullName = entity.FullName
+            | _ -> false
+        | _ -> false
+    | None -> false

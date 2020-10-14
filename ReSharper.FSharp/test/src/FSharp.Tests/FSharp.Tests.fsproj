@@ -86,7 +86,8 @@
     <Compile Include="QuickFixes\SimplifyListConsPatTest.fs" />
     <Compile Include="QuickFixes\SimplifyLambdaTest.fs" />
     <Compile Include="QuickFixes\ReplaceLambdaWithInnerExpressionTest.fs" />
-    <Compile Include="QuickFixes\ReplaceExpressionWithIdTest.fs" />
+    <Compile Include="QuickFixes\ReplaceLambdaWithBuiltinFunctionTest.fs" />
+    <Compile Include="QuickFixes\ReplaceLambdaBodyWithIdTest.fs" />
     <Compile Include="QuickFixes\GenerateInterfaceMembersFixTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantAttributeTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />

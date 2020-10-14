@@ -190,7 +190,14 @@
     <QuickFix>SimplifyLambdaFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplaced">
+  <Warning staticGroup="FSharpErrors" name="LambdaBodyCanBeReplacedWithId">
+    <Parameter type="ILambdaExpr" name="lambda"/>
+    <Range>lambda.GetHighlightingRange()</Range>
+    <Message value="Lambda body can be replaced with 'id'"/>
+    <QuickFix>ReplaceLambdaBodyWithIdFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplacedWithInnerExpression">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
@@ -200,13 +207,14 @@
     <QuickFix>ReplaceLambdaWithInnerExpressionFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="ExpressionCanBeReplacedWithId">
-    <Parameter type="IFSharpExpression" name="expr"/>
-    <Range>expr.GetHighlightingRange()</Range>
+  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplacedWithBuiltinFunction">
+    <Parameter type="ILambdaExpr" name="lambda"/>
+    <Parameter type="string" name="funName"/>
+    <Range>lambda.GetHighlightingRange()</Range>
     <Message value="{0}">
-      <Argument>getExpressionCanBeReplacedWithIdWarningText expr</Argument>
+      <Argument>sprintf "Lambda can be replaced with '%s'" funName</Argument>
     </Message>
-    <QuickFix>ReplaceExpressionWithIdFix</QuickFix>
+    <QuickFix>ReplaceLambdaWithBuiltinFunctionFix</QuickFix>
   </Warning>
 
 </Errors>

@@ -4,7 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-type ReplaceLambdaWithInnerExpressionFix(warning: LambdaCanBeReplacedWarning) =
+type ReplaceLambdaWithInnerExpressionFix(warning: LambdaCanBeReplacedWithInnerExpressionWarning) =
     inherit ReplaceWithInnerExpressionFixBase(warning.LambdaExpr, warning.ReplaceCandidate)
 
     let replaceCandidate = warning.ReplaceCandidate
