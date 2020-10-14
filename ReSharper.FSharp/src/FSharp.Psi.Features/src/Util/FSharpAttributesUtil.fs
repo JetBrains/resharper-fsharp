@@ -1,6 +1,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpAttributesUtil
 
 open System
+open JetBrains.Diagnostics
 open JetBrains.Metadata.Reader.API
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -41,6 +42,75 @@ let addAttributeAfter (anchor: IAttribute) (attribute: IAttribute) =
                 not (nextSiblingType.IsWhitespace || nextSiblingType == FSharpTokenType.GREATER_RBRACK) then
             Whitespace()
     ] |> ignore
+
+
+let removeAttributeList (attrList: IAttributeList) =
+    if isOnlyMeaningfulNodeOnLine attrList then
+        let first = getFirstMatchingNodeBefore isInlineSpaceOrComment attrList
+        let last =
+            match attrList.PrevSibling with
+            | null -> getLastInlineSpaceOrCommentSkipNewLine attrList
+            | _ -> skipMatchingNodesAfter isInlineSpaceOrComment attrList
+        deleteChildRange first last
+
+    elif isFirstMeaningfulNodeOnLine attrList then
+        let last =
+            match attrList.PrevSibling with
+            | null -> getLastInlineSpaceOrCommentSkipNewLine attrList
+            | _ -> getLastMatchingNodeAfter isInlineSpaceOrComment attrList
+        deleteChildRange attrList last
+
+    else
+        let first = getFirstMatchingNodeBefore isInlineSpaceOrComment attrList
+        let last = getLastMatchingNodeAfter isInlineSpaceOrComment attrList
+
+        if isLastMeaningfulNodeOnLine attrList then
+            deleteChildRange first last
+        else
+            replaceRangeWithNode first last (Whitespace())
+
+let removeAttributeFromList (attr: IAttribute) =
+    let attrList = AttributeListNavigator.GetByAttribute(attr)
+    let attrs = attrList.Attributes
+    let rBrack = attrList.RBrack
+
+    if isNotNull rBrack && attrs.Count = 1 then
+        deleteChildRange attrList.LBrack.NextSibling rBrack.PrevSibling else
+
+    if attrs.Count > 1 && attrs.First() == attr then
+        deleteChildRange attrList.LBrack.NextSibling attrs.[1].PrevSibling else
+
+    if isNotNull rBrack && attrs.Last() == attr then
+        deleteChildRange attrs.[attrs.Count - 2].NextSibling rBrack.PrevSibling else
+
+    let isFirstOnLine = isFirstMeaningfulNodeOnLine attr
+
+    let first =
+        if not isFirstOnLine then getFirstMatchingNodeBefore isInlineSpaceOrComment attr else attr :> _
+
+    let last =
+        let nodeAfter = skipMatchingNodesAfter isWhitespaceOrComment attr
+        let last =
+            if getTokenType nodeAfter == FSharpTokenType.SEMICOLON then
+                getLastMatchingNodeAfter isInlineSpaceOrComment nodeAfter
+            else
+                getLastMatchingNodeAfter isInlineSpaceOrComment attr
+
+        if not isFirstOnLine then last else
+        getThisOrNextNewLine last |> getLastMatchingNodeAfter isInlineSpaceOrComment
+
+    if isFirstOnLine then
+        deleteChildRange first last
+    else
+        replaceRangeWithNode first last (Whitespace())
+
+
+let removeAttributeOrList (attr: IAttribute) =
+    let attrList = AttributeListNavigator.GetByAttribute(attr).NotNull()
+    if attrList.Attributes.Count = 1 then
+        removeAttributeList attrList
+    else
+        removeAttributeFromList attr
 
 
 let addAttributesList (decl: IFSharpTreeNode) addNewLine =

@@ -1,0 +1,3 @@
+﻿[<CompiledName "E"{caret}>]
+type E =
+    | A = 1

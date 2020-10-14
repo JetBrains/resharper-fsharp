@@ -137,9 +137,16 @@ let isInlineSpaceOrComment (node: ITreeNode) =
 let isInlineSpace (node: ITreeNode) =
     getTokenType node == FSharpTokenType.WHITESPACE
 
+let isNewLine (node: ITreeNode) =
+    getTokenType node == FSharpTokenType.NEW_LINE
+
 let isWhitespace (node: ITreeNode) =
     let tokenType = getTokenType node
     isNotNull tokenType && tokenType.IsWhitespace
+
+let isWhitespaceOrComment (node: ITreeNode) =
+    let tokenType = getTokenType node
+    isNotNull tokenType && (tokenType.IsWhitespace || tokenType.IsComment)
 
 let isFiltered (node: ITreeNode) =
     let tokenType = getTokenType node
@@ -265,6 +272,36 @@ let isAfterEmptyLine (node: ITreeNode) =
 
 let isFirstChildOrAfterEmptyLine (node: ITreeNode) =
     isNull node.PrevSibling || isAfterEmptyLine node
+
+let isNullOrNewLine (node: ITreeNode) =
+    isNull node || isNewLine node
+
+let getLastMatchingNodeAfterSkippingToken predicate tokenType node =
+    node
+    |> getLastMatchingNodeAfter predicate
+    |> getThisOrNextTokenOfType tokenType
+    |> getLastMatchingNodeAfter predicate
+
+let getLastInlineSpaceOrCommentSkipNewLine (node: ITreeNode) =
+    getLastMatchingNodeAfterSkippingToken isInlineSpaceOrComment FSharpTokenType.NEW_LINE node
+
+
+/// Only takes siblings into account.
+let isFirstMeaningfulNodeOnLine (node: ITreeNode) =
+    let skipBefore = getFirstMatchingNodeBefore isInlineSpaceOrComment node
+    let newLine = getThisOrPrevNewLIne skipBefore
+    newLine == node && isNull node.PrevSibling || isNewLine newLine
+
+/// Only takes siblings into account.
+let isLastMeaningfulNodeOnLine (node: ITreeNode) =
+    let skipAfter = getLastMatchingNodeAfter isInlineSpaceOrComment node
+    let newLine = getThisOrNextNewLine skipAfter
+    newLine == node && isNull node.NextSibling || isNullOrNewLine newLine
+
+/// Only takes siblings into account.
+let isOnlyMeaningfulNodeOnLine (node: ITreeNode) =
+    isFirstMeaningfulNodeOnLine node && isLastMeaningfulNodeOnLine node
+
 
 [<AutoOpen>]
 module PsiModificationUtil =

@@ -88,6 +88,7 @@
     <Compile Include="QuickFixes\ReplaceLambdaWithInnerExpressionTest.fs" />
     <Compile Include="QuickFixes\ReplaceExpressionWithIdTest.fs" />
     <Compile Include="QuickFixes\GenerateInterfaceMembersFixTest.fs" />
+    <Compile Include="QuickFixes\RemoveRedundantAttributeTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

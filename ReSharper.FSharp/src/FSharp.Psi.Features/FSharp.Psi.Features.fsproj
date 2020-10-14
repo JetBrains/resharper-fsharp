@@ -187,6 +187,7 @@
     <Compile Include="src\QuickFixes\ReplaceLambdaWithInnerExpressionFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceExpressionWithIdFix.fs" />
     <Compile Include="src\QuickFixes\GenerateInterfaceMembersFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAttributeFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />
