@@ -2,19 +2,17 @@
 
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
-open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
@@ -29,12 +27,6 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             let fcsEntity = t.TypeDefinition
             fcsEntity, Seq.zip fcsEntity.GenericParameters t.GenericArguments |> Seq.toList)
 
-    let mutable nextUnnamedVariableNumber = 0
-    let getUnnamedVariableName () =
-        let name = sprintf "var%d" nextUnnamedVariableNumber
-        nextUnnamedVariableNumber <- nextUnnamedVariableNumber + 1
-        name
-
     override x.Text = "Generate missing members"
 
     override x.IsAvailable _ =
@@ -42,12 +34,8 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
         isNotNull fcsEntity && fcsEntity.IsInterface 
 
     override x.ExecutePsiTransaction _ =
-        let factory = impl.CreateElementFactory()
         use writeCookie = WriteLockCookie.Create(impl.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-
-        let settingsStore = impl.GetSettingsStoreWithEditorConfig()
-        let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
 
         let interfaceType =
             let typeDeclaration =
@@ -103,6 +91,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
                 let xmlDocId = FSharpElementsUtil.GetXmlDocId(mfv)
                 isNotNull xmlDocId && not (implementedMembers.Contains(xmlDocId)))
             |> Seq.sortBy (fun (mfv, _) -> mfv.LogicalName) // todo: better sorting?
+            |> Seq.map (fun (mfv, s) -> mfv, s, needsTypesAnnotations.Contains(mfv))
             |> Seq.toList
 
         let indent =
@@ -111,40 +100,10 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             else
                 existingMemberDecls.Last().Indent
 
-        let lineEnding = impl.GetLineEnding()
-
         let generatedMembers =
             membersToGenerate
-            |> List.collect (fun (mfv, substitution) ->
-                let argNames =
-                    mfv.CurriedParameterGroups
-                    |> Seq.map (Seq.map (fun x ->
-                        let name = x.Name |> Option.defaultWith (fun _ -> getUnnamedVariableName ())
-                        name, x.Type.Instantiate(substitution)) >> Seq.toList)
-                    |> Seq.toList
-
-                let typeParams = mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
-                let memberName = mfv.LogicalName
-
-                let addTypes = needsTypesAnnotations.Contains(mfv)
-
-                let paramGroups =
-                    if mfv.IsProperty then [] else
-                    factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, addTypes, displayContext)
-
-                let memberDeclaration = factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups)
-
-                if addTypes then
-                    let lastParam = memberDeclaration.ParametersPatterns.LastOrDefault()
-                    if isNull lastParam then () else
-
-                    let typeString = mfv.ReturnParameter.Type.Instantiate(substitution)
-                    let typeUsage = factory.CreateTypeUsage(typeString.Format(displayContext))
-                    ModificationUtil.AddChildAfter(lastParam, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
-
-                [ NewLine(lineEnding) :> ITreeNode
-                  Whitespace(indent) :> _
-                  memberDeclaration :> _ ])
+            |> List.map (GenerateOverrides.generateMember impl displayContext)
+            |> List.collect (withNewLineAndIndentBefore indent)
 
         if isNull impl.WithKeyword then
             addNodesAfter impl.LastChild [

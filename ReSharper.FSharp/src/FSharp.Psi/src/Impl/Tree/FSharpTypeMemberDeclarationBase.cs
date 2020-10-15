@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public void SetOverride(bool value)
+    public virtual void SetOverride(bool value)
     {
     }
 

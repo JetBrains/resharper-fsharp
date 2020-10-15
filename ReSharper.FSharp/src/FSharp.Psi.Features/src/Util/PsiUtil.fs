@@ -437,6 +437,12 @@ let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
     shiftExpr shift expr
 
 
+let withNewLineAndIndentBefore (indent: int) (node: IFSharpTreeNode) =
+    [ NewLine(node.GetLineEnding()) :> ITreeNode
+      Whitespace(indent) :> _
+      node :> _ ]
+
+
 [<CanBeNull>]
 let rec tryFindRootPrefixAppWhereExpressionIsFunc ([<CanBeNull>] expr: IFSharpExpression) =
     let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())

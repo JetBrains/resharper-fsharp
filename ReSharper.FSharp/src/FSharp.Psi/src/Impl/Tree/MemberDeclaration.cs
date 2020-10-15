@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -74,5 +75,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override TreeTextRange GetNameIdentifierRange() =>
       NameIdentifier.GetMemberNameIdentifierRange();
+
+    public override void SetOverride(bool value)
+    {
+      if (value == IsOverride)
+        return;
+
+      if (!value)
+        throw new NotImplementedException();
+
+      ModificationUtil.ReplaceChild(MemberKeyword, FSharpTokenType.OVERRIDE.CreateLeafElement());
+    }
   }
 }
