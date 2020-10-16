@@ -2,6 +2,7 @@
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Progress
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
@@ -63,6 +64,7 @@ type FSharpGeneratorElement(element, mfv) =
     inherit GeneratorDeclaredElement(element)
 
     member x.Mfv = mfv
+    override x.ToString() = element.ToString()
 
 
 [<GeneratorElementProvider(GeneratorStandardKinds.Overrides, typeof<FSharpLanguage>)>]
@@ -111,6 +113,7 @@ type FSharpOverridableMembersProvider() =
             // todo: separate getters/setters (including existing ones)
             (m :? IMethod || m :? IProperty) && m.GetContainingType() <> typeElement && m.CanBeOverridden())
         |> Seq.map FSharpGeneratorElement
+        |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
         |> Seq.iter context.ProvidedElements.Add
 
 
@@ -124,7 +127,33 @@ type FSharpOverridingMembersBuilder() =
 
         let typeDecl = context.Root :?> IFSharpTypeDeclaration
         let displayContext = typeDecl.GetFSharpSymbolUse().DisplayContext
-        let lastMember = typeDecl.TypeMembers.Last()
+
+        let anchor: ITreeNode =
+            let typeMembers = typeDecl.TypeMembers
+            if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
+
+            let typeRepr = typeDecl.TypeRepresentation.NotNull()
+            let objModelTypeRepr = typeRepr.As<IObjectModelTypeRepresentation>()
+            if isNull objModelTypeRepr then typeRepr :> _ else
+
+            let typeMembers = objModelTypeRepr.TypeMembers
+            if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
+
+            if objModelTypeRepr :? IStructRepresentation then objModelTypeRepr :> _ else
+
+            let equalsToken = typeDecl.EqualsToken.NotNull()
+            deleteChildRange equalsToken.NextSibling typeRepr
+
+            equalsToken :> _
+
+        let (anchor: ITreeNode), indent =
+            match anchor with
+            | :? IStructRepresentation as structRepr ->
+                structRepr.StructKeyword :> _, structRepr.StructKeyword.Indent + typeDecl.GetIndentSize()
+            | :? ITokenNode ->
+                let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl).NotNull()
+                anchor, typeDeclarationGroup.Indent + typeDecl.GetIndentSize()
+            | _ -> anchor, anchor.Indent
 
         context.InputElements
         |> Seq.map (fun input ->
@@ -132,5 +161,5 @@ type FSharpOverridingMembersBuilder() =
             let memberDecl = GenerateOverrides.generateMember typeDecl displayContext (mfv, List.empty, false)
             memberDecl.SetOverride(true)
             memberDecl)
-        |> Seq.collect (withNewLineAndIndentBefore lastMember.Indent)
-        |> addNodesAfter lastMember |> ignore
+        |> Seq.collect (withNewLineAndIndentBefore indent)
+        |> addNodesAfter anchor |> ignore

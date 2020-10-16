@@ -902,21 +902,21 @@ interface objectModelTypeRepresentation:
 classRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; } extras {
   get { methodName="TypeMembers" path=<classRepresentation:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
 }:
-  CLASS
+  CLASS<CLASS, ClassKeyword>
   typeMemberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
   END;
 
 structRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; } extras {
   get { methodName="TypeMembers" path=<structRepresentation:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
 }:
-  STRUCT
+  STRUCT<STRUCT, StructKeyword>
   typeMemberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
   END;
 
 interfaceRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; } extras {
   get { methodName="TypeMembers" path=<interfaceRepresentation:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
 }:
-  INTERFACE
+  INTERFACE<INTERFACE, InterfaceKeyword>
   typeMemberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
   END;
 
