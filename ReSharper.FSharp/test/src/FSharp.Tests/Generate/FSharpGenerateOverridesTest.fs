@@ -19,8 +19,11 @@ type FSharpGenerateOverridesTest() =
     [<Test; Explicit>] member x.``Anchor - Repr - Member 02``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Type 02``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Anchor - Type 03``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Anchor - Type 04 - Start``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - Type 03``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - Type 04 - Start``() = x.DoNamedTest()
+
+    [<Test>] member x.``Anchor - Union Case 01``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - Union Case 02 - Modifier``() = x.DoNamedTest()
 
     [<Test>] member x.``Repr - Empty - Class 01``() = x.DoNamedTest()
     [<Test>] member x.``Repr - Empty - Class 02 - Same line``() = x.DoNamedTest()

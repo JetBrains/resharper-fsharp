@@ -35,8 +35,7 @@ type FSharpGeneratorContext(kind, typeDecl: IFSharpTypeDeclaration) =
     override x.CreatePointer() =
         FSharpGeneratorWorkflowPointer(x) :> _
 
-    static member Create(kind, treeNode: ITreeNode) =
-        let typeDeclaration = treeNode.As<IFSharpTypeDeclaration>()
+    static member Create(kind, typeDeclaration: IFSharpTypeDeclaration) =
         if isNull typeDeclaration || isNull typeDeclaration.DeclaredElement then null else
 
         FSharpGeneratorContext(kind, typeDeclaration)
@@ -53,8 +52,15 @@ type FSharpGeneratorContextFactory() =
     interface IGeneratorContextFactory with
         member x.TryCreate(kind: string, psiDocumentRangeView: IPsiDocumentRangeView): IGeneratorContext =
             let psiView = psiDocumentRangeView.View<FSharpLanguage>()
-            // todo: get union through union case
-            let typeDeclaration = psiView.GetSelectedTreeNode<IFSharpTypeDeclaration>()
+            let typeDeclaration: IFSharpTypeDeclaration =
+                match psiView.GetSelectedTreeNode<IFSharpTypeDeclaration>() with
+                | null ->
+                    match psiView.GetSelectedTreeNode<ITypeDeclarationGroup>() with
+                    | null -> null
+                    | group -> group.TypeDeclarations.FirstOrDefault().As<IFSharpTypeDeclaration>()
+                | typeDeclaration -> typeDeclaration
+
+            if isNull typeDeclaration then null else
             FSharpGeneratorContext.Create(kind, typeDeclaration) :> _
 
         member x.TryCreate(_, _, _) = null
