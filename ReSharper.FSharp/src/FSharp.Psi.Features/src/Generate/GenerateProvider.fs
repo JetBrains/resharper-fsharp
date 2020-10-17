@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
@@ -121,6 +122,10 @@ type FSharpOverridableMembersProvider() =
             let baseTypes = getBaseTypes fcsEntity
             baseTypes |> Seq.collect (fun (fcsEntity, substitution) ->
                 fcsEntity.MembersFunctionsAndValues |> Seq.choose (fun mfv ->
+                    // todo: allow generating accessors
+                    if mfv.IsAccessor() then None else
+
+                    // FCS provides wrong XmlDocId for accessors, e.g. T.P for T.get_P()
                     match memberInstances.TryGetValue(mfv.XmlDocSig) with
                     | true, i -> Some (i.Member, (mfv, substitution))
                     | _ -> None))
