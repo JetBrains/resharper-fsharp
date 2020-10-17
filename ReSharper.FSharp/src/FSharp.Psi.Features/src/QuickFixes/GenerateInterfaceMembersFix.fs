@@ -15,6 +15,12 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
+type FSharpGeneratorMfvElement(mfv, substitution, addTypes) =
+    interface IFSharpGeneratorElement with
+        member x.Mfv = mfv
+        member x.Substitution = substitution
+        member x.AddTypes = addTypes
+
 type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
     inherit FSharpQuickFixBase()
 
@@ -92,6 +98,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
                 isNotNull xmlDocId && not (implementedMembers.Contains(xmlDocId)))
             |> Seq.sortBy (fun (mfv, _) -> mfv.LogicalName) // todo: better sorting?
             |> Seq.map (fun (mfv, s) -> mfv, s, needsTypesAnnotations.Contains(mfv))
+            |> Seq.map FSharpGeneratorMfvElement
             |> Seq.toList
 
         let indent =

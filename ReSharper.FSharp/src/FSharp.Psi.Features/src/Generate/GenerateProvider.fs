@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 
+open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Progress
 open JetBrains.Diagnostics
@@ -60,10 +61,14 @@ type FSharpGeneratorContextFactory() =
         member x.TryCreate(_: string, _: IDeclaredElement): IGeneratorContext = null
 
 
-type FSharpGeneratorElement(element, mfv) =
+type FSharpGeneratorElement(element, mfv, substitution, addTypes) =
     inherit GeneratorDeclaredElement(element)
 
-    member x.Mfv = mfv
+    interface IFSharpGeneratorElement with
+        member x.Mfv = mfv
+        member x.Substitution = substitution
+        member x.AddTypes = addTypes
+
     override x.ToString() = element.ToString()
 
 
@@ -86,14 +91,20 @@ type FSharpOverridableMembersProvider() =
         let fcsEntity = typeDeclaration.GetFSharpSymbol().As<FSharpEntity>()
         if isNull fcsEntity then () else
 
-        let rec getBaseTypes fcsEntity =
-            let rec loop acc (fcsEntity: FSharpEntity) =
-                match fcsEntity.BaseType with
-                | Some baseType when baseType.HasTypeDefinition ->
-                    let baseEntity = getAbbreviatedEntity baseType.TypeDefinition
-                    loop (baseEntity :: acc) baseEntity
+        let rec getBaseTypes (fcsEntity: FSharpEntity) =
+            let rec loop acc (fcsType: FSharpType) =
+                let fcsType = getAbbreviatedType fcsType
+                let fcsEntity = fcsType.TypeDefinition
+                let substitution = Seq.zip fcsEntity.GenericParameters fcsType.GenericArguments |> Seq.toList
+                let acc = (fcsEntity, substitution) :: acc
+
+                match fcsType.BaseType with
+                | Some baseType when baseType.HasTypeDefinition -> loop acc baseType
                 | _ -> List.rev acc
-            loop [] fcsEntity
+
+            match fcsEntity.BaseType with
+            | Some baseType when baseType.HasTypeDefinition -> loop [] baseType
+            | _ -> []
 
         let memberInstances =
             GenerateUtil.GetOverridableMembersOrder(typeElement, false)
@@ -101,18 +112,38 @@ type FSharpOverridableMembersProvider() =
             |> dict
 
         let memberInstances =
-            getBaseTypes fcsEntity |> Seq.collect (fun fcsEntity ->
+            let baseTypes = getBaseTypes fcsEntity
+            baseTypes |> Seq.collect (fun (fcsEntity, substitution) ->
                 fcsEntity.MembersFunctionsAndValues |> Seq.choose (fun mfv ->
                     match memberInstances.TryGetValue(mfv.XmlDocSig) with
-                    | true, i -> Some (i.Member, mfv)
+                    | true, i -> Some (i.Member, (mfv, substitution))
                     | _ -> None))
+            |> Seq.toList
+
+        let needsTypesAnnotations = 
+            let sameParamNumberMembersGroups = 
+                memberInstances
+                |> Seq.distinctBy (fun (m, _) -> GeneratorElementBase.GetTestDescriptor(m, m.IdSubstitution))
+                |> Seq.groupBy (fun (_, (mfv, _)) ->
+                    let parameterGroups = mfv.CurriedParameterGroups
+                    mfv.LogicalName, (Seq.length parameterGroups), (Seq.map Seq.length parameterGroups |> Seq.toList))
+                |> Seq.toList
+
+            let sameParamNumberMembers =
+                List.map (snd >> (Seq.map snd) >> Seq.toList) sameParamNumberMembersGroups
+
+            sameParamNumberMembers
+            |> Seq.filter (Seq.length >> ((<) 1))
+            |> Seq.concat
+            |> Seq.map fst
+            |> HashSet
 
         memberInstances
         |> Seq.filter (fun (m, _) ->
             // todo: events, anything else?
             // todo: separate getters/setters (including existing ones)
             (m :? IMethod || m :? IProperty) && m.GetContainingType() <> typeElement && m.CanBeOverridden())
-        |> Seq.map FSharpGeneratorElement
+        |> Seq.map (fun (i, (mfv, substitution)) -> FSharpGeneratorElement(i, mfv, substitution, needsTypesAnnotations.Contains(mfv)))
         |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
         |> Seq.iter context.ProvidedElements.Add
 
@@ -157,8 +188,8 @@ type FSharpOverridingMembersBuilder() =
 
         context.InputElements
         |> Seq.map (fun input ->
-            let mfv = input.As<FSharpGeneratorElement>().Mfv
-            let memberDecl = GenerateOverrides.generateMember typeDecl displayContext (mfv, List.empty, false)
+            let element = input :?> FSharpGeneratorElement
+            let memberDecl = GenerateOverrides.generateMember typeDecl displayContext element
             memberDecl.SetOverride(true)
             memberDecl)
         |> Seq.collect (withNewLineAndIndentBefore indent)

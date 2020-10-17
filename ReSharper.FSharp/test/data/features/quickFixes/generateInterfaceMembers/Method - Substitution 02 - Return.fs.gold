@@ -7,4 +7,4 @@ type I<'T> =
 type T() =
   interface I<int> with
     member this.M(var0: int): int = failwith "todo"
-    member this.M(var1: double): int = failwith "todo"{caret}
+    member this.M(var0: double): int = failwith "todo"{caret}

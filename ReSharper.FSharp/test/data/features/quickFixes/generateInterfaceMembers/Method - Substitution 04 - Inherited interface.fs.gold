@@ -10,4 +10,4 @@ type IB<'T2> =
 type T() =
   interface IB<int> with
     member this.M(var0: int, var1: int): unit = failwith "todo"
-    member this.M(var2: double, var3: double): unit = failwith "todo"{caret}
+    member this.M(var0: double, var1: double): unit = failwith "todo"{caret}

@@ -1,4 +1,4 @@
-﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate.GenerateOverrides
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
@@ -8,41 +8,47 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let generateMember
-        (context: IFSharpTreeNode) displayContext (mfv: FSharpMemberOrFunctionOrValue, substitution, addTypes) =
+type IFSharpGeneratorElement =
+    abstract Mfv: FSharpMemberOrFunctionOrValue
+    abstract Substitution: (FSharpGenericParameter * FSharpType) list
+    abstract AddTypes: bool
 
-    let mutable nextUnnamedVariableNumber = 0
-    let getUnnamedVariableName () =
-        let name = sprintf "var%d" nextUnnamedVariableNumber
-        nextUnnamedVariableNumber <- nextUnnamedVariableNumber + 1
-        name
+module GenerateOverrides =
+    let generateMember (context: IFSharpTreeNode) displayContext (element: IFSharpGeneratorElement) =
+        let mfv = element.Mfv
 
-    let argNames =
-        mfv.CurriedParameterGroups
-        |> Seq.map (Seq.map (fun x ->
-            let name = x.Name |> Option.defaultWith (fun _ -> getUnnamedVariableName ())
-            name, x.Type.Instantiate(substitution)) >> Seq.toList)
-        |> Seq.toList
+        let mutable nextUnnamedVariableNumber = 0
+        let getUnnamedVariableName () =
+            let name = sprintf "var%d" nextUnnamedVariableNumber
+            nextUnnamedVariableNumber <- nextUnnamedVariableNumber + 1
+            name
 
-    let typeParams = mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
-    let memberName = mfv.LogicalName
+        let argNames =
+            mfv.CurriedParameterGroups
+            |> Seq.map (Seq.map (fun x ->
+                let name = x.Name |> Option.defaultWith (fun _ -> getUnnamedVariableName ())
+                name, x.Type.Instantiate(element.Substitution)) >> Seq.toList)
+            |> Seq.toList
 
-    let factory = context.CreateElementFactory()
-    let settingsStore = context.GetSettingsStoreWithEditorConfig()
-    let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
-    
-    let paramGroups =
-        if mfv.IsProperty then [] else
-        factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, addTypes, displayContext)
+        let typeParams = mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
+        let memberName = mfv.LogicalName
 
-    let memberDeclaration = factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups)
+        let factory = context.CreateElementFactory()
+        let settingsStore = context.GetSettingsStoreWithEditorConfig()
+        let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
+        
+        let paramGroups =
+            if mfv.IsProperty then [] else
+            factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, element.AddTypes, displayContext)
 
-    if addTypes then
-        let lastParam = memberDeclaration.ParametersPatterns.LastOrDefault()
-        if isNull lastParam then () else
+        let memberDeclaration = factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups)
 
-        let typeString = mfv.ReturnParameter.Type.Instantiate(substitution)
-        let typeUsage = factory.CreateTypeUsage(typeString.Format(displayContext))
-        ModificationUtil.AddChildAfter(lastParam, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
+        if element.AddTypes then
+            let lastParam = memberDeclaration.ParametersPatterns.LastOrDefault()
+            if isNull lastParam then () else
 
-    memberDeclaration
+            let typeString = mfv.ReturnParameter.Type.Instantiate(element.Substitution)
+            let typeUsage = factory.CreateTypeUsage(typeString.Format(displayContext))
+            ModificationUtil.AddChildAfter(lastParam, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
+
+        memberDeclaration
