@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.Resolve;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public abstract class FSharpGeneratedElementBase : FSharpDeclaredElementBase
+  public abstract class FSharpGeneratedElementBase : FSharpDeclaredElementBase, IFSharpGeneratedElement
   {
     [NotNull] protected abstract IClrDeclaredElement ContainingElement { get; }
 

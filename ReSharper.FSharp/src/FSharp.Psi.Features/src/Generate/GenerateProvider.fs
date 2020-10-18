@@ -113,6 +113,12 @@ type FSharpOverridableMembersProvider() =
             | Some baseType when baseType.HasTypeDefinition -> loop [] baseType
             | _ -> []
 
+        let ownMembersIds =
+            typeElement.GetMembers()
+            |> Seq.filter (fun e -> not (e :? IFSharpGeneratedElement))
+            |> Seq.map (fun e -> GeneratorElementBase.GetTestDescriptor(e, e.IdSubstitution))
+            |> HashSet
+
         let memberInstances =
             GenerateUtil.GetOverridableMembersOrder(typeElement, false)
             |> Seq.map (fun i -> i.Member.XMLDocId, i)
@@ -126,7 +132,10 @@ type FSharpOverridableMembersProvider() =
                     if mfv.IsAccessor() then None else
 
                     // FCS provides wrong XmlDocId for accessors, e.g. T.P for T.get_P()
-                    match memberInstances.TryGetValue(mfv.XmlDocSig) with
+                    let xmlDocId = mfv.XmlDocSig
+                    if ownMembersIds.Contains(xmlDocId) then None else
+
+                    match memberInstances.TryGetValue(xmlDocId) with
                     | true, i -> Some (i.Member, (mfv, substitution))
                     | _ -> None))
             |> Seq.toList
@@ -153,8 +162,9 @@ type FSharpOverridableMembersProvider() =
         |> Seq.filter (fun (m, _) ->
             // todo: events, anything else?
             // todo: separate getters/setters (including existing ones)
-            (m :? IMethod || m :? IProperty) && m.GetContainingType() <> typeElement && m.CanBeOverridden())
+            (m :? IMethod || m :? IProperty) && m.CanBeOverridden())
         |> Seq.map (fun (i, (mfv, substitution)) -> FSharpGeneratorElement(i, mfv, substitution, needsTypesAnnotations.Contains(mfv)))
+        |> Seq.filter (fun i -> not (ownMembersIds.Contains(i.TestDescriptor)))
         |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
         |> Seq.iter context.ProvidedElements.Add
 
