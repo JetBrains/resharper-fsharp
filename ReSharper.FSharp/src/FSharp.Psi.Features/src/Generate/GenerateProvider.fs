@@ -35,7 +35,8 @@ type FSharpGeneratorContext(kind, typeDecl: IFSharpTypeDeclaration) =
     override x.CreatePointer() =
         FSharpGeneratorWorkflowPointer(x) :> _
 
-    static member Create(kind, typeDeclaration: IFSharpTypeDeclaration) =
+    static member Create(kind, typeDeclaration: ITreeNode) =
+        let typeDeclaration = typeDeclaration.As<IFSharpTypeDeclaration>()
         if isNull typeDeclaration || isNull typeDeclaration.DeclaredElement then null else
 
         FSharpGeneratorContext(kind, typeDeclaration)
@@ -60,15 +61,18 @@ type FSharpGeneratorContextFactory() =
                     | group -> group.TypeDeclarations.FirstOrDefault().As<IFSharpTypeDeclaration>()
                 | typeDeclaration -> typeDeclaration
 
-            if isNull typeDeclaration then null else
             FSharpGeneratorContext.Create(kind, typeDeclaration) :> _
 
-        member x.TryCreate(_, _, _) = null
+        member x.TryCreate(kind, treeNode, _) =
+            FSharpGeneratorContext.Create(kind, treeNode) :> _
+
         member x.TryCreate(_: string, _: IDeclaredElement): IGeneratorContext = null
 
 
 type FSharpGeneratorElement(element, mfv, substitution, addTypes) =
     inherit GeneratorDeclaredElement(element)
+
+    member x.Member = element
 
     interface IFSharpGeneratorElement with
         member x.Mfv = mfv
@@ -79,6 +83,7 @@ type FSharpGeneratorElement(element, mfv, substitution, addTypes) =
 
 
 [<GeneratorElementProvider(GeneratorStandardKinds.Overrides, typeof<FSharpLanguage>)>]
+[<GeneratorElementProvider(GeneratorStandardKinds.MissingMembers, typeof<FSharpLanguage>)>]
 type FSharpOverridableMembersProvider() =
     inherit GeneratorProviderBase<FSharpGeneratorContext>()
 
@@ -154,6 +159,8 @@ type FSharpOverridableMembersProvider() =
             |> List.map snd
             |> GenerateOverrides.getMembersNeedingTypeAnnotations
 
+        let missingMembersOnly = context.Kind = GeneratorStandardKinds.MissingMembers
+
         overridableMemberInstances
         |> Seq.filter (fun (m, _) ->
             // todo: events, anything else?
@@ -164,10 +171,12 @@ type FSharpOverridableMembersProvider() =
             FSharpGeneratorElement(m, mfv, mfvInstance.Substitution, needsTypesAnnotations.Contains(mfv)))
         |> Seq.filter (fun i -> not (ownMembersIds.Contains(i.TestDescriptor)))
         |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
+        |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)
         |> Seq.iter context.ProvidedElements.Add
 
 
 [<GeneratorBuilder(GeneratorStandardKinds.Overrides, typeof<FSharpLanguage>)>]
+[<GeneratorBuilder(GeneratorStandardKinds.MissingMembers, typeof<FSharpLanguage>)>]
 type FSharpOverridingMembersBuilder() =
     inherit GeneratorBuilderBase<FSharpGeneratorContext>()
 

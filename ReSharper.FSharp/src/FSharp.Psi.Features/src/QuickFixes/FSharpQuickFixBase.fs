@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Feature.Services.QuickFixes
 type FSharpQuickFixBase() =
     inherit QuickFixBase()
 
-    abstract ExecutePsiTransaction: ISolution -> unit
+    abstract ExecutePsiTransaction: solution: ISolution -> unit
     default x.ExecutePsiTransaction _ = ()
 
     override x.ExecutePsiTransaction(solution, _) =

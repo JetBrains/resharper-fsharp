@@ -258,6 +258,7 @@
     </Message>
     <Range>typeDecl.GetNameDocumentRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateMissingOverridesFix</QuickFix>
     <QuickFix>ToAbstractFix</QuickFix>
   </Error>
 
