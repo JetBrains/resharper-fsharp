@@ -242,7 +242,6 @@ tasks {
         targetDir = "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer"
         targetClass = "_FSharpLexer"
         purgeOldFiles = true
-        outputs.upToDateWhen { false }
     }
 
     withType<KotlinCompile> {
@@ -256,7 +255,7 @@ tasks {
             showStandardStreams = true
             exceptionFormat = TestExceptionFormat.FULL
         }
-        val rerunSuccessfulTests = true
+        val rerunSuccessfulTests = false
         outputs.upToDateWhen { !rerunSuccessfulTests }
         ignoreFailures = true
     }
