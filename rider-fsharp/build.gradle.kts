@@ -126,6 +126,7 @@ val dotNetSdkPath by lazy {
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
 val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
+val backendLexerSources = "$repoRoot/rider-fsharp/build/backend-lexer-sources/"
 
 val riderFSharpTargetsGroup = "rider-fsharp"
 
@@ -208,11 +209,40 @@ tasks {
         maxHeapSize = "1500m"
     }
 
+    val resetLexerDirectory = create("resetLexerDirectory") {
+        doFirst {
+            File(backendLexerSources).deleteRecursively()
+            File(backendLexerSources).mkdirs()
+        }
+    }
+
+    // Cannot use ordinary copy here, because it requires eager evaluation of locations
+    val copyUnicodeLex = create("copyUnicodeLex") {
+        dependsOn(resetLexerDirectory)
+        doFirst {
+            val libPath = File("$dotNetSdkPath").parent
+            File(libPath, "ReSharperHost/PsiTasks").listFiles { it -> it.extension == "lex" }!!.forEach {
+                println(it)
+                it.copyTo(File(backendLexerSources, it.name))
+            }
+        }
+    }
+
+    val copyBackendLexerSources = create<Copy>("copyBackendLexerSources") {
+        dependsOn(resetLexerDirectory)
+        from("$resharperPluginPath/src/FSharp.Psi/src/Parsing/Lexing") {
+            include("*.lex")
+        }
+        into(backendLexerSources)
+    }
+
     val generateFSharpLexer = task<GenerateLexer>("generateFSharpLexer") {
+        dependsOn(copyBackendLexerSources, copyUnicodeLex)
         source = "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer/_FSharpLexer.flex"
         targetDir = "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer"
         targetClass = "_FSharpLexer"
         purgeOldFiles = true
+        outputs.upToDateWhen { false }
     }
 
     withType<KotlinCompile> {
@@ -226,7 +256,7 @@ tasks {
             showStandardStreams = true
             exceptionFormat = TestExceptionFormat.FULL
         }
-        val rerunSuccessfulTests = false
+        val rerunSuccessfulTests = true
         outputs.upToDateWhen { !rerunSuccessfulTests }
         ignoreFailures = true
     }
