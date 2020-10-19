@@ -16,6 +16,9 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type FSharpGeneratorMfvElement(mfv, substitution, addTypes) =
+    new (mfvInstance: FcsMfvInstance, addTypes) =
+        FSharpGeneratorMfvElement(mfvInstance.Mfv, mfvInstance.Substitution, addTypes)
+
     interface IFSharpGeneratorElement with
         member x.Mfv = mfv
         member x.Substitution = substitution
@@ -29,9 +32,8 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
     let getInterfaces (fcsType: FSharpType) =
         fcsType.AllInterfaces
         |> Seq.filter (fun t -> t.HasTypeDefinition)
-        |> Seq.map (fun t ->
-            let fcsEntity = t.TypeDefinition
-            fcsEntity, Seq.zip fcsEntity.GenericParameters t.GenericArguments |> Seq.toList)
+        |> Seq.map FcsEntityInstance.create
+        |> Seq.toList
 
     override x.Text = "Generate missing members"
 
@@ -68,38 +70,26 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             |> HashSet
 
         let allInterfaceMembers = 
-            getInterfaces interfaceType
-            |> Seq.collect (fun (fcsEntity, substitution) ->
-                fcsEntity.MembersFunctionsAndValues |> Seq.map (fun mfv -> mfv, substitution))
-            |> Seq.toList
+            getInterfaces interfaceType |> List.collect (fun fcsEntityInstance ->
+                fcsEntityInstance.Entity.MembersFunctionsAndValues
+                |> Seq.map (fun mfv -> FcsMfvInstance.create mfv fcsEntityInstance.Substitution)
+                |> Seq.toList)
 
-        let needsTypesAnnotations = 
-            let sameParamNumberMembersGroups = 
-                allInterfaceMembers |> Seq.groupBy (fun (mfv, _) ->
-                    let parameterGroups = mfv.CurriedParameterGroups
-                    mfv.LogicalName, (Seq.length parameterGroups), (Seq.map Seq.length parameterGroups |> Seq.toList))
-                |> Seq.toList
-
-            let sameParamNumberMembers =
-                List.map (snd >> (Seq.map fst) >> Seq.toList) sameParamNumberMembersGroups
-
-            sameParamNumberMembers
-            |> Seq.filter (Seq.length >> ((<) 1))
-            |> Seq.concat
-            |> HashSet
+        let needsTypesAnnotations =
+            GenerateOverrides.getMembersNeedingTypeAnnotations allInterfaceMembers
 
         let membersToGenerate = 
             allInterfaceMembers
-            |> Seq.filter (fun (mfv, _) ->
+            |> List.filter (fun mfvInstance ->
+                let mfv = mfvInstance.Mfv
                 // todo: other accessors
                 not (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod) &&
 
                 let xmlDocId = FSharpElementsUtil.GetXmlDocId(mfv)
                 isNotNull xmlDocId && not (implementedMembers.Contains(xmlDocId)))
-            |> Seq.sortBy (fun (mfv, _) -> mfv.LogicalName) // todo: better sorting?
-            |> Seq.map (fun (mfv, s) -> mfv, s, needsTypesAnnotations.Contains(mfv))
-            |> Seq.map FSharpGeneratorMfvElement
-            |> Seq.toList
+            |> List.sortBy (fun mfvInstance -> mfvInstance.Mfv.LogicalName) // todo: better sorting?
+            |> List.map (fun mfvInstance -> mfvInstance, needsTypesAnnotations.Contains(mfvInstance.Mfv))
+            |> List.map FSharpGeneratorMfvElement
 
         let indent =
             if existingMemberDecls.IsEmpty then

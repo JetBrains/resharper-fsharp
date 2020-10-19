@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -90,6 +89,9 @@ type FSharpOverridableMembersProvider() =
         | :? IStruct -> true
         | _ -> false // todo: interfaces with default impl
 
+    let getTestDescriptor (overridableMember: ITypeMember) =
+        GeneratorElementBase.GetTestDescriptor(overridableMember, overridableMember.IdSubstitution)
+
     override x.Populate(context: FSharpGeneratorContext) =
         let typeDeclaration = context.TypeDeclaration
         let typeElement = typeDeclaration.DeclaredElement
@@ -100,10 +102,7 @@ type FSharpOverridableMembersProvider() =
 
         let rec getBaseTypes (fcsEntity: FSharpEntity) =
             let rec loop acc (fcsType: FSharpType) =
-                let fcsType = getAbbreviatedType fcsType
-                let fcsEntity = fcsType.TypeDefinition
-                let substitution = Seq.zip fcsEntity.GenericParameters fcsType.GenericArguments |> Seq.toList
-                let acc = (fcsEntity, substitution) :: acc
+                let acc = FcsEntityInstance.create fcsType :: acc
 
                 match fcsType.BaseType with
                 | Some baseType when baseType.HasTypeDefinition -> loop acc baseType
@@ -116,7 +115,7 @@ type FSharpOverridableMembersProvider() =
         let ownMembersIds =
             typeElement.GetMembers()
             |> Seq.filter (fun e -> not (e :? IFSharpGeneratedElement))
-            |> Seq.map (fun e -> GeneratorElementBase.GetTestDescriptor(e, e.IdSubstitution))
+            |> Seq.map getTestDescriptor
             |> HashSet
 
         let memberInstances =
@@ -124,46 +123,45 @@ type FSharpOverridableMembersProvider() =
             |> Seq.map (fun i -> i.Member.XMLDocId, i)
             |> dict
 
-        let memberInstances =
-            let baseTypes = getBaseTypes fcsEntity
-            baseTypes |> Seq.collect (fun (fcsEntity, substitution) ->
-                fcsEntity.MembersFunctionsAndValues |> Seq.choose (fun mfv ->
-                    // todo: allow generating accessors
-                    if mfv.IsAccessor() then None else
+        let baseFcsTypes = getBaseTypes fcsEntity
+
+        let baseFcsMembers =
+            baseFcsTypes |> List.map (fun fcsEntityInstance ->
+                let mfvInstances =
+                    fcsEntityInstance.Entity.MembersFunctionsAndValues
+                    |> Seq.map (fun mfv -> FcsMfvInstance.create mfv fcsEntityInstance.Substitution)
+                    |> Seq.toList
+                fcsEntityInstance, mfvInstances)
+
+        let overridableMemberInstances =
+            baseFcsMembers |> List.collect (fun (_, mfvInstances) ->
+                mfvInstances |> List.choose (fun mfvInstance ->
+                    let mfv = mfvInstance.Mfv
+                    if mfv.IsAccessor() then None else // todo: allow generating accessors
 
                     // FCS provides wrong XmlDocId for accessors, e.g. T.P for T.get_P()
                     let xmlDocId = mfv.XmlDocSig
                     if ownMembersIds.Contains(xmlDocId) then None else
 
                     match memberInstances.TryGetValue(xmlDocId) with
-                    | true, i -> Some (i.Member, (mfv, substitution))
-                    | _ -> None))
-            |> Seq.toList
+                    | true, i -> Some (i.Member, mfvInstance)
+                    | _ -> None)
+                |> Seq.toList)
 
         let needsTypesAnnotations = 
-            let sameParamNumberMembersGroups = 
-                memberInstances
-                |> Seq.distinctBy (fun (m, _) -> GeneratorElementBase.GetTestDescriptor(m, m.IdSubstitution))
-                |> Seq.groupBy (fun (_, (mfv, _)) ->
-                    let parameterGroups = mfv.CurriedParameterGroups
-                    mfv.LogicalName, (Seq.length parameterGroups), (Seq.map Seq.length parameterGroups |> Seq.toList))
-                |> Seq.toList
+            overridableMemberInstances
+            |> List.distinctBy (fst >> getTestDescriptor)
+            |> List.map snd
+            |> GenerateOverrides.getMembersNeedingTypeAnnotations
 
-            let sameParamNumberMembers =
-                List.map (snd >> (Seq.map snd) >> Seq.toList) sameParamNumberMembersGroups
-
-            sameParamNumberMembers
-            |> Seq.filter (Seq.length >> ((<) 1))
-            |> Seq.concat
-            |> Seq.map fst
-            |> HashSet
-
-        memberInstances
+        overridableMemberInstances
         |> Seq.filter (fun (m, _) ->
             // todo: events, anything else?
             // todo: separate getters/setters (including existing ones)
-            (m :? IMethod || m :? IProperty) && m.CanBeOverridden())
-        |> Seq.map (fun (i, (mfv, substitution)) -> FSharpGeneratorElement(i, mfv, substitution, needsTypesAnnotations.Contains(mfv)))
+            (m :? IMethod || m :? IProperty || m :? IEvent) && m.CanBeOverridden())
+        |> Seq.map (fun (m, mfvInstance) ->
+            let mfv = mfvInstance.Mfv
+            FSharpGeneratorElement(m, mfv, mfvInstance.Substitution, needsTypesAnnotations.Contains(mfv)))
         |> Seq.filter (fun i -> not (ownMembersIds.Contains(i.TestDescriptor)))
         |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
         |> Seq.iter context.ProvidedElements.Add
@@ -208,10 +206,11 @@ type FSharpOverridingMembersBuilder() =
             | _ -> anchor, anchor.Indent
 
         context.InputElements
-        |> Seq.map (fun input ->
-            let element = input :?> FSharpGeneratorElement
+        |> Seq.cast<FSharpGeneratorElement>
+        |> Seq.map (fun element ->
             let memberDecl = GenerateOverrides.generateMember typeDecl displayContext element
             memberDecl.SetOverride(true)
             memberDecl)
         |> Seq.collect (withNewLineAndIndentBefore indent)
-        |> addNodesAfter anchor |> ignore
+        |> addNodesAfter anchor
+        |> ignore

@@ -1,10 +1,12 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 
+open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
@@ -13,7 +15,51 @@ type IFSharpGeneratorElement =
     abstract Substitution: (FSharpGenericParameter * FSharpType) list
     abstract AddTypes: bool
 
+
+type FcsEntityInstance =
+    { Entity: FSharpEntity
+      Substitution: (FSharpGenericParameter * FSharpType) list }
+
+    override x.ToString() = x.Entity.ToString()
+
+module FcsEntityInstance =
+    let create fcsType =
+        let fcsType = getAbbreviatedType fcsType
+        let fcsEntity = fcsType.TypeDefinition
+        let substitution = Seq.zip fcsEntity.GenericParameters fcsType.GenericArguments |> Seq.toList
+
+        { Entity = fcsEntity
+          Substitution = substitution }
+
+
+type FcsMfvInstance =
+    { Mfv: FSharpMemberOrFunctionOrValue
+      Substitution: (FSharpGenericParameter * FSharpType) list }
+
+    override x.ToString() = x.Mfv.ToString()
+
+module FcsMfvInstance =
+    let create mfv substitution =
+        { Mfv = mfv
+          Substitution = substitution }
+
+
 module GenerateOverrides =
+    let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
+        let sameParamNumberMembersGroups =
+            mfvInstances
+            |> List.map (fun mfvInstance -> mfvInstance.Mfv)
+            |> List.groupBy (fun mfv ->
+                mfv.LogicalName, Seq.map Seq.length mfv.CurriedParameterGroups |> Seq.toList)
+
+        let sameParamNumberMembers =
+            List.map snd sameParamNumberMembersGroups
+
+        sameParamNumberMembers
+        |> Seq.filter (Seq.length >> ((<) 1))
+        |> Seq.concat
+        |> HashSet
+
     let generateMember (context: IFSharpTreeNode) displayContext (element: IFSharpGeneratorElement) =
         let mfv = element.Mfv
 
