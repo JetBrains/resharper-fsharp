@@ -13,6 +13,8 @@ type GenerateInterfaceMembersFixTest() =
 
     [<Test>] member x.``Empty impl 01``() = x.DoNamedTest()
     [<Test>] member x.``Empty impl 02 - Generate multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Empty impl 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Partial impl 01``() = x.DoNamedTest()
     [<Test>] member x.``Partial impl 02 - Generate multiple``() = x.DoNamedTest()
 
@@ -42,6 +44,7 @@ type GenerateInterfaceMembersFixTest() =
 
     [<Test>] member x.``Nested interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Nested interface 02 - Multiple``() = x.DoNamedTest()
+
 
 type GenerateMissingMembersFixTest() =
     inherit FSharpQuickFixTestBase<GenerateMissingOverridesFix>()

@@ -130,6 +130,12 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         while not x.Eof && x.TokenType != tokenType do
             x.AdvanceLexer()
     
+    /// Should only be used when expected token is known to exist.
+    member x.AdvanceToTokenAndSkip(tokenType: TokenNodeType) =
+        x.AdvanceToToken(tokenType)
+        if x.TokenType == tokenType then
+            x.Advance()
+
     member x.ProcessReferenceName(lid: Ident list) =
         if lid.IsEmpty then () else
 
@@ -498,6 +504,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             for pat in pats do
                 x.ProcessImplicitCtorParam(pat)
             x.Done(tupleMark, ElementType.TUPLE_PAT)
+            x.AdvanceToTokenAndSkip(FSharpTokenType.RPAREN)
 
         | SynSimplePats.Typed(pats, synType, _) ->
             failwith "foo"
