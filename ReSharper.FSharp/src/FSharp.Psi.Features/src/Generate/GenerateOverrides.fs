@@ -3,9 +3,11 @@
 open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -26,7 +28,7 @@ let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
     |> Seq.concat
     |> HashSet
 
-let generateMember (context: IFSharpTreeNode) displayContext (element: IFSharpGeneratorElement) =
+let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGeneratorElement) =
     let mfv = element.Mfv
 
     let mutable nextUnnamedVariableNumber = 0
@@ -51,19 +53,24 @@ let generateMember (context: IFSharpTreeNode) displayContext (element: IFSharpGe
     
     let paramGroups =
         if mfv.IsProperty then [] else
-        factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, element.AddTypes, displayContext)
+        factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, element.AddTypes, element.DisplayContext)
 
     let memberDeclaration = factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups)
 
     if element.IsOverride then
         memberDeclaration.SetOverride(true)
 
+    if element.Mfv.IsCliEvent() then
+        let attribute = context.CreateElementFactory().CreateAttribute("CLIEvent")
+        FSharpAttributesUtil.addAttributesListWithIndent true indent memberDeclaration
+        FSharpAttributesUtil.addAttribute memberDeclaration.AttributeLists.[0] attribute
+
     if element.AddTypes then
         let lastParam = memberDeclaration.ParametersPatterns.LastOrDefault()
         if isNull lastParam then () else
 
         let typeString = mfv.ReturnParameter.Type.Instantiate(element.Substitution)
-        let typeUsage = factory.CreateTypeUsage(typeString.Format(displayContext))
+        let typeUsage = factory.CreateTypeUsage(typeString.Format(element.DisplayContext))
         ModificationUtil.AddChildAfter(lastParam, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
 
     memberDeclaration

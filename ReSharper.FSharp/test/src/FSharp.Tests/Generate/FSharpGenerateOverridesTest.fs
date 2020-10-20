@@ -2,9 +2,10 @@
 
 open JetBrains.ReSharper.FeaturesTestFramework.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest>]
+[<FSharpTest; TestPackages(FSharpCorePackage)>]
 type FSharpGenerateOverridesTest() =
     inherit GenerateTestBase()
 
@@ -25,6 +26,7 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Anchor - Union Case 01``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Union Case 02 - Modifier``() = x.DoNamedTest()
 
+    [<Test>] member x.``Member - Event - Cli 01``() = x.DoNamedTest()
     [<Test>] member x.``Member - Property 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Input elements - Overriden 01``() = x.DoNamedTest()

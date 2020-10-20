@@ -113,26 +113,33 @@ let removeAttributeOrList (attr: IAttribute) =
         removeAttributeFromList attr
 
 
-let addAttributesList (decl: IFSharpTreeNode) addNewLine =
+let addAttributesListWithIndent addNewLine (indent: int) (decl: IFSharpTreeNode) =
     addNodesBefore decl.FirstChild [
         decl.CreateElementFactory().CreateEmptyAttributeList()
         if addNewLine then
             NewLine(decl.GetLineEnding())
-            Whitespace(decl.Indent)
+            Whitespace(indent)
         else
             Whitespace()
     ] |> ignore
+
+let addAttributesList addNewLine (decl: IFSharpTreeNode) =
+    addAttributesListWithIndent addNewLine decl.Indent decl
+
 
 let getTypeDeclarationAttributeList (typeDecl: #IFSharpTypeOrExtensionDeclaration) =
     let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl)
     if typeDeclarationGroup.TypeDeclarations.[0] == typeDecl then
         let attributeLists = typeDeclarationGroup.AttributeLists
         if not attributeLists.IsEmpty then attributeLists.[0] else
-        addAttributesList typeDeclarationGroup true; typeDeclarationGroup.AttributeLists.[0]
+
+        addAttributesList true typeDeclarationGroup
+        typeDeclarationGroup.AttributeLists.[0]
     else
         let attributeLists = typeDecl.AttributeLists
         if not attributeLists.IsEmpty then attributeLists.[0] else
-        addAttributesList typeDecl false; typeDecl.AttributeLists.[0]
+        addAttributesList false typeDecl
+        typeDecl.AttributeLists.[0]
 
 let resolvesToType (clrTypeName: IClrTypeName) (attr: IAttribute) =
     let reference = attr.ReferenceName.Reference

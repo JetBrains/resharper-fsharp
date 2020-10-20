@@ -186,11 +186,13 @@ module FcsEntityInstance =
 
 type FcsMfvInstance =
     { Mfv: FSharpMemberOrFunctionOrValue
+      DisplayContext: FSharpDisplayContext
       Substitution: (FSharpGenericParameter * FSharpType) list }
 
     override x.ToString() = x.Mfv.ToString()
 
 module FcsMfvInstance =
-    let create mfv substitution =
+    let create mfv displayContext substitution =
         { Mfv = mfv
-          Substitution = substitution }
+          Substitution = substitution
+          DisplayContext = displayContext }

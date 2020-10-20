@@ -16,12 +16,13 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type FSharpGeneratorMfvElement(mfv, substitution, addTypes) =
+type FSharpGeneratorMfvElement(mfv, displayContext, substitution, addTypes) =
     new (mfvInstance: FcsMfvInstance, addTypes) =
-        FSharpGeneratorMfvElement(mfvInstance.Mfv, mfvInstance.Substitution, addTypes)
+        FSharpGeneratorMfvElement(mfvInstance.Mfv, mfvInstance.DisplayContext, mfvInstance.Substitution, addTypes)
 
     interface IFSharpGeneratorElement with
         member x.Mfv = mfv
+        member x.DisplayContext = displayContext
         member x.Substitution = substitution
         member x.AddTypes = addTypes
         member x.IsOverride = false
@@ -74,7 +75,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
         let allInterfaceMembers = 
             getInterfaces interfaceType |> List.collect (fun fcsEntityInstance ->
                 fcsEntityInstance.Entity.MembersFunctionsAndValues
-                |> Seq.map (fun mfv -> FcsMfvInstance.create mfv fcsEntityInstance.Substitution)
+                |> Seq.map (fun mfv -> FcsMfvInstance.create mfv displayContext fcsEntityInstance.Substitution)
                 |> Seq.toList)
 
         let needsTypesAnnotations =
@@ -83,12 +84,10 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
         let membersToGenerate = 
             allInterfaceMembers
             |> List.filter (fun mfvInstance ->
-                let mfv = mfvInstance.Mfv
-                // todo: other accessors
-                not (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod) &&
+                not (mfvInstance.Mfv.IsAccessor()) &&
 
-                let xmlDocId = FSharpElementsUtil.GetXmlDocId(mfv)
-                isNotNull xmlDocId && not (implementedMembers.Contains(xmlDocId)))
+                let xmlDocId = FSharpElementsUtil.GetXmlDocId(mfvInstance.Mfv)
+                not (implementedMembers.Contains(xmlDocId)))
             |> List.sortBy (fun mfvInstance -> mfvInstance.Mfv.LogicalName) // todo: better sorting?
             |> List.map (fun mfvInstance -> mfvInstance, needsTypesAnnotations.Contains(mfvInstance.Mfv))
             |> List.map FSharpGeneratorMfvElement
@@ -101,7 +100,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
 
         let generatedMembers =
             membersToGenerate
-            |> List.map (GenerateOverrides.generateMember impl displayContext)
+            |> List.map (GenerateOverrides.generateMember impl indent)
             |> List.collect (withNewLineAndIndentBefore indent)
 
         if isNull impl.WithKeyword then

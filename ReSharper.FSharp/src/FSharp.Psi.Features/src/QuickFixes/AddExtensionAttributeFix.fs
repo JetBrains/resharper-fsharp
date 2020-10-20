@@ -45,7 +45,7 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
             | None -> ()
 
             if m.AttributeLists.IsEmpty then
-                addAttributesList m true
+                addAttributesList true m
             addAttribute m.AttributeLists.[0] attribute
 
         | :? IFSharpTypeOrExtensionDeclaration as t ->

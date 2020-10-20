@@ -4,6 +4,7 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Components
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.TestFramework
@@ -18,7 +19,7 @@ type NameResolutionTest() =
 
     let getFullName (symbol: FSharpSymbol) =
         match symbol with
-        | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsModuleValueOrMember -> Some mfv.XmlDocSig
+        | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsModuleValueOrMember -> Some (mfv.GetXmlDocId())
         | :? FSharpEntity as entity -> Some entity.XmlDocSig
         | _ -> None
 

@@ -8,15 +8,12 @@ open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
@@ -73,13 +70,17 @@ type FSharpGeneratorContextFactory() =
         member x.TryCreate(_: string, _: IDeclaredElement): IGeneratorContext = null
 
 
-type FSharpGeneratorElement(element, mfv, substitution, addTypes) =
+type FSharpGeneratorElement(element, mfv, displayContext, substitution, addTypes) =
     inherit GeneratorDeclaredElement(element)
+
+    new (element, mfvInstance: FcsMfvInstance, addTypes) =
+        FSharpGeneratorElement(element, mfvInstance.Mfv, mfvInstance.DisplayContext, mfvInstance.Substitution, addTypes)
 
     member x.Member = element
 
     interface IFSharpGeneratorElement with
         member x.Mfv = mfv
+        member x.DisplayContext = displayContext
         member x.Substitution = substitution
         member x.AddTypes = addTypes
         member x.IsOverride = true
@@ -110,6 +111,8 @@ type FSharpOverridableMembersProvider() =
         let fcsEntity = typeDeclaration.GetFSharpSymbol().As<FSharpEntity>()
         if isNull fcsEntity then () else
 
+        let displayContext = typeDeclaration.GetFSharpSymbolUse().DisplayContext
+
         let rec getBaseTypes (fcsEntity: FSharpEntity) =
             let rec loop acc (fcsType: FSharpType) =
                 let acc = FcsEntityInstance.create fcsType :: acc
@@ -139,7 +142,7 @@ type FSharpOverridableMembersProvider() =
             baseFcsTypes |> List.map (fun fcsEntityInstance ->
                 let mfvInstances =
                     fcsEntityInstance.Entity.MembersFunctionsAndValues
-                    |> Seq.map (fun mfv -> FcsMfvInstance.create mfv fcsEntityInstance.Substitution)
+                    |> Seq.map (fun mfv -> FcsMfvInstance.create mfv displayContext fcsEntityInstance.Substitution)
                     |> Seq.toList
                 fcsEntityInstance, mfvInstances)
 
@@ -150,7 +153,7 @@ type FSharpOverridableMembersProvider() =
                     if mfv.IsAccessor() then None else // todo: allow generating accessors
 
                     // FCS provides wrong XmlDocId for accessors, e.g. T.P for T.get_P()
-                    let xmlDocId = mfv.XmlDocSig
+                    let xmlDocId = mfv.GetXmlDocId()
                     if ownMembersIds.Contains(xmlDocId) then None else
 
                     match memberInstances.TryGetValue(xmlDocId) with
@@ -172,8 +175,7 @@ type FSharpOverridableMembersProvider() =
             // todo: separate getters/setters (including existing ones)
             (m :? IMethod || m :? IProperty || m :? IEvent) && m.CanBeOverridden())
         |> Seq.map (fun (m, mfvInstance) ->
-            let mfv = mfvInstance.Mfv
-            FSharpGeneratorElement(m, mfv, mfvInstance.Substitution, needsTypesAnnotations.Contains(mfv)))
+            FSharpGeneratorElement(m, mfvInstance, needsTypesAnnotations.Contains(mfvInstance.Mfv)))
         |> Seq.filter (fun i -> not (ownMembersIds.Contains(i.TestDescriptor)))
         |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
         |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)
@@ -190,7 +192,6 @@ type FSharpOverridingMembersBuilder() =
         use disableFormatter = new DisableCodeFormatter()
 
         let typeDecl = context.Root :?> IFSharpTypeDeclaration
-        let displayContext = typeDecl.GetFSharpSymbolUse().DisplayContext
 
         let anchor: ITreeNode =
             let typeMembers = typeDecl.TypeMembers
@@ -223,7 +224,7 @@ type FSharpOverridingMembersBuilder() =
 
         context.InputElements
         |> Seq.cast
-        |> Seq.map (GenerateOverrides.generateMember typeDecl displayContext)
+        |> Seq.map (GenerateOverrides.generateMember typeDecl indent)
         |> Seq.collect (withNewLineAndIndentBefore indent)
         |> addNodesAfter anchor
         |> ignore
