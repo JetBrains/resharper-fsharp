@@ -49,6 +49,7 @@
       <OutputFile>src\Daemon\Highlightings\FcsErrors.Generated.fs</OutputFile>
       <SubType>Designer</SubType>
     </ErrorsGen>
+    <Compile Include="src\Daemon\QuickDoc\FSharpQuickDocRequest.fs" />
     <Compile Include="src\Daemon\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
     <Compile Include="src\Daemon\Stages\FSharpIdentifierTooltipProvider.fs" />
     <Compile Include="src\Daemon\Stages\FcsErrorsStageProcessBase.fs" />
