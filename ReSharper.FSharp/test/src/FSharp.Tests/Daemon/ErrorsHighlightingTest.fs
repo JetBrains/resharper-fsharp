@@ -4,7 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages("FSharp.Core")>]
+[<TestPackages(FSharpCorePackage)>]
 type ErrorsHighlightingTest() =
     inherit FSharpHighlightingTestBase()
 

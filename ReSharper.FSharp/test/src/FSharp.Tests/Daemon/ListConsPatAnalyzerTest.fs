@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages("FSharp.Core")>]
+[<TestPackages(FSharpCorePackage)>]
 type ListConsPatAnalyzerTest() =
     inherit FSharpHighlightingTestBase()
 

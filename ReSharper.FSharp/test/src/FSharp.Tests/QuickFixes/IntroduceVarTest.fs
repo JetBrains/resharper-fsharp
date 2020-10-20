@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages("FSharp.Core")>]
+[<FSharpTest; TestPackages(FSharpCorePackage)>]
 type IntroduceVarTest() =
     inherit FSharpQuickFixTestBase<IntroduceVarFix>()
 
