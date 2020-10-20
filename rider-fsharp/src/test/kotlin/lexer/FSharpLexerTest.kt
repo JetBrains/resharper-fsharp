@@ -1,18 +1,14 @@
 package lexer
 
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.*
 import com.intellij.lexer.Lexer
-import com.intellij.testFramework.LexerTestCase
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
+import com.jetbrains.rider.test.RiderFrontendLexerTest
 import org.testng.annotations.Test
 
 @Test
-class FSharpLexerTest : LexerTestCase() {
+class FSharpLexerTest : RiderFrontendLexerTest("fs") {
     override fun createLexer(): Lexer {
         return FSharpLexer()
-    }
-
-    override fun getDirPath(): String? {
-        return null
     }
 
     @Test
@@ -1166,8 +1162,7 @@ class FSharpLexerTest : LexerTestCase() {
                 |LESS ('<')
                 |LBRACK_LESS ('[<')
                 |IDENT ('Measure')
-                |GREATER ('>')
-                |RBRACK (']')
+                |GREATER_RBRACK ('>]')
                 |WHITESPACE (' ')
                 |QUOTE (''')
                 |IDENT ('m')
