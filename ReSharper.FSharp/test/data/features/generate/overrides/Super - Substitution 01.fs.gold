@@ -17,5 +17,6 @@ type A<'T>() =
 
 type T() ={caret}
     inherit A<double>()
+
     override this.M(var0: int): unit = failwith "todo"
     override this.M(var0: double): unit = failwith "todo"

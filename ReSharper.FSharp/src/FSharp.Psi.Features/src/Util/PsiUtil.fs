@@ -61,14 +61,6 @@ type IFile with
     member x.GetNode<'T when 'T :> ITreeNode and 'T : null>(documentRange: DocumentRange) =
         x.GetNode<'T>(documentRange.StartOffset)
 
-type IFSharpTreeNode with
-    member x.GetLineEnding() =
-        let fsFile = x.FSharpFile
-        fsFile.DetectLineEnding(fsFile.GetPsiServices()).GetPresentation()
-
-    member x.GetIndentSize() =
-        let sourceFile = x.GetSourceFile()
-        sourceFile.GetFormatterSettings(x.Language).INDENT_SIZE
 
 type FSharpLanguage with
     member x.FSharpLanguageService =
@@ -76,30 +68,38 @@ type FSharpLanguage with
 
 
 type ITreeNode with
-        member x.IsChildOf(node: ITreeNode) =
-            if isNull node then false else node.Contains(x)
+    member x.GetLineEnding() =
+        let fsFile = x.GetContainingFile()
+        fsFile.DetectLineEnding(fsFile.GetPsiServices()).GetPresentation()
 
-        member x.GetIndent(document: IDocument) =
-            let startOffset = x.GetDocumentStartOffset().Offset
-            let startCoords = document.GetCoordsByOffset(startOffset)
-            startOffset - document.GetLineStartOffset(startCoords.Line)
+    member x.GetIndentSize() =
+        let sourceFile = x.GetSourceFile()
+        sourceFile.GetFormatterSettings(x.Language).INDENT_SIZE
 
-        member x.Indent =
-            let document = x.GetSourceFile().Document
-            x.GetIndent(document)
+    member x.IsChildOf(node: ITreeNode) =
+        if isNull node then false else node.Contains(x)
 
-        member x.GetStartLine(document: IDocument) =
-            document.GetCoordsByOffset(x.GetDocumentStartOffset().Offset).Line
+    member x.GetIndent(document: IDocument) =
+        let startOffset = x.GetDocumentStartOffset().Offset
+        let startCoords = document.GetCoordsByOffset(startOffset)
+        startOffset - document.GetLineStartOffset(startCoords.Line)
 
-        member x.GetEndLine(document: IDocument) =
-            document.GetCoordsByOffset(x.GetDocumentEndOffset().Offset).Line
-        
-        member x.StartLine = x.GetStartLine(x.GetSourceFile().Document)
-        member x.EndLine = x.GetEndLine(x.GetSourceFile().Document)
+    member x.Indent =
+        let document = x.GetSourceFile().Document
+        x.GetIndent(document)
 
-        member x.IsSingleLine =
-            let document = x.GetSourceFile().Document
-            x.GetStartLine(document) = x.GetEndLine(document)
+    member x.GetStartLine(document: IDocument) =
+        document.GetCoordsByOffset(x.GetDocumentStartOffset().Offset).Line
+
+    member x.GetEndLine(document: IDocument) =
+        document.GetCoordsByOffset(x.GetDocumentEndOffset().Offset).Line
+    
+    member x.StartLine = x.GetStartLine(x.GetSourceFile().Document)
+    member x.EndLine = x.GetEndLine(x.GetSourceFile().Document)
+
+    member x.IsSingleLine =
+        let document = x.GetSourceFile().Document
+        x.GetStartLine(document) = x.GetEndLine(document)
 
 let getNode<'T when 'T :> ITreeNode and 'T : null> (fsFile: IFSharpFile) (range: DocumentRange) =
     // todo: use IExpressionSelectionProvider

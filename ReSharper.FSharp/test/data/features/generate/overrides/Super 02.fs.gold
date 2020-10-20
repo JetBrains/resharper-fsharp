@@ -25,5 +25,6 @@ type B() =
 
 type T() ={caret}
     inherit B()
+
     override this.M(var0: int): unit = failwith "todo"
     override this.M(var0: double): unit = failwith "todo"

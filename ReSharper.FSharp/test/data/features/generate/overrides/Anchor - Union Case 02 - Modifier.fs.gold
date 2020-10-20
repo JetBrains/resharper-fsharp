@@ -10,4 +10,5 @@
 type T =
     private
         | C of {caret}int
+
     override this.ToString() = failwith "todo"

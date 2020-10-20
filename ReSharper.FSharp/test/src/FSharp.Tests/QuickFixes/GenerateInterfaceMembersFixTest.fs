@@ -17,6 +17,7 @@ type GenerateInterfaceMembersFixTest() =
 
     [<Test>] member x.``Partial impl 01``() = x.DoNamedTest()
     [<Test>] member x.``Partial impl 02 - Generate multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Partial impl 03 - Multiline``() = x.DoNamedTest()
 
     [<Test>] member x.``Method - Parameters - Curried 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Parameters - Curried 02``() = x.DoNamedTest()

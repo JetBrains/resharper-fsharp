@@ -8,11 +8,15 @@ open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
@@ -78,6 +82,7 @@ type FSharpGeneratorElement(element, mfv, substitution, addTypes) =
         member x.Mfv = mfv
         member x.Substitution = substitution
         member x.AddTypes = addTypes
+        member x.IsOverride = true
 
     override x.ToString() = element.ToString()
 
@@ -214,12 +219,11 @@ type FSharpOverridingMembersBuilder() =
                 anchor, typeDeclarationGroup.Indent + typeDecl.GetIndentSize()
             | _ -> anchor, anchor.Indent
 
+        let anchor = GenerateOverrides.addEmptyLineIfNeeded anchor
+
         context.InputElements
-        |> Seq.cast<FSharpGeneratorElement>
-        |> Seq.map (fun element ->
-            let memberDecl = GenerateOverrides.generateMember typeDecl displayContext element
-            memberDecl.SetOverride(true)
-            memberDecl)
+        |> Seq.cast
+        |> Seq.map (GenerateOverrides.generateMember typeDecl displayContext)
         |> Seq.collect (withNewLineAndIndentBefore indent)
         |> addNodesAfter anchor
         |> ignore

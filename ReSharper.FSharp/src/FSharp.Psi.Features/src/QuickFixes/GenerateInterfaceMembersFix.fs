@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -23,6 +24,7 @@ type FSharpGeneratorMfvElement(mfv, substitution, addTypes) =
         member x.Mfv = mfv
         member x.Substitution = substitution
         member x.AddTypes = addTypes
+        member x.IsOverride = false
 
 type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
     inherit FSharpQuickFixBase()
@@ -108,4 +110,5 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
                 FSharpTokenType.WITH.CreateLeafElement()
             ] |> ignore
 
-        addNodesAfter impl.LastChild generatedMembers |> ignore
+        let anchor = GenerateOverrides.addEmptyLineIfNeeded impl.LastChild
+        addNodesAfter anchor generatedMembers |> ignore

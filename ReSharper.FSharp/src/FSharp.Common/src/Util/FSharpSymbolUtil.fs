@@ -166,3 +166,31 @@ let hasMeasureParameter(entity: FSharpEntity) =
 
 type FSharpActivePatternGroup with
     member x.PatternName = patternName x
+
+
+type FcsEntityInstance =
+    { Entity: FSharpEntity
+      Substitution: (FSharpGenericParameter * FSharpType) list }
+
+    override x.ToString() = x.Entity.ToString()
+
+module FcsEntityInstance =
+    let create fcsType =
+        let fcsType = getAbbreviatedType fcsType
+        let fcsEntity = fcsType.TypeDefinition
+        let substitution = Seq.zip fcsEntity.GenericParameters fcsType.GenericArguments |> Seq.toList
+
+        { Entity = fcsEntity
+          Substitution = substitution }
+
+
+type FcsMfvInstance =
+    { Mfv: FSharpMemberOrFunctionOrValue
+      Substitution: (FSharpGenericParameter * FSharpType) list }
+
+    override x.ToString() = x.Mfv.ToString()
+
+module FcsMfvInstance =
+    let create mfv substitution =
+        { Mfv = mfv
+          Substitution = substitution }

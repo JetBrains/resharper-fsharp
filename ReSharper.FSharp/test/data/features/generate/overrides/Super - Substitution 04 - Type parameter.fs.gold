@@ -17,4 +17,5 @@ type A<'T1>() =
 [<AbstractClass>]
 type T<'T2>() ={caret}
     inherit A<'T2>()
+
     override this.M(var0: 'T2): unit = failwith "todo"
