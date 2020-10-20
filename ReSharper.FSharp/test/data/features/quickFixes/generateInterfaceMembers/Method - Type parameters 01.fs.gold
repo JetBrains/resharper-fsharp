@@ -1,0 +1,8 @@
+﻿module Module
+
+type I =
+  abstract M<'T> : int -> unit
+
+type T() =
+  interface I with
+    member this.M<'T>(var0) = failwith "todo"{caret}

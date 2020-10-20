@@ -6,6 +6,7 @@ open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions
+open JetBrains.DataFlow
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
@@ -83,26 +84,37 @@ type FSharpExperimentalFeatures =
       mutable FsiInteractiveEditor: bool }
 
 
-[<SolutionInstanceComponent>]
-type FSharpScriptSettingsProvider(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive) =
-    new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore) =
+[<AllowNullLiteral>]
+type FSharpSettingsProviderBase<'T>
+        (lifetime: Lifetime, settings: IContextBoundSettingsStoreLive, settingsSchema: SettingsSchema) =
+
+    let settingsKey = settingsSchema.GetKey<'T>()
+
+    new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore, settingsSchema: SettingsSchema) =
         let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
-        FSharpScriptSettingsProvider(lifetime, settings)
+        FSharpSettingsProviderBase(lifetime, settings, settingsSchema)
 
-    member val LanguageVersion = settings.GetValueProperty(lifetime, fun s -> s.LanguageVersion)
-    member val CustomDefines = settings.GetValueProperty(lifetime, fun s -> s.CustomDefines)
+    member x.GetValueProperty<'V>(name: string) =
+        let entry = settingsKey.TryFindEntryByMemberName(name) :?> SettingsScalarEntry
+        settings.GetValueProperty(lifetime, entry, null) :> IProperty<'V>
 
 
 [<SolutionInstanceComponent>]
-type FSharpExperimentalFeaturesProvider(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive) =
-    new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore) =
-        let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
-        FSharpExperimentalFeaturesProvider(lifetime, settings)
+type FSharpScriptSettingsProvider(lifetime, solution, settings, settingsSchema) =
+    inherit FSharpSettingsProviderBase<FSharpScriptOptions>(lifetime, solution, settings, settingsSchema)
 
-    member val EnableInlineVarRefactoring = settings.GetValueProperty(lifetime, fun s -> s.InlineVarRefactoring)
-    member val EnablePostfixTemplates = settings.GetValueProperty(lifetime, fun s -> s.PostfixTemplates)
-    member val RedundantParensAnalysis = settings.GetValueProperty(lifetime, fun s -> s.RedundantParensAnalysis)
-    member val Formatter = settings.GetValueProperty(lifetime, fun s -> s.Formatter)
+    member val LanguageVersion = base.GetValueProperty<FSharpLanguageVersion>("LanguageVersion")
+    member val CustomDefines = base.GetValueProperty<string>("CustomDefines")
+
+
+[<SolutionInstanceComponent>]
+type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSchema) =
+    inherit FSharpSettingsProviderBase<FSharpExperimentalFeatures>(lifetime, solution, settings, settingsSchema)
+
+    member val EnableInlineVarRefactoring = base.GetValueProperty<bool>("InlineVarRefactoring")
+    member val EnablePostfixTemplates = base.GetValueProperty<bool>("PostfixTemplates")
+    member val RedundantParensAnalysis = base.GetValueProperty<bool>("RedundantParensAnalysis")
+    member val Formatter = base.GetValueProperty<bool>("Formatter")
 
 
 module FSharpTypeHintOptions =
@@ -162,7 +174,7 @@ type FSharpTypeHintOptionsStore(lifetime: Lifetime, settingsStore: ISettingsStor
     do
         let settingsKey = settingsStore.Schema.GetKey<FSharpTypeHintOptions>()
 
-        settingsStore.Changed.Advise(lifetime, fun args ->
+        settingsStore.Changed.Advise(lifetime, fun (args: SettingsStoreChangeArgs) ->
             let typeHintOptionChanged =
                 args.ChangedEntries
                 |> Seq.exists (fun changedEntry -> changedEntry.Parent = settingsKey)

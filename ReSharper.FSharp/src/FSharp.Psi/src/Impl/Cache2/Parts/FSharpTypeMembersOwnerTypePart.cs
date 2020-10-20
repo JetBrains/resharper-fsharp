@@ -8,9 +8,9 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal abstract class FSharpTypeMembersOwnerTypePart : FSharpClassLikePart<IFSharpTypeDeclaration>
+  internal abstract class FSharpTypeMembersOwnerTypePart : FSharpClassLikePart<IFSharpTypeOldDeclaration>
   {
-    protected FSharpTypeMembersOwnerTypePart([NotNull] IFSharpTypeDeclaration declaration,
+    protected FSharpTypeMembersOwnerTypePart([NotNull] IFSharpTypeOldDeclaration declaration,
       [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.AllAttributes),
         declaration.TypeParameters, cacheBuilder)
@@ -52,18 +52,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override string[] ExtendsListShortNames { get; }
 
     [CanBeNull] internal IClrTypeName[] SuperTypesClrTypeNames;
-
-    public virtual MemberPresenceFlag GetMemberPresenceFlag() =>
-      MemberPresenceFlag.SIGN_OP | MemberPresenceFlag.EXPLICIT_OP |
-      MemberPresenceFlag.MAY_EQUALS_OVERRIDE | MemberPresenceFlag.MAY_TOSTRING_OVERRIDE |
-
-      // RIDER-10263
-      (HasPublicDefaultCtor ? MemberPresenceFlag.PUBLIC_DEFAULT_CTOR : MemberPresenceFlag.NONE);
-
-    public virtual IDeclaredType GetBaseClassType() =>
-      ExtendsListShortNames.IsEmpty()
-        ? null
-        : GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
 
     public override IEnumerable<IDeclaredType> GetSuperTypes()
     {

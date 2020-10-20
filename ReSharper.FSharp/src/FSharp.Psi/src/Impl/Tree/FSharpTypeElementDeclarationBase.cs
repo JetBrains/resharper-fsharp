@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal abstract class FSharpTypeElementDeclarationBase : FSharpCachedDeclarationBase, IFSharpTypeElementDeclaration
   {
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
-    ITypeElement ITypeDeclaration.DeclaredElement => (ITypeElement) DeclaredElement;
+    ITypeElement ITypeDeclaration.DeclaredElement => (ITypeElement) CacheDeclaredElement;
 
     /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -88,6 +88,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
           if (child is IBindingSignature bindingSignature) 
             ProcessBinding(bindingSignature, result);
+
+          if (child is IUnionCaseFieldDeclarationList fieldDeclarationList)
+            result.AddRange(fieldDeclarationList.FieldsEnumerable);
         }
 
         return result.AsReadOnly();
@@ -123,7 +126,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        if (!(this is IFSharpTypeDeclaration typeDeclaration))
+        if (!(this is IFSharpTypeOrExtensionDeclaration typeDeclaration))
           return TreeNodeCollection<IAttribute>.Empty;
 
         var attributes = typeDeclaration.Attributes;
@@ -152,7 +155,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       var module =
         ModuleLikeDeclarationNavigator.GetByMember(
-          this as IModuleMember ?? TypeDeclarationGroupNavigator.GetByTypeDeclaration(this as IFSharpTypeDeclaration));
+          this as IModuleMember ?? 
+          TypeDeclarationGroupNavigator.GetByTypeDeclaration(this as IFSharpTypeOrExtensionDeclaration));
 
       if (module == null)
         return;

@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (typeDeclaration == null)
         return null;
 
-      if (TryCreateDeclaredElementFast(typeDeclaration) is var declaredElement && declaredElement != null)
+      if (TryCreateDeclaredElementFast(typeDeclaration) is { } declaredElement)
         return declaredElement;
 
       return GetFSharpSymbol() is { } fcsSymbol
@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (typeDeclaration == null)
         return null;
 
-      if (typeDeclaration is IFSharpTypeDeclaration)
+      if (typeDeclaration is IFSharpTypeOldDeclaration)
       {
         if ((!mfv.CurriedParameterGroups.IsEmpty() || !mfv.GenericParameters.IsEmpty()) && !mfv.IsMutable)
           return new FSharpTypePrivateMethod(declaration);
@@ -75,10 +75,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       if (this is IParametersOwnerPat)
       {
-        if (this.TryCreateOperator() is var opDeclaredElement && opDeclaredElement != null)
+        if (this.TryCreateOperator() is { } opDeclaredElement)
           return opDeclaredElement;
 
-        return typeDeclaration is IFSharpTypeDeclaration
+        return typeDeclaration is IFSharpTypeOldDeclaration
           ? (IDeclaredElement) new FSharpTypePrivateMethod(this)
           : new ModuleFunction(this);
       }
@@ -89,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (chameleonExpr == null)
         return null;
 
-      if (TryCreateLiteral(binding, chameleonExpr) is var literal && literal != null)
+      if (TryCreateLiteral(binding, chameleonExpr) is { } literal)
         return literal;
 
       if (chameleonExpr.IsSimpleValueExpression())
@@ -111,7 +111,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     [NotNull]
     private IDeclaredElement CreateValue(ITypeDeclaration typeDeclaration) =>
-      typeDeclaration is IFSharpTypeDeclaration
+      typeDeclaration is IFSharpTypeOldDeclaration
         ? (IDeclaredElement) new FSharpTypePrivateField(this)
         : new ModuleValue(this);
 

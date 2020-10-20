@@ -55,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetDeclaration() is ITopReferencePat referencePat && referencePat.CanBeMutable;
 
     public override bool IsStatic => 
-      GetDeclaration() is var decl && decl != null && decl.IsStatic;
+      GetDeclaration() is { } decl && decl.IsStatic;
   }
 
   internal class FSharpValField : FSharpFieldBase<ValFieldDeclaration>

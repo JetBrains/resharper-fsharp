@@ -3,5 +3,5 @@
 | _ :: |_ :: []|(1) -> ()
 
 ---------------------------------------------------------
-(0): ReSharper Warning: Pattern can be simplified
-(1): ReSharper Warning: Pattern can be simplified
+(0): ReSharper Suggestion: Pattern can be simplified
+(1): ReSharper Suggestion: Pattern can be simplified

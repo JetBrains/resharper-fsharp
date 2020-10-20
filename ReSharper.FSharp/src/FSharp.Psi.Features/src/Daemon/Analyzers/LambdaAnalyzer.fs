@@ -14,8 +14,9 @@ open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
                          HighlightingTypes = [| typeof<LambdaCanBeSimplifiedWarning>
-                                                typeof<LambdaCanBeReplacedWarning>
-                                                typeof<ExpressionCanBeReplacedWithIdWarning> |])>]
+                                                typeof<LambdaCanBeReplacedWithInnerExpressionWarning>
+                                                typeof<LambdaBodyCanBeReplacedWithIdWarning>
+                                                typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>|])>]
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
 
@@ -100,10 +101,22 @@ type LambdaAnalyzer() =
 
         match compareArgs pats expr with
         | true, true, replaceCandidate ->
-            consumer.AddHighlighting(LambdaCanBeReplacedWarning(lambda, replaceCandidate))
+            consumer.AddHighlighting(LambdaCanBeReplacedWithInnerExpressionWarning(lambda, replaceCandidate))
         | true, false, replaceCandidate ->
             consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, replaceCandidate))
         | _ ->
 
-        if compareArg (pats.LastOrDefault()) expr then
-            consumer.AddHighlighting(ExpressionCanBeReplacedWithIdWarning(lambda))
+        if pats.Count = 1 then
+            match pats.First().IgnoreInnerParens() with
+            | :? ITuplePat as pat when pat.PatternsEnumerable.CountIs(2) ->
+                let tuplePats = pat.Patterns
+                if compareArg (tuplePats.[0]) expr then
+                    consumer.AddHighlighting(LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "fst"))
+                elif compareArg (tuplePats.[1]) expr then
+                    consumer.AddHighlighting(LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "snd"))
+            | _ -> ()
+
+        match compareArg (pats.LastOrDefault()) expr, pats.Count with
+        | true, 1 -> consumer.AddHighlighting(LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "id"))
+        | true, _ -> consumer.AddHighlighting(LambdaBodyCanBeReplacedWithIdWarning(lambda))
+        | _ -> ()

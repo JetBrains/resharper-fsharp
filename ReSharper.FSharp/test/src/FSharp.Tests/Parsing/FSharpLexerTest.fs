@@ -54,6 +54,7 @@ type FSharpLexerTest() =
     [<Test>] member x.Keywords() = x.DoNamedTest()
     [<Test>] member x.Punctuation() = x.DoNamedTest()
     [<Test>] member x.Attribute() = x.DoNamedTest()
+    [<Test>] member x.``Attribute inside generic``() = x.DoNamedTest()
 
     [<Test>] member x.``Symbolic keyword``() = x.DoNamedTest()
     [<Test>] member x.``Code quotation``() = x.DoNamedTest()
@@ -86,6 +87,8 @@ type FSharpLexerTest() =
     [<Test>] member x.``Operators 07 - Integer range``() = x.DoNamedTest()
     [<Test>] member x.``Operators 08 - Bad operator``() = x.DoNamedTest()
     [<Test>] member x.``Operators 09 - Left arrow``() = x.DoNamedTest()
+    [<Test>] member x.``Operators 10 - Circumflexes``() = x.DoNamedTest()
+    [<Test>] member x.``Operators 11 - More circumflexes``() = x.DoNamedTest()
 
     [<Test>] member x.``Identifiers 01 - Backticked``() = x.DoNamedTest()
     [<Test>] member x.``Identifiers 02 - Unfinished backticked``() = x.DoNamedTest()

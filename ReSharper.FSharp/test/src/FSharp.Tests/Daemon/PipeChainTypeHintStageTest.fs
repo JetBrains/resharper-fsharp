@@ -4,11 +4,12 @@ open JetBrains.ReSharper.Feature.Services.ParameterNameHints.ManagedLanguage
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<HighlightOnly(typeof<PipeTypeHintHighlighting>)>]
-[<TestPackages("FSharp.Core")>]
+[<TestPackages(FSharpCorePackage)>]
 [<TestSettingsKey(typeof<FSharpTypeHintOptions>)>]
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowPipeReturnTypes", "true")>]
 [<TestSetting(typeof<ManagedLanguageParameterNameHintsOptions>, "ShowCodeAnnotationsHintsOnParameterDeclarations", "false")>]

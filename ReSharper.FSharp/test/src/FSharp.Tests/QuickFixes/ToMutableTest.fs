@@ -7,7 +7,7 @@ open NUnit.Framework
 
 // todo: add test with signature files
 
-[<FSharpTest; TestPackages("FSharp.Core")>]
+[<FSharpTest; TestPackages(FSharpCorePackage)>]
 type ToMutableFixTest() =
     inherit FSharpQuickFixTestBase<ToMutableFix>()
 

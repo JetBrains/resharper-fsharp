@@ -72,11 +72,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
       var typeDeclarationIndentingRulesParameters = new[]
       {
-        ("EnumDeclaration", ElementType.ENUM_DECLARATION, EnumDeclaration.ENUM_REPR),
-        ("UnionDeclarationCases", ElementType.UNION_DECLARATION, UnionDeclaration.UNION_REPR),
-        ("TypeAbbreviation", ElementType.TYPE_ABBREVIATION_DECLARATION, TypeAbbreviationDeclaration.TYPE_OR_UNION_CASE),
+        ("TypeDeclaration", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.TYPE_REPR),
         ("ModuleAbbreviationDeclaration", ElementType.MODULE_ABBREVIATION_DECLARATION, ModuleAbbreviationDeclaration.TYPE_REFERENCE),
-        ("RecordDeclaration", ElementType.RECORD_DECLARATION, RecordDeclaration.RECORD_REPR),
       };
 
       bindingAndModuleDeclIndentingRulesParameters
@@ -217,7 +214,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
         .Name("SpaceAfterImplicitConstructorDecl")
-        .Where(Left().HasType(ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION))
+        .Where(Left().HasType(ElementType.PRIMARY_CONSTRUCTOR_DECLARATION))
         .Return(IntervalFormatType.Space)
         .Build();
       

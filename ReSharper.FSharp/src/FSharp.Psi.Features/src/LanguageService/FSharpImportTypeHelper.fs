@@ -129,7 +129,7 @@ type FSharpQuickFixUtilComponent() =
 
             if nameToOpen.IsNullOrEmpty() then reference :> _ else
 
-            let settings = fsFile.GetSettingsStore()
+            let settings = fsFile.GetSettingsStoreWithEditorConfig()
             addOpen (referenceOwner.GetDocumentStartOffset()) fsFile settings nameToOpen
             reference :> _
 

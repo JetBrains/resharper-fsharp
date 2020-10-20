@@ -60,31 +60,29 @@ type FSharpIdentifierTooltipProvider
             LayoutTag.TypeParameter, FSharpHighlightingAttributeIds.TypeParameter
             //LayoutTag.Text
             //LayoutTag.Punctuation
-            // todo: what to use for these?
             LayoutTag.UnknownType, FSharpHighlightingAttributeIds.Class
-            LayoutTag.UnknownEntity, FSharpHighlightingAttributeIds.Class
+            LayoutTag.UnknownEntity, FSharpHighlightingAttributeIds.Value
         ]
         |> List.map (fun (tag, attributeId) -> tag, TextStyle attributeId)
         |> readOnlyDict
 
     let emptyPresentation = RichTextBlock()
 
-    let taggedTextToRichText layout =
-        let result = RichText()
+    let richTextR =
+        { new LayoutRenderer<RichText, RichText> with
+            member x.Start () = RichText()
+            member x.AddText result text =
+                let style =
+                    match layoutTagLookup.TryGetValue text.Tag with
+                    | true, style -> style
+                    | false, _ -> TextStyle.Default
 
-        layout
-        |> renderL (taggedTextListR (fun text ->
-            let style =
-                match layoutTagLookup.TryGetValue text.Tag with
-                | true, style -> style
-                | false, _ -> TextStyle.Default
-
-            // todo: replace spaces at the start of a line with \xA0 (non-breaking space)
-            result.Append(text.Text, style) |> ignore
-        ))
-        |> ignore
-
-        result
+                result.Append(text.Text, style)
+            member x.AddBreak result n =
+                // RIDER-51304: Replace spaces at the start of a line with \xA0 (non-breaking space)
+                result.Append("\n" + String('\xA0', n), TextStyle.Default)
+            member x.AddTag result (_, _, _) = result
+            member x.Finish result = result }
 
     let richTextJoin (sep : string) (parts : RichText seq) =
         let sep = RichText(sep, TextStyle.Default)
@@ -146,10 +144,10 @@ type FSharpIdentifierTooltipProvider
                 overloads
                 |> List.map (fun overload ->
                     [ if not (isEmptyL overload.MainDescription) then
-                          yield taggedTextToRichText overload.MainDescription
+                          yield overload.MainDescription |> renderL richTextR
 
                       if not overload.TypeMapping.IsEmpty then
-                          yield overload.TypeMapping |> List.map taggedTextToRichText |> richTextJoin "\n"
+                          yield overload.TypeMapping |> List.map (renderL richTextR) |> richTextJoin "\n"
 
                       match xmlDocService.GetXmlDoc(overload.XmlDoc) with
                       | null -> ()
@@ -158,7 +156,7 @@ type FSharpIdentifierTooltipProvider
 
                       match overload.Remarks with
                       | Some remarks when not (isEmptyL remarks) ->
-                          yield taggedTextToRichText remarks
+                          yield remarks |> renderL richTextR
                       | _ -> () ]
                     |> richTextJoin "\n\n"))
         |> richTextJoin RiderTooltipSeparator

@@ -3,6 +3,8 @@ package model
 import com.jetbrains.rider.model.nova.ide.SolutionModel
 import com.jetbrains.rd.generator.nova.*
 import com.jetbrains.rd.generator.nova.PredefinedType.*
+import com.jetbrains.rd.generator.nova.csharp.CSharp50Generator
+import com.jetbrains.rd.generator.nova.kotlin.Kotlin11Generator
 
 @Suppress("unused")
 object RdFSharpModel : Ext(SolutionModel.Solution) {
@@ -50,6 +52,10 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
     }
 
     init {
+
+        setting(Kotlin11Generator.Namespace, "com.jetbrains.rider.plugins.fsharp")
+        setting(CSharp50Generator.Namespace, "JetBrains.ReSharper.Plugins.FSharp")
+
         field("fSharpInteractiveHost", RdFSharpInteractiveHost)
         field("fsharpTestHost", RdFSharpTestHost)
         property("fcsBusyDelayMs", int)

@@ -6,7 +6,7 @@ open JetBrains.Metadata.Reader.API
 open JetBrains.Util
 
 [<Extension; Sealed; AbstractClass>]
-type FSharpAttributeUtil =
+type FcsAttributeUtil =
     [<Extension>]
     static member GetClrName(attr: FSharpAttribute) = attr.AttributeType.QualifiedBaseName
     

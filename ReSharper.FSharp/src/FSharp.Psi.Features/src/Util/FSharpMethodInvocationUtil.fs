@@ -51,15 +51,8 @@ let getMatchingParameter (expr: IFSharpExpression) =
     let symbolReference = argsOwner.Reference
     if isNull symbolReference then null else
 
-    let mfv =
-        symbolReference.TryGetFSharpSymbol()
-        |> Option.bind (function
-            | :? FSharpMemberOrFunctionOrValue as mfv -> Some mfv
-            | _ -> None)
-
-    match mfv with
-    | None -> null
-    | Some mfv ->
+    let mfv = symbolReference.GetFSharpSymbol().As<FSharpMemberOrFunctionOrValue>()
+    if isNull mfv then null else
 
     let paramOwner = symbolReference.Resolve().DeclaredElement.As<IParametersOwner>()
     if isNull paramOwner then null else

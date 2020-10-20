@@ -1,9 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
+[<TestPackages(FSharpCorePackage)>]
 type ErrorsHighlightingTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -38,6 +40,8 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Undefined indexer 02 - Undefined id``() = x.DoNamedTest()
     [<Test>] member x.``Undefined indexer 03 - Item Id``() = x.DoNamedTest()
 
+    [<Test>] member x.``Enum Rqa analyzer 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Extension analyzer``() = x.DoNamedTest()
     
     [<Test>] member x.``Unexpected args 01 - single arg``() = x.DoNamedTest()
@@ -52,3 +56,5 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Upcast unnecessary 01``() = x.DoNamedTest()
     
     [<Test>] member x.``Value in namespace``() = x.DoNamedTest()
+
+    [<Test>] member x.``No implementation given 01``() = x.DoNamedTest()

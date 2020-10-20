@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rd.util.lifetime.Lifetime
-import com.jetbrains.rider.model.rdFSharpModel
+import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.actions.ProjectViewActionBase
 import com.jetbrains.rider.projectView.nodes.ProjectModelNode
 import com.jetbrains.rider.projectView.nodes.isProject

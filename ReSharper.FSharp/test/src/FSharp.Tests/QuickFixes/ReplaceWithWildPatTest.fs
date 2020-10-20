@@ -36,6 +36,7 @@ type ReplaceWithWildPatTest() =
     [<Test; NotAvailable>] member x.``Not available - Let - Attribute 02 - Parens``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Let - Attribute 03 - Typed``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Let - Attribute 04 - Typed``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available - Member - Optional 01``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type ReplaceWithWildPatScopedFixTest() =

@@ -15,7 +15,6 @@ open JetBrains.Util
 [<AutoOpen>]
 module FSharpErrorsStage =
     let visualElementFactoryKey = Key<VisualElementHighlighter>("ColorUsageHighlightingEnabled")
-    let openedModulesProvider = Key<OpenedModulesProvider>("OpenedModulesProvider")
     let redundantParenAnalysisEnabledKey = Key<obj>("RedundantParenAnalysisEnabled")
 
 

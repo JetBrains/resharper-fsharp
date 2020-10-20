@@ -1,7 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System.Collections.Generic
-open FSharp.Compiler
 open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.PrettyNaming
 open FSharp.Compiler.Range
@@ -57,7 +56,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             let mark = x.Mark(typeDefnGroupStartPos typeDefns range)
             match typeDefns with
             | [] -> ()
-            | TypeDefn(ComponentInfo(attrs, _, _, _, _, _, _, _), _, _, _) :: _ ->
+            | TypeDefn(ComponentInfo(attributes = attrs), _, _, _) :: _ ->
                 x.ProcessOuterAttrs(attrs, range)
 
             for typeDefn in typeDefns do
@@ -80,7 +79,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             let letMark = x.Mark(letBindingGroupStartPos bindings range)
             match bindings with
             | [] -> ()
-            | Binding(_, _, _, _, attrs, _, _, _, _, _, _ , _) :: _ ->
+            | Binding(attributes = attrs) :: _ ->
                 x.ProcessOuterAttrs(attrs, range)
 
             for binding in bindings do
@@ -115,66 +114,109 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             x.Done(range, mark, ElementType.MODULE_ABBREVIATION_DECLARATION)
 
         | decl ->
-            failwithf "unexpected decl: %O" decl
+            failwithf "unexpected decl: %A" decl
 
-    member x.ProcessTypeDefn(TypeDefn(ComponentInfo(attrs, typeParams, constraints, lid , _, _, _, _), repr, members, range) as typeDefn) =
+    member x.ProcessTypeDefn(TypeDefn(info, repr, members, range) as typeDefn) =
+        let (ComponentInfo(attrs, typeParams, constraints, lid , _, _, _, _)) = info
+
+        // Only mark attributes that are inside the declaration node.
+        let attrs = x.SkipOuterAttrs(attrs, range)
+
         match repr with
         | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation, _, _) ->
-            let mark = x.Mark(range)
-            x.ProcessReferenceNameSkipLast(lid)
-            x.ProcessTypeParametersOfType typeParams constraints range false
-            for typeConstraint in constraints do
-                x.ProcessTypeConstraint(typeConstraint)
-            for extensionMember in members do
-                x.ProcessTypeMember(extensionMember)
-            x.EnsureMembersAreFinished()
-            x.Done(range, mark, ElementType.TYPE_EXTENSION_DECLARATION)
+            x.ProcessTypeExtensionDeclaration(typeDefn, attrs)
         | _ ->
 
-        let attrs = x.SkipOuterAttrs(attrs, range)
         let mark = x.StartType attrs typeParams constraints lid range
-        let elementType =
-            match repr with
-            | SynTypeDefnRepr.Simple(simpleRepr, _) ->
-                x.ProcessSimpleTypeRepresentation(simpleRepr)
 
-            | SynTypeDefnRepr.Exception _ ->
-                // This is compiler-internal union case with instances created inside type checker only.
-                failwithf "unexpected exception type: %O" typeDefn 
+        // Mark primary constructor before type representation.
+        match repr with
+        | SynTypeDefnRepr.ObjectModel(_, (SynMemberDefn.ImplicitCtor _ as ctor :: _), _) ->
+            x.ProcessPrimaryConstructor(ctor)
+        | _ -> ()
 
-            | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation, _, _) ->
-                ElementType.TYPE_EXTENSION_DECLARATION
+        match repr with
+        | SynTypeDefnRepr.Simple(simpleRepr, _) ->
+            x.ProcessSimpleTypeRepresentation(simpleRepr)
 
-            | SynTypeDefnRepr.ObjectModel(kind, members, range) ->
-                match kind with
-                | TyconDelegate(synType, _) ->
-                    match members with
-                    | SynMemberDefn.ImplicitCtor _ as ctor :: _ -> x.ProcessTypeMember(ctor)
-                    | _ -> ()
+        | SynTypeDefnRepr.ObjectModel(kind, members, reprRange) ->
+            match kind with
+            | SynTypeDefnKind.TyconDelegate(synType, _) ->
+                let mark = x.Mark(reprRange)
+                x.ProcessType(synType)
+                x.Done(reprRange, mark, ElementType.DELEGATE_REPRESENTATION)
 
-                    let mark = x.Mark(range)
-                    x.ProcessType(synType)
-                    x.Done(range, mark, ElementType.DELEGATE_REPRESENTATION)
-                    ElementType.DELEGATE_DECLARATION
+            | _ ->
 
-                | _ ->
-
+            if x.AddObjectModelTypeReprNode(kind) then
+                let mark = x.Mark(reprRange)
                 for m in members do
-                    x.ProcessTypeMember m
+                    x.ProcessTypeMember(m)
                 x.EnsureMembersAreFinished()
 
-                match kind with
-                | TyconClass -> ElementType.CLASS_DECLARATION
-                | TyconInterface -> ElementType.INTERFACE_DECLARATION
-                | TyconStruct -> ElementType.STRUCT_DECLARATION
-                | _ -> ElementType.OBJECT_TYPE_DECLARATION
+                // todo: 'end' is outside both repr and type range :(
+                // todo: fix FCS parser, add test with missing end
+                x.AdvanceToToken(FSharpTokenType.END)
+                if x.TokenType == FSharpTokenType.END then
+                    x.Advance()
+
+                let elementType = x.GetObjectModelTypeReprElementType(kind)
+                x.Done(mark, elementType)
+            else
+                for m in members do
+                    x.ProcessTypeMember(m)
+                x.EnsureMembersAreFinished()
+
+        | _ -> failwithf "Unexpected simple type representation: %A" repr
 
         for m in members do
-            x.ProcessTypeMember m
+            x.ProcessTypeMember(m)
         x.EnsureMembersAreFinished()
-        x.Done(range, mark, elementType)
+
+        x.Done(range, mark, ElementType.F_SHARP_TYPE_DECLARATION)
+
+    member x.ProcessTypeExtensionDeclaration(TypeDefn(info, _, members, range), attrs) =
+        let (ComponentInfo(_, typeParams, constraints, lid , _, _, _, _)) = info
+        let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
+
+        // Skipping the last name to have the identifier out of qualifier reference name. 
+        x.ProcessReferenceNameSkipLast(lid)
+
+        x.ProcessTypeParametersOfType typeParams constraints range false
+        // todo: check this; add rename test
+        for typeConstraint in constraints do
+            x.ProcessTypeConstraint(typeConstraint)
+
+        for extensionMember in members do
+            x.ProcessTypeMember(extensionMember)
+
+        x.EnsureMembersAreFinished()
+
+        x.Done(range, mark, ElementType.TYPE_EXTENSION_DECLARATION)
+
+    member x.ProcessPrimaryConstructor(typeMember: SynMemberDefn) =
+        match typeMember with
+        | SynMemberDefn.ImplicitCtor(_, attrs, args, selfId, range) ->
+
+            // Skip spaces inside `T ()` range 
+            while (isNotNull x.TokenType && x.TokenType.IsWhitespace) && not x.Eof do
+                x.AdvanceLexer()
+
+            let mark = x.MarkAttributesOrIdOrRange(typeMember.OuterAttributes, None, typeMember.Range)
+            
+            x.ProcessAttributeLists(attrs)
+            x.ProcessImplicitCtorSimplePats(args)
+            x.ProcessCtorSelfId(selfId)
+
+            x.Done(range, mark, ElementType.PRIMARY_CONSTRUCTOR_DECLARATION)
+
+        | _ -> failwithf "Expecting primary constructor, got: %A" typeMember
 
     member x.ProcessTypeMember(typeMember: SynMemberDefn) =
+        match typeMember with
+        | SynMemberDefn.ImplicitCtor _ -> ()
+        | _ ->
+
         let mark =
             match unfinishedDeclaration with
             | Some(mark, unfinishedRange, _) when unfinishedRange = typeMember.Range ->
@@ -182,22 +224,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 mark
 
             | _ ->
-                match typeMember with
-                | SynMemberDefn.ImplicitCtor _ ->
-                    while (isNotNull x.TokenType && x.TokenType.IsWhitespace) && not x.Eof do
-                        x.AdvanceLexer()
-                | _ -> ()
-                
                 x.MarkAttributesOrIdOrRange(typeMember.OuterAttributes, None, typeMember.Range)
 
         let memberType =
             match typeMember with
-            | SynMemberDefn.ImplicitCtor(_, attrs, args, selfId, _) ->
-                x.ProcessAttributeLists(attrs)
-                x.ProcessImplicitCtorSimplePats(args)
-                x.ProcessCtorSelfId(selfId)
-                ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
-
             | SynMemberDefn.ImplicitInherit(baseType, args, _, _) ->
                 x.ProcessTypeAsTypeReferenceName(baseType)
                 x.MarkChameleonExpression(args)
@@ -241,7 +271,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 x.ProcessType(synType)
                 ElementType.ABSTRACT_MEMBER_DECLARATION
 
-            | SynMemberDefn.ValField(Field(_, _, _, synType, _, _, _, _), _) ->
+            | SynMemberDefn.ValField(Field(fieldType = synType), _) ->
                 x.ProcessType(synType)
                 ElementType.VAL_FIELD_DECLARATION
 
@@ -255,7 +285,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 | _ -> ()
                 ElementType.AUTO_PROPERTY_DECLARATION
 
-            | _ -> ElementType.OTHER_TYPE_MEMBER
+            | _ -> failwithf "Unexpected type member: %A" typeMember
 
         if unfinishedDeclaration.IsNone then
             x.Done(typeMember.Range, mark, memberType)
@@ -321,6 +351,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         x.MarkChameleonExpression(expr)
         x.Done(mark, ElementType.ACCESSOR_DECLARATION)
 
+    /// The last member may be a property the could be extended
+    /// with another accessor represented as a separate member declaration.
     member x.EnsureMembersAreFinished() =
         match unfinishedDeclaration with
         | Some(mark, unfinishedRange, elementType) ->
@@ -370,7 +402,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             match pat with
             | SynPat.Named(pat, id, _, _, _) ->
                 match pat with
-                | SynPat.Wild(range) when Range.equals id.idRange range ->
+                | SynPat.Wild(range) when equals id.idRange range ->
                     let mark = x.Mark(id.idRange)
                     if IsActivePatternName id.idText then x.ProcessActivePatternId(id, isLocal)
                     x.Done(id.idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
@@ -514,7 +546,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             for pat in pats do
                 x.ProcessParam(pat, isLocal, markMember)
 
-        | _ -> failwithf "args: %O" args
+        | _ -> failwithf "args: %A" args
 
     member x.ProcessParam(PatRange range as pat, isLocal, markMember) =
         if not markMember then x.ProcessPat(pat, isLocal, false) else
@@ -634,7 +666,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
     member x.ProcessExpression(ExprRange range as expr) =
         match expr with
-        | SynExpr.Paren(expr, _, _, _) ->
+        | SynExpr.Paren(expr = expr) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.PAREN_EXPR)
 
         | SynExpr.Quote(_, _, expr, _, _) ->
@@ -795,7 +827,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushExpression(argExpr)
             x.ProcessExpression(funcExpr)
 
-        | SynExpr.TypeApp(expr, _, _, _, _, _, _) as typeApp ->
+        | SynExpr.TypeApp(expr = expr) as typeApp ->
             // Process expression first, then inject type args into it in the processor.
             x.PushStep(typeApp, typeArgsInReferenceExprProcessor)
             x.ProcessExpression(expr)
@@ -1395,7 +1427,7 @@ type ObjectExpressionMemberListProcessor() =
     inherit StepListProcessorBase<SynBinding>()
 
     override x.Process(binding, builder) =
-        let (Binding(_, _, _, _, _, _, _, _, _, _, range, _)) = binding
+        let (Binding(range = range)) = binding
         let mark = builder.Mark(range)
         let elementType = builder.ProcessMemberBinding(mark, binding, range)
         builder.Done(range, mark, elementType)

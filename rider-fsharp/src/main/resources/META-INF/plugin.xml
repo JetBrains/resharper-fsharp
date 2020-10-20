@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="true">
   <name>F# Support</name>
   <id>com.jetbrains.rider.fsharp</id>
   <vendor url="https://jetbrains.com">JetBrains</vendor>
@@ -57,6 +57,8 @@
     <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpOptionsPage" id="FSharp" />
     <projectConfigurable parentId="FileTemplatesSettingsId" instance="com.jetbrains.rider.settings.RiderFSharpFileTemplatesOptionPage" groupWeight="-20"/>
     <projectConfigurable parentId="FileTemplatesSettingsId" instance="com.jetbrains.rider.settings.RiderAzureFSharpFileTemplatesOptionPage" groupWeight="-151"/>
+
+    <projectConfigurable parentId="Errors" instance="com.jetbrains.rider.settings.FSharpInspectionsPage" />
 
     <intentionAction>
       <className>com.jetbrains.rider.plugins.fsharp.services.fsi.SendLineToFsiIntentionAction</className>

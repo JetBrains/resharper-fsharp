@@ -1,8 +1,9 @@
-module Module
+﻿module Module
 
-let g = (((id 2) |3|(0)) |4|(1)) |7|(2) |8|(3)
+let g = (((|id|(0) 2) |3|(1)) |4|(2)) |7|(3) |8|(4)
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Unexpected arguments
+(0): ReSharper Dead Code: Redundant application
 (1): ReSharper Underlined Error Highlighting: Unexpected arguments
 (2): ReSharper Underlined Error Highlighting: Unexpected arguments
 (3): ReSharper Underlined Error Highlighting: Unexpected arguments
+(4): ReSharper Underlined Error Highlighting: Unexpected arguments

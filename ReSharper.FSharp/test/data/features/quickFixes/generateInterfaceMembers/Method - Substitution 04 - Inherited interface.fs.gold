@@ -1,0 +1,13 @@
+﻿module Module
+
+type IA<'T1> =
+  abstract M: 'T1 * double -> unit
+
+type IB<'T2> =
+  inherit IA<double>
+  abstract M: 'T2 * int -> unit
+
+type T() =
+  interface IB<int> with
+    member this.M(var0: int, var1: int): unit = failwith "todo"
+    member this.M(var2: double, var3: double): unit = failwith "todo"{caret}

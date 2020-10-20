@@ -1,0 +1,8 @@
+﻿module Module
+
+[<|RequireQualifiedAccess|(0)>]
+type E =
+    | A = 1
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant RequireQualifiedAccess attribute
