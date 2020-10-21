@@ -401,6 +401,7 @@ interface fSharpExpression:
   yieldOrReturnExpr |
 
   // todo: cover cases
+  interpolatedStringExpr |
   libraryOnlyExpr |
   fromErrorExpr;
 
@@ -823,6 +824,9 @@ libraryOnlyExpr options { stubBase="FSharpExpressionBase"; }:
 
 fromErrorExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>;
+
+interpolatedStringExpr options { stubBase="FSharpExpressionBase"; }:
+  fakeSeparator;
 
 fixedExpr options { stubBase="FSharpExpressionBase"; }:
   FIXED<KEYWORD, Keyword>
@@ -1273,6 +1277,7 @@ otherDirective:
 
 openStatement:
   OPEN<OPEN, Open>
+  TYPE<TYPE, TypeKeyword>?
   typeReferenceName<TYPE_REFERENCE, ReferenceName>;
 
 doStatement options { stubBase="DummyDeclaration"; } extras {

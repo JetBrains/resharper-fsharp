@@ -45,11 +45,15 @@ type FSharpXmlDocService
     [<CanBeNull>]
     member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc) =
         match fsXmlDoc with
-        | FSharpXmlDoc.Text s -> RichTextBlock(s.TrimStart())
+        | FSharpXmlDoc.Text (s, _) ->
+            let text = s |> Array.map (fun s -> s.Trim()) |> String.concat "\n"
+            RichTextBlock(text)
+
         | FSharpXmlDoc.XmlDocFileSignature (dllFile, memberName) ->
             getIndex dllFile
             |> Option.map (fun index ->
                 let summary = XMLDocUtil.ExtractSummary(index.GetXml(memberName))
                 XmlDocRichTextPresenter.Run(summary, false, FSharpLanguage.Instance))
             |> Option.defaultValue null
+
         | FSharpXmlDoc.None -> null

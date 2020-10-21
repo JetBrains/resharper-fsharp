@@ -265,6 +265,15 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStart) else rangeStart
             x.Mark(startOffset)
 
+    member x.ProcessOpenDeclTarget(openDeclTarget, range) =
+        let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
+        match openDeclTarget with
+        | SynOpenDeclTarget.ModuleOrNamespace(lid, _) ->
+            x.ProcessNamedTypeReference(lid)
+        | SynOpenDeclTarget.Type(typeName, _) ->
+            x.ProcessType(typeName)
+        x.Done(range, mark, ElementType.OPEN_STATEMENT)
+
     member x.StartException(SynExceptionDefnRepr(_, UnionCase(caseType = unionCaseType), _, _, _, range)) =
         let mark = x.Mark(range)
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION)

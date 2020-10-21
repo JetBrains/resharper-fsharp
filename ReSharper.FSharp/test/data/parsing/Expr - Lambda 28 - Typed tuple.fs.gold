@@ -12,15 +12,15 @@ IFSharpImplFile
               ITypedPat
                 IParenPat
                   FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                  ITypedPat
+                  ITuplePat
                     ILocalReferencePat
                       IExpressionReferenceName
-                        FSharpIdentifierToken(type:IDENTIFIER, text:x)
-                    FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                        FSharpIdentifierToken(type:IDENTIFIER, text:a)
+                    FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
                     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                    INamedTypeUsage
-                      ITypeReferenceName
-                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                    ILocalReferencePat
+                      IExpressionReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:b)
                   FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
                 FSharpTokenType+ColonTokenElement(type:COLON, text::)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "

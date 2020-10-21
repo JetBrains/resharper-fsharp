@@ -4,7 +4,6 @@ open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.PrettyNaming
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
 type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
@@ -80,10 +79,8 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
             x.Done(valMark, ElementType.BINDING_SIGNATURE)
 
-        | SynModuleSigDecl.Open(lid, range) ->
-            let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
-            x.ProcessNamedTypeReference(lid)
-            x.Done(range, mark, ElementType.OPEN_STATEMENT)
+        | SynModuleSigDecl.Open(openDeclTarget, range) ->
+            x.ProcessOpenDeclTarget(openDeclTarget, range)
 
         | SynModuleSigDecl.HashDirective(hashDirective, _) ->
             x.ProcessHashDirective(hashDirective)

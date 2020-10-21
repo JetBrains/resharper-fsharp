@@ -11,9 +11,9 @@ IFSharpImplFile
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               IParenPat
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                ILocalReferencePat
-                  IExpressionReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:a)
+                IUnitPat
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
                 FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

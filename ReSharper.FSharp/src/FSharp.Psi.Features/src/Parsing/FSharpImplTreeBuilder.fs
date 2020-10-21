@@ -1,9 +1,9 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System.Collections.Generic
-open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.PrettyNaming
 open FSharp.Compiler.Range
+open FSharp.Compiler.SyntaxTree
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -70,10 +70,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             x.EnsureMembersAreFinished()
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
 
-        | SynModuleDecl.Open(lidWithDots, range) ->
-            let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
-            x.ProcessNamedTypeReference(lidWithDots.Lid)
-            x.Done(range, mark, ElementType.OPEN_STATEMENT)
+        | SynModuleDecl.Open(openDeclTarget, range) ->
+            x.ProcessOpenDeclTarget(openDeclTarget, range)
 
         | SynModuleDecl.Let(_, bindings, range) ->
             let letMark = x.Mark(letBindingGroupStartPos bindings range)
@@ -196,7 +194,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
     member x.ProcessPrimaryConstructor(typeMember: SynMemberDefn) =
         match typeMember with
-        | SynMemberDefn.ImplicitCtor(_, attrs, args, selfId, range) ->
+        | SynMemberDefn.ImplicitCtor(_, attrs, args, selfId, _, range) ->
 
             // Skip spaces inside `T ()` range 
             while (isNotNull x.TokenType && x.TokenType.IsWhitespace) && not x.Eof do
@@ -767,22 +765,18 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         | SynExpr.CompExpr(_, _, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.COMPUTATION_EXPR)
 
-        | SynExpr.Lambda(_, inLambdaSeq, args, bodyExpr, _) ->
-            // Lambdas get "desugared" by converting to fake nested lambdas and match expressions.
-            // Simple patterns like ids are preserved in lambdas and more complex ones are replaced
-            // with generated placeholder patterns and go to generated match expressions inside lambda bodies.
-
-            // Generated match expression have have a single generated clause with a generated id pattern.
-            // Their ranges overlap with lambda param pattern ranges and they have the same start pos as lambdas. 
-
+        | SynExpr.Lambda(_, inLambdaSeq, _, bodyExpr, parsedData, _) ->
             Assertion.Assert(not inLambdaSeq, "Expecting non-generated lambda expression, got:\n{0}", expr)
             x.PushRange(range, ElementType.LAMBDA_EXPR)
+            x.PushExpression(getLambdaBodyExpr bodyExpr)
 
-            let skippedLambdas = skipGeneratedLambdas bodyExpr
-            let parametersMark = x.Mark(args.Range)
-            x.ProcessLambdaParameters(expr, skippedLambdas, true)
-            x.Done(parametersMark, ElementType.LAMBDA_PARAMETERS_LIST)
-            x.ProcessExpression(skipGeneratedMatch skippedLambdas)
+            match parsedData with
+            | Some(head :: _ as pats, _) ->
+                let patsRange = unionRanges head.Range (List.last pats).Range
+                x.PushRange(patsRange, ElementType.LAMBDA_PARAMETERS_LIST)
+                for pat in pats do
+                    x.ProcessPat(pat, true, false)
+            | _ -> ()
 
         | SynExpr.MatchLambda(_, _, clauses, _, _) ->
             x.PushRange(range, ElementType.MATCH_LAMBDA_EXPR)
@@ -1002,6 +996,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushSequentialExpression(expr2)
             x.ProcessExpression(expr1)
 
+        | SynExpr.InterpolatedString _ -> x.MarkAndDone(range, ElementType.INTERPOLATED_STRING_EXPR)
+
     member x.ProcessAndLocalBinding(_, _, _, pat: SynPat, expr: SynExpr, _) =
         x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
         x.ProcessPat(pat, true, false)
@@ -1064,85 +1060,6 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
         x.ProcessExpression(expr)
     
-    member x.ProcessLambdaParameters(expr, outerBodyExpr, topLevel): SynExpr =
-        match expr with
-        | SynExpr.Lambda(_, inLambdaSeq, pats, bodyExpr, _) when inLambdaSeq <> topLevel ->
-            x.ProcessLambdaParameters(pats, bodyExpr, outerBodyExpr)
-
-        | _ ->
-            outerBodyExpr
-
-    member x.ProcessLambdaParameters(pats: SynSimplePats, lambdaBody: SynExpr, outerBodyExpr) =
-        match pats with
-        | SynSimplePats.SimplePats(pats, range) ->
-            match pats with
-            | [] ->
-                x.MarkAndDone(range, ElementType.UNIT_PAT)
-                x.ProcessLambdaParameters(lambdaBody, outerBodyExpr, false)
-
-            | [pat] ->
-                if posLt range.Start pat.Range.Start then
-                    let mark = x.Mark(range)
-                    let outerBodyExpr = x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, false)
-                    x.Done(range, mark, ElementType.PAREN_PAT)
-                    x.ProcessLambdaParameters(lambdaBody, outerBodyExpr, false)
-                else
-                    x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, true)
-
-            | pats ->
-                let parenMark = x.Mark(range)
-                let tupleMark = x.Mark(range)
-                let outerBodyExpr = x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, false)
-                x.Done(tupleMark, ElementType.TUPLE_PAT)
-                x.Done(parenMark, ElementType.PAREN_PAT)
-                x.ProcessLambdaParameters(lambdaBody, outerBodyExpr, false)
-
-        | SynSimplePats.Typed _ ->
-            failwithf "Expecting SimplePats, got:\n%A" pats
-
-    member x.ProcessOneLambdaParam(pats: SynSimplePat list, lambdaBody: SynExpr, outerBodyExpr, processNext) =
-        match pats with
-        | [] ->
-            if processNext then
-                x.ProcessLambdaParameters(lambdaBody, outerBodyExpr, false)
-            else
-                outerBodyExpr
-
-        | pat :: pats ->
-
-        match pat with
-        | SynSimplePat.Id(_, _, isGenerated, _, _, range) ->
-            if not isGenerated then
-                let mark = x.Mark(range)
-                x.MarkAndDone(range, ElementType.EXPRESSION_REFERENCE_NAME)
-                x.Done(range, mark, ElementType.LOCAL_REFERENCE_PAT)
-                x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, processNext)
-            else
-                match outerBodyExpr with
-                | SynExpr.Match(_, _, [ Clause(pat, whenExpr, innerExpr, _, _) as clause ], matchRange) when
-                        matchRange.Start = clause.Range.Start ->
-
-                    Assertion.Assert(whenExpr.IsNone, "whenExpr.IsNone")
-                    x.ProcessPat(pat, true, false)
-                    x.ProcessOneLambdaParam(pats, lambdaBody, innerExpr, processNext)
-
-                | _ ->
-                    failwithf "Expecting generated match expression, got:\n%A" lambdaBody
-
-        | SynSimplePat.Typed(pat, patType, range) ->
-            let mark = x.Mark(range)
-            x.ProcessOneLambdaParam([pat], lambdaBody, outerBodyExpr, false)
-            x.ProcessType(patType)
-            x.Done(range, mark, ElementType.TYPED_PAT)
-            x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, processNext)
-
-        | SynSimplePat.Attrib(pat, attrs, range) ->
-            let mark = x.Mark(range)
-            x.ProcessAttributeLists(attrs)
-            x.ProcessOneLambdaParam([pat], lambdaBody, outerBodyExpr, false)
-            x.Done(range, mark, ElementType.ATTRIB_PAT)
-            x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, processNext)
-
     member x.MarkMatchExpr(range: range, expr, clauses) =
         x.PushRange(range, ElementType.MATCH_EXPR)
         x.PushStepList(clauses, matchClauseListProcessor)

@@ -53,7 +53,7 @@ type SynSimplePat with
         | SynSimplePat.Attrib(range = range) -> range
 
 
-let attrOwnerStartPos (attrLists: SynAttributeList list) (ownerRange: Range.range) =
+let attrOwnerStartPos (attrLists: SynAttributeList list) (ownerRange: range) =
     match attrLists with
     | { Range = attrsRange } :: _ ->
         let attrsStart = attrsRange.Start
@@ -78,7 +78,7 @@ let letBindingGroupStartPos (bindings: SynBinding list) (range: Range.range) =
 
 let rec skipGeneratedLambdas expr =
     match expr with
-    | SynExpr.Lambda(_, true, _, bodyExpr, _) ->
+    | SynExpr.Lambda(_, true, _, bodyExpr, _, _) ->
         skipGeneratedLambdas bodyExpr
     | _ -> expr
 
@@ -92,18 +92,6 @@ and skipGeneratedMatch expr =
 let inline getLambdaBodyExpr expr =
     let skippedLambdas = skipGeneratedLambdas expr
     skipGeneratedMatch skippedLambdas
-
-
-let rec getGeneratedLambdaParam dflt expr =
-    match expr with
-    | SynExpr.Lambda(_, true, pats, bodyExpr, _) ->
-        getGeneratedLambdaParam pats bodyExpr
-    | _ -> dflt
-
-let getLastLambdaParam expr =
-    match expr with
-    | SynExpr.Lambda(_, _, pats, bodyExpr, _) -> getGeneratedLambdaParam pats bodyExpr
-    | _ -> failwithf "Expecting lambda expression, got:\n%A" expr
 
 let getGeneratedAppArg (expr: SynExpr) =
     if not expr.Range.IsSynthetic then expr else
