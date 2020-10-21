@@ -20,6 +20,7 @@ open JetBrains.ReSharper.Psi.TreeBuilder
 type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset, lineShift) =
     inherit TreeBuilderBase(lifetime, lexer)
 
+    // FCS ranges are 1-based.
     let lineShift = lineShift - 1
 
     let lineOffsets =
@@ -785,6 +786,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
         let startOffset = x.GetStartOffset(range)
         let mark = x.Mark(startOffset)
+        Assertion.Assert(x.CurrentOffset = startOffset, "x.CurrentOffset = startOffset")
 
         // Replace all tokens with single chameleon token.
         let tokenMark = x.Mark(range)
