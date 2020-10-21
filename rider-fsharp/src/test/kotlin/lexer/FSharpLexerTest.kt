@@ -4,6 +4,9 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.*
 import com.intellij.lexer.Lexer
 import com.intellij.testFramework.LexerTestCase
 import org.testng.annotations.Test
+import com.jetbrains.rdclient.lang.ProtocolLanguageManager
+import com.jetbrains.rider.test.ProtocolLanguageManagerMock
+import org.testng.annotations.BeforeMethod
 
 @Test
 class FSharpLexerTest : LexerTestCase() {
@@ -1183,5 +1186,15 @@ class FSharpLexerTest : LexerTestCase() {
     @Test
     fun testCharQuote() {
         doTest("'''", "CHARACTER_LITERAL (''''')")
+    }
+
+    // This is a hack that allows these tests to run.
+    // It might affect other tests, though.
+    // TODO: if current version >= 211, remove this method!
+    // If compilation breaks, it almost certainly means that
+    // the problem has been solved in the platform and this hack is no longer necessary
+    @BeforeMethod
+    fun beforeMethod() {
+        ProtocolLanguageManager.setCustomInstance(ProtocolLanguageManagerMock)
     }
 }
