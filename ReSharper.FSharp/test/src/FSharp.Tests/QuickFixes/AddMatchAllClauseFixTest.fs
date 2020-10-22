@@ -16,3 +16,5 @@ type AddMatchAllClauseFixTest() =
     [<Test>] member x.``Simple 02 - Indent``() = x.DoNamedTest()
     [<Test>] member x.``Simple 03 - Multiple clauses``() = x.DoNamedTest()
     [<Test>] member x.``Simple 04 - Generate single line``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type binding 01``() = x.DoNamedTest()

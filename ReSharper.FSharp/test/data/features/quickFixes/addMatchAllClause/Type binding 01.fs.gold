@@ -1,0 +1,7 @@
+﻿type Test() =
+    let a =
+        match 1{caret} with
+        | 1 -> ()
+        | _ -> failwith "todo"
+
+    member x.P = ()
