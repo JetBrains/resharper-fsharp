@@ -28,6 +28,9 @@ module rec CommonUtil =
     let concatErrors errors =
         Seq.fold (fun s (e: FSharpErrorInfo) -> s + "\n" + e.Message) "" errors
 
+    let logErrors (logger: ILogger) message errors =
+        logger.Warn("{0}: {1}", message, concatErrors errors)
+
     [<CompiledName("DecompileOpName")>]
     let decompileOpName name =
         PrettyNaming.DecompileOpName name
