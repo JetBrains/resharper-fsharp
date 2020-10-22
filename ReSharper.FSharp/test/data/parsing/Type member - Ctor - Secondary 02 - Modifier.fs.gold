@@ -15,26 +15,27 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        IMemberConstructorDeclaration
-          FSharpTokenType+InternalTokenElement(type:INTERNAL, text:internal)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+NewTokenElement(type:NEW, text:new)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IParametersPatternDeclaration
-            IParenPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              IWildPat
-                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IChameleonExpression
-            IPrefixAppExpr
-              IReferenceExpr
-                FSharpIdentifierToken(type:IDENTIFIER, text:T)
-              IUnitExpr
+        ITypeMemberDeclarationList
+          IMemberConstructorDeclaration
+            FSharpTokenType+InternalTokenElement(type:INTERNAL, text:internal)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+NewTokenElement(type:NEW, text:new)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IParametersPatternDeclaration
+              IParenPat
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                IWildPat
+                  FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
                 FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IChameleonExpression
+              IPrefixAppExpr
+                IReferenceExpr
+                  FSharpIdentifierToken(type:IDENTIFIER, text:T)
+                IUnitExpr
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

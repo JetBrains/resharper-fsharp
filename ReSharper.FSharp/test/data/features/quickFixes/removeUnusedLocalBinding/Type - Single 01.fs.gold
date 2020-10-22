@@ -1,1 +1,2 @@
-﻿type T() ={caret}
+﻿type T() =
+    {caret}

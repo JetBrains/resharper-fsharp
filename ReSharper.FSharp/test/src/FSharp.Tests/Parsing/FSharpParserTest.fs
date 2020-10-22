@@ -23,11 +23,13 @@ type FSharpParserTest() =
     [<Test>] member x.``Namespace 06 - Global, type``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 07 - Global, Multiple``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type decl - Exception 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type decl - Exception 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Exception 01 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Exception 03 - Members``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Extension 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Extension 02 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Extension 03 - Member attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Delegate - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate - Ctor 02 - Parameter``() = x.DoNamedTest()
@@ -344,6 +346,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Inherit - Type 03 - Arguments``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit - Type 04 - Type parameters 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Interface 02 - Members``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member - Do 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Let bindings - Static 01``() = x.DoNamedTest()
@@ -464,3 +469,5 @@ type FSharpErrorsParserTest() =
 
     [<Test>] member x.``Expr - New 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()

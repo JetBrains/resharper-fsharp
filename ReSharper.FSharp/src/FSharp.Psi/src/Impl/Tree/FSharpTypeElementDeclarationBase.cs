@@ -49,52 +49,62 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        static void ProcessBinding(IBinding binding, ICollection<ITypeMemberDeclaration> result)
-        {
-          var headPattern = binding.HeadPattern;
-          if (headPattern == null)
-            return;
-
-          foreach (var declaration in headPattern.Declarations)
-          {
-            if (declaration is ITypeMemberDeclaration typeMemberDeclaration)
-              result.Add(typeMemberDeclaration);
-          }
-        }
-
         var result = new List<ITypeMemberDeclaration>();
-        foreach (var child in this.Children())
-        {
-          if (child is ITypeMemberDeclaration m)
-            result.Add(m);
-
-          if (child is IInterfaceImplementation interfaceImplementation)
-            foreach (var implementedMember in interfaceImplementation.Children<ITypeMemberDeclaration>())
-              result.Add(implementedMember);
-
-          if (child is ITypeDeclarationGroup typeDeclarationGroup)
-            foreach (var typeDeclaration in typeDeclarationGroup.TypeDeclarations)
-            {
-              if (typeDeclaration is ITypeExtensionDeclaration typeExtension && !typeExtension.IsTypePartDeclaration)
-                foreach (var extensionMember in typeExtension.Children<ITypeMemberDeclaration>())
-                  result.Add(extensionMember);
-              else
-                result.Add(typeDeclaration);
-            }
-
-          if (child is ILetBindingsDeclaration let)
-            foreach (var binding in let.Bindings)
-              ProcessBinding(binding, result);
-
-          if (child is IBindingSignature bindingSignature) 
-            ProcessBinding(bindingSignature, result);
-
-          if (child is IUnionCaseFieldDeclarationList fieldDeclarationList)
-            result.AddRange(fieldDeclarationList.FieldsEnumerable);
-        }
-
+        ProcessChildren(result, this);
         return result.AsReadOnly();
       }
+    }
+
+    private static void ProcessChildren(List<ITypeMemberDeclaration> result, ITreeNode node)
+    {
+      foreach (var child in node.Children())
+      {
+        if (child is ITypeMemberDeclaration m)
+          result.Add(m);
+
+        if (child is IInterfaceImplementation interfaceImplementation)
+          foreach (var implementedMember in interfaceImplementation.TypeMembers)
+            result.Add(implementedMember);
+
+        if (child is ITypeDeclarationGroup typeDeclarationGroup)
+          foreach (var typeDeclaration in typeDeclarationGroup.TypeDeclarations)
+          {
+            if (typeDeclaration is ITypeExtensionDeclaration typeExtension && !typeExtension.IsTypePartDeclaration)
+            {
+              foreach (var extensionMember in typeExtension.TypeMembers)
+                if (extensionMember is ITypeMemberDeclaration typeMemberDeclaration)
+                  result.Add(typeMemberDeclaration);
+            }
+            else
+              result.Add(typeDeclaration);
+          }
+
+        if (child is ILetBindingsDeclaration let)
+          foreach (var binding in let.Bindings)
+            ProcessBinding(binding, result);
+
+        if (child is IBindingSignature bindingSignature)
+          ProcessBinding(bindingSignature, result);
+
+        if (child is IUnionCaseFieldDeclarationList fieldDeclarationList)
+          result.AddRange(fieldDeclarationList.FieldsEnumerable);
+
+        if (child is ITypeMemberDeclarationList typeMemberDeclarationList)
+          ProcessChildren(result, typeMemberDeclarationList);
+
+        if (child is IMemberDeclarationList memberDeclarationList)
+          ProcessChildren(result, memberDeclarationList);
+      }
+    }
+
+    private static void ProcessBinding(IBinding binding, ICollection<ITypeMemberDeclaration> result)
+    {
+      var headPattern = binding.HeadPattern;
+      if (headPattern == null) return;
+
+      foreach (var declaration in headPattern.Declarations)
+        if (declaration is ITypeMemberDeclaration typeMemberDeclaration)
+          result.Add(typeMemberDeclaration);
     }
 
     public string CLRName => this.MakeClrName();

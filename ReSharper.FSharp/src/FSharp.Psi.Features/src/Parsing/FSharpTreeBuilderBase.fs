@@ -72,6 +72,9 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         /// The base member is protected and cannot be used in closures.
         base.Mark()
 
+    member x.Done(mark, elementType) =
+        base.Done(mark, elementType)
+
     member x.Done(range, mark, elementType) =
         x.AdvanceToEnd(range)
         x.Done(mark, elementType)
@@ -226,7 +229,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
                     x.Mark()
 
                 | _ ->
-                    x.MarkAttributesOrIdOrRange(attrs, Some id, range)
+                    x.MarkAndProcessAttributesOrIdOrRange(attrs, Some id, range)
 
             if moduleKind <> AnonModule then
                 x.ProcessReferenceNameSkipLast(lid)
@@ -253,11 +256,11 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         if mark.IsSome then
             x.Done(mark.Value, elementType)
 
-    member x.MarkAttributesOrIdOrRange(attrs: SynAttributes, id: Ident option, range: range) =
-        match attrs with
-        | head :: _ ->
-            let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, head.Range)
-            x.ProcessAttributeLists(attrs)
+    member x.MarkAndProcessAttributesOrIdOrRange(outerAttrs: SynAttributes, id: Ident option, range: range) =
+        match outerAttrs with
+        | attrList :: _ ->
+            let mark = x.Mark(attrList.Range)
+            x.ProcessAttributeLists(outerAttrs)
             mark
 
         | _ ->
@@ -265,6 +268,15 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStart) else rangeStart
             x.Mark(startOffset)
 
+    member x.MarkAttributesOrIdOrRangeStart(outerAttrs: SynAttributes, id: Ident option, range: range) =
+        match outerAttrs with
+        | attrList :: _ -> x.Mark(attrList.Range)
+        | _ ->
+
+        let rangeStart = x.GetStartOffset(range)
+        let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStart) else rangeStart
+        x.Mark(startOffset)
+    
     member x.ProcessOpenDeclTarget(openDeclTarget, range) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
         match openDeclTarget with
@@ -280,7 +292,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         mark
 
     member x.StartType attrs typeParams constraints (lid: LongIdent) range =
-        let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
+        let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, List.tryHead lid, range)
         if not lid.IsEmpty then
             let id = lid.Head
             let idOffset = x.GetStartOffset id

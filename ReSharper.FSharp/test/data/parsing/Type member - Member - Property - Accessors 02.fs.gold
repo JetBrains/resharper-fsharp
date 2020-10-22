@@ -15,28 +15,29 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        IMemberDeclaration
-          FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IMemberSelfId
-            FSharpIdentifierToken(type:IDENTIFIER, text:x)
-          FSharpTokenType+DotTokenElement(type:DOT, text:.)
-          FSharpIdentifierToken(type:IDENTIFIER, text:P)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+WithTokenElement(type:WITH, text:with)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IAccessorDeclaration
-            FSharpIdentifierToken(type:IDENTIFIER, text:get)
+        ITypeMemberDeclarationList
+          IMemberDeclaration
+            FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IWildPat
-                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+            IMemberSelfId
+              FSharpIdentifierToken(type:IDENTIFIER, text:x)
+            FSharpTokenType+DotTokenElement(type:DOT, text:.)
+            FSharpIdentifierToken(type:IDENTIFIER, text:P)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+            FSharpTokenType+WithTokenElement(type:WITH, text:with)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IChameleonExpression
-              IUnitExpr
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            IAccessorDeclaration
+              FSharpIdentifierToken(type:IDENTIFIER, text:get)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IParametersPatternDeclaration
+                IWildPat
+                  FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IChameleonExpression
+                IUnitExpr
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

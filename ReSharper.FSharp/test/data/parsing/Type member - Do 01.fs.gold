@@ -15,12 +15,13 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        IDoStatement
-          FSharpTokenType+DoTokenElement(type:DO, text:do)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IChameleonExpression
-            IUnitExpr
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        ITypeMemberDeclarationList
+          IDoStatement
+            FSharpTokenType+DoTokenElement(type:DO, text:do)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IChameleonExpression
+              IUnitExpr
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
