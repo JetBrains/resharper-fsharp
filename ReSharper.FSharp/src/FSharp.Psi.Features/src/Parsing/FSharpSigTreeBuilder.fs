@@ -41,7 +41,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
         | SynModuleSigDecl.Exception(SynExceptionSig(exn, members, range), _) ->
             let mark = x.StartException(exn)
-            for m in members do x.ProcessTypeMemberSignature(m)
+            x.ProcessTypeMemberList(members, ElementType.MEMBER_DECLARATION_LIST)
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
 
         | SynModuleSigDecl.ModuleAbbrev(IdentRange range, lid, _) ->
@@ -98,21 +98,25 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
         | SynTypeDefnSigRepr.ObjectModel(kind, members, _) ->
             if x.AddObjectModelTypeReprNode(kind) then
                 let mark = x.Mark(range)
-                for memberSig in members do
-                    x.ProcessTypeMemberSignature(memberSig)
-
+                x.ProcessTypeMemberList(members, ElementType.TYPE_MEMBER_DECLARATION_LIST)
                 let elementType = x.GetObjectModelTypeReprElementType(kind)
                 x.Done(range, mark, elementType)
             else
-                for memberSig in members do
-                    x.ProcessTypeMemberSignature(memberSig)
+                x.ProcessTypeMemberList(members, ElementType.TYPE_MEMBER_DECLARATION_LIST)
 
         | _ -> failwithf "Unexpected simple type representation: %A" repr
 
-        for memberSig in memberSigs do
-            x.ProcessTypeMemberSignature(memberSig)
-
+        x.ProcessTypeMemberList(memberSigs, ElementType.TYPE_MEMBER_DECLARATION_LIST)
         x.Done(range, mark, ElementType.F_SHARP_TYPE_DECLARATION)
+
+    member x.ProcessTypeMemberList(members: SynMemberSig list, elementType) =
+        match members with
+        | m :: _ ->
+            let mark = x.MarkAttributesOrIdOrRangeStart(m.OuterAttributes, None, m.Range)
+            for m in members do
+                x.ProcessTypeMemberSignature(m)
+            x.Done(mark, elementType)
+        | _ -> ()
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with

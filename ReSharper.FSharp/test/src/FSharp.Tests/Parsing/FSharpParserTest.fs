@@ -441,6 +441,7 @@ type FSharpSignatureParserTest() =
 
     [<Test>] member x.``Type member - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Constructor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Hash directive 01``() = x.DoNamedTest()
 

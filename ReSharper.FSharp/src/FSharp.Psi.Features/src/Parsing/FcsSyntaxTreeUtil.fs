@@ -39,6 +39,21 @@ type SynMemberDefn with
 
         | _ -> []
 
+type SynMemberSig with
+    member x.OuterAttributes =
+        match x with
+        | SynMemberSig.Member(ValSpfn(attributes = attrs), _, _)
+        | SynMemberSig.ValField(Field(attributes = attrs), _) -> attrs
+        | _ -> []
+
+    member x.Range =
+        match x with
+        | SynMemberSig.Member(_, _, range)
+        | SynMemberSig.ValField(_, range)
+        | SynMemberSig.Inherit(_, range)
+        | SynMemberSig.Interface(_, range) -> range
+        | _ -> range.Zero
+
 type SynSimplePats with
     member x.Range =
         match x with

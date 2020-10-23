@@ -15,19 +15,20 @@ IFSharpSigFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        IMemberConstructorDeclaration
-          FSharpTokenType+NewTokenElement(type:NEW, text:new)
-          FSharpTokenType+ColonTokenElement(type:COLON, text::)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IFunctionTypeUsage
-            INamedTypeUsage
-              ITypeReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:int)
+        ITypeMemberDeclarationList
+          IMemberConstructorDeclaration
+            FSharpTokenType+NewTokenElement(type:NEW, text:new)
+            FSharpTokenType+ColonTokenElement(type:COLON, text::)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedTypeUsage
-              ITypeReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:T)
+            IFunctionTypeUsage
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:T)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
