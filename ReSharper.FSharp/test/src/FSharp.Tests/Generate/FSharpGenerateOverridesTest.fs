@@ -45,3 +45,9 @@ type FSharpGenerateOverridesTest() =
 
     [<Test>] member x.``Super 01``() = x.DoNamedTest()
     [<Test>] member x.``Super 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Not available - Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Static class 01``() = x.DoNamedTest()
+
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``Not available - Signature 01``() = x.DoNamedTest()

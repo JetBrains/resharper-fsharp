@@ -36,8 +36,10 @@ type FSharpGeneratorContext(kind, typeDecl: IFSharpTypeDeclaration) =
     override x.CreatePointer() =
         FSharpGeneratorWorkflowPointer(x) :> _
 
-    static member Create(kind, typeDeclaration: ITreeNode) =
-        let typeDeclaration = typeDeclaration.As<IFSharpTypeDeclaration>()
+    static member Create(kind, treeNode: ITreeNode) =
+        if isNull treeNode || treeNode.IsFSharpSigFile() then null else
+
+        let typeDeclaration = treeNode.As<IFSharpTypeDeclaration>()
         if isNull typeDeclaration || isNull typeDeclaration.DeclaredElement then null else
 
         FSharpGeneratorContext(kind, typeDeclaration)
