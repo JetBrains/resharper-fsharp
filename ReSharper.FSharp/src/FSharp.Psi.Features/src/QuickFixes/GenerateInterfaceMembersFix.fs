@@ -107,7 +107,16 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             addNodesAfter impl.LastChild [
                 Whitespace()
                 FSharpTokenType.WITH.CreateLeafElement()
+                NewLine(impl.GetLineEnding())
+                Whitespace(indent)
+                ElementType.MEMBER_DECLARATION_LIST.Create()
             ] |> ignore
 
-        let anchor = GenerateOverrides.addEmptyLineIfNeeded impl.LastChild
-        addNodesAfter anchor generatedMembers |> ignore
+            let memberDeclList = impl.MemberDeclarationsList
+            ModificationUtil.AddChild(memberDeclList, Whitespace()) |> ignore
+            addNodesAfter memberDeclList.FirstChild generatedMembers |> ignore
+            deleteChildRange memberDeclList.FirstChild memberDeclList.TypeMembers.[0].PrevSibling
+
+        else
+            let anchor = GenerateOverrides.addEmptyLineIfNeeded impl.MemberDeclarationsList.LastChild
+            addNodesAfter anchor generatedMembers |> ignore

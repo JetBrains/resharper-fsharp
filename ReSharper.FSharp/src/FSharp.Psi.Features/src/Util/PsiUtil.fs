@@ -336,8 +336,8 @@ module PsiModificationUtil =
         nodes |> Seq.fold (fun anchor treeNode ->
             ModificationUtil.AddChildAfter(anchor, treeNode)) anchor
 
-    let addNodesBefore anchor (nodes: ITreeNode list) =
-        nodes |> List.rev |> List.fold (fun anchor treeNode ->
+    let addNodesBefore anchor (nodes: ITreeNode seq) =
+        nodes |> Seq.rev |> Seq.fold (fun anchor treeNode ->
             ModificationUtil.AddChildBefore(anchor, treeNode)) anchor
 
     let addNodeBefore anchor node = ModificationUtil.AddChildBefore(anchor, node) |> ignore
