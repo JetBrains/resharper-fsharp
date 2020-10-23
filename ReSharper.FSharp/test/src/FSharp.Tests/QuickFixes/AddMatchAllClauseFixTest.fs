@@ -18,3 +18,7 @@ type AddMatchAllClauseFixTest() =
     [<Test>] member x.``Simple 04 - Generate single line``() = x.DoNamedTest()
 
     [<Test>] member x.``Type binding 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 02``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 03``() = x.DoNamedTest()
