@@ -210,7 +210,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="SuccessiveArgsShouldBeSpacedOrTupled">
-    <Parameter type="IPrefixAppExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Range>expr.GetHighlightingRange()</Range>
     <Message value="Successive arguments should be separated by spaces, tupled, or parenthesized"/>
     <Behavour overlapResolvePolicy="NONE"/>
