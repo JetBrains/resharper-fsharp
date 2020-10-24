@@ -1,12 +1,14 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open FSharp.Compiler
+open FSharp.Compiler.SourceCodeServices
 open System
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -84,8 +86,30 @@ type LambdaAnalyzer() =
             | x -> hasMatches, i = pats.Count, x
 
         compareArgsRec expr 0 null
+    
+    let isLambdaApplicable (lambda: ILambdaExpr) =
+        let lambda = lambda.IgnoreParentParens()
+        let appTuple = TupleExprNavigator.GetByExpression(lambda)
 
-    let isApplicable (expr: IFSharpExpression) =
+        let appArg = if isNotNull appTuple then appTuple.IgnoreParentParens() else lambda
+        let app = PrefixAppExprNavigator.GetByArgumentExpression(appArg)
+
+        let isСonvertibleToDelegate =
+            isNotNull app && isNotNull app.Reference &&
+            match app.Reference.GetFSharpSymbol() with
+            | :? FSharpMemberOrFunctionOrValue as m ->
+                m.IsMember &&
+                let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(lambda) else 0
+                let args = m.CurriedParameterGroups
+                if args.[0].Count <= lambdaPos then false else
+                let argDecl = args.[0].[lambdaPos]
+                let argDeclType = argDecl.Type
+                argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
+            | _ -> false
+
+        not isСonvertibleToDelegate
+
+    let isExpressionApplicable (expr: IFSharpExpression) =
         match expr with
         | :? IPrefixAppExpr
         | :? IReferenceExpr
@@ -95,7 +119,8 @@ type LambdaAnalyzer() =
 
     override x.Run(lambda, _, consumer) =
         let expr = lambda.Expression.IgnoreInnerParens()
-        if not (isApplicable expr) then () else
+        if not (isLambdaApplicable lambda) then () else
+        if not (isExpressionApplicable expr) then () else
 
         let pats = lambda.Patterns
 
