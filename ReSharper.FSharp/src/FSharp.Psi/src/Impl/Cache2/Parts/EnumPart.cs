@@ -32,15 +32,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       get
       {
-        var declaration = GetDeclaration();
-        if (declaration != null)
+        if (GetDeclaration() is IFSharpTypeDeclaration decl &&
+            decl.TypeRepresentation is IEnumRepresentation repr)
         {
-          var subDeclarationMembers = GetDeclaration() is IFSharpTypeDeclaration decl &&
-                                      decl.TypeRepresentation is IEnumRepresentation repr
-            ? repr.EnumMembers
-            : EmptyList<IEnumMemberDeclaration>.InstanceList;
-
-          foreach (var memberDeclaration in subDeclarationMembers)
+          foreach (var memberDeclaration in repr.EnumMembers)
           {
             var field = (IField) memberDeclaration.DeclaredElement;
             if (field != null) yield return field;

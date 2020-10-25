@@ -50,9 +50,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       var comparisonRule = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
       foreach (var name in MemberNames)
-      {
-        if (string.Equals(name, shortName, comparisonRule)) return true;
-      }
+        if (string.Equals(name, shortName, comparisonRule))
+          return true;
 
       return false;
     }
