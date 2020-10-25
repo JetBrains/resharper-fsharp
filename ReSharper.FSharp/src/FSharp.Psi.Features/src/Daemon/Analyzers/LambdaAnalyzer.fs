@@ -87,27 +87,24 @@ type LambdaAnalyzer() =
 
         compareArgsRec expr 0 null
     
-    let isLambdaApplicable (lambda: ILambdaExpr) =
+    let isImplicitlyConvertedToDelegate (lambda: ILambdaExpr) =
         let lambda = lambda.IgnoreParentParens()
         let appTuple = TupleExprNavigator.GetByExpression(lambda)
 
         let appArg = if isNotNull appTuple then appTuple.IgnoreParentParens() else lambda
         let app = PrefixAppExprNavigator.GetByArgumentExpression(appArg)
 
-        let isСonvertibleToDelegate =
-            isNotNull app && isNotNull app.Reference &&
-            match app.Reference.GetFSharpSymbol() with
-            | :? FSharpMemberOrFunctionOrValue as m ->
-                m.IsMember &&
-                let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(lambda) else 0
-                let args = m.CurriedParameterGroups
-                if args.[0].Count <= lambdaPos then false else
-                let argDecl = args.[0].[lambdaPos]
-                let argDeclType = argDecl.Type
-                argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
-            | _ -> false
-
-        not isСonvertibleToDelegate
+        isNotNull app && isNotNull app.Reference &&
+        match app.Reference.GetFSharpSymbol() with
+        | :? FSharpMemberOrFunctionOrValue as m ->
+            m.IsMember &&
+            let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(lambda) else 0
+            let args = m.CurriedParameterGroups
+            if args.[0].Count <= lambdaPos then false else
+            let argDecl = args.[0].[lambdaPos]
+            let argDeclType = argDecl.Type
+            argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
+        | _ -> false
 
     let isExpressionApplicable (expr: IFSharpExpression) =
         match expr with
@@ -119,7 +116,7 @@ type LambdaAnalyzer() =
 
     override x.Run(lambda, _, consumer) =
         let expr = lambda.Expression.IgnoreInnerParens()
-        if not (isLambdaApplicable lambda) then () else
+        if isImplicitlyConvertedToDelegate lambda then () else
         if not (isExpressionApplicable expr) then () else
 
         let pats = lambda.Patterns

@@ -1,10 +1,4 @@
 ﻿let f x y = ()
-type Delegate = delegate of int -> int
-type DelegateAbbreviation = Delegate
-type Type1(x: Delegate) = 
-    static member M1(x: Delegate) = ()
-    static member M2(x: DelegateAbbreviation) = ()
-    static member M3(x: int, y: Delegate) = ()
 
 fun x -> -x
 fun x -> ~~x
@@ -28,10 +22,6 @@ fun x -> (fun y -> x) x
 fun struct(a, b) -> (a, b)
 fun (a, b) -> struct(a, b)
 
-Type1(fun x -> x)
-Type1.M1(fun x -> x)
-Type1.M2(fun x -> x)
-Type1.M3(0, fun x -> x)
 
 module A =
     let [<Literal>] b = 5

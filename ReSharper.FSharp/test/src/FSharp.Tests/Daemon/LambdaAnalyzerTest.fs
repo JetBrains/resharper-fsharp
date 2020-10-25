@@ -26,6 +26,7 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Fst``() = x.DoNamedTest()
     [<Test>] member x.``Snd``() = x.DoNamedTest()
     [<Test>] member x.``Delegates``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates - Not available``() = x.DoNamedTest()
     [<Test>] member x.``Not available``() = x.DoNamedTest()
 
     [<Test>] member x.``Used names - Nested scope``() = x.DoNamedTest()
