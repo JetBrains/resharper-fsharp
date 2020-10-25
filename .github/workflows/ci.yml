@@ -1,11 +1,9 @@
 name: "build-test"
 on:
   push:
-    branches:
-      - ber.a/ci
+    branches: [ $default-branch ]
   pull_request:
-    branches:
-      - ber.a/ci
+    branches: [ $default-branch ]
 
 jobs:
   test-backend:
