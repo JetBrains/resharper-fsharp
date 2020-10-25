@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
@@ -34,7 +35,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public override bool IsCompatibleWithLanguage(PsiLanguageType languageType) => languageType.Is<FSharpLanguage>();
 
-    public override IDomainSpecificSearcher CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates) =>
+    public override IDomainSpecificSearcher
+      CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates) =>
       new FSharpReferenceSearcher(elements, findCandidates);
 
     public override IEnumerable<string> GetAllPossibleWordsInFile(IDeclaredElement element) =>
@@ -101,7 +103,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
     private static IEnumerable<RelatedDeclaredElement> GetUnionCaseRelatedElements([NotNull] IUnionCase unionCase) =>
       unionCase.GetGeneratedMembers().Select(member => new RelatedDeclaredElement(member));
 
-    public override Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)
+    public override NavigateTargets GetNavigateToTargets(IDeclaredElement element)
     {
       if (element is ResolvedFSharpSymbolElement resolvedSymbolElement &&
           resolvedSymbolElement.Symbol is FSharpActivePatternCase activePatternCase)
@@ -111,14 +113,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         var entityOption = activePattern.DeclaringEntity;
         var patternNameOption = activePattern.Name;
         if (entityOption == null || patternNameOption == null)
-          return null;
+          return NavigateTargets.Empty;
 
         var typeElement = FSharpElementsUtil.GetTypeElement(entityOption.Value, resolvedSymbolElement.Module);
         var pattern = typeElement.EnumerateMembers(patternNameOption.Value, true).FirstOrDefault() as IDeclaredElement;
         if (pattern is IFSharpTypeMember)
         {
           if (!(pattern.GetDeclarations().FirstOrDefault() is IFSharpDeclaration patternDecl))
-            return null;
+            return NavigateTargets.Empty;
 
           var caseElement = patternDecl.GetActivePatternByIndex(activePatternCase.Index);
           if (caseElement != null)
@@ -132,14 +134,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         return CreateTarget(origin);
 
       if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.CanNavigateTo)
-        return null;
+        return NavigateTargets.Empty;
 
       return fsTypeMember.GetContainingType() is IDeclaredElement containingType
         ? CreateTarget(containingType)
-        : null;
+        : NavigateTargets.Empty;
     }
 
-    private static Tuple<ICollection<IDeclaredElement>, bool> CreateTarget(IDeclaredElement element) =>
-      new Tuple<ICollection<IDeclaredElement>, bool>(new[] {element}, false);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static NavigateTargets CreateTarget(IDeclaredElement element) => new NavigateTargets(element, false);
   }
 }

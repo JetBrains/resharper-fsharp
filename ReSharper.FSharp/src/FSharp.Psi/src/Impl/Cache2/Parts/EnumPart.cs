@@ -28,11 +28,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return TypeFactory.CreateUnknownType(GetPsiModule());
     }
 
-    public IList<IField> Fields =>
-      ProcessSubDeclaration<IField, IEnumMemberDeclaration>(input =>
-        GetDeclaration() is IFSharpTypeDeclaration decl && decl.TypeRepresentation is IEnumRepresentation repr
-          ? repr.EnumMembers
-          : EmptyList<IEnumMemberDeclaration>.InstanceList);
+    public IEnumerable<IField> Fields
+    {
+      get
+      {
+        var declaration = GetDeclaration();
+        if (declaration != null)
+        {
+          var subDeclarationMembers = GetDeclaration() is IFSharpTypeDeclaration decl &&
+                                      decl.TypeRepresentation is IEnumRepresentation repr
+            ? repr.EnumMembers
+            : EmptyList<IEnumMemberDeclaration>.InstanceList;
+
+          foreach (var memberDeclaration in subDeclarationMembers)
+          {
+            var field = (IField) memberDeclaration.DeclaredElement;
+            if (field != null) yield return field;
+          }
+        }
+      }
+    }
 
     protected override byte SerializationTag => (byte) FSharpPartKind.Enum;
   }

@@ -48,9 +48,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       Method.GetContainingType()?.GetContainingNamespace() ??
       Module.GetSymbolScope().GlobalNamespace;
 
+    public bool HasMemberWithName(string shortName, bool ignoreCase) => false;
+
     public IPsiSourceFile GetSingleOrDefaultSourceFile() => null;
 
     public IList<ITypeElement> NestedTypes => EmptyList<ITypeElement>.InstanceList;
+    public IEnumerable<IField> Constants => EmptyList<IField>.Instance;
+    public IEnumerable<IField> Fields => EmptyList<IField>.Instance;
     public IEnumerable<IConstructor> Constructors => EmptyList<IConstructor>.Instance;
     public IEnumerable<IOperator> Operators => EmptyList<IOperator>.Instance;
     public IEnumerable<IMethod> Methods => EmptyList<IMethod>.Instance;
@@ -59,6 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IEnumerable<string> MemberNames => EmptyList<string>.InstanceList;
 
     public TypeParameterNullability Nullability => TypeParameterNullability.Unknown;
+
     public TypeParameterNullability GetNullability(ISubstitution explicitInheritorSubstitution) =>
       TypeParameterNullability.Unknown;
 
