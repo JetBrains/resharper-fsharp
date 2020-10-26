@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
@@ -115,7 +113,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         if (entityOption == null || patternNameOption == null)
           return NavigateTargets.Empty;
 
-        var typeElement = FSharpElementsUtil.GetTypeElement(entityOption.Value, resolvedSymbolElement.Module);
+        var typeElement = entityOption.Value.GetTypeElement(resolvedSymbolElement.Module);
         var pattern = typeElement.EnumerateMembers(patternNameOption.Value, true).FirstOrDefault() as IDeclaredElement;
         if (pattern is IFSharpTypeMember)
         {
@@ -124,23 +122,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
           var caseElement = patternDecl.GetActivePatternByIndex(activePatternCase.Index);
           if (caseElement != null)
-            return CreateTarget(caseElement);
+            return new NavigateTargets(caseElement, false);
         }
         else if (pattern != null)
-          return CreateTarget(pattern);
+          return new NavigateTargets(pattern, false);
       }
 
       if (element is IFSharpGeneratedFromOtherElement generated && generated.OriginElement is { } origin)
-        return CreateTarget(origin);
+        return new NavigateTargets(origin, false);
 
       if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.CanNavigateTo)
         return NavigateTargets.Empty;
 
       return fsTypeMember.GetContainingType() is IDeclaredElement containingType
-        ? CreateTarget(containingType)
+        ? new NavigateTargets(containingType, false)
         : NavigateTargets.Empty;
     }
-
-    private static NavigateTargets CreateTarget(IDeclaredElement element) => new NavigateTargets(element, false);
   }
 }
