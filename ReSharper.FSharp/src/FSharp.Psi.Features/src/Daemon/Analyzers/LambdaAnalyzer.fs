@@ -1,12 +1,15 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open FSharp.Compiler
+open FSharp.Compiler.SourceCodeServices
 open System
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -84,8 +87,25 @@ type LambdaAnalyzer() =
             | x -> hasMatches, i = pats.Count, x
 
         compareArgsRec expr 0 null
+    
+    let isImplicitlyConvertedToDelegate (lambda: ILambdaExpr) =
+        let lambda = lambda.IgnoreParentParens()
+        let appTuple = TupleExprNavigator.GetByExpression(lambda)
+        let app = getArgsOwner lambda
 
-    let isApplicable (expr: IFSharpExpression) =
+        app :? IPrefixAppExpr && isNotNull app.Reference &&
+        match app.Reference.GetFSharpSymbol() with
+        | :? FSharpMemberOrFunctionOrValue as m ->
+            m.IsMember &&
+            let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(lambda) else 0
+            let args = m.CurriedParameterGroups
+            if args.[0].Count <= lambdaPos then false else
+            let argDecl = args.[0].[lambdaPos]
+            let argDeclType = argDecl.Type
+            argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
+        | _ -> false
+
+    let isExpressionApplicable (expr: IFSharpExpression) =
         match expr with
         | :? IPrefixAppExpr
         | :? IReferenceExpr
@@ -95,28 +115,34 @@ type LambdaAnalyzer() =
 
     override x.Run(lambda, _, consumer) =
         let expr = lambda.Expression.IgnoreInnerParens()
-        if not (isApplicable expr) then () else
+        if not (isExpressionApplicable expr) then () else
 
         let pats = lambda.Patterns
 
-        match compareArgs pats expr with
-        | true, true, replaceCandidate ->
-            consumer.AddHighlighting(LambdaCanBeReplacedWithInnerExpressionWarning(lambda, replaceCandidate))
-        | true, false, replaceCandidate ->
-            consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, replaceCandidate))
-        | _ ->
+        let warning = 
+            match compareArgs pats expr with
+            | true, true, replaceCandidate ->
+                LambdaCanBeReplacedWithInnerExpressionWarning(lambda, replaceCandidate) :> IHighlighting
+            | true, false, replaceCandidate ->
+                LambdaCanBeSimplifiedWarning(lambda, replaceCandidate) :> _
+            | _ ->
 
-        if pats.Count = 1 then
-            match pats.First().IgnoreInnerParens() with
-            | :? ITuplePat as pat when pat.PatternsEnumerable.CountIs(2) ->
-                let tuplePats = pat.Patterns
-                if compareArg (tuplePats.[0]) expr then
-                    consumer.AddHighlighting(LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "fst"))
-                elif compareArg (tuplePats.[1]) expr then
-                    consumer.AddHighlighting(LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "snd"))
-            | _ -> ()
+            if pats.Count = 1 then
+                let pat = pats.First().IgnoreInnerParens()
+                if compareArg pat expr then LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "id") :> _ else
 
-        match compareArg (pats.LastOrDefault()) expr, pats.Count with
-        | true, 1 -> consumer.AddHighlighting(LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "id"))
-        | true, _ -> consumer.AddHighlighting(LambdaBodyCanBeReplacedWithIdWarning(lambda))
-        | _ -> ()
+                match pat with
+                | :? ITuplePat as pat when pat.PatternsEnumerable.CountIs(2) ->
+                    let tuplePats = pat.Patterns
+                    if compareArg (tuplePats.[0]) expr then
+                        LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "fst") :> _
+                    elif compareArg (tuplePats.[1]) expr then
+                        LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "snd") :> _
+                    else null
+                | _ -> null
+
+            elif compareArg (pats.LastOrDefault()) expr then LambdaBodyCanBeReplacedWithIdWarning(lambda) :>_
+            else null
+
+        if isNotNull warning && not (isImplicitlyConvertedToDelegate lambda) then
+            consumer.AddHighlighting(warning)
