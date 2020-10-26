@@ -52,11 +52,11 @@ jobs:
 
       - name: Build Plugin Frontend
         working-directory: ./rider-fsharp
-        run: gradlew buildPlugin
+        run: ./gradlew buildPlugin
 
       - name: Test BuildSearchableOptions
         working-directory: ./rider-fsharp
-        run: gradlew buildSearchableOptions
+        run: ./gradlew buildSearchableOptions
 
       - name: Stop Gradle Daemon # to collect Gradle cache
         working-directory: ./rider-fsharp
