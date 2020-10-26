@@ -50,6 +50,10 @@ jobs:
         working-directory: ./ReSharper.FSharp
         run: dotnet test --no-build
 
+      - name: Build Plugin Frontend
+        working-directory: ./rider-fsharp
+        run: gradlew buildPlugin
+
       - name: Stop Gradle Daemon # to collect Gradle cache
         working-directory: ./rider-fsharp
         run: ./gradlew --stop
