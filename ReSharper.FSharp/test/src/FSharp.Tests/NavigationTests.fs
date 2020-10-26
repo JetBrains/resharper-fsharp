@@ -122,7 +122,7 @@ type FSharpGoToDeclarationTest() =
     [<Test>] member x.``Signature 02 - Same range``() = x.DoTestSolution("Signature 02 - Same range.fsi", "Signature 02 - Same range.fs")
 
     [<TestReferences("Library1.dll", "Library2.dll")>]
-    [<Test>] member x.``Same type from different assemblies``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Same type from different assemblies``() = x.DoNamedTest()
 
     [<Test>] member x.``Union - Case - Empty 01 - Expr``() = x.DoNamedTest()
     [<Test>] member x.``Union - Case - Empty 02 - Pattern``() = x.DoNamedTest()
