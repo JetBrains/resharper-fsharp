@@ -141,7 +141,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         : NavigateTargets.Empty;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static NavigateTargets CreateTarget(IDeclaredElement element) => new NavigateTargets(element, false);
   }
 }
