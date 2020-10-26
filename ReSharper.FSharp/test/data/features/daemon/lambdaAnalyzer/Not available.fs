@@ -22,7 +22,6 @@ fun x -> (fun y -> x) x
 fun struct(a, b) -> (a, b)
 fun (a, b) -> struct(a, b)
 
-
 module A =
     let [<Literal>] b = 5
 

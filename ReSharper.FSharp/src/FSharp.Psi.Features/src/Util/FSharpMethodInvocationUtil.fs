@@ -30,13 +30,13 @@ let tryGetNamedArg (expr: IFSharpExpression) =
     | null -> null
     | refExpr -> refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
 
+let getArgsOwner (expr: IFSharpExpression) =
+    let tupleExpr = TupleExprNavigator.GetByExpression(expr.IgnoreParentParens())
+    let exprContext = if isNull tupleExpr then expr else tupleExpr :> _
+    FSharpArgumentOwnerNavigator.GetByArgumentExpression(exprContext.IgnoreParentParens())
 
 let getMatchingParameter (expr: IFSharpExpression) =
-    let argsOwner =
-        let tupleExpr = TupleExprNavigator.GetByExpression(expr.IgnoreParentParens())
-        let exprContext = if isNull tupleExpr then expr else tupleExpr :> _
-        FSharpArgumentOwnerNavigator.GetByArgumentExpression(exprContext.IgnoreParentParens())
-
+    let argsOwner = getArgsOwner(expr)
     if isNull argsOwner then null else
 
     let namedArgRefExpr = tryGetNamedArgRefExpr expr
