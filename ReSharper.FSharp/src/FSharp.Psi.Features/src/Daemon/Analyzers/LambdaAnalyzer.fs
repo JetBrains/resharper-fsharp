@@ -93,7 +93,7 @@ type LambdaAnalyzer() =
         let appTuple = TupleExprNavigator.GetByExpression(lambda)
         let app = getArgsOwner lambda
 
-        isNotNull app && isNotNull app.Reference &&
+        app :? IPrefixAppExpr && isNotNull app.Reference &&
         match app.Reference.GetFSharpSymbol() with
         | :? FSharpMemberOrFunctionOrValue as m ->
             m.IsMember &&
