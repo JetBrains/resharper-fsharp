@@ -50,7 +50,9 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
         | _ -> "Remove unused value"
 
     override x.IsAvailable _ =
-        isValid pat && isValid letOrUse
+        isValid pat && isValid letOrUse &&
+
+        not (pat :? IAsPat) // todo: enable, check inner patterns
 
     override x.ExecutePsiTransaction(_, _) =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
