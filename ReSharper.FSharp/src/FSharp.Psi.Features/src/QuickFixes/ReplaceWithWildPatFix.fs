@@ -25,30 +25,35 @@ module ReplaceWithWildPat =
         replace pat (pat.GetFSharpLanguageService().CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
 
     let getPatOwner (pat: IFSharpPattern) =
-        if isNull pat then None else
+        if isNull pat then null else
 
         let pat = pat.IgnoreParentParens()
-        if isNotNull (AttribPatNavigator.GetByPattern(pat)) then None else
-        if isNotNull (OptionalValPatNavigator.GetByPattern(pat)) then None else
+        if isNotNull (AttribPatNavigator.GetByPattern(pat)) then null else
+        if isNotNull (OptionalValPatNavigator.GetByPattern(pat)) then null else
 
         let typedPat = TypedPatNavigator.GetByPattern(pat).IgnoreParentParens()
-        if isNotNull (AttribPatNavigator.GetByPattern(typedPat)) then None else
+        if isNotNull (AttribPatNavigator.GetByPattern(typedPat)) then null else
 
-        Some(skipIntermediatePatParents pat)
+        skipIntermediatePatParents pat
 
     let isAvailable (pat: IFSharpPattern) =
-        isValid pat && not (pat :? IParametersOwnerPat) &&
+        isValid pat &&
 
-        match getPatOwner pat with
-        | None -> false
-        | Some node ->
+        match pat with
+        | :? IParametersOwnerPat
+        | :? IAsPat -> false // todo: allow for 'as' patterns, check if inner patterns are used
+        | _ ->
+
+        let node = getPatOwner pat
+        if isNull node then false else
 
         match node.Parent with
-        | :? IBinding
-        | :? IMatchClause
-        | :? ILambdaParametersList -> true
-        | :? IParametersPatternDeclaration as parent when
-            (parent.Parent :? IMemberDeclaration || parent.Parent :? IMemberConstructorDeclaration) -> true
+        | :? IBinding | :? IMatchClause | :? ILambdaParametersList -> true
+
+        | :? IParametersPatternDeclaration as parent ->
+            let parent = parent.Parent
+            parent :? IMemberDeclaration || parent :? IMemberConstructorDeclaration
+
         | _ -> false
 
 
@@ -104,8 +109,8 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
             if not isFromUnusedValue then FileCollectorInfo.Empty else
 
             match patOwner with
-            | None -> FileCollectorInfo.Default
-            | Some pat ->
+            | null -> FileCollectorInfo.Default
+            | pat ->
 
             let scopeText =
                 match pat.Parent with
