@@ -5,6 +5,8 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Resources.Shell
+open JetBrains.TextControl
 open JetBrains.Util
 
 [<DaemonStage(StagesBefore = [| typeof<SyntaxErrorsStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
@@ -24,6 +26,12 @@ and TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger: ILogger) =
         base.ShouldAddDiagnostic(error, range) && error.Subcategory <> BuildPhaseSubcategory.Parse
 
     override x.Execute(committer) =
+        let textControlManager = Shell.Instance.GetComponent<ITextControlManager>()
+        let visibleTextControls = textControlManager.VisibleTextControls
+        let textControls = textControlManager.TextControls
+        let lastFocusedTextControl = textControlManager.LastFocusedTextControl
+        let _ = visibleTextControls, textControls, lastFocusedTextControl
+
         match fsFile.GetParseAndCheckResults(false, opName) with
         | None -> ()
         | Some results ->

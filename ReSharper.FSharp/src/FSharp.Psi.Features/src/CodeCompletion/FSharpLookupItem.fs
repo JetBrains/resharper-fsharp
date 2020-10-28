@@ -6,7 +6,6 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Feature.Services.ParameterInfo
 open JetBrains.ReSharper.Host.Features.Completion
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -44,7 +43,7 @@ type FSharpErrorLookupItem(item: FSharpDeclarationListItem) =
 
     interface IDescriptionProvidingLookupItem with
         member x.GetDescription() =
-            let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
+            let (FSharpToolTipText(tooltips)) = item.DescriptionText
             tooltips
             |> List.tryHead
             |> Option.bind (function | FSharpToolTipElement.CompositionError e -> Some (RichTextBlock(e)) | _ -> None)
@@ -71,7 +70,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
         match candidates with
         | null ->
             let result = LocalList<ICandidate>()
-            let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
+            let (FSharpToolTipText(tooltips)) = item.DescriptionText
             for tooltip in tooltips do
                 match tooltip with
                 | FSharpToolTipElement.Group(overloads) ->
