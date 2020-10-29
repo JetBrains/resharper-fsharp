@@ -35,7 +35,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
                 |WHITESPACE (' ')
                 |INT32 ('0b1')
                 |WHITESPACE (' ')
-                |RESERVED_LITERAL_FORMATS ('1F')
+                |IEEE32 ('1F')
                 """.trimMargin()
         )
     }
