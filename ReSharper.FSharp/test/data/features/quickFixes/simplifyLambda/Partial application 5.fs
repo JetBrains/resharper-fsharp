@@ -1,3 +1,1 @@
-let f _ _ _ = ()
-
-fun (a, b) x ->{caret} f () (a, b) x
+fun (a, b) x ->{caret} id x
