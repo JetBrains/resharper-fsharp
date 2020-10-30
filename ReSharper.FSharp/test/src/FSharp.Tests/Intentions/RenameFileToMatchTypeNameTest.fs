@@ -12,7 +12,9 @@ type RenameFileToMatchTypeNameActionAvailabilityTest() =
     [<Test>] member x.``Module - Nested 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Nested 02 - Multiple``() = x.DoNamedTest()
     [<Test>] member x.``Module - Nested 03 - Associated``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Nested 04``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 02 - Multiple types``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 03 - Multiple namespaces``() = x.DoNamedTest()

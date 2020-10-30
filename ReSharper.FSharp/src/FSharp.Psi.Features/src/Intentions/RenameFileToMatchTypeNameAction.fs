@@ -41,8 +41,8 @@ type RenameFileToMatchTypeNameAction(dataProvider: FSharpContextActionDataProvid
 
         match types.SingleItem(), modules.SingleItem() with
         | null, null -> false
-        | null, m -> m.Equals(typeElement)
-        | t, null -> t.Equals(typeElement)
+        | null, m -> types.IsEmpty() && m.Equals(typeElement)
+        | t, null -> modules.IsEmpty() && t.Equals(typeElement)
         | t, m -> m.AssociatedTypeElement.Equals(t) && (m.Equals(typeElement) || t.Equals(typeElement))
 
     override this.Text =
