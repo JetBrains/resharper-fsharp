@@ -8,9 +8,10 @@ open FSharp.Compiler.SourceCodeServices.AstTraversal
 open JetBrains.Application.CommandProcessing
 open JetBrains.Application.UI.ActionSystem.Text
 open JetBrains.Application.Settings
-open JetBrains.DocumentModel
 open JetBrains.Diagnostics
+open JetBrains.DocumentModel
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.Options
 open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -1159,7 +1160,18 @@ type FSharpTypingAssist
         let typedChar = context.Char
 
         if context.EnsureWritable() <> EnsureWritableResult.SUCCESS then false else
-        if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
+
+        let selection = textControl.Selection
+
+        let surroundTypingEnabled =
+            let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
+            settingsStore.GetValue(TypingAssistOptions.SurroundTypingEnabled)
+
+        if surroundTypingEnabled && selection.HasSelection() && typedChar = '"' then
+            x.SurroundSelectionWithQuotes(textControl, fun _ -> false)
+            true else
+
+        if selection.OneDocRangeWithCaret().Length > 0 then false else
 
         if x.HandleThirdQuote(textControl, typedChar) then true else
         if x.SkipQuote(textControl, typedChar) then true else

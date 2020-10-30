@@ -214,6 +214,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Comment 01 - Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Comment 02 - Before comment``() = x.DoNamedTest()
 
+    [<Test>] member x.``Quotes - Surround 01``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Surround 02 - Multiline``() = x.DoNamedTest()
+
     [<Test>] member x.``Brackets - Left 01 - Add right``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 02 - No add right before other``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 03 - Add right before other and space``() = x.DoNamedTest()
