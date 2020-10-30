@@ -103,6 +103,7 @@
     <Compile Include="Intentions\SpecifyTypesTest.fs" />
     <Compile Include="Intentions\ToLiteralTest.fs" />
     <Compile Include="Intentions\LetToUseTest.fs" />
+    <Compile Include="Intentions\RenameFileToMatchTypeNameTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />
