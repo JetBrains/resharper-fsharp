@@ -14,8 +14,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Util
 
 [<AllowNullLiteral>]
 type FSharpGeneratorContext(kind, typeDecl: IFSharpTypeDeclaration) =
@@ -148,6 +150,8 @@ type FSharpOverridableMembersProvider() =
                     |> Seq.toList
                 fcsEntityInstance, mfvInstances)
 
+        let alreadyOverriden = HashSet()
+
         let overridableMemberInstances =
             baseFcsMembers |> List.collect (fun (_, mfvInstances) ->
                 mfvInstances |> List.choose (fun mfvInstance ->
@@ -158,9 +162,12 @@ type FSharpOverridableMembersProvider() =
                     let xmlDocId = mfv.GetXmlDocId()
                     if ownMembersIds.Contains(xmlDocId) then None else
 
-                    match memberInstances.TryGetValue(xmlDocId) with
-                    | true, i -> Some (i.Member, mfvInstance)
-                    | _ -> None)
+                    let mutable memberInstance = Unchecked.defaultof<_>
+                    if not (memberInstances.TryGetValue(xmlDocId, &memberInstance)) then None else
+                    if alreadyOverriden.Contains(memberInstance) then None else
+
+                    OverridableMemberImpl.GetImmediateOverride(memberInstance) |> alreadyOverriden.AddRange
+                    Some (memberInstance.Member, mfvInstance))
                 |> Seq.toList)
 
         let needsTypesAnnotations = 

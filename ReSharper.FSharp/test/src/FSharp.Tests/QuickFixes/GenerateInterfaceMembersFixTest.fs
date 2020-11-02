@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open NUnit.Framework
 
@@ -49,9 +50,11 @@ type GenerateInterfaceMembersFixTest() =
     [<Test>] member x.``Nested interface 02 - Multiple``() = x.DoNamedTest()
 
 
+[<FSharpTest>]
 type GenerateMissingMembersFixTest() =
     inherit FSharpQuickFixTestBase<GenerateMissingOverridesFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/generateMissingMembers"
 
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Super 01 - Different type parameter name``() = x.DoNamedTest()
