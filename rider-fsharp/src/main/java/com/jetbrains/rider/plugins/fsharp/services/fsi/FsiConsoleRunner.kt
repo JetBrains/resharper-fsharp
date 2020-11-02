@@ -87,7 +87,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
                 runtime.patchRunCommandLine(cmdLine, listOf())
             }
         } else {
-            val runtime = runtimeHost.getCurrentDotNetRuntime(false).runtime
+            val runtime = runtimeHost.getCurrentClassicNetRuntime(false).runtime
             if (runtime != null && runtime is MonoRuntime && sessionInfo.fsiPath.endsWith(".exe", true)) {
                 runtime.patchRunCommandLine(cmdLine, listOf())
             }
