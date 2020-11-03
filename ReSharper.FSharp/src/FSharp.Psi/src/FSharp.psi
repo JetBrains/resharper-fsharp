@@ -135,6 +135,7 @@ interface moduleMember:
   typeDeclarationGroup |
   exceptionDeclaration |
   letBindingsDeclaration |
+  externDeclaration |
   moduleAbbreviationDeclaration |
   openStatement |
   doStatement |
@@ -207,6 +208,18 @@ returnTypeInfo extras {
   COLON<FSHARP_COLON, Colon>
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   typeUsage<TYPE, ReturnType>;
+
+externDeclaration:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  EXTERN
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  fSharpIdentifier<IDENTIFIER, Identifier>;
+//   cLikeParameterList<PARAMETER_LIST, ParameterList>;
+
+// cLikeParameterList:
+//   LPAREN
+//   fakeSeparator
+//   RPAREN;
 
 interface fSharpPattern:
   namedPat |

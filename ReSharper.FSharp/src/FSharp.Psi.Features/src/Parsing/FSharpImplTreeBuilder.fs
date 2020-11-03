@@ -78,6 +78,20 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             | Binding(attributes = attrs) :: _ ->
                 x.ProcessOuterAttrs(attrs, range)
 
+            // `extern` declarations are represented as normal `let` bindings with fake rhs expressions in FCS AST.
+            // This is a workaround to mark such declarations and not to mark the non-existent expressions inside it.
+            x.AdvanceToStart(range)
+            match bindings with
+            | [Binding(returnInfo = returnInfo)] when x.TokenType == FSharpTokenType.EXTERN ->
+                match returnInfo with
+                | Some(SynBindingReturnInfo(attributes = attrs)) ->
+                    x.ProcessAttributeLists(attrs)
+                | _ -> ()
+                // todo: mark parameters
+                x.Done(range, letMark, ElementType.EXTERN_DECLARATION)
+
+            | _ ->
+
             for binding in bindings do
                 x.ProcessTopLevelBinding(binding, range)
             x.Done(range, letMark, ElementType.LET_BINDINGS_DECLARATION)
