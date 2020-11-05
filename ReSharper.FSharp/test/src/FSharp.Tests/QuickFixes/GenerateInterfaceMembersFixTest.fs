@@ -56,5 +56,6 @@ type GenerateMissingMembersFixTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/generateMissingMembers"
 
+    [<Test>] member x.``Context - Common namespace 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Super 01 - Different type parameter name``() = x.DoNamedTest()

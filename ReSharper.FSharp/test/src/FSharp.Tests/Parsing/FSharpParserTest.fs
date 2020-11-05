@@ -164,9 +164,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Match 03 - When Expr``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 04 - Multiple When clauses``() = x.DoNamedTest()
 
-    [<Test>] member x.``Expr - Do 01 - Simple``() = x.DoNamedTest()
-    [<Test>] member x.``Expr - Do 02 - Let``() = x.DoNamedTest()
-    [<Test>] member x.``Expr - Do 03 - Let in do``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Do 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Do 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Do 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Assert 01 - Simple``() = x.DoNamedTest()
 
@@ -387,6 +387,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Member - Property - Accessors 03``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property 02 - Static``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module member - Do 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Do 02 - Let``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Do 03 - Let in do``() = x.DoNamedTest()
 
     [<Test>] member x.``Module member - Extern - Params 01 - Type``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Extern - Params 02 - Type and name``() = x.DoNamedTest()
