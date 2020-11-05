@@ -1,10 +1,10 @@
-﻿Suggested names: foo
+﻿Suggested names: objectFunc, func
 module Module
 
 do
-    let foo = 
+    let objectFunc = 
       fun _ ->
           1
           1
-    [] |> List.map(foo
+    [] |> List.map(objectFunc
     )
