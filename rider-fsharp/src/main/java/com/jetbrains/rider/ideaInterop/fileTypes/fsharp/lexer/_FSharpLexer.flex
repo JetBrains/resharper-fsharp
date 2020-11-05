@@ -20,10 +20,10 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 %type IElementType
 %eofval{
   if(yystate() == IN_BLOCK_COMMENT || yystate() == IN_BLOCK_COMMENT_FROM_LINE) {
-    return fillBlockComment(UNFINISHED_BLOCK_COMMENT);
+    return FillBlockComment(UNFINISHED_BLOCK_COMMENT);
   }
   else
-    return makeToken(null);
+    return MakeToken(null);
 %eofval}
 %unicode
 
@@ -36,7 +36,7 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 
 %{
   // for sharing rules with ReSharper
-  private IElementType makeToken(IElementType type) {
+  private IElementType MakeToken(IElementType type) {
     return type;
   }
 
@@ -61,51 +61,51 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     zzNestedCommentLevel++;
   }
 
-  private IElementType initIdent() {
+  private IElementType InitIdent() {
     IElementType keyword = FindKeywordByCurrentToken();
     // use if you need to separate the reserved keyword
     // IElementType reservedKeyword = FindReservedKeywordByCurrentToken();
-    return makeToken(keyword != null ? keyword : IDENT);
+    return MakeToken(keyword != null ? keyword : IDENT);
   }
 
-  private IElementType identInTypeApp() {
+  private IElementType IdentInTypeApp() {
     IElementType keyword = FindKeywordByCurrentToken();
     if (keyword != null) {
-        return makeToken(keyword);
+        return MakeToken(keyword);
     }
-    return makeToken(IDENT);
+    return MakeToken(IDENT);
   }
 
-  private IElementType identInInitTypeApp() {
+  private IElementType IdentInInitTypeApp() {
     IElementType keyword = FindKeywordByCurrentToken();
     if (keyword != null) {
         yybegin(LINE);
-        return makeToken(keyword);
+        return MakeToken(keyword);
     }
-    return makeToken(IDENT);
+    return MakeToken(IDENT);
   }
 
-  private IElementType fillBlockComment(IElementType tokenType) {
+  private IElementType FillBlockComment(IElementType tokenType) {
     if (yystate() == IN_BLOCK_COMMENT_FROM_LINE) {
       yybegin(LINE);
     } else {
-      riseFromParenLevel(0);
+      RiseFromParenLevel(0);
     }
     zzNestedCommentLevel = 0;
-    return makeToken(tokenType);
+    return MakeToken(tokenType);
   }
 
-  private void checkGreatRBrack(int state, int finalState) {
+  private void CheckGreatRBrack(int state, int finalState) {
     if (zzBrackLevel > 0) {
       zzBrackLevel--;
       yybegin(SYMBOLIC_OPERATOR);
     }
     else {
-      initSmashAdjacent(state, finalState);
+      InitSmashAdjacent(state, finalState);
     }
   }
 
-  private void initSmashAdjacent(int state, int finalState) {
+  private void InitSmashAdjacent(int state, int finalState) {
     zzParenLevel--;
     if (zzLevel() <= 0) {
       yybegin(finalState);
@@ -115,30 +115,30 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     }
   }
 
-  private void deepInto()
+  private void DeepInto()
   {
-    if (zzLevel() > 1 && yystate() == INIT_ADJACENT_TYAPP)
-      yybegin(ADJACENT_TYAPP);
+    if (zzLevel() > 1 && yystate() == INIT_ADJACENT_TYPE_APP)
+      yybegin(ADJACENT_TYPE_APP);
   }
 
-  private void deepIntoParenLevel() {
+  private void DeepIntoParenLevel() {
     zzParenLevel++;
-    deepInto();
+    DeepInto();
   }
 
-  private void deepIntoBrackLevel() {
+  private void DeepIntoBrackLevel() {
     zzBrackLevel++;
-    deepInto();
+    DeepInto();
   }
 
-  private void riseFromParenLevel(int n) {
+  private void RiseFromParenLevel(int n) {
     zzParenLevel -= n;
     if (zzLevel() > 1) {
-      yybegin(ADJACENT_TYAPP);
+      yybegin(ADJACENT_TYPE_APP);
     } else if (zzLevel() <= 0) {
       yybegin(LINE);
     } else {
-      yybegin(INIT_ADJACENT_TYAPP);
+      yybegin(INIT_ADJACENT_TYPE_APP);
     }
   }
 
@@ -151,7 +151,7 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     }
     zzParenLevel = 0;
     zzBrackLevel = 0;
-    yybegin(INIT_ADJACENT_TYAPP);
+    yybegin(INIT_ADJACENT_TYPE_APP);
   }
 
   private void adjacentTypeCloseOp()
@@ -170,7 +170,7 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     if (yystate() == state) {
       yybegin(LINE);
     } else {
-      riseFromParenLevel(0);
+      RiseFromParenLevel(0);
     }
   }
 
@@ -185,7 +185,7 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
   private void exitGreaterOp()
   {
     if (yystate() == GREATER_OP) {
-      riseFromParenLevel(0);
+      RiseFromParenLevel(0);
     } else {
       yybegin(SYMBOLIC_OPERATOR);
     }
