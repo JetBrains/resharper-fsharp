@@ -39,26 +39,21 @@ type FSharpIdentifierTooltipProvider
             LayoutTag.Field, FSharpHighlightingAttributeIds.Field
             LayoutTag.Interface, FSharpHighlightingAttributeIds.Interface
             LayoutTag.Keyword, FSharpHighlightingAttributeIds.Keyword
-            //LayoutTag.LineBreak
             LayoutTag.Local, FSharpHighlightingAttributeIds.Value
             LayoutTag.Record, FSharpHighlightingAttributeIds.Record
-            LayoutTag.RecordField, FSharpHighlightingAttributeIds.Property
+            LayoutTag.RecordField, FSharpHighlightingAttributeIds.Field
             LayoutTag.Method, FSharpHighlightingAttributeIds.Method
-            LayoutTag.Member, FSharpHighlightingAttributeIds.Value
+            LayoutTag.Member, FSharpHighlightingAttributeIds.Property
             LayoutTag.ModuleBinding, FSharpHighlightingAttributeIds.Value
             LayoutTag.Module, FSharpHighlightingAttributeIds.Module
             LayoutTag.Namespace, FSharpHighlightingAttributeIds.Namespace
-            LayoutTag.NumericLiteral, FSharpHighlightingAttributeIds.Literal
+            LayoutTag.NumericLiteral, FSharpHighlightingAttributeIds.Number
             LayoutTag.Operator, FSharpHighlightingAttributeIds.Operator
-            //LayoutTag.Parameter, FSharpHighlightingAttributeIds.Parameter
             LayoutTag.Parameter, FSharpHighlightingAttributeIds.Value
             LayoutTag.Property, FSharpHighlightingAttributeIds.Property
-            //LayoutTag.Space
             LayoutTag.StringLiteral, FSharpHighlightingAttributeIds.String
             LayoutTag.Struct, FSharpHighlightingAttributeIds.Struct
             LayoutTag.TypeParameter, FSharpHighlightingAttributeIds.TypeParameter
-            //LayoutTag.Text
-            //LayoutTag.Punctuation
             LayoutTag.UnknownType, FSharpHighlightingAttributeIds.Class
             LayoutTag.UnknownEntity, FSharpHighlightingAttributeIds.Value
         ]
