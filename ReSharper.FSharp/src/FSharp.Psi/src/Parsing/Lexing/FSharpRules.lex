@@ -509,18 +509,17 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <STRING_IN_COMMENT> {STRING}                          { yybegin(IN_BLOCK_COMMENT); IncreaseTokenLength(yylength()); Clear(); break; }
 <STRING_IN_COMMENT> {VERBATIM_STRING}                 { yybegin(IN_BLOCK_COMMENT); IncreaseTokenLength(yylength()); Clear(); break; }
 <STRING_IN_COMMENT> {TRIPLE_QUOTED_STRING}            { yybegin(IN_BLOCK_COMMENT); IncreaseTokenLength(yylength()); Clear(); break; }
-<STRING_IN_COMMENT> {UNFINISHED_STRING}               { return FillBlockComment(UNFINISHED_STRING_IN_COMMENT); }
-<STRING_IN_COMMENT> {UNFINISHED_VERBATIM_STRING}      { return FillBlockComment(UNFINISHED_VERBATIM_STRING_IN_COMMENT); }
-<STRING_IN_COMMENT> {UNFINISHED_TRIPLE_QUOTED_STRING} { return FillBlockComment(UNFINISHED_TRIPLE_QUOTED_STRING_IN_COMMENT); }
+<STRING_IN_COMMENT> {UNFINISHED_STRING}               { return FillBlockComment(); }
+<STRING_IN_COMMENT> {UNFINISHED_VERBATIM_STRING}      { return FillBlockComment(); }
+<STRING_IN_COMMENT> {UNFINISHED_TRIPLE_QUOTED_STRING} { return FillBlockComment(); }
 
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "(*"      { myNestedCommentLevel++; IncreaseTokenLength(yylength()); Clear(); break; }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "*)"      { if (--myNestedCommentLevel == 0) return FillBlockComment(BLOCK_COMMENT); IncreaseTokenLength(yylength()); Clear(); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "*)"      { if (--myNestedCommentLevel == 0) return FillBlockComment(); IncreaseTokenLength(yylength()); Clear(); break; }
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"        { PushBack(yylength()); yybegin(STRING_IN_COMMENT); Clear(); break; }
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> @\"       { PushBack(yylength()); yybegin(STRING_IN_COMMENT); Clear(); break; }
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"\"\"    { PushBack(yylength()); yybegin(STRING_IN_COMMENT); Clear(); break; }
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> [^(\"@*]+ { IncreaseTokenLength(yylength()); Clear(); break; }
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> [^]|"(*)" { IncreaseTokenLength(yylength()); Clear(); break; }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> <<EOF>>   { return FillBlockComment(UNFINISHED_BLOCK_COMMENT); }
 
 <SMASH_ADJACENT_LESS_OP> {LESS} { return MakeToken(LESS); }
 <SMASH_ADJACENT_LESS_OP> "/"    { RiseFromParenLevel(0); return MakeToken(SYMBOLIC_OP); }

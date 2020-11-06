@@ -101,14 +101,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       return MakeToken(FSharpTokenType.IDENTIFIER);
     }
 
-    private TokenNodeType FillBlockComment(TokenNodeType tokenType)
+    private TokenNodeType FillBlockComment()
     {
       if (yy_lexical_state == IN_BLOCK_COMMENT_FROM_LINE)
         yybegin(LINE);
       else
         RiseFromParenLevel(0);
       myNestedCommentLevel = 0;
-      return SetTokenLength(tokenType);
+      return SetTokenLength(FSharpTokenType.BLOCK_COMMENT);
     }
 
     private void CheckGreatRBrack(int state, int finalState)

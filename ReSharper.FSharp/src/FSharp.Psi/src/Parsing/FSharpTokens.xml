@@ -176,11 +176,6 @@
         <Token name="NATIVEINT" />
         <Token name="UNATIVEINT" />
 
-        <Token name="UNFINISHED_BLOCK_COMMENT" />
-        <Token name="UNFINISHED_STRING_IN_COMMENT" />
-        <Token name="UNFINISHED_VERBATIM_STRING_IN_COMMENT" />
-        <Token name="UNFINISHED_TRIPLE_QUOTED_STRING_IN_COMMENT" />
-        
         <Token name="CHARACTER_LITERAL" />
         <Token name="STRING" />
         <Token name="VERBATIM_STRING" />

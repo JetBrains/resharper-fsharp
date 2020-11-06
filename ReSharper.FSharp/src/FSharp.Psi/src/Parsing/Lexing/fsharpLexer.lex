@@ -22,7 +22,7 @@ using static JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.FSharpTokenType;
 
 %eofval{
   if (yy_lexical_state == IN_BLOCK_COMMENT || yy_lexical_state == IN_BLOCK_COMMENT_FROM_LINE)
-    return FillBlockComment(UNFINISHED_BLOCK_COMMENT);
+    return FillBlockComment();
   else
     return MakeToken(null);
 %eofval}
