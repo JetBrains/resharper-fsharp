@@ -132,8 +132,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
 
     private void DeepInto()
     {
-      if (Level > 1 && yy_lexical_state == INIT_ADJACENT_TYPE_APP)
-        yybegin(ADJACENT_TYPE_APP);
+      if (Level > 1 && yy_lexical_state == INIT_TYPE_APP)
+        yybegin(TYPE_APP);
     }
 
     private void DeepIntoParenLevel()
@@ -152,19 +152,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     {
       myParenLevel -= n;
       if (Level > 1)
-        yybegin(ADJACENT_TYPE_APP);
+        yybegin(TYPE_APP);
       else if (Level <= 0)
         yybegin(LINE);
       else
-        yybegin(INIT_ADJACENT_TYPE_APP);
+        yybegin(INIT_TYPE_APP);
     }
 
-    private void InitAdjacentTypeApp()
+    private void InitTypeApp()
     {
       PushBack(yytext()[yylength() - 1] == '/' ? 2 : 1);
       myParenLevel = 0;
       myBrackLevel = 0;
-      yybegin(INIT_ADJACENT_TYPE_APP);
+      yybegin(INIT_TYPE_APP);
     }
 
     private void AdjacentTypeCloseOp()
@@ -203,9 +203,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       yy_buffer_end = startOffset;
       yy_eof_pos = endOffset;
 
-      var unpack = FSharpLexerStatePacker.Unpack(state);
-      yy_lexical_state = unpack.First;
-      myParenLevel = unpack.Second;
+      var (lexicalState, parenLevel) = FSharpLexerStateEncoding.DecodeLexerState(state);
+      yy_lexical_state = lexicalState;
+      myParenLevel = parenLevel;
 
       myCurrentTokenType = null;
     }
@@ -279,7 +279,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       myCurrentTokenType ??= _locateToken();
 
     public uint LexerStateEx =>
-      FSharpLexerStatePacker.Pack(yy_lexical_state, myParenLevel);
+      FSharpLexerStateEncoding.EncodeLexerState(yy_lexical_state, myParenLevel);
   }
 
   /// <summary>
@@ -288,34 +288,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
   ///  27 bits - paren depth in type app state
   ///  In invalid state all bits are 1
   /// </summary>
-  public static class FSharpLexerStatePacker
+  public static class FSharpLexerStateEncoding
   {
-    public static Pair<int, int> Unpack(uint state)
+    private const uint LexicalStateMask = 0b11111;
+    private const uint TypeAppStateMask = 0x7FFFFFF;
+    private const int TypeAppStateOffset = 5;
+
+    public static Pair<int, int> DecodeLexerState(uint state)
     {
       if (state == LexerStateConstants.InvalidState)
         throw new ArgumentException("Invalid lexer state");
 
-      const uint mask5Bit = 0b11111;
-      const uint mask27Bit = 0x7FFFFFF;
-
-      // Restore yy state from first 5 bits
-      var lexicalState = (int) (state & mask5Bit);
-
-      // Restore items count from next 27 bits
-      var parenLevel = (int) (state >> 5 & mask27Bit);
+      var lexicalState = (int) (state & LexicalStateMask);
+      var parenLevel = (int) (state >> TypeAppStateOffset & TypeAppStateMask);
 
       return Pair.Of(lexicalState, parenLevel);
     }
 
-    public static uint Pack(int lexicalState, int parenLevel)
+    public static uint EncodeLexerState(int lexicalState, int parenLevel)
     {
-      // We can store only 31 states
-      Assertion.Assert(lexicalState <= 31, "lexicalState overflow");
+      Assertion.Assert(lexicalState <= LexicalStateMask, "lexicalState overflow");
 
-      // Store state into first 5 bits
       var state = (uint) lexicalState;
-      // Store items count in next 27 bits
-      state ^= (uint) parenLevel << 5;
+      state ^= (uint) parenLevel << TypeAppStateOffset;
 
       return state;
     }

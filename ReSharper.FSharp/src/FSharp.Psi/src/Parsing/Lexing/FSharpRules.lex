@@ -11,8 +11,8 @@
 %state SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN
 %state SMASH_ADJACENT_GREATER_RBRACK_FIN
 %state ADJACENT_TYPE_CLOSE_OP
-%state INIT_ADJACENT_TYPE_APP
-%state ADJACENT_TYPE_APP
+%state INIT_TYPE_APP
+%state TYPE_APP
 %state SYMBOLIC_OPERATOR
 %state GREATER_OP
 %state GREATER_OP_SYMBOLIC_OP
@@ -175,35 +175,35 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <YYINITIAL> {PP_DIRECTIVE} { PushBack(yylength()); yybegin(PPDIRECTIVE); Clear(); break; }
 <YYINITIAL> [^]            { PushBack(1); yybegin(LINE); Clear(); break; }
 
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> {LESS}                        { DeepIntoParenLevel(); return MakeToken(LESS); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> {LPAREN}                      { DeepIntoParenLevel(); return MakeToken(LPAREN); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> {LBRACK}                      { DeepIntoParenLevel(); return MakeToken(LBRACK); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> {LBRACK_LESS}                 { DeepIntoBrackLevel(); return MakeToken(LBRACK_LESS); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> {GREATER}+                    { RiseFromParenLevel(yylength()); PushBack(yylength()); yybegin(GREATER_OP); Clear(); break; }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "</"                          { DeepIntoParenLevel(); PushBack(2); yybegin(SMASH_ADJACENT_LESS_OP); Clear(); break;}
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> {RPAREN}                      { RiseFromParenLevel(1); return MakeToken(RPAREN); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> {RBRACK}                      { RiseFromParenLevel(1); return MakeToken(RBRACK); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> {GREATER_RBRACK}              { PushBack(yylength()); CheckGreatRBrack(SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN); Clear(); break; }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> {GREATER_BAR_RBRACK}          { PushBack(yylength()); InitSmashAdjacent(SMASH_ADJACENT_GREATER_BAR_RBRACK, SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN); Clear(); break; }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> {GREATER}+{BAD_SYMBOLIC_OP}   { PushBack(yylength()); yybegin(ADJACENT_TYPE_CLOSE_OP); Clear(); break; }
+<INIT_TYPE_APP, TYPE_APP> {LESS}                        { DeepIntoParenLevel(); return MakeToken(LESS); }
+<INIT_TYPE_APP, TYPE_APP> {LPAREN}                      { DeepIntoParenLevel(); return MakeToken(LPAREN); }
+<INIT_TYPE_APP, TYPE_APP> {LBRACK}                      { DeepIntoParenLevel(); return MakeToken(LBRACK); }
+<INIT_TYPE_APP, TYPE_APP> {LBRACK_LESS}                 { DeepIntoBrackLevel(); return MakeToken(LBRACK_LESS); }
+<INIT_TYPE_APP, TYPE_APP> {GREATER}+                    { RiseFromParenLevel(yylength()); PushBack(yylength()); yybegin(GREATER_OP); Clear(); break; }
+<INIT_TYPE_APP, TYPE_APP> "</"                          { DeepIntoParenLevel(); PushBack(2); yybegin(SMASH_ADJACENT_LESS_OP); Clear(); break;}
+<INIT_TYPE_APP, TYPE_APP> {RPAREN}                      { RiseFromParenLevel(1); return MakeToken(RPAREN); }
+<INIT_TYPE_APP, TYPE_APP> {RBRACK}                      { RiseFromParenLevel(1); return MakeToken(RBRACK); }
+<INIT_TYPE_APP, TYPE_APP> {GREATER_RBRACK}              { PushBack(yylength()); CheckGreatRBrack(SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN); Clear(); break; }
+<INIT_TYPE_APP, TYPE_APP> {GREATER_BAR_RBRACK}          { PushBack(yylength()); InitSmashAdjacent(SMASH_ADJACENT_GREATER_BAR_RBRACK, SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN); Clear(); break; }
+<INIT_TYPE_APP, TYPE_APP> {GREATER}+{BAD_SYMBOLIC_OP}   { PushBack(yylength()); yybegin(ADJACENT_TYPE_CLOSE_OP); Clear(); break; }
 
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "default"  { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "struct"   { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "null"     { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "delegate" { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "and"      { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "when"     { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "new"      { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "global"   { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "const"    { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "true"     { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "false"    { return InitIdent(); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "^"        { return MakeToken(SYMBOLIC_OP); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "^-"       { return MakeToken(SYMBOLIC_OP); }
-<INIT_ADJACENT_TYPE_APP, ADJACENT_TYPE_APP> "/"        { return MakeToken(SYMBOLIC_OP); }
+<INIT_TYPE_APP, TYPE_APP> "default"  { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "struct"   { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "null"     { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "delegate" { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "and"      { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "when"     { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "new"      { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "global"   { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "const"    { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "true"     { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "false"    { return InitIdent(); }
+<INIT_TYPE_APP, TYPE_APP> "^"        { return MakeToken(SYMBOLIC_OP); }
+<INIT_TYPE_APP, TYPE_APP> "^-"       { return MakeToken(SYMBOLIC_OP); }
+<INIT_TYPE_APP, TYPE_APP> "/"        { return MakeToken(SYMBOLIC_OP); }
 
-<INIT_ADJACENT_TYPE_APP> {IDENT} { return IdentInInitTypeApp(); }
-<ADJACENT_TYPE_APP> {IDENT}      { return IdentInTypeApp(); }
+<INIT_TYPE_APP> {IDENT} { return IdentInInitTypeApp(); }
+<TYPE_APP> {IDENT}      { return IdentInTypeApp(); }
 
 <ADJACENT_TYPE_CLOSE_OP> {GREATER}+ { AdjacentTypeCloseOp(); Clear(); break; }
 
@@ -261,163 +261,163 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <SYMBOLIC_OPERATOR> {SYMBOLIC_OP}         { RiseFromParenLevel(0); return MakeToken(SYMBOLIC_OP); }
 <SYMBOLIC_OPERATOR> {BAD_SYMBOLIC_OP}     { RiseFromParenLevel(0); return MakeToken(BAD_SYMBOLIC_OP); }
 
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {TAB}        { return MakeToken(BAD_TAB); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {WHITESPACE} { return MakeToken(WHITESPACE); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {NEW_LINE}   { yybegin(YYINITIAL); return MakeToken(NEW_LINE); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {TAB}        { return MakeToken(BAD_TAB); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {WHITESPACE} { return MakeToken(WHITESPACE); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {NEW_LINE}   { yybegin(YYINITIAL); return MakeToken(NEW_LINE); }
 
-<LINE, ADJACENT_TYPE_APP> "(*IF-FSHARP"    { return MakeToken(BLOCK_COMMENT); }
-<LINE, ADJACENT_TYPE_APP> "ENDIF-FSHARP*)" { return MakeToken(BLOCK_COMMENT); }
-<LINE, ADJACENT_TYPE_APP> "(*F#"           { return MakeToken(BLOCK_COMMENT); }
-<LINE, ADJACENT_TYPE_APP> "F#*)"           { return MakeToken(BLOCK_COMMENT); }
-<LINE, ADJACENT_TYPE_APP> {LINE_COMMENT}   { return MakeToken(LINE_COMMENT); }
-<LINE, ADJACENT_TYPE_APP> {SHEBANG}        { return MakeToken(SHEBANG); }
-<LINE, ADJACENT_TYPE_APP> {HASH}"light"    { return MakeToken(PP_LIGHT); }
+<LINE, TYPE_APP> "(*IF-FSHARP"    { return MakeToken(BLOCK_COMMENT); }
+<LINE, TYPE_APP> "ENDIF-FSHARP*)" { return MakeToken(BLOCK_COMMENT); }
+<LINE, TYPE_APP> "(*F#"           { return MakeToken(BLOCK_COMMENT); }
+<LINE, TYPE_APP> "F#*)"           { return MakeToken(BLOCK_COMMENT); }
+<LINE, TYPE_APP> {LINE_COMMENT}   { return MakeToken(LINE_COMMENT); }
+<LINE, TYPE_APP> {SHEBANG}        { return MakeToken(SHEBANG); }
+<LINE, TYPE_APP> {HASH}"light"    { return MakeToken(PP_LIGHT); }
 
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> ("(*")                  { InitBlockComment(); InitTokenLength(); IncreaseTokenLength(yylength()); Clear(); break; }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {PP_COMPILER_DIRECTIVE} { PushBack(yylength()); yybegin(BAD_PPSHARP); Clear(); break; }
+<LINE, TYPE_APP, INIT_TYPE_APP> ("(*")                  { InitBlockComment(); InitTokenLength(); IncreaseTokenLength(yylength()); Clear(); break; }
+<LINE, TYPE_APP, INIT_TYPE_APP> {PP_COMPILER_DIRECTIVE} { PushBack(yylength()); yybegin(BAD_PPSHARP); Clear(); break; }
 
-<INIT_ADJACENT_TYPE_APP> "(*IF-FSHARP"    { yybegin(LINE); return MakeToken(BLOCK_COMMENT); }
-<INIT_ADJACENT_TYPE_APP> "ENDIF-FSHARP*)" { yybegin(LINE); return MakeToken(BLOCK_COMMENT); }
-<INIT_ADJACENT_TYPE_APP> "(*F#"           { yybegin(LINE); return MakeToken(BLOCK_COMMENT); }
-<INIT_ADJACENT_TYPE_APP> "F#*)"           { yybegin(LINE); return MakeToken(BLOCK_COMMENT); }
-<INIT_ADJACENT_TYPE_APP> {LINE_COMMENT}   { yybegin(LINE); return MakeToken(LINE_COMMENT); }
-<INIT_ADJACENT_TYPE_APP> {SHEBANG}        { yybegin(LINE); return MakeToken(SHEBANG); }
-<INIT_ADJACENT_TYPE_APP> {HASH}"light"    { yybegin(LINE); return MakeToken(PP_LIGHT); }
+<INIT_TYPE_APP> "(*IF-FSHARP"    { yybegin(LINE); return MakeToken(BLOCK_COMMENT); }
+<INIT_TYPE_APP> "ENDIF-FSHARP*)" { yybegin(LINE); return MakeToken(BLOCK_COMMENT); }
+<INIT_TYPE_APP> "(*F#"           { yybegin(LINE); return MakeToken(BLOCK_COMMENT); }
+<INIT_TYPE_APP> "F#*)"           { yybegin(LINE); return MakeToken(BLOCK_COMMENT); }
+<INIT_TYPE_APP> {LINE_COMMENT}   { yybegin(LINE); return MakeToken(LINE_COMMENT); }
+<INIT_TYPE_APP> {SHEBANG}        { yybegin(LINE); return MakeToken(SHEBANG); }
+<INIT_TYPE_APP> {HASH}"light"    { yybegin(LINE); return MakeToken(PP_LIGHT); }
 
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {PP_BAD_COMPILER_DIRECTIVE} {
+<LINE, TYPE_APP, INIT_TYPE_APP> {PP_BAD_COMPILER_DIRECTIVE} {
   // TODO: delete this rule and use the following rule instead after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-  // <LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {PP_BAD_COMPILER_DIRECTIVE} { PushBack(yylength() - 1); return MakeToken(HASH); }
+  // <LINE, TYPE_APP, INIT_TYPE_APP> {PP_BAD_COMPILER_DIRECTIVE} { PushBack(yylength() - 1); return MakeToken(HASH); }
   PushBack(yylength()); yybegin(BAD_PPSHARP); Clear(); break; }
 
-<LINE, ADJACENT_TYPE_APP> {LQUOTE_TYPED}   { return MakeToken(LQUOTE_TYPED); }
-<LINE, ADJACENT_TYPE_APP> {RQUOTE_TYPED}   { return MakeToken(RQUOTE_TYPED); }
-<LINE, ADJACENT_TYPE_APP> {LQUOTE_UNTYPED} { return MakeToken(LQUOTE_UNTYPED); }
-<LINE, ADJACENT_TYPE_APP> {RQUOTE_UNTYPED} { return MakeToken(RQUOTE_UNTYPED); }
+<LINE, TYPE_APP> {LQUOTE_TYPED}   { return MakeToken(LQUOTE_TYPED); }
+<LINE, TYPE_APP> {RQUOTE_TYPED}   { return MakeToken(RQUOTE_TYPED); }
+<LINE, TYPE_APP> {LQUOTE_UNTYPED} { return MakeToken(LQUOTE_UNTYPED); }
+<LINE, TYPE_APP> {RQUOTE_UNTYPED} { return MakeToken(RQUOTE_UNTYPED); }
 
-<LINE, INIT_ADJACENT_TYPE_APP> {LQUOTE_TYPED}   { yybegin(LINE); return MakeToken(LQUOTE_TYPED); }
-<LINE, INIT_ADJACENT_TYPE_APP> {RQUOTE_TYPED}   { yybegin(LINE); return MakeToken(RQUOTE_TYPED); }
-<LINE, INIT_ADJACENT_TYPE_APP> {LQUOTE_UNTYPED} { yybegin(LINE); return MakeToken(LQUOTE_UNTYPED); }
-<LINE, INIT_ADJACENT_TYPE_APP> {RQUOTE_UNTYPED} { yybegin(LINE); return MakeToken(RQUOTE_UNTYPED); }
+<LINE, INIT_TYPE_APP> {LQUOTE_TYPED}   { yybegin(LINE); return MakeToken(LQUOTE_TYPED); }
+<LINE, INIT_TYPE_APP> {RQUOTE_TYPED}   { yybegin(LINE); return MakeToken(RQUOTE_TYPED); }
+<LINE, INIT_TYPE_APP> {LQUOTE_UNTYPED} { yybegin(LINE); return MakeToken(LQUOTE_UNTYPED); }
+<LINE, INIT_TYPE_APP> {RQUOTE_UNTYPED} { yybegin(LINE); return MakeToken(RQUOTE_UNTYPED); }
 
-<LINE, ADJACENT_TYPE_APP> "@>."|"@@>." {
+<LINE, TYPE_APP> "@>."|"@@>." {
   // Rule for smash RQUOTE_DOT.
   // https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2148
   PushBack(yylength()); InitSmash(SMASH_RQUOTE_DOT_FROM_LINE, SMASH_RQUOTE_DOT); Clear(); break; }
-<INIT_ADJACENT_TYPE_APP> "@>."|"@@>."  { PushBack(yylength()); yybegin(SMASH_RQUOTE_DOT_FROM_LINE); Clear(); break; }
+<INIT_TYPE_APP> "@>."|"@@>."  { PushBack(yylength()); yybegin(SMASH_RQUOTE_DOT_FROM_LINE); Clear(); break; }
 
-<LINE, ADJACENT_TYPE_APP> {LET_BANG}            { return MakeToken(LET_BANG); }
-<LINE, ADJACENT_TYPE_APP> {USE_BANG}            { return MakeToken(USE_BANG); }
-<LINE, ADJACENT_TYPE_APP> {DO_BANG}             { return MakeToken(DO_BANG); }
-<LINE, ADJACENT_TYPE_APP> {YIELD_BANG}          { return MakeToken(YIELD_BANG); }
-<LINE, ADJACENT_TYPE_APP> {RETURN_BANG}         { return MakeToken(RETURN_BANG); }
-<LINE, ADJACENT_TYPE_APP> {MATCH_BANG}          { return MakeToken(MATCH_BANG); }
-<LINE, ADJACENT_TYPE_APP> {AND_BANG}            { return MakeToken(AND_BANG); }
-<LINE, ADJACENT_TYPE_APP> {BAR}                 { return MakeToken(BAR); }
-<LINE, ADJACENT_TYPE_APP> {LARROW}              { return MakeToken(LARROW); }
-<LINE, ADJACENT_TYPE_APP> {LPAREN}              { return MakeToken(LPAREN); }
-<LINE, ADJACENT_TYPE_APP> {RPAREN}              { return MakeToken(RPAREN); }
-<LINE, ADJACENT_TYPE_APP> {LBRACK}              { return MakeToken(LBRACK); }
-<LINE, ADJACENT_TYPE_APP> {RBRACK}              { return MakeToken(RBRACK); }
-<LINE, ADJACENT_TYPE_APP> {LBRACK_LESS}         { return MakeToken(LBRACK_LESS); }
-<LINE, ADJACENT_TYPE_APP> {GREATER_RBRACK}      { return MakeToken(GREATER_RBRACK); }
-<LINE, ADJACENT_TYPE_APP> {LBRACK_BAR}          { return MakeToken(LBRACK_BAR); }
-<LINE, ADJACENT_TYPE_APP> {LBRACE_BAR}          { return MakeToken(LBRACE_BAR); }
-<LINE, ADJACENT_TYPE_APP> {LESS}                { return MakeToken(LESS); }
-<LINE, ADJACENT_TYPE_APP> {GREATER}             { return MakeToken(GREATER); }
-<LINE, ADJACENT_TYPE_APP> {BAR_RBRACK}          { return MakeToken(BAR_RBRACK); }
-<LINE, ADJACENT_TYPE_APP> {BAR_RBRACE}          { return MakeToken(BAR_RBRACE); }
-<LINE, ADJACENT_TYPE_APP> {LBRACE}              { return MakeToken(LBRACE); }
-<LINE, ADJACENT_TYPE_APP> {RBRACE}              { return MakeToken(RBRACE); }
-<LINE, ADJACENT_TYPE_APP> {GREATER_BAR_RBRACK}  { return MakeToken(GREATER_BAR_RBRACK); }
-<LINE, ADJACENT_TYPE_APP> {COLON_QMARK_GREATER} { return MakeToken(COLON_QMARK_GREATER); }
-<LINE, ADJACENT_TYPE_APP> {COLON_QMARK}         { return MakeToken(COLON_QMARK); }
-<LINE, ADJACENT_TYPE_APP> {COLON_COLON}         { return MakeToken(COLON_COLON); }
-<LINE, ADJACENT_TYPE_APP> {COLON_EQUALS}        { return MakeToken(COLON_EQUALS); }
-<LINE, ADJACENT_TYPE_APP> {SEMICOLON_SEMICOLON} { return MakeToken(SEMICOLON_SEMICOLON); }
-<LINE, ADJACENT_TYPE_APP> {SEMICOLON}           { return MakeToken(SEMICOLON); }
-<LINE, ADJACENT_TYPE_APP> {QMARK}               { return MakeToken(QMARK); }
-<LINE, ADJACENT_TYPE_APP> {QMARK_QMARK}         { return MakeToken(QMARK_QMARK); }
-<LINE, ADJACENT_TYPE_APP> {LPAREN_STAR_RPAREN}  { return MakeToken(LPAREN_STAR_RPAREN); }
-<LINE, ADJACENT_TYPE_APP> {PLUS}                { return MakeToken(PLUS); }
-<LINE, ADJACENT_TYPE_APP> {DOLLAR}              { return MakeToken(DOLLAR); }
-<LINE, ADJACENT_TYPE_APP> {PERCENT}             { return MakeToken(PERCENT); }
-<LINE, ADJACENT_TYPE_APP> {PERCENT_PERCENT}     { return MakeToken(PERCENT_PERCENT); }
-<LINE, ADJACENT_TYPE_APP> {AMP}                 { return MakeToken(AMP); }
-<LINE, ADJACENT_TYPE_APP> {AMP_AMP}             { return MakeToken(AMP_AMP); }
+<LINE, TYPE_APP> {LET_BANG}            { return MakeToken(LET_BANG); }
+<LINE, TYPE_APP> {USE_BANG}            { return MakeToken(USE_BANG); }
+<LINE, TYPE_APP> {DO_BANG}             { return MakeToken(DO_BANG); }
+<LINE, TYPE_APP> {YIELD_BANG}          { return MakeToken(YIELD_BANG); }
+<LINE, TYPE_APP> {RETURN_BANG}         { return MakeToken(RETURN_BANG); }
+<LINE, TYPE_APP> {MATCH_BANG}          { return MakeToken(MATCH_BANG); }
+<LINE, TYPE_APP> {AND_BANG}            { return MakeToken(AND_BANG); }
+<LINE, TYPE_APP> {BAR}                 { return MakeToken(BAR); }
+<LINE, TYPE_APP> {LARROW}              { return MakeToken(LARROW); }
+<LINE, TYPE_APP> {LPAREN}              { return MakeToken(LPAREN); }
+<LINE, TYPE_APP> {RPAREN}              { return MakeToken(RPAREN); }
+<LINE, TYPE_APP> {LBRACK}              { return MakeToken(LBRACK); }
+<LINE, TYPE_APP> {RBRACK}              { return MakeToken(RBRACK); }
+<LINE, TYPE_APP> {LBRACK_LESS}         { return MakeToken(LBRACK_LESS); }
+<LINE, TYPE_APP> {GREATER_RBRACK}      { return MakeToken(GREATER_RBRACK); }
+<LINE, TYPE_APP> {LBRACK_BAR}          { return MakeToken(LBRACK_BAR); }
+<LINE, TYPE_APP> {LBRACE_BAR}          { return MakeToken(LBRACE_BAR); }
+<LINE, TYPE_APP> {LESS}                { return MakeToken(LESS); }
+<LINE, TYPE_APP> {GREATER}             { return MakeToken(GREATER); }
+<LINE, TYPE_APP> {BAR_RBRACK}          { return MakeToken(BAR_RBRACK); }
+<LINE, TYPE_APP> {BAR_RBRACE}          { return MakeToken(BAR_RBRACE); }
+<LINE, TYPE_APP> {LBRACE}              { return MakeToken(LBRACE); }
+<LINE, TYPE_APP> {RBRACE}              { return MakeToken(RBRACE); }
+<LINE, TYPE_APP> {GREATER_BAR_RBRACK}  { return MakeToken(GREATER_BAR_RBRACK); }
+<LINE, TYPE_APP> {COLON_QMARK_GREATER} { return MakeToken(COLON_QMARK_GREATER); }
+<LINE, TYPE_APP> {COLON_QMARK}         { return MakeToken(COLON_QMARK); }
+<LINE, TYPE_APP> {COLON_COLON}         { return MakeToken(COLON_COLON); }
+<LINE, TYPE_APP> {COLON_EQUALS}        { return MakeToken(COLON_EQUALS); }
+<LINE, TYPE_APP> {SEMICOLON_SEMICOLON} { return MakeToken(SEMICOLON_SEMICOLON); }
+<LINE, TYPE_APP> {SEMICOLON}           { return MakeToken(SEMICOLON); }
+<LINE, TYPE_APP> {QMARK}               { return MakeToken(QMARK); }
+<LINE, TYPE_APP> {QMARK_QMARK}         { return MakeToken(QMARK_QMARK); }
+<LINE, TYPE_APP> {LPAREN_STAR_RPAREN}  { return MakeToken(LPAREN_STAR_RPAREN); }
+<LINE, TYPE_APP> {PLUS}                { return MakeToken(PLUS); }
+<LINE, TYPE_APP> {DOLLAR}              { return MakeToken(DOLLAR); }
+<LINE, TYPE_APP> {PERCENT}             { return MakeToken(PERCENT); }
+<LINE, TYPE_APP> {PERCENT_PERCENT}     { return MakeToken(PERCENT_PERCENT); }
+<LINE, TYPE_APP> {AMP}                 { return MakeToken(AMP); }
+<LINE, TYPE_APP> {AMP_AMP}             { return MakeToken(AMP_AMP); }
 
-<INIT_ADJACENT_TYPE_APP> {LET_BANG}            { yybegin(LINE); return MakeToken(LET_BANG); }
-<INIT_ADJACENT_TYPE_APP> {USE_BANG}            { yybegin(LINE); return MakeToken(USE_BANG); }
-<INIT_ADJACENT_TYPE_APP> {DO_BANG}             { yybegin(LINE); return MakeToken(DO_BANG); }
-<INIT_ADJACENT_TYPE_APP> {YIELD_BANG}          { yybegin(LINE); return MakeToken(YIELD_BANG); }
-<INIT_ADJACENT_TYPE_APP> {RETURN_BANG}         { yybegin(LINE); return MakeToken(RETURN_BANG); }
-<INIT_ADJACENT_TYPE_APP> {MATCH_BANG}          { yybegin(LINE); return MakeToken(MATCH_BANG); }
-<INIT_ADJACENT_TYPE_APP> {AND_BANG}            { yybegin(LINE); return MakeToken(AND_BANG); }
-<INIT_ADJACENT_TYPE_APP> {BAR}                 { yybegin(LINE); return MakeToken(BAR); }
-<INIT_ADJACENT_TYPE_APP> {LARROW}              { yybegin(LINE); return MakeToken(LARROW); }
-<INIT_ADJACENT_TYPE_APP> {LBRACK_BAR}          { yybegin(LINE); return MakeToken(LBRACK_BAR); }
-<INIT_ADJACENT_TYPE_APP> {BAR_RBRACK}          { yybegin(LINE); return MakeToken(BAR_RBRACK); }
-<INIT_ADJACENT_TYPE_APP> {LBRACE_BAR}          { yybegin(LINE); return MakeToken(LBRACE_BAR); }
-<INIT_ADJACENT_TYPE_APP> {BAR_RBRACE}          { yybegin(LINE); return MakeToken(BAR_RBRACE); }
-<INIT_ADJACENT_TYPE_APP> {LBRACE}              { yybegin(LINE); return MakeToken(LBRACE); }
-<INIT_ADJACENT_TYPE_APP> {RBRACE}              { yybegin(LINE); return MakeToken(RBRACE); }
-<INIT_ADJACENT_TYPE_APP> {COLON_QMARK_GREATER} { yybegin(LINE); return MakeToken(COLON_QMARK_GREATER); }
-<INIT_ADJACENT_TYPE_APP> {COLON_QMARK}         { yybegin(LINE); return MakeToken(COLON_QMARK); }
-<INIT_ADJACENT_TYPE_APP> {COLON_COLON}         { yybegin(LINE); return MakeToken(COLON_COLON); }
-<INIT_ADJACENT_TYPE_APP> {COLON_EQUALS}        { yybegin(LINE); return MakeToken(COLON_EQUALS); }
-<INIT_ADJACENT_TYPE_APP> {SEMICOLON_SEMICOLON} { yybegin(LINE); return MakeToken(SEMICOLON_SEMICOLON); }
-<INIT_ADJACENT_TYPE_APP> {SEMICOLON}           { yybegin(LINE); return MakeToken(SEMICOLON); }
-<INIT_ADJACENT_TYPE_APP> {QMARK}               { yybegin(LINE); return MakeToken(QMARK); }
-<INIT_ADJACENT_TYPE_APP> {QMARK_QMARK}         { yybegin(LINE); return MakeToken(QMARK_QMARK); }
-<INIT_ADJACENT_TYPE_APP> {LPAREN_STAR_RPAREN}  { yybegin(LINE); return MakeToken(LPAREN_STAR_RPAREN); }
-<INIT_ADJACENT_TYPE_APP> {PLUS}                { yybegin(LINE); return MakeToken(PLUS); }
-<INIT_ADJACENT_TYPE_APP> {DOLLAR}              { yybegin(LINE); return MakeToken(DOLLAR); }
-<INIT_ADJACENT_TYPE_APP> {PERCENT}             { yybegin(LINE); return MakeToken(PERCENT); }
-<INIT_ADJACENT_TYPE_APP> {PERCENT_PERCENT}     { yybegin(LINE); return MakeToken(PERCENT_PERCENT); }
-<INIT_ADJACENT_TYPE_APP> {AMP}                 { yybegin(LINE); return MakeToken(AMP); }
-<INIT_ADJACENT_TYPE_APP> {AMP_AMP}             { yybegin(LINE); return MakeToken(AMP_AMP); }
+<INIT_TYPE_APP> {LET_BANG}            { yybegin(LINE); return MakeToken(LET_BANG); }
+<INIT_TYPE_APP> {USE_BANG}            { yybegin(LINE); return MakeToken(USE_BANG); }
+<INIT_TYPE_APP> {DO_BANG}             { yybegin(LINE); return MakeToken(DO_BANG); }
+<INIT_TYPE_APP> {YIELD_BANG}          { yybegin(LINE); return MakeToken(YIELD_BANG); }
+<INIT_TYPE_APP> {RETURN_BANG}         { yybegin(LINE); return MakeToken(RETURN_BANG); }
+<INIT_TYPE_APP> {MATCH_BANG}          { yybegin(LINE); return MakeToken(MATCH_BANG); }
+<INIT_TYPE_APP> {AND_BANG}            { yybegin(LINE); return MakeToken(AND_BANG); }
+<INIT_TYPE_APP> {BAR}                 { yybegin(LINE); return MakeToken(BAR); }
+<INIT_TYPE_APP> {LARROW}              { yybegin(LINE); return MakeToken(LARROW); }
+<INIT_TYPE_APP> {LBRACK_BAR}          { yybegin(LINE); return MakeToken(LBRACK_BAR); }
+<INIT_TYPE_APP> {BAR_RBRACK}          { yybegin(LINE); return MakeToken(BAR_RBRACK); }
+<INIT_TYPE_APP> {LBRACE_BAR}          { yybegin(LINE); return MakeToken(LBRACE_BAR); }
+<INIT_TYPE_APP> {BAR_RBRACE}          { yybegin(LINE); return MakeToken(BAR_RBRACE); }
+<INIT_TYPE_APP> {LBRACE}              { yybegin(LINE); return MakeToken(LBRACE); }
+<INIT_TYPE_APP> {RBRACE}              { yybegin(LINE); return MakeToken(RBRACE); }
+<INIT_TYPE_APP> {COLON_QMARK_GREATER} { yybegin(LINE); return MakeToken(COLON_QMARK_GREATER); }
+<INIT_TYPE_APP> {COLON_QMARK}         { yybegin(LINE); return MakeToken(COLON_QMARK); }
+<INIT_TYPE_APP> {COLON_COLON}         { yybegin(LINE); return MakeToken(COLON_COLON); }
+<INIT_TYPE_APP> {COLON_EQUALS}        { yybegin(LINE); return MakeToken(COLON_EQUALS); }
+<INIT_TYPE_APP> {SEMICOLON_SEMICOLON} { yybegin(LINE); return MakeToken(SEMICOLON_SEMICOLON); }
+<INIT_TYPE_APP> {SEMICOLON}           { yybegin(LINE); return MakeToken(SEMICOLON); }
+<INIT_TYPE_APP> {QMARK}               { yybegin(LINE); return MakeToken(QMARK); }
+<INIT_TYPE_APP> {QMARK_QMARK}         { yybegin(LINE); return MakeToken(QMARK_QMARK); }
+<INIT_TYPE_APP> {LPAREN_STAR_RPAREN}  { yybegin(LINE); return MakeToken(LPAREN_STAR_RPAREN); }
+<INIT_TYPE_APP> {PLUS}                { yybegin(LINE); return MakeToken(PLUS); }
+<INIT_TYPE_APP> {DOLLAR}              { yybegin(LINE); return MakeToken(DOLLAR); }
+<INIT_TYPE_APP> {PERCENT}             { yybegin(LINE); return MakeToken(PERCENT); }
+<INIT_TYPE_APP> {PERCENT_PERCENT}     { yybegin(LINE); return MakeToken(PERCENT_PERCENT); }
+<INIT_TYPE_APP> {AMP}                 { yybegin(LINE); return MakeToken(AMP); }
+<INIT_TYPE_APP> {AMP_AMP}             { yybegin(LINE); return MakeToken(AMP_AMP); }
 
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {LBRACE_BAR}    { return MakeToken(LBRACE_BAR); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {BAR_RBRACE}    { return MakeToken(BAR_RBRACE); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {SEMICOLON}     { return MakeToken(SEMICOLON); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {RARROW}        { return MakeToken(RARROW); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {DOT}           { return MakeToken(DOT); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {COLON}         { return MakeToken(COLON); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {STAR}          { return MakeToken(STAR); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {QUOTE}         { return MakeToken(QUOTE); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {HASH}          { return MakeToken(HASH); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {COLON_GREATER} { return MakeToken(COLON_GREATER); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {DOT_DOT}       { return MakeToken(DOT_DOT); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {EQUALS}        { return MakeToken(EQUALS); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {UNDERSCORE}    { return MakeToken(UNDERSCORE); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {MINUS}         { return MakeToken(MINUS); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {COMMA}         { return MakeToken(COMMA); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {LBRACE_BAR}    { return MakeToken(LBRACE_BAR); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {BAR_RBRACE}    { return MakeToken(BAR_RBRACE); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {SEMICOLON}     { return MakeToken(SEMICOLON); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {RARROW}        { return MakeToken(RARROW); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {DOT}           { return MakeToken(DOT); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {COLON}         { return MakeToken(COLON); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {STAR}          { return MakeToken(STAR); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {QUOTE}         { return MakeToken(QUOTE); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {HASH}          { return MakeToken(HASH); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {COLON_GREATER} { return MakeToken(COLON_GREATER); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {DOT_DOT}       { return MakeToken(DOT_DOT); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {EQUALS}        { return MakeToken(EQUALS); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {UNDERSCORE}    { return MakeToken(UNDERSCORE); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {MINUS}         { return MakeToken(MINUS); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {COMMA}         { return MakeToken(COMMA); }
 
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {KEYWORD_STRING_SOURCE_DIRECTORY} { return MakeToken(KEYWORD_STRING_SOURCE_DIRECTORY); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {KEYWORD_STRING_SOURCE_FILE}      { return MakeToken(KEYWORD_STRING_SOURCE_FILE); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {KEYWORD_STRING_LINE}             { return MakeToken(KEYWORD_STRING_LINE); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {KEYWORD_STRING_SOURCE_DIRECTORY} { return MakeToken(KEYWORD_STRING_SOURCE_DIRECTORY); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {KEYWORD_STRING_SOURCE_FILE}      { return MakeToken(KEYWORD_STRING_SOURCE_FILE); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {KEYWORD_STRING_LINE}             { return MakeToken(KEYWORD_STRING_LINE); }
 
-<LINE, ADJACENT_TYPE_APP> {RESERVED_IDENT_FORMATS} { return MakeToken(RESERVED_IDENT_FORMATS); }
+<LINE, TYPE_APP> {RESERVED_IDENT_FORMATS} { return MakeToken(RESERVED_IDENT_FORMATS); }
 
 <LINE> "delegate"{LESS_OP}                 {
   // Rule for smashing type apply.
   // https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2131
-  InitAdjacentTypeApp(); return MakeToken(DELEGATE); }
-<LINE> {IDENT}{LESS_OP}                    { InitAdjacentTypeApp(); return IdentInTypeApp(); }
-<LINE> {IEEE32}{LESS_OP}                   { InitAdjacentTypeApp(); return MakeToken(IEEE32); }
-<LINE> {IEEE64}{LESS_OP}                   { InitAdjacentTypeApp(); return MakeToken(IEEE64); }
-<LINE> {DECIMAL}{LESS_OP}                  { InitAdjacentTypeApp(); return MakeToken(DECIMAL); }
-<LINE> {BYTE}{LESS_OP}                     { InitAdjacentTypeApp(); return MakeToken(BYTE); }
-<LINE> {INT16}{LESS_OP}                    { InitAdjacentTypeApp(); return MakeToken(INT16); }
-<LINE> ({XINT}|{INT}){LESS_OP}             { InitAdjacentTypeApp(); return MakeToken(INT32); }
-<LINE> {INT32}{LESS_OP}                    { InitAdjacentTypeApp(); return MakeToken(INT32); }
-<LINE> {INT64}{LESS_OP}                    { InitAdjacentTypeApp(); return MakeToken(INT64); }
-<LINE> {SBYTE}{LESS_OP}                    { InitAdjacentTypeApp(); return MakeToken(SBYTE); }
-<LINE> {UINT16}{LESS_OP}                   { InitAdjacentTypeApp(); return MakeToken(UINT16); }
-<LINE> {UINT32}{LESS_OP}                   { InitAdjacentTypeApp(); return MakeToken(UINT32); }
-<LINE> {UINT64}{LESS_OP}                   { InitAdjacentTypeApp(); return MakeToken(UINT64); }
-<LINE> {BIGNUM}{LESS_OP}                   { InitAdjacentTypeApp(); return MakeToken(BIGNUM); }
-<LINE> {NATIVEINT}{LESS_OP}                { InitAdjacentTypeApp(); return MakeToken(NATIVEINT); }
-<LINE> {RESERVED_LITERAL_FORMATS}{LESS_OP} { InitAdjacentTypeApp(); return MakeToken(RESERVED_LITERAL_FORMATS); }
+  InitTypeApp(); return MakeToken(DELEGATE); }
+<LINE> {IDENT}{LESS_OP}                    { InitTypeApp(); return IdentInTypeApp(); }
+<LINE> {IEEE32}{LESS_OP}                   { InitTypeApp(); return MakeToken(IEEE32); }
+<LINE> {IEEE64}{LESS_OP}                   { InitTypeApp(); return MakeToken(IEEE64); }
+<LINE> {DECIMAL}{LESS_OP}                  { InitTypeApp(); return MakeToken(DECIMAL); }
+<LINE> {BYTE}{LESS_OP}                     { InitTypeApp(); return MakeToken(BYTE); }
+<LINE> {INT16}{LESS_OP}                    { InitTypeApp(); return MakeToken(INT16); }
+<LINE> ({XINT}|{INT}){LESS_OP}             { InitTypeApp(); return MakeToken(INT32); }
+<LINE> {INT32}{LESS_OP}                    { InitTypeApp(); return MakeToken(INT32); }
+<LINE> {INT64}{LESS_OP}                    { InitTypeApp(); return MakeToken(INT64); }
+<LINE> {SBYTE}{LESS_OP}                    { InitTypeApp(); return MakeToken(SBYTE); }
+<LINE> {UINT16}{LESS_OP}                   { InitTypeApp(); return MakeToken(UINT16); }
+<LINE> {UINT32}{LESS_OP}                   { InitTypeApp(); return MakeToken(UINT32); }
+<LINE> {UINT64}{LESS_OP}                   { InitTypeApp(); return MakeToken(UINT64); }
+<LINE> {BIGNUM}{LESS_OP}                   { InitTypeApp(); return MakeToken(BIGNUM); }
+<LINE> {NATIVEINT}{LESS_OP}                { InitTypeApp(); return MakeToken(NATIVEINT); }
+<LINE> {RESERVED_LITERAL_FORMATS}{LESS_OP} { InitTypeApp(); return MakeToken(RESERVED_LITERAL_FORMATS); }
 
 <LINE> "delegate"{LESS_OP}{BAD_SYMBOLIC_OP}                 { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
 <LINE> {IDENT}{LESS_OP}{BAD_SYMBOLIC_OP}                    { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
@@ -455,49 +455,49 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <PRE_LESS_OP> {NATIVEINT}                { yybegin(LINE); return MakeToken(NATIVEINT); }
 <PRE_LESS_OP> {RESERVED_LITERAL_FORMATS} { yybegin(LINE); return MakeToken(RESERVED_LITERAL_FORMATS); }
 
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {IDENT}      { return InitIdent(); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {SBYTE}      { return MakeToken(SBYTE); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {BYTE}       { return MakeToken(BYTE); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {INT16}      { return MakeToken(INT16); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {UINT16}     { return MakeToken(UINT16); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {XINT}|{INT} { return MakeToken(INT32); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {INT32}      { return MakeToken(INT32); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {UINT32}     { return MakeToken(UINT32); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {NATIVEINT}  { return MakeToken(NATIVEINT); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {UNATIVEINT} { return MakeToken(UNATIVEINT); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {INT64}      { return MakeToken(INT64); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {UINT64}     { return MakeToken(UINT64); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {IDENT}      { return InitIdent(); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {SBYTE}      { return MakeToken(SBYTE); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {BYTE}       { return MakeToken(BYTE); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {INT16}      { return MakeToken(INT16); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {UINT16}     { return MakeToken(UINT16); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {XINT}|{INT} { return MakeToken(INT32); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {INT32}      { return MakeToken(INT32); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {UINT32}     { return MakeToken(UINT32); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {NATIVEINT}  { return MakeToken(NATIVEINT); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {UNATIVEINT} { return MakeToken(UNATIVEINT); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {INT64}      { return MakeToken(INT64); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {UINT64}     { return MakeToken(UINT64); }
 
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {INT}\.\. {
+<LINE, TYPE_APP, INIT_TYPE_APP> {INT}\.\. {
   // Rule for smashing INT_DOT_DOT.
   // https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2142
   PushBack(yylength()); InitSmash(SMASH_INT_DOT_DOT_FROM_LINE, SMASH_INT_DOT_DOT); Clear(); break; }
 
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {IEEE32}  { return MakeToken(IEEE32); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {IEEE64}  { return MakeToken(IEEE64); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {BIGNUM}  { return MakeToken(BIGNUM); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {DECIMAL} { return MakeToken(DECIMAL); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {IEEE32}  { return MakeToken(IEEE32); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {IEEE64}  { return MakeToken(IEEE64); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {BIGNUM}  { return MakeToken(BIGNUM); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {DECIMAL} { return MakeToken(DECIMAL); }
 
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {CHARACTER_LITERAL}               { return MakeToken(CHARACTER_LITERAL); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {STRING}                          { return MakeToken(STRING); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {UNFINISHED_STRING}               { return MakeToken(UNFINISHED_STRING); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {VERBATIM_STRING}                 { return MakeToken(VERBATIM_STRING); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {UNFINISHED_VERBATIM_STRING}      { return MakeToken(UNFINISHED_VERBATIM_STRING); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {TRIPLE_QUOTED_STRING}            { return MakeToken(TRIPLE_QUOTED_STRING); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {UNFINISHED_TRIPLE_QUOTED_STRING} { return MakeToken(UNFINISHED_TRIPLE_QUOTED_STRING); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {BYTEARRAY}                       { return MakeToken(BYTEARRAY); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {VERBATIM_BYTEARRAY}              { return MakeToken(VERBATIM_BYTEARRAY); }
-<LINE, ADJACENT_TYPE_APP, INIT_ADJACENT_TYPE_APP> {BYTECHAR}                        { return MakeToken(BYTECHAR); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {CHARACTER_LITERAL}               { return MakeToken(CHARACTER_LITERAL); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {STRING}                          { return MakeToken(STRING); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {UNFINISHED_STRING}               { return MakeToken(UNFINISHED_STRING); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {VERBATIM_STRING}                 { return MakeToken(VERBATIM_STRING); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {UNFINISHED_VERBATIM_STRING}      { return MakeToken(UNFINISHED_VERBATIM_STRING); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {TRIPLE_QUOTED_STRING}            { return MakeToken(TRIPLE_QUOTED_STRING); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {UNFINISHED_TRIPLE_QUOTED_STRING} { return MakeToken(UNFINISHED_TRIPLE_QUOTED_STRING); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {BYTEARRAY}                       { return MakeToken(BYTEARRAY); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {VERBATIM_BYTEARRAY}              { return MakeToken(VERBATIM_BYTEARRAY); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {BYTECHAR}                        { return MakeToken(BYTECHAR); }
 
-<LINE, ADJACENT_TYPE_APP> {RESERVED_SYMBOLIC_SEQUENCE} { return MakeToken(RESERVED_SYMBOLIC_SEQUENCE); }
-<LINE, ADJACENT_TYPE_APP> {RESERVED_LITERAL_FORMATS}   { return MakeToken(RESERVED_LITERAL_FORMATS); }
-<LINE, ADJACENT_TYPE_APP> {SYMBOLIC_OP}                { return MakeToken(SYMBOLIC_OP); }
-<LINE, ADJACENT_TYPE_APP> {BAD_SYMBOLIC_OP}            { return MakeToken(BAD_SYMBOLIC_OP); }
+<LINE, TYPE_APP> {RESERVED_SYMBOLIC_SEQUENCE} { return MakeToken(RESERVED_SYMBOLIC_SEQUENCE); }
+<LINE, TYPE_APP> {RESERVED_LITERAL_FORMATS}   { return MakeToken(RESERVED_LITERAL_FORMATS); }
+<LINE, TYPE_APP> {SYMBOLIC_OP}                { return MakeToken(SYMBOLIC_OP); }
+<LINE, TYPE_APP> {BAD_SYMBOLIC_OP}            { return MakeToken(BAD_SYMBOLIC_OP); }
 
-<INIT_ADJACENT_TYPE_APP> {RESERVED_SYMBOLIC_SEQUENCE} { yybegin(LINE); return MakeToken(RESERVED_SYMBOLIC_SEQUENCE); }
-<INIT_ADJACENT_TYPE_APP> {RESERVED_LITERAL_FORMATS}   { yybegin(LINE); return MakeToken(RESERVED_LITERAL_FORMATS); }
-<INIT_ADJACENT_TYPE_APP> {SYMBOLIC_OP}                { yybegin(LINE); return MakeToken(SYMBOLIC_OP); }
-<INIT_ADJACENT_TYPE_APP> {BAD_SYMBOLIC_OP}            { yybegin(LINE); return MakeToken(BAD_SYMBOLIC_OP); }
+<INIT_TYPE_APP> {RESERVED_SYMBOLIC_SEQUENCE} { yybegin(LINE); return MakeToken(RESERVED_SYMBOLIC_SEQUENCE); }
+<INIT_TYPE_APP> {RESERVED_LITERAL_FORMATS}   { yybegin(LINE); return MakeToken(RESERVED_LITERAL_FORMATS); }
+<INIT_TYPE_APP> {SYMBOLIC_OP}                { yybegin(LINE); return MakeToken(SYMBOLIC_OP); }
+<INIT_TYPE_APP> {BAD_SYMBOLIC_OP}            { yybegin(LINE); return MakeToken(BAD_SYMBOLIC_OP); }
 
 <SMASH_INT_DOT_DOT, SMASH_INT_DOT_DOT_FROM_LINE> {INT} { return MakeToken(INT32); }
 <SMASH_INT_DOT_DOT, SMASH_INT_DOT_DOT_FROM_LINE> \.\.  { ExitSmash(SMASH_INT_DOT_DOT_FROM_LINE); return MakeToken(DOT_DOT); }
@@ -604,8 +604,8 @@ PP_CONDITIONAL_SYMBOL={IDENT}
  SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN,
  SMASH_ADJACENT_GREATER_RBRACK_FIN,
  ADJACENT_TYPE_CLOSE_OP,
- INIT_ADJACENT_TYPE_APP,
- ADJACENT_TYPE_APP,
+ INIT_TYPE_APP,
+ TYPE_APP,
  SYMBOLIC_OPERATOR,
  GREATER_OP,
  GREATER_OP_SYMBOLIC_OP,

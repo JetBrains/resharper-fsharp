@@ -73,6 +73,7 @@ type FSharpLexerTest() =
     [<Test>] member x.``Type application 02 - Incorrect``() = x.DoNamedTest()
     [<Test>] member x.``Type application 03 - Smashing GREATER_BAR_RBRACK``() = x.DoNamedTest()
     [<Test>] member x.``Type application 04 - Inside generic``() = x.DoNamedTest()
+    [<Test>] member x.``Type application 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Preprocessor 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Preprocessor 02 - Disjunction``() = x.DoNamedTest()
