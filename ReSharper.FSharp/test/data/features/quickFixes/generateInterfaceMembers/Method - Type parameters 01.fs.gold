@@ -5,4 +5,4 @@ type I =
 
 type T() =
   interface I with
-    member this.M<'T>(var0) = failwith "todo"{caret}
+    member this.M(var0) = failwith "todo"{caret}

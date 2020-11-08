@@ -1,0 +1,11 @@
+﻿type I =
+    abstract M1: p: int -> 'a
+
+    abstract M2: int -> 'a
+    abstract M2: double -> 'a
+
+type T() =
+    interface I with
+      member this.M1(p) = failwith "todo"
+      member this.M2<'a>(var0: int): 'a = failwith "todo"
+      member this.M2<'a>(var0: double): 'a = failwith "todo"{caret}

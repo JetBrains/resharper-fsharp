@@ -31,6 +31,7 @@ type GenerateInterfaceMembersFixTest() =
     [<Test>] member x.``Method - Parameters - Single 02 - Anon``() = x.DoNamedTest()
     [<Test>] member x.``Method - Type parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Type parameters 02 - Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Type parameters 03 - Implicit``() = x.DoNamedTest()
     [<Test>] member x.``Method - Substitution 01 - Param``() = x.DoNamedTest()
     [<Test>] member x.``Method - Substitution 02 - Return``() = x.DoNamedTest()
     [<Test>] member x.``Method - Substitution 03 - Multiple``() = x.DoNamedTest()

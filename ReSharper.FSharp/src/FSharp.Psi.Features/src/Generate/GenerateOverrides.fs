@@ -44,7 +44,10 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
             name, x.Type.Instantiate(element.Substitution)) >> Seq.toList)
         |> Seq.toList
 
-    let typeParams = mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
+    let typeParams =
+        if not element.AddTypes then [] else
+        mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
+
     let memberName = mfv.LogicalName
 
     let factory = context.CreateElementFactory()
