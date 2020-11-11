@@ -75,6 +75,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       myNestedCommentLevel++;
     }
 
+    private void InitStringInClockComment()
+    {
+      Assertion.Assert(yy_lexical_state == IN_BLOCK_COMMENT || yy_lexical_state == IN_BLOCK_COMMENT_FROM_LINE,
+        "yy_lexical_state == IN_BLOCK_COMMENT || yy_lexical_state == IN_BLOCK_COMMENT_FROM_LINE");
+
+      yybegin(yy_lexical_state == IN_BLOCK_COMMENT ? STRING_IN_COMMENT : STRING_IN_COMMENT_FROM_LINE);
+    }
+
+    private void FinishStringInClockComment()
+    {
+      Assertion.Assert(yy_lexical_state == STRING_IN_COMMENT || yy_lexical_state == STRING_IN_COMMENT_FROM_LINE,
+        "yy_lexical_state == STRING_IN_COMMENT || yy_lexical_state == STRING_IN_COMMENT_FROM_LINE");
+
+      yybegin(yy_lexical_state == STRING_IN_COMMENT ? IN_BLOCK_COMMENT : IN_BLOCK_COMMENT_FROM_LINE);
+    }
+
     private TokenNodeType InitIdent()
     {
       var keyword = FindKeywordByCurrentToken();

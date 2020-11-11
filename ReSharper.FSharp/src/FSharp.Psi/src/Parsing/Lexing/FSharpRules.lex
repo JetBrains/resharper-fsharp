@@ -1,6 +1,7 @@
 %state IN_BLOCK_COMMENT
 %state IN_BLOCK_COMMENT_FROM_LINE
 %state STRING_IN_COMMENT
+%state STRING_IN_COMMENT_FROM_LINE
 %state SMASH_INT_DOT_DOT
 %state SMASH_INT_DOT_DOT_FROM_LINE
 %state SMASH_RQUOTE_DOT
@@ -506,18 +507,18 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <SMASH_RQUOTE_DOT, SMASH_RQUOTE_DOT_FROM_LINE> "@@>" { return MakeToken(RQUOTE_UNTYPED); }
 <SMASH_RQUOTE_DOT, SMASH_RQUOTE_DOT_FROM_LINE> \.    { ExitSmash(SMASH_RQUOTE_DOT_FROM_LINE); return MakeToken(DOT); }
 
-<STRING_IN_COMMENT> {STRING}                          { yybegin(IN_BLOCK_COMMENT); IncreaseTokenLength(yylength()); Clear(); break; }
-<STRING_IN_COMMENT> {VERBATIM_STRING}                 { yybegin(IN_BLOCK_COMMENT); IncreaseTokenLength(yylength()); Clear(); break; }
-<STRING_IN_COMMENT> {TRIPLE_QUOTED_STRING}            { yybegin(IN_BLOCK_COMMENT); IncreaseTokenLength(yylength()); Clear(); break; }
-<STRING_IN_COMMENT> {UNFINISHED_STRING}               { return FillBlockComment(); }
-<STRING_IN_COMMENT> {UNFINISHED_VERBATIM_STRING}      { return FillBlockComment(); }
-<STRING_IN_COMMENT> {UNFINISHED_TRIPLE_QUOTED_STRING} { return FillBlockComment(); }
+<STRING_IN_COMMENT, STRING_IN_COMMENT_FROM_LINE> {STRING}                          { FinishStringInClockComment(); IncreaseTokenLength(yylength()); Clear(); break; }
+<STRING_IN_COMMENT, STRING_IN_COMMENT_FROM_LINE> {VERBATIM_STRING}                 { FinishStringInClockComment(); IncreaseTokenLength(yylength()); Clear(); break; }
+<STRING_IN_COMMENT, STRING_IN_COMMENT_FROM_LINE> {TRIPLE_QUOTED_STRING}            { FinishStringInClockComment(); IncreaseTokenLength(yylength()); Clear(); break; }
+<STRING_IN_COMMENT, STRING_IN_COMMENT_FROM_LINE> {UNFINISHED_STRING}               { return FillBlockComment(); }
+<STRING_IN_COMMENT, STRING_IN_COMMENT_FROM_LINE> {UNFINISHED_VERBATIM_STRING}      { return FillBlockComment(); }
+<STRING_IN_COMMENT, STRING_IN_COMMENT_FROM_LINE> {UNFINISHED_TRIPLE_QUOTED_STRING} { return FillBlockComment(); }
 
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "(*"      { myNestedCommentLevel++; IncreaseTokenLength(yylength()); Clear(); break; }
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "*)"      { if (--myNestedCommentLevel == 0) return FillBlockComment(); IncreaseTokenLength(yylength()); Clear(); break; }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"        { PushBack(yylength()); yybegin(STRING_IN_COMMENT); Clear(); break; }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> @\"       { PushBack(yylength()); yybegin(STRING_IN_COMMENT); Clear(); break; }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"\"\"    { PushBack(yylength()); yybegin(STRING_IN_COMMENT); Clear(); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"        { PushBack(yylength()); InitStringInClockComment(); Clear(); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> @\"       { PushBack(yylength()); InitStringInClockComment(); Clear(); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"\"\"    { PushBack(yylength()); InitStringInClockComment(); Clear(); break; } 
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> [^(\"@*]+ { IncreaseTokenLength(yylength()); Clear(); break; }
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> [^]|"(*)" { IncreaseTokenLength(yylength()); Clear(); break; }
 

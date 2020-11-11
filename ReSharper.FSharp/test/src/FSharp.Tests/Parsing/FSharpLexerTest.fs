@@ -48,6 +48,14 @@ type FSharpLexerTest() =
     [<Test>] member x.``Comment - Eof - Line 01``() = x.DoNamedTest()
     [<Test>] member x.``Comment - Eof - Line 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Comment - String 01``() = x.DoNamedTest()
+    [<Test>] member x.``Comment - String 02``() = x.DoNamedTest()
+    [<Test>] member x.``Comment - String 03``() = x.DoNamedTest()
+    [<Test>] member x.``Comment - String 04``() = x.DoNamedTest()
+    [<Test>] member x.``Comment - String 05``() = x.DoNamedTest()
+    [<Test>] member x.``Comment - String 06``() = x.DoNamedTest()
+    [<Test>] member x.``Comment - String 07``() = x.DoNamedTest()
+
     [<Test>] member x.``Comments 01 - End of line``() = x.DoNamedTest()
     [<Test>] member x.``Comments 02 - Multiple end of line``() = x.DoNamedTest()
     [<Test>] member x.``Comments 03 - Multiline 01``() = x.DoNamedTest()
