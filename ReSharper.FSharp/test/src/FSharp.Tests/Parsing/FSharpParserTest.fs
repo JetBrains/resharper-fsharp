@@ -491,3 +491,7 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Expr - Lambda 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Interface 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Interface 03``() = x.DoNamedTest()
