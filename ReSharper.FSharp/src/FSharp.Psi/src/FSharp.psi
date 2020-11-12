@@ -1147,7 +1147,7 @@ typeInherit options { stubBase="ReferenceOwnerBase"; } extras {
 interfaceImplementation extras {
   get { methodName="TypeMembers" path=<interfaceImplementation:MEMBER_LIST/memberDeclarationList:MEMBER_DECL> };
 }:
-  INTERFACE
+  INTERFACE<INTERFACE, InterfaceKeyword>
   typeReferenceName<TYPE_REFERENCE, TypeName>
   (
     WITH<WITH, WithKeyword>
