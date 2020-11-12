@@ -268,7 +268,7 @@
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>impl.TypeName.GetHighlightingRange()</Range>
+    <Range>getInterfaceImplHeaderRange impl</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>GenerateInterfaceMembersFix</QuickFix>
   </Error>

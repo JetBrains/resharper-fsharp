@@ -1,7 +1,0 @@
-﻿module Module
-
-type T() =
-    interface |System.IDisposable|(0)
-
----------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: No implementation was given for 'System.IDisposable.Dispose() : unit'. Note that all interface members must be implemented and listed under an appropriate 'interface' declaration, e.g. 'interface ... with member ...'.

@@ -108,3 +108,11 @@ let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
     | :? IReferenceExpr as x when isSimpleQualifiedName x ->
         sprintf "Lambda can be replaced with '%s'" x.QualifiedName
     | _ -> "Lambda can be simplified"
+
+let getInterfaceImplHeaderRange (interfaceImpl: IInterfaceImplementation) =
+    let last = 
+        match interfaceImpl.WithKeyword with
+        | null -> interfaceImpl.TypeName :> ITreeNode
+        | withKeyword -> withKeyword :> ITreeNode
+
+    getTreeNodesDocumentRange interfaceImpl.InterfaceKeyword last
