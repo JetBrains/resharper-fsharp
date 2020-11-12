@@ -43,7 +43,7 @@ type RenameFileToMatchTypeNameAction(dataProvider: FSharpContextActionDataProvid
         | null, null -> false
         | null, m -> types.IsEmpty() && m.Equals(typeElement)
         | t, null -> modules.IsEmpty() && t.Equals(typeElement)
-        | t, m -> m.AssociatedTypeElement.Equals(t) && (m.Equals(typeElement) || t.Equals(typeElement))
+        | t, m -> t.Equals(m.AssociatedTypeElement) && (m.Equals(typeElement) || t.Equals(typeElement))
 
     override this.Text =
         match dataProvider.GetSelectedElement<IFSharpTypeElementDeclaration>() with
