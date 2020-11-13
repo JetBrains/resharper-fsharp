@@ -24,3 +24,4 @@ type AddDiscriminatedUnionAllClausesTest() =
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple in context 01``() = x.DoNamedTest()
+    [<Test>] member x.``Simple single existing case 01``() = x.DoNamedTest()
