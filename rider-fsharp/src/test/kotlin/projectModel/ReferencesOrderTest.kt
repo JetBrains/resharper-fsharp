@@ -1,6 +1,6 @@
 package projectModel
 
-import com.jetbrains.rider.model.rdFSharpModel
+import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.BaseTestWithSolution

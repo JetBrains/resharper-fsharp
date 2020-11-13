@@ -1,0 +1,31 @@
+type Delegate = delegate of int -> int
+type DelegateAbbreviation = Delegate
+
+let f (x: Delegate) = ()
+
+type A() = 
+    static member M1(x: int -> int) = ()
+    static member M2(x: int, y: int -> int) = ()
+    static member M3(x: int, y: (int * int -> int)) = ()
+    static member M4(x: Unresolved) = ()
+
+f (|fun x -> x|(0))
+Delegate(|fun x -> x|(1))
+(fun (x: Delegate) -> ()) (|fun x -> x|(2))
+A.M1(|fun x -> x|(3))
+A.M1(0, |fun x -> x|(4))
+A.M2(0, |fun x -> x|(5))
+A.M3(0, (0, |fun x -> x|(6)))
+A.M4(|fun x -> x|(7))
+A.UnresolvedM(|fun x -> x|(8))
+
+---------------------------------------------------------
+(0): ReSharper Warning: Lambda can be replaced with 'id'
+(1): ReSharper Warning: Lambda can be replaced with 'id'
+(2): ReSharper Warning: Lambda can be replaced with 'id'
+(3): ReSharper Warning: Lambda can be replaced with 'id'
+(4): ReSharper Warning: Lambda can be replaced with 'id'
+(5): ReSharper Warning: Lambda can be replaced with 'id'
+(6): ReSharper Warning: Lambda can be replaced with 'id'
+(7): ReSharper Warning: Lambda can be replaced with 'id'
+(8): ReSharper Warning: Lambda can be replaced with 'id'

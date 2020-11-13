@@ -13,11 +13,11 @@ buildscript {
         maven { setUrl("https://cache-redirector.jetbrains.com/www.myget.org/F/rd-snapshots/maven") }
         maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
         maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
+        maven { setUrl("https://jetbrains.bintray.com/intellij-plugin-service") }
     }
     dependencies {
         // https://www.myget.org/feed/rd-snapshots/package/maven/com.jetbrains.rd/rd-gen
         classpath("com.jetbrains.rd:rd-gen:0.203.148")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0")
     }
 }
 
@@ -27,9 +27,10 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.intellij") version "0.4.13"
+    id("org.jetbrains.intellij") version "0.6.1"
     id("org.jetbrains.grammarkit") version "2018.1.7"
     id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
+    kotlin("jvm") version "1.4.10"
 }
 
 apply {
@@ -125,6 +126,7 @@ val dotNetSdkPath by lazy {
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
 val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
+val backendLexerSources = "$repoRoot/rider-fsharp/build/backend-lexer-sources/"
 
 val riderFSharpTargetsGroup = "rider-fsharp"
 
@@ -207,7 +209,35 @@ tasks {
         maxHeapSize = "1500m"
     }
 
+    val resetLexerDirectory = create("resetLexerDirectory") {
+        doFirst {
+            File(backendLexerSources).deleteRecursively()
+            File(backendLexerSources).mkdirs()
+        }
+    }
+
+    // Cannot use ordinary copy here, because it requires eager evaluation of locations
+    val copyUnicodeLex = create("copyUnicodeLex") {
+        dependsOn(resetLexerDirectory)
+        doFirst {
+            val libPath = File("$dotNetSdkPath").parent
+            File(libPath, "ReSharperHost/PsiTasks").listFiles { it -> it.extension == "lex" }!!.forEach {
+                println(it)
+                it.copyTo(File(backendLexerSources, it.name))
+            }
+        }
+    }
+
+    val copyBackendLexerSources = create<Copy>("copyBackendLexerSources") {
+        dependsOn(resetLexerDirectory)
+        from("$resharperPluginPath/src/FSharp.Psi/src/Parsing/Lexing") {
+            include("*.lex")
+        }
+        into(backendLexerSources)
+    }
+
     val generateFSharpLexer = task<GenerateLexer>("generateFSharpLexer") {
+        dependsOn(copyBackendLexerSources, copyUnicodeLex)
         source = "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer/_FSharpLexer.flex"
         targetDir = "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer"
         targetClass = "_FSharpLexer"
@@ -297,8 +327,3 @@ tasks {
 }
 
 defaultTasks("prepare")
-
-// workaround for https://youtrack.jetbrains.com/issue/RIDER-18697
-dependencies {
-    testCompile("xalan", "xalan", "2.7.2")
-}

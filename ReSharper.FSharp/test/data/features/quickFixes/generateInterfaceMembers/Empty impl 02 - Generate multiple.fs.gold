@@ -1,0 +1,8 @@
+﻿type I =
+  abstract P1: int
+  abstract P2: int
+
+type T() =
+  interface I with
+    member this.P1 = failwith "todo"
+    member this.P2 = failwith "todo"{caret}

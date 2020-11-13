@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class ImplicitConstructorDeclaration
+  internal partial class PrimaryConstructorDeclaration
   {
     protected override string DeclaredElementName =>
       GetContainingTypeDeclaration()?.CompiledName ?? SharedImplUtil.MISSING_DECLARATION_NAME;

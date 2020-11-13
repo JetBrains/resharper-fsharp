@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal class InterfacePart : FSharpTypeMembersOwnerTypePart, Interface.IInterfacePart
   {
-    public InterfacePart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+    public InterfacePart([NotNull] IFSharpTypeOldDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
     {
     }

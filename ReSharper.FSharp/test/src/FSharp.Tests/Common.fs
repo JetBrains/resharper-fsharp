@@ -25,6 +25,7 @@ open NUnit.Framework
 [<assembly: Apartment(ApartmentState.STA)>]
 do()
 
+
 module FSharpTestAttribute =
     let extensions =
         [ FSharpProjectFileType.FsExtension
@@ -33,6 +34,12 @@ module FSharpTestAttribute =
 
     let targetFrameworkId =
         TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, Version(4, 5, 1), ProfileIdentifier.Default)
+
+
+[<AutoOpen>]
+module PackageReferences =
+    let [<Literal>] FSharpCorePackage = "FSharp.Core/4.7.2"
+
 
 type FSharpTestAttribute(extension) =
     inherit Attribute()

@@ -1,0 +1,3 @@
+﻿type T(a, b) =
+  interface System.IDisposable with
+    member this.Dispose() = failwith "todo"{caret}

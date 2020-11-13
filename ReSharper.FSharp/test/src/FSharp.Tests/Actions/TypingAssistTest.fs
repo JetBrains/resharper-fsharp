@@ -214,6 +214,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Comment 01 - Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Comment 02 - Before comment``() = x.DoNamedTest()
 
+    [<Test>] member x.``Quotes - Surround 01``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Surround 02 - Multiline``() = x.DoNamedTest()
+
     [<Test>] member x.``Brackets - Left 01 - Add right``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 02 - No add right before other``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 03 - Add right before other and space``() = x.DoNamedTest()
@@ -225,6 +228,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Skip right 02 - After code``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 03 - After code and space``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 04 - Angle``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip right 05 - Multiplication decl``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Skip 01 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip 02 - Array``() = x.DoNamedTest()

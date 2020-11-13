@@ -1,0 +1,26 @@
+﻿module Module
+
+type I =
+    abstract P1: int
+    abstract P2: int
+
+type T1() =
+    |interface I|(0)
+
+type T2() =
+    |interface I with|(1)
+
+type T3() =
+    |interface I with|(2)
+        member x.P1 = 1
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: No implementation was given for those members: 
+	'abstract member I.P1 : int'
+	'abstract member I.P2 : int'
+Note that all interface members must be implemented and listed under an appropriate 'interface' declaration, e.g. 'interface ... with member ...'.
+(1): ReSharper Underlined Error Highlighting: No implementation was given for those members: 
+	'abstract member I.P1 : int'
+	'abstract member I.P2 : int'
+Note that all interface members must be implemented and listed under an appropriate 'interface' declaration, e.g. 'interface ... with member ...'.
+(2): ReSharper Underlined Error Highlighting: No implementation was given for 'abstract member I.P2 : int'. Note that all interface members must be implemented and listed under an appropriate 'interface' declaration, e.g. 'interface ... with member ...'.

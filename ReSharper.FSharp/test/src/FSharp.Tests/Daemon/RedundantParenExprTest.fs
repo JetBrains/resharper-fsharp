@@ -1,11 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages("FSharp.Core")>]
+[<TestPackages(FSharpCorePackage)>]
 type RedundantParenExprTest() =
     inherit FSharpHighlightingTestBase()
 

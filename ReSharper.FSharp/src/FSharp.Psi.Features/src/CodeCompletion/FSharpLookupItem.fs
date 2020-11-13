@@ -6,7 +6,6 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Feature.Services.ParameterInfo
 open JetBrains.ReSharper.Host.Features.Completion
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -26,7 +25,7 @@ type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocServ
     interface ICandidate with
         member x.GetSignature(_, _, _, _, _) = RichText(description)
         member x.GetDescription() = xmlDocService.GetXmlDoc(xmlDoc)
-        member x.Matches(_) = true
+        member x.Matches _ = true
 
         member x.GetParametersInfo(_, _) = ()
         member x.PositionalParameterCount = 0
@@ -44,7 +43,7 @@ type FSharpErrorLookupItem(item: FSharpDeclarationListItem) =
 
     interface IDescriptionProvidingLookupItem with
         member x.GetDescription() =
-            let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
+            let (FSharpToolTipText(tooltips)) = item.DescriptionText
             tooltips
             |> List.tryHead
             |> Option.bind (function | FSharpToolTipElement.CompositionError e -> Some (RichTextBlock(e)) | _ -> None)
@@ -68,10 +67,10 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
         addOpen offset fsFile context.BasicContext.ContextBoundSettingsStore ns
 
     member x.Candidates =
-        match box candidates with
+        match candidates with
         | null ->
             let result = LocalList<ICandidate>()
-            let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
+            let (FSharpToolTipText(tooltips)) = item.DescriptionText
             for tooltip in tooltips do
                 match tooltip with
                 | FSharpToolTipElement.Group(overloads) ->
@@ -83,7 +82,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
             candidates <- result.ResultingList()
             candidates
 
-        | candidates -> candidates :?> _
+        | candidates -> candidates
 
     override x.Image =
         try getIconId item.FSharpSymbol
@@ -107,7 +106,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
         let ns = item.NamespaceToOpen
         if ns.IsEmpty() then () else
 
-        let ns = ns |> Array.map (fun ns -> Keywords.QuoteIdentifierIfNeeded ns) |> String.concat "."
+        let ns = ns |> Array.map Keywords.QuoteIdentifierIfNeeded |> String.concat "."
 
         let solution = context.BasicContext.Solution
         solution.GetPsiServices().Files.CommitAllDocuments()    

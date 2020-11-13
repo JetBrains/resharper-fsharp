@@ -11,6 +11,7 @@ open JetBrains.ProjectModel
 open JetBrains.Rd.Tasks
 open JetBrains.ReSharper.Host.Features.ProjectModel
 open JetBrains.ReSharper.Host.Features.ProjectModel.View
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
@@ -18,7 +19,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Rider.Model
 open JetBrains.Util
 
 [<SolutionComponent>]
@@ -39,7 +39,11 @@ type FsiHost
             else
                 fsiDetector.GetActiveTool(solution, fsiOptions)
 
-        let fsiPath = fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
+        let fsiPath =
+            if fsiOptions.IsCustomTool.Value then
+                fsiOptions.FsiPathAsPath
+            else
+                fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
 
         let args =
             [| yield! stringArrayArgs fsiOptions.FsiArgs.Value

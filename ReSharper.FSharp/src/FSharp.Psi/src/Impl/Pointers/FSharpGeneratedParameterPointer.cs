@@ -1,5 +1,4 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
-using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers
 {
@@ -11,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers
     }
 
     public override FSharpGeneratedParameter CreateGenerated(IFSharpFieldProperty field) =>
-      field.GetContainingType().GetGeneratedConstructor() is IParametersOwner constructor
+      field.GetContainingType().GetGeneratedConstructor() is { } constructor
         ? new FSharpGeneratedParameter(constructor, field)
         : null;
   }

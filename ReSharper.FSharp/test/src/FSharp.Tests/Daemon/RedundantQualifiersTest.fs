@@ -1,11 +1,12 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages("FSharp.Core")>]
+[<TestPackages(FSharpCorePackage)>]
 type RedundantQualifiersTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -41,3 +42,5 @@ type RedundantQualifiersTest() =
     [<Test>] member x.``Opens 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Attributes 01 - Top level module``() = x.DoNamedTest()
+
+    [<Test>] member x.``Delegate - Partially shadowed 01``() = x.DoNamedTest()

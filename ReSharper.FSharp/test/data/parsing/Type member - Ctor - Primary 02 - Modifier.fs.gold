@@ -4,10 +4,10 @@ IFSharpImplFile
     ITypeDeclarationGroup
       FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      IClassDeclaration
+      IFSharpTypeDeclaration
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        IImplicitConstructorDeclaration
+        IPrimaryConstructorDeclaration
           FSharpTokenType+InternalTokenElement(type:INTERNAL, text:internal)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IParametersPatternDeclaration
@@ -18,9 +18,10 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        FSharpTokenType+ClassTokenElement(type:CLASS, text:class)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-    FSharpTokenType+EndTokenElement(type:END, text:end)
+        IClassRepresentation
+          FSharpTokenType+ClassTokenElement(type:CLASS, text:class)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+          FSharpTokenType+EndTokenElement(type:END, text:end)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

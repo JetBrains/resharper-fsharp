@@ -52,7 +52,7 @@ type ScriptFcsProjectProvider
             try
                 let options, errors = getScriptOptionsAsync.RunAsTask()
                 if not errors.IsEmpty then
-                    logger.Warn("Script options for {0}: {1}", path, concatErrors errors)
+                    logErrors logger (sprintf "Script options for %s" path) errors
                 let options = fixScriptOptions options
                 Some options
             with

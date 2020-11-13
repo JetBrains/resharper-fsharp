@@ -1,0 +1,13 @@
+-------------- offset 73 line 6 col 12 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
+Immediate result: Occurrence's dump:
+TO: [O] | A of |a|: int RANGE: (33,34) @ Union - Field 03 - Struct.fs
+Occurrence's navigation result. Opened file: Union - Field 03 - Struct.fs
+------------------
+[<Struct>]
+type U =
+    | A of |CARET|a: int
+    | B of b: int
+
+------------------
+

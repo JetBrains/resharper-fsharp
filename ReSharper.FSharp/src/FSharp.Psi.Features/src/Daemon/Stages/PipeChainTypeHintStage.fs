@@ -81,7 +81,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
         for token, exprToAdorn in exprs do
             if daemonProcess.InterruptFlag then raise <| OperationCanceledException()
 
-            let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(opName, checkResults, token)
+            let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(checkResults, token)
 
             // The |> operator should have one overload and two type parameters
             match layouts with

@@ -15,6 +15,7 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
 
     let [<Literal>] extensionNamespaceName = "System.Runtime.CompilerServices"
     let [<Literal>] attributeName = "Extension"
+
     let declaration =
         let attributeOwner: IFSharpTypeMemberDeclaration =
             match LetBindingsDeclarationNavigator.GetByAttribute(warning.Attr) with
@@ -39,12 +40,15 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
             match tryGetOpen m extensionNamespaceName with
             | Some _ ->
                 let file = declaration.FSharpFile
-                addOpen (m.GetDocumentStartOffset()) file (file.GetSettingsStore()) extensionNamespaceName
+                let settingsStore = file.GetSettingsStoreWithEditorConfig()
+                addOpen (m.GetDocumentStartOffset()) file settingsStore extensionNamespaceName
             | None -> ()
-            if m.AttributeLists.IsEmpty then addAttributesList m true
+
+            if m.AttributeLists.IsEmpty then
+                addAttributesList true m
             addAttribute m.AttributeLists.[0] attribute
 
-        | :? IFSharpTypeDeclaration as t ->
+        | :? IFSharpTypeOrExtensionDeclaration as t ->
             let attributeList = getTypeDeclarationAttributeList t
             addAttribute attributeList attribute
         | _ -> ()

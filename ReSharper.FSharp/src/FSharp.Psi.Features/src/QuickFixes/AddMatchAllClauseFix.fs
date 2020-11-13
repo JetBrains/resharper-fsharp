@@ -39,7 +39,13 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
         let clause = 
             addNodesAfter expr.LastChild [
                 if addToNewLine then
-                    NewLine(expr.GetLineEnding())
+                    let lineEnding = expr.GetLineEnding()
+
+                    let lastClause = expr.Clauses.Last()
+                    if not (lastClause.IsSingleLine) && isAfterEmptyLine lastClause then
+                        NewLine(lineEnding)
+
+                    NewLine(lineEnding)
                 else
                     Whitespace()
                 factory.CreateMatchClause()

@@ -1,0 +1,64 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    ITypeDeclarationGroup
+      FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      IFSharpTypeDeclaration
+        FSharpIdentifierToken(type:IDENTIFIER, text:T1)
+        IPrimaryConstructorDeclaration
+          IParametersPatternDeclaration
+            IParenPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IInterfaceRepresentation
+          FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        ITypeMemberDeclarationList
+          IInterfaceImplementation
+            FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:T2)
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+            FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:I)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    ILetBindingsDeclaration
+      FSharpTokenType+LetTokenElement(type:LET, text:let)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      ITopBinding
+        ITopParametersOwnerPat
+          IExpressionReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:main)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IWildPat
+            FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IChameleonExpression
+          ISequentialExpr
+            IUnitExpr
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+            IUnitExpr
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

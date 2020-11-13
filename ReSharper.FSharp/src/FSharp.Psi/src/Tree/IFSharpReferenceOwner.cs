@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public interface IFSharpReferenceOwner : IFSharpTreeNode
   {
-    FSharpSymbolReference Reference { get; }
+    [NotNull] FSharpSymbolReference Reference { get; }
 
     [CanBeNull] IFSharpIdentifier FSharpIdentifier { get; }
 

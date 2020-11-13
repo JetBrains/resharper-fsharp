@@ -3,10 +3,10 @@ namespace global
 [<AutoOpen>]
 module FSharpGlobalUtil =
     type System.Object with
-        member x.As() =
+        member x.As<'T when 'T: not struct>() =
             match x with
             | :? 'T as t -> t
-            | _ -> null
+            | _ -> Unchecked.defaultof<_>
 
     /// Reference equality.
     let inline (==) a b = obj.ReferenceEquals(a, b)

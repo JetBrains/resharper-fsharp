@@ -6,7 +6,6 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
@@ -40,51 +39,44 @@ type FSharpIdentifierTooltipProvider
             LayoutTag.Field, FSharpHighlightingAttributeIds.Field
             LayoutTag.Interface, FSharpHighlightingAttributeIds.Interface
             LayoutTag.Keyword, FSharpHighlightingAttributeIds.Keyword
-            //LayoutTag.LineBreak
             LayoutTag.Local, FSharpHighlightingAttributeIds.Value
             LayoutTag.Record, FSharpHighlightingAttributeIds.Record
-            LayoutTag.RecordField, FSharpHighlightingAttributeIds.Property
+            LayoutTag.RecordField, FSharpHighlightingAttributeIds.Field
             LayoutTag.Method, FSharpHighlightingAttributeIds.Method
-            LayoutTag.Member, FSharpHighlightingAttributeIds.Value
+            LayoutTag.Member, FSharpHighlightingAttributeIds.Property
             LayoutTag.ModuleBinding, FSharpHighlightingAttributeIds.Value
             LayoutTag.Module, FSharpHighlightingAttributeIds.Module
             LayoutTag.Namespace, FSharpHighlightingAttributeIds.Namespace
-            LayoutTag.NumericLiteral, FSharpHighlightingAttributeIds.Literal
+            LayoutTag.NumericLiteral, FSharpHighlightingAttributeIds.Number
             LayoutTag.Operator, FSharpHighlightingAttributeIds.Operator
-            //LayoutTag.Parameter, FSharpHighlightingAttributeIds.Parameter
             LayoutTag.Parameter, FSharpHighlightingAttributeIds.Value
             LayoutTag.Property, FSharpHighlightingAttributeIds.Property
-            //LayoutTag.Space
             LayoutTag.StringLiteral, FSharpHighlightingAttributeIds.String
             LayoutTag.Struct, FSharpHighlightingAttributeIds.Struct
             LayoutTag.TypeParameter, FSharpHighlightingAttributeIds.TypeParameter
-            //LayoutTag.Text
-            //LayoutTag.Punctuation
-            // todo: what to use for these?
             LayoutTag.UnknownType, FSharpHighlightingAttributeIds.Class
-            LayoutTag.UnknownEntity, FSharpHighlightingAttributeIds.Class
+            LayoutTag.UnknownEntity, FSharpHighlightingAttributeIds.Value
         ]
         |> List.map (fun (tag, attributeId) -> tag, TextStyle attributeId)
         |> readOnlyDict
 
     let emptyPresentation = RichTextBlock()
 
-    let taggedTextToRichText layout =
-        let result = RichText()
+    let richTextR =
+        { new LayoutRenderer<RichText, RichText> with
+            member x.Start () = RichText()
+            member x.AddText result text =
+                let style =
+                    match layoutTagLookup.TryGetValue text.Tag with
+                    | true, style -> style
+                    | false, _ -> TextStyle.Default
 
-        layout
-        |> renderL (taggedTextListR (fun text ->
-            let style =
-                match layoutTagLookup.TryGetValue text.Tag with
-                | true, style -> style
-                | false, _ -> TextStyle.Default
-
-            // todo: replace spaces at the start of a line with \xA0 (non-breaking space)
-            result.Append(text.Text, style) |> ignore
-        ))
-        |> ignore
-
-        result
+                result.Append(text.Text, style)
+            member x.AddBreak result n =
+                // RIDER-51304: Replace spaces at the start of a line with \xA0 (non-breaking space)
+                result.Append("\n" + String('\xA0', n), TextStyle.Default)
+            member x.AddTag result (_, _, _) = result
+            member x.Finish result = result }
 
     let richTextJoin (sep : string) (parts : RichText seq) =
         let sep = RichText(sep, TextStyle.Default)
@@ -95,7 +87,7 @@ type FSharpIdentifierTooltipProvider
 
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
-    static member GetFSharpToolTipText(userOpName: string, checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
+    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
         // todo: fix getting qualifiers
         let tokenNames = [token.Name]
 
@@ -104,11 +96,8 @@ type FSharpIdentifierTooltipProvider
         let lineText = sourceFile.Document.GetLineText(coords.Line)
         use cookie = CompilationContextCookie.GetOrCreate(sourceFile.GetPsiModule().GetContextFromModule())
 
-        use op = token.CheckerService.FcsReactorMonitor.MonitorOperation userOpName
-
         // todo: provide tooltip for #r strings in fsx, should pass String tag
-        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier, op.OperationName)
-        getTooltip.RunAsTask()
+        checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier)
 
     override x.GetRichTooltip(highlighter) =
         if not highlighter.IsValid then emptyPresentation else
@@ -135,7 +124,7 @@ type FSharpIdentifierTooltipProvider
         | None -> emptyPresentation
         | Some results ->
 
-        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(opName, results.CheckResults, token)
+        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(results.CheckResults, token)
 
         layouts
         |> List.collect (function
@@ -146,10 +135,10 @@ type FSharpIdentifierTooltipProvider
                 overloads
                 |> List.map (fun overload ->
                     [ if not (isEmptyL overload.MainDescription) then
-                          yield taggedTextToRichText overload.MainDescription
+                          yield overload.MainDescription |> renderL richTextR
 
                       if not overload.TypeMapping.IsEmpty then
-                          yield overload.TypeMapping |> List.map taggedTextToRichText |> richTextJoin "\n"
+                          yield overload.TypeMapping |> List.map (renderL richTextR) |> richTextJoin "\n"
 
                       match xmlDocService.GetXmlDoc(overload.XmlDoc) with
                       | null -> ()
@@ -158,7 +147,7 @@ type FSharpIdentifierTooltipProvider
 
                       match overload.Remarks with
                       | Some remarks when not (isEmptyL remarks) ->
-                          yield taggedTextToRichText remarks
+                          yield remarks |> renderL richTextR
                       | _ -> () ]
                     |> richTextJoin "\n\n"))
         |> richTextJoin RiderTooltipSeparator

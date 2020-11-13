@@ -2,11 +2,12 @@
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages("FSharp.Core")>]
+[<TestPackages(FSharpCorePackage)>]
 type SpecifyTypesActionTest() =
     inherit FSharpContextActionExecuteTestBase<FunctionAnnotationAction>()
 
@@ -46,16 +47,13 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Value 03 - Function, tuple``() = x.DoNamedTest()
 
 
-[<TestPackages("FSharp.Core")>]
+[<TestPackages(FSharpCorePackage)>]
 type SpecifyTypesActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<FunctionAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes"
 
-    [<Test>] member x.``Module - Name 01``() = x.DoNamedTest()
-    [<Test>] member x.``Module - Name 02 - Attributes``() = x.DoNamedTest()
-
-    [<Test>] member x.``Not available 01``() = x.DoNamedTest()
-    [<Test>] member x.``Not available 02 - Annotated``() = x.DoNamedTest()
+    [<Test>] member x.``Let bindings - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let bindings - Module 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Class - member - 01``() = x.DoNamedTest()

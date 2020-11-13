@@ -11,8 +11,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.Util;
-using Microsoft.FSharp.Control;
-using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
 {
@@ -50,13 +48,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
       var names = paramInfoLocations.LongId;
       var lidEnd = paramInfoLocations.LongIdEndLocation;
 
-      using var op = fsFile.CheckerService.FcsReactorMonitor.MonitorOperation(OpName);
-      var getMethodsAsync =
-        checkResults.GetMethods(lidEnd.Line, lidEnd.Column, string.Empty, OptionModule.OfObj(names), FSharpOption<string>.Some(op.OperationName));
+      var overloads = checkResults.GetMethods(lidEnd.Line, lidEnd.Column, string.Empty, names);
 
       // do not show when no overloads are found or got an operator info
       // github.com/Microsoft/visualfsharp/blob/Visual-Studio-2017/vsintegration/src/FSharp.LanguageService/Intellisense.fs#L274
-      var overloads = FSharpAsync.RunSynchronously(getMethodsAsync, FSharpOption<int>.Some(2000), null);
       if (overloads.Methods.IsEmpty() || overloads.MethodName.EndsWith("> )"))
         return null;
 

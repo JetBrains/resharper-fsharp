@@ -51,7 +51,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (GetAttributeFirstArgValue(attrOwner, SourceNameAttrTypeName) is string sourceName)
           names.Add(sourceName);
 
-        if (GetAttributeFirstArgValue(attrOwner, CompilationMappingAttrTypeName) is var flagValue && flagValue != null)
+        if (GetAttributeFirstArgValue(attrOwner, CompilationMappingAttrTypeName) is { } flagValue)
         {
           if ((SourceConstructFlags) flagValue == SourceConstructFlags.UnionCase && element is IMethod &&
               name.StartsWith("New", StringComparison.Ordinal))

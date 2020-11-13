@@ -1,0 +1,12 @@
+﻿Provided elements:
+ 0: ToString():System.String
+ 1: Equals(System.Object):System.Boolean
+ 2: GetHashCode():System.Int32
+ 3: Finalize():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:ToString():System.String}
+
+type T() ={caret}
+    member x.P = 1
+    override this.ToString() = failwith "todo"

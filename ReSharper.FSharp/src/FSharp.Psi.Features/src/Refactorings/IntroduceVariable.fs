@@ -458,7 +458,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
     static member CanIntroduceVar(expr: IFSharpExpression) =
-        if not (isValid expr) then false else
+        if not (isValid expr) || expr.IsFSharpSigFile() then false else
 
         let rec isValidExpr (expr: IFSharpExpression) =
             if FSharpMethodInvocationUtil.isNamedArgReference expr then false else

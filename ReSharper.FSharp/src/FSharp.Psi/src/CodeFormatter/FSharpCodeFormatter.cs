@@ -102,7 +102,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     }
 
     public override void FormatDeletedNodes(ITreeNode parent, ITreeNode prevNode, ITreeNode nextNode) =>
-      FormatterImplHelper.FormatDeletedNodesHelper(this, parent, prevNode, nextNode, parent is ImplicitConstructorDeclaration);
+      FormatterImplHelper.FormatDeletedNodesHelper(this, parent, prevNode, nextNode, parent is PrimaryConstructorDeclaration);
 
     public override string OverridenSettingPrefix => "// @formatter:";
 

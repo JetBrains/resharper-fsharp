@@ -81,7 +81,7 @@ type FsiOptions =
       [<SettingsEntry(null, fsiPathText); DefaultValue>]
       mutable FsiPath: string
 
-      [<SettingsEntry(false, FsiOptions.specifyLanguageVersion); DefaultValue>]
+      [<SettingsEntry(false, specifyLanguageVersion); DefaultValue>]
       mutable SpecifyLanguageVersion: bool
 
       [<SettingsEntry(FSharpLanguageVersion.Default, FSharpScriptOptions.languageVersion); DefaultValue>]
@@ -92,28 +92,29 @@ type FsiOptions =
 
 
 [<SolutionInstanceComponent>]
-type FsiOptionsProvider(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive) =
-    new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore) =
+type FsiOptionsProvider(lifetime, settings, settingsSchema) =
+    inherit FSharpSettingsProviderBase<FsiOptions>(lifetime, settings, settingsSchema)
+
+    new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore, settingsSchema) =
         let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
-        FsiOptionsProvider(lifetime, settings)
+        FsiOptionsProvider(lifetime, settings, settingsSchema)
 
-    member val AutoDetect                = settings.GetValueProperty(lifetime, fun s -> s.AutoDetect)
-    member val IsCustomTool              = settings.GetValueProperty(lifetime, fun s -> s.IsCustomTool)
-    member val UseAnyCpu                 = settings.GetValueProperty(lifetime, fun s -> s.UseAnyCpu)
-    member val ShadowCopyReferences      = settings.GetValueProperty(lifetime, fun s -> s.ShadowCopyReferences)
-    member val FsiArgs                   = settings.GetValueProperty(lifetime, fun s -> s.FsiArgs)
-    member val FsiInternalArgs           = settings.GetValueProperty(lifetime, fun s -> s.FsiInternalArgs)
-    member val MoveCaretOnSendLine       = settings.GetValueProperty(lifetime, fun s -> s.MoveCaretOnSendLine)
-    member val MoveCaretOnSendSelection  = settings.GetValueProperty(lifetime, fun s -> s.MoveCaretOnSendSelection)
-    member val ExecuteRecent             = settings.GetValueProperty(lifetime, fun s -> s.ExecuteRecent)
-    member val FixOptionsForDebug        = settings.GetValueProperty(lifetime, fun s -> s.FixOptionsForDebug)
-    member val FsiPath                   = settings.GetValueProperty(lifetime, fun s -> s.FsiPath)
-
-    member val LanguageVersion           = settings.GetValueProperty(lifetime, fun s -> s.LanguageVersion)
-    member val SpecifyLanguageVersion    = settings.GetValueProperty(lifetime, fun s -> s.SpecifyLanguageVersion)
+    member val AutoDetect               = base.GetValueProperty<bool>("AutoDetect")
+    member val IsCustomTool             = base.GetValueProperty<bool>("IsCustomTool")
+    member val UseAnyCpu                = base.GetValueProperty<bool>("UseAnyCpu")
+    member val ShadowCopyReferences     = base.GetValueProperty<bool>("ShadowCopyReferences")
+    member val FsiArgs                  = base.GetValueProperty<string>("FsiArgs")
+    member val FsiInternalArgs          = base.GetValueProperty<string>("FsiInternalArgs")
+    member val MoveCaretOnSendLine      = base.GetValueProperty<bool>("MoveCaretOnSendLine")
+    member val MoveCaretOnSendSelection = base.GetValueProperty<bool>("MoveCaretOnSendSelection")
+    member val ExecuteRecent            = base.GetValueProperty<bool>("ExecuteRecent")
+    member val FixOptionsForDebug       = base.GetValueProperty<bool>("FixOptionsForDebug")
+    member val FsiPath                  = base.GetValueProperty<string>("FsiPath")
+    member val LanguageVersion          = base.GetValueProperty<FSharpLanguageVersion>("LanguageVersion")
+    member val SpecifyLanguageVersion   = base.GetValueProperty<bool>("SpecifyLanguageVersion")
 
     member val UseLanguageVersionFromScriptOptions =
-        settings.GetValueProperty(lifetime, fun s -> s.UseLanguageVersionFromScriptOptions)
+        base.GetValueProperty<bool>("UseLanguageVersionFromScriptOptions")
 
     member x.FsiPathAsPath =
         FileSystemPath.TryParse(x.FsiPath.Value)

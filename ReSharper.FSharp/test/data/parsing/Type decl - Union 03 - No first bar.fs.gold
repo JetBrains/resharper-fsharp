@@ -4,17 +4,17 @@ IFSharpImplFile
     ITypeDeclarationGroup
       FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      IUnionDeclaration
+      IFSharpTypeDeclaration
         FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IUnionRepresentation
           IUnionCaseList
-            ISingletonCaseDeclaration
+            IUnionCaseDeclaration
               FSharpIdentifierToken(type:IDENTIFIER, text:A)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ISingletonCaseDeclaration
+            IUnionCaseDeclaration
               FSharpTokenType+BarTokenElement(type:BAR, text:|)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpIdentifierToken(type:IDENTIFIER, text:B)

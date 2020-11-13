@@ -1,0 +1,9 @@
+﻿Provided elements:
+ 0: Equals(System.Object):System.Boolean
+ 1: GetHashCode():System.Int32
+ 2: Finalize():System.Void
+
+// ${KIND:Overrides}
+
+type T() ={caret}
+    override x.ToString() = ""

@@ -31,33 +31,29 @@ type InheritedMembersStageProcess(fsFile, daemonProcess) =
     let searchDomain = SearchDomainFactory.Instance.CreateSearchDomain(daemonProcess.Solution, false)
 
     let processDeclaration (result: IList<_>) (typeMemberDeclaration: ITypeMemberDeclaration) =
-        match typeMemberDeclaration.As<IFSharpDeclaration>() with
+        match typeMemberDeclaration.As<IFSharpTypeDeclaration>() with
         | null -> ()
-        | fsDeclaration ->
+        | typeDecl ->
 
-        match fsDeclaration with
-        | :? IUnionDeclaration ->
-            // Don't add inherited icon for unions with cases compiled as nested inherited types.
-            ()
+        // Don't add inherited icon for unions with cases compiled as nested inherited types.
+        if typeDecl.TypeRepresentation :? IUnionRepresentation then () else
 
-        | :? ITypeDeclaration as typeDecl when isNotNull typeDecl.DeclaredElement ->
-            // This is a workaround until we can resolve types without waiting for FCS to type check projects graph
-            // up to the possible inheritor point.
-            // Using this approach may add unwanted gutter icons in some cases.
+        // This is a workaround until we can resolve types without waiting for FCS to type check projects graph
+        // up to the possible inheritor point.
+        // Using this approach may add unwanted gutter icons in some cases.
+        if isNull typeDecl.DeclaredElement then () else
 
-            let typeElement = typeDecl.DeclaredElement
-            if not (typeElement :? IClass || typeElement :? IInterface) then () else
+        let typeElement = typeDecl.DeclaredElement
+        if not (typeElement :? IClass || typeElement :? IInterface) then () else
 
-            let typeElement = typeElement.As<TypeElement>()
-            if isNotNull typeElement && typeElement.IsSealed then () else
+        let typeElement = typeElement.As<TypeElement>()
+        if isNotNull typeElement && typeElement.IsSealed then () else
 
-            let inheritors = symbolScope.GetPossibleInheritors(fsDeclaration.CompiledName)
-            if not (Seq.exists (searchDomain.HasIntersectionWith) inheritors) then () else
+        let inheritors = symbolScope.GetPossibleInheritors(typeDecl.CompiledName)
+        if not (Seq.exists (searchDomain.HasIntersectionWith) inheritors) then () else
 
-            let range = typeDecl.GetNameDocumentRange()
-            result.Add(HighlightingInfo(range, TypeIsInheritedMarkOnGutter(typeDecl, range)))
-
-        | _ -> ()
+        let range = typeDecl.GetNameDocumentRange()
+        result.Add(HighlightingInfo(range, TypeIsInheritedMarkOnGutter(typeDecl, range)))
 
     override x.Execute(committer) =
         let result = List()

@@ -6,26 +6,29 @@ IFSharpSigFile
     FSharpIdentifierToken(type:IDENTIFIER, text:Module)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
-    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-    IRecordDeclaration
-      FSharpIdentifierToken(type:IDENTIFIER, text:R)
+    ITypeDeclarationGroup
+      FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+      IFSharpTypeDeclaration
+        FSharpIdentifierToken(type:IDENTIFIER, text:R)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IRecordRepresentation
+          FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IRecordFieldDeclarationList
+            IRecordFieldDeclaration
+              FSharpTokenType+MutableTokenElement(type:MUTABLE, text:mutable)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpIdentifierToken(type:IDENTIFIER, text:Field)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-      Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-      FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      IRecordFieldDeclaration
-        FSharpTokenType+MutableTokenElement(type:MUTABLE, text:mutable)
-        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        FSharpIdentifierToken(type:IDENTIFIER, text:Field)
-        FSharpTokenType+ColonTokenElement(type:COLON, text::)
-        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        INamedType
-          ITypeReferenceName
-            FSharpIdentifierToken(type:IDENTIFIER, text:int)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

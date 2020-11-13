@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [CanBeNull]
     public static IDeclaredType MapBaseType([NotNull] this FSharpEntity entity, IList<ITypeParameter> typeParams,
       [NotNull] IPsiModule psiModule) =>
-      entity.BaseType?.Value is var baseType && baseType != null
+      entity.BaseType?.Value is { } baseType
         ? MapType(baseType, typeParams, psiModule) as IDeclaredType
         : TypeFactory.CreateUnknownType(psiModule);
 
@@ -128,7 +128,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (entity.IsArrayType)
       {
         var argType = GetSingleTypeArgument(type, typeParams, psiModule, isFromMethod);
-        return TypeFactory.CreateArrayType(argType, type.TypeDefinition.ArrayRank);
+        return TypeFactory.CreateArrayType(argType, type.TypeDefinition.ArrayRank, NullableAnnotation.Unknown);
       }
 
       // e.g. byref<int>, we need int
@@ -136,7 +136,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return MapType(type.GenericArguments[0], typeParams, psiModule, isFromMethod, isFromReturn);
 
       if (entity.IsProvidedAndErased)
-        return entity.BaseType is var baseType && baseType != null
+        return entity.BaseType is { } baseType
           ? MapType(baseType.Value, typeParams, psiModule, isFromMethod, isFromReturn)
           : TypeFactory.CreateUnknownType(psiModule);
 
@@ -150,7 +150,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           : TypeFactory.CreateUnknownType(psiModule);
       }
 
-      var declaredType = TypeFactory.CreateTypeByCLRName(clrName, psiModule);
+      var declaredType = clrName.CreateTypeByClrName(psiModule);
       var genericArgs = type.GenericArguments;
       if (genericArgs.IsEmpty())
         return declaredType;
@@ -243,5 +243,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         ? fsharpType.MapType(fsTreeNode)
         : TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
     }
+
+    [NotNull]
+    public static IDeclaredType CreateTypeByClrName([NotNull] this IClrTypeName clrTypeName,
+      [NotNull] IPsiModule psiModule) =>
+      TypeFactory.CreateTypeByCLRName(clrTypeName, NullableAnnotation.Unknown, psiModule);
   }
 }

@@ -1,8 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
+[<TestPackages(FSharpCorePackage)>]
 type InferredTypeCodeVisionProviderTest() =
     inherit FSharpHighlightingTestBase()
 

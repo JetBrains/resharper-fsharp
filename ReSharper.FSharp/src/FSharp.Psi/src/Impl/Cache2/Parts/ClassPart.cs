@@ -2,6 +2,7 @@
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
@@ -9,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal class ClassPart : FSharpTypeMembersOwnerTypePart, IFSharpClassPart
   {
-    public ClassPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+    public ClassPart([NotNull] IFSharpTypeOldDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
     {
     }
@@ -37,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public virtual IClass GetSuperClass()
     {
       if (BaseTypeClrTypeName != null)
-        return TypeFactory.CreateTypeByCLRName(BaseTypeClrTypeName, GetPsiModule()).GetTypeElement() as IClass;
+        return BaseTypeClrTypeName.CreateTypeByClrName(GetPsiModule()).GetTypeElement() as IClass;
 
       var typeElement = GetBaseClassType()?.GetTypeElement();
       if (typeElement == null)
