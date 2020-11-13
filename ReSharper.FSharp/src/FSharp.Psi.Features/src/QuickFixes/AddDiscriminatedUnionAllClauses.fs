@@ -26,7 +26,7 @@ type AddDiscriminatedUnionAllClauses(warning: MatchIncompleteWarning) =
                 match unionLiteral with
                 | Some literal ->
                     match literal.UnionCaseFields |> Seq.toList with
-                    | [] -> true
+                    | [] -> false
                     | caseFields ->
                         // If there are case fields, valid F# should have something in this pattern, unless
                         // there's a catchall parameter - deal with that...
@@ -46,24 +46,20 @@ type AddDiscriminatedUnionAllClauses(warning: MatchIncompleteWarning) =
         || restrictedForAnotherReason
         
     
-    let isCaseExhaustive (unionCase: FSharpUnionCase) (relevantMatchClauses: IMatchClause list) : bool =
+    let isCaseNonExhaustive (unionCase: FSharpUnionCase) (relevantMatchClauses: IMatchClause list) : bool =
         // TODO MC
-        let areAllWhenExpressions =
-            relevantMatchClauses
-            |> List.forall(fun clause -> clause.WhenExpression |> isNotNull)
-            // TODO MC use this one now: caseIsRestrictive
-        relevantMatchClauses |> List.isEmpty |> not
-        areAllWhenExpressions
+        relevantMatchClauses |> List.forall(fun clause -> caseIsRestrictive clause.Pattern unionCase.ReturnType)
     
     let nonExhaustiveUnionCases (unionCases : FSharpUnionCase seq) (allMatchClauses : IMatchClause seq) : FSharpUnionCase list =
         let allMatchClauses = allMatchClauses |> Seq.toList
         // TODO MC: Cover wild cases
+        // TODO MC: Unfold?
         unionCases
         |> Seq.map (fun case ->
             (case,
              allMatchClauses
              |> List.filter (fun clause -> case.DisplayName = (unionNameFromCase clause.Pattern).Value)))
-        |> Seq.filter (fun (case, clauses) -> isCaseExhaustive case clauses |> not)
+        |> Seq.filter (fun (case, clauses) -> isCaseNonExhaustive case clauses)
         |> Seq.map fst
         |> Seq.toList
     

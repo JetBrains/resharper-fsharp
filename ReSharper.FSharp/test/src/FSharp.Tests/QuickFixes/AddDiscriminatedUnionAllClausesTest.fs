@@ -14,7 +14,6 @@ type AddDiscriminatedUnionAllClausesAvailabilityTest() =
 
     [<Test>] member x.``Union literal availability``() = x.DoNamedTest()
     [<Test>] member x.``Non-union variable``() = x.DoNamedTest()
-    [<Test>] member x.``Partially complete union match``() = x.DoNamedTest()
 
 [<FSharpTest; TestPackages("FSharp.Core")>]
 type AddDiscriminatedUnionAllClausesTest() =
@@ -25,3 +24,5 @@ type AddDiscriminatedUnionAllClausesTest() =
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple in context 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple single existing case 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Partially complete union match``() = x.DoNamedTest()

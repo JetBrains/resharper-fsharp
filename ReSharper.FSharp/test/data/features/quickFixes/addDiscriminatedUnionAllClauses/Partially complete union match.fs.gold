@@ -6,9 +6,7 @@ type TestUnion =
 
 // Not available if the match statement is partially complete
 let unionCaseMatch = TestUnion.FieldlessCase
-match |unionCaseMatch|(0) with
+match unionCaseMatch{caret} with
+| CaseWithSingleField(_) -> failwith "todo"
+| CaseWithMultipleFields(_) -> failwith "todo"
 | FieldlessCase -> failwith ""
-------------------------------------------------
-0: Incomplete pattern matches on this expression. For example, the value 'CaseWithMultipleFields (_, _)' may indicate a case not covered by the pattern(s).
-QUICKFIXES:
-Add '_' pattern

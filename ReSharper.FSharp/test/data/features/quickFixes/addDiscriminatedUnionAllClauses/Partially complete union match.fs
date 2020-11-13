@@ -6,5 +6,5 @@ type TestUnion =
 
 // Not available if the match statement is partially complete
 let unionCaseMatch = TestUnion.FieldlessCase
-match unionCaseMatch with
+match unionCaseMatch{caret} with
 | FieldlessCase -> failwith ""
