@@ -1,8 +1,10 @@
 using System;
+using JetBrains.DataStructures;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 using JetBrains.Diagnostics;
 using JetBrains.Util;
+using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
 {
@@ -13,6 +15,36 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     public int BufferStart;
     public int BufferEnd;
     public int LexicalState;
+    public ImmutableStack<FSharpLexerInterpolatedStringState> InterpolatedStringPreviousStates;
+  }
+
+  public struct FSharpLexerContext
+  {
+    public int LexerState;
+    public int ParenLevel;
+    public int BrackLevel;
+    public int NestedCommentLevel;
+  }
+
+  public enum FSharpInterpolatedStringKind
+  {
+    Regular,
+    Verbatim,
+    TripleQuote
+  }
+
+  public enum InterpolatedStringStackItem
+  {
+    Paren,
+    Brace,
+    Bracket
+  }
+  
+  public struct FSharpLexerInterpolatedStringState
+  {
+    public FSharpInterpolatedStringKind Kind;
+    public FSharpLexerContext PreviousLexerContext;
+    public ImmutableArray<InterpolatedStringStackItem> InterpolatedStringStack;
   }
 
   partial class FSharpLexerGenerated : ILexer<FSharpLexerState>
@@ -25,6 +57,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     private int myParenLevel;
     private int myTokenLength;
     private int myBrackLevel;
+
+    private ImmutableStack<FSharpLexerInterpolatedStringState> myInterpolatedStringPreviousStates =
+      ImmutableStack<FSharpLexerInterpolatedStringState>.Empty;
 
     static FSharpLexerGenerated()
     {
@@ -39,7 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     {
       var yyState = yy_state_dtrans[yy_lexical_state];
       yy_buffer_start = yy_buffer_index;
-      if (YY_NOT_ACCEPT != yy_acpt[yyState]) 
+      if (YY_NOT_ACCEPT != yy_acpt[yyState])
         yy_buffer_end = yy_buffer_index;
     }
 
@@ -68,6 +103,48 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     }
 
     private int Level => myParenLevel + myBrackLevel;
+
+    private void StartInterpolatedString(FSharpInterpolatedStringKind kind)
+    {
+      var previousContext = new FSharpLexerContext
+      {
+        LexerState = yy_lexical_state,
+        ParenLevel = myParenLevel,
+        BrackLevel = myBrackLevel,
+        NestedCommentLevel = myNestedCommentLevel
+      };
+
+      var interpolatedStringState = new FSharpLexerInterpolatedStringState
+      {
+        Kind = kind,
+        PreviousLexerContext = previousContext
+      };
+      myInterpolatedStringPreviousStates = myInterpolatedStringPreviousStates.Push(interpolatedStringState);
+    }
+
+    private void FinishInterpolatedString()
+    {
+      Assertion.Assert(!myInterpolatedStringPreviousStates.IsEmpty, "!myInterpolatedStringPreviousStates.IsEmpty");
+
+      var interpolatedStringState = myInterpolatedStringPreviousStates.Peek();
+      var prevContext = interpolatedStringState.PreviousLexerContext;
+
+      yy_lexical_state = prevContext.LexerState;
+      myBrackLevel = prevContext.BrackLevel;
+      myParenLevel = prevContext.ParenLevel;
+      myNestedCommentLevel = prevContext.NestedCommentLevel;
+
+      myInterpolatedStringPreviousStates = myInterpolatedStringPreviousStates.Pop();
+    }
+
+    public static int ToState(FSharpLexerInterpolatedStringState interpolatedStringState) =>
+      interpolatedStringState.Kind switch
+      {
+        FSharpInterpolatedStringKind.Regular => ISR,
+        FSharpInterpolatedStringKind.Verbatim => ISV,
+        FSharpInterpolatedStringKind.TripleQuote => ISTQ,
+        _ => LINE // todo: check this
+      };
 
     private void InitBlockComment()
     {
@@ -242,6 +319,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         tokenPosition.BufferStart = yy_buffer_start;
         tokenPosition.BufferEnd = yy_buffer_end;
         tokenPosition.LexicalState = yy_lexical_state;
+        tokenPosition.InterpolatedStringPreviousStates = myInterpolatedStringPreviousStates;
         return tokenPosition;
       }
       set
@@ -295,7 +373,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       myCurrentTokenType ??= _locateToken();
 
     public uint LexerStateEx =>
-      FSharpLexerStateEncoding.EncodeLexerState(yy_lexical_state, myParenLevel);
+      !myInterpolatedStringPreviousStates.IsEmpty || myNestedCommentLevel > 0 || myBrackLevel > 0
+        ? LexerStateConstants.InvalidState
+        : FSharpLexerStateEncoding.EncodeLexerState(yy_lexical_state, myParenLevel);
   }
 
   /// <summary>

@@ -96,6 +96,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Tuple 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Const - Numbers 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - String 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const - Unit 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const - Unit 02 - Parens``() = x.DoNamedTest()
 
@@ -263,6 +264,13 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - LetOrUseBang 02 - Group``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Typeof 01 - Type parameter``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Interpolated string 01 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string 03 - Whitespace``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string 04 - Braces``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string 05 - Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string 06 - Multiple``() = x.DoNamedTest()
 
     [<Test>] member x.``Binding - Return type 01``() = x.DoNamedTest()
     [<Test>] member x.``Binding - Return type 02 - Attrs``() = x.DoNamedTest()

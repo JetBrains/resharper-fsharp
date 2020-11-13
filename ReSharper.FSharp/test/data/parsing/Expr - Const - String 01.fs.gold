@@ -1,0 +1,9 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDoStatement
+      IChameleonExpression
+        ILiteralExpr
+          FSharpString(type:STRING, text:"")
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

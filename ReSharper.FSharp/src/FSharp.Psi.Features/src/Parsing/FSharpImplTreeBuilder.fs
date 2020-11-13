@@ -1004,7 +1004,9 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushSequentialExpression(expr2)
             x.ProcessExpression(expr1)
 
-        | SynExpr.InterpolatedString _ -> x.MarkAndDone(range, ElementType.INTERPOLATED_STRING_EXPR)
+        | SynExpr.InterpolatedString(stringParts, _) ->
+            x.PushRange(range, ElementType.INTERPOLATED_STRING_EXPR)
+            x.PushStepList(stringParts, interpolatedStringProcessor)
 
     member x.ProcessAndLocalBinding(_, _, _, pat: SynPat, expr: SynExpr, _) =
         x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
@@ -1403,6 +1405,14 @@ type IndexerArgsProcessor() =
 
         | _ -> failwithf "Expecting dotIndexedGet/Set, got: %A" synExpr
 
+type InterpolatedStringProcessor() =
+    inherit StepListProcessorBase<SynInterpolatedStringPart>()
+
+    override x.Process(stringPart, builder) =
+        match stringPart with
+        | SynInterpolatedStringPart.String _ -> ()
+        | SynInterpolatedStringPart.FillExpr(expr, _) -> builder.ProcessExpression(expr)
+
 
 [<AutoOpen>]
 module BuilderStepProcessors =
@@ -1430,3 +1440,4 @@ module BuilderStepProcessors =
     let objectExpressionMemberListProcessor = ObjectExpressionMemberListProcessor()
     let interfaceImplementationListProcessor = InterfaceImplementationListProcessor()
     let indexerArgListProcessor = IndexerArgListProcessor()
+    let interpolatedStringProcessor = InterpolatedStringProcessor()

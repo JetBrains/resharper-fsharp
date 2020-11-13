@@ -18,6 +18,19 @@ type FSharpLexerTest() =
     [<Test>] member x.``Literals 03 - digits``() = x.DoNamedTest()
     [<Test>] member x.``Literals 04 - escape characters``() = x.DoNamedTest()
 
+    [<Test>] member x.``Strings - Interpolated - Braces - Escape 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Braces - Escape 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Braces - Escape 03``() = x.DoNamedTest()
+
+    [<Test>] member x.``Strings - Interpolated - Regular 01 - No interpolation``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Regular 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Triple quote 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Triple quote 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Verbatim 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Verbatim 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Strings - Triple quote 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Strings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Strings 02 - Triple quoted``() = x.DoNamedTest()
     [<Test>] member x.``Strings 03 - Verbatim``() = x.DoNamedTest()
@@ -54,7 +67,6 @@ type FSharpLexerTest() =
     [<Test>] member x.``Comment - String 04``() = x.DoNamedTest()
     [<Test>] member x.``Comment - String 05``() = x.DoNamedTest()
     [<Test>] member x.``Comment - String 06``() = x.DoNamedTest()
-    [<Test>] member x.``Comment - String 07``() = x.DoNamedTest()
 
     [<Test>] member x.``Comments 01 - End of line``() = x.DoNamedTest()
     [<Test>] member x.``Comments 02 - Multiple end of line``() = x.DoNamedTest()
