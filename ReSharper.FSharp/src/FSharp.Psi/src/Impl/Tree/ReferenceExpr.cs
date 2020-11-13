@@ -58,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public string QualifiedName =>
 //      todo: ignore parens for this and qualifier
-      Qualifier is IReferenceExpr qualifier && qualifier.QualifiedName is var qualifierName && qualifierName != null
+      Qualifier is IReferenceExpr qualifier && qualifier.QualifiedName is { } qualifierName
         ? qualifierName + "." + ShortName
         : ShortName;
 

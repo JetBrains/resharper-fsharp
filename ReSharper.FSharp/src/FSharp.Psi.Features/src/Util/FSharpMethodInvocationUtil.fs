@@ -30,13 +30,13 @@ let tryGetNamedArg (expr: IFSharpExpression) =
     | null -> null
     | refExpr -> refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
 
+let getArgsOwner (expr: IFSharpExpression) =
+    let tupleExpr = TupleExprNavigator.GetByExpression(expr.IgnoreParentParens())
+    let exprContext = if isNull tupleExpr then expr else tupleExpr :> _
+    FSharpArgumentOwnerNavigator.GetByArgumentExpression(exprContext.IgnoreParentParens())
 
 let getMatchingParameter (expr: IFSharpExpression) =
-    let argsOwner =
-        let tupleExpr = TupleExprNavigator.GetByExpression(expr.IgnoreParentParens())
-        let exprContext = if isNull tupleExpr then expr else tupleExpr :> _
-        FSharpArgumentOwnerNavigator.GetByArgumentExpression(exprContext.IgnoreParentParens())
-
+    let argsOwner = getArgsOwner(expr)
     if isNull argsOwner then null else
 
     let namedArgRefExpr = tryGetNamedArgRefExpr expr
@@ -51,15 +51,8 @@ let getMatchingParameter (expr: IFSharpExpression) =
     let symbolReference = argsOwner.Reference
     if isNull symbolReference then null else
 
-    let mfv =
-        symbolReference.TryGetFSharpSymbol()
-        |> Option.bind (function
-            | :? FSharpMemberOrFunctionOrValue as mfv -> Some mfv
-            | _ -> None)
-
-    match mfv with
-    | None -> null
-    | Some mfv ->
+    let mfv = symbolReference.GetFSharpSymbol().As<FSharpMemberOrFunctionOrValue>()
+    if isNull mfv then null else
 
     let paramOwner = symbolReference.Resolve().DeclaredElement.As<IParametersOwner>()
     if isNull paramOwner then null else

@@ -1,7 +1,7 @@
-﻿Suggested names: foo
+﻿Suggested names: int32s, l
 module Module
 
 let f a b = ()
 do
-    let foo = [1]
-    f foo id
+    let int32s = [1]
+    f int32s id

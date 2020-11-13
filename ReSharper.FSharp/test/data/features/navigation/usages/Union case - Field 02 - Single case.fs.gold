@@ -1,0 +1,74 @@
+-------------- offset 42 line 4 col 13 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [O] U u = U.NewA(|a|: 123); RANGE: (65,66) @ Union case - Field 02 - Single case.cs
+Menu Item presentation: 
+Text: Class1.Class1      |U u = U.NewA(|a|: 123);| (5)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: U u = U.NewA(a: 123);
+
+Occurrence's navigation result. Opened file: Union case - Field 02 - Single case.cs
+------------------
+  public Class1()
+  {
+    U u = U.NewA(|CARET|a: 123);
+    var a = u.a;
+  }
+------------------
+
+Occurrence's dump:
+TO: [R] var a = u.|a|; RANGE: (89,90) @ Union case - Field 02 - Single case.cs
+Menu Item presentation: 
+Text: Class1.Class1      |var a = u.|a|;| (6)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: var a = u.a;
+
+Occurrence's navigation result. Opened file: Union case - Field 02 - Single case.cs
+------------------
+  {
+    U u = U.NewA(a: 123);
+    var a = u.|CARET|a;
+  }
+}
+------------------
+
+Occurrence's dump:
+TO: [R] | A (|a| = 123) -> () RANGE: (104,105) @ Union case - Field 02 - Single case.fs
+Menu Item presentation: 
+Text: Module      || A (|a| = 123) -> ()| (8)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: | A (a = 123) -> ()
+
+Occurrence's navigation result. Opened file: Union case - Field 02 - Single case.fs
+------------------
+module Module =
+    match A(a = 123) with
+    | A (|CARET|a = 123) -> ()
+
+------------------
+
+Occurrence's dump:
+TO: [R] match A(|a| = 123) with RANGE: (80,81) @ Union case - Field 02 - Single case.fs
+Menu Item presentation: 
+Text: Module      |match A(|a| = 123) with| (7)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: match A(a = 123) with
+
+Occurrence's navigation result. Opened file: Union case - Field 02 - Single case.fs
+------------------
+
+module Module =
+    match A(|CARET|a = 123) with
+    | A (a = 123) -> ()
+
+------------------
+

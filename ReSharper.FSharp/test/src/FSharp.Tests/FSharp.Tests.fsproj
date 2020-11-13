@@ -23,7 +23,7 @@
     <Compile Include="Service\FSharpAssemblyAutoOpenTest.fs" />
     <Compile Include="Service\ArgumentsOwnerTest.fs" />
     <Compile Include="Cache\CSharpResolveTest.fs" />
-    <Compile Include="Cache\SymbolCacheTest.fs" />
+    <Compile Include="Cache\FSharpSymbolCacheTest.fs" />
     <Compile Include="Parsing\FSharpLexerTest.fs" />
     <Compile Include="Parsing\FSharpParserTest.fs" />
     <Compile Include="Daemon\FSharpHighlightingTestBase.fs" />
@@ -87,7 +87,10 @@
     <Compile Include="QuickFixes\SimplifyListConsPatTest.fs" />
     <Compile Include="QuickFixes\SimplifyLambdaTest.fs" />
     <Compile Include="QuickFixes\ReplaceLambdaWithInnerExpressionTest.fs" />
-    <Compile Include="QuickFixes\ReplaceExpressionWithIdTest.fs" />
+    <Compile Include="QuickFixes\ReplaceLambdaWithBuiltinFunctionTest.fs" />
+    <Compile Include="QuickFixes\ReplaceLambdaBodyWithIdTest.fs" />
+    <Compile Include="QuickFixes\GenerateInterfaceMembersFixTest.fs" />
+    <Compile Include="QuickFixes\RemoveRedundantAttributeTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
@@ -101,9 +104,11 @@
     <Compile Include="Intentions\SpecifyTypesTest.fs" />
     <Compile Include="Intentions\ToLiteralTest.fs" />
     <Compile Include="Intentions\LetToUseTest.fs" />
+    <Compile Include="Intentions\RenameFileToMatchTypeNameTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />
+    <Compile Include="Generate\FSharpGenerateOverridesTest.fs" />
     <Compile Include="Refactorings\RenameTest.fs" />
     <Compile Include="Refactorings\IntroduceVarTest.fs" />
     <Compile Include="Refactorings\InlineVarTest.fs" />
@@ -116,9 +121,10 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
     <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="NUnit.Console" Version="3.10.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
   </ItemGroup>
 
   <ItemGroup>

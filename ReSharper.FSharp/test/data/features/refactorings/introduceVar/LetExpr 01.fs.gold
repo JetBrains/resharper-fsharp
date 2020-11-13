@@ -1,5 +1,5 @@
-﻿Suggested names: unit
+﻿Suggested names: i
 do
-  let unit = 
+  let i = 
     let x = 1 + 1
-    ()
+    x + 1

@@ -9,8 +9,12 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
+  public interface IUnionCaseField : IProperty
+  {
+  }
+
   /// Union case or exception field compiled to a property.
-  internal class FSharpUnionCaseField<T> : FSharpFieldProperty<T>
+  internal class FSharpUnionCaseField<T> : FSharpFieldProperty<T>, IUnionCaseField
     where T : IFSharpDeclaration, IModifiersOwnerDeclaration, ICaseFieldDeclaration, ITypeMemberDeclaration
   {
     internal FSharpUnionCaseField([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
@@ -19,6 +23,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool IsVisibleFromFSharp => false;
     public override bool CanNavigateTo => true;
+
+    protected override ITypeElement GetTypeElement(IDeclaration declaration)
+    {
+      var unionCaseDecl = declaration.GetContainingNode<ITypeDeclaration>();
+      return unionCaseDecl?.DeclaredElement ?? unionCaseDecl?.GetContainingNode<ITypeDeclaration>()?.DeclaredElement;
+    }
+
+    public override IParameter GetGeneratedParameter()
+    {
+      var decl = GetDeclaration();
+      if (decl == null)
+        return null;
+
+      var caseWithFields = decl.GetContainingNode<IDeclaration>()?.DeclaredElement as IUnionCase;
+      var constructor = caseWithFields?.GetConstructor();
+      return constructor != null
+        ? new FSharpGeneratedParameter(constructor, this)
+        : null;
+    }
   }
 
   /// Record field compiled to a property.
@@ -63,7 +86,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override AccessRights GetAccessRights() =>
       GetContainingType().GetRepresentationAccessRights();
 
-    public IParameter GetGeneratedParameter() =>
+    public virtual IParameter GetGeneratedParameter() =>
       new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this);
   }
 

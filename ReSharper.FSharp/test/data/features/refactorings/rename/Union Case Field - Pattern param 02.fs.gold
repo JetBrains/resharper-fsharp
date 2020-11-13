@@ -1,7 +1,4 @@
-﻿CONFLICTS FOUND:
-Warning Module.U.C.zzz will hide Module.U.C.zzz
-==========
-module Module
+﻿module Module
 
 type U =
     | C of f: int * zzz: int

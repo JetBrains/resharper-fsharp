@@ -4,7 +4,6 @@ open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.PrettyNaming
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
 type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
@@ -25,7 +24,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
     member x.ProcessModuleMemberSignature(moduleMember) =
         match moduleMember with
         | SynModuleSigDecl.NestedModule(ComponentInfo(attrs, _, _, lid, _, _, _, _), _, sigs, range) ->
-            let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
+            let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, List.tryHead lid, range)
             for s in sigs do x.ProcessModuleMemberSignature s
             x.Done(range, mark, ElementType.NESTED_MODULE_DECLARATION)
 
@@ -33,7 +32,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             let mark = x.Mark(typeSigGroupStartPos typeSigs range)
             match typeSigs with
             | [] -> ()
-            | TypeDefnSig(ComponentInfo(attrs, _, _, _, _, _, _, _), _, _, _) :: _ ->
+            | TypeDefnSig(ComponentInfo(attributes = attrs), _, _, _) :: _ ->
                 x.ProcessOuterAttrs(attrs, range)
 
             for typeSig in typeSigs do
@@ -42,7 +41,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
         | SynModuleSigDecl.Exception(SynExceptionSig(exn, members, range), _) ->
             let mark = x.StartException(exn)
-            for m in members do x.ProcessTypeMemberSignature(m)
+            x.ProcessTypeMemberList(members, ElementType.MEMBER_DECLARATION_LIST)
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
 
         | SynModuleSigDecl.ModuleAbbrev(IdentRange range, lid, _) ->
@@ -50,7 +49,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             x.MarkAndDone(range, ElementType.MODULE_ABBREVIATION_DECLARATION)
 
         | SynModuleSigDecl.Val(ValSpfn(attrs, id, _, synType, arity, _, _, _, _, exprOption, _), range) ->
-            let valMark = x.MarkAttributesOrIdOrRange(attrs, Some id, range)
+            let valMark = x.MarkAndProcessAttributesOrIdOrRange(attrs, Some id, range)
 
             let patMark = x.Mark(id.idRange)
             let referenceNameMark = x.Mark()
@@ -80,45 +79,49 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
             x.Done(valMark, ElementType.BINDING_SIGNATURE)
 
-        | SynModuleSigDecl.Open(lid, range) ->
-            let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
-            x.ProcessNamedTypeReference(lid)
-            x.Done(range, mark, ElementType.OPEN_STATEMENT)
+        | SynModuleSigDecl.Open(openDeclTarget, range) ->
+            x.ProcessOpenDeclTarget(openDeclTarget, range)
 
         | SynModuleSigDecl.HashDirective(hashDirective, _) ->
             x.ProcessHashDirective(hashDirective)
 
         | _ -> ()
 
-    member x.ProcessTypeSignature(TypeDefnSig(ComponentInfo(attrs, typeParams, constraints, lid, _, _, _, _), typeSig, memberSigs, range)) =
+    member x.ProcessTypeSignature(TypeDefnSig(info, repr, memberSigs, range)) =
+        let (ComponentInfo(attrs, typeParams, constraints, lid, _, _, _, _)) = info
+
         let mark = x.StartType attrs typeParams constraints lid range
-        let elementType =
-            match typeSig with
-            | SynTypeDefnSigRepr.Simple(simpleRepr, _) ->
-                x.ProcessSimpleTypeRepresentation(simpleRepr)
+        match repr with
+        | SynTypeDefnSigRepr.Simple(simpleRepr, _) ->
+            x.ProcessSimpleTypeRepresentation(simpleRepr)
 
-            | SynTypeDefnSigRepr.Exception _ ->
-                ElementType.EXCEPTION_DECLARATION
+        | SynTypeDefnSigRepr.ObjectModel(kind, members, _) ->
+            if x.AddObjectModelTypeReprNode(kind) then
+                let mark = x.Mark(range)
+                x.ProcessTypeMemberList(members, ElementType.TYPE_MEMBER_DECLARATION_LIST)
+                let elementType = x.GetObjectModelTypeReprElementType(kind)
+                x.Done(range, mark, elementType)
+            else
+                x.ProcessTypeMemberList(members, ElementType.TYPE_MEMBER_DECLARATION_LIST)
 
-            | SynTypeDefnSigRepr.ObjectModel(kind, members, _) ->
-                for memberSig in members do
-                    x.ProcessTypeMemberSignature(memberSig)
+        | _ -> failwithf "Unexpected simple type representation: %A" repr
 
-                match kind with
-                | TyconClass -> ElementType.CLASS_DECLARATION
-                | TyconInterface -> ElementType.INTERFACE_DECLARATION
-                | TyconStruct -> ElementType.STRUCT_DECLARATION
-                | TyconAugmentation -> ElementType.TYPE_EXTENSION_DECLARATION
-                | _ -> ElementType.OBJECT_TYPE_DECLARATION
+        x.ProcessTypeMemberList(memberSigs, ElementType.TYPE_MEMBER_DECLARATION_LIST)
+        x.Done(range, mark, ElementType.F_SHARP_TYPE_DECLARATION)
 
-        for memberSig in memberSigs do
-            x.ProcessTypeMemberSignature(memberSig)
-        x.Done(range, mark, elementType)
+    member x.ProcessTypeMemberList(members: SynMemberSig list, elementType) =
+        match members with
+        | m :: _ ->
+            let mark = x.MarkAttributesOrIdOrRangeStart(m.OuterAttributes, None, m.Range)
+            for m in members do
+                x.ProcessTypeMemberSignature(m)
+            x.Done(mark, elementType)
+        | _ -> ()
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
         | SynMemberSig.Member(ValSpfn(attrs, id, _, synType, _, _, _, _, _, _, _), flags, range) ->
-            let mark = x.MarkAttributesOrIdOrRange(attrs, Some id, range)
+            let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, Some id, range)
             x.ProcessType(synType)
             let elementType =
                 if flags.IsDispatchSlot then
@@ -131,7 +134,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
         | SynMemberSig.ValField(Field(attrs, _, id, synType, _, _, _, _), range) ->
             if id.IsSome then
-                let mark = x.MarkAttributesOrIdOrRange(attrs, id, range)
+                let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, id, range)
                 x.ProcessType(synType)
                 x.Done(mark,ElementType.VAL_FIELD_DECLARATION)
 

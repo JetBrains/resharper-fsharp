@@ -49,6 +49,7 @@ type RemoveUnusedLocalBindingTest() =
 
     [<Test; NotAvailable>] member x.``Not available 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 02 - Param``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available 03 - As``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

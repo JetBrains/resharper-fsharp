@@ -15,8 +15,10 @@ open JetBrains.Util
 
 [<AutoOpen>]
 module FSharpErrors =
-    // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
-    // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt
+    // Error numbers as reported by FCS:
+    // * Exception types: fsharp/CompilerDiagnostics.fs#L217
+    // * Generated from text: fsharp/FSComp.txt
+
     let [<Literal>] TypeEquation = 1
     let [<Literal>] NotAFunction = 3
     let [<Literal>] FieldNotMutable = 5
@@ -33,6 +35,7 @@ module FSharpErrors =
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
     let [<Literal>] NoImplementationGiven = 365
+    let [<Literal>] NoImplementationGivenWithSuggestion = 366
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
     let [<Literal>] LetAndForNonRecBindings = 576
     let [<Literal>] FieldRequiresAssignment = 764
@@ -50,7 +53,7 @@ module FSharpErrors =
 
     let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
-    let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is string -> unit."
+    let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
 
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
@@ -166,11 +169,20 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | UseBindingsIllegalInModules ->
             createHighlightingFromNode UseBindingsIllegalInModulesWarning range
 
-        | NoImplementationGiven ->
-            let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            match expr.Parent with
-            | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == expr ->
-                NoImplementationGivenError(typeDecl, error.Message) :> _
+        | NoImplementationGiven
+        | NoImplementationGivenWithSuggestion ->
+            let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+            match node.Parent with
+            | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == node ->
+                NoImplementationGivenTypeError(typeDecl, error.Message) :> _
+
+            | :? IInterfaceImplementation as impl when impl.TypeName == node ->
+                NoImplementationGivenInterfaceError(impl, error.Message) :> _
+
+            | :? ITypeReferenceName as typeName when
+                    isNotNull (InterfaceImplementationNavigator.GetByTypeName(typeName)) ->
+                let impl = InterfaceImplementationNavigator.GetByTypeName(typeName)
+                NoImplementationGivenInterfaceError(impl, error.Message) :> _
 
             | _ -> createGenericHighlighting error range
 

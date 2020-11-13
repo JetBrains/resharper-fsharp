@@ -120,7 +120,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         consumer.AddHighlighting(FSharpInferredTypeHighlighting(range, text, provider))
 
     override x.Execute(committer) =
-        let consumer = new FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
+        let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
         fsFile.ProcessThisAndDescendants(Processor(x, consumer))
         committer.Invoke(DaemonStageResult(consumer.Highlightings))
 
@@ -132,11 +132,9 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         | :? ITopReferencePat
         | :? ITopParametersOwnerPat
         | :? ITopAsPat ->
-            match box ((headPattern :?> IFSharpDeclaration).GetFSharpSymbolUse()) with
-            | null -> ()
-            | symbolUse ->
+            let symbolUse = (headPattern :?> IFSharpDeclaration).GetFSharpSymbolUse()
+            if isNull symbolUse then () else
 
-            let symbolUse = (symbolUse :?> FSharpSymbolUse)
             match symbolUse.Symbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
                 let text = formatMfv symbolUse mfv
@@ -151,11 +149,9 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
     override x.VisitMemberDeclaration(decl, consumer) =
         if isNotNull (ObjExprNavigator.GetByMember(decl)) then () else
 
-        match box (decl.GetFSharpSymbolUse()) with
-        | null -> ()
-        | symbolUse ->
+        let symbolUse = decl.GetFSharpSymbolUse()
+        if isNull symbolUse then () else
 
-        let symbolUse = symbolUse :?> FSharpSymbolUse
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as mfv ->
             let text = formatMfv symbolUse mfv

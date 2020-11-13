@@ -1,0 +1,7 @@
+Project Files:Union - Struct - Single case 01 - Empty.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:Module->Class:Module
+  StructTypeAbbreviationOrDeclarationPart:U->Struct:Module+U
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [U]: Struct:Module+U[TestProject]

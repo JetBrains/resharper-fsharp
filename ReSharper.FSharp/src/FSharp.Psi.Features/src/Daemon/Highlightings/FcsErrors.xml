@@ -77,9 +77,9 @@
     </Message>
     <Range>pat.GetNavigationRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
     <QuickFix>AddUnderscorePrefixFix</QuickFix>
-    <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
     <QuickFix>RemoveUnusedNamedAsPatFix</QuickFix>
   </Warning>
 
@@ -211,7 +211,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="SuccessiveArgsShouldBeSpacedOrTupled">
-    <Parameter type="IPrefixAppExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Range>expr.GetHighlightingRange()</Range>
     <Message value="Successive arguments should be separated by spaces, tupled, or parenthesized"/>
     <Behavour overlapResolvePolicy="NONE"/>
@@ -251,7 +251,7 @@
     <QuickFix>ToMutableFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="NoImplementationGiven">
+  <Error staticGroup="FSharpErrors" name="NoImplementationGivenType">
     <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -259,7 +259,19 @@
     </Message>
     <Range>typeDecl.GetNameDocumentRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateMissingOverridesFix</QuickFix>
     <QuickFix>ToAbstractFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="NoImplementationGivenInterface">
+    <Parameter type="IInterfaceImplementation" name="impl"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>getInterfaceImplHeaderRange impl</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateInterfaceMembersFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression">

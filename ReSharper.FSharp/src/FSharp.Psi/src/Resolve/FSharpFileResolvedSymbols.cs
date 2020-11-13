@@ -93,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return ResolvedSymbols.Empty;
 
       var checkResults = CheckerService.ParseAndCheckFile(SourceFile, OpName)?.Value.CheckResults;
-      var symbolUses = checkResults?.GetAllUsesOfAllSymbolsInFile().RunAsTask();
+      var symbolUses = checkResults?.GetAllUsesOfAllSymbolsInFile(null);
       if (symbolUses == null)
         return ResolvedSymbols.Empty;
 

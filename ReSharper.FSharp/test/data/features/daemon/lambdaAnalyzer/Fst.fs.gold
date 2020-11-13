@@ -1,0 +1,8 @@
+﻿|fun (x, y) -> x|(0)
+|fun ((x, y), z) -> x, y|(1)
+|fun ((x, y), z) -> (x, y)|(2)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Lambda can be replaced with 'fst'
+(1): ReSharper Warning: Lambda can be replaced with 'fst'
+(2): ReSharper Warning: Lambda can be replaced with 'fst'

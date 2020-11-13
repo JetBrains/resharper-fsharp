@@ -1,0 +1,8 @@
+﻿[<AbstractClass>]
+type A() =
+    abstract P: int
+
+type {caret}T() =
+    inherit A()
+
+    override this.P = failwith "todo"

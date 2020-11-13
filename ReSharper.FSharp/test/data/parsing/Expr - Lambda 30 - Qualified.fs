@@ -1,0 +1,1 @@
+fun Foo.Bar -> ()

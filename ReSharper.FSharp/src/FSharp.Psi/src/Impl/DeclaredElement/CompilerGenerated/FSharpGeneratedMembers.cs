@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
@@ -39,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     protected override IType FirstParamType => PredefinedType.Object;
     protected override string FirstParamName => ObjParameterName;
 
-    protected override IType SecondParamType => TypeFactory.CreateTypeByCLRName(ComparerTypeName, Module);
+    protected override IType SecondParamType => ComparerTypeName.CreateTypeByClrName(Module);
     protected override string SecondParamName => CompParameterName;
   }
 
@@ -93,7 +94,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     protected override IType FirstParamType => PredefinedType.Object;
     protected override string FirstParamName => ObjParameterName;
 
-    protected override IType SecondParamType => TypeFactory.CreateTypeByCLRName(EqualityComparerTypeName, Module);
+    protected override IType SecondParamType => EqualityComparerTypeName.CreateTypeByClrName(Module);
     protected override string SecondParamName => CompParameterName;
   }
 
@@ -141,7 +142,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override string ShortName => GetHashCodeMethodName;
     public override IType ReturnType => PredefinedType.Int;
 
-    protected override IType FirstParamType => TypeFactory.CreateTypeByCLRName(EqualityComparerTypeName, Module);
+    protected override IType FirstParamType => EqualityComparerTypeName.CreateTypeByClrName(Module);
     protected override string FirstParamName => CompParameterName;
   }
 

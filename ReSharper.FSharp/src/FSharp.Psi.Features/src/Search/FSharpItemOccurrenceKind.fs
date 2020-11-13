@@ -86,7 +86,7 @@ type FSharpItemOccurenceKindProvider() =
                 if isNotNull (CastExprNavigator.GetByTypeUsage(namedTypeUsage)) then
                     [| CSharpSpecificOccurrenceKinds.TypeConversions |] :> _ else
 
-                if isNotNull (TypeAbbreviationDeclarationNavigator.GetByAbbreviatedType(namedTypeUsage)) then
+                if isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(namedTypeUsage)) then
                     [| FSharpOccurrenceKinds.typeAbbreviation |] :> _ else
 
                 if isNotNull (TypeArgumentListNavigator.GetByType(namedTypeUsage)) ||
@@ -118,8 +118,7 @@ type FSharpItemOccurenceKindProvider() =
                 if element :? IConstructor then
                     [| OccurrenceKind.NewInstanceCreation |] :> _ else
 
-                let fsSymbol = symbolReference.GetFSharpSymbol()
-                match box fsSymbol with
+                match symbolReference.GetFSharpSymbol() with
                 | :? FSharpUnionCase ->
                     [| OccurrenceKind.NewInstanceCreation |] :> _
 

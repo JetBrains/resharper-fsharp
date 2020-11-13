@@ -6,7 +6,7 @@ open JetBrains.Annotations
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.Rider.Model
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 
 module FSharpRegistryUtil =

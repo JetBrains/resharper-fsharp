@@ -428,10 +428,12 @@ module FSharpNamingService =
 
                     let scope = scopes.Peek()
                     if scope.Expr == fsExpr then
-                        for name in scope.Names do 
-                            match scopedNames.[name] with
-                            | 1 -> scopedNames.Remove(name) |> ignore
-                            | count -> scopedNames.[name] <- count - 1
+                        for name in scope.Names do
+                            let mutable count = Unchecked.defaultof<_>
+                            if scopedNames.TryGetValue(name, &count) then
+                                match count with
+                                | 1 -> scopedNames.Remove(name) |> ignore
+                                | count -> scopedNames.[name] <- count - 1
 
                         scopes.Pop() |> ignore
             }

@@ -1,0 +1,2 @@
+type T =
+    struct end

@@ -19,7 +19,7 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         let attributeLists = binding.AttributeLists
         if not attributeLists.IsEmpty then attributeLists.First() else
 
-        FSharpAttributesUtil.addAttributesList binding false
+        FSharpAttributesUtil.addAttributesList false binding
         binding.AttributeLists.[0]
 
     let rec isSimplePattern (fsPattern: IFSharpPattern): bool =

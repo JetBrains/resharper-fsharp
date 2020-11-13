@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override ITypeElement GetContainingType() => null;
 
     public IType Type =>
-      FcsField is var field && field != null
+      FcsField is { } field
         ? field.FieldType.MapType(Reference.GetElement())
         : TypeFactory.CreateUnknownType(Module);
 

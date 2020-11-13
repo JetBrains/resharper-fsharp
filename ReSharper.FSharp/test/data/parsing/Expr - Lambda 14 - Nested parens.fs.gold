@@ -9,11 +9,12 @@ IFSharpImplFile
           ILambdaParametersList
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              ILocalReferencePat
-                IExpressionReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:a)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              IParenPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                ILocalReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:a)
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)

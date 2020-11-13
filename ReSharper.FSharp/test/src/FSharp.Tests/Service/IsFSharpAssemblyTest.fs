@@ -21,5 +21,5 @@ type IsFSharpAssemblyTest() =
     [<Test>]
     member x.``mscorlib``() = x.DoTest("mscorlib", false)
 
-    [<Test; TestPackages("FSharp.Core")>]
+    [<Test; TestPackages(FSharpCorePackage)>]
     member x.``FSharpCore``() = x.DoTest("FSharp.Core", true)

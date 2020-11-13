@@ -2,12 +2,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Util
 
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 
-[<RequireQualifiedAccess>]
 type PartKind =
     | Class = 0
     | Struct = 1
     | Interface = 2
     | Enum = 3
+    | Delegate = 4
 
 
 [<Struct>]

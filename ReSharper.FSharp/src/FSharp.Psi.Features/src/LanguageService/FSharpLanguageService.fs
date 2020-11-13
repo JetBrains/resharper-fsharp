@@ -58,7 +58,7 @@ type FSharpLanguageService
     override x.DeclaredElementPresenter = CSharpDeclaredElementPresenter.Instance :> _ // todo: implement F# presenter
 
     override x.CodeFormatter = formatter :> _
-    override x.FindTypeDeclarations(_) = EmptyList.Instance :> _
+    override x.FindTypeDeclarations _ = EmptyList.Instance :> _
 
     override x.CanContainCachableDeclarations(node) =
         not (node :? IExpression || node :? IChameleonExpression) || node :? IObjExpr

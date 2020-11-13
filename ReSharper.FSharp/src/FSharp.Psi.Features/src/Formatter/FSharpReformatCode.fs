@@ -26,11 +26,14 @@ type FSharpReformatCode() =
         member x.Descriptors = EmptyList.Instance :> _
         member x.IsAvailableOnSelection = true
         member x.SetDefaultSetting(_, _) = ()
-        member x.IsAvailable(sourceFile) = sourceFile.PrimaryPsiLanguage :? FSharpLanguage
 
-        member x.Process(sourceFile, rangeMarker, profile, _, _) =
-            if not (profile.GetSetting(ReformatCode.REFORMAT_CODE_DESCRIPTOR)) then () else
+        member x.IsAvailable(sourceFile: IPsiSourceFile) =
+            sourceFile.PrimaryPsiLanguage :? FSharpLanguage
 
+        member x.IsAvailable(profile: CodeCleanupProfile) =
+            profile.GetSetting(ReformatCode.REFORMAT_CODE_DESCRIPTOR)
+
+        member x.Process(sourceFile, rangeMarker, _, _, _) =
             let fsFile = sourceFile.FSharpFile
             if isNull fsFile then () else
 

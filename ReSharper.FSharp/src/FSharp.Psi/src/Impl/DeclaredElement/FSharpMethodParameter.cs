@@ -44,8 +44,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
             a.GetClrName() == PredefinedType.DEFAULTPARAMETERVALUE_ATTRIBUTE_CLASS.FullName)
           ?.ConstructorArguments.FirstOrDefault();
         return defaultValueAttr == null
-          ? new DefaultValue(Type)
-          : new DefaultValue(new ConstantValue(defaultValueAttr.Item2, type: null));
+          ? new DefaultValue(Type, Type)
+          : new DefaultValue(Type, new ConstantValue(defaultValueAttr.Item2, type: null));
       }
       // todo: change exception in FCS
       catch (Exception)

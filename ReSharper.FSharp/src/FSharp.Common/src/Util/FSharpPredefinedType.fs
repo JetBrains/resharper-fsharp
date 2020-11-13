@@ -74,7 +74,7 @@ let unitTypeName = clrTypeName "Microsoft.FSharp.Core.Unit"
 
 
 let predefinedFunctionTypes =
-    [| operatorsModuleTypeName, [| "not"; "id"; "ignore"; "|>"; "<|"; "<>"; "=" |]
+    [| operatorsModuleTypeName, [| "not"; "id"; "ignore"; "|>"; "<|"; "<>"; "="; "fst"; "snd" |]
        intrinsicOperatorsTypeName, [| "||"; "&&" |] |]
     |> Array.collect (fun (typeName, names) -> [| for name in names -> name, typeName |])
     |> dict

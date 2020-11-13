@@ -1,0 +1,20 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExternDeclaration
+      FSharpTokenType+ExternTokenElement(type:EXTERN, text:extern)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      IAttributeList
+        FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+        IAttribute
+          ITypeReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:A)
+        FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      FSharpTokenType+VoidTokenElement(type:VOID, text:void)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      FSharpIdentifierToken(type:IDENTIFIER, text:F)
+      FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+      FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

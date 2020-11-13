@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override IClass GetSuperClass()
     {
       foreach (var part in EnumerateParts())
-        if (part is IFSharpClassPart fsPart && fsPart.GetSuperClass() is var super && super != null)
+        if (part is IFSharpClassPart fsPart && fsPart.GetSuperClass() is { } super)
           return super;
       return null;
     }

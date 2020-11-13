@@ -15,7 +15,7 @@ open JetBrains.TextControl
 open NUnit.Framework
 
 [<FSharpTest>]
-[<TestPackages("FSharp.Core"); TestReferences("System.Drawing", "System", "System.Core")>]
+[<TestPackages(FSharpCorePackage); TestReferences("System.Drawing", "System", "System.Core")>]
 [<TestProjectOutputType(ProjectOutputType.CONSOLE_EXE)>]
 type ArgumentsOwnerTest() =
     inherit BaseTestWithTextControl()

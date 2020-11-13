@@ -76,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public virtual IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
 
     public override IType ReturnType =>
-      Mfv?.ReturnParameter.Type is var returnType && returnType != null
+      Mfv?.ReturnParameter.Type is { } returnType
         ? returnType.MapType(AllTypeParameters, Module, true, true) // todo: isFromMethod?
         : TypeFactory.CreateUnknownType(Module);
 

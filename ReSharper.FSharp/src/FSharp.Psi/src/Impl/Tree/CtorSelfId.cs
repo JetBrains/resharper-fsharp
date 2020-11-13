@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override IType Type =>
       // FCS returns FSharpRef<TContainingType> for self identifiers.
-      GetContainingType() is ITypeElement typeElement
+      GetContainingType() is { } typeElement
         ? TypeFactory.CreateType(typeElement)
         : TypeFactory.CreateUnknownType(Module);
   }

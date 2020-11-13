@@ -38,24 +38,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       }
     }
 
-    private void clear(
-      out int yy_lookahead, out int yy_anchor, out int yy_state,
-      out int yy_next_state, out int yy_last_accept_state, out bool yy_initial,
-      out int yy_this_accept)
+    private void clear()
     {
-      yy_lookahead = 0;
-      yy_anchor = YY_NO_ANCHOR;
-      yy_state = yy_state_dtrans[yy_lexical_state];
-      yy_next_state = YY_NO_STATE;
-      yy_last_accept_state = YY_NO_STATE;
-      yy_initial = true;
-      yy_this_accept = 0;
-
+      int yy_state = yy_state_dtrans[yy_lexical_state];
       yy_buffer_start = yy_buffer_index;
-      yy_this_accept = yy_acpt[yy_state];
-      if (YY_NOT_ACCEPT != yy_this_accept)
+      if (YY_NOT_ACCEPT != yy_acpt[yy_state])
       {
-        yy_last_accept_state = yy_state;
         yy_buffer_end = yy_buffer_index;
       }
     }

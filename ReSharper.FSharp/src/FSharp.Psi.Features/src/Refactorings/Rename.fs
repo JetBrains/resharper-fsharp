@@ -112,7 +112,9 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
             unionCase.GetGeneratedMembers()
 
         | :? IGeneratedConstructorParameterOwner as parameterOwner ->
-            [| parameterOwner.GetGeneratedParameter() :> IDeclaredElement |] :> _
+            match parameterOwner.GetGeneratedParameter() with
+            | null -> EmptyArray.Instance :> _
+            | parameter -> [| parameter :> IDeclaredElement |] :> _
 
         | :? IFSharpModule -> EmptyArray.Instance :> _
 

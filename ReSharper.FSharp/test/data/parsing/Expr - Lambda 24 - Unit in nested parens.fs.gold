@@ -1,0 +1,25 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDoStatement
+      IChameleonExpression
+        ILambdaExpr
+          FSharpTokenType+FunTokenElement(type:FUN, text:fun)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ILambdaParametersList
+            IParenPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IParenPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                IUnitPat
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IUnitExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+

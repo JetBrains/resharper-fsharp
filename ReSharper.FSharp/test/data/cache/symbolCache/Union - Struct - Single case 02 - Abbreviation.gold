@@ -1,0 +1,9 @@
+Project Files:Union - Struct - Single case 02 - Abbreviation.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:Module->Class:Module
+  ClassPart:A->Class:Module+A
+  StructTypeAbbreviationOrDeclarationPart:U->Struct:Module+U
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [A]: Class:Module+A[TestProject]
+  [U]: Struct:Module+U[TestProject]
