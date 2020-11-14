@@ -7,6 +7,6 @@ type TestUnion =
 
 let unionCaseMatch = TestUnion.FieldlessCase
 match unionCaseMatch{caret} with
-| FieldlessCase -> failwith "todo"
-| CaseWithSingleField(_) -> failwith "todo"
-| CaseWithMultipleFields(_) -> failwith "todo"
+| TestUnion.FieldlessCase -> failwith "todo"
+| TestUnion.CaseWithSingleField(_) -> failwith "todo"
+| TestUnion.CaseWithMultipleFields(_) -> failwith "todo"

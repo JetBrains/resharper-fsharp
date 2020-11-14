@@ -1,4 +1,4 @@
-﻿module Say
+module Say
 
 type TestUnion =
     | FieldlessCase
@@ -7,8 +7,9 @@ type TestUnion =
 
 let unionCaseMatch = TestUnion.FieldlessCase
 match unionCaseMatch{caret} with
-| TestUnion.CaseWithSingleField(_) -> failwith "todo"
-| TestUnion.CaseWithMultipleFields(_) -> failwith "todo"
+| TestUnion.CaseWithSingleField(x) when x = 0 -> failwith ""
+| TestUnion.CaseWithSingleField(x) when x = 100 -> failwith ""
+| TestUnion.CaseWithMultipleFields(x, y) -> failwith ""
 | TestUnion.FieldlessCase -> failwith ""
 
 // A comment

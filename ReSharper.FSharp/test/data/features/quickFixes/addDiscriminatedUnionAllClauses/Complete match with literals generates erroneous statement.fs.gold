@@ -2,14 +2,14 @@
 
 type TestUnion =
     | FieldlessCase
-    | CaseWithSingleField of int
-    | CaseWithMultipleFields of string * int
+    | CaseWithSingleField of bool
 
 let unionCaseMatch = TestUnion.FieldlessCase
 match unionCaseMatch{caret} with
 | TestUnion.FieldlessCase -> failwith "todo"
 | TestUnion.CaseWithSingleField(_) -> failwith "todo"
-| TestUnion.CaseWithMultipleFields(_) -> failwith "todo"
+| TestUnion.CaseWithSingleField(true) -> failwith ""
+| TestUnion.CaseWithSingleField(false) -> failwith ""
 
 // A comment
 let foo = 1

@@ -1,15 +1,12 @@
 ﻿module Say
 
 type TestUnion =
-    | FieldlessCase
-    | CaseWithSingleField of int
-    | CaseWithMultipleFields of string * int
+    | CaseWithMultipleFields of string * int * int
 
 let unionCaseMatch = TestUnion.FieldlessCase
 match unionCaseMatch{caret} with
-| TestUnion.CaseWithSingleField(_) -> failwith "todo"
 | TestUnion.CaseWithMultipleFields(_) -> failwith "todo"
-| TestUnion.FieldlessCase -> failwith ""
+| TestUnion.CaseWithMultipleFields("string", _) -> failwith ""
 
 // A comment
 let foo = 1

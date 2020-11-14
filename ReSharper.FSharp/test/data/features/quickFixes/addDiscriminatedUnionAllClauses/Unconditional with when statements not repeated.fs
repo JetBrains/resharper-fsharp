@@ -1,10 +1,15 @@
 module Say
+
 type TestUnion =
     | FieldlessCase
     | CaseWithSingleField of int
     | CaseWithMultipleFields of string * int
 
-// Not available if the match statement is partially complete
 let unionCaseMatch = TestUnion.FieldlessCase
 match unionCaseMatch{caret} with
-| FieldlessCase -> failwith ""
+| TestUnion.CaseWithSingleField(x) when x = 0 -> failwith ""
+| TestUnion.CaseWithSingleField(_) -> failwith ""
+| TestUnion.CaseWithMultipleFields(_) -> failwith ""
+
+// A comment
+let foo = 1
