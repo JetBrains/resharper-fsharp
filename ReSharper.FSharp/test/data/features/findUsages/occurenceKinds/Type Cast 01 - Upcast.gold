@@ -1,17 +1,17 @@
 ﻿Pattern
 ---
-TO: [O] let |o1| = "" :> obj RANGE: (21,23) @ Type Cast 01 - Upcast.fs
-TO: [O] let |o2| = "" :> System.Object RANGE: (41,43) @ Type Cast 01 - Upcast.fs
+UsageOther TO: [O] let |o1| = "" :> obj RANGE: (21,23) @ Type Cast 01 - Upcast.fs
+UsageOther TO: [O] let |o2| = "" :> System.Object RANGE: (41,43) @ Type Cast 01 - Upcast.fs
 
 
 Type conversions
 ---
-TO: [O] let o1 = "" :> |obj| RANGE: (32,35) @ Type Cast 01 - Upcast.fs
-TO: [O] let o2 = "" :> System.|Object| RANGE: (59,65) @ Type Cast 01 - Upcast.fs
+UsageTypeConversions TO: [O] let o1 = "" :> |obj| RANGE: (32,35) @ Type Cast 01 - Upcast.fs
+UsageTypeConversions TO: [O] let o2 = "" :> System.|Object| RANGE: (59,65) @ Type Cast 01 - Upcast.fs
 
 
 Other
 ---
-TO: [O] let o2 = "" :> |System|.Object RANGE: (52,58) @ Type Cast 01 - Upcast.fs
+UsageOther TO: [O] let o2 = "" :> |System|.Object RANGE: (52,58) @ Type Cast 01 - Upcast.fs
 
 

@@ -114,3 +114,6 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Record expr alignment 02 - Copy``() = x.DoNamedTest()
     [<Test>] member x.``Anon record expr alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Anon record expr alignment 02 - Copy``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type members 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type members 02 - Interface``() = x.DoNamedTest()

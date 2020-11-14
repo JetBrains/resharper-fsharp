@@ -2,8 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 
@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Psi
 type RedundantNewAnalyzer() =
     inherit ElementProblemAnalyzer<INewExpr>()
 
-    override x.Run(newExpr, _, consumer) =
+    override x.Run(newExpr, data, consumer) =
         let typeName = newExpr.TypeName
         if isNull typeName then () else
 
@@ -25,10 +25,10 @@ type RedundantNewAnalyzer() =
         if typeElement.IsDescendantOf(predefinedType.IDisposable.GetTypeElement()) then () else
         if isNull newExpr.NewKeyword then () else
 
-        match newExpr.CheckerService.ResolveNameAtLocation(newExpr, typeName.Names, "RedundantNewAnalyzer") with
+        match newExpr.CheckerService.ResolveNameAtLocation(typeName, typeName.Names, "RedundantNewAnalyzer") with
         | None -> ()
         | Some symbolUse ->
 
-        match symbolUse.Symbol with
-        | :? FSharpEntity -> consumer.AddHighlighting(RedundantNewWarning(newExpr))
-        | _ -> ()
+        let fcsEntity = symbolUse.Symbol.As<FSharpEntity>()
+        if isNotNull fcsEntity && not (FSharpResolveUtil.mayShadowPartially newExpr data fcsEntity) then
+            consumer.AddHighlighting(RedundantNewWarning(newExpr))

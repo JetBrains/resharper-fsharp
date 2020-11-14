@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsImplicit => false;
   }
 
-  internal class FSharpImplicitConstructor : FSharpConstructorBase<ImplicitConstructorDeclaration>
+  internal class FSharpImplicitConstructor : FSharpConstructorBase<PrimaryConstructorDeclaration>
   {
     public FSharpImplicitConstructor([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {

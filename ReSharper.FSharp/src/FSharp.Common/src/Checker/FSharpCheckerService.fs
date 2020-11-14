@@ -141,9 +141,7 @@ type FSharpCheckerService
             let checkResults = results.CheckResults
             let fcsPos = getPosFromCoords coords
             let lineText = sourceFile.Document.GetLineText(coords.Line)
-
-            use op = reactorMonitor.MonitorOperation opName
-            checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names, op.OperationName).RunAsTask())
+            checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names))
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, name, coords, opName) =
@@ -151,10 +149,9 @@ type FSharpCheckerService
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(context: ITreeNode, names, opName) =
-        let sourceFile = context.GetSourceFile()
-        let names = List.ofSeq names
-        let coords = context.GetNavigationRange().StartOffset.ToDocumentCoords()
-        x.ResolveNameAtLocation(sourceFile, names, coords, opName)
+        let offset = context.GetNavigationRange().EndOffset - 1
+        let coords = offset.ToDocumentCoords()
+        x.ResolveNameAtLocation(context.GetSourceFile(), List.ofSeq names, coords, opName)
 
 
 type FSharpParseAndCheckResults = 

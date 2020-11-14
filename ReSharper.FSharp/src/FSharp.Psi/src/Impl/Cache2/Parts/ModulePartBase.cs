@@ -62,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public ITypeElement AssociatedTypeElement =>
       GetDeclaration() is INestedModuleDeclaration moduleDeclaration
-        ? ((ITypeDeclaration) moduleDeclaration.GetAssociatedTypeDeclaration(out _)).DeclaredElement
+        ? ((ITypeDeclaration) moduleDeclaration.GetAssociatedTypeDeclaration(out _))?.DeclaredElement
         : null;
   }
 }

@@ -4,8 +4,6 @@ using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -23,20 +21,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public override IDeclaredElement DeclaredElement =>
-      GetOrCreateDeclaredElement(DeclaredElementFactory);
+      this.GetOrCreateDeclaredElement(DeclaredElementFactory);
 
     [CanBeNull]
     public IDeclaredElement GetOrCreateDeclaredElement([NotNull] FSharpSymbol fcsSymbol) =>
-      GetOrCreateDeclaredElement(declaration => declaration.CreateDeclaredElement(fcsSymbol));
-
-    private IDeclaredElement GetOrCreateDeclaredElement(
-      Func<FSharpProperTypeMemberDeclarationBase, IDeclaredElement> factory)
-    {
-      this.AssertIsValid("Asking declared element from invalid declaration");
-      var cache = GetPsiServices().Caches.SourceDeclaredElementsCache;
-      // todo: calc types on demand in members (move cookie to FSharpTypesUtil)
-      using (CompilationContextCookie.GetOrCreate(GetPsiModule().GetContextFromModule()))
-        return cache.GetOrCreateDeclaredElement(this, factory);
-    }
+      this.GetOrCreateDeclaredElement(declaration => declaration.CreateDeclaredElement(fcsSymbol));
   }
 }

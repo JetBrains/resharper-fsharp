@@ -1,5 +1,3 @@
-module Module
-
 type Roar =
     { Field: int }
 

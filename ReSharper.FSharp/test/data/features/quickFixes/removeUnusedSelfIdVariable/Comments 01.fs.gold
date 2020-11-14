@@ -1,5 +1,3 @@
-﻿module Module
-
-type T() (* 1 *) {caret}(* 3 *) =
+﻿type T() (* 1 *) {caret}(* 3 *) =
     class
     end

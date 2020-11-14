@@ -4,6 +4,8 @@ module JetBrains.ReSharper.Plugins.FSharp.Checker.FSharpCheckerExtensions
 open System
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Text
+open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.Util.Logging
 
 let map (f: 'T -> 'U) (a: Async<'T>) : Async<'U> =
     async {
@@ -26,6 +28,12 @@ type FSharpChecker with
                 return
                     match checkFileAnswer with
                     | FSharpCheckFileAnswer.Aborted ->
+                        if parseResults.ParseTree.IsNone then
+                            let creationErrors = parseResults.Errors
+                            if not (Array.isEmpty creationErrors) then
+                                let logger = Logger.GetLogger<CheckResults>()
+                                logErrors logger "FCS aborted" creationErrors
+
                         None
                     | FSharpCheckFileAnswer.Succeeded(checkFileResults) ->
                         Some (parseResults, checkFileResults)

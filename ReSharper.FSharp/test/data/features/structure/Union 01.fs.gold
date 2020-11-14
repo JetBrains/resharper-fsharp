@@ -2,6 +2,6 @@
  Module
   U
    A:U
-   B
+   B:U
    IDisposable
     IDisposable.Dispose():void

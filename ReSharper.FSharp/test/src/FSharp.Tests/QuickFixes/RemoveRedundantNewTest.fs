@@ -7,12 +7,15 @@ open NUnit.Framework
 
 [<FSharpTest>]
 type RemoveRedundantNewTest() =
-    inherit QuickFixTestBase<RemoveRedundantNewFix>()
+    inherit FSharpQuickFixTestBase<RemoveRedundantNewFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/removeRedundantNew"
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02 - Type args``() = x.DoNamedTest()
+
+    [<Test; NoHighlightingFound>] member x.``Function 01 - String, not available``() = x.DoNamedTest()
+    [<Test; NoHighlightingFound>] member x.``Function 03 - String, not available, anon module``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
@@ -21,8 +24,9 @@ type RemoveRedundantNewAvailabilityTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/removeRedundantNew"
 
-    [<Test>] member x.``Function 01 - String, not available``() = x.DoNamedTest()
     [<Test>] member x.``Function 02 - Qualified name``() = x.DoNamedTest()
+
+    [<Test>] member x.``Delegate 01 - Partially shadowed``() = x.DoNamedTest()
 
     [<Test>] member x.``String 01 - Type``() = x.DoNamedTest()
     [<Test>] member x.``String 02 - Type, qualified``() = x.DoNamedTest()

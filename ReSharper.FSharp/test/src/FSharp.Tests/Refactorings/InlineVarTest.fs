@@ -11,7 +11,7 @@ type InlineVarTest() =
     override x.RelativeTestDataPath = "features/refactorings/inlineVar"
 
     override x.DoTest(lifetime, project) =
-        use cookie = FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Create()
+        use cookie = FSharpRegistryUtil.EnableInlineVarRefactoringCookie.Create()
         base.DoTest(lifetime, project)
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()

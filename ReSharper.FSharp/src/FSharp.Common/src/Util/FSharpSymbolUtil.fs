@@ -147,11 +147,18 @@ let patternName (pattern: FSharpActivePatternGroup) =
     "|" + joinedNames + wildCase
     
 [<Extension; CompiledName("GetAbbreviatedEntity")>]
-let getAbbreviatedEntity (entity: FSharpEntity) =
-    let mutable baseTypeEntity = entity
-    while baseTypeEntity.IsFSharpAbbreviation && baseTypeEntity.AbbreviatedType.HasTypeDefinition do
-        baseTypeEntity <- baseTypeEntity.AbbreviatedType.TypeDefinition
-    baseTypeEntity
+let rec getAbbreviatedEntity (entity: FSharpEntity) =
+    if entity.IsFSharpAbbreviation && entity.AbbreviatedType.HasTypeDefinition then
+        getAbbreviatedEntity entity.AbbreviatedType.TypeDefinition
+    else
+        entity
+
+[<Extension; CompiledName("GetAbbreviatedType")>]
+let rec getAbbreviatedType (fcsType: FSharpType) =
+    if fcsType.IsAbbreviation then
+        getAbbreviatedType fcsType.AbbreviatedType
+    else
+        fcsType
 
 [<Extension; CompiledName("HasMeasureParameter")>]
 let hasMeasureParameter(entity: FSharpEntity) =
@@ -159,3 +166,33 @@ let hasMeasureParameter(entity: FSharpEntity) =
 
 type FSharpActivePatternGroup with
     member x.PatternName = patternName x
+
+
+type FcsEntityInstance =
+    { Entity: FSharpEntity
+      Substitution: (FSharpGenericParameter * FSharpType) list }
+
+    override x.ToString() = x.Entity.ToString()
+
+module FcsEntityInstance =
+    let create fcsType =
+        let fcsType = getAbbreviatedType fcsType
+        let fcsEntity = fcsType.TypeDefinition
+        let substitution = Seq.zip fcsEntity.GenericParameters fcsType.GenericArguments |> Seq.toList
+
+        { Entity = fcsEntity
+          Substitution = substitution }
+
+
+type FcsMfvInstance =
+    { Mfv: FSharpMemberOrFunctionOrValue
+      DisplayContext: FSharpDisplayContext
+      Substitution: (FSharpGenericParameter * FSharpType) list }
+
+    override x.ToString() = x.Mfv.ToString()
+
+module FcsMfvInstance =
+    let create mfv displayContext substitution =
+        { Mfv = mfv
+          Substitution = substitution
+          DisplayContext = displayContext }

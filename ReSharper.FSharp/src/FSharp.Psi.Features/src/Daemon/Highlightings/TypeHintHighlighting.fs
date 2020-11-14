@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 
 open System
+open JetBrains.Application.InlayHints
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
@@ -50,5 +51,6 @@ and [<SolutionComponent>] TypeHintAdornmentProvider() =
                     override x.IconId = null
                     override x.IsPreceding = false
                     override x.Order = 0
+                    override x.InlayHintsMode = InlayHintsMode.Default
                 }
             | _ -> null

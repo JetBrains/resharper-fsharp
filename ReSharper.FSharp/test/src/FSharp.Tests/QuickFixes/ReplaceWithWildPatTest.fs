@@ -7,7 +7,7 @@ open NUnit.Framework
 
 [<FSharpTest>]
 type ReplaceWithWildPatTest() =
-    inherit QuickFixTestBase<ReplaceWithWildPatFix>()
+    inherit FSharpQuickFixTestBase<ReplaceWithWildPatFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceWithWildPat"
 
@@ -21,6 +21,32 @@ type ReplaceWithWildPatTest() =
     [<Test>] member x.``Match clause pat 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Parameters list - lambda``() = x.DoNamedTest()
+    [<Test>] member x.``Parameters list - method``() = x.DoNamedTest()
+    [<Test>] member x.``Parameters list - parameter with attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Parameters list - typed parameter with attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Match clause pattern - parameters owner pat``() = x.DoNamedTest()
+    [<Test>] member x.``Match clause pattern - simple pat``() = x.DoNamedTest()
+    [<Test>] member x.``Binding pattern``() = x.DoNamedTest()
+    [<Test; ExecuteScopedQuickFixInFile>] member x.``Whole file``() = x.DoNamedTest()
+
+    [<Test; NotAvailable>] member x.``Not available - As 01``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available - Ctor 01``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available - Let - Attribute 01``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available - Let - Attribute 02 - Parens``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available - Let - Attribute 03 - Typed``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available - Let - Attribute 04 - Typed``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available - Member - Optional 01``() = x.DoNamedTest()
+
+[<FSharpTest>]
+type ReplaceWithWildPatScopedFixTest() =
+    inherit FSharpQuickFixTestBase<ReplaceWithWildPatScopedFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/replaceWithWildPat"
+
+    [<Test>] member x.``No space 01 - Before``() = x.DoNamedTest()
+    [<Test>] member x.``No space 02 - After``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type ReplaceWithWildPatAvailabilityTest() =
@@ -28,10 +54,8 @@ type ReplaceWithWildPatAvailabilityTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceWithWildPat"
 
-    [<Test>] member x.``Not available - Ctor 01``() = x.DoNamedTest()
-    [<Test>] member x.``Not available - Function 01``() = x.DoNamedTest()
-
-    [<Test>] member x.``Not available - Let - Attribute 01``() = x.DoNamedTest()
-    [<Test>] member x.``Not available - Let - Attribute 02 - Parens``() = x.DoNamedTest()
-    [<Test>] member x.``Not available - Let - Attribute 03 - Typed``() = x.DoNamedTest()
-    [<Test>] member x.``Not available - Let - Attribute 04 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``Availability - Parameters list - lambda``() = x.DoNamedTest()
+    [<Test>] member x.``Availability - Parameters list - method``() = x.DoNamedTest()
+    [<Test>] member x.``Availability - Match clause pattern - parameters owner pat``() = x.DoNamedTest()
+    [<Test>] member x.``Availability - Match clause pattern - simple pat``() = x.DoNamedTest()
+    [<Test>] member x.``Availability - Binding pattern``() = x.DoNamedTest()

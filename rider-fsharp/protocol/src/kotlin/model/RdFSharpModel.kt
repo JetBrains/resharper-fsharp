@@ -3,6 +3,8 @@ package model
 import com.jetbrains.rider.model.nova.ide.SolutionModel
 import com.jetbrains.rd.generator.nova.*
 import com.jetbrains.rd.generator.nova.PredefinedType.*
+import com.jetbrains.rd.generator.nova.csharp.CSharp50Generator
+import com.jetbrains.rd.generator.nova.kotlin.Kotlin11Generator
 
 @Suppress("unused")
 object RdFSharpModel : Ext(SolutionModel.Solution) {
@@ -33,7 +35,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         property("copyRecentToEditor", bool).readonly
     }
 
-    private val RdFcsHost = aggregatedef("RdFcsHost") {
+    private val RdFSharpTestHost = aggregatedef("RdFSharpTestHost") {
         sink("fileChecked", string).async
         sink("projectChecked", string).async
         sink("fcsProjectInvalidated", structdef("RdFcsProject") {
@@ -46,13 +48,16 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
             field("timestamp", dateTime)
         }.nullable)
         call("dumpSingleProjectMapping", void, string)
+        call("dumpSingleProjectLocalReferences", void, immutableList(string))
     }
 
     init {
+
+        setting(Kotlin11Generator.Namespace, "com.jetbrains.rider.plugins.fsharp")
+        setting(CSharp50Generator.Namespace, "JetBrains.ReSharper.Plugins.FSharp")
+
         field("fSharpInteractiveHost", RdFSharpInteractiveHost)
-        field("fcsHost", RdFcsHost)
-        property("enableExperimentalFeatures", bool)
-        property("enableFormatter", bool)
+        field("fsharpTestHost", RdFSharpTestHost)
         property("fcsBusyDelayMs", int)
     }
 }

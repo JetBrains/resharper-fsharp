@@ -20,14 +20,14 @@ and FSharpVcsCodeVisionRangesProviderProcess(file, daemonProcess) =
         match declaration with
         | :? ITypeDeclaration ->
             not (declaration :? IAnonModuleDeclaration ||
-                 declaration :? IUnionCaseDeclaration)
+                 declaration :? IUnionCaseLikeDeclaration)
 
         | :? ITypeMemberDeclaration ->
             declaration :? ITopBinding ||
             declaration :? IMemberDeclaration ||
-            declaration :? IAbstractSlot ||
-            declaration :? IAutoProperty ||
+            declaration :? IAbstractMemberDeclaration ||
+            declaration :? IAutoPropertyDeclaration ||
             declaration :? IMemberConstructorDeclaration ||
-            declaration :? IValField
+            declaration :? IValFieldDeclaration
 
         | _ -> false

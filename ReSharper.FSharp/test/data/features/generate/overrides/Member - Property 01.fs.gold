@@ -1,0 +1,18 @@
+﻿Provided elements:
+ 0: P():System.Int32
+ 1: ToString():System.String
+ 2: Equals(System.Object):System.Boolean
+ 3: GetHashCode():System.Int32
+ 4: Finalize():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:P():System.Int32}
+
+type A() =
+    abstract P: int
+    default x.P = 1
+
+type T() ={caret}
+    inherit A()
+
+    override this.P = failwith "todo"

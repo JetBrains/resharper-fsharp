@@ -39,9 +39,9 @@ import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
-import com.jetbrains.rider.model.RdFsiRuntime
-import com.jetbrains.rider.model.RdFsiSessionInfo
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
+import com.jetbrains.rider.plugins.fsharp.RdFsiRuntime
+import com.jetbrains.rider.plugins.fsharp.RdFsiSessionInfo
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.rider.runtime.mono.MonoRuntime
 import com.jetbrains.rider.util.idea.getComponent
@@ -87,7 +87,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
                 runtime.patchRunCommandLine(cmdLine, listOf())
             }
         } else {
-            val runtime = runtimeHost.getCurrentDotNetRuntime(false).runtime
+            val runtime = runtimeHost.getCurrentClassicNetRuntime(false).runtime
             if (runtime != null && runtime is MonoRuntime && sessionInfo.fsiPath.endsWith(".exe", true)) {
                 runtime.patchRunCommandLine(cmdLine, listOf())
             }

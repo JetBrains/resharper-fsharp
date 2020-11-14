@@ -1,4 +1,7 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+﻿using System;
+using FSharp.Compiler.SourceCodeServices;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
@@ -19,10 +22,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IReferenceExpr CreateReferenceExpr(string expr);
 
     ILetOrUseExpr CreateLetBindingExpr(string bindingName);
-    ILetModuleDecl CreateLetModuleDecl(string bindingName);
+    ILetBindingsDeclaration CreateLetModuleDecl(string bindingName);
 
     IBinaryAppExpr CreateIgnoreApp(IFSharpExpression expr, bool newLine);
     IRecordFieldBinding CreateRecordFieldBinding(string fieldName, bool addSemicolon);
+
+    IParenPat CreateParenPat();
+    ITypedPat CreateTypedPat(IFSharpPattern pattern, ITypeUsage typeUsage);
+
+    ITypeUsage CreateTypeUsage(string typeUsage);
+
+    IReturnTypeInfo CreateReturnTypeInfo(ITypeUsage typeSignature);
 
     IMatchExpr CreateMatchExpr(IFSharpExpression expr);
     IMatchClause CreateMatchClause();
@@ -36,5 +46,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     IAttributeList CreateEmptyAttributeList();
     IAttribute CreateAttribute(string attrName);
+    
+    FSharpList<IParametersPatternDeclaration> CreateMemberParamDeclarations(FSharpList<FSharpList<Tuple<string, FSharpType>>> curriedParameterNames, bool isSpaceAfterComma, bool addTypes, FSharpDisplayContext displayContext);
+    IMemberDeclaration CreateMemberBindingExpr(string bindingName, FSharpList<string> typeParameters, FSharpList<IParametersPatternDeclaration> args); 
+    IInterfaceImplementation CreateInterfaceImplementation(ITypeReferenceName typeReferenceName, FSharpList<IMemberDeclaration> memberDeclarations, int indent); 
   }
 }

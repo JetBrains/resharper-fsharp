@@ -41,28 +41,28 @@ public class Class1
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
-(1): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
-(2): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
-(3): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
-(4): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
-(5): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'CaseA'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'CaseA'
+(2): ReSharper Error Highlighting: Cannot resolve symbol 'CaseB'
+(3): ReSharper Error Highlighting: Cannot resolve symbol 'CaseB'
+(4): ReSharper Error Highlighting: Cannot resolve symbol 'CaseC'
+(5): ReSharper Error Highlighting: Cannot resolve symbol 'CaseC'
 M:Module.U.NewCaseA(System.Int32)
 M:Module.U.NewCaseA(System.Int32)
 M:Module.U.NewCaseB(System.Int32)
 M:Module.U.NewCaseB(System.Int32)
 M:Module.U.NewCaseC(System.Int32,System.Double)
 M:Module.U.NewCaseC(System.Int32,System.Double)
-P:Module.U.CaseA.Item
-P:Module.U.CaseA.Item
-P:Module.U.CaseA.Item
-P:Module.U.CaseB.Named
-P:Module.U.CaseC.Item1
-P:Module.U.CaseC.Other
-P:Module.U.CaseA.Item
-P:Module.U.CaseB.Named
-P:Module.U.CaseC.Item1
-P:Module.U.CaseC.Other
+P:Module.U.Item
+P:Module.U.Item
+P:Module.U.Item
+P:Module.U.Named
+P:Module.U.Item1
+P:Module.U.Other
+P:Module.U.Item
+P:Module.U.Named
+P:Module.U.Item1
+P:Module.U.Other
 P:Module.U.IsCaseA
 P:Module.U.IsCaseB
 P:Module.U.IsCaseC

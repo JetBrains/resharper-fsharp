@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -140,36 +141,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (symbol is FSharpUnionCase unionCase)
-      {
-        if (unionCase.IsUnresolved) return null;
-
-        var unionTypeElement = GetTypeElement(unionCase.ReturnType.TypeDefinition, psiModule);
-        if (unionTypeElement == null) return null;
-
-        var caseCompiledName = unionCase.CompiledName;
-        var caseMember = unionTypeElement.GetMembers().FirstOrDefault(m =>
-        {
-          var shortName = m.ShortName;
-          return shortName == caseCompiledName || shortName == "New" + caseCompiledName;
-        });
-
-        if (caseMember != null)
-          return caseMember;
-
-        var unionClrName = unionTypeElement.GetClrName();
-        var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + caseCompiledName, psiModule);
-        return caseDeclaredType.GetTypeElement();
-      }
+        return GetDeclaredElement(unionCase, psiModule);
 
       if (symbol is FSharpField field)
       {
         if (field.IsAnonRecordField)
           return new FSharpAnonRecordFieldProperty(referenceExpression.Reference);
 
-        if (field.IsUnionCaseField && field.DeclaringUnionCase?.Value is var fieldUnionCase)
+        if (field.IsUnionCaseField && field.DeclaringUnionCase?.Value is { } fieldUnionCase)
         {
-          var unionCaseTypeElement = GetDeclaredElement(fieldUnionCase, psiModule, referenceExpression) as ITypeElement;
-          return unionCaseTypeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
+          var unionEntity = fieldUnionCase.ReturnType.TypeDefinition;
+          var fieldOwnerTypeElement =
+            unionEntity.UnionCases.Count > 1 && !unionEntity.IsValueType
+              ? GetDeclaredElement(fieldUnionCase, psiModule, true) as ITypeElement
+              : GetTypeElement(unionEntity, psiModule);
+
+          return fieldOwnerTypeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
         }
 
         if (!field.IsUnresolved && field.DeclaringEntity?.Value is { } fieldEntity)
@@ -188,6 +175,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return null;
     }
 
+    private static IDeclaredElement GetDeclaredElement(FSharpUnionCase unionCase, IPsiModule psiModule,
+      bool preferType = false)
+    {
+      if (unionCase.IsUnresolved) return null;
+
+      var unionTypeElement = GetTypeElement(unionCase.ReturnType.TypeDefinition, psiModule);
+      if (unionTypeElement == null) return null;
+
+      var caseCompiledName = unionCase.CompiledName;
+      var caseMember = unionTypeElement.GetMembers().FirstOrDefault(m =>
+      {
+        if (preferType)
+        {
+          if (!(m is FSharpUnionCaseClass))
+            return false;
+        }
+        else if (m is IFSharpGeneratedFromUnionCase)
+          return false;
+
+        var shortName = m.ShortName;
+        return shortName == caseCompiledName || shortName == "New" + caseCompiledName;
+      });
+
+      if (caseMember != null)
+        return caseMember;
+
+      var unionClrName = unionTypeElement.GetClrName();
+      var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + caseCompiledName, psiModule);
+      return caseDeclaredType.GetTypeElement();
+    }
+
     private static IDeclaredElement GetTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
       [NotNull] IPsiModule psiModule)
     {
@@ -202,7 +220,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (entity.IsProvided)
         return typeElement;
 
-      return typeElement is IFSharpTypeElement fsTypeElement
+      return typeElement is IFSharpTypeElement fsTypeElement && !mfv.IsConstructor
         ? GetFSharpSourceTypeMember(mfv, fsTypeElement)
         : GetTypeMember(mfv, typeElement);
     }
@@ -210,7 +228,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     private static IDeclaredElement GetFSharpSourceTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
       [NotNull] IFSharpTypeElement fsTypeElement)
     {
-      var name = mfv.IsConstructor ? fsTypeElement.ShortName : mfv.GetMfvCompiledName();
+      var name = mfv.GetMfvCompiledName();
 
       var symbolTableCache = fsTypeElement.GetPsiServices().Caches.GetPsiCache<SymbolTableCache>();
       var symbolTable = symbolTableCache.TryGetCachedSymbolTable(fsTypeElement, SymbolTableMode.FULL);
@@ -245,7 +263,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (declarations.Count == 0)
         return GetTypeMember(mfv, typeElement);
 
-      var singleDeclaration = declarations.SingleOrDefault(decl =>
+      var singleDeclaration = declarations.SingleItem(decl =>
       {
         var range = decl.GetSourceFile().NotNull().Document.GetTreeTextRange(fcsRange);
         return range.Contains(decl.GetNameIdentifierRange());
@@ -278,12 +296,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       var mfvXmlDocId = GetXmlDocId(mfv);
-      if (mfvXmlDocId == null)
+      if (mfvXmlDocId.IsEmpty())
         return null;
 
       return members.FirstOrDefault(member =>
         // todo: Fix signature for extension properties
-        member is IFSharpMember fsMember && fsMember.Mfv?.XmlDocSig == mfvXmlDocId ||
+        member is IFSharpMember fsMember && fsMember.Mfv?.GetXmlDocId() == mfvXmlDocId ||
         member.XMLDocId == mfvXmlDocId);
     }
 
@@ -309,7 +327,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var typeElement = GetTypeElement(entity, psiModule);
       var patternName = pattern.Name?.Value;
-      if (typeElement == null || !(patternName is var name) || name == null)
+      if (typeElement == null || patternName == null)
         return null;
 
       if (typeElement.Module.ContainingProjectModule is IProject)
@@ -360,20 +378,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return patternId?.GetContainingNode<IFSharpDeclaration>();
     }
 
-    [CanBeNull]
-    private static string GetXmlDocId([NotNull] FSharpMemberOrFunctionOrValue mfv)
+    [NotNull]
+    public static string GetXmlDocId([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
       try
       {
-        return mfv.XmlDocSig;
+        var xmlDocId = mfv.XmlDocSig;
+        if (xmlDocId.StartsWith("P", StringComparison.Ordinal) && mfv.IsCliEvent())
+          return "E" + xmlDocId.Substring(1);
+
+        return xmlDocId;
       }
       catch (Exception e)
       {
         Logger.LogMessage(LoggingLevel.WARN, "Could not get XmlDocId for {0}", mfv);
         Logger.LogExceptionSilently(e);
-        return null;
+        return "";
       }
     }
+
+    public static bool IsCliEvent(this FSharpMemberOrFunctionOrValue mfv) => 
+      mfv.IsProperty && mfv.Attributes.HasAttributeInstance(FSharpPredefinedType.CLIEventAttribute);
+
+    public static bool IsAccessor([NotNull] this FSharpMemberOrFunctionOrValue mfv) =>
+      mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod || mfv.IsEventAddMethod || mfv.IsEventRemoveMethod;
 
     private static T FindNode<T>(Range.range range, [CanBeNull] ITreeNode node) where T : class, ITreeNode
     {

@@ -50,7 +50,9 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
         | _ -> "Remove unused value"
 
     override x.IsAvailable _ =
-        isValid pat && isValid letOrUse
+        isValid pat && isValid letOrUse &&
+
+        not (pat :? IAsPat) // todo: enable, check inner patterns
 
     override x.ExecutePsiTransaction(_, _) =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
@@ -59,14 +61,14 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
         let bindings = letOrUse.Bindings
         if bindings.Count = 1 then
             match letOrUse with
-            | :? ILetModuleDecl as letModuleDecl ->
+            | :? ILetBindingsDeclaration as letBindings ->
                 let first =
-                    letModuleDecl
+                    letBindings
                     |> skipMatchingNodesBefore isInlineSpaceOrComment
                     |> getThisOrPrevNewLIne
 
                 let last =
-                    letModuleDecl
+                    letBindings
                     |> getLastMatchingNodeAfter isInlineSpaceOrComment
 
                 ModificationUtil.DeleteChildRange(TreeRange(first, last))

@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -21,10 +22,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? FSharpFile.GetSymbolUse(identifierRange.StartOffset.Offset)
         : base.GetSymbolDeclaration(identifierRange);
 
-    protected override IDeclaredElement CreateDeclaredElement() =>
-      GetFSharpSymbol() is { } fcsSymbol
+    protected override IDeclaredElement CreateDeclaredElement()
+    {
+      if (ParametersPatternsEnumerable.Any())
+      {
+        var compiledName = CompiledName;
+        if (compiledName.StartsWith("op_", StringComparison.Ordinal) && IsStatic)
+          return compiledName switch
+          {
+            StandardOperatorNames.Explicit => new FSharpConversionOperator<MemberDeclaration>(this, true),
+            StandardOperatorNames.Implicit => new FSharpConversionOperator<MemberDeclaration>(this, false),
+            _ => new FSharpSignOperator<MemberDeclaration>(this)
+          };
+
+        return new FSharpMethod<MemberDeclaration>(this);
+      }
+
+      return GetFSharpSymbol() is { } fcsSymbol
         ? CreateDeclaredElement(fcsSymbol)
         : null;
+    }
 
     protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol)
     {
@@ -40,20 +57,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return cliEvent != null
           ? (ITypeMember) new FSharpCliEvent<MemberDeclaration>(this)
           : new FSharpProperty<MemberDeclaration>(this, property);
-      }
-
-      var compiledName = mfv.CompiledName;
-      if (!mfv.IsInstanceMember && compiledName.StartsWith("op_", StringComparison.Ordinal))
-      {
-        switch (compiledName)
-        {
-          case StandardOperatorNames.Explicit:
-            return new FSharpConversionOperator<MemberDeclaration>(this, true);
-          case StandardOperatorNames.Implicit:
-            return new FSharpConversionOperator<MemberDeclaration>(this, false);
-        }
-
-        return new FSharpSignOperator<MemberDeclaration>(this);
       }
 
       return new FSharpMethod<MemberDeclaration>(this);
@@ -72,5 +75,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override TreeTextRange GetNameIdentifierRange() =>
       NameIdentifier.GetMemberNameIdentifierRange();
+
+    public override void SetOverride(bool value)
+    {
+      if (value == IsOverride)
+        return;
+
+      if (!value)
+        throw new NotImplementedException();
+
+      ModificationUtil.ReplaceChild(MemberKeyword, FSharpTokenType.OVERRIDE.CreateLeafElement());
+    }
   }
 }

@@ -106,7 +106,7 @@ type FSharpItemsContainerRefresherStub() =
         member x.RefreshFolder(_, _, _) = ()
         member x.UpdateFile(_, _) = ()
         member x.UpdateFolder(_, _, _) = ()
-        member x.ReloadProject(_) = ()
+        member x.ReloadProject _ = ()
         member x.SelectItem(_, _) = ()
 
 
@@ -119,5 +119,5 @@ type FSharpFileServiceStub() =
     interface IHideImplementation<FSharpFileService>
 
     interface IFSharpFileService with
-        member x.IsScratchFile(_) = false
-        member x.IsScriptLike(_) = false
+        member x.IsScratchFile _ = false
+        member x.IsScriptLike _ = false

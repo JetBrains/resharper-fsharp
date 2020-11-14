@@ -1,0 +1,30 @@
+﻿Provided elements:
+ 0: M(System.Int32):System.Void
+ 1: M(System.Double):System.Void
+ 2: M():System.Int32
+ 3: ToString():System.String
+ 4: Equals(System.Object):System.Boolean
+ 5: GetHashCode():System.Int32
+ 6: Finalize():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:M(System.Int32):System.Void}
+// ${SELECT1:M(System.Double):System.Void}
+
+[<AbstractClass>]
+type A() =
+    abstract M: int
+    default x.M(_: int) = ()
+
+    abstract M: double
+    default x.M(_: double) = ()
+
+type B() =
+    inherit A()
+    override x.M(_: int) = ()
+
+type T() ={caret}
+    inherit B()
+
+    override this.M(var0: int): unit = failwith "todo"
+    override this.M(var0: double): unit = failwith "todo"

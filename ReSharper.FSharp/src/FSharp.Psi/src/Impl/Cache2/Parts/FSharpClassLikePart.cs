@@ -10,7 +10,7 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal abstract class FSharpClassLikePart<T> : FSharpTypeParametersOwnerPart<T>, IFSharpClassLikePart
-    where T : class, IFSharpTypeDeclaration
+    where T : class, IFSharpTypeOldDeclaration
   {
     private bool? myHasPublicDefaultCtor;
 
@@ -43,6 +43,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public abstract IEnumerable<IDeclaredType> GetSuperTypes();
     public virtual IEnumerable<ITypeElement> GetSuperTypeElements() => GetSuperTypes().AsIList().ToTypeElements(); 
+
+    public virtual MemberPresenceFlag GetMemberPresenceFlag() =>
+      MemberPresenceFlag.SIGN_OP | MemberPresenceFlag.EXPLICIT_OP |
+      MemberPresenceFlag.MAY_EQUALS_OVERRIDE | MemberPresenceFlag.MAY_TOSTRING_OVERRIDE |
+
+      // RIDER-10263
+      (HasPublicDefaultCtor ? MemberPresenceFlag.PUBLIC_DEFAULT_CTOR : MemberPresenceFlag.NONE);
+
+    public virtual IDeclaredType GetBaseClassType() =>
+      ExtendsListShortNames.IsEmpty()
+        ? null
+        : GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
 
     public bool HasPublicDefaultCtor
     {

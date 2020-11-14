@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("NestedModuleDeclaration", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.MODULE_MEMBER),
         ("TopBinding", ElementType.TOP_BINDING, TopBinding.CHAMELEON_EXPR),
         ("LocalBinding", ElementType.LOCAL_BINDING, LocalBinding.EXPR),
-        ("LetModuleDeclBinding", ElementType.LET_MODULE_DECL, LetModuleDecl.BINDING),
+        ("LetModuleDeclBinding", ElementType.LET_BINDINGS_DECLARATION, LetBindingsDeclaration.BINDING),
         ("LetExprBinding", ElementType.LET_OR_USE_EXPR, LetOrUseExpr.BINDING),
         ("NestedModuleDeclName", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.IDENTIFIER),
         ("NamedModuleDeclName", ElementType.NAMED_MODULE_DECLARATION, NamedModuleDeclaration.IDENTIFIER),
@@ -72,11 +72,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
       var typeDeclarationIndentingRulesParameters = new[]
       {
-        ("EnumDeclaration", ElementType.ENUM_DECLARATION, EnumDeclaration.ENUM_REPR),
-        ("UnionDeclarationCases", ElementType.UNION_DECLARATION, UnionDeclaration.UNION_REPR),
-        ("TypeAbbreviation", ElementType.TYPE_ABBREVIATION_DECLARATION, TypeAbbreviationDeclaration.TYPE_OR_UNION_CASE),
-        ("ModuleAbbreviation", ElementType.MODULE_ABBREVIATION, ModuleAbbreviation.TYPE_REFERENCE),
-        ("RecordDeclaration", ElementType.RECORD_DECLARATION, RecordDeclaration.RECORD_REPR),
+        ("TypeDeclarationRepr", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.TYPE_REPR),
+        ("TypeDeclarationMemberList", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.MEMBER_LIST),
+        ("ClassReprTypeMemberList", ElementType.CLASS_REPRESENTATION, ClassRepresentation.MEMBER_LIST),
+        ("StructReprTypeMemberList", ElementType.STRUCT_REPRESENTATION, StructRepresentation.MEMBER_LIST),
+        ("InterfaceReprTypeMemberList", ElementType.INTERFACE_REPRESENTATION, InterfaceRepresentation.MEMBER_LIST),
+        ("ExceptionMemberList", ElementType.EXCEPTION_DECLARATION, ExceptionDeclaration.MEMBER_LIST),
+        ("InterfaceImplMemberList", ElementType.INTERFACE_IMPLEMENTATION, InterfaceImplementation.MEMBER_LIST),
+        ("ModuleAbbreviationDeclaration", ElementType.MODULE_ABBREVIATION_DECLARATION, ModuleAbbreviationDeclaration.TYPE_REFERENCE),
       };
 
       bindingAndModuleDeclIndentingRulesParameters
@@ -151,9 +154,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Name("DoDeclIndent")
         .Where(
           Parent()
-            .HasType(ElementType.DO)
-            .Satisfies((node, context) => !((IDo) node).IsImplicit),
-          Node().HasRole(Do.CHAMELEON_EXPR))
+            .HasType(ElementType.DO_STATEMENT)
+            .Satisfies((node, context) => !((IDoStatement) node).IsImplicit),
+          Node().HasRole(DoStatement.CHAMELEON_EXPR))
         .Return(IndentType.External)
         .Build();
 
@@ -184,6 +187,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("BinaryExpr", ElementType.BINARY_APP_EXPR),
         ("RecordDeclaration", ElementType.RECORD_FIELD_DECLARATION_LIST),
         ("RecordExprBindings", ElementType.RECORD_FIELD_BINDING_LIST),
+        ("MemberDeclarationList", ElementType.MEMBER_DECLARATION_LIST),
+        ("TypeMemberDeclarationList", ElementType.TYPE_MEMBER_DECLARATION_LIST),
       };
 
       alignmentRulesParameters
@@ -217,7 +222,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
         .Name("SpaceAfterImplicitConstructorDecl")
-        .Where(Left().HasType(ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION))
+        .Where(Left().HasType(ElementType.PRIMARY_CONSTRUCTOR_DECLARATION))
         .Return(IntervalFormatType.Space)
         .Build();
       

@@ -2,7 +2,7 @@
 
 open System.Collections.Generic
 open FSharp.Compiler
-open JetBrains.Rider.Model
+open JetBrains.ReSharper.Plugins.FSharp
 
 module FsiSandboxUtil =
     let prepareCommands (rdFsiPrepareCommandsArgs: RdFsiPrepareCommandsArgs): List<string> =

@@ -6,9 +6,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages("FSharp.Core")>]
+[<FSharpTest; TestPackages(FSharpCorePackage)>]
 type AddUnderscorePrefixFixTest() =
-    inherit QuickFixTestBase<AddUnderscorePrefixFix>()
+    inherit FSharpQuickFixTestBase<AddUnderscorePrefixFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/addUnderscorePrefix"
 

@@ -1,0 +1,4 @@
+﻿type E1 =
+    | A = 1
+and {caret}E =
+    | A = 1

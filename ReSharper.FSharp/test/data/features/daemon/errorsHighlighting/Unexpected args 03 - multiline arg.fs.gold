@@ -1,9 +1,10 @@
-module Module
+﻿module Module
 
 open System
 
-let g = (id 2) |({ new IDisposable with
+let g = (|id|(0) 2) |({ new IDisposable with
                   member this.Dispose() = ()
-                })|(0)
+                })|(1)
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Unexpected argument
+(0): ReSharper Dead Code: Redundant application
+(1): ReSharper Underlined Error Highlighting: Unexpected argument

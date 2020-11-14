@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   ///   * units of measure
   internal class HiddenTypePart : FSharpTypeMembersOwnerTypePart, Class.IClassPart
   {
-    public HiddenTypePart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+    public HiddenTypePart([NotNull] IFSharpTypeOldDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
     {
     }

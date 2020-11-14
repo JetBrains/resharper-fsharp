@@ -24,7 +24,7 @@ type ReplaceLetWithExpressionFix(error: ExpectedExpressionAfterLetError) =
             removeDanglingIn node.Parent
 
     override x.Text =
-        let tokenText = getLetTokenText letExpr.LetOrUseToken
+        let tokenText = getLetTokenText letExpr.BindingKeyword
         sprintf "Replace '%s' with expression" tokenText
 
     override x.IsAvailable _ =

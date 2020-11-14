@@ -1,6 +1,4 @@
-﻿module Module
-
-let x =
+﻿let x =
     async{caret} {
         return 1
     } |> ignore

@@ -1,4 +1,2 @@
-﻿module Module
-
-let x =  id
+﻿let x =  id
            (){caret}

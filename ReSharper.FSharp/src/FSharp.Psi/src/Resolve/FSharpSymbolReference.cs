@@ -28,15 +28,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         : null;
 
     public virtual TreeOffset SymbolOffset =>
-      myOwner.FSharpIdentifier is var fsIdentifier && fsIdentifier != null
+      myOwner.FSharpIdentifier is { } fsIdentifier
         ? fsIdentifier.NameRange.StartOffset
         : myOwner.GetTreeStartOffset();
 
     public virtual FSharpSymbol GetFSharpSymbol() =>
       GetSymbolUse()?.Symbol;
-
-    public FSharpOption<FSharpSymbol> TryGetFSharpSymbol() =>
-      OptionModule.OfObj(GetFSharpSymbol());
 
     public bool HasFcsSymbol => GetSymbolUse() != null;
 
@@ -131,7 +128,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ? qualifiableReferenceOwner.Names
         : new[] {GetName()};
 
-      return checkerService.ResolveNameAtLocation(referenceOwner, names, opName);
+      return checkerService.ResolveNameAtLocation(referenceOwner.FSharpIdentifier, names, opName);
     }
   }
 }

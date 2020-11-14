@@ -40,23 +40,33 @@ type FSharpCodeStructureProvider() =
             for memberDeclaration in moduleLikeDeclaration.Members do
                 processNode memberDeclaration parent
 
-        | :? IUnionDeclaration as unionDecl ->
-            let cases = Seq.cast unionDecl.UnionCases
-            processTypeDeclaration unionDecl cases parent
+        | :? IFSharpTypeDeclaration as typeDecl ->
+            match typeDecl.TypeRepresentation with
+            | :? IUnionRepresentation as unionDecl ->
+                let cases = Seq.cast unionDecl.UnionCases
+                processTypeDeclaration typeDecl cases parent
 
-        | :? IUnionCaseDeclaration as caseDecl ->
+            | :? IRecordRepresentation as recordDecl ->
+                let fields = Seq.cast recordDecl.FieldDeclarations 
+                processTypeDeclaration typeDecl fields parent
+
+            | _ ->
+                let ctor =
+                    match typeDecl.PrimaryConstructorDeclaration with
+                    | null -> Seq.empty
+                    | ctorDecl -> Seq.singleton ctorDecl |> Seq.cast
+
+                processTypeDeclaration typeDecl ctor parent
+
+        | :? IUnionCaseLikeDeclaration as caseDecl ->
             FSharpDeclarationCodeStructureElement(parent, caseDecl) |> ignore
-
-        | :? IRecordDeclaration as recordDecl ->
-            let fields = Seq.cast recordDecl.FieldDeclarations 
-            processTypeDeclaration recordDecl fields parent
 
         | :? ITypeExtensionDeclaration as extensionDecl when not extensionDecl.IsTypePartDeclaration ->
             let parent = NamedIdentifierOwner(extensionDecl, parent, typeExtensionIconId)
             for memberDecl in  extensionDecl.TypeMembers do
                 processNode memberDecl parent
 
-        | :? IFSharpTypeDeclaration as decl ->
+        | :? IFSharpTypeOldDeclaration as decl ->
             processTypeDeclaration decl TreeNodeCollection.Empty parent
 
         | :? ITypeMemberDeclaration as typeMember ->
@@ -67,8 +77,8 @@ type FSharpCodeStructureProvider() =
             for memberDecl in interfaceImpl.TypeMembers do
                 processNode memberDecl parent
 
-        | :? ILetModuleDecl as letDecl ->
-            for binding in Seq.cast<ITopBinding> letDecl.Bindings do
+        | :? ILetBindingsDeclaration as letBindings ->
+            for binding in Seq.cast<ITopBinding> letBindings.Bindings do
                 FSharpDeclarationCodeStructureElement(parent, binding) |> ignore
 
         | :? ITypeDeclarationGroup as declarationGroup ->
@@ -77,7 +87,7 @@ type FSharpCodeStructureProvider() =
 
         | _ -> ()
 
-    and processTypeDeclaration (typeDecl: IFSharpTypeDeclaration) (members: IDeclaration seq) parent =
+    and processTypeDeclaration (typeDecl: IFSharpTypeOldDeclaration) (members: IDeclaration seq) parent =
         let structureElement = FSharpDeclarationCodeStructureElement(parent, typeDecl)
         for memberDecl in members do
             processNode memberDecl structureElement
@@ -104,7 +114,7 @@ type FSharpDeclarationCodeStructureElement(parentElement, declaration: IDeclarat
 
     let language = declaration.Language
     let declarationPointer = declaration.GetPsiServices().Pointers.CreateTreeElementPointer(declaration)
-    let textRange = declaration.GetDocumentRange().TextRange
+    let textRange = declaration.GetDocumentRange()
     let aspects = CodeStructureDeclarationAspects(declaration)
 
     let getDeclaration () = declarationPointer.GetTreeNode()
@@ -180,7 +190,7 @@ type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconI
         member x.Remove() = raise (NotSupportedException())
         member x.CanRename() = false
         member x.InitialName() = raise (NotSupportedException())
-        member x.Rename(_) = ()
+        member x.Rename _ = ()
 
     interface IMemberNavigationAspect with
         member x.GetNavigationRanges() = [| navigationRange |]
@@ -193,8 +203,8 @@ type NamedIdentifierOwner(treeNode: INameIdentifierOwner, parent, iconId) =
 
     let textRange =
         match treeNode.NameIdentifier with
-        | null -> treeNode.GetNavigationRange().TextRange
-        | ident -> ident.GetDocumentRange().TextRange
+        | null -> treeNode.GetNavigationRange()
+        | ident -> ident.GetDocumentRange()
 
     override x.TreeNode = treeNodePointer.GetTreeNode() :> _
     override x.Language = FSharpLanguage.Instance :> _

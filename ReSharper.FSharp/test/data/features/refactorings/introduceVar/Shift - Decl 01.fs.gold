@@ -1,5 +1,5 @@
-﻿Suggested names: i
-let i = 
+﻿Suggested names: identity, i
+let identity = 
   id
     1
-ignore (i)
+ignore (identity)

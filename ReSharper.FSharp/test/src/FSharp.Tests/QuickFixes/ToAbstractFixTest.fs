@@ -1,14 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
-open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages("FSharp.Core")>]
+[<FSharpTest; TestPackages(FSharpCorePackage)>]
 type ToAbstractFixTest() =
-    inherit QuickFixTestBase<ToAbstractFix>()
+    inherit FSharpQuickFixTestBase<ToAbstractFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/toAbstract"
 

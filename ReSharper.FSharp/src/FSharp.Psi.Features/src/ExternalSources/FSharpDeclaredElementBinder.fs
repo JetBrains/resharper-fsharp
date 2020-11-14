@@ -23,7 +23,7 @@ type FSharpDeclaredElementBinder() =
 
         cachedDecl.CacheDeclaredElement <- ns
 
-    let bindTypeParameters (typeElement: ITypeElement) (typeDecl: IFSharpTypeDeclaration) =
+    let bindTypeParameters (typeElement: ITypeElement) (typeDecl: IFSharpTypeOldDeclaration) =
         if isNull typeDecl then () else
 
         let typeParametersOwner = typeElement.As<ITypeParametersOwner>()
@@ -54,7 +54,7 @@ type FSharpDeclaredElementBinder() =
 
         cachedDecl.CacheDeclaredElement <- typeElement
 
-        bindTypeParameters typeElement (typeDecl.As<IFSharpTypeDeclaration>())
+        bindTypeParameters typeElement (typeDecl.As<IFSharpTypeOldDeclaration>())
         bindModuleMembers typeElement (typeDecl.As<IModuleDeclaration>())
 
     override x.BindDeclarations(file, psiModule, _) =

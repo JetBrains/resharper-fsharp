@@ -1,0 +1,4 @@
+﻿module Module
+
+let f{caret} (Some 123: int option): unit =
+    ()

@@ -20,8 +20,8 @@ type FSharpFileServiceStub() =
     interface IHideImplementation<FSharpFileService>
 
     interface IFSharpFileService with
-        member x.IsScratchFile(_) = false
-        member x.IsScriptLike(_) = false
+        member x.IsScratchFile _ = false
+        member x.IsScriptLike _ = false
 
 [<ShellComponent>]
 type TestFcsReactorMonitor() =

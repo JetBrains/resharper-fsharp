@@ -2,10 +2,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
 open System.Collections.Generic
-open JetBrains.ReSharper.Daemon.Stages.Dispatcher
 open JetBrains.ReSharper.Daemon.VisualElements
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -16,8 +15,7 @@ open JetBrains.Util
 [<AutoOpen>]
 module FSharpErrorsStage =
     let visualElementFactoryKey = Key<VisualElementHighlighter>("ColorUsageHighlightingEnabled")
-    let openedModulesProvider = Key<OpenedModulesProvider>("OpenedModulesProvider")
-    let experimentalFeaturesEnabledKey = Key<obj>("ExperimentalFeaturesEnabled")
+    let redundantParenAnalysisEnabledKey = Key<obj>("RedundantParenAnalysisEnabled")
 
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |])>]
@@ -41,10 +39,10 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
         analyzerData.PutData(openedModulesProvider, OpenedModulesProvider(fsFile))
 
         let solution = fsFile.GetSolution()
-        let experimentalFeaturesEnabled =
-            if solution.FSharpExperimentalFeaturesEnabled() then BooleanBoxes.True else BooleanBoxes.False
+        let redundantParensAnalysisEnabled =
+            if solution.FSharpRedundantParenAnalysisEnabled() then BooleanBoxes.True else BooleanBoxes.False
 
-        analyzerData.PutData(experimentalFeaturesEnabledKey, experimentalFeaturesEnabled)
+        analyzerData.PutData(redundantParenAnalysisEnabledKey, redundantParensAnalysisEnabled)
 
     override x.VisitNode(element: ITreeNode, consumer: IHighlightingConsumer) =
         analyzerDispatcher.Run(element, consumer)
@@ -94,7 +92,7 @@ and private GlobalProcessor(daemonProcessor, consumer) =
     inherit Processor(daemonProcessor, consumer)
 
     let shouldProcess (node: ITreeNode) =
-        not (node :? IBinding || node :? IMemberDeclaration || node :? IDo)
+        not (node :? IBinding || node :? IMemberDeclaration || node :? IDoStatement)
 
     member val MemberDeclarations: JetHashSet<ITreeNode> = JetHashSet()
 

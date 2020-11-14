@@ -1,0 +1,5 @@
+{caret}
+module Module
+
+// ${CHAR:[}
+// ${CHAR:<}

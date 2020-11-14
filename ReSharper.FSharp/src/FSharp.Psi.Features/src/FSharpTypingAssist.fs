@@ -8,9 +8,10 @@ open FSharp.Compiler.SourceCodeServices.AstTraversal
 open JetBrains.Application.CommandProcessing
 open JetBrains.Application.UI.ActionSystem.Text
 open JetBrains.Application.Settings
-open JetBrains.DocumentModel
 open JetBrains.Diagnostics
+open JetBrains.DocumentModel
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.Options
 open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -30,10 +31,11 @@ open JetBrains.Util
 [<SolutionComponent>]
 type FSharpTypingAssist
         (lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
-         externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, manager: ITypingAssistManager) as this =
+         externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager,
+         manager: ITypingAssistManager) as this =
     inherit TypingAssistLanguageBase<FSharpLanguage>
         (solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost,
-         skippingTypingAssist, lastTypingAssistAction)
+         skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager)
 
     static let indentFromToken =
         [| FSharpTokenType.LBRACK_LESS
@@ -115,7 +117,8 @@ type FSharpTypingAssist
     static let bracketsAllowingDeindent =
         [| FSharpTokenType.LBRACE
            FSharpTokenType.LBRACK
-           FSharpTokenType.LBRACK_BAR |]
+           FSharpTokenType.LBRACK_BAR
+           FSharpTokenType.LPAREN |]
         |> HashSet
 
     static let leftBrackets =
@@ -228,7 +231,8 @@ type FSharpTypingAssist
 
            '@', [| FSharpTokenType.RQUOTE_TYPED, 0
                    FSharpTokenType.RQUOTE_UNTYPED, 0
-                   FSharpTokenType.RQUOTE_UNTYPED, 1 |] |]
+                   FSharpTokenType.RQUOTE_UNTYPED, 1 |]
+           ')', [| FSharpTokenType.LPAREN_STAR_RPAREN, 2 |] |]
         |> dict
 
 
@@ -787,7 +791,12 @@ type FSharpTypingAssist
         let indentString = baseIndentString + String(' ',  getIndentSize textControl)
 
         if lastElementEndOffset = leftBracketEndOffset then
-            let newText = indentString + baseIndentString
+            let newText =
+                if tokenType == FSharpTokenType.LPAREN then
+                    indentString
+                else
+                    indentString + baseIndentString
+
             document.ReplaceText(TextRange(lastElementEndOffset, rightBracketStartOffset), newText)
         else
             let firstElementStartOffset =
@@ -796,7 +805,9 @@ type FSharpTypingAssist
                     lexer.Advance()
                 lexer.TokenStart
 
-            document.ReplaceText(TextRange(lastElementEndOffset, rightBracketStartOffset), baseIndentString)
+            if tokenType != FSharpTokenType.LPAREN then
+                document.ReplaceText(TextRange(lastElementEndOffset, rightBracketStartOffset), baseIndentString)
+
             document.ReplaceText(TextRange(leftBracketEndOffset, firstElementStartOffset), indentString)
 
         textControl.Caret.MoveTo(leftBracketEndOffset + indentString.Length, CaretVisualPlacement.DontScrollIfVisible)
@@ -1149,7 +1160,18 @@ type FSharpTypingAssist
         let typedChar = context.Char
 
         if context.EnsureWritable() <> EnsureWritableResult.SUCCESS then false else
-        if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
+
+        let selection = textControl.Selection
+
+        let surroundTypingEnabled =
+            let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
+            settingsStore.GetValue(TypingAssistOptions.SurroundTypingEnabled)
+
+        if surroundTypingEnabled && selection.HasSelection() && typedChar = '"' then
+            x.SurroundSelectionWithQuotes(textControl, fun _ -> false)
+            true else
+
+        if selection.OneDocRangeWithCaret().Length > 0 then false else
 
         if x.HandleThirdQuote(textControl, typedChar) then true else
         if x.SkipQuote(textControl, typedChar) then true else
@@ -1411,7 +1433,8 @@ type FSharpTypingAssist
         let offset = textControl.Caret.Offset()
 
         let mutable lexer = Unchecked.defaultof<_>
-        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
+        if offset > 0 && not (lexer.FindTokenAt(offset - 1)) then false else
 
         // Don't add pair quotes/brackets after opening char quote:
         // `'"{caret}"` or `'({caret})`

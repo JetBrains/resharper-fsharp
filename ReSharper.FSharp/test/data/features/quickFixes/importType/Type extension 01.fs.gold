@@ -1,6 +1,4 @@
-﻿module Module
-
-open System
+﻿open System
 
 type String{caret} with
     member x.Foo = 123

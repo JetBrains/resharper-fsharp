@@ -1,4 +1,2 @@
-﻿module Module
-
-type T(x) =
+﻿type T(x) =
     new () {caret}= T(1)

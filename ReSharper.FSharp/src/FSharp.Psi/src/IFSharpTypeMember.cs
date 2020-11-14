@@ -20,15 +20,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   {
     [CanBeNull] FSharpMemberOrFunctionOrValue Mfv { get; }
   }
-  
+
   public interface IFSharpTypeParametersOwner : IFSharpDeclaredElement
   {
     IList<ITypeParameter> AllTypeParameters { get; }
   }
 
-  public interface IFSharpGeneratedFromOtherElement : IFSharpDeclaredElement
+  public interface IFSharpGeneratedElement : IFSharpDeclaredElement
+  {
+  }
+
+  public interface IFSharpGeneratedFromOtherElement : IFSharpGeneratedElement
   {
     [NotNull] IClrDeclaredElement OriginElement { get; }
     IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer();
+  }
+
+  public interface IFSharpGeneratedFromUnionCase : IFSharpGeneratedFromOtherElement
+  {
   }
 }

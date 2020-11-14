@@ -1,5 +1,3 @@
-﻿module Module
-
-do
+﻿do
     match () with | a -> () {caret}| c -> ()
     ()

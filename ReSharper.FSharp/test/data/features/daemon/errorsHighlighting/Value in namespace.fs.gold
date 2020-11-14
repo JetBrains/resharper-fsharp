@@ -1,0 +1,6 @@
+namespace N
+
+let |a|(0) = ()
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Namespaces cannot contain values or functions

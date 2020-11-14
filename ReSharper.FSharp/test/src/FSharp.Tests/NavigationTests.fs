@@ -1,14 +1,16 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Navigation
 
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Navigation.ContextNavigation
 open JetBrains.ReSharper.Features.Navigation.Features.FindDeclarations
 open JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration
 open JetBrains.ReSharper.IntentionsTests.Navigation
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<AbstractClass; FSharpTest; TestPackages("FSharp.Core")>]
+[<AbstractClass; FSharpTest; TestPackages(FSharpCorePackage)>]
 type FSharpContextSearchTestBase(extraPath) =
     inherit AllNavigationProvidersTestBase()
 
@@ -18,6 +20,12 @@ type FSharpContextSearchTestBase(extraPath) =
 
 type FSharpGoToUsagesTest() =
     inherit FSharpContextSearchTestBase("usages")
+
+    member x.DoNamedTestFiles() =
+        let testName = x.TestMethodName
+        let csExtension = CSharpProjectFileType.CS_EXTENSION
+        let fsExtension = FSharpProjectFileType.FsExtension
+        x.DoTestSolution([| testName + csExtension; testName + fsExtension |])
 
     override x.CreateContextAction(solution, textControl) =
         base.CreateContextAction(solution, textControl)
@@ -42,6 +50,12 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Operator 01 - Pipe``() = x.DoNamedTest()
     [<Test; Explicit("Not implemented")>] member x.``Operator 02 - =``() = x.DoNamedTest()
 
+    [<Test>] member x.``Union case 01 - Fields``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Union case 02 - Singleton``() = x.DoNamedTestFiles()
+
+    [<Test>] member x.``Union case - Field 01``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Union case - Field 02 - Single case``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Union case - Field 03 - Struct``() = x.DoNamedTestFiles()
 
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")
@@ -108,7 +122,20 @@ type FSharpGoToDeclarationTest() =
     [<Test>] member x.``Signature 02 - Same range``() = x.DoTestSolution("Signature 02 - Same range.fsi", "Signature 02 - Same range.fs")
 
     [<TestReferences("Library1.dll", "Library2.dll")>]
-    [<Test>] member x.``Same type from different assemblies``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Same type from different assemblies``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union - Case - Empty 01 - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Case - Empty 02 - Pattern``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union - Case - Fields 01 - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Case - Fields 02 - Pattern``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union - Case - Single - Fields 01 - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Case - Single - Fields 01 - Pattern``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union - Field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Field 02 - Single case``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Field 03 - Struct``() = x.DoNamedTest()
 
 
 type FSharpGoToTypeTest() =

@@ -1,12 +1,16 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
+open FSharp.Compiler
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
+open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
@@ -39,9 +43,14 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let moduleDeclaration = getModuleDeclaration source
         moduleDeclaration.Members.First()
 
+    let getTypeDecl memberSource =
+        let source = "type T =\n  " + memberSource
+        let moduleMember = getModuleMember source
+        moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations.[0] :?> IFSharpTypeDeclaration
+
     let getDoDecl source =
         let moduleMember = getModuleMember source
-        moduleMember.As<IDo>().NotNull()
+        moduleMember.As<IDoStatement>().NotNull()
 
     let getExpression source =
         let doDecl = getDoDecl source
@@ -57,10 +66,31 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
+    let createMemberDecl logicalName typeParameters parameters =
+        let typeParametersSource =
+            match typeParameters with
+            | [] -> ""
+            | parameters -> parameters |> List.map ((+) "'") |> String.concat ", " |> sprintf "<%s>"
+
+        let name =
+            let name = PrettyNaming.DecompileOpName logicalName
+            if PrettyNaming.IsMangledOpName logicalName then
+                sprintf "( %s )" name
+            else
+                Keywords.QuoteIdentifierIfNeeded name
+
+        let memberSource = sprintf "member this.%s%s%s = failwith \"todo\"" name typeParametersSource parameters
+        let typeDecl = getTypeDecl memberSource
+        typeDecl.TypeMembers.[0] :?> IMemberDeclaration
+
     let createAttributeList attrName: IAttributeList =
             let source = sprintf "[<%s>] ()" attrName
             let doDecl = getDoDecl source
             doDecl.AttributeLists.[0]
+            
+    let createTypeUsage usage: ITypeUsage =
+        let expr = createLetBinding (sprintf "(a: %s)" usage)
+        expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().Type
 
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
@@ -74,8 +104,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = "let _ = ()"
             let moduleDeclaration = getModuleDeclaration source
 
-            let letModuleDecl = moduleDeclaration.Members.First().As<ILetModuleDecl>()
-            let binding = letModuleDecl.Bindings.First()
+            let letBindings = moduleDeclaration.Members.First().As<ILetBindingsDeclaration>()
+            let binding = letBindings.Bindings.First()
             binding.HeadPattern :?> _
 
         member x.CreateIgnoreApp(expr, newLine) =
@@ -125,7 +155,52 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateLetModuleDecl(bindingName) =
             let source = sprintf "let %s = ()" bindingName
-            getModuleMember source :?> ILetModuleDecl
+            getModuleMember source :?> ILetBindingsDeclaration
+
+        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
+            let printParam (name, fcsType: FSharpType) =
+                let name = Keywords.QuoteIdentifierIfNeeded name
+                if not addTypes then name else
+
+                let fcsType = fcsType.Format(displayContext)
+                sprintf "%s: %s" name fcsType
+
+            let parametersSource =
+                curriedParameterNames
+                |> List.map (List.map printParam >> String.concat (if isSpaceAfterComma then ", " else ","))
+                |> List.map (sprintf "(%s)")
+                |> String.concat " "
+
+            let memberBinding = createMemberDecl "P" List.empty parametersSource
+            memberBinding.ParametersPatterns |> Seq.toList
+
+        member x.CreateMemberBindingExpr(name, typeParameters, parameters) =
+            let parsedParams = "()" |> List.replicate parameters.Length |> String.concat " "
+            let memberDecl = createMemberDecl name typeParameters parsedParams
+
+            for realArg, fakeArg in Seq.zip parameters memberDecl.ParametersPatterns do
+                ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
+            memberDecl
+
+        member x.CreateInterfaceImplementation(typeReferenceName, memberDeclarations, baseIndent) =
+            let lineEnding = typeReferenceName.GetLineEnding()
+            let memberIndent = baseIndent + typeReferenceName.GetIndentSize()
+
+            let memberSource = "interface I with\n    member _.P = ()"
+            let typeDecl = getTypeDecl memberSource
+            let interfaceImpl = typeDecl.TypeMembers.[0] :?> IInterfaceImplementation
+
+            ModificationUtil.ReplaceChild(interfaceImpl.TypeName, typeReferenceName) |> ignore
+            ModificationUtil.DeleteChildRange(interfaceImpl.WithKeyword.NextSibling, interfaceImpl.LastChild)
+
+            seq { for d in memberDeclarations do
+                      yield NewLine(lineEnding) :> ITreeNode
+                      yield Whitespace(memberIndent) :> _
+                      yield d :> _ }
+            |> addNodesAfter interfaceImpl.WithKeyword
+            |> ignore
+
+            interfaceImpl
 
         member x.CreateConstExpr(text) =
             getExpression text :?> _
@@ -165,8 +240,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateReferenceExpr(name) =
             let source = sprintf "do %s" name
-            let newExpr = getExpression source :?> IReferenceExpr
-            newExpr :> _
+            getExpression source :?> IReferenceExpr
 
         member x.CreateForEachExpr(expr) =
             let sourceFile = expr.GetSourceFile()
@@ -196,6 +270,31 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
 
+        member x.CreateParenPat() =
+            let expr = createLetBinding "(())"
+            expr.Bindings.[0].HeadPattern.As<IParenPat>()
+
+        member x.CreateTypedPat(pattern, typeUsage: ITypeUsage) =
+            let settingsStore = typeUsage.GetSettingsStoreWithEditorConfig()
+            let spaceBeforeColon = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon)
+            let preColonSpace = if spaceBeforeColon then " " else ""
+
+            let expr = createLetBinding (sprintf "(_%s: _)" preColonSpace)
+            let typedPat = expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>()
+
+            ModificationUtil.ReplaceChild(typedPat.Pattern, pattern.Copy()) |> ignore
+            ModificationUtil.ReplaceChild(typedPat.Type, typeUsage) |> ignore
+            typedPat
+
+        member x.CreateReturnTypeInfo(typeUsage: ITypeUsage): IReturnTypeInfo =
+            let expr = createLetBinding "_: _"
+            let returnTypeInfo = expr.Bindings.[0].ReturnTypeInfo
+            ModificationUtil.ReplaceChild(returnTypeInfo.ReturnType, typeUsage) |> ignore
+            returnTypeInfo
+
+        member x.CreateTypeUsage(typeUsage: string) : ITypeUsage =
+            createTypeUsage typeUsage
+    
         member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"
             let expr = getExpression source
@@ -211,13 +310,14 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
   
         member x.CreateExpressionReferenceName(name) =
             let source = sprintf "let %s = ()" name
-            let letModuleDecl = getModuleMember source :?> ILetModuleDecl
-            letModuleDecl.Bindings.[0].HeadPattern.As<IReferencePat>().ReferenceName
+            let letBindings = getModuleMember source :?> ILetBindingsDeclaration
+            letBindings.Bindings.[0].HeadPattern.As<IReferencePat>().ReferenceName
 
         member x.CreateTypeReferenceName(name) =
             let source = sprintf "type T = %s" name
             let typeDeclarationGroup = getModuleMember source :?> ITypeDeclarationGroup
-            let typeAbbreviation = typeDeclarationGroup.TypeDeclarations.[0].As<ITypeAbbreviationDeclaration>()
+            let typeDeclaration = typeDeclarationGroup.TypeDeclarations.[0].As<IFSharpTypeDeclaration>()
+            let typeAbbreviation = typeDeclaration.TypeRepresentation.As<ITypeAbbreviationRepresentation>()
             typeAbbreviation.AbbreviatedType.As<INamedTypeUsage>().ReferenceName
 
         member x.CreateEmptyAttributeList() =

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Pointers;
 
@@ -17,6 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers
         ? CreateGenerated(origin)
         : null;
 
+    [CanBeNull]
     public abstract TGenerated CreateGenerated(TOrigin fsElement);
   }
 }

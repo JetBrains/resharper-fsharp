@@ -1,0 +1,8 @@
+﻿// ${COMPLETE_ITEM:StringBuilder (in System.Text)}
+module Module =
+
+  open System.IO
+  open System.Text
+
+  let foo () =
+    StringBuilder{caret}

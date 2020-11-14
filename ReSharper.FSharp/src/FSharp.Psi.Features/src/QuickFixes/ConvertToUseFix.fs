@@ -12,7 +12,7 @@ type ConvertToUseFix(warning: ConvertToUseBindingWarning) =
     override x.Text = "Convert to 'use' binding"
 
     override x.IsAvailable _ =
-        isValid letExpr && isValid letExpr.LetOrUseToken
+        isValid letExpr && isValid letExpr.BindingKeyword
 
     override x.ExecutePsiTransaction _ =
         LetToUseAction.Execute(letExpr)
