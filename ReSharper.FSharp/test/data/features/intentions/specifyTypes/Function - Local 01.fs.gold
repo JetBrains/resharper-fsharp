@@ -1,5 +1,0 @@
-﻿module Module
-
-do
-    let f{caret} (a: string) (b: int): string = sprintf "%s %d" a b
-    ()
