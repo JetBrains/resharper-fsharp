@@ -266,8 +266,19 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <SYMBOLIC_OPERATOR> {GREATER}             { RiseFromParenLevel(0); return MakeToken(GREATER); }
 <SYMBOLIC_OPERATOR> {BAR_RBRACK}          { RiseFromParenLevel(0); return MakeToken(BAR_RBRACK); }
 <SYMBOLIC_OPERATOR> {BAR_RBRACE}          { RiseFromParenLevel(0); return MakeToken(BAR_RBRACE); }
-<SYMBOLIC_OPERATOR> {LBRACE}              { RiseFromParenLevel(0); return MakeToken(LBRACE); }
-<SYMBOLIC_OPERATOR> {RBRACE}              { RiseFromParenLevel(0); return MakeToken(RBRACE); }
+
+<SYMBOLIC_OPERATOR> {LBRACE}              { PushInterpolatedStringItem(InterpolatedStringStackItem.Brace);
+                                            RiseFromParenLevel(0);
+                                            return MakeToken(LBRACE); }
+
+<SYMBOLIC_OPERATOR> {RBRACE}              { if (PopInterpolatedStringItem(InterpolatedStringStackItem.Brace))
+                                              break;
+                                            else
+                                            {
+                                              RiseFromParenLevel(0);
+                                              return MakeToken(RBRACE);
+                                            } }
+
 <SYMBOLIC_OPERATOR> {GREATER_BAR_RBRACK}  { RiseFromParenLevel(0); return MakeToken(GREATER_BAR_RBRACK); }
 <SYMBOLIC_OPERATOR> {COLON_QMARK_GREATER} { RiseFromParenLevel(0); return MakeToken(COLON_QMARK_GREATER); }
 <SYMBOLIC_OPERATOR> {COLON_QMARK}         { RiseFromParenLevel(0); return MakeToken(COLON_QMARK); }
@@ -363,16 +374,12 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, TYPE_APP> {GREATER}             { return MakeToken(GREATER); }
 <LINE, TYPE_APP> {BAR_RBRACK}          { return MakeToken(BAR_RBRACK); }
 <LINE, TYPE_APP> {BAR_RBRACE}          { return MakeToken(BAR_RBRACE); }
-<LINE, TYPE_APP> {LBRACE}              { return MakeToken(LBRACE); }
 
-<LINE, TYPE_APP> {RBRACE}              { if (!myInterpolatedStringPreviousStates.IsEmpty)
-                                         {
-                                           // todo: init type state?
-                                           PushBack(1);
-                                           yybegin(ToState(myInterpolatedStringPreviousStates.Peek()));
-                                           Clear();
+<LINE, TYPE_APP> {LBRACE}              { PushInterpolatedStringItem(InterpolatedStringStackItem.Brace);
+                                         return MakeToken(LBRACE); }
+
+<LINE, TYPE_APP> {RBRACE}              { if (PopInterpolatedStringItem(InterpolatedStringStackItem.Brace))
                                            break;
-                                         }
                                          else
                                            return MakeToken(RBRACE); }
 
@@ -406,8 +413,19 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_TYPE_APP> {BAR_RBRACK}          { yybegin(LINE); return MakeToken(BAR_RBRACK); }
 <INIT_TYPE_APP> {LBRACE_BAR}          { yybegin(LINE); return MakeToken(LBRACE_BAR); }
 <INIT_TYPE_APP> {BAR_RBRACE}          { yybegin(LINE); return MakeToken(BAR_RBRACE); }
-<INIT_TYPE_APP> {LBRACE}              { yybegin(LINE); return MakeToken(LBRACE); }
-<INIT_TYPE_APP> {RBRACE}              { yybegin(LINE); return MakeToken(RBRACE); }
+
+<INIT_TYPE_APP> {LBRACE}              { PushInterpolatedStringItem(InterpolatedStringStackItem.Brace);
+                                        yybegin(LINE);
+                                        return MakeToken(LBRACE); }
+
+<INIT_TYPE_APP> {RBRACE}              { if (PopInterpolatedStringItem(InterpolatedStringStackItem.Brace))
+                                           break;
+                                         else
+                                         {
+                                           yybegin(LINE);
+                                           return MakeToken(RBRACE);
+                                         } }
+
 <INIT_TYPE_APP> {COLON_QMARK_GREATER} { yybegin(LINE); return MakeToken(COLON_QMARK_GREATER); }
 <INIT_TYPE_APP> {COLON_QMARK}         { yybegin(LINE); return MakeToken(COLON_QMARK); }
 <INIT_TYPE_APP> {COLON_COLON}         { yybegin(LINE); return MakeToken(COLON_COLON); }

@@ -1,5 +1,4 @@
 using System;
-using JetBrains.DataStructures;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 using JetBrains.Diagnostics;
@@ -44,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
   {
     public FSharpInterpolatedStringKind Kind;
     public FSharpLexerContext PreviousLexerContext;
-    public ImmutableArray<InterpolatedStringStackItem> InterpolatedStringStack;
+    public ImmutableStack<InterpolatedStringStackItem> InterpolatedStringStack;
   }
 
   partial class FSharpLexerGenerated : ILexer<FSharpLexerState>
@@ -58,7 +57,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     private int myTokenLength;
     private int myBrackLevel;
 
-    private ImmutableStack<FSharpLexerInterpolatedStringState> myInterpolatedStringPreviousStates =
+    private ImmutableStack<FSharpLexerInterpolatedStringState> myInterpolatedStringStates =
       ImmutableStack<FSharpLexerInterpolatedStringState>.Empty;
 
     static FSharpLexerGenerated()
@@ -117,16 +116,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       var interpolatedStringState = new FSharpLexerInterpolatedStringState
       {
         Kind = kind,
-        PreviousLexerContext = previousContext
+        PreviousLexerContext = previousContext,
+        InterpolatedStringStack = ImmutableStack<InterpolatedStringStackItem>.Empty
       };
-      myInterpolatedStringPreviousStates = myInterpolatedStringPreviousStates.Push(interpolatedStringState);
+      myInterpolatedStringStates = myInterpolatedStringStates.Push(interpolatedStringState);
     }
 
     private void FinishInterpolatedString()
     {
-      Assertion.Assert(!myInterpolatedStringPreviousStates.IsEmpty, "!myInterpolatedStringPreviousStates.IsEmpty");
+      Assertion.Assert(!myInterpolatedStringStates.IsEmpty, "!myInterpolatedStringPreviousStates.IsEmpty");
 
-      var interpolatedStringState = myInterpolatedStringPreviousStates.Peek();
+      var interpolatedStringState = myInterpolatedStringStates.Peek();
       var prevContext = interpolatedStringState.PreviousLexerContext;
 
       yy_lexical_state = prevContext.LexerState;
@@ -134,7 +134,41 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       myParenLevel = prevContext.ParenLevel;
       myNestedCommentLevel = prevContext.NestedCommentLevel;
 
-      myInterpolatedStringPreviousStates = myInterpolatedStringPreviousStates.Pop();
+      myInterpolatedStringStates = myInterpolatedStringStates.Pop();
+    }
+
+    private void PushInterpolatedStringItem(InterpolatedStringStackItem item)
+    {
+      if (!myInterpolatedStringStates.IsEmpty && myInterpolatedStringStates.Peek() is var state)
+      {
+        myInterpolatedStringStates = myInterpolatedStringStates.Pop();
+
+        state.InterpolatedStringStack = state.InterpolatedStringStack.Push(item);
+        myInterpolatedStringStates = myInterpolatedStringStates.Push(state);
+      }
+    }
+
+    private bool PopInterpolatedStringItem(InterpolatedStringStackItem item)
+    {
+      if (myInterpolatedStringStates.IsEmpty || !(myInterpolatedStringStates.Peek() is var state)) return false;
+
+      if (state.InterpolatedStringStack.IsEmpty && item == InterpolatedStringStackItem.Brace)
+      {
+        PushBack(1);
+        yybegin(ToState(myInterpolatedStringStates.Peek()));
+        Clear();
+
+        return true;
+      }
+
+      if (state.InterpolatedStringStack.Peek() == item)
+      {
+        state.InterpolatedStringStack = state.InterpolatedStringStack.Pop();
+        myInterpolatedStringStates = myInterpolatedStringStates.Pop();
+        myInterpolatedStringStates = myInterpolatedStringStates.Push(state);
+      }
+
+      return false;
     }
 
     public static int ToState(FSharpLexerInterpolatedStringState interpolatedStringState) =>
@@ -319,7 +353,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         tokenPosition.BufferStart = yy_buffer_start;
         tokenPosition.BufferEnd = yy_buffer_end;
         tokenPosition.LexicalState = yy_lexical_state;
-        tokenPosition.InterpolatedStringPreviousStates = myInterpolatedStringPreviousStates;
+        tokenPosition.InterpolatedStringPreviousStates = myInterpolatedStringStates;
         return tokenPosition;
       }
       set
@@ -329,6 +363,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         yy_buffer_start = value.BufferStart;
         yy_buffer_end = value.BufferEnd;
         yy_lexical_state = value.LexicalState;
+        myInterpolatedStringStates = value.InterpolatedStringPreviousStates;
       }
     }
 
@@ -373,7 +408,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       myCurrentTokenType ??= _locateToken();
 
     public uint LexerStateEx =>
-      !myInterpolatedStringPreviousStates.IsEmpty || myNestedCommentLevel > 0 || myBrackLevel > 0
+      !myInterpolatedStringStates.IsEmpty || myNestedCommentLevel > 0 || myBrackLevel > 0
         ? LexerStateConstants.InvalidState
         : FSharpLexerStateEncoding.EncodeLexerState(yy_lexical_state, myParenLevel);
   }
