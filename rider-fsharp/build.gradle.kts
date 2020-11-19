@@ -75,7 +75,6 @@ intellij {
 
     instrumentCode = false
     downloadSources = false
-    updateSinceUntilBuild = false
 
     // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
     setPlugins("rider-plugins-appender")
