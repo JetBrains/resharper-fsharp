@@ -95,7 +95,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       return MakeToken(type);
     }
 
-    private void PushBack(int n)
+    private void yypushback(int n)
     {
       yy_buffer_index -= n;
       yy_buffer_end -= n;
@@ -154,7 +154,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
 
       if (state.InterpolatedStringStack.IsEmpty && item == InterpolatedStringStackItem.Brace)
       {
-        PushBack(1);
+        yypushback(1);
         yybegin(ToState(myInterpolatedStringStates.Peek()));
         Clear();
 
@@ -288,7 +288,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
 
     private void InitTypeApp()
     {
-      PushBack(yytext()[yylength() - 1] == '/' ? 2 : 1);
+      yypushback(yytext()[yylength() - 1] == '/' ? 2 : 1);
       myParenLevel = 0;
       myBrackLevel = 0;
       yybegin(INIT_TYPE_APP);
@@ -297,7 +297,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     private void AdjacentTypeCloseOp()
     {
       myParenLevel -= yylength();
-      PushBack(yylength());
+      yypushback(yylength());
       yybegin(Level > 0 ? SYMBOLIC_OPERATOR : GREATER_OP_SYMBOLIC_OP);
     }
 
@@ -430,6 +430,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       if (state == LexerStateConstants.InvalidState)
         throw new ArgumentException("Invalid lexer state");
 
+      // todo: check nesting is not overflowed
       var lexicalState = (int) (state & LexicalStateMask);
       var parenLevel = (int) (state >> TypeAppStateOffset & TypeAppStateMask);
 

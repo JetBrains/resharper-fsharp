@@ -212,20 +212,20 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 
 %%
 
-<YYINITIAL> {PP_DIRECTIVE} { PushBack(yylength()); yybegin(PPDIRECTIVE); Clear(); break; }
-<YYINITIAL> [^]            { PushBack(1); yybegin(LINE); Clear(); break; }
+<YYINITIAL> {PP_DIRECTIVE} { yypushback(yylength()); yybegin(PPDIRECTIVE); Clear(); break; }
+<YYINITIAL> [^]            { yypushback(1); yybegin(LINE); Clear(); break; }
 
 <INIT_TYPE_APP, TYPE_APP> {LESS}                        { DeepIntoParenLevel(); return MakeToken(LESS); }
 <INIT_TYPE_APP, TYPE_APP> {LPAREN}                      { DeepIntoParenLevel(); return MakeToken(LPAREN); }
 <INIT_TYPE_APP, TYPE_APP> {LBRACK}                      { DeepIntoParenLevel(); return MakeToken(LBRACK); }
 <INIT_TYPE_APP, TYPE_APP> {LBRACK_LESS}                 { DeepIntoBrackLevel(); return MakeToken(LBRACK_LESS); }
-<INIT_TYPE_APP, TYPE_APP> {GREATER}+                    { RiseFromParenLevel(yylength()); PushBack(yylength()); yybegin(GREATER_OP); Clear(); break; }
-<INIT_TYPE_APP, TYPE_APP> "</"                          { DeepIntoParenLevel(); PushBack(2); yybegin(SMASH_ADJACENT_LESS_OP); Clear(); break;}
+<INIT_TYPE_APP, TYPE_APP> {GREATER}+                    { RiseFromParenLevel(yylength()); yypushback(yylength()); yybegin(GREATER_OP); Clear(); break; }
+<INIT_TYPE_APP, TYPE_APP> "</"                          { DeepIntoParenLevel(); yypushback(2); yybegin(SMASH_ADJACENT_LESS_OP); Clear(); break;}
 <INIT_TYPE_APP, TYPE_APP> {RPAREN}                      { RiseFromParenLevel(1); return MakeToken(RPAREN); }
 <INIT_TYPE_APP, TYPE_APP> {RBRACK}                      { RiseFromParenLevel(1); return MakeToken(RBRACK); }
-<INIT_TYPE_APP, TYPE_APP> {GREATER_RBRACK}              { PushBack(yylength()); CheckGreatRBrack(SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN); Clear(); break; }
-<INIT_TYPE_APP, TYPE_APP> {GREATER_BAR_RBRACK}          { PushBack(yylength()); InitSmashAdjacent(SMASH_ADJACENT_GREATER_BAR_RBRACK, SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN); Clear(); break; }
-<INIT_TYPE_APP, TYPE_APP> {GREATER}+{BAD_SYMBOLIC_OP}   { PushBack(yylength()); yybegin(ADJACENT_TYPE_CLOSE_OP); Clear(); break; }
+<INIT_TYPE_APP, TYPE_APP> {GREATER_RBRACK}              { yypushback(yylength()); CheckGreatRBrack(SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN); Clear(); break; }
+<INIT_TYPE_APP, TYPE_APP> {GREATER_BAR_RBRACK}          { yypushback(yylength()); InitSmashAdjacent(SMASH_ADJACENT_GREATER_BAR_RBRACK, SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN); Clear(); break; }
+<INIT_TYPE_APP, TYPE_APP> {GREATER}+{BAD_SYMBOLIC_OP}   { yypushback(yylength()); yybegin(ADJACENT_TYPE_CLOSE_OP); Clear(); break; }
 
 <INIT_TYPE_APP, TYPE_APP> "default"  { return InitIdent(); }
 <INIT_TYPE_APP, TYPE_APP> "struct"   { return InitIdent(); }
@@ -248,13 +248,13 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <ADJACENT_TYPE_CLOSE_OP> {GREATER}+ { AdjacentTypeCloseOp(); Clear(); break; }
 
 <GREATER_OP, GREATER_OP_SYMBOLIC_OP> {GREATER} { return MakeToken(GREATER); }
-<GREATER_OP, GREATER_OP_SYMBOLIC_OP> [^]       { PushBack(1); ExitGreaterOp(); Clear(); break; }
+<GREATER_OP, GREATER_OP_SYMBOLIC_OP> [^]       { yypushback(1); ExitGreaterOp(); Clear(); break; }
 
 <SYMBOLIC_OPERATOR> {LQUOTE_TYPED}        { RiseFromParenLevel(0); return MakeToken(LQUOTE_TYPED); }
 <SYMBOLIC_OPERATOR> {RQUOTE_TYPED}        { RiseFromParenLevel(0); return MakeToken(RQUOTE_TYPED); }
 <SYMBOLIC_OPERATOR> {LQUOTE_UNTYPED}      { RiseFromParenLevel(0); return MakeToken(LQUOTE_UNTYPED); }
 <SYMBOLIC_OPERATOR> {RQUOTE_UNTYPED}      { RiseFromParenLevel(0); return MakeToken(RQUOTE_UNTYPED); }
-<SYMBOLIC_OPERATOR> "@>."|"@@>."          { PushBack(yylength()); yybegin(SMASH_RQUOTE_DOT); Clear(); break; }
+<SYMBOLIC_OPERATOR> "@>."|"@@>."          { yypushback(yylength()); yybegin(SMASH_RQUOTE_DOT); Clear(); break; }
 <SYMBOLIC_OPERATOR> {BAR}                 { RiseFromParenLevel(0); return MakeToken(BAR); }
 <SYMBOLIC_OPERATOR> {LARROW}              { RiseFromParenLevel(0); return MakeToken(LARROW); }
 <SYMBOLIC_OPERATOR> {LPAREN}              { RiseFromParenLevel(0); return MakeToken(LPAREN); }
@@ -325,7 +325,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, TYPE_APP> {HASH}"light"    { return MakeToken(PP_LIGHT); }
 
 <LINE, TYPE_APP, INIT_TYPE_APP> ("(*")                  { InitBlockComment(); InitTokenLength(); IncreaseTokenLength(yylength()); Clear(); break; }
-<LINE, TYPE_APP, INIT_TYPE_APP> {PP_COMPILER_DIRECTIVE} { PushBack(yylength()); yybegin(BAD_PPSHARP); Clear(); break; }
+<LINE, TYPE_APP, INIT_TYPE_APP> {PP_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(BAD_PPSHARP); Clear(); break; }
 
 <INIT_TYPE_APP> "(*IF-FSHARP"    { yybegin(LINE); return MakeToken(BLOCK_COMMENT); }
 <INIT_TYPE_APP> "ENDIF-FSHARP*)" { yybegin(LINE); return MakeToken(BLOCK_COMMENT); }
@@ -337,8 +337,8 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 
 <LINE, TYPE_APP, INIT_TYPE_APP> {PP_BAD_COMPILER_DIRECTIVE} {
   // TODO: delete this rule and use the following rule instead after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-  // <LINE, TYPE_APP, INIT_TYPE_APP> {PP_BAD_COMPILER_DIRECTIVE} { PushBack(yylength() - 1); return MakeToken(HASH); }
-  PushBack(yylength()); yybegin(BAD_PPSHARP); Clear(); break; }
+  // <LINE, TYPE_APP, INIT_TYPE_APP> {PP_BAD_COMPILER_DIRECTIVE} { yypushback(yylength() - 1); return MakeToken(HASH); }
+  yypushback(yylength()); yybegin(BAD_PPSHARP); Clear(); break; }
 
 <LINE, TYPE_APP> {LQUOTE_TYPED}   { return MakeToken(LQUOTE_TYPED); }
 <LINE, TYPE_APP> {RQUOTE_TYPED}   { return MakeToken(RQUOTE_TYPED); }
@@ -353,8 +353,8 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, TYPE_APP> "@>."|"@@>." {
   // Rule for smash RQUOTE_DOT.
   // https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2148
-  PushBack(yylength()); InitSmash(SMASH_RQUOTE_DOT_FROM_LINE, SMASH_RQUOTE_DOT); Clear(); break; }
-<INIT_TYPE_APP> "@>."|"@@>."  { PushBack(yylength()); yybegin(SMASH_RQUOTE_DOT_FROM_LINE); Clear(); break; }
+  yypushback(yylength()); InitSmash(SMASH_RQUOTE_DOT_FROM_LINE, SMASH_RQUOTE_DOT); Clear(); break; }
+<INIT_TYPE_APP> "@>."|"@@>."  { yypushback(yylength()); yybegin(SMASH_RQUOTE_DOT_FROM_LINE); Clear(); break; }
 
 <LINE, TYPE_APP> {LET_BANG}            { return MakeToken(LET_BANG); }
 <LINE, TYPE_APP> {USE_BANG}            { return MakeToken(USE_BANG); }
@@ -488,23 +488,23 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE> {NATIVEINT}{LESS_OP}                { InitTypeApp(); return MakeToken(NATIVEINT); }
 <LINE> {RESERVED_LITERAL_FORMATS}{LESS_OP} { InitTypeApp(); return MakeToken(RESERVED_LITERAL_FORMATS); }
 
-<LINE> "delegate"{LESS_OP}{BAD_SYMBOLIC_OP}                 { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {IDENT}{LESS_OP}{BAD_SYMBOLIC_OP}                    { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {IEEE32}{LESS_OP}{BAD_SYMBOLIC_OP}                   { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {IEEE64}{LESS_OP}{BAD_SYMBOLIC_OP}                   { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {DECIMAL}{LESS_OP}{BAD_SYMBOLIC_OP}                  { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {BYTE}{LESS_OP}{BAD_SYMBOLIC_OP}                     { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {INT16}{LESS_OP}{BAD_SYMBOLIC_OP}                    { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> ({XINT}|{INT}){LESS_OP}{BAD_SYMBOLIC_OP}             { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {INT32}{LESS_OP}{BAD_SYMBOLIC_OP}                    { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {INT64}{LESS_OP}{BAD_SYMBOLIC_OP}                    { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {SBYTE}{LESS_OP}{BAD_SYMBOLIC_OP}                    { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {UINT16}{LESS_OP}{BAD_SYMBOLIC_OP}                   { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {UINT32}{LESS_OP}{BAD_SYMBOLIC_OP}                   { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {UINT64}{LESS_OP}{BAD_SYMBOLIC_OP}                   { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {BIGNUM}{LESS_OP}{BAD_SYMBOLIC_OP}                   { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {NATIVEINT}{LESS_OP}{BAD_SYMBOLIC_OP}                { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
-<LINE> {RESERVED_LITERAL_FORMATS}{LESS_OP}{BAD_SYMBOLIC_OP} { PushBack(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> "delegate"{LESS_OP}{BAD_SYMBOLIC_OP}                 { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {IDENT}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {IEEE32}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {IEEE64}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {DECIMAL}{LESS_OP}{BAD_SYMBOLIC_OP}                  { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {BYTE}{LESS_OP}{BAD_SYMBOLIC_OP}                     { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {INT16}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> ({XINT}|{INT}){LESS_OP}{BAD_SYMBOLIC_OP}             { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {INT32}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {INT64}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {SBYTE}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {UINT16}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {UINT32}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {UINT64}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {BIGNUM}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {NATIVEINT}{LESS_OP}{BAD_SYMBOLIC_OP}                { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
+<LINE> {RESERVED_LITERAL_FORMATS}{LESS_OP}{BAD_SYMBOLIC_OP} { yypushback(yylength()); yybegin(PRE_LESS_OP); Clear(); break; }
 
 <PRE_LESS_OP> "delegate"                 { yybegin(LINE); return MakeToken(DELEGATE); }
 <PRE_LESS_OP> {IDENT}                    { yybegin(LINE); return IdentInTypeApp(); }
@@ -540,7 +540,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, TYPE_APP, INIT_TYPE_APP> {INT}\.\. {
   // Rule for smashing INT_DOT_DOT.
   // https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2142
-  PushBack(yylength()); InitSmash(SMASH_INT_DOT_DOT_FROM_LINE, SMASH_INT_DOT_DOT); Clear(); break; }
+  yypushback(yylength()); InitSmash(SMASH_INT_DOT_DOT_FROM_LINE, SMASH_INT_DOT_DOT); Clear(); break; }
 
 <LINE, TYPE_APP, INIT_TYPE_APP> {IEEE32}  { return MakeToken(IEEE32); }
 <LINE, TYPE_APP, INIT_TYPE_APP> {IEEE64}  { return MakeToken(IEEE64); }
@@ -603,9 +603,9 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "(*"      { myNestedCommentLevel++; IncreaseTokenLength(yylength()); Clear(); break; }
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "*)"      { if (--myNestedCommentLevel == 0) return FillBlockComment(); IncreaseTokenLength(yylength()); Clear(); break; }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"        { PushBack(yylength()); InitStringInClockComment(); Clear(); break; }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> @\"       { PushBack(yylength()); InitStringInClockComment(); Clear(); break; }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"\"\"    { PushBack(yylength()); InitStringInClockComment(); Clear(); break; } 
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"        { yypushback(yylength()); InitStringInClockComment(); Clear(); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> @\"       { yypushback(yylength()); InitStringInClockComment(); Clear(); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"\"\"    { yypushback(yylength()); InitStringInClockComment(); Clear(); break; } 
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> [^(\"@*]+ { IncreaseTokenLength(yylength()); Clear(); break; }
 <IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> [^]|"(*)" { IncreaseTokenLength(yylength()); Clear(); break; }
 
@@ -633,19 +633,19 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <PPDIRECTIVE> {HASH}"I"                          { yybegin(LINE); return MakeToken(PP_I); }
 <PPDIRECTIVE> {HASH}"nowarn"                     { yybegin(LINE); return MakeToken(PP_NOWARN); }
 
-<PPDIRECTIVE> {HASH}"if"                         { PushBack(yylength()); yybegin(PPSHARP); Clear(); break; }
-<PPDIRECTIVE> {HASH}"else"                       { PushBack(yylength()); yybegin(PPSHARP); Clear(); break; }
-<PPDIRECTIVE> {HASH}"endif"                      { PushBack(yylength()); yybegin(PPSHARP); Clear(); break; }
+<PPDIRECTIVE> {HASH}"if"                         { yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
+<PPDIRECTIVE> {HASH}"else"                       { yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
+<PPDIRECTIVE> {HASH}"endif"                      { yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 
 <PPDIRECTIVE> {HASH}"if"{TAIL_IDENT}             {
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-  PushBack(yylength()); yybegin(PPSHARP); Clear(); break; }
+  yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 <PPDIRECTIVE> {HASH}"else"{TAIL_IDENT}           {
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-  PushBack(yylength()); yybegin(PPSHARP); Clear(); break; }
+  yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 <PPDIRECTIVE> {HASH}"endif"{TAIL_IDENT}          {
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-  PushBack(yylength()); yybegin(PPSHARP); Clear(); break; }
+  yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 
 <PPDIRECTIVE> {HASH}{IDENT}                      { yybegin(LINE); return MakeToken(PP_DIRECTIVE); }
 
@@ -659,13 +659,13 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 
 <PPSHARP, BAD_PPSHARP> {HASH}"if"{TAIL_IDENT}    {
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-  PushBack(yylength() - 3); yybegin(LINE); return MakeToken(PP_DIRECTIVE); }
+  yypushback(yylength() - 3); yybegin(LINE); return MakeToken(PP_DIRECTIVE); }
 <PPSHARP, BAD_PPSHARP> {HASH}"else"{TAIL_IDENT}  {
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-  PushBack(yylength() - 5); yybegin(PPSYMBOL); return MakeToken(PP_DIRECTIVE); }
+  yypushback(yylength() - 5); yybegin(PPSYMBOL); return MakeToken(PP_DIRECTIVE); }
 <PPSHARP, BAD_PPSHARP> {HASH}"endif"{TAIL_IDENT} {
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-  PushBack(yylength() - 6); yybegin(PPSYMBOL); return MakeToken(PP_DIRECTIVE); }
+  yypushback(yylength() - 6); yybegin(PPSYMBOL); return MakeToken(PP_DIRECTIVE); }
 
 <PPSYMBOL> "||"                    { return MakeToken(PP_OR); }
 <PPSYMBOL> "&&"                    { return MakeToken(PP_AND); }
