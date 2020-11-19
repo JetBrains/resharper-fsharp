@@ -131,6 +131,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public static readonly NodeTypeSet Keywords;
     public static readonly NodeTypeSet Identifiers;
     public static readonly NodeTypeSet Strings;
+    public static readonly NodeTypeSet InterpolatedStrings;
     public static readonly NodeTypeSet Literals;
     public static readonly NodeTypeSet CreateIdentifierTokenTypes;
 
@@ -244,6 +245,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         VERBATIM_STRING,
         TRIPLE_QUOTED_STRING,
         BYTEARRAY);
+
+      InterpolatedStrings = new NodeTypeSet(
+        REGULAR_INTERPOLATED_STRING,
+        REGULAR_INTERPOLATED_STRING_START,
+        REGULAR_INTERPOLATED_STRING_MIDDLE,
+        REGULAR_INTERPOLATED_STRING_END,
+        VERBATIM_INTERPOLATED_STRING,
+        VERBATIM_INTERPOLATED_STRING_START,
+        VERBATIM_INTERPOLATED_STRING_MIDDLE,
+        VERBATIM_INTERPOLATED_STRING_END,
+        TRIPLE_QUOTE_INTERPOLATED_STRING,
+        TRIPLE_QUOTE_INTERPOLATED_STRING_START,
+        TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE,
+        TRIPLE_QUOTE_INTERPOLATED_STRING_END,
+        UNFINISHED_REGULAR_INTERPOLATED_STRING,
+        UNFINISHED_VERBATIM_INTERPOLATED_STRING,
+        UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING);
 
       Literals = new NodeTypeSet(
         IEEE32,
