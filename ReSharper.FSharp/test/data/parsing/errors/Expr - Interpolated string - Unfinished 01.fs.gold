@@ -1,0 +1,7 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    FSharpString(type:REGULAR_INTERPOLATED_STRING_START, text:$" {)
+    FSharpToken(type:INT32, text:1)
+    FSharpString(type:REGULAR_INTERPOLATED_STRING_MIDDLE, text:})
+

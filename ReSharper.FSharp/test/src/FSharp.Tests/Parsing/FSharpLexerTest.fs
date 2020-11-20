@@ -18,6 +18,8 @@ type FSharpLexerTest() =
     [<Test>] member x.``Literals 03 - digits``() = x.DoNamedTest()
     [<Test>] member x.``Literals 04 - escape characters``() = x.DoNamedTest()
 
+    [<Test>] member x.``Strings - Byte array 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Byte array 02 - Verbatim``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Eof - Interpolated - Regular 01``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Eof - Interpolated - Regular 02``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Eof - Interpolated - Regular 03``() = x.DoNamedTest()
@@ -54,7 +56,6 @@ type FSharpLexerTest() =
     [<Test>] member x.``Strings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Strings 02 - Triple quoted``() = x.DoNamedTest()
     [<Test>] member x.``Strings 03 - Verbatim``() = x.DoNamedTest()
-    [<Test>] member x.``Strings 04 - Bytearray``() = x.DoNamedTest()
     [<Test>] member x.``Strings 05 - Escape characters 1``() = x.DoNamedTest()
     [<Test>] member x.``Strings 05 - Escape characters 2``() = x.DoNamedTest()
     [<Test>] member x.``Strings 05 - Escape characters 3 - Triple quoted``() = x.DoNamedTest()

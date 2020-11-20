@@ -4,11 +4,11 @@ IFSharpImplFile
     IDoStatement
       IChameleonExpression
         IInterpolatedStringExpr
-          FSharpToken(type:REGULAR_INTERPOLATED_STRING_START, text:$"{)
+          FSharpString(type:REGULAR_INTERPOLATED_STRING_START, text:$"{)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ILiteralExpr
             FSharpToken(type:INT32, text:1)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpToken(type:REGULAR_INTERPOLATED_STRING_END, text:}")
+          FSharpString(type:REGULAR_INTERPOLATED_STRING_END, text:}")
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

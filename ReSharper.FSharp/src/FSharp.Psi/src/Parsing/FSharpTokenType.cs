@@ -31,7 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         if (IsComment)
           return new FSharpComment(this, text);
 
-        if (IsStringLiteral)
+        if (Strings[this])
           return new FSharpString(this, text);
 
         return this != DEAD_CODE
@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
       public override bool IsWhitespace => this == WHITESPACE || this == NEW_LINE;
       public override bool IsComment => this == LINE_COMMENT || this == BLOCK_COMMENT;
-      public override bool IsStringLiteral => Strings[this];
+      public override bool IsStringLiteral => StringsLiterals[this];
       public override bool IsConstantLiteral => Literals[this];
       public override bool IsIdentifier => Identifiers[this];
       public override bool IsKeyword => Keywords[this];
@@ -130,8 +130,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public static readonly NodeTypeSet AccessModifiersKeywords;
     public static readonly NodeTypeSet Keywords;
     public static readonly NodeTypeSet Identifiers;
-    public static readonly NodeTypeSet Strings;
+    public static readonly NodeTypeSet StringsLiterals;
     public static readonly NodeTypeSet InterpolatedStrings;
+    public static readonly NodeTypeSet Strings;
     public static readonly NodeTypeSet Literals;
     public static readonly NodeTypeSet CreateIdentifierTokenTypes;
 
@@ -239,12 +240,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         LESS,
         LPAREN_STAR_RPAREN);
 
-      Strings = new NodeTypeSet(
+      StringsLiterals = new NodeTypeSet(
         CHARACTER_LITERAL,
         STRING,
         VERBATIM_STRING,
         TRIPLE_QUOTED_STRING,
-        BYTEARRAY);
+        BYTEARRAY,
+        VERBATIM_BYTEARRAY);
 
       InterpolatedStrings = new NodeTypeSet(
         REGULAR_INTERPOLATED_STRING,
@@ -262,6 +264,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         UNFINISHED_REGULAR_INTERPOLATED_STRING,
         UNFINISHED_VERBATIM_INTERPOLATED_STRING,
         UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING);
+
+      Strings = StringsLiterals.Union(InterpolatedStrings);
 
       Literals = new NodeTypeSet(
         IEEE32,

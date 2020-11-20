@@ -36,7 +36,7 @@
     <Compile Include="Daemon\SyntaxHighlightingTest.fs" />
     <Compile Include="Daemon\RedundantParenExprTest.fs" />
     <Compile Include="Daemon\RedundantParenPatTest.fs" />
-    <Compile Include="Daemon\StringEscapingTest.fs" />
+    <Compile Include="Daemon\StringAnalyzerTest.fs" />
     <Compile Include="Daemon\RedundantAttributeParensTest.fs" />
     <Compile Include="Daemon\RedundantAttributeSuffixAnalyzerTest.fs" />
     <Compile Include="Daemon\FSharpColorHighlightingTest.fs" />
