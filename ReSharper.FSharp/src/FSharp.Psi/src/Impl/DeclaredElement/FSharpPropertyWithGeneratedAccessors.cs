@@ -28,8 +28,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       var isReadable = IsReadable = getter != null;
       var isWritable = IsWritable = setter != null;
 
-      Getter = isReadable ? new FSharpPropertyAccessor(getter, this, AccessorKind.GETTER) : null;
-      Setter = isWritable ? new FSharpPropertyAccessor(setter, this, AccessorKind.SETTER) : null;
+      Getter = isReadable ? new FSharpPropertyAccessor(getter, this) : null;
+      Setter = isWritable ? new FSharpPropertyAccessor(setter, this) : null;
     }
 
     public override bool IsReadable { get; }

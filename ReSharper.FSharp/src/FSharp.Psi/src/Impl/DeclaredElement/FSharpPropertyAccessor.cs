@@ -20,8 +20,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     private readonly FSharpMemberOrFunctionOrValue myMfv;
     private readonly ImplicitAccessor myImplicitAccessor;
 
-    public FSharpPropertyAccessor(FSharpMemberOrFunctionOrValue mfv, IOverridableMember owner, AccessorKind kind)
+    public FSharpPropertyAccessor(FSharpMemberOrFunctionOrValue mfv, IOverridableMember owner)
     {
+      var kind = mfv.IsPropertyGetterMethod ? AccessorKind.GETTER : AccessorKind.SETTER;
       myMfv = mfv;
       myImplicitAccessor = new ImplicitAccessor(owner, kind);
     }
