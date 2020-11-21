@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
@@ -120,17 +119,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return result.ResultingList();
     }
 
-    public static IList<ITypeMember> GetGeneratedMembersFromDeclarations(this IFSharpProperty property)
+    public static IEnumerable<ITypeMember> GetGeneratedMembersFromDeclarations(this IFSharpProperty property)
     {
-      var result = new LocalList<ITypeMember>();
+      foreach (var getter in property.Getters)
+        yield return new FSharpGeneratedPropertyAccessor(getter);
 
-      var getters = property.Getters.Select(t => new FSharpGeneratedPropertyAccessor(t));
-      var setters = property.Setters.Select(t => new FSharpGeneratedPropertyAccessor(t));
-
-      result.AddRange(getters);
-      result.AddRange(setters);
-
-      return result.ResultingList();
+      foreach (var setter in property.Setters)
+        yield return new FSharpGeneratedPropertyAccessor(setter);
     }
   }
 }
