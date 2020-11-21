@@ -119,7 +119,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return result.ResultingList();
     }
 
-    public static IEnumerable<ITypeMember> GetGeneratedMembersFromDeclarations(this IFSharpProperty property)
+    public static IEnumerable<IDeclaredElement> GetGeneratedMembersFromDeclarations(this IFSharpProperty property)
     {
       foreach (var getter in property.Getters)
         yield return new FSharpGeneratedPropertyAccessor(getter);
