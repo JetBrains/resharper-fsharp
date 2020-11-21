@@ -1,4 +1,3 @@
-//${NEW_NAME:Zzz}
 public class Class1
 {
   public Class1()
