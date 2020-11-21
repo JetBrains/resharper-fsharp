@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
@@ -6,6 +7,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
@@ -103,6 +105,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       result.Add(new FSharpUnionCaseTag(unionCase));
 
       return result;
+    }
+
+    public static IList<ITypeMember> GetGeneratedMembers(this IFSharpProperty property)
+    {
+      var result = new FrugalLocalList<ITypeMember>();
+
+      if (property.IsReadable)
+        result.Add(new FSharpGeneratedPropertyAccessor(property.Getter));
+
+      if (property.IsWritable)
+        result.Add(new FSharpGeneratedPropertyAccessor(property.Setter));
+
+      return result.ResultingList();
+    }
+
+    public static IList<ITypeMember> GetGeneratedMembersFromDeclarations(this IFSharpProperty property)
+    {
+      var result = new LocalList<ITypeMember>();
+
+      var getters = property.Getters.Select(t => new FSharpGeneratedPropertyAccessor(t));
+      var setters = property.Setters.Select(t => new FSharpGeneratedPropertyAccessor(t));
+
+      result.AddRange(getters);
+      result.AddRange(setters);
+
+      return result.ResultingList();
     }
   }
 }

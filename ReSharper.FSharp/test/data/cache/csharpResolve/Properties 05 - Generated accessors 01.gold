@@ -1,0 +1,30 @@
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+    var _ = t.|A|(0);
+    var __ = t.get_A(0);
+    var ___ = t.get_A(0, 0);
+    var ____ = t.get_A(0, 0, 0);
+    t.set_A(0, 0);
+    t.set_A(0, 0, 0);
+    t.set_A(0, 0, 0, 0, 0);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'A'
+M:T.#ctor
+M:T.get_A(System.Int32)
+M:T.get_A(System.Int32)
+M:T.get_A(System.Int32,System.Int32)
+M:T.get_A(System.Int32,System.Int32)
+M:T.get_A(System.Int32,System.Int32,System.Int32)
+M:T.get_A(System.Int32,System.Int32,System.Int32)
+M:T.set_A(System.Int32,System.Int32)
+M:T.set_A(System.Int32,System.Int32)
+M:T.set_A(System.Int32,System.Int32,System.Int32)
+M:T.set_A(System.Int32,System.Int32,System.Int32)
+M:T.set_A(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)
+M:T.set_A(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)

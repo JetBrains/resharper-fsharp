@@ -116,6 +116,9 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
             | null -> EmptyArray.Instance :> _
             | parameter -> [| parameter :> IDeclaredElement |] :> _
 
+        | :? IFSharpProperty as property ->
+            property.GetGeneratedMembersFromDeclarations() |> Seq.cast<IDeclaredElement>
+
         | :? IFSharpModule -> EmptyArray.Instance :> _
 
         | :? IFSharpTypeElement as fsTypeElement ->

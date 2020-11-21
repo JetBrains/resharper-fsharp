@@ -84,5 +84,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       SuperTypesClrTypeNames = superTypeNames.ToArray();
       return superTypeElements;
     }
+
+    public override IEnumerable<ITypeMember> GetTypeMembers()
+    {
+      var declaration = GetDeclaration();
+      if (declaration == null) return EmptyList<ITypeMember>.Instance;
+
+      var result = new LocalList<ITypeMember>();
+      foreach (var memberDeclaration in declaration.MemberDeclarations)
+      {
+        var declaredElement = memberDeclaration.DeclaredElement;
+        if (declaredElement is IFSharpProperty prop)
+          result.AddRange(prop.GetGeneratedMembers());
+
+        if (declaredElement != null) result.Add(declaredElement);
+      }
+
+      return result.ResultingList();
+    }
   }
 }
