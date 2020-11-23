@@ -1,4 +1,4 @@
-<idea-plugin require-restart="true">
+<idea-plugin require-restart="true" allow-bundled-update="true">
   <name>F# Support</name>
   <id>com.jetbrains.rider.fsharp</id>
   <vendor url="https://jetbrains.com">JetBrains</vendor>
