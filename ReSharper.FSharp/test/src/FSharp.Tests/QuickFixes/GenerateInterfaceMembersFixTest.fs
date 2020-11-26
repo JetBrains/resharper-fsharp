@@ -60,4 +60,6 @@ type GenerateMissingMembersFixTest() =
 
     [<Test>] member x.``Context - Common namespace 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Same name 01``() = x.DoNamedTest()
+    [<Test>] member x.``Same name 02``() = x.DoNamedTest()
     [<Test>] member x.``Super 01 - Different type parameter name``() = x.DoNamedTest()
