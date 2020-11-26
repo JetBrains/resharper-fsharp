@@ -16,7 +16,7 @@ IFSharpImplFile
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         ITypeMemberDeclarationList
-          IMemberConstructorDeclaration
+          ISecondaryConstructorDeclaration
             FSharpTokenType+NewTokenElement(type:NEW, text:new)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IParametersPatternDeclaration

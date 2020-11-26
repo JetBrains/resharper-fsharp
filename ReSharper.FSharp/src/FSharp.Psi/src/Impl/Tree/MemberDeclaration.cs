@@ -67,11 +67,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       ObjExprNavigator.GetByMemberDeclaration(this) is { } objExpr && objExpr.ArgExpression == null ||
       ObjExprNavigator.GetByInterfaceMember(this) != null;
 
-    public override bool IsStatic => StaticKeyword != null;
+    public override bool IsStatic => 
+      StaticKeyword != null;
 
-    public override bool IsOverride =>
-      MemberKeyword?.GetTokenType() is var tokenType &&
-      tokenType == FSharpTokenType.OVERRIDE || tokenType == FSharpTokenType.DEFAULT;
+    public override bool IsVirtual =>
+      MemberKeyword?.GetTokenType() == FSharpTokenType.DEFAULT;
+
+    public override bool IsOverride => this.IsOverride();
 
     public override TreeTextRange GetNameIdentifierRange() =>
       NameIdentifier.GetMemberNameIdentifierRange();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FSharp.Compiler.SourceCodeServices;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -10,6 +11,41 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class AbstractMemberDeclaration
   {
+    private bool? myHasDefaultImplementation;
+
+    protected override void ClearCachedData()
+    {
+      base.ClearCachedData();
+      myHasDefaultImplementation = null;
+    }
+
+    public bool HasDefaultImplementation
+    {
+      get
+      {
+        if (myHasDefaultImplementation != null)
+          return myHasDefaultImplementation.Value;
+
+        lock (this)
+          return myHasDefaultImplementation ??= 
+            CalcHasDefaultImplementation(GetFSharpSymbol() as FSharpMemberOrFunctionOrValue);
+      }
+    }
+
+    private static bool CalcHasDefaultImplementation([CanBeNull] FSharpMemberOrFunctionOrValue mfv)
+    {
+      if (mfv == null || !mfv.IsDispatchSlot)
+        return false;
+
+      var logicalName = mfv.LogicalName;
+      var mfvType = mfv.FullType.GenericArguments[1];
+
+      return
+        mfv.DeclaringEntity?.Value.MembersFunctionsAndValues.Any(m =>
+          m.IsOverrideOrExplicitInterfaceImplementation &&
+          logicalName == m.LogicalName && mfvType.Equals(m.FullType)) ?? false;
+    }
+    
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
@@ -23,17 +59,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv))
         return null;
 
-      // todo: remove this and provide API in FCS and cache it somehow
-      var logicalName = mfv.LogicalName;
-
-      var hasDefault =
-        mfv.DeclaringEntity?.Value.MembersFunctionsAndValues.Any(m =>
-          m.IsOverrideOrExplicitInterfaceImplementation && logicalName == m.LogicalName) ?? false;
-
-      if (hasDefault)
-        return null;
-
       // workaround for RIDER-26985, FCS provides wrong info for abstract events.
+      var logicalName = mfv.LogicalName;
       if (logicalName.StartsWith("add_", StringComparison.Ordinal) ||
           logicalName.StartsWith("remove_", StringComparison.Ordinal))
       {

@@ -32,10 +32,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         ? new ConstantValue(literalValue, Type)
         : ConstantValue.BAD_VALUE;
 
-    public override bool IsAbstract => false;
-    public override bool IsSealed => false;
-    public override bool IsVirtual => false;
-    public override bool IsOverride => false;
     public override bool IsStatic => true;
     public override bool IsReadonly => true;
   }

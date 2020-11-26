@@ -128,7 +128,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
                     ElementType.ABSTRACT_MEMBER_DECLARATION
                 else
                     match flags.MemberKind with
-                    | MemberKind.Constructor -> ElementType.MEMBER_CONSTRUCTOR_DECLARATION
+                    | MemberKind.Constructor -> ElementType.SECONDARY_CONSTRUCTOR_DECLARATION
                     | _ -> ElementType.MEMBER_DECLARATION
             x.Done(range, mark, elementType)
 

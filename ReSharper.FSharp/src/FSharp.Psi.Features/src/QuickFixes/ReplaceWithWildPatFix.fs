@@ -52,7 +52,7 @@ module ReplaceWithWildPat =
 
         | :? IParametersPatternDeclaration as parent ->
             let parent = parent.Parent
-            parent :? IMemberDeclaration || parent :? IMemberConstructorDeclaration
+            parent :? IMemberDeclaration || parent :? ISecondaryConstructorDeclaration
 
         | _ -> false
 

@@ -229,7 +229,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
         .Name("SpacesInMemberConstructorDecl")
-        .Where(Parent().HasType(ElementType.MEMBER_CONSTRUCTOR_DECLARATION))
+        .Where(Parent().HasType(ElementType.SECONDARY_CONSTRUCTOR_DECLARATION))
         .Return(IntervalFormatType.Space)
         .Build();
 

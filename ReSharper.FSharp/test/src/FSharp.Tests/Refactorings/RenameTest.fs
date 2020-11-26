@@ -168,8 +168,19 @@ type FSharpRenameTest() =
     [<Test>] member x.``Related symbols - Single case union 01 - Union``() = x.DoNamedTestFiles()
     [<Test>] member x.``Related symbols - Single case union 02 - Case``() = x.DoNamedTestFiles()
 
+    [<Test>] member x.``Object expr 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member - Abstract 01 - Name``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Abstract 02 - Type``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Virtual - Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Virtual - Method 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Virtual - Method 03 - Overload``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Virtual - Method 04 - Overload``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Virtual - Auto property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Virtual - Auto property 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Virtual - Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Virtual - Property 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Auto prop 01 - Name``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Auto prop 02 - Type``() = x.DoNamedTest()

@@ -76,6 +76,17 @@ type FSharpGoToInheritorsTest() =
     [<Test>] member x.``Interface 06 - Implement multiple``() = x.DoNamedTest()
     [<Test>] member x.``Interface 07 - Implement multiple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Member - Override - Auto property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Override - Auto property 02 - Default``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Override - Auto property 03 - Member``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Override - Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Override - Property 02 - Default``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Override - Property 03 - Member``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Auto property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Auto property 02``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Property 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Interface 02 - Dispose``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Override 01 - Default member``() = x.DoNamedTest()
@@ -98,6 +109,12 @@ type FSharpGoToBaseTest() =
     [<Test>] member x.``Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Interface 02 - Inherit``() = x.DoNamedTest()
     [<Test>] member x.``Interface 03 - Implement multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Auto property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Auto property 02``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Method 02``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Property 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Interface 02 - Dispose``() = x.DoNamedTest()
@@ -118,6 +135,11 @@ type FSharpGoToDeclarationTest() =
     [<Test>] member x.``Own member vs interface``() = x.DoNamedTest()
     [<Test>] member x.``Ctor 01 - Modifier``() = x.DoNamedTest()
 
+    [<Test>] member x.``Member - Virtual - Auto property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Method 02``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Virtual - Property 01``() = x.DoNamedTest()
+    
     [<Test>] member x.``Signature 01``() = x.DoTestSolution("Signature 01.fsi", "Signature 01.fs")
     [<Test>] member x.``Signature 02 - Same range``() = x.DoTestSolution("Signature 02 - Same range.fsi", "Signature 02 - Same range.fs")
 

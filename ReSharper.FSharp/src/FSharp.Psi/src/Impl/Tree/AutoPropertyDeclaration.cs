@@ -26,5 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? new FSharpProperty<AutoPropertyDeclaration>(this, property.Value)
         : null;
     }
+    
+    public override bool IsOverride => this.IsOverride();
   }
 }

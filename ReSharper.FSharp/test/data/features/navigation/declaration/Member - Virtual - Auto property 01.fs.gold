@@ -1,0 +1,39 @@
+﻿-------------- offset 99 line 8 col 6 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [O] abstract |P|: int RANGE: (61,62) @ Member - Virtual - Auto property 01.fs
+Menu Item presentation: 
+Text: Member - Virtual - Auto property 01.fs| (5)
+Shortcut text: in <TestProject>
+Style: Enabled
+Mnemonic: 
+Tooltip: abstract P: int
+
+Occurrence's navigation result. Opened file: Member - Virtual - Auto property 01.fs
+------------------
+[<AbstractClass>]
+type A() =
+    abstract |CARET|P: int
+    default val P = 1
+
+------------------
+
+Occurrence's dump:
+TO: [O] default val |P| = 1 RANGE: (85,86) @ Member - Virtual - Auto property 01.fs
+Menu Item presentation: 
+Text: Member - Virtual - Auto property 01.fs| (6)
+Shortcut text: in <TestProject>
+Style: Enabled
+Mnemonic: 
+Tooltip: default val P = 1
+
+Occurrence's navigation result. Opened file: Member - Virtual - Auto property 01.fs
+------------------
+type A() =
+    abstract P: int
+    default val |CARET|P = 1
+
+A().P
+------------------
+

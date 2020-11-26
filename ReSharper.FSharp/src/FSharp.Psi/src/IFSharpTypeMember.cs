@@ -12,11 +12,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     bool IsVisibleFromFSharp { get; }
     bool CanNavigateTo { get; }
-
-    bool IsExtensionMember { get; }
   }
 
-  public interface IFSharpMember : IFSharpTypeMember
+  public interface IFSharpMember : IFSharpTypeMember, IOverridableMember
   {
     [CanBeNull] FSharpMemberOrFunctionOrValue Mfv { get; }
   }

@@ -1,0 +1,31 @@
+﻿-------------- offset 62 line 5 col 15 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
+Immediate result: Occurrence's dump:
+[*] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.MemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.MemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Member - Override - Property 01.fs
++++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [O] override x.|P| = 123 RANGE: (117,118) @ Member - Override - Property 01.fs
+Menu Item presentation: 
+Text: Member - Override - Property 01.fs| (10)
+Shortcut text: in <TestProject>
+Style: Enabled
+Mnemonic: 
+Tooltip: override x.P = 123
+
+Occurrence's navigation result. Opened file: Member - Override - Property 01.fs
+------------------
+    inherit A()
+
+    override x.|CARET|P = 123
+
+------------------
+
+Occurrence's navigation result. Opened file: Member - Override - Property 01.fs
+------------------
+    inherit A()
+
+    override x.|CARET|P = 123
+
+------------------
+

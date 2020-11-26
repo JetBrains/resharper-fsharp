@@ -308,7 +308,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                         x.ProcessCtorSelfId(selfId)
 
                         x.MarkChameleonExpression(expr)
-                        ElementType.MEMBER_CONSTRUCTOR_DECLARATION
+                        ElementType.SECONDARY_CONSTRUCTOR_DECLARATION
 
                     | _ ->
                         match accessorId with

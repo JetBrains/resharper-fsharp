@@ -1,9 +1,7 @@
-﻿using FSharp.Compiler.SourceCodeServices;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -19,10 +17,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.CONSTRUCTOR;
 
-    public override string ShortName =>
-      GetContainingType()?.ShortName ??
-      SharedImplUtil.MISSING_DECLARATION_NAME;
-
     public override bool IsStatic => false;
     public override IType ReturnType => Module.GetPredefinedType().Void;
 
@@ -30,20 +24,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public bool IsDefault => false;
     public bool IsParameterless => Parameters.IsEmpty();
+
+    public override bool Equals(object obj) => 
+      obj is IConstructor && base.Equals(obj);
+
+    public override int GetHashCode() => ShortName.GetHashCode();
   }
 
-  internal class FSharpConstructor : FSharpConstructorBase<MemberConstructorDeclaration>
+  internal class FSharpSecondaryConstructor : FSharpConstructorBase<SecondaryConstructorDeclaration>
   {
-    public FSharpConstructor([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
+    public FSharpSecondaryConstructor([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
     public override bool IsImplicit => false;
   }
 
-  internal class FSharpImplicitConstructor : FSharpConstructorBase<PrimaryConstructorDeclaration>
+  internal class FSharpPrimaryConstructor : FSharpConstructorBase<PrimaryConstructorDeclaration>
   {
-    public FSharpImplicitConstructor([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
+    public FSharpPrimaryConstructor([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 

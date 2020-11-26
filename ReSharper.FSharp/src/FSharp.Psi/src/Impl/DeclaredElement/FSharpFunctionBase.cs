@@ -10,7 +10,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpFunctionBase<TDeclaration> : FSharpMemberBase<TDeclaration>, IFunction
+  internal abstract class FSharpFunctionBase<TDeclaration> : FSharpMemberBase<TDeclaration>, IFSharpFunction
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected FSharpFunctionBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
@@ -88,11 +88,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (!base.Equals(obj))
         return false;
 
-      if (!(obj is FSharpFunctionBase<TDeclaration> member) || IsStatic != member.IsStatic) // RIDER-11321, RSRP-467025
+      if (!(obj is IFSharpFunction fsFunction) || IsStatic != fsFunction.IsStatic) // RIDER-11321, RSRP-467025
         return false;
 
       return SignatureComparers.Strict.CompareWithoutName(GetSignature(IdSubstitution),
-        member.GetSignature(member.IdSubstitution));
+        fsFunction.GetSignature(fsFunction.IdSubstitution));
     }
 
     public override int GetHashCode() => ShortName.GetHashCode();
