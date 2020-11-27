@@ -1,0 +1,5 @@
+﻿0000: VERBATIM_INTERPOLATED_STRING '@$"\n\\r\n    a"'
+0014: NEW_LINE '\r\n'
+0016: NEW_LINE '\r\n'
+0018: VERBATIM_INTERPOLATED_STRING '$@"\n\\r\n    a"'
+0032: NEW_LINE '\r\n'

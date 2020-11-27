@@ -42,6 +42,16 @@ type FSharpLexerTest() =
     [<Test>] member x.``Strings - Interpolated - Braces - Escape 02``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Braces - Escape 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Strings - Interpolated - Escape - Regular 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Escape - Regular 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Escape - Regular 03``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Escape - Triple quote 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Escape - Triple quote 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Escape - Triple quote 03``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Escape - Verbatim 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Escape - Verbatim 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Escape - Verbatim 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Strings - Interpolated - Regular 01 - No interpolation``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Regular 02``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Regular 03 - Record``() = x.DoNamedTest()
