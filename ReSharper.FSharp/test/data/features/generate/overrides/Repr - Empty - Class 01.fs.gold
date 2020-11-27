@@ -8,5 +8,4 @@
 // ${SELECT0:ToString():System.String}
 
 type T() ={caret}
-
   override this.ToString() = failwith "todo"

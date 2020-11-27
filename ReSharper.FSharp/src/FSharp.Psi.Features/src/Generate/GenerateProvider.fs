@@ -216,7 +216,13 @@ type FSharpOverridingMembersBuilder() =
             if objModelTypeRepr :? IStructRepresentation then objModelTypeRepr :> _ else
 
             let equalsToken = typeDecl.EqualsToken.NotNull()
-            deleteChildRange equalsToken.NextSibling typeRepr
+
+            let anchor =
+                let afterComment = getLastMatchingNodeAfter isInlineSpaceOrComment equalsToken
+                let afterSpace = getLastMatchingNodeAfter isInlineSpace equalsToken
+                if afterComment != afterSpace then afterComment else equalsToken :> _
+
+            deleteChildRange anchor.NextSibling typeRepr
 
             equalsToken :> _
 
