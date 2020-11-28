@@ -64,7 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private IDeclaredElement CreateProperty(FSharpMemberOrFunctionOrValue mfv) =>
       mfv.CurriedParameterGroups[0].Any()
-        ? new FSharpPropertyWithGeneratedAccessors<MemberDeclaration>(this, mfv)
+        ? new FSharpPropertyWithExplicitAccessors(this)
         : new FSharpProperty<MemberDeclaration>(this, mfv) as IDeclaredElement;
 
     public bool IsExplicitImplementation =>

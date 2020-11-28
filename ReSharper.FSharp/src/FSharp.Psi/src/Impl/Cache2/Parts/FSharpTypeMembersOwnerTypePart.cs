@@ -95,7 +95,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       {
         var declaredElement = memberDeclaration.DeclaredElement;
         if (declaredElement is IFSharpProperty prop)
-          result.AddRange(prop.GetGeneratedMembers());
+          result.AddRange(prop.GetAccessorMethods());
 
         if (declaredElement != null) result.Add(declaredElement);
       }

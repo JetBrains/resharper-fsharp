@@ -414,7 +414,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     public static IList<IParameter> GetParameters<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
-      where T : IFunction, IFSharpTypeParametersOwner
+      where T : IParametersOwner, IFSharpTypeParametersOwner
     {
       if (mfv == null)
         return EmptyList<IParameter>.Instance;
@@ -462,6 +462,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       foreach (var list in lists)
         count += list.Count;
       return count;
+    }
+
+    [CanBeNull]
+    public static IAccessorDeclaration TryGet(this IEnumerable<IAccessorDeclaration> accessors, AccessorKind kind)
+    {
+      foreach (var accessor in accessors)
+        if (accessor.Kind == kind)
+          return accessor;
+      return null;
     }
   }
 }

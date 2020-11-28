@@ -112,7 +112,7 @@ Occurrence's navigation result. Opened file: Property 01 - Generated accessors.c
 Occurrence's dump:
 TO: [R] static member A with set (_: int, _: int) (_: int) = T.|A|(0) <- 0 RANGE: (224,225) @ Property 01 - Generated accessors.fs
 Menu Item presentation: 
-Text: T.A      |... int, _: int) (_: int) = T.|A|(0) <- 0| (9)
+Text: T.A.set      |... int, _: int) (_: int) = T.|A|(0) <- 0| (9)
 Shortcut text: in <Root Namespace>
 Style: Enabled
 Mnemonic: 
@@ -130,7 +130,7 @@ Occurrence's navigation result. Opened file: Property 01 - Generated accessors.f
 Occurrence's dump:
 TO: [R] static member A with set (_: int, _: int, _: int, _: int) (_: int) = T.|A|(0, 0) <- 0 RANGE: (369,370) @ Property 01 - Generated accessors.fs
 Menu Item presentation: 
-Text: T.A      |... int, _: int) (_: int) = T.|A|(0, 0) <- 0| (13)
+Text: T.A.set      |... int, _: int) (_: int) = T.|A|(0, 0) <- 0| (13)
 Shortcut text: in <Root Namespace>
 Style: Enabled
 Mnemonic: 

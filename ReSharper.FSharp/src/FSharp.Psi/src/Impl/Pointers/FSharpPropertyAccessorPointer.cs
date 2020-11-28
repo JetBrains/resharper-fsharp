@@ -4,16 +4,17 @@ using JetBrains.ReSharper.Psi;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers
 {
   internal class
-    FSharpPropertyAccessorPointer : FSharpGeneratedElementPointerBase<FSharpGeneratedPropertyAccessor, IProperty>
+    FSharpPropertyAccessorPointer : FSharpGeneratedElementPointerBase<FSharpPropertyAccessorMethod, IFSharpProperty>
   {
-    private readonly bool myIsGetter;
+    private readonly AccessorKind myKind;
 
-    public FSharpPropertyAccessorPointer(FSharpGeneratedPropertyAccessor accessor, bool isGetter) : base(accessor)
+    public FSharpPropertyAccessorPointer(FSharpPropertyAccessorMethod accessorMethod) : base(
+      accessorMethod)
     {
-      myIsGetter = isGetter;
+      myKind = accessorMethod.Kind;
     }
 
-    public override FSharpGeneratedPropertyAccessor CreateGenerated(IProperty property) =>
-      new FSharpGeneratedPropertyAccessor(property, myIsGetter);
+    public override FSharpPropertyAccessorMethod CreateGenerated(IFSharpProperty property) =>
+      new FSharpPropertyAccessorMethod(property, myKind);
   }
 }

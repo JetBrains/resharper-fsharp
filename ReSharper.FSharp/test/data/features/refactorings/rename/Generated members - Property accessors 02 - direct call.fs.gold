@@ -1,0 +1,6 @@
+﻿namespace global
+
+type T =
+  member x.zzz
+    with get (_: int) = x.get_zzz(0)
+    and set (_: int) (_: int) = x.set_zzz(0, 0)

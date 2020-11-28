@@ -148,7 +148,7 @@ module rec CommonUtil =
 
     let compose a b = CompositeIconId.Compose(a, b)
 
-[<Extension; AutoOpen>]
+[<AutoOpen>]
 module rec FcsUtil =
     open FSharp.Compiler.SyntaxTree
 
@@ -156,13 +156,6 @@ module rec FcsUtil =
     let inline (|PatRange|) (pat: SynPat) = pat.Range
     let inline (|IdentRange|) (id: Ident) = id.idRange
     let inline (|TypeRange|) (typ: SynType) = typ.Range
-
-    [<Extension>]
-    let GetAccessRights(m: FSharpMemberOrFunctionOrValue) =
-        if m.Accessibility.IsPublic then AccessRights.PUBLIC else
-        if m.Accessibility.IsPrivate then AccessRights.PRIVATE else
-        if m.Accessibility.IsProtected then AccessRights.PROTECTED
-        else AccessRights.INTERNAL
 
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =

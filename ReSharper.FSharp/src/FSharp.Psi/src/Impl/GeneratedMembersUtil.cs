@@ -106,26 +106,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return result;
     }
 
-    public static IList<ITypeMember> GetGeneratedMembers(this IFSharpProperty property)
+    public static IList<ITypeMember> GetAccessorMethods(this IFSharpProperty property)
     {
       var result = new FrugalLocalList<ITypeMember>();
 
       if (property.IsReadable)
-        result.Add(new FSharpGeneratedPropertyAccessor(property.Getter));
+        result.Add(new FSharpPropertyAccessorMethod(property.Getter));
 
       if (property.IsWritable)
-        result.Add(new FSharpGeneratedPropertyAccessor(property.Setter));
+        result.Add(new FSharpPropertyAccessorMethod(property.Setter));
 
       return result.ResultingList();
     }
 
-    public static IEnumerable<IDeclaredElement> GetGeneratedMembersFromDeclarations(this IFSharpProperty property)
+    public static IEnumerable<IDeclaredElement> GetAccessorMethodsFromDeclarations(this IFSharpProperty property)
     {
       foreach (var getter in property.Getters)
-        yield return new FSharpGeneratedPropertyAccessor(getter);
+        yield return new FSharpPropertyAccessorMethod(getter);
 
       foreach (var setter in property.Setters)
-        yield return new FSharpGeneratedPropertyAccessor(setter);
+        yield return new FSharpPropertyAccessorMethod(setter);
     }
   }
 }

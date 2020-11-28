@@ -6,40 +6,37 @@ using JetBrains.ReSharper.Psi.Pointers;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  internal class FSharpGeneratedPropertyAccessor : FSharpGeneratedMethodBase, IFSharpGeneratedAccessor
+  internal class FSharpPropertyAccessorMethod : FSharpGeneratedMethodBase, IFSharpGeneratedAccessor
   {
-    private readonly bool myIsGetter;
     private readonly IAccessor myAccessor;
 
-    public FSharpGeneratedPropertyAccessor(IProperty property, bool isGetter)
+    public FSharpPropertyAccessorMethod(IProperty property, AccessorKind kind)
     {
-      myIsGetter = isGetter;
-      myAccessor = isGetter ? property.Getter : property.Setter;
+      myAccessor = kind == AccessorKind.GETTER ? property.Getter : property.Setter;
     }
 
-    public FSharpGeneratedPropertyAccessor(IAccessor accessor)
+    public FSharpPropertyAccessorMethod(IAccessor accessor)
     {
-      myIsGetter = accessor.Kind == AccessorKind.GETTER;
       myAccessor = accessor;
     }
 
     public override string ShortName => myAccessor.ShortName;
+    public override string SourceName => ShortName;
     protected override ITypeElement ContainingType => myAccessor.GetContainingType();
     public override AccessRights GetAccessRights() => myAccessor.GetAccessRights();
     public override IList<IParameter> Parameters => myAccessor.Parameters;
     public override IType ReturnType => myAccessor.ReturnType;
-    public IClrDeclaredElement OriginElement => myAccessor.OwnerMember;
     public override bool IsStatic => myAccessor.IsStatic;
+    public IClrDeclaredElement OriginElement => myAccessor.OwnerMember;
+    public AccessorKind Kind => myAccessor.Kind;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
-      new FSharpPropertyAccessorPointer(this, myIsGetter);
+      new FSharpPropertyAccessorPointer(this);
 
     public override bool Equals(object obj) =>
-      obj is FSharpGeneratedPropertyAccessor prop &&
-      prop.ShortName == ShortName && base.Equals(obj);
+      obj is FSharpPropertyAccessorMethod prop && myAccessor.Equals(prop.myAccessor);
 
     public override int GetHashCode() => OriginElement.GetHashCode();
-
     public override bool IsValid() => myAccessor.IsValid();
   }
 }

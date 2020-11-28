@@ -94,6 +94,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Properties 07 - Generated private accessor``() = x.DoNamedTest()
     [<Test>] member x.``Properties 08 - Generated static accessor``() = x.DoNamedTest()
     [<Test>] member x.``Properties 09 - Generated generic accessor``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 10 - Implicit accessors``() = x.DoNamedTest()
 
     [<Test>] member x.``Module bindings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()

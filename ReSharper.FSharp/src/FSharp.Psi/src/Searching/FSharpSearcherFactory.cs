@@ -105,7 +105,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       unionCase.GetGeneratedMembers().Select(member => new RelatedDeclaredElement(member));
 
     private static IEnumerable<RelatedDeclaredElement> GetPropertyRelatedElements([NotNull] IFSharpProperty property) =>
-      property.GetGeneratedMembersFromDeclarations().Select(member => new RelatedDeclaredElement(member));
+      property.GetAccessorMethodsFromDeclarations().Select(member => new RelatedDeclaredElement(member));
 
     public override NavigateTargets GetNavigateToTargets(IDeclaredElement element)
     {
