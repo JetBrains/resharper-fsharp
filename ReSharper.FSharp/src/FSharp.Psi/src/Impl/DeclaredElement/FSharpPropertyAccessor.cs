@@ -19,6 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IParameter ValueVariable => Kind == AccessorKind.SETTER ? Parameters.Last() : null;
     public override bool IsVisibleFromFSharp => false;
     public override IList<ITypeParameter> AllTypeParameters => GetContainingType().GetAllTypeParametersReversed();
+    public override IList<IDeclaration> GetDeclarations() => new List<IDeclaration>(1) {GetDeclaration()};
 
     public override bool Equals(object obj) =>
       obj is FSharpPropertyAccessor accessor && ShortName == accessor.ShortName && base.Equals(accessor);

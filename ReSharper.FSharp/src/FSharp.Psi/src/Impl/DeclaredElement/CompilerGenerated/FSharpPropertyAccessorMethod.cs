@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Pointers;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  internal class FSharpPropertyAccessorMethod : FSharpGeneratedMethodBase, IFSharpGeneratedAccessor
+  internal class FSharpPropertyAccessorMethod : FSharpGeneratedMethodBase, IFSharpGeneratedAccessor, IFSharpMember
   {
     private readonly IAccessor myAccessor;
 
@@ -38,5 +41,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override int GetHashCode() => OriginElement.GetHashCode();
     public override bool IsValid() => myAccessor.IsValid();
+
+    public FSharpMemberOrFunctionOrValue Mfv =>
+      (myAccessor.GetDeclarations().FirstOrDefault() as IFSharpDeclaration)?.GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
   }
 }

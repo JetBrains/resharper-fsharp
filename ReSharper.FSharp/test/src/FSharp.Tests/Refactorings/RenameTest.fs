@@ -165,7 +165,7 @@ type FSharpRenameTest() =
 
     [<Test>] member x.``Generated members - Record fields 01 - Ctor param``() = x.DoNamedTestFiles()
     [<Test>] member x.``Generated members - Property accessors 01``() = x.DoNamedTestFiles()
-    [<Test>] member x.``Generated members - Property accessors 02 - direct call``() = x.DoNamedTest()
+    [<Test>] member x.``Generated members - Property accessors 02 - Direct call``() = x.DoNamedTest()
 
     [<Test>] member x.``Related symbols - Single case union 01 - Union``() = x.DoNamedTestFiles()
     [<Test>] member x.``Related symbols - Single case union 02 - Case``() = x.DoNamedTestFiles()
