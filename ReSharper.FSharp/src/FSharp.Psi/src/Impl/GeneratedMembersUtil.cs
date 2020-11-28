@@ -6,7 +6,6 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.Util;
-using JetBrains.Util.dataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
@@ -104,28 +103,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       result.Add(new FSharpUnionCaseTag(unionCase));
 
       return result;
-    }
-
-    public static IList<ITypeMember> GetAccessorMethods(this IFSharpProperty property)
-    {
-      var result = new FrugalLocalList<ITypeMember>();
-
-      if (property.IsReadable)
-        result.Add(new FSharpPropertyAccessorMethod(property.Getter));
-
-      if (property.IsWritable)
-        result.Add(new FSharpPropertyAccessorMethod(property.Setter));
-
-      return result.ResultingList();
-    }
-
-    public static IEnumerable<IDeclaredElement> GetAccessorMethodsFromDeclarations(this IFSharpProperty property)
-    {
-      foreach (var getter in property.Getters)
-        yield return new FSharpPropertyAccessorMethod(getter);
-
-      foreach (var setter in property.Setters)
-        yield return new FSharpPropertyAccessorMethod(setter);
     }
   }
 }

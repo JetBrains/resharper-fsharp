@@ -1120,7 +1120,6 @@ interface fSharpTypeMemberDeclaration:
   letBindingsDeclaration |
   overridableMemberDeclaration |
   doStatement |
-  accessorDeclaration |
 
   otherTypeMember;
 

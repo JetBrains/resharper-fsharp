@@ -105,7 +105,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       unionCase.GetGeneratedMembers().Select(member => new RelatedDeclaredElement(member));
 
     private static IEnumerable<RelatedDeclaredElement> GetPropertyRelatedElements([NotNull] IFSharpProperty property) =>
-      property.GetAccessorMethodsFromDeclarations().Select(member => new RelatedDeclaredElement(member));
+      property.Getters.Concat(property.Setters).Select(member => new RelatedDeclaredElement(member));
 
     public override NavigateTargets GetNavigateToTargets(IDeclaredElement element)
     {
@@ -134,7 +134,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
           return new NavigateTargets(pattern, false);
       }
 
-      if (element is IFSharpGeneratedFromOtherElement generated && generated.OriginElement is { } origin)
+      if (element is ISecondaryDeclaredElement {OriginElement: { } origin})
         return new NavigateTargets(origin, false);
 
       if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.CanNavigateTo)

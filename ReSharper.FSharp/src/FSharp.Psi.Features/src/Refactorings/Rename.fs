@@ -117,7 +117,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
             | parameter -> [| parameter :> IDeclaredElement |] :> _
 
         | :? IFSharpProperty as property ->
-            property.GetAccessorMethodsFromDeclarations()
+            Seq.append property.Getters property.Setters |> Seq.cast<IDeclaredElement>
 
         | :? IFSharpModule -> EmptyArray.Instance :> _
 
@@ -226,7 +226,7 @@ type FSharpAtomicRenamesFactory() =
 type FSharpDeclaredElementForRenameProvider() =
     interface IPrimaryDeclaredElementForRenameProvider with
         member x.GetPrimaryDeclaredElement(element, _) =
-            match element.As<IFSharpGeneratedFromOtherElement>() with
+            match element.As<ISecondaryDeclaredElement>() with
             | null -> element
             | generated ->
 

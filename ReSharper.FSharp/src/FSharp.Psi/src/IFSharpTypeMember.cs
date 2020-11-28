@@ -24,22 +24,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IList<ITypeParameter> AllTypeParameters { get; }
   }
 
+  public interface ISecondaryDeclaredElement
+  {
+    [NotNull] IClrDeclaredElement OriginElement { get; }
+  }
+
   public interface IFSharpGeneratedElement : IFSharpDeclaredElement
   {
   }
 
-  public interface IFSharpGeneratedFromOtherElement : IFSharpGeneratedElement
+  public interface IFSharpGeneratedFromOtherElement : IFSharpGeneratedElement, ISecondaryDeclaredElement
   {
-    [NotNull] IClrDeclaredElement OriginElement { get; }
     IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer();
   }
 
   public interface IFSharpGeneratedFromUnionCase : IFSharpGeneratedFromOtherElement
   {
-  }
-
-  public interface IFSharpGeneratedAccessor : IFSharpGeneratedFromOtherElement
-  {
-    AccessorKind Kind { get; }
   }
 }

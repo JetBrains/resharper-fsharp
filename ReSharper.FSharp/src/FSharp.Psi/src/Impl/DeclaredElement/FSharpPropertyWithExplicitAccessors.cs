@@ -8,44 +8,43 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class FSharpPropertyWithExplicitAccessors : FSharpPropertyBase<MemberDeclaration>, IFSharpProperty
   {
-    private readonly IAccessorDeclaration myGetter;
-    private readonly IAccessorDeclaration mySetter;
-
     public FSharpPropertyWithExplicitAccessors(IMemberDeclaration declaration) : base(declaration)
     {
       var accessors = declaration.AccessorDeclarations;
-      myGetter = accessors.TryGet(AccessorKind.GETTER);
-      mySetter = accessors.TryGet(AccessorKind.SETTER);
+      IsReadable = accessors.TryGet(AccessorKind.GETTER) != null;
+      IsWritable = accessors.TryGet(AccessorKind.SETTER) != null;
     }
 
-    public override bool IsReadable => myGetter != null;
-    public override bool IsWritable => mySetter != null;
-    public override IAccessor Getter => IsReadable ? myGetter.DeclaredElement as IAccessor : null;
-    public override IAccessor Setter => IsWritable ? mySetter.DeclaredElement as IAccessor : null;
+    public override bool IsReadable { get; }
+    public override bool IsWritable { get; }
     public override AccessRights GetAccessRights() => AccessRights.PRIVATE;
     public AccessRights RepresentationAccessRights => base.GetAccessRights();
     public override IList<IParameter> Parameters => this.GetParameters(Mfv);
 
-    public IEnumerable<IAccessor> Getters
+    public IEnumerable<IFSharpExplicitAccessor> Getters
     {
       get
       {
         foreach (var declaration in GetDeclarations())
         {
-          if (declaration.DeclaredElement is IFSharpProperty {IsReadable: true} prop)
-            yield return prop.Getter;
+          if (declaration is IMemberDeclaration member &&
+              member.AccessorDeclarations.TryGet(AccessorKind.GETTER) is
+                {DeclaredElement: IFSharpExplicitAccessor accessor} _)
+            yield return accessor;
         }
       }
     }
 
-    public IEnumerable<IAccessor> Setters
+    public IEnumerable<IFSharpExplicitAccessor> Setters
     {
       get
       {
         foreach (var declaration in GetDeclarations())
         {
-          if (declaration.DeclaredElement is IFSharpProperty {IsWritable: true} prop)
-            yield return prop.Setter;
+          if (declaration is IMemberDeclaration member &&
+              member.AccessorDeclarations.TryGet(AccessorKind.SETTER) is
+                {DeclaredElement: IFSharpExplicitAccessor accessor} _)
+            yield return accessor;
         }
       }
     }
