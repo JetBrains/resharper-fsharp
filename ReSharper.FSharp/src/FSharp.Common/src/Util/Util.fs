@@ -1,9 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Util
 
-open FSharp.Compiler.SourceCodeServices
 open JetBrains.Annotations
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Threading
@@ -14,6 +12,7 @@ module rec CommonUtil =
     open System.Collections.Generic
     open System.Diagnostics
     open FSharp.Compiler
+    open FSharp.Compiler.SourceCodeServices
     open JetBrains.Application.UI.Icons.ComposedIcons
     open JetBrains.DataFlow
     open JetBrains.DocumentModel
@@ -156,6 +155,7 @@ module rec FcsUtil =
     let inline (|PatRange|) (pat: SynPat) = pat.Range
     let inline (|IdentRange|) (id: Ident) = id.idRange
     let inline (|TypeRange|) (typ: SynType) = typ.Range
+
 
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =
