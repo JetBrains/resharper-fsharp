@@ -58,3 +58,6 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Value in namespace``() = x.DoNamedTest()
 
     [<Test>] member x.``No implementation given 01 - Interface``() = x.DoNamedTest()
+
+    // Workaround for type-private tests as function bindings. Probably check attribute names instead?
+    [<Test>] member x.``Ignored - Top level function with attributes 01``() = x.DoNamedTest()
