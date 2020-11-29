@@ -19,31 +19,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public AccessRights RepresentationAccessRights => base.GetAccessRights();
     public override IList<IParameter> Parameters => this.GetParameters(Mfv);
 
-    public IEnumerable<IFSharpExplicitAccessor> Getters
-    {
-      get
-      {
-        foreach (var declaration in GetDeclarations())
-        {
-          if (declaration is IMemberDeclaration member &&
-              member.AccessorDeclarations.TryGet(AccessorKind.GETTER) is
-                {DeclaredElement: IFSharpExplicitAccessor accessor} _)
-            yield return accessor;
-        }
-      }
-    }
+    public IEnumerable<IFSharpExplicitAccessor> Getters => GetAccessors(AccessorKind.GETTER);
+    public IEnumerable<IFSharpExplicitAccessor> Setters => GetAccessors(AccessorKind.SETTER);
 
-    public IEnumerable<IFSharpExplicitAccessor> Setters
+    private IEnumerable<IFSharpExplicitAccessor> GetAccessors(AccessorKind kind)
     {
-      get
+      foreach (var declaration in GetDeclarations())
       {
-        foreach (var declaration in GetDeclarations())
-        {
-          if (declaration is IMemberDeclaration member &&
-              member.AccessorDeclarations.TryGet(AccessorKind.SETTER) is
-                {DeclaredElement: IFSharpExplicitAccessor accessor} _)
-            yield return accessor;
-        }
+        if (declaration is IMemberDeclaration member &&
+            member.AccessorDeclarations.TryGet(kind) is {DeclaredElement: IFSharpExplicitAccessor accessor} _)
+          yield return accessor;
       }
     }
   }

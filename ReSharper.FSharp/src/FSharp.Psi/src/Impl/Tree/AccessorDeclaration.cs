@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
     protected override string DeclaredElementName => Identifier.GetSourceName() + "_" + OwnerMember.CompiledName;
-    public override string CompiledName => DeclaredElementName; // todo
+    public override string CompiledName => DeclaredElementName;
     public override string SourceName => DeclaredElementName;
 
     public override FSharpSymbol GetFSharpSymbol()

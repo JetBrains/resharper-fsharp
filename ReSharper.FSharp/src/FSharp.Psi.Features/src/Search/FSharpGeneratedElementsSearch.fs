@@ -31,5 +31,7 @@ type FSharpGeneratedElementsSearch() =
                 | :? IFSharpGeneratedFromUnionCase as case -> case.OriginElement
                 | :? IFSharpExplicitAccessor as accessor -> accessor.OriginElement
                 | _ -> null
-            if isNotNull originElement then result.Add(DeclaredElementInstance(originElement))
+
+            if isNotNull originElement then
+                result.Add(DeclaredElementInstance(originElement))
         result :> _
