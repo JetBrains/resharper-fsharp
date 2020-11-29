@@ -1,0 +1,12 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    var _ = T.get_zzz(0);
+    var __ = T.get_zzz(0, 0);
+    var ___ = T.get_zzz(0, 0, 0);
+    T.set_zzz(0, 0);
+    T.set_zzz(0, 0, 0);
+    T.set_zzz(0, 0, 0, 0, 0);
+  }
+}
