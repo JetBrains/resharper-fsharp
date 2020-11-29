@@ -2,7 +2,7 @@
 +++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
 Occurrences provided for OccurrenceUtil:
 Occurrence's dump:
-TO: [I] T.|set_A|(0, 0); RANGE: (141,146) @ Property 01 - Generated accessors.cs
+TO: [I] T.|set_A|(0, 0); RANGE: (141,146) @ Property 01 - Explicit accessors.cs
 Menu Item presentation: 
 Text: Class1.Class1      |T.|set_A|(0, 0);| (8)
 Shortcut text: in <Root Namespace>
@@ -10,7 +10,7 @@ Style: Enabled
 Mnemonic: 
 Tooltip: T.set_A(0, 0);
 
-Occurrence's navigation result. Opened file: Property 01 - Generated accessors.cs
+Occurrence's navigation result. Opened file: Property 01 - Explicit accessors.cs
 ------------------
     var __ = T.get_A(0, 0);
     var ___ = T.get_A(0, 0, 0);
@@ -20,7 +20,7 @@ Occurrence's navigation result. Opened file: Property 01 - Generated accessors.c
 ------------------
 
 Occurrence's dump:
-TO: [I] T.|set_A|(0, 0, 0); RANGE: (161,166) @ Property 01 - Generated accessors.cs
+TO: [I] T.|set_A|(0, 0, 0); RANGE: (161,166) @ Property 01 - Explicit accessors.cs
 Menu Item presentation: 
 Text: Class1.Class1      |T.|set_A|(0, 0, 0);| (9)
 Shortcut text: in <Root Namespace>
@@ -28,7 +28,7 @@ Style: Enabled
 Mnemonic: 
 Tooltip: T.set_A(0, 0, 0);
 
-Occurrence's navigation result. Opened file: Property 01 - Generated accessors.cs
+Occurrence's navigation result. Opened file: Property 01 - Explicit accessors.cs
 ------------------
     var ___ = T.get_A(0, 0, 0);
     T.set_A(0, 0);
@@ -38,7 +38,7 @@ Occurrence's navigation result. Opened file: Property 01 - Generated accessors.c
 ------------------
 
 Occurrence's dump:
-TO: [I] T.|set_A|(0, 0, 0, 0, 0); RANGE: (184,189) @ Property 01 - Generated accessors.cs
+TO: [I] T.|set_A|(0, 0, 0, 0, 0); RANGE: (184,189) @ Property 01 - Explicit accessors.cs
 Menu Item presentation: 
 Text: Class1.Class1      |T.|set_A|(0, 0, 0, 0, 0);| (10)
 Shortcut text: in <Root Namespace>
@@ -46,7 +46,7 @@ Style: Enabled
 Mnemonic: 
 Tooltip: T.set_A(0, 0, 0, 0, 0);
 
-Occurrence's navigation result. Opened file: Property 01 - Generated accessors.cs
+Occurrence's navigation result. Opened file: Property 01 - Explicit accessors.cs
 ------------------
     T.set_A(0, 0);
     T.set_A(0, 0, 0);
@@ -56,7 +56,7 @@ Occurrence's navigation result. Opened file: Property 01 - Generated accessors.c
 ------------------
 
 Occurrence's dump:
-TO: [I] var _ = T.|get_A|(0); RANGE: (62,67) @ Property 01 - Generated accessors.cs
+TO: [I] var _ = T.|get_A|(0); RANGE: (62,67) @ Property 01 - Explicit accessors.cs
 Menu Item presentation: 
 Text: Class1.Class1      |var _ = T.|get_A|(0);| (5)
 Shortcut text: in <Root Namespace>
@@ -64,7 +64,7 @@ Style: Enabled
 Mnemonic: 
 Tooltip: var _ = T.get_A(0);
 
-Occurrence's navigation result. Opened file: Property 01 - Generated accessors.cs
+Occurrence's navigation result. Opened file: Property 01 - Explicit accessors.cs
 ------------------
   public Class1()
   {
@@ -74,7 +74,7 @@ Occurrence's navigation result. Opened file: Property 01 - Generated accessors.c
 ------------------
 
 Occurrence's dump:
-TO: [I] var __ = T.|get_A|(0, 0); RANGE: (88,93) @ Property 01 - Generated accessors.cs
+TO: [I] var __ = T.|get_A|(0, 0); RANGE: (88,93) @ Property 01 - Explicit accessors.cs
 Menu Item presentation: 
 Text: Class1.Class1      |var __ = T.|get_A|(0, 0);| (6)
 Shortcut text: in <Root Namespace>
@@ -82,7 +82,7 @@ Style: Enabled
 Mnemonic: 
 Tooltip: var __ = T.get_A(0, 0);
 
-Occurrence's navigation result. Opened file: Property 01 - Generated accessors.cs
+Occurrence's navigation result. Opened file: Property 01 - Explicit accessors.cs
 ------------------
   {
     var _ = T.get_A(0);
@@ -92,7 +92,7 @@ Occurrence's navigation result. Opened file: Property 01 - Generated accessors.c
 ------------------
 
 Occurrence's dump:
-TO: [I] var ___ = T.|get_A|(0, 0, 0); RANGE: (118,123) @ Property 01 - Generated accessors.cs
+TO: [I] var ___ = T.|get_A|(0, 0, 0); RANGE: (118,123) @ Property 01 - Explicit accessors.cs
 Menu Item presentation: 
 Text: Class1.Class1      |var ___ = T.|get_A|(0, 0, 0);| (7)
 Shortcut text: in <Root Namespace>
@@ -100,7 +100,7 @@ Style: Enabled
 Mnemonic: 
 Tooltip: var ___ = T.get_A(0, 0, 0);
 
-Occurrence's navigation result. Opened file: Property 01 - Generated accessors.cs
+Occurrence's navigation result. Opened file: Property 01 - Explicit accessors.cs
 ------------------
     var _ = T.get_A(0);
     var __ = T.get_A(0, 0);
@@ -110,7 +110,7 @@ Occurrence's navigation result. Opened file: Property 01 - Generated accessors.c
 ------------------
 
 Occurrence's dump:
-TO: [R] static member A with set (_: int, _: int) (_: int) = T.|A|(0) <- 0 RANGE: (224,225) @ Property 01 - Generated accessors.fs
+TO: [R] static member A with set (_: int, _: int) (_: int) = T.|A|(0) <- 0 RANGE: (224,225) @ Property 01 - Explicit accessors.fs
 Menu Item presentation: 
 Text: T.set_A      |... int, _: int) (_: int) = T.|A|(0) <- 0| (9)
 Shortcut text: in <Root Namespace>
@@ -118,7 +118,7 @@ Style: Enabled
 Mnemonic: 
 Tooltip: ... int, _: int) (_: int) = T.A(0) <- 0
 
-Occurrence's navigation result. Opened file: Property 01 - Generated accessors.fs
+Occurrence's navigation result. Opened file: Property 01 - Explicit accessors.fs
 ------------------
 
   static member A with get (_: int, _: int) = 0
@@ -128,7 +128,7 @@ Occurrence's navigation result. Opened file: Property 01 - Generated accessors.f
 ------------------
 
 Occurrence's dump:
-TO: [R] static member A with set (_: int, _: int, _: int, _: int) (_: int) = T.|A|(0, 0) <- 0 RANGE: (369,370) @ Property 01 - Generated accessors.fs
+TO: [R] static member A with set (_: int, _: int, _: int, _: int) (_: int) = T.|A|(0, 0) <- 0 RANGE: (369,370) @ Property 01 - Explicit accessors.fs
 Menu Item presentation: 
 Text: T.set_A      |... int, _: int) (_: int) = T.|A|(0, 0) <- 0| (13)
 Shortcut text: in <Root Namespace>
@@ -136,7 +136,7 @@ Style: Enabled
 Mnemonic: 
 Tooltip: ... int, _: int) (_: int) = T.A(0, 0) <- 0
 
-Occurrence's navigation result. Opened file: Property 01 - Generated accessors.fs
+Occurrence's navigation result. Opened file: Property 01 - Explicit accessors.fs
 ------------------
   static member A with get (_: int, _: int, _: int) = 0
 
