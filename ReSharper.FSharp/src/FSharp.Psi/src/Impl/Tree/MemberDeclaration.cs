@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -47,20 +48,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv)) return null;
 
-      if (mfv.IsProperty)
-        return new FSharpProperty<MemberDeclaration>(this, mfv);
+      if (mfv.IsProperty) return CreateProperty(mfv);
 
       var property = mfv.AccessorProperty?.Value;
       if (property != null)
       {
         var cliEvent = property.EventForFSharpProperty?.Value;
         return cliEvent != null
-          ? (ITypeMember) new FSharpCliEvent<MemberDeclaration>(this)
-          : new FSharpProperty<MemberDeclaration>(this, property);
+          ? new FSharpCliEvent<MemberDeclaration>(this)
+          : CreateProperty(property);
       }
 
       return new FSharpMethod<MemberDeclaration>(this);
     }
+
+    private IDeclaredElement CreateProperty(FSharpMemberOrFunctionOrValue mfv) =>
+      mfv.CurriedParameterGroups[0].Any()
+        ? new FSharpPropertyWithExplicitAccessors(this)
+        : new FSharpProperty<MemberDeclaration>(this, mfv) as IDeclaredElement;
 
     public bool IsExplicitImplementation =>
       InterfaceImplementationNavigator.GetByTypeMember(this) != null ||

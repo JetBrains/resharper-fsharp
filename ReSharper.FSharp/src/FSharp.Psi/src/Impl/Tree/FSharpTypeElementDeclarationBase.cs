@@ -79,6 +79,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
               result.Add(typeDeclaration);
           }
 
+        if (child is IMemberDeclaration {DeclaredElement: IFSharpProperty _} memberDeclaration)
+          result.AddRange(memberDeclaration.AccessorDeclarations);
+
         if (child is ILetBindingsDeclaration let)
           foreach (var binding in let.Bindings)
             ProcessBinding(binding, result);

@@ -237,10 +237,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         var compiledName = compiledNameAttr != null && !compiledNameAttr.Value.ConstructorArguments.IsEmpty()
           ? compiledNameAttr.Value.ConstructorArguments[0].Item2 as string
           : null;
-        return compiledName ??
-               (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
-                 ? mfv.DisplayName
-                 : mfv.LogicalName);
+        return compiledName ?? (IsImplicitAccessor(mfv) ? mfv.DisplayName : mfv.LogicalName);
       }
       catch (Exception e)
       {
@@ -249,6 +246,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       }
 
       return SharedImplUtil.MISSING_DECLARATION_NAME;
+    }
+
+    public static bool IsImplicitAccessor([NotNull] this FSharpMemberOrFunctionOrValue mfv)
+    {
+      if (mfv.IsPropertyGetterMethod)
+        return mfv.CurriedParameterGroups[0].IsEmpty();
+
+      if (mfv.IsPropertySetterMethod)
+        return mfv.CurriedParameterGroups[0]?.Count == 1;
+
+      return false;
     }
 
     public static FSharpFileKind GetFSharpFileKind([CanBeNull] this IPsiSourceFile sourceFile)

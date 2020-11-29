@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     private ITypeElement Union => UnionCase.GetContainingType();
     private FSharpUnionTagsClass TagsClass => Union.GetUnionTagsClass();
 
-    IClrDeclaredElement IFSharpGeneratedFromOtherElement.OriginElement => UnionCase;
+    IClrDeclaredElement ISecondaryDeclaredElement.OriginElement => UnionCase;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new FSharpUnionCaseTagPointer(this);
