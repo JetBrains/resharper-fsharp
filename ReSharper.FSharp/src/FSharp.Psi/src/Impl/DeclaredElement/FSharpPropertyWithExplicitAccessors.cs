@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -10,13 +11,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   {
     public FSharpPropertyWithExplicitAccessors(IMemberDeclaration declaration) : base(declaration)
     {
-      var accessors = declaration.AccessorDeclarations;
-      IsReadable = accessors.TryGet(AccessorKind.GETTER) != null;
-      IsWritable = accessors.TryGet(AccessorKind.SETTER) != null;
     }
 
-    public override bool IsReadable { get; }
-    public override bool IsWritable { get; }
+    public override bool IsReadable => Getters.Any();
+    public override bool IsWritable => Setters.Any();
     public override AccessRights GetAccessRights() => AccessRights.PRIVATE;
     public AccessRights RepresentationAccessRights => base.GetAccessRights();
     public override IList<IParameter> Parameters => this.GetParameters(Mfv);
