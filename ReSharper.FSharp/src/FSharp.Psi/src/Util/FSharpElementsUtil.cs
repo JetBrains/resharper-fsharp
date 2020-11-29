@@ -269,7 +269,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return range.Contains(decl.GetNameIdentifierRange());
       });
 
-      return singleDeclaration?.GetOrCreateDeclaredElement(mfv) ?? GetTypeMember(mfv, typeElement);
+      var singleSourceElement = singleDeclaration?.GetOrCreateDeclaredElement(mfv);
+      if (singleSourceElement != null)
+        return singleSourceElement;
+
+      if (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod && !mfv.IsImplicitAccessor())
+        return GetTypeMember(mfv, typeElement);
+
+      return null;
     }
 
     private static IDeclaredElement GetTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,

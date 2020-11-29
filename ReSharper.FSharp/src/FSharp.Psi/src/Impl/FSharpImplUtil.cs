@@ -248,10 +248,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
-    private static bool IsImplicitAccessor(FSharpMemberOrFunctionOrValue mfv)
+    public static bool IsImplicitAccessor([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
       if (mfv.IsPropertyGetterMethod)
-        return mfv.CurriedParameterGroups[0].IsNullOrEmpty();
+        return mfv.CurriedParameterGroups[0].IsEmpty();
 
       if (mfv.IsPropertySetterMethod)
         return mfv.CurriedParameterGroups[0]?.Count == 1;
