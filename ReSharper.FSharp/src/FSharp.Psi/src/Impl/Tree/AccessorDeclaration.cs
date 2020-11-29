@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
     protected override string DeclaredElementName => Identifier.GetSourceName() + "_" + OwnerMember.CompiledName;
-    public override string CompiledName => DeclaredElementName;
+    public override string CompiledName => DeclaredElementName; // todo
     public override string SourceName => DeclaredElementName;
 
     public override FSharpSymbol GetFSharpSymbol()
@@ -30,7 +30,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? new FSharpPropertyAccessor(this)
         : null;
 
-    public IMemberDeclaration OwnerMember => MemberDeclarationNavigator.GetByAccessorDeclaration(this);
-    public AccessorKind Kind => NameIdentifier?.Name == "get" ? AccessorKind.GETTER : AccessorKind.SETTER;
+    public IMemberDeclaration OwnerMember => 
+      MemberDeclarationNavigator.GetByAccessorDeclaration(this);
+
+    public AccessorKind Kind =>
+      NameIdentifier?.Name switch
+      {
+        "get" => AccessorKind.GETTER,
+        "set" => AccessorKind.SETTER,
+        _ => AccessorKind.UNKNOWN
+      };
   }
 }
