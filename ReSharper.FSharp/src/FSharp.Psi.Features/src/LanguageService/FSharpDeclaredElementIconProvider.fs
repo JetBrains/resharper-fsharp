@@ -66,7 +66,7 @@ type FSharpDeclaredElementIconProvider() =
 
                 let icon = PsiSymbolsThemedIcons.Property.Id
                 let icon =
-                    match property.Getters.Any(), property.Setters.Any() with
+                    match property.IsReadable, property.IsWritable with
                     | true, true -> compose icon PsiSymbolsThemedIcons.ModifiersReadWrite.Id
                     | true, false -> compose icon PsiSymbolsThemedIcons.ModifiersRead.Id
                     | false, true -> compose icon PsiSymbolsThemedIcons.ModifiersWrite.Id
