@@ -117,7 +117,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
             | parameter -> [| parameter :> IDeclaredElement |] :> _
 
         | :? IFSharpProperty as property ->
-            Seq.append property.Getters property.Setters |> Seq.cast<IDeclaredElement>
+            Seq.append property.Getters property.Setters |> Seq.cast
 
         | :? IFSharpModule -> EmptyArray.Instance :> _
 
