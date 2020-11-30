@@ -43,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
       if (tokenBeforeType == FSharpTokenType.LINE_COMMENT ||
           tokenBeforeType == FSharpTokenType.DEAD_CODE || tokenType == FSharpTokenType.DEAD_CODE ||
           tokenBeforeType != null && (token == tokenBefore || token == null) &&
-          (tokenBeforeType.IsComment || tokenBeforeType.IsStringLiteral ||
+          (tokenBeforeType.IsComment || FSharpTokenType.Strings[tokenBeforeType] ||
            tokenBeforeType.IsConstantLiteral) ||
           tokenBefore.GetDocumentEndOffset() < caretTreeOffset || token.GetDocumentEndOffset() < caretTreeOffset)
         return null;
