@@ -639,6 +639,7 @@ whileExpr options { stubBase="UnitExpressionBase"; }:
   fSharpExpression<DO_EXPR, DoExpression>;
 
 objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="MemberDeclarations" path=<objExpr:MEMBER_LIST/memberDeclarationList:MEMBER_DECL> };
   get { methodName="InterfaceMembers" path=<objExpr:INTERFACE_IMPL/interfaceImplementation:MEMBER_LIST/memberDeclarationList:MEMBER_DECL> };
 }:
   LBRACE
@@ -646,7 +647,7 @@ objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   typeReferenceName<TYPE_REFERENCE, TypeName>
   fSharpExpression<ARG_EXPR, ArgExpression>
   WITH<WITH, WithKeyword>
-  memberDeclaration<MEMBER_DECL, MemberDeclarations>*
+  memberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
   interfaceImplementation<INTERFACE_IMPL, InterfaceImplementations>*
   RBRACE;
 
