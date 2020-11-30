@@ -502,6 +502,9 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Expr - Interpolated string - Unfinished 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string - Unfinished 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Object expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Object expr 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Interface 01``() = x.DoNamedTest()

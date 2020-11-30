@@ -742,7 +742,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushRange(range, ElementType.OBJ_EXPR)
             x.ProcessTypeAsTypeReferenceName(synType)
             x.PushStepList(interfaceImpls, interfaceImplementationListProcessor)
-            x.PushStepList(bindings, objectExpressionMemberListProcessor)
+            x.PushStep(bindings, memberDeclarationListProcessor)
 
             match args with
             | Some(expr, _) -> x.ProcessExpression(expr)
@@ -1108,18 +1108,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         | expr :: rest ->
             x.PushExpressionList(rest)
             x.ProcessExpression(expr)
-    
+
     member x.ProcessInterfaceImplementation(InterfaceImpl(interfaceType, bindings, range)) =
         x.PushRange(range, ElementType.INTERFACE_IMPLEMENTATION)
         x.ProcessTypeAsTypeReferenceName(interfaceType)
-
-        match bindings with
-        | Binding(range = rangeStart) :: _ ->
-            let item = { Mark = x.Mark(rangeStart); ElementType = ElementType.MEMBER_DECLARATION_LIST }
-            x.PushStep(item, endNodeProcessor)
-        | _ -> ()
-
-        x.PushStepList(bindings, objectExpressionMemberListProcessor)
+        x.PushStep(bindings, memberDeclarationListProcessor)
 
     member x.ProcessSynIndexerArg(arg) =
         match arg with
@@ -1384,6 +1377,17 @@ type InterfaceImplementationListProcessor() =
     override x.Process(interfaceImpl, builder) =
         builder.ProcessInterfaceImplementation(interfaceImpl)
 
+type MemberDeclarationListProcessor() =
+    inherit StepProcessorBase<SynBinding list>()
+
+    override x.Process(bindings, builder) =
+        match bindings with
+        | Binding(range = rangeStart) :: _ ->
+            let item = { Mark = builder.Mark(rangeStart); ElementType = ElementType.MEMBER_DECLARATION_LIST }
+            builder.PushStep(item, endNodeProcessor)
+        | _ -> ()
+        builder.PushStepList(bindings, objectExpressionMemberListProcessor)
+
 
 type IndexerArgListProcessor() =
     inherit StepListProcessorBase<SynIndexerArg>()
@@ -1439,5 +1443,6 @@ module BuilderStepProcessors =
     let matchClauseListProcessor = MatchClauseListProcessor()
     let objectExpressionMemberListProcessor = ObjectExpressionMemberListProcessor()
     let interfaceImplementationListProcessor = InterfaceImplementationListProcessor()
+    let memberDeclarationListProcessor = MemberDeclarationListProcessor()
     let indexerArgListProcessor = IndexerArgListProcessor()
     let interpolatedStringProcessor = InterpolatedStringProcessor()
