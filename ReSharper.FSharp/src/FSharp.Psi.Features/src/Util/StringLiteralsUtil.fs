@@ -85,11 +85,17 @@ let getStringEndingQuotesOffset (tokenType: TokenNodeType) =
     match tokenType.GetLiteralType() with
     | Character
     | RegularString
-    | VerbatimString -> 1
-    | TripleQuoteString -> 3
+    | InterpolatedString
+    | InterpolatedStringEnd
+    | VerbatimString
+    | VerbatimInterpolatedString
+    | VerbatimInterpolatedStringEnd -> 1
+    | TripleQuoteString
+    | TripleQuoteInterpolatedString
+    | TripleQuoteInterpolatedStringEnd -> 3
     | ByteArray
     | VerbatimByteArray -> 2
-    | _ -> failwith "todo"
+    | literalType -> failwithf "Unexpected string literal %O" literalType 
 
 
 let emptyString = "\"\""
