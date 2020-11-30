@@ -213,6 +213,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Pair quotes 14 - After char``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 15 - File start``() = x.DoNamedTest()
 
+    [<Test>] member x.``Quotes - Skip end - Interpolated - Regular 01``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end - Interpolated - Triple quote 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Quotes - Skip end 01 - Char``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 02 - String``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 03 - Verbatim``() = x.DoNamedTest()

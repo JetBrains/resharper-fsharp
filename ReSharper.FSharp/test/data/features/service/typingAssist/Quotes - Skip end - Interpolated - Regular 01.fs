@@ -1,0 +1,4 @@
+// ${CHAR:"}
+module Module
+
+$"{caret}"
