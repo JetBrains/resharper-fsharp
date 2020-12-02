@@ -13,7 +13,7 @@ open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages("FSharp.Core")>]
+[<TestPackages("FSharp.Core/4.7.2")>]
 type CSharpResolveTest() =
     inherit TestWithTwoProjectsBase()
 

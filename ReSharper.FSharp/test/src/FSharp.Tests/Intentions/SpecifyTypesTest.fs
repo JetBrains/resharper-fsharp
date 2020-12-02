@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages("FSharp.Core")>]
+[<TestPackages("FSharp.Core/4.7.2")>]
 type SpecifyTypesActionTest() =
     inherit FSharpContextActionExecuteTestBase<FunctionAnnotationAction>()
 
@@ -46,7 +46,7 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Value 03 - Function, tuple``() = x.DoNamedTest()
 
 
-[<TestPackages("FSharp.Core")>]
+[<TestPackages("FSharp.Core/4.7.2")>]
 type SpecifyTypesActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<FunctionAnnotationAction>()
 

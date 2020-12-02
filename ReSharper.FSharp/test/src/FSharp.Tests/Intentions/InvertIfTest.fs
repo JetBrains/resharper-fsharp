@@ -4,7 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages("FSharp.Core")>]
+[<TestPackages("FSharp.Core/4.7.2")>]
 type InvertIfTest() =
     inherit FSharpContextActionExecuteTestBase<InvertIfAction>()
 
