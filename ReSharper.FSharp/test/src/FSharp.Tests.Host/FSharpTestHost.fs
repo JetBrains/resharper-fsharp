@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
+open System
 open System.Collections.Generic
 open System.Linq
 open FSharp.Compiler.AbstractIL.Internal.Library
@@ -19,6 +20,8 @@ open JetBrains.Util
 type FSharpTestHost
         (lifetime: Lifetime, solution: ISolution, checkerService: FSharpCheckerService, sourceCache: FSharpSourceCache,
          itemsContainer: FSharpItemsContainer) =
+
+    let experimentalFeatures = Dictionary<_, IDisposable>()
 
     let dumpSingleProjectMapping _ =
         let projectMapping =
@@ -41,11 +44,25 @@ type FSharpTestHost
         |> Option.map (fun options ->
             options.OtherOptions
             |> Array.choose (fun o -> if o.StartsWith("-r:") then Some (o.Substring("-r:".Length)) else None)
-            |> Array.map (fun s -> FileSystemPath.TryParse(s))
+            |> Array.map (FileSystemPath.TryParse)
             |> Array.filter (fun p -> not p.IsEmpty && directory.IsPrefixOf(p))
             |> Array.map (fun p -> p.Name)
             |> List)
         |> Option.defaultWith (fun _ -> List())
+
+    let setFeatures (rdFeatures: RdSetFeatures) =
+        for feature in rdFeatures.Features do
+            match experimentalFeatures.TryGetValue feature with
+            | null -> ()
+            | value -> value.Dispose()
+
+            if rdFeatures.Enable then
+                experimentalFeatures.[feature] <-
+                    match feature with
+                    | RdExperimentalFeatures.AllowFormatter -> FSharpRegistryUtil.AllowFormatterCookie.Create()
+                    | _ -> raise (InvalidOperationException("Unexpected experimental feature"))
+
+        JetBrains.Core.Unit.Instance
 
     do
         let fsTestHost = solution.RdFSharpModel().FsharpTestHost
@@ -61,3 +78,4 @@ type FSharpTestHost
         fsTestHost.GetSourceCache.Set(sourceCache.GetRdFSharpSource)
         fsTestHost.DumpSingleProjectMapping.Set(dumpSingleProjectMapping)
         fsTestHost.DumpSingleProjectLocalReferences.Set(dumpSingleProjectLocalReferences)
+        fsTestHost.SetFeatures.Set(setFeatures)

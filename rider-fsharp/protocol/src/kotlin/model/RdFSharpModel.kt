@@ -15,6 +15,10 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         +"Core"
     }
 
+    private val features = enum("RdExperimentalFeatures") {
+        +"AllowFormatter"
+    }
+
     private val RdFSharpInteractiveHost = aggregatedef("RdFSharpInteractiveHost") {
         call("requestNewFsiSessionInfo", void, structdef("RdFsiSessionInfo") {
             field("fsiPath", string)
@@ -49,6 +53,10 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         }.nullable)
         call("dumpSingleProjectMapping", void, string)
         call("dumpSingleProjectLocalReferences", void, immutableList(string))
+        call("setFeatures", structdef("RdSetFeatures"){
+            field("features", array(features))
+            field("enable", bool)
+        }, void)
     }
 
     init {
