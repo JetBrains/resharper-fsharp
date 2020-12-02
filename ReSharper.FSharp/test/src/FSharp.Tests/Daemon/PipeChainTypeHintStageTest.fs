@@ -7,7 +7,7 @@ open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<HighlightOnly(typeof<TypeHintHighlighting>)>]
-[<TestPackages("FSharp.Core")>]
+[<TestPackages("FSharp.Core/4.7.2")>]
 [<TestSettingsKey(typeof<FSharpTypeHintOptions>)>]
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowPipeReturnTypes", "true")>]
 type PipeChainTypeHintStageTest() =
