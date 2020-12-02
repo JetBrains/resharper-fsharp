@@ -54,7 +54,9 @@ type FSharpTestHost
         for feature in rdFeatures.Features do
             match experimentalFeatures.TryGetValue feature with
             | null -> ()
-            | value -> value.Dispose()
+            | value ->
+                value.Dispose()
+                ignore (experimentalFeatures.Remove(feature))
 
             if rdFeatures.Enable then
                 experimentalFeatures.[feature] <-
