@@ -3,6 +3,7 @@
   <id>com.jetbrains.rider.fsharp</id>
   <vendor url="https://jetbrains.com">JetBrains</vendor>
   <description>F# language support plugin for JetBrains Rider.</description>
+  <category>Languages</category>
 
   <version>0.9999</version>
 
