@@ -27,7 +27,7 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Error - no inherit lid``() = x.DoNamedTest()
 
     [<TestFileExtension(FSharpScriptProjectFileType.FsxExtension)>]
-    [<Test>] member x.``Unused value in script``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Unused value in script``() = x.DoNamedTest()
 
     [<Test>] member x.``Unused value 01 - Object expression``() = x.DoNamedTest()
 
