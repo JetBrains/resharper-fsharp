@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages("FSharp.Core")>]
+[<FSharpTest; TestPackages("FSharp.Core/4.7.2")>]
 type ReplaceWithAssignmentExpressionTest() =
     inherit QuickFixTestBase<ReplaceWithAssignmentExpressionFix>()
 
@@ -18,7 +18,7 @@ type ReplaceWithAssignmentExpressionTest() =
     [<Test>] member x.``ReferenceExpr 4 - Mutable member``() = x.DoNamedTest()
     [<Test>] member x.``IndexerExpr``() = x.DoNamedTest()
     
-[<FSharpTest; TestPackages("FSharp.Core")>]
+[<FSharpTest; TestPackages("FSharp.Core/4.7.2")>]
 type ReplaceWithAssignmentExpressionAvailabilityTest() =
     inherit QuickFixAvailabilityTestBase()
 
