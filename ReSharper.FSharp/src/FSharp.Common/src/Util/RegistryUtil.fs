@@ -27,6 +27,12 @@ module FSharpRegistryUtil =
     type EnableInlineVarRefactoringCookie() = inherit EnabledCookieBase<EnableInlineVarRefactoringCookie>()
     type EnableRedundantParenAnalysisCookie() = inherit EnabledCookieBase<EnableRedundantParenAnalysisCookie>()
     type AllowFormatterCookie() = inherit EnabledCookieBase<AllowFormatterCookie>()
+    type TestEnvironmentCookie() = inherit EnabledCookieBase<TestEnvironmentCookie>()
+
+    let createCookie feature =
+        match feature with
+        | RdFSharpFeatures.TestEnvironment -> TestEnvironmentCookie.Create()
+        | _ -> raise (InvalidOperationException("Unexpected experimental feature"))
 
 [<AbstractClass; Sealed; Extension>]
 type ProtocolSolutionExtensions =

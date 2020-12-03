@@ -15,6 +15,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
+open JetBrains.Core
+open FSharpRegistryUtil
 
 [<SolutionComponent>]
 type FSharpTestHost
@@ -50,7 +52,7 @@ type FSharpTestHost
             |> List)
         |> Option.defaultWith (fun _ -> List())
 
-    let setFeatures (rdFeatures: RdSetFeatures) =
+    let enableOrDisableFeatures (rdFeatures: RdEnableOrDisableFeatures) =
         for feature in rdFeatures.Features do
             match experimentalFeatures.TryGetValue feature with
             | null -> ()
@@ -59,12 +61,9 @@ type FSharpTestHost
                 ignore (experimentalFeatures.Remove(feature))
 
             if rdFeatures.Enable then
-                experimentalFeatures.[feature] <-
-                    match feature with
-                    | RdExperimentalFeatures.AllowFormatter -> FSharpRegistryUtil.AllowFormatterCookie.Create()
-                    | _ -> raise (InvalidOperationException("Unexpected experimental feature"))
+                experimentalFeatures.[feature] <- createCookie feature
 
-        JetBrains.Core.Unit.Instance
+        Unit.Instance
 
     do
         let fsTestHost = solution.RdFSharpModel().FsharpTestHost
@@ -80,4 +79,5 @@ type FSharpTestHost
         fsTestHost.GetSourceCache.Set(sourceCache.GetRdFSharpSource)
         fsTestHost.DumpSingleProjectMapping.Set(dumpSingleProjectMapping)
         fsTestHost.DumpSingleProjectLocalReferences.Set(dumpSingleProjectLocalReferences)
-        fsTestHost.SetFeatures.Set(setFeatures)
+        fsTestHost.EnableOrDisableFeatures.Set(enableOrDisableFeatures)
+        fsTestHost.IsTestEnvironment.Set(fun _ -> TestEnvironmentCookie.Enabled)
