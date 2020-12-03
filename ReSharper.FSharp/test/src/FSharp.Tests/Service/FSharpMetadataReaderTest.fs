@@ -29,7 +29,7 @@ type FSharpMetadataReaderTest() =
     override x.DoTest(assemblyModule: IPsiModule) =
         FSharpMetadataReader.ReadMetadata(assemblyModule)
 
-    [<Test; TestPackages("FSharp.Core")>]
+    [<Test; TestPackages("FSharp.Core/4.7.2")>]
     member x.FSharpCore() = x.DoTest("FSharp.Core")
 
     [<Test; TestReferences("TypeInGlobalNamespace.dll")>]
