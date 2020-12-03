@@ -29,7 +29,7 @@ module FSharpRegistryUtil =
     type AllowFormatterCookie() = inherit EnabledCookieBase<AllowFormatterCookie>()
     type TestEnvironmentCookie() = inherit EnabledCookieBase<TestEnvironmentCookie>()
 
-    let createCookie feature =
+    let createFeatureCookie feature =
         match feature with
         | RdFSharpFeatures.TestEnvironment -> TestEnvironmentCookie.Create()
         | _ -> raise (InvalidOperationException("Unexpected experimental feature"))

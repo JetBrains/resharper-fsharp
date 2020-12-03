@@ -61,7 +61,7 @@ type FSharpTestHost
                 ignore (experimentalFeatures.Remove(feature))
 
             if rdFeatures.Enable then
-                experimentalFeatures.[feature] <- createCookie feature
+                experimentalFeatures.[feature] <- createFeatureCookie feature
 
         Unit.Instance
 
