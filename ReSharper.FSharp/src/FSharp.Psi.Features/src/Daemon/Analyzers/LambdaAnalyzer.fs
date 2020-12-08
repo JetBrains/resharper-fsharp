@@ -129,7 +129,7 @@ type LambdaAnalyzer() =
                 if compareArg pat expr then LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "id") :> _ else
 
                 match pat with
-                | :? ITuplePat as pat when pat.PatternsEnumerable.CountIs(2) && isNull pat.StructKeyword ->
+                | :? ITuplePat as pat when isNull pat.StructKeyword && pat.PatternsEnumerable.CountIs(2) ->
                     let tuplePats = pat.Patterns
                     if compareArg (tuplePats.[0]) expr then
                         LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "fst") :> _
