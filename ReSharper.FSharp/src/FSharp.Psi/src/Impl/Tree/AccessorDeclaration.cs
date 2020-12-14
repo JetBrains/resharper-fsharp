@@ -45,12 +45,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        var parametersItem = ParametersPatternsEnumerable.SingleItem;
-        if (parametersItem == null)
+        var pattern = ParametersPatternsEnumerable.SingleItem?.Pattern.IgnoreInnerParens();
+        if (pattern == null)
           return false;
 
-        return Kind == AccessorKind.GETTER && !(parametersItem.Pattern is IUnitPat) ||
-               Kind == AccessorKind.SETTER && parametersItem.Pattern is ITuplePat;
+        return Kind == AccessorKind.GETTER && !(pattern is IUnitPat) ||
+               Kind == AccessorKind.SETTER && pattern is ITuplePat;
       }
     }
   }
