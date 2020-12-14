@@ -1270,7 +1270,7 @@ accessorsNamesClause:
     IDENTIFIER<ACESSOR, AccessorsNames>
   );
 
-accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+accessorDeclaration:
   IDENTIFIER<IDENTIFIER, Identifier>
   (
     parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*

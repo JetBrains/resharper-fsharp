@@ -269,14 +269,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return range.Contains(decl.GetNameIdentifierRange());
       });
 
-      var singleSourceElement = singleDeclaration?.GetOrCreateDeclaredElement(mfv);
-      if (singleSourceElement != null)
-        return singleSourceElement;
-
-      if (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod && !mfv.IsImplicitAccessor())
-        return GetTypeMember(mfv, typeElement);
-
-      return null;
+      return singleDeclaration?.GetOrCreateDeclaredElement(mfv);
     }
 
     private static IDeclaredElement GetTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
@@ -404,7 +397,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
     }
 
-    public static bool IsCliEvent(this FSharpMemberOrFunctionOrValue mfv) =>
+    public static bool IsCliEvent(this FSharpMemberOrFunctionOrValue mfv) => 
       mfv.IsProperty && mfv.Attributes.HasAttributeInstance(FSharpPredefinedType.CLIEventAttribute);
 
     public static bool IsAccessor([NotNull] this FSharpMemberOrFunctionOrValue mfv) =>
@@ -418,66 +411,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var idToken = fsFile.FindTokenAt(document.GetTreeEndOffset(range) - 1);
       return idToken?.GetContainingNode<T>(true);
-    }
-
-    public static IList<IParameter> GetParameters<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
-      where T : IParametersOwner, IFSharpTypeParametersOwner
-    {
-      if (mfv == null)
-        return EmptyList<IParameter>.Instance;
-
-      var module = function.Module;
-      var paramGroups = mfv.CurriedParameterGroups;
-      var isFsExtension = mfv.IsExtensionMember;
-      var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit;
-
-      if (!isFsExtension && isVoidReturn)
-        return EmptyArray<IParameter>.Instance;
-
-      var paramsCount = GetElementsCount(paramGroups);
-      if (paramsCount == 0)
-        return EmptyList<IParameter>.Instance;
-
-      var typeParameters = function.AllTypeParameters;
-      var methodParams = new List<IParameter>(paramsCount);
-      if (isFsExtension && mfv.IsInstanceMember)
-      {
-        var typeElement = mfv.ApparentEnclosingEntity.GetTypeElement(module);
-
-        var type =
-          typeElement != null
-            ? TypeFactory.CreateType(typeElement)
-            : TypeFactory.CreateUnknownType(function.Module);
-
-        methodParams.Add(new FSharpExtensionMemberParameter(function, type));
-      }
-
-      if (isVoidReturn)
-        return methodParams;
-
-      foreach (var paramsGroup in paramGroups)
-      foreach (var param in paramsGroup)
-        methodParams.Add(new FSharpMethodParameter(param, function, methodParams.Count,
-          param.Type.MapType(typeParameters, module, true)));
-
-      return methodParams;
-    }
-
-    private static int GetElementsCount<T>([NotNull] IEnumerable<IList<T>> lists)
-    {
-      var count = 0;
-      foreach (var list in lists)
-        count += list.Count;
-      return count;
-    }
-
-    [CanBeNull]
-    public static IAccessorDeclaration TryGet(this IEnumerable<IAccessorDeclaration> accessors, AccessorKind kind)
-    {
-      foreach (var accessor in accessors)
-        if (accessor.Kind == kind)
-          return accessor;
-      return null;
     }
   }
 }
