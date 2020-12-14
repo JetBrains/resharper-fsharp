@@ -16,8 +16,7 @@ type FSharpGeneratedElementsSearch() =
     override x.IsContextApplicable(dataContext: IDataContext) =
         match dataContext.GetData(PsiDataConstants.DECLARED_ELEMENTS) with
         | null -> false
-        | elements ->
-            elements |> Seq.forall (fun el -> el :? IFSharpGeneratedFromUnionCase || el :? IFSharpExplicitAccessor)
+        | elements -> elements |> Seq.forall (fun el -> el :? IFSharpGeneratedFromUnionCase)
 
     override x.GetElementCandidates(context: IDataContext, _, _) =
         match context.GetData(PsiDataConstants.DECLARED_ELEMENTS) with
@@ -26,12 +25,7 @@ type FSharpGeneratedElementsSearch() =
 
         let result = List()
         for element in elements do
-            let originElement =
-                match element with
-                | :? IFSharpGeneratedFromUnionCase as case -> case.OriginElement
-                | :? IFSharpExplicitAccessor as accessor -> accessor.OriginElement
-                | _ -> null
-
-            if isNotNull originElement then
-                result.Add(DeclaredElementInstance(originElement))
+            match element.As<IFSharpGeneratedFromUnionCase>() with
+            | null -> ()
+            | generated -> result.Add(DeclaredElementInstance(generated.OriginElement))
         result :> _

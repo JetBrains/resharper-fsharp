@@ -57,8 +57,6 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Union case - Field 02 - Single case``() = x.DoNamedTestFiles()
     [<Test>] member x.``Union case - Field 03 - Struct``() = x.DoNamedTestFiles()
 
-    [<Test>] member x.``Property 01 - Explicit accessors``() = x.DoNamedTestFiles()
-
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")
 

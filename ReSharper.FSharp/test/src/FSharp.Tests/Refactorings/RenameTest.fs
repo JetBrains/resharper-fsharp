@@ -208,6 +208,3 @@ type FSharpRenameTest() =
 
     [<Test>] member x.``Wild - Let - Top 01``() = x.DoNamedTest()
     [<Test>] member x.``Wild - Match 01``() = x.DoNamedTest()
-
-    [<Test>] member x.``Property accessors 01``() = x.DoNamedTestFiles()
-    [<Test>] member x.``Property accessors 02 - Direct call``() = x.DoNamedTest()
