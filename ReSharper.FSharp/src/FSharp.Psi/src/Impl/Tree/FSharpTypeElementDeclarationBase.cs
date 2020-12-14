@@ -79,8 +79,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
               result.Add(typeDeclaration);
           }
 
-        if (child is IMemberDeclaration {DeclaredElement: IFSharpProperty _} memberDeclaration)
-          result.AddRange(memberDeclaration.AccessorDeclarations);
+        if (child is IMemberDeclaration memberDeclaration)
+          foreach (var accessor in memberDeclaration.AccessorDeclarations)
+            if (accessor.IsExplicit)
+              result.Add(accessor);
 
         if (child is ILetBindingsDeclaration let)
           foreach (var binding in let.Bindings)
@@ -168,7 +170,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       var module =
         ModuleLikeDeclarationNavigator.GetByMember(
-          this as IModuleMember ?? 
+          this as IModuleMember ??
           TypeDeclarationGroupNavigator.GetByTypeDeclaration(this as IFSharpTypeOrExtensionDeclaration));
 
       if (module == null)

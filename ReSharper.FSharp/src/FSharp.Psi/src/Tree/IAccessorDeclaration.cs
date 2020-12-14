@@ -6,5 +6,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   public partial interface IAccessorDeclaration : ITypeMemberDeclaration
   {
     AccessorKind Kind { get; }
+    bool IsExplicit { get; }
   }
 }
