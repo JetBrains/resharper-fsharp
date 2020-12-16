@@ -99,7 +99,8 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         isAtLetExprKeywordOrNamedPat dataProvider letBindings && not (isAnnotated bindings.[0])
 
     override x.ExecutePsiTransaction _ =
-        let binding = dataProvider.GetSelectedElement<IBinding>()
+        let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
+        let binding = letBindings.Bindings |> Seq.exactlyOne
         let factory = binding.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
