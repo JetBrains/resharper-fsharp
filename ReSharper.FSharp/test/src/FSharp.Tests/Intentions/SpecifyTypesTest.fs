@@ -45,6 +45,8 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Value 01``() = x.DoNamedTest()
     [<Test>] member x.``Value 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Value 03 - Function, tuple``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Function - Caret on let binding``() = x.DoNamedTest()
 
 
 [<TestPackages(FSharpCorePackage)>]
