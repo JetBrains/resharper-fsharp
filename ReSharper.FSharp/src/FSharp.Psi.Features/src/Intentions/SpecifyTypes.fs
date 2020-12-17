@@ -30,9 +30,10 @@ module SpecifyTypes =
             if bindings.Count <> 1 then false else
 
             isAtLetExprKeywordOrNamedPat dataProvider letBindings &&
-                bindings |> Seq.head |> this.IsAnnotated |> not
+                bindings |> Seq.exactlyOne |> this.IsAnnotated |> not
         override this.ExecutePsiTransaction _ =
-            let binding = dataProvider.GetSelectedElement<IBinding>()
+            let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
+            let binding = letBindings.Bindings |> Seq.exactlyOne
 
             use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
             use disableFormatter = new DisableCodeFormatter()

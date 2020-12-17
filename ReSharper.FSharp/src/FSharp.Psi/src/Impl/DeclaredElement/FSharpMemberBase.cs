@@ -12,8 +12,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpMemberBase<TDeclaration> : FSharpTypeMember<TDeclaration>,
-    IOverridableMember, IFSharpMember
+  internal abstract class FSharpMemberBase<TDeclaration> : FSharpTypeMember<TDeclaration>, IFSharpMember
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected FSharpMemberBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
@@ -22,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public FSharpMemberOrFunctionOrValue Mfv => Symbol as FSharpMemberOrFunctionOrValue;
 
-    public override bool IsExtensionMember =>
+    public bool IsExtensionMember =>
       GetContainingType() is IFSharpModule && GetDeclaration() is IMemberDeclaration;
 
     protected override ITypeElement GetTypeElement(IDeclaration declaration)
@@ -111,23 +110,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       }
     }
 
-    // todo: check interface impl
-    public override bool IsOverride => 
-      (SymbolUse?.IsFromDispatchSlotImplementation ?? false) && (!Mfv?.DeclaringEntity?.Value.IsInterface ?? false) ||
-      (Mfv?.IsOverrideOrExplicitInterfaceImplementation ?? false);
+    public override bool IsOverride =>
+      GetDeclaration() is { } decl &&
+      (decl.IsOverride || InterfaceImplementationNavigator.GetByTypeMember(decl as IMemberDeclaration) != null);
 
     public override bool IsAbstract =>
-      (Mfv?.IsDispatchSlot ?? false) &&
-      ObjExprNavigator.GetByMember(GetDeclaration() as IMemberDeclaration) == null;
+      GetDeclaration() is IAbstractMemberDeclaration memberDeclaration && !memberDeclaration.HasDefaultImplementation;
 
-    public override bool IsVirtual => false; // todo
+    public override bool IsVirtual =>
+      GetDeclaration() switch
+      {
+        IMemberDeclaration memberDeclaration => memberDeclaration.IsVirtual,
+        IAbstractMemberDeclaration memberDeclaration => memberDeclaration.HasDefaultImplementation,
+        _ => false
+      };
 
     public override bool Equals(object obj)
     {
       if (ReferenceEquals(this, obj))
         return true;
 
-      if (!base.Equals(obj) || !(obj is FSharpMemberBase<TDeclaration> otherMember))
+      if (!(obj is IFSharpMember otherMember) || !base.Equals(obj))
         return false;
 
       if (IsExplicitImplementation != otherMember.IsExplicitImplementation)

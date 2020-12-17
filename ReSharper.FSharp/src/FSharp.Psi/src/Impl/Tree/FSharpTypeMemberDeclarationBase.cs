@@ -91,9 +91,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
 
     public AccessRights GetAccessRights() => AccessRights.PUBLIC;
-    public bool IsAbstract => false;
+    public virtual bool IsAbstract => false;
     public bool IsSealed => false;
-    public bool IsVirtual => false;
+    public virtual bool IsVirtual => false;
     public virtual bool IsOverride => false;
     public virtual bool IsStatic => false;
     public bool IsReadonly => false;

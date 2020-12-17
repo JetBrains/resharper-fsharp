@@ -23,7 +23,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public bool IsAsync => false;
     public bool IsVarArg => false;
-    public bool IsXamlImplicitMethod => false;
 
     public override ISubstitution IdSubstitution => MethodIdSubstitution.Create(this);
   }

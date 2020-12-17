@@ -95,5 +95,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public bool IsAuto => false;
     public bool IsDefault => false;
+
+    public override bool Equals(object obj) => 
+      obj is IProperty && base.Equals(obj);
+
+    public override int GetHashCode() => 
+      ShortName.GetHashCode();
   }
 }

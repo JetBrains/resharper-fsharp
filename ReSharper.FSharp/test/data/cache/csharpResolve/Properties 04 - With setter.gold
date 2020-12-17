@@ -2,10 +2,14 @@
 {
   public Class1()
   {
-    var _ = new Module.Foo {Foo = 123};
+    var f = new Module.Foo {Foo = 123};
+    int foo = f.Foo;
+    f.Foo = 1;
   }
 }
 
 ---------------------------------------------------------
 M:Module.Foo.#ctor
+P:Module.Foo.Foo
+P:Module.Foo.Foo
 P:Module.Foo.Foo

@@ -1,7 +1,7 @@
 ﻿-------------- offset 66 line 7 col 1 --------------------
 +++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
 MULTIPLE CANDIDATES EXECUTION:
---> CANDIDATE DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpConstructor, PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpConstructor, PsiLanguageType:F# RANGE: (0,0) @ Ctor 01 - Modifier.fs
+--> CANDIDATE DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpSecondaryConstructor, PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpSecondaryConstructor, PsiLanguageType:F# RANGE: (0,0) @ Ctor 01 - Modifier.fs
 Immediate result: Occurrence's dump:
 TO: [O] internal |new| (x: int) = T() RANGE: (42,45) @ Ctor 01 - Modifier.fs
 Occurrence's navigation result. Opened file: Ctor 01 - Modifier.fs

@@ -14,12 +14,12 @@
 |fun x -> List<int>.Equals(x)|(8)
 
 ---------------------------------------------------------
-(0): ReSharper Warning: Lambda can be replaced with 'f'
-(1): ReSharper Warning: Lambda can be replaced with 'f'
-(2): ReSharper Warning: Lambda can be replaced with 'id'
-(3): ReSharper Warning: Lambda can be simplified
-(4): ReSharper Warning: Lambda can be replaced with 'f'
-(5): ReSharper Warning: Lambda can be replaced with 'f'
-(6): ReSharper Warning: Lambda can be simplified
-(7): ReSharper Warning: Lambda can be replaced with 'System.Math.Abs'
-(8): ReSharper Warning: Lambda can be simplified
+(0): ReSharper Hint: Lambda can be replaced with 'f'
+(1): ReSharper Hint: Lambda can be replaced with 'f'
+(2): ReSharper Hint: Lambda can be replaced with 'id'
+(3): ReSharper Hint: Lambda can be simplified
+(4): ReSharper Hint: Lambda can be replaced with 'f'
+(5): ReSharper Hint: Lambda can be replaced with 'f'
+(6): ReSharper Hint: Lambda can be simplified
+(7): ReSharper Hint: Lambda can be replaced with 'System.Math.Abs'
+(8): ReSharper Hint: Lambda can be simplified

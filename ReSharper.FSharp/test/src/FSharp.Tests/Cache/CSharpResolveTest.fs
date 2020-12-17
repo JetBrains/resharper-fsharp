@@ -89,6 +89,12 @@ type CSharpResolveTest() =
     [<Test>] member x.``Properties 02 - Function type``() = x.DoNamedTest()
     [<Test>] member x.``Properties 03 - Auto with setter``() = x.DoNamedTest()
     [<Test>] member x.``Properties 04 - With setter``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 05 - With setter``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 06 - Explicit accessors 01``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 07 - Explicit private accessor``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 08 - Explicit static accessor``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 09 - Explicit generic accessor``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 10 - Implicit accessors``() = x.DoNamedTest()
 
     [<Test>] member x.``Module bindings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()
@@ -149,7 +155,7 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``AttributeUsage 01 - AllowMultiple``() = x.DoNamedTest()
     [<Test>] member x.``AttributeUsage 02 - AttributeTargets``() = x.DoNamedTest()
-    
+
     override x.RelativeTestDataPath = "cache/csharpResolve"
 
     override x.MainFileExtension = CSharpProjectFileType.CS_EXTENSION

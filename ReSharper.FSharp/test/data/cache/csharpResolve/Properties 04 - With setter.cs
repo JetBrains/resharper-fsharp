@@ -2,6 +2,8 @@
 {
   public Class1()
   {
-    var _ = new Module.Foo {Foo = 123};
+    var f = new Module.Foo {Foo = 123};
+    int foo = f.Foo;
+    f.Foo = 1;
   }
 }

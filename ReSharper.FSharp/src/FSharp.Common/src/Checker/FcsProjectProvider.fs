@@ -12,7 +12,6 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
 open JetBrains.ProjectModel.Tasks
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -44,13 +43,21 @@ module FcsProjectProvider =
     let isFSharpProjectModule (psiModule: IPsiModule) =
         psiModule.IsValid() && isFSharpProject psiModule.ContainingProjectModule
 
+    let [<Literal>] invalidateProjectChangeType =
+        ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.TARGET_FRAMEWORK |||
+        ProjectModelChangeType.REFERENCE_TARGET ||| ProjectModelChangeType.REMOVED
+
+    let [<Literal>] invalidateChildChangeType =
+        ProjectModelChangeType.ADDED ||| ProjectModelChangeType.REMOVED |||
+        ProjectModelChangeType.MOVED_IN ||| ProjectModelChangeType.MOVED_OUT |||
+        ProjectModelChangeType.REFERENCE_TARGET
 
 [<SolutionComponent>]
 type FcsProjectProvider
         (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, checkerService: FSharpCheckerService,
          fcsProjectBuilder: FcsProjectBuilder, scriptFcsProjectProvider: IScriptFcsProjectProvider,
          scheduler: ISolutionLoadTasksScheduler, fsFileService: IFSharpFileService, psiModules: IPsiModules,
-         locks: IShellLocks, logger: ILogger, fileExtensions: IProjectFileExtensions) as this =
+         locks: IShellLocks, logger: ILogger) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let locker = JetFastSemiReenterableRWLock()
@@ -198,40 +205,51 @@ type FcsProjectProvider
         else
             None
 
+    let invalidateProject (project: IProject) =
+        for psiModule in psiModules.GetPsiModules(project) do
+            dirtyModules.Add(psiModule) |> ignore
+    
     member x.FcsProjectInvalidated = fcsProjectInvalidated
 
-    member private x.ProcessChange(obj: ChangeEventArgs) =
-        if not (solution.IsValid()) then () else
+    member x.ProcessChange(obj: ChangeEventArgs) =
+        let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
+        if isNull change || change.IsClosingSolution then () else
 
-        match obj.ChangeMap.GetChange<PsiModuleChange>(psiModules) with
-        | null -> ()
-        | change ->
-
-        // todo: check if there's a change for a project module when referenced assembly module is changed?
         use lock = locker.UsingWriteLock()
+        match change with
+        | :? ProjectReferenceChange as referenceChange ->
+            let referenceOwnerProject = referenceChange.ProjectToModuleReference.OwnerModule
+            if referenceOwnerProject.IsFSharp then
+                invalidateProject referenceOwnerProject
+        | change ->
+            x.VisitDelta(change)
 
-        for moduleChange in change.ModuleChanges do
-            // todo: ignore `PsiModuleChange.ChangeType.Invalidated`?
-            if moduleChange.Type <> PsiModuleChange.ChangeType.Added then
-                let psiModule = moduleChange.Item
-                if isMiscModule psiModule then () else
+    override x.VisitDelta(change: ProjectModelChange) =
+        match change.ProjectModelElement with
+         | :? IProject as project ->
+             if project.IsFSharp then
+                 if change.ContainsChangeType(invalidateProjectChangeType) then
+                     invalidateProject project
 
-                logger.Trace("Module change: type: {0}, module: {1}", moduleChange.Type, psiModule)
-                dirtyModules.Add(psiModule) |> ignore
+                 elif change.IsSubtreeChanged then
+                     let mutable invalidate = false
+                     let changeVisitor =
+                         { new RecursiveProjectModelChangeDeltaVisitor() with
+                             member x.VisitDelta(change) =
+                                 if change.ContainsChangeType(invalidateChildChangeType) then
+                                     invalidate <- true
+                                 else
+                                     base.VisitDelta(change) }
 
-        for fileChange in change.FileChanges do
-            let changeType = fileChange.Type
-            if changeType <> PsiModuleChange.ChangeType.Invalidated then
-                let sourceFile = fileChange.Item
-                let projectFileType = fileExtensions.GetFileType(sourceFile.GetLocation().ExtensionWithDot)
-                if not (projectFileType.Is<FSharpProjectFileType>()) then () else
+                     change.Accept(changeVisitor)
+                     if invalidate then
+                         invalidateProject project
 
-                // todo: make it possible to distinguish fsi sandbox files from sandbox in diffs 
-                let psiModule = sourceFile.PsiModule
-                if isMiscModule psiModule && not (projectFileType.Is<FSharpScriptProjectFileType>()) then () else
+             else if project.ProjectProperties.ProjectKind = ProjectKind.SOLUTION_FOLDER then
+                 base.VisitDelta(change)
 
-                logger.Trace("File change: type {0}, name: {1}, module: {2}", changeType, sourceFile.Name, psiModule)
-                dirtyModules.Add(psiModule) |> ignore
+         | :? ISolution -> base.VisitDelta(change)
+         | _ -> ()
 
     interface IFcsProjectProvider with
         member x.GetProjectOptions(sourceFile) =

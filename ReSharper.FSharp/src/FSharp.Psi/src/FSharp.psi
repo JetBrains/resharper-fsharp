@@ -639,6 +639,7 @@ whileExpr options { stubBase="UnitExpressionBase"; }:
   fSharpExpression<DO_EXPR, DoExpression>;
 
 objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="MemberDeclarations" path=<objExpr:MEMBER_LIST/memberDeclarationList:MEMBER_DECL> };
   get { methodName="InterfaceMembers" path=<objExpr:INTERFACE_IMPL/interfaceImplementation:MEMBER_LIST/memberDeclarationList:MEMBER_DECL> };
 }:
   LBRACE
@@ -646,7 +647,7 @@ objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   typeReferenceName<TYPE_REFERENCE, TypeName>
   fSharpExpression<ARG_EXPR, ArgExpression>
   WITH<WITH, WithKeyword>
-  memberDeclaration<MEMBER_DECL, MemberDeclarations>*
+  memberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
   interfaceImplementation<INTERFACE_IMPL, InterfaceImplementations>*
   RBRACE;
 
@@ -1116,18 +1117,21 @@ interface fSharpTypeMemberDeclaration:
   constructorDeclaration |
   inheritMember |
   interfaceImplementation |
-  abstractMemberDeclaration |
-  memberDeclaration |
   valFieldDeclaration |
-  autoPropertyDeclaration |
   letBindingsDeclaration |
+  overridableMemberDeclaration |
   doStatement |
-
   otherTypeMember;
+
+interface overridableMemberDeclaration:
+  abstractMemberDeclaration |
+  autoPropertyDeclaration |
+  memberDeclaration;
+
 
 interface constructorDeclaration:
   primaryConstructorDeclaration |
-  memberConstructorDeclaration;
+  secondaryConstructorDeclaration;
 
 interface inheritMember:
   typeInherit |
@@ -1157,7 +1161,7 @@ interfaceImplementation extras {
 
 otherTypeMember: fakeSeparator;
 
-primaryConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+primaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   parametersPatternDeclaration<PARAMETERS, ParametersPatternDeclaration>
@@ -1174,8 +1178,8 @@ ctorSelfId options { stubBase="LocalDeclarationBase"; }:
 memberSelfId options { stubBase="LocalDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>;  
 
-memberConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
-  get { methodName="Expression" path=<memberConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+secondaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
+  get { methodName="Expression" path=<secondaryConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
@@ -1249,8 +1253,8 @@ autoPropertyDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBas
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
+  memberKeyword{MEMBER, MemberKeyword}
   VAL<VAL, ValKeyword>
-  MEMBER<MEMBER, MemberKeyword>
   IDENTIFIER<IDENTIFIER, Identifier>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, InitExpression>
@@ -1266,7 +1270,7 @@ accessorsNamesClause:
     IDENTIFIER<ACESSOR, AccessorsNames>
   );
 
-accessorDeclaration:
+accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>
   (
     parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*

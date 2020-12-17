@@ -3,6 +3,6 @@
 |fun (x, (y, z)) -> (y, z)|(2)
 
 ---------------------------------------------------------
-(0): ReSharper Warning: Lambda can be replaced with 'snd'
-(1): ReSharper Warning: Lambda can be replaced with 'snd'
-(2): ReSharper Warning: Lambda can be replaced with 'snd'
+(0): ReSharper Hint: Lambda can be replaced with 'snd'
+(1): ReSharper Hint: Lambda can be replaced with 'snd'
+(2): ReSharper Hint: Lambda can be replaced with 'snd'

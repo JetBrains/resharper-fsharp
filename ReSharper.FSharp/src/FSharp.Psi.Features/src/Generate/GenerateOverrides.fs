@@ -78,14 +78,20 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
 
     memberDeclaration
 
+let noEmptyLineAnchors =
+    NodeTypeSet(
+        FSharpTokenType.STRUCT,
+        FSharpTokenType.CLASS,
+        FSharpTokenType.WITH,
+        FSharpTokenType.EQUALS)
 
 let addEmptyLineIfNeeded (anchor: ITreeNode) =
     let addEmptyLine =
-        let tokenType = getTokenType anchor
-        if tokenType == FSharpTokenType.STRUCT || tokenType == FSharpTokenType.CLASS || tokenType == FSharpTokenType.WITH then false else
-        not (anchor :? IMemberDeclaration) || not anchor.IsSingleLine
+        not noEmptyLineAnchors.[getTokenType anchor] &&
+        not ((anchor :? IMemberDeclaration) && anchor.IsSingleLine)
 
     if addEmptyLine then
         ModificationUtil.AddChildAfter(anchor, NewLine(anchor.GetLineEnding())) :> ITreeNode
     else
         anchor
+    |> getLastMatchingNodeAfter isInlineSpaceOrComment

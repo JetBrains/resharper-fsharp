@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.Util
 
 let getTreeNodesDocumentRange (startNode: ITreeNode) (endNode: ITreeNode) =
     let startOffset = startNode.GetDocumentStartOffset()

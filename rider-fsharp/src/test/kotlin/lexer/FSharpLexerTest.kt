@@ -1,15 +1,12 @@
 package lexer
 
-import com.intellij.lexer.Lexer
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
 import com.jetbrains.rider.test.RiderFrontendLexerTest
 import org.testng.annotations.Test
 
 @Test
 class FSharpLexerTest : RiderFrontendLexerTest("fs") {
-    override fun createLexer(): Lexer {
-        return FSharpLexer()
-    }
+    override fun createLexer() = FSharpLexer()
 
     @Test
     fun testDigit() {
@@ -1178,5 +1175,49 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
     @Test
     fun testCharQuote() {
         doTest("'''", "CHARACTER_LITERAL (''''')")
+    }
+
+    @Test
+    fun `testStrings - Interpolated - Regular 01 - No interpolation`() {
+        doTest("$\"\"", "REGULAR_INTERPOLATED_STRING ('\$\"\"')")
+    }
+
+    @Test
+    fun `testStrings - Interpolated - Regular 02`() {
+        doTest("$\"{1} hello {2 + 3}\"",
+            """REGULAR_INTERPOLATED_STRING_START ('${'$'}"{')
+            |INT32 ('1')
+            |REGULAR_INTERPOLATED_STRING_MIDDLE ('} hello {')
+            |INT32 ('2')
+            |WHITESPACE (' ')
+            |PLUS ('+')
+            |WHITESPACE (' ')
+            |INT32 ('3')
+            |REGULAR_INTERPOLATED_STRING_END ('}"')""".trimMargin())
+    }
+
+    @Test
+    fun `testStrings - Interpolated - Regular 03 - Record`() {
+        doTest("$\"{ {F=1} }\"",
+            """REGULAR_INTERPOLATED_STRING_START ('$"{')
+            |WHITESPACE (' ')
+            |LBRACE ('{')
+            |IDENT ('F')
+            |EQUALS ('=')
+            |INT32 ('1')
+            |RBRACE ('}')
+            |WHITESPACE (' ')
+            |REGULAR_INTERPOLATED_STRING_END ('}"')""".trimMargin()
+        )
+    }
+
+    @Test
+    fun `testStrings - Interpolated - Triple quote - Nested 01`() {
+        doTest("$\"\"\"{\$\"{1}\"}\"\"\"",
+            """TRIPLE_QUOTE_INTERPOLATED_STRING_START ('${'$'}""${'"'}{')
+            |REGULAR_INTERPOLATED_STRING_START ('${'$'}"{')
+            |INT32 ('1')
+            |REGULAR_INTERPOLATED_STRING_END ('}"')
+            |TRIPLE_QUOTED_STRING_END ('}""${'"'}')""".trimMargin());
     }
 }

@@ -6,4 +6,4 @@
      id) i|(0)
 
 ---------------------------------------------------------
-(0): ReSharper Warning: Lambda can be simplified
+(0): ReSharper Hint: Lambda can be simplified

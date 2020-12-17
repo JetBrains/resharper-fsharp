@@ -96,6 +96,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Tuple 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Const - Numbers 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - String 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const - Unit 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const - Unit 02 - Parens``() = x.DoNamedTest()
 
@@ -264,6 +265,13 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - Typeof 01 - Type parameter``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Interpolated string 01 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string 03 - Whitespace``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string 04 - Braces``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string 05 - Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string 06 - Multiple``() = x.DoNamedTest()
+
     [<Test>] member x.``Binding - Return type 01``() = x.DoNamedTest()
     [<Test>] member x.``Binding - Return type 02 - Attrs``() = x.DoNamedTest()
     [<Test>] member x.``Binding - Return type 03 - Attrs, wild type``() = x.DoNamedTest()
@@ -360,10 +368,11 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type member - Member 01 - Wild self id``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Member - Method - Parameters - Optional 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Method - Parameters - Optional 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Method - Parameters - Optional 03 - Private``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Method - Parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Method - Parameters 02``() = x.DoNamedTest()
-    [<Test>] member x.``Type member - Member - Method - Parameters 03 - Optional``() = x.DoNamedTest()
-    [<Test>] member x.``Type member - Member - Method - Parameters 04 - Optional``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Member - Method - Curried Parameters 01``() = x.DoNamedTest()
 
@@ -489,6 +498,12 @@ type FSharpErrorsParserTest() =
 
     [<Test>] member x.``Expr - New 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Interpolated string - Unfinished 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string - Unfinished 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Object expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Object expr 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
 

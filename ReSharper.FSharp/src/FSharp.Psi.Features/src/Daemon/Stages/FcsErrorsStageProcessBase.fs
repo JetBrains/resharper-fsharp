@@ -13,6 +13,19 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.Util
 
+type IIgnoredHighlighting =
+    inherit IHighlighting
+
+type IgnoredHighlighting() =
+    static member val Instance = IgnoredHighlighting()
+
+    interface IIgnoredHighlighting with
+        member this.CalculateRange() = DocumentRange.InvalidRange
+        member this.ErrorStripeToolTip = ""
+        member this.IsValid() = true
+        member this.ToolTip = ""
+
+
 [<AutoOpen>]
 module FSharpErrors =
     // Error numbers as reported by FCS:
@@ -139,9 +152,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNodeWithMessage TypeTestUnnecessaryWarning range error
 
         | UnusedValue ->
-            match fsFile.GetNode(range) with
+            match fsFile.GetNode<INamedPat>(range) with
             | null -> UnusedHighlighting(error.Message, range) :> _
-            | pat -> UnusedValueWarning(pat) :> _
+            | pat ->
+
+            let decl = LetBindingsDeclarationNavigator.GetByBinding(TopBindingNavigator.GetByHeadPattern(pat))
+            if pat :? IParametersOwnerPat && isNotNull decl && not (Seq.isEmpty decl.AttributesEnumerable) then
+                IgnoredHighlighting.Instance :> _
+            else
+                UnusedValueWarning(pat) :> _
 
         | RuleNeverMatched ->
             createHighlightingFromParentNode RuleNeverMatchedWarning range
@@ -247,6 +266,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                             highlightings.Add(HighlightingInfo(range, highlighting))
                         highlighting :> _   
                     | highlighting -> highlighting
+
+                if highlighting :? IIgnoredHighlighting then () else
 
                 highlightings.Add(HighlightingInfo(highlighting.CalculateRange(), highlighting))
             x.SeldomInterruptChecker.CheckForInterrupt()

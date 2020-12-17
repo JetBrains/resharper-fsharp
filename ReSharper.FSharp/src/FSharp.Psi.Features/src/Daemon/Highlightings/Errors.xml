@@ -53,6 +53,14 @@
         <Title>Redundant RequireQualifiedAccess attribute</Title>
         <Description>Enum type always requires qualified access.</Description>
       </Tag>
+      <Tag name="FSharpLambdaCanBeSimplified" default="HINT">
+        <Title>Lambda expression can be simplified</Title>
+        <Description>Lambda expression can be simplified.</Description>
+      </Tag>
+      <Tag name="FSharpBuiltinFunctionReimplementation" default="HINT">
+        <Title>Lambda expression can be replaced with built-in function</Title>
+        <Description>Lambda expression can be replaced with built-in function.</Description>
+      </Tag>
     </Group>
   </SeverityConfiguration>
 
@@ -182,7 +190,7 @@
     <QuickFix>ReplaceAppExprWithArgFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaCanBeSimplified">
+  <Warning name="LambdaCanBeSimplified" configurableSeverity="FSharpLambdaCanBeSimplified">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
@@ -190,14 +198,14 @@
     <QuickFix>SimplifyLambdaFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaBodyCanBeReplacedWithId">
+  <Warning name="LambdaBodyCanBeReplacedWithId" configurableSeverity="FSharpLambdaCanBeSimplified">
     <Parameter type="ILambdaExpr" name="lambda"/>
     <Range>lambda.GetHighlightingRange()</Range>
     <Message value="Lambda body can be replaced with 'id'"/>
     <QuickFix>ReplaceLambdaBodyWithIdFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplacedWithInnerExpression">
+  <Warning name="LambdaCanBeReplacedWithInnerExpression" configurableSeverity="FSharpLambdaCanBeSimplified">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
@@ -207,7 +215,7 @@
     <QuickFix>ReplaceLambdaWithInnerExpressionFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplacedWithBuiltinFunction">
+  <Warning name="LambdaCanBeReplacedWithBuiltinFunction" configurableSeverity="FSharpBuiltinFunctionReimplementation">
     <Parameter type="ILambdaExpr" name="lambda"/>
     <Parameter type="string" name="funName"/>
     <Range>lambda.GetHighlightingRange()</Range>

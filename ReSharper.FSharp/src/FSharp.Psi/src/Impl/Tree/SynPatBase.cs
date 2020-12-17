@@ -188,6 +188,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IEnumerable<IDeclaration> Declarations =>
       Patterns.SelectMany(pat => pat.Declarations);
+
+    public bool IsStruct => StructKeyword != null;
   }
 
   internal partial class ParenPat

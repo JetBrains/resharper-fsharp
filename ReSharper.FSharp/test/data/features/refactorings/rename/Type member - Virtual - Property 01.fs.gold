@@ -1,0 +1,11 @@
+﻿type A() =
+    abstract zzz: int
+    override x.zzz = 1
+
+type B() =
+    inherit A()
+
+    override x.zzz = 1
+
+A().zzz
+B().zzz

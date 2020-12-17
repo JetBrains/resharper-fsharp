@@ -1,0 +1,11 @@
+﻿type A() =
+    abstract zzz: unit -> unit
+    override x.zzz() = ()
+
+type B() =
+    inherit A()
+
+    override x.zzz() = ()
+
+A().zzz()
+B().zzz()

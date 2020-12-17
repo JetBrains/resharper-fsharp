@@ -49,6 +49,9 @@ and UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess) 
             | null -> ()
             | openDirective ->
 
+            // todo: remove after FCS update, https://github.com/dotnet/fsharp/pull/10510
+            if isNotNull openDirective.TypeKeyword then () else
+
             let range = openDirective.GetHighlightingRange()
             highlightings.Add(HighlightingInfo(range, UnusedOpenWarning(openDirective)))
         committer.Invoke(DaemonStageResult(highlightings))
