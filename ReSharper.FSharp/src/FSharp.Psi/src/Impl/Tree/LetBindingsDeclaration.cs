@@ -18,6 +18,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       BindingKeyword.NotNull().AddTokenAfter(FSharpTokenType.REC);
     }
 
+    public bool IsInline => InlineKeyword != null;
+
     public void SetIsInline(bool value)
     {
       if (value)

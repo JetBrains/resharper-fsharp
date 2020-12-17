@@ -73,6 +73,10 @@ let intrinsicOperatorsTypeName = clrTypeName "Microsoft.FSharp.Core.LanguagePrim
 let unitTypeName = clrTypeName "Microsoft.FSharp.Core.Unit"
 
 
+[<CompiledName("EntryPointAttrTypeName")>]
+let entryPointAttrTypeName = clrTypeName "Microsoft.FSharp.Core.EntryPointAttribute"
+
+
 let predefinedFunctionTypes =
     [| operatorsModuleTypeName, [| "not"; "id"; "ignore"; "|>"; "<|"; "<>"; "="; "fst"; "snd" |]
        intrinsicOperatorsTypeName, [| "||"; "&&" |] |]

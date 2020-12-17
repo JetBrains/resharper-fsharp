@@ -414,6 +414,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Module member - Extern 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Extern 02 - Access modifier``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module member - Let - Inline 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 02 - Qualifier``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open - Type 01``() = x.DoNamedTest()

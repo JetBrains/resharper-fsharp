@@ -184,7 +184,6 @@ topBinding extras {
   get { methodName="Attributes" path=<topBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  INLINE<INLINE, InlineKeyword>?
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
@@ -195,7 +194,6 @@ localBinding extras {
   get { methodName="Attributes" path=<localBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  INLINE<INLINE, InlineKeyword>?
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?

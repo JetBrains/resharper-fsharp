@@ -571,15 +571,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string DropAttributeSuffix([NotNull] this string attrName) =>
       attrName.SubstringBeforeLast(AttributeSuffix, StringComparison.Ordinal);
 
-    public static bool HasAttribute(this TreeNodeCollection<IAttribute> attributes, [NotNull] string shortName)
+    public static IAttribute GetAttribute(this TreeNodeCollection<IAttribute> attributes, [NotNull] string shortName)
     {
       foreach (var attr in attributes)
         if (attr.ShortNameEquals(shortName))
-          return true;
+          return attr;
 
-      return false;
+      return null;
     }
-    
+
+    public static bool HasAttribute(this TreeNodeCollection<IAttribute> attributes, [NotNull] string shortName) =>
+      GetAttribute(attributes, shortName) != null;
+
     public static bool HasAttribute([NotNull] this IFSharpTypeOldDeclaration typeDeclaration, [NotNull] string shortName) =>
       HasAttribute(typeDeclaration.AllAttributes, shortName);
 
