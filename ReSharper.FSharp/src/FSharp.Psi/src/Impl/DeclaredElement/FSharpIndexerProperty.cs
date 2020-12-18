@@ -14,7 +14,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsReadable => HasPublicAccessor(AccessorKind.GETTER);
     public override bool IsWritable => HasPublicAccessor(AccessorKind.SETTER);
     public override bool IsDefault => true;
-    public override AccessRights GetAccessRights() => RepresentationAccessRights;
+
+    public override AccessRights GetAccessRights()
+    {
+      var accessRights = GetDeclaration()?.GetAccessRights();
+      if (accessRights == AccessRights.PUBLIC)
+        return IsReadable || IsWritable ? AccessRights.PUBLIC : AccessRights.PRIVATE;
+
+      return accessRights ?? AccessRights.NONE;
+    }
+
     public override IList<IParameter> Parameters => this.GetParameters(Mfv);
 
     private bool HasPublicAccessor(AccessorKind kind) =>

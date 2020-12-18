@@ -1,0 +1,22 @@
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+
+    var _ = t[0];
+    t|[0]|(0) = 0;
+
+    var __ = t|[""]|(1);
+    t[""] = 0;
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The indexer 'T.this' has no setter
+(1): ReSharper Underlined Error Highlighting: The indexer 'T.this' has no getter
+M:T.#ctor
+P:T.Item(System.Int32)
+P:T.Item(System.Int32)
+P:T.Item(System.String)
+P:T.Item(System.String)

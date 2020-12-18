@@ -1,0 +1,30 @@
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+
+    var _ = t[0];
+    t[0] = 0;
+    var __ = t[""];
+    t[""] = 0;
+    
+    var ___ = t.|get_Item|(0)(0);
+    var ____ = t.|get_Item|(1)("");
+    var _____ = t.|Item|(2);
+    t.|set_A|(3)(0, 0);
+    t.|set_A|(4)("", 0);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'get_Item'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'get_Item'
+(2): ReSharper Error Highlighting: Cannot resolve symbol 'Item'
+(3): ReSharper Error Highlighting: Cannot resolve symbol 'set_A'
+(4): ReSharper Error Highlighting: Cannot resolve symbol 'set_A'
+M:T.#ctor
+P:T.Item(System.Int32)
+P:T.Item(System.Int32)
+P:T.Item(System.String)
+P:T.Item(System.String)

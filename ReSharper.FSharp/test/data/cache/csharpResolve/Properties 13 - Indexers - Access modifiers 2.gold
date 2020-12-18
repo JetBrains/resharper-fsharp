@@ -1,0 +1,17 @@
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+
+    var _ = t|[0]|(0);
+    t|[0]|(1)= 0;
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access private indexer 'this' here
+(1): ReSharper Underlined Error Highlighting: Cannot access private indexer 'this' here
+M:T.#ctor
+P:T.Item(System.Int32)
+P:T.Item(System.Int32)
