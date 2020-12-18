@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -79,7 +80,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
               result.Add(typeDeclaration);
           }
 
-        if (child is IMemberDeclaration memberDeclaration)
+        if (child is IMemberDeclaration {IsStatic: false} memberDeclaration &&
+            memberDeclaration.SourceName != StandardMemberNames.DefaultIndexerName)
           foreach (var accessor in memberDeclaration.AccessorDeclarations)
             if (accessor.IsExplicit)
               result.Add(accessor);

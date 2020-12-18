@@ -17,7 +17,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsWritable => Setters.Any();
     public override AccessRights GetAccessRights() => AccessRights.PRIVATE;
     public AccessRights RepresentationAccessRights => base.GetAccessRights();
-    public override IList<IParameter> Parameters => this.GetParameters(Mfv);
 
     public IEnumerable<IFSharpExplicitAccessor> Getters => GetAccessors(AccessorKind.GETTER);
     public IEnumerable<IFSharpExplicitAccessor> Setters => GetAccessors(AccessorKind.SETTER);

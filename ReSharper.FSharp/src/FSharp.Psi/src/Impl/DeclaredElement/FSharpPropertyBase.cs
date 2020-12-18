@@ -94,7 +94,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public abstract bool IsWritable { get; }
 
     public bool IsAuto => false;
-    public bool IsDefault => false;
+    public virtual bool IsDefault => false;
 
     public override bool Equals(object obj) => 
       obj is IProperty && base.Equals(obj);

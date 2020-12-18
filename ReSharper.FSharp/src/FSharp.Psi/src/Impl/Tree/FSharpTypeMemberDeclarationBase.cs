@@ -90,7 +90,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
 
-    public AccessRights GetAccessRights() => AccessRights.PUBLIC;
+    public virtual AccessRights GetAccessRights() => AccessRights.PUBLIC;
     public virtual bool IsAbstract => false;
     public bool IsSealed => false;
     public virtual bool IsVirtual => false;

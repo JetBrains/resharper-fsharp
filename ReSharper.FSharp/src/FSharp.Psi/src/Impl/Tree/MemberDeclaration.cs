@@ -66,7 +66,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       foreach (var accessor in AccessorDeclarationsEnumerable)
         if (accessor.IsExplicit)
-          return new FSharpPropertyWithExplicitAccessors(this);
+          return SourceName == StandardMemberNames.DefaultIndexerName && !IsStatic
+              ? new FSharpIndexerProperty(this)
+              : new FSharpPropertyWithExplicitAccessors(this);
 
       return new FSharpProperty<MemberDeclaration>(this, mfv);
     }

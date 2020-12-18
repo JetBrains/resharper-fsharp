@@ -33,6 +33,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IMemberDeclaration OwnerMember =>
       MemberDeclarationNavigator.GetByAccessorDeclaration(this);
 
+    public override AccessRights GetAccessRights() =>
+      GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv && mfv.Accessibility.IsPublic
+        ? AccessRights.PUBLIC
+        : AccessRights.PRIVATE;
+
     public AccessorKind Kind =>
       NameIdentifier?.Name switch
       {
