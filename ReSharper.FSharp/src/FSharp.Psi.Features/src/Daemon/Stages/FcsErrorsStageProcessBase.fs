@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 type IIgnoredHighlighting =
@@ -190,20 +191,29 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | NoImplementationGiven
         | NoImplementationGivenWithSuggestion ->
-            let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            match node.Parent with
-            | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == node ->
-                NoImplementationGivenTypeError(typeDecl, error.Message) :> _
+            let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) :> ITreeNode
+            match node with
+            | :? IObjExpr as impl ->
+                NoImplementationGivenInterfaceObjExprError(impl, error.Message) :> _
+            | _ ->    
+                match node.Parent with
+                | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == node ->
+                    NoImplementationGivenTypeError(typeDecl, error.Message) :> _
 
-            | :? IInterfaceImplementation as impl when impl.TypeName == node ->
-                NoImplementationGivenInterfaceError(impl, error.Message) :> _
+                | :? IInterfaceImplementation as impl when impl.TypeName == node ->
+                    NoImplementationGivenInterfaceError(impl, error.Message) :> _
 
-            | :? ITypeReferenceName as typeName when
-                    isNotNull (InterfaceImplementationNavigator.GetByTypeName(typeName)) ->
-                let impl = InterfaceImplementationNavigator.GetByTypeName(typeName)
-                NoImplementationGivenInterfaceError(impl, error.Message) :> _
+                | :? ITypeReferenceName as typeName when
+                        isNotNull (InterfaceImplementationNavigator.GetByTypeName(typeName)) ->
+                    let impl = InterfaceImplementationNavigator.GetByTypeName(typeName)
+                    NoImplementationGivenInterfaceError(impl, error.Message) :> _
+                    
+                | :? ITypeReferenceName as typeName when
+                        isNotNull (ObjExprNavigator.GetByTypeName(typeName)) ->
+                    let impl = ObjExprNavigator.GetByTypeName(typeName)
+                    NoImplementationGivenInterfaceObjExprError(impl, error.Message) :> _
 
-            | _ -> createGenericHighlighting error range
+                | _ -> createGenericHighlighting error range
 
         | UseBindingsIllegalInImplicitClassConstructors ->
             createHighlightingFromNode UseKeywordIllegalInPrimaryCtorError range

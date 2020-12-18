@@ -273,6 +273,17 @@
     <QuickFix>GenerateInterfaceMembersFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="NoImplementationGivenInterfaceObjExpr">
+    <Parameter type="IObjExpr" name="impl"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>getInterfaceImplOnObjExprHeaderRange impl</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateObjExprInterfaceMembersFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression">
     <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
     <Message value="`return` may only be used within computation expressions"/>

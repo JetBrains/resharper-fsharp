@@ -1,0 +1,4 @@
+﻿module Module
+
+let foo = { new System.IDisposable with
+            member this.Dispose() = failwith "todo"{caret} }

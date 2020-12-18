@@ -115,3 +115,11 @@ let getInterfaceImplHeaderRange (interfaceImpl: IInterfaceImplementation) =
         | withKeyword -> withKeyword :> ITreeNode
 
     getTreeNodesDocumentRange interfaceImpl.InterfaceKeyword last
+
+let getInterfaceImplOnObjExprHeaderRange (objExpr: IObjExpr) =
+    let last = 
+        match objExpr.WithKeyword with
+        | null -> objExpr.TypeName :> ITreeNode
+        | withKeyword -> withKeyword :> ITreeNode
+
+    getTreeNodesDocumentRange objExpr.NewKeyword last

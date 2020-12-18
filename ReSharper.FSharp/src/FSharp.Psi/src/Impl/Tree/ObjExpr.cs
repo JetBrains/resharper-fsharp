@@ -1,3 +1,4 @@
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -22,5 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IType Type() => this.GetExpressionTypeFromFcs();
     public IExpressionType GetExpressionType() => Type();
     public IType GetImplicitlyConvertedTo() => Type();
+
+
+    public FSharpEntity FcsEntity => TypeName?.Reference.GetFSharpSymbol() as FSharpEntity;
   }
 }
