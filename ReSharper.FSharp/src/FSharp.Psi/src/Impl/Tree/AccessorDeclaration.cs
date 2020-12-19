@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? new FSharpPropertyAccessor(this)
         : null;
 
-    public IMemberDeclaration OwnerMember => 
+    public IMemberDeclaration OwnerMember =>
       MemberDeclarationNavigator.GetByAccessorDeclaration(this);
 
     public AccessorKind Kind =>
@@ -40,5 +40,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         "set" => AccessorKind.SETTER,
         _ => AccessorKind.UNKNOWN
       };
+
+    public bool IsExplicit
+    {
+      get
+      {
+        var pattern = ParametersPatternsEnumerable.SingleItem?.Pattern;
+        if (pattern == null)
+          return false;
+
+        return Kind == AccessorKind.GETTER && !(pattern.IgnoreInnerParens() is IUnitPat) ||
+               Kind == AccessorKind.SETTER && pattern is ITuplePat;
+      }
+    }
   }
 }

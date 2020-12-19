@@ -7,6 +7,7 @@ public class Class1
     var __ = t.get_A(0);
     var ___ = t.get_A(0, 0);
     var ____ = t.get_A(0, 0, 0);
+    var _____ = t.get_A(new object());
     t.set_A(0, 0);
     t.set_A(0, 0, 0);
     t.set_A(0, 0, 0, 0, 0);

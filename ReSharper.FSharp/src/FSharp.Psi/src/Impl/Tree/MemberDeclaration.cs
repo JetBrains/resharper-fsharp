@@ -62,17 +62,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return new FSharpMethod<MemberDeclaration>(this);
     }
 
-    private IDeclaredElement CreateProperty(FSharpMemberOrFunctionOrValue mfv) =>
-      mfv.CurriedParameterGroups[0].Any()
-        ? new FSharpPropertyWithExplicitAccessors(this)
-        : new FSharpProperty<MemberDeclaration>(this, mfv) as IDeclaredElement;
+    private IDeclaredElement CreateProperty(FSharpMemberOrFunctionOrValue mfv)
+    {
+      foreach (var accessor in AccessorDeclarationsEnumerable)
+        if (accessor.IsExplicit)
+          return new FSharpPropertyWithExplicitAccessors(this);
+
+      return new FSharpProperty<MemberDeclaration>(this, mfv);
+    }
 
     public bool IsExplicitImplementation =>
       InterfaceImplementationNavigator.GetByTypeMember(this) != null ||
       ObjExprNavigator.GetByMemberDeclaration(this) is { } objExpr && objExpr.ArgExpression == null ||
       ObjExprNavigator.GetByInterfaceMember(this) != null;
 
-    public override bool IsStatic => 
+    public override bool IsStatic =>
       StaticKeyword != null;
 
     public override bool IsVirtual =>
