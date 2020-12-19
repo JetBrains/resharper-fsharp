@@ -19,7 +19,7 @@ type CheckResults =
     | StillRunning of Task<(FSharpParseFileResults * FSharpCheckFileResults) option>
 
 type FSharpChecker with
-    member x.ParseAndCheckDocument(path, source: ISourceText, options, allowStale: bool, opName) =
+    member internal x.ParseAndCheckDocument(path, source: ISourceText, options, allowStale: bool, opName) =
         let version = source.GetHashCode()
 
         let parseAndCheckFile =

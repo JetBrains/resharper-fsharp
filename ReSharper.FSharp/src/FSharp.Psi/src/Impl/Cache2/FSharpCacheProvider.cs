@@ -21,6 +21,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public void BuildCache(IFile file, ICacheBuilder builder)
     {
+      using var cookie = ProhibitTypeCheckCookie.Create();
+
       var sourceFile = file.GetSourceFile();
       Assertion.AssertNotNull(sourceFile, "sourceFile != null");
 

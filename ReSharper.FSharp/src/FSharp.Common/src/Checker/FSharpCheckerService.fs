@@ -92,6 +92,8 @@ type FSharpCheckerService
 
     member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, opName,
                                [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
+        ProhibitTypeCheckCookie.AssertTypeCheckIsAllowed()
+
         match x.FcsProjectProvider.GetProjectOptions(file) with
         | None -> None
         | Some options ->
