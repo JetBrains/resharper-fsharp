@@ -20,9 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     public void Dispose() => IsAcquired = false;
 
     [Conditional("JET_MODE_ASSERT")]
-    public static void AssertTypeCheckIsAllowed()
-    {
+    public static void AssertTypeCheckIsAllowed() =>
       Assertion.Assert(!IsAcquired, "!IsAcquired");
-    }
   }
 }
