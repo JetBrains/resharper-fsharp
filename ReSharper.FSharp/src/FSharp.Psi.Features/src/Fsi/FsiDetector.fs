@@ -4,9 +4,9 @@ open System
 open System.Collections.Generic
 open System.Globalization
 open JetBrains.Application
-open JetBrains.Application.platforms
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.NuGet.Packaging
+open JetBrains.ProjectModel.Platforms
 open JetBrains.ProjectModel.Properties
 open JetBrains.ReSharper.Host.Features.Runtime
 open JetBrains.ReSharper.Host.Features.Toolset

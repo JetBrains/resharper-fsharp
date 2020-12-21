@@ -10,7 +10,6 @@ open JetBrains.Application
 open JetBrains.Application.Progress
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
-open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.DocumentManagers
 open JetBrains.DocumentManagers.impl
@@ -19,6 +18,7 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
+open JetBrains.ProjectModel.Platforms
 open JetBrains.ProjectModel.model2.Assemblies.Impl
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -36,7 +36,7 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 [<SolutionComponent>]
 type FSharpScriptPsiModulesProvider
         (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, documentManager: DocumentManager,
-         scriptOptionsProvider: IScriptFcsProjectProvider, platformManager: PlatformManager,
+         scriptOptionsProvider: IScriptFcsProjectProvider, platformManager: IPlatformManager,
          assemblyFactory: AssemblyFactory, projectFileExtensions, projectFileTypeCoordinator) as this =
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.
@@ -58,7 +58,7 @@ type FSharpScriptPsiModulesProvider
     let locks = solution.Locks
 
     let targetFrameworkId =
-        let platformInfos = platformManager.GetAllPlatformInfos().AsList()
+        let platformInfos = platformManager.GetAllCompilePlatforms().AsList()
         if platformInfos.IsEmpty() then TargetFrameworkId.Default else
 
         let platformInfo = platformInfos |> Seq.maxBy (fun info -> info.TargetFrameworkId.Version)
