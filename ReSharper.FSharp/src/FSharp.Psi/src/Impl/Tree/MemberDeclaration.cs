@@ -77,7 +77,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       ObjExprNavigator.GetByMemberDeclaration(this) is { } objExpr && objExpr.ArgExpression == null ||
       ObjExprNavigator.GetByInterfaceMember(this) != null;
 
-    public bool IsIndexer => SourceName == StandardMemberNames.DefaultIndexerName && !IsStatic;
+    public bool IsIndexer =>
+      SourceName == StandardMemberNames.DefaultIndexerName && SourceName == CompiledName;
 
     public override bool IsStatic =>
       StaticKeyword != null;
