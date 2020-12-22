@@ -102,6 +102,7 @@ type CSharpResolveTest() =
     [<Test; Explicit>] member x.``Properties 15 - Indexer - Static``() = x.DoNamedTest()
     [<Test>] member x.``Properties 16 - Indexers - Partial accessors``() = x.DoNamedTest()
     [<Test>] member x.``Properties 17 - Indexers - Compiled name``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 18 - Explicit accessors - Compiled name``() = x.DoNamedTest()
 
     [<Test>] member x.``Module bindings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()

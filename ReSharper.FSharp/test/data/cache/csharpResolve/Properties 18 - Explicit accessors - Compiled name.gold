@@ -1,0 +1,16 @@
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+ 
+    var _ = t.get_A(0);
+    var __ = t.|get_A1|(0)(0);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'get_A1'
+M:T.#ctor
+M:T.get_A(System.Int32)
+M:T.get_A(System.Int32)
