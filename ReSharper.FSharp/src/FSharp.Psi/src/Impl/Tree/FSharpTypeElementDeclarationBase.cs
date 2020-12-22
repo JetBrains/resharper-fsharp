@@ -80,8 +80,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
               result.Add(typeDeclaration);
           }
 
-        if (child is IMemberDeclaration memberDeclaration &&
-            memberDeclaration.SourceName != StandardMemberNames.DefaultIndexerName)
+        if (child is IMemberDeclaration {IsIndexer: false} memberDeclaration)
           foreach (var accessor in memberDeclaration.AccessorDeclarations)
             if (accessor.IsExplicit)
               result.Add(accessor);

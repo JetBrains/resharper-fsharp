@@ -65,7 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       foreach (var accessor in AccessorDeclarationsEnumerable)
         if (accessor.IsExplicit)
-          return SourceName == StandardMemberNames.DefaultIndexerName && !IsStatic
+          return IsIndexer
             ? new FSharpIndexerProperty(this)
             : new FSharpPropertyWithExplicitAccessors(this);
 
@@ -76,6 +76,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       InterfaceImplementationNavigator.GetByTypeMember(this) != null ||
       ObjExprNavigator.GetByMemberDeclaration(this) is { } objExpr && objExpr.ArgExpression == null ||
       ObjExprNavigator.GetByInterfaceMember(this) != null;
+
+    public bool IsIndexer => SourceName == StandardMemberNames.DefaultIndexerName && !IsStatic;
 
     public override bool IsStatic =>
       StaticKeyword != null;
