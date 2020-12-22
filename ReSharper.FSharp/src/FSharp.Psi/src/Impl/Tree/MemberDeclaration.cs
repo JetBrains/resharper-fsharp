@@ -7,7 +7,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -67,8 +66,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       foreach (var accessor in AccessorDeclarationsEnumerable)
         if (accessor.IsExplicit)
           return SourceName == StandardMemberNames.DefaultIndexerName && !IsStatic
-              ? new FSharpIndexerProperty(this)
-              : new FSharpPropertyWithExplicitAccessors(this);
+            ? new FSharpIndexerProperty(this)
+            : new FSharpPropertyWithExplicitAccessors(this);
 
       return new FSharpProperty<MemberDeclaration>(this, mfv);
     }
@@ -99,5 +98,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       ModificationUtil.ReplaceChild(MemberKeyword, FSharpTokenType.OVERRIDE.CreateLeafElement());
     }
+
+    public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
   }
 }
