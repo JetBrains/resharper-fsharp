@@ -33,6 +33,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IMemberDeclaration OwnerMember =>
       MemberDeclarationNavigator.GetByAccessorDeclaration(this);
 
+    public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
+
     public AccessorKind Kind =>
       NameIdentifier?.Name switch
       {

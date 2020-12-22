@@ -1,0 +1,23 @@
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+
+    var _ = t|[0]|(0);
+    var __ = t.|get_Item|(1)(0);
+    var ___ = T.|get_Item|(2)(0);
+    t|[0]|(3) = 0;
+    t.|set_Item|(4)(0, 0);
+    T.|set_Item|(5)(0, 0);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression of type 'T'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'get_Item'
+(2): ReSharper Error Highlighting: Cannot resolve symbol 'get_Item'
+(3): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression of type 'T'
+(4): ReSharper Error Highlighting: Cannot resolve symbol 'set_Item'
+(5): ReSharper Error Highlighting: Cannot resolve symbol 'set_Item'
+M:T.#ctor

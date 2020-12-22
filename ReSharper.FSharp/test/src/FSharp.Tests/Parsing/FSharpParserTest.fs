@@ -390,12 +390,15 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Auto Property 02``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Auto Property 03``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Auto Property 04``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Auto Property 05 - Access modifier``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Member - Property - Accessors 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property - Accessors 02``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property - Accessors 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Property - Accessors 04 - Access modifiers 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property 02 - Static``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Property 03 - Access modifier``() = x.DoNamedTest()
 
     [<Test>] member x.``Module member - Do 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Do 02 - Let``() = x.DoNamedTest()

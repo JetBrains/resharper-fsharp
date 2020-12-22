@@ -7,7 +7,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -66,7 +65,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       foreach (var accessor in AccessorDeclarationsEnumerable)
         if (accessor.IsExplicit)
-          return new FSharpPropertyWithExplicitAccessors(this);
+          return IsIndexer
+            ? new FSharpIndexerProperty(this)
+            : new FSharpPropertyWithExplicitAccessors(this);
 
       return new FSharpProperty<MemberDeclaration>(this, mfv);
     }
@@ -75,6 +76,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       InterfaceImplementationNavigator.GetByTypeMember(this) != null ||
       ObjExprNavigator.GetByMemberDeclaration(this) is { } objExpr && objExpr.ArgExpression == null ||
       ObjExprNavigator.GetByInterfaceMember(this) != null;
+
+    public bool IsIndexer =>
+      SourceName == StandardMemberNames.DefaultIndexerName && SourceName == CompiledName;
 
     public override bool IsStatic =>
       StaticKeyword != null;
@@ -97,5 +101,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       ModificationUtil.ReplaceChild(MemberKeyword, FSharpTokenType.OVERRIDE.CreateLeafElement());
     }
+
+    public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
   }
 }

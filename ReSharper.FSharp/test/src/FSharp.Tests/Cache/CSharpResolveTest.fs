@@ -95,6 +95,13 @@ type CSharpResolveTest() =
     [<Test>] member x.``Properties 08 - Explicit static accessor``() = x.DoNamedTest()
     [<Test>] member x.``Properties 09 - Explicit generic accessor``() = x.DoNamedTest()
     [<Test>] member x.``Properties 10 - Implicit accessors``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 11 - Indexers``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 12 - Indexers - Access modifiers 01``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 13 - Indexers - Access modifiers 02``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 14 - Indexers - Access modifiers 03``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Properties 15 - Indexer - Static``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 16 - Indexers - Partial accessors``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 17 - Indexers - Compiled name``() = x.DoNamedTest()
 
     [<Test>] member x.``Module bindings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()

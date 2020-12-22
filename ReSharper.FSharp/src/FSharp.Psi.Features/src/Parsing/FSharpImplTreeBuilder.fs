@@ -299,7 +299,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
     member x.ProcessMemberBinding(mark, Binding(_, _, _, _, _, _, valData, headPat, returnInfo, expr, _, _), range) =
         let elType =
             match headPat with
-            | SynPat.LongIdent(LongIdentWithDots(lid, _), accessorId, typeParamsOpt, memberParams, _, _) ->
+            | SynPat.LongIdent(LongIdentWithDots(lid, _), accessorId, typeParamsOpt, memberParams, _, range) ->
                 match lid with
                 | [_] ->
                     match valData with
@@ -313,7 +313,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                     | _ ->
                         match accessorId with
                         | Some ident ->
-                            x.ProcessAccessor(ident, memberParams, expr)
+                            x.ProcessAccessor(range, memberParams, expr)
                             ElementType.MEMBER_DECLARATION
                         | _ ->
 
@@ -325,7 +325,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
                     match accessorId with
                     | Some ident ->
-                        x.ProcessAccessor(ident, memberParams, expr)
+                        x.ProcessAccessor(range, memberParams, expr)
                         ElementType.MEMBER_DECLARATION
                     | _ ->
 
@@ -351,7 +351,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
         elType
     
-    member x.ProcessAccessor(IdentRange range, memberParams, expr) =
+    member x.ProcessAccessor(range, memberParams, expr) =
         let mark = x.Mark(range)
         x.ProcessPatternParams(memberParams, true, true)
         x.MarkChameleonExpression(expr)

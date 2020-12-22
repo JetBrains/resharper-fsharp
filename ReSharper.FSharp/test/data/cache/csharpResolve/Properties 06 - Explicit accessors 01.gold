@@ -15,8 +15,9 @@ public class Class1
 }
 
 ---------------------------------------------------------
-(0): ReSharper Error Highlighting: Cannot resolve symbol 'A'
+(0): ReSharper Underlined Error Highlighting: Cannot access private property 'A' here
 M:T.#ctor
+P:T.A
 M:T.get_A(System.Int32)
 M:T.get_A(System.Int32)
 M:T.get_A(System.Int32,System.Int32)

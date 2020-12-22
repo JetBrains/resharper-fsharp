@@ -1,0 +1,17 @@
+public class Class1
+{
+  public Class1()
+  {
+    var _ = new T1()|[0]|(0);
+    var __ = new T2()|[0]|(1);
+    var ___ = new T3()[0]; 
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression of type 'T1'
+(1): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression of type 'T2'
+M:T1.#ctor
+M:T2.#ctor
+P:T3.Item(System.Int32)
+M:T3.#ctor
