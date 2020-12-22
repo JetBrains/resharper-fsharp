@@ -1,0 +1,21 @@
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+ 
+    var _ = t.get_A(0);
+    var __ = t.|get_A1|(0)(0);
+    var ___ = t.|A|(1);
+    var ____ = t.|A1|(2);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'get_A1'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'A'
+(2): ReSharper Underlined Error Highlighting: Cannot access private property 'A1' here
+M:T.#ctor
+M:T.get_A(System.Int32)
+M:T.get_A(System.Int32)
+P:T.A1
