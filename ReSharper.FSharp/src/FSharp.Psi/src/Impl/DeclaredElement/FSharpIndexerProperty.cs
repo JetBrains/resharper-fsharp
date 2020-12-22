@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
       var accessRights = GetDeclaration()?.GetAccessRights();
       if (accessRights == AccessRights.PUBLIC)
-        return IsReadable || IsWritable ? AccessRights.PUBLIC : AccessRights.PRIVATE;
+        return IsReadable || IsWritable ? AccessRights.PUBLIC : AccessRights.INTERNAL;
 
       return accessRights ?? AccessRights.NONE;
     }
@@ -32,8 +32,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool Equals(object obj)
     {
-      if (ReferenceEquals(this, obj))
-        return true;
+      if (!base.Equals(obj))
+        return false;
 
       if (!(obj is FSharpIndexerProperty indexer))
         return false;
