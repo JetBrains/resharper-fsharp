@@ -2,13 +2,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Common.Scripts
 
 open System
 open System.IO
+open System.Linq
 open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.Application.Environment
+open JetBrains.Application.platforms
 open JetBrains.DataFlow
+open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.BuildTools
+open JetBrains.ProjectModel.MSBuild.BuildTools
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost.Impl
 open JetBrains.ReSharper.Plugins.FSharp
@@ -76,12 +80,17 @@ type ScriptPsiModulesTest() =
 
 
 [<SolutionInstanceComponent>]
-type MyTestSolutionToolset(lifetime: Lifetime, buildToolContainer: BuildToolContainer) =
+type MyTestSolutionToolset(lifetime: Lifetime) =
     inherit DefaultSolutionToolset(lifetime)
-    
+
     let changed = new Signal<_>(lifetime, "MySolutionToolset::Changed")
-    let buildTool = buildToolContainer.GetAutoDetected(BuildToolEnvironment.EmptyEnvironment)
-    
+
+    let cli = DotNetCoreRuntimesDetector.DetectDotNetCoreRuntimes().FirstOrDefault().NotNull()
+    let dotnetCoreToolset = DotNetCoreToolset(cli, cli.Sdks.FirstOrDefault().NotNull())
+
+    let env = BuildToolEnvironment.Create(dotnetCoreToolset, null)
+    let buildTool = DotNetCoreMsBuildProvider().Discover(env).FirstOrDefault().NotNull()
+
     interface ISolutionToolset with
         member x.GetBuildTool() = buildTool
         member x.Changed = changed :> _
