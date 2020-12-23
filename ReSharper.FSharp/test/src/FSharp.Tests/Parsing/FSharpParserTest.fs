@@ -399,6 +399,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Member - Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property 02 - Static``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property 03 - Access modifier``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Property 04 - Attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Module member - Do 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Do 02 - Let``() = x.DoNamedTest()

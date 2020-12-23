@@ -231,9 +231,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 unfinishedDeclaration <- None
                 mark
             | _ ->
-                x.MarkAttributesOrIdOrRangeStart(outerAttrs, None, typeMember.Range)
-
-        x.ProcessAttributeLists(outerAttrs)
+                x.MarkAndProcessAttributesOrIdOrRange(outerAttrs, None, typeMember.Range)
 
         let memberType =
             match typeMember with
