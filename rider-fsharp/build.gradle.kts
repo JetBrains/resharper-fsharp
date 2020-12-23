@@ -100,25 +100,24 @@ repositories.forEach {
 
 val repoRoot = projectDir.parentFile!!
 val resharperPluginPath = File(repoRoot, "ReSharper.FSharp")
-
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
-val targetFramework = "net461"
-val projectOutputRelativePath = "bin/$buildConfiguration/$targetFramework"
 
 val libFiles = listOf(
-        Pair("FSharp.Common", "FSharp.Core.dll"),
-        Pair("FSharp.Common", "FSharp.Core.xml"),
-        Pair("FSharp.Common", "FSharp.Compiler.Service.dll"), // todo: add pdb after next repack
-        Pair("FSharp.Common", "FSharp.Compiler.Interactive.Settings.dll"),
-        Pair("FSharp.Psi.Features", "Fantomas.dll"))
+    "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Core.dll",
+    "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Core.xml",
+    "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
+    "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Interactive.Settings.dll",
+    "FSharp.Psi.Features/bin/$buildConfiguration/net461/Fantomas.dll"
+)
 
 val pluginFiles = listOf(
-        "FSharp.ProjectModelBase/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
-        "FSharp.Common/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Common",
-        "FSharp.Psi/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi",
-        "FSharp.Psi.Features/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
-        "Expecto.Runner/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Expecto.Runner",
-        "Expecto.Tasks/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Expecto.Tasks")
+    "FSharp.ProjectModelBase/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
+    "FSharp.Common/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Common",
+    "FSharp.Psi/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi",
+    "FSharp.Psi.Features/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
+    "Expecto.Runner/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Expecto.Runner",
+    "Expecto.Tasks/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Expecto.Tasks"
+)
 
 val dotNetSdkPath by lazy {
     val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
@@ -179,21 +178,16 @@ configure<RdGenExtension> {
 
 tasks {
     withType<PrepareSandboxTask> {
-        val files = libFiles +
-                pluginFiles.map { (project, file) -> Pair(project, "$file.dll") } +
-                pluginFiles.map { (project, file) -> Pair(project, "$file.pdb") }
-
-        var filePaths = files.map { (project, file) ->
-            "$resharperPluginPath/src/$project/$projectOutputRelativePath/$file"
-        }
+        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
+        files = files.map { "$resharperPluginPath/src/$it" }
 
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {
-            val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/$projectOutputRelativePath"
+            val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/bin/$buildConfiguration/net461"
             val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
-            filePaths = filePaths + listOf("$testHostName.dll", "$testHostName.pdb")
+            files = files + listOf("$testHostName.dll", "$testHostName.pdb")
         }
 
-        filePaths.forEach {
+        files.forEach {
             from(it) { into("${intellij.pluginName}/dotnet") }
         }
 
@@ -202,7 +196,7 @@ tasks {
         }
 
         doLast {
-            filePaths.forEach {
+            files.forEach {
                 val file = file(it)
                 if (!file.exists()) throw RuntimeException("File $file does not exist")
                 logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/dotnet")
@@ -272,12 +266,14 @@ tasks {
     create("writeDotNetSdkPathProps") {
         group = riderFSharpTargetsGroup
         doLast {
-            dotNetSdkPathPropsPath.writeTextIfChanged("""<Project>
+            dotNetSdkPathPropsPath.writeTextIfChanged(
+                """<Project>
   <PropertyGroup>
     <DotNetSdkPath>$dotNetSdkPath</DotNetSdkPath>
   </PropertyGroup>
 </Project>
-""")
+"""
+            )
         }
 
         getByName("buildSearchableOptions") {
@@ -288,13 +284,15 @@ tasks {
     create("writeNuGetConfig") {
         group = riderFSharpTargetsGroup
         doLast {
-            nugetConfigPath.writeTextIfChanged("""<?xml version="1.0" encoding="utf-8"?>
+            nugetConfigPath.writeTextIfChanged(
+                """<?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
     <add key="resharper-sdk" value="$dotNetSdkPath" />
   </packageSources>
 </configuration>
-""")
+"""
+            )
         }
     }
 

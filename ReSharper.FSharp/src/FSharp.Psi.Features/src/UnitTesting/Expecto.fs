@@ -7,6 +7,9 @@ open System.Linq
 open JetBrains.Application.UI.BindableLinq.Collections
 open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Assemblies.AssemblyToAssemblyResolvers
+open JetBrains.ProjectModel.Assemblies.Impl
+open JetBrains.ProjectModel.NuGet.Packaging
 open JetBrains.ReSharper.Feature.Services.ClrLanguages
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoTasks
@@ -391,8 +394,13 @@ let isExpectoFunction m = isPublic m && isStatic m && isExpectoType (returnType 
 
 
 [<SolutionComponent>]
-type ExpectoTestMetadataExplorer(provider: ExpectoProvider, resolveManager, resolveContextManager, logger) =
-    inherit UnitTestExplorerFrom.DotNetArtifacts(provider, resolveManager, resolveContextManager, logger)
+type ExpectoTestMetadataExplorer
+        (provider: ExpectoProvider,
+         resolveManager: AssemblyToAssemblyReferencesResolveManager,
+         resolveContextManager: ResolveContextManager,
+         installedPackageChecker: NuGetInstalledPackageChecker,
+         logger: ILogger) =
+    inherit UnitTestExplorerFrom.Metadata(provider, resolveManager, resolveContextManager, installedPackageChecker, logger)
 
     override x.ProcessProject(project, assemblyPath, loader, observer, cancellationToken) =
         MetadataElementsSource.ExploreProject(project, assemblyPath, loader, observer, logger, cancellationToken,
@@ -410,5 +418,4 @@ type ExpectoTestMetadataExplorer(provider: ExpectoProvider, resolveManager, reso
  
                 for method in t.GetMethods() do
                     if isExpectoFunction method then members.Add(method)
-
-            ())
+        )
