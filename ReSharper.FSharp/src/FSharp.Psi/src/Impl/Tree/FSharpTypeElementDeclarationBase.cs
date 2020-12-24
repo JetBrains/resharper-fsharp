@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
-using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -108,7 +107,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       var headPattern = binding.HeadPattern;
       if (headPattern == null) return;
 
-      foreach (var declaration in headPattern.Declarations)
+      foreach (var declaration in headPattern.NestedPatterns)
         if (declaration is ITypeMemberDeclaration typeMemberDeclaration)
           result.Add(typeMemberDeclaration);
     }

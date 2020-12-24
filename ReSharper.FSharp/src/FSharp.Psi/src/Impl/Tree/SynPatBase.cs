@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public bool IsDeclaration => true;
 
-    public IEnumerable<IDeclaration> Declarations => new[] {this};
+    public override IEnumerable<IFSharpPattern> NestedPatterns => new[] {this};
 
     public bool IsMutable => Binding?.IsMutable ?? false;
 
@@ -54,7 +54,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public IEnumerable<IDeclaration> Declarations => new[] {this};
+    public override IEnumerable<IFSharpPattern> NestedPatterns => new[] {this};
 
     public override TreeTextRange GetNameIdentifierRange() =>
       NameIdentifier.GetMemberNameIdentifierRange();
@@ -77,25 +77,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
 
-    public bool IsDeclaration
-    {
-      get
-      {
-        if (Parent is IBinding)
-          return true;
+    public bool IsDeclaration => Parent is IBinding;
 
-        if (ReferenceName?.Qualifier != null)
-          return false;
-
-        var idOffset = GetNameIdentifierRange().StartOffset.Offset;
-        return Parameters.IsEmpty && FSharpFile.GetSymbolUse(idOffset) == null;
-      }
-    }
-
-    public IEnumerable<IDeclaration> Declarations =>
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
       IsDeclaration
         ? new[] {this}
-        : Parameters.SelectMany(param => param.Declarations);
+        : Parameters.SelectMany(param => param.NestedPatterns);
   }
 
   internal partial class TopAsPat
@@ -103,7 +90,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public bool IsDeclaration => true;
-    public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
+    public override IEnumerable<IFSharpPattern> NestedPatterns => Pattern?.NestedPatterns.Prepend(this) ?? new[] {this};
 
     public TreeNodeCollection<IAttribute> Attributes =>
       this.GetBinding()?.AllAttributes ??
@@ -125,7 +112,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
     public bool IsDeclaration => true;
-    public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
+    public override IEnumerable<IFSharpPattern> NestedPatterns => Pattern?.NestedPatterns.Prepend(this) ?? new[] {this};
     
     public bool IsMutable => Binding?.IsMutable ?? false;
 
@@ -143,12 +130,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   internal partial class OrPat
   {
-    public override IEnumerable<IDeclaration> Declarations
+    public override IEnumerable<IFSharpPattern> NestedPatterns
     {
       get
       {
-        var pattern1Decls = Pattern1?.Declarations ?? EmptyList<IDeclaration>.Instance;
-        var pattern2Decls = Pattern2?.Declarations ?? EmptyList<IDeclaration>.Instance;
+        var pattern1Decls = Pattern1?.NestedPatterns ?? EmptyList<IFSharpPattern>.Instance;
+        var pattern2Decls = Pattern2?.NestedPatterns ?? EmptyList<IFSharpPattern>.Instance;
         return pattern2Decls.Prepend(pattern1Decls);
       }
     }
@@ -156,80 +143,80 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   internal partial class AndsPat
   {
-    public override IEnumerable<IDeclaration> Declarations =>
-      EmptyList<IDeclaration>.Instance;
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
+      EmptyList<IFSharpPattern>.Instance;
   }
 
   internal partial class TopParametersOwnerPat
   {
     public bool IsDeclaration => Parent is IBinding;
 
-    public IEnumerable<IDeclaration> Declarations =>
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
       IsDeclaration
         ? new[] {this}
-        : Parameters.SelectMany(param => param.Declarations);
+        : Parameters.SelectMany(param => param.NestedPatterns);
 
     public override IBinding Binding => this.GetBinding();
   }
 
   internal partial class ArrayPat
   {
-    public override IEnumerable<IDeclaration> Declarations =>
-      Patterns.SelectMany(pat => pat.Declarations);
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
+      Patterns.SelectMany(pat => pat.NestedPatterns);
   }
 
   internal partial class ListPat
   {
-    public override IEnumerable<IDeclaration> Declarations =>
-      Patterns.SelectMany(pat => pat.Declarations);
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
+      Patterns.SelectMany(pat => pat.NestedPatterns);
   }
 
   internal partial class TuplePat
   {
-    public override IEnumerable<IDeclaration> Declarations =>
-      Patterns.SelectMany(pat => pat.Declarations);
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
+      Patterns.SelectMany(pat => pat.NestedPatterns);
 
     public bool IsStruct => StructKeyword != null;
   }
 
   internal partial class ParenPat
   {
-    public override IEnumerable<IDeclaration> Declarations =>
-      Pattern.Declarations;
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
+      Pattern.NestedPatterns;
   }
 
   internal partial class AttribPat
   {
-    public override IEnumerable<IDeclaration> Declarations =>
-      Pattern.Declarations;
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
+      Pattern.NestedPatterns;
   }
 
   internal partial class RecordPat
   {
-    public override IEnumerable<IDeclaration> Declarations =>
-      FieldPatterns.SelectMany(pat => pat.Pattern?.Declarations).WhereNotNull();
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
+      FieldPatterns.SelectMany(pat => pat.Pattern?.NestedPatterns).WhereNotNull();
   }
 
   internal partial class OptionalValPat
   {
-    public override IEnumerable<IDeclaration> Declarations =>
-      Pattern.Declarations;
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
+      Pattern.NestedPatterns;
   }
 
   internal partial class TypedPat
   {
-    public override IEnumerable<IDeclaration> Declarations =>
-      Pattern.Declarations;
+    public override IEnumerable<IFSharpPattern> NestedPatterns =>
+      Pattern.NestedPatterns;
   }
 
   internal partial class ListConsPat
   {
-    public override IEnumerable<IDeclaration> Declarations
+    public override IEnumerable<IFSharpPattern> NestedPatterns
     {
       get
       {
-        var pattern1Decls = HeadPattern?.Declarations ?? EmptyList<IDeclaration>.Instance;
-        var pattern2Decls = TailPattern?.Declarations ?? EmptyList<IDeclaration>.Instance;
+        var pattern1Decls = HeadPattern?.NestedPatterns ?? EmptyList<IFSharpPattern>.Instance;
+        var pattern2Decls = TailPattern?.NestedPatterns ?? EmptyList<IFSharpPattern>.Instance;
         return pattern2Decls.Prepend(pattern1Decls);
       }
     }

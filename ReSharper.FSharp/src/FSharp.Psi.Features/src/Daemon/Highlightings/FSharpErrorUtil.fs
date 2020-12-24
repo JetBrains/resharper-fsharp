@@ -32,8 +32,8 @@ let getLetTokenText (token: ITokenNode) =
     let tokenType = if isNull tokenType then FSharpTokenType.LET else tokenType 
     tokenType.TokenRepresentation
 
-let getExpressionsRanges (exprs: IFSharpExpression seq) =
-    exprs |> Seq.map (fun x -> if isValid x then x.GetHighlightingRange() else DocumentRange.InvalidRange) 
+let getNodeRanges (exprs: #ITreeNode seq) =
+    exprs |> Seq.map (fun x -> x.GetHighlightingRange()) 
 
 let getRefExprNameRange (refExpr: IReferenceExpr) =
     match refExpr.Identifier with

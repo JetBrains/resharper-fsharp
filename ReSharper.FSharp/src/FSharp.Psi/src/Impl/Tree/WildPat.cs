@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => null;
 
     public bool IsDeclaration => true;
-    public IEnumerable<IDeclaration> Declarations => new[] {this};
+    public override IEnumerable<IFSharpPattern> NestedPatterns => new[] {this};
 
     public override IType GetPatternType() => this.GetExpressionTypeFromFcs();
     public override IType Type => GetPatternType();

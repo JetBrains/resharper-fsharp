@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -22,7 +23,8 @@ module ReplaceWithWildPat =
         if isIdentifierOrKeyword (pat.GetNextToken()) then
             ModificationUtil.AddChildAfter(pat, Whitespace()) |> ignore
 
-        replace pat (pat.GetFSharpLanguageService().CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
+        for pat in pat.GetPartialDeclarations() do
+            replace pat (pat.GetFSharpLanguageService().CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
 
     let getPatOwner (pat: IFSharpPattern) =
         if isNull pat then null else

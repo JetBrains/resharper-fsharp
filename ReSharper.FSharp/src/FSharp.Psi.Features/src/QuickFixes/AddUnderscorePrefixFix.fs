@@ -17,12 +17,21 @@ type AddUnderscorePrefixFix(warning: UnusedValueWarning) =
     override x.IsAvailable _ =
         if not (isValid pat) then false else
 
-        let identifier = pat.Identifier
-        if not (isValid identifier) || identifier.GetText().IsEscapedWithBackticks() then false else
+        if pat.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME then false else
 
-        pat.SourceName <> SharedImplUtil.MISSING_DECLARATION_NAME
+        pat.GetPartialDeclarations() |> Seq.forall (fun pat ->
+            let referencePat = pat.As<IReferencePat>()
+            if isNull referencePat then false else
+
+            let identifier = referencePat.Identifier
+            isValid identifier && not (identifier.GetText().IsEscapedWithBackticks()))
+
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        pat.SetName("_" + pat.SourceName, ChangeNameKind.SourceName)
+
+        let patterns = pat.GetPartialDeclarations() |> Seq.toList
+        for pat in patterns do
+            let pat = pat.As<IReferencePat>()
+            pat.SetName("_" + pat.SourceName, ChangeNameKind.SourceName)

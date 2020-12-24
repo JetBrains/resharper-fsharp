@@ -219,6 +219,10 @@ externDeclaration:
 //   fakeSeparator
 //   RPAREN;
 
+
+// todo: extract declaring pattern interface
+// todo: split parameters owner interface and move binding parameters out
+
 interface fSharpPattern:
   namedPat |
   typedPat |

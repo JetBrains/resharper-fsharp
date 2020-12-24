@@ -5,10 +5,11 @@
     JetBrains.ReSharper.Plugins.FSharp.Psi;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
-    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
-    JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   </Usings>
 
   <StaticSeverityGroups>
@@ -75,6 +76,7 @@
       <Argument>pat.SourceName</Argument>
     </Message>
     <Range>pat.GetNavigationRange()</Range>
+    <SecondaryRanges>pat.GetPartialDeclarations() |> Seq.filter ((!=) pat) |> getNodeRanges</SecondaryRanges>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
@@ -234,7 +236,7 @@
       <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
     </Message>
     <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression.GetHighlightingRange()</Range>
-    <SecondaryRanges>getAllExpressionArgs expr |> Seq.tail |> getExpressionsRanges</SecondaryRanges>
+    <SecondaryRanges>getAllExpressionArgs expr |> Seq.tail |> getNodeRanges</SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddParensToApplicationFix</QuickFix>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>

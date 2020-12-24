@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
@@ -121,5 +123,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool CanBeMutable => Binding != null;
     public override bool IsStatic => LetBindingsDeclarationNavigator.GetByBinding(Binding)?.StaticKeyword != null;
+    
+    public virtual IEnumerable<IFSharpPattern> NestedPatterns =>
+      EmptyList<IFSharpPattern>.Instance;
+
+    public virtual IEnumerable<IFSharpDeclaration> Declarations =>
+      NestedPatterns.OfType<IFSharpDeclaration>();
+
   }
 }

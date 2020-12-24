@@ -172,7 +172,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
       var headPattern = binding.HeadPattern;
       if (headPattern != null)
-        ProcessTypeMembers(headPattern.Declarations);
+        ProcessTypeMembers(headPattern.NestedPatterns);
     }
 
     public override void VisitLetBindingsDeclaration(ILetBindingsDeclaration letBindings)

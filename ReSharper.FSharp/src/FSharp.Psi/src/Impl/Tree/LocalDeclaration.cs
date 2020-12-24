@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -72,7 +73,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public TreeNodeCollection<IAttribute> Attributes =>
       TreeNodeCollection<IAttribute>.Empty;
-    
+
     public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
+
+    public virtual IEnumerable<IFSharpPattern> NestedPatterns =>
+      EmptyList<IFSharpPattern>.Instance;
+
+    public virtual IEnumerable<IFSharpDeclaration> Declarations =>
+      NestedPatterns.OfType<IFSharpDeclaration>();
   }
 }

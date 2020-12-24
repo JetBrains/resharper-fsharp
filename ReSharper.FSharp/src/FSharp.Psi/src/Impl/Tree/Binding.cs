@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     private ITypeMemberDeclaration FirstDeclaration =>
       HeadPattern is ITypeMemberDeclaration headPattern
         ? headPattern
-        : HeadPattern?.Declarations.FirstOrDefault() as ITypeMemberDeclaration;
+        : HeadPattern?.NestedPatterns.FirstOrDefault() as ITypeMemberDeclaration;
 
     public ITypeMember DeclaredElement => FirstDeclaration?.DeclaredElement;
     IDeclaredElement IDeclaration.DeclaredElement => DeclaredElement;
