@@ -122,6 +122,7 @@
     <Compile Include="src\Generate\GenerateProvider.fs" />
     <Compile Include="src\Intentions\DataProviders.fs" />
     <Compile Include="src\Intentions\FSharpContextActionBase.fs" />
+    <Compile Include="src\Intentions\SpecifyTypes.fs" />
     <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
     <Compile Include="src\Intentions\ToMultilineRecord.fs" />
     <Compile Include="src\Intentions\ToRecursiveModuleAction.fs" />
@@ -131,11 +132,12 @@
     <Compile Include="src\Intentions\IfToElifAction.fs" />
     <Compile Include="src\Intentions\NegateConditionActions.fs" />
     <Compile Include="src\Intentions\ToMutableAction.fs" />
-    <Compile Include="src\Intentions\FunctionAnnotationAction.fs" />
     <Compile Include="src\Intentions\ToLiteralAction.fs" />
     <Compile Include="src\Intentions\SetNameAction.fs" />
     <Compile Include="src\Intentions\LetToUseAction.fs" />
     <Compile Include="src\Intentions\RenameFileToMatchTypeNameAction.fs" />
+    <Compile Include="src\Intentions\FunctionReturnTypeAnnotationAction.fs" />
+    <Compile Include="src\Intentions\FunctionArgumentTypesAnnotationAction.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\Errors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

@@ -1,4 +1,0 @@
-﻿module Module
-
-let f{caret} (a as b: int): int =
-    a + b
