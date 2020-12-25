@@ -63,5 +63,5 @@ type SetNameAction(dataProvider: FSharpContextActionDataProvider) =
             let escapeAction = LiveTemplatesManager.EscapeAction.LeaveTextAndCaret
             LiveTemplatesManager.Instance
                 .CreateHotspotSessionAtopExistingText(solution, endCaretPosition, textControl, escapeAction, hotspots)
-                .Execute() |> ignore
+                .Execute()
         )

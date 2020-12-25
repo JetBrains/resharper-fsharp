@@ -119,4 +119,4 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
                     solution, endCaretPosition, textControl,
                     LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
 
-            hotspotSession.Execute() |> ignore)
+            hotspotSession.Execute())

@@ -149,14 +149,14 @@ type FcsProjectBuilder(checkerService: FSharpCheckerService, itemsContainer: IFS
         for path, buildAction in projectItems do
             match buildAction with
             | SourceFile ->
-                sourceFiles.Add(path) |> ignore
+                sourceFiles.Add(path)
                 let fileName = path.NameWithoutExtension
                 match path.ExtensionNoDot with
                 | SigExtension -> sigFiles.Add(fileName) |> ignore
                 | ImplExtension when sigFiles.Contains(fileName) -> implsWithSigs.add(path)
                 | _ -> ()
 
-            | Resource -> resources.Add(path) |> ignore
+            | Resource -> resources.Add(path)
             | _ -> ()
 
         let resources: IList<_> = if resources.IsEmpty() then EmptyList.InstanceList else resources :> _

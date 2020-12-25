@@ -77,4 +77,4 @@ and LetPostfixTemplateBehavior(info) =
                 solution, letExpr.GetDocumentEndOffset(), textControl,
                 LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
 
-        hotspotSession.Execute() |> ignore
+        hotspotSession.Execute()

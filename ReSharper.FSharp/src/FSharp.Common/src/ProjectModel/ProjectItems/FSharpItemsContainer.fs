@@ -572,7 +572,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                 | FolderItem _ ->
                     renameFolder oldChildLocation newChildLocation ignore)
             itemUpdater folderItem)
-        folders.RemoveKey(oldLocation) |> ignore
+        folders.RemoveKey(oldLocation)
 
     let rec removeSplittedFolderIfEmpty folder folderPath folderRefresher itemUpdater =
         let isFolderSplitted path = (folders.[path]).Count > 1
@@ -601,7 +601,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         tryJoinRelativeFolders itemBefore itemAfter refreshFolder update
         match item with
         | FileItem _ -> files.Remove(item.PhysicalPath) |> ignore
-        | _ -> folders.RemoveValue(item.PhysicalPath, item) |> ignore
+        | _ -> folders.RemoveValue(item.PhysicalPath, item)
         removeChild item
 
         moveFollowingItems item.Parent item.SortKey MoveDirection.Up update

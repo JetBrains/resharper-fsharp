@@ -31,4 +31,4 @@ type RemoveRedundantBackticksFix(warning: RedundantBackticksWarning) =
         member x.IsReanalysisRequired = false
         member x.ReanalysisDependencyRoot = null
         member x.IsValid() = isValid identifier
-        member x.Execute() = x.ExecutePsiTransaction() |> ignore
+        member x.Execute() = x.ExecutePsiTransaction()

@@ -37,7 +37,7 @@ module rec CommonUtil =
         
     type IDictionary<'TKey, 'TValue> with
         member x.remove (key: 'TKey) = x.Remove key |> ignore
-        member x.add (key: 'TKey, value: 'TValue) = x.Add(key, value) |> ignore
+        member x.add (key: 'TKey, value: 'TValue) = x.Add(key, value)
         member x.contains (key: 'TKey) = x.ContainsKey key
 
     type ISet<'T> with

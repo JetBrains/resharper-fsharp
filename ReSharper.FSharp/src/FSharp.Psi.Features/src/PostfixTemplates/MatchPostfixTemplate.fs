@@ -63,4 +63,4 @@ and MatchPostfixTemplateBehavior(info) =
                 solution, matchClause.Expression.GetDocumentEndOffset(), textControl,
                 LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
 
-        hotspotSession.Execute() |> ignore
+        hotspotSession.Execute()
