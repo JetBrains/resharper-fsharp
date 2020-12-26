@@ -100,7 +100,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         | :? IForLikeExpr as forLikeExpr when forLikeExpr.DoExpression == expr -> expr
         | :? ISequentialExpr | :? ILambdaExpr | :? ITryLikeExpr -> expr
 
-        | :? IBinding as binding when
+        | :? IBindingImplementation as binding when
                 binding.Expression == expr && isNotNull (LetOrUseExprNavigator.GetByBinding(binding)) &&
 
                 // Don't escape bindings with expressions on separate lines
@@ -108,7 +108,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 isNotNull equalsToken && equalsToken.StartLine = expr.StartLine &&
 
                 // Don't escape function declarations
-                not (binding.HeadPattern :? IParametersOwnerPat) ->
+                not binding.HasParameters ->
             LetOrUseExprNavigator.GetByBinding(binding) :> _
 
         | :? IRecordFieldBinding as fieldBinding ->
@@ -149,8 +149,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         contextExpr :?> _
 
     let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
-        let binding = BindingNavigator.GetByExpression(contextExpr)
-        if isNotNull binding && binding.HeadPattern :? IParametersOwnerPat then null else
+        let binding = BindingImplementationNavigator.GetByExpression(contextExpr)
+        if isNotNull binding && binding.HasParameters then null else
 
         let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
         if isNotNull letBindings then letBindings :> _ else

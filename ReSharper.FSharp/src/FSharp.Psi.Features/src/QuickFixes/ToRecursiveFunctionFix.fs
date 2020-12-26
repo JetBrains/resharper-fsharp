@@ -30,8 +30,11 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
         letBindings.BindingsEnumerable
         |> Seq.tryHead
         |> Option.map (fun (binding: IBinding) ->
+            let binding = binding.As<IBindingImplementation>()
+            isNotNull binding &&
+
             match binding.HeadPattern with
-            | :? IParametersOwnerPat as lidPat -> lidPat.SourceName = referenceExpr.ShortName
+            | :? IReferencePat as refPat -> refPat.SourceName = referenceExpr.ShortName && binding.HasParameters
             | _ -> false)
         |> Option.defaultValue false
 

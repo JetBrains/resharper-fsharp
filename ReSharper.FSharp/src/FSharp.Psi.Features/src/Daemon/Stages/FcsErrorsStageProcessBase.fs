@@ -156,8 +156,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | null -> UnusedHighlighting(error.Message, range) :> _
             | pat ->
 
-            let decl = LetBindingsDeclarationNavigator.GetByBinding(TopBindingNavigator.GetByHeadPattern(pat))
-            if pat :? IParametersOwnerPat && isNotNull decl && not (Seq.isEmpty decl.AttributesEnumerable) then
+            let binding = TopBindingNavigator.GetByHeadPattern(pat)
+            let decl = LetBindingsDeclarationNavigator.GetByBinding(binding)
+            if isNotNull decl && binding.HasParameters && not (Seq.isEmpty decl.AttributesEnumerable) then
                 IgnoredHighlighting.Instance :> _
             else
                 UnusedValueWarning(pat) :> _

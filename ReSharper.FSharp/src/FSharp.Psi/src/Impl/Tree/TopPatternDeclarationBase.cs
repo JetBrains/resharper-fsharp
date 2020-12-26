@@ -75,7 +75,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (binding.IsMutable)
         return CreateValue(typeDeclaration);
 
-      if (this is IParametersOwnerPat)
+      if (binding.HasParameters)
       {
         if (this.TryCreateOperator() is { } opDeclaredElement)
           return opDeclaredElement;

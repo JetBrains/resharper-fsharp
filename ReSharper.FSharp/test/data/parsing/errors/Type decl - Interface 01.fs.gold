@@ -40,10 +40,11 @@ IFSharpImplFile
       FSharpTokenType+LetTokenElement(type:LET, text:let)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding
-        ITopParametersOwnerPat
+        ITopReferencePat
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:main)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IParametersPatternDeclaration
           IWildPat
             FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

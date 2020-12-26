@@ -41,6 +41,9 @@ module ReplaceWithWildPat =
     let isAvailable (pat: IFSharpPattern) =
         isValid pat &&
 
+        let binding = BindingImplementationNavigator.GetByHeadPattern(pat)
+        if isNotNull binding && binding.HasParameters then false else
+
         match pat with
         | :? IParametersOwnerPat
         | :? IAsPat -> false // todo: allow for 'as' patterns, check if inner patterns are used
@@ -54,7 +57,7 @@ module ReplaceWithWildPat =
 
         | :? IParametersPatternDeclaration as parent ->
             let parent = parent.Parent
-            parent :? IMemberDeclaration || parent :? ISecondaryConstructorDeclaration
+            parent :? IMemberDeclaration || parent :? ISecondaryConstructorDeclaration || parent :? IBinding
 
         | _ -> false
 
@@ -114,20 +117,24 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
             | null -> FileCollectorInfo.Default
             | pat ->
 
-            let scopeText =
+            let (scopeNode: ITreeNode), scopeText =
                 match pat.Parent with
                 | :? IMatchClause ->
                     let patternText = 
                         match pat with
-                        | :? ILocalParametersOwnerPat as owner -> owner.SourceName
+                        | :? IParametersOwnerPat as owner -> owner.ReferenceName.ShortName
                         | _ -> "match clause"
-                    sprintf "'%s' pattern" patternText
-                | :? ILambdaParametersList
-                | :? IParametersPatternDeclaration -> "parameter list"
-                | :? IBinding -> "binding patterns"
+                    pat :> _, sprintf "'%s' pattern" patternText
+
+                | :? IParametersPatternDeclaration as p ->
+                    match BindingImplementationNavigator.GetByParametersPattern(p) with
+                    | null -> pat :> _, "parameter list"
+                    | binding -> binding :> _, "binding patterns"
+
+                | :? ILambdaParametersList as parametersList -> parametersList :> _, "parameter list"
+                | :? IBinding -> pat :> _, "binding patterns"
                 | _ -> invalidArg "patOwner.Parent" "unexpected type"
 
-            let scopeNode = if pat.Parent :? ILambdaParametersList then pat.Parent else pat :>_
             FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode, LocalScope(scopeNode, scopeText, scopeText))
 
         member x.ExecuteAction(highlightingInfos, _, _) =

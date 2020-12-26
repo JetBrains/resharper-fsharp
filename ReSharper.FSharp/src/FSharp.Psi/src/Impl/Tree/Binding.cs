@@ -80,5 +80,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (headPat != null)
         FSharpImplUtil.AddTokenBefore(headPat, FSharpTokenType.MUTABLE);
     }
+
+    public bool HasParameters => !ParametersPatternsEnumerable.IsEmpty();
   }
 }

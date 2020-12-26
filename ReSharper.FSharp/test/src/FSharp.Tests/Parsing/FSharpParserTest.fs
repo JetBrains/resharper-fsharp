@@ -85,9 +85,26 @@ type FSharpParserTest() =
     [<Test>] member x.``Let - As 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - As 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Let - Local - Parameters 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Local - Parameters 02``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Local - Upper case 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Local - Upper case 02 - Parameters``() = x.DoNamedTest()
+
     [<Test>] member x.``Let - Local 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local 02 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local 03 - Typed expr``() = x.DoNamedTest()
+
+    [<Test>] member x.``Let - Top 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Top 02 - Upper case``() = x.DoNamedTest()
+
+    [<Test>] member x.``Let - Type parameters - Local - Parameters 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type parameters - Local - Parameters 02 - Upper case``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type parameters - Local - Ref 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type parameters - Local - Ref 02 - Upper case``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type parameters - Top - Parameters 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type parameters - Top - Parameters 02 - Upper case``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type parameters - Top - Ref 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type parameters - Top - Ref 02 - Upper case``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Paren 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Quote 01 - Typed``() = x.DoNamedTest()
@@ -441,8 +458,12 @@ type FSharpParserTest() =
     [<Test>] member x.``Pattern - Parameters owner 02 - Qualified``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Parameters owner 03 - Tuple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - ListCons - Compiled name 01 - Let``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - ListCons - Compiled name 02 - Match``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - ListCons - Compiled name 03 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - ListCons 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - ListCons 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - ListCons 03 - Let``() = x.DoNamedTest()
 
 
 [<FSharpSignatureTest>]

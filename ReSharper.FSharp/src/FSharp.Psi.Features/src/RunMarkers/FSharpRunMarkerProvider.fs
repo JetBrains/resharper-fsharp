@@ -33,12 +33,15 @@ let isEntryPoint (binding: ITopBinding) =
     | :? IArrayType as parameterType -> parameterType.ElementType.IsString()
     | _ -> false
 
-let isApplicableMethod (parametersOwner: IParametersOwnerPat) =
-    let pattern = parametersOwner.ParametersEnumerable.SingleItem
+let isApplicableMethod (binding: IBindingImplementation) =
+    let pattern = binding.ParametersPatternsEnumerable.SingleItem.Pattern
     let unitPattern = pattern.IgnoreInnerParens().As<IUnitPat>()
     if isNull unitPattern then false else
 
-    let method = parametersOwner.DeclaredElement.As<IMethod>()
+    let refPat = binding.HeadPattern.As<IReferencePat>()
+    if isNull refPat then false else
+
+    let method = refPat.DeclaredElement.As<IMethod>()
     isNotNull method && RunMarkerUtil.IsSuitableStaticMethod(method)
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -66,7 +69,7 @@ type FSharpRunMarkerProvider() =
                 let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
                 if letBindings.IsInline || isNull (ModuleDeclarationNavigator.GetByMember(letBindings)) then () else
 
-                if showMarkerOnStaticMethods && isApplicableMethod parametersOwner then
+                if showMarkerOnStaticMethods && isApplicableMethod binding then
                     addHighlighting binding RunMarkerAttributeIds.RUN_METHOD_MARKER_ID
 
                 if showMarkerOnEntryPoint && isEntryPoint binding then

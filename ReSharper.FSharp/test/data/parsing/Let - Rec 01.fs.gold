@@ -7,10 +7,11 @@ IFSharpImplFile
       FSharpTokenType+RecTokenElement(type:REC, text:rec)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding
-        ITopParametersOwnerPat
+        ITopReferencePat
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:foo)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IParametersPatternDeclaration
           ILocalReferencePat
             IExpressionReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:x)

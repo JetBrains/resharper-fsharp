@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var canBePartial = false;
 
-      while (fsPattern.Parent is IFSharpPattern parent && !(parent is IParametersOwnerPat { IsDeclaration: true }))
+      while (fsPattern.Parent is IFSharpPattern parent)
       {
         fsPattern = parent;
 

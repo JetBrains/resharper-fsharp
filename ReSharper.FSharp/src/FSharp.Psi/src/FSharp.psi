@@ -186,6 +186,8 @@ topBinding extras {
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
+  typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
@@ -196,6 +198,8 @@ localBinding extras {
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
+  typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
   fSharpExpression<EXPR, Expression>;
@@ -221,7 +225,6 @@ externDeclaration:
 
 
 // todo: extract declaring pattern interface
-// todo: split parameters owner interface and move binding parameters out
 
 interface fSharpPattern:
   namedPat |
@@ -237,6 +240,7 @@ interface fSharpPattern:
   isInstPat |
   listPat |
   listConsPat |
+  parametersOwnerPat |
   wildPat |
   constPat |
   fieldPat |
@@ -244,17 +248,11 @@ interface fSharpPattern:
 
 interface namedPat:
   referencePat |
-  parametersOwnerPat |
   asPat;
 
 interface referencePat:
   localReferencePat |
   topReferencePat;
-
-// todo: fix active pattern and operator decls
-interface parametersOwnerPat:
-  localParametersOwnerPat
-  topParametersOwnerPat;
 
 interface asPat:
   localAsPat |
@@ -271,14 +269,8 @@ topReferencePat options { stubBase="TopPatternDeclarationBase"; } extras {
 }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>;
 
-localParametersOwnerPat options { stubBase="LocalPatternDeclarationBase"; } extras {
-  get { methodName="Identifier" path=<localParametersOwnerPat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
-}:
-  expressionReferenceName<REFERENCE_NAME, ReferenceName>
-  fSharpPattern<PARAMETER, Parameters>*;
-
-topParametersOwnerPat options { stubBase="TopPatternDeclarationBase"; } extras {
-  get { methodName="Identifier" path=<topParametersOwnerPat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
+parametersOwnerPat options { stubBase="FSharpPatternBase"; } extras {
+  get { methodName="Identifier" path=<parametersOwnerPat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
 }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   fSharpPattern<PARAMETER, Parameters>*;

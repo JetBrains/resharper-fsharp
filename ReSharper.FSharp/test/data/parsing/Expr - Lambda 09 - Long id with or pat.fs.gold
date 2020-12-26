@@ -10,7 +10,7 @@ IFSharpImplFile
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               IOrPat
-                ILocalParametersOwnerPat
+                IParametersOwnerPat
                   IExpressionReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
                   Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -20,7 +20,7 @@ IFSharpImplFile
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 FSharpTokenType+BarTokenElement(type:BAR, text:|)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                ILocalParametersOwnerPat
+                IParametersOwnerPat
                   IExpressionReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
                   IParenPat

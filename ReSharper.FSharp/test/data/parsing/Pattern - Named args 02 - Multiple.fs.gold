@@ -7,7 +7,7 @@ IFSharpImplFile
       ITopBinding
         IParenPat
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          ITopParametersOwnerPat
+          IParametersOwnerPat
             IExpressionReferenceName
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:Union)

@@ -156,6 +156,11 @@ module rec FcsUtil =
     let inline (|IdentRange|) (id: Ident) = id.idRange
     let inline (|TypeRange|) (typ: SynType) = typ.Range
 
+    let inline (|IdentText|_|) text (id: Ident) =
+        if id.idText = text then someUnit else None
+
+    let inline (|LongIdentLid|) (lid: LongIdentWithDots) = lid.Lid
+
 
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =

@@ -394,13 +394,42 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         x.ProcessReturnInfo(returnInfo)
         x.MarkChameleonExpression(expr)
 
-    // isTopLevelPat is needed to distinguish function definitions from other long ident pats:
-    // let (Some x) = ...
-    // let Some x = ...
-    // When long pat is a function pat its args are currently mapped as local decls. todo: rewrite it to be params
-    // Getting proper params (with right impl and sig ranges) isn't easy, probably a fix is needed in FCS.
-    member x.ProcessPat(PatRange range as pat, isLocal, isTopLevelPat) =
-        let mark = x.Mark(range)
+    // isBindingHeadPattern is needed to distinguish function definitions from other long ident pats:
+    //   let (Some x) = ...
+    //   let Some x = ...
+    member x.ProcessPat(PatRange range as pat, isLocal, isBindingHeadPattern) =
+        let patMark = x.Mark(range)
+
+        match pat with
+        | SynPat.LongIdent(LongIdentLid [ IdentText "op_ColonColon" ], _, _, Pats([SynPat.Tuple(_, pats, _)]), _, _) ->
+            for pat in pats do
+                x.ProcessPat(pat, isLocal, false)
+            x.Done(range, patMark, ElementType.LIST_CONS_PAT)
+        | _ ->
+
+        match isBindingHeadPattern, pat with
+        | true, SynPat.LongIdent(lid, _, typars, args, _, _) ->
+            match lid.Lid with
+            | [ IdentRange idRange as id ] ->
+                let mark = x.Mark(idRange)
+                if IsActivePatternName id.idText then
+                    x.ProcessActivePatternId(id, isLocal)
+                x.Done(idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
+            | lid ->
+                x.ProcessReferenceName(lid)
+
+            let elementType = if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
+            x.Done(patMark, elementType)
+
+            match typars with
+            | Some(SynValTyparDecls(typarDecls, _, _)) ->
+                for typarDecl in typarDecls do
+                    x.ProcessTypeParameter(typarDecl, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
+            | None -> ()
+
+            x.ProcessMemberParams(args, true, true)
+
+        | _ ->
 
         let elementType =
             match pat with
@@ -408,7 +437,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 match pat with
                 | SynPat.Wild(range) when equals id.idRange range ->
                     let mark = x.Mark(id.idRange)
-                    if IsActivePatternName id.idText then x.ProcessActivePatternId(id, isLocal)
+                    if IsActivePatternName id.idText then
+                        x.ProcessActivePatternId(id, isLocal)
                     x.Done(id.idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
                     if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
 
@@ -416,39 +446,21 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                     x.ProcessPat(pat, isLocal, false)
                     if isLocal then ElementType.LOCAL_AS_PAT else ElementType.TOP_AS_PAT
 
-            | SynPat.LongIdent(lid, _, typars, args, _, _) ->
-                match lid.Lid, args with
-                | [id], Pats([SynPat.Tuple(_, pats, _)]) when id.idText = "op_ColonColon" ->
-                    for pat in pats do
-                        x.ProcessPat(pat, isLocal, false)
-
-                    ElementType.LIST_CONS_PAT
-
-                | _ ->
-
-                // todo: replace all lids
+            | SynPat.LongIdent(lid, _, _, args, _, _) ->
                 match lid.Lid with
                 | [ IdentRange idRange as id ] ->
                     let mark = x.Mark(idRange)
                     if IsActivePatternName id.idText then
                         x.ProcessActivePatternId(id, isLocal)
                     x.Done(idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
-    
-                    match typars with
-                    | None -> ()
-                    | Some(SynValTyparDecls(typarDecls, _, _)) ->
-
-                    for typarDecl in typarDecls do
-                        x.ProcessTypeParameter(typarDecl, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
-
                 | lid ->
                     x.ProcessReferenceName(lid)
 
                 if args.IsEmpty then
                     if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
                 else
-                    x.ProcessPatternParams(args, isLocal || isTopLevelPat, false)
-                    if isLocal then ElementType.LOCAL_PARAMETERS_OWNER_PAT else ElementType.TOP_PARAMETERS_OWNER_PAT
+                    x.ProcessPatternParams(args, isLocal, false)
+                    ElementType.PARAMETERS_OWNER_PAT
 
             | SynPat.Typed(pat, synType, _) ->
                 x.ProcessPat(pat, isLocal, false)
@@ -525,7 +537,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             | _ ->
                 ElementType.OTHER_PAT
 
-        x.Done(range, mark, elementType)
+        x.Done(range, patMark, elementType)
 
     member x.ProcessListLikePat(pats, isLocal) =
         for pat in pats do
@@ -799,12 +811,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
         | SynExpr.App(_, false, SynExpr.App(_, true, funcExpr, leftArg, _), rightArg, prefixAppRange) ->
             match funcExpr with
-            | SynExpr.Ident(id) when id.idText = "op_Range" ->
-                x.ProcessRangeExpr(leftArg, rightArg, prefixAppRange)
-
-            | SynExpr.Ident(id) when id.idText = "op_RangeStep" ->
-                x.ProcessRangeStepExpr(leftArg, rightArg)
-
+            | SynExpr.Ident(IdentText "op_Range") -> x.ProcessRangeExpr(leftArg, rightArg, prefixAppRange)
+            | SynExpr.Ident(IdentText "op_RangeStep") -> x.ProcessRangeStepExpr(leftArg, rightArg)
             | _ ->
 
             x.PushRange(range, ElementType.BINARY_APP_EXPR)
@@ -812,9 +820,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushExpression(funcExpr)
             x.ProcessExpression(leftArg)
 
-        | SynExpr.App(_, true, (SynExpr.Ident(id) as funcExpr), SynExpr.Tuple(_, [first; second], _, _), _) when
-                id.idText = "op_ColonColon" ->
-
+        | SynExpr.App(_, true, (SynExpr.Ident(IdentText "op_ColonColon") as funcExpr), SynExpr.Tuple(exprs = [first; second]), _) ->
             x.PushRange(range, ElementType.BINARY_APP_EXPR)
             x.PushExpression(second)
             x.PushExpression(funcExpr)

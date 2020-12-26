@@ -7,6 +7,7 @@ do
 0: The value 'foo' is unused
 QUICKFIXES:
 Remove unused function
+Rename to '_foo'
 1: The value 'x' is unused
 QUICKFIXES:
 Replace with '_'

@@ -16,13 +16,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         switch (node)
         {
-          case IBinding binding:
-            return binding;
-          case ITopParametersOwnerPat parametersOwner when parametersOwner.IsDeclaration:
-            return null;
-          default:
+          case IFSharpPattern:
             node = node.Parent;
             break;
+          case IBinding binding:
+            return binding;
+          default:
+            return null;
         }
       }
 

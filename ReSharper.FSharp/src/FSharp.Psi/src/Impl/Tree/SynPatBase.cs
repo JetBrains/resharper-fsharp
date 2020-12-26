@@ -73,16 +73,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IBinding Binding => this.GetBinding();
   }
 
-  internal partial class LocalParametersOwnerPat
+  internal partial class ParametersOwnerPat
   {
-    public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
-
-    public bool IsDeclaration => Parent is IBinding;
-
     public override IEnumerable<IFSharpPattern> NestedPatterns =>
-      IsDeclaration
-        ? new[] {this}
-        : Parameters.SelectMany(param => param.NestedPatterns);
+      Parameters.SelectMany(param => param.NestedPatterns);
   }
 
   internal partial class TopAsPat
@@ -145,18 +139,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IEnumerable<IFSharpPattern> NestedPatterns =>
       EmptyList<IFSharpPattern>.Instance;
-  }
-
-  internal partial class TopParametersOwnerPat
-  {
-    public bool IsDeclaration => Parent is IBinding;
-
-    public override IEnumerable<IFSharpPattern> NestedPatterns =>
-      IsDeclaration
-        ? new[] {this}
-        : Parameters.SelectMany(param => param.NestedPatterns);
-
-    public override IBinding Binding => this.GetBinding();
   }
 
   internal partial class ArrayPat
