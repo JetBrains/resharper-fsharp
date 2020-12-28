@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ExtendSelection
 open System
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Editor
 open JetBrains.ReSharper.Feature.Services.SelectEmbracingConstruct
 open JetBrains.ReSharper.Plugins.FSharp
@@ -17,7 +16,7 @@ open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
-[<ProjectFileType(typeof<FSharpProjectFileType>)>]
+[<Language(typeof<FSharpLanguage>)>]
 type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
     static member ExtendNodeSelection(fsFile: IFSharpFile, node: ITreeNode): ISelectedRange =
         match node with
