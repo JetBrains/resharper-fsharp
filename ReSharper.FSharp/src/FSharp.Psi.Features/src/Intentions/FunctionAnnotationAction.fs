@@ -15,7 +15,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 module SpecifyTypes =
-    let specifyBindingReturnType (binding: IBindingImplementation) (mfv: FSharpMemberOrFunctionOrValue) displayContext =
+    let specifyBindingReturnType (binding: IBinding) (mfv: FSharpMemberOrFunctionOrValue) displayContext =
         let typeString =
             let fullType = mfv.FullType
             if fullType.IsFunctionType then
@@ -51,7 +51,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
     let specifyParameterTypes
-            (binding: IBindingImplementation) (factory: IFSharpElementFactory)
+            (binding: IBinding) (factory: IFSharpElementFactory)
             (mfv: FSharpMemberOrFunctionOrValue) displayContext =
 
         let addParens pattern =
@@ -74,12 +74,14 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
             let typedPat = factory.CreateTypedPat(pattern, factory.CreateTypeUsage(fcsType.Format(displayContext)))
             let parenPat = addParens typedPat
-            let p = ElementType.PARAMETERS_PATTERN_DECLARATION.Create()
-            let p1 = ModificationUtil.AddChildBefore(parameter, p)
-            ModificationUtil.AddChild(p1, parenPat.Copy()) |> ignore
+
+            let parameterDecl =
+                ModificationUtil.AddChildBefore(parameter, (ElementType.PARAMETERS_PATTERN_DECLARATION.Create()))
+
+            ModificationUtil.AddChild(parameterDecl, parenPat.Copy()) |> ignore
             deleteChild parameter
 
-    let isAnnotated (binding: IBindingImplementation) =
+    let isAnnotated (binding: IBinding) =
         isNotNull binding.ReturnTypeInfo &&
         binding.ParametersPatterns |> Seq.forall (fun p -> p.Pattern.IgnoreInnerParens() :? ITypedPat)
 
@@ -92,12 +94,11 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         let bindings = letBindings.Bindings
         if bindings.Count <> 1 then false else
 
-        let binding = bindings.[0].As<IBindingImplementation>()
-        isNotNull binding && isAtLetExprKeywordOrNamedPat dataProvider letBindings && not (isAnnotated binding)
+        isAtLetExprKeywordOrNamedPat dataProvider letBindings && not (isAnnotated bindings.[0])
 
     override x.ExecutePsiTransaction _ =
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
-        let binding = letBindings.Bindings |> Seq.exactlyOne :?> IBindingImplementation
+        let binding = letBindings.Bindings |> Seq.exactlyOne
         let factory = binding.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())

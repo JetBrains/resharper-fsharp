@@ -36,7 +36,7 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
                     memberOrFunctionOrValue.IsMutable || memberOrFunctionOrValue.HasSetterMethod
                 else
                     let referencePat = declaredElement.GetDeclarations().FirstOrDefault().As<IReferencePat>()
-                    let binding = BindingImplementationNavigator.GetByHeadPattern(referencePat)
+                    let binding = BindingNavigator.GetByHeadPattern(referencePat)
                     isNotNull binding && not binding.HasParameters
             | _ -> false
 

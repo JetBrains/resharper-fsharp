@@ -15,10 +15,7 @@ type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider)
         if not (isAtLetExprKeywordOrNamedPat dataProvider letBindings) then false else
 
         let bindings = letBindings.Bindings
-        bindings.Count = 1 &&
-
-        let binding = bindings.[0].As<IBindingImplementation>()
-        isNotNull binding && binding.HasParameters
+        bindings.Count = 1 && bindings.[0].HasParameters
 
     override x.ExecutePsiTransaction(_, _) =
         use cookie = FSharpRegistryUtil.AllowFormatterCookie.Create()

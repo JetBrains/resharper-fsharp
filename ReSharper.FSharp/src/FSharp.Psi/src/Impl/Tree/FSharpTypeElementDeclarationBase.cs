@@ -102,7 +102,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    private static void ProcessBinding(IBinding binding, ICollection<ITypeMemberDeclaration> result)
+    private static void ProcessBinding(IBindingLikeDeclaration binding, ICollection<ITypeMemberDeclaration> result)
     {
       var headPattern = binding.HeadPattern;
       if (headPattern == null) return;

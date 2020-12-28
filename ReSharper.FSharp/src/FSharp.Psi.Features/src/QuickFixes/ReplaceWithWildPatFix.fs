@@ -41,7 +41,7 @@ module ReplaceWithWildPat =
     let isAvailable (pat: IFSharpPattern) =
         isValid pat &&
 
-        let binding = BindingImplementationNavigator.GetByHeadPattern(pat)
+        let binding = BindingNavigator.GetByHeadPattern(pat)
         if isNotNull binding && binding.HasParameters then false else
 
         match pat with
@@ -127,7 +127,7 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
                     pat :> _, sprintf "'%s' pattern" patternText
 
                 | :? IParametersPatternDeclaration as p ->
-                    match BindingImplementationNavigator.GetByParametersPattern(p) with
+                    match BindingNavigator.GetByParametersPattern(p) with
                     | null -> pat :> _, "parameter list"
                     | binding -> binding :> _, "binding patterns"
 

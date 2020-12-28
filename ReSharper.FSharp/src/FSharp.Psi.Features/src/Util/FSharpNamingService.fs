@@ -381,7 +381,7 @@ module FSharpNamingService =
                         let patterns = letExpr.BindingsEnumerable |> Seq.map (fun b -> b.HeadPattern)
                         addScopeForPatterns patterns letExpr.InExpression
 
-                    | :? IBindingImplementation as binding ->
+                    | :? IBinding as binding ->
                         let headPattern = binding.HeadPattern
                         if isNull headPattern then () else
 

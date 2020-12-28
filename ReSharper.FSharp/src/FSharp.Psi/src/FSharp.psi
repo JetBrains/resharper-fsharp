@@ -171,11 +171,11 @@ interface letBindings:
   letBindingsDeclaration |
   letOrUseExpr;
 
-interface binding:
-  bindingImplementation
+interface bindingLikeDeclaration:
+  binding |
   bindingSignature;
 
-interface bindingImplementation:
+interface binding:
   topBinding |
   localBinding;
 

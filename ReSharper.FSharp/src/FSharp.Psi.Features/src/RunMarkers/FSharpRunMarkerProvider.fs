@@ -33,7 +33,7 @@ let isEntryPoint (binding: ITopBinding) =
     | :? IArrayType as parameterType -> parameterType.ElementType.IsString()
     | _ -> false
 
-let isApplicableMethod (binding: IBindingImplementation) =
+let isApplicableMethod (binding: IBinding) =
     let pattern = binding.ParametersPatternsEnumerable.SingleItem.Pattern
     let unitPattern = pattern.IgnoreInnerParens().As<IUnitPat>()
     if isNull unitPattern then false else

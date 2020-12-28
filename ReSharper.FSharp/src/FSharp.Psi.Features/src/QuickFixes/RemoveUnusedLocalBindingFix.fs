@@ -45,7 +45,7 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
         TreeRange(first, inExpr)
 
     override x.Text =
-        let binding = BindingNavigator.GetByHeadPattern(pat).As<IBindingImplementation>()
+        let binding = BindingNavigator.GetByHeadPattern(pat)
         if isNotNull binding && binding.HasParameters then
             "Remove unused function"
         else
