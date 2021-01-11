@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public FSharpUnionCaseNewMethod([NotNull] IUnionCase unionCase) =>
       UnionCase = unionCase;
 
-    protected override ITypeElement ContainingType => UnionCase.GetContainingType();
+    public override ITypeElement GetContainingType() => UnionCase.GetContainingType();
     public IClrDeclaredElement OriginElement => UnionCase;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>

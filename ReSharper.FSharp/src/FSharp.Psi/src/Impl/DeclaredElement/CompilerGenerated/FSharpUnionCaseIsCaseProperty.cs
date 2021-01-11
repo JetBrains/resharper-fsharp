@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     internal FSharpUnionCaseIsCaseProperty([NotNull] IUnionCase unionCase) =>
       UnionCase = unionCase;
 
-    public override ITypeElement ContainingType => UnionCase.GetContainingType();
+    public override ITypeElement GetContainingType() => UnionCase.GetContainingType();
     public IClrDeclaredElement OriginElement => UnionCase;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>

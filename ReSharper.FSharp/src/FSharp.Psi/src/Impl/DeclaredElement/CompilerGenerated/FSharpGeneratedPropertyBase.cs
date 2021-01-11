@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -10,19 +9,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 {
   public abstract class FSharpGeneratedPropertyFromTypeBase : FSharpGeneratedPropertyBase
   {
-    protected FSharpGeneratedPropertyFromTypeBase(ITypeElement typeElement) =>
-      ContainingType = typeElement;
+    private readonly ITypeElement myContainingType;
 
-    public override ITypeElement ContainingType { get; }
+    protected FSharpGeneratedPropertyFromTypeBase(ITypeElement containingType) =>
+      myContainingType = containingType;
+
+    public override ITypeElement GetContainingType() => myContainingType;
   }
 
   public abstract class FSharpGeneratedPropertyBase : FSharpGeneratedMemberBase, IProperty
   {
     protected override IClrDeclaredElement ContainingElement => ContainingType;
-    public override ITypeElement GetContainingType() => ContainingType;
     public override ITypeMember GetContainingTypeMember() => (ITypeMember) ContainingType;
-
-    [NotNull] public abstract ITypeElement ContainingType { get; }
 
     public abstract IType Type { get; }
 

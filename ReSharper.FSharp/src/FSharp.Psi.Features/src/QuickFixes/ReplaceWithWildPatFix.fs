@@ -2,8 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
-open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.QuickFixes
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Scopes
+open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
