@@ -35,7 +35,7 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
         let lineEnding = recordExpr.FSharpFile.GetLineEnding()
 
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
-        use enableFormatterCookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use enableFormatterCookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
 
         let bindings = recordExpr.FieldBindings
         let firstBinding = bindings.[0]

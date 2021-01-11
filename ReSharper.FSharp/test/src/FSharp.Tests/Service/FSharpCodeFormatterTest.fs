@@ -15,7 +15,7 @@ type FSharpCodeFormatterTest() =
     override x.RelativeTestDataPath = "features/service/codeFormatter"
 
     override x.DoNamedTest() =
-        use cookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
     [<Test>] member x.``Top binding indent 01 - No indent``() = x.DoNamedTest()

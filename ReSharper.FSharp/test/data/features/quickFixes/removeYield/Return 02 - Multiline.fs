@@ -1,2 +1,2 @@
-return 123
-       123{caret}
+return ignore
+           (){caret}

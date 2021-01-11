@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 
 type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
-    inherit QuickFixBase()
+    inherit FSharpQuickFixBase()
 
     let pat = warning.Pat.IgnoreParentParens()
 

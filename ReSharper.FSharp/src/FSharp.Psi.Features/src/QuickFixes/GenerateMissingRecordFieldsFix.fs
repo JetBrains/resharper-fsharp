@@ -62,7 +62,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let elementFactory = fsFile.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
-        use enableFormatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
 
         let isSingleLine = recordExpr.IsSingleLine
 

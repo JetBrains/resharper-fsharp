@@ -30,7 +30,7 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         let factory = expr.CreateElementFactory()
-        use enableFormatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
 
         let isSingleLineMatch = expr.IsSingleLine
 

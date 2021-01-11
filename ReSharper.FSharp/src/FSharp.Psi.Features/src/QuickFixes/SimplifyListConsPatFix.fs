@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -26,6 +27,7 @@ type SimplifyListConsPatFix(warning: ConsWithEmptyListPatWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
 
         let settings = pat.GetSettingsStoreWithEditorConfig()
         let addSpaces = settings.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAroundDelimiter)

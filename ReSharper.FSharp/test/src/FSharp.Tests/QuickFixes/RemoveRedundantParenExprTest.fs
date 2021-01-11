@@ -9,7 +9,7 @@ type RemoveRedundantParenExprTest() =
     inherit FSharpQuickFixTestBase<RemoveRedundantParenExprFix>()
 
     override x.DoTest(lifetime, project) =
-        use cookie = FSharpRegistryUtil.EnableRedundantParenAnalysisCookie.Create()
+        use cookie = FSharpExperimentalFeatures.EnableRedundantParenAnalysisCookie.Create()
         base.DoTest(lifetime, project)
     
     override x.RelativeTestDataPath = "features/quickFixes/removeRedundantParens/expr"

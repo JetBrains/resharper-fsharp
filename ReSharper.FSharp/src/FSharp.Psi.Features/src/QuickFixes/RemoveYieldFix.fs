@@ -25,7 +25,6 @@ type RemoveYieldFix(yieldExpr: IYieldOrReturnExpr) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(yieldExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let expr = yieldExpr.Expression
         let shift = expr.Indent - yieldExpr.Indent

@@ -26,7 +26,7 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
 
     override x.ExecutePsiTransaction _ =
         let clause = warning.MatchClause
-        use enableFormatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         use writeLock = WriteLockCookie.Create(clause.IsPhysical())
         removeMatchClause clause
 
@@ -35,7 +35,7 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
         member x.FileCollectorInfo = FileCollectorInfo.Default
 
         member x.ExecuteAction(highlightingInfos, _, _) =
-            use enableFormatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
+            use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
 
             for highlightingInfo in highlightingInfos do
                 match highlightingInfo.Highlighting.As<RuleNeverMatchedWarning>() with

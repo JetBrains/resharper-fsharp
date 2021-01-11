@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
-    inherit QuickFixBase()
+    inherit FSharpQuickFixBase()
 
     let [<Literal>] actionText = "Remove unused opens"
 

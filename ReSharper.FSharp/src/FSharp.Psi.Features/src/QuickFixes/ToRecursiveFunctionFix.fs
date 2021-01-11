@@ -67,6 +67,6 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
         base.Execute(solution, textControl)
     
     override x.ExecutePsiTransaction _ =
-        use cookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         use writeCookie = WriteLockCookie.Create(referenceExpr.IsPhysical())
         chosenLetBindings.SetIsRecursive(true)

@@ -29,7 +29,6 @@ type AddUnderscorePrefixFix(warning: UnusedValueWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let patterns = pat.GetPartialDeclarations() |> Seq.toList
         for pat in patterns do

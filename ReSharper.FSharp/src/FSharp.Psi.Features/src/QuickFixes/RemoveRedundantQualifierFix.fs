@@ -36,7 +36,6 @@ type RemoveRedundantQualifierFix(warning: RedundantQualifierWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(treeNode.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
         removeQualifiers treeNode
 
     interface IHighlightingsSetScopedAction with

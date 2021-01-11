@@ -14,7 +14,7 @@ type RemoveUnusedSelfIdVariableFix(warning: UnusedThisVariableWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(selfId.IsPhysical())
-        use formatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use formatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
 
         // todo: move comments (if any) out of ctor node (see example below) to outer node
         // type T() (* foo *) as this = ...

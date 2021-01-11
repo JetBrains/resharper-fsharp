@@ -18,7 +18,7 @@ type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider)
         bindings.Count = 1 && bindings.[0].HasParameters
 
     override x.ExecutePsiTransaction(_, _) =
-        use cookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
         letBindings.SetIsRecursive(true)
 
