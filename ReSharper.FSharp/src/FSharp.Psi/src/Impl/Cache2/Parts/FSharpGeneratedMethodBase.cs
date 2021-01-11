@@ -10,22 +10,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   public abstract class FSharpGeneratedMethodFromTypeBase : FSharpGeneratedMethodBase
   {
-    protected FSharpGeneratedMethodFromTypeBase([NotNull] ITypeElement containingType) =>
-      ContainingType = containingType;
+    [NotNull] private readonly ITypeElement myContainingType;
 
-    protected override ITypeElement ContainingType { get; }
+    protected FSharpGeneratedMethodFromTypeBase([NotNull] ITypeElement containingType) =>
+      myContainingType = containingType;
+
+    public override ITypeElement GetContainingType() => myContainingType;
   }
 
   public abstract class FSharpGeneratedMethodBase : FSharpGeneratedFunctionBase, IMethod
   {
-    [NotNull] protected abstract ITypeElement ContainingType { get; }
-
     protected override IClrDeclaredElement ContainingElement => ContainingType;
 
     protected IType ContainingTypeType =>
       ContainingType.WithIdSubstitution();
-
-    public override ITypeElement GetContainingType() => ContainingType;
     public override ITypeMember GetContainingTypeMember() => ContainingType as ITypeMember;
 
     public override DeclaredElementType GetElementType() =>

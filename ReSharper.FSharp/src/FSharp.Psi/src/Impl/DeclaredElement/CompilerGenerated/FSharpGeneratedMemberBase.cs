@@ -34,6 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
 
     public Hash? CalcHash() => null;
+    public ITypeElement ContainingType => GetContainingType();
 
     public AccessibilityDomain AccessibilityDomain =>
       new AccessibilityDomain(AccessibilityDomain.AccessibilityDomainType.PUBLIC, null);
