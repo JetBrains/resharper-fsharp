@@ -14,8 +14,8 @@ open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -30,10 +30,32 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
         context |> function | :? FSharpCodeCompletionContext as context -> context.Ranges | _ -> null
 
     member x.IsAvailable(context: ISpecificCodeCompletionContext) =
-        context |> function | :? FSharpCodeCompletionContext -> obj() | _ -> null
+        let fsContext = context.As<FSharpCodeCompletionContext>()
+        if isNull context then null else
+
+        let tokenType = getTokenType fsContext.TokenAtCaret
+        let tokenBeforeType = getTokenType fsContext.TokenBeforeCaret
+
+        // :{caret}:
+        if fsContext.InsideToken && tokenType == FSharpTokenType.COLON_COLON then null else
+
+        // foo // comment{caret}
+        if tokenBeforeType == FSharpTokenType.LINE_COMMENT then null else
+
+        // "{caret}"
+        // " foo {caret}EOF
+        // todo: check unfinished strings/comments instead of `isNull tokenType`
+        if isNotNull tokenBeforeType && (fsContext.InsideToken || isNull tokenType) &&
+                (tokenBeforeType.IsComment ||
+                 FSharpTokenType.Strings.[tokenBeforeType] ||
+                 tokenBeforeType.IsConstantLiteral) then null else
+
+        obj()
 
     member x.AddLookupItems(context: FSharpCodeCompletionContext, collector: IItemsCollector) =
-        match context.FsCompletionContext with
+        let fcsContext = context.FcsCompletionContext
+
+        match fcsContext.CompletionContext with
         | Some (CompletionContext.Invalid) -> false
         | _ ->
 
@@ -55,20 +77,18 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
 
             let checkResults = results.CheckResults
             let parseResults = fsFile.ParseResults
-            let line = int context.Coords.Line + 1
-            let lineText = context.LineText
+            let line = int fcsContext.Coords.Line + 1
 
             let getAllSymbols () = getAllSymbols checkResults
             try
                 let completionInfo =
                     checkResults
-                        .GetDeclarationListInfo(parseResults, line, lineText, context.PartialLongName,
+                        .GetDeclarationListInfo(parseResults, line, fcsContext.LineText, fcsContext.PartialName,
                                                 getAllSymbols, filterResolved)
 
                 if completionInfo.Items.IsEmpty() then false else
 
-                context.XmlDocService <- basicContext.Solution.GetComponent<FSharpXmlDocService>()
-                context.DisplayContext <- completionInfo.DisplayContext
+                fcsContext.DisplayContext <- completionInfo.DisplayContext
 
                 if completionInfo.IsError then
                     let item = Seq.head completionInfo.Items
@@ -87,7 +107,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
             | OperationCanceled -> reraise()
             | e ->
                 let path = basicContext.SourceFile.GetLocation().FullPath
-                let coords = context.Coords
+                let coords = fcsContext.Coords
                 logger.LogMessage(LoggingLevel.WARN, "Getting completions at location: {0}: {1}", path, coords)
                 logger.LogExceptionSilently(e)
                 false
@@ -136,7 +156,9 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
     interface ICodeCompletionItemsProvider with
         member x.IsAvailable(context) =
             let settings = context.BasicContext.ContextBoundSettingsStore
-            if settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion) then obj() else null
+            let enabled = settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion)
+
+            if enabled then base.IsAvailable(context) else null
 
         member x.GetDefaultRanges(context) = base.GetDefaultRanges(context)
         member x.AddLookupItems(context, collector, _) =

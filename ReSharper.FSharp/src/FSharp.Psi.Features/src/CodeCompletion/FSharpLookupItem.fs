@@ -94,7 +94,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
     override x.DisplayTypeName =
         try
             match getReturnType item.FSharpSymbol with
-            | Some t -> RichText(t.Format(context.DisplayContext))
+            | Some t -> RichText(t.Format(context.FcsCompletionContext.DisplayContext))
             | _ -> null
         with _ -> null
 

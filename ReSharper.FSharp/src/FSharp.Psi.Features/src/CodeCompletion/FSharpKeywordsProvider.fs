@@ -3,6 +3,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
@@ -23,6 +24,17 @@ type KeywordSuffix =
     | Quotes
     | Space
     | None
+
+
+type FSharpItemsProviderBase() =
+    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
+
+    // todo: override IsAvailable when it's possible to disable smart completion on the second invocation
+    // override x.IsAvailable = context.BasicContext.CodeCompletionType = CodeCompletionType.BasicCompletion
+
+    override x.GetDefaultRanges(context) = context.Ranges
+    override x.GetLookupFocusBehaviour _ = LookupFocusBehaviour.Soft
+
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpKeywordsProvider() =
@@ -52,11 +64,11 @@ type FSharpKeywordsProvider() =
     override x.IsAvailable _ = true
 
     override x.AddLookupItems(context, collector) =
-        match context.TokenBeforeCaret with
-        | null -> false
-        | tokenBefore ->
+        let tokenBeforeCaret = context.TokenBeforeCaret
+        if isNull tokenBeforeCaret then false else
 
-        match context.FsCompletionContext, tokenBefore.GetTokenType() with
+        let fcsCompletionContext = context.FcsCompletionContext
+        match fcsCompletionContext.CompletionContext, tokenBeforeCaret.GetTokenType() with
         | Some (CompletionContext.Invalid), tokenBeforeType when tokenBeforeType != FSharpTokenType.HASH -> false
         | _, tokenBeforeType ->
 
@@ -65,11 +77,11 @@ type FSharpKeywordsProvider() =
            tokenBeforeType == FSharpTokenType.DOT ||
            tokenBeforeType == FSharpTokenType.RESERVED_LITERAL_FORMATS ||
            isNotNull tokenBeforeType && tokenBeforeType.IsConstantLiteral ||
-           tokenBefore == context.TokenAtCaret && isNotNull tokenBeforeType &&
+           tokenBeforeCaret == context.TokenAtCaret && isNotNull tokenBeforeType &&
                (tokenBeforeType.IsComment || tokenBeforeType.IsStringLiteral || tokenBeforeType.IsConstantLiteral)
         then false else
 
-        if not context.PartialLongName.QualifyingIdents.IsEmpty then false else
+        if not fcsCompletionContext.PartialName.QualifyingIdents.IsEmpty then false else
 
         for item in x.LookupItems do
             item.InitializeRanges(context.Ranges, context.BasicContext)
@@ -120,7 +132,7 @@ type FSharpHashDirectiveAutocompletionStrategy() =
     interface IAutomaticCodeCompletionStrategy with
         member x.Language = FSharpLanguage.Instance :> _
 
-        member x.AcceptsFile(file, textControl) =
+        member x.AcceptsFile(file, _) =
             match file.GetSourceFile() with
             | null -> false
             | sourceFile -> sourceFile.LanguageType.Is<FSharpScriptProjectFileType>()

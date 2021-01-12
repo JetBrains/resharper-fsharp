@@ -38,12 +38,6 @@ type ITextControl with
     member x.GetFSharpFile(solution) =
         x.Document.GetPsiSourceFile(solution).FSharpFile
 
-type IFSharpFile with
-    member x.ParseTree =
-        match x.ParseResults with
-        | Some parseResults -> parseResults.ParseTree
-        | _ -> None
-
 type IFile with
     member x.GetNode<'T when 'T :> ITreeNode and 'T : null>(document, range) =
         let offset = getStartOffset document range

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FSharp.Compiler;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -29,6 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       get => myParseResults.GetValue(this, fsFile => FcsCheckerService.ParseFile(SourceFile));
       set => myParseResults.SetValue(this, value);
     }
+
+    public FSharpOption<SyntaxTree.ParsedInput> ParseTree => ParseResults?.Value.ParseTree;
 
     PsiLanguageType IFSharpFileCheckInfoOwner.LanguageType { get; set; }/* = FSharpLanguage.Instance;*/
 
