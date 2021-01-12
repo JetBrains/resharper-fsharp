@@ -1,4 +1,5 @@
-﻿namespace global
+﻿//${RENAME_RELATED:false}
+namespace global
 
 type zzz =
     { Field: int }
