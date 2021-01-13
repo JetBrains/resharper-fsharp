@@ -23,8 +23,12 @@ type GenerateMissingRecordFieldsTest() =
 
     [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02``() = x.DoNamedTest()
-
+    
     [<Test>] member x.``Empty function``() = x.DoNamedTest()
+    [<Test>] member x.``Function statement``() = x.DoNamedTest()
+    [<Test>] member x.``If statement in function``() = x.DoNamedTest()
+    [<Test>] member x.``Elif statement``() = x.DoNamedTest()
+    [<Test>] member x.``Match statement in function``() = x.DoNamedTest()
 
     // The quickfix should apply if the empty record is the final statement of a function binding, as that's what the
     // annotated return type pertains to.

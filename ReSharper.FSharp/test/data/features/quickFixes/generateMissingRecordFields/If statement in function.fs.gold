@@ -1,0 +1,12 @@
+﻿type R = { A: int; B: int }
+
+let r (shouldFail : bool) : R = 
+    ()
+    if shouldFail then 
+        failwith "" 
+    else 
+    if true then
+        { A = {selstart}failwith "todo"{selend}
+          B = failwith "todo" }
+    else
+        failwith ""
