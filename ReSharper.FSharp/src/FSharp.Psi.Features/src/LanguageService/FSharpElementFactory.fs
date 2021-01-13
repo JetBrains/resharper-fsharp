@@ -328,3 +328,13 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateAttribute(attrName) =
             let attributeList = createAttributeList attrName
             attributeList.Attributes.[0]
+
+        member this.CreateTypeParameterOfTypeList(names) =
+            let names = names |> List.map ((+) "'") |> String.concat ", "
+            let source = $"type T<{names}> = class end"
+            let moduleMember = getModuleMember source
+
+            let typeDeclaration =
+                moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations.[0] :?> IFSharpTypeDeclaration
+
+            typeDeclaration.TypeParameterList

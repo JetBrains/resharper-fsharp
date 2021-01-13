@@ -49,6 +49,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     
     FSharpList<IParametersPatternDeclaration> CreateMemberParamDeclarations(FSharpList<FSharpList<Tuple<string, FSharpType>>> curriedParameterNames, bool isSpaceAfterComma, bool addTypes, FSharpDisplayContext displayContext);
     IMemberDeclaration CreateMemberBindingExpr(string bindingName, FSharpList<string> typeParameters, FSharpList<IParametersPatternDeclaration> args); 
-    IInterfaceImplementation CreateInterfaceImplementation(ITypeReferenceName typeReferenceName, FSharpList<IMemberDeclaration> memberDeclarations, int indent); 
+    IInterfaceImplementation CreateInterfaceImplementation(ITypeReferenceName typeReferenceName, FSharpList<IMemberDeclaration> memberDeclarations, int indent);
+
+    ITypeParameterOfTypeList CreateTypeParameterOfTypeList(FSharpList<string> names);
   }
 }

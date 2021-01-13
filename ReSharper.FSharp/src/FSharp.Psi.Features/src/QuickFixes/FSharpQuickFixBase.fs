@@ -2,6 +2,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.QuickFixes
+open JetBrains.ReSharper.Intentions.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Psi
 
 [<AbstractClass>]
 type FSharpQuickFixBase() =
@@ -26,3 +29,9 @@ type FSharpScopedQuickFixBase() =
         use formatterCookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         x.ExecutePsiTransaction(solution)
         null
+
+
+type IFSharpQuickFixUtilComponent =
+    inherit IQuickFixUtilComponent
+
+    abstract BindTo: FSharpSymbolReference * ITypeElement -> FSharpSymbolReference

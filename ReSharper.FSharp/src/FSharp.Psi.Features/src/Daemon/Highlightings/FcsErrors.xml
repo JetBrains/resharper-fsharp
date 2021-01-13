@@ -299,4 +299,12 @@
     <QuickFix>NamespaceToModuleFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="TypeAbbreviationsCannotHaveAugmentations">
+    <Parameter type="ITypeExtensionDeclaration" name="extensionDecl"/>
+    <Message value="Type abbreviations cannot have augmentations"/>
+    <Range>extensionDecl.Identifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithAbbreviatedTypeFix</QuickFix>
+  </Error>
+
 </Errors>

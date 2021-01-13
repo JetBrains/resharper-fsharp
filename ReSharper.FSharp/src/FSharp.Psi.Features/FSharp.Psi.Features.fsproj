@@ -193,6 +193,7 @@
     <Compile Include="src\QuickFixes\GenerateInterfaceMembersFix.fs" />
     <Compile Include="src\QuickFixes\GenerateMissingOverridesFix.fs" />
     <Compile Include="src\QuickFixes\RemoveRedundantAttributeFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithAbbreviatedTypeFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

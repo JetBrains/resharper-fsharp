@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Psi
 open JetBrains.Util
 
 type IIgnoredHighlighting =
@@ -59,6 +60,7 @@ module FSharpErrors =
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] UseBindingsIllegalInModules = 524
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
+    let [<Literal>] TypeAbbreviationsCannotHaveAugmentations = 964
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
 
@@ -88,11 +90,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | FSharpErrorSeverity.Warning -> WarningHighlighting(error.Message, range) :> _
         | _ -> ErrorHighlighting(error.Message, range) :> _
 
+    /// Finds node of the corresponding type in the range.
     let createHighlightingFromNode highlightingCtor range: IHighlighting =
         match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
         | null -> null
         | expr -> highlightingCtor expr :> _
 
+    /// Finds node in the range and creates highlighting for the smallest containing node of the corresponding type.
     let createHighlightingFromParentNode highlightingCtor range: IHighlighting =
         match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
         | null -> null
@@ -116,6 +120,16 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | null -> null
         | parent -> highlightingCtor (parent, error.Message) :> _
 
+    /// Finds the smallest node of the corresponding type at offset.
+    let createHighlightingFromNodeAtOffset highlightingCtor offset: IHighlighting =
+        match fsFile.FindTokenAt(TreeOffset(offset)) with
+        | null -> null
+        | token ->
+
+        match token.GetContainingNode() with
+        | null -> null
+        | node -> highlightingCtor(node) :> _
+    
     let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
         | TypeEquation when error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
@@ -211,6 +225,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | LocalClassBindingsCannotBeInline ->
             createHighlightingFromParentNode LocalClassBindingsCannotBeInlineError range
+
+        | TypeAbbreviationsCannotHaveAugmentations ->
+            // For `type Foo.Bar<'T> with ...` FCS reports `Foo.Bar` lid range, we're interested in `Bar` offset.
+            createHighlightingFromNodeAtOffset TypeAbbreviationsCannotHaveAugmentationsError range.EndOffset.Offset
 
         | LetAndForNonRecBindings ->
             createHighlightingFromParentNode LetAndForNonRecBindingsError range
