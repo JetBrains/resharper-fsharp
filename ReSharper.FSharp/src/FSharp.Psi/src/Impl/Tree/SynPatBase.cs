@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       binding.SetIsMutable(true);
     }
 
-    public override IBinding Binding => this.GetBinding();
+    public override IBindingLikeDeclaration Binding => this.GetBinding();
   }
 
   internal partial class LocalReferencePat
@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       get
       {
         // todo: check other parents: e.g. parameters?
-        if (Parent is IBinding)
+        if (Parent is IBindingLikeDeclaration)
           return true;
 
         var referenceName = ReferenceName;
@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool CanBeMutable => Binding != null;
 
-    public IBinding Binding => this.GetBinding();
+    public IBindingLikeDeclaration Binding => this.GetBinding();
   }
 
   internal partial class ParametersOwnerPat
@@ -99,7 +99,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       binding.SetIsMutable(true);
     }
 
-    public override IBinding Binding => this.GetBinding();
+    public override IBindingLikeDeclaration Binding => this.GetBinding();
   }
 
   internal partial class LocalAsPat
@@ -119,7 +119,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool CanBeMutable => Binding is LocalBinding;
 
-    private IBinding Binding => this.GetBinding();
+    private IBindingLikeDeclaration Binding => this.GetBinding();
   }
 
   internal partial class OrPat

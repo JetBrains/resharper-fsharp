@@ -4,6 +4,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public partial interface IReferencePat : IMutableModifierOwner
   {
-    [CanBeNull] IBinding Binding { get; }
+    [CanBeNull] IBindingLikeDeclaration Binding { get; }
   }
 }

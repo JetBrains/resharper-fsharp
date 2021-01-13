@@ -1,8 +1,8 @@
-using JetBrains.ReSharper.Psi.Tree;
+﻿using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IBinding
+  public partial interface IBindingLikeDeclaration
   {
     TreeNodeCollection<IAttribute> AllAttributes { get; }
 

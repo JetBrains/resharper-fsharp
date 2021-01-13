@@ -119,16 +119,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
 
-    [CanBeNull] public abstract IBinding Binding { get; }
+    [CanBeNull] public abstract IBindingLikeDeclaration Binding { get; }
 
     public bool CanBeMutable => Binding != null;
-    public override bool IsStatic => LetBindingsDeclarationNavigator.GetByBinding(Binding)?.StaticKeyword != null;
+    public override bool IsStatic => LetBindingsDeclarationNavigator.GetByBinding(Binding as IBinding)?.StaticKeyword != null;
     
     public virtual IEnumerable<IFSharpPattern> NestedPatterns =>
       EmptyList<IFSharpPattern>.Instance;
 
     public virtual IEnumerable<IFSharpDeclaration> Declarations =>
       NestedPatterns.OfType<IFSharpDeclaration>();
-
   }
 }
