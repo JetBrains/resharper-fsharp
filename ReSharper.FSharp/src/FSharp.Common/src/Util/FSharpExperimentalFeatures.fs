@@ -12,17 +12,18 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 module FSharpExperimentalFeatures =
     [<AbstractClass>]
     type EnableFeatureCookieBase<'T when 'T :> EnableFeatureCookieBase<'T> and 'T: (new: unit -> 'T)>() =
-        static let enabled = Stack [false]
+        static let cookies = Stack()
 
         static member Create() =
-            enabled.Push(true)
-            new 'T()
+            let t = new 'T()
+            cookies.Push(t)
+            t
 
-        static member Enabled = enabled.Peek()
+        static member Enabled = cookies.Count > 0
 
         interface IDisposable with
-            member _.Dispose() =
-                enabled.Pop() |> ignore
+            member this.Dispose() =
+                cookies.Pop() |> ignore
 
     type EnableInlineVarRefactoringCookie() = inherit EnableFeatureCookieBase<EnableInlineVarRefactoringCookie>()
     type EnableRedundantParenAnalysisCookie() = inherit EnableFeatureCookieBase<EnableRedundantParenAnalysisCookie>()
