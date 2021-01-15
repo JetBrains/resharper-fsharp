@@ -42,7 +42,7 @@ type FSharpLanguageLevelProjectProperty
         project.ProjectProperties.TryGetConfiguration<IFSharpProjectConfiguration>(targetFrameworkId)
     
     let (|Version|) (version: Version) =
-        version.Major, version.Minor, version.Build
+        version.Major, version.Minor
 
     let getLanguageLevelByToolsetVersion () =
         match solutionToolset.GetBuildTool() with
@@ -62,7 +62,8 @@ type FSharpLanguageLevelProjectProperty
     // todo: more versions
     let getLanguageLevelByCompilerVersion (fscVersion: Version): VersionMapping =
         match fscVersion with
-        | Version (11, 0, 20) -> VersionMapping(FSharpLanguageLevel.FSharp50, FSharpLanguageLevel.Preview)
+        | Version (10, 1000) -> VersionMapping(FSharpLanguageLevel.FSharp47, FSharpLanguageLevel.FSharp50)
+        | Version (11, 0) -> VersionMapping(FSharpLanguageLevel.FSharp50, FSharpLanguageLevel.Preview)
         | _ -> null
 
     let getCompilerVersion (fscPath: FileSystemPath) =

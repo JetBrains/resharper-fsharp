@@ -64,11 +64,11 @@ module FSharpLanguageLevel =
         PsiFileCachedDataUtil.GetPsiModuleData<FSharpLanguageLevel>(treeNode, cachedLevelKey, ofPsiModuleNoCache)
 
     [<Extension; CompiledName("IsFSharp47Supported")>]
-    let isFSharp47Supported (treeNode: ITokenNode) =
+    let isFSharp47Supported (treeNode: ITreeNode) =
         ofTreeNode treeNode >= FSharpLanguageLevel.FSharp47
 
     [<Extension; CompiledName("IsFSharp50Supported")>]
-    let isFSharp50Supported (treeNode: ITokenNode) =
+    let isFSharp50Supported (treeNode: ITreeNode) =
         ofTreeNode treeNode >= FSharpLanguageLevel.FSharp50
 
 
