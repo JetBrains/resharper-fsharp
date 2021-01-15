@@ -2,6 +2,7 @@
 
 open System
 open System.Collections.Concurrent
+open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
@@ -10,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Resources.Settings
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
@@ -29,12 +31,20 @@ type VersionMapping
     member this.LatestMinor = latestMinor
     member this.Preview = preview
 
+
+[<SettingsKey(typeof<CodeInspectionSettings>, "F# language settings")>]
+type FSharpLanguageProjectSettings =
+    { [<SettingsEntry(FSharpLanguageLevel.Latest, "F# language level")>]
+      LanguageLevel: FSharpLanguageLevel }
+
+
+[<SolutionComponent>]
 type FSharpLanguageLevelProjectProperty
         (lifetime, locks, projectPropertiesListener, projectSettings, persistentProjectItemProperties,
-         languageLevelSettingsEntry, solutionToolset: ISolutionToolset) =
+         settingsSchema: SettingsSchema, solutionToolset: ISolutionToolset) =
     inherit OverridableLanguageLevelProjectProperty<FSharpLanguageLevel, FSharpLanguageVersion>
             (lifetime, locks, projectPropertiesListener, projectSettings, persistentProjectItemProperties,
-             languageLevelSettingsEntry)
+             settingsSchema.GetKey<FSharpLanguageProjectSettings>().TryFindEntryByMemberName("LanguageLevel"))
 
     let compilerPathToLanguageLevels = ConcurrentDictionary<FileSystemPath, VersionMapping>()
 
@@ -132,15 +142,16 @@ type FSharpLanguageLevelProjectProperty
 
     override this.ConvertToLanguageVersion(languageLevel) = FSharpLanguageLevel.toLanguageVersion languageLevel
 
+    override this.GetOverriddenLanguageLevelFromSettings _ = Nullable()
+
     override this.IsAvailable(_: FSharpLanguageVersion, _: IProject, _: TargetFrameworkId): bool = failwith "todo"
     override this.TryParseCompilationOption _ = failwith "todo"
     override this.ConvertToCompilationOption _ = failwith "todo"
-    override this.GetOverriddenLanguageLevelFromSettings _ = failwith "todo"
     override this.SetOverridenLanguageLevelInSettings(_, _) = failwith "todo"
     override this.GetPresentation(_, _, _, _) = failwith "todo"
     override this.GetLatestAvailableLanguageLevel _ = failwith "todo"
 
-
+[<SolutionFeaturePart>]
 type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProperty) =
     let (|PsiModule|) (psiModule: IPsiModule) =
         let project = psiModule.ContainingProjectModule.NotNull() :?> IProject
