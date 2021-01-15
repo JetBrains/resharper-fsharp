@@ -4,11 +4,11 @@ open System
 open JetBrains.Application
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Extensions
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.EditProperties.Projects.MsBuild
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.EditProperties.Projects.MsBuild.Providers
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.EditProperties.Utils
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.Util
 
 [<ShellFeaturePart>]
@@ -27,6 +27,15 @@ type FSharpProjectPropertiesBuilder(projectPropertiesRequests) =
             | _ -> false
 
         base.BuildProjectBuildSettings(rdProjectDescriptor, rdProjects, buildSettings)
+
+    override this.BuildProjectConfiguration(rdProjectDescriptor, project, configuration) =
+        base.BuildProjectConfiguration(rdProjectDescriptor, project, configuration)
+
+        let languageVersion = project.GetPropertyValueIgnoreCase(MSBuildProjectUtil.LanguageVersionProperty)
+        let languageVersion = FSharpLanguageVersion.parseCompilationOption languageVersion 
+
+        let configuration = configuration.As<IFSharpProjectConfiguration>()
+        configuration.LanguageVersion <- languageVersion 
 
 
 [<SolutionComponent>]

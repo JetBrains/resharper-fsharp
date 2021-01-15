@@ -1,4 +1,4 @@
-namespace rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+namespace rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open JetBrains.Application
 open System
@@ -13,11 +13,41 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic.Components
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Common
 open JetBrains.ProjectModel.Properties.Managed
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.Util
+open JetBrains.Util.PersistentMap
+
+[<AllowNullLiteral>]
+type IFSharpProjectConfiguration =
+    inherit IManagedProjectConfiguration
+
+    abstract LanguageVersion: FSharpLanguageVersion with get, set
+
+type FSharpProjectConfiguration() as this =
+    inherit ManagedProjectConfigurationBase()
+
+    let configuration = this :> IFSharpProjectConfiguration
+
+    interface IFSharpProjectConfiguration with
+        member val LanguageVersion = FSharpLanguageVersion.Default with get, set
+
+    override this.WriteConfiguration(writer) =
+        base.WriteConfiguration(writer)
+        writer.WriteEnum(configuration.LanguageVersion)
+
+    override this.ReadConfiguration(reader) =
+        base.ReadConfiguration(reader)
+        configuration.LanguageVersion <- reader.ReadEnum(FSharpLanguageVersion.Default)
+
+    override this.UpdateFrom(otherConfiguration) =
+        let fsConfiguration = otherConfiguration.As<IFSharpProjectConfiguration>()
+        if isNull fsConfiguration then false else
+
+        fsConfiguration.LanguageVersion <- fsConfiguration.LanguageVersion
+        base.UpdateFrom(otherConfiguration)
+
 
 type FSharpProjectProperties =
-    inherit ProjectPropertiesBase<ManagedProjectConfiguration>
+    inherit ProjectPropertiesBase<FSharpProjectConfiguration>
 
     val mutable targetPlatformData: TargetPlatformData
     val buildSettings: FSharpBuildSettings
@@ -92,7 +122,7 @@ type FSharpProjectMarkTypeGuidProvider() =
     override x.IsApplicable(projectMark) =
         projectMark.Location.ExtensionNoDot = FsprojExtension
 
-    override x.GetActualTypeGuid(projectMark) = fsProjectTypeGuid
+    override x.GetActualTypeGuid _ = fsProjectTypeGuid
 
 
 [<ProjectModelExtension>]
@@ -153,3 +183,28 @@ module Util =
         member x.IsFSharp =
             x.ProjectProperties :? FSharpProjectProperties ||
             isFSharpProjectFile x.ProjectFileLocation
+
+
+module FSharpProperties =
+    let [<Literal>] TargetProfile = "TargetProfile"
+    let [<Literal>] OtherFlags = "OtherFlags"
+    let [<Literal>] NoWarn = "NoWarn"
+    let [<Literal>] WarnAsError = "WarnAsError"
+    let [<Literal>] LangVersion = "LangVersion"
+    let [<Literal>] FscToolPath = "FscToolPath"
+    let [<Literal>] DotnetFscCompilerPath = "DotnetFscCompilerPath"
+
+
+[<ShellComponent>]
+type FSharpProjectPropertiesRequest() =
+    let properties =
+        [| FSharpProperties.TargetProfile
+           FSharpProperties.OtherFlags
+           FSharpProperties.NoWarn
+           FSharpProperties.WarnAsError
+           FSharpProperties.LangVersion
+           FSharpProperties.FscToolPath
+           FSharpProperties.DotnetFscCompilerPath |]
+
+    interface IProjectPropertiesRequest with
+        member x.RequestedProperties = properties :> _

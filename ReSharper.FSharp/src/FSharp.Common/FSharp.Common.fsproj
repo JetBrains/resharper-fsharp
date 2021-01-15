@@ -13,9 +13,10 @@
     <Compile Include="src\Util\FSharpRangeUtil.fs" />
     <Compile Include="src\Util\FSharpCompilerAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpAssemblyUtil.fs" />
-    <Compile Include="src\ProjectModel\FSharpLanguageVersion.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
+    <Compile Include="src\ProjectModel\FSharpLanguageVersion.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties.fs" />
+    <Compile Include="src\ProjectModel\FSharpLanguageLevelProvider.fs" />
     <Compile Include="src\ProjectModel\FSharpLanguageSpecificItemsProvider.fs" />
     <Compile Include="src\ProjectModel\ZoneMarker.fs" />
     <Compile Include="src\ProjectModel\ProjectItems\FSharpItemsContainer.fs" />
@@ -31,7 +32,7 @@
     <Compile Include="src\Util\CacheUtil.fs" />
     <Compile Include="src\Util\FSharpHighlightingAttributeIds.fs" />
     <Compile Include="src\Util\FcsExpressionUtil.fs" />
-    <Compile Include="src\Util\RegistryUtil.fs" />
+    <Compile Include="src\Util\FSharpExperimentalFeatures.fs" />
     <Compile Include="src\Util\FcsReactorMonitor.fs" />
     <Compile Include="src\Settings\FSharpOptionsPageBase.fs" />
     <Compile Include="src\Settings\FSharpOptions.fs" />

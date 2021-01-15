@@ -117,13 +117,14 @@ module rec CommonUtil =
     let equalsIgnoreCase other (string: string) =
         string.Equals(other, StringComparison.OrdinalIgnoreCase)
 
+    let (|IgnoreCase|_|) other string =
+        if equalsIgnoreCase other string then someUnit else None
+
     let startsWith other (string: string) =
         string.StartsWith(other, StringComparison.Ordinal)
 
     let endsWith other (string: string) =
         string.EndsWith(other, StringComparison.Ordinal)
-
-    let eq a b = a = b
 
     let getCommonParent path1 path2 =
         FileSystemPath.GetDeepestCommonParent(path1, path2)
