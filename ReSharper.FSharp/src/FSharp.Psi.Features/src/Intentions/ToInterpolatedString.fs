@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open System.Text
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing

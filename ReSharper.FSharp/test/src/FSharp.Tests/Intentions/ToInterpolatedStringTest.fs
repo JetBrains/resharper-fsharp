@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
-open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ReSharper.TestFramework
