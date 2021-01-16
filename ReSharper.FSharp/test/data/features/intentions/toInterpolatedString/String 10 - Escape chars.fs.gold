@@ -1,0 +1,3 @@
+﻿module Module
+
+let s = ${caret}"\n%d{10}\n"

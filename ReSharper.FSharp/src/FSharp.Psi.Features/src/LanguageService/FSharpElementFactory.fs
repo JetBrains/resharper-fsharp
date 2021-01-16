@@ -343,3 +343,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
                 moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations.[0] :?> IFSharpTypeDeclaration
 
             typeDeclaration.TypeParameterList
+
+        member this.CreateInterpolatedString(contents) =
+            let source = "$\"" + contents + "\""
+            getExpression source :?> IInterpolatedStringExpr

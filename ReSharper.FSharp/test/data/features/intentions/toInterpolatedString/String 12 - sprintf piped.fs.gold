@@ -1,0 +1,3 @@
+﻿module Module
+
+let s = ${caret}"%d{10} %s{foo}" |> ignore
