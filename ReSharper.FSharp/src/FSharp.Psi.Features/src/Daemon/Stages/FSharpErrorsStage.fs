@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open JetBrains.ReSharper.Daemon.VisualElements
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -16,6 +17,7 @@ open JetBrains.Util
 module FSharpErrorsStage =
     let visualElementFactoryKey = Key<VisualElementHighlighter>("ColorUsageHighlightingEnabled")
     let redundantParenAnalysisEnabledKey = Key<obj>("RedundantParenAnalysisEnabled")
+    let parseAndCheckResultsKey = Key<FSharpParseAndCheckResults option>("ParseAndCheckResultsKey")
 
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |])>]
