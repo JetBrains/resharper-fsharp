@@ -229,7 +229,7 @@
     <QuickFix>ReplaceLambdaWithBuiltinFunctionFix</QuickFix>
   </Warning>
 
-  <Warning name="UseWildSelfId" configurableSeverity="FSharpRedundantYields">
+  <Warning name="UseWildSelfId" configurableSeverity="FSharpUseWildSelfId">
     <Parameter type="INamedSelfId" name="selfId" />
     <Message value="Use '_'"/>
     <Range>selfId.GetDocumentRange()</Range>
