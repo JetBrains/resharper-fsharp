@@ -24,3 +24,7 @@ type ToInterpolatedStringTest() =
     [<Test>] member x.``String 10 - Escape chars``() = x.DoNamedTest()
     [<Test>] member x.``String 11 - Remove outer parens``() = x.DoNamedTest()
     [<Test>] member x.``String 12 - sprintf piped``() = x.DoNamedTest()
+
+    [<Test>] member x.``Triple Quoted String 01 - Many specifiers with text``() = x.DoNamedTest()
+
+    [<Test>] member x.``Verbatim String 01 - Many specifiers with text``() = x.DoNamedTest()

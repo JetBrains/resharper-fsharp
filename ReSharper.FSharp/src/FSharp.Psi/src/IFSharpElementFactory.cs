@@ -54,7 +54,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IInterfaceImplementation CreateInterfaceImplementation(ITypeReferenceName typeReferenceName, FSharpList<IMemberDeclaration> memberDeclarations, int indent);
 
     ITypeParameterOfTypeList CreateTypeParameterOfTypeList(FSharpList<string> names);
-
-    IInterpolatedStringExpr CreateInterpolatedString(string contents);
   }
 }

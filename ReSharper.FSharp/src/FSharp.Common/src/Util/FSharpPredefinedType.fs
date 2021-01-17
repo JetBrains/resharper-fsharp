@@ -69,6 +69,9 @@ let languagePrimitivesModuleTypeName = clrTypeName "Microsoft.FSharp.Core.Langua
 [<CompiledName("IntrinsicTypeName")>]
 let intrinsicOperatorsTypeName = clrTypeName "Microsoft.FSharp.Core.LanguagePrimitives+IntrinsicOperators"
 
+[<CompiledName("ExtraTopLevelOperatorsTypeName")>]
+let extraTopLevelOperatorsTypeName = clrTypeName "Microsoft.FSharp.Core.ExtraTopLevelOperators"
+
 [<CompiledName("UnitTypeName")>]
 let unitTypeName = clrTypeName "Microsoft.FSharp.Core.Unit"
 
@@ -79,7 +82,8 @@ let entryPointAttrTypeName = clrTypeName "Microsoft.FSharp.Core.EntryPointAttrib
 
 let predefinedFunctionTypes =
     [| operatorsModuleTypeName, [| "not"; "id"; "ignore"; "|>"; "<|"; "<>"; "="; "fst"; "snd" |]
-       intrinsicOperatorsTypeName, [| "||"; "&&" |] |]
+       intrinsicOperatorsTypeName, [| "||"; "&&" |]
+       extraTopLevelOperatorsTypeName, [| "sprintf" |] |]
     |> Array.collect (fun (typeName, names) -> [| for name in names -> name, typeName |])
     |> dict
 

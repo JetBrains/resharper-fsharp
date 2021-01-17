@@ -4,12 +4,16 @@ open System.Text
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Feature.Services.Daemon
 
@@ -36,21 +40,25 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
         let literalExpr = prefixAppExpr.ArgumentExpression.IgnoreInnerParens().As<ILiteralExpr>()
         if isNull literalExpr then false else
 
-        // todo: support FSharpTokenType.TRIPLE_QUOTED_STRING and FSharpTokenType.VERBATIM_STRING
-        let tokenType = literalExpr.Literal.GetTokenType()
-        if tokenType <> FSharpTokenType.STRING then false else
+        let tokenType = getTokenType literalExpr.Literal
+        if tokenType <> FSharpTokenType.STRING &&
+           tokenType <> FSharpTokenType.TRIPLE_QUOTED_STRING &&
+           tokenType <> FSharpTokenType.VERBATIM_STRING then false
+        else
 
-        let sourceFile = prefixAppExpr.GetSourceFile()
-        match prefixAppExpr.CheckerService.ParseAndCheckFile(sourceFile, opName, true) with
+        let fsFile = prefixAppExpr.FSharpFile
+        match fsFile.GetParseAndCheckResults(true, opName) with
         | None -> false
         | Some results ->
 
         // Find all format specifiers in our argument expression
         let argRange = prefixAppExpr.ArgumentExpression.GetHighlightingRange()
         let matchingFormatSpecifiers =
+            let document = prefixAppExpr.GetSourceFile().Document
+
             results.CheckResults.GetFormatSpecifierLocationsAndArity()
             |> Seq.filter (fun (r, _) ->
-                let range = getDocumentRange sourceFile.Document r
+                let range = getDocumentRange document r
                 argRange.Contains(&range)
             )
             |> List.ofSeq
@@ -65,9 +73,9 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
         let prefixAppExpr = dataProvider.GetSelectedElement<IPrefixAppExpr>()
         let literalExpr = prefixAppExpr.ArgumentExpression.IgnoreInnerParens().As<ILiteralExpr>()
 
-        let sourceFile = prefixAppExpr.GetSourceFile()
-        let document = sourceFile.Document
-        match prefixAppExpr.CheckerService.ParseAndCheckFile(sourceFile, opName, true) with
+        let fsFile = prefixAppExpr.FSharpFile
+        let document = prefixAppExpr.GetSourceFile().Document
+        match fsFile.GetParseAndCheckResults(true, opName) with
         | None -> ()
         | Some results ->
 
@@ -87,13 +95,13 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
             let rec loop acc (expr: IPrefixAppExpr) =
                 match PrefixAppExprNavigator.GetByFunctionExpression (expr.IgnoreParentParens()) with
                 | null -> expr.IgnoreParentParens(), acc
-                | parent -> loop (parent.ArgumentExpression::acc) parent
+                | parent -> loop (parent.ArgumentExpression :: acc) parent
             loop [] prefixAppExpr
 
         if appliedExprs.Length <> matchingFormatSpecs.Length then () else
 
         let appliedExprFormatSpecs =
-            let startOffset = literalExpr.GetNavigationRange().StartOffset.Offset + 1
+            let startOffset = literalExpr.GetNavigationRange().StartOffset.Offset
 
             matchingFormatSpecs
             |> Seq.map (fun (specifierRange, text) -> specifierRange.EndOffset.Offset - startOffset, text)
@@ -101,10 +109,7 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
             |> Seq.zip appliedExprs
             |> Seq.map (fun (expr, (i, text)) -> i, InsertInterpolation (text, expr))
 
-        // Get the contents of the format string, excluding quotes
-        let formatString =
-            let t = literalExpr.GetText()
-            t.Substring(1, t.Length - 2)
+        let formatString = literalExpr.GetText()
 
         let bracesToEscape =
             formatString
@@ -120,22 +125,22 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
             |> Seq.sortByDescending fst
             |> List.ofSeq
 
-        let interpolatedString = StringBuilder(formatString)
+        let interpolatedSb = StringBuilder(formatString)
         for index, manipulation in manipulations do
             match manipulation with
             | EscapeBrace braceChar ->
-                interpolatedString.Insert(index, braceChar) |> ignore
+                interpolatedSb.Insert(index, braceChar) |> ignore
             | InsertInterpolation (text, expr) ->
                 let index =
                     // %O is the implied default in interpolated strings
                     if text = "%O" then
-                        interpolatedString.Remove(index - 2, 2) |> ignore
+                        interpolatedSb.Remove(index - 2, 2) |> ignore
                         index - 2
                     else
                         index
 
                 let exprText = expr.GetText()
-                interpolatedString
+                interpolatedSb
                     .Insert(index, '{')
                     .Insert(index + 1, exprText)
                     .Insert(index + 1 + exprText.Length, '}')
@@ -143,12 +148,14 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
 
         use writeCookie = WriteLockCookie.Create(prefixAppExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
+        use cookie = CompilationContextCookie.GetOrCreate(prefixAppExpr.GetPsiModule().GetContextFromModule())
 
         let factory = literalExpr.CreateElementFactory()
-        let interpolatedStringExpr = factory.CreateInterpolatedString(interpolatedString.ToString())
 
-        // todo: use isPredefinedFunctionRef instead
-        if prefixAppExpr.Reference.GetName() = "sprintf" then
+        interpolatedSb.Insert(0, '$') |> ignore
+        let interpolatedStringExpr = factory.CreateExpr(interpolatedSb.ToString())
+
+        if prefixAppExpr.FunctionExpression |> isPredefinedFunctionRef "sprintf" then
             ModificationUtil.ReplaceChild(outerPrefixAppExpr, interpolatedStringExpr) |> ignore
         else
             ModificationUtil.ReplaceChild(literalExpr, interpolatedStringExpr) |> ignore
