@@ -40,7 +40,7 @@ module FSharpTestAttribute =
 
 [<AutoOpen>]
 module PackageReferences =
-    let [<Literal>] FSharpCorePackage = "FSharp.Core/4.7.2"
+    let [<Literal>] FSharpCorePackage = "FSharp.Core/5.0.0"
 
 
 type FSharpTestAttribute(extension) =

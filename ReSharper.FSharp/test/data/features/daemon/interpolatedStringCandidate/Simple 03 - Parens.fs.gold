@@ -1,0 +1,6 @@
+﻿module Module
+
+let s = sprintf (|"%d"|(0)) 10
+
+---------------------------------------------------------
+(0): ReSharper Suggestion: Format string can be replaced with an interpolated string

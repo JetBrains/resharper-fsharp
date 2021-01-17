@@ -1,47 +1,29 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
+open System
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi.Tree
-
-type StringLiteralSearch(allowSingleQuoteStrings: bool) =
-    inherit TreeNodeVisitor<bool, bool>()
-
-    override this.VisitNode (node, found) =
-        // todo: there has to be a better way to do this
-        node.Children()
-        |> Seq.fold
-            (fun found child ->
-                match child with
-                | :? IFSharpTreeNode as treeNode when not found ->
-                    treeNode.Accept(this, false)
-                | _ -> found)
-            found
-
-    override __.VisitLiteralExpr (node, _) =
-        let tokenType = getTokenType node.Literal
-        if not tokenType.IsStringLiteral then false else
-
-        // Triple quoted strings are never allowed to fill interpolations
-        if tokenType = FSharpTokenType.TRIPLE_QUOTED_STRING then true else
-
-        // Triple quoted interpolated strings can contain any other kind of string
-        if allowSingleQuoteStrings then false else
-
-        tokenType = FSharpTokenType.STRING ||
-        tokenType = FSharpTokenType.VERBATIM_STRING ||
-        tokenType = FSharpTokenType.REGULAR_INTERPOLATED_STRING ||
-        tokenType = FSharpTokenType.BYTEARRAY
 
 [<ElementProblemAnalyzer([| typeof<IPrefixAppExpr> |],
                          HighlightingTypes = [| typeof<InterpolatedStringCandidateWarning> |])>]
 type InterpolatedStringCandidateAnalyzer() =
     inherit ElementProblemAnalyzer<IPrefixAppExpr>()
+
+    let nodeSelectionProvider = FSharpTreeNodeSelectionProvider.Instance
+
+    let isSingleQuoteStringLiteral (literalExpr : ILiteralExpr) =
+        let tokenType = getTokenType literalExpr.Literal
+        tokenType = FSharpTokenType.STRING ||
+        tokenType = FSharpTokenType.BYTEARRAY ||
+        tokenType = FSharpTokenType.VERBATIM_STRING ||
+        tokenType = FSharpTokenType.TRIPLE_QUOTED_STRING ||
+        tokenType = FSharpTokenType.REGULAR_INTERPOLATED_STRING
 
     override x.Run(prefixAppExpr, data, consumer) =
         if not data.IsFSharp50Supported then () else
@@ -86,11 +68,21 @@ type InterpolatedStringCandidateAnalyzer() =
 
         if appliedExprs.Length <> matchingFormatSpecsAndArity.Length then () else
 
-        let allowSingleQuoteStrings = tokenType = FSharpTokenType.TRIPLE_QUOTED_STRING
 
         // Check that the applied expressions do not contain disallowed string literals
-        let visitor = StringLiteralSearch(allowSingleQuoteStrings)
-        if appliedExprs |> List.exists (fun expr -> expr.Accept(visitor, false)) then () else
+        let anyDisallowedExprs =
+            let isDisallowed =
+                if tokenType = FSharpTokenType.TRIPLE_QUOTED_STRING then
+                    Predicate<_>(fun (literalExpr: ILiteralExpr) ->
+                        getTokenType literalExpr.Literal = FSharpTokenType.TRIPLE_QUOTED_STRING)
+                else
+                    Predicate<_>(isSingleQuoteStringLiteral)
+
+            appliedExprs
+            |> List.exists (fun expr ->
+                nodeSelectionProvider.GetExpressionInRange<ILiteralExpr>(prefixAppExpr.FSharpFile, expr.GetHighlightingRange(), false, isDisallowed) <> null)
+
+        if anyDisallowedExprs then () else
 
         let formatSpecsAndExprs =
             appliedExprs

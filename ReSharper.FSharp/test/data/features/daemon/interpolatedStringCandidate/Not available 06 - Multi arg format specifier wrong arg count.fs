@@ -1,0 +1,4 @@
+module Module
+
+let foo = "foo"
+let s = sprintf "%*d %s" 5 10

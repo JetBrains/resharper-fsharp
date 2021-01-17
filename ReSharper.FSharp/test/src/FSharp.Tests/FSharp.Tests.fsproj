@@ -44,6 +44,7 @@
     <Compile Include="Daemon\RedundantQualifiersTest.fs" />
     <Compile Include="Daemon\AppExprAnalyzerTest.fs" />
     <Compile Include="Daemon\LambdaAnalyzerTest.fs" />
+    <Compile Include="Daemon\InterpolatedStringCandidateTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\FSharpQuickFixTestBase.fs" />
@@ -90,6 +91,7 @@
     <Compile Include="QuickFixes\GenerateInterfaceMembersFixTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantAttributeTest.fs" />
     <Compile Include="QuickFixes\ReplaceWithAbbreviatedTypeTest.fs" />
+    <Compile Include="QuickFixes\ReplaceWithInterpolatedStringTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
@@ -104,7 +106,6 @@
     <Compile Include="Intentions\ToLiteralTest.fs" />
     <Compile Include="Intentions\LetToUseTest.fs" />
     <Compile Include="Intentions\RenameFileToMatchTypeNameTest.fs" />
-    <Compile Include="Intentions\ToInterpolatedStringTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />

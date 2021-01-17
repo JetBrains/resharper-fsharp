@@ -1,0 +1,7 @@
+﻿module Module
+
+let foo = id "foo"
+let s = sprintf |"%d %s"|(0) 5 foo
+
+---------------------------------------------------------
+(0): ReSharper Suggestion: Format string can be replaced with an interpolated string

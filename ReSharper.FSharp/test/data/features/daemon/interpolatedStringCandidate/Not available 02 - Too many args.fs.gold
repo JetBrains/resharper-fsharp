@@ -1,0 +1,11 @@
+﻿module Module
+
+let foo = "foo"
+let s = sprintf |"%d %s"|(0) 10 foo 15
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Type mismatch. Expecting a
+    ''a -> string -> 'b -> 'c'    
+but given a
+    ''a -> string -> string'    
+The type ''a -> 'b' does not match the type 'string'
