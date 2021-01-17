@@ -97,6 +97,10 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
 
         if appliedExprs.Length <> matchingFormatSpecs.Length then () else
 
+        // todo: assert that applied string expressions are valid:
+        //   $"hi %s{"there"}" <- not allowed
+        //   $"""hi %s{"there"}""" <- allowed
+
         let appliedExprFormatSpecs =
             let startOffset = literalExpr.GetNavigationRange().StartOffset.Offset
 
