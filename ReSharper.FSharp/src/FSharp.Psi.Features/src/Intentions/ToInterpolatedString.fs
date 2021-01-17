@@ -4,7 +4,6 @@ open System.Text
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -18,7 +17,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Feature.Services.Daemon
 
 type private StringManipulation =
-    | InsertInterpolation of specifier: string * expr: IFSharpExpression
+    | InsertInterpolation of formatSpecifier: string * exprText: string
     | EscapeBrace of braceChar: char
 
 [<ContextAction(Name = "ToInterpolatedString", Group = "F#",
@@ -59,8 +58,7 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
             results.CheckResults.GetFormatSpecifierLocationsAndArity()
             |> Seq.filter (fun (r, _) ->
                 let range = getDocumentRange document r
-                argRange.Contains(&range)
-            )
+                argRange.Contains(&range))
             |> List.ofSeq
 
         match matchingFormatSpecifiers with
@@ -85,8 +83,7 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
             results.CheckResults.GetFormatSpecifierLocationsAndArity()
             |> Seq.map (fun (r, _) ->
                 let textRange = getTextRange document r
-                DocumentRange(document, textRange), document.GetText(textRange)
-            )
+                DocumentRange(document, textRange), document.GetText(textRange))
             |> Seq.filter (fun (range, _) -> argRange.Contains(&range))
             |> Array.ofSeq
 
@@ -107,7 +104,7 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
             |> Seq.map (fun (specifierRange, text) -> specifierRange.EndOffset.Offset - startOffset, text)
             |> Seq.rev
             |> Seq.zip appliedExprs
-            |> Seq.map (fun (expr, (i, text)) -> i, InsertInterpolation (text, expr))
+            |> Seq.map (fun (expr, (i, specifier)) -> i, InsertInterpolation (specifier, expr.GetText()))
 
         let formatString = literalExpr.GetText()
 
@@ -125,21 +122,28 @@ type ToInterpolatedStringAction(dataProvider: FSharpContextActionDataProvider) =
             |> Seq.sortByDescending fst
             |> List.ofSeq
 
-        let interpolatedSb = StringBuilder(formatString)
+        let interpolatedSb =
+            let extraCapacity =
+                manipulations
+                |> Seq.sumBy (function
+                    | _, EscapeBrace _ -> 1
+                    | _, InsertInterpolation (_, exprText) -> 2 + exprText.Length)
+
+            StringBuilder(formatString, formatString.Length + 1 + extraCapacity)
+
         for index, manipulation in manipulations do
             match manipulation with
             | EscapeBrace braceChar ->
                 interpolatedSb.Insert(index, braceChar) |> ignore
-            | InsertInterpolation (text, expr) ->
+            | InsertInterpolation (formatSpecifier, exprText) ->
                 let index =
                     // %O is the implied default in interpolated strings
-                    if text = "%O" then
+                    if formatSpecifier = "%O" then
                         interpolatedSb.Remove(index - 2, 2) |> ignore
                         index - 2
                     else
                         index
 
-                let exprText = expr.GetText()
                 interpolatedSb
                     .Insert(index, '{')
                     .Insert(index + 1, exprText)
