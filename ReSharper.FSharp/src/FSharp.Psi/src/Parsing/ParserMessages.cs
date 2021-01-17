@@ -21,6 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_INHERIT_MEMBER = "";
     public const string IDS_CONSTRUCTOR_DECLARATION = "";
     public const string IDS_MEMBER_PARAMS_DECLARATION = "";
+    public const string IDS_MEMBER_SELF_ID = "";
     public const string IDS_MEMBER_KEYWORD = "";
     public const string IDS_SELF_ID = "";
     public const string IDS_NOT_COMPILED_TYPE_DECLARATION = "";

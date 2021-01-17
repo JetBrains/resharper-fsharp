@@ -12,7 +12,7 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
 open JetBrains.ProjectModel.Tasks
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel

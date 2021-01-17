@@ -14,8 +14,10 @@ open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework.Projects
 open JetBrains.Util.Dotnet.TargetFrameworkIds
@@ -73,6 +75,19 @@ type FSharpSignatureTestAttribute() =
 
 type FSharpScriptTestAttribute() =
     inherit FSharpTestAttribute(FSharpScriptProjectFileType.FsxExtension)
+
+
+[<AttributeUsage(AttributeTargets.Method ||| AttributeTargets.Class, Inherited = false)>]
+type FSharpLanguageLevelAttribute(languageLevel: FSharpLanguageLevel) =
+    inherit TestAspectAttribute()
+
+    override this.OnBeforeTestExecute(context) =
+        let project = context.TestProject
+
+        let property = project.GetSolution().GetComponent<FSharpLanguageLevelProjectProperty>()
+        property.OverrideLanguageLevel(context.TestLifetime, languageLevel, project)
+
+        PsiFileCachedDataUtil.InvalidateInAllProjectFiles(project, FSharpLanguage.Instance, FSharpLanguageLevel.key)
 
 
 [<SolutionComponent>]

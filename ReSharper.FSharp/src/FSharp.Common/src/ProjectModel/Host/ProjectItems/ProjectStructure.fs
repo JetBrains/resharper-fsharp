@@ -1,4 +1,4 @@
-module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ProjectStructure
+module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ProjectStructure
 
 open System
 open JetBrains.Diagnostics
@@ -6,7 +6,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features.ProjectModel.View
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.Appenders.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model
 
 [<SolutionComponent>]

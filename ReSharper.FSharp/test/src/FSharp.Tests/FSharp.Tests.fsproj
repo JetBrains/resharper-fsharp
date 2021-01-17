@@ -45,6 +45,7 @@
     <Compile Include="Daemon\ListConsPatAnalyzerTest.fs" />
     <Compile Include="Daemon\AppExprAnalyzerTest.fs" />
     <Compile Include="Daemon\LambdaAnalyzerTest.fs" />
+    <Compile Include="Daemon\SelfIdAnalyzerTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\FSharpQuickFixTestBase.fs" />

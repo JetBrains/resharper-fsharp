@@ -108,6 +108,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let binding = letBindings.Bindings.First()
             binding.HeadPattern :?> _
 
+        member x.CreateWildSelfId() =
+            let typeDecl = getTypeDecl "member _.P = 1"
+            let memberDecl = typeDecl.TypeMembers.[0] :?> IMemberDeclaration
+            memberDecl.SelfId :?> IWildSelfId
+
         member x.CreateIgnoreApp(expr, newLine) =
             let source = "() |> ignore"
 

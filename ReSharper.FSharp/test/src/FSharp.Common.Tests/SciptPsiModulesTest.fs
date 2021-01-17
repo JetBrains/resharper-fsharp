@@ -17,8 +17,8 @@ open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost.Impl
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ProjectStructure
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules

@@ -1,4 +1,4 @@
-module rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+module rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 
 open System
 open System.Collections.Generic

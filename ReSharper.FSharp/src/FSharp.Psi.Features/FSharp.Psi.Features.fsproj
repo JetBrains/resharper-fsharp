@@ -65,6 +65,7 @@
     <Compile Include="src\Daemon\Stages\InferredTypeCodeVisionProvider.fs" />
     <Compile Include="src\Daemon\Stages\FSharpSyntaxHighlightingStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
+    <Compile Include="src\Daemon\Analyzers\ElementProblemAnalyzerUtil.fs" />
     <Compile Include="src\Daemon\Analyzers\ReSpellerHelper.fs" />
     <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\AttributeTargetAnalyzer.fs" />
@@ -83,6 +84,7 @@
     <Compile Include="src\Daemon\Analyzers\ListConsPatAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\AppExpressionAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\LambdaAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\SelfIdAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
@@ -194,6 +196,7 @@
     <Compile Include="src\QuickFixes\GenerateMissingOverridesFix.fs" />
     <Compile Include="src\QuickFixes\RemoveRedundantAttributeFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithAbbreviatedTypeFix.fs" />
+    <Compile Include="src\QuickFixes\UseWildSelfIdFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

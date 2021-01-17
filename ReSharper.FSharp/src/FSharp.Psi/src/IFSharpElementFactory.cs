@@ -8,7 +8,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   public interface IFSharpElementFactory
   {
     IOpenStatement CreateOpenStatement(string ns);
+
     IWildPat CreateWildPat();
+    IWildSelfId CreateWildSelfId();
 
     IParenExpr CreateParenExpr();
     IConstExpr CreateConstExpr(string text);

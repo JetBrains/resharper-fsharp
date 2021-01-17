@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host
 
 open System
 open JetBrains.Application
@@ -9,6 +9,7 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild.Extensions
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.EditProperties.Projects.MsBuild
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.EditProperties.Projects.MsBuild.Providers
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.EditProperties.Utils
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.Util
 
 [<ShellFeaturePart>]

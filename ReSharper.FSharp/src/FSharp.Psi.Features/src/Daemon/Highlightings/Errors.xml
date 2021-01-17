@@ -61,6 +61,10 @@
         <Title>Lambda expression can be replaced with built-in function</Title>
         <Description>Lambda expression can be replaced with built-in function.</Description>
       </Tag>
+      <Tag name="FSharpUseWildSelfId" default="SUGGESTION">
+        <Title>Use `_` self id</Title>
+        <Description>Use `_` self id.</Description>
+      </Tag>
     </Group>
   </SeverityConfiguration>
 
@@ -223,6 +227,13 @@
       <Argument>sprintf "Lambda can be replaced with '%s'" funName</Argument>
     </Message>
     <QuickFix>ReplaceLambdaWithBuiltinFunctionFix</QuickFix>
+  </Warning>
+
+  <Warning name="UseWildSelfId" configurableSeverity="FSharpRedundantYields">
+    <Parameter type="INamedSelfId" name="selfId" />
+    <Message value="Use '_'"/>
+    <Range>selfId.GetDocumentRange()</Range>
+    <QuickFix>UseWildSelfIdFix</QuickFix>
   </Warning>
 
 </Errors>

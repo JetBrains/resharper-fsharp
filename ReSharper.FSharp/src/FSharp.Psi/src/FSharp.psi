@@ -1171,10 +1171,10 @@ interface memberSelfId:
 
 ctorSelfId options { stubBase="LocalDeclarationBase"; }:
   AS
-  IDENTIFIER<IDENTIFIER, Identifier>;
+  identifier<IDENTIFIER, Identifier>;
 
 namedSelfId options { stubBase="LocalDeclarationBase"; }:
-  IDENTIFIER<IDENTIFIER, Identifier>;  
+  identifier<IDENTIFIER, Identifier>;  
 
 wildSelfId options { stubBase="LocalDeclarationBase"; }:
   UNDERSCORE<UNDERSCORE, Underscore>;

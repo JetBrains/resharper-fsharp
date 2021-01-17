@@ -16,7 +16,7 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild.Internal
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Structure
 open JetBrains.ProjectModel.Update
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.TestFramework
 open JetBrains.Util

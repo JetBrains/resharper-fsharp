@@ -15,10 +15,10 @@ type FSharpLanguageLevel =
     /// Anon records
     | FSharp46 = 46
 
-    /// Implicit yield, nameof
+    /// Implicit yield
     | FSharp47 = 47
 
-    /// String interpolation, open types
+    /// String interpolation, nameof, open types
     | FSharp50 = 50
 
     | Latest = 50
@@ -28,7 +28,6 @@ type FSharpLanguageLevel =
 
 type FSharpLanguageVersion =
     | Default = 0
-    | FSharp45 = 45
     | FSharp46 = 46
     | FSharp47 = 47
     | FSharp50 = 50
@@ -47,7 +46,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageLevel.Preview -> FSharpLanguageVersion.Preview
         | _ -> failwithf $"Unexpected language level: {level}"
 
-    let cachedLevelKey = Key<Boxed<FSharpLanguageLevel>>("LanguageLevel")
+    let key = Key<Boxed<FSharpLanguageLevel>>("LanguageLevel")
 
     let private ofPsiModuleNoCache (psiModule: IPsiModule) =
         let levelProvider = 
@@ -61,7 +60,7 @@ module FSharpLanguageLevel =
 
     [<Extension; CompiledName("GetLanguageLevel")>]
     let ofTreeNode (treeNode: ITreeNode) =
-        PsiFileCachedDataUtil.GetPsiModuleData<FSharpLanguageLevel>(treeNode, cachedLevelKey, ofPsiModuleNoCache)
+        PsiFileCachedDataUtil.GetPsiModuleData<FSharpLanguageLevel>(treeNode, key, ofPsiModuleNoCache)
 
     [<Extension; CompiledName("IsFSharp47Supported")>]
     let isFSharp47Supported (treeNode: ITreeNode) =
@@ -83,7 +82,6 @@ module FSharpLanguageVersion =
         | IgnoreCase "Latest" -> FSharpLanguageVersion.Latest 
         | IgnoreCase "Preview" -> FSharpLanguageVersion.Preview
 
-        | "4.5" -> FSharpLanguageVersion.FSharp45
         | "4.6" -> FSharpLanguageVersion.FSharp46
         | "4.7" -> FSharpLanguageVersion.FSharp47
         | "5" | "5.0" -> FSharpLanguageVersion.FSharp50
