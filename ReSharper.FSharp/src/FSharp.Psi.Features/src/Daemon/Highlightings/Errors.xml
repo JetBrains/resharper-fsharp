@@ -65,6 +65,10 @@
         <Title>Use `_` self id</Title>
         <Description>Use `_` self id.</Description>
       </Tag>
+      <Tag name="FSharpInterpolatedString" default="SUGGESTION">
+        <Title>Format string can be replaced with an interpolated string</Title>
+        <Description>Format string can be replaced with an interpolated string.</Description>
+      </Tag>
     </Group>
   </SeverityConfiguration>
 
@@ -234,6 +238,16 @@
     <Message value="Use '_'"/>
     <Range>selfId.GetDocumentRange()</Range>
     <QuickFix>UseWildSelfIdFix</QuickFix>
+  </Warning>
+
+  <Warning name="InterpolatedStringCandidate" configurableSeverity="FSharpInterpolatedString">
+    <Parameter type="ILiteralExpr" name="formatStringExpr"/>
+    <Parameter type="IPrefixAppExpr" name="prefixAppExpr"/>
+    <Parameter type="IFSharpExpression" name="outerPrefixAppExpr"/>
+    <Parameter type="(DocumentRange * IFSharpExpression) list" name="formatSpecsAndExprs" isValid="skip"/>
+    <Range>formatStringExpr.GetHighlightingRange()</Range>
+    <Message value="Format string can be replaced with an interpolated string"/>
+    <QuickFix>ReplaceWithInterpolatedStringFix</QuickFix>
   </Warning>
 
 </Errors>
