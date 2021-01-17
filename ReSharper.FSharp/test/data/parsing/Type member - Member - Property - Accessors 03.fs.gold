@@ -19,7 +19,7 @@ IFSharpImplFile
           IMemberDeclaration
             FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IMemberSelfId
+            INamedSelfId
               FSharpIdentifierToken(type:IDENTIFIER, text:x)
             FSharpTokenType+DotTokenElement(type:DOT, text:.)
             FSharpIdentifierToken(type:IDENTIFIER, text:P)
@@ -39,7 +39,7 @@ IFSharpImplFile
                 IUnitExpr
                   FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                   FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            IMemberSelfId
+            INamedSelfId
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+AndTokenElement(type:AND, text:and)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

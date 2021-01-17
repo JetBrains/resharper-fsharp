@@ -1165,12 +1165,19 @@ interface selfId:
   ctorSelfId |
   memberSelfId;
 
+interface memberSelfId:
+  namedSelfId |
+  wildSelfId;
+
 ctorSelfId options { stubBase="LocalDeclarationBase"; }:
   AS
   IDENTIFIER<IDENTIFIER, Identifier>;
 
-memberSelfId options { stubBase="LocalDeclarationBase"; }:
+namedSelfId options { stubBase="LocalDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>;  
+
+wildSelfId options { stubBase="LocalDeclarationBase"; }:
+  UNDERSCORE<UNDERSCORE, Underscore>;
 
 secondaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
   get { methodName="Expression" path=<secondaryConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };

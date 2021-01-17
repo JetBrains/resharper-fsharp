@@ -31,7 +31,7 @@ IFSharpImplFile
           IMemberDeclaration
             FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IMemberSelfId
+            INamedSelfId
               FSharpIdentifierToken(type:IDENTIFIER, text:x)
             FSharpTokenType+DotTokenElement(type:DOT, text:.)
             FSharpIdentifierToken(type:IDENTIFIER, text:Foo)

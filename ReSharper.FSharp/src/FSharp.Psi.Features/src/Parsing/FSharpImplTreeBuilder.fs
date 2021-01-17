@@ -319,7 +319,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                         ElementType.MEMBER_DECLARATION
 
                 | selfId :: _ :: _ ->
-                    x.MarkAndDone(selfId.idRange, ElementType.MEMBER_SELF_ID)
+                    let selfIdNodeType =
+                        if selfId.idText = "_" then ElementType.WILD_SELF_ID else ElementType.NAMED_SELF_ID
+                    x.MarkAndDone(selfId.idRange, selfIdNodeType)
 
                     match accessorId with
                     | Some ident ->

@@ -35,7 +35,7 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
             FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IMemberSelfId
+            INamedSelfId
               FSharpIdentifierToken(type:IDENTIFIER, text:x)
             FSharpTokenType+DotTokenElement(type:DOT, text:.)
             FSharpIdentifierToken(type:IDENTIFIER, text:A)
@@ -64,7 +64,7 @@ IFSharpImplFile
               IChameleonExpression
                 ILiteralExpr
                   FSharpToken(type:INT32, text:1)
-            IMemberSelfId
+            INamedSelfId
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
             FSharpTokenType+AndTokenElement(type:AND, text:and)
