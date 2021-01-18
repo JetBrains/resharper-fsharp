@@ -1218,7 +1218,7 @@ type FSharpTypingAssist
         if not (isBacktick lexer) then false else
         if prevTokenIs isBacktick lexer || nextTokenIs isBacktick lexer then false else
 
-        if lexer.FindTokenAt(offset) && lexer.TokenType == FSharpTokenType.IDENTIFIER then
+        if lexer.FindTokenAt(offset) && lexer.TokenType == FSharpTokenType.IDENTIFIER || lexer.TokenType.IsKeyword then
             textControl.Document.InsertText(lexer.TokenEnd, "``")
             textControl.Document.InsertText(offset, "`")
         else
