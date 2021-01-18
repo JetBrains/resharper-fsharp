@@ -1,7 +1,0 @@
-﻿match [] with
-| |_ :: []|(0) -> ()
-| _ :: |_ :: []|(1) -> ()
-
----------------------------------------------------------
-(0): ReSharper Suggestion: Pattern can be simplified
-(1): ReSharper Suggestion: Pattern can be simplified

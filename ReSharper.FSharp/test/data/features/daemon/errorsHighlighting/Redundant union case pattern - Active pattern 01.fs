@@ -1,3 +1,5 @@
+module Module
+
 open System.Collections.Generic
 
 match KeyValuePair(1, 2) with

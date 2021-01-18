@@ -1,0 +1,8 @@
+﻿module Module
+
+match None with
+| Some (|x|(0) :: _, _) -> ()
+| _ -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: The value 'x' is unused

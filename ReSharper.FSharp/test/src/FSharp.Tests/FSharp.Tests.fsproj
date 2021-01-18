@@ -28,6 +28,7 @@
     <Compile Include="Parsing\FSharpParserTest.fs" />
     <Compile Include="Daemon\FSharpHighlightingTestBase.fs" />
     <Compile Include="Daemon\IdentifierHighlightingTest.fs" />
+    <Compile Include="Daemon\FcsErrorsHighlightingTest.fs" />
     <Compile Include="Daemon\ErrorsHighlightingTest.fs" />
     <Compile Include="Daemon\FormatSpecifiersHighlightingTest.fs" />
     <Compile Include="Daemon\InferredTypeCodeVisionProviderTest.fs" />
@@ -41,11 +42,8 @@
     <Compile Include="Daemon\RedundantAttributeSuffixAnalyzerTest.fs" />
     <Compile Include="Daemon\FSharpColorHighlightingTest.fs" />
     <Compile Include="Daemon\RedundantQualifiersTest.fs" />
-    <Compile Include="Daemon\RedundantUnionCaseFieldPatsTest.fs" />
-    <Compile Include="Daemon\ListConsPatAnalyzerTest.fs" />
     <Compile Include="Daemon\AppExprAnalyzerTest.fs" />
     <Compile Include="Daemon\LambdaAnalyzerTest.fs" />
-    <Compile Include="Daemon\SelfIdAnalyzerTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\FSharpQuickFixTestBase.fs" />
