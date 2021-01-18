@@ -17,7 +17,7 @@ type InterpolatedStringCandidateAnalyzer() =
 
     let nodeSelectionProvider = FSharpTreeNodeSelectionProvider.Instance
 
-    let isSingleQuoteStringLiteral (literalExpr : ILiteralExpr) =
+    let isDisallowedStringLiteral (literalExpr : ILiteralExpr) =
         let tokenType = getTokenType literalExpr.Literal
         tokenType = FSharpTokenType.STRING ||
         tokenType = FSharpTokenType.BYTEARRAY ||
@@ -68,7 +68,6 @@ type InterpolatedStringCandidateAnalyzer() =
 
         if appliedExprs.Length <> matchingFormatSpecsAndArity.Length then () else
 
-
         // Check that the applied expressions do not contain disallowed string literals
         let anyDisallowedExprs =
             let isDisallowed =
@@ -76,11 +75,13 @@ type InterpolatedStringCandidateAnalyzer() =
                     Predicate<_>(fun (literalExpr: ILiteralExpr) ->
                         getTokenType literalExpr.Literal = FSharpTokenType.TRIPLE_QUOTED_STRING)
                 else
-                    Predicate<_>(isSingleQuoteStringLiteral)
+                    Predicate<_>(isDisallowedStringLiteral)
 
+            let fsFile = prefixAppExpr.FSharpFile
             appliedExprs
             |> List.exists (fun expr ->
-                nodeSelectionProvider.GetExpressionInRange<ILiteralExpr>(prefixAppExpr.FSharpFile, expr.GetHighlightingRange(), false, isDisallowed) <> null)
+                let range = expr.GetHighlightingRange()
+                nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, isDisallowed) <> null)
 
         if anyDisallowedExprs then () else
 
