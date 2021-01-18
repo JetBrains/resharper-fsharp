@@ -294,17 +294,18 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Surround 05``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Surround 06``() = x.DoNamedTest()
 
-    [<Test>] member x.``Backticks 01 - Finish id``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks - Skip 02 - End``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks - Skip 01 - Start``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks - Skip 03 - No skip``() = x.DoNamedTest()
 
+    [<Test>] member x.``Backticks 01 - Finish id``() = x.DoNamedTest()
     [<Test>] member x.``Backticks 02 - Insert 01``() = x.DoNamedTest()
 
     [<Test; Explicit(reason = "Is `` erased in test?")>]
     member x.``Backticks 03 - Insert 02``() = x.DoNamedTest()
 
-    [<Test>] member x.``Backticks 04 - Skip``() = x.DoNamedTest()
-    [<Test>] member x.``Backticks 05 - No skip``() = x.DoNamedTest()
-    [<Test>] member x.``Backticks 06 - Before ident``() = x.DoNamedTest()
-    [<Test>] member x.``Backticks 07 - Before keyword``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks 04 - Before ident``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks 05 - Before keyword``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type LineIndentsTest() =
