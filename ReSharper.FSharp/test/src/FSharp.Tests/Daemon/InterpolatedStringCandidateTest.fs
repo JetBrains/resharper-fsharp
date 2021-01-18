@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages(FSharpCorePackage)>]
+[<TestPackages("FSharp.Core/5.0.0")>]
 type InterpolatedStringCandidateTest() =
     inherit FSharpHighlightingTestBase()
 
