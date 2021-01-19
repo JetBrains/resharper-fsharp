@@ -460,6 +460,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Pattern - Parameters owner 02 - Qualified``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Parameters owner 03 - Tuple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - IsInst 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - IsInst 02 - Function``() = x.DoNamedTest()
+
     [<Test>] member x.``Pattern - ListCons - Compiled name 01 - Let``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - ListCons - Compiled name 02 - Match``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - ListCons - Compiled name 03 - Typed``() = x.DoNamedTest()

@@ -17,6 +17,7 @@ type RedundantParenTypeUsageTest() =
 
     [<Test>] member x.``Array 01``() = x.DoNamedTest()
     [<Test>] member x.``Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function 02 - IsInstPat``() = x.DoNamedTest()
     [<Test>] member x.``Parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Paren 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()

@@ -26,7 +26,8 @@ type RedundantParenTypeUsageAnalyzer() =
             isNotNull (TupleTypeUsageNavigator.GetByItem(context)) ||
             isNotNull (FunctionTypeUsageNavigator.GetByArgumentTypeUsage(context)) ||
             isNotNull (ArrayTypeUsageNavigator.GetByType(context)) ||
-            isNotNull (PostfixAppTypeArgumentListNavigator.GetByType(context))
+            isNotNull (PostfixAppTypeArgumentListNavigator.GetByType(context)) ||
+            isNotNull (IsInstPatNavigator.GetByType(context))
 
         | _ -> false
 
