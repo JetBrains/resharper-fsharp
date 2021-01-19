@@ -467,6 +467,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Pattern - ListCons 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - ListCons 03 - Let``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - Null 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - QuoteExpr 01``() = x.DoNamedTest()
+
 
 [<FSharpSignatureTest>]
 type FSharpSignatureParserTest() =
@@ -535,6 +538,8 @@ type FSharpErrorsParserTest() =
 
     [<Test>] member x.``Expr - Object expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Object expr 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pat - Char range 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
 

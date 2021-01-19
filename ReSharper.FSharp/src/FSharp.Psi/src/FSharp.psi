@@ -244,7 +244,10 @@ interface fSharpPattern:
   wildPat |
   constPat |
   fieldPat |
-  otherPat;
+  nullPat |
+  quoteExprPat |
+  charRangePat |
+  fromErrorPat;  
 
 interface namedPat:
   referencePat |
@@ -372,9 +375,21 @@ unitPat options { stubBase="FSharpPatternBase"; }:
   LPAREN<LPAREN, LParen>
   RPAREN<RPAREN, RParen>;
 
+nullPat options { stubBase="FSharpPatternBase"; }:
+  NULL;
 
-otherPat options { stubBase="FSharpPatternBase"; }:
-  fakeSeparator;
+quoteExprPat options { stubBase="FSharpPatternBase"; } extras {
+  get { methodName="Expression" path=<quoteExprPat:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
+  chameleonExpression<CHAMELEON_EXPR, QuoteExpr>;
+
+charRangePat options { stubBase="FSharpPatternBase"; }:
+  CHARACTER_LITERAL
+  DOT_DOT
+  CHARACTER_LITERAL;
+
+fromErrorPat options { stubBase="FSharpPatternBase"; }:
+  fSharpPattern<PATTERN, Pattern>;
 
 
 interface fSharpExpression:

@@ -536,8 +536,17 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 x.Done(mark, if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT)
                 ElementType.OPTIONAL_VAL_PAT
 
-            | _ ->
-                ElementType.OTHER_PAT
+            | SynPat.QuoteExpr(expr, _) ->
+                x.MarkChameleonExpression(expr)
+                ElementType.QUOTE_EXPR_PAT
+
+            | SynPat.Null _ -> ElementType.NULL_PAT
+            | SynPat.DeprecatedCharRange _ -> ElementType.CHAR_RANGE_PAT
+
+            // todo: mark inner pattern, assert ranges
+            | SynPat.FromParseError _ -> ElementType.FROM_ERROR_PAT
+
+            | SynPat.InstanceMember _ -> failwith $"Unexpected pattern: {pat}"
 
         x.Done(range, patMark, elementType)
 

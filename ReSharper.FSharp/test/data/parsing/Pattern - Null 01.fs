@@ -1,0 +1,2 @@
+match () with
+| null -> ()
