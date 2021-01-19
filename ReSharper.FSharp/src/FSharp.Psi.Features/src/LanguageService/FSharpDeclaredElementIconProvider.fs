@@ -24,11 +24,14 @@ type FSharpDeclaredElementIconProvider() =
     let mutableInternalField = compose mutableField PsiSymbolsThemedIcons.ModifiersInternal.Id
 
     interface IDeclaredElementIconProvider with
-        member x.GetImageId(declaredElement, _, [<Out>] canApplyExtensions) =
+        member x.GetImageId(declaredElement, lang, [<Out>] canApplyExtensions) =
             canApplyExtensions <- true
 
             match declaredElement with
             | :? IFSharpModule -> FSharpIcons.FSharpModule.Id
+
+            | :? IFSharpGeneratedFromUnionCase as e ->
+                (x :> IDeclaredElementIconProvider).GetImageId(e.OriginElement, lang, &canApplyExtensions)
 
             | :? IUnionCase as unionCase ->
                 canApplyExtensions <- false
