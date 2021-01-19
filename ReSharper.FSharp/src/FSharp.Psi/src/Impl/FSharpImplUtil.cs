@@ -722,6 +722,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return fsExpr;
     }
 
+    [CanBeNull]
+    public static ITypeUsage IgnoreParentParens([CanBeNull] this ITypeUsage typeUsage)
+    {
+      if (typeUsage == null) return null;
+
+      while (typeUsage.Parent is IParenTypeUsage parenExpr)
+        typeUsage = parenExpr;
+      return typeUsage;
+    }
+
     public static ITreeNode IgnoreParentChameleonExpr([NotNull] this ITreeNode treeNode) =>
       treeNode.Parent is IChameleonExpression parenExpr
         ? parenExpr.Parent

@@ -4,6 +4,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 type RemoveRedundantParenExprFix(warning: RedundantParenExprWarning) =
-    inherit ReplaceWithInnerExpressionFixBase(warning.ParenExpr, warning.ParenExpr.InnerExpression)
+    inherit ReplaceWithInnerTreeNodeFixBase(warning.ParenExpr, warning.ParenExpr.InnerExpression)
+
+    override x.Text = "Remove redundant parens"
+
+type RemoveRedundantParenTypeUsageFix(warning: RedundantParenTypeUsageWarning) =
+    inherit ReplaceWithInnerTreeNodeFixBase(warning.ParenTypeUsage, warning.ParenTypeUsage.InnerTypeUsage)
 
     override x.Text = "Remove redundant parens"

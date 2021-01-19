@@ -298,7 +298,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let elementFactory = sourceExpr.CreateElementFactory()
 
         let indentShift = contextExpr.Indent - sourceExpr.Indent
-        shiftExpr indentShift sourceExpr
+        shiftNode indentShift sourceExpr
 
         let letBindings = createBinding contextExpr contextDecl name
         setBindingExpression sourceExpr contextIndent letBindings

@@ -179,7 +179,7 @@ let addParens (expr: IFSharpExpression) =
     let parenExpr = ModificationUtil.ReplaceChild(expr, parenExpr)
     let expr = parenExpr.SetInnerExpression(exprCopy)
 
-    shiftExpr 1 expr
+    shiftNode 1 expr
     expr
 
 

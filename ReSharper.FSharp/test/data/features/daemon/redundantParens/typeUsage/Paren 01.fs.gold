@@ -1,0 +1,10 @@
+﻿module Module
+
+type TP1 = |(|(0)(int * int)|)|(1) []
+type TP2 = |(|(2)(int -> int)|)|(3) -> int
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses

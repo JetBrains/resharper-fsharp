@@ -316,10 +316,12 @@ type FSharpParserTest() =
     [<Test>] member x.``Types - Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Simple 02 - Long ident``() = x.DoNamedTest()
     [<Test>] member x.``Types - Simple 03 - Type app``() = x.DoNamedTest()
-
-    // todo: fix parens are not in type nodes in FCS
     [<Test>] member x.``Types - Simple 04 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Types - Simple 05 - Nested parens``() = x.DoNamedTest()
+
+    [<Test>] member x.``Types - Paren - App 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Paren - App 02``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Paren - App 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Types - Type app 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Type app 02 - ML-style``() = x.DoNamedTest()

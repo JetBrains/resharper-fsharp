@@ -45,13 +45,12 @@ type FSharpInlineVariable(workflow, solution, driver) =
     override x.ProcessReferenceWithContext(reference, _, info) =
         let referenceOwner = reference.GetTreeNode()
         use cookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let expr = info.InlinedMethodInfo.Expression :?> IFSharpExpression
         let exprCopy = expr.Copy()
 
         let indentShift = referenceOwner.Indent - exprIndent
-        shiftExpr indentShift exprCopy
+        shiftNode indentShift exprCopy
         
         let newExpr = ModificationUtil.ReplaceChild(referenceOwner, exprCopy)
         addParensIfNeeded newExpr |> ignore

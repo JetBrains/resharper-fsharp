@@ -1529,9 +1529,9 @@ arrayTypeUsage:
   RBRACK;
 
 functionTypeUsage:
-  typeUsage
+  typeUsage<ARG_TYPE, ArgumentTypeUsage>
   RARROW
-  typeUsage;
+  typeUsage<RETURN_TYPE, ReturnTypeUsage>;
 
 anonTypeUsage:
   UNDERSCORE;

@@ -1,0 +1,12 @@
+﻿module Module
+
+type TP1 = (int * int) option
+type TP2 = (int -> int) option
+type TP3 = |(|(0)int []|)|(1) option
+type TP4 = |(|(2)int option|)|(3) option
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses

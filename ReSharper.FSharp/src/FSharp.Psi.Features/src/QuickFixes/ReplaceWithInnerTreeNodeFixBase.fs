@@ -9,19 +9,19 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 [<AbstractClass>]
-type ReplaceWithInnerExpressionFixBase(parentExpr: IFSharpExpression, innerExpr: IFSharpExpression) =
+type ReplaceWithInnerTreeNodeFixBase(parentNode: IFSharpTreeNode, innerNode: IFSharpTreeNode) =
     inherit FSharpQuickFixBase()
 
     override x.IsAvailable _ =
-        isValid parentExpr && isValid innerExpr
+        isValid parentNode && isValid innerNode
 
     override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(parentExpr.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(parentNode.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let parenExprIndent = parentExpr.Indent
-        let innerExprIndent = innerExpr.Indent
+        let parenExprIndent = parentNode.Indent
+        let innerExprIndent = innerNode.Indent
         let indentDiff = parenExprIndent - innerExprIndent
 
-        let expr = ModificationUtil.ReplaceChild(parentExpr, innerExpr.Copy())
-        shiftExpr indentDiff expr
+        let expr = ModificationUtil.ReplaceChild(parentNode, innerNode.Copy())
+        shiftNode indentDiff expr

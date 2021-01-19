@@ -76,6 +76,7 @@
     <Compile Include="src\Daemon\Analyzers\LetDisposableAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantParenExprAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantParenPatAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\RedundantParenTypeUsageAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\InactivePreprocessorBranchAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\AttributeRedundanciesAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\ColorReferenceAnalyzer.fs" />
@@ -183,8 +184,8 @@
     <Compile Include="src\QuickFixes\RemoveRedundantQualifierFix.fs" />
     <Compile Include="src\QuickFixes\AddParensToApplicationFix.fs" />
     <Compile Include="src\QuickFixes\AddExtensionAttributeFix.fs" />
-    <Compile Include="src\QuickFixes\ReplaceWithInnerExpressionFixBase.fs" />
-    <Compile Include="src\QuickFixes\RemoveRedundantParenExprFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithInnerTreeNodeFixBase.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantParens.fs" />
     <Compile Include="src\QuickFixes\NamespaceToModuleFix.fs" />
     <Compile Include="src\QuickFixes\SimplifyListConsPatFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceAppExprWithArgFix.fs" />

@@ -13,6 +13,10 @@
 
   <SeverityConfiguration>
     <Group name="HighlightingGroupIds.CodeRedundancy">
+      <Tag name="FSharpRedundantParens" default="WARNING">
+        <Title>Remove redundant parentheses</Title>
+        <Description>Parentheses can be safely removed without changing code semantics.</Description>
+      </Tag>
       <Tag name="FSharpRedundantOpen" default="WARNING">
         <Title>Redundant 'open' directive</Title>
         <Description>Open directive is not required by the code and can be safely removed.</Description>
@@ -137,6 +141,8 @@
     <Parameter type="IParenExpr" name="parenExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
+    <Range>parenExpr.LeftParen.GetHighlightingRange()</Range>
+    <SecondaryRanges>secondaryRangesFromNode parenExpr.RightParen</SecondaryRanges>
     <QuickFix>RemoveRedundantParenExprFix</QuickFix>
   </Warning>
 
@@ -144,7 +150,18 @@
     <Parameter type="IParenPat" name="parenPat"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
+    <Range>parenPat.LeftParen.GetHighlightingRange()</Range>
+    <SecondaryRanges>secondaryRangesFromNode parenPat.RightParen</SecondaryRanges>
     <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantParenTypeUsage" configurableSeverity="FSharpRedundantParens">
+    <Parameter type="IParenTypeUsage" name="parenTypeUsage"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant parentheses"/>
+    <Range>parenTypeUsage.LeftParen.GetHighlightingRange()</Range>
+    <SecondaryRanges>secondaryRangesFromNode parenTypeUsage.RightParen</SecondaryRanges>
+    <QuickFix>RemoveRedundantParenTypeUsageFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantAttributeParens" configurableSeverity="FSharpRedundantAttributeParens">

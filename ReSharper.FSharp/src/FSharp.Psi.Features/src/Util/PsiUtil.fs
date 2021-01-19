@@ -400,7 +400,7 @@ let shiftWhitespaceBefore shift (whitespace: Whitespace) =
     else
         ModificationUtil.DeleteChild(whitespace)
 
-let shiftExpr shift (expr: IFSharpExpression) =
+let shiftNode shift (expr: #IFSharpTreeNode) =
     if shift = 0 then () else
 
     for child in List.ofSeq (expr.Tokens()) do
@@ -428,7 +428,7 @@ let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
         if shift > 0 then
             ModificationUtil.AddChildBefore(expr, Whitespace(shift)) |> ignore
 
-    shiftExpr shift expr
+    shiftNode shift expr
 
 
 let withNewLineAndIndentBefore (indent: int) (node: IFSharpTreeNode) =
