@@ -1,0 +1,11 @@
+﻿module Module
+
+let a = |new|(0) System.Action<_>(fun _ -> ())
+
+------------------------------------------------
+0: 'new' keyword is redundant
+QUICKFIXES:
+Remove redundant 'new'
+--Remove redundant 'new' in file
+--Remove redundant 'new' in project
+--Remove redundant 'new' in solution
