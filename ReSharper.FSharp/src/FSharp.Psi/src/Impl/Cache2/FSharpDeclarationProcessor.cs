@@ -146,6 +146,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitMemberDeclaration(IMemberDeclaration decl) => 
       Builder.AddDeclaredMemberName(decl.CompiledName);
 
+    public override void VisitMemberSignature(IMemberSignature decl) =>
+      Builder.AddDeclaredMemberName(decl.CompiledName);
+
     public override void VisitTypeDeclarationGroup(ITypeDeclarationGroup typeDeclarationGroupParam)
     {
       foreach (var typeDeclaration in typeDeclarationGroupParam.TypeDeclarationsEnumerable) 

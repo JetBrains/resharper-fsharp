@@ -1135,7 +1135,15 @@ interface fSharpTypeMemberDeclaration:
 interface overridableMemberDeclaration:
   abstractMemberDeclaration |
   autoPropertyDeclaration |
-  memberDeclaration;
+  memberSignatureOrDeclaration;
+
+interface memberSignatureOrDeclaration:
+  memberDeclaration |
+  memberSignature;
+
+interface memberSignatureLikeDeclaration:
+  abstractMemberDeclaration |
+  memberSignature;
 
 
 interface constructorDeclaration:
@@ -1229,13 +1237,30 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
     EQUALS<FSHARP_EQUALS, EqualsToken>
     chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>
   |
-    WITH
-    accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
-    (
-      AND
-      accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
-    )?
+    accessorDecls
   );
+
+memberSignature  options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<memberSignature:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<memberSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  STATIC<STATIC, StaticKeyword>?
+  memberKeyword{MEMBER_KEYWORD, MemberKeyword}
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  identOrOpName{IDENTIFIER, Identifier}
+  typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  COLON
+  typeUsage<TYPE, Type>
+  accessorDecls?;
+
+private accessorDecls:
+  WITH
+  accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
+  (
+    AND
+    accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
+  )?;
 
 private memberKeyword{ROLE, Getter}:
   MEMBER<@ROLE, @Getter> |
@@ -1251,7 +1276,8 @@ abstractMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationB
   MEMBER<MEMBER, MemberKeyword>?
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*;
+  COLON
+  typeUsage<TYPE, Type>;
 
 valFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<valFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -1519,9 +1545,11 @@ interface typeUsage:
 
 
 namedTypeUsage:
+  topLevelTypeParameterDecl
   typeReferenceName<TYPE_REFERENCE, ReferenceName>;
 
 tupleTypeUsage:
+  topLevelTypeParameterDecl
   typeUsage<ITEM, Items>
   (
     STAR
@@ -1529,6 +1557,7 @@ tupleTypeUsage:
   )*;
 
 anonRecordTypeUsage:
+  topLevelTypeParameterDecl
   LBRACE_BAR
   anonRecordField<FIELD, Fields>*
   BAR_RBRACE;
@@ -1539,22 +1568,39 @@ anonRecordField:
   typeUsage<TYPE, Type>;
 
 arrayTypeUsage:
+  topLevelTypeParameterDecl
   typeUsage<TYPE, Type>
   LBRACK
   RBRACK;
 
 functionTypeUsage:
+  topLevelTypeParameterDecl
   typeUsage<ARG_TYPE, ArgumentTypeUsage>
   RARROW
+  topLevelTypeParameterDecl
   typeUsage<RETURN_TYPE, ReturnTypeUsage>;
 
 anonTypeUsage:
   UNDERSCORE;
 
 parenTypeUsage:
+  topLevelTypeParameterDecl
   LPAREN<LPAREN, LeftParen>
   typeUsage<TYPE, InnerTypeUsage>
   RPAREN<RPAREN, RightParen>;
 
 unsupportedTypeUsage:
   fakeSeparator;
+
+
+private topLevelTypeParameterDecl:
+  topLevelTypeAttribute?
+  topLevelTypeParameterName?;
+  
+
+private topLevelTypeAttribute:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*;
+
+private topLevelTypeParameterName:
+  IDENTIFIER
+  COLON;

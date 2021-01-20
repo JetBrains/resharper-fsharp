@@ -1,0 +1,15 @@
+﻿module Module
+
+type I =
+    member P1: (int * int)
+    member P2: p: (int * int)
+
+    member M1: (int * int) -> int
+    member M2: p: (int * int) -> int
+
+    member M3: p: (int * int) -> (int * int)
+    member M4: p: (int * int) -> [<A>] |(|(0)int * int|)|(1)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

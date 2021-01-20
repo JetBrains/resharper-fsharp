@@ -16,7 +16,7 @@ IFSharpSigFile
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         ITypeMemberDeclarationList
-          IMemberDeclaration
+          IMemberSignature
             FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpIdentifierToken(type:IDENTIFIER, text:P)
@@ -27,7 +27,7 @@ IFSharpSigFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:int)
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-          IMemberDeclaration
+          IMemberSignature
             FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpIdentifierToken(type:IDENTIFIER, text:M)

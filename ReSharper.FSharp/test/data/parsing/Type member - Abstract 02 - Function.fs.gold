@@ -1,0 +1,36 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  INamedModuleDeclaration
+    FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpIdentifierToken(type:IDENTIFIER, text:Module)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    ITypeDeclarationGroup
+      FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      IFSharpTypeDeclaration
+        FSharpIdentifierToken(type:IDENTIFIER, text:I)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        ITypeMemberDeclarationList
+          IAbstractMemberDeclaration
+            FSharpTokenType+AbstractTokenElement(type:ABSTRACT, text:abstract)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:P)
+            FSharpTokenType+ColonTokenElement(type:COLON, text::)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IFunctionTypeUsage
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

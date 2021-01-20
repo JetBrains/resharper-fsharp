@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class FSharpPropertyWithExplicitAccessors : FSharpPropertyBase<MemberDeclaration>, IFSharpProperty
   {
-    public FSharpPropertyWithExplicitAccessors(IMemberDeclaration declaration) : base(declaration)
+    public FSharpPropertyWithExplicitAccessors(IMemberSignatureOrDeclaration declaration) : base(declaration)
     {
     }
 

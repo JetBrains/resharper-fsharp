@@ -385,6 +385,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Let bindings 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Let bindings 02 - Rec``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Abstract 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Abstract 02 - Function``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Abstract 03 - Function return``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member - Member 01 - Wild self id``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Member - Method - Parameters - Optional 01``() = x.DoNamedTest()
@@ -503,6 +507,8 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Type member - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Constructor 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member 02 - Parameter 01``() = x.DoNamedTest() // todo: parameter name
+    [<Test>] member x.``Type member - Member 03 - Return attribute``() = x.DoNamedTest() // todo: attribute
 
     [<Test>] member x.``Hash directive 01``() = x.DoNamedTest()
 

@@ -1,0 +1,17 @@
+﻿module Module
+
+type I =
+    abstract AM1: (int -> int)
+    abstract AM2: (int -> |(|(0)int -> int|)|(1))
+    abstract AM3: int -> (int -> int) -> int
+
+    member P1: (int -> int)
+    member P2: (int -> |(|(2)int -> int|)|(3))
+
+    member M1: int -> (int -> int) -> int
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses

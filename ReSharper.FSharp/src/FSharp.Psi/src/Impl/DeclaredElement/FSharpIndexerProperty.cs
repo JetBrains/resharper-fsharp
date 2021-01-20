@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class FSharpIndexerProperty : FSharpPropertyWithExplicitAccessors
   {
-    public FSharpIndexerProperty(IMemberDeclaration declaration) : base(declaration)
+    public FSharpIndexerProperty(IMemberSignatureOrDeclaration declaration) : base(declaration)
     {
     }
 

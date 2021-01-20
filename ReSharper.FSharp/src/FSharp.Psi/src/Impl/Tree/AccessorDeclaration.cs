@@ -31,8 +31,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? new FSharpPropertyAccessor(this)
         : null;
 
-    public IMemberDeclaration OwnerMember =>
-      MemberDeclarationNavigator.GetByAccessorDeclaration(this);
+    public IMemberSignatureOrDeclaration OwnerMember =>
+      MemberSignatureOrDeclarationNavigator.GetByAccessorDeclaration(this);
 
     public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
 

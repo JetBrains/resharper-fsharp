@@ -649,7 +649,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             // Produced on error
             ()
 
-        | _ -> failwithf "unexpected type: %A" synType
+        | _ -> x.AdvanceToEnd(synType.Range) // todo: mark error types
 
     member x.ProcessType(TypeRange range as synType) =
         match synType with

@@ -1,7 +1,5 @@
 using System;
 using FSharp.Compiler.SourceCodeServices;
-using JetBrains.Metadata.Reader.API;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -25,67 +23,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override IDeclaredElement CreateDeclaredElement()
     {
       if (ParametersPatternsEnumerable.Any())
-      {
-        var compiledName = CompiledName;
-        if (compiledName.StartsWith("op_", StringComparison.Ordinal) && IsStatic)
-          return compiledName switch
-          {
-            StandardOperatorNames.Explicit => new FSharpConversionOperator<MemberDeclaration>(this, true),
-            StandardOperatorNames.Implicit => new FSharpConversionOperator<MemberDeclaration>(this, false),
-            _ => new FSharpSignOperator<MemberDeclaration>(this)
-          };
-
-        return new FSharpMethod<MemberDeclaration>(this);
-      }
+        return this.CreateMethod();
 
       return GetFSharpSymbol() is { } fcsSymbol
         ? CreateDeclaredElement(fcsSymbol)
         : null;
     }
 
-    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol)
-    {
-      if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv)) return null;
-
-      if (mfv.IsProperty) return CreateProperty(mfv);
-
-      var property = mfv.AccessorProperty?.Value;
-      if (property != null)
-      {
-        var cliEvent = property.EventForFSharpProperty?.Value;
-        return cliEvent != null
-          ? new FSharpCliEvent<MemberDeclaration>(this)
-          : CreateProperty(property);
-      }
-
-      return new FSharpMethod<MemberDeclaration>(this);
-    }
-
-    private IDeclaredElement CreateProperty(FSharpMemberOrFunctionOrValue mfv)
-    {
-      foreach (var accessor in AccessorDeclarationsEnumerable)
-        if (accessor.IsExplicit)
-          return IsIndexer
-            ? new FSharpIndexerProperty(this)
-            : new FSharpPropertyWithExplicitAccessors(this);
-
-      return new FSharpProperty<MemberDeclaration>(this, mfv);
-    }
+    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol) =>
+      this.CreateMemberDeclaredElement(fcsSymbol);
 
     public bool IsExplicitImplementation =>
       InterfaceImplementationNavigator.GetByTypeMember(this) != null ||
       ObjExprNavigator.GetByMemberDeclaration(this) is { } objExpr && objExpr.ArgExpression == null ||
       ObjExprNavigator.GetByInterfaceMember(this) != null;
 
-    public bool IsIndexer =>
-      SourceName == StandardMemberNames.DefaultIndexerName && SourceName == CompiledName;
+    public bool IsIndexer => this.IsIndexer();
 
-    public override bool IsStatic =>
-      StaticKeyword != null;
-
-    public override bool IsVirtual =>
-      MemberKeyword?.GetTokenType() == FSharpTokenType.DEFAULT;
-
+    public override bool IsStatic => StaticKeyword != null;
+    public override bool IsVirtual => MemberKeyword?.GetTokenType() == FSharpTokenType.DEFAULT;
     public override bool IsOverride => this.IsOverride();
 
     public override TreeTextRange GetNameIdentifierRange() =>
