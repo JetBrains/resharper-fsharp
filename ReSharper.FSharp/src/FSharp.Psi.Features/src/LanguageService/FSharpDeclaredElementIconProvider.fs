@@ -1,10 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
-open System.Linq
 open System.Runtime.InteropServices
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -24,14 +24,16 @@ type FSharpDeclaredElementIconProvider() =
     let mutableInternalField = compose mutableField PsiSymbolsThemedIcons.ModifiersInternal.Id
 
     interface IDeclaredElementIconProvider with
-        member x.GetImageId(declaredElement, lang, [<Out>] canApplyExtensions) =
+        member x.GetImageId(declaredElement, _, [<Out>] canApplyExtensions) =
             canApplyExtensions <- true
+
+            let declaredElement =
+                match declaredElement with
+                | :? FSharpUnionCaseClass as c -> c.OriginElement.As<IDeclaredElement>()
+                | _ -> declaredElement
 
             match declaredElement with
             | :? IFSharpModule -> FSharpIcons.FSharpModule.Id
-
-            | :? IFSharpGeneratedFromUnionCase as e ->
-                (x :> IDeclaredElementIconProvider).GetImageId(e.OriginElement, lang, &canApplyExtensions)
 
             | :? IUnionCase as unionCase ->
                 canApplyExtensions <- false
