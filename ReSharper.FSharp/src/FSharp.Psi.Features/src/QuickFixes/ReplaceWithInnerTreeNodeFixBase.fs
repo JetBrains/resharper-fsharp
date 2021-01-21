@@ -2,6 +2,7 @@
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -22,6 +23,12 @@ type ReplaceWithInnerTreeNodeFixBase(parentNode: IFSharpTreeNode, innerNode: IFS
         let parenExprIndent = parentNode.Indent
         let innerExprIndent = innerNode.Indent
         let indentDiff = parenExprIndent - innerExprIndent
+
+        if isIdentifierOrKeyword (parentNode.GetPreviousToken()) then
+            ModificationUtil.AddChildBefore(parentNode, Whitespace()) |> ignore
+
+        if isIdentifierOrKeyword (parentNode.GetNextToken()) then
+            ModificationUtil.AddChildAfter(parentNode, Whitespace()) |> ignore
 
         let expr = ModificationUtil.ReplaceChild(parentNode, innerNode.Copy())
         shiftNode indentDiff expr

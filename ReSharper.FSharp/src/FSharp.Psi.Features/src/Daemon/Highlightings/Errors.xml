@@ -152,7 +152,7 @@
     <Message value="Redundant parentheses"/>
     <Range>parenPat.LeftParen.GetHighlightingRange()</Range>
     <SecondaryRanges>secondaryRangesFromNode parenPat.RightParen</SecondaryRanges>
-    <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
+    <QuickFix>RemoveRedundantParenPatFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="RedundantParenTypeUsage" configurableSeverity="FSharpRedundantParens">

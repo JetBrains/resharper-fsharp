@@ -12,3 +12,8 @@ type RemoveRedundantParenTypeUsageFix(warning: RedundantParenTypeUsageWarning) =
     inherit ReplaceWithInnerTreeNodeFixBase(warning.ParenTypeUsage, warning.ParenTypeUsage.InnerTypeUsage)
 
     override x.Text = "Remove redundant parens"
+
+type RemoveRedundantParenPatFix(warning: RedundantParenPatWarning) =
+    inherit ReplaceWithInnerTreeNodeFixBase(warning.ParenPat, warning.ParenPat.Pattern)
+
+    override x.Text = "Remove redundant parens"

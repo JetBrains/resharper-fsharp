@@ -238,7 +238,6 @@ interface fSharpPattern:
   recordPat |
   optionalValPat |
   isInstPat |
-  listPat |
   listConsPat |
   parametersOwnerPat |
   wildPat |
@@ -247,7 +246,7 @@ interface fSharpPattern:
   nullPat |
   quoteExprPat |
   charRangePat |
-  fromErrorPat;  
+  fromErrorPat;
 
 interface namedPat:
   referencePat |
@@ -262,7 +261,7 @@ interface asPat:
   topAsPat;
 
 
-localReferencePat options { stubBase="LocalPatternDeclarationBase"; }extras {
+localReferencePat options { stubBase="LocalPatternDeclarationBase"; } extras {
   get { methodName="Identifier" path=<localReferencePat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
 }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>;
@@ -310,9 +309,7 @@ orPat options { stubBase="FSharpPatternBase"; }:
   fSharpPattern<PATTERN2, Pattern2>;
 
 andsPat options { stubBase="FSharpPatternBase"; }:
-  fSharpPattern<PATTERN1, Pattern1>
-  AMP
-  fSharpPattern<PATTERN2, Pattern2>;
+  LIST fSharpPattern<PATTERN, Patterns> SEP AMP<AMP, Ands>;
 
 arrayPat options { stubBase="FSharpPatternBase"; }:
   LBRACK_BAR
@@ -326,7 +323,7 @@ listPat options { stubBase="FSharpPatternBase"; }:
 
 tuplePat options { stubBase="FSharpPatternBase"; }:
   STRUCT<STRUCT, StructKeyword>?
-  LIST fSharpPattern<ATTRIBUTE, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
+  LIST fSharpPattern<PATTERN, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
 
 parenPat options { stubBase="FSharpPatternBase"; }:
   LPAREN<LPAREN, LeftParen>

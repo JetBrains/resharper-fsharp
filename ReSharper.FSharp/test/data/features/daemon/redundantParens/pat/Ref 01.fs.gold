@@ -1,0 +1,13 @@
+﻿module Module
+
+match () with
+| |(|(0)a|)|(1) -> ()
+| |(|(2)|(|(3)a|)|(4)|)|(5) -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3): ReSharper Dead Code: Redundant parentheses
+(4):<secondary> ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses

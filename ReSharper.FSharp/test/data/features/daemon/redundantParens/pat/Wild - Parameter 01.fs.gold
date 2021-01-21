@@ -1,0 +1,8 @@
+﻿module Module
+
+match None with
+| Some |(|(0)x|)|(1) -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
