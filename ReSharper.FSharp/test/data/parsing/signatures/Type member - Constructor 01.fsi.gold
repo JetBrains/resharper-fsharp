@@ -16,7 +16,7 @@ IFSharpSigFile
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         ITypeMemberDeclarationList
-          ISecondaryConstructorDeclaration
+          IConstructorSignature
             FSharpTokenType+NewTokenElement(type:NEW, text:new)
             FSharpTokenType+ColonTokenElement(type:COLON, text::)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
