@@ -4,17 +4,17 @@ using JetBrains.Application.Settings.Calculated.Interface;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Services.Formatter;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 {
   [Language(typeof(FSharpLanguage))]
   public class FSharpFormatterInfoProvider :
@@ -155,7 +155,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           Parent()
             .HasType(ElementType.DO_STATEMENT)
-            .Satisfies((node, context) => !((IDoStatement) node).IsImplicit),
+            .Satisfies((node, _) => !((IDoStatement) node).IsImplicit),
           Node().HasRole(DoStatement.CHAMELEON_EXPR))
         .Return(IndentType.External)
         .Build();
@@ -200,7 +200,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           GrandParent().HasType(ElementType.BINARY_APP_EXPR),
           Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
-          Node().Satisfies((node, context) => !IsPipeOperator(node)))
+          Node().Satisfies((node, _) => !IsPipeOperator(node)))
         .Switch(settings => settings.OutdentBinaryOperators,
           When(true).Return(IndentType.Outdent | IndentType.External))
         .Build();
@@ -210,7 +210,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           GrandParent().HasType(ElementType.BINARY_APP_EXPR),
           Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
-          Node().Satisfies((node, context) => IsPipeOperator(node)))
+          Node().Satisfies((node, _) => IsPipeOperator(node)))
         .Switch(settings => settings.OutdentBinaryOperators,
           When(true).Switch(settings => settings.NeverOutdentPipeOperators,
             When(false).Return(IndentType.Outdent | IndentType.External)))
@@ -238,7 +238,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           Left()
             .HasType(ElementType.RECORD_FIELD_BINDING)
-            .Satisfies((node, context) => ((IRecordFieldBinding) node).Semicolon != null),
+            .Satisfies((node, _) => ((IRecordFieldBinding) node).Semicolon != null),
           Right().HasType(ElementType.RECORD_FIELD_BINDING))
         .Return(IntervalFormatType.Space)
         .Build();
@@ -249,7 +249,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           Left()
             .HasType(ElementType.RECORD_FIELD_BINDING)
-            .Satisfies((node, context) => ((IRecordFieldBinding) node).Semicolon == null),
+            .Satisfies((node, _) => ((IRecordFieldBinding) node).Semicolon == null),
           Right().HasType(ElementType.RECORD_FIELD_BINDING))
         .Return(IntervalFormatType.NewLine)
         .Build();
