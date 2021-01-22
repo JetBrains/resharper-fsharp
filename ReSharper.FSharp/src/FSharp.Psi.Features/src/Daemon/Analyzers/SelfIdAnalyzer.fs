@@ -9,5 +9,5 @@ type SelfIdAnalyzer() =
     inherit ElementProblemAnalyzer<INamedSelfId>()
 
     override this.Run(selfId, data, consumer) =
-        if selfId.Identifier.Name = "__" && data.IsFSharp47Supported then
+        if selfId.SourceName = "__" && data.IsFSharp47Supported then
             consumer.AddHighlighting(UseWildSelfIdWarning(selfId))

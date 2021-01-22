@@ -18,6 +18,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
     ///   * property declaration when both getter and setter bodies are present
     ///   * attributes for module-level do
     let mutable unfinishedDeclaration: (int * range * CompositeNodeType) option = None
+    let mutable isFinishingDeclaration = false
 
     new (lexer, document, decls, lifetime) =
         FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0, 0)
@@ -228,6 +229,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         let mark =
             match unfinishedDeclaration with
             | Some(mark, unfinishedRange, _) when unfinishedRange = typeMember.Range ->
+                isFinishingDeclaration <- true
                 unfinishedDeclaration <- None
                 mark
             | _ ->
@@ -291,6 +293,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
             | _ -> failwithf "Unexpected type member: %A" typeMember
 
+        isFinishingDeclaration <- false
         if unfinishedDeclaration.IsNone then
             x.Done(typeMember.Range, mark, memberType)
 
@@ -319,9 +322,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                         ElementType.MEMBER_DECLARATION
 
                 | selfId :: _ :: _ ->
-                    let selfIdNodeType =
-                        if selfId.idText = "_" then ElementType.WILD_SELF_ID else ElementType.NAMED_SELF_ID
-                    x.MarkAndDone(selfId.idRange, selfIdNodeType)
+                    if not isFinishingDeclaration then
+                        let selfIdNodeType =
+                            if selfId.idText = "_" then ElementType.WILD_SELF_ID else ElementType.NAMED_SELF_ID
+                        x.MarkAndDone(selfId.idRange, selfIdNodeType)
 
                     match accessorId with
                     | Some ident ->

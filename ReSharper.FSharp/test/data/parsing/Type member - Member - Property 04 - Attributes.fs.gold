@@ -64,7 +64,6 @@ IFSharpImplFile
               IChameleonExpression
                 ILiteralExpr
                   FSharpToken(type:INT32, text:1)
-            INamedSelfId
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
             FSharpTokenType+AndTokenElement(type:AND, text:and)

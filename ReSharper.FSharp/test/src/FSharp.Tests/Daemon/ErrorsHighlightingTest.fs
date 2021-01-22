@@ -21,6 +21,7 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Redundant union case pattern - Nested 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Self id 01``() = x.DoNamedTest()
+    [<Test>] member x.``Self id 02 - Property with accessors``() = x.DoNamedTest()
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp46)>]
     [<Test>] member x.``Self id - Not available 01``() = x.DoNamedTest()

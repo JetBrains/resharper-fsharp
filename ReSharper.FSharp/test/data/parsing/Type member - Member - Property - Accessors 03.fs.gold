@@ -39,7 +39,6 @@ IFSharpImplFile
                 IUnitExpr
                   FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                   FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            INamedSelfId
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+AndTokenElement(type:AND, text:and)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
