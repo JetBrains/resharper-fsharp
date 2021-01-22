@@ -57,7 +57,6 @@
     <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" />
     <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpOptionsPage" id="FSharp" />
     <projectConfigurable parentId="FileTemplatesSettingsId" instance="com.jetbrains.rider.settings.RiderFSharpFileTemplatesOptionPage" groupWeight="-20"/>
-    <projectConfigurable parentId="FileTemplatesSettingsId" instance="com.jetbrains.rider.settings.RiderAzureFSharpFileTemplatesOptionPage" groupWeight="-151"/>
 
     <projectConfigurable parentId="Errors" instance="com.jetbrains.rider.settings.FSharpInspectionsPage" />
 
