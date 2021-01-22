@@ -19,6 +19,7 @@ type RedundantParenPatTest() =
 
     [<Test>] member x.``As - And 01``() = x.DoNamedTest()
     [<Test>] member x.``As - Attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``As - Let 01``() = x.DoNamedTest()
     [<Test>] member x.``As - List cons 01``() = x.DoNamedTest()
     [<Test>] member x.``As - Or 01``() = x.DoNamedTest()
     [<Test>] member x.``As - Param owner 01``() = x.DoNamedTest()
@@ -35,8 +36,11 @@ type RedundantParenPatTest() =
     [<Test>] member x.``Ref 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Tuple 01 - Param``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 02 - Nested``() = x.DoNamedTest()
+
     [<Test>] member x.``Typed 01 - As``() = x.DoNamedTest()
     [<Test>] member x.``Typed 02 - Attr``() = x.DoNamedTest()
+    [<Test>] member x.``Typed 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Wild - Function param 01``() = x.DoNamedTest()
     [<Test>] member x.``Wild - Pattern param 01``() = x.DoNamedTest()
@@ -45,4 +49,7 @@ type RedundantParenPatTest() =
     [<Test>] member x.``Wild - Parameter 01``() = x.DoNamedTest()
     [<Test>] member x.``Wild - Parameter 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Binding 01``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``Deindent 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type 01``() = x.DoNamedTest()

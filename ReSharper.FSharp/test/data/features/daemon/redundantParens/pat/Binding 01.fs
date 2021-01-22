@@ -1,0 +1,13 @@
+let (()) = ()
+let (_) = ()
+let (a) = ()
+let (_, _) = ()
+let (_ :: _) = ()
+let (Some _ as a) = ()
+let (_ | _) = ()
+let (_ & _) = ()
+
+let () = ()
+let (Some _) = ()
+let (_: int) = ()
+let ([<A>] _) = ()
