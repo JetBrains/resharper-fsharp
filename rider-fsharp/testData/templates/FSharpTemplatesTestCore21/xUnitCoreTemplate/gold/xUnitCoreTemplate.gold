@@ -6,8 +6,16 @@ Opened
   -UnitTestProject
    -Dependencies
     -.NETCoreApp 2.1
-     Packages
-     SDK
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.6.2
+      Microsoft.NET.Test.Sdk/15.9.0
+      xunit.runner.visualstudio/2.4.0
+      xunit/2.4.0
+     -SDK
+      ...
    Tests.fs
    Program.fs
 

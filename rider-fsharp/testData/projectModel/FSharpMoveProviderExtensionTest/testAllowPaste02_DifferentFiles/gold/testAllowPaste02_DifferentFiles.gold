@@ -1,0 +1,32 @@
+-Project
+ -MoveProviderSolution2 * 2 projects
+  -SourceProject
+   -Dependencies
+    -.NETCoreApp 3.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.7.2
+     -Frameworks
+      Microsoft.NETCore.App
+   CompileBeforeFile.fs [CompileBefore]
+   CompileFile.fs
+   CompileAfterFile.fs [CompileAfter]
+  -TargetProject
+   -Dependencies
+    -.NETCoreApp 3.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.7.2
+     -Frameworks
+      Microsoft.NETCore.App
+   File1.fs [CompileBefore]
+   File2.fs [CompileBefore]
+   File3.fs
+   File4.fs
+   File5.fs [CompileAfter]
+   File6.fs [CompileAfter]
+

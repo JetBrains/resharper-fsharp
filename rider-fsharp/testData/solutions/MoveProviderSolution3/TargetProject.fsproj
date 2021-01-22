@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <!-- Do not generate files in obj to have only exact list of files in test project -->
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CompileBefore Include="Folder1/File1.fs" />
+    <Compile Include="Folder1/File2.fs" />
+    <Compile Include="File3.fs" />
+    <Compile Include="Folder2/File4.fs" />
+    <CompileAfter Include="Folder2/File5.fs" />
+  </ItemGroup>
+
+</Project>
