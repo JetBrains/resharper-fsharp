@@ -31,7 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override int GetHashCode() => ShortName.GetHashCode();
   }
 
-  internal class FSharpSecondaryConstructor : FSharpConstructorBase<SecondaryConstructorDeclaration>
+  internal class FSharpSecondaryConstructor : FSharpConstructorBase<IConstructorSignatureOrDeclaration>
   {
     public FSharpSecondaryConstructor([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {

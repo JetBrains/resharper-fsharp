@@ -863,12 +863,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (compiledName.StartsWith("op_", StringComparison.Ordinal) && decl.IsStatic)
         return compiledName switch
         {
-          StandardOperatorNames.Explicit => new FSharpConversionOperator<MemberDeclaration>(decl, true),
-          StandardOperatorNames.Implicit => new FSharpConversionOperator<MemberDeclaration>(decl, false),
-          _ => new FSharpSignOperator<MemberDeclaration>(decl)
+          StandardOperatorNames.Explicit => new FSharpConversionOperator<IMemberSignatureOrDeclaration>(decl, true),
+          StandardOperatorNames.Implicit => new FSharpConversionOperator<IMemberSignatureOrDeclaration>(decl, false),
+          _ => new FSharpSignOperator<IMemberSignatureOrDeclaration>(decl)
         };
 
-      return new FSharpMethod<MemberDeclaration>(decl);
+      return new FSharpMethod<IMemberSignatureOrDeclaration>(decl);
     }
 
     public static IDeclaredElement CreateMemberDeclaredElement([NotNull] this IMemberSignatureOrDeclaration decl, FSharpSymbol fcsSymbol)
@@ -882,11 +882,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       {
         var cliEvent = property.EventForFSharpProperty?.Value;
         return cliEvent != null
-          ? new FSharpCliEvent<MemberDeclaration>(decl)
+          ? new FSharpCliEvent<IMemberSignatureOrDeclaration>(decl)
           : CreateProperty(decl, property);
       }
 
-      return new FSharpMethod<MemberDeclaration>(decl);
+      return new FSharpMethod<IMemberSignatureOrDeclaration>(decl);
     }
 
     [NotNull]
@@ -899,7 +899,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
             ? new FSharpIndexerProperty(decl)
             : new FSharpPropertyWithExplicitAccessors(decl);
 
-      return new FSharpProperty<MemberDeclaration>(decl, mfv);
+      return new FSharpProperty<IMemberSignatureOrDeclaration>(decl, mfv);
     }
   }
 }

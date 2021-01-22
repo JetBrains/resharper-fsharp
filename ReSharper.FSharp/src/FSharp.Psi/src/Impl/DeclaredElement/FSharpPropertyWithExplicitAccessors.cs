@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpPropertyWithExplicitAccessors : FSharpPropertyBase<MemberDeclaration>, IFSharpProperty
+  internal class FSharpPropertyWithExplicitAccessors : FSharpPropertyBase<IMemberSignatureOrDeclaration>, IFSharpProperty
   {
     public FSharpPropertyWithExplicitAccessors(IMemberSignatureOrDeclaration declaration) : base(declaration)
     {
