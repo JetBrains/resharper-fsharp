@@ -56,7 +56,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
         let fcsContext = context.FcsCompletionContext
 
         match fcsContext.CompletionContext with
-        | Some (CompletionContext.Invalid) -> false
+        | Some(CompletionContext.Invalid) -> false
         | _ ->
 
         let basicContext = context.BasicContext

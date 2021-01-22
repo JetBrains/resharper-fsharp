@@ -1148,7 +1148,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         let wrappedArgExpr = { Expression = expr; ElementType = ElementType.INDEXER_ARG_EXPR }
         x.PushStep(wrappedArgExpr, wrapExpressionProcessor)
 
-    member x.ProcessRecordFieldBindingList(fields: (RecordFieldName * (SynExpr option) * BlockSeparator option) list) =
+    member x.ProcessRecordFieldBindingList(fields: (RecordFieldName * SynExpr option * BlockSeparator option) list) =
         let fieldsRange =
             match fields.Head, List.last fields with
             | ((lid, _), _, _), (_, Some(fieldValue), _) -> unionRanges lid.Range fieldValue.Range
@@ -1172,7 +1172,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         x.MarkAndDone(idRange, ElementType.EXPRESSION_REFERENCE_NAME)
         x.ProcessExpression(expr)
 
-    member x.ProcessRecordFieldBinding(field: (RecordFieldName * (SynExpr option) * BlockSeparator option)) =
+    member x.ProcessRecordFieldBinding(field: RecordFieldName * SynExpr option * BlockSeparator option) =
         let (lid, _), expr, blockSep = field
         let lid = lid.Lid
         match lid, expr with
@@ -1327,15 +1327,15 @@ type TypeArgsInReferenceExprProcessor() =
 
 
 type RecordBindingListRepresentationProcessor() =
-    inherit StepProcessorBase<(RecordFieldName * (SynExpr option) * BlockSeparator option) list>()
-    
+    inherit StepProcessorBase<(RecordFieldName * SynExpr option * BlockSeparator option) list>()
+
     override x.Process(fields, builder) =
         builder.ProcessRecordFieldBindingList(fields)
 
 
 type AnonRecordBindingListRepresentationProcessor() =
     inherit StepProcessorBase<(Ident * SynExpr) list>()
-    
+
     override x.Process(fields, builder) =
         builder.ProcessAnonRecordFieldBindingList(fields)
 
@@ -1362,7 +1362,7 @@ type AndLocalBindingListProcessor() =
 
 
 type RecordFieldBindingListProcessor() =
-    inherit StepListProcessorBase<RecordFieldName * (SynExpr option) * BlockSeparator option>()
+    inherit StepListProcessorBase<RecordFieldName * SynExpr option * BlockSeparator option>()
 
     override x.Process(field, builder) =
         builder.ProcessRecordFieldBinding(field)

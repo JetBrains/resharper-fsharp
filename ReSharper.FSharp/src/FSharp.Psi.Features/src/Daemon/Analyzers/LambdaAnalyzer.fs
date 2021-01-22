@@ -16,10 +16,10 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
-                         HighlightingTypes = [| typeof<LambdaCanBeSimplifiedWarning>
+                         HighlightingTypes = [| typeof<LambdaBodyCanBeReplacedWithIdWarning>
+                                                typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>
                                                 typeof<LambdaCanBeReplacedWithInnerExpressionWarning>
-                                                typeof<LambdaBodyCanBeReplacedWithIdWarning>
-                                                typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>|])>]
+                                                typeof<LambdaCanBeSimplifiedWarning> |])>]
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
 
@@ -46,7 +46,7 @@ type LambdaAnalyzer() =
 
             patName = expr.ShortName
 
-        | :? IUnitPat, (:? IUnitExpr) -> true
+        | :? IUnitPat, :? IUnitExpr -> true
         | _ -> false
 
     and compareArgsSeq (pats: IFSharpPattern seq) (args: IFSharpExpression seq) =
