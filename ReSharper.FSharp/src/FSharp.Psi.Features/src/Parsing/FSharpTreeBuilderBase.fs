@@ -494,6 +494,14 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     member x.ProcessImplicitCtorSimplePats(pats: SynSimplePats) =
         let range = pats.Range
         let paramMark = x.Mark(range)
+
+        match pats with
+        | SynSimplePats.SimplePats([], _) ->
+            x.MarkAndDone(range, ElementType.UNIT_PAT)
+            x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
+
+        | _ ->
+        
         let parenPatMark = x.Mark()
 
         match pats with
@@ -507,12 +515,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.Done(tupleMark, ElementType.TUPLE_PAT)
             x.AdvanceToTokenAndSkip(FSharpTokenType.RPAREN)
 
-        | SynSimplePats.Typed(pats, synType, _) ->
-            failwith "foo"
-            x.ProcessImplicitCtorSimplePats(pats)
-            x.ProcessType(synType)
-
-        | _ -> ()
+        | _ -> failwithf $"Unexpected simple pats: {pats}"
 
         x.Done(range, parenPatMark, ElementType.PAREN_PAT)
         x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
