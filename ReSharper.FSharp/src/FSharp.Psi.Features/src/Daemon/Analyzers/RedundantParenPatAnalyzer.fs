@@ -17,14 +17,22 @@ type RedundantParenPatAnalyzer() =
         | :? IAndsPat -> 2
         | :? IListConsPat -> 3
         | :? ITuplePat -> 4
-        | :? IParametersOwnerPat -> 5
+
         | :? IAttribPat
         | :? ITypedPat
-        | :? IAsPat -> 6
-        | :? IFSharpPattern -> 7
+        | :? IAsPat -> 5
+
+        | :? IParametersOwnerPat -> 6
+
+        | :? ILambdaParametersList
+        | :? IParametersPatternDeclaration -> 7
+
+        // The rest of the patterns.
+        | :? IFSharpPattern -> 8
+
         | _ -> 0
 
-    let getParentViaLeftSide (pat: IFSharpPattern): IFSharpPattern =
+    let getParentPatternFromLeftSide (pat: IFSharpPattern): IFSharpPattern =
         let listConsPat = ListConsPatNavigator.GetByHeadPattern(pat)
         if isNotNull listConsPat then listConsPat :> _ else
 
@@ -33,7 +41,7 @@ type RedundantParenPatAnalyzer() =
 
         null
 
-    let rec isOnOrAndRightSide pat =
+    let rec isAtCompoundPatternRightSide pat =
         if isNull pat then false else
 
         if isNotNull (OrPatNavigator.GetByPattern2(pat)) then true else
@@ -45,8 +53,8 @@ type RedundantParenPatAnalyzer() =
         let andsPat = AndsPatNavigator.GetByPattern(pat)
         if isNotNull andsPat && andsPat.PatternsEnumerable.FirstOrDefault() != pat then true else
 
-        let parent = getParentViaLeftSide pat
-        isOnOrAndRightSide parent
+        let parent = getParentPatternFromLeftSide pat
+        isAtCompoundPatternRightSide parent
 
     let checkPrecedence pat parent =
         precedence pat < precedence parent
@@ -55,28 +63,24 @@ type RedundantParenPatAnalyzer() =
         match fsPattern with
         | :? IListConsPat ->
             isNotNull (ListConsPatNavigator.GetByHeadPattern(context)) ||
-            isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context)) ||
             checkPrecedence fsPattern context.Parent
 
         | :? IAsPat ->
-            isOnOrAndRightSide context ||
-            isNotNull (ParametersOwnerPatNavigator.GetByParameter(context)) ||
-            isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context)) ||
+            isAtCompoundPatternRightSide context ||
             checkPrecedence fsPattern context.Parent
 
         | :? ITuplePat ->
-            isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context)) ||
+            isNotNull (TuplePatNavigator.GetByPattern(context)) ||
             checkPrecedence fsPattern context.Parent
 
         | :? IParametersOwnerPat ->
-            isNotNull (ParametersOwnerPatNavigator.GetByParameter(context)) ||
-            isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context)) ||
             isNotNull (BindingNavigator.GetByHeadPattern(context)) ||
+            isNotNull (ParametersOwnerPatNavigator.GetByParameter(context)) ||
             checkPrecedence fsPattern context.Parent
 
         | :? ITypedPat
         | :? IAttribPat ->
-            isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context)) ||
+            isNotNull (BindingNavigator.GetByHeadPattern(context)) ||
             isNotNull (LambdaParametersListNavigator.GetByPattern(context)) ||
             checkPrecedence fsPattern context.Parent
 
@@ -87,6 +91,14 @@ type RedundantParenPatAnalyzer() =
         // todo: add code style setting
         let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(context)
         isNotNull parametersOwnerPat && getNextSibling parametersOwnerPat.ReferenceName == context ||
+
+        let parameterDecl = ParametersPatternDeclarationNavigator.GetByPattern(context)
+        isNotNull (ConstructorDeclarationNavigator.GetByParametersPatternDeclaration(parameterDecl)) ||
+
+        // todo: add code style setting
+        let memberDeclaration = MemberDeclarationNavigator.GetByParametersPattern(parameterDecl)
+        isNotNull memberDeclaration && getNextSibling memberDeclaration.NameIdentifier == parameterDecl ||
+        isNotNull memberDeclaration && getNextSibling memberDeclaration.TypeParameterList == parameterDecl ||
 
         checkPrecedence fsPattern context.Parent
 
