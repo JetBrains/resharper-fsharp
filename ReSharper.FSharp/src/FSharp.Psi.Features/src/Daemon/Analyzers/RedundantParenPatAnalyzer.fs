@@ -80,15 +80,6 @@ type RedundantParenPatAnalyzer() =
             isNotNull (LambdaParametersListNavigator.GetByPattern(context)) ||
             checkPrecedence fsPattern context.Parent
 
-        | :? IOrPat ->
-            isNotNull (OrPatNavigator.GetByPattern2(context)) ||
-            checkPrecedence fsPattern context.Parent
-
-        | :? IAndsPat ->
-            let andsPat = AndsPatNavigator.GetByPattern(context)
-            isNotNull andsPat && andsPat.PatternsEnumerable.FirstOrDefault() != context ||
-            checkPrecedence fsPattern context.Parent
-
         | :? IWildPat -> false
 
         | _ ->
