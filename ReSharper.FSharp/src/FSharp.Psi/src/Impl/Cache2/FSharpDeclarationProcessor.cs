@@ -146,6 +146,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitMemberDeclaration(IMemberDeclaration decl) => 
       Builder.AddDeclaredMemberName(decl.CompiledName);
 
+    public override void VisitMemberSignature(IMemberSignature decl) =>
+      Builder.AddDeclaredMemberName(decl.CompiledName);
+
     public override void VisitTypeDeclarationGroup(ITypeDeclarationGroup typeDeclarationGroupParam)
     {
       foreach (var typeDeclaration in typeDeclarationGroupParam.TypeDeclarationsEnumerable) 
@@ -168,11 +171,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
-    private void ProcessBinding(IBinding binding)
+    private void ProcessBinding(IBindingLikeDeclaration binding)
     {
       var headPattern = binding.HeadPattern;
       if (headPattern != null)
-        ProcessTypeMembers(headPattern.Declarations);
+        ProcessTypeMembers(headPattern.NestedPatterns);
     }
 
     public override void VisitLetBindingsDeclaration(ILetBindingsDeclaration letBindings)

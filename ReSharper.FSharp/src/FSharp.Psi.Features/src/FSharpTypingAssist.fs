@@ -8,9 +8,10 @@ open FSharp.Compiler.SourceCodeServices.AstTraversal
 open JetBrains.Application.CommandProcessing
 open JetBrains.Application.UI.ActionSystem.Text
 open JetBrains.Application.Settings
-open JetBrains.DocumentModel
 open JetBrains.Diagnostics
+open JetBrains.DocumentModel
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.Options
 open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -21,6 +22,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CachingLexers
 open JetBrains.ReSharper.Psi.CodeStyle
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
@@ -35,6 +37,9 @@ type FSharpTypingAssist
     inherit TypingAssistLanguageBase<FSharpLanguage>
         (solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost,
          skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager)
+
+    static let nodeTypeSet (tokenTypes: NodeType[]) =
+        NodeTypeSet(tokenTypes)
 
     static let indentFromToken =
         [| FSharpTokenType.LBRACK_LESS
@@ -176,24 +181,28 @@ type FSharpTypingAssist
 
 
     static let stringLiteralStoppers =
-        [| FSharpTokenType.WHITESPACE
-           FSharpTokenType.NEW_LINE
-           FSharpTokenType.LINE_COMMENT
-           FSharpTokenType.BLOCK_COMMENT
-           FSharpTokenType.SEMICOLON
-           FSharpTokenType.COMMA
-           FSharpTokenType.RPAREN
-           FSharpTokenType.RBRACK
-           FSharpTokenType.RBRACE
-           FSharpTokenType.RQUOTE_TYPED
-           FSharpTokenType.RQUOTE_UNTYPED
-           FSharpTokenType.BAR_RBRACK
-           FSharpTokenType.GREATER_RBRACK |]
-        |> HashSet
+        let tokenTypes: NodeType[] =
+            [| FSharpTokenType.WHITESPACE
+               FSharpTokenType.NEW_LINE
+               FSharpTokenType.LINE_COMMENT
+               FSharpTokenType.BLOCK_COMMENT
+               FSharpTokenType.SEMICOLON
+               FSharpTokenType.COMMA
+               FSharpTokenType.RPAREN
+               FSharpTokenType.RBRACK
+               FSharpTokenType.RBRACE
+               FSharpTokenType.RQUOTE_TYPED
+               FSharpTokenType.RQUOTE_UNTYPED
+               FSharpTokenType.BAR_RBRACK
+               FSharpTokenType.GREATER_RBRACK |]
+        nodeTypeSet tokenTypes
 
-    let isStringLiteralStopper tokenType =
-        stringLiteralStoppers.Contains(tokenType) ||
-        isNotNull tokenType && tokenType.IsStringLiteral
+    let isStringLiteralStopper (tokenType: TokenNodeType) =
+        stringLiteralStoppers.[tokenType] || isNotNull tokenType && tokenType.IsStringLiteral
+
+
+    let strings =
+        FSharpTokenType.Strings.Union(FSharpTokenType.InterpolatedStrings)
 
 
     static let infixOpTokens =
@@ -1070,21 +1079,37 @@ type FSharpTypingAssist
 
         this.DoHandleBackspacePressed
             (textControl,
-             (fun lexer -> lexer.TokenType == FSharpTokenType.STRING),
+             (fun lexer ->
+                lexer.TokenType == FSharpTokenType.STRING ||
+                lexer.TokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING ||
+                lexer.TokenType == FSharpTokenType.VERBATIM_STRING ||
+                lexer.TokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING),
              (fun _ -> FSharpBracketMatcher() :> _))
 
     member x.HandlerBackspaceInTripleQuotedString(textControl: ITextControl) =
         let offset = textControl.Caret.Offset()
         let mutable lexer = Unchecked.defaultof<_>
 
-        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset)) then false else
-        if lexer.TokenType != FSharpTokenType.TRIPLE_QUOTED_STRING || lexer.TokenStart = offset then false else
+        let isTripleQuoteString (tokenType: TokenNodeType) =
+            tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING ||
+            tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING        
 
-        let strStart = "\"\"\""
+        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset)) then false else
+        if not (isTripleQuoteString lexer.TokenType) || lexer.TokenStart = offset then false else
+
+        let getStrStart (tokenType: TokenNodeType) =
+            if tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING then "\"\"\"" else
+            if tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING then "$\"\"\"" else
+
+            failwithf "Unexpected token %O" tokenType
+
+        let strStart = getStrStart lexer.TokenType
+        let strEnd = "\"\"\""
+
         let newLineLength = this.GetNewLineText(textControl).Length
 
         // """{caret}"""
-        if lexer.TokenStart = offset - strStart.Length && lexer.TokenEnd = offset + strStart.Length then 
+        if lexer.TokenStart = offset - strStart.Length && lexer.TokenEnd = offset + strEnd.Length then 
             textControl.Document.DeleteText(TextRange(offset - 1, offset + 3))
             textControl.Caret.MoveTo(offset - 1, CaretVisualPlacement.DontScrollIfVisible)
             true
@@ -1102,7 +1127,7 @@ type FSharpTypingAssist
             if strStartCoords.Line + (docLine 2) <> strEndCoords.Line then false else
             if strEndCoords.Column <> (docColumn 3) then false else
 
-            let lastNewLineOffset = lexer.TokenEnd - strStart.Length - newLineLength
+            let lastNewLineOffset = lexer.TokenEnd - strEnd.Length - newLineLength
             textControl.Document.DeleteText(TextRange(lastNewLineOffset, lastNewLineOffset + newLineLength))
             textControl.Document.DeleteText(TextRange(offset - newLineLength, offset))
             textControl.Caret.MoveTo(offset - newLineLength, CaretVisualPlacement.DontScrollIfVisible)
@@ -1159,7 +1184,18 @@ type FSharpTypingAssist
         let typedChar = context.Char
 
         if context.EnsureWritable() <> EnsureWritableResult.SUCCESS then false else
-        if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
+
+        let selection = textControl.Selection
+
+        let surroundTypingEnabled =
+            let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
+            settingsStore.GetValue(TypingAssistOptions.SurroundTypingEnabled)
+
+        if surroundTypingEnabled && selection.HasSelection() && typedChar = '"' then
+            x.SurroundSelectionWithQuotes(textControl, fun _ -> false)
+            true else
+
+        if selection.OneDocRangeWithCaret().Length > 0 then false else
 
         if x.HandleThirdQuote(textControl, typedChar) then true else
         if x.SkipQuote(textControl, typedChar) then true else
@@ -1182,7 +1218,7 @@ type FSharpTypingAssist
         if not (isBacktick lexer) then false else
         if prevTokenIs isBacktick lexer || nextTokenIs isBacktick lexer then false else
 
-        if lexer.FindTokenAt(offset) && lexer.TokenType == FSharpTokenType.IDENTIFIER then
+        if lexer.FindTokenAt(offset) && lexer.TokenType == FSharpTokenType.IDENTIFIER || lexer.TokenType.IsKeyword then
             textControl.Document.InsertText(lexer.TokenEnd, "``")
             textControl.Document.InsertText(offset, "`")
         else
@@ -1192,8 +1228,9 @@ type FSharpTypingAssist
         true
 
     member x.SkipBacktickInId(textControl: ITextControl, lexer: CachingLexer, offset) =
+        if not (lexer.FindTokenAt(offset)) then false else
         if lexer.TokenType != FSharpTokenType.IDENTIFIER then false else
-        if offset + 2 < lexer.TokenEnd then false else
+        if offset - 2 > lexer.TokenStart && offset + 2 < lexer.TokenEnd then false else
         if not (lexer.GetTokenText().IsEscapedWithBackticks()) then false else
 
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
@@ -1209,11 +1246,11 @@ type FSharpTypingAssist
             offset >= lexer.TokenEnd - getStringEndingQuotesOffset lexer.TokenType
 
         let skipEscapedQuoteInVerbatim (lexer: CachingLexer) =
-            lexer.TokenType == FSharpTokenType.VERBATIM_STRING && typedChar = '\"'
+            lexer.TokenType == FSharpTokenType.VERBATIM_STRING && typedChar = '\"' // todo: isv
 
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
-        if not lexer.TokenType.IsStringLiteral || offset = lexer.TokenEnd then false else
+        if not strings.[lexer.TokenType] || offset = lexer.TokenEnd then false else
         if not (skipEndQuote lexer || skipEscapedQuoteInVerbatim lexer) then false else
 
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
@@ -1264,8 +1301,12 @@ type FSharpTypingAssist
         let offset = textControl.Caret.Offset()
         let mutable lexer = Unchecked.defaultof<_>
 
+        let isEmptyRegularString (lexer: CachingLexer) =
+            lexer.TokenType == FSharpTokenType.STRING && lexer.GetTokenLength() = 2 ||
+            lexer.TokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING && lexer.GetTokenLength() = 3
+
         if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
-        if lexer.TokenType != FSharpTokenType.STRING || lexer.GetTokenLength() <> 2 then false else
+        if not (isEmptyRegularString lexer) then false else
         if lexer.TokenEnd <> offset then false else
 
         textControl.Document.InsertText(offset, "\"\"\"\"")

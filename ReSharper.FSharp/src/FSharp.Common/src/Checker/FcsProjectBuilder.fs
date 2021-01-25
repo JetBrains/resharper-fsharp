@@ -8,11 +8,9 @@ open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Strategies
-open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
@@ -37,31 +35,6 @@ type ReferencedModule =
     static member Create(psiModule: IPsiModule) =
         { ReferencedPath = getOutputPath psiModule
           ReferencingModules = HashSet() }
-
-
-module FSharpProperties =
-    let [<Literal>] TargetProfile = "TargetProfile"
-    let [<Literal>] BaseAddress = "BaseAddress"
-    let [<Literal>] OtherFlags = "OtherFlags"
-    let [<Literal>] NoWarn = "NoWarn"
-    let [<Literal>] WarnAsError = "WarnAsError"
-    let [<Literal>] FscToolPath = "FscToolPath"
-    let [<Literal>] LangVersion = "LangVersion"
-
-
-[<ShellComponent>]
-type FSharpProjectPropertiesRequest() =
-    let properties =
-        [| FSharpProperties.TargetProfile
-           FSharpProperties.BaseAddress
-           FSharpProperties.OtherFlags
-           FSharpProperties.NoWarn
-           FSharpProperties.WarnAsError
-           FSharpProperties.FscToolPath
-           FSharpProperties.LangVersion |]
-
-    interface IProjectPropertiesRequest with
-        member x.RequestedProperties = properties :> _
 
 
 [<ShellComponent>]
@@ -149,14 +122,14 @@ type FcsProjectBuilder(checkerService: FSharpCheckerService, itemsContainer: IFS
         for path, buildAction in projectItems do
             match buildAction with
             | SourceFile ->
-                sourceFiles.Add(path) |> ignore
+                sourceFiles.Add(path)
                 let fileName = path.NameWithoutExtension
                 match path.ExtensionNoDot with
                 | SigExtension -> sigFiles.Add(fileName) |> ignore
                 | ImplExtension when sigFiles.Contains(fileName) -> implsWithSigs.add(path)
                 | _ -> ()
 
-            | Resource -> resources.Add(path) |> ignore
+            | Resource -> resources.Add(path)
             | _ -> ()
 
         let resources: IList<_> = if resources.IsEmpty() then EmptyList.InstanceList else resources :> _
@@ -202,7 +175,7 @@ type FcsProjectBuilder(checkerService: FSharpCheckerService, itemsContainer: IFS
                 | true, v when not (v.IsNullOrWhitespace()) -> Some ("--" + p.ToLower() + ":" + f v)
                 | _ -> None
 
-            [ FSharpProperties.TargetProfile; FSharpProperties.BaseAddress; FSharpProperties.LangVersion ]
+            [ FSharpProperties.TargetProfile; FSharpProperties.LangVersion ]
             |> List.choose (getOption id)
             |> otherOptions.AddRange
 

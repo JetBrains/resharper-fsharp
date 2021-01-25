@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
@@ -99,14 +100,9 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
     override x.GetSecondaryElements(element: IDeclaredElement, newName) =
         match element with
         | :? ILocalReferencePat as localNamedPat ->
-            let mutable pat = localNamedPat :> IFSharpPattern
-            while pat.Parent :? IFSharpPattern &&
-                    not (pat.Parent :? IParametersOwnerPat && (pat.Parent :?> IFSharpPattern).IsDeclaration) do
-                pat <- pat.Parent :?> IFSharpPattern
-
-            pat.Declarations
+            localNamedPat.GetPartialDeclarations()
             |> Seq.cast<IDeclaredElement>
-            |> Seq.filter (fun decl -> decl != element && decl.ShortName = element.ShortName)
+            |> Seq.filter (fun decl -> decl != localNamedPat)
 
         | :? IUnionCase as unionCase ->
             unionCase.GetGeneratedMembers()
@@ -115,6 +111,9 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
             match parameterOwner.GetGeneratedParameter() with
             | null -> EmptyArray.Instance :> _
             | parameter -> [| parameter :> IDeclaredElement |] :> _
+
+        | :? IFSharpProperty as property ->
+            Seq.append property.Getters property.Setters |> Seq.cast
 
         | :? IFSharpModule -> EmptyArray.Instance :> _
 
@@ -223,7 +222,7 @@ type FSharpAtomicRenamesFactory() =
 type FSharpDeclaredElementForRenameProvider() =
     interface IPrimaryDeclaredElementForRenameProvider with
         member x.GetPrimaryDeclaredElement(element, _) =
-            match element.As<IFSharpGeneratedFromOtherElement>() with
+            match element.As<ISecondaryDeclaredElement>() with
             | null -> element
             | generated ->
 

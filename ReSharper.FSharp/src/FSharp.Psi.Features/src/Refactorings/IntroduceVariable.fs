@@ -108,7 +108,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 isNotNull equalsToken && equalsToken.StartLine = expr.StartLine &&
 
                 // Don't escape function declarations
-                not (binding.HeadPattern :? IParametersOwnerPat) ->
+                not binding.HasParameters ->
             LetOrUseExprNavigator.GetByBinding(binding) :> _
 
         | :? IRecordFieldBinding as fieldBinding ->
@@ -150,7 +150,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
     let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
         let binding = BindingNavigator.GetByExpression(contextExpr)
-        if isNotNull binding && binding.HeadPattern :? IParametersOwnerPat then null else
+        if isNotNull binding && binding.HasParameters then null else
 
         let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
         if isNotNull letBindings then letBindings :> _ else
@@ -298,7 +298,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let elementFactory = sourceExpr.CreateElementFactory()
 
         let indentShift = contextExpr.Indent - sourceExpr.Indent
-        shiftExpr indentShift sourceExpr
+        shiftNode indentShift sourceExpr
 
         let letBindings = createBinding contextExpr contextDecl name
         setBindingExpression sourceExpr contextIndent letBindings
@@ -458,7 +458,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
     static member CanIntroduceVar(expr: IFSharpExpression) =
-        if not (isValid expr) then false else
+        if not (isValid expr) || expr.IsFSharpSigFile() then false else
 
         let rec isValidExpr (expr: IFSharpExpression) =
             if FSharpMethodInvocationUtil.isNamedArgReference expr then false else

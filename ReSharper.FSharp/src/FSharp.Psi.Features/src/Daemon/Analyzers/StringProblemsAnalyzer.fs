@@ -2,7 +2,6 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open System
 open System.Globalization
-open JetBrains.Diagnostics
 open JetBrains.ReSharper.Daemon.StringAnalysis
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
@@ -27,8 +26,24 @@ type FSharpStringProblemAnalyzer() =
         | FSharpLiteralType.Character
         | FSharpLiteralType.RegularString -> RegularStringLexer(buffer) :> _
         | FSharpLiteralType.VerbatimString -> VerbatimStringLexer(buffer) :> _
+        | FSharpLiteralType.VerbatimByteArray -> VerbatimByteArrayLexer(buffer) :> _
         | FSharpLiteralType.TripleQuoteString -> TripleQuoteStringLexer(buffer) :> _
-        | FSharpLiteralType.ByteArray -> ByteArrayStringLexer(buffer) :> _
+        | FSharpLiteralType.ByteArray -> ByteArrayLexer(buffer) :> _
+
+        | FSharpLiteralType.InterpolatedString
+        | FSharpLiteralType.InterpolatedStringStart -> RegularInterpolatedStringLexer(buffer) :> _
+        | FSharpLiteralType.InterpolatedStringMiddle
+        | FSharpLiteralType.InterpolatedStringEnd -> RegularInterpolatedStringMiddleEndLexer(buffer) :> _
+
+        | FSharpLiteralType.VerbatimInterpolatedString
+        | FSharpLiteralType.VerbatimInterpolatedStringStart -> VerbatimInterpolatedStringLexer(buffer) :> _
+        | FSharpLiteralType.VerbatimInterpolatedStringMiddle
+        | FSharpLiteralType.VerbatimInterpolatedStringEnd -> VerbatimInterpolatedStringMiddleEndLexer(buffer) :> _
+
+        | FSharpLiteralType.TripleQuoteInterpolatedString -> TripleQuoteInterpolatedStringLexer(buffer) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedStringStart -> TripleQuoteInterpolatedStringStartLexer(buffer) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedStringMiddle -> TripleQuoteInterpolatedStringMiddleLexer(buffer) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedStringEnd -> TripleQuoteInterpolatedStringEndLexer(buffer) :> _
 
     let getCachedLexer (literalToken: FSharpString) =
         let isValid = literalToken.IsValid()
@@ -51,15 +66,20 @@ type FSharpStringProblemAnalyzer() =
 
             | lexer -> lexer
 
-    override x.ExtractElements(literalToken: FSharpString, consumer: IHighlightingConsumer) =
-        let lexer = getCachedLexer literalToken
-        [| Pair(literalToken :> ITokenNode, lexer) |] :> _
+    override x.ExtractElements(literalToken: FSharpString, _) =
+        [| Pair(literalToken :> ITokenNode, getCachedLexer literalToken) |] :> _
 
 
+[<AbstractClass>]
+type FSharpStringLexerBase(buffer) =
+    inherit StringLexerBase(buffer)
+
+    member x.Position with get () = base.Position and
+                           set value = base.Position <- value  
 
 
 type RegularStringLexer(buffer) =
-    inherit StringLexerBase(buffer)
+    inherit FSharpStringLexerBase(buffer)
 
     static let maxUnicodeCodePoint = uint32 0x10FFFF
 
@@ -108,9 +128,23 @@ type RegularStringLexer(buffer) =
 
     override x.ParseEscapeCharacter _ = raise (NotImplementedException())
 
+type RegularInterpolatedStringLexer(buffer) =
+    inherit RegularStringLexer(buffer)
+
+    override x.StartOffset = 2
+
+    override x.AdvanceInternal() =
+        match InterpolatedStringLexer.advance x with
+        | null -> base.AdvanceInternal()
+        | nodeType -> nodeType
+
+type RegularInterpolatedStringMiddleEndLexer(buffer) =
+    inherit RegularInterpolatedStringLexer(buffer)
+
+    override x.StartOffset = 1
 
 type VerbatimStringLexer(buffer) =
-    inherit StringLexerBase(buffer)
+    inherit FSharpStringLexerBase(buffer)
 
         override x.StartOffset = 2
         override x.EndOffset = 1
@@ -126,17 +160,65 @@ type VerbatimStringLexer(buffer) =
 
         override x.ParseEscapeCharacter _ = raise (NotImplementedException())
 
+type VerbatimByteArrayLexer(buffer) =
+    inherit VerbatimStringLexer(buffer)
+
+    override x.EndOffset = 2
+
+type VerbatimInterpolatedStringLexer(buffer) =
+    inherit VerbatimStringLexer(buffer)
+
+    override x.StartOffset = 3
+
+    override x.AdvanceInternal() =
+        match InterpolatedStringLexer.advance x with
+        | null -> base.AdvanceInternal()
+        | nodeType -> nodeType
+
+type VerbatimInterpolatedStringMiddleEndLexer(buffer) =
+    inherit VerbatimInterpolatedStringLexer(buffer)
+
+    override x.StartOffset = 1
+
 
 type TripleQuoteStringLexer(buffer) =
-        inherit VerbatimStringLexer(buffer)
+    inherit VerbatimStringLexer(buffer)
 
-        override x.StartOffset = 4
-        override x.EndOffset = 4
+    override x.StartOffset = 3
+    override x.EndOffset = 3
 
-        override x.AdvanceInternal() = StringTokenTypes.CHARACTER
+    override x.AdvanceInternal() = StringTokenTypes.CHARACTER
+
+type TripleQuoteInterpolatedStringLexer(buffer) =
+    inherit TripleQuoteStringLexer(buffer)
+
+    override x.StartOffset = 4
+    
+    override x.AdvanceInternal() =
+        match InterpolatedStringLexer.advance x with
+        | null -> base.AdvanceInternal()
+        | nodeType -> nodeType
+
+type TripleQuoteInterpolatedStringStartLexer(buffer) =
+    inherit TripleQuoteInterpolatedStringLexer(buffer)
+
+    override x.StartOffset = 4
+    override x.EndOffset = 1
+
+type TripleQuoteInterpolatedStringMiddleLexer(buffer) =
+    inherit TripleQuoteInterpolatedStringLexer(buffer)
+
+    override x.StartOffset = 1
+    override x.EndOffset = 1
+
+type TripleQuoteInterpolatedStringEndLexer(buffer) =
+    inherit TripleQuoteInterpolatedStringLexer(buffer)
+
+    override x.StartOffset = 1
+    override x.EndOffset = 3
 
 
-type ByteArrayStringLexer(buffer) =
+type ByteArrayLexer(buffer) =
     inherit RegularStringLexer(buffer)
 
     override x.EndOffset = 2
@@ -147,3 +229,19 @@ type ByteArrayStringLexer(buffer) =
         | _ -> StringTokenTypes.CHARACTER
 
     override x.ParseEscapeCharacter _ = raise (NotImplementedException())
+
+
+module InterpolatedStringLexer =
+    let private checkChar (lexer: FSharpStringLexerBase) c =
+        lexer.Position <- lexer.Position + 1
+        if lexer.CanAdvance && lexer.Buffer.[lexer.Position] = c then
+            StringTokenTypes.ESCAPE_CHARACTER
+        else
+            lexer.Position <- lexer.Position - 1
+            StringTokenTypes.INVALID_CHARACTER
+
+    let advance (lexer: FSharpStringLexerBase) =
+        match lexer.Buffer.[lexer.Position] with
+        | '{' -> checkChar lexer '{'
+        | '}' -> checkChar lexer '}'
+        | _ -> null

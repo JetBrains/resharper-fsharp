@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open System.Linq
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -24,19 +25,19 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
             match ref.Reference.GetFSharpSymbol() with
             | :? FSharpField as field ->
                 field.IsMutable ||
+
                 not (declaredElement :? ICompiledElement) &&
                 match field.DeclaringEntity with
-                | Some (entity) -> entity.IsFSharpRecord
+                | Some(entity) -> entity.IsFSharpRecord
                 | None -> false
 
             | :? FSharpMemberOrFunctionOrValue as memberOrFunctionOrValue ->
                 if memberOrFunctionOrValue.IsMember then
                     memberOrFunctionOrValue.IsMutable || memberOrFunctionOrValue.HasSetterMethod
                 else
-                    match declaredElement.GetDeclarations() |> Seq.tryHead with
-                    | Some decl when (decl :? IReferencePat) -> isNotNull (decl :?> IReferencePat).Binding
-                    | _ -> false
-
+                    let referencePat = declaredElement.GetDeclarations().FirstOrDefault().As<IReferencePat>()
+                    let binding = BindingNavigator.GetByHeadPattern(referencePat)
+                    isNotNull binding && not binding.HasParameters
             | _ -> false
 
         | :? IIndexerExpr -> true
@@ -47,6 +48,7 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
+
         let factory = expr.CreateElementFactory()
         let setExpr = factory.CreateSetExpr(expr.LeftArgument, expr.RightArgument)
         replace expr setExpr

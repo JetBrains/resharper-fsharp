@@ -19,10 +19,7 @@ module SpecifyTypes =
         let typeString =
             let fullType = mfv.FullType
             if fullType.IsFunctionType then
-                let specifiedTypesCount =
-                    match binding.HeadPattern with
-                    | :? IParametersOwnerPat as pat -> pat.Parameters.Count
-                    | _ -> 0
+                let specifiedTypesCount = binding.ParametersPatterns.Count
 
                 let types = FcsTypesUtil.getFunctionTypeArgs fullType
                 if types.Length <= specifiedTypesCount then mfv.ReturnParameter.Type.Format(displayContext) else
@@ -39,7 +36,8 @@ module SpecifyTypes =
         let factory = binding.CreateElementFactory()
         let typeUsage = factory.CreateTypeUsage(typeString)
 
-        let pat = binding.HeadPattern
+        let parameters = binding.ParametersPatterns
+        let pat = if parameters.IsEmpty then binding.HeadPattern else parameters.Last().Pattern
         let returnTypeInfo = ModificationUtil.AddChildAfter(pat, factory.CreateReturnTypeInfo(typeUsage))
 
         let settingsStore = pat.GetSettingsStoreWithEditorConfig()
@@ -53,7 +51,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
     let specifyParameterTypes
-            (parameterOwner: IParametersOwnerPat) (factory: IFSharpElementFactory)
+            (binding: IBinding) (factory: IFSharpElementFactory)
             (mfv: FSharpMemberOrFunctionOrValue) displayContext =
 
         let addParens pattern =
@@ -62,10 +60,10 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             parenPat :> IFSharpPattern
 
         let types = FcsTypesUtil.getFunctionTypeArgs mfv.FullType
-        let parameters = parameterOwner.Parameters
+        let parameters = binding.ParametersPatterns
 
         for fcsType, parameter in (types, parameters) ||> Seq.zip do
-            match parameter.IgnoreInnerParens() with
+            match parameter.Pattern.IgnoreInnerParens() with
             | :? IConstPat | :? ITypedPat -> ()
             | pattern ->
 
@@ -77,15 +75,15 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             let typedPat = factory.CreateTypedPat(pattern, factory.CreateTypeUsage(fcsType.Format(displayContext)))
             let parenPat = addParens typedPat
 
-            replaceWithCopy parameter parenPat
+            let parameterDecl =
+                ModificationUtil.AddChildBefore(parameter, (ElementType.PARAMETERS_PATTERN_DECLARATION.Create()))
+
+            ModificationUtil.AddChild(parameterDecl, parenPat.Copy()) |> ignore
+            deleteChild parameter
 
     let isAnnotated (binding: IBinding) =
         isNotNull binding.ReturnTypeInfo &&
-
-        match binding.HeadPattern with
-        | :? IParametersOwnerPat as parametersOwner ->
-            parametersOwner.ParametersEnumerable |> Seq.forall (fun pat -> pat.IgnoreInnerParens() :? ITypedPat)
-        | _ -> true
+        binding.ParametersPatterns |> Seq.forall (fun p -> p.Pattern.IgnoreInnerParens() :? ITypedPat)
 
     override x.Text = "Add type annotations"
 
@@ -99,24 +97,24 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         isAtLetExprKeywordOrNamedPat dataProvider letBindings && not (isAnnotated bindings.[0])
 
     override x.ExecutePsiTransaction _ =
-        let binding = dataProvider.GetSelectedElement<IBinding>()
+        let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
+        let binding = letBindings.Bindings |> Seq.exactlyOne
         let factory = binding.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let namedPat = binding.HeadPattern.As<INamedPat>()
-        if isNull namedPat then () else
+        let refPat = binding.HeadPattern.As<IReferencePat>()
+        if isNull refPat then () else
 
-        let symbolUse = namedPat.GetFSharpSymbolUse()
+        let symbolUse = refPat.GetFSharpSymbolUse()
         if isNull symbolUse then () else
 
         let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
         let displayContext = symbolUse.DisplayContext
 
-        let parametersOwner = namedPat.As<IParametersOwnerPat>()
-        if isNotNull parametersOwner then
-            specifyParameterTypes parametersOwner factory mfv displayContext
+        if binding.HasParameters then
+            specifyParameterTypes binding factory mfv displayContext
 
         if isNull binding.ReturnTypeInfo then
             SpecifyTypes.specifyBindingReturnType binding mfv displayContext

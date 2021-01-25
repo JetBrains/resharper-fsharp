@@ -30,7 +30,7 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         let factory = expr.CreateElementFactory()
-        use enableFormatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
 
         let isSingleLineMatch = expr.IsSingleLine
 
@@ -39,7 +39,13 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
         let clause = 
             addNodesAfter expr.LastChild [
                 if addToNewLine then
-                    NewLine(expr.GetLineEnding())
+                    let lineEnding = expr.GetLineEnding()
+
+                    let lastClause = expr.Clauses.Last()
+                    if not (lastClause.IsSingleLine) && isAfterEmptyLine lastClause then
+                        NewLine(lineEnding)
+
+                    NewLine(lineEnding)
                 else
                     Whitespace()
                 factory.CreateMatchClause()

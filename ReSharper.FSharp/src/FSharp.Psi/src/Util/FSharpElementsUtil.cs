@@ -220,7 +220,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (entity.IsProvided)
         return typeElement;
 
-      return typeElement is IFSharpTypeElement fsTypeElement
+      return typeElement is IFSharpTypeElement fsTypeElement && !mfv.IsConstructor
         ? GetFSharpSourceTypeMember(mfv, fsTypeElement)
         : GetTypeMember(mfv, typeElement);
     }
@@ -228,7 +228,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     private static IDeclaredElement GetFSharpSourceTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
       [NotNull] IFSharpTypeElement fsTypeElement)
     {
-      var name = mfv.IsConstructor ? fsTypeElement.ShortName : mfv.GetMfvCompiledName();
+      var name = mfv.GetMfvCompiledName();
 
       var symbolTableCache = fsTypeElement.GetPsiServices().Caches.GetPsiCache<SymbolTableCache>();
       var symbolTable = symbolTableCache.TryGetCachedSymbolTable(fsTypeElement, SymbolTableMode.FULL);
@@ -269,7 +269,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return range.Contains(decl.GetNameIdentifierRange());
       });
 
-      return singleDeclaration?.GetOrCreateDeclaredElement(mfv);
+      var singleSourceElement = singleDeclaration?.GetOrCreateDeclaredElement(mfv);
+      if (singleSourceElement != null)
+        return singleSourceElement;
+
+      if (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod && !mfv.IsImplicitAccessor())
+        return GetTypeMember(mfv, typeElement);
+
+      return null;
     }
 
     private static IDeclaredElement GetTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
@@ -296,12 +303,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       var mfvXmlDocId = GetXmlDocId(mfv);
-      if (mfvXmlDocId == null)
+      if (mfvXmlDocId.IsEmpty())
         return null;
 
       return members.FirstOrDefault(member =>
         // todo: Fix signature for extension properties
-        member is IFSharpMember fsMember && fsMember.Mfv?.XmlDocSig == mfvXmlDocId ||
+        member is IFSharpMember fsMember && fsMember.Mfv?.GetXmlDocId() == mfvXmlDocId ||
         member.XMLDocId == mfvXmlDocId);
     }
 
@@ -378,20 +385,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return patternId?.GetContainingNode<IFSharpDeclaration>();
     }
 
-    [CanBeNull]
-    public static string GetXmlDocId([NotNull] FSharpMemberOrFunctionOrValue mfv)
+    [NotNull]
+    public static string GetXmlDocId([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
       try
       {
-        return mfv.XmlDocSig;
+        var xmlDocId = mfv.XmlDocSig;
+        if (xmlDocId.StartsWith("P", StringComparison.Ordinal) && mfv.IsCliEvent())
+          return "E" + xmlDocId.Substring(1);
+
+        return xmlDocId;
       }
       catch (Exception e)
       {
         Logger.LogMessage(LoggingLevel.WARN, "Could not get XmlDocId for {0}", mfv);
         Logger.LogExceptionSilently(e);
-        return null;
+        return "";
       }
     }
+
+    public static bool IsCliEvent(this FSharpMemberOrFunctionOrValue mfv) =>
+      mfv.IsProperty && mfv.Attributes.HasAttributeInstance(FSharpPredefinedType.CLIEventAttribute);
+
+    public static bool IsAccessor([NotNull] this FSharpMemberOrFunctionOrValue mfv) =>
+      mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod || mfv.IsEventAddMethod || mfv.IsEventRemoveMethod;
 
     private static T FindNode<T>(Range.range range, [CanBeNull] ITreeNode node) where T : class, ITreeNode
     {
@@ -401,6 +418,66 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var idToken = fsFile.FindTokenAt(document.GetTreeEndOffset(range) - 1);
       return idToken?.GetContainingNode<T>(true);
+    }
+
+    public static IList<IParameter> GetParameters<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
+      where T : IParametersOwner, IFSharpTypeParametersOwner
+    {
+      if (mfv == null)
+        return EmptyList<IParameter>.Instance;
+
+      var module = function.Module;
+      var paramGroups = mfv.CurriedParameterGroups;
+      var isFsExtension = mfv.IsExtensionMember;
+      var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit;
+
+      if (!isFsExtension && isVoidReturn)
+        return EmptyArray<IParameter>.Instance;
+
+      var paramsCount = GetElementsCount(paramGroups);
+      if (paramsCount == 0)
+        return EmptyList<IParameter>.Instance;
+
+      var typeParameters = function.AllTypeParameters;
+      var methodParams = new List<IParameter>(paramsCount);
+      if (isFsExtension && mfv.IsInstanceMember)
+      {
+        var typeElement = mfv.ApparentEnclosingEntity.GetTypeElement(module);
+
+        var type =
+          typeElement != null
+            ? TypeFactory.CreateType(typeElement)
+            : TypeFactory.CreateUnknownType(function.Module);
+
+        methodParams.Add(new FSharpExtensionMemberParameter(function, type));
+      }
+
+      if (isVoidReturn)
+        return methodParams;
+
+      foreach (var paramsGroup in paramGroups)
+      foreach (var param in paramsGroup)
+        methodParams.Add(new FSharpMethodParameter(param, function, methodParams.Count,
+          param.Type.MapType(typeParameters, module, true)));
+
+      return methodParams;
+    }
+
+    private static int GetElementsCount<T>([NotNull] IEnumerable<IList<T>> lists)
+    {
+      var count = 0;
+      foreach (var list in lists)
+        count += list.Count;
+      return count;
+    }
+
+    [CanBeNull]
+    public static IAccessorDeclaration TryGet(this IEnumerable<IAccessorDeclaration> accessors, AccessorKind kind)
+    {
+      foreach (var accessor in accessors)
+        if (accessor.Kind == kind)
+          return accessor;
+      return null;
     }
   }
 }

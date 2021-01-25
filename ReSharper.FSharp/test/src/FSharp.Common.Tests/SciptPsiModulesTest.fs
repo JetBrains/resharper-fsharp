@@ -2,19 +2,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Common.Scripts
 
 open System
 open System.IO
+open System.Linq
 open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.Application.Environment
+open JetBrains.Application.platforms
 open JetBrains.DataFlow
+open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.BuildTools
+open JetBrains.ProjectModel.MSBuild.BuildTools
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost.Impl
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ProjectStructure
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
@@ -76,12 +80,17 @@ type ScriptPsiModulesTest() =
 
 
 [<SolutionInstanceComponent>]
-type MyTestSolutionToolset(lifetime: Lifetime, buildToolContainer: BuildToolContainer) =
-    inherit DefaultSolutionToolset(lifetime)
-    
+type MyTestSolutionToolset(lifetime: Lifetime, logger: ILogger) =
+    inherit DefaultSolutionToolset(lifetime, logger)
+
     let changed = new Signal<_>(lifetime, "MySolutionToolset::Changed")
-    let buildTool = buildToolContainer.GetAutoDetected(BuildToolEnvironment.EmptyEnvironment)
-    
+
+    let cli = DotNetCoreRuntimesDetector.DetectDotNetCoreRuntimes().FirstOrDefault().NotNull()
+    let dotnetCoreToolset = DotNetCoreToolset(cli, cli.Sdks.FirstOrDefault().NotNull())
+
+    let env = BuildToolEnvironment.Create(dotnetCoreToolset, null)
+    let buildTool = DotNetCoreMsBuildProvider().Discover(env).FirstOrDefault().NotNull()
+
     interface ISolutionToolset with
         member x.GetBuildTool() = buildTool
         member x.Changed = changed :> _

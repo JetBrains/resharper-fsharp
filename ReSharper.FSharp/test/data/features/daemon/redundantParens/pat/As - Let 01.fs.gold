@@ -1,0 +1,7 @@
+﻿module Module
+
+let |(|(0)A _ as a|)|(1) = ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

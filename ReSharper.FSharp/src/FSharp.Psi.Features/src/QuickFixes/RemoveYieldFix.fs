@@ -25,13 +25,12 @@ type RemoveYieldFix(yieldExpr: IYieldOrReturnExpr) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(yieldExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let expr = yieldExpr.Expression
         let shift = expr.Indent - yieldExpr.Indent
         if shift > 0 then
             // Parsing `return` currently doesn't support deindenting,
             // but we do a defensive indent diff check in case it's supported in future.
-            shiftExpr -shift yieldExpr
+            shiftNode -shift yieldExpr
 
         replaceWithCopy yieldExpr expr

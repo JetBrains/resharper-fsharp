@@ -1,0 +1,1 @@
+bool<[<Measure(* "" *)>] 'm>

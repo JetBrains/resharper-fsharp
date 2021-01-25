@@ -13,6 +13,10 @@
 
   <SeverityConfiguration>
     <Group name="HighlightingGroupIds.CodeRedundancy">
+      <Tag name="FSharpRedundantParens" default="WARNING">
+        <Title>Remove redundant parentheses</Title>
+        <Description>Parentheses can be safely removed without changing code semantics.</Description>
+      </Tag>
       <Tag name="FSharpRedundantOpen" default="WARNING">
         <Title>Redundant 'open' directive</Title>
         <Description>Open directive is not required by the code and can be safely removed.</Description>
@@ -52,6 +56,18 @@
       <Tag name="FSharpRedundantRequireQualifiedAccessAttribute" default="WARNING">
         <Title>Redundant RequireQualifiedAccess attribute</Title>
         <Description>Enum type always requires qualified access.</Description>
+      </Tag>
+      <Tag name="FSharpLambdaCanBeSimplified" default="HINT">
+        <Title>Lambda expression can be simplified</Title>
+        <Description>Lambda expression can be simplified.</Description>
+      </Tag>
+      <Tag name="FSharpBuiltinFunctionReimplementation" default="HINT">
+        <Title>Lambda expression can be replaced with built-in function</Title>
+        <Description>Lambda expression can be replaced with built-in function.</Description>
+      </Tag>
+      <Tag name="FSharpUseWildSelfId" default="SUGGESTION">
+        <Title>Use `_` self id</Title>
+        <Description>Use `_` self id.</Description>
       </Tag>
     </Group>
   </SeverityConfiguration>
@@ -125,6 +141,8 @@
     <Parameter type="IParenExpr" name="parenExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
+    <Range>parenExpr.LeftParen.GetHighlightingRange()</Range>
+    <SecondaryRanges>secondaryRangesFromNode parenExpr.RightParen</SecondaryRanges>
     <QuickFix>RemoveRedundantParenExprFix</QuickFix>
   </Warning>
 
@@ -132,7 +150,18 @@
     <Parameter type="IParenPat" name="parenPat"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
-    <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
+    <Range>parenPat.LeftParen.GetHighlightingRange()</Range>
+    <SecondaryRanges>secondaryRangesFromNode parenPat.RightParen</SecondaryRanges>
+    <QuickFix>RemoveRedundantParenPatFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantParenTypeUsage" configurableSeverity="FSharpRedundantParens">
+    <Parameter type="IParenTypeUsage" name="parenTypeUsage"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant parentheses"/>
+    <Range>parenTypeUsage.LeftParen.GetHighlightingRange()</Range>
+    <SecondaryRanges>secondaryRangesFromNode parenTypeUsage.RightParen</SecondaryRanges>
+    <QuickFix>RemoveRedundantParenTypeUsageFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantAttributeParens" configurableSeverity="FSharpRedundantAttributeParens">
@@ -182,7 +211,7 @@
     <QuickFix>ReplaceAppExprWithArgFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaCanBeSimplified">
+  <Warning name="LambdaCanBeSimplified" configurableSeverity="FSharpLambdaCanBeSimplified">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
@@ -190,14 +219,14 @@
     <QuickFix>SimplifyLambdaFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaBodyCanBeReplacedWithId">
+  <Warning name="LambdaBodyCanBeReplacedWithId" configurableSeverity="FSharpLambdaCanBeSimplified">
     <Parameter type="ILambdaExpr" name="lambda"/>
     <Range>lambda.GetHighlightingRange()</Range>
     <Message value="Lambda body can be replaced with 'id'"/>
     <QuickFix>ReplaceLambdaBodyWithIdFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplacedWithInnerExpression">
+  <Warning name="LambdaCanBeReplacedWithInnerExpression" configurableSeverity="FSharpLambdaCanBeSimplified">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
@@ -207,7 +236,7 @@
     <QuickFix>ReplaceLambdaWithInnerExpressionFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplacedWithBuiltinFunction">
+  <Warning name="LambdaCanBeReplacedWithBuiltinFunction" configurableSeverity="FSharpBuiltinFunctionReimplementation">
     <Parameter type="ILambdaExpr" name="lambda"/>
     <Parameter type="string" name="funName"/>
     <Range>lambda.GetHighlightingRange()</Range>
@@ -215,6 +244,13 @@
       <Argument>sprintf "Lambda can be replaced with '%s'" funName</Argument>
     </Message>
     <QuickFix>ReplaceLambdaWithBuiltinFunctionFix</QuickFix>
+  </Warning>
+
+  <Warning name="UseWildSelfId" configurableSeverity="FSharpUseWildSelfId">
+    <Parameter type="INamedSelfId" name="selfId" />
+    <Message value="Use '_'"/>
+    <Range>selfId.GetDocumentRange()</Range>
+    <QuickFix>UseWildSelfIdFix</QuickFix>
   </Warning>
 
 </Errors>

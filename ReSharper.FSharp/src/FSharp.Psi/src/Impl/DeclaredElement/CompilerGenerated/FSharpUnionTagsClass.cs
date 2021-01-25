@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -43,6 +44,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public INamespace GetContainingNamespace() =>
       Union.GetContainingNamespace();
+
+    public bool HasMemberWithName(string shortName, bool ignoreCase)
+    {
+      var comparisonRule = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+
+      foreach (var name in MemberNames)
+        if (string.Equals(name, shortName, comparisonRule))
+          return true;
+
+      return false;
+    }
 
     public IPsiSourceFile GetSingleOrDefaultSourceFile() =>
       Union.GetSingleOrDefaultSourceFile();

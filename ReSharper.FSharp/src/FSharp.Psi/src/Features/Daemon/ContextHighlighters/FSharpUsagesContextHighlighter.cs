@@ -90,7 +90,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
       var isGreaterOp =
         symbol is FSharpMemberOrFunctionOrValue mfv && mfv.LogicalName == StandardOperatorNames.GreaterThan;
 
-      var symbolUsages = checkResults?.GetUsesOfSymbolInFile(symbol).RunAsTask();
+      var symbolUsages = checkResults?.GetUsesOfSymbolInFile(symbol, null);
       if (symbolUsages == null)
         return;
 

@@ -45,9 +45,7 @@ type SetNameAction(dataProvider: FSharpContextActionDataProvider) =
 
         let elementType =
             match skipIntermediatePatParents wildPat with
-            | :? ITopBinding as topBinding when
-                    not (topBinding.HeadPattern :? IParametersOwnerPat) ->
-                ElementType.TOP_REFERENCE_PAT
+            | :? ITopBinding as topBinding when not (topBinding.HasParameters) -> ElementType.TOP_REFERENCE_PAT
             | _ -> ElementType.LOCAL_REFERENCE_PAT
 
         let refPat = ModificationUtil.ReplaceChild(wildPat, elementType.Create())
@@ -63,5 +61,5 @@ type SetNameAction(dataProvider: FSharpContextActionDataProvider) =
             let escapeAction = LiveTemplatesManager.EscapeAction.LeaveTextAndCaret
             LiveTemplatesManager.Instance
                 .CreateHotspotSessionAtopExistingText(solution, endCaretPosition, textControl, escapeAction, hotspots)
-                .Execute() |> ignore
+                .Execute()
         )

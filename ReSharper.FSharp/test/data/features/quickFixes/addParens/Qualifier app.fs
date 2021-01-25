@@ -1,0 +1,3 @@
+module Say
+
+ignore "".ToString().Length{caret}

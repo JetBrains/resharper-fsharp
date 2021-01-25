@@ -5,10 +5,11 @@
     JetBrains.ReSharper.Plugins.FSharp.Psi;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
-    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
-    JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   </Usings>
 
   <StaticSeverityGroups>
@@ -75,10 +76,11 @@
       <Argument>pat.SourceName</Argument>
     </Message>
     <Range>pat.GetNavigationRange()</Range>
+    <SecondaryRanges>pat.GetPartialDeclarations() |> Seq.filter ((!=) pat) |> getNodeRanges</SecondaryRanges>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
     <QuickFix>AddUnderscorePrefixFix</QuickFix>
-    <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
     <QuickFix>RemoveUnusedNamedAsPatFix</QuickFix>
   </Warning>
 
@@ -90,8 +92,8 @@
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>AddIgnoreFix</QuickFix>
     <QuickFix>IntroduceVarFix</QuickFix>
+    <QuickFix>AddIgnoreFix</QuickFix>
     <QuickFix>RemoveSubsequentFix</QuickFix>
     <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
   </Warning>
@@ -104,8 +106,8 @@
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>AddIgnoreFix</QuickFix>
     <QuickFix>IntroduceVarFix</QuickFix>
+    <QuickFix>AddIgnoreFix</QuickFix>
     <QuickFix>RemoveSubsequentFix</QuickFix>
   </Warning>
   
@@ -210,7 +212,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="SuccessiveArgsShouldBeSpacedOrTupled">
-    <Parameter type="IPrefixAppExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Range>expr.GetHighlightingRange()</Range>
     <Message value="Successive arguments should be separated by spaces, tupled, or parenthesized"/>
     <Behavour overlapResolvePolicy="NONE"/>
@@ -234,7 +236,7 @@
       <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
     </Message>
     <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression.GetHighlightingRange()</Range>
-    <SecondaryRanges>getAllExpressionArgs expr |> Seq.tail |> getExpressionsRanges</SecondaryRanges>
+    <SecondaryRanges>getAllExpressionArgs expr |> Seq.tail |> getNodeRanges</SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddParensToApplicationFix</QuickFix>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
@@ -258,6 +260,7 @@
     </Message>
     <Range>typeDecl.GetNameDocumentRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateMissingOverridesFix</QuickFix>
     <QuickFix>ToAbstractFix</QuickFix>
   </Error>
 
@@ -267,7 +270,7 @@
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>impl.TypeName.GetHighlightingRange()</Range>
+    <Range>getInterfaceImplHeaderRange impl</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>GenerateInterfaceMembersFix</QuickFix>
   </Error>
@@ -294,6 +297,14 @@
     <Range>identifier.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>NamespaceToModuleFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="TypeAbbreviationsCannotHaveAugmentations">
+    <Parameter type="ITypeExtensionDeclaration" name="extensionDecl"/>
+    <Message value="Type abbreviations cannot have augmentations"/>
+    <Range>extensionDecl.Identifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithAbbreviatedTypeFix</QuickFix>
   </Error>
 
 </Errors>

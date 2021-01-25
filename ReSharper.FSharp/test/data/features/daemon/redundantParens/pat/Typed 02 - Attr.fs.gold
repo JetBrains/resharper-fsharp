@@ -1,0 +1,16 @@
+﻿module Module
+
+let f1 ([<A>] a: int) = ()
+let f2 ([<A>] |(|(0)a: int|)|(1)) = ()
+let f3 (|(|(2)[<A>] a|)|(3): int) = ()
+let f4 |(|(4)(|(|(5)[<A>] a|)|(6): int)|)|(7) = ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5): ReSharper Dead Code: Redundant parentheses
+(6):<secondary> ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses

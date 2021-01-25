@@ -4,17 +4,17 @@ using JetBrains.Application.Settings.Calculated.Interface;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Services.Formatter;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 {
   [Language(typeof(FSharpLanguage))]
   public class FSharpFormatterInfoProvider :
@@ -72,7 +72,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
       var typeDeclarationIndentingRulesParameters = new[]
       {
-        ("TypeDeclaration", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.TYPE_REPR),
+        ("TypeDeclarationRepr", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.TYPE_REPR),
+        ("TypeDeclarationMemberList", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.MEMBER_LIST),
+        ("ClassReprTypeMemberList", ElementType.CLASS_REPRESENTATION, ClassRepresentation.MEMBER_LIST),
+        ("StructReprTypeMemberList", ElementType.STRUCT_REPRESENTATION, StructRepresentation.MEMBER_LIST),
+        ("InterfaceReprTypeMemberList", ElementType.INTERFACE_REPRESENTATION, InterfaceRepresentation.MEMBER_LIST),
+        ("ExceptionMemberList", ElementType.EXCEPTION_DECLARATION, ExceptionDeclaration.MEMBER_LIST),
+        ("InterfaceImplMemberList", ElementType.INTERFACE_IMPLEMENTATION, InterfaceImplementation.MEMBER_LIST),
         ("ModuleAbbreviationDeclaration", ElementType.MODULE_ABBREVIATION_DECLARATION, ModuleAbbreviationDeclaration.TYPE_REFERENCE),
       };
 
@@ -149,7 +155,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           Parent()
             .HasType(ElementType.DO_STATEMENT)
-            .Satisfies((node, context) => !((IDoStatement) node).IsImplicit),
+            .Satisfies((node, _) => !((IDoStatement) node).IsImplicit),
           Node().HasRole(DoStatement.CHAMELEON_EXPR))
         .Return(IndentType.External)
         .Build();
@@ -181,6 +187,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("BinaryExpr", ElementType.BINARY_APP_EXPR),
         ("RecordDeclaration", ElementType.RECORD_FIELD_DECLARATION_LIST),
         ("RecordExprBindings", ElementType.RECORD_FIELD_BINDING_LIST),
+        ("MemberDeclarationList", ElementType.MEMBER_DECLARATION_LIST),
+        ("TypeMemberDeclarationList", ElementType.TYPE_MEMBER_DECLARATION_LIST),
       };
 
       alignmentRulesParameters
@@ -192,7 +200,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           GrandParent().HasType(ElementType.BINARY_APP_EXPR),
           Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
-          Node().Satisfies((node, context) => !IsPipeOperator(node)))
+          Node().Satisfies((node, _) => !IsPipeOperator(node)))
         .Switch(settings => settings.OutdentBinaryOperators,
           When(true).Return(IndentType.Outdent | IndentType.External))
         .Build();
@@ -202,7 +210,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           GrandParent().HasType(ElementType.BINARY_APP_EXPR),
           Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
-          Node().Satisfies((node, context) => IsPipeOperator(node)))
+          Node().Satisfies((node, _) => IsPipeOperator(node)))
         .Switch(settings => settings.OutdentBinaryOperators,
           When(true).Switch(settings => settings.NeverOutdentPipeOperators,
             When(false).Return(IndentType.Outdent | IndentType.External)))
@@ -221,7 +229,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
         .Name("SpacesInMemberConstructorDecl")
-        .Where(Parent().HasType(ElementType.MEMBER_CONSTRUCTOR_DECLARATION))
+        .Where(Parent().HasType(ElementType.SECONDARY_CONSTRUCTOR_DECLARATION))
         .Return(IntervalFormatType.Space)
         .Build();
 
@@ -230,7 +238,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           Left()
             .HasType(ElementType.RECORD_FIELD_BINDING)
-            .Satisfies((node, context) => ((IRecordFieldBinding) node).Semicolon != null),
+            .Satisfies((node, _) => ((IRecordFieldBinding) node).Semicolon != null),
           Right().HasType(ElementType.RECORD_FIELD_BINDING))
         .Return(IntervalFormatType.Space)
         .Build();
@@ -241,7 +249,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           Left()
             .HasType(ElementType.RECORD_FIELD_BINDING)
-            .Satisfies((node, context) => ((IRecordFieldBinding) node).Semicolon == null),
+            .Satisfies((node, _) => ((IRecordFieldBinding) node).Semicolon == null),
           Right().HasType(ElementType.RECORD_FIELD_BINDING))
         .Return(IntervalFormatType.NewLine)
         .Build();

@@ -6,10 +6,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-[<ElementProblemAnalyzer([| typeof<ILocalParametersOwnerPat> |],
+[<ElementProblemAnalyzer([| typeof<IParametersOwnerPat> |],
                          HighlightingTypes = [| typeof<RedundantUnionCaseFieldPatternsWarning> |])>]
 type RedundantUnionCaseFieldPatsAnalyzer() =
-    inherit ElementProblemAnalyzer<ILocalParametersOwnerPat>()
+    inherit ElementProblemAnalyzer<IParametersOwnerPat>()
 
     let isWildTuplePat (pat: ITuplePat) =
         pat.PatternsEnumerable |> Seq.forall (fun pat -> pat.IgnoreInnerParens() :? IWildPat)

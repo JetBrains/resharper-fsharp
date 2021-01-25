@@ -1,0 +1,8 @@
+﻿type I =
+    [<CLIEvent>]
+    abstract E: IEvent<int>
+
+type T() =
+    interface I with
+      [<CLIEvent>]
+      member this.E = failwith "todo"{caret}

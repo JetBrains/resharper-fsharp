@@ -1,4 +1,4 @@
-﻿Suggested names: unit
+﻿Suggested names: ignore, unit
 do
   let a = 1
-  let unit = ignore 1
+  let ignore = ignore 1

@@ -4,6 +4,7 @@ open System.Collections.Generic
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -106,34 +107,38 @@ type FSharpImportTypeHelper() =
 type FSharpQuickFixUtilComponent() =
     let [<Literal>] FcsOpName = "FSharpQuickFixUtilComponent.BindTo"
 
-    interface IQuickFixUtilComponent with
+    member x.BindTo(reference: FSharpSymbolReference, typeElement: ITypeElement) =
+        let referenceOwner = reference.GetElement()
+        use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
+
+        FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, typeElement)
+        if FSharpResolveUtil.resolvesToQualified typeElement reference FcsOpName then reference else
+
+        let moduleToOpen = getModuleToOpen typeElement
+        let fsFile = referenceOwner.FSharpFile
+        let namingService = NamingManager.GetNamingLanguageService(fsFile.Language)
+
+        let nameToOpen =
+            toQualifiedList moduleToOpen
+            |> List.map (fun el ->
+                let sourceName = el.GetSourceName()
+                namingService.MangleNameIfNecessary(sourceName))
+            |> String.concat "."
+
+        if nameToOpen.IsNullOrEmpty() then reference else
+
+        let settings = fsFile.GetSettingsStoreWithEditorConfig()
+        addOpen (referenceOwner.GetDocumentStartOffset()) fsFile settings nameToOpen
+        reference
+    
+    interface IFSharpQuickFixUtilComponent with
         member x.BindTo(reference, typeElement, _, _) =
-            let reference = reference :?> FSharpSymbolReference
-
-            let referenceOwner = reference.GetElement()
-            use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
-
-            FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, typeElement)
-            if FSharpResolveUtil.resolvesToQualified typeElement reference FcsOpName then reference :> _ else
-
-            let moduleToOpen = getModuleToOpen typeElement
-            let fsFile = referenceOwner.FSharpFile
-            let namingService = NamingManager.GetNamingLanguageService(fsFile.Language)
-
-            let nameToOpen =
-                toQualifiedList moduleToOpen
-                |> List.map (fun el ->
-                    let sourceName = el.GetSourceName()
-                    namingService.MangleNameIfNecessary(sourceName))
-                |> String.concat "."
-
-            if nameToOpen.IsNullOrEmpty() then reference :> _ else
-
-            let settings = fsFile.GetSettingsStoreWithEditorConfig()
-            addOpen (referenceOwner.GetDocumentStartOffset()) fsFile settings nameToOpen
-            reference :> _
+            x.BindTo(reference :?> _, typeElement) :> _
 
         member x.AddImportsForExtensionMethod(reference, _) = reference
+
+        member this.BindTo(reference, typeElement) =
+            this.BindTo(reference :?> _, typeElement) :> _
 
 
 // todo: ExtensionMethodImportUtilBase

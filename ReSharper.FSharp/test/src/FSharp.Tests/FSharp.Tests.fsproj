@@ -28,6 +28,7 @@
     <Compile Include="Parsing\FSharpParserTest.fs" />
     <Compile Include="Daemon\FSharpHighlightingTestBase.fs" />
     <Compile Include="Daemon\IdentifierHighlightingTest.fs" />
+    <Compile Include="Daemon\FcsErrorsHighlightingTest.fs" />
     <Compile Include="Daemon\ErrorsHighlightingTest.fs" />
     <Compile Include="Daemon\FormatSpecifiersHighlightingTest.fs" />
     <Compile Include="Daemon\InferredTypeCodeVisionProviderTest.fs" />
@@ -37,13 +38,12 @@
     <Compile Include="Daemon\SyntaxHighlightingTest.fs" />
     <Compile Include="Daemon\RedundantParenExprTest.fs" />
     <Compile Include="Daemon\RedundantParenPatTest.fs" />
-    <Compile Include="Daemon\StringEscapingTest.fs" />
+    <Compile Include="Daemon\RedundantParenTypeUsageTest.fs" />
+    <Compile Include="Daemon\StringAnalyzerTest.fs" />
     <Compile Include="Daemon\RedundantAttributeParensTest.fs" />
     <Compile Include="Daemon\RedundantAttributeSuffixAnalyzerTest.fs" />
     <Compile Include="Daemon\FSharpColorHighlightingTest.fs" />
     <Compile Include="Daemon\RedundantQualifiersTest.fs" />
-    <Compile Include="Daemon\RedundantUnionCaseFieldPatsTest.fs" />
-    <Compile Include="Daemon\ListConsPatAnalyzerTest.fs" />
     <Compile Include="Daemon\AppExprAnalyzerTest.fs" />
     <Compile Include="Daemon\LambdaAnalyzerTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
@@ -91,6 +91,8 @@
     <Compile Include="QuickFixes\ReplaceLambdaBodyWithIdTest.fs" />
     <Compile Include="QuickFixes\GenerateInterfaceMembersFixTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantAttributeTest.fs" />
+    <Compile Include="QuickFixes\ReplaceWithAbbreviatedTypeTest.fs" />
+    <Compile Include="QuickFixes\RemoveRedundantParens.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
@@ -104,9 +106,11 @@
     <Compile Include="Intentions\SpecifyTypesTest.fs" />
     <Compile Include="Intentions\ToLiteralTest.fs" />
     <Compile Include="Intentions\LetToUseTest.fs" />
+    <Compile Include="Intentions\RenameFileToMatchTypeNameTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />
+    <Compile Include="Generate\FSharpGenerateOverridesTest.fs" />
     <Compile Include="Refactorings\RenameTest.fs" />
     <Compile Include="Refactorings\IntroduceVarTest.fs" />
     <Compile Include="Refactorings\InlineVarTest.fs" />
@@ -114,13 +118,16 @@
     <Compile Include="FSharpOccurenceKindTest.fs" />
     <Compile Include="NavigationTests.fs" />
     <Compile Include="FSharpCompletionTest.fs" />
+    <Compile Include="FSharpIconProviderTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
     <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="NUnit.Console" Version="3.10.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
   </ItemGroup>
 
   <ItemGroup>

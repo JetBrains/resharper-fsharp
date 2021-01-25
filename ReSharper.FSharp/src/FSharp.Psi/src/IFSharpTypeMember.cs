@@ -12,23 +12,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     bool IsVisibleFromFSharp { get; }
     bool CanNavigateTo { get; }
-
-    bool IsExtensionMember { get; }
   }
 
-  public interface IFSharpMember : IFSharpTypeMember
+  public interface IFSharpMember : IFSharpTypeMember, IOverridableMember
   {
     [CanBeNull] FSharpMemberOrFunctionOrValue Mfv { get; }
   }
-  
+
   public interface IFSharpTypeParametersOwner : IFSharpDeclaredElement
   {
     IList<ITypeParameter> AllTypeParameters { get; }
   }
 
-  public interface IFSharpGeneratedFromOtherElement : IFSharpDeclaredElement
+  public interface ISecondaryDeclaredElement
   {
     [NotNull] IClrDeclaredElement OriginElement { get; }
+  }
+
+  public interface IFSharpGeneratedElement : IFSharpDeclaredElement
+  {
+  }
+
+  public interface IFSharpGeneratedFromOtherElement : IFSharpGeneratedElement, ISecondaryDeclaredElement
+  {
     IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer();
   }
 

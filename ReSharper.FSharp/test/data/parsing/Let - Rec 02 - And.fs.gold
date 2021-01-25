@@ -7,10 +7,11 @@ IFSharpImplFile
       FSharpTokenType+RecTokenElement(type:REC, text:rec)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding
-        ITopParametersOwnerPat
+        ITopReferencePat
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:f)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IParametersPatternDeclaration
           ILocalReferencePat
             IExpressionReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:x)
@@ -25,10 +26,11 @@ IFSharpImplFile
       FSharpTokenType+AndTokenElement(type:AND, text:and)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding
-        ITopParametersOwnerPat
+        ITopReferencePat
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:g)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IParametersPatternDeclaration
           ILocalReferencePat
             IExpressionReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:x)

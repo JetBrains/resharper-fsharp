@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using FSharp.Compiler.SourceCodeServices;
-using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
@@ -34,7 +32,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public override bool IsCompatibleWithLanguage(PsiLanguageType languageType) => languageType.Is<FSharpLanguage>();
 
-    public override IDomainSpecificSearcher CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates) =>
+    public override IDomainSpecificSearcher
+      CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates) =>
       new FSharpReferenceSearcher(elements, findCandidates);
 
     public override IEnumerable<string> GetAllPossibleWordsInFile(IDeclaredElement element) =>
@@ -89,19 +88,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
     public override IEnumerable<RelatedDeclaredElement> GetRelatedDeclaredElements(IDeclaredElement element)
     {
       if (element is IUnionCase unionCase)
-        return GetUnionCaseRelatedElements(unionCase);
+        return unionCase.GetGeneratedMembers().Select(member => new RelatedDeclaredElement(member));
 
       if (element is IGeneratedConstructorParameterOwner parameterOwner &&
           parameterOwner.GetGeneratedParameter() is { } parameter)
         return new[] {new RelatedDeclaredElement(parameter)};
 
+      if (element is IFSharpProperty property)
+        return property.Getters.Concat(property.Setters).Select(member => new RelatedDeclaredElement(member));
+
       return EmptyList<RelatedDeclaredElement>.Instance;
     }
 
-    private static IEnumerable<RelatedDeclaredElement> GetUnionCaseRelatedElements([NotNull] IUnionCase unionCase) =>
-      unionCase.GetGeneratedMembers().Select(member => new RelatedDeclaredElement(member));
-
-    public override Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)
+    public override NavigateTargets GetNavigateToTargets(IDeclaredElement element)
     {
       if (element is ResolvedFSharpSymbolElement resolvedSymbolElement &&
           resolvedSymbolElement.Symbol is FSharpActivePatternCase activePatternCase)
@@ -111,35 +110,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         var entityOption = activePattern.DeclaringEntity;
         var patternNameOption = activePattern.Name;
         if (entityOption == null || patternNameOption == null)
-          return null;
+          return NavigateTargets.Empty;
 
-        var typeElement = FSharpElementsUtil.GetTypeElement(entityOption.Value, resolvedSymbolElement.Module);
+        var typeElement = entityOption.Value.GetTypeElement(resolvedSymbolElement.Module);
         var pattern = typeElement.EnumerateMembers(patternNameOption.Value, true).FirstOrDefault() as IDeclaredElement;
         if (pattern is IFSharpTypeMember)
         {
           if (!(pattern.GetDeclarations().FirstOrDefault() is IFSharpDeclaration patternDecl))
-            return null;
+            return NavigateTargets.Empty;
 
           var caseElement = patternDecl.GetActivePatternByIndex(activePatternCase.Index);
           if (caseElement != null)
-            return CreateTarget(caseElement);
+            return new NavigateTargets(caseElement, false);
         }
         else if (pattern != null)
-          return CreateTarget(pattern);
+          return new NavigateTargets(pattern, false);
       }
 
-      if (element is IFSharpGeneratedFromOtherElement generated && generated.OriginElement is { } origin)
-        return CreateTarget(origin);
+      if (element is ISecondaryDeclaredElement {OriginElement: { } origin})
+        return new NavigateTargets(origin, false);
 
       if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.CanNavigateTo)
-        return null;
+        return NavigateTargets.Empty;
 
       return fsTypeMember.GetContainingType() is IDeclaredElement containingType
-        ? CreateTarget(containingType)
-        : null;
+        ? new NavigateTargets(containingType, false)
+        : NavigateTargets.Empty;
     }
-
-    private static Tuple<ICollection<IDeclaredElement>, bool> CreateTarget(IDeclaredElement element) =>
-      new Tuple<ICollection<IDeclaredElement>, bool>(new[] {element}, false);
   }
 }

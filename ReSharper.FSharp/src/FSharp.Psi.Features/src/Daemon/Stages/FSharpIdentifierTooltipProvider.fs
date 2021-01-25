@@ -6,7 +6,6 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
@@ -40,26 +39,21 @@ type FSharpIdentifierTooltipProvider
             LayoutTag.Field, FSharpHighlightingAttributeIds.Field
             LayoutTag.Interface, FSharpHighlightingAttributeIds.Interface
             LayoutTag.Keyword, FSharpHighlightingAttributeIds.Keyword
-            //LayoutTag.LineBreak
             LayoutTag.Local, FSharpHighlightingAttributeIds.Value
             LayoutTag.Record, FSharpHighlightingAttributeIds.Record
-            LayoutTag.RecordField, FSharpHighlightingAttributeIds.Property
+            LayoutTag.RecordField, FSharpHighlightingAttributeIds.Field
             LayoutTag.Method, FSharpHighlightingAttributeIds.Method
-            LayoutTag.Member, FSharpHighlightingAttributeIds.Value
+            LayoutTag.Member, FSharpHighlightingAttributeIds.Property
             LayoutTag.ModuleBinding, FSharpHighlightingAttributeIds.Value
             LayoutTag.Module, FSharpHighlightingAttributeIds.Module
             LayoutTag.Namespace, FSharpHighlightingAttributeIds.Namespace
-            LayoutTag.NumericLiteral, FSharpHighlightingAttributeIds.Literal
+            LayoutTag.NumericLiteral, FSharpHighlightingAttributeIds.Number
             LayoutTag.Operator, FSharpHighlightingAttributeIds.Operator
-            //LayoutTag.Parameter, FSharpHighlightingAttributeIds.Parameter
             LayoutTag.Parameter, FSharpHighlightingAttributeIds.Value
             LayoutTag.Property, FSharpHighlightingAttributeIds.Property
-            //LayoutTag.Space
             LayoutTag.StringLiteral, FSharpHighlightingAttributeIds.String
             LayoutTag.Struct, FSharpHighlightingAttributeIds.Struct
             LayoutTag.TypeParameter, FSharpHighlightingAttributeIds.TypeParameter
-            //LayoutTag.Text
-            //LayoutTag.Punctuation
             LayoutTag.UnknownType, FSharpHighlightingAttributeIds.Class
             LayoutTag.UnknownEntity, FSharpHighlightingAttributeIds.Value
         ]
@@ -93,7 +87,7 @@ type FSharpIdentifierTooltipProvider
 
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
-    static member GetFSharpToolTipText(userOpName: string, checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
+    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
         // todo: fix getting qualifiers
         let tokenNames = [token.Name]
 
@@ -102,11 +96,8 @@ type FSharpIdentifierTooltipProvider
         let lineText = sourceFile.Document.GetLineText(coords.Line)
         use cookie = CompilationContextCookie.GetOrCreate(sourceFile.GetPsiModule().GetContextFromModule())
 
-        use op = token.CheckerService.FcsReactorMonitor.MonitorOperation userOpName
-
         // todo: provide tooltip for #r strings in fsx, should pass String tag
-        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier, op.OperationName)
-        getTooltip.RunAsTask()
+        checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier)
 
     override x.GetRichTooltip(highlighter) =
         if not highlighter.IsValid then emptyPresentation else
@@ -133,7 +124,7 @@ type FSharpIdentifierTooltipProvider
         | None -> emptyPresentation
         | Some results ->
 
-        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(opName, results.CheckResults, token)
+        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(results.CheckResults, token)
 
         layouts
         |> List.collect (function

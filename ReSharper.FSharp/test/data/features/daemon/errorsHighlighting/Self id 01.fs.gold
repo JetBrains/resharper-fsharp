@@ -1,0 +1,7 @@
+﻿module Module
+
+type T() =
+    member |__|(0).P = 1
+
+---------------------------------------------------------
+(0): ReSharper Suggestion: Use '_'

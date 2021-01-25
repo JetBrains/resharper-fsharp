@@ -1,0 +1,23 @@
+﻿module Module
+
+match None, None with
+| |a|(0), _
+| _, |a|(1) -> ()
+|| a -> ()|(2)
+
+match None, None with
+| a, _
+| _, a -> a |> ignore
+|| a -> ()|(3)
+
+match None, None with
+| _, Some (|a|(4) | |a|(5)) -> ()
+| _ -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: The value 'a' is unused
+(1): ReSharper Dead Code: The value 'a' is unused
+(2): ReSharper Dead Code: This rule will never be matched
+(3): ReSharper Dead Code: This rule will never be matched
+(4): ReSharper Dead Code: The value 'a' is unused
+(5): ReSharper Dead Code: The value 'a' is unused

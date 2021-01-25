@@ -1,0 +1,20 @@
+﻿Provided elements:
+ 0: E:Microsoft.FSharp.Control.FSharpHandler`1[T -> System.Int32]
+ 1: ToString():System.String
+ 2: Equals(System.Object):System.Boolean
+ 3: GetHashCode():System.Int32
+ 4: Finalize():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:E:Microsoft.FSharp.Control.FSharpHandler`1[T -> System.Int32]}
+
+[<AbstractClass>]
+type A() =
+    [<CLIEvent>]
+    abstract E: IEvent<int>
+
+type T() ={caret}
+    inherit A()
+
+    [<CLIEvent>]
+    override this.E = failwith "todo"

@@ -62,7 +62,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let elementFactory = fsFile.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
-        use enableFormatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
 
         let isSingleLine = recordExpr.IsSingleLine
 
@@ -119,4 +119,4 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
                     solution, endCaretPosition, textControl,
                     LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
 
-            hotspotSession.Execute() |> ignore)
+            hotspotSession.Execute())

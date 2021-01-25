@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   public static class NamedPatEx
   {
     [CanBeNull]
-    public static IBinding GetBinding([CanBeNull] this INamedPat pat)
+    public static IBindingLikeDeclaration GetBinding([CanBeNull] this INamedPat pat)
     {
       if (pat == null)
         return null;
@@ -16,13 +16,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         switch (node)
         {
-          case IBinding binding:
-            return binding;
-          case ITopParametersOwnerPat parametersOwner when parametersOwner.IsDeclaration:
-            return null;
-          default:
+          case IFSharpPattern:
             node = node.Parent;
             break;
+          case IBindingLikeDeclaration binding:
+            return binding;
+          default:
+            return null;
         }
       }
 

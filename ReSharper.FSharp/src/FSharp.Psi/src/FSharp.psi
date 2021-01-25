@@ -135,6 +135,7 @@ interface moduleMember:
   typeDeclarationGroup |
   exceptionDeclaration |
   letBindingsDeclaration |
+  externDeclaration |
   moduleAbbreviationDeclaration |
   openStatement |
   doStatement |
@@ -170,11 +171,11 @@ interface letBindings:
   letBindingsDeclaration |
   letOrUseExpr;
 
-interface binding:
-  bindingImplementation
+interface bindingLikeDeclaration:
+  binding |
   bindingSignature;
 
-interface bindingImplementation:
+interface binding:
   topBinding |
   localBinding;
 
@@ -183,9 +184,10 @@ topBinding extras {
   get { methodName="Attributes" path=<topBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  INLINE<INLINE, InlineKeyword>?
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
+  typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
@@ -194,9 +196,10 @@ localBinding extras {
   get { methodName="Attributes" path=<localBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  INLINE<INLINE, InlineKeyword>?
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
+  typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
   fSharpExpression<EXPR, Expression>;
@@ -207,6 +210,21 @@ returnTypeInfo extras {
   COLON<FSHARP_COLON, Colon>
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   typeUsage<TYPE, ReturnType>;
+
+externDeclaration:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  EXTERN
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  fSharpIdentifier<IDENTIFIER, Identifier>;
+//   cLikeParameterList<PARAMETER_LIST, ParameterList>;
+
+// cLikeParameterList:
+//   LPAREN
+//   fakeSeparator
+//   RPAREN;
+
+
+// todo: extract declaring pattern interface
 
 interface fSharpPattern:
   namedPat |
@@ -220,33 +238,30 @@ interface fSharpPattern:
   recordPat |
   optionalValPat |
   isInstPat |
-  listPat |
   listConsPat |
+  parametersOwnerPat |
   wildPat |
   constPat |
   fieldPat |
-  otherPat;
+  nullPat |
+  quoteExprPat |
+  charRangePat |
+  fromErrorPat;
 
 interface namedPat:
   referencePat |
-  parametersOwnerPat |
   asPat;
 
 interface referencePat:
   localReferencePat |
   topReferencePat;
 
-// todo: fix active pattern and operator decls
-interface parametersOwnerPat:
-  localParametersOwnerPat
-  topParametersOwnerPat;
-
 interface asPat:
   localAsPat |
   topAsPat;
 
 
-localReferencePat options { stubBase="LocalPatternDeclarationBase"; }extras {
+localReferencePat options { stubBase="LocalPatternDeclarationBase"; } extras {
   get { methodName="Identifier" path=<localReferencePat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
 }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>;
@@ -256,14 +271,8 @@ topReferencePat options { stubBase="TopPatternDeclarationBase"; } extras {
 }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>;
 
-localParametersOwnerPat options { stubBase="LocalPatternDeclarationBase"; } extras {
-  get { methodName="Identifier" path=<localParametersOwnerPat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
-}:
-  expressionReferenceName<REFERENCE_NAME, ReferenceName>
-  fSharpPattern<PARAMETER, Parameters>*;
-
-topParametersOwnerPat options { stubBase="TopPatternDeclarationBase"; } extras {
-  get { methodName="Identifier" path=<topParametersOwnerPat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
+parametersOwnerPat options { stubBase="FSharpPatternBase"; } extras {
+  get { methodName="Identifier" path=<parametersOwnerPat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
 }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   fSharpPattern<PARAMETER, Parameters>*;
@@ -300,9 +309,7 @@ orPat options { stubBase="FSharpPatternBase"; }:
   fSharpPattern<PATTERN2, Pattern2>;
 
 andsPat options { stubBase="FSharpPatternBase"; }:
-  fSharpPattern<PATTERN1, Pattern1>
-  AMP
-  fSharpPattern<PATTERN2, Pattern2>;
+  LIST fSharpPattern<PATTERN, Patterns> SEP AMP<AMP, Ands>;
 
 arrayPat options { stubBase="FSharpPatternBase"; }:
   LBRACK_BAR
@@ -316,7 +323,7 @@ listPat options { stubBase="FSharpPatternBase"; }:
 
 tuplePat options { stubBase="FSharpPatternBase"; }:
   STRUCT<STRUCT, StructKeyword>?
-  LIST fSharpPattern<ATTRIBUTE, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
+  LIST fSharpPattern<PATTERN, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
 
 parenPat options { stubBase="FSharpPatternBase"; }:
   LPAREN<LPAREN, LeftParen>
@@ -365,9 +372,21 @@ unitPat options { stubBase="FSharpPatternBase"; }:
   LPAREN<LPAREN, LParen>
   RPAREN<RPAREN, RParen>;
 
+nullPat options { stubBase="FSharpPatternBase"; }:
+  NULL;
 
-otherPat options { stubBase="FSharpPatternBase"; }:
-  fakeSeparator;
+quoteExprPat options { stubBase="FSharpPatternBase"; } extras {
+  get { methodName="Expression" path=<quoteExprPat:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
+  chameleonExpression<CHAMELEON_EXPR, QuoteExpr>;
+
+charRangePat options { stubBase="FSharpPatternBase"; }:
+  CHARACTER_LITERAL
+  DOT_DOT
+  CHARACTER_LITERAL;
+
+fromErrorPat options { stubBase="FSharpPatternBase"; }:
+  fSharpPattern<PATTERN, Pattern>;
 
 
 interface fSharpExpression:
@@ -401,6 +420,7 @@ interface fSharpExpression:
   yieldOrReturnExpr |
 
   // todo: cover cases
+  interpolatedStringExpr |
   libraryOnlyExpr |
   fromErrorExpr;
 
@@ -625,14 +645,15 @@ whileExpr options { stubBase="UnitExpressionBase"; }:
   fSharpExpression<DO_EXPR, DoExpression>;
 
 objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
-  get { methodName="InterfaceMembers" path=<objExpr:INTERFACE_IMPL/interfaceImplementation:MEMBER_DECL> };
+  get { methodName="MemberDeclarations" path=<objExpr:MEMBER_LIST/memberDeclarationList:MEMBER_DECL> };
+  get { methodName="InterfaceMembers" path=<objExpr:INTERFACE_IMPL/interfaceImplementation:MEMBER_LIST/memberDeclarationList:MEMBER_DECL> };
 }:
   LBRACE
   NEW
   typeReferenceName<TYPE_REFERENCE, TypeName>
   fSharpExpression<ARG_EXPR, ArgExpression>
   WITH<WITH, WithKeyword>
-  memberDeclaration<MEMBER_DECL, MemberDeclarations>*
+  memberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
   interfaceImplementation<INTERFACE_IMPL, InterfaceImplementations>*
   RBRACE;
 
@@ -824,6 +845,9 @@ libraryOnlyExpr options { stubBase="FSharpExpressionBase"; }:
 fromErrorExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>;
 
+interpolatedStringExpr options { stubBase="FSharpExpressionBase"; }:
+  fakeSeparator;
+
 fixedExpr options { stubBase="FSharpExpressionBase"; }:
   FIXED<KEYWORD, Keyword>
   fSharpExpression<EXPR, Expression>;
@@ -856,7 +880,7 @@ fSharpTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } e
   get { methodName="Attributes" path=<fSharpTypeDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="TypeParameters" path=<fSharpTypeDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 //  get { methodName="TypeRepresentation" path=<fSharpTypeDeclaration:DECLARATION_BODY/typeDeclarationBody:TYPE_REPR> };
-//  get { methodName="TypeMembers" path=<fSharpTypeDeclaration:DECLARATION_BODY/typeDeclarationBody:TYPE_MEMBER> };
+  get { methodName="TypeMembers" path=<fSharpTypeDeclaration:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
@@ -866,12 +890,18 @@ fSharpTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } e
   EQUALS<FSHARP_EQUALS, EqualsToken>
 //  typeDeclarationBody<DECLARATION_BODY, DeclarationBody>;
   typeRepresentation<TYPE_REPR, TypeRepresentation>?
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+  typeMemberDeclarationList<MEMBER_LIST, MemberDeclarationsList>;
 
 
 // typeDeclarationBody:
 //   typeRepresentation<TYPE_REPR, TypeRepresentation>?
 //   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+
+memberDeclarationList:
+  memberDeclaration<MEMBER_DECL, TypeMembers>*;
+
+typeMemberDeclarationList:
+  fSharpTypeMemberDeclaration<MEMBER_DECL, TypeMembers>*;
 
 interface typeRepresentation:
   simpleTypeRepresentation |
@@ -889,20 +919,25 @@ interface objectModelTypeRepresentation:
   structRepresentation |
   interfaceRepresentation;
 
-classRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
-  CLASS
-  objectModelTypeRepresentationBody;
+classRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; } extras {
+  get { methodName="TypeMembers" path=<classRepresentation:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
+}:
+  CLASS<CLASS, ClassKeyword>
+  typeMemberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
+  END;
 
-structRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
-  STRUCT
-  objectModelTypeRepresentationBody;
+structRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; } extras {
+  get { methodName="TypeMembers" path=<structRepresentation:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
+}:
+  STRUCT<STRUCT, StructKeyword>
+  typeMemberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
+  END;
 
-interfaceRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
-  INTERFACE
-  objectModelTypeRepresentationBody;
-
-private objectModelTypeRepresentationBody:
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
+interfaceRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; } extras {
+  get { methodName="TypeMembers" path=<interfaceRepresentation:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
+}:
+  INTERFACE<INTERFACE, InterfaceKeyword>
+  typeMemberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
   END;
 
 interface fSharpTypeOldDeclaration:
@@ -924,7 +959,7 @@ nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }
 
 typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
    get { methodName="TypeParameters" path=<typeExtensionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
-   get { methodName="TypeMembers" path=<typeExtensionDeclaration:TYPE_MEMBER> };
+   get { methodName="TypeMembers" path=<typeExtensionDeclaration:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
    get { methodName="Attributes" path=<typeExtensionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
  }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
@@ -935,7 +970,8 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+  WITH<WITH, WithKeyword>
+  typeMemberDeclarationList<MEMBER_LIST, MemberDeclarationsList>;
 
 
 enumRepresentation options { stubBase="TypeRepresentationBase"; } extras {
@@ -1022,13 +1058,17 @@ exceptionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ex
   get { methodName="TypeParameters" path=<exceptionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<exceptionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Fields" path=<exceptionDeclaration:FIELD_DECLARATION_LIST/unionCaseFieldDeclarationList:FIELD_DECLARATION> };
+  get { methodName="TypeMembers" path=<exceptionDeclaration:MEMBER_LIST/memberDeclarationList:MEMBER_DECL> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   unionCaseFieldDeclarationList<FIELD_DECLARATION_LIST, FieldList>?
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+  (
+    WITH<WITH, WithKeyword>
+    memberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
+  )?;
 
 
 typeAbbreviationRepresentation options { stubBase="TypeRepresentationBase"; } extras {
@@ -1080,20 +1120,36 @@ delegateRepresentation options { stubBase="TypeRepresentationBase"; }:
   typeUsage<TYPE, Type>;
 
 interface fSharpTypeMemberDeclaration:
-  constructorDeclaration |
+  constructorSignatureOrDeclaration |
   inheritMember |
   interfaceImplementation |
-  abstractMemberDeclaration |
-  memberDeclaration |
   valFieldDeclaration |
-  autoPropertyDeclaration |
   letBindingsDeclaration |
-
+  overridableMemberDeclaration |
+  doStatement |
   otherTypeMember;
+
+interface overridableMemberDeclaration:
+  abstractMemberDeclaration |
+  autoPropertyDeclaration |
+  memberSignatureOrDeclaration;
+
+interface memberSignatureOrDeclaration:
+  memberDeclaration |
+  memberSignature;
+
+interface memberSignatureLikeDeclaration:
+  abstractMemberDeclaration |
+  constructorSignature |
+  memberSignature;
+
+interface constructorSignatureOrDeclaration:
+  constructorDeclaration |
+  constructorSignature;
 
 interface constructorDeclaration:
   primaryConstructorDeclaration |
-  memberConstructorDeclaration;
+  secondaryConstructorDeclaration;
 
 interface inheritMember:
   typeInherit |
@@ -1110,18 +1166,20 @@ typeInherit options { stubBase="ReferenceOwnerBase"; } extras {
   typeReferenceName<TYPE_REFERENCE, TypeName>
   chameleonExpression<CHAMELEON_EXPR, CtorArg>;
 
-interfaceImplementation:
-  INTERFACE
+interfaceImplementation extras {
+  get { methodName="TypeMembers" path=<interfaceImplementation:MEMBER_LIST/memberDeclarationList:MEMBER_DECL> };
+}:
+  INTERFACE<INTERFACE, InterfaceKeyword>
   typeReferenceName<TYPE_REFERENCE, TypeName>
   (
     WITH<WITH, WithKeyword>
-    memberDeclaration<MEMBER_DECL, TypeMembers>*
+    memberDeclarationList<MEMBER_LIST, MemberDeclarationsList>
   )?;
 
 
 otherTypeMember: fakeSeparator;
 
-primaryConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+primaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   parametersPatternDeclaration<PARAMETERS, ParametersPatternDeclaration>
@@ -1131,15 +1189,29 @@ interface selfId:
   ctorSelfId |
   memberSelfId;
 
+interface memberSelfId:
+  namedSelfId |
+  wildSelfId;
+
 ctorSelfId options { stubBase="LocalDeclarationBase"; }:
   AS
-  IDENTIFIER<IDENTIFIER, Identifier>;
+  identifier<IDENTIFIER, Identifier>;
 
-memberSelfId options { stubBase="LocalDeclarationBase"; }:
-  IDENTIFIER<IDENTIFIER, Identifier>;  
+namedSelfId options { stubBase="LocalDeclarationBase"; }:
+  identifier<IDENTIFIER, Identifier>;  
 
-memberConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
-  get { methodName="Expression" path=<memberConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+wildSelfId options { stubBase="LocalDeclarationBase"; }:
+  UNDERSCORE<UNDERSCORE, Underscore>;
+
+constructorSignature options { stubBase="ConstructorDeclarationBase"; }:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  NEW<NEW, NewKeyword>
+  COLON
+  typeUsage<TYPE, Type>;
+
+secondaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
+  get { methodName="Expression" path=<secondaryConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
@@ -1173,13 +1245,30 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
     EQUALS<FSHARP_EQUALS, EqualsToken>
     chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>
   |
-    WITH
-    accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
-    (
-      AND
-      accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
-    )?
+    accessorDecls
   );
+
+memberSignature  options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<memberSignature:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<memberSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  STATIC<STATIC, StaticKeyword>?
+  memberKeyword{MEMBER_KEYWORD, MemberKeyword}
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  identOrOpName{IDENTIFIER, Identifier}
+  typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  COLON
+  typeUsage<TYPE, Type>
+  accessorDecls?;
+
+private accessorDecls:
+  WITH
+  accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
+  (
+    AND
+    accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
+  )?;
 
 private memberKeyword{ROLE, Getter}:
   MEMBER<@ROLE, @Getter> |
@@ -1195,7 +1284,8 @@ abstractMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationB
   MEMBER<MEMBER, MemberKeyword>?
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*;
+  COLON
+  typeUsage<TYPE, Type>;
 
 valFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<valFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -1213,8 +1303,8 @@ autoPropertyDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBas
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
+  memberKeyword{MEMBER, MemberKeyword}
   VAL<VAL, ValKeyword>
-  MEMBER<MEMBER, MemberKeyword>
   IDENTIFIER<IDENTIFIER, Identifier>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, InitExpression>
@@ -1230,7 +1320,8 @@ accessorsNamesClause:
     IDENTIFIER<ACESSOR, AccessorsNames>
   );
 
-accessorDeclaration:
+accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   IDENTIFIER<IDENTIFIER, Identifier>
   (
     parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
@@ -1273,6 +1364,7 @@ otherDirective:
 
 openStatement:
   OPEN<OPEN, Open>
+  TYPE<TYPE, TypeKeyword>?
   typeReferenceName<TYPE_REFERENCE, ReferenceName>;
 
 doStatement options { stubBase="DummyDeclaration"; } extras {
@@ -1461,9 +1553,11 @@ interface typeUsage:
 
 
 namedTypeUsage:
+  topLevelTypeParameterDecl
   typeReferenceName<TYPE_REFERENCE, ReferenceName>;
 
 tupleTypeUsage:
+  topLevelTypeParameterDecl
   typeUsage<ITEM, Items>
   (
     STAR
@@ -1471,6 +1565,7 @@ tupleTypeUsage:
   )*;
 
 anonRecordTypeUsage:
+  topLevelTypeParameterDecl
   LBRACE_BAR
   anonRecordField<FIELD, Fields>*
   BAR_RBRACE;
@@ -1481,22 +1576,39 @@ anonRecordField:
   typeUsage<TYPE, Type>;
 
 arrayTypeUsage:
+  topLevelTypeParameterDecl
   typeUsage<TYPE, Type>
   LBRACK
   RBRACK;
 
 functionTypeUsage:
-  typeUsage
+  topLevelTypeParameterDecl
+  typeUsage<ARG_TYPE, ArgumentTypeUsage>
   RARROW
-  typeUsage;
+  topLevelTypeParameterDecl
+  typeUsage<RETURN_TYPE, ReturnTypeUsage>;
 
 anonTypeUsage:
   UNDERSCORE;
 
 parenTypeUsage:
+  topLevelTypeParameterDecl
   LPAREN<LPAREN, LeftParen>
   typeUsage<TYPE, InnerTypeUsage>
   RPAREN<RPAREN, RightParen>;
 
 unsupportedTypeUsage:
   fakeSeparator;
+
+
+private topLevelTypeParameterDecl:
+  topLevelTypeAttribute?
+  topLevelTypeParameterName?;
+  
+
+private topLevelTypeAttribute:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*;
+
+private topLevelTypeParameterName:
+  IDENTIFIER
+  COLON;

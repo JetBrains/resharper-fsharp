@@ -4,10 +4,10 @@ using JetBrains.Serialization;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  [PolymorphicMarshaller(30)]
+  [PolymorphicMarshaller(33)]
   public class FSharpCacheVersion
   {
-    [UsedImplicitly] public static UnsafeReader.ReadDelegate<object> ReadDelegate = r => new FSharpCacheVersion();
-    [UsedImplicitly] public static UnsafeWriter.WriteDelegate<object> WriteDelegate = (w, o) => { };
+    [UsedImplicitly] public static UnsafeReader.ReadDelegate<object> ReadDelegate = _ => new FSharpCacheVersion();
+    [UsedImplicitly] public static UnsafeWriter.WriteDelegate<object> WriteDelegate = (_, _) => { };
   }
 }

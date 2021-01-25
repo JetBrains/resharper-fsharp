@@ -1,0 +1,31 @@
+﻿let |(|(0)()|)|(1) = ()
+let |(|(2)_|)|(3) = ()
+let |(|(4)a|)|(5) = ()
+let |(|(6)_, _|)|(7) = ()
+let |(|(8)_ :: _|)|(9) = ()
+let |(|(10)Some _ as a|)|(11) = ()
+let |(|(12)_ | _|)|(13) = ()
+let |(|(14)_ & _|)|(15) = ()
+
+let () = ()
+let (Some _) = ()
+let (_: int) = ()
+let ([<A>] _) = ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
+(8): ReSharper Dead Code: Redundant parentheses
+(9):<secondary> ReSharper Dead Code: Redundant parentheses
+(10): ReSharper Dead Code: Redundant parentheses
+(11):<secondary> ReSharper Dead Code: Redundant parentheses
+(12): ReSharper Dead Code: Redundant parentheses
+(13):<secondary> ReSharper Dead Code: Redundant parentheses
+(14): ReSharper Dead Code: Redundant parentheses
+(15):<secondary> ReSharper Dead Code: Redundant parentheses

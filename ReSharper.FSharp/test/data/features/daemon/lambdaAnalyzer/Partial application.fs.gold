@@ -18,15 +18,15 @@
 |fun (a, b) x -> f a (a, b) x|(11)
 
 ---------------------------------------------------------
-(0): ReSharper Warning: Lambda can be replaced with 'f'
-(1): ReSharper Warning: Lambda can be simplified
-(2): ReSharper Warning: Lambda can be simplified
-(3): ReSharper Warning: Lambda can be simplified
-(4): ReSharper Warning: Lambda can be simplified
-(5): ReSharper Warning: Lambda can be replaced with 'Math.Abs'
-(6): ReSharper Warning: Lambda can be simplified
-(7): ReSharper Warning: Lambda can be simplified
-(8): ReSharper Warning: Lambda can be simplified
-(9): ReSharper Warning: Lambda can be simplified
-(10): ReSharper Warning: Lambda can be simplified
-(11): ReSharper Warning: Lambda can be simplified
+(0): ReSharper Hint: Lambda can be replaced with 'f'
+(1): ReSharper Hint: Lambda can be simplified
+(2): ReSharper Hint: Lambda can be simplified
+(3): ReSharper Hint: Lambda can be simplified
+(4): ReSharper Hint: Lambda can be simplified
+(5): ReSharper Hint: Lambda can be replaced with 'Math.Abs'
+(6): ReSharper Hint: Lambda can be simplified
+(7): ReSharper Hint: Lambda can be simplified
+(8): ReSharper Hint: Lambda can be simplified
+(9): ReSharper Hint: Lambda can be simplified
+(10): ReSharper Hint: Lambda can be simplified
+(11): ReSharper Hint: Lambda can be simplified

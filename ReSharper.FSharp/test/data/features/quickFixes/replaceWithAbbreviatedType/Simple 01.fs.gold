@@ -1,0 +1,4 @@
+﻿open System
+
+type Int32{caret} with
+    member x.P = 1

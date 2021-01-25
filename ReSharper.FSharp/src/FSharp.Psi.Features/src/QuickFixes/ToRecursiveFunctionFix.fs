@@ -31,7 +31,7 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
         |> Seq.tryHead
         |> Option.map (fun (binding: IBinding) ->
             match binding.HeadPattern with
-            | :? IParametersOwnerPat as lidPat -> lidPat.SourceName = referenceExpr.ShortName
+            | :? IReferencePat as refPat -> refPat.SourceName = referenceExpr.ShortName && binding.HasParameters
             | _ -> false)
         |> Option.defaultValue false
 
@@ -67,6 +67,6 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
         base.Execute(solution, textControl)
     
     override x.ExecutePsiTransaction _ =
-        use cookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         use writeCookie = WriteLockCookie.Create(referenceExpr.IsPhysical())
         chosenLetBindings.SetIsRecursive(true)

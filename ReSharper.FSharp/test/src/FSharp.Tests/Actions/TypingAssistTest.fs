@@ -158,13 +158,26 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter in app 15 - After first token on line``() = x.DoNamedTest()
     [<Test>] member x.``Enter in app 16 - After last infix op token on line``() = x.DoNamedTest()
 
-    [<Test>] member x.``Backspace 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
-    [<Test>] member x.``Backspace 02 - Inside multiline triple-quoted string``() = x.DoNamedTest()
-    [<Test>] member x.``Backspace 03 - Inside multiline triple-quoted string 2``() = x.DoNamedTest()
-    [<Test>] member x.``Backspace 04 - Inside triple-quoted string``() = x.DoNamedTest()
-    [<Test>] member x.``Backspace 05 - Inside triple-quoted string 2``() = x.DoNamedTest()
-    [<Test>] member x.``Backspace 06 - Inside multiline triple-quoted string``() = x.DoNamedTest()
-    [<Test>] member x.``Backspace 07 - Inside multiline triple-quoted string``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Interpolated String - Regular 01 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Interpolated String - Triple quote 01 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Interpolated String - Triple quote 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Interpolated String - Triple quote 03 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Interpolated String - Triple quote 04``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Interpolated String - Triple quote 05``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Interpolated String - Triple quote 06``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Interpolated String - Triple quote 07``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Interpolated String - Verbatim 01 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Interpolated String - Verbatim 02 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - String - Regular 01 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - String - Triple quote 01 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - String - Triple quote 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - String - Triple quote 03 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - String - Triple quote 04``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - String - Triple quote 05``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - String - Triple quote 06``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - String - Triple quote 07``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - String - Verbatim 01 - Empty``() = x.DoNamedTest()
+
     
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
@@ -200,6 +213,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Pair quotes 14 - After char``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 15 - File start``() = x.DoNamedTest()
 
+    [<Test>] member x.``Quotes - Skip end - Interpolated - Regular 01``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end - Interpolated - Triple quote 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Quotes - Skip end 01 - Char``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 02 - String``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 03 - Verbatim``() = x.DoNamedTest()
@@ -213,6 +229,9 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``Quotes - Comment 01 - Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Comment 02 - Before comment``() = x.DoNamedTest()
+
+    [<Test>] member x.``Quotes - Surround 01``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Surround 02 - Multiline``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Left 01 - Add right``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 02 - No add right before other``() = x.DoNamedTest()
@@ -275,16 +294,18 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Surround 05``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Surround 06``() = x.DoNamedTest()
 
-    [<Test>] member x.``Backticks 01 - Finish id``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks - Skip 02 - End``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks - Skip 01 - Start``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks - Skip 03 - No skip``() = x.DoNamedTest()
 
+    [<Test>] member x.``Backticks 01 - Finish id``() = x.DoNamedTest()
     [<Test>] member x.``Backticks 02 - Insert 01``() = x.DoNamedTest()
 
     [<Test; Explicit(reason = "Is `` erased in test?")>]
     member x.``Backticks 03 - Insert 02``() = x.DoNamedTest()
 
-    [<Test>] member x.``Backticks 04 - Skip``() = x.DoNamedTest()
-    [<Test>] member x.``Backticks 05 - No skip``() = x.DoNamedTest()
-    [<Test>] member x.``Backticks 06 - Before ident``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks 04 - Before ident``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks 05 - Before keyword``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type LineIndentsTest() =

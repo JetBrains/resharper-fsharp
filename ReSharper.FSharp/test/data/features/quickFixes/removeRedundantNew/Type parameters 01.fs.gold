@@ -1,0 +1,5 @@
+﻿module Module
+
+let a = new System.Action(fun _ -> ())
+
+------------------------------------------------

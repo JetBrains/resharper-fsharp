@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 
 [<ProjectModelElementPresenter(2.0)>]

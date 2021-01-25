@@ -16,7 +16,7 @@ type ToRecursiveModuleAction(dataProvider: FSharpContextActionDataProvider) =
         isAtModuleDeclarationKeyword dataProvider moduleDeclaration
 
     override x.ExecutePsiTransaction(_, _) =
-        use cookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         let moduleLikeDeclaration = dataProvider.GetSelectedElement<IDeclaredModuleLikeDeclaration>()
         moduleLikeDeclaration.SetIsRecursive(true)
 

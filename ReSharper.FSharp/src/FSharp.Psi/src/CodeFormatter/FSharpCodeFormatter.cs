@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
-using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Services.Formatter;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -13,15 +13,14 @@ using JetBrains.Text;
 using JetBrains.Util.Text;
 using Whitespace = JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.Whitespace;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 {
   [Language(typeof(FSharpLanguage))]
   public class FSharpCodeFormatter : CodeFormatterBase<FSharpFormatSettingsKey>
   {
     private readonly FSharpFormatterInfoProvider myFormatterInfoProvider;
 
-    private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> myGluingCache =
-      new ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool>();
+    private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> myGluingCache = new();
 
     public FSharpCodeFormatter(FSharpLanguage language, CodeFormatterRequirements requirements,
       FSharpFormatterInfoProvider formatterInfoProvider) : base(language, requirements)
@@ -30,11 +29,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     }
 
     protected override CodeFormattingContext CreateFormatterContext(CodeFormatProfile profile, ITreeNode firstNode,
-      ITreeNode lastNode, AdditionalFormatterParameters parameters, ICustomFormatterInfoProvider provider)
-    {
-      return new CodeFormattingContext(this, firstNode, lastNode, profile,
-        FormatterLoggerProvider.FormatterLogger, parameters);
-    }
+      ITreeNode lastNode, AdditionalFormatterParameters parameters, ICustomFormatterInfoProvider provider) =>
+      new(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger, parameters);
 
     public override MinimalSeparatorType GetMinimalSeparatorByNodeTypes(TokenNodeType leftTokenType,
       TokenNodeType rightTokenType)
@@ -54,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       return MinimalSeparatorType.NotRequired;
     }
 
-    public override bool IsNewLine(ITreeNode ws) => ws is NewLine;
+    public override bool IsNewLine(ITreeNode treeNode) => treeNode is NewLine;
 
     public override ITreeNode CreateSpace(string indent, ITreeNode replacedSpace) => new Whitespace(indent);
 
@@ -90,19 +86,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     public override void FormatReplacedNode(ITreeNode oldNode, ITreeNode newNode)
     {
       FormatInsertedNodes(newNode, newNode, true);
-
       FormatterImplHelper.CheckForMinimumSeparator(this, newNode);
     }
 
     public override void FormatReplacedRange(ITreeNode first, ITreeNode last, ITreeRange oldNodes)
     {
       FormatInsertedNodes(first, last, false);
-
       FormatterImplHelper.CheckForMinimumSeparator(this, first, last);
     }
 
     public override void FormatDeletedNodes(ITreeNode parent, ITreeNode prevNode, ITreeNode nextNode) =>
-      FormatterImplHelper.FormatDeletedNodesHelper(this, parent, prevNode, nextNode, parent is PrimaryConstructorDeclaration);
+      FormatterImplHelper.FormatDeletedNodesHelper(this, parent, prevNode, nextNode,
+        parent is PrimaryConstructorDeclaration);
 
     public override string OverridenSettingPrefix => "// @formatter:";
 

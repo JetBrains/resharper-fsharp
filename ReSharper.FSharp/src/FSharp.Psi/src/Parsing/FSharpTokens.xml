@@ -176,11 +176,6 @@
         <Token name="NATIVEINT" />
         <Token name="UNATIVEINT" />
 
-        <Token name="UNFINISHED_BLOCK_COMMENT" />
-        <Token name="UNFINISHED_STRING_IN_COMMENT" />
-        <Token name="UNFINISHED_VERBATIM_STRING_IN_COMMENT" />
-        <Token name="UNFINISHED_TRIPLE_QUOTED_STRING_IN_COMMENT" />
-        
         <Token name="CHARACTER_LITERAL" />
         <Token name="STRING" />
         <Token name="VERBATIM_STRING" />
@@ -188,10 +183,29 @@
         <Token name="BYTEARRAY" />
         <Token name="VERBATIM_BYTEARRAY" />
         <Token name="BYTECHAR" />
-        
+
+        <Token name="REGULAR_INTERPOLATED_STRING" />
+        <Token name="REGULAR_INTERPOLATED_STRING_START" />
+        <Token name="REGULAR_INTERPOLATED_STRING_MIDDLE" />
+        <Token name="REGULAR_INTERPOLATED_STRING_END" />
+
+        <Token name="VERBATIM_INTERPOLATED_STRING" />
+        <Token name="VERBATIM_INTERPOLATED_STRING_START" />
+        <Token name="VERBATIM_INTERPOLATED_STRING_MIDDLE" />
+        <Token name="VERBATIM_INTERPOLATED_STRING_END" />
+
+        <Token name="TRIPLE_QUOTE_INTERPOLATED_STRING" />
+        <Token name="TRIPLE_QUOTE_INTERPOLATED_STRING_START" />
+        <Token name="TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE" />
+        <Token name="TRIPLE_QUOTE_INTERPOLATED_STRING_END" />
+
         <Token name="UNFINISHED_STRING" />
         <Token name="UNFINISHED_VERBATIM_STRING" />
         <Token name="UNFINISHED_TRIPLE_QUOTED_STRING" />
+
+        <Token name="UNFINISHED_REGULAR_INTERPOLATED_STRING" />
+        <Token name="UNFINISHED_VERBATIM_INTERPOLATED_STRING" />
+        <Token name="UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING" />
 
         <Token name="RESERVED_LITERAL_FORMATS" />
         <Token name="RESERVED_SYMBOLIC_SEQUENCE" />
@@ -200,7 +214,7 @@
         <Token name="BAD_TAB" />
         <Token name="BAD_CHARACTER" />
 
-        <!-- Used in FsharpFakeLexer and as a separator in psi grammar -->
+        <!-- Used for incomplete rules in psi grammar -->
         <Token name="FAKE" />
 
         <Token name="PP_LOAD" />

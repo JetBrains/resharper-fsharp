@@ -1,0 +1,7 @@
+﻿type |T|(0)() =
+    static member private |M1|(1)(?|a|(2)) = ()
+
+---------------------------------------------------------
+(0): ReSharper F# Class Identifier: 
+(1): ReSharper F# Method Identifier: 
+(2): ReSharper F# Value Identifier: 

@@ -6,7 +6,3 @@ import com.jetbrains.rider.settings.simple.SimpleOptionsPage
 class RiderFSharpFileTemplatesOptionPage : SimpleOptionsPage("F#", "RiderFSharpFileTemplatesSettings"), Configurable.NoScroll {
     override fun getId(): String = "RiderFSharpFileTemplatesSettings"
 }
-
-class RiderAzureFSharpFileTemplatesOptionPage : SimpleOptionsPage("Azure (F#)", "RiderAzureFSharpFileTemplatesSettings"), Configurable.NoScroll {
-    override fun getId(): String = "RiderAzureFSharpFileTemplatesSettings"
-}

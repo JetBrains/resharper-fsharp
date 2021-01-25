@@ -12,5 +12,5 @@ type ToRecursiveLetBindingsFix(error: LetAndForNonRecBindingsError) =
     override x.IsAvailable _ = isValid letBindings
 
     override x.ExecutePsiTransaction _ =
-        use cookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         letBindings.SetIsRecursive(true)

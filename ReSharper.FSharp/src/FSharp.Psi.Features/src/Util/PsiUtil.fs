@@ -38,12 +38,6 @@ type ITextControl with
     member x.GetFSharpFile(solution) =
         x.Document.GetPsiSourceFile(solution).FSharpFile
 
-type IFSharpFile with
-    member x.ParseTree =
-        match x.ParseResults with
-        | Some parseResults -> parseResults.ParseTree
-        | _ -> None
-
 type IFile with
     member x.GetNode<'T when 'T :> ITreeNode and 'T : null>(document, range) =
         let offset = getStartOffset document range
@@ -61,14 +55,6 @@ type IFile with
     member x.GetNode<'T when 'T :> ITreeNode and 'T : null>(documentRange: DocumentRange) =
         x.GetNode<'T>(documentRange.StartOffset)
 
-type IFSharpTreeNode with
-    member x.GetLineEnding() =
-        let fsFile = x.FSharpFile
-        fsFile.DetectLineEnding(fsFile.GetPsiServices()).GetPresentation()
-
-    member x.GetIndentSize() =
-        let sourceFile = x.GetSourceFile()
-        sourceFile.GetFormatterSettings(x.Language).INDENT_SIZE
 
 type FSharpLanguage with
     member x.FSharpLanguageService =
@@ -76,30 +62,38 @@ type FSharpLanguage with
 
 
 type ITreeNode with
-        member x.IsChildOf(node: ITreeNode) =
-            if isNull node then false else node.Contains(x)
+    member x.GetLineEnding() =
+        let fsFile = x.GetContainingFile()
+        fsFile.DetectLineEnding(fsFile.GetPsiServices()).GetPresentation()
 
-        member x.GetIndent(document: IDocument) =
-            let startOffset = x.GetDocumentStartOffset().Offset
-            let startCoords = document.GetCoordsByOffset(startOffset)
-            startOffset - document.GetLineStartOffset(startCoords.Line)
+    member x.GetIndentSize() =
+        let sourceFile = x.GetSourceFile()
+        sourceFile.GetFormatterSettings(x.Language).INDENT_SIZE
 
-        member x.Indent =
-            let document = x.GetSourceFile().Document
-            x.GetIndent(document)
+    member x.IsChildOf(node: ITreeNode) =
+        if isNull node then false else node.Contains(x)
 
-        member x.GetStartLine(document: IDocument) =
-            document.GetCoordsByOffset(x.GetDocumentStartOffset().Offset).Line
+    member x.GetIndent(document: IDocument) =
+        let startOffset = x.GetDocumentStartOffset().Offset
+        let startCoords = document.GetCoordsByOffset(startOffset)
+        startOffset - document.GetLineStartOffset(startCoords.Line)
 
-        member x.GetEndLine(document: IDocument) =
-            document.GetCoordsByOffset(x.GetDocumentEndOffset().Offset).Line
-        
-        member x.StartLine = x.GetStartLine(x.GetSourceFile().Document)
-        member x.EndLine = x.GetEndLine(x.GetSourceFile().Document)
+    member x.Indent =
+        let document = x.GetSourceFile().Document
+        x.GetIndent(document)
 
-        member x.IsSingleLine =
-            let document = x.GetSourceFile().Document
-            x.GetStartLine(document) = x.GetEndLine(document)
+    member x.GetStartLine(document: IDocument) =
+        document.GetCoordsByOffset(x.GetDocumentStartOffset().Offset).Line
+
+    member x.GetEndLine(document: IDocument) =
+        document.GetCoordsByOffset(x.GetDocumentEndOffset().Offset).Line
+    
+    member x.StartLine = x.GetStartLine(x.GetSourceFile().Document)
+    member x.EndLine = x.GetEndLine(x.GetSourceFile().Document)
+
+    member x.IsSingleLine =
+        let document = x.GetSourceFile().Document
+        x.GetStartLine(document) = x.GetEndLine(document)
 
 let getNode<'T when 'T :> ITreeNode and 'T : null> (fsFile: IFSharpFile) (range: DocumentRange) =
     // todo: use IExpressionSelectionProvider
@@ -336,8 +330,8 @@ module PsiModificationUtil =
         nodes |> Seq.fold (fun anchor treeNode ->
             ModificationUtil.AddChildAfter(anchor, treeNode)) anchor
 
-    let addNodesBefore anchor (nodes: ITreeNode list) =
-        nodes |> List.rev |> List.fold (fun anchor treeNode ->
+    let addNodesBefore anchor (nodes: ITreeNode seq) =
+        nodes |> Seq.rev |> Seq.fold (fun anchor treeNode ->
             ModificationUtil.AddChildBefore(anchor, treeNode)) anchor
 
     let addNodeBefore anchor node = ModificationUtil.AddChildBefore(anchor, node) |> ignore
@@ -406,7 +400,7 @@ let shiftWhitespaceBefore shift (whitespace: Whitespace) =
     else
         ModificationUtil.DeleteChild(whitespace)
 
-let shiftExpr shift (expr: IFSharpExpression) =
+let shiftNode shift (expr: #IFSharpTreeNode) =
     if shift = 0 then () else
 
     for child in List.ofSeq (expr.Tokens()) do
@@ -434,7 +428,13 @@ let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
         if shift > 0 then
             ModificationUtil.AddChildBefore(expr, Whitespace(shift)) |> ignore
 
-    shiftExpr shift expr
+    shiftNode shift expr
+
+
+let withNewLineAndIndentBefore (indent: int) (node: IFSharpTreeNode) =
+    [ NewLine(node.GetLineEnding()) :> ITreeNode
+      Whitespace(indent) :> _
+      node :> _ ]
 
 
 [<CanBeNull>]

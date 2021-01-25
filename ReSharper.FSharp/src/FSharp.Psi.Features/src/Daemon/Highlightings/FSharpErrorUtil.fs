@@ -10,7 +10,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.Util
+
+let secondaryRangesFromNode (node: #ITreeNode) =
+    match node with
+    | null -> Seq.empty<DocumentRange>
+    | node -> [| node.GetHighlightingRange() |] :> _
 
 let getTreeNodesDocumentRange (startNode: ITreeNode) (endNode: ITreeNode) =
     let startOffset = startNode.GetDocumentStartOffset()
@@ -33,8 +37,8 @@ let getLetTokenText (token: ITokenNode) =
     let tokenType = if isNull tokenType then FSharpTokenType.LET else tokenType 
     tokenType.TokenRepresentation
 
-let getExpressionsRanges (exprs: IFSharpExpression seq) =
-    exprs |> Seq.map (fun x -> if isValid x then x.GetHighlightingRange() else DocumentRange.InvalidRange) 
+let getNodeRanges (exprs: #ITreeNode seq) =
+    exprs |> Seq.map (fun x -> x.GetHighlightingRange()) 
 
 let getRefExprNameRange (refExpr: IReferenceExpr) =
     match refExpr.Identifier with
@@ -108,3 +112,11 @@ let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
     | :? IReferenceExpr as x when isSimpleQualifiedName x ->
         sprintf "Lambda can be replaced with '%s'" x.QualifiedName
     | _ -> "Lambda can be simplified"
+
+let getInterfaceImplHeaderRange (interfaceImpl: IInterfaceImplementation) =
+    let last = 
+        match interfaceImpl.WithKeyword with
+        | null -> interfaceImpl.TypeName :> ITreeNode
+        | withKeyword -> withKeyword :> ITreeNode
+
+    getTreeNodesDocumentRange interfaceImpl.InterfaceKeyword last

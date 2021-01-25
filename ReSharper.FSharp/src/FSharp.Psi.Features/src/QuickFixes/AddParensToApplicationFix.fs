@@ -143,7 +143,6 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(errorPrefixApp.IsPhysical())
         let factory = errorPrefixApp.CreateElementFactory()
-        use disableFormatter = new DisableCodeFormatter()
 
         let newAppExpr = createAppExpr factory appToApply argsToApply
         let newAppExpr = ModificationUtil.ReplaceChild(appToApply, newAppExpr)

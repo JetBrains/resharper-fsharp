@@ -14,20 +14,17 @@ using static JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.FSharpTokenType;
 %unicode
 
 %init{
-   currTokenType = null;
+   myCurrentTokenType = null;
 %init}
 
 %{
-
 %}
 
 %eofval{
-  if(yy_lexical_state == IN_BLOCK_COMMENT || yy_lexical_state == IN_BLOCK_COMMENT_FROM_LINE)
-  {
-    return fillBlockComment(UNFINISHED_BLOCK_COMMENT);
-  }
+  if (yy_lexical_state == IN_BLOCK_COMMENT || yy_lexical_state == IN_BLOCK_COMMENT_FROM_LINE)
+    return FillBlockComment();
   else
-    return makeToken(null);
+    return MakeToken(null);
 %eofval}
 
 %namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing

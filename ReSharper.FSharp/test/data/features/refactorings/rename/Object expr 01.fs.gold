@@ -1,0 +1,9 @@
+﻿type T() =
+    abstract zzz: int
+    default val zzz = 1
+
+{ new T() with
+    override x.zzz = base.zzz }
+
+{ new T() with
+    override x.zzz = base.zzz }

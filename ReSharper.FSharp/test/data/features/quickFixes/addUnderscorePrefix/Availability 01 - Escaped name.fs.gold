@@ -8,18 +8,18 @@ do
 ------------------------------------------------
 0: The value 'foo' is unused
 QUICKFIXES:
+Remove unused value
 Replace with '_'
 --Replace unused values with '_' in binding patterns
 --Replace unused values with '_' in file
 --Replace unused values with '_' in project
 --Replace unused values with '_' in solution
 Rename to '_foo'
-Remove unused value
 1: The value 'foo bar' is unused
 QUICKFIXES:
+Remove unused value
 Replace with '_'
 --Replace unused values with '_' in binding patterns
 --Replace unused values with '_' in file
 --Replace unused values with '_' in project
 --Replace unused values with '_' in solution
-Remove unused value

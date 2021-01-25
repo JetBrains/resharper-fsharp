@@ -112,7 +112,7 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
                 Whitespace(indent)
 
             // Add space after new opens group.
-            if not (moduleMember :? IOpenStatement) && not (isFollowedByEmptyLineOrComment moduleMember) then
+            if not (moduleMember :? IOpenStatement) then
                 NewLine(lineEnding)
         ] |> ignore
 

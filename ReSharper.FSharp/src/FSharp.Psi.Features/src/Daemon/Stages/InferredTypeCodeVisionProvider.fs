@@ -54,7 +54,7 @@ type InferredTypeCodeVisionProvider() =
             shell.GetComponent<Clipboard>().SetText(entry.Text)
             shell.GetComponent<ITooltipManager>().Show(copiedText, PopupWindowContextSource(fun _ ->
                 let offset = highlighting.Range.StartOffset.Offset
-                RiderEditorOffsetPopupWindowContext(offset) :> _)) |> ignore
+                RiderEditorOffsetPopupWindowContext(offset) :> _))
 
         member x.OnExtraActionClick(_, _, _) = ()
 
@@ -128,22 +128,20 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         let headPattern = binding.HeadPattern.IgnoreInnerParens()
         if not headPattern.IsDeclaration then () else
 
-        match headPattern with
-        | :? ITopReferencePat
-        | :? ITopParametersOwnerPat
-        | :? ITopAsPat ->
-            let symbolUse = (headPattern :?> IFSharpDeclaration).GetFSharpSymbolUse()
-            if isNull symbolUse then () else
+        let namedPat = headPattern.As<INamedPat>()
+        if isNull namedPat then () else
 
-            match symbolUse.Symbol with
-            | :? FSharpMemberOrFunctionOrValue as mfv ->
-                let text = formatMfv symbolUse mfv
-                x.AddHighlighting(consumer, binding, text)
+        let symbolUse = (headPattern :?> IFSharpDeclaration).GetFSharpSymbolUse()
+        if isNull symbolUse then () else
 
-            | :? FSharpField as field ->
-                let text = field.FieldType.Format(symbolUse.DisplayContext)
-                x.AddHighlighting(consumer, binding, text)
-            | _ -> ()
+        match symbolUse.Symbol with
+        | :? FSharpMemberOrFunctionOrValue as mfv ->
+            let text = formatMfv symbolUse mfv
+            x.AddHighlighting(consumer, binding, text)
+
+        | :? FSharpField as field ->
+            let text = field.FieldType.Format(symbolUse.DisplayContext)
+            x.AddHighlighting(consumer, binding, text)
         | _ -> ()
 
     override x.VisitMemberDeclaration(decl, consumer) =

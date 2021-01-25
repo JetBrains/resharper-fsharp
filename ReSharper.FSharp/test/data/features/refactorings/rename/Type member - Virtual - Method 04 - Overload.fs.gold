@@ -1,0 +1,13 @@
+﻿type A() =
+    member this.M() = ()
+
+    abstract zzz: int -> unit
+    default x.zzz _ = ()
+
+type B() =
+    inherit A()
+
+    override x.zzz _ = ()
+
+A().zzz 1
+B().zzz 1

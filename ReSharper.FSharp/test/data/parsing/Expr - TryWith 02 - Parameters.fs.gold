@@ -13,7 +13,7 @@ IFSharpImplFile
           FSharpTokenType+WithTokenElement(type:WITH, text:with)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IMatchClause
-            ILocalParametersOwnerPat
+            IParametersOwnerPat
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "

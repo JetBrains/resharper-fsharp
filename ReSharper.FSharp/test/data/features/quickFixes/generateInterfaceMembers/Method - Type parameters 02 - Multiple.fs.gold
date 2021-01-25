@@ -1,8 +1,10 @@
 ﻿module Module
 
 type I =
-  abstract M<'T1, 'T2> : int -> unit
+  abstract M<'T1> : int -> 'T1
+  abstract M<'T1, 'T2> : double -> 'T2
 
 type T() =
   interface I with
-    member this.M<'T1, 'T2>(var0) = failwith "todo"{caret}
+    member this.M<'T1>(var0: int): 'T1 = failwith "todo"
+    member this.M<'T1, 'T2>(var0: double): 'T2 = failwith "todo"{caret}

@@ -1,0 +1,6 @@
+﻿open System.Collections.Generic
+
+type d = System.Collections.Generic.IDictionary<int, int>
+
+type IDictionary<'TKey, 'TValue>{caret} with
+    member x.P = 1

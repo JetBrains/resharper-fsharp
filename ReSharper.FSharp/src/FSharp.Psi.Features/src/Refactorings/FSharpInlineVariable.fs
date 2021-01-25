@@ -8,7 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Refactorings.Inline
@@ -30,7 +29,7 @@ type FSharpInlineHelper(driver) =
     override x.GetQualifierExpression _ = raise (NotImplementedException())
     override x.InsertReturnValueTempVariable(_, _, _, _) = raise (NotImplementedException())
     override x.InsertTempForQualifier(_, _, _, _, _) = raise (NotImplementedException())
-    override x.InsertTempVariableForAssignedValue(_, _, _) = raise (NotImplementedException())
+    override x.InsertTempVariableForAssignedValue(_, _, _, _) = raise (NotImplementedException())
     override x.InsertTempForArgument(_, _, _, _, _, _) = raise (NotImplementedException())
     override x.RemoveCastFromElement _ = raise (NotImplementedException())
     override x.GetArgumentOwner(_, _) = raise (NotImplementedException())
@@ -46,13 +45,12 @@ type FSharpInlineVariable(workflow, solution, driver) =
     override x.ProcessReferenceWithContext(reference, _, info) =
         let referenceOwner = reference.GetTreeNode()
         use cookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let expr = info.InlinedMethodInfo.Expression :?> IFSharpExpression
         let exprCopy = expr.Copy()
 
         let indentShift = referenceOwner.Indent - exprIndent
-        shiftExpr indentShift exprCopy
+        shiftNode indentShift exprCopy
         
         let newExpr = ModificationUtil.ReplaceChild(referenceOwner, exprCopy)
         addParensIfNeeded newExpr |> ignore
@@ -87,6 +85,8 @@ type FSharpInlineVariable(workflow, solution, driver) =
 type FSharpInlineVarAnalyser(workflow) =
     inherit InlineVarAnalyserBase(workflow)
 
+    let [<Literal>] cannotInline = "Cannot inline value."
+    
     let mutable inlineExpr = null
     let mutable inlineReferences = null
 
@@ -98,24 +98,29 @@ type FSharpInlineVarAnalyser(workflow) =
 
     override x.Run(declaredElement, _, references) =
         let refPat = declaredElement.As<ILocalReferencePat>()
-        if isNull refPat then Pair(false, "") else
+        if isNull refPat then Pair(false, cannotInline) else
 
         let binding = BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())
-        if isNull binding || isNull binding.Expression then Pair(false, "") else
+        if isNull binding || isNull binding.Expression then Pair(false, cannotInline) else
 
         let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
-        if isNull letExpr || letExpr.Bindings.Count <> 1 || isNull letExpr.InExpression then Pair(false, "") else
+        if isNull letExpr || letExpr.Bindings.Count <> 1 || isNull letExpr.InExpression then Pair(false, cannotInline) else
 
-        let hasWriteReferences (references: IList<IReference>) =
-            references |> Seq.exists (fun reference ->
-                let treeNode = reference.GetTreeNode()
-                let refExpr = treeNode.As<IReferenceExpr>()
-                if isNull refExpr then false else
-                isNotNull (SetExprNavigator.GetByLeftExpression(refExpr.IgnoreParentParens())))
+        references
+        |> Seq.tryPick (fun reference ->
+            let expr = reference.GetTreeNode().As<IReferenceExpr>().IgnoreParentParens()
+            if isNull expr then None else
 
-        if hasWriteReferences references then Pair(false, "") else
+            if isNotNull (SetExprNavigator.GetByLeftExpression(expr)) then
+                Some "Value has write usages." else
 
-        inlineExpr <- binding.Expression
-        inlineReferences <- List(references)
+            if isNotNull (AddressOfExprNavigator.GetByExpression(expr)) then
+                Some "Value has 'address of' usages." else
 
-        Pair(true, "")
+            None)
+        |> Option.map (fun error -> Pair(false, error))
+        |> Option.defaultWith (fun _ ->
+            inlineExpr <- binding.Expression
+            inlineReferences <- List(references)
+
+            Pair(true, ""))

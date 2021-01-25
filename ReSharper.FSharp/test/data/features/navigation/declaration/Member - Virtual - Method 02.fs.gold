@@ -1,0 +1,39 @@
+﻿-------------- offset 110 line 8 col 6 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [O] abstract |M|: unit -> unit RANGE: (61,62) @ Member - Virtual - Method 02.fs
+Menu Item presentation: 
+Text: Member - Virtual - Method 02.fs| (5)
+Shortcut text: in <TestProject>
+Style: Enabled
+Mnemonic: 
+Tooltip: abstract M: unit -> unit
+
+Occurrence's navigation result. Opened file: Member - Virtual - Method 02.fs
+------------------
+[<AbstractClass>]
+type A() =
+    abstract |CARET|M: unit -> unit
+    override x.M() = ()
+
+------------------
+
+Occurrence's dump:
+TO: [O] override x.|M|() = () RANGE: (93,94) @ Member - Virtual - Method 02.fs
+Menu Item presentation: 
+Text: Member - Virtual - Method 02.fs| (6)
+Shortcut text: in <TestProject>
+Style: Enabled
+Mnemonic: 
+Tooltip: override x.M() = ()
+
+Occurrence's navigation result. Opened file: Member - Virtual - Method 02.fs
+------------------
+type A() =
+    abstract M: unit -> unit
+    override x.|CARET|M() = ()
+
+A().M()
+------------------
+

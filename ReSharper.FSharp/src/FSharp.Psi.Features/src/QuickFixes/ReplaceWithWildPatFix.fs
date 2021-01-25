@@ -2,13 +2,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
-open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.QuickFixes
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Scopes
+open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -22,33 +23,42 @@ module ReplaceWithWildPat =
         if isIdentifierOrKeyword (pat.GetNextToken()) then
             ModificationUtil.AddChildAfter(pat, Whitespace()) |> ignore
 
-        replace pat (pat.GetFSharpLanguageService().CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
+        for pat in pat.GetPartialDeclarations() do
+            replace pat (pat.GetFSharpLanguageService().CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
 
     let getPatOwner (pat: IFSharpPattern) =
-        if isNull pat then None else
+        if isNull pat then null else
 
         let pat = pat.IgnoreParentParens()
-        if isNotNull (AttribPatNavigator.GetByPattern(pat)) then None else
-        if isNotNull (OptionalValPatNavigator.GetByPattern(pat)) then None else
+        if isNotNull (AttribPatNavigator.GetByPattern(pat)) then null else
+        if isNotNull (OptionalValPatNavigator.GetByPattern(pat)) then null else
 
         let typedPat = TypedPatNavigator.GetByPattern(pat).IgnoreParentParens()
-        if isNotNull (AttribPatNavigator.GetByPattern(typedPat)) then None else
+        if isNotNull (AttribPatNavigator.GetByPattern(typedPat)) then null else
 
-        Some(skipIntermediatePatParents pat)
+        skipIntermediatePatParents pat
 
     let isAvailable (pat: IFSharpPattern) =
-        isValid pat && not (pat :? IParametersOwnerPat) &&
+        isValid pat &&
 
-        match getPatOwner pat with
-        | None -> false
-        | Some node ->
+        let binding = BindingNavigator.GetByHeadPattern(pat)
+        if isNotNull binding && binding.HasParameters then false else
+
+        match pat with
+        | :? IParametersOwnerPat
+        | :? IAsPat -> false // todo: allow for 'as' patterns, check if inner patterns are used
+        | _ ->
+
+        let node = getPatOwner pat
+        if isNull node then false else
 
         match node.Parent with
-        | :? IBinding
-        | :? IMatchClause
-        | :? ILambdaParametersList -> true
-        | :? IParametersPatternDeclaration as parent when
-            (parent.Parent :? IMemberDeclaration || parent.Parent :? IMemberConstructorDeclaration) -> true
+        | :? IBinding | :? IMatchClause | :? ILambdaParametersList -> true
+
+        | :? IParametersPatternDeclaration as parent ->
+            let parent = parent.Parent
+            parent :? IMemberDeclaration || parent :? ISecondaryConstructorDeclaration || parent :? IBinding
+
         | _ -> false
 
 
@@ -56,9 +66,6 @@ type ReplaceWithWildPatScopedFix(pat: IFSharpPattern, highlightingType) =
     inherit FSharpScopedQuickFixBase()
 
     new (warning: RedundantUnionCaseFieldPatternsWarning) =
-        ReplaceWithWildPatScopedFix(warning.ParenPat, warning.GetType())
-
-    new (warning: RedundantParenPatWarning) =
         ReplaceWithWildPatScopedFix(warning.ParenPat, warning.GetType())
 
     override x.Text = "Replace with '_'"
@@ -104,23 +111,27 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
             if not isFromUnusedValue then FileCollectorInfo.Empty else
 
             match patOwner with
-            | None -> FileCollectorInfo.Default
-            | Some pat ->
+            | null -> FileCollectorInfo.Default
+            | pat ->
 
-            let scopeText =
+            let (scopeNode: ITreeNode), scopeText =
                 match pat.Parent with
                 | :? IMatchClause ->
                     let patternText = 
                         match pat with
-                        | :? ILocalParametersOwnerPat as owner -> owner.SourceName
+                        | :? IParametersOwnerPat as owner -> owner.ReferenceName.ShortName
                         | _ -> "match clause"
-                    sprintf "'%s' pattern" patternText
-                | :? ILambdaParametersList
-                | :? IParametersPatternDeclaration -> "parameter list"
-                | :? IBinding -> "binding patterns"
+                    pat :> _, sprintf "'%s' pattern" patternText
+
+                | :? IParametersPatternDeclaration as p ->
+                    match BindingNavigator.GetByParametersPattern(p) with
+                    | null -> pat :> _, "parameter list"
+                    | binding -> binding :> _, "binding patterns"
+
+                | :? ILambdaParametersList as parametersList -> parametersList :> _, "parameter list"
+                | :? IBinding -> pat :> _, "binding patterns"
                 | _ -> invalidArg "patOwner.Parent" "unexpected type"
 
-            let scopeNode = if pat.Parent :? ILambdaParametersList then pat.Parent else pat :>_
             FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode, LocalScope(scopeNode, scopeText, scopeText))
 
         member x.ExecuteAction(highlightingInfos, _, _) =

@@ -1,0 +1,21 @@
+﻿Provided elements:
+ 0: M(T1):System.Void
+ 1: M(System.Double):System.Void
+ 2: ToString():System.String
+ 3: Equals(System.Object):System.Boolean
+ 4: GetHashCode():System.Int32
+ 5: Finalize():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:M(T1):System.Void}
+
+[<AbstractClass>]
+type A<'T1>() =
+    abstract M: 'T1 -> unit
+    abstract M: double -> unit
+
+[<AbstractClass>]
+type T<'T2>() ={caret}
+    inherit A<'T2>()
+
+    override this.M(var0: 'T2): unit = failwith "todo"

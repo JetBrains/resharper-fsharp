@@ -77,6 +77,5 @@ type FSharpDebuggerLocalSymbolProvider() =
 
             | None -> null, null
 
-        member x.FindContainingFunctionDeclarationBody(functionDeclaration: IFunctionDeclaration) =
-            // todo: refactor to get tree node instead of function declaration in SDK
-            functionDeclaration :> _
+        member x.FindContainingFunctionDeclarationBody(treeNode) =
+            treeNode // todo: refactor to get tree node instead of function declaration in SDK

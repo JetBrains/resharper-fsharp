@@ -28,13 +28,16 @@ module rec CommonUtil =
     let concatErrors errors =
         Seq.fold (fun s (e: FSharpErrorInfo) -> s + "\n" + e.Message) "" errors
 
+    let logErrors (logger: ILogger) message errors =
+        logger.Warn("{0}: {1}", message, concatErrors errors)
+
     [<CompiledName("DecompileOpName")>]
     let decompileOpName name =
         PrettyNaming.DecompileOpName name
         
     type IDictionary<'TKey, 'TValue> with
         member x.remove (key: 'TKey) = x.Remove key |> ignore
-        member x.add (key: 'TKey, value: 'TValue) = x.Add(key, value) |> ignore
+        member x.add (key: 'TKey, value: 'TValue) = x.Add(key, value)
         member x.contains (key: 'TKey) = x.ContainsKey key
 
     type ISet<'T> with
@@ -114,13 +117,14 @@ module rec CommonUtil =
     let equalsIgnoreCase other (string: string) =
         string.Equals(other, StringComparison.OrdinalIgnoreCase)
 
+    let (|IgnoreCase|_|) other string =
+        if equalsIgnoreCase other string then someUnit else None
+
     let startsWith other (string: string) =
         string.StartsWith(other, StringComparison.Ordinal)
 
     let endsWith other (string: string) =
         string.EndsWith(other, StringComparison.Ordinal)
-
-    let eq a b = a = b
 
     let getCommonParent path1 path2 =
         FileSystemPath.GetDeepestCommonParent(path1, path2)
@@ -152,6 +156,11 @@ module rec FcsUtil =
     let inline (|PatRange|) (pat: SynPat) = pat.Range
     let inline (|IdentRange|) (id: Ident) = id.idRange
     let inline (|TypeRange|) (typ: SynType) = typ.Range
+
+    let inline (|IdentText|_|) text (id: Ident) =
+        if id.idText = text then someUnit else None
+
+    let inline (|LongIdentLid|) (lid: LongIdentWithDots) = lid.Lid
 
 
 [<AutoOpen>]

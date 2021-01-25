@@ -15,7 +15,7 @@ IFSharpImplFile
           IMatchClause
             FSharpTokenType+BarTokenElement(type:BAR, text:|)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ILocalParametersOwnerPat
+            IParametersOwnerPat
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:A)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "

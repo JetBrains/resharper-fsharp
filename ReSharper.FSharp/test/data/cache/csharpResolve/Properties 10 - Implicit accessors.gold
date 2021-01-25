@@ -1,0 +1,20 @@
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+    var _ = t.|get_A|(0)();
+    t.|set_A|(1)(0);
+    var __ = t.|get_B|(2)(0);
+    t.|set_B|(3)(0, 0);
+    t.|set_C|(4)(0, 0);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'get_A'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'set_A'
+(2): ReSharper Error Highlighting: Cannot resolve symbol 'get_B'
+(3): ReSharper Error Highlighting: Cannot resolve symbol 'set_B'
+(4): ReSharper Error Highlighting: Cannot resolve symbol 'set_C'
+M:T.#ctor

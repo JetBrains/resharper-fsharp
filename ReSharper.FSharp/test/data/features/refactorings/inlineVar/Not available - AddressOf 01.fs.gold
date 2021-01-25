@@ -1,0 +1,6 @@
+﻿do
+    let foo _ = ()
+
+    let mutable i = 123
+    i <- 1
+    foo &i

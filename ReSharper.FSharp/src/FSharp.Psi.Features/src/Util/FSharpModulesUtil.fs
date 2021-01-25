@@ -2,21 +2,21 @@
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
-let private toModuleNamespaceDeclaration tokenType (nodeType: CompositeNodeType)
-    (moduleDeclaration: IDeclaredModuleLikeDeclaration) =
+let private toModuleNamespaceDeclaration
+        tokenType (nodeType: CompositeNodeType) (decl: IDeclaredModuleLikeDeclaration) =
 
-    if isNull moduleDeclaration then () else
+    if isNull decl then () else
 
-    replaceWithToken moduleDeclaration.ModuleOrNamespaceKeyword tokenType
-    let newModuleDeclaration = ModificationUtil.ReplaceChild(moduleDeclaration, nodeType.Create())
-    LowLevelModificationUtil.AddChild    (newModuleDeclaration, moduleDeclaration.Children().AsArray())
+    replaceWithToken decl.ModuleOrNamespaceKeyword tokenType
+    let newModuleDeclaration = ModificationUtil.ReplaceChild(decl, nodeType.Create())
+    LowLevelModificationUtil.AddChild(newModuleDeclaration, decl.Children().AsArray())
 
 let convertModuleToNamespace: IDeclaredModuleLikeDeclaration -> unit =
     toModuleNamespaceDeclaration FSharpTokenType.NAMESPACE ElementType.NAMED_NAMESPACE_DECLARATION

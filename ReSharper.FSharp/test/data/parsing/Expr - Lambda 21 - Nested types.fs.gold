@@ -10,17 +10,18 @@ IFSharpImplFile
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               ITypedPat
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                ITypedPat
-                  ILocalReferencePat
-                    IExpressionReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:x)
-                  FSharpTokenType+ColonTokenElement(type:COLON, text::)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                IParenPat
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  ITypedPat
+                    ILocalReferencePat
+                      IExpressionReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:x)
+                    FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
                 FSharpTokenType+ColonTokenElement(type:COLON, text::)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 INamedTypeUsage

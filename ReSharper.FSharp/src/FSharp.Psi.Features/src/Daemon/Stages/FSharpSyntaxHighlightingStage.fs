@@ -10,8 +10,12 @@ open JetBrains.ReSharper.Psi
 type FSharpSyntaxHighlighting() =
     inherit DefaultSyntaxHighlighting()
 
+    static let strings =
+        FSharpTokenType.InterpolatedStrings.Union(FSharpTokenType.Strings)
+
     override x.IsBlockComment(tokenType) = tokenType == FSharpTokenType.BLOCK_COMMENT
     override x.IsLineComment(tokenType) = tokenType == FSharpTokenType.LINE_COMMENT
+    override x.IsString(tokenType) = strings.[tokenType]
 
     override x.BlockCommentAttributeId = FSharpHighlightingAttributeIds.BlockComment
     override x.LineCommentAttributeId = FSharpHighlightingAttributeIds.LineComment

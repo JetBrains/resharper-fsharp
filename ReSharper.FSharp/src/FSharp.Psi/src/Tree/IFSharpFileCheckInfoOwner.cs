@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FSharp.Compiler;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
@@ -20,6 +21,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     [NotNull] IFSharpResolvedSymbolsCache ResolvedSymbolsCache { get; set; }
 
     [CanBeNull] FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
+
+    [CanBeNull] FSharpOption<SyntaxTree.ParsedInput> ParseTree { get; }
 
     [CanBeNull]
     FSharpSymbolUse GetSymbolUse(int offset);

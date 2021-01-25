@@ -8,7 +8,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   public partial interface IFSharpPattern
   {
     bool IsDeclaration { get; }
-    IEnumerable<IDeclaration> Declarations { get; }
+    IEnumerable<IFSharpDeclaration> Declarations { get; }
+    IEnumerable<IFSharpPattern> NestedPatterns { get; }
 
     TreeNodeCollection<IAttribute> Attributes { get; }
 

@@ -37,9 +37,6 @@ type ScriptFcsProjectProvider
             IPropertyEx.FlowInto(languageVersion, lifetime, flags, fun version -> getOtherFlags version)
             flags
 
-    let fixScriptOptions options =
-        { options with OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore options.OtherOptions }
-
     let getOptions (path: FileSystemPath) source =
         let path = path.FullPath
         let source = SourceText.ofString source
@@ -52,8 +49,7 @@ type ScriptFcsProjectProvider
             try
                 let options, errors = getScriptOptionsAsync.RunAsTask()
                 if not errors.IsEmpty then
-                    logger.Warn("Script options for {0}: {1}", path, concatErrors errors)
-                let options = fixScriptOptions options
+                    logErrors logger (sprintf "Script options for %s" path) errors
                 Some options
             with
             | OperationCanceled -> reraise()

@@ -93,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return ResolvedSymbols.Empty;
 
       var checkResults = CheckerService.ParseAndCheckFile(SourceFile, OpName)?.Value.CheckResults;
-      var symbolUses = checkResults?.GetAllUsesOfAllSymbolsInFile().RunAsTask();
+      var symbolUses = checkResults?.GetAllUsesOfAllSymbolsInFile(null);
       if (symbolUses == null)
         return ResolvedSymbols.Empty;
 
@@ -243,7 +243,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private static bool CanIgnoreSymbol([NotNull] FSharpSymbol symbol) =>
       symbol is FSharpEntity || 
-      symbol is FSharpMemberOrFunctionOrValue mfv && mfv.LogicalName == "op_RangeStep";
+      symbol is FSharpMemberOrFunctionOrValue mfv && (mfv.LogicalName == "op_RangeStep" || mfv.IsConstructor);
 
     private TextRange FixRange(int startOffset, int endOffset, [CanBeNull] string logicalName, IBuffer buffer,
       CachingLexer lexer)
@@ -268,7 +268,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           return new TextRange(startOffset, endOffset);
 
         // todo: use lexer buffer
-        if (lexer.FindTokenAt(endOffset - 1) && lexer.TokenType is TokenNodeType tokenType)
+        if (lexer.FindTokenAt(endOffset - 1) && lexer.TokenType is { } tokenType)
         {
           var opText = tokenType == FSharpTokenType.SYMBOLIC_OP ? sourceName : logicalName;
           return new TextRange(endOffset - opText.Length, endOffset);

@@ -71,7 +71,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (ReferenceEquals(this, obj))
         return true;
 
-      if (!(obj is FSharpTypeMember<TDeclaration> member)) return false;
+      if (!(obj is IFSharpMember member)) return false;
 
       if (!ShortName.Equals(member.ShortName))
         return false;
@@ -92,7 +92,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public virtual AccessRights GetAccessRights() =>
       GetDeclaration()?.GetAccessRights() ?? AccessRights.PUBLIC;
 
-    // todo
     public virtual bool IsAbstract => false;
     public virtual bool IsSealed => false;
     public virtual bool IsVirtual => false;
@@ -116,8 +115,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public virtual bool IsVisibleFromFSharp => true;
     public virtual bool CanNavigateTo => IsVisibleFromFSharp;
-
-    public virtual bool IsExtensionMember => false;
 
     public virtual IList<ITypeParameter> AllTypeParameters =>
       GetContainingType().GetAllTypeParameters().ResultingList().Reverse();

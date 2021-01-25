@@ -1,9 +1,26 @@
 ﻿-------------- offset 90 line 6 col 19 --------------------
 +++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
 Immediate result: Occurrence's dump:
-DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.MemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.MemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 02 - Default member.fs
+DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 02 - Default member.fs
 +++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
 Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [O] abstract |P|: int RANGE: (25,26) @ Object expr - Override 02 - Default member.fs
+Menu Item presentation: 
+Text: Object expr - Override 02 - Default member.fs| (2)
+Shortcut text: in <TestProject>
+Style: Enabled
+Mnemonic: 
+Tooltip: abstract P: int
+
+Occurrence's navigation result. Opened file: Object expr - Override 02 - Default member.fs
+------------------
+type T() =
+    abstract |CARET|P: int
+    default x.P = 1
+
+------------------
+
 Occurrence's dump:
 TO: [O] default x.|P| = 1 RANGE: (47,48) @ Object expr - Override 02 - Default member.fs
 Menu Item presentation: 

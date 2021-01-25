@@ -129,7 +129,7 @@ let setBindingExpression (expr: IFSharpExpression) contextIndent (letBindings: #
         let indentSize = expr.GetIndentSize()
         ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
         ModificationUtil.AddChildBefore(newExpr, Whitespace(contextIndent + indentSize)) |> ignore
-        shiftExpr indentSize newExpr
+        shiftNode indentSize newExpr
 
 let rec isTypeEvident (expr: IFSharpExpression) =
     match expr.IgnoreInnerParens() with

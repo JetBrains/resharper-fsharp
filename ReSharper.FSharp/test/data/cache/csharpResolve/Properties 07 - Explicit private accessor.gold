@@ -1,0 +1,17 @@
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+    var _ = t.get_A(0);
+    t.|set_A|(0)(0, 1);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access private method 'set_A' here
+M:T.#ctor
+M:T.get_A(System.Int32)
+M:T.get_A(System.Int32)
+M:T.set_A(System.Int32,System.Int32)
+M:T.set_A(System.Int32,System.Int32)

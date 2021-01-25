@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public void SetOverride(bool value)
+    public virtual void SetOverride(bool value)
     {
     }
 
@@ -90,10 +90,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
 
-    public AccessRights GetAccessRights() => AccessRights.PUBLIC;
-    public bool IsAbstract => false;
+    public virtual AccessRights GetAccessRights() => AccessRights.PUBLIC;
+    public virtual bool IsAbstract => false;
     public bool IsSealed => false;
-    public bool IsVirtual => false;
+    public virtual bool IsVirtual => false;
     public virtual bool IsOverride => false;
     public virtual bool IsStatic => false;
     public bool IsReadonly => false;

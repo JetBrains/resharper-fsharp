@@ -108,6 +108,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let binding = letBindings.Bindings.First()
             binding.HeadPattern :?> _
 
+        member x.CreateWildSelfId() =
+            let typeDecl = getTypeDecl "member _.P = 1"
+            let memberDecl = typeDecl.TypeMembers.[0] :?> IMemberDeclaration
+            memberDecl.SelfId :?> IWildSelfId
+
         member x.CreateIgnoreApp(expr, newLine) =
             let source = "() |> ignore"
 
@@ -328,3 +333,13 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateAttribute(attrName) =
             let attributeList = createAttributeList attrName
             attributeList.Attributes.[0]
+
+        member this.CreateTypeParameterOfTypeList(names) =
+            let names = names |> List.map ((+) "'") |> String.concat ", "
+            let source = $"type T<{names}> = class end"
+            let moduleMember = getModuleMember source
+
+            let typeDeclaration =
+                moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations.[0] :?> IFSharpTypeDeclaration
+
+            typeDeclaration.TypeParameterList

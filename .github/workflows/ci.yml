@@ -1,0 +1,53 @@
+name: "build-test"
+on: [push, pull_request]
+
+jobs:
+  test-backend:
+    runs-on: ${{ matrix.image }}
+    strategy:
+      matrix:
+        image: [windows-latest]
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.github/nuget-packages
+      GRADLE_USER_HOME: ${{ github.workspace }}/.github/gradle
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Gradle Wrapper Cache
+        uses: actions/cache@v1.1.0
+        with:
+          path: ${{ env.GRADLE_USER_HOME }}/wrapper
+          key: ${{ runner.os }}.gradle-wrapper.${{ hashFiles('rider-fsharp/gradle/**') }}
+
+      - name: Gradle Wrapper Validation
+        uses: gradle/wrapper-validation-action@v1.0.3
+
+      - name: NuGet Cache
+        uses: actions/cache@v1.1.0
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ runner.os }}.nuget.${{ hashFiles('ReSharper.FSharp/**/*proj') }}+${{ hashFiles('ReSharper.FSharp/**/*.props') }}
+
+      - name: Gradlew Prepare
+        working-directory: ./rider-fsharp
+        run: ./gradlew prepare
+
+      - name: Add MSBuild to PATH # for tests
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Build ReSharper.FSharp
+        working-directory: ./ReSharper.FSharp
+        run: dotnet build
+
+      - name: Test ReSharper.FSharp
+        working-directory: ./ReSharper.FSharp
+        run: dotnet test --no-build
+
+      - name: Build Plugin Frontend
+        working-directory: ./rider-fsharp
+        if: ${{ success() }} || ${{ failure() }}
+        run: ./gradlew buildPlugin
+
+      - name: Stop Gradle Daemon # to collect Gradle cache
+        working-directory: ./rider-fsharp
+        run: ./gradlew --stop

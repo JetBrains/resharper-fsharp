@@ -1,11 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 [<ContextAction(Name = "ToMultilineRecord", Group = "F#", Description = "Converts record expression to multiline")>]
@@ -35,7 +35,7 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
         let lineEnding = recordExpr.FSharpFile.GetLineEnding()
 
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
-        use enableFormatterCookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
+        use enableFormatterCookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
 
         let bindings = recordExpr.FieldBindings
         let firstBinding = bindings.[0]

@@ -9,7 +9,7 @@ IFSharpImplFile
           ILambdaParametersList
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              ILocalParametersOwnerPat
+              IParametersOwnerPat
                 IExpressionReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:Some)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "

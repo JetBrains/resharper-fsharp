@@ -4,6 +4,7 @@ open System.Runtime.InteropServices
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -25,6 +26,11 @@ type FSharpDeclaredElementIconProvider() =
     interface IDeclaredElementIconProvider with
         member x.GetImageId(declaredElement, _, [<Out>] canApplyExtensions) =
             canApplyExtensions <- true
+
+            let declaredElement =
+                match declaredElement with
+                | :? FSharpUnionCaseClass as c -> c.OriginElement.As<IDeclaredElement>()
+                | _ -> declaredElement
 
             match declaredElement with
             | :? IFSharpModule -> FSharpIcons.FSharpModule.Id
@@ -59,5 +65,26 @@ type FSharpDeclaredElementIconProvider() =
 
             | :? IActivePatternCase ->
                 PsiSymbolsThemedIcons.EnumMember.Id
+
+            | :? IFSharpProperty as property ->
+                canApplyExtensions <- false
+
+                let icon = PsiSymbolsThemedIcons.Property.Id
+                let icon =
+                    match property.IsReadable, property.IsWritable with
+                    | true, true -> compose icon PsiSymbolsThemedIcons.ModifiersReadWrite.Id
+                    | true, false -> compose icon PsiSymbolsThemedIcons.ModifiersRead.Id
+                    | false, true -> compose icon PsiSymbolsThemedIcons.ModifiersWrite.Id
+                    | _ -> icon
+
+                let icon =
+                    if property.IsStatic then
+                        compose icon PsiSymbolsThemedIcons.ModifiersStatic.Id
+                    else icon
+
+                match property.RepresentationAccessRights with
+                | AccessRights.PRIVATE -> compose icon PsiSymbolsThemedIcons.ModifiersPrivate.Id
+                | AccessRights.INTERNAL -> compose icon PsiSymbolsThemedIcons.ModifiersInternal.Id
+                | _ -> icon
 
             | _ -> null

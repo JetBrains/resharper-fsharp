@@ -12,9 +12,9 @@ IFSharpImplFile
       IFSharpTypeDeclaration
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
         IPrimaryConstructorDeclaration
-          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           IParametersPatternDeclaration
             IParenPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               ITuplePat
                 ITypedPat
                   ILocalReferencePat
@@ -36,7 +36,7 @@ IFSharpImplFile
                   INamedTypeUsage
                     ITypeReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:int)
-        FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
