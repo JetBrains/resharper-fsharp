@@ -13,7 +13,7 @@ IFSharpImplFile
             FSharpIdentifierToken(type:IDENTIFIER, text:String)
           IParenExpr
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            IArrayOrListExpr
+            IArrayExpr
               FSharpTokenType+LbrackBarTokenElement(type:LBRACK_BAR, text:[|)
               FSharpTokenType+BarRbrackTokenElement(type:BAR_RBRACK, text:|])
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))

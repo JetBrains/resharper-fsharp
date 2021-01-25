@@ -6,7 +6,7 @@ IFSharpImplFile
         IMatchExpr
           FSharpTokenType+MatchTokenElement(type:MATCH, text:match)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IArrayOrListExpr
+          IListExpr
             FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
             FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

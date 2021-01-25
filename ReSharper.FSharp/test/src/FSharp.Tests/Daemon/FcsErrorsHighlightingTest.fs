@@ -58,3 +58,5 @@ type FcsErrorsHighlightingTest() =
 
     // Workaround for type-private tests as function bindings. Probably check attribute names instead?
     [<Test>] member x.``Ignored - Top level function with attributes 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Unexpected expression type 01``() = x.DoNamedTest()

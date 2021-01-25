@@ -299,6 +299,19 @@
     <QuickFix>NamespaceToModuleFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="AddTypeEquation">
+    <Parameter type="string" name="expectedType"/>
+    <Parameter type="string" name="actualType"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ConvertTupleToArrayOrListElementsFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="TypeAbbreviationsCannotHaveAugmentations">
     <Parameter type="ITypeExtensionDeclaration" name="extensionDecl"/>
     <Message value="Type abbreviations cannot have augmentations"/>

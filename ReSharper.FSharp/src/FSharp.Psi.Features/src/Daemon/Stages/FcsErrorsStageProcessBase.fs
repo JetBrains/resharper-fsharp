@@ -70,6 +70,8 @@ module FSharpErrors =
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
 
+    let [<Literal>] addTypeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
+
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
@@ -132,8 +134,17 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     
     let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
-        | TypeEquation when error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
-            createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
+        | TypeEquation ->
+            match error.Message with
+            | message when message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
+                createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
+
+            | Regex addTypeEquationMessage [expectedType; actualType] ->
+                let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                if isNotNull node then AddTypeEquationError(expectedType, actualType, node, error.Message) :> _
+                else null
+
+            | _ -> createGenericHighlighting error range
 
         | NotAFunction ->
             let notAFunctionNode = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
@@ -145,7 +156,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | FieldNotMutable ->
             createHighlightingFromNode FieldOrValueNotMutableError range
 
-        | VarBoundTwice -> 
+        | VarBoundTwice ->
             createHighlightingFromNode VarBoundTwiceError range
 
         | UndefinedName ->
@@ -283,7 +294,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     | :? IHighlightingWithSecondaryRanges as highlighting ->
                         for range in highlighting.CalculateSecondaryRanges() do
                             highlightings.Add(HighlightingInfo(range, highlighting))
-                        highlighting :> _   
+                        highlighting :> _
                     | highlighting -> highlighting
 
                 if highlighting :? IIgnoredHighlighting then () else

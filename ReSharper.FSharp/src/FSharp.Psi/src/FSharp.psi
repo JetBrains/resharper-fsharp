@@ -460,6 +460,10 @@ interface conditionOwnerExpr:
   ifExpr |
   whileExpr;
 
+interface arrayOrListExpr:
+  arrayExpr |
+  listExpr;
+
 setExpr options { stubBase="UnitExpressionBase"; }:
   fSharpExpression<LEFT_EXPR, LeftExpression>
   LARROW<LARROW, LArrow>
@@ -586,10 +590,15 @@ anonRecordExpr options { stubBase="FSharpExpressionBase"; } extras {
   recordFieldBindingList<BINDING_LIST, FieldBindingList>
   BAR_RBRACE;
 
-arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:
-  (LBRACK | LBRACK_BAR)
+arrayExpr options { stubBase="FSharpExpressionBase"; }:
+  LBRACK_BAR
   fSharpExpression<EXPR, Expression>
-  (RBRACK | BAR_RBRACK);
+  BAR_RBRACK;
+
+listExpr options { stubBase="FSharpExpressionBase"; }:
+  LBRACK
+  fSharpExpression<EXPR, Expression>
+  RBRACK;
 
 recordExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="FieldBindings" path=<recordExpr:BINDING_LIST/recordFieldBindingList:BINDING> };
