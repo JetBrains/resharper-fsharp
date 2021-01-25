@@ -44,7 +44,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         NodeTypeSet(
            ElementType.RECORD_EXPR,
            ElementType.ANON_RECORD_EXPR,
-           ElementType.ARRAY_OR_LIST_EXPR,
+           ElementType.ARRAY_EXPR,
+           ElementType.LIST_EXPR,
            ElementType.PAREN_EXPR,
            ElementType.LAMBDA_EXPR,
            ElementType.MATCH_LAMBDA_EXPR,

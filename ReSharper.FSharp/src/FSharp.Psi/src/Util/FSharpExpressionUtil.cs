@@ -13,7 +13,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       new NodeTypeSet(
         ElementType.LITERAL_EXPR,
         ElementType.UNIT_EXPR,
-        ElementType.ARRAY_OR_LIST_EXPR,
+        ElementType.ARRAY_EXPR,
+        ElementType.LIST_EXPR,
         ElementType.QUOTE_EXPR,
         ElementType.OBJ_EXPR,
         ElementType.NEW_EXPR,

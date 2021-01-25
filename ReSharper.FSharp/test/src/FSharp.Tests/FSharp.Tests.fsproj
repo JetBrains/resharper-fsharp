@@ -90,6 +90,7 @@
     <Compile Include="QuickFixes\ReplaceLambdaBodyWithIdTest.fs" />
     <Compile Include="QuickFixes\GenerateInterfaceMembersFixTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantAttributeTest.fs" />
+    <Compile Include="QuickFixes\ConvertTupleToArrayOrListElementsFixTest.fs" />
     <Compile Include="QuickFixes\ReplaceWithAbbreviatedTypeTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantParens.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />

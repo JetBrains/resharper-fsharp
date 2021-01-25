@@ -313,7 +313,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
                     | _ ->
                         match accessorId with
-                        | Some ident ->
+                        | Some _ ->
                             x.ProcessAccessor(range, memberParams, expr)
                             ElementType.MEMBER_DECLARATION
                         | _ ->
@@ -328,7 +328,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                         x.MarkAndDone(selfId.idRange, selfIdNodeType)
 
                     match accessorId with
-                    | Some ident ->
+                    | Some _ ->
                         x.ProcessAccessor(range, memberParams, expr)
                         ElementType.MEMBER_DECLARATION
                     | _ ->
@@ -728,11 +728,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushRangeForMark(range, x.Mark(), ElementType.TUPLE_EXPR)
             x.ProcessExpressionList(exprs)
 
-        | SynExpr.ArrayOrList(_, exprs, _) ->
+        | SynExpr.ArrayOrList(isArray, exprs, _) ->
             // SynExpr.ArrayOrList is currently only used for error recovery and empty lists in the parser.
             // Non-empty SynExpr.ArrayOrList is created in the type checker only.
             Assertion.Assert(List.isEmpty exprs, "Non-empty SynExpr.ArrayOrList: {0}", expr)
-            x.MarkAndDone(range, ElementType.ARRAY_OR_LIST_EXPR)
+            x.MarkAndDone(range, if isArray then ElementType.ARRAY_EXPR else ElementType.LIST_EXPR)
 
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
             x.PushRange(range, ElementType.ANON_RECORD_EXPR)
@@ -791,9 +791,9 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushExpression(bodyExpr)
             x.ProcessExpression(enumExpr)
 
-        | SynExpr.ArrayOrListOfSeqExpr(_, expr, _) ->
+        | SynExpr.ArrayOrListOfSeqExpr(isArray, expr, _) ->
             let expr = match expr with | SynExpr.CompExpr(expr = expr) -> expr | _ -> expr
-            x.PushRangeAndProcessExpression(expr, range, ElementType.ARRAY_OR_LIST_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, if isArray then ElementType.ARRAY_EXPR else ElementType.LIST_EXPR)
 
         | SynExpr.CompExpr(_, _, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.COMPUTATION_EXPR)
