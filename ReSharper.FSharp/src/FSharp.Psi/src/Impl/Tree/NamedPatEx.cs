@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         switch (node)
         {
-          case IFSharpPattern:
+          case IFSharpPattern _:
             node = node.Parent;
             break;
           case IBindingLikeDeclaration binding:

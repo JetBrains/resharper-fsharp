@@ -20,7 +20,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
   {
     private readonly FSharpFormatterInfoProvider myFormatterInfoProvider;
 
-    private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> myGluingCache = new();
+    private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> myGluingCache =
+      new ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool>();
 
     public FSharpCodeFormatter(FSharpLanguage language, CodeFormatterRequirements requirements,
       FSharpFormatterInfoProvider formatterInfoProvider) : base(language, requirements)
@@ -30,7 +31,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     protected override CodeFormattingContext CreateFormatterContext(CodeFormatProfile profile, ITreeNode firstNode,
       ITreeNode lastNode, AdditionalFormatterParameters parameters, ICustomFormatterInfoProvider provider) =>
-      new(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger, parameters);
+      new CodeFormattingContext(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger,
+        parameters);
 
     public override MinimalSeparatorType GetMinimalSeparatorByNodeTypes(TokenNodeType leftTokenType,
       TokenNodeType rightTokenType)
