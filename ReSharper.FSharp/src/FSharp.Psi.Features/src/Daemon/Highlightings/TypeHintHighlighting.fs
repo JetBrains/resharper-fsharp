@@ -10,7 +10,7 @@ open JetBrains.TextControl.DocumentMarkup
 open JetBrains.UI.RichText
 
 [<AbstractClass>]
-type TypeHintHighlightingBase(typeNameString: string, range: DocumentRange) =
+type TypeHintHighlightingBase(typeNameString: string, range: DocumentRange, mode) =
     let text = RichText(": " + typeNameString)
 
     interface IHighlighting with
@@ -23,6 +23,7 @@ type TypeHintHighlightingBase(typeNameString: string, range: DocumentRange) =
         member x.TestOutput = text.Text
 
     member x.Text = text
+    member x.Mode = mode
     member x.IsValid() = not text.IsEmpty && not range.IsEmpty
 
 and [<SolutionComponent>] TypeHintAdornmentProvider() =
@@ -46,7 +47,7 @@ and [<SolutionComponent>] TypeHintAdornmentProvider() =
                     override x.IconId = null
                     override x.IsPreceding = false
                     override x.Order = 0
-                    override x.InlayHintsMode = InlayHintsMode.Default
+                    override x.InlayHintsMode = thh.Mode
                 }
             | _ -> null
 
@@ -57,8 +58,8 @@ and [<SolutionComponent>] TypeHintAdornmentProvider() =
      AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
      OverlapResolve = OverlapResolveKind.NONE,
      ShowToolTipInStatusBar = false)>]
-type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
-    inherit TypeHintHighlightingBase(typeNameString, range)
+type TypeHintHighlighting(typeNameString: string, range: DocumentRange, mode) =
+    inherit TypeHintHighlightingBase(typeNameString, range, mode)
 
 
 [<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
@@ -68,4 +69,4 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
      OverlapResolve = OverlapResolveKind.NONE,
      ShowToolTipInStatusBar = false)>]
 type PipeTypeHintHighlighting(typeNameString: string, range: DocumentRange) =
-    inherit TypeHintHighlightingBase(typeNameString, range)
+    inherit TypeHintHighlightingBase(typeNameString, range, InlayHintsMode.Default)

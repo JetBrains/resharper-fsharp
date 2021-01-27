@@ -137,11 +137,14 @@ let rec isTypeEvident (expr: IFSharpExpression) =
     | :? ICastExpr
     | :? ILambdaExpr
     | :? ILiteralExpr -> true
+
     | :? ITupleExpr as tupleExpr ->
         tupleExpr.Expressions |> Seq.forall isTypeEvident
+
     | :? IArrayOrListExpr as arrayOrListExpr ->
         match arrayOrListExpr.Expression with
         | :? ISequentialExpr as seqExpr ->
             isTypeEvident (seqExpr.ExpressionsEnumerable.FirstOrDefault())
         | _ -> false
+
     | _ -> false
