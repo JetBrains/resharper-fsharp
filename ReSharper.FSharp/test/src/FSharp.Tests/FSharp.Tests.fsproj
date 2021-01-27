@@ -110,6 +110,7 @@
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />
+    <Compile Include="Actions\HighlightUsagesTest.fs" />
     <Compile Include="Generate\FSharpGenerateOverridesTest.fs" />
     <Compile Include="Refactorings\RenameTest.fs" />
     <Compile Include="Refactorings\IntroduceVarTest.fs" />

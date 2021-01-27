@@ -1,0 +1,8 @@
+﻿let |x|(0) = 1
+|x|(1) + |x|(2)
+
+Status Bar: Found 2 usages of 'x' and 1 declaration (Press Escape to remove highlighting)
+
+(0) :TextRange: (4,5), Kind: Target, ToolTip: 
+(1) :TextRange: (11,12), Kind: ReadUsage, ToolTip: 
+(2) :TextRange: (15,16), Kind: ReadUsage, ToolTip: 
