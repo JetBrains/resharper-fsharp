@@ -74,8 +74,9 @@ type FSharpImportTypeHelper() =
                             not (psiModule.References(typeElement.Module)) then
                         true else
 
-                    let names = toQualifiedList typeElement |> List.map (fun el -> el.GetSourceName())
-                    let symbolUse = context.FSharpFile.CheckerService.ResolveNameAtLocation(context, names, opName)
+                    let fsFile = context.FSharpFile
+                    let names = toQualifiedList fsFile typeElement |> List.map (fun el -> el.GetSourceName())
+                    let symbolUse = fsFile.CheckerService.ResolveNameAtLocation(context, names, opName)
                     Option.isSome symbolUse)
                 |> Seq.cast
 
@@ -119,7 +120,7 @@ type FSharpQuickFixUtilComponent() =
         let namingService = NamingManager.GetNamingLanguageService(fsFile.Language)
 
         let nameToOpen =
-            toQualifiedList moduleToOpen
+            toQualifiedList fsFile moduleToOpen
             |> List.map (fun el ->
                 let sourceName = el.GetSourceName()
                 namingService.MangleNameIfNecessary(sourceName))

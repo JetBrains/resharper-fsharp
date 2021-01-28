@@ -16,7 +16,7 @@ open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
-let toQualifiedList (declaredElement: IClrDeclaredElement) =
+let toQualifiedList (fsFile: IFSharpFile) (declaredElement: IClrDeclaredElement) =
     let rec loop acc (declaredElement: IClrDeclaredElement) =
         match declaredElement with
         | :? INamespace as ns ->
@@ -28,6 +28,13 @@ let toQualifiedList (declaredElement: IClrDeclaredElement) =
 
             match typeElement.GetContainingType() with
             | null -> loop acc (typeElement.GetContainingNamespace())
+
+            | :? IFSharpModule as fsModule when
+                    fsModule.IsAnonymous &&
+                    let decls = fsFile.ModuleDeclarations
+                    decls.Count = 1 && decls.[0].DeclaredElement == fsModule ->
+                acc
+
             | containingType -> loop acc containingType
 
         | _ -> failwithf "Expecting namespace to type element"
