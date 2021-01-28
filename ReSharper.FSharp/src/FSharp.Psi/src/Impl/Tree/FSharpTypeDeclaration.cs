@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
@@ -8,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class FSharpTypeDeclaration
   {
-    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(AllAttributes);
+    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
 
     public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
@@ -20,5 +21,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       TypeRepresentation is { } repr
         ? repr.TypePartKind
         : this.GetTypeKind();
+
+    public bool IsPrimary =>
+      TypeKeyword?.GetTokenType() == FSharpTokenType.TYPE;
   }
 }

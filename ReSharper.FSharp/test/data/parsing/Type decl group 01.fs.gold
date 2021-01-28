@@ -1,0 +1,42 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    ITypeDeclarationGroup
+      IFSharpTypeDeclaration
+        FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpIdentifierToken(type:IDENTIFIER, text:A)
+        IPrimaryConstructorDeclaration
+          IParametersPatternDeclaration
+            IUnitPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IClassRepresentation
+          FSharpTokenType+ClassTokenElement(type:CLASS, text:class)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+EndTokenElement(type:END, text:end)
+      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+      IFSharpTypeDeclaration
+        FSharpTokenType+AndTokenElement(type:AND, text:and)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpIdentifierToken(type:IDENTIFIER, text:B)
+        IPrimaryConstructorDeclaration
+          IParametersPatternDeclaration
+            IUnitPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IClassRepresentation
+          FSharpTokenType+ClassTokenElement(type:CLASS, text:class)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+EndTokenElement(type:END, text:end)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

@@ -287,7 +287,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       switch (declaration)
       {
         case IFSharpTypeOldDeclaration typeDeclaration:
-          return typeDeclaration.AllAttributes;
+          return typeDeclaration.Attributes;
         case IMemberSignatureOrDeclaration memberDeclaration:
           return memberDeclaration.Attributes;
         case IFSharpPattern fsPattern:
@@ -475,7 +475,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : AccessRights.PUBLIC;
 
     public static PartKind GetSimpleTypeKindFromAttributes(this IFSharpTypeDeclaration decl) => 
-      GetTypeKind(decl.AllAttributes, out var kind) ? kind : PartKind.Class; // todo struct or class only
+      GetTypeKind(decl.Attributes, out var kind) ? kind : PartKind.Class; // todo struct or class only
 
     public static bool GetTypeKind(TreeNodeCollection<IAttribute> attributes, out PartKind fSharpPartKind)
     {
@@ -509,7 +509,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static PartKind GetTypeKind([NotNull] this IFSharpTypeDeclaration declaration)
     {
-      if (GetTypeKind(declaration.AllAttributes, out var typeKind))
+      if (GetTypeKind(declaration.Attributes, out var typeKind))
         return typeKind;
 
       foreach (var member in declaration.TypeMembersEnumerable)
@@ -584,7 +584,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       GetAttribute(attributes, shortName) != null;
 
     public static bool HasAttribute([NotNull] this IFSharpTypeOldDeclaration typeDeclaration, [NotNull] string shortName) =>
-      HasAttribute(typeDeclaration.AllAttributes, shortName);
+      HasAttribute(typeDeclaration.Attributes, shortName);
 
     public static void ReplaceIdentifier([CanBeNull] this IFSharpIdentifierLikeNode fsIdentifier, string name)
     {

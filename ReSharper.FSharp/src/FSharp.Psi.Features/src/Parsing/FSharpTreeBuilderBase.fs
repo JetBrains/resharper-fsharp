@@ -298,8 +298,15 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION)
         mark
 
-    member x.StartType attrs typeParams constraints (lid: LongIdent) range =
-        let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, List.tryHead lid, range)
+    member x.StartType(attrs, typeParams, constraints, lid: LongIdent, range, typeTokenType) =
+        let startRange =
+            match attrs with
+            | attrList :: _ -> attrList.Range
+            | _ -> range
+
+        let mark = x.MarkTokenOrRange(typeTokenType, startRange)
+        x.ProcessAttributeLists(attrs)
+
         if not lid.IsEmpty then
             let id = lid.Head
             let idOffset = x.GetStartOffset id

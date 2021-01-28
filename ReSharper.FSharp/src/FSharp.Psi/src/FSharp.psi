@@ -874,12 +874,8 @@ chameleonExpression:
   fSharpExpression<EXPR, Expression>;
 
 
-typeDeclarationGroup extras {
-  get { methodName="Attributes" path=<typeDeclarationGroup:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-}:
-  attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  TYPE<TYPE, TypeKeyword>
-  LIST fSharpTypeOrExtensionDeclaration<TYPE_DECLARATION, TypeDeclarations> SEP AND<FSHARP_AND, Separators>;
+typeDeclarationGroup:
+  fSharpTypeOrExtensionDeclaration<TYPE_DECLARATION, TypeDeclarations>*;
 
 interface fSharpTypeOrExtensionDeclaration:
   fSharpTypeDeclaration |
@@ -891,6 +887,11 @@ fSharpTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } e
 //  get { methodName="TypeRepresentation" path=<fSharpTypeDeclaration:DECLARATION_BODY/typeDeclarationBody:TYPE_REPR> };
   get { methodName="TypeMembers" path=<fSharpTypeDeclaration:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
 }:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  (
+    TYPE<TYPE, TypeKeyword> |
+    AND<TYPE, TypeKeyword>
+  )
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
@@ -971,6 +972,11 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
    get { methodName="TypeMembers" path=<typeExtensionDeclaration:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
    get { methodName="Attributes" path=<typeExtensionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
  }:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  (
+    TYPE<TYPE, TypeKeyword> |
+    AND<TYPE, TypeKeyword>
+  )
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   (

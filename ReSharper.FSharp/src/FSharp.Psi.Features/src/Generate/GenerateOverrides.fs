@@ -65,7 +65,7 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
 
     if element.Mfv.IsCliEvent() then
         let attribute = context.CreateElementFactory().CreateAttribute("CLIEvent")
-        FSharpAttributesUtil.addAttributesListWithIndent true indent memberDeclaration
+        FSharpAttributesUtil.addOuterAttributeListWithIndent true indent memberDeclaration
         FSharpAttributesUtil.addAttribute memberDeclaration.AttributeLists.[0] attribute
 
     if element.AddTypes then

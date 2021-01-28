@@ -57,11 +57,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             let mark = x.Mark(typeDefnGroupStartPos typeDefns range)
             match typeDefns with
             | [] -> ()
-            | TypeDefn(ComponentInfo(attributes = attrs), _, _, _) :: _ ->
-                x.ProcessOuterAttrs(attrs, range)
-
-            for typeDefn in typeDefns do
-                x.ProcessTypeDefn(typeDefn)
+            | primary :: secondary ->
+                x.ProcessTypeDefn(primary, FSharpTokenType.TYPE)
+                for typeDefn in secondary do
+                    x.ProcessTypeDefn(typeDefn, FSharpTokenType.AND)
             x.Done(range, mark, ElementType.TYPE_DECLARATION_GROUP)
 
         | SynModuleDecl.Exception(SynExceptionDefn(exn, members, range), _) ->
@@ -127,18 +126,15 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         | decl ->
             failwithf "unexpected decl: %A" decl
 
-    member x.ProcessTypeDefn(TypeDefn(info, repr, members, range) as typeDefn) =
+    member x.ProcessTypeDefn(TypeDefn(info, repr, members, range) as typeDefn, typeKeywordType) =
         let (ComponentInfo(attrs, typeParams, constraints, lid , _, _, _, _)) = info
-
-        // Only mark attributes that are inside the declaration node.
-        let attrs = x.SkipOuterAttrs(attrs, range)
 
         match repr with
         | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation, _, _) ->
             x.ProcessTypeExtensionDeclaration(typeDefn, attrs)
         | _ ->
 
-        let mark = x.StartType attrs typeParams constraints lid range
+        let mark = x.StartType(attrs, typeParams, constraints, lid, range, typeKeywordType)
 
         // Mark primary constructor before type representation.
         match repr with

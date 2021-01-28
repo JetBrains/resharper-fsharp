@@ -23,6 +23,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Namespace 06 - Global, type``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 07 - Global, Multiple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl group 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl group 02 - Attributes``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Exception 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 03 - Members``() = x.DoNamedTest()
@@ -485,6 +488,9 @@ type FSharpSignatureParserTest() =
     inherit ParserTestBase<FSharpLanguage>()
 
     override x.RelativeTestDataPath = "parsing/signatures"
+
+    [<Test>] member x.``Type decl group 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl group 02 - Attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Val - Value 01``() = x.DoNamedTest()
     [<Test>] member x.``Val - Value 02 - Return attrs``() = x.DoNamedTest()

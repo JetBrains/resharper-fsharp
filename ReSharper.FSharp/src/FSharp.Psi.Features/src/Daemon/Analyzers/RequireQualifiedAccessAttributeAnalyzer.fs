@@ -18,6 +18,6 @@ type RequireQualifiedAccessAttributeAnalyzer() =
         let typeDecl = FSharpTypeDeclarationNavigator.GetByTypeRepresentation(repr)
         if isNull typeDecl then () else
 
-        for attr in typeDecl.AllAttributes do
+        for attr in typeDecl.Attributes do
             if isRqa attr then
                 consumer.AddHighlighting(RedundantRequireQualifiedAccessAttributeWarning(attr))

@@ -113,7 +113,7 @@ let removeAttributeOrList (attr: IAttribute) =
         removeAttributeFromList attr
 
 
-let addAttributesListWithIndent addNewLine (indent: int) (decl: IFSharpTreeNode) =
+let addOuterAttributeListWithIndent addNewLine (indent: int) (decl: IFSharpTreeNode) =
     addNodesBefore decl.FirstChild [
         decl.CreateElementFactory().CreateEmptyAttributeList()
         if addNewLine then
@@ -123,22 +123,31 @@ let addAttributesListWithIndent addNewLine (indent: int) (decl: IFSharpTreeNode)
             Whitespace()
     ] |> ignore
 
-let addAttributesList addNewLine (decl: IFSharpTreeNode) =
-    addAttributesListWithIndent addNewLine decl.Indent decl
+let addOuterAttributeList addNewLine (decl: IFSharpTreeNode) =
+    addOuterAttributeListWithIndent addNewLine decl.Indent decl
 
+let addAttributeList (decl: IFSharpTypeOrExtensionDeclaration) =
+    addNodesAfter decl.TypeKeyword [
+        Whitespace()
+        decl.CreateElementFactory().CreateEmptyAttributeList()
+    ] |> ignore
+
+
+let isOuterAttributeList (typeDecl: IFSharpTypeOrExtensionDeclaration) (attrList: IAttributeList) =
+    attrList.GetTreeStartOffset().Offset < typeDecl.TypeKeyword.GetTreeStartOffset().Offset
 
 let getTypeDeclarationAttributeList (typeDecl: #IFSharpTypeOrExtensionDeclaration) =
-    let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl)
-    if typeDeclarationGroup.TypeDeclarations.[0] == typeDecl then
-        let attributeLists = typeDeclarationGroup.AttributeLists
-        if not attributeLists.IsEmpty then attributeLists.[0] else
-
-        addAttributesList true typeDeclarationGroup
-        typeDeclarationGroup.AttributeLists.[0]
+    if typeDecl.IsPrimary then
+        let attributeLists = typeDecl.AttributeLists
+        if attributeLists.Count > 0 && isOuterAttributeList typeDecl attributeLists.[0] then
+            attributeLists.[0]
+        else
+            addOuterAttributeList true typeDecl
+            typeDecl.AttributeLists.[0]
     else
         let attributeLists = typeDecl.AttributeLists
-        if not attributeLists.IsEmpty then attributeLists.[0] else
-        addAttributesList false typeDecl
+        if attributeLists.IsEmpty then
+            addAttributeList typeDecl
         typeDecl.AttributeLists.[0]
 
 let resolvesToType (clrTypeName: IClrTypeName) (attr: IAttribute) =
