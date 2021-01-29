@@ -40,7 +40,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool IsIndexer => this.IsIndexer();
 
-    public override bool IsStatic => StaticKeyword != null;
+    public override bool IsStatic =>
+      StaticKeyword != null || TypeExtensionDeclarationNavigator.GetByTypeMember(this) != null;
+
     public override bool IsVirtual => MemberKeyword?.GetTokenType() == FSharpTokenType.DEFAULT;
     public override bool IsOverride => this.IsOverride();
 
