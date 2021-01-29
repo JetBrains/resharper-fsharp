@@ -661,6 +661,44 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
         | _ -> x.AdvanceToEnd(synType.Range) // todo: mark error types
 
+    member x.ProcessSignatureType(SynValInfo(paramGroups, returnInfo), synType: SynType) =
+        let processParameterSig (SynArgInfo(attrs, isOptional, id)) (TypeRange range as synType) =
+            let mark =
+                match attrs with
+                | attrList :: _ -> x.Mark(attrList.Range)
+                | _ ->
+
+                let range = id |> Option.map (fun id -> id.idRange) |> Option.defaultValue range
+                if isOptional then
+                    x.MarkTokenOrRange(FSharpTokenType.QMARK, range)
+                else
+                    x.Mark(range)
+
+            x.ProcessAttributeLists(attrs)
+            x.ProcessType(synType)
+            x.Done(mark, ElementType.PARAMETER_SIGNATURE_TYPE_USAGE)
+
+        let processParameterGroup paramGroup synType =
+            match paramGroup, synType with
+            | _, SynType.Tuple(_, types, range) ->
+                let mark = x.Mark(range)
+                List.map snd types |> List.iter2 processParameterSig paramGroup
+                x.Done(mark, ElementType.TUPLE_TYPE_USAGE)
+            | [ param ], _ ->
+                processParameterSig param synType
+            | _ -> ()
+
+        let rec loop paramGroups returnInfo synType =
+            match paramGroups, synType with
+            | group :: rest, SynType.Fun(arg, returnType, range) ->
+                let mark = x.Mark(range)
+                processParameterGroup group arg
+                loop rest returnInfo returnType
+                x.Done(mark, ElementType.FUNCTION_TYPE_USAGE)
+            | _, _ -> processParameterSig returnInfo synType
+
+        loop paramGroups returnInfo synType
+
     member x.ProcessType(TypeRange range as synType) =
         match synType with
         | SynType.LongIdent(lid) ->

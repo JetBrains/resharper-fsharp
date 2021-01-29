@@ -1564,6 +1564,7 @@ interface typeUsage:
   functionTypeUsage |
   anonTypeUsage |
   parenTypeUsage |
+  parameterSignatureTypeUsage |
   unsupportedTypeUsage;
 
 
@@ -1611,6 +1612,15 @@ parenTypeUsage:
   LPAREN<LPAREN, LeftParen>
   typeUsage<TYPE, InnerTypeUsage>
   RPAREN<RPAREN, RightParen>;
+
+parameterSignatureTypeUsage:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  QMARK<QMARK, OptionalMark>?
+  (
+    identifier<IDENTIFIER, Identifier>
+    COLON
+  )?
+  typeUsage<TYPE, Type>;
 
 unsupportedTypeUsage:
   fakeSeparator;

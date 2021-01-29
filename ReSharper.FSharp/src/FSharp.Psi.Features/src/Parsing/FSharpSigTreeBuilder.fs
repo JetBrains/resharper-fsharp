@@ -121,9 +121,9 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
-        | SynMemberSig.Member(ValSpfn(attrs, id, _, synType, _, _, _, _, _, _, _), flags, range) ->
+        | SynMemberSig.Member(ValSpfn(attrs, id, _, synType, arity, _, _, _, _, _, _), flags, range) ->
             let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, Some id, range)
-            x.ProcessType(synType)
+            x.ProcessSignatureType(arity, synType)
             let elementType =
                 if flags.IsDispatchSlot then
                     ElementType.ABSTRACT_MEMBER_DECLARATION

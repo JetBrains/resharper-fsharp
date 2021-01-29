@@ -264,13 +264,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                     x.ProcessTopLevelBinding(binding, range)
                 ElementType.LET_BINDINGS_DECLARATION
 
-            | SynMemberDefn.AbstractSlot(ValSpfn(_, _, typeParams, synType, _, _, _, _, _, _, _), _, range) ->
+            | SynMemberDefn.AbstractSlot(ValSpfn(explicitValDecls = typeParams; synType = synType; arity = arity), _, range) ->
                 match typeParams with
                 | SynValTyparDecls(typeParams, _, constraints) ->
                     x.ProcessTypeParametersOfType typeParams constraints range true
                     for typeConstraint in constraints do
                         x.ProcessTypeConstraint(typeConstraint)
-                x.ProcessType(synType)
+                x.ProcessSignatureType(arity, synType)
                 ElementType.ABSTRACT_MEMBER_DECLARATION
 
             | SynMemberDefn.ValField(Field(fieldType = synType), _) ->

@@ -24,12 +24,29 @@ IFSharpSigFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IFunctionTypeUsage
               IParameterSignatureTypeUsage
+                IAttributeList
+                  FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+                  IAttribute
+                    ITypeReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:A)
+                  FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 FSharpIdentifierToken(type:IDENTIFIER, text:p)
                 FSharpTokenType+ColonTokenElement(type:COLON, text::)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                INamedTypeUsage
-                  ITypeReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:obj)
+                IParenTypeUsage
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  ITupleTypeUsage
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    FSharpTokenType+StarTokenElement(type:STAR, text:*)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "

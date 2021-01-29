@@ -25,9 +25,9 @@ type RedundantParenTypeUsageAnalyzer() =
         | :? ITupleTypeUsage ->
             // todo: rewrite when top-level-types are supported
             let functionTypeUsage = FunctionTypeUsageNavigator.GetByReturnTypeUsage(context)
-            if isNotNull (MemberSignatureLikeDeclarationNavigator.GetByType(context)) then true else
-            if isNotNull (MemberSignatureLikeDeclarationNavigator.GetByType(functionTypeUsage)) then true else
-            if isNotNull (MemberSignatureLikeDeclarationNavigator.GetByType(getLongestReturn context)) then true else
+            if isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(context)) then true else
+            if isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(functionTypeUsage)) then true else
+            if isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(getLongestReturn context)) then true else
 
             isNotNull (TupleTypeUsageNavigator.GetByItem(context)) ||
             isNotNull (ArrayTypeUsageNavigator.GetByType(context)) ||
@@ -40,7 +40,7 @@ type RedundantParenTypeUsageAnalyzer() =
             isNotNull (ArrayTypeUsageNavigator.GetByType(context)) ||
             isNotNull (PostfixAppTypeArgumentListNavigator.GetByType(context)) ||
             isNotNull (IsInstPatNavigator.GetByType(context)) ||
-            isNotNull (MemberSignatureLikeDeclarationNavigator.GetByType(context))
+            isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(context))
 
         | _ -> false
 

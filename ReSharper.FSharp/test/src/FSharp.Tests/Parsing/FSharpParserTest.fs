@@ -514,9 +514,18 @@ type FSharpSignatureParserTest() =
 
     [<Test>] member x.``Type member - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Constructor 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Member - Parameter - Attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Parameter - Attribute 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Parameter - Attribute 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Parameter - Attribute 04``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Parameter - Groups 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member - Member 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member 02 - Parameter 01``() = x.DoNamedTest() // todo: parameter name
     [<Test>] member x.``Type member - Member 03 - Return attribute``() = x.DoNamedTest() // todo: attribute
+    [<Test>] member x.``Type member - Member 04 - Tuple``() = x.DoNamedTest() // todo: attribute
+    [<Test>] member x.``Type member - Member 05 - Tuple``() = x.DoNamedTest() // todo: attribute
 
     [<Test>] member x.``Hash directive 01``() = x.DoNamedTest()
 
