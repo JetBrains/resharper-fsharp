@@ -11,10 +11,8 @@ type T =
     member M2: p: (int * int) -> int
 
     member M3: p: (int * int) -> (int * int)
-    member M4: p: (int * int) -> [<A>] |(|(0)int * int|)|(1)
+    member M4: p: (int * int) -> [<A>] (int * int)
 
     new: (int * int) -> T
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Redundant parentheses
-(1):<secondary> ReSharper Dead Code: Redundant parentheses
