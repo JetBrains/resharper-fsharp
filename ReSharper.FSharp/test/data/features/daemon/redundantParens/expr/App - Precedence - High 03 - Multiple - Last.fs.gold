@@ -1,4 +1,11 @@
-﻿f|(|(0)x|)|(1)|(|(2)y|)|(3)
+﻿AllowHighPrecedenceAppParens = True
+f(x)(y)
+
+---------------------------------------------------------
+
+================
+AllowHighPrecedenceAppParens = False
+f|(|(0)x|)|(1)|(|(2)y|)|(3)
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant parentheses

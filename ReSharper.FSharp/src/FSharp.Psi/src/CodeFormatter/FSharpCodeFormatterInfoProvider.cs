@@ -146,7 +146,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Name("MatchClauseWhenExprIndent")
         .Where(
           Parent().HasType(ElementType.MATCH_CLAUSE),
-          Node().HasRole(MatchClause.WHEN_EXPR))
+          Node().HasRole(MatchClause.WHEN_CLAUSE))
         .Return(IndentType.External, 2)
         .Build();
 

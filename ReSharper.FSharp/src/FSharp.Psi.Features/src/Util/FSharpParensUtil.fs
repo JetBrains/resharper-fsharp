@@ -3,15 +3,18 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpParensUtil
 
 open System
 open FSharp.Compiler
+open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
 let deindentsBody (expr: IFSharpExpression) =
     match expr with
-    | :? IMatchClauseListOwner as matchExpr ->
+    | :? IMatchClauseListOwnerExpr as matchExpr ->
         if expr.IsSingleLine then false else
 
         let clause = matchExpr.Clauses.LastOrDefault()
@@ -28,62 +31,11 @@ let deindentsBody (expr: IFSharpExpression) =
 
     | _ -> false
 
-let contextExprRequiresParens (expr: IFSharpExpression) =
-    isNotNull (TypeInheritNavigator.GetByCtorArgExpression(expr)) ||
-    isNotNull (ObjExprNavigator.GetByArgExpression(expr)) ||
-    isNotNull (NewExprNavigator.GetByArgumentExpression(expr))
-
-let isTopLevelContextExpr (expr: IFSharpExpression) =
-    if expr.Parent :? IChameleonExpression && isNull (AttributeNavigator.GetByExpression(expr)) then true else
-
-    if isNotNull (ParenExprNavigator.GetByInnerExpression(expr)) then
-        true else
-
-    if isNotNull (LetOrUseExprNavigator.GetByBinding(LocalBindingNavigator.GetByExpression(expr))) then
-        true else
-
-    if isNotNull (LetOrUseExprNavigator.GetByInExpression(expr)) then
-        true else
-
-    if isNotNull (MatchClauseNavigator.GetByExpression(expr)) ||
-            isNotNull (MatchClauseNavigator.GetByWhenExpression(WhenExprClauseNavigator.GetByExpression(expr))) then
-        true else
-
-    if isNotNull (WhileExprNavigator.GetByExpression(expr)) then
-        true else
-
-    false
-
-let (|Prefix|_|) (other: string) (str: string) =
-    if str.StartsWith(other, StringComparison.Ordinal) then someUnit else None
-
-let precedence (expr: IFSharpExpression): int =
-    match expr with
-    | :? IBinaryAppExpr as binaryApp ->
-        let refExpr = binaryApp.Operator
-        if isNull refExpr then 0 else
-
-        // todo: fix op tokens in references
-        let name = PrettyNaming.DecompileOpName (refExpr.GetText())
-        if name.Length = 0 then 0 else
-
-        match name with
-        | "|" | "||" -> 1
-        | "&" | "&&" -> 2
-        | Prefix "!=" | Prefix "<" | Prefix ">" | Prefix "|" | Prefix "&" | "$" | "=" -> 4
-        | Prefix "^" -> 5
-        | Prefix "::" -> 6
-        | Prefix "+" | Prefix "-" -> 8
-        | Prefix "*" | Prefix "/" | Prefix "%" -> 9
-        | Prefix "**" -> 10
-        | _ -> 0
-
-    | :? ICastExpr -> 3
-    | :? ITypeTestExpr -> 7
-    | :? IPrefixAppExpr | :? IDoLikeExpr -> 11
-    | :? IParenExpr -> 12
-
-    | _ -> 0
+let contextRequiresParens (context: IFSharpExpression) =
+    // todo: check nested parens
+    isNotNull (TypeInheritNavigator.GetByCtorArgExpression(context)) ||
+    isNotNull (ObjExprNavigator.GetByArgExpression(context)) ||
+    isNotNull (NewExprNavigator.GetByArgumentExpression(context))
 
 
 let isHighPrecedenceApp (appExpr: IPrefixAppExpr) =
@@ -91,74 +43,224 @@ let isHighPrecedenceApp (appExpr: IPrefixAppExpr) =
 
     let funExpr = appExpr.FunctionExpression
     let argExpr = appExpr.ArgumentExpression
-    if isNull funExpr || isNull argExpr then false else
 
-    let funEndOffset = funExpr.GetTreeEndOffset()
-    let argStartOffset = argExpr.GetTreeStartOffset()
-    funEndOffset = argStartOffset
+    // todo: attribute arg :(
+    isNotNull funExpr && isNotNull argExpr && funExpr.NextSibling == argExpr
 
-let private canBeTopLevelArgInHighPrecedenceApp (expr: IFSharpExpression) =
-    // todo: check `ignore{| Field = 1 + 1 |}.Field` vs `ignore[].Head` 
-    expr :? IArrayOrListExpr || expr :? IObjExpr || expr :? IRecordLikeExpr
 
-let rec private isHighPrecedenceAppRequired (appExpr: IPrefixAppExpr) =
-    let argExpr = appExpr.ArgumentExpression.IgnoreInnerParens()
-    if canBeTopLevelArgInHighPrecedenceApp argExpr then false else
+let (|Prefix|_|) (other: string) (str: string) =
+    if str.StartsWith(other, StringComparison.Ordinal) then someUnit else None
 
-    if isNotNull (QualifiedExprNavigator.GetByQualifier(appExpr)) then true else
+let operatorName (binaryApp: IBinaryAppExpr) =
+    let refExpr = binaryApp.Operator
+    if isNull refExpr then SharedImplUtil.MISSING_DECLARATION_NAME else
+
+    // todo: fix op tokens in references
+    let name = refExpr.GetText()
+    PrettyNaming.DecompileOpName(name)
+
+let operatorPrecedence (binaryApp: IBinaryAppExpr) =
+    let name = operatorName binaryApp
+    if name.Length = 0 then 0 else
+
+    match name with
+    | "|" | "||" -> 1
+    | "&" | "&&" -> 2
+    | Prefix "!=" | Prefix "<" | Prefix ">" | Prefix "|" | Prefix "&" | "$" | "=" -> 4
+    | Prefix "^" -> 5
+    | Prefix "::" -> 6
+    | Prefix "+" | Prefix "-" -> 8
+    | Prefix "*" | Prefix "/" | Prefix "%" -> 9
+    | Prefix "**" -> 10
+    | _ -> 0
+
+let precedence (expr: ITreeNode) =
+    match expr with
+    | :? ILetOrUseExpr -> 1
+
+    | :? IIfThenElseExpr
+    | :? IMatchLikeExpr -> 3
+
+    // todo: type test, cast, typed
+    | :? ITypedLikeExpr -> 4
+    | :? ILambdaExpr -> 5
+    | :? ISequentialExpr -> 6
+    | :? ITupleExpr -> 7
+
+    | :? IBinaryAppExpr as binaryAppExpr ->
+        // todo: remove this hack and align common precedence
+        match operatorName binaryAppExpr with
+        | "|>" -> 2
+        | _ -> 8
+
+    | :? IDoLikeExpr -> 9
+
+    | :? IPrefixAppExpr as prefixApp ->
+        if isHighPrecedenceApp prefixApp then 10 else 9
+
+    | :? IFSharpExpression -> 11
+
+    | _ -> 0
+
+let startsBlock (context: IFSharpExpression) =
+//    isNotNull (BinaryAppExprNavigator.GetByRightArgument(context)) || // todo: not really a block here :(
+    isNotNull (SetExprNavigator.GetByRightExpression(context))
+
+let getContextPrecedence (context: IFSharpExpression) =
+    if isNotNull (QualifiedExprNavigator.GetByQualifier(context)) then 10 else
+
+    if startsBlock context then 0 else precedence context.Parent
+
+let checkPrecedence (context: IFSharpExpression) node =
+    let nodePrecedence = precedence node
+    let contextPrecedence = getContextPrecedence context
+    nodePrecedence < contextPrecedence
+
+
+let rec getContainingCompoundExpr (context: IFSharpExpression): IFSharpExpression =
+    match BinaryAppExprNavigator.GetByArgument(context) with
+    | null -> context
+    | binaryAppExpr -> getContainingCompoundExpr binaryAppExpr
+
+let rec getLongestBinaryAppParentViaRightArg (context: IFSharpExpression): IFSharpExpression =
+    match BinaryAppExprNavigator.GetByRightArgument(context) with
+    | null -> context
+    | binaryAppExpr -> getLongestBinaryAppParentViaRightArg binaryAppExpr
+
+let rec getQualifiedExpr (expr: IFSharpExpression) =
+    match QualifiedExprNavigator.GetByQualifier(expr.IgnoreParentParens()) with
+    | null -> expr.IgnoreParentParens()
+    | expr -> getQualifiedExpr expr
+
+let rec getFirstQualifier (expr: IQualifiedExpr) =
+    match expr.Qualifier with
+    | null -> expr :> IFSharpExpression
+    | :? IQualifiedExpr as qualifier -> getFirstQualifier qualifier
+    | qualifier -> qualifier
+
+
+//let private canBeTopLevelArgInHighPrecedenceApp (expr: IFSharpExpression) =
+//    // todo: check `ignore{| Field = 1 + 1 |}.Field` vs `ignore[].Head` 
+//    expr :? IArrayOrListExpr || expr :? IObjExpr || expr :? IRecordLikeExpr
+
+let isHighPrecedenceAppArg context =
+    let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(context)
+    if isNotNull appExpr then
+        let funExpr = appExpr.FunctionExpression
+        isNotNull funExpr && funExpr.NextSibling == context else
+
+    // todo: add test with spaces
+    let chameleonExpr = ChameleonExpressionNavigator.GetByExpression(context)
+    let attribute = AttributeNavigator.GetByArgExpression(chameleonExpr)
+    if isNotNull attribute then
+        let referenceName = attribute.ReferenceName
+        isNotNull referenceName && referenceName.NextSibling == chameleonExpr else
 
     false
 
 let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
-    if isNull expr then false else
+    if expr :? IParenExpr then false else
 
-    let context = if isNotNull context then context else expr.IgnoreParentParens()
+    let expr = expr.IgnoreInnerParens()
+    if isNull expr|| contextRequiresParens context then true else
 
-    if contextExprRequiresParens context then true else
-    if isTopLevelContextExpr context then false else
+    let ParentPrefixAppExpr = PrefixAppExprNavigator.GetByArgumentExpression(context)
+    if isHighPrecedenceApp ParentPrefixAppExpr && isNotNull (QualifiedExprNavigator.GetByQualifier(ParentPrefixAppExpr)) then true else
 
-    let appExpr = PrefixAppExprNavigator.GetByExpression(context)
-    if isHighPrecedenceApp appExpr && isHighPrecedenceAppRequired appExpr then true else
+    // todo: calc once?
+    let allowHighPrecedenceAppParens = 
+        let settingsStore = context.GetSettingsStoreWithEditorConfig()
+        settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.AllowHighPrecedenceAppParens)
+
+    if isHighPrecedenceAppArg context && allowHighPrecedenceAppParens then true else
 
     match expr with
-    | :? IReferenceExpr as refExpr when
-            let attr = AttributeNavigator.GetByExpression(refExpr.IgnoreParentParens())
-            isNotNull attr && (isNotNull refExpr.TypeArgumentList || isNotNull attr.Target) ->
-        true
+    | :? IIfThenElseExpr as ifExpr ->
+        isNotNull (IfThenElseExprNavigator.GetByThenExpr(context)) ||
+        isNotNull (ConditionOwnerExprNavigator.GetByConditionExpr(context)) ||
+        isNotNull (BinaryAppExprNavigator.GetByLeftArgument(context)) ||
+        isNotNull (PrefixAppExprNavigator.GetByFunctionExpression(context)) ||
+        isNotNull (TypedLikeExprNavigator.GetByExpression(context)) ||
+        isNotNull (WhenExprClauseNavigator.GetByExpression(getContainingCompoundExpr context)) ||
 
-    | :? IQualifiedExpr as qualifiedExpr ->
-        needsParens context qualifiedExpr.Qualifier
+        let tupleExpr = TupleExprNavigator.GetByExpression(context)
+        isNotNull tupleExpr && tupleExpr.Expressions.LastOrDefault() != context ||
 
-    | :? IParenExpr | :? IQuoteExpr
-    | :? IConstExpr | :? INullExpr
-    | :? IRecordLikeExpr | :? IArrayOrListExpr | :? IComputationExpr
-    | :? IObjExpr | :? IAddressOfExpr -> false
+        checkPrecedence context expr ||
+        needsParens context ifExpr.ElseExpr
 
-    | :? IBinaryAppExpr as binaryAppExpr when
-            isNotNull (AppExprNavigator.GetByArgument(context)) ->
-        let outerApp = AppExprNavigator.GetByArgument(context)
-        precedence outerApp > precedence binaryAppExpr ||
+    | :? IMatchClauseListOwnerExpr as matchExpr ->
+        isNotNull (WhenExprClauseNavigator.GetByExpression(getContainingCompoundExpr context)) ||
+        checkPrecedence context expr ||
 
-        let outerApp = AppExprNavigator.GetByRightArgument(context)
-        precedence outerApp = precedence binaryAppExpr
+        let lastClause = matchExpr.ClausesEnumerable.LastOrDefault()
+        let lastClauseExpr = if isNull lastClause then null else lastClause.Expression
+        if isNull lastClauseExpr then false else // todo: or true?
 
-    | :? IAppExpr when
-            // todo: for each
-            isNotNull (BinaryAppExprNavigator.GetByArgument(context)) ->
+        needsParens context lastClauseExpr ||
+        lastClauseExpr.Indent = matchExpr.Indent ||
+
+        let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(context)
+        let opExpr = if isNull binaryAppExpr then null else binaryAppExpr.Operator
+
+        isNotNull opExpr && opExpr.Indent <> matchExpr.Indent ||
+        
         false
 
-    | :? IIfThenElseExpr when
-            isNotNull (IfThenElseExprNavigator.GetByElseExpr(context)) ->
-        false
+    | :? ITupleExpr ->
+        isNotNull (WhenExprClauseNavigator.GetByExpression(getContainingCompoundExpr context)) ||
+        isNotNull (AttributeNavigator.GetByExpression(context)) ||
+        isNotNull (TupleExprNavigator.GetByExpression(context)) ||
 
-    | :? IAppExpr | :? ITypedLikeExpr | :? IDoLikeExpr when
-            isNotNull (ConditionOwnerExprNavigator.GetByExpr(context)) ->
-        false
+        checkPrecedence context expr
+
+    | :? IReferenceExpr as refExpr ->
+        let typeArgumentList = refExpr.TypeArgumentList
+
+        let attribute = AttributeNavigator.GetByExpression(context)
+        isNotNull attribute && (isNotNull attribute.Target || isNotNull typeArgumentList) ||
+
+        isNotNull (AppExprNavigator.GetByArgument(context)) && getFirstQualifier refExpr :? IAppExpr ||
+
+        // todo: tests
+        isNull typeArgumentList && isNull refExpr.Qualifier && PrettyNaming.IsOperatorName (refExpr.GetText()) ||
+
+        checkPrecedence context expr
+
+    | :? ITypedLikeExpr ->
+        isNotNull (WhenExprClauseNavigator.GetByExpression(getContainingCompoundExpr context)) ||
+        isNotNull (AttributeNavigator.GetByExpression(context)) ||
+        checkPrecedence context expr
+
+    | :? IBinaryAppExpr as binaryAppExpr ->
+        let precedence = operatorPrecedence binaryAppExpr
+
+        // todo: check assoc
+
+        let parentViaLeftArg = BinaryAppExprNavigator.GetByLeftArgument(context)
+        isNotNull parentViaLeftArg && operatorPrecedence parentViaLeftArg > precedence ||
+
+        let parentViaRightArg = BinaryAppExprNavigator.GetByRightArgument(context)
+        isNotNull parentViaRightArg && operatorPrecedence parentViaRightArg >= precedence ||
+
+        checkPrecedence context expr ||
+        needsParens context binaryAppExpr.RightArgument ||
+        needsParens context binaryAppExpr.LeftArgument
+
+    | :? IPrefixAppExpr as prefixAppExpr ->
+        isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(getQualifiedExpr context)) ||
+
+        checkPrecedence context expr ||
+        needsParens context prefixAppExpr.ArgumentExpression
+
+    | :? ISequentialExpr ->
+        isNotNull (WhenExprClauseNavigator.GetByExpression(getContainingCompoundExpr context)) ||
+        checkPrecedence context expr
 
     | _ ->
 
     let binaryApp = BinaryAppExprNavigator.GetByLeftArgument(context)
-    if isNull binaryApp then true else
+    if isNull binaryApp then checkPrecedence context expr else
 
     if deindentsBody expr then true else
 
@@ -184,5 +286,6 @@ let addParens (expr: IFSharpExpression) =
 
 
 let addParensIfNeeded (expr: IFSharpExpression) =
-    if not (needsParens expr expr) then expr else
+    let context = expr.IgnoreParentParens()
+    if context != expr || not (needsParens context expr) then expr else
     addParens expr

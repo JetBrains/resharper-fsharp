@@ -1,4 +1,11 @@
-﻿f (g|(|(0)1|)|(1))
+﻿AllowHighPrecedenceAppParens = True
+f (g(1))
+
+---------------------------------------------------------
+
+================
+AllowHighPrecedenceAppParens = False
+f (g|(|(0)1|)|(1))
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant parentheses

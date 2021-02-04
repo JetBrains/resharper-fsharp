@@ -172,7 +172,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         match contextParent with
         | :? IMatchClause as matchClause ->
-            let matchClauseOwner = MatchClauseListOwnerNavigator.GetByClause(matchClause)
+            let matchClauseOwner = MatchClauseListOwnerExprNavigator.GetByClause(matchClause)
             if matchClauseOwner.IsSingleLine then true else
 
             let clauses = matchClauseOwner.Clauses

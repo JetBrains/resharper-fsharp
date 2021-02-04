@@ -139,7 +139,7 @@
     <QuickFix>ConvertToUseFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" isSuppressedInTests="true">
+  <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" configurableSeverity="FSharpRedundantParens" isSuppressedInTests="true">
     <Parameter type="IParenExpr" name="parenExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>

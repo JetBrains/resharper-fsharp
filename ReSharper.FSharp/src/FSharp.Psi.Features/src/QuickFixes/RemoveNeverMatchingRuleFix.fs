@@ -12,7 +12,7 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
 
     let removeMatchClause (clause : IMatchClause) =
         if isLastChild clause then
-            let matchClauseOwner = MatchClauseListOwnerNavigator.GetByClause(clause)
+            let matchClauseOwner = MatchClauseListOwnerExprNavigator.GetByClause(clause)
             if isNotNull matchClauseOwner && isInlineSpaceOrComment matchClauseOwner.NextSibling then
                 let first = matchClauseOwner.NextSibling
                 let last = getLastMatchingNodeAfter isInlineSpaceOrComment first

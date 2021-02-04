@@ -1,4 +1,13 @@
-﻿f|(|(0)x|)|(1)|(|(2)y|)|(3).P
+﻿AllowHighPrecedenceAppParens = True
+f(x)|(|(0)y|)|(1).P
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+
+================
+AllowHighPrecedenceAppParens = False
+f|(|(0)x|)|(1)|(|(2)y|)|(3).P
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant parentheses

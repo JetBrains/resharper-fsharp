@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
 
@@ -16,6 +17,9 @@ type RedundantParenExprAnalyzer() =
         if isNull parenExpr.LeftParen || isNull parenExpr.RightParen then () else
 
         let innerExpression = parenExpr.InnerExpression
+        if isNull innerExpression then () else
 
-        if innerExpression :? IParenExpr || not (needsParens null innerExpression) then
+        let context = parenExpr.IgnoreParentParens()
+
+        if innerExpression :? IParenExpr || not (needsParens context innerExpression) then
             consumer.AddHighlighting(RedundantParenExprWarning(parenExpr))

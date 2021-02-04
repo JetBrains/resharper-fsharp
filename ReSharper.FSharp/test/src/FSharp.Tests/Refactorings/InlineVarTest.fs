@@ -14,6 +14,26 @@ type InlineVarTest() =
         use cookie = FSharpExperimentalFeatures.EnableInlineVarRefactoringCookie.Create()
         base.DoTest(lifetime, project)
 
+    [<Test>] member x.``Expr - If - Binary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - If - Binary 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - If - Match 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - If - Match 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - If - Then 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - If - Then 02 - No else``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Match - If 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Match - If 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Ref - Operator 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Ref - Operator 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Ref - Operator 03 - Compiled name``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Typed - Binary 01 - Ignore``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Typed - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Typed - Tuple 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Qualifier - Ident 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Qualifier - Literal 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Qualifier - Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Qualifier - Method 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02``() = x.DoNamedTest()
 
@@ -32,6 +52,12 @@ type InlineVarTest() =
 
     [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Qualifier - App - High 01``() = x.DoNamedTest()
+    [<Test>] member x.``Qualifier - App 01``() = x.DoNamedTest()
+    [<Test>] member x.``Qualifier - Ident 01``() = x.DoNamedTest()
+    [<Test>] member x.``Qualifier - Ident 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Qualifier - If 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Space 01``() = x.DoNamedTest()
 

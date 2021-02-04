@@ -112,6 +112,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [SettingsEntry(true, "Don't indent comments started at first column")]
     public bool StickComment;
 
+    [SettingsEntry(true, "Don't report parens in application expressions")]
+    public bool AllowHighPrecedenceAppParens;
+
     [SettingsEntry(true, "Outdent binary operators")]
     public bool OutdentBinaryOperators;
 

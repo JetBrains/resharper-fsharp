@@ -1,12 +1,15 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages(FSharpCorePackage)>]
+[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
+[<TestSettings("{AllowHighPrecedenceAppParens:All}")>]
 type RedundantParenExprTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -29,6 +32,7 @@ type RedundantParenExprTest() =
     [<Test>] member x.``App - Precedence - High 03 - Multiple - Last``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Precedence - Low 01``() = x.DoNamedTest()
+    [<Test>] member x.``App - Precedence - Low 02``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Precedence - List 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Precedence - List 02``() = x.DoNamedTest()
@@ -48,6 +52,10 @@ type RedundantParenExprTest() =
     [<Test>] member x.``App - Attribute 03 - Reference``() = x.DoNamedTest()
     [<Test>] member x.``App - Attribute 04 - Targets``() = x.DoNamedTest()
 
+    [<Test>] member x.``Binary - App 01``() = x.DoNamedTest()
+    [<Test>] member x.``Binary - App 02 - If``() = x.DoNamedTest()
+    [<Test>] member x.``Binary - Typed 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Let - Local - App - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local - App - Binary 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local - Literal 01``() = x.DoNamedTest()
@@ -56,7 +64,20 @@ type RedundantParenExprTest() =
     [<Test>] member x.``Let - Top - App - Binary 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Let - Top - Literal 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Paren 01``() = x.DoNamedTest()
+    [<Test>] member x.``Paren 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Required - Inherit 01``() = x.DoNamedTest()
     [<Test>] member x.``Required - Inherit 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Required - New expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Required - Obj expr 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``When - Binary 01``() = x.DoNamedTest()
+    [<Test>] member x.``When - Binary 02 - Pipe``() = x.DoNamedTest()
+    [<Test>] member x.``When - If - Binary 01``() = x.DoNamedTest() // todo: parens
+    [<Test>] member x.``When - If - Seq 01``() = x.DoNamedTest()
+    [<Test>] member x.``When - If - Seq 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``When - Typed 01``() = x.DoNamedTest()
+    [<Test>] member x.``When - Typed 02``() = x.DoNamedTest()
+    [<Test>] member x.``When - Typed 03 - Record``() = x.DoNamedTest()
+    [<Test>] member x.``When 01``() = x.DoNamedTest()
