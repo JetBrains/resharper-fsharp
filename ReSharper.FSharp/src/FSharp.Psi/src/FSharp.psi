@@ -605,8 +605,16 @@ recordExpr options { stubBase="FSharpExpressionBase"; } extras {
 }:
   LBRACE<LBRACE, LeftBrace>
   (
-    fSharpExpression<COPY_INFO, CopyInfoExpression>
-    WITH
+     (
+       fSharpExpression<COPY_INFO, CopyInfoExpression>
+       WITH
+     )
+     |
+     (
+       INHERIT
+       typeReferenceName<TYPE_REFERENCE, TypeName>
+       fSharpExpression<EXPR, InheritCtorArgExpression>
+     )
   )?
   recordFieldBindingList<BINDING_LIST, FieldBindingList>
   RBRACE<RBRACE, RightBrace>;

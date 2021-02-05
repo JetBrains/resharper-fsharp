@@ -1,0 +1,11 @@
+﻿module M
+
+{ inherit T(1)
+  F = 1 }
+
+{ inherit T|(|(0)(1)|)|(1)
+  F = 1 }
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

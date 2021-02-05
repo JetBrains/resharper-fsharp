@@ -71,6 +71,7 @@ type RedundantParenExprTest() =
     [<Test>] member x.``Required - Inherit 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Required - New expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Required - Obj expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Required - Record - Inherit 01``() = x.DoNamedTest()
 
     [<Test>] member x.``When - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``When - Binary 02 - Pipe``() = x.DoNamedTest()

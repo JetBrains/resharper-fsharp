@@ -38,6 +38,12 @@ match () with
     |(|(4)let x: bool = ()
      x|)|(5) -> ()
 
+| _ when let x: bool = ()
+         x -> ()
+
+| _ when |(|(6)let x: bool = ()
+          x|)|(7) -> ()
+
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant parentheses
 (1):<secondary> ReSharper Dead Code: Redundant parentheses
@@ -45,3 +51,5 @@ match () with
 (3):<secondary> ReSharper Dead Code: Redundant parentheses
 (4): ReSharper Dead Code: Redundant parentheses
 (5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses

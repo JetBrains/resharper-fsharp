@@ -31,11 +31,12 @@ let deindentsBody (expr: IFSharpExpression) =
 
     | _ -> false
 
+
 let contextRequiresParens (context: IFSharpExpression) =
-    // todo: check nested parens
-    isNotNull (TypeInheritNavigator.GetByCtorArgExpression(context)) ||
     isNotNull (ObjExprNavigator.GetByArgExpression(context)) ||
-    isNotNull (NewExprNavigator.GetByArgumentExpression(context))
+    isNotNull (NewExprNavigator.GetByArgumentExpression(context)) ||
+    isNotNull (RecordExprNavigator.GetByInheritCtorArgExpression(context)) ||
+    isNotNull (TypeInheritNavigator.GetByCtorArgExpression(context))
 
 
 let isHighPrecedenceApp (appExpr: IPrefixAppExpr) =
@@ -172,11 +173,12 @@ let rec needsParensInDeclExprContext (expr: IFSharpExpression) =
     match expr with
     | null -> false
 
-    | :? IIfThenElseExpr
+    | :? IConditionOwnerExpr
+    | :? IForLikeExpr
     | :? IMatchClauseListOwnerExpr
+    | :? ISequentialExpr
     | :? ITupleExpr
-    | :? ITypedLikeExpr
-    | :? ISequentialExpr ->
+    | :? ITypedLikeExpr ->
         true
 
     | :? IBinaryAppExpr as binaryAppExpr ->

@@ -37,3 +37,9 @@ match () with
 | _ when
     (let x: bool = ()
      x) -> ()
+
+| _ when let x: bool = ()
+         x -> ()
+
+| _ when (let x: bool = ()
+          x) -> ()
