@@ -96,9 +96,9 @@ let precedence (expr: ITreeNode) =
     | :? IDoLikeExpr -> 9
 
     | :? IPrefixAppExpr as prefixApp ->
-        if isHighPrecedenceApp prefixApp then 10 else 9
+        if isHighPrecedenceApp prefixApp then 11 else 10
 
-    | :? IFSharpExpression -> 11
+    | :? IFSharpExpression -> 12
 
     | _ -> 0
 
@@ -107,7 +107,7 @@ let startsBlock (context: IFSharpExpression) =
     isNotNull (SetExprNavigator.GetByRightExpression(context))
 
 let getContextPrecedence (context: IFSharpExpression) =
-    if isNotNull (QualifiedExprNavigator.GetByQualifier(context)) then 10 else
+    if isNotNull (QualifiedExprNavigator.GetByQualifier(context)) then 11 else
 
     if startsBlock context then 0 else precedence context.Parent
 
@@ -117,10 +117,20 @@ let checkPrecedence (context: IFSharpExpression) node =
     nodePrecedence < contextPrecedence
 
 
-let rec getContainingCompoundExpr (context: IFSharpExpression): IFSharpExpression =
-    match BinaryAppExprNavigator.GetByArgument(context) with
-    | null -> context
-    | binaryAppExpr -> getContainingCompoundExpr binaryAppExpr
+let rec getPossibleParentWhenClauseExpr (context: IFSharpExpression): IFSharpExpression =
+    let binaryAppExpr = BinaryAppExprNavigator.GetByArgument(context)
+    if isNotNull binaryAppExpr then getPossibleParentWhenClauseExpr binaryAppExpr else
+
+    let letExpr = LetOrUseExprNavigator.GetByInExpression(context)
+    if isNotNull letExpr then getPossibleParentWhenClauseExpr letExpr else
+
+    context
+
+let contextRequiresDeclExpr (context: IFSharpExpression) =
+    let context = getPossibleParentWhenClauseExpr context
+
+    isNotNull (WhenExprClauseNavigator.GetByExpression(context)) ||
+    isNotNull (YieldOrReturnExprNavigator.GetByExpression(context))
 
 let rec getLongestBinaryAppParentViaRightArg (context: IFSharpExpression): IFSharpExpression =
     match BinaryAppExprNavigator.GetByRightArgument(context) with
@@ -158,6 +168,26 @@ let isHighPrecedenceAppArg context =
 
     false
 
+let rec needsParensInDeclExprContext (expr: IFSharpExpression) =
+    match expr with
+    | null -> false
+
+    | :? IIfThenElseExpr
+    | :? IMatchClauseListOwnerExpr
+    | :? ITupleExpr
+    | :? ITypedLikeExpr
+    | :? ISequentialExpr ->
+        true
+
+    | :? IBinaryAppExpr as binaryAppExpr ->
+        needsParensInDeclExprContext binaryAppExpr.RightArgument ||
+        needsParensInDeclExprContext binaryAppExpr.LeftArgument
+
+    | :? ILetOrUseExpr as letExpr ->
+        needsParensInDeclExprContext letExpr.InExpression
+
+    | _ -> false
+
 let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     if expr :? IParenExpr then false else
 
@@ -175,22 +205,22 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     if isHighPrecedenceAppArg context && allowHighPrecedenceAppParens then true else
 
     match expr with
-    | :? IIfThenElseExpr as ifExpr ->
+    | :? IIfThenElseExpr ->
         isNotNull (IfThenElseExprNavigator.GetByThenExpr(context)) ||
         isNotNull (ConditionOwnerExprNavigator.GetByConditionExpr(context)) ||
         isNotNull (BinaryAppExprNavigator.GetByLeftArgument(context)) ||
         isNotNull (PrefixAppExprNavigator.GetByFunctionExpression(context)) ||
         isNotNull (TypedLikeExprNavigator.GetByExpression(context)) ||
-        isNotNull (WhenExprClauseNavigator.GetByExpression(getContainingCompoundExpr context)) ||
+
+        contextRequiresDeclExpr context ||
 
         let tupleExpr = TupleExprNavigator.GetByExpression(context)
         isNotNull tupleExpr && tupleExpr.Expressions.LastOrDefault() != context ||
 
-        checkPrecedence context expr ||
-        needsParens context ifExpr.ElseExpr
+        checkPrecedence context expr
 
     | :? IMatchClauseListOwnerExpr as matchExpr ->
-        isNotNull (WhenExprClauseNavigator.GetByExpression(getContainingCompoundExpr context)) ||
+        contextRequiresDeclExpr context ||
         checkPrecedence context expr ||
 
         let lastClause = matchExpr.ClausesEnumerable.LastOrDefault()
@@ -208,9 +238,9 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
         false
 
     | :? ITupleExpr ->
-        isNotNull (WhenExprClauseNavigator.GetByExpression(getContainingCompoundExpr context)) ||
         isNotNull (AttributeNavigator.GetByExpression(context)) ||
         isNotNull (TupleExprNavigator.GetByExpression(context)) ||
+        contextRequiresDeclExpr context ||
 
         checkPrecedence context expr
 
@@ -228,8 +258,9 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
         checkPrecedence context expr
 
     | :? ITypedLikeExpr ->
-        isNotNull (WhenExprClauseNavigator.GetByExpression(getContainingCompoundExpr context)) ||
-        isNotNull (AttributeNavigator.GetByExpression(context)) ||
+        expr :? ITypedExpr && isNotNull (BinaryAppExprNavigator.GetByLeftArgument(context)) ||
+
+        contextRequiresDeclExpr context ||
         checkPrecedence context expr
 
     | :? IBinaryAppExpr as binaryAppExpr ->
@@ -243,20 +274,25 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
         let parentViaRightArg = BinaryAppExprNavigator.GetByRightArgument(context)
         isNotNull parentViaRightArg && operatorPrecedence parentViaRightArg >= precedence ||
 
-        checkPrecedence context expr ||
-        needsParens context binaryAppExpr.RightArgument ||
-        needsParens context binaryAppExpr.LeftArgument
+        let requireDeclExprContext = getPossibleParentWhenClauseExpr context
+        contextRequiresDeclExpr requireDeclExprContext && needsParensInDeclExprContext binaryAppExpr ||
 
-    | :? IPrefixAppExpr as prefixAppExpr ->
-        isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(getQualifiedExpr context)) ||
-
-        checkPrecedence context expr ||
-        needsParens context prefixAppExpr.ArgumentExpression
-
-    | :? ISequentialExpr ->
-        isNotNull (WhenExprClauseNavigator.GetByExpression(getContainingCompoundExpr context)) ||
         checkPrecedence context expr
 
+    | :? IPrefixAppExpr ->
+        isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(getQualifiedExpr context)) ||
+        checkPrecedence context expr
+
+    | :? ISequentialExpr ->
+        contextRequiresDeclExpr context ||
+        checkPrecedence context expr
+
+    | :? ILetOrUseExpr ->
+        let requireDeclExprContext = getPossibleParentWhenClauseExpr context
+        contextRequiresDeclExpr requireDeclExprContext && needsParensInDeclExprContext expr ||
+
+        checkPrecedence context expr
+    
     | _ ->
 
     let binaryApp = BinaryAppExprNavigator.GetByLeftArgument(context)

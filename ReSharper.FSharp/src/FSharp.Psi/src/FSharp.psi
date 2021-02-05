@@ -725,7 +725,9 @@ binaryAppExpr options { stubBase="FSharpExpressionBase"; } extras {
   referenceExpr<OP_REF_EXPR, Operator>
   fSharpExpression<RIGHT_ARG_EXPR, RightArgument>;
 
-letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
+letOrUseExpr options { stubBase="FSharpExpressionBase"; } extras {
+  get { methodName="BoundExpressions" path=<letOrUseExpr:BINDING/localBinding:EXPR> };
+}:
   letOrUse{LET, BindingKeyword}
   REC<REC, RecKeyword>?
   LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>  

@@ -25,7 +25,13 @@ type InlineVarTest() =
     [<Test>] member x.``Expr - Ref - Operator 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Ref - Operator 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Ref - Operator 03 - Compiled name``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Type cast - Binary 01 - Ignore``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Type cast - Binary 02 - Ignore``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Type check - Binary 01 - Ignore``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Type check - Binary 02 - Ignore``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Typed - Binary 01 - Ignore``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Typed - Binary 02 - Ignore``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Typed - Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Typed - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Typed - Tuple 02``() = x.DoNamedTest()
 
