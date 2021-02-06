@@ -1,0 +1,20 @@
+﻿module Module
+
+type U =
+    | A of (int -> int)
+    | B of ((int -> int) * int) * int
+    | C of ((int -> int) -> int) * int
+    | D of (int * (int -> int)) * int
+    | E of (int -> |(|(0)int -> int|)|(1)) * int
+
+exception EA of (int -> int)
+exception EB of ((int -> int) * int) * int
+exception EC of ((int -> int) -> int) * int
+exception ED of (int * (int -> int)) * int
+exception EE of (int -> |(|(2)int -> int|)|(3)) * int
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses

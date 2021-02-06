@@ -40,7 +40,8 @@ type RedundantParenTypeUsageAnalyzer() =
             isNotNull (ArrayTypeUsageNavigator.GetByType(context)) ||
             isNotNull (PostfixAppTypeArgumentListNavigator.GetByType(context)) ||
             isNotNull (IsInstPatNavigator.GetByType(context)) ||
-            isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(context))
+            isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(context)) ||
+            isNotNull (CaseFieldDeclarationNavigator.GetByType(context))
 
         | _ -> false
 

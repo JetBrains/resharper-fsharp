@@ -23,6 +23,8 @@ type RedundantParenTypeUsageTest() =
     [<FSharpSignatureTest>]
     [<Test>] member x.``Function 04 - Signature``() = x.DoNamedTest()
 
+    [<Test>] member x.``Function 05 - Case field``() = x.DoNamedTest()
+
     [<Test>] member x.``Parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Paren 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
