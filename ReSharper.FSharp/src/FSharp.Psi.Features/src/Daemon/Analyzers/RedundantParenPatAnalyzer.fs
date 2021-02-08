@@ -15,8 +15,8 @@ type RedundantParenPatAnalyzer() =
         match treeNode with
         | :? IOrPat -> 1
         | :? IAndsPat -> 2
-        | :? IListConsPat -> 3
-        | :? ITuplePat -> 4
+        | :? ITuplePat -> 3
+        | :? IListConsPat -> 4
 
         | :? IAttribPat
         | :? ITypedPat
