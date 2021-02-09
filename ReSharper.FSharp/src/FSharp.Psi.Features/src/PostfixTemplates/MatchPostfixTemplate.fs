@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-[<PostfixTemplate("match", "Pattern match expression", "match expr with | _ -> ()")>]
+[<PostfixTemplate("match", "Pattern match expression", false, "match expr with | _ -> ()")>]
 type MatchPostfixTemplate() =
     interface IPostfixTemplate with
         member x.Language = FSharpLanguage.Instance :> _

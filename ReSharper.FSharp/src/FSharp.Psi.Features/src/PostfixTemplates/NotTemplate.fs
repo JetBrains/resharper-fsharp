@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-[<PostfixTemplate("not", "Apply not function", "not (expr)")>]
+[<PostfixTemplate("not", "Apply not function", false, "not (expr)")>]
 type NotPostfixTemplate() =
     interface IPostfixTemplate with
         member x.Language = FSharpLanguage.Instance :> _

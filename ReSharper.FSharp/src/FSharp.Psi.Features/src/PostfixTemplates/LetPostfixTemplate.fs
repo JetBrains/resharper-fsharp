@@ -17,7 +17,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
-[<PostfixTemplate("let", "Introduce let binding", "let _ = expr")>]
+[<PostfixTemplate("let", "Introduce let binding", false, "let _ = expr")>]
 type LetPostfixTemplate() =
     interface IPostfixTemplate with
         member x.Language = FSharpLanguage.Instance :> _

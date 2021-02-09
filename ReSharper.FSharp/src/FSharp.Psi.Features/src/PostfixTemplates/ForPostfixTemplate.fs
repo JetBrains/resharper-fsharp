@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 
-[<PostfixTemplate("for", "Iterates over enumerable collection", "for _ in expr do ()")>]
+[<PostfixTemplate("for", "Iterates over enumerable collection", false, "for _ in expr do ()")>]
 type ForPostfixTemplate() =
     interface IPostfixTemplate with
         member x.Language = FSharpLanguage.Instance :> _
