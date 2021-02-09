@@ -1,0 +1,7 @@
+﻿//${NEW_NAME:Zzz}
+module Module
+
+type Zzz =
+    | A
+
+let a: Zzz = A

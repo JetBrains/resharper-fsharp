@@ -239,15 +239,22 @@ type SingleUnionCaseRenameEvaluator() =
         member x.CreateFromReference(_, _) = EmptyList.Instance :> _
 
         member x.CreateFromElement(initialElement, _) =
-            match initialElement.FirstOrDefault() with
-            | :? ITypeElement as typeElement when typeElement.IsUnion() ->
+            let isApplicable (typeElement: ITypeElement) =
+                typeElement.IsUnion() &&
+
+                let sourceName = typeElement.GetSourceName()
+                sourceName <> SharedImplUtil.MISSING_DECLARATION_NAME &&
+
                 let unionCases = typeElement.GetSourceUnionCases()
-                if unionCases.Count <> 1 then [] :> _ else
-                [| unionCases.[0] :> IDeclaredElement |] :> _
+                unionCases.Count = 1 && unionCases.[0].SourceName = sourceName
+
+            match initialElement.FirstOrDefault() with
+            | :? ITypeElement as typeElement when isApplicable typeElement ->
+                [| typeElement.GetSourceUnionCases().[0] :> IDeclaredElement |] :> _
 
             | :? IUnionCase as unionCase ->
                 let containingType = unionCase.GetContainingType().NotNull()
-                if containingType.GetSourceUnionCases().Count <> 1 then [] :> _ else
+                if not (isApplicable containingType) then [] :> _ else
                 [| containingType :> IDeclaredElement |] :> _
 
             | _ -> [] :> _

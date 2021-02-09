@@ -1,7 +1,7 @@
 ﻿//${NEW_NAME:Zzz}
 module Module
 
-type Zzz =
+type U =
     | Zzz
 
-let a = Zzz
+let a: U = Zzz

@@ -98,8 +98,11 @@ type FSharpRenameTest() =
     [<Test>] member x.``Attribute - Arg 01 - Record field``() = x.DoNamedTest()
     [<Test>] member x.``Attribute - Attribute type 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Union Cases 01``() = x.DoNamedTest() // todo: option to disable renaming related symbols in test
-    [<Test>] member x.``Union Cases 02 - Should start with upper case``() = x.DoNamedTest()
+    [<Test>] member x.``Union Case - Single - Different name 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union Case - Single - Different name 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union Case - Single - Same name 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union Case - Single - Same name 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union Case 01 - Should start with upper case``() = x.DoNamedTest()
 
     [<Test>] member x.``Types - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Ctor 02 - Secondary``() = x.DoNamedTest()

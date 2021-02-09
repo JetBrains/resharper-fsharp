@@ -2,6 +2,6 @@
 module Module
 
 type U =
-    | A{caret}
+    | U{caret}
 
-let a = A
+let u: U = U
