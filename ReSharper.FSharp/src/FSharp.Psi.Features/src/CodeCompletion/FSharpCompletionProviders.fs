@@ -23,7 +23,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.Util
 
-type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolved) =
+type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbols) =
     let [<Literal>] opName = "FSharpLookupItemsProviderBase"
     
     member x.GetDefaultRanges(context: ISpecificCodeCompletionContext) =
@@ -66,6 +66,9 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
             | None -> false
             | Some results ->
 
+            let settings = basicContext.ContextBoundSettingsStore
+            let addImportItems = settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion)
+
             let skipFsiModules =
                 // Workaround for FSI_0123 modules generated in sandboxes 
                 fsFile.Language.Is<FSharpScriptLanguage>() &&
@@ -97,6 +100,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                     collector.Add(lookupItem)
                 else
                     for item in completionInfo.Items do
+                        if not addImportItems && not (item.NamespaceToOpen.IsEmpty()) then () else
                         if skipFsiModules && isFsiModuleToSkip item then () else
 
                         let lookupItem = FSharpLookupItem(item, context)
@@ -116,11 +120,11 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLookupItemsProvider(logger: ILogger) =
-    inherit FSharpLookupItemsProviderBase(logger, (fun checkResults ->
+    inherit FSharpLookupItemsProviderBase(logger, false, fun checkResults ->
         let assemblySignature = checkResults.PartialAssemblySignature
         let getSymbolsAsync = async {
             return AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full assemblySignature }
-        getSymbolsAsync.RunAsTask()), false)
+        getSymbolsAsync.RunAsTask())
 
     interface ICodeCompletionItemsProvider with
         member x.IsAvailable(context) = base.IsAvailable(context)
@@ -151,7 +155,7 @@ type FSharpRangesProvider() =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvider: FSharpAssemblyContentProvider) =
-    inherit FSharpLookupItemsProviderBase(logger, assemblyContentProvider.GetLibrariesEntities, true)
+    inherit FSharpLookupItemsProviderBase(logger, true, assemblyContentProvider.GetLibrariesEntities)
 
     interface ICodeCompletionItemsProvider with
         member x.IsAvailable(context) =
