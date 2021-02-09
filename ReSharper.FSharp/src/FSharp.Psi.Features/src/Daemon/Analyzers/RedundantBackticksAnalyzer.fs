@@ -19,9 +19,5 @@ type RedundantBackticksAnalyzer() =
         if text.Length = withoutBackticks.Length then () else
 
         let escaped = Keywords.QuoteIdentifierIfNeeded withoutBackticks
-        if escaped.Length <> withoutBackticks.Length then () else
-
-        let range = identifier.GetNavigationRange()
-        let highlighting = RedundantBackticksWarning(identifier)
-        consumer.AddHighlighting(highlighting, range.StartOffsetRange().ExtendRight(2))
-        consumer.AddHighlighting(highlighting, range.EndOffsetRange().ExtendLeft(2), isSecondaryHighlighting = true)
+        if escaped.Length = withoutBackticks.Length then
+            consumer.AddHighlighting((RedundantBackticksWarning(identifier)))

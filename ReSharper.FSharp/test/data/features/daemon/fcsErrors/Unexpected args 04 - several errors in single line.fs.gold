@@ -1,10 +1,10 @@
-module Module
+﻿module Module
 
 let f (x:int) (y:int) = x + y
 let g = (f 2 3) |4|(0) + (f 4 5 |6|(1) |7|(2) |8|(3) |9|(4))
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Unexpected argument
 (1): ReSharper Underlined Error Highlighting: Unexpected arguments
-(2): ReSharper Underlined Error Highlighting: Unexpected arguments
-(3): ReSharper Underlined Error Highlighting: Unexpected arguments
-(4): ReSharper Underlined Error Highlighting: Unexpected arguments
+(2):<secondary> ReSharper Underlined Error Highlighting: Unexpected arguments
+(3):<secondary> ReSharper Underlined Error Highlighting: Unexpected arguments
+(4):<secondary> ReSharper Underlined Error Highlighting: Unexpected arguments

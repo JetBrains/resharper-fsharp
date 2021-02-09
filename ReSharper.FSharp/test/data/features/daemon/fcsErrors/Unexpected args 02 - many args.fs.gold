@@ -4,6 +4,6 @@ let g = (((|id|(0) 2) |3|(1)) |4|(2)) |7|(3) |8|(4)
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant application
 (1): ReSharper Underlined Error Highlighting: Unexpected arguments
-(2): ReSharper Underlined Error Highlighting: Unexpected arguments
-(3): ReSharper Underlined Error Highlighting: Unexpected arguments
-(4): ReSharper Underlined Error Highlighting: Unexpected arguments
+(2):<secondary> ReSharper Underlined Error Highlighting: Unexpected arguments
+(3):<secondary> ReSharper Underlined Error Highlighting: Unexpected arguments
+(4):<secondary> ReSharper Underlined Error Highlighting: Unexpected arguments

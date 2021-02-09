@@ -291,10 +291,6 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 let highlighting =
                     match createHighlighting error range with
                     | null -> createGenericHighlighting error range
-                    | :? IHighlightingWithSecondaryRanges as highlighting ->
-                        for range in highlighting.CalculateSecondaryRanges() do
-                            highlightings.Add(HighlightingInfo(range, highlighting))
-                        highlighting :> _
                     | highlighting -> highlighting
 
                 if highlighting :? IIgnoredHighlighting then () else
