@@ -22,9 +22,8 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<SolutionComponent>]
-type FsiHost
-        (lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, fsiOptions: FsiOptionsProvider,
-         projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules) =
+type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, fsiOptions: FsiOptionsProvider,
+        projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules) =
 
     let stringArg = sprintf "--%s:%O"
     let boolArg option arg = sprintf "--%s%s" option (if arg then "+" else "-")

@@ -30,13 +30,11 @@ open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
 [<SolutionComponent>]
-type FSharpTypingAssist
-        (lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
-         externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager,
-         manager: ITypingAssistManager) as this =
-    inherit TypingAssistLanguageBase<FSharpLanguage>
-        (solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost,
-         skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager)
+type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
+        externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager,
+        manager: ITypingAssistManager) as this =
+    inherit TypingAssistLanguageBase<FSharpLanguage>(solution, settingsStore, cachingLexerService, commandProcessor,
+        psiServices, externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager)
 
     static let nodeTypeSet (tokenTypes: NodeType[]) =
         NodeTypeSet(tokenTypes)

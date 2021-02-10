@@ -21,10 +21,9 @@ type FcsCodeCompletionContext =
       mutable DisplayContext: FSharpDisplayContext }
 
 
-type FSharpCodeCompletionContext
-        (context: CodeCompletionContext, fcsCompletionContext: FcsCodeCompletionContext,
-         tokenBeforeCaret: ITreeNode, tokenAtCaret: ITreeNode, lookupRanges: TextLookupRanges,
-         psiModule: IPsiModule, nodeInFile: ITreeNode, xmlDocService) =
+type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionContext: FcsCodeCompletionContext,
+        tokenBeforeCaret: ITreeNode, tokenAtCaret: ITreeNode, lookupRanges: TextLookupRanges,
+        psiModule: IPsiModule, nodeInFile: ITreeNode, xmlDocService) =
     inherit ClrSpecificCodeCompletionContext(context, psiModule, nodeInFile)
 
     override this.ContextId = "FSharpCodeCompletionContext"

@@ -16,9 +16,8 @@ open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
 [<AllowNullLiteral>]
-type VersionMapping
-        (defaultVersion: FSharpLanguageLevel, latestMajor: FSharpLanguageLevel, latestMinor: FSharpLanguageLevel,
-         preview: FSharpLanguageLevel) =
+type VersionMapping(defaultVersion: FSharpLanguageLevel, latestMajor: FSharpLanguageLevel,
+        latestMinor: FSharpLanguageLevel, preview: FSharpLanguageLevel) =
 
     new (latestMajor, latestMinor, preview) =
         VersionMapping(latestMinor, latestMajor, latestMinor, preview)
@@ -39,12 +38,11 @@ type FSharpLanguageProjectSettings =
 
 
 [<SolutionComponent>]
-type FSharpLanguageLevelProjectProperty
-        (lifetime, locks, projectPropertiesListener, projectSettings, persistentProjectItemProperties,
-         settingsSchema: SettingsSchema, solutionToolset: ISolutionToolset) =
-    inherit OverridableLanguageLevelProjectProperty<FSharpLanguageLevel, FSharpLanguageVersion>
-            (lifetime, locks, projectPropertiesListener, projectSettings, persistentProjectItemProperties,
-             settingsSchema.GetKey<FSharpLanguageProjectSettings>().TryFindEntryByMemberName("LanguageLevel"))
+type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListener, projectSettings,
+        persistentProjectItemProperties, settingsSchema: SettingsSchema, solutionToolset: ISolutionToolset) =
+    inherit OverridableLanguageLevelProjectProperty<FSharpLanguageLevel, FSharpLanguageVersion>(lifetime, locks,
+        projectPropertiesListener, projectSettings, persistentProjectItemProperties,
+        settingsSchema.GetKey<FSharpLanguageProjectSettings>().TryFindEntryByMemberName("LanguageLevel"))
 
     let compilerPathToLanguageLevels = ConcurrentDictionary<FileSystemPath, VersionMapping>()
 

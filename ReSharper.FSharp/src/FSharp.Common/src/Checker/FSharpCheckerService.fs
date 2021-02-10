@@ -27,9 +27,8 @@ module FSharpCheckerService =
 
 
 [<ShellComponent; AllowNullLiteral>]
-type FSharpCheckerService
-        (lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-         settingsStore: ISettingsStore, settingsSchema: SettingsSchema, reactorMonitor: IFcsReactorMonitor) =
+type FSharpCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
+        settingsStore: ISettingsStore, settingsSchema: SettingsSchema, reactorMonitor: IFcsReactorMonitor) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")

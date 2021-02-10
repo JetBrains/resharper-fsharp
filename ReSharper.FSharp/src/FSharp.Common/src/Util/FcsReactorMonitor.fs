@@ -41,9 +41,8 @@ type IFcsReactorMonitor =
     abstract MonitorOperation : opName: string -> IMonitoredReactorOperation
 
 [<ShellComponent>]
-type FcsReactorMonitor
-        (lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading,
-         logger: ILogger, configurations: RunsProducts.ProductConfigurations) as this =
+type FcsReactorMonitor(lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading,
+        logger: ILogger, configurations: RunsProducts.ProductConfigurations) as this =
 
     let isInternalMode = configurations.IsInternalMode()
 

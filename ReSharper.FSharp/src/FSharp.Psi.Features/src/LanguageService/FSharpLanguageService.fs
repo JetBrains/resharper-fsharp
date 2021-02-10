@@ -23,9 +23,8 @@ open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpLanguageService
-        (languageType, constantValueService, cacheProvider: FSharpCacheProvider, checkerService: FSharpCheckerService,
-         formatter: FSharpCodeFormatter) =
+type FSharpLanguageService(languageType, constantValueService, cacheProvider: FSharpCacheProvider,
+        checkerService: FSharpCheckerService, formatter: FSharpCodeFormatter) =
     inherit LanguageService(languageType, constantValueService)
 
     let lexerFactory = FSharpLexerFactory()

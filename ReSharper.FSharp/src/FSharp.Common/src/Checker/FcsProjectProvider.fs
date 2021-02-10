@@ -52,11 +52,10 @@ module FcsProjectProvider =
         ProjectModelChangeType.REFERENCE_TARGET
 
 [<SolutionComponent>]
-type FcsProjectProvider
-        (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, checkerService: FSharpCheckerService,
-         fcsProjectBuilder: FcsProjectBuilder, scriptFcsProjectProvider: IScriptFcsProjectProvider,
-         scheduler: ISolutionLoadTasksScheduler, fsFileService: IFSharpFileService, psiModules: IPsiModules,
-         locks: IShellLocks, logger: ILogger) as this =
+type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
+        checkerService: FSharpCheckerService, fcsProjectBuilder: FcsProjectBuilder,
+        scriptFcsProjectProvider: IScriptFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
+        fsFileService: IFSharpFileService, psiModules: IPsiModules, locks: IShellLocks, logger: ILogger) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let locker = JetFastSemiReenterableRWLock()
@@ -307,9 +306,8 @@ type FcsProjectProvider
 
 /// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
 [<SolutionComponent>]
-type OutputAssemblyChangeInvalidator
-        (lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon, psiFiles: IPsiFiles,
-         fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler) =
+type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,
+        psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler) =
     do
         scheduler.EnqueueTask(SolutionLoadTask("FSharpProjectOptionsProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
             // todo: track file system changes instead? This currently may be triggered on a project model change too.
