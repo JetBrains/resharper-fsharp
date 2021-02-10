@@ -1,0 +1,14 @@
+module Test
+
+let o = obj()
+let _ = |not |o|(1) :? string|(0)
+
+------------------------------------------------
+0: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
+QUICKFIXES:
+Add parens to type test
+1: This expression was expected to have type
+    'bool'    
+but here has type
+    'obj'    
+NO QUICKFIXES

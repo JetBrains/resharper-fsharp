@@ -36,6 +36,7 @@ module FSharpErrors =
     let [<Literal>] TypeEquation = 1
     let [<Literal>] NotAFunction = 3
     let [<Literal>] FieldNotMutable = 5
+    let [<Literal>] RuntimeCoercionSourceSealed = 16
     let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] MatchIncomplete = 25
     let [<Literal>] RuleNeverMatched = 26
@@ -157,6 +158,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | FieldNotMutable ->
             createHighlightingFromNode FieldOrValueNotMutableError range
+
+        | RuntimeCoercionSourceSealed ->
+            createHighlightingFromNodeWithMessage RuntimeCoercionSourceSealedError range error
 
         | VarBoundTwice ->
             createHighlightingFromNode VarBoundTwiceError range
