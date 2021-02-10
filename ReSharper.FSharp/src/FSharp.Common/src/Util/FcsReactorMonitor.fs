@@ -189,8 +189,8 @@ type FcsReactorMonitor(lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTa
 
 and 
     [<SolutionComponent; AllowNullLiteral>]
-    FcsReactorMonitorSettingsProvider
-        (lifetime, solution, monitor: IFcsReactorMonitor, settings, settingsSchema) as this =
+    FcsReactorMonitorSettingsProvider(lifetime, solution, monitor: IFcsReactorMonitor, settings,
+        settingsSchema) as this =
     inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
     
     let isEnabledProperty = base.GetValueProperty<bool>("EnableReactorMonitor")

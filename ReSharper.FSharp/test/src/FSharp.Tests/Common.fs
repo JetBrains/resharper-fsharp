@@ -114,9 +114,8 @@ type TestFcsProjectBuilder(checkerService: FSharpCheckerService, logger: ILogger
 
 
 [<SolutionComponent>]
-type TestFcsProjectProvider
-        (lifetime: Lifetime, checkerService: FSharpCheckerService, fcsProjectBuilder: FcsProjectBuilder,
-         scriptFcsProjectProvider: IScriptFcsProjectProvider) as this =
+type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FSharpCheckerService,
+        fcsProjectBuilder: FcsProjectBuilder, scriptFcsProjectProvider: IScriptFcsProjectProvider) as this =
     do
         checkerService.FcsProjectProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore

@@ -85,8 +85,8 @@ type FSharpExperimentalFeatures =
 
 
 [<AllowNullLiteral>]
-type FSharpSettingsProviderBase<'T>
-        (lifetime: Lifetime, settings: IContextBoundSettingsStoreLive, settingsSchema: SettingsSchema) =
+type FSharpSettingsProviderBase<'T>(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive,
+        settingsSchema: SettingsSchema) =
 
     let settingsKey = settingsSchema.GetKey<'T>()
 
