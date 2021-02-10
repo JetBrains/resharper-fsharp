@@ -6,6 +6,7 @@
 
     <!-- Do not generate files in obj to have only exact list of files in test project -->
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>False</GenerateTargetFrameworkAttribute>
 
   </PropertyGroup>
 
