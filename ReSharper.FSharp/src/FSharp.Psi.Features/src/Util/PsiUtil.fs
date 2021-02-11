@@ -79,8 +79,9 @@ type ITreeNode with
         startOffset - document.GetLineStartOffset(startCoords.Line)
 
     member x.Indent =
-        let document = x.GetSourceFile().Document
-        x.GetIndent(document)
+        match x.GetSourceFile() with
+        | null -> FormatterHelper.CalcNodeIndent(x, x.GetCodeFormatter()).Length
+        | sourceFile -> x.GetIndent(sourceFile.Document)
 
     member x.GetStartLine(document: IDocument) =
         document.GetCoordsByOffset(x.GetDocumentStartOffset().Offset).Line
