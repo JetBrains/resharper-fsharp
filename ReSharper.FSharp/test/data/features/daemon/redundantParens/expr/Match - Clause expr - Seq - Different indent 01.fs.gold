@@ -1,0 +1,18 @@
+﻿module M
+
+match () with
+| _ -> |(|(0)ignore ();
+            ignore ()|)|(1)
+| _ -> ()
+
+match () with
+| _ -> |(|(2)ignore ();
+            ignore ();
+          ignore ()|)|(3);
+| _ -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses

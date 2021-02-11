@@ -12,12 +12,12 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let deindentsBody (expr: IFSharpExpression) =
+let lastBlockHasSameIndent (expr: IFSharpExpression) =
     match expr with
-    | :? IMatchClauseListOwnerExpr as matchExpr ->
+    | :? IMatchClauseListOwnerExpr as clausesOwnerExpr ->
         if expr.IsSingleLine then false else
 
-        let clause = matchExpr.Clauses.LastOrDefault()
+        let clause = clausesOwnerExpr.Clauses.LastOrDefault()
         if isNull clause then false else
 
         let clauseExpr = clause.Expression
@@ -28,6 +28,37 @@ let deindentsBody (expr: IFSharpExpression) =
 
         let elseExpr = ifExpr.ElseExpr
         isNotNull elseExpr && elseExpr.Indent = expr.Indent
+
+    | _ -> false
+
+
+let rec deindentsBody blockIndent (expr: IFSharpExpression) =
+    isNotNull expr && expr.Indent < blockIndent ||
+
+    match expr with
+    | :? ISequentialExpr as seqExpr ->
+        seqExpr.ExpressionsEnumerable |> Seq.exists (deindentsBody blockIndent)
+
+    | :? IMatchClauseListOwnerExpr as clausesOwnerExpr ->
+        clausesOwnerExpr.ClauseExpressionsEnumerable |> Seq.exists (deindentsBody blockIndent)
+
+    | :? ILetOrUseExpr as letExpr ->
+        deindentsBody blockIndent letExpr.InExpression
+
+    | :? IBinaryAppExpr as binaryAppExpr ->
+        let op = binaryAppExpr.Operator
+        let leftArg = binaryAppExpr.LeftArgument
+
+        isNotNull op && isNotNull leftArg && op.Indent + op.GetTextLength() + 1 < leftArg.Indent ||
+
+        deindentsBody blockIndent leftArg ||
+        deindentsBody blockIndent binaryAppExpr.RightArgument
+
+    | :? ILambdaExpr as lambdaExpr ->
+        deindentsBody blockIndent lambdaExpr.Expression
+
+    | :? IParenExpr as parenExpr ->
+        deindentsBody blockIndent parenExpr.InnerExpression
 
     | _ -> false
 
@@ -80,7 +111,8 @@ let precedence (expr: ITreeNode) =
     | :? ILetOrUseExpr -> 1
 
     | :? IIfThenElseExpr
-    | :? IMatchLikeExpr -> 3
+    | :? IMatchClauseListOwnerExpr
+    | :? IWhileExpr -> 3
 
     // todo: type test, cast, typed
     | :? ITypedLikeExpr -> 4
@@ -118,20 +150,22 @@ let checkPrecedence (context: IFSharpExpression) node =
     nodePrecedence < contextPrecedence
 
 
-let rec getPossibleParentWhenClauseExpr (context: IFSharpExpression): IFSharpExpression =
+let rec getPossibleStrictContextExpr (context: IFSharpExpression): IFSharpExpression =
     let binaryAppExpr = BinaryAppExprNavigator.GetByArgument(context)
-    if isNotNull binaryAppExpr then getPossibleParentWhenClauseExpr binaryAppExpr else
+    if isNotNull binaryAppExpr then getPossibleStrictContextExpr binaryAppExpr else
 
     let letExpr = LetOrUseExprNavigator.GetByInExpression(context)
-    if isNotNull letExpr then getPossibleParentWhenClauseExpr letExpr else
+    if isNotNull letExpr then getPossibleStrictContextExpr letExpr else
 
     context
 
-let contextRequiresDeclExpr (context: IFSharpExpression) =
-    let context = getPossibleParentWhenClauseExpr context
-
+let strictContextRequiresDeclExpr (context: IFSharpExpression) =
     isNotNull (WhenExprClauseNavigator.GetByExpression(context)) ||
     isNotNull (YieldOrReturnExprNavigator.GetByExpression(context))
+
+let contextRequiresDeclExpr (context: IFSharpExpression) =
+    let strictContextExpr = getPossibleStrictContextExpr context
+    strictContextRequiresDeclExpr strictContextExpr
 
 let rec getLongestBinaryAppParentViaRightArg (context: IFSharpExpression): IFSharpExpression =
     match BinaryAppExprNavigator.GetByRightArgument(context) with
@@ -276,8 +310,14 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
         let parentViaRightArg = BinaryAppExprNavigator.GetByRightArgument(context)
         isNotNull parentViaRightArg && operatorPrecedence parentViaRightArg >= precedence ||
 
-        let requireDeclExprContext = getPossibleParentWhenClauseExpr context
-        contextRequiresDeclExpr requireDeclExprContext && needsParensInDeclExprContext binaryAppExpr ||
+        // todo: only check this when expr is limited by some block
+        // RedundantParenExprTest.``Seq - Binary - Deindent 01``
+        let op = binaryAppExpr.Operator
+        let leftArg = binaryAppExpr.LeftArgument
+        isNotNull op && isNotNull leftArg && op.Indent + op.GetTextLength() + 1 < leftArg.Indent ||
+
+        let strictContextExpr = getPossibleStrictContextExpr context
+        strictContextRequiresDeclExpr strictContextExpr && needsParensInDeclExprContext binaryAppExpr ||
 
         checkPrecedence context expr
 
@@ -285,22 +325,35 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
         isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(getQualifiedExpr context)) ||
         checkPrecedence context expr
 
-    | :? ISequentialExpr ->
-        contextRequiresDeclExpr context ||
+    | :? ISequentialExpr as seqExpr ->
+        deindentsBody seqExpr.Indent seqExpr ||
+
+        let strictContextExpr = getPossibleStrictContextExpr context
+        isNotNull (ConditionOwnerExprNavigator.GetByConditionExpr(strictContextExpr)) ||
+        strictContextRequiresDeclExpr strictContextExpr ||
+
         checkPrecedence context expr
 
     | :? ILetOrUseExpr ->
-        let requireDeclExprContext = getPossibleParentWhenClauseExpr context
-        contextRequiresDeclExpr requireDeclExprContext && needsParensInDeclExprContext expr ||
+        let strictContextExpr = getPossibleStrictContextExpr context
+        strictContextRequiresDeclExpr strictContextExpr && needsParensInDeclExprContext expr ||
+        isNotNull (IfThenElseExprNavigator.GetByConditionExpr(strictContextExpr)) ||
 
         checkPrecedence context expr
-    
+
+    | :? ILambdaExpr ->
+        isNotNull (BinaryAppExprNavigator.GetByLeftArgument(context)) ||
+        isNotNull (PrefixAppExprNavigator.GetByFunctionExpression(context)) ||
+        isNotNull (TypedLikeExprNavigator.GetByExpression(context)) ||
+
+        checkPrecedence context expr
+
     | _ ->
 
     let binaryApp = BinaryAppExprNavigator.GetByLeftArgument(context)
     if isNull binaryApp then checkPrecedence context expr else
 
-    if deindentsBody expr then true else
+    if lastBlockHasSameIndent expr then true else
 
     let operator = binaryApp.Operator
     if isNotNull operator && context.Indent = operator.Indent then false else

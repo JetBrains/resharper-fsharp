@@ -1,0 +1,7 @@
+﻿module M
+
+if |(|(0)true, true|)|(1) then () else ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

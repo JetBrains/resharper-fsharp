@@ -14,12 +14,17 @@ type InlineVarTest() =
         use cookie = FSharpExperimentalFeatures.EnableInlineVarRefactoringCookie.Create()
         base.DoTest(lifetime, project)
 
+    // todo: remove parens
     [<Test>] member x.``Expr - If - Binary 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - If - Binary 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - If - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - If - Match 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - If - Then 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - If - Then 02 - No else``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda - App 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda - Binary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda - Type cast 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match - If 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match - If 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Ref - Operator 01``() = x.DoNamedTest()

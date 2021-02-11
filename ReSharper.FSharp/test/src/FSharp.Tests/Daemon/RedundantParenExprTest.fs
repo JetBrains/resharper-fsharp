@@ -54,7 +54,15 @@ type RedundantParenExprTest() =
 
     [<Test>] member x.``Binary - App 01``() = x.DoNamedTest()
     [<Test>] member x.``Binary - App 02 - If``() = x.DoNamedTest()
+    [<Test>] member x.``Binary - Op deindent 01``() = x.DoNamedTest()
     [<Test>] member x.``Binary - Typed 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``For each - Condition - If 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``If - Condition - Seq 01``() = x.DoNamedTest()
+    [<Test>] member x.``If - Condition - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``If - Condition - Type cast 01``() = x.DoNamedTest()
+    [<Test>] member x.``If - Condition - Type check 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Let - Local - App - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local - App - Binary 02 - Nested``() = x.DoNamedTest()
@@ -64,6 +72,18 @@ type RedundantParenExprTest() =
     [<Test>] member x.``Let - Top - App - Binary 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Let - Top - Literal 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Match - Expr - Seq 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Expr - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Expr - Type cast 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Expr - Type check 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Clause expr - App 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Clause expr - App 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Clause expr - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Clause expr - Seq - Different indent 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Clause expr - Seq - Different indent 02 - Deindent``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Clause expr - Seq 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Clause expr - Seq 02 - Semicolon``() = x.DoNamedTest()
+
     [<Test>] member x.``Paren 01``() = x.DoNamedTest()
     [<Test>] member x.``Paren 02``() = x.DoNamedTest()
 
@@ -72,6 +92,9 @@ type RedundantParenExprTest() =
     [<Test>] member x.``Required - New expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Required - Obj expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Required - Record - Inherit 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Seq - Binary - Deindent 01``() = x.DoNamedTest()
+    [<Test>] member x.``Seq - Fun - Deindent 01``() = x.DoNamedTest()
 
     [<Test>] member x.``When - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``When - Binary 02 - Pipe``() = x.DoNamedTest()
@@ -83,3 +106,9 @@ type RedundantParenExprTest() =
     [<Test>] member x.``When - Typed 02``() = x.DoNamedTest()
     [<Test>] member x.``When - Typed 03 - Record``() = x.DoNamedTest()
     [<Test>] member x.``When 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``While - Condition - Seq 01``() = x.DoNamedTest()
+    [<Test>] member x.``While - Condition - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``While - Condition - Type cast 01``() = x.DoNamedTest()
+    [<Test>] member x.``While - Condition - Type check 01``() = x.DoNamedTest()
+

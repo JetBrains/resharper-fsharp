@@ -746,7 +746,9 @@ interface tryLikeExpr:
   tryWithExpr |
   tryFinallyExpr;
 
-tryWithExpr options { stubBase="FSharpExpressionBase"; }:
+tryWithExpr options { stubBase="FSharpExpressionBase"; } extras {
+  get { methodName="ClauseExpressions" path=<tryWithExpr:MATCH_CLAUSE/matchClause:EXPR> };
+}:
   TRY<TRY_KEYWORD, TryKeyword>
   fSharpExpression<TRY_EXPR, TryExpression>
   WITH
