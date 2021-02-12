@@ -445,6 +445,11 @@ let rec tryFindRootPrefixAppWhereExpressionIsFunc ([<CanBeNull>] expr: IFSharpEx
         tryFindRootPrefixAppWhereExpressionIsFunc(prefixApp)
     else expr
 
+let rec getRootFunctionExpr ([<NotNull>] app : IPrefixAppExpr) =
+    match app.FunctionExpression with
+    | :? IPrefixAppExpr as previousApp -> getRootFunctionExpr previousApp
+    | x -> x
+
 let rec getAllExpressionArgs (expr: IFSharpExpression) =
     let mutable currentExpr = expr
     seq {

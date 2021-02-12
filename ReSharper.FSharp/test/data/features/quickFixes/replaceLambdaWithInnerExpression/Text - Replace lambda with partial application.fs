@@ -1,5 +1,3 @@
 module Test
 
-let f _ _ = ()
-
-let _ = fun x -> f 1 x
+let _ = fun x -> (fun _ _ -> 1) 1 x

@@ -25,6 +25,7 @@ type ReplaceLambdaWithInnerExpressionAvailabilityTest() =
 
     [<Test>] member x.``Text - Replace lambda with reference``() = x.DoNamedTest()
     [<Test>] member x.``Text - Replace lambda with qualified reference``() = x.DoNamedTest()
+    [<Test>] member x.``Text - Replace lambda with reference partial application``() = x.DoNamedTest()
     [<Test>] member x.``Text - Replace lambda with partial application``() = x.DoNamedTest()
     [<Test>] member x.``Text - Simplify lambda 1``() = x.DoNamedTest()
     [<Test>] member x.``Text - Simplify lambda 2``() = x.DoNamedTest()
