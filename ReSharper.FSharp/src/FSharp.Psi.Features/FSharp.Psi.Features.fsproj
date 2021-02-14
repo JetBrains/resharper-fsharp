@@ -199,7 +199,7 @@
     <Compile Include="src\QuickFixes\ConvertTupleToArrayOrListElementsFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithAbbreviatedTypeFix.fs" />
     <Compile Include="src\QuickFixes\UseWildSelfIdFix.fs" />
-    <Compile Include="src\QuickFixes\AddParensToTypeTestFix.fs" />
+    <Compile Include="src\QuickFixes\AddParensToTypedLikeExprFix.fs" />
     <Compile Include="src\QuickFixes\SpecifyParameterTypeFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
