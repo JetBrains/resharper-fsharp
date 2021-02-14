@@ -71,6 +71,7 @@ module FSharpErrors =
     let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
+    let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type "
 
     let [<Literal>] addTypeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
 
@@ -288,7 +289,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
                 let expr = getResultExpr expr
                 FunctionValueUnexpectedWarning(expr, error.Message) :> _
-            | _ -> createHighlightingFromNodeWithMessage TypeConstraintMismatchError range error
+
+            | x when startsWith typeConstraintMismatchMessage x ->
+                createHighlightingFromNodeWithMessage TypeConstraintMismatchError range error
+
+            | _ -> null
 
         | NamespaceCannotContainValues ->
             createHighlightingFromNode NamespaceCannotContainValuesError range
