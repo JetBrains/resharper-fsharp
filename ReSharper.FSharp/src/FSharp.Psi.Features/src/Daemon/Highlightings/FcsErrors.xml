@@ -321,6 +321,17 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="RuntimeCoercionSourceSealed">
+    <Parameter type="ITypedLikeExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="TypeConstraintMismatch">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -328,7 +339,7 @@
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>AddParensToTypeTestFix</QuickFix>
+    <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="IndeterminateType">

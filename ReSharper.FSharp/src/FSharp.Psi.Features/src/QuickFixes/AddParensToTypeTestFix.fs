@@ -9,24 +9,35 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type AddParensToTypeTestFix(error: RuntimeCoercionSourceSealedError) =
+type AddParensToTypedLikeExprFix(typedLikeExpr: ITypedLikeExpr) =
     inherit FSharpQuickFixBase()
 
-    let typeTestExpr = error.Expr.As<ITypeTestExpr>()
-    let prefixApp = if isNotNull typeTestExpr then typeTestExpr.Expression.As<IPrefixAppExpr>() else null
-    let testedExpr = if isNotNull prefixApp then prefixApp.ArgumentExpression else null
+    let prefixApp = if isNotNull typedLikeExpr then typedLikeExpr.Expression.As<IPrefixAppExpr>() else null
+    let expr = if isNotNull prefixApp then prefixApp.ArgumentExpression else null
 
-    override x.Text = "Add parens to type test"
-    override x.IsAvailable _ = isValid testedExpr
+    new (error: RuntimeCoercionSourceSealedError) =
+        AddParensToTypedLikeExprFix(error.Expr)
+
+    new (error: TypeConstraintMismatchError) =
+        AddParensToTypedLikeExprFix(error.Expr.As<ITypedLikeExpr>())
+
+    override x.Text =
+        match typedLikeExpr with
+        | :? IUpcastExpr -> "Add parens to type upcast"
+        | :? IDowncastExpr -> "Add parens to type downcast"
+        | :? ITypeTestExpr -> "Add parens to type test"
+        | _ -> ""
+
+    override x.IsAvailable _ = isValid expr
 
     override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(testedExpr.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let testedExprCopy = testedExpr.Copy()
-        let typeTestExprCopy = typeTestExpr.Copy()
-        let prefixApp = ModificationUtil.ReplaceChild(typeTestExpr, prefixApp.Copy())
+        let exprCopy = expr.Copy()
+        let typedLikeExprCopy = typedLikeExpr.Copy()
+        let prefixApp = ModificationUtil.ReplaceChild(typedLikeExpr, prefixApp.Copy())
 
-        typeTestExprCopy.SetExpression(testedExprCopy) |> ignore
-        let parenExpr = ParenExprNavigator.GetByInnerExpression(addParens typeTestExprCopy)
+        typedLikeExprCopy.SetExpression(exprCopy) |> ignore
+        let parenExpr = ParenExprNavigator.GetByInnerExpression(addParens typedLikeExprCopy)
         prefixApp.SetArgumentExpression(parenExpr) |> ignore

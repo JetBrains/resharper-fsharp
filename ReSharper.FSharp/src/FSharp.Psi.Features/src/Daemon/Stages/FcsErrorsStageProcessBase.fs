@@ -160,7 +160,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode FieldOrValueNotMutableError range
 
         | RuntimeCoercionSourceSealed ->
-            createHighlightingFromNodeWithMessage RuntimeCoercionSourceSealedError range error
+            match fsFile.GetNode<ITypedLikeExpr>(range) with
+            | null -> null
+            | expr -> RuntimeCoercionSourceSealedError(expr, error.Message) :> _
 
         | VarBoundTwice ->
             createHighlightingFromNode VarBoundTwiceError range
@@ -280,10 +282,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | EmptyRecordInvalid ->
             createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error
 
-        | MissingErrorNumber when startsWith expressionIsAFunctionMessage error.Message ->
-            let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            let expr = getResultExpr expr
-            FunctionValueUnexpectedWarning(expr, error.Message) :> _
+        | MissingErrorNumber ->
+            match error.Message with
+            | x when startsWith expressionIsAFunctionMessage x ->
+                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                let expr = getResultExpr expr
+                FunctionValueUnexpectedWarning(expr, error.Message) :> _
+            | _ -> createHighlightingFromNodeWithMessage TypeConstraintMismatchError range error
 
         | NamespaceCannotContainValues ->
             createHighlightingFromNode NamespaceCannotContainValuesError range
