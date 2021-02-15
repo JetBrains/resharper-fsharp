@@ -23,8 +23,7 @@ type AddParensToTypedLikeExprFix(typedLikeExpr: ITypedLikeExpr) =
 
     override x.Text =
         match typedLikeExpr with
-        | :? IUpcastExpr -> "Add parens to type upcast"
-        | :? IDowncastExpr -> "Add parens to type downcast"
+        | :? ICastExpr -> "Add parens to type cast"
         | :? ITypeTestExpr -> "Add parens to type test"
         | _ -> ""
 
