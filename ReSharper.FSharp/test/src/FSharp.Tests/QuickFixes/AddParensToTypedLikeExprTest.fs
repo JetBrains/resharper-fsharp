@@ -12,6 +12,7 @@ type AddParensToTypedLikeExprTest() =
     override x.RelativeTestDataPath = "features/quickFixes/addParensToTypedLikeExpr"
 
     [<Test>] member x.``Type test 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type test 02``() = x.DoNamedTest()
     [<Test>] member x.``Upcast 01``() = x.DoNamedTest()
 
 
