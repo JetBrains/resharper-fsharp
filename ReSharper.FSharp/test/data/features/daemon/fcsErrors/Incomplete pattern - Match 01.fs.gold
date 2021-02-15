@@ -1,0 +1,14 @@
+﻿module Module
+
+match |[]|(0) with
+| [] -> ()
+
+match [] with
+| [] ->
+    match |[]|(1) with
+    | [] -> ()
+| _ -> ()
+
+---------------------------------------------------------
+(0): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '[_]' may indicate a case not covered by the pattern(s).
+(1): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '[_]' may indicate a case not covered by the pattern(s).

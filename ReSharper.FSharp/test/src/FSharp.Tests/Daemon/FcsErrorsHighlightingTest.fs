@@ -60,3 +60,7 @@ type FcsErrorsHighlightingTest() =
     [<Test>] member x.``Ignored - Top level function with attributes 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Unexpected expression type 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Incomplete pattern - Match 01``() = x.DoNamedTest()
+    [<Test>] member x.``Incomplete pattern - Match lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Incomplete pattern - Pattern 01``() = x.DoNamedTest()

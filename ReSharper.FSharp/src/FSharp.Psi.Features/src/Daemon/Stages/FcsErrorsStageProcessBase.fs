@@ -192,6 +192,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromParentNode RuleNeverMatchedWarning range
 
         | MatchIncomplete ->
+            let fsPattern = fsFile.GetNode<IFSharpPattern>(range)
+            if isNotNull fsPattern then createGenericHighlighting error range else
+
+            let matchLambdaExpr = fsFile.GetNode<IMatchLambdaExpr>(range)
+            if isNotNull matchLambdaExpr then createGenericHighlighting error range else
+
             createHighlightingFromParentNodeWithMessage MatchIncompleteWarning range error
 
         | EnumMatchIncomplete ->
