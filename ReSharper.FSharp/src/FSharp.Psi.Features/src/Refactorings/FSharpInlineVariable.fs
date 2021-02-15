@@ -103,6 +103,8 @@ type FSharpInlineVarAnalyser(workflow) =
         let binding = BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())
         if isNull binding || isNull binding.Expression then Pair(false, cannotInline) else
 
+        if binding.ParametersPatternsEnumerable.Any() then Pair(false, "Cannot inline function.") else
+
         let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
         if isNull letExpr || letExpr.Bindings.Count <> 1 || isNull letExpr.InExpression then Pair(false, cannotInline) else
 

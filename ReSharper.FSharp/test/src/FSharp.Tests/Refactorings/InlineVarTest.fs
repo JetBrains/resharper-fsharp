@@ -73,4 +73,5 @@ type InlineVarTest() =
     [<Test>] member x.``Space 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available - AddressOf 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Set 01``() = x.DoNamedTest()
