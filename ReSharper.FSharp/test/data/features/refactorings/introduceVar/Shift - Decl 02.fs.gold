@@ -3,4 +3,4 @@ let i =
   id
     id
       1
-ignore (i)
+ignore i

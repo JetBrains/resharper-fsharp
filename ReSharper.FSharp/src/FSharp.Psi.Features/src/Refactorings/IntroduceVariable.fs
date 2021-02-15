@@ -306,6 +306,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         let replacedUsages, sourceExpr =
             data.Usages |> Seq.fold (fun ((replacedUsages, sourceExpr: IFSharpExpression) as acc) usage ->
+                let usage = usage.As<IFSharpExpression>()
                 if not (isValid usage) then acc else
 
                 let usageIsSourceExpr = usage == sourceExpr
@@ -315,6 +316,15 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                     acc else
 
                 let refExpr = elementFactory.CreateReferenceExpr(name) :> IFSharpExpression
+
+                let usage =
+                    // remove parens in `not ({selstart}v.M(){selend})`, so it becomes `not x`
+                    let argExpr = usage.IgnoreParentParens()
+                    let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(argExpr)
+                    let funExpr = if isNotNull appExpr then appExpr.FunctionExpression else null
+
+                    if argExpr != usage && isNotNull funExpr && funExpr.NextSibling != argExpr then argExpr else usage 
+
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
 
                 if addSpaceNearIdents then

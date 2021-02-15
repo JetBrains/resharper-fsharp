@@ -3,4 +3,4 @@ do
   let identity = 
     id
       1
-  ignore (identity)
+  ignore identity
