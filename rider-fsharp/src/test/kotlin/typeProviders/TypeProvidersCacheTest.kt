@@ -60,7 +60,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
                 }
 
                 testDirectory.mkdir().shouldBeTrue()
-                typeWithLatency("//invalidated")
+                typeWithLatency("  ")
                 waitForDaemon()
 
                 executeWithGold(File(testGoldFile.path + "_after")) {
