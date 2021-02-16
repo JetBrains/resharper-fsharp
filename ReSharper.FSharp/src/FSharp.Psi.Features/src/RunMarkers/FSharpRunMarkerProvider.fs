@@ -34,9 +34,8 @@ let isEntryPoint (binding: ITopBinding) =
     | _ -> false
 
 let isApplicableMethod (binding: IBinding) =
-    let pattern = binding.ParametersPatternsEnumerable.SingleItem.Pattern
-    let unitPattern = pattern.IgnoreInnerParens().As<IUnitPat>()
-    if isNull unitPattern then false else
+    let pattern = binding.ParameterPatterns.SingleItem.IgnoreInnerParens().As<IUnitPat>()
+    if isNull pattern then false else
 
     let refPat = binding.HeadPattern.As<IReferencePat>()
     if isNull refPat then false else

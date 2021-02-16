@@ -69,7 +69,7 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
         FSharpAttributesUtil.addAttribute memberDeclaration.AttributeLists.[0] attribute
 
     if element.AddTypes then
-        let lastParam = memberDeclaration.ParametersPatterns.LastOrDefault()
+        let lastParam = memberDeclaration.ParametersDeclarations.LastOrDefault()
         if isNull lastParam then () else
 
         let typeString = mfv.ReturnParameter.Type.Instantiate(element.Substitution)

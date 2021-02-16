@@ -48,7 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        var pattern = ParametersPatternsEnumerable.SingleItem?.Pattern;
+        var pattern = ParameterPatternsEnumerable.SingleItem;
         if (pattern == null)
           return false;
 

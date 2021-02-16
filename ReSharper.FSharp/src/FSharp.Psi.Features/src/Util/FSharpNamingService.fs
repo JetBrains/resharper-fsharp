@@ -392,7 +392,7 @@ module FSharpNamingService =
                         if isNull letExpr then () else
 
                         let patterns =
-                            let parameters = binding.ParametersPatternsEnumerable
+                            let parameters = binding.ParametersDeclarationsEnumerable
                             if parameters.IsEmpty() then [| binding.HeadPattern |] :> IFSharpPattern seq else
 
                             let parameters = parameters |> Seq.map (fun paramDecl -> paramDecl.Pattern)

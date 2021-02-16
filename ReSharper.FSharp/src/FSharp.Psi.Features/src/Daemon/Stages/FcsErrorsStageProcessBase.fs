@@ -44,6 +44,7 @@ module FSharpErrors =
     let [<Literal>] UndefinedName = 39
     let [<Literal>] UpcastUnnecessary = 66
     let [<Literal>] TypeTestUnnecessary = 67
+    let [<Literal>] IndeterminateType = 72
     let [<Literal>] EnumMatchIncomplete = 104
     let [<Literal>] NamespaceCannotContainValues = 201
     let [<Literal>] ModuleOrNamespaceRequired = 222
@@ -175,6 +176,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | TypeTestUnnecessary ->
             createHighlightingFromNodeWithMessage TypeTestUnnecessaryWarning range error
+
+        | IndeterminateType ->
+            createHighlightingFromNode IndeterminateTypeError range
 
         | UnusedValue ->
             match fsFile.GetNode<INamedPat>(range) with

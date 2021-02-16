@@ -182,24 +182,26 @@ interface binding:
 topBinding extras {
   get { methodName="Expression" path=<topBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   get { methodName="Attributes" path=<topBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="ParameterPatterns" path=<topBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
+  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
 localBinding extras {
   get { methodName="Attributes" path=<localBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="ParameterPatterns" path=<localBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
+  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
   fSharpExpression<EXPR, Expression>;
@@ -1212,10 +1214,12 @@ interfaceImplementation extras {
 
 otherTypeMember: fakeSeparator;
 
-primaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; }:
+primaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
+  get { methodName="ParameterPatterns" path=<primaryConstructorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+}:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  parametersPatternDeclaration<PARAMETERS, ParametersPatternDeclaration>
+  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclaration> 
   ctorSelfId<SELF_ID, SelfIdentifier>?;
 
 interface selfId:
@@ -1245,11 +1249,12 @@ constructorSignature options { stubBase="ConstructorDeclarationBase"; }:
 
 secondaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
   get { methodName="Expression" path=<secondaryConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  get { methodName="ParameterPatterns" path=<secondaryConstructorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   NEW<NEW, NewKeyword>
-  parametersPatternDeclaration<PARAMETERS, ParametersPatternDeclaration>
+  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclaration>
   ctorSelfId<SELF_ID, SelfIdentifier>?
   EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
@@ -1262,6 +1267,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Expression" path=<memberDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  get { methodName="ParameterPatterns" path=<memberDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
@@ -1274,7 +1280,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   (
-    parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
+    parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
     EQUALS<FSHARP_EQUALS, EqualsToken>
     chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>
   |
@@ -1353,11 +1359,13 @@ accessorsNamesClause:
     IDENTIFIER<ACESSOR, AccessorsNames>
   );
 
-accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="ParameterPatterns" path=<accessorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+}:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   IDENTIFIER<IDENTIFIER, Identifier>
   (
-    parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
+    parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
     EQUALS<FSHARP_EQUALS, EqualsToken>
     chameleonExpression<CHAMELEON_EXPR, BodyExpression>
   )?;

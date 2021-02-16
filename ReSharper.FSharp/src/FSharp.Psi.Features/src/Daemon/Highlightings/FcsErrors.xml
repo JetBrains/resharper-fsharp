@@ -320,4 +320,12 @@
     <QuickFix>ReplaceWithAbbreviatedTypeFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="IndeterminateType">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message value="Lookup on object of indeterminate type based on information prior to this program point. A type annotation may be needed constrain the type of the object."/>
+    <Range>refExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>SpecifyParameterTypeFix</QuickFix>
+  </Error>
+
 </Errors>

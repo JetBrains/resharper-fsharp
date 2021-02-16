@@ -93,6 +93,7 @@
     <Compile Include="QuickFixes\ConvertTupleToArrayOrListElementsFixTest.fs" />
     <Compile Include="QuickFixes\ReplaceWithAbbreviatedTypeTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantParens.fs" />
+    <Compile Include="QuickFixes\SpecifyParameterTypeTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

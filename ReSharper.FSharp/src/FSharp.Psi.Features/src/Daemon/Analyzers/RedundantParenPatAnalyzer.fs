@@ -93,10 +93,10 @@ type RedundantParenPatAnalyzer() =
         isNotNull parametersOwnerPat && getNextSibling parametersOwnerPat.ReferenceName == context ||
 
         let parameterDecl = ParametersPatternDeclarationNavigator.GetByPattern(context)
-        isNotNull (ConstructorDeclarationNavigator.GetByParametersPatternDeclaration(parameterDecl)) ||
+        isNotNull (ConstructorDeclarationNavigator.GetByParametersDeclaration(parameterDecl)) ||
 
         // todo: add code style setting
-        let memberDeclaration = MemberDeclarationNavigator.GetByParametersPattern(parameterDecl)
+        let memberDeclaration = MemberDeclarationNavigator.GetByParametersDeclaration(parameterDecl)
         isNotNull memberDeclaration && getNextSibling memberDeclaration.NameIdentifier == parameterDecl ||
         isNotNull memberDeclaration && getNextSibling memberDeclaration.TypeParameterList == parameterDecl ||
 
