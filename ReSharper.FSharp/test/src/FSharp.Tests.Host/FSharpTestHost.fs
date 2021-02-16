@@ -2,6 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open System.Collections.Generic
 open System.Linq
+open FSharp.Compiler.AbstractIL.Internal.Library
+open FSharp.Compiler.ExtensionTyping
 open FSharp.Compiler.IO
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
@@ -11,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
+open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -46,6 +49,12 @@ type FSharpTestHost(lifetime: Lifetime, solution: ISolution, checkerService: FSh
             |> List)
         |> Option.defaultWith (fun _ -> List())
 
+    let typeProvidersRuntimeVersion _ =
+        solution.GetComponent<IProxyExtensionTypingProvider>().RuntimeVersion()
+
+    let dumpTypeProvidersProcess _ =
+        solution.GetComponent<IProxyExtensionTypingProvider>().DumpTypeProvidersProcess()
+
     do
         let fsTestHost = solution.RdFSharpModel().FsharpTestHost
 
@@ -60,3 +69,5 @@ type FSharpTestHost(lifetime: Lifetime, solution: ISolution, checkerService: FSh
         fsTestHost.GetSourceCache.Set(sourceCache.GetRdFSharpSource)
         fsTestHost.DumpSingleProjectMapping.Set(dumpSingleProjectMapping)
         fsTestHost.DumpSingleProjectLocalReferences.Set(dumpSingleProjectLocalReferences)
+        fsTestHost.TypeProvidersRuntimeVersion.Set(typeProvidersRuntimeVersion)
+        fsTestHost.DumpTypeProvidersProcess.Set(dumpTypeProvidersProcess)

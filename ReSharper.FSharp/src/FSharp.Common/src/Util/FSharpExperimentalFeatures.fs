@@ -27,6 +27,7 @@ module FSharpExperimentalFeatures =
 
     type EnableInlineVarRefactoringCookie() = inherit EnableFeatureCookieBase<EnableInlineVarRefactoringCookie>()
     type EnableRedundantParenAnalysisCookie() = inherit EnableFeatureCookieBase<EnableRedundantParenAnalysisCookie>()
+    type EnableOutOfProcessTypeProvidersCookie() = inherit EnableFeatureCookieBase<EnableOutOfProcessTypeProvidersCookie>()
     type EnableFormatterCookie() = inherit EnableFeatureCookieBase<EnableFormatterCookie>()
 
 
@@ -69,3 +70,10 @@ type FSharpExperimentalFeaturesEx =
     [<Extension>]
     static member FSharpFormatterEnabled(node: ITreeNode) =
         FSharpExperimentalFeaturesEx.FSharpFormatterEnabled(node.GetSolution())
+
+    [<Extension>]
+    static member FSharpOutOfProcessTypeProvidersEnabled(solution: ISolution) =
+        if FSharpExperimentalFeatures.EnableOutOfProcessTypeProvidersCookie.Enabled then true else
+
+        let settingsProvider = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
+        settingsProvider.OutOfProcessTypeProviders.Value

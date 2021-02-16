@@ -1,0 +1,7 @@
+ReSharper Dead Code - (65, 90) - open FSharp.Configuration - 
+ReSharper Error Underlined - (248, 277) - OpenApiClientProvider<Schema> - 
+ReSharper Error Underlined - (295, 324) - OpenApiClientProvider<Schema> - 
+ReSharper Error Underlined - (336, 346) - YamlConfig - 
+ReSharper Error Underlined - (380, 392) - AbstractType - 
+ReSharper Error Underlined - (395, 436) - SimpleErasedType().ReadonlyStringProperty - 
+ReSharper Error Underlined - (470, 471) - 1 - 

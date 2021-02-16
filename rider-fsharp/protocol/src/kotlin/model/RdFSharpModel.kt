@@ -49,6 +49,8 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         }.nullable)
         call("dumpSingleProjectMapping", void, string)
         call("dumpSingleProjectLocalReferences", void, immutableList(string))
+        call("TypeProvidersRuntimeVersion", void, string.nullable)
+        call("DumpTypeProvidersProcess", void, string)
     }
 
     init {

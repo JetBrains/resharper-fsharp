@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader</RootNamespace>
+        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader</AssemblyName>
+        <LangVersion>$(CSharpLanguageVersion)</LangVersion>
+        <OutputType>Exe</OutputType>
+        <TargetFrameworks>net461;netcoreapp3.1</TargetFrameworks>
+        <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
+        <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
+        <ProjectReference Include="..\FSharp.TypeProvidersProtocol\FSharp.TypeProvidersProtocol.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Content Include="app.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
+      <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
+      <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.7.0" />
+      <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <None Update="tploader3.win.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="tploader3.unix.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="tploader5.unix.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="tploader5.win.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
+</Project>
