@@ -70,4 +70,18 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
             }
         }
     }
+
+    @Test
+    fun typing() {
+        withTypeProviders {
+            withOpenedEditor(project, sourceFile) {
+                waitForDaemon()
+                typeWithLatency("//")
+                waitForDaemon()
+                executeWithGold(testGoldFile) {
+                    dumpTypeProviders(it)
+                }
+            }
+        }
+    }
 }
