@@ -18,8 +18,6 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-let [<Literal>] RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_"
-
 [<SolutionComponent>]
 type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocService: FSharpXmlDocService,
         textStylesService) =
@@ -150,7 +148,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                           yield remarks |> renderL richTextR
                       | _ -> () ]
                     |> richTextJoin "\n\n"))
-        |> richTextJoin RiderTooltipSeparator
+        |> richTextJoin IdentifierTooltipProvider<FSharpLanguage>.RIDER_TOOLTIP_SEPARATOR
         |> RichTextBlock
 
     interface IFSharpIdentifierTooltipProvider
