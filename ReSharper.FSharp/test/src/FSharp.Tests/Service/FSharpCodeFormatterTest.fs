@@ -18,6 +18,8 @@ type FSharpCodeFormatterTest() =
         use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Enum 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Top binding indent 01 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Top binding indent 02 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Top binding indent 03 - Big indent``() = x.DoNamedTest()

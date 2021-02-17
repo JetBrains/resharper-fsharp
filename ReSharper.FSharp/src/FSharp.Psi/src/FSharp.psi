@@ -1054,13 +1054,8 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
   typeMemberDeclarationList<MEMBER_LIST, MemberDeclarationsList>;
 
 
-enumRepresentation options { stubBase="TypeRepresentationBase"; } extras {
-  get { methodName="EnumMembers" path=<enumRepresentation:ENUM_CASE_LIST/enumCaseList:ENUM_MEMBER> };
-}:
+enumRepresentation options { stubBase="TypeRepresentationBase"; }:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  enumCaseList<ENUM_CASE_LIST, EnumCaseList>;
-
-enumCaseList:
   enumMemberDeclaration<ENUM_MEMBER, EnumMembers>*;
 
 enumMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
@@ -1091,13 +1086,8 @@ recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase
   typeUsage<TYPE, Type>;
 
 
-unionRepresentation options { stubBase="TypeRepresentationBase"; } extras {
-  get { methodName="UnionCases" path=<unionRepresentation:UNION_CASE_LIST/unionCaseList:UNION_CASE> };
-}:
+unionRepresentation options { stubBase="TypeRepresentationBase"; }:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  unionCaseList<UNION_CASE_LIST, UnionCaseList>;
-
-unionCaseList:
   unionCaseDeclaration<UNION_CASE, UnionCases>*;
 
 

@@ -9,6 +9,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
   [EditorConfigKey("fsharp")]
   public class FSharpFormatSettingsKey : FormatSettingsKeyBase
   {
+    [SettingsEntry(true, "Line break after type representation access modifier")]
+    public bool LineBreakAfterTypeReprAccessModifier;
+
+    [SettingsEntry(true, "Line break after '=' in types")]
+    public bool LineBreakAfterEqualsInTypeDecl;
+
     [SettingsEntry(false, "Semicolon at end of line")]
     [EditorConfigEntryAlias("semicolon_at_end_of_line", EditorConfigAliasType.LanguageSpecific)]
     public bool SemicolonAtEndOfLine;
