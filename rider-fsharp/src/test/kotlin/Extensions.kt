@@ -17,6 +17,9 @@ fun com.intellij.openapi.editor.Editor.dumpTypeProviders(stream: PrintStream) {
 fun BaseTestWithSolution.withTypeProviders(function: () -> Unit) {
     val typeProvidersSetting = "FSharp/FSharpOptions/FSharpExperimentalFeatures/OutOfProcessTypeProviders/@EntryValue"
     TestHost.getInstance(project.protocolHost).setSetting(typeProvidersSetting, "true")
-    function()
-    TestHost.getInstance(project.protocolHost).setSetting(typeProvidersSetting, "false")
+    try {
+        function()
+    } finally {
+        TestHost.getInstance(project.protocolHost).setSetting(typeProvidersSetting, "false")
+    }
 }

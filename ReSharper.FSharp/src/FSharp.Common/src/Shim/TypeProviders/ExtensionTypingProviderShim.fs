@@ -24,6 +24,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                                  typeProvidersLoadersFactory: TypeProvidersLoaderExternalProcessFactory) as this =
     let solutionLifetime = solution.GetLifetime()
     let defaultExtensionTypingProvider = ExtensionTypingProvider
+    let typeProvidersFeature = featuresProvider.OutOfProcessTypeProviders
     let mutable connection: TypeProvidersConnection = null
     let mutable outOfProcessLifetime: LifetimeDefinition = null
     let mutable typeProvidersManager = Unchecked.defaultof<IProxyTypeProvidersManager>
@@ -39,7 +40,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
     do ExtensionTypingProvider <- this
        toolset.Changed
            .Advise(solutionLifetime, fun _ -> terminateConnection ())
-       featuresProvider.OutOfProcessTypeProviders.Change
+       typeProvidersFeature.Change
            .Advise(solutionLifetime, fun enabled -> if enabled.HasNew && not enabled.New then terminateConnection ())
 
     interface IProxyExtensionTypingProvider with
@@ -53,7 +54,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                                                        systemRuntimeAssemblyVersion: Version,
                                                        compilerToolsPath: string list,
                                                        m: range) =
-            if not (solution.FSharpOutOfProcessTypeProvidersEnabled()) then
+            if not typeProvidersFeature.Value then
                defaultExtensionTypingProvider.InstantiateTypeProvidersOfAssembly(
                  runTimeAssemblyFileName, designTimeAssemblyNameString, resolutionEnvironment, isInvalidationSupported,
                  isInteractive, systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath, m)

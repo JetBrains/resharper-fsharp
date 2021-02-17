@@ -21,7 +21,8 @@ import java.io.File
 class TypeProvidersCacheTest : BaseTestWithSolution() {
     override fun getSolutionDirectoryName() = "TypeProviderLibrary"
     override val restoreNuGetPackages = true
-    private val sourceFile = "TypeProviderLibrary/Caches.fs";
+    private val sourceFile = "TypeProviderLibrary/Caches.fs"
+
     private fun checkTypeProviders() {
         withOpenedEditor(project, sourceFile) {
             waitForDaemon()
@@ -52,7 +53,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
                 waitForDaemon()
 
                 testDirectory.delete().shouldBeTrue()
-                typeWithLatency(" ")
+                typeWithLatency("//")
                 waitForDaemon()
 
                 executeWithGold(File(testGoldFile.path + "_before")) {
@@ -60,7 +61,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
                 }
 
                 testDirectory.mkdir().shouldBeTrue()
-                typeWithLatency("  ")
+                typeWithLatency(" ")
                 waitForDaemon()
 
                 executeWithGold(File(testGoldFile.path + "_after")) {

@@ -5,6 +5,7 @@ import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeNull
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
@@ -28,6 +29,7 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
         withOpenedEditor(project, sourceFile) {
             waitForDaemon()
             rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldBeNull()
+            markupAdapter.hasErrors.shouldBeFalse()
         }
 
         withTypeProviders {
@@ -37,6 +39,7 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
             withOpenedEditor(project, sourceFile) {
                 waitForDaemon()
                 rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()
+                markupAdapter.hasErrors.shouldBeFalse()
             }
         }
 
@@ -46,6 +49,7 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
         withOpenedEditor(project, sourceFile) {
             waitForDaemon()
             rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldBeNull()
+            markupAdapter.hasErrors.shouldBeFalse()
         }
     }
 }
