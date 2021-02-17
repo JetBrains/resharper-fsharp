@@ -35,6 +35,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Formatting();
     }
 
+    protected readonly NodeTypeSet TypeRepresentations =
+      new NodeTypeSet(
+        ElementType.ENUM_REPRESENTATION,
+        ElementType.UNION_REPRESENTATION,
+        ElementType.RECORD_REPRESENTATION,
+        ElementType.CLASS_REPRESENTATION,
+        ElementType.INTERFACE_REPRESENTATION,
+        ElementType.STRUCT_REPRESENTATION,
+        ElementType.DELEGATE_REPRESENTATION);
+
+    protected readonly NodeTypeSet FunctionTypeRepresentations =
+      new NodeTypeSet(
+        ElementType.ENUM_REPRESENTATION,
+        ElementType.UNION_REPRESENTATION,
+        ElementType.RECORD_REPRESENTATION);
+
+    protected readonly NodeTypeSet UnionLikeTypeRepresentations =
+      new NodeTypeSet(
+        ElementType.ENUM_REPRESENTATION,
+        ElementType.UNION_REPRESENTATION);
+    
+    protected readonly NodeTypeSet UnionCaseLikeDeclarations =
+      new NodeTypeSet(
+        ElementType.ENUM_MEMBER_DECLARATION,
+        ElementType.UNION_CASE_DECLARATION);
+    
+    
     public override ProjectFileType MainProjectFileType => FSharpProjectFileType.Instance;
 
     private void Indenting()
@@ -88,6 +115,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .ToList()
         .ForEach(DescribeSimpleIndentingRule);
 
+      Describe<IndentingRule>()
+        .Name("TypeRepr_Accessibility")
+        .Where(
+          Parent().In(FunctionTypeRepresentations),
+          Left().In(ElementType.ENUM_MEMBER_DECLARATION, ElementType.UNION_CASE_DECLARATION).Satisfies((node, context) =>
+            node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.PRIVATE))
+        .CloseNodeGetter((node, context) => node.Parent?.LastChild)
+        .Return(IndentType.External)
+        .Build();
+      
       Describe<IndentingRule>()
         .Name("TryWith_WithClauseIndent")
         .Where(
@@ -159,20 +196,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           Node().HasRole(DoStatement.CHAMELEON_EXPR))
         .Return(IndentType.External)
         .Build();
-
-      Describe<IndentingRule>()
-        .Name("UnionRepresentationCasesIndent")
-        .Where(
-          Parent()
-            .HasType(ElementType.UNION_REPRESENTATION)
-            .Satisfies((node, context) =>
-            {
-              var modifier = ((IUnionRepresentation) node).AccessModifier;
-              return modifier != null && modifier.HasNewLineAfter(context.CodeFormatter);
-            }),
-          Node().HasRole(UnionRepresentation.UNION_CASE_LIST))
-        .Return(IndentType.External)
-        .Build();
     }
 
     private void Aligning()
@@ -180,7 +203,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       var alignmentRulesParameters = new[]
       {
         ("MatchClauses", ElementType.MATCH_EXPR),
-        ("UnionCases", ElementType.UNION_CASE_LIST),
         ("UnionRepresentation", ElementType.UNION_REPRESENTATION),
         ("EnumCases", ElementType.ENUM_REPRESENTATION),
         ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
@@ -195,6 +217,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .ToList()
         .ForEach(DescribeSimpleAlignmentRule);
 
+      Describe<IndentingRule>().Name("EnumCases")
+        .Where(Parent().In(ElementType.ENUM_REPRESENTATION, ElementType.UNION_REPRESENTATION),
+          Left().In(ElementType.ENUM_MEMBER_DECLARATION).Satisfies(IsFirstNodeOfItsType))
+        .CloseNodeGetter((node, context) => node.Parent?.LastChild)
+        .Return(IndentType.AlignThrough) // through => including the last node (till => without the last one)
+        .Build();
+      
       Describe<IndentingRule>()
         .Name("OutdentBinaryOperators")
         .Where(
@@ -217,6 +246,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     private void Formatting()
     {
+      Describe<FormattingRule>()
+        .Group(LineBreaksRuleGroup)
+        .Name("LineBreakAfterTypeReprAccessModifier")
+        .Where(
+          Parent()
+            .In(UnionLikeTypeRepresentations)
+            .Satisfies((node, context) => ((ISimpleTypeRepresentation) node).AccessModifier != null),
+          Right().In(UnionCaseLikeDeclarations))
+        .Switch(settings => settings.LineBreakAfterTypeReprAccessModifier, 
+          When(true).Return(IntervalFormatType.NewLine))
+        .Build();
+
+      // todo: type U = C of int
+      Describe<FormattingRule>()
+        .Group(LineBreaksRuleGroup)
+        .Name("LineBreakAfterEqualsInTypeDecl")
+        .Where(Parent().In(ElementType.F_SHARP_TYPE_DECLARATION),
+          Right().In(TypeRepresentations).Satisfies((node, context) =>
+            node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS))
+        .Switch(settings => settings.LineBreakAfterEqualsInTypeDecl, When(true).Return(IntervalFormatType.NewLine))
+        .Build();
+
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
         .Name("SpaceAfterImplicitConstructorDecl")

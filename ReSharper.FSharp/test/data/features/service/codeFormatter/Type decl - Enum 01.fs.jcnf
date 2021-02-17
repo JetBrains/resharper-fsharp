@@ -1,0 +1,4 @@
+{
+  LineBreakAfterTypeReprAccessModifier: all,
+  LineBreakAfterEqualsInTypeDecl: all,
+}
