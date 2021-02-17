@@ -198,9 +198,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<IndentingRule>()
         .Name("OutdentBinaryOperators")
         .Where(
-          GrandParent().HasType(ElementType.BINARY_APP_EXPR),
-          Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
-          Node().Satisfies((node, _) => !IsPipeOperator(node)))
+          Parent().HasType(ElementType.BINARY_APP_EXPR),
+          Node().HasRole(BinaryAppExpr.OP_REF_EXPR).Satisfies((node, _) => !IsPipeOperator(node, _)))
         .Switch(settings => settings.OutdentBinaryOperators,
           When(true).Return(IndentType.Outdent | IndentType.External))
         .Build();
@@ -208,9 +207,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<IndentingRule>()
         .Name("OutdentPipeOperators")
         .Where(
-          GrandParent().HasType(ElementType.BINARY_APP_EXPR),
-          Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
-          Node().Satisfies((node, _) => IsPipeOperator(node)))
+          Parent().HasType(ElementType.BINARY_APP_EXPR),
+          Node().HasRole(BinaryAppExpr.OP_REF_EXPR).Satisfies(IsPipeOperator))
         .Switch(settings => settings.OutdentBinaryOperators,
           When(true).Switch(settings => settings.NeverOutdentPipeOperators,
             When(false).Return(IndentType.Outdent | IndentType.External)))
@@ -295,10 +293,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     private static bool AreAligned(ITreeNode first, ITreeNode second, IWhitespaceChecker whitespaceChecker) =>
       first.CalcLineIndent(whitespaceChecker) == second.CalcLineIndent(whitespaceChecker);
 
-    private static bool IsPipeOperator(ITreeNode node)
-    {
-      var opText = node.GetText();
-      return FSharpPredefinedType.PipeOperatorNames.Contains(opText);
-    }
+    private static bool IsPipeOperator(ITreeNode node, CodeFormattingContext context) =>
+      node is IReferenceExpr refExpr && FSharpPredefinedType.PipeOperatorNames.Contains(refExpr.ShortName);
   }
 }

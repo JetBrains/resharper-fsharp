@@ -18,8 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (referenceOwner is IReferenceExpr referenceExpr)
       {
         var infixAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr);
-
-        if (!(infixAppExpr?.Operator is var funExpr) || funExpr?.GetText() != "=")
+        if (!(infixAppExpr?.Operator is { ShortName: "=" }))
           return null;
 
         var innerExpr = (IFSharpExpression) TupleExprNavigator.GetByExpression(infixAppExpr) ?? infixAppExpr;

@@ -914,7 +914,7 @@ fSharpTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } e
   )
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  fSharpIdentifier<IDENTIFIER, Identifier>
+  identifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   primaryConstructorDeclaration<PRIMARY_CTOR_DECL, PrimaryConstructorDeclaration>?
   EQUALS<FSHARP_EQUALS, EqualsToken>
@@ -983,7 +983,7 @@ nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }
   MODULE<MODULE, ModuleOrNamespaceKeyword>
   REC<REC, RecKeyword>?
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  fSharpIdentifier<IDENTIFIER, Identifier>
+  identifier<IDENTIFIER, Identifier>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   moduleMember<MODULE_MEMBER, Members>*;
 
@@ -1124,7 +1124,7 @@ moduleAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBa
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MODULE<MODULE, ModuleOrNamespaceKeyword>
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  fSharpIdentifier<IDENTIFIER, Identifier>
+  identifier<IDENTIFIER, Identifier>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   typeReferenceName<TYPE_REFERENCE, TypeName>
   // todo: remove rules below
@@ -1448,24 +1448,41 @@ typeParameterId:
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 interface fSharpIdentifier:
-  identifier |
-  symbolicOp |
-  ampAmp |
   activePatternId |
-  typeParameterId |
-  global;
+  ampAmp |
+  colonColon |
+  equals |
+  global |
+  greater
+  identifier |
+  less |
+  lparenStarRparen |
+  minus |
+  percent |
+  percentPercent |
+  plus |
+  qmark |
+  qmarkQmark |
+  star |
+  symbolicOp |
+  typeParameterId;
 
-abstract identifier options { interfaceName="IFSharpIdentifier"; }:
-  IDENTIFIER;
-
-abstract symbolicOp options { interfaceName="IFSharpIdentifier"; }:
-  SYMBOLIC_OP;
-
-abstract ampAmp options { interfaceName="IFSharpIdentifier"; }:
-  ampAmp;
-
-abstract global options { interfaceName="IFSharpIdentifier"; }:
-  GLOBAL;
+abstract ampAmp options { interfaceName="IFSharpIdentifier"; }: AMP_AMP;
+abstract colonColon options { interfaceName="IFSharpIdentifier"; }: PERCENT;
+abstract equals options { interfaceName="IFSharpIdentifier"; }: EQUALS;
+abstract global options { interfaceName="IFSharpIdentifier"; }: GLOBAL;
+abstract greater options { interfaceName="IFSharpIdentifier"; }: GREATER;
+abstract identifier options { interfaceName="IFSharpIdentifier"; }: IDENTIFIER;
+abstract less options { interfaceName="IFSharpIdentifier"; }: LESS;
+abstract lparenStarRparen options { interfaceName="IFSharpIdentifier"; }: LPAREN_STAR_RPAREN;
+abstract minus options { interfaceName="IFSharpIdentifier"; }: MINUS;
+abstract plus options { interfaceName="IFSharpIdentifier"; }: PLUS;
+abstract percent options { interfaceName="IFSharpIdentifier"; }: PERCENT_PERCENT;
+abstract percentPercent options { interfaceName="IFSharpIdentifier"; }: COLON_COLON;
+abstract qmark options { interfaceName="IFSharpIdentifier"; }: QMARK;
+abstract qmarkQmark options { interfaceName="IFSharpIdentifier"; }: QMARK_QMARK;
+abstract star options { interfaceName="IFSharpIdentifier"; }: STAR;
+abstract symbolicOp options { interfaceName="IFSharpIdentifier"; }: SYMBOLIC_OP;
 
 // Type parameters
 

@@ -5,7 +5,7 @@ IFSharpImplFile
       IChameleonExpression
         IPrefixAppExpr
           IReferenceExpr
-            FSharpIdentifierToken(type:PLUS, text:+)
+            FSharpTokenType+PlusTokenElement(type:PLUS, text:+)
           IReferenceExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:foo)
 

@@ -29,6 +29,8 @@ type FcsErrorsHighlightingTest() =
     [<TestFileExtension(FSharpScriptProjectFileType.FsxExtension)>]
     [<Test; Explicit>] member x.``Unused value in script``() = x.DoNamedTest()
 
+    [<Test>] member x.``Unused value - Operators 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Unused value - Partial pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Unused value 01 - Object expression``() = x.DoNamedTest()
 

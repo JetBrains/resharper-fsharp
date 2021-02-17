@@ -21,7 +21,7 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpIdentifierToken(type:LPAREN_STAR_RPAREN, text:(*))
+            FSharpTokenType+LparenStarRparenTokenElement(type:LPAREN_STAR_RPAREN, text:(*))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IParametersPatternDeclaration
               IParenPat

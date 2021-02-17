@@ -204,8 +204,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
 
     static let infixOpTokens =
-        [| FSharpTokenType.BAR_BAR
-           FSharpTokenType.AMP_AMP
+        [| FSharpTokenType.AMP_AMP
            FSharpTokenType.PLUS
            FSharpTokenType.MINUS |]
         |> HashSet

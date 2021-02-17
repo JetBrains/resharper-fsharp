@@ -85,7 +85,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
 
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
-    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
+    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: IFSharpIdentifierToken) =
         // todo: fix getting qualifiers
         let tokenNames = [token.Name]
 
@@ -114,7 +114,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         | null -> emptyPresentation
         | fsFile ->
 
-        match fsFile.FindTokenAt(documentRange.StartOffset).As<FSharpIdentifierToken>() with
+        match fsFile.FindTokenAt(documentRange.StartOffset).As<IFSharpIdentifierToken>() with
         | null -> emptyPresentation
         | token ->
 

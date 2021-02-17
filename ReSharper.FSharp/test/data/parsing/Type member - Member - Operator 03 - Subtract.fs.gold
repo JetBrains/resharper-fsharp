@@ -22,7 +22,7 @@ IFSharpImplFile
             FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            FSharpIdentifierToken(type:MINUS, text:-)
+            FSharpTokenType+MinusTokenElement(type:MINUS, text:-)
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IParametersPatternDeclaration

@@ -43,7 +43,7 @@ IFSharpImplFile
           FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          FSharpIdentifierToken(type:PLUS, text:+)
+          FSharpTokenType+PlusTokenElement(type:PLUS, text:+)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

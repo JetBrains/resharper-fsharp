@@ -8,7 +8,7 @@ IFSharpImplFile
             IParenExpr
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               IReferenceExpr
-                FSharpIdentifierToken(type:PLUS, text:+)
+                FSharpTokenType+PlusTokenElement(type:PLUS, text:+)
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ILiteralExpr

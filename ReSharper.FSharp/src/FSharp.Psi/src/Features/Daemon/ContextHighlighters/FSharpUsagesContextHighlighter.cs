@@ -117,7 +117,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
           }
         }
 
-        if (!(usageToken is FSharpIdentifierToken identToken))
+        if (!(usageToken is IFSharpIdentifierToken identToken))
           continue;
 
         var tokenType = identToken.GetTokenType();
