@@ -875,7 +875,33 @@ fromErrorExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>;
 
 interpolatedStringExpr options { stubBase="FSharpExpressionBase"; }:
-  fakeSeparator;
+  REGULAR_INTERPOLATED_STRING<LITERAL,Literals> |
+  VERBATIM_INTERPOLATED_STRING<LITERAL,Literals> |
+  TRIPLE_QUOTE_INTERPOLATED_STRING<LITERAL,Literals> |
+  
+  REGULAR_INTERPOLATED_STRING_START<LITERAL,Literals>
+  fSharpExpression<INSERT,Inserts>
+  (
+    REGULAR_INTERPOLATED_STRING_MIDDLE<LITERAL,Literals>
+    fSharpExpression<INSERT,Inserts>
+  )*
+  REGULAR_INTERPOLATED_STRING_END<LITERAL,Literals> |
+  
+  VERBATIM_INTERPOLATED_STRING_START<LITERAL,Literals>
+  fSharpExpression<INSERT,Inserts>
+  (
+    VERBATIM_INTERPOLATED_STRING_MIDDLE<LITERAL,Literals>
+    fSharpExpression<INSERT,Inserts>
+  )*
+  VERBATIM_INTERPOLATED_STRING_END<LITERAL,Literals> |
+  
+  TRIPLE_QUOTE_INTERPOLATED_STRING_START<LITERAL,Literals>
+  fSharpExpression<INSERT,Inserts>
+  (
+    TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE<LITERAL,Literals>
+    fSharpExpression<INSERT,Inserts>
+  )*
+  TRIPLE_QUOTE_INTERPOLATED_STRING_END<LITERAL,Literals>;
 
 fixedExpr options { stubBase="FSharpExpressionBase"; }:
   FIXED<KEYWORD, Keyword>

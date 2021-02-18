@@ -3,9 +3,12 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 open System
 open System.Globalization
 open JetBrains.ReSharper.Daemon.StringAnalysis
+open JetBrains.ReSharper.Daemon.SyntaxHighlighting
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
@@ -245,3 +248,17 @@ module InterpolatedStringLexer =
         | '{' -> checkChar lexer '{'
         | '}' -> checkChar lexer '}'
         | _ -> null
+
+
+[<ElementProblemAnalyzer(typeof<IInterpolatedStringExpr>)>]
+type InterpolatedStringExprAnalyzer() =
+    inherit ElementProblemAnalyzer<IInterpolatedStringExpr>()
+
+    override this.Run(expr, data, consumer) =
+        if not data.IsFSharp50Supported then () else
+
+        if expr.IsTrivial() then
+            consumer.AddHighlighting(RedundantStringInterpolationWarning(expr))
+        else
+            let range = expr.GetDollarSignRange()
+            consumer.AddHighlighting(ReSharperSyntaxHighlighting(FSharpHighlightingAttributeIds.Method, null, range))

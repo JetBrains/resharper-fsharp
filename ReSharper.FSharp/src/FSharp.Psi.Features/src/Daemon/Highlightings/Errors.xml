@@ -69,6 +69,10 @@
         <Title>Use `_` self id</Title>
         <Description>Use `_` self id.</Description>
       </Tag>
+      <Tag name="FSharpRedundantStringInterpolation" default="SUGGESTION">
+        <Title>Redundant string interpolation</Title>
+        <Description>String interpolation expression without arguments is redundant.</Description>
+      </Tag>
     </Group>
   </SeverityConfiguration>
 
@@ -253,6 +257,13 @@
     <Message value="Use '_'"/>
     <Range>selfId.GetDocumentRange()</Range>
     <QuickFix>UseWildSelfIdFix</QuickFix>
+  </Warning>
+
+  <Warning name="RedundantStringInterpolation" configurableSeverity="FSharpRedundantStringInterpolation">
+    <Parameter type="IInterpolatedStringExpr" name="expr"/>
+    <Message value="Redundant string interpolation"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Range>expr.GetDollarSignRange()</Range>
   </Warning>
 
 </Errors>

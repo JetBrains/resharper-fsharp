@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
@@ -148,7 +147,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                           yield remarks |> renderL richTextR
                       | _ -> () ]
                     |> richTextJoin "\n\n"))
-        |> richTextJoin IdentifierTooltipProvider<FSharpLanguage>.RIDER_TOOLTIP_SEPARATOR
+        |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
         |> RichTextBlock
 
     interface IFSharpIdentifierTooltipProvider
