@@ -39,4 +39,4 @@ type FSharpStructureTest() =
         let services = Shell.Instance.GetComponent<IProjectFileTypeServices>()
         let structureProvider = services.TryGetService<IProjectFileCodeStructureProvider>(sourceFile.LanguageType)
         let root = structureProvider.Build(sourceFile, CodeStructureOptions.Default)
-        x.ExecuteWithGold(projectFile, fun writer -> root.Dump(writer))
+        x.ExecuteWithGold(projectFile, root.Dump)
