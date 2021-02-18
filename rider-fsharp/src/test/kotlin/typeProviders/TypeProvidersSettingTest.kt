@@ -26,16 +26,7 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
     fun enableTypeProvidersSetting() {
         val sourceFile = "TypeProviderLibrary/Library.fs"
 
-        withOpenedEditor(project, sourceFile) {
-            waitForDaemon()
-            rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldBeNull()
-            markupAdapter.hasErrors.shouldBeFalse()
-        }
-
         withTypeProviders {
-            unloadAllProjects()
-            reloadAllProjects(project)
-
             withOpenedEditor(project, sourceFile) {
                 waitForDaemon()
                 rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()
@@ -50,6 +41,17 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
             waitForDaemon()
             rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldBeNull()
             markupAdapter.hasErrors.shouldBeFalse()
+        }
+
+        unloadAllProjects()
+        reloadAllProjects(project)
+
+        withTypeProviders {
+            withOpenedEditor(project, sourceFile) {
+                waitForDaemon()
+                rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()
+                markupAdapter.hasErrors.shouldBeFalse()
+            }
         }
     }
 }

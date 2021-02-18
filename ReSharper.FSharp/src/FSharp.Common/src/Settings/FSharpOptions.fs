@@ -84,7 +84,7 @@ type FSharpExperimentalFeatures =
       [<SettingsEntry(false, FSharpExperimentalFeatures.fsiInteractiveEditor); DefaultValue>]
       mutable FsiInteractiveEditor: bool
       
-      [<SettingsEntry(false, FSharpExperimentalFeatures.outOfProcessTypeProviders)>]
+      [<SettingsEntry(true, FSharpExperimentalFeatures.outOfProcessTypeProviders)>]
       mutable OutOfProcessTypeProviders: bool }
 
 
