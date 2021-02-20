@@ -158,6 +158,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter in app 15 - After first token on line``() = x.DoNamedTest()
     [<Test>] member x.``Enter in app 16 - After last infix op token on line``() = x.DoNamedTest()
 
+    [<Test>] member x.``Backspace - Interpolated string - Braces 01``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Interpolated String - Regular 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Interpolated String - Triple quote 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Interpolated String - Triple quote 02 - Multiline``() = x.DoNamedTest()
@@ -233,6 +234,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Surround 01``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Surround 02 - Multiline``() = x.DoNamedTest()
 
+    [<Test>] member x.``Brackets - Left - Add right - Interpolated string 01``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 01 - Add right``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 02 - No add right before other``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 03 - Add right before other and space``() = x.DoNamedTest()
@@ -245,6 +247,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Skip right 03 - After code and space``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 04 - Angle``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 05 - Multiplication decl``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip right 06 - Interpolated string``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Skip 01 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip 02 - Array``() = x.DoNamedTest()
