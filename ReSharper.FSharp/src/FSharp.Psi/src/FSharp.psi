@@ -984,10 +984,13 @@ interface typeRepresentation:
   delegateRepresentation |
   typeAbbreviationRepresentation;
 
-interface simpleTypeRepresentation options { customParseFunction; noInternalParseFunction; }:
-  unionRepresentation |
-  recordRepresentation |
-  enumRepresentation;
+interface simpleTypeRepresentation:
+  enumLikeTypeRepresentation |
+  recordRepresentation;
+
+interface enumLikeTypeRepresentation options { customParseFunction; noInternalParseFunction; }:
+  enumRepresentation |
+  unionRepresentation;
 
 interface objectModelTypeRepresentation:
   classRepresentation |
@@ -1054,6 +1057,10 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
   typeMemberDeclarationList<MEMBER_LIST, MemberDeclarationsList>;
 
 
+interface enumCaseLikeDeclaration:
+  enumMemberDeclaration |
+  unionCaseDeclaration;
+
 enumRepresentation options { stubBase="TypeRepresentationBase"; }:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   enumMemberDeclaration<ENUM_MEMBER, EnumMembers>*;
@@ -1062,7 +1069,7 @@ enumMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"
   get { methodName="Attributes" path=<enumMemberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  IDENTIFIER<IDENTIFIER, Identifier>;
+  identifier<IDENTIFIER, Identifier>;
 
 
 recordRepresentation options { stubBase="TypeRepresentationBase"; } extras {
@@ -1103,7 +1110,7 @@ unionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ex
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  fSharpIdentifier<IDENTIFIER, Identifier>
+  identifier<IDENTIFIER, Identifier>
   unionCaseFieldDeclarationList<FIELD_DECLARATION_LIST, FieldList>?
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;

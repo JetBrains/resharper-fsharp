@@ -1,0 +1,5 @@
+﻿SpaceAfterComma = True
+1, 2, 3, 4
+================
+SpaceAfterComma = False
+1,2,3,4

@@ -1,0 +1,6 @@
+{ KeepMaxBlankLineAroundModuleMembers: [0, 2]} * ["BlankLinesAround",
+{ BlankLinesAroundMultilineModuleMembers: [0, 1] },
+{ BlankLinesAroundSingleLineModuleMember: [0, 1] },
+{ BlankLinesBeforeFirstTopLevelModuleMember: [0, 1] },
+{ BlankLineAroundTopLevelModules: [0, 2] },
+{ BlankLinesAroundDifferentModuleMembers: [0, 2] }]

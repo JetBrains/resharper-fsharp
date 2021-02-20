@@ -1,0 +1,17 @@
+﻿unaffected by KeepExistingLineBreakInDoLikeExpr
+  unaffected by DoLikeExprOnTheSameLine
+()
+
+[<A>]
+()
+
+[<A;
+  A>]
+()
+
+(1 +
+ 1)
+
+[<A>]
+(1 +
+ 1)
