@@ -21,7 +21,7 @@ type ReplaceLambdaWithInnerExpressionFix(warning: LambdaCanBeReplacedWithInnerEx
             $"Replace lambda with '{ref.QualifiedName}'"
         | :? IPrefixAppExpr as app ->
             match getRootFunctionExpr app with
-            | :? IReferenceExpr as ref ->
-                $"Replace with '{ref.ShortName}' partial application"
+            | :? IReferenceExpr as refExpr ->
+                $"Replace with '{refExpr.ShortName}' partial application"
             | _ -> "Replace lambda with partial application"
         | _ -> "Simplify lambda"
