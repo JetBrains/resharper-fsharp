@@ -7,14 +7,13 @@ open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-[<PostfixTemplate("match", "Pattern match expression", false, "match expr with | _ -> ()")>]
+[<PostfixTemplate("match", "Pattern match expression", "match expr with | _ -> ()")>]
 type MatchPostfixTemplate() =
     interface IPostfixTemplate with
         member x.Language = FSharpLanguage.Instance :> _
