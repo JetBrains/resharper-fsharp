@@ -2,7 +2,6 @@
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
 type ReplaceLambdaWithInnerExpressionFix(warning: LambdaCanBeReplacedWithInnerExpressionWarning) =
@@ -10,18 +9,12 @@ type ReplaceLambdaWithInnerExpressionFix(warning: LambdaCanBeReplacedWithInnerEx
 
     let replaceCandidate = warning.ReplaceCandidate
 
-    let rec getRootFunctionExpr (app : IPrefixAppExpr) =
-        match app.FunctionExpression.IgnoreInnerParens() with
-        | :? IPrefixAppExpr as previousApp -> getRootFunctionExpr previousApp
-        | x -> x
-
     override x.Text =
         match replaceCandidate with
         | :? IReferenceExpr as ref when isSimpleQualifiedName ref ->
             $"Replace lambda with '{ref.QualifiedName}'"
         | :? IPrefixAppExpr as app ->
-            match getRootFunctionExpr app with
-            | :? IReferenceExpr as refExpr ->
-                $"Replace with '{refExpr.ShortName}' partial application"
-            | _ -> "Replace lambda with partial application"
+            match app.InvokedReferenceExpression with
+            | null -> "Replace lambda with partial application"
+            | refExpr -> $"Replace with '{refExpr.ShortName}' partial application"
         | _ -> "Simplify lambda"
