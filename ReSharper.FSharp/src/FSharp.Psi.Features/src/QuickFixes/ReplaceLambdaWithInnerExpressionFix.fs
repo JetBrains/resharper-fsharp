@@ -1,11 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open FSharp.Compiler
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 
 type ReplaceLambdaWithInnerExpressionFix(warning: LambdaCanBeReplacedWithInnerExpressionWarning) =
     inherit ReplaceWithInnerTreeNodeFixBase(warning.LambdaExpr, warning.ReplaceCandidate)
@@ -24,11 +22,6 @@ type ReplaceLambdaWithInnerExpressionFix(warning: LambdaCanBeReplacedWithInnerEx
         | :? IPrefixAppExpr as app ->
             match getRootFunctionExpr app with
             | :? IReferenceExpr as ref ->
-                match ref.ShortName with
-                | name when name = SharedImplUtil.MISSING_DECLARATION_NAME ||
-                            PrettyNaming.IsOperatorName name ->
-                    $"Replace with '{ref.Reference.GetName()}' partial application"
-                | _ ->
-                    $"Replace with '{ref.ShortName}' partial application"
+                $"Replace with '{ref.ShortName}' partial application"
             | _ -> "Replace lambda with partial application"
         | _ -> "Simplify lambda"
