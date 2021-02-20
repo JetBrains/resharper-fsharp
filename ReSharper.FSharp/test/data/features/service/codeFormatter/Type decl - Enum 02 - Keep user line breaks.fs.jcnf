@@ -1,0 +1,5 @@
+{
+  LineBreakAfterTypeReprAccessModifier: all,
+  LineBreakAfterEqualsInTypeDecl: all,
+  KeepUserLinebreaks: all,
+}

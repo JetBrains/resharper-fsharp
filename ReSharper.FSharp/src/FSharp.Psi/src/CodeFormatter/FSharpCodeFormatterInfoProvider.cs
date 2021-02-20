@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Calculated.Interface;
 using JetBrains.Application.Threading;
@@ -10,6 +12,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Services.Formatter;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Tree;
@@ -26,6 +29,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     {
     }
 
+    protected readonly NodeTypeSet Comments =
+      new NodeTypeSet(FSharpTokenType.LINE_COMMENT, FSharpTokenType.BLOCK_COMMENT);
+
+    protected readonly NodeTypeSet ExpressionsWithChameleon =
+      ElementBitsets.F_SHARP_EXPRESSION_BIT_SET.Union(ElementType.CHAMELEON_EXPRESSION);
+
     protected override void Initialize()
     {
       base.Initialize();
@@ -33,98 +42,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Indenting();
       Aligning();
       Formatting();
+      BlankLines();
     }
 
-    protected readonly NodeTypeSet TypeRepresentations =
-      new NodeTypeSet(
-        ElementType.ENUM_REPRESENTATION,
-        ElementType.UNION_REPRESENTATION,
-        ElementType.RECORD_REPRESENTATION,
-        ElementType.CLASS_REPRESENTATION,
-        ElementType.INTERFACE_REPRESENTATION,
-        ElementType.STRUCT_REPRESENTATION,
-        ElementType.DELEGATE_REPRESENTATION);
-
-    protected readonly NodeTypeSet FunctionTypeRepresentations =
-      new NodeTypeSet(
-        ElementType.ENUM_REPRESENTATION,
-        ElementType.UNION_REPRESENTATION,
-        ElementType.RECORD_REPRESENTATION);
-
-    protected readonly NodeTypeSet UnionLikeTypeRepresentations =
-      new NodeTypeSet(
-        ElementType.ENUM_REPRESENTATION,
-        ElementType.UNION_REPRESENTATION);
-    
-    protected readonly NodeTypeSet UnionCaseLikeDeclarations =
-      new NodeTypeSet(
-        ElementType.ENUM_MEMBER_DECLARATION,
-        ElementType.UNION_CASE_DECLARATION);
-    
-    
     public override ProjectFileType MainProjectFileType => FSharpProjectFileType.Instance;
 
     private void Indenting()
     {
-      var bindingAndModuleDeclIndentingRulesParameters = new[]
-      {
-        ("NestedModuleDeclaration", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.MODULE_MEMBER),
-        ("TopBinding", ElementType.TOP_BINDING, TopBinding.CHAMELEON_EXPR),
-        ("LocalBinding", ElementType.LOCAL_BINDING, LocalBinding.EXPR),
-        ("LetModuleDeclBinding", ElementType.LET_BINDINGS_DECLARATION, LetBindingsDeclaration.BINDING),
-        ("LetExprBinding", ElementType.LET_OR_USE_EXPR, LetOrUseExpr.BINDING),
-        ("NestedModuleDeclName", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.IDENTIFIER),
-        ("NamedModuleDeclName", ElementType.NAMED_MODULE_DECLARATION, NamedModuleDeclaration.IDENTIFIER),
-      };
-
-      var fsExprIndentingRulesParameters = new[]
-      {
-        ("ForExpr", ElementType.FOR_EXPR, ForExpr.DO_EXPR),
-        ("ForEachExpr", ElementType.FOR_EACH_EXPR, ForEachExpr.DO_EXPR),
-        ("WhileExpr", ElementType.WHILE_EXPR, WhileExpr.DO_EXPR),
-        ("DoExpr", ElementType.DO_EXPR, DoExpr.EXPR),
-        ("AssertExpr", ElementType.ASSERT_EXPR, AssertExpr.EXPR),
-        ("LazyExpr", ElementType.LAZY_EXPR, LazyExpr.EXPR),
-        ("ComputationExpr", ElementType.COMPUTATION_EXPR, ComputationExpr.EXPR),
-        ("SetExpr", ElementType.SET_EXPR, SetExpr.RIGHT_EXPR),
-        ("TryFinally_TryExpr", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.TRY_EXPR),
-        ("TryFinally_FinallyExpr", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.FINALLY_EXPR),
-        ("TryWith_TryExpr", ElementType.TRY_WITH_EXPR, TryWithExpr.TRY_EXPR),
-        ("IfThenExpr", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.THEN_EXPR),
-        ("ElifThenExpr", ElementType.ELIF_EXPR, ElifExpr.THEN_EXPR),
-        ("LambdaExprBody", ElementType.LAMBDA_EXPR, LambdaExpr.EXPR),
-        ("MatchExpr_Expr", ElementType.MATCH_EXPR, MatchExpr.EXPR),
-        ("MatchExpr_With", ElementType.MATCH_EXPR, MatchExpr.WITH),
-      };
-
-      var typeDeclarationIndentingRulesParameters = new[]
-      {
-        ("TypeDeclarationRepr", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.TYPE_REPR),
-        ("TypeDeclarationMemberList", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.MEMBER_LIST),
-        ("ClassReprTypeMemberList", ElementType.CLASS_REPRESENTATION, ClassRepresentation.MEMBER_LIST),
-        ("StructReprTypeMemberList", ElementType.STRUCT_REPRESENTATION, StructRepresentation.MEMBER_LIST),
-        ("InterfaceReprTypeMemberList", ElementType.INTERFACE_REPRESENTATION, InterfaceRepresentation.MEMBER_LIST),
-        ("ExceptionMemberList", ElementType.EXCEPTION_DECLARATION, ExceptionDeclaration.MEMBER_LIST),
-        ("InterfaceImplMemberList", ElementType.INTERFACE_IMPLEMENTATION, InterfaceImplementation.MEMBER_LIST),
-        ("ModuleAbbreviationDeclaration", ElementType.MODULE_ABBREVIATION_DECLARATION, ModuleAbbreviationDeclaration.TYPE_REFERENCE),
-      };
-
-      bindingAndModuleDeclIndentingRulesParameters
-        .Union(fsExprIndentingRulesParameters)
-        .Union(typeDeclarationIndentingRulesParameters)
-        .ToList()
-        .ForEach(DescribeSimpleIndentingRule);
+      // todo: use parens rules for parens (closing bracket without indent)
+      Describe<ContinuousIndentRule>()
+        .Name("ContinuousIndent")
+        .Where(Node().In(ElementBitsets.DO_LIKE_EXPR_BIT_SET.Union(ElementType.DO_STATEMENT,
+          ElementType.NESTED_MODULE_DECLARATION, ElementType.F_SHARP_TYPE_DECLARATION,
+          ElementType.ENUM_CASE_DECLARATION, ElementType.UNION_CASE_DECLARATION, ElementType.ATTRIBUTE_LIST)))
+        .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
+        .Build();
 
       Describe<IndentingRule>()
         .Name("TypeRepr_Accessibility")
         .Where(
-          Parent().In(FunctionTypeRepresentations),
-          Left().In(ElementType.ENUM_MEMBER_DECLARATION, ElementType.UNION_CASE_DECLARATION).Satisfies((node, context) =>
+          Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET),
+          Left().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies((node, context) =>
             node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.PRIVATE))
         .CloseNodeGetter((node, context) => node.Parent?.LastChild)
         .Return(IndentType.External)
         .Build();
-      
+
       Describe<IndentingRule>()
         .Name("TryWith_WithClauseIndent")
         .Where(
@@ -205,7 +148,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         ("MatchClauses", ElementType.MATCH_EXPR),
         ("UnionRepresentation", ElementType.UNION_REPRESENTATION),
         ("EnumCases", ElementType.ENUM_REPRESENTATION),
-        ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
+        ("SequentialExpr", ElementType.SEQUENTIAL_EXPR), // todo: do stmt
         ("BinaryExpr", ElementType.BINARY_APP_EXPR),
         ("RecordDeclaration", ElementType.RECORD_FIELD_DECLARATION_LIST),
         ("RecordExprBindings", ElementType.RECORD_FIELD_BINDING_LIST),
@@ -219,11 +162,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       Describe<IndentingRule>().Name("EnumCases")
         .Where(Parent().In(ElementType.ENUM_REPRESENTATION, ElementType.UNION_REPRESENTATION),
-          Left().In(ElementType.ENUM_MEMBER_DECLARATION).Satisfies(IsFirstNodeOfItsType))
+          Left().In(ElementType.ENUM_CASE_DECLARATION).Satisfies(IsFirstNodeOfItsType))
         .CloseNodeGetter((node, context) => node.Parent?.LastChild)
         .Return(IndentType.AlignThrough) // through => including the last node (till => without the last one)
         .Build();
-      
+
       Describe<IndentingRule>()
         .Name("OutdentBinaryOperators")
         .Where(
@@ -244,17 +187,126 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
     }
 
+    private void BlankLines()
+    {
+      Describe<BlankLinesAroundNodeRule>()
+        .AddNodesToGroupBefore(Node().In(Comments))
+        .AddNodesToGroupAfter(Node().In(Comments))
+        // .AddNodesToGroupConditionally(Node().In(ElementBitsets.PREPROCESSOR_DIRECTIVE_BIT_SET // todo: check tree
+        //   // Regions are excepted because of separate BLANK_LINES_AROUND_REGION and BLANK_LINES_INSIDE_REGION
+        //   .Except(ElementType.START_REGION)
+        //   .Except(ElementType.END_REGION)))
+        .AllowedNodesBefore(Node().Satisfies((node, checker) => true))
+        .AllowedNodesAfter(Node().Satisfies((node, checker) => true))
+        .Priority(1)
+        .StartAlternating()
+        .Name("BlankLinesAroundModuleMembers") // todo: rename option to decls
+        .Where(Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET.Union(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET)))
+        .MinBlankLines(it => it.BlankLinesAroundMultilineModuleMembers)
+        .MinBlankLinesForSingleLine(it => it.BlankLinesAroundSingleLineModuleMember)
+        .Build()
+        .Name("BlankLinesAroundDifferentModuleMemberTypes")
+        .Where(Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET))
+        .MinBlankLines(it => it.BlankLinesAroundDifferentModuleMembers)
+        .AdditionalCheckForBlankLineAfter((node, context) =>
+          node.GetNextMeaningfulSibling()?.NodeType is var nodeType &&
+          nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType])
+        .AdditionalCheckForBlankLineBefore((node, context) =>
+          node.GetPreviousMeaningfulSibling()?.NodeType is var nodeType &&
+          nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType])
+        .Build()
+        .Name("BlankLinesBeforeFirstTopLevelModuleMember")
+        .Where(
+          Parent().In(ElementBitsets.TOP_LEVEL_MODULE_LIKE_DECLARATION_BIT_SET),
+          Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET)
+            .Satisfies(IsFirstNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET)))
+        .MinBlankLinesBefore(it => it.BlankLinesBeforeFirstTopLevelModuleMember)
+        .Build()
+        .Name("BlankLinesBeforeFirstNestedModuleMember")
+        .Where(
+          Parent().In(ElementType.NESTED_MODULE_DECLARATION),
+          Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET)
+            .Satisfies(IsFirstNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET)))
+        .MinBlankLinesBefore(it => it.BlankLinesBeforeFirstNestedModuleMember)
+        .Build()
+        .Name("BlankLinesAroundModules")
+        .Where(Node().In(ElementBitsets.TOP_LEVEL_MODULE_LIKE_DECLARATION_BIT_SET))
+        .MinBlankLines(it => it.BlankLineAroundTopLevelModules)
+        .Build();
+
+      // todo: test sig files
+      Describe<BlankLinesRule>()
+        .Name("BlankLinesInDecls")
+        .Group(MaxLineBreaks)
+        .Where(Parent().In(ElementBitsets.MODULE_LIKE_DECLARATION_BIT_SET.Union(ElementBitsets.F_SHARP_FILE_BIT_SET)))
+        .SwitchBlankLines(it => it.KeepMaxBlankLineAroundModuleMembers, true, BlankLineLimitKind.LimitMaximumMild)
+        .Build();
+    }
+
     private void Formatting()
     {
+      Describe<FormattingRule>()
+        .Name("EnumCaseSpaces")
+        .Group(SpaceRuleGroup)
+        .Where(Parent().In(ElementType.ENUM_CASE_DECLARATION, ElementType.UNION_CASE_DECLARATION,
+          ElementType.UNION_CASE_FIELD_DECLARATION_LIST))
+        .Return(IntervalFormatType.Space)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("SpaceBeforeColon")
+        .Group(SpaceRuleGroup)
+        .Where(Right().In(FSharpTokenType.COLON))
+        .Switch(it => it.SpaceBeforeColon, SpaceOptionsBuilders)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("SpaceAfterComma")
+        .Group(SpaceRuleGroup)
+        .Where(Left().In(FSharpTokenType.COMMA))
+        .Switch(it => it.SpaceAfterComma, SpaceOptionsBuilders)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("NoSpaceBeforeComma")
+        .Group(SpaceRuleGroup)
+        .Where(Right().In(FSharpTokenType.COMMA))
+        .Return(IntervalFormatType.Empty)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("NoSpaceInUnit")
+        .Group(SpaceRuleGroup)
+        .Where(
+          Parent().In(ElementType.UNIT_EXPR, ElementType.UNIT_PAT),
+          Left().In(FSharpTokenType.LPAREN),
+          Right().In(FSharpTokenType.RPAREN))
+        .Return(IntervalFormatType.Empty)
+        .Build();
+      
+      Describe<FormattingRule>()
+        .Name("KeepUserLineBreaks")
+        .FormatHighlighting(FormatterImplHelper.ProhibitHighlighting) // todo: other cases
+        .Group(UserLineBreaksRuleGroup)
+        .Priority(0)
+        .Switch(it => it.KeepUserLinebreaks,
+          When(false).Return(IntervalFormatType.RemoveUserNewLines)) // todo: generator mode
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("LineBreakBeforeModuleMember")
+        .Group(LineBreaksRuleGroup)
+        .Where(Right().In(ElementBitsets.MODULE_MEMBER_BIT_SET))
+        .Return(IntervalFormatType.NewLine).Build();
+
       Describe<FormattingRule>()
         .Group(LineBreaksRuleGroup)
         .Name("LineBreakAfterTypeReprAccessModifier")
         .Where(
-          Parent()
-            .In(UnionLikeTypeRepresentations)
+          Parent().In(ElementBitsets.ENUM_LIKE_TYPE_REPRESENTATION_BIT_SET)
             .Satisfies((node, context) => ((ISimpleTypeRepresentation) node).AccessModifier != null),
-          Right().In(UnionCaseLikeDeclarations))
-        .Switch(settings => settings.LineBreakAfterTypeReprAccessModifier, 
+          Right().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET))
+        .Switch(settings => settings.LineBreakAfterTypeReprAccessModifier,
           When(true).Return(IntervalFormatType.NewLine))
         .Build();
 
@@ -263,18 +315,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Group(LineBreaksRuleGroup)
         .Name("LineBreakAfterEqualsInTypeDecl")
         .Where(Parent().In(ElementType.F_SHARP_TYPE_DECLARATION),
-          Right().In(TypeRepresentations).Satisfies((node, context) =>
+          Right().In(ElementBitsets.TYPE_REPRESENTATION_BIT_SET).Satisfies((node, context) =>
             node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS))
         .Switch(settings => settings.LineBreakAfterEqualsInTypeDecl, When(true).Return(IntervalFormatType.NewLine))
         .Build();
 
+      DescribeDoLikeClause(Node().In(ElementBitsets.DO_LIKE_EXPR_BIT_SET), key => key.DoLikeExprOnTheSameLine);
+
+      DescribeDoLikeClause(
+        Node().In(ElementType.DO_STATEMENT).Satisfies((node, context) => !((IDoStatement) node).IsImplicit),
+        key => key.DoLikeExprOnTheSameLine);
+
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
-        .Name("SpaceAfterImplicitConstructorDecl")
+        .Name("SpaceAfterPrimaryConstructorDecl")
         .Where(Left().HasType(ElementType.PRIMARY_CONSTRUCTOR_DECLARATION))
         .Return(IntervalFormatType.Space)
         .Build();
-      
+
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
         .Name("SpacesInMemberConstructorDecl")
@@ -318,14 +376,45 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
     }
 
-    private void DescribeSimpleIndentingRule((string name, CompositeNodeType parentType, short childRole) parameters)
+    private void DescribeDoLikeClause(IBuilderAction<IBlankWithSinglePattern> builder,
+      Expression<Func<FSharpFormatSettingsKey, object>> setting)
     {
-      Describe<IndentingRule>()
-        .Name(parameters.name + "Indent")
+      var patternBlank = builder.BuildBlank();
+
+      Describe<WrapRule>()
+        .Name("DoLikeClauseWrap")
+        .Where(Node().Is(patternBlank))
+        .Switch(it => it.KeepExistingLineBreakInDoLikeExpr,
+          When(false).Switch(setting,
+            When(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE)
+              .Return(WrapType.Chop | WrapType.PseudoStartBeforeExternal)))
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("DoLikeClauseNewLine")
         .Where(
-          Parent().HasType(parameters.parentType),
-          Node().HasRole(parameters.childRole))
-        .Return(IndentType.External)
+          Parent().Is(patternBlank), 
+          Right().In(ExpressionsWithChameleon))
+        .Group(LineBreaksRuleGroup | WrapRuleGroup)
+        .Switch(
+          it => it.KeepExistingLineBreakInDoLikeExpr,
+          When(true).Return(IntervalFormatType.DoNotRemoveUserNewLines),
+          When(false)
+            .Switch(setting,
+              When(PlaceOnSameLineAsOwner.NEVER).Return(IntervalFormatType.NewLine),
+              When(PlaceOnSameLineAsOwner.ALWAYS).Return(IntervalFormatType.RemoveUserNewLines),
+              When(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE)
+                .Return(IntervalFormatType.RemoveUserNewLines | IntervalFormatType.InsertNewLineConditionally)))
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("DoLikeClauseSpace")
+        .Where(
+          Parent().Is(patternBlank),
+          Right().In(ExpressionsWithChameleon))
+        .Group(SpaceRuleGroup)
+        .Return(IntervalFormatType.Space)
+        .Priority(3)
         .Build();
     }
 

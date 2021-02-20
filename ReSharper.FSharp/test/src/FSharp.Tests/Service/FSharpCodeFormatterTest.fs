@@ -18,7 +18,27 @@ type FSharpCodeFormatterTest() =
         use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
+    [<Test>] member x.``Expr - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Tuple 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Unit 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Do 01``() = x.DoNamedTest()
+    [<Test>] member x.``Do 02 - Statement``() = x.DoNamedTest()
+    [<Test>] member x.``Do - Statement 02``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Nested``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Attributes 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Attributes 02 - Before name``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Attributes 03 - Type group``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Attributes 04 - Multiline list``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Enum 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 02 - Keep user line breaks``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 04 - Spaces``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 05 - Comment``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Union 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Top binding indent 01 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Top binding indent 02 - Correct indent``() = x.DoNamedTest()
@@ -101,10 +121,6 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Module abbreviation declaration indent 01 - Correct indent``() = x.DoNamedTest()
 
     [<Test>] member x.``Match clauses alignment 01``() = x.DoNamedTest()
-    [<Test>] member x.``Union cases alignment 01``() = x.DoNamedTest()
-    [<Test>] member x.``Union cases alignment 02 - Modifier``() = x.DoNamedTest()
-    [<Test>] member x.``Union cases alignment 03 - Modifier and new line``() = x.DoNamedTest()
-    [<Test>] member x.``Enum cases alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Sequential expr alignment 01 - No separators``() = x.DoNamedTest()
     [<Test>] member x.``Sequential expr alignment 02 - Separators``() = x.DoNamedTest()
     [<Test>] member x.``Binary expr alignment 01``() = x.DoNamedTest()

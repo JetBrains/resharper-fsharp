@@ -29,7 +29,6 @@ type E6 =
   private
     | A = 1
     | B = 2
-
 ================
   LineBreakAfterEqualsInTypeDecl = False
 namespace Namespace
@@ -58,7 +57,6 @@ type E5 = private
 type E6 = private
             | A = 1
             | B = 2
-
 ================
 LineBreakAfterTypeReprAccessModifier = False
   LineBreakAfterEqualsInTypeDecl = True
@@ -89,7 +87,6 @@ type E5 =
 type E6 =
   private | A = 1
           | B = 2
-
 ================
   LineBreakAfterEqualsInTypeDecl = False
 namespace Namespace

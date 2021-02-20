@@ -12,8 +12,40 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [SettingsEntry(true, "Line break after type representation access modifier")]
     public bool LineBreakAfterTypeReprAccessModifier;
 
+    [SettingsEntry(true, "todo")]
+    public bool KeepExistingLineBreakInDoLikeExpr;
+    
+    [SettingsEntry(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE, "todo")]
+    public PlaceOnSameLineAsOwner DoLikeExprOnTheSameLine;
+
     [SettingsEntry(true, "Line break after '=' in types")]
     public bool LineBreakAfterEqualsInTypeDecl;
+
+    [SettingsEntry(1, "todo")]
+    public int BlankLinesBeforeFirstTopLevelModuleMember;
+
+    [SettingsEntry(0, "todo")]
+    public int BlankLinesBeforeFirstNestedModuleMember;
+
+    [SettingsEntry(0, "todo")]
+    public int BlankLinesAroundSingleLineModuleMember;
+
+    [SettingsEntry(1, "todo")]
+    public int BlankLinesAroundMultilineModuleMembers;
+
+    [SettingsEntry(1, "todo")]
+    public int BlankLinesAroundDifferentModuleMembers;
+    
+    [SettingsEntry(2, "todo")]
+    public int BlankLineAroundTopLevelModules;
+
+    [SettingsEntry(2, "todo")]
+    public int KeepMaxBlankLineAroundModuleMembers;
+
+    [EditorConfigEntryAlias("keep_existing_arrangement", EditorConfigAliasType.ReSharperGeneralized)]
+    [EditorConfigEntryAlias("keep_existing_linebreaks", EditorConfigAliasType.ReSharperGeneralized)]
+    [SettingsEntry(true, "Keep existing line breaks")]
+    public bool KeepUserLinebreaks;
 
     [SettingsEntry(false, "Semicolon at end of line")]
     [EditorConfigEntryAlias("semicolon_at_end_of_line", EditorConfigAliasType.LanguageSpecific)]

@@ -1,0 +1,4 @@
+{
+KeepExistingLineBreakInDoLikeExpr: all,
+DoLikeExprOnTheSameLine: all
+}
