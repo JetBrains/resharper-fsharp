@@ -82,6 +82,12 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
             (fun (result: RichText) part -> if result.IsEmpty then part else result + sep + part)
             RichText.Empty
 
+    let richTextEscapeNewLines (text: RichText) =
+        text.GetFormattedParts()
+        |> Seq.fold
+               (fun (result: RichText) (part: RichString) -> result.Append(part.Text.Replace("\n", "<br>")))
+               RichText.Empty
+
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
     static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: IFSharpIdentifierToken) =
@@ -148,6 +154,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                       | _ -> () ]
                     |> richTextJoin "\n\n"))
         |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
+        |> richTextEscapeNewLines
         |> RichTextBlock
 
     interface IFSharpIdentifierTooltipProvider
