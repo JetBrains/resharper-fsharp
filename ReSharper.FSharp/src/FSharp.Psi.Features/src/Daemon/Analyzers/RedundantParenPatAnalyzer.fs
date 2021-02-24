@@ -80,7 +80,12 @@ type RedundantParenPatAnalyzer() =
 
         | :? ITypedPat
         | :? IAttribPat ->
-            isNotNull (BindingNavigator.GetByHeadPattern(context)) ||
+            let bindingHeadPattern =
+                match TuplePatNavigator.GetByPattern(context) with
+                | null -> context
+                | tuplePat -> tuplePat.IgnoreParentParens()
+
+            isNotNull (BindingNavigator.GetByHeadPattern(bindingHeadPattern)) ||
             isNotNull (LambdaParametersListNavigator.GetByPattern(context)) ||
             checkPrecedence fsPattern context.Parent
 

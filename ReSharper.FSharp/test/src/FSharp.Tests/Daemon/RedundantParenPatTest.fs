@@ -41,7 +41,8 @@ type RedundantParenPatTest() =
 
     [<Test>] member x.``Typed 01 - As``() = x.DoNamedTest()
     [<Test>] member x.``Typed 02 - Attr``() = x.DoNamedTest()
-    [<Test>] member x.``Typed 03``() = x.DoNamedTest()
+    [<Test>] member x.``Typed 03 - Param owner``() = x.DoNamedTest()
+    [<Test>] member x.``Typed 04 - Binding``() = x.DoNamedTest()
 
     [<Test>] member x.``Wild - Function param 01``() = x.DoNamedTest()
     [<Test>] member x.``Wild - Pattern param 01``() = x.DoNamedTest()
