@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Rider Debug (Unix)" type="RunExe" factoryName=".NET Executable">
+  <configuration default="false" name="Rider Debug (Unix)" type="RunNativeExe" factoryName="Native Executable">
     <option name="EXE_PATH" value="$PROJECT_DIR$/../rider-fsharp/gradlew" />
     <option name="PROGRAM_PARAMETERS" value="runIde" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../rider-fsharp" />
