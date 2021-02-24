@@ -16,6 +16,7 @@ type RedundantParenTypeUsageTest() =
         highlighting :? RedundantParenTypeUsageWarning
 
     [<Test>] member x.``Array 01``() = x.DoNamedTest()
+    [<Test>] member x.``Array 02 - Patterns``() = x.DoNamedTest()
     [<Test>] member x.``Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Function 02 - IsInstPat``() = x.DoNamedTest()
     [<Test>] member x.``Function 03 - Abstract member``() = x.DoNamedTest()
@@ -32,3 +33,5 @@ type RedundantParenTypeUsageTest() =
 
     [<FSharpSignatureTest>]
     [<Test>] member x.``Tuple 03 - Signature``() = x.DoNamedTest() // todo: return attribute
+
+    [<Test>] member x.``Tuple 04 - Patterns``() = x.DoNamedTest() // todo: return attribute

@@ -17,6 +17,13 @@ type RedundantParenTypeUsageAnalyzer() =
         | null -> if typeUsage :? IFunctionTypeUsage then typeUsage else null
         | typeUsage -> getLongestReturn typeUsage
 
+    let rec ignoreParentCompoundTypes (typeUsage: ITypeUsage) =
+        let parent = typeUsage.Parent
+        match parent with
+        | :? ITupleTypeUsage
+        | :? IFunctionTypeUsage -> ignoreParentCompoundTypes (parent :?> ITypeUsage)
+        | _ -> typeUsage
+
     let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
         let parentTypeUsage = context.Parent.As<ITypeUsage>()
         if isNotNull parentTypeUsage && not (applicable parentTypeUsage) then true else
@@ -32,7 +39,9 @@ type RedundantParenTypeUsageAnalyzer() =
             isNotNull (TupleTypeUsageNavigator.GetByItem(context)) ||
             isNotNull (ArrayTypeUsageNavigator.GetByType(context)) ||
             isNotNull (PostfixAppTypeArgumentListNavigator.GetByType(context)) ||
-            isNotNull (CaseFieldDeclarationNavigator.GetByType(context))
+            isNotNull (IsInstPatNavigator.GetByType(context)) ||
+            isNotNull (CaseFieldDeclarationNavigator.GetByType(context)) ||
+            isNotNull (IsInstPatNavigator.GetByType(ignoreParentCompoundTypes context))
 
         | :? IFunctionTypeUsage ->
             isNotNull (TupleTypeUsageNavigator.GetByItem(context)) ||
@@ -41,7 +50,11 @@ type RedundantParenTypeUsageAnalyzer() =
             isNotNull (PostfixAppTypeArgumentListNavigator.GetByType(context)) ||
             isNotNull (IsInstPatNavigator.GetByType(context)) ||
             isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(context)) ||
-            isNotNull (CaseFieldDeclarationNavigator.GetByType(context))
+            isNotNull (CaseFieldDeclarationNavigator.GetByType(context)) ||
+            isNotNull (IsInstPatNavigator.GetByType(ignoreParentCompoundTypes context))
+
+        | :? IArrayTypeUsage ->
+            isNotNull (IsInstPatNavigator.GetByType(ignoreParentCompoundTypes context))
 
         | _ -> false
 

@@ -1,0 +1,15 @@
+﻿module Module
+
+let f (_: |(|(0)int[]|)|(1)) = ()
+let f (_: |(|(2)int[]|)|(3) as a) = ()
+
+match [] with
+| :? (obj[]) -> ()
+| :? (obj[]) as a -> ()
+| :? (obj[]) as a as b -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
