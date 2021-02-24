@@ -1,8 +1,11 @@
 ﻿module Test
 
-let _ = |fun x -> (fun _ _ -> 1) 1 x|(0)
+module A =
+    let f _ _ = ()
+
+let _ = |fun x -> A.f 1 x|(0)
 
 ------------------------------------------------
 0: Lambda can be simplified
 QUICKFIXES:
-Replace lambda with partial application
+Replace with 'f' partial application

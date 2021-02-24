@@ -12,6 +12,9 @@ type ReplaceLambdaWithInnerExpressionFix(warning: LambdaCanBeReplacedWithInnerEx
     override x.Text =
         match replaceCandidate with
         | :? IReferenceExpr as ref when isSimpleQualifiedName ref ->
-            sprintf "Replace lambda with '%s'" ref.QualifiedName
-        | :? IPrefixAppExpr -> "Replace lambda with partial application"
+            $"Replace lambda with '{ref.QualifiedName}'"
+        | :? IPrefixAppExpr as app ->
+            match app.InvokedReferenceExpression with
+            | null -> "Replace lambda with partial application"
+            | refExpr -> $"Replace with '{refExpr.ShortName}' partial application"
         | _ -> "Simplify lambda"
