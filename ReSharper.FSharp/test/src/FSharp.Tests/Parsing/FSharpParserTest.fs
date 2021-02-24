@@ -185,6 +185,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Match 03 - When Expr``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 04 - Multiple When clauses``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Match lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Match lambda 02 - Tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Match lambda 03 - Multiple clauses``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Do 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Do 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Do 03``() = x.DoNamedTest()
