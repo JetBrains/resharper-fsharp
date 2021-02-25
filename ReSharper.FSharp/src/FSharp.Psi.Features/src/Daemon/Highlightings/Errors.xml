@@ -152,7 +152,7 @@
     <QuickFix>RemoveRedundantParenExprFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantParenPat" isSuppressedInTests="true">
+  <Warning staticGroup="FSharpErrors" name="RedundantParenPat" configurableSeverity="FSharpRedundantParens">
     <Parameter type="IParenPat" name="parenPat"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
