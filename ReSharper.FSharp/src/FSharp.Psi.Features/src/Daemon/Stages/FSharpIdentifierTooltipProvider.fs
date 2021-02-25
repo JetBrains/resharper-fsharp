@@ -84,7 +84,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
 
     let richTextEscapeNewLines (text: RichText) =
         (RichText.Empty, text.GetFormattedParts()) ||> Seq.fold (fun result part ->
-            result.Append(part.Text.Replace("\n", "<br>")))
+            result.Append(part.Text.Replace("\n", "<br>"), part.Style))
 
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
