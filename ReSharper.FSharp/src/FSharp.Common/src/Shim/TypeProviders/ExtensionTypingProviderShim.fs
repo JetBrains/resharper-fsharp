@@ -37,7 +37,8 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
             connection <- typeProvidersLoadersFactory.Create(outOfProcessLifetime.Lifetime).Run()
             typeProvidersManager <- TypeProvidersManager(connection) :?> _
 
-    do ExtensionTypingProvider <- this
+    do solutionLifetime.Bracket((fun () -> ExtensionTypingProvider <- this),
+                                fun () -> ExtensionTypingProvider <- defaultExtensionTypingProvider)
        toolset.Changed
            .Advise(solutionLifetime, fun _ -> terminateConnection ())
        typeProvidersFeature.Change
