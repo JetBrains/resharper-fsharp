@@ -1,0 +1,71 @@
+﻿Language: PsiLanguageType:F#
+IFSharpSigFile
+  INamedModuleDeclaration
+    FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpIdentifierToken(type:IDENTIFIER, text:Module)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    INestedModuleDeclaration
+      FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      FSharpIdentifierToken(type:IDENTIFIER, text:CancellableAutoOpens)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+      Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+      IBindingSignature
+        FSharpTokenType+ValTokenElement(type:VAL, text:val)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        ITopReferencePat
+          IExpressionReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:cancellable)
+        FSharpTokenType+ColonTokenElement(type:COLON, text::)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IReturnTypeInfo
+          INamedTypeUsage
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:CancellableBuilder)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    ITypeDeclarationGroup
+      IFSharpTypeDeclaration
+        FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpIdentifierToken(type:IDENTIFIER, text:Eventually)
+        ITypeParameterOfTypeList
+          FSharpTokenType+LessTokenElement(type:LESS, text:<)
+          ITypeParameterOfTypeDeclaration
+            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+            FSharpIdentifierToken(type:IDENTIFIER, text:T)
+          FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IUnionRepresentation
+          IUnionCaseList
+            IUnionCaseDeclaration
+              FSharpTokenType+BarTokenElement(type:BAR, text:|)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpIdentifierToken(type:IDENTIFIER, text:NotYetDone)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+OfTokenElement(type:OF, text:of)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IUnionCaseFieldDeclarationList
+                IUnionCaseFieldDeclaration
+                  IParenTypeUsage
+                    FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:Eventually)
+                        IPrefixAppTypeArgumentList
+                          FSharpTokenType+LessTokenElement(type:LESS, text:<)
+                          INamedTypeUsage
+                            ITypeReferenceName
+                              FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                          FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+                    FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
