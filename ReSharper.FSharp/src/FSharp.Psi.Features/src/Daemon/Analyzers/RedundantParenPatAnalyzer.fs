@@ -107,11 +107,20 @@ type RedundantParenPatAnalyzer() =
 
         checkPrecedence fsPattern context.Parent
 
+    let escapesTuplePatParamDecl (context: IFSharpPattern) (innerPattern: IFSharpPattern) =
+        match innerPattern with
+        | :? IParenPat as parenPat ->
+            match parenPat.Pattern with
+            | :? ITuplePat -> isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context))
+            | _ -> false
+        | _ -> false
+
     override x.Run(parenPat, _, consumer) =
         let innerPattern = parenPat.Pattern
         if isNull innerPattern then () else
 
         let context = parenPat.IgnoreParentParens()
+        if escapesTuplePatParamDecl context innerPattern then () else
 
         if innerPattern :? IParenPat || not (needsParens context innerPattern) && innerPattern.IsSingleLine then
             consumer.AddHighlighting(RedundantParenPatWarning(parenPat))
