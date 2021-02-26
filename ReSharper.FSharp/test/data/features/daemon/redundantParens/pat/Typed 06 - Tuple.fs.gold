@@ -1,12 +1,21 @@
-﻿match [] with
-| |(|(0)_ & _|)|(1) | _ -> ()
-| |(|(2)_ & _|)|(3) & _ -> ()
-| _ & |(|(4)_ & _|)|(5) -> ()
+﻿module Module
 
-| |(|(6)_ & _|)|(7) as a -> ()
-| |(|(8)_ as a & _|)|(9) -> ()
-| |(|(10)|(|(11)_ as a|)|(12) & _|)|(13) -> ()
-| _ & (_ as a) -> ()
+let a, (b: int) = 1, 2
+let (a: int), b = 1, 2
+
+for a, |(|(0)b: int|)|(1) in [] do ()
+for |(|(2)a: int|)|(3), b in [] do ()
+
+match 1, 2 with
+| a, (b: int) -> ()
+| a, (b: int) when true -> ()
+| |(|(4)a: int|)|(5), b -> ()
+
+function a, (b: int) -> ()
+function |(|(6)a: int|)|(7), b -> ()
+
+try () with a, (b: int) -> ()
+try () with |(|(8)a: int|)|(9), b -> ()
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant parentheses
@@ -19,7 +28,3 @@
 (7):<secondary> ReSharper Dead Code: Redundant parentheses
 (8): ReSharper Dead Code: Redundant parentheses
 (9):<secondary> ReSharper Dead Code: Redundant parentheses
-(10): ReSharper Dead Code: Redundant parentheses
-(11): ReSharper Dead Code: Redundant parentheses
-(12):<secondary> ReSharper Dead Code: Redundant parentheses
-(13):<secondary> ReSharper Dead Code: Redundant parentheses
