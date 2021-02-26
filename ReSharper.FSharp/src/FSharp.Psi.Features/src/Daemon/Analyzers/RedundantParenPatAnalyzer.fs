@@ -56,6 +56,12 @@ type RedundantParenPatAnalyzer() =
         let parent = getParentPatternFromLeftSide pat
         isAtCompoundPatternRightSide parent
 
+    let compoundPatternNeedsParens (fsPattern: IFSharpPattern) =
+        match fsPattern with
+        | :? ITuplePat as tuplePat ->
+            tuplePat.PatternsEnumerable |> Seq.exists (function :? ITypedPat | :? IAttribPat -> true | _ -> false)
+        | _ -> false
+
     let checkPrecedence pat parent =
         precedence pat < precedence parent
 
@@ -71,6 +77,14 @@ type RedundantParenPatAnalyzer() =
 
         | :? ITuplePat ->
             isNotNull (TuplePatNavigator.GetByPattern(context)) ||
+
+            // todo: suggest moving parens to a single inner pattern?
+            let binding = BindingNavigator.GetByHeadPattern(context)
+            isNotNull binding && compoundPatternNeedsParens fsPattern ||
+
+            let parametersList = MatchClauseNavigator.GetByPattern(context)
+            isNotNull parametersList && compoundPatternNeedsParens fsPattern ||
+
             checkPrecedence fsPattern context.Parent
 
         | :? IParametersOwnerPat ->

@@ -1,0 +1,7 @@
+﻿module Module
+
+let |(|(0)struct (a, b)|)|(1) = 1, 2
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

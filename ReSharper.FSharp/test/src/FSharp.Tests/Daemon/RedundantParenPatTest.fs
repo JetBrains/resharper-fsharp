@@ -40,6 +40,8 @@ type RedundantParenPatTest() =
     [<Test>] member x.``Tuple 03 - List cons``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 04 - Match lambda``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 05 - Member like param``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 06 - Struct``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 07 - Inner pattern``() = x.DoNamedTest()
 
     [<Test>] member x.``Typed 01 - As``() = x.DoNamedTest()
     [<Test>] member x.``Typed 02 - Attr``() = x.DoNamedTest()
