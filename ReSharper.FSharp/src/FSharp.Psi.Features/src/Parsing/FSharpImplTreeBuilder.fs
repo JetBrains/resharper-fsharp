@@ -353,6 +353,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
     
     member x.ProcessAccessor(range, memberParams, expr) =
         let mark = x.Mark(range)
+
+        let memberParams =
+            match memberParams with
+            | Pats([SynPat.Tuple(_, patterns, _)]) -> Pats(patterns)
+            | _ -> memberParams
+
         x.ProcessPatternParams(memberParams, true, true)
         x.MarkChameleonExpression(expr)
         x.Done(mark, ElementType.ACCESSOR_DECLARATION)
