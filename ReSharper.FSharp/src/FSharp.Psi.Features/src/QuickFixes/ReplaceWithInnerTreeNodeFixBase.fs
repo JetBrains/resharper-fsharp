@@ -13,6 +13,12 @@ open JetBrains.ReSharper.Resources.Shell
 type ReplaceWithInnerTreeNodeFixBase(parentNode: IFSharpTreeNode, innerNode: IFSharpTreeNode) =
     inherit FSharpQuickFixBase()
 
+    abstract AddSpaceAfter: prevToken: ITokenNode -> bool
+    default _.AddSpaceAfter(prevToken: ITokenNode) = isIdentifierOrKeyword prevToken
+
+    abstract AddSpaceBefore: nextToken: ITokenNode -> bool
+    default _.AddSpaceBefore(nextToken: ITokenNode) = isIdentifierOrKeyword nextToken
+
     override x.IsAvailable _ =
         isValid parentNode && isValid innerNode
 
@@ -24,10 +30,10 @@ type ReplaceWithInnerTreeNodeFixBase(parentNode: IFSharpTreeNode, innerNode: IFS
         let innerExprIndent = innerNode.Indent
         let indentDiff = parenExprIndent - innerExprIndent
 
-        if isIdentifierOrKeyword (parentNode.GetPreviousToken()) then
+        if x.AddSpaceAfter(parentNode.GetPreviousToken()) then
             ModificationUtil.AddChildBefore(parentNode, Whitespace()) |> ignore
 
-        if isIdentifierOrKeyword (parentNode.GetNextToken()) then
+        if x.AddSpaceBefore(parentNode.GetNextToken()) then
             ModificationUtil.AddChildAfter(parentNode, Whitespace()) |> ignore
 
         let expr = ModificationUtil.ReplaceChild(parentNode, innerNode.Copy())
