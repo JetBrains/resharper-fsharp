@@ -1,0 +1,24 @@
+﻿module Module
+
+let |(|(0)_, _ :: _|)|(1) = []
+
+for |(|(2)_, _ :: _|)|(3) in [] do ()
+
+match [] with
+| |(|(4)_, _ :: _|)|(5) -> ()
+
+function |(|(6)_, _ :: _|)|(7) -> ()
+
+try () with |(|(8)_, _ :: _|)|(9) -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
+(8): ReSharper Dead Code: Redundant parentheses
+(9):<secondary> ReSharper Dead Code: Redundant parentheses

@@ -42,11 +42,13 @@ type RedundantParenPatTest() =
     [<Test>] member x.``Tuple 05 - Member like param``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 06 - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 07 - Inner pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 08 - Inner list cons``() = x.DoNamedTest()
 
     [<Test>] member x.``Typed 01 - As``() = x.DoNamedTest()
     [<Test>] member x.``Typed 02 - Attr``() = x.DoNamedTest()
     [<Test>] member x.``Typed 03 - Param owner``() = x.DoNamedTest()
     [<Test>] member x.``Typed 04 - Binding``() = x.DoNamedTest()
+    [<Test>] member x.``Typed 05 - Members param decl``() = x.DoNamedTest()
 
     [<Test>] member x.``Wild - Function param 01``() = x.DoNamedTest()
     [<Test>] member x.``Wild - Pattern param 01``() = x.DoNamedTest()

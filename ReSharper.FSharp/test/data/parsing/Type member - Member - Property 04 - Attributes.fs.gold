@@ -72,30 +72,30 @@ IFSharpImplFile
               FSharpIdentifierToken(type:IDENTIFIER, text:set)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IParametersPatternDeclaration
-                ITuplePat
-                  IParenPat
-                    FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                    ITypedPat
-                      IWildPat
-                        FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-                      FSharpTokenType+ColonTokenElement(type:COLON, text::)
-                      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                      INamedTypeUsage
-                        ITypeReferenceName
-                          FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                    FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  IParenPat
-                    FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                    ITypedPat
-                      IWildPat
-                        FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-                      FSharpTokenType+ColonTokenElement(type:COLON, text::)
-                      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                      INamedTypeUsage
-                        ITypeReferenceName
-                          FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                    FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                IParenPat
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  ITypedPat
+                    IWildPat
+                      FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+                    FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IParametersPatternDeclaration
+                IParenPat
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  ITypedPat
+                    IWildPat
+                      FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+                    FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
