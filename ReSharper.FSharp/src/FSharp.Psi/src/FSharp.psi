@@ -230,7 +230,7 @@ externDeclaration:
 
 interface fSharpPattern:
   namedPat |
-  typedPat |
+  typedLikePat |
   attribPat |
   orPat |
   andsPat |
@@ -239,7 +239,6 @@ interface fSharpPattern:
   parenPat |
   recordPat |
   optionalValPat |
-  isInstPat |
   listConsPat |
   parametersOwnerPat |
   wildPat |
@@ -262,6 +261,9 @@ interface asPat:
   localAsPat |
   topAsPat;
 
+interface typedLikePat:
+  typedPat |
+  isInstPat;
 
 localReferencePat options { stubBase="LocalPatternDeclarationBase"; } extras {
   get { methodName="Identifier" path=<localReferencePat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };

@@ -5,6 +5,19 @@ match (), () with
 | (_ | _) & _ -> ()
 | _, (_ | _) -> ()
 
+| |(|(2)_ | _|)|(3) as a -> ()
+| |(|(4)_ as a|)|(5) | _ -> ()
+| |(|(6)|(|(7)_ as a|)|(8) | _|)|(9) -> ()
+| _ | (_ as a) -> ()
+
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant parentheses
 (1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7): ReSharper Dead Code: Redundant parentheses
+(8):<secondary> ReSharper Dead Code: Redundant parentheses
+(9):<secondary> ReSharper Dead Code: Redundant parentheses

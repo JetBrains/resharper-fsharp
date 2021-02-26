@@ -1,0 +1,23 @@
+﻿module Module
+
+let (a: int as b) = 1
+let |(|(0)|(|(1)a: int|)|(2) as b|)|(3) = 1
+
+let (a: int as b) as c = 1
+let (a: int as b as c) = 1
+let (a: int as b as c) as d = 1
+
+function |(|(4)a: int as b|)|(5) -> ()
+
+match 1 with
+| |(|(6)a: int as b|)|(7) -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1): ReSharper Dead Code: Redundant parentheses
+(2):<secondary> ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
