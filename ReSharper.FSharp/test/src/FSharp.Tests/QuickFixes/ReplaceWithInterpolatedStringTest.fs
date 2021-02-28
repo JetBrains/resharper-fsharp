@@ -1,11 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages("FSharp.Core/5.0.0")>]
+[<TestPackages(FSharpCorePackage)>]
 type ReplaceWithInterpolatedStringTest() =
     inherit FSharpQuickFixTestBase<ReplaceWithInterpolatedStringFix>()
 

@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.Tree
 
 [<ElementProblemAnalyzer([| typeof<IPrefixAppExpr> |],
                          HighlightingTypes = [| typeof<InterpolatedStringCandidateWarning> |])>]
@@ -72,16 +73,14 @@ type InterpolatedStringCandidateAnalyzer() =
         let anyDisallowedExprs =
             let isDisallowed =
                 if tokenType = FSharpTokenType.TRIPLE_QUOTED_STRING then
-                    Predicate<_>(fun (literalExpr: ILiteralExpr) ->
-                        getTokenType literalExpr.Literal = FSharpTokenType.TRIPLE_QUOTED_STRING)
+                    fun (literalExpr: ILiteralExpr) ->
+                        getTokenType literalExpr.Literal = FSharpTokenType.TRIPLE_QUOTED_STRING
                 else
-                    Predicate<_>(isDisallowedStringLiteral)
+                    isDisallowedStringLiteral
 
-            let fsFile = prefixAppExpr.FSharpFile
             appliedExprs
             |> List.exists (fun expr ->
-                let range = expr.GetHighlightingRange()
-                nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, isDisallowed) <> null)
+                expr.ThisAndDescendants<ILiteralExpr>().ToEnumerable() |> Seq.exists isDisallowed)
 
         if anyDisallowedExprs then () else
 

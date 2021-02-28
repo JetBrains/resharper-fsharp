@@ -3,8 +3,11 @@
 open System.Text
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 
 type private StringManipulation =
@@ -86,10 +89,7 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
         interpolatedSb.Insert(0, '$') |> ignore
         let interpolatedStringExpr = factory.CreateExpr(interpolatedSb.ToString())
 
-        // todo: get this working with isPredefinedFunctionRef
-        //use cookie = CompilationContextCookie.GetOrCreate(prefixAppExpr.GetPsiModule().GetContextFromModule())
-
-        if prefixAppExpr.Reference.GetName() = "sprintf" then
+        if isPredefinedFunctionRef "sprintf" prefixAppExpr.FunctionExpression then
             ModificationUtil.ReplaceChild(outerPrefixAppExpr, interpolatedStringExpr) |> ignore
         else
             ModificationUtil.ReplaceChild(formatStringExpr, interpolatedStringExpr) |> ignore

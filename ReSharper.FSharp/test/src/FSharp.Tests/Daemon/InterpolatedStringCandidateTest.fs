@@ -1,11 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
+open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages("FSharp.Core/5.0.0")>]
+[<TestPackages(FSharpCorePackage); HighlightOnly(typeof<InterpolatedStringCandidateWarning>)>]
 type InterpolatedStringCandidateTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -28,3 +30,4 @@ type InterpolatedStringCandidateTest() =
     [<Test>] member x.``Not available 10 - Applied triple quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Not available 11 - Applied triple quoted string on triple quoted format``() = x.DoNamedTest()
     [<Test>] member x.``Not available 12 - Applied string literal``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 13 - Descendant string in applied arg``() = x.DoNamedTest()
