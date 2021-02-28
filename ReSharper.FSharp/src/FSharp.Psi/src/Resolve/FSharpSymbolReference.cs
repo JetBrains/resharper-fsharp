@@ -10,7 +10,6 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.Util;
 using JetBrains.Util.DataStructures;
 using Microsoft.FSharp.Core;
 
@@ -50,17 +49,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         : ResolveResultWithInfo.Ignore;
     }
 
-    public override string GetName()
-    {
-      var identifier = myOwner.FSharpIdentifier?.IdentifierToken;
-      if (identifier != null)
-        return identifier.GetSourceName();
-
-      // Current grammar rules can't get some operator identifiers, like '=', we're trying to workaround it below.
-      // todo: rewrite after https://youtrack.jetbrains.com/issue/RIDER-41848 is fixed, also change SymbolOffset
-      var text = myOwner.GetText().RemoveBackticks();
-      return text.IsEmpty() ? SharedImplUtil.MISSING_DECLARATION_NAME : text;
-    }
+    public override string GetName() =>
+      myOwner.FSharpIdentifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override bool HasMultipleNames =>
       AttributeNavigator.GetByReferenceName(myOwner as ITypeReferenceName) != null;

@@ -29,6 +29,7 @@ module FSharpGlobalAbbreviations =
 
     type ILogger = JetBrains.Util.ILogger
     type FileSystemPath = JetBrains.Util.FileSystemPath
+    type FormatterHelper = JetBrains.ReSharper.Psi.Impl.CodeStyle.FormatterImplHelper
 
 
 [<AutoOpen>]

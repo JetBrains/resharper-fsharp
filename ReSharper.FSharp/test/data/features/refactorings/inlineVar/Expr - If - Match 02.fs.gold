@@ -1,0 +1,4 @@
+﻿do
+    match () with
+    | _ ->
+        if true then 1 else 2

@@ -19,7 +19,7 @@ type AddIgnoreFix(expr: IFSharpExpression) =
 
     let shouldAddNewLine (expr: IFSharpExpression) =
         if expr.IsSingleLine then false else
-        if deindentsBody expr then false else
+        if lastBlockHasSameIndent expr then false else
 
         match expr with
         | :? IMatchLikeExpr | :? IIfThenElseExpr | :? ITryLikeExpr | :? ILambdaExpr

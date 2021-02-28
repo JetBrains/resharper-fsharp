@@ -3,5 +3,6 @@
   U
    A:U
    B:U
-   IDisposable
+   IDisposable start
     IDisposable.Dispose():void
+   IDisposable end

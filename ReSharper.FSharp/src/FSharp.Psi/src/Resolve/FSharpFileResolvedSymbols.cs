@@ -193,27 +193,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         else
         {
           // workaround for indexer properties, visualfsharp#3933
-          if (startOffset == endOffset ||
-              mfv != null && mfv.IsProperty && buffer[endOffset - 1] == ']')
+          if (startOffset == endOffset || mfv is { IsProperty: true } && buffer[endOffset - 1] == ']')
             continue;
 
           var entity =
-            symbol as FSharpEntity ??
-            (mfv != null && mfv.IsConstructor ? mfv.DeclaringEntity?.Value : null);
+            symbol as FSharpEntity ?? (mfv is { IsConstructor: true } ? mfv.DeclaringEntity?.Value : null);
 
           // we need `foo` in
           // inherit mod.foo<bar.baz>()
-          if (entity != null && !entity.GenericParameters.IsEmpty())
+          if (entity != null)
           {
-            if (lexer.FindTokenAt(endOffset - 1) && lexer.TokenType == FSharpTokenType.GREATER)
+            var isStaticInstantiation = entity.IsStaticInstantiation;
+            if (!entity.GenericParameters.IsEmpty() || isStaticInstantiation)
             {
-              if (new ParenMatcher().FindMatchingBracket(lexer) && lexer.TokenStart >= startOffset)
+              if (lexer.FindTokenAt(endOffset - 1) && lexer.TokenType == FSharpTokenType.GREATER)
               {
-                lexer.Advance(-1);
-                if (lexer.TokenType != null)
+                if (new ParenMatcher().FindMatchingBracket(lexer) && lexer.TokenStart >= startOffset)
                 {
-                  startOffset = lexer.TokenStart;
-                  endOffset = lexer.TokenEnd;
+                  lexer.Advance(-1);
+                  if (lexer.TokenType != null)
+                  {
+                    if (isStaticInstantiation && resolvedSymbols.Uses.ContainsKey(startOffset))
+                      continue;
+
+                    startOffset = lexer.TokenStart;
+                    endOffset = lexer.TokenEnd;
+                  }
                 }
               }
             }

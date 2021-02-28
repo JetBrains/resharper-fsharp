@@ -1,0 +1,55 @@
+﻿module M
+
+match () with
+| _ when
+    |(|(0)let x = 1
+     x|)|(1) -> ()
+
+| _ when
+    (let x = 1
+     true
+     true) -> ()
+
+| _ when
+    (let x = 1
+     true :? bool) -> ()
+
+| _ when
+    let x = 1
+    (true :? bool) -> ()
+
+| _ when
+    let x = 1
+    (true :? bool) && true -> ()
+
+| _ when
+    let x = 1
+    true && (true :? bool) -> ()
+
+| _ when
+    let x: int = 1
+    true -> ()
+
+| _ when
+    let x: bool = |(|(2)true :? bool|)|(3)
+    x -> ()
+
+| _ when
+    |(|(4)let x: bool = ()
+     x|)|(5) -> ()
+
+| _ when let x: bool = ()
+         x -> ()
+
+| _ when |(|(6)let x: bool = ()
+          x|)|(7) -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses

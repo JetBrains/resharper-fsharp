@@ -1,0 +1,3 @@
+﻿do
+    let s = ""
+    s.ToString().ToString()

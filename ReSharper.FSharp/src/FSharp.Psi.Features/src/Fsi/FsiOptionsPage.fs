@@ -22,10 +22,9 @@ open JetBrains.UI.RichText
 open JetBrains.Util
 
 [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>, HelpKeyword = fsiHelpKeyword)>]
-type FsiOptionsPage
-        (lifetime: Lifetime, optionsPageContext, settings, settingsSchema, fsiDetector: FsiDetector,
-         [<Optional; DefaultParameterValue(null: ISolution)>] solution: ISolution,
-         dialogs: ICommonFileDialogs, iconHost: IconHostBase) as this =
+type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSchema, fsiDetector: FsiDetector,
+        [<Optional; DefaultParameterValue(null: ISolution)>] solution: ISolution, dialogs: ICommonFileDialogs,
+        iconHost: IconHostBase) as this =
     inherit FSharpOptionsPageBase(lifetime, optionsPageContext, settings)
 
     let (|FsiTool|) (obj: obj) = obj :?> FsiTool 

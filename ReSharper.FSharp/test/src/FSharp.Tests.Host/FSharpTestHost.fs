@@ -16,9 +16,8 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<SolutionComponent>]
-type FSharpTestHost
-        (lifetime: Lifetime, solution: ISolution, checkerService: FSharpCheckerService, sourceCache: FSharpSourceCache,
-         itemsContainer: FSharpItemsContainer) =
+type FSharpTestHost(lifetime: Lifetime, solution: ISolution, checkerService: FSharpCheckerService,
+        sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer) =
 
     let dumpSingleProjectMapping _ =
         let projectMapping =

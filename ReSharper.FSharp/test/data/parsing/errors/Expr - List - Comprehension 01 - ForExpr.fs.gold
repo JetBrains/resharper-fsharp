@@ -3,7 +3,7 @@ IFSharpImplFile
   IAnonModuleDeclaration
     IDoStatement
       IChameleonExpression
-        IArrayOrListExpr
+        IListExpr
           FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IFromErrorExpr

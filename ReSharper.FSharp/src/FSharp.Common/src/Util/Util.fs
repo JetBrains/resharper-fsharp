@@ -11,6 +11,7 @@ module rec CommonUtil =
     open System
     open System.Collections.Generic
     open System.Diagnostics
+    open System.Text.RegularExpressions
     open FSharp.Compiler
     open FSharp.Compiler.SourceCodeServices
     open JetBrains.Application.UI.Icons.ComposedIcons
@@ -147,6 +148,11 @@ module rec CommonUtil =
             x.OnTermination(fun _ -> func.Invoke() |> ignore) |> ignore
 
     let compose a b = CompositeIconId.Compose(a, b)
+
+    let (|Regex|_|) pattern input =
+        let m = Regex.Match(input, pattern)
+        if m.Success then Some(List.tail [ for g in m.Groups -> g.Value ])
+        else None
 
 [<AutoOpen>]
 module rec FcsUtil =

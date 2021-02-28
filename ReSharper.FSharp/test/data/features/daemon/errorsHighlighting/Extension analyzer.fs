@@ -30,3 +30,9 @@ module Module2 =
 module Module3 =
     [<Extension>]
     let foo (_: int) = ()
+
+[<Extension>]
+module Module4 =
+    type System.String with
+        [<Extension>]
+        member _.M() = ()

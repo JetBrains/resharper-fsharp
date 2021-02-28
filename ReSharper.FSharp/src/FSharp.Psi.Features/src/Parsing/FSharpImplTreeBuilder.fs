@@ -18,6 +18,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
     ///   * property declaration when both getter and setter bodies are present
     ///   * attributes for module-level do
     let mutable unfinishedDeclaration: (int * range * CompositeNodeType) option = None
+    let mutable isFinishingDeclaration = false
 
     new (lexer, document, decls, lifetime) =
         FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0, 0)
@@ -56,11 +57,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             let mark = x.Mark(typeDefnGroupStartPos typeDefns range)
             match typeDefns with
             | [] -> ()
-            | TypeDefn(ComponentInfo(attributes = attrs), _, _, _) :: _ ->
-                x.ProcessOuterAttrs(attrs, range)
-
-            for typeDefn in typeDefns do
-                x.ProcessTypeDefn(typeDefn)
+            | primary :: secondary ->
+                x.ProcessTypeDefn(primary, FSharpTokenType.TYPE)
+                for typeDefn in secondary do
+                    x.ProcessTypeDefn(typeDefn, FSharpTokenType.AND)
             x.Done(range, mark, ElementType.TYPE_DECLARATION_GROUP)
 
         | SynModuleDecl.Exception(SynExceptionDefn(exn, members, range), _) ->
@@ -126,18 +126,15 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         | decl ->
             failwithf "unexpected decl: %A" decl
 
-    member x.ProcessTypeDefn(TypeDefn(info, repr, members, range) as typeDefn) =
+    member x.ProcessTypeDefn(TypeDefn(info, repr, members, range) as typeDefn, typeKeywordType) =
         let (ComponentInfo(attrs, typeParams, constraints, lid , _, _, _, _)) = info
-
-        // Only mark attributes that are inside the declaration node.
-        let attrs = x.SkipOuterAttrs(attrs, range)
 
         match repr with
         | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation, _, _) ->
             x.ProcessTypeExtensionDeclaration(typeDefn, attrs)
         | _ ->
 
-        let mark = x.StartType attrs typeParams constraints lid range
+        let mark = x.StartType(attrs, typeParams, constraints, lid, range, typeKeywordType)
 
         // Mark primary constructor before type representation.
         match repr with
@@ -228,6 +225,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         let mark =
             match unfinishedDeclaration with
             | Some(mark, unfinishedRange, _) when unfinishedRange = typeMember.Range ->
+                isFinishingDeclaration <- true
                 unfinishedDeclaration <- None
                 mark
             | _ ->
@@ -266,13 +264,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                     x.ProcessTopLevelBinding(binding, range)
                 ElementType.LET_BINDINGS_DECLARATION
 
-            | SynMemberDefn.AbstractSlot(ValSpfn(_, _, typeParams, synType, _, _, _, _, _, _, _), _, range) ->
+            | SynMemberDefn.AbstractSlot(ValSpfn(explicitValDecls = typeParams; synType = synType; arity = arity), _, range) ->
                 match typeParams with
                 | SynValTyparDecls(typeParams, _, constraints) ->
                     x.ProcessTypeParametersOfType typeParams constraints range true
                     for typeConstraint in constraints do
                         x.ProcessTypeConstraint(typeConstraint)
-                x.ProcessType(synType)
+                x.ProcessSignatureType(arity, synType)
                 ElementType.ABSTRACT_MEMBER_DECLARATION
 
             | SynMemberDefn.ValField(Field(fieldType = synType), _) ->
@@ -291,6 +289,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
             | _ -> failwithf "Unexpected type member: %A" typeMember
 
+        isFinishingDeclaration <- false
         if unfinishedDeclaration.IsNone then
             x.Done(typeMember.Range, mark, memberType)
 
@@ -310,7 +309,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
                     | _ ->
                         match accessorId with
-                        | Some ident ->
+                        | Some _ ->
                             x.ProcessAccessor(range, memberParams, expr)
                             ElementType.MEMBER_DECLARATION
                         | _ ->
@@ -319,12 +318,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                         ElementType.MEMBER_DECLARATION
 
                 | selfId :: _ :: _ ->
-                    let selfIdNodeType =
-                        if selfId.idText = "_" then ElementType.WILD_SELF_ID else ElementType.NAMED_SELF_ID
-                    x.MarkAndDone(selfId.idRange, selfIdNodeType)
+                    if not isFinishingDeclaration then
+                        let selfIdNodeType =
+                            if selfId.idText = "_" then ElementType.WILD_SELF_ID else ElementType.NAMED_SELF_ID
+                        x.MarkAndDone(selfId.idRange, selfIdNodeType)
 
                     match accessorId with
-                    | Some ident ->
+                    | Some _ ->
                         x.ProcessAccessor(range, memberParams, expr)
                         ElementType.MEMBER_DECLARATION
                     | _ ->
@@ -353,6 +353,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
     
     member x.ProcessAccessor(range, memberParams, expr) =
         let mark = x.Mark(range)
+
+        let memberParams =
+            match memberParams with
+            | Pats([SynPat.Tuple(_, patterns, _)]) -> Pats(patterns)
+            | _ -> memberParams
+
         x.ProcessPatternParams(memberParams, true, true)
         x.MarkChameleonExpression(expr)
         x.Done(mark, ElementType.ACCESSOR_DECLARATION)
@@ -536,8 +542,17 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 x.Done(mark, if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT)
                 ElementType.OPTIONAL_VAL_PAT
 
-            | _ ->
-                ElementType.OTHER_PAT
+            | SynPat.QuoteExpr(expr, _) ->
+                x.MarkChameleonExpression(expr)
+                ElementType.QUOTE_EXPR_PAT
+
+            | SynPat.Null _ -> ElementType.NULL_PAT
+            | SynPat.DeprecatedCharRange _ -> ElementType.CHAR_RANGE_PAT
+
+            // todo: mark inner pattern, assert ranges
+            | SynPat.FromParseError _ -> ElementType.FROM_ERROR_PAT
+
+            | SynPat.InstanceMember _ -> failwith $"Unexpected pattern: {pat}"
 
         x.Done(range, patMark, elementType)
 
@@ -715,11 +730,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushRangeForMark(range, x.Mark(), ElementType.TUPLE_EXPR)
             x.ProcessExpressionList(exprs)
 
-        | SynExpr.ArrayOrList(_, exprs, _) ->
+        | SynExpr.ArrayOrList(isArray, exprs, _) ->
             // SynExpr.ArrayOrList is currently only used for error recovery and empty lists in the parser.
             // Non-empty SynExpr.ArrayOrList is created in the type checker only.
             Assertion.Assert(List.isEmpty exprs, "Non-empty SynExpr.ArrayOrList: {0}", expr)
-            x.MarkAndDone(range, ElementType.ARRAY_OR_LIST_EXPR)
+            x.MarkAndDone(range, if isArray then ElementType.ARRAY_EXPR else ElementType.LIST_EXPR)
 
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
             x.PushRange(range, ElementType.ANON_RECORD_EXPR)
@@ -778,9 +793,9 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushExpression(bodyExpr)
             x.ProcessExpression(enumExpr)
 
-        | SynExpr.ArrayOrListOfSeqExpr(_, expr, _) ->
+        | SynExpr.ArrayOrListOfSeqExpr(isArray, expr, _) ->
             let expr = match expr with | SynExpr.CompExpr(expr = expr) -> expr | _ -> expr
-            x.PushRangeAndProcessExpression(expr, range, ElementType.ARRAY_OR_LIST_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, if isArray then ElementType.ARRAY_EXPR else ElementType.LIST_EXPR)
 
         | SynExpr.CompExpr(_, _, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.COMPUTATION_EXPR)
@@ -1135,7 +1150,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         let wrappedArgExpr = { Expression = expr; ElementType = ElementType.INDEXER_ARG_EXPR }
         x.PushStep(wrappedArgExpr, wrapExpressionProcessor)
 
-    member x.ProcessRecordFieldBindingList(fields: (RecordFieldName * (SynExpr option) * BlockSeparator option) list) =
+    member x.ProcessRecordFieldBindingList(fields: (RecordFieldName * SynExpr option * BlockSeparator option) list) =
         let fieldsRange =
             match fields.Head, List.last fields with
             | ((lid, _), _, _), (_, Some(fieldValue), _) -> unionRanges lid.Range fieldValue.Range
@@ -1159,7 +1174,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         x.MarkAndDone(idRange, ElementType.EXPRESSION_REFERENCE_NAME)
         x.ProcessExpression(expr)
 
-    member x.ProcessRecordFieldBinding(field: (RecordFieldName * (SynExpr option) * BlockSeparator option)) =
+    member x.ProcessRecordFieldBinding(field: RecordFieldName * SynExpr option * BlockSeparator option) =
         let (lid, _), expr, blockSep = field
         let lid = lid.Lid
         match lid, expr with
@@ -1314,15 +1329,15 @@ type TypeArgsInReferenceExprProcessor() =
 
 
 type RecordBindingListRepresentationProcessor() =
-    inherit StepProcessorBase<(RecordFieldName * (SynExpr option) * BlockSeparator option) list>()
-    
+    inherit StepProcessorBase<(RecordFieldName * SynExpr option * BlockSeparator option) list>()
+
     override x.Process(fields, builder) =
         builder.ProcessRecordFieldBindingList(fields)
 
 
 type AnonRecordBindingListRepresentationProcessor() =
     inherit StepProcessorBase<(Ident * SynExpr) list>()
-    
+
     override x.Process(fields, builder) =
         builder.ProcessAnonRecordFieldBindingList(fields)
 
@@ -1349,7 +1364,7 @@ type AndLocalBindingListProcessor() =
 
 
 type RecordFieldBindingListProcessor() =
-    inherit StepListProcessorBase<RecordFieldName * (SynExpr option) * BlockSeparator option>()
+    inherit StepListProcessorBase<RecordFieldName * SynExpr option * BlockSeparator option>()
 
     override x.Process(field, builder) =
         builder.ProcessRecordFieldBinding(field)

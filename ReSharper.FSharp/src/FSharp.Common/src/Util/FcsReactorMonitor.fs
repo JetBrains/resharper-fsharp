@@ -41,9 +41,8 @@ type IFcsReactorMonitor =
     abstract MonitorOperation : opName: string -> IMonitoredReactorOperation
 
 [<ShellComponent>]
-type FcsReactorMonitor
-        (lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading,
-         logger: ILogger, configurations: RunsProducts.ProductConfigurations) as this =
+type FcsReactorMonitor(lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading,
+        logger: ILogger, configurations: RunsProducts.ProductConfigurations) as this =
 
     let isInternalMode = configurations.IsInternalMode()
 
@@ -190,8 +189,8 @@ type FcsReactorMonitor
 
 and 
     [<SolutionComponent; AllowNullLiteral>]
-    FcsReactorMonitorSettingsProvider
-        (lifetime, solution, monitor: IFcsReactorMonitor, settings, settingsSchema) as this =
+    FcsReactorMonitorSettingsProvider(lifetime, solution, monitor: IFcsReactorMonitor, settings,
+        settingsSchema) as this =
     inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
     
     let isEnabledProperty = base.GetValueProperty<bool>("EnableReactorMonitor")

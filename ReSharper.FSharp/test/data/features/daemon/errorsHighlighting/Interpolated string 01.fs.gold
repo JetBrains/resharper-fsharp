@@ -1,0 +1,21 @@
+﻿module Module
+
+|$|(0)""
+@|$|(1)""
+|$|(2)@""
+|$|(3)""""""
+
+|$|(4)"{1}"
+@|$|(5)"{1}"
+|$|(6)@"{1}"
+|$|(7)"""{1}"""
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant string interpolation
+(1): ReSharper Dead Code: Redundant string interpolation
+(2): ReSharper Dead Code: Redundant string interpolation
+(3): ReSharper Dead Code: Redundant string interpolation
+(4): ReSharper F# Method Identifier: 
+(5): ReSharper F# Method Identifier: 
+(6): ReSharper F# Method Identifier: 
+(7): ReSharper F# Method Identifier: 

@@ -14,9 +14,8 @@ open JetBrains.UI.RichText
 open JetBrains.Util
 
 [<SolutionComponent>]
-type FSharpXmlDocService
-        (psiServices: IPsiServices, xmlDocThread: XmlIndexThread, psiConfig: IPsiConfiguration, psiModules: IPsiModules,
-         assemblyInfoDatabase: AssemblyInfoDatabase) =
+type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread, psiConfig: IPsiConfiguration,
+        psiModules: IPsiModules, assemblyInfoDatabase: AssemblyInfoDatabase) =
 
     let indexCache = ConcurrentDictionary<string, XmlDocIndex>()
 

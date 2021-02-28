@@ -111,11 +111,10 @@ type FSharpProjectScopeCategoryUIProvider() as this =
 
 
 [<OptionsPage("RiderFSharpFileTemplatesSettings", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
-type RiderFSharpFileTemplatesOptionPage
-        (lifetime, optionsPageContext, settings, storedTemplatesProvider, uiProvider: FSharpProjectScopeCategoryUIProvider,
-         scopeCategoryManager, uiFactory, iconHost, dialogHost) =
-    inherit RiderFileTemplatesOptionPageBase(lifetime, uiProvider, optionsPageContext, settings, storedTemplatesProvider,
-        scopeCategoryManager, uiFactory, iconHost, dialogHost, FSharpProjectFileType.Name)
+type RiderFSharpFileTemplatesOptionPage(lifetime, optionsPageContext, settings, storedTemplatesProvider,
+        uiProvider: FSharpProjectScopeCategoryUIProvider, scopeCategoryManager, uiFactory, iconHost, dialogHost) =
+    inherit RiderFileTemplatesOptionPageBase(lifetime, uiProvider, optionsPageContext, settings,
+        storedTemplatesProvider, scopeCategoryManager, uiFactory, iconHost, dialogHost, FSharpProjectFileType.Name)
 
 
 [<ShellComponent>]

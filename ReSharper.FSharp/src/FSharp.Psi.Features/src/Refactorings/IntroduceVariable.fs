@@ -44,7 +44,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         NodeTypeSet(
            ElementType.RECORD_EXPR,
            ElementType.ANON_RECORD_EXPR,
-           ElementType.ARRAY_OR_LIST_EXPR,
+           ElementType.ARRAY_EXPR,
+           ElementType.LIST_EXPR,
            ElementType.PAREN_EXPR,
            ElementType.LAMBDA_EXPR,
            ElementType.MATCH_LAMBDA_EXPR,
@@ -171,7 +172,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         match contextParent with
         | :? IMatchClause as matchClause ->
-            let matchClauseOwner = MatchClauseListOwnerNavigator.GetByClause(matchClause)
+            let matchClauseOwner = MatchClauseListOwnerExprNavigator.GetByClause(matchClause)
             if matchClauseOwner.IsSingleLine then true else
 
             let clauses = matchClauseOwner.Clauses
@@ -298,13 +299,14 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let elementFactory = sourceExpr.CreateElementFactory()
 
         let indentShift = contextExpr.Indent - sourceExpr.Indent
-        shiftExpr indentShift sourceExpr
+        shiftNode indentShift sourceExpr
 
         let letBindings = createBinding contextExpr contextDecl name
         setBindingExpression sourceExpr contextIndent letBindings
 
         let replacedUsages, sourceExpr =
             data.Usages |> Seq.fold (fun ((replacedUsages, sourceExpr: IFSharpExpression) as acc) usage ->
+                let usage = usage.As<IFSharpExpression>()
                 if not (isValid usage) then acc else
 
                 let usageIsSourceExpr = usage == sourceExpr
@@ -314,6 +316,15 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                     acc else
 
                 let refExpr = elementFactory.CreateReferenceExpr(name) :> IFSharpExpression
+
+                let usage =
+                    // remove parens in `not ({selstart}v.M(){selend})`, so it becomes `not x`
+                    let argExpr = usage.IgnoreParentParens()
+                    let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(argExpr)
+                    let funExpr = if isNotNull appExpr then appExpr.FunctionExpression else null
+
+                    if argExpr != usage && isNotNull funExpr && funExpr.NextSibling != argExpr then argExpr else usage 
+
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
 
                 if addSpaceNearIdents then

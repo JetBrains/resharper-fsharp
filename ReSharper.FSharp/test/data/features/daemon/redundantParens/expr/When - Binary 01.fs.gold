@@ -1,0 +1,12 @@
+﻿module M
+
+match () with
+| _ when |(|(0)true && true|)|(1) -> ()
+| _ when true && (true && true) -> ()
+| _ when |(|(2)true && true|)|(3) && true -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses

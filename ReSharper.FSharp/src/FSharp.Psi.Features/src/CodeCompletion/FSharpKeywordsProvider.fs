@@ -69,7 +69,7 @@ type FSharpKeywordsProvider() =
 
         let fcsCompletionContext = context.FcsCompletionContext
         match fcsCompletionContext.CompletionContext, tokenBeforeCaret.GetTokenType() with
-        | Some (CompletionContext.Invalid), tokenBeforeType when tokenBeforeType != FSharpTokenType.HASH -> false
+        | Some(CompletionContext.Invalid), tokenBeforeType when tokenBeforeType != FSharpTokenType.HASH -> false
         | _, tokenBeforeType ->
 
         if tokenBeforeType == FSharpTokenType.LINE_COMMENT ||

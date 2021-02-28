@@ -34,10 +34,10 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 
 /// Provides psi modules for script files with referenced assemblies determined by "#r" directives.
 [<SolutionComponent>]
-type FSharpScriptPsiModulesProvider
-        (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, documentManager: DocumentManager,
-         scriptOptionsProvider: IScriptFcsProjectProvider, platformManager: IPlatformManager,
-         assemblyFactory: AssemblyFactory, projectFileExtensions, projectFileTypeCoordinator) as this =
+type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
+        documentManager: DocumentManager, scriptOptionsProvider: IScriptFcsProjectProvider,
+        platformManager: IPlatformManager, assemblyFactory: AssemblyFactory, projectFileExtensions,
+        projectFileTypeCoordinator) as this =
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.
     let scriptsFromProjectFiles = OneToListMap<FileSystemPath, FSharpScriptPsiModule>()
@@ -307,8 +307,7 @@ type FSharpScriptPsiModulesProvider
 
 
 /// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc). 
-type FSharpScriptPsiModuleHandler
-        (lifetime, solution, handler, modulesProvider, changeManager) as this =
+type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, changeManager) as this =
     inherit DelegatingProjectPsiModuleHandler(handler)
 
     let locks = solution.Locks
@@ -357,8 +356,8 @@ type FSharpScriptPsiModuleHandler
         handler.InternalsVisibleTo(moduleTo, moduleFrom)
 
 
-type FSharpScriptPsiModule
-        (lifetime, path, solution, sourceFileCtor, moduleId, assemblyFactory, modulesProvider) as this =
+type FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, moduleId, assemblyFactory,
+        modulesProvider) as this =
     inherit ConcurrentUserDataHolder()
 
     let lifetimeDefinition = Lifetime.Define(lifetime)

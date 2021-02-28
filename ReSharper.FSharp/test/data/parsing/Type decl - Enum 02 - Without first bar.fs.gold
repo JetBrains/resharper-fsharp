@@ -2,9 +2,9 @@
 IFSharpImplFile
   IAnonModuleDeclaration
     ITypeDeclarationGroup
-      FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       IFSharpTypeDeclaration
+        FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:A)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)

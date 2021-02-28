@@ -79,8 +79,9 @@ type ITreeNode with
         startOffset - document.GetLineStartOffset(startCoords.Line)
 
     member x.Indent =
-        let document = x.GetSourceFile().Document
-        x.GetIndent(document)
+        match x.GetSourceFile() with
+        | null -> FormatterHelper.CalcNodeIndent(x, x.GetCodeFormatter()).Length
+        | sourceFile -> x.GetIndent(sourceFile.Document)
 
     member x.GetStartLine(document: IDocument) =
         document.GetCoordsByOffset(x.GetDocumentStartOffset().Offset).Line
@@ -400,7 +401,7 @@ let shiftWhitespaceBefore shift (whitespace: Whitespace) =
     else
         ModificationUtil.DeleteChild(whitespace)
 
-let shiftExpr shift (expr: IFSharpExpression) =
+let shiftNode shift (expr: #IFSharpTreeNode) =
     if shift = 0 then () else
 
     for child in List.ofSeq (expr.Tokens()) do
@@ -428,7 +429,7 @@ let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
         if shift > 0 then
             ModificationUtil.AddChildBefore(expr, Whitespace(shift)) |> ignore
 
-    shiftExpr shift expr
+    shiftNode shift expr
 
 
 let withNewLineAndIndentBefore (indent: int) (node: IFSharpTreeNode) =

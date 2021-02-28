@@ -85,8 +85,8 @@ type FSharpExperimentalFeatures =
 
 
 [<AllowNullLiteral>]
-type FSharpSettingsProviderBase<'T>
-        (lifetime: Lifetime, settings: IContextBoundSettingsStoreLive, settingsSchema: SettingsSchema) =
+type FSharpSettingsProviderBase<'T>(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive,
+        settingsSchema: SettingsSchema) =
 
     let settingsKey = settingsSchema.GetKey<'T>()
 
@@ -133,8 +133,8 @@ type FSharpTypeHintOptions =
 
 
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
-type FSharpOptionsPage
-        (lifetime: Lifetime, optionsPageContext, settings, configurations: RunsProducts.ProductConfigurations) as this =
+type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
+        configurations: RunsProducts.ProductConfigurations) as this =
     inherit FSharpOptionsPageBase(lifetime, optionsPageContext, settings)
 
     do
@@ -170,7 +170,8 @@ type FSharpOptionsPage
 
 
 [<ShellComponent>]
-type FSharpTypeHintOptionsStore(lifetime: Lifetime, settingsStore: ISettingsStore, highlightingSettingsManager: HighlightingSettingsManager) =
+type FSharpTypeHintOptionsStore(lifetime: Lifetime, settingsStore: ISettingsStore,
+        highlightingSettingsManager: HighlightingSettingsManager) =
     do
         let settingsKey = settingsStore.Schema.GetKey<FSharpTypeHintOptions>()
 

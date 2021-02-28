@@ -1,0 +1,14 @@
+﻿fun |(|(0)_|)|(1) -> ()
+fun |(|(2)a|)|(3) -> ()
+fun (_, _) -> ()
+fun (_ :: _) -> ()
+fun (_ as a) -> ()
+fun (Some x) -> ()
+fun (_ | _) -> ()
+fun (_ & _) -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses

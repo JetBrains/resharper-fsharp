@@ -3,6 +3,6 @@ IFSharpImplFile
   IGlobalNamespaceDeclaration
     FSharpTokenType+NamespaceTokenElement(type:NAMESPACE, text:namespace)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-    FSharpIdentifierToken(type:GLOBAL, text:global)
+    FSharpTokenType+GlobalTokenElement(type:GLOBAL, text:global)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

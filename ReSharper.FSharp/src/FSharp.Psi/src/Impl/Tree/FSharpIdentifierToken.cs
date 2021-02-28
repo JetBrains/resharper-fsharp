@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  public class FSharpIdentifierToken : FSharpToken, IFSharpIdentifier
+  public class FSharpIdentifierToken : FSharpToken, IFSharpIdentifierToken
   {
     public FSharpIdentifierToken(NodeType nodeType, string text) : base(nodeType, text)
     {

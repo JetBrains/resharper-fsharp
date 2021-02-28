@@ -44,15 +44,6 @@ type ReplaceWithWildPatTest() =
     [<Test; NotAvailable>] member x.``Not available - Member - Optional 01``() = x.DoNamedTest()
 
 [<FSharpTest>]
-type ReplaceWithWildPatScopedFixTest() =
-    inherit FSharpQuickFixTestBase<ReplaceWithWildPatScopedFix>()
-
-    override x.RelativeTestDataPath = "features/quickFixes/replaceWithWildPat"
-
-    [<Test>] member x.``No space 01 - Before``() = x.DoNamedTest()
-    [<Test>] member x.``No space 02 - After``() = x.DoNamedTest()
-
-[<FSharpTest>]
 type ReplaceWithWildPatAvailabilityTest() =
     inherit QuickFixAvailabilityTestBase()
 

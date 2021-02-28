@@ -11,6 +11,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 
+let secondaryRangesFromNode (node: #ITreeNode) =
+    match node with
+    | null -> Seq.empty<DocumentRange>
+    | node -> [| node.GetHighlightingRange() |] :> _
+
 let getTreeNodesDocumentRange (startNode: ITreeNode) (endNode: ITreeNode) =
     let startOffset = startNode.GetDocumentStartOffset()
     let endOffset = endNode.GetDocumentEndOffset()

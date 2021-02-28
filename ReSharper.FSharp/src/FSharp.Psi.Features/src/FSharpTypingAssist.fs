@@ -30,13 +30,11 @@ open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
 [<SolutionComponent>]
-type FSharpTypingAssist
-        (lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
-         externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager,
-         manager: ITypingAssistManager) as this =
-    inherit TypingAssistLanguageBase<FSharpLanguage>
-        (solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost,
-         skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager)
+type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
+        externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager,
+        manager: ITypingAssistManager) as this =
+    inherit TypingAssistLanguageBase<FSharpLanguage>(solution, settingsStore, cachingLexerService, commandProcessor,
+        psiServices, externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager)
 
     static let nodeTypeSet (tokenTypes: NodeType[]) =
         NodeTypeSet(tokenTypes)
@@ -197,6 +195,32 @@ type FSharpTypingAssist
                FSharpTokenType.GREATER_RBRACK |]
         nodeTypeSet tokenTypes
 
+    static let interpolatedStrings =
+        let tokenTypes: NodeType[] =
+            [| FSharpTokenType.REGULAR_INTERPOLATED_STRING
+               FSharpTokenType.REGULAR_INTERPOLATED_STRING_START
+               FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE
+               FSharpTokenType.REGULAR_INTERPOLATED_STRING_END
+               FSharpTokenType.VERBATIM_INTERPOLATED_STRING
+               FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START
+               FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE
+               FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END
+               FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING
+               FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_START
+               FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE
+               FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END |]
+        nodeTypeSet tokenTypes
+    
+    static let skipCloseBrackets =
+        let tokenTypes: NodeType[] =
+            [| FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE
+               FSharpTokenType.REGULAR_INTERPOLATED_STRING_END
+               FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE
+               FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END
+               FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE
+               FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END |]
+        nodeTypeSet tokenTypes
+    
     let isStringLiteralStopper (tokenType: TokenNodeType) =
         stringLiteralStoppers.[tokenType] || isNotNull tokenType && tokenType.IsStringLiteral
 
@@ -206,8 +230,7 @@ type FSharpTypingAssist
 
 
     static let infixOpTokens =
-        [| FSharpTokenType.BAR_BAR
-           FSharpTokenType.AMP_AMP
+        [| FSharpTokenType.AMP_AMP
            FSharpTokenType.PLUS
            FSharpTokenType.MINUS |]
         |> HashSet
@@ -235,7 +258,13 @@ type FSharpTypingAssist
                    FSharpTokenType.GREATER_RBRACK, 1
                    FSharpTokenType.GREATER_BAR_RBRACK, 2 |]
 
-           '}', [| FSharpTokenType.BAR_RBRACE, 1 |]
+           '}', [| FSharpTokenType.BAR_RBRACE, 1
+                   FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE, 0
+                   FSharpTokenType.REGULAR_INTERPOLATED_STRING_END, 0
+                   FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE, 0
+                   FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END, 0
+                   FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE, 0
+                   FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END, 0 |]
 
            '@', [| FSharpTokenType.RQUOTE_TYPED, 0
                    FSharpTokenType.RQUOTE_UNTYPED, 0
@@ -286,7 +315,7 @@ type FSharpTypingAssist
            "<@@@@>", "<@@" |]
         |> dict
 
-    let isInsideEmptyQuoation (lexer: CachingLexer) offset =
+    let isInsideEmptyQuotation (lexer: CachingLexer) offset =
         if not (lexer.FindTokenAt(offset - 1)) then false else
         let leftStart = lexer.TokenStart
 
@@ -1071,11 +1100,42 @@ type FSharpTypingAssist
 
         insertNewLineAt textControl indent TrimTrailingSpaces.Yes
 
+    member x.HandleBackspaceInInterpolatedString(context: IActionContext) =
+      let mutable lexer = Unchecked.defaultof<_>
+      let textControl = context.TextControl
+      let charPos = textControl.Caret.Offset()
+      if charPos <= 0 || not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(charPos)) then false else
+
+      if lexer.TokenStart <> charPos then false else
+      let tokenType = lexer.TokenType
+      if tokenType != FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE &&
+         tokenType != FSharpTokenType.REGULAR_INTERPOLATED_STRING_END &&
+         tokenType != FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE &&
+         tokenType != FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END &&
+         tokenType != FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE &&
+         tokenType != FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END
+            then false else
+
+      lexer.Advance(-1)
+      let prevTokenType = lexer.TokenType
+      if prevTokenType != FSharpTokenType.REGULAR_INTERPOLATED_STRING_START &&
+         prevTokenType != FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE &&
+         prevTokenType != FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START &&
+         prevTokenType != FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE &&
+         prevTokenType != FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_START &&
+         prevTokenType != FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE
+            then false else
+
+      textControl.Caret.MoveTo(charPos - 1, CaretVisualPlacement.DontScrollIfVisible)
+      textControl.Document.DeleteText(TextRange(charPos - 1, charPos + 1))
+      true
+
     member x.HandleBackspacePressed(context: IActionContext) =
         let textControl = context.TextControl
         if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
 
-        if this.HandlerBackspaceInTripleQuotedString(textControl) then true else
+        if this.HandleBackspaceInInterpolatedString(context) then true else
+        if this.HandleBackspaceInTripleQuotedString(textControl) then true else
 
         this.DoHandleBackspacePressed
             (textControl,
@@ -1086,7 +1146,7 @@ type FSharpTypingAssist
                 lexer.TokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING),
              (fun _ -> FSharpBracketMatcher() :> _))
 
-    member x.HandlerBackspaceInTripleQuotedString(textControl: ITextControl) =
+    member x.HandleBackspaceInTripleQuotedString(textControl: ITextControl) =
         let offset = textControl.Caret.Offset()
         let mutable lexer = Unchecked.defaultof<_>
 
@@ -1147,13 +1207,22 @@ type FSharpTypingAssist
         x.HandleSurroundTyping(context, lBrace, rBrace, lToken, rToken, JetFunc<_>.False)
 
     member x.HandleLeftBracket(context: ITypingContext) =
-        this.HandleLeftBracketTyped
-            (context,
+        this.HandleLeftBracketTyped(context,
              (fun lexer -> leftBrackets.Contains(lexer.TokenType)),
              (fun _ -> FSharpBracketMatcher() :> _),
              (fun _ -> x.TrySurroundWithBraces(context, context.Char, true, leftToRightBracket)),    
              (fun tokenType _ -> tokensSuitableForRightBracket.Contains(tokenType)),
-             (fun _ -> rightBracketsText.[context.Char]))
+             (fun _ -> rightBracketsText.[context.Char])) |> ignore
+
+        // todo: insert pair brace in `$"{ {caret} }"` 
+
+        let mutable lexer = Unchecked.defaultof<_>
+        let textControl = context.TextControl
+        let typedPos = textControl.Caret.Offset() - 1
+        if x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(typedPos) then
+            base.AutoInsertRBraceInStringInterpolation(textControl, lexer, typedPos, interpolatedStrings,
+                skipCloseBrackets, FSharpTokenType.RBRACE) |> ignore
+        true
 
     member x.HandleRightBracket(context: ITypingContext) =
         let textControl = context.TextControl
@@ -1228,8 +1297,9 @@ type FSharpTypingAssist
         true
 
     member x.SkipBacktickInId(textControl: ITextControl, lexer: CachingLexer, offset) =
+        if not (lexer.FindTokenAt(offset)) then false else
         if lexer.TokenType != FSharpTokenType.IDENTIFIER then false else
-        if offset + 2 < lexer.TokenEnd then false else
+        if offset - 2 > lexer.TokenStart && offset + 2 < lexer.TokenEnd then false else
         if not (lexer.GetTokenText().IsEscapedWithBackticks()) then false else
 
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
@@ -1326,7 +1396,7 @@ type FSharpTypingAssist
                 if not (lexer.FindTokenAt(offset)) then false else
                 let right = lexer.TokenType
 
-                emptyBracketsToAddSpace.Contains((left, right)) || isInsideEmptyQuoation lexer offset)
+                emptyBracketsToAddSpace.Contains((left, right)) || isInsideEmptyQuotation lexer offset)
 
         if not isAvailable then false else
 
@@ -1394,7 +1464,7 @@ type FSharpTypingAssist
     member x.MakeEmptyQuotationUntyped(context: ITypingContext, lexer: CachingLexer, offset) =
         let textControl = context.TextControl
 
-        if isInsideEmptyQuoation lexer offset && lexer.GetTokenLength() = 4 then
+        if isInsideEmptyQuotation lexer offset && lexer.GetTokenLength() = 4 then
             textControl.Document.InsertText(offset, "@@")
             textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
             true else

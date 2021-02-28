@@ -1,0 +1,7 @@
+﻿module M
+
+while |(|(0)true :? bool|)|(1) do ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

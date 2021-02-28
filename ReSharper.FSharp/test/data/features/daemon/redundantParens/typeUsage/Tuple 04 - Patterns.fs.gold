@@ -1,0 +1,14 @@
+﻿module Module
+
+let f (_: |(|(0)int * int|)|(1)) = ()
+let f (_: |(|(2)int * int|)|(3) -> int) = ()
+
+match [] with
+| :? (int * int) -> ()
+| :? (int * int) -> int -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses

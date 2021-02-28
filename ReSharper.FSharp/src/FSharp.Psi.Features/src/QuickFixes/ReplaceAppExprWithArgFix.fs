@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 type ReplaceAppExprWithArgFix(warning: RedundantApplicationWarning) =
-    inherit ReplaceWithInnerExpressionFixBase(warning.AppExpr, warning.ArgExpr)
+    inherit ReplaceWithInnerTreeNodeFixBase(warning.AppExpr, warning.ArgExpr)
 
     let appExpr = warning.AppExpr
     let funExpr = getFunctionExpr appExpr

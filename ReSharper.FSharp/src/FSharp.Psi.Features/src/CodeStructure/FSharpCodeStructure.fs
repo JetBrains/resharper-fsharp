@@ -24,21 +24,21 @@ open JetBrains.Util
 type FSharpCodeStructureProvider() =
     let typeExtensionIconId = compose PsiSymbolsThemedIcons.Class.Id FSharpIcons.ExtensionOverlay.Id
 
-    let rec processNode (node: ITreeNode) (parent: CodeStructureElement) =
+    let rec processNode (parent: CodeStructureElement) (parentBlock: ICodeStructureBlockStart) (node: ITreeNode) =
         InterruptableActivityCookie.CheckAndThrow()
 
         match node with
         | :? IFSharpFile as fsFile ->
             for decl in fsFile.ModuleDeclarations do
-                processNode decl parent
+                processNode parent null decl
 
         | :? IModuleLikeDeclaration as moduleLikeDeclaration ->
             let parent =
                 if not (moduleLikeDeclaration :? IModuleDeclaration) then parent else
-                FSharpDeclarationCodeStructureElement(parent, moduleLikeDeclaration) :> CodeStructureElement
+                FSharpDeclarationCodeStructureElement(moduleLikeDeclaration, parent, null) :> CodeStructureElement
 
             for memberDeclaration in moduleLikeDeclaration.Members do
-                processNode memberDeclaration parent
+                processNode parent null memberDeclaration
 
         | :? IFSharpTypeDeclaration as typeDecl ->
             match typeDecl.TypeRepresentation with
@@ -59,41 +59,43 @@ type FSharpCodeStructureProvider() =
                 processTypeDeclaration typeDecl ctor parent
 
         | :? IUnionCaseLikeDeclaration as caseDecl ->
-            FSharpDeclarationCodeStructureElement(parent, caseDecl) |> ignore
+            FSharpDeclarationCodeStructureElement(caseDecl, parent, null) |> ignore
 
         | :? ITypeExtensionDeclaration as extensionDecl when not extensionDecl.IsTypePartDeclaration ->
-            let parent = NamedIdentifierOwner(extensionDecl, parent, typeExtensionIconId)
+            let parentBlock = ContainerElementStart(extensionDecl, parent, typeExtensionIconId)
             for memberDecl in  extensionDecl.TypeMembers do
-                processNode memberDecl parent
+                processNode parent parentBlock memberDecl
+            ContainerElementEnd(extensionDecl, parent, typeExtensionIconId) |> ignore
 
         | :? IFSharpTypeOldDeclaration as decl ->
             processTypeDeclaration decl TreeNodeCollection.Empty parent
 
         | :? ITypeMemberDeclaration as typeMember ->
-            FSharpDeclarationCodeStructureElement(parent, typeMember) |> ignore
+            FSharpDeclarationCodeStructureElement(typeMember, parent, parentBlock) |> ignore
 
         | :? IInterfaceImplementation as interfaceImpl ->
-            let parent = NamedIdentifierOwner(interfaceImpl, parent, PsiSymbolsThemedIcons.Interface.Id)
+            let parentBlock = ContainerElementStart(interfaceImpl, parent, PsiSymbolsThemedIcons.Interface.Id)
             for memberDecl in interfaceImpl.TypeMembers do
-                processNode memberDecl parent
+                processNode parent parentBlock memberDecl
+            ContainerElementEnd(interfaceImpl, parent, PsiSymbolsThemedIcons.Interface.Id) |> ignore
 
         | :? ILetBindingsDeclaration as letBindings ->
             for binding in Seq.cast<ITopBinding> letBindings.Bindings do
-                FSharpDeclarationCodeStructureElement(parent, binding) |> ignore
+                FSharpDeclarationCodeStructureElement(binding, parent, null) |> ignore
 
         | :? ITypeDeclarationGroup as declarationGroup ->
             for typeDeclaration in declarationGroup.TypeDeclarations do
-                processNode typeDeclaration parent
+                processNode parent null typeDeclaration
 
         | _ -> ()
 
     and processTypeDeclaration (typeDecl: IFSharpTypeOldDeclaration) (members: IDeclaration seq) parent =
-        let structureElement = FSharpDeclarationCodeStructureElement(parent, typeDecl)
+        let structureElement = FSharpDeclarationCodeStructureElement(typeDecl, parent, null)
         for memberDecl in members do
-            processNode memberDecl structureElement
+            processNode structureElement null memberDecl
 
         for memberDecl in typeDecl.TypeMembers do
-            processNode memberDecl structureElement
+            processNode structureElement null memberDecl
 
     interface IProjectFileCodeStructureProvider with
         member x.Build(sourceFile, _) =
@@ -101,12 +103,12 @@ type FSharpCodeStructureProvider() =
             if isNull fsFile then null else
 
             let root = CodeStructureRootElement(fsFile)
-            processNode fsFile root
+            processNode root null fsFile
             root
 
 
-type FSharpDeclarationCodeStructureElement(parentElement, declaration: IDeclaration) =
-    inherit CodeStructureElement(parentElement)
+type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, parentBlock: ICodeStructureBlockStart) =
+    inherit CodeStructureElement(parent)
 
     do
         if not (isValid declaration) then
@@ -129,10 +131,14 @@ type FSharpDeclarationCodeStructureElement(parentElement, declaration: IDeclarat
     override x.GetMemberNavigationAspect() = aspects :> _
 
     override x.DumpSelf(builder: TextWriter ) =
+      if isNotNull parentBlock then
+          builder.Write(" ")
+
       let description = MenuItemDescriptor(x)
-      let aspect = aspects
-      aspect.Present(description, PresentationState())
+      aspects.Present(description, PresentationState())
       builder.Write(description.Text.Text)
+
+    override this.ParentBlock = parentBlock
 
     interface ICodeStructureDeclarationElement with
         member x.Declaration = getDeclaration ()
@@ -172,6 +178,7 @@ type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconI
         member x.Present(descriptor, _) =
             descriptor.Icon <- iconId
             descriptor.Text <- x.Name
+
         member x.NavigationRange = treeNode.GetNavigationRange()
         member x.GetQuickSearchTexts() = searchNames
         member x.GetSourceFile() = treeNode.GetSourceFile()
@@ -198,7 +205,6 @@ type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconI
 type NamedIdentifierOwner(treeNode: INameIdentifierOwner, parent, iconId) =
     inherit CodeStructureElement(parent)
 
-    let aspect = NameIdentifierOwnerNodeAspect(treeNode, iconId)
     let treeNodePointer = treeNode.GetPsiServices().Pointers.CreateTreeElementPointer(treeNode)
 
     let textRange =
@@ -206,10 +212,31 @@ type NamedIdentifierOwner(treeNode: INameIdentifierOwner, parent, iconId) =
         | null -> treeNode.GetNavigationRange()
         | ident -> ident.GetDocumentRange()
 
+    member val Aspect = NameIdentifierOwnerNodeAspect(treeNode, iconId)
+    
     override x.TreeNode = treeNodePointer.GetTreeNode() :> _
     override x.Language = FSharpLanguage.Instance :> _
-    override x.GetFileStructureAspect() = aspect :> _
-    override x.GetGotoMemberAspect() = aspect :> _
-    override x.GetMemberNavigationAspect() = aspect :> _
+    override x.GetFileStructureAspect() = x.Aspect :> _
+    override x.GetGotoMemberAspect() = x.Aspect :> _
+    override x.GetMemberNavigationAspect() = x.Aspect :> _
     override x.GetTextRange() = textRange
-    override x.DumpSelf(writer) = writer.Write(aspect.Name)
+    override x.DumpSelf(writer) = writer.Write(x.Aspect.Name)
+
+
+type ContainerElementStart(treeNode: INameIdentifierOwner, parent, iconId) =
+    inherit NamedIdentifierOwner(treeNode, parent, iconId)
+
+    override x.DumpSelf(writer) = writer.Write($"{x.Aspect.Name} start")
+
+    interface ICodeStructureBlockStart with
+        member this.ParentBlock = null
+        member val Expanded = true with get, set
+
+
+type ContainerElementEnd(treeNode: INameIdentifierOwner, parent, iconId) =
+    inherit NamedIdentifierOwner(treeNode, parent, iconId)
+
+    override x.DumpSelf(writer) = writer.Write($"{x.Aspect.Name} end")
+
+    interface ICodeStructureBlockEnd with
+        member this.ParentBlock = null

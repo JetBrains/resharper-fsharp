@@ -1,5 +1,3 @@
-﻿f|(|(0)[x]|)|(1).P
+﻿f([x]).P
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Redundant parentheses
-(1):<secondary> ReSharper Dead Code: Redundant parentheses

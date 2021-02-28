@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
@@ -18,11 +17,9 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-let [<Literal>] RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_"
-
 [<SolutionComponent>]
-type FSharpIdentifierTooltipProvider
-        (lifetime, solution, presenter, xmlDocService: FSharpXmlDocService, textStylesService) =
+type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocService: FSharpXmlDocService,
+        textStylesService) =
     inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter, textStylesService)
 
     let layoutTagLookup =
@@ -85,9 +82,13 @@ type FSharpIdentifierTooltipProvider
             (fun (result: RichText) part -> if result.IsEmpty then part else result + sep + part)
             RichText.Empty
 
+    let richTextEscapeToHtml (text: RichText) =
+        (RichText.Empty, text.GetFormattedParts()) ||> Seq.fold (fun result part ->
+            result.Append(part.Text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\n", "<br>"), part.Style))
+
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
-    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
+    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: IFSharpIdentifierToken) =
         // todo: fix getting qualifiers
         let tokenNames = [token.Name]
 
@@ -116,7 +117,7 @@ type FSharpIdentifierTooltipProvider
         | null -> emptyPresentation
         | fsFile ->
 
-        match fsFile.FindTokenAt(documentRange.StartOffset).As<FSharpIdentifierToken>() with
+        match fsFile.FindTokenAt(documentRange.StartOffset).As<IFSharpIdentifierToken>() with
         | null -> emptyPresentation
         | token ->
 
@@ -150,7 +151,8 @@ type FSharpIdentifierTooltipProvider
                           yield remarks |> renderL richTextR
                       | _ -> () ]
                     |> richTextJoin "\n\n"))
-        |> richTextJoin RiderTooltipSeparator
+        |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
+        |> richTextEscapeToHtml
         |> RichTextBlock
 
     interface IFSharpIdentifierTooltipProvider

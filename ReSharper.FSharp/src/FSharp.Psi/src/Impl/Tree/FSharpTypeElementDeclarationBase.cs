@@ -79,7 +79,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
               result.Add(typeDeclaration);
           }
 
-        if (child is IMemberDeclaration {IsIndexer: false} memberDeclaration)
+        if (child is IMemberSignatureOrDeclaration {IsIndexer: false} memberDeclaration)
           foreach (var accessor in memberDeclaration.AccessorDeclarations)
             if (accessor.IsExplicit)
               result.Add(accessor);
@@ -136,32 +136,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public virtual PartKind TypePartKind => PartKind.Class;
-
-    public TreeNodeCollection<IAttribute> AllAttributes
-    {
-      get
-      {
-        if (!(this is IFSharpTypeOrExtensionDeclaration typeDeclaration))
-          return TreeNodeCollection<IAttribute>.Empty;
-
-        var attributes = typeDeclaration.Attributes;
-
-        var typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDeclaration);
-        if (typeDeclarationGroup == null)
-          return attributes;
-
-        if (typeDeclarationGroup.TypeDeclarations.FirstOrDefault() != this)
-          return attributes;
-
-        var typeGroupAttributes = typeDeclarationGroup.Attributes;
-        if (typeGroupAttributes.IsEmpty)
-          return attributes;
-
-        return attributes.IsEmpty
-          ? typeGroupAttributes
-          : attributes.Prepend(typeGroupAttributes).ToTreeNodeCollection();
-      }
-    }
 
     public override void SetName(string name, ChangeNameKind changeNameKind)
     {

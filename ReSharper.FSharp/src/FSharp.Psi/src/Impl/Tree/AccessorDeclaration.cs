@@ -10,8 +10,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class AccessorDeclaration
   {
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
-    // We refer to OwnerMember.SourceName because the CompiledName Attribute does not apply to accessor's CompiledName
+
+    // CompiledName is ignored for accessors.
     protected override string DeclaredElementName => Identifier.GetSourceName() + "_" + OwnerMember.SourceName;
+
     public override string CompiledName => DeclaredElementName;
     public override string SourceName => DeclaredElementName;
 
@@ -31,8 +33,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? new FSharpPropertyAccessor(this)
         : null;
 
-    public IMemberDeclaration OwnerMember =>
-      MemberDeclarationNavigator.GetByAccessorDeclaration(this);
+    public IMemberSignatureOrDeclaration OwnerMember =>
+      MemberSignatureOrDeclarationNavigator.GetByAccessorDeclaration(this);
 
     public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
 
@@ -44,17 +46,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         _ => AccessorKind.UNKNOWN
       };
 
-    public bool IsExplicit
-    {
-      get
-      {
-        var pattern = ParametersPatternsEnumerable.SingleItem?.Pattern;
-        if (pattern == null)
-          return false;
-
-        return Kind == AccessorKind.GETTER && !(pattern.IgnoreInnerParens() is IUnitPat) ||
-               Kind == AccessorKind.SETTER && pattern is ITuplePat;
-      }
-    }
+    public bool IsExplicit =>
+      Kind == AccessorKind.GETTER && !(ParameterPatternsEnumerable.SingleItem.IgnoreInnerParens() is IUnitPat) ||
+      Kind == AccessorKind.SETTER && ParameterPatternsEnumerable.Count() > 1;
   }
 }

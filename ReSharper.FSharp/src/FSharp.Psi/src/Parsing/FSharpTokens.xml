@@ -77,9 +77,6 @@
         <Token name="YIELD_BANG" representation="yield!" />
         <Token name="UNDERSCORE" representation="_" />
 
-        <Token name="GREATER" representation=">" />
-        <Token name="LESS" representation="&lt;" />
-
         <Token name="LPAREN" representation="(" />
         <Token name="RPAREN" representation=")" />
         <Token name="LBRACE" representation="{" />
@@ -102,27 +99,19 @@
         
         <Token name="AMP" representation="&amp;" />
         <Token name="BAR" representation="|" />
-        <Token name="BAR_BAR" representation="||" />
-        <Token name="STAR" representation="*" />
         <Token name="COMMA" representation="," />
         <Token name="RARROW" representation="->" />
         <Token name="DOT_DOT" representation=".." />
         <Token name="DOT" representation="." />
         <Token name="COLON" representation=":" />
-        <Token name="COLON_COLON" representation="::" />
         <Token name="COLON_GREATER" representation=":>" />
         <Token name="COLON_QMARK_GREATER" representation=":?>" />
         <Token name="COLON_QMARK" representation=":?" />
         <Token name="COLON_EQUALS" representation=":=" />
-        <Token name="PERCENT" representation="%" />
-        <Token name="PERCENT_PERCENT" representation="%%" />
         <Token name="SEMICOLON" representation=";" />
         <Token name="SEMICOLON_SEMICOLON" representation=";;" />
         <Token name="LARROW" representation="&lt;-" />
-        <Token name="EQUALS" representation="=" />
         <Token name="DOLLAR" representation="$" />
-        <Token name="QMARK" representation="?" />
-        <Token name="QMARK_QMARK" representation="??" />
         <Token name="QUOTE" representation="'" />
 
 
@@ -146,15 +135,26 @@
         <Token name="PP_RPAR" representation=")" />
     </Tokens>
 
+    <Tokens NodeType="FixedTokenNodeType" TokenElement="FixedIdentifierTokenNodeElement">
+        <Token name="AMP_AMP" representation="&amp;&amp;" />
+        <Token name="COLON_COLON" representation="::" />
+        <Token name="EQUALS" representation="=" />
+        <Token name="GLOBAL" representation="global" />
+        <Token name="GREATER" representation=">" />
+        <Token name="LESS" representation="&lt;" />
+        <Token name="LPAREN_STAR_RPAREN" representation="(*)" /> <!--todo: fix text-->
+        <Token name="MINUS" representation="-" />
+        <Token name="PERCENT" representation="%" />
+        <Token name="PERCENT_PERCENT" representation="%%" />
+        <Token name="PLUS" representation="+" />
+        <Token name="QMARK" representation="?" />
+        <Token name="QMARK_QMARK" representation="??" />
+        <Token name="STAR" representation="*" />
+    </Tokens>
+    
     <Tokens NodeType="FSharpTokenNodeType">
-        <!-- todo: Add fixed identifier tokens -->
         <Token name="IDENTIFIER" />
         <Token name="SYMBOLIC_OP" />
-        <Token name="MINUS" />
-        <Token name="PLUS" />
-        <Token name="LPAREN_STAR_RPAREN" />
-        <Token name="AMP_AMP" />
-        <Token name="GLOBAL" representation="global" />
         <Token name="BAD_SYMBOLIC_OP" />
         <Token name="SHEBANG" />
         <Token name="HASH" />

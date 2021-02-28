@@ -1,0 +1,7 @@
+﻿namespace global
+
+type zzz =
+    { Field: int }
+
+module zzz =
+    let x = 123

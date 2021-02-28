@@ -1,0 +1,8 @@
+module Module
+
+match 1, 2 with
+| (a: int) -> ()
+
+function (a: int) -> ()
+
+try () with (a: int) -> ()

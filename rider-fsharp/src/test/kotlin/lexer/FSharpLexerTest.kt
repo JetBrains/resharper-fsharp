@@ -111,7 +111,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
     @Test
     fun testBlockCommentError() {
         doTest("(* \" *)",
-                "UNFINISHED_STRING_IN_COMMENT ('(* \" *)')"
+                "BLOCK_COMMENT ('(* \" *)')"
         )
     }
 
@@ -252,7 +252,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
                 |\ NEW_LINE
                 |"
                 """.trimMargin(),
-                "UNFINISHED_TRIPLE_QUOTED_STRING_IN_COMMENT ('(* \"\"\" *)\\nlet str = \"STRING\\n\\ NEW_LINE\\n\"')"
+                "BLOCK_COMMENT ('(* \"\"\" *)\\nlet str = \"STRING\\n\\ NEW_LINE\\n\"')"
         )
     }
 

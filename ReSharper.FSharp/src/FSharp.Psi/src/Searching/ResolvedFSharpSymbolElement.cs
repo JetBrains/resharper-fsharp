@@ -2,7 +2,7 @@
 using System.Xml;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
   public class ResolvedFSharpSymbolElement : IFSharpSymbolElement
   {
-    public ResolvedFSharpSymbolElement(FSharpSymbol symbol, FSharpIdentifierToken referenceOwnerToken)
+    public ResolvedFSharpSymbolElement(FSharpSymbol symbol, IFSharpIdentifierToken referenceOwnerToken)
     {
       Symbol = symbol;
       Module = referenceOwnerToken.GetPsiModule();

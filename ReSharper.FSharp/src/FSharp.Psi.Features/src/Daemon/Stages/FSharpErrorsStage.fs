@@ -66,8 +66,8 @@ and private Processor(daemonProcess: FSharpDaemonStageProcessBase, consumer: IHi
     abstract InteriorShouldBeProcessed: ITreeNode -> bool
     default x.InteriorShouldBeProcessed _ = true
 
-    abstract ProcessAfterInterior: ITreeNode -> unit
-    default x.ProcessAfterInterior(element) =
+    abstract ProcessBeforeInterior: ITreeNode -> unit
+    default x.ProcessBeforeInterior(element) =
         match element with
         | :? FSharpToken as token ->
             if not (token.GetTokenType().IsWhitespace) then
@@ -82,8 +82,8 @@ and private Processor(daemonProcess: FSharpDaemonStageProcessBase, consumer: IHi
         member x.InteriorShouldBeProcessed(element) =
             x.InteriorShouldBeProcessed(element)
 
-        member x.ProcessAfterInterior(element) = x.ProcessAfterInterior(element)
-        member x.ProcessBeforeInterior _ = ()
+        member x.ProcessAfterInterior _ = ()
+        member x.ProcessBeforeInterior(element) = x.ProcessBeforeInterior(element)
 
         member x.ProcessingIsFinished =
             match daemonProcess.DaemonProcess.InterruptFlag with
@@ -100,8 +100,8 @@ and private GlobalProcessor(daemonProcessor, consumer) =
 
     override x.InteriorShouldBeProcessed(node) = shouldProcess node
 
-    override x.ProcessAfterInterior(node) =
+    override x.ProcessBeforeInterior(node) =
         if shouldProcess node then
-            base.ProcessAfterInterior(node)
+            base.ProcessBeforeInterior(node)
         else
             x.MemberDeclarations.Add(node) |> ignore

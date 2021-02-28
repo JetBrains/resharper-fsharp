@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
@@ -238,15 +239,58 @@ type SingleUnionCaseRenameEvaluator() =
         member x.CreateFromReference(_, _) = EmptyList.Instance :> _
 
         member x.CreateFromElement(initialElement, _) =
-            match initialElement.FirstOrDefault() with
-            | :? ITypeElement as typeElement when typeElement.IsUnion() ->
+            let isApplicable (typeElement: ITypeElement) =
+                typeElement.IsUnion() &&
+
+                let sourceName = typeElement.GetSourceName()
+                sourceName <> SharedImplUtil.MISSING_DECLARATION_NAME &&
+
                 let unionCases = typeElement.GetSourceUnionCases()
-                if unionCases.Count <> 1 then [] :> _ else
-                [| unionCases.[0] :> IDeclaredElement |] :> _
+                unionCases.Count = 1 && unionCases.[0].SourceName = sourceName
+
+            match initialElement.FirstOrDefault() with
+            | :? ITypeElement as typeElement when isApplicable typeElement ->
+                [| typeElement.GetSourceUnionCases().[0] :> IDeclaredElement |] :> _
 
             | :? IUnionCase as unionCase ->
                 let containingType = unionCase.GetContainingType().NotNull()
-                if containingType.GetSourceUnionCases().Count <> 1 then [] :> _ else
+                if not (isApplicable containingType) then [] :> _ else
                 [| containingType :> IDeclaredElement |] :> _
+
+            | _ -> [] :> _
+
+
+[<DerivedRenamesEvaluator>]
+type AssociatedTypeRenameEvaluator() =
+    interface IDerivedRenamesEvaluator with
+        member x.SuggestedElementsHaveDerivedName = false
+        member x.CreateFromReference(_, _) = EmptyList.Instance :> _
+
+        member x.CreateFromElement(initialElement, _) =
+            match initialElement.FirstOrDefault() with
+            | :? IFSharpModule as fsModule ->
+                let associatedTypeElement = fsModule.AssociatedTypeElement
+                [ if isNotNull associatedTypeElement then
+                    associatedTypeElement :> IDeclaredElement ] :>  _
+
+            | :? IFSharpTypeElement as fsTypeElement ->
+                let containingEntityNestedTypes: ITypeElement seq =
+                    match fsTypeElement.GetContainingType() with
+                    | null ->
+                        let ns = fsTypeElement.GetContainingNamespace()
+                        ns.GetNestedTypeElements(getModuleOnlySymbolScope fsTypeElement.Module) :> _
+
+                    | containingType ->
+                        containingType.NestedTypes :> _
+
+                let associatedModule = 
+                    containingEntityNestedTypes |> Seq.tryFind (fun typeElement ->
+                        let fsModule = typeElement.As<IFSharpModule>()
+
+                        isNotNull fsModule &&
+                        fsModule.SourceName = fsTypeElement.SourceName &&
+                        fsTypeElement.Equals(fsModule.AssociatedTypeElement))
+
+                associatedModule |> Option.toList |> Seq.cast
 
             | _ -> [] :> _

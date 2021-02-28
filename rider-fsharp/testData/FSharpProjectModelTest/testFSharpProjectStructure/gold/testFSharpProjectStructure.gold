@@ -7,6 +7,10 @@ Init
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -16,7 +20,9 @@ Init
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    -Folder
     File1.fs
@@ -76,48 +82,39 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File3.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   File1.fs [Nodes: 1] Index:Include
-   File2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 2] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    Class2.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File1.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:Folder[1]
   1:File1.fs
   2:File2.fs
-5:File3.fs
-6:EmptyFolder[1]
-7:Folder[2]
+4:File3.fs
+5:EmptyFolder[1]
+6:Folder[2]
   1:File3.fs
   2:File4.fs
   3:Sub[1]
@@ -125,14 +122,14 @@ File Path Index
   4:File5.fs
   5:Sub[2]
     1:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File1.fs
 Folder/File2.fs
@@ -155,6 +152,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -164,7 +165,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    -Folder
     File2.fs
@@ -224,47 +227,38 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File3.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   File1.fs [Nodes: 1] Index:Include
-   File2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 2] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    Class2.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File1.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:Folder[1]
   1:File2.fs
-5:File3.fs
-6:EmptyFolder[1]
-7:Folder[2]
+4:File3.fs
+5:EmptyFolder[1]
+6:Folder[2]
   1:File3.fs
   2:File4.fs
   3:File1.fs
@@ -273,14 +267,14 @@ File Path Index
   5:File5.fs
   6:Sub[2]
     1:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File2.fs
 File3.fs
@@ -303,6 +297,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -312,7 +310,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -372,48 +372,39 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File3.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   File1.fs [Nodes: 1] Index:Include
-   File2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 2] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    Class2.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File1.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:Folder[1]
   1:File3.fs
   2:File2.fs
-5:File3.fs
-6:EmptyFolder[1]
-7:Folder[2]
+4:File3.fs
+5:EmptyFolder[1]
+6:Folder[2]
   1:File4.fs
   2:File1.fs
   3:Sub[1]
@@ -421,14 +412,14 @@ File Path Index
   4:File5.fs
   5:Sub[2]
     1:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -451,6 +442,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -460,7 +455,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -520,63 +517,54 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File1.fs [Nodes: 1] Index:Include
-  File3.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   File2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 2] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    Class2.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File1.fs
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:Folder[1]
   1:File3.fs
   2:File2.fs
-5:File3.fs
-6:EmptyFolder[1]
-7:File1.fs
-8:Folder[2]
+4:File3.fs
+5:EmptyFolder[1]
+6:File1.fs
+7:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:Class1.fs
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-9:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-10:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-11:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -599,6 +587,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -608,7 +600,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -668,47 +662,38 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   File2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 2] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    Class2.fs [Nodes: 1] Index:Include
-    File1.fs [Nodes: 1] Index:Include
-    File3.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/Folder/Sub/File3.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:Folder[1]
   1:File3.fs
   2:File2.fs
-5:EmptyFolder[1]
-6:Folder[2]
+4:EmptyFolder[1]
+5:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File3.fs
@@ -717,14 +702,14 @@ File Path Index
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+8:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -747,6 +732,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -756,7 +745,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -816,48 +807,39 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File3.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   File2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 2] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    Class2.fs [Nodes: 1] Index:Include
-    File1.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:Folder[1]
   1:File3.fs
   2:File2.fs
-5:File3.fs
-6:EmptyFolder[1]
-7:Folder[2]
+4:File3.fs
+5:EmptyFolder[1]
+6:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
@@ -865,14 +847,14 @@ File Path Index
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -895,6 +877,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -904,7 +890,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -964,48 +952,39 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File3.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   File2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 2] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    Class2.fs [Nodes: 1] Index:Include
-    File1.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:Folder[1]
   1:File3.fs
   2:File2.fs
-5:EmptyFolder[1]
-6:File3.fs
-7:Folder[2]
+4:EmptyFolder[1]
+5:File3.fs
+6:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
@@ -1013,14 +992,14 @@ File Path Index
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -1043,6 +1022,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -1052,7 +1035,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -1111,62 +1096,53 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File3.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   Class2.fs [Nodes: 1] Index:Include
-   File2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 1] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    File1.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:Folder[1]
   1:File3.fs
   2:File2.fs
-5:EmptyFolder[1]
-6:File3.fs
-7:Folder[2]
+4:EmptyFolder[1]
+5:File3.fs
+6:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -1189,6 +1165,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -1198,7 +1178,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    -Folder
     File2.fs
@@ -1257,62 +1239,53 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File3.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   Class2.fs [Nodes: 1] Index:Include
-   File2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 1] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    File1.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:Folder[1]
   1:File2.fs
   2:File3.fs
-5:EmptyFolder[1]
-6:File3.fs
-7:Folder[2]
+4:EmptyFolder[1]
+5:File3.fs
+6:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File2.fs
 Folder/File3.fs
@@ -1335,6 +1308,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -1344,7 +1321,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
@@ -1403,62 +1382,53 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File2.fs [Nodes: 1] Index:Include
-  File3.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   Class2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 1] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    File1.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File2.fs
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:File2.fs
-5:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:File2.fs
+4:Folder[1]
   1:File3.fs
-6:EmptyFolder[1]
-7:File3.fs
-8:Folder[2]
+5:EmptyFolder[1]
+6:File3.fs
+7:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-9:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-10:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-11:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
@@ -1481,6 +1451,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -1490,7 +1464,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
@@ -1549,62 +1525,53 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File2.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   Class2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 1] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    File1.fs [Nodes: 1] Index:Include
-  Foo.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File2.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/Foo.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:File2.fs
-5:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:File2.fs
+4:Folder[1]
   1:File3.fs
-6:EmptyFolder[1]
-7:Foo.fs
-8:Folder[2]
+5:EmptyFolder[1]
+6:Foo.fs
+7:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-9:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-10:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-11:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
@@ -1627,6 +1594,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -1636,7 +1607,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
@@ -1696,62 +1669,53 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-   Foo.fs [Nodes: 1] Index:Include
-  File2.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   Class2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 1] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    File1.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/EmptyFolder/Foo.fs
+  ClassLibrary1/File2.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:File2.fs
-5:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:File2.fs
+4:Folder[1]
   1:File3.fs
-6:EmptyFolder[1]
+5:EmptyFolder[1]
   1:Foo.fs
-7:Folder[2]
+6:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
@@ -1774,6 +1738,10 @@ AfterFile.fs
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -1783,7 +1751,9 @@ AfterFile.fs
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
@@ -1842,62 +1812,53 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File2.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   Class2.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 1] Index:Include
-    Class1.fs [Nodes: 1] Index:Include
-    File1.fs [Nodes: 1] Index:Include
-  Foo.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File2.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/Foo.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:File2.fs
-5:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:File2.fs
+4:Folder[1]
   1:File3.fs
-6:Foo.fs
-7:EmptyFolder[1]
-8:Folder[2]
+5:Foo.fs
+6:EmptyFolder[1]
+7:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-9:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-10:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-11:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
@@ -1920,6 +1881,10 @@ Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
    -Dependencies
     -.NETFramework 4.5
      -Assemblies
+      -Implicit
+       FSharp.Core
+       mscorlib
+       System.ValueTuple
       System
       System.Core
       System.Data
@@ -1929,7 +1894,9 @@ Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
       System.Runtime.Serialization
       System.Xml
       System.Xml.Linq
-     Packages
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
    BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
@@ -1987,62 +1954,53 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 ===================
-File Path Index
-<SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
-  AfterFile.fs [Nodes: 1] Index:Include
-  BeforeFile.fs [Nodes: 1] Index:Include
-  bin Index:ExcludeRecursive
-  ClassLibrary1.fsproj [Nodes: 1] Index:IncludeRecursive
-  EmptyFolder [Nodes: 1] Index:Include
-  File2.fs [Nodes: 1] Index:Include
-  Folder [Nodes: 2] Index:Include
-   Class1.fs [Nodes: 1] Index:Include
-   Class2.fs [Nodes: 1] Index:Include
-   File1.fs [Nodes: 1] Index:Include
-   File3.fs [Nodes: 1] Index:Include
-   File4.fs [Nodes: 1] Index:Include
-   File5.fs [Nodes: 1] Index:Include
-   Sub [Nodes: 1] Index:Include
-  Foo.fs [Nodes: 1] Index:Include
-  LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder
-  LinkedFile1.fs [Nodes: 1] Index:Include
-  LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
- packages Index:ExcludeRecursive
-
+Workspace Model
+Modules:
+  ClassLibrary1#Project#GUID
+  FSharpProjectTree#SolutionItems
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File2.fs
+  ClassLibrary1/Folder/Class1.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File1.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Foo.fs
+  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
 
 1:BeforeFile.fs (CompileBefore)
-2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
-3:obj[1]
+2:obj[1]
   1:Debug[1]
     1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-4:File2.fs
-5:Folder[1]
+      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+3:File2.fs
+4:Folder[1]
   1:File3.fs
-6:Foo.fs
-7:EmptyFolder[1]
-8:Folder[2]
+5:Foo.fs
+6:EmptyFolder[1]
+7:Folder[2]
   1:File4.fs
   2:File1.fs
   3:Class1.fs
   4:Sub[1]
   5:File5.fs
   6:Class2.fs
-9:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-10:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-11:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
+obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs

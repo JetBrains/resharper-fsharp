@@ -16,10 +16,10 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
-                         HighlightingTypes = [| typeof<LambdaCanBeSimplifiedWarning>
+                         HighlightingTypes = [| typeof<LambdaBodyCanBeReplacedWithIdWarning>
+                                                typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>
                                                 typeof<LambdaCanBeReplacedWithInnerExpressionWarning>
-                                                typeof<LambdaBodyCanBeReplacedWithIdWarning>
-                                                typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>|])>]
+                                                typeof<LambdaCanBeSimplifiedWarning> |])>]
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
 
@@ -46,7 +46,7 @@ type LambdaAnalyzer() =
 
             patName = expr.ShortName
 
-        | :? IUnitPat, (:? IUnitExpr) -> true
+        | :? IUnitPat, :? IUnitExpr -> true
         | _ -> false
 
     and compareArgsSeq (pats: IFSharpPattern seq) (args: IFSharpExpression seq) =
@@ -87,14 +87,16 @@ type LambdaAnalyzer() =
     
     let isImplicitlyConvertedToDelegate (lambda: ILambdaExpr) =
         let lambda = lambda.IgnoreParentParens()
-        let appTuple = TupleExprNavigator.GetByExpression(lambda)
-        let app = getArgsOwner lambda
+        let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
+        let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
+        let appTuple = TupleExprNavigator.GetByExpression(argExpr)
+        let app = getArgsOwner argExpr
 
         app :? IPrefixAppExpr && isNotNull app.Reference &&
         match app.Reference.GetFSharpSymbol() with
         | :? FSharpMemberOrFunctionOrValue as m ->
             m.IsMember &&
-            let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(lambda) else 0
+            let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
             let args = m.CurriedParameterGroups
             if args.[0].Count <= lambdaPos then false else
             let argDecl = args.[0].[lambdaPos]

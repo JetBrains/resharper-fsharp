@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -77,5 +78,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public void SetQualifier(IClrDeclaredElement declaredElement) => 
       this.SetQualifier(this.CreateElementFactory().CreateTypeReferenceName, declaredElement);
+
+    public bool IsPrimary =>
+      TypeKeyword?.GetTokenType() == FSharpTokenType.TYPE;
   }
 }

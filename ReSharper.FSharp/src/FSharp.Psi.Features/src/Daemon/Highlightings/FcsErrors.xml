@@ -299,12 +299,33 @@
     <QuickFix>NamespaceToModuleFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="AddTypeEquation">
+    <Parameter type="string" name="expectedType"/>
+    <Parameter type="string" name="actualType"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ConvertTupleToArrayOrListElementsFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="TypeAbbreviationsCannotHaveAugmentations">
     <Parameter type="ITypeExtensionDeclaration" name="extensionDecl"/>
     <Message value="Type abbreviations cannot have augmentations"/>
     <Range>extensionDecl.Identifier.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceWithAbbreviatedTypeFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="IndeterminateType">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message value="Lookup on object of indeterminate type based on information prior to this program point. A type annotation may be needed constrain the type of the object."/>
+    <Range>refExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>SpecifyParameterTypeFix</QuickFix>
   </Error>
 
 </Errors>

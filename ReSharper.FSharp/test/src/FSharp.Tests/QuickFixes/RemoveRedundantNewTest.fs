@@ -31,3 +31,6 @@ type RemoveRedundantNewAvailabilityTest() =
     [<Test>] member x.``String 01 - Type``() = x.DoNamedTest()
     [<Test>] member x.``String 02 - Type, qualified``() = x.DoNamedTest()
     [<Test>] member x.``String 03 - Redefined type``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type parameters 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type parameters 02``() = x.DoNamedTest()

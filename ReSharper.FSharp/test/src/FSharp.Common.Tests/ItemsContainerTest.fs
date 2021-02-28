@@ -93,7 +93,7 @@ let createViewFile path (solutionItems: IDictionary<FileSystemPath, IProjectItem
 let createViewFolder path id solutionItems =
     FSharpViewFolder (getOrCreateFolder path solutionItems, { Identity = id })
 
-let getOrCreateFile (AbsolutePath path) (solutionItems): IProjectFile =
+let getOrCreateFile (AbsolutePath path) solutionItems: IProjectFile =
     solutionItems.GetOrCreateValue(path, fun () ->
 
     let file = Mock<IProjectFile>()

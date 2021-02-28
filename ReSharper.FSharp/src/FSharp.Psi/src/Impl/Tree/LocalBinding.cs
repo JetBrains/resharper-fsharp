@@ -19,6 +19,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         FSharpImplUtil.AddTokenBefore(headPat, FSharpTokenType.MUTABLE);
     }
 
-    public bool HasParameters => !ParametersPatternsEnumerable.IsEmpty();
+    public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
   }
 }

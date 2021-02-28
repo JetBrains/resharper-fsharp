@@ -15,9 +15,11 @@ Delegate(|fun x -> x|(1))
 A.M1(|fun x -> x|(3))
 A.M1(0, |fun x -> x|(4))
 A.M2(0, |fun x -> x|(5))
-A.M3(0, (0, |fun x -> x|(6)))
-A.M4(|fun x -> x|(7))
-A.UnresolvedM(|fun x -> x|(8))
+A.M2(0, y = |fun x -> x|(6))
+A.M2(0, y = (|fun x -> x|(7)))
+A.M3(0, (0, |fun x -> x|(8)))
+A.M4(|fun x -> x|(9))
+A.UnresolvedM(|fun x -> x|(10))
 
 ---------------------------------------------------------
 (0): ReSharper Hint: Lambda can be replaced with 'id'
@@ -29,3 +31,5 @@ A.UnresolvedM(|fun x -> x|(8))
 (6): ReSharper Hint: Lambda can be replaced with 'id'
 (7): ReSharper Hint: Lambda can be replaced with 'id'
 (8): ReSharper Hint: Lambda can be replaced with 'id'
+(9): ReSharper Hint: Lambda can be replaced with 'id'
+(10): ReSharper Hint: Lambda can be replaced with 'id'

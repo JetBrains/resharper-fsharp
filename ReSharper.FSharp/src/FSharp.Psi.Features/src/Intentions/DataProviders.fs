@@ -2,10 +2,10 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.DataProviders
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 
 type FSharpContextActionDataProvider(solution, textControl, fsFile) =
     inherit CachedContextActionDataProviderBase<IFSharpFile>(solution, textControl, fsFile)

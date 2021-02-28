@@ -15,7 +15,7 @@ type FSharpLanguageLevel =
     /// Anon records
     | FSharp46 = 46
 
-    /// Implicit yield
+    /// Implicit yield, wild pat self id, constructor/static method parameters deindent 
     | FSharp47 = 47
 
     /// String interpolation, nameof, open types

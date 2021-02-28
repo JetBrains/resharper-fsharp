@@ -6,8 +6,13 @@ Opened
   -ClassLibrary
    -Dependencies
     -.NETStandard 2.0
-     Packages
-     SDK
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.6.2
+     -SDK
+      ...
    Library.fs
 
 

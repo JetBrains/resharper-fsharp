@@ -182,24 +182,26 @@ interface binding:
 topBinding extras {
   get { methodName="Expression" path=<topBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   get { methodName="Attributes" path=<topBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="ParameterPatterns" path=<topBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
+  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
 localBinding extras {
   get { methodName="Attributes" path=<localBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="ParameterPatterns" path=<localBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
+  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
   fSharpExpression<EXPR, Expression>;
@@ -228,7 +230,7 @@ externDeclaration:
 
 interface fSharpPattern:
   namedPat |
-  typedPat |
+  typedLikePat |
   attribPat |
   orPat |
   andsPat |
@@ -237,14 +239,15 @@ interface fSharpPattern:
   parenPat |
   recordPat |
   optionalValPat |
-  isInstPat |
-  listPat |
   listConsPat |
   parametersOwnerPat |
   wildPat |
   constPat |
   fieldPat |
-  otherPat;
+  nullPat |
+  quoteExprPat |
+  charRangePat |
+  fromErrorPat;
 
 interface namedPat:
   referencePat |
@@ -258,8 +261,11 @@ interface asPat:
   localAsPat |
   topAsPat;
 
+interface typedLikePat:
+  typedPat |
+  isInstPat;
 
-localReferencePat options { stubBase="LocalPatternDeclarationBase"; }extras {
+localReferencePat options { stubBase="LocalPatternDeclarationBase"; } extras {
   get { methodName="Identifier" path=<localReferencePat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
 }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>;
@@ -307,9 +313,7 @@ orPat options { stubBase="FSharpPatternBase"; }:
   fSharpPattern<PATTERN2, Pattern2>;
 
 andsPat options { stubBase="FSharpPatternBase"; }:
-  fSharpPattern<PATTERN1, Pattern1>
-  AMP
-  fSharpPattern<PATTERN2, Pattern2>;
+  LIST fSharpPattern<PATTERN, Patterns> SEP AMP<AMP, Ands>;
 
 arrayPat options { stubBase="FSharpPatternBase"; }:
   LBRACK_BAR
@@ -323,7 +327,7 @@ listPat options { stubBase="FSharpPatternBase"; }:
 
 tuplePat options { stubBase="FSharpPatternBase"; }:
   STRUCT<STRUCT, StructKeyword>?
-  LIST fSharpPattern<ATTRIBUTE, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
+  LIST fSharpPattern<PATTERN, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
 
 parenPat options { stubBase="FSharpPatternBase"; }:
   LPAREN<LPAREN, LeftParen>
@@ -372,9 +376,21 @@ unitPat options { stubBase="FSharpPatternBase"; }:
   LPAREN<LPAREN, LParen>
   RPAREN<RPAREN, RParen>;
 
+nullPat options { stubBase="FSharpPatternBase"; }:
+  NULL;
 
-otherPat options { stubBase="FSharpPatternBase"; }:
-  fakeSeparator;
+quoteExprPat options { stubBase="FSharpPatternBase"; } extras {
+  get { methodName="Expression" path=<quoteExprPat:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
+  chameleonExpression<CHAMELEON_EXPR, QuoteExpr>;
+
+charRangePat options { stubBase="FSharpPatternBase"; }:
+  CHARACTER_LITERAL
+  DOT_DOT
+  CHARACTER_LITERAL;
+
+fromErrorPat options { stubBase="FSharpPatternBase"; }:
+  fSharpPattern<PATTERN, Pattern>;
 
 
 interface fSharpExpression:
@@ -447,6 +463,10 @@ interface ifExpr:
 interface conditionOwnerExpr:
   ifExpr |
   whileExpr;
+
+interface arrayOrListExpr:
+  arrayExpr |
+  listExpr;
 
 setExpr options { stubBase="UnitExpressionBase"; }:
   fSharpExpression<LEFT_EXPR, LeftExpression>
@@ -574,18 +594,31 @@ anonRecordExpr options { stubBase="FSharpExpressionBase"; } extras {
   recordFieldBindingList<BINDING_LIST, FieldBindingList>
   BAR_RBRACE;
 
-arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:
-  (LBRACK | LBRACK_BAR)
+arrayExpr options { stubBase="FSharpExpressionBase"; }:
+  LBRACK_BAR
   fSharpExpression<EXPR, Expression>
-  (RBRACK | BAR_RBRACK);
+  BAR_RBRACK;
+
+listExpr options { stubBase="FSharpExpressionBase"; }:
+  LBRACK
+  fSharpExpression<EXPR, Expression>
+  RBRACK;
 
 recordExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="FieldBindings" path=<recordExpr:BINDING_LIST/recordFieldBindingList:BINDING> };
 }:
   LBRACE<LBRACE, LeftBrace>
   (
-    fSharpExpression<COPY_INFO, CopyInfoExpression>
-    WITH
+     (
+       fSharpExpression<COPY_INFO, CopyInfoExpression>
+       WITH
+     )
+     |
+     (
+       INHERIT
+       typeReferenceName<TYPE_REFERENCE, TypeName>
+       fSharpExpression<EXPR, InheritCtorArgExpression>
+     )
   )?
   recordFieldBindingList<BINDING_LIST, FieldBindingList>
   RBRACE<RBRACE, RightBrace>;
@@ -661,7 +694,7 @@ lambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
 lambdaParametersList:
   fSharpPattern<PAT, Patterns>*;
 
-interface matchClauseListOwner:
+interface matchClauseListOwnerExpr:
   matchExpr |
   matchLambdaExpr |
   tryWithExpr;
@@ -670,12 +703,16 @@ interface matchLikeExpr:
   matchExpr |
   matchLambdaExpr;
 
-matchLambdaExpr options { stubBase="FSharpExpressionBase"; }:
+matchLambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
+  get { methodName="ClauseExpressions" path=<matchLambdaExpr:MATCH_CLAUSE/matchClause:EXPR> };
+}:
   FUNCTION
   matchClause<MATCH_CLAUSE, Clauses>*;
 
 // todo: separate nodes for bang exprs?
-matchExpr options { stubBase="FSharpExpressionBase"; }:
+matchExpr options { stubBase="FSharpExpressionBase"; } extras {
+  get { methodName="ClauseExpressions" path=<matchExpr:MATCH_CLAUSE/matchClause:EXPR> };
+}:
   MATCH
   fSharpExpression<EXPR, Expression>
   WITH<WITH, WithKeyword>
@@ -700,7 +737,9 @@ binaryAppExpr options { stubBase="FSharpExpressionBase"; } extras {
   referenceExpr<OP_REF_EXPR, Operator>
   fSharpExpression<RIGHT_ARG_EXPR, RightArgument>;
 
-letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
+letOrUseExpr options { stubBase="FSharpExpressionBase"; } extras {
+  get { methodName="BoundExpressions" path=<letOrUseExpr:BINDING/localBinding:EXPR> };
+}:
   letOrUse{LET, BindingKeyword}
   REC<REC, RecKeyword>?
   LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>  
@@ -711,7 +750,9 @@ interface tryLikeExpr:
   tryWithExpr |
   tryFinallyExpr;
 
-tryWithExpr options { stubBase="FSharpExpressionBase"; }:
+tryWithExpr options { stubBase="FSharpExpressionBase"; } extras {
+  get { methodName="ClauseExpressions" path=<tryWithExpr:MATCH_CLAUSE/matchClause:EXPR> };
+}:
   TRY<TRY_KEYWORD, TryKeyword>
   fSharpExpression<TRY_EXPR, TryExpression>
   WITH
@@ -763,10 +804,12 @@ referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
   fSharpIdentifier<IDENTIFIER, Identifier>
   prefixAppTypeArgumentList<TYPE_ARG_LIST, TypeArgumentList>?;
 
-matchClause:
+matchClause extras {
+  get { methodName="WhenExpression" path=<matchClause:WHEN_CLAUSE/whenExprClause:EXPR> };
+}:
   BAR<BAR, Bar>?
   fSharpPattern<PAT, Pattern>
-  whenExprClause<WHEN_EXPR, WhenExpression>?
+  whenExprClause<WHEN_CLAUSE, WhenExpressionClause>?
   RARROW<RARROW, RArrow>
   fSharpExpression<EXPR, Expression>;
   
@@ -834,7 +877,33 @@ fromErrorExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>;
 
 interpolatedStringExpr options { stubBase="FSharpExpressionBase"; }:
-  fakeSeparator;
+  REGULAR_INTERPOLATED_STRING<LITERAL,Literals> |
+  VERBATIM_INTERPOLATED_STRING<LITERAL,Literals> |
+  TRIPLE_QUOTE_INTERPOLATED_STRING<LITERAL,Literals> |
+  
+  REGULAR_INTERPOLATED_STRING_START<LITERAL,Literals>
+  fSharpExpression<INSERT,Inserts>
+  (
+    REGULAR_INTERPOLATED_STRING_MIDDLE<LITERAL,Literals>
+    fSharpExpression<INSERT,Inserts>
+  )*
+  REGULAR_INTERPOLATED_STRING_END<LITERAL,Literals> |
+  
+  VERBATIM_INTERPOLATED_STRING_START<LITERAL,Literals>
+  fSharpExpression<INSERT,Inserts>
+  (
+    VERBATIM_INTERPOLATED_STRING_MIDDLE<LITERAL,Literals>
+    fSharpExpression<INSERT,Inserts>
+  )*
+  VERBATIM_INTERPOLATED_STRING_END<LITERAL,Literals> |
+  
+  TRIPLE_QUOTE_INTERPOLATED_STRING_START<LITERAL,Literals>
+  fSharpExpression<INSERT,Inserts>
+  (
+    TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE<LITERAL,Literals>
+    fSharpExpression<INSERT,Inserts>
+  )*
+  TRIPLE_QUOTE_INTERPOLATED_STRING_END<LITERAL,Literals>;
 
 fixedExpr options { stubBase="FSharpExpressionBase"; }:
   FIXED<KEYWORD, Keyword>
@@ -853,12 +922,8 @@ chameleonExpression:
   fSharpExpression<EXPR, Expression>;
 
 
-typeDeclarationGroup extras {
-  get { methodName="Attributes" path=<typeDeclarationGroup:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-}:
-  attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  TYPE<TYPE, TypeKeyword>
-  LIST fSharpTypeOrExtensionDeclaration<TYPE_DECLARATION, TypeDeclarations> SEP AND<FSHARP_AND, Separators>;
+typeDeclarationGroup:
+  fSharpTypeOrExtensionDeclaration<TYPE_DECLARATION, TypeDeclarations>*;
 
 interface fSharpTypeOrExtensionDeclaration:
   fSharpTypeDeclaration |
@@ -871,8 +936,13 @@ fSharpTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } e
   get { methodName="TypeMembers" path=<fSharpTypeDeclaration:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  (
+    TYPE<TYPE, TypeKeyword> |
+    AND<TYPE, TypeKeyword>
+  )
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  fSharpIdentifier<IDENTIFIER, Identifier>
+  identifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   primaryConstructorDeclaration<PRIMARY_CTOR_DECL, PrimaryConstructorDeclaration>?
   EQUALS<FSHARP_EQUALS, EqualsToken>
@@ -941,7 +1011,7 @@ nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }
   MODULE<MODULE, ModuleOrNamespaceKeyword>
   REC<REC, RecKeyword>?
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  fSharpIdentifier<IDENTIFIER, Identifier>
+  identifier<IDENTIFIER, Identifier>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   moduleMember<MODULE_MEMBER, Members>*;
 
@@ -950,6 +1020,11 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
    get { methodName="TypeMembers" path=<typeExtensionDeclaration:MEMBER_LIST/typeMemberDeclarationList:MEMBER_DECL> };
    get { methodName="Attributes" path=<typeExtensionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
  }:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  (
+    TYPE<TYPE, TypeKeyword> |
+    AND<TYPE, TypeKeyword>
+  )
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   (
@@ -1077,7 +1152,7 @@ moduleAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBa
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MODULE<MODULE, ModuleOrNamespaceKeyword>
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  fSharpIdentifier<IDENTIFIER, Identifier>
+  identifier<IDENTIFIER, Identifier>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   typeReferenceName<TYPE_REFERENCE, TypeName>
   // todo: remove rules below
@@ -1108,7 +1183,7 @@ delegateRepresentation options { stubBase="TypeRepresentationBase"; }:
   typeUsage<TYPE, Type>;
 
 interface fSharpTypeMemberDeclaration:
-  constructorDeclaration |
+  constructorSignatureOrDeclaration |
   inheritMember |
   interfaceImplementation |
   valFieldDeclaration |
@@ -1120,8 +1195,20 @@ interface fSharpTypeMemberDeclaration:
 interface overridableMemberDeclaration:
   abstractMemberDeclaration |
   autoPropertyDeclaration |
-  memberDeclaration;
+  memberSignatureOrDeclaration;
 
+interface memberSignatureOrDeclaration:
+  memberDeclaration |
+  memberSignature;
+
+interface memberSignatureLikeDeclaration:
+  abstractMemberDeclaration |
+  constructorSignature |
+  memberSignature;
+
+interface constructorSignatureOrDeclaration:
+  constructorDeclaration |
+  constructorSignature;
 
 interface constructorDeclaration:
   primaryConstructorDeclaration |
@@ -1155,10 +1242,12 @@ interfaceImplementation extras {
 
 otherTypeMember: fakeSeparator;
 
-primaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; }:
+primaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
+  get { methodName="ParameterPatterns" path=<primaryConstructorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+}:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  parametersPatternDeclaration<PARAMETERS, ParametersPatternDeclaration>
+  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclaration> 
   ctorSelfId<SELF_ID, SelfIdentifier>?;
 
 interface selfId:
@@ -1179,13 +1268,21 @@ namedSelfId options { stubBase="LocalDeclarationBase"; }:
 wildSelfId options { stubBase="LocalDeclarationBase"; }:
   UNDERSCORE<UNDERSCORE, Underscore>;
 
+constructorSignature options { stubBase="ConstructorDeclarationBase"; }:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  NEW<NEW, NewKeyword>
+  COLON
+  typeUsage<TYPE, Type>;
+
 secondaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
   get { methodName="Expression" path=<secondaryConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  get { methodName="ParameterPatterns" path=<secondaryConstructorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   NEW<NEW, NewKeyword>
-  parametersPatternDeclaration<PARAMETERS, ParametersPatternDeclaration>
+  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclaration>
   ctorSelfId<SELF_ID, SelfIdentifier>?
   EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
@@ -1198,6 +1295,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Expression" path=<memberDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  get { methodName="ParameterPatterns" path=<memberDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
@@ -1210,17 +1308,34 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   (
-    parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
+    parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
     EQUALS<FSHARP_EQUALS, EqualsToken>
     chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>
   |
-    WITH
-    accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
-    (
-      AND
-      accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
-    )?
+    accessorDecls
   );
+
+memberSignature  options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<memberSignature:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<memberSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  STATIC<STATIC, StaticKeyword>?
+  memberKeyword{MEMBER_KEYWORD, MemberKeyword}
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  identOrOpName{IDENTIFIER, Identifier}
+  typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  COLON
+  typeUsage<TYPE, Type>
+  accessorDecls?;
+
+private accessorDecls:
+  WITH
+  accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
+  (
+    AND
+    accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
+  )?;
 
 private memberKeyword{ROLE, Getter}:
   MEMBER<@ROLE, @Getter> |
@@ -1236,7 +1351,8 @@ abstractMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationB
   MEMBER<MEMBER, MemberKeyword>?
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*;
+  COLON
+  typeUsage<TYPE, Type>;
 
 valFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<valFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -1271,11 +1387,13 @@ accessorsNamesClause:
     IDENTIFIER<ACESSOR, AccessorsNames>
   );
 
-accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="ParameterPatterns" path=<accessorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+}:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   IDENTIFIER<IDENTIFIER, Identifier>
   (
-    parametersPatternDeclaration<PARAMETERS_PATTERN, ParametersPatterns>*
+    parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
     EQUALS<FSHARP_EQUALS, EqualsToken>
     chameleonExpression<CHAMELEON_EXPR, BodyExpression>
   )?;
@@ -1358,24 +1476,41 @@ typeParameterId:
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 interface fSharpIdentifier:
-  identifier |
-  symbolicOp |
-  ampAmp |
   activePatternId |
-  typeParameterId |
-  global;
+  ampAmp |
+  colonColon |
+  equals |
+  global |
+  greater
+  identifier |
+  less |
+  lparenStarRparen |
+  minus |
+  percent |
+  percentPercent |
+  plus |
+  qmark |
+  qmarkQmark |
+  star |
+  symbolicOp |
+  typeParameterId;
 
-abstract identifier options { interfaceName="IFSharpIdentifier"; }:
-  IDENTIFIER;
-
-abstract symbolicOp options { interfaceName="IFSharpIdentifier"; }:
-  SYMBOLIC_OP;
-
-abstract ampAmp options { interfaceName="IFSharpIdentifier"; }:
-  ampAmp;
-
-abstract global options { interfaceName="IFSharpIdentifier"; }:
-  GLOBAL;
+abstract ampAmp options { interfaceName="IFSharpIdentifier"; }: AMP_AMP;
+abstract colonColon options { interfaceName="IFSharpIdentifier"; }: PERCENT;
+abstract equals options { interfaceName="IFSharpIdentifier"; }: EQUALS;
+abstract global options { interfaceName="IFSharpIdentifier"; }: GLOBAL;
+abstract greater options { interfaceName="IFSharpIdentifier"; }: GREATER;
+abstract identifier options { interfaceName="IFSharpIdentifier"; }: IDENTIFIER;
+abstract less options { interfaceName="IFSharpIdentifier"; }: LESS;
+abstract lparenStarRparen options { interfaceName="IFSharpIdentifier"; }: LPAREN_STAR_RPAREN;
+abstract minus options { interfaceName="IFSharpIdentifier"; }: MINUS;
+abstract plus options { interfaceName="IFSharpIdentifier"; }: PLUS;
+abstract percent options { interfaceName="IFSharpIdentifier"; }: PERCENT_PERCENT;
+abstract percentPercent options { interfaceName="IFSharpIdentifier"; }: COLON_COLON;
+abstract qmark options { interfaceName="IFSharpIdentifier"; }: QMARK;
+abstract qmarkQmark options { interfaceName="IFSharpIdentifier"; }: QMARK_QMARK;
+abstract star options { interfaceName="IFSharpIdentifier"; }: STAR;
+abstract symbolicOp options { interfaceName="IFSharpIdentifier"; }: SYMBOLIC_OP;
 
 // Type parameters
 
@@ -1500,13 +1635,16 @@ interface typeUsage:
   functionTypeUsage |
   anonTypeUsage |
   parenTypeUsage |
+  parameterSignatureTypeUsage |
   unsupportedTypeUsage;
 
 
 namedTypeUsage:
+  topLevelTypeParameterDecl
   typeReferenceName<TYPE_REFERENCE, ReferenceName>;
 
 tupleTypeUsage:
+  topLevelTypeParameterDecl
   typeUsage<ITEM, Items>
   (
     STAR
@@ -1514,6 +1652,7 @@ tupleTypeUsage:
   )*;
 
 anonRecordTypeUsage:
+  topLevelTypeParameterDecl
   LBRACE_BAR
   anonRecordField<FIELD, Fields>*
   BAR_RBRACE;
@@ -1524,22 +1663,48 @@ anonRecordField:
   typeUsage<TYPE, Type>;
 
 arrayTypeUsage:
+  topLevelTypeParameterDecl
   typeUsage<TYPE, Type>
   LBRACK
   RBRACK;
 
 functionTypeUsage:
-  typeUsage
+  topLevelTypeParameterDecl
+  typeUsage<ARG_TYPE, ArgumentTypeUsage>
   RARROW
-  typeUsage;
+  topLevelTypeParameterDecl
+  typeUsage<RETURN_TYPE, ReturnTypeUsage>;
 
 anonTypeUsage:
   UNDERSCORE;
 
 parenTypeUsage:
+  topLevelTypeParameterDecl
   LPAREN<LPAREN, LeftParen>
   typeUsage<TYPE, InnerTypeUsage>
   RPAREN<RPAREN, RightParen>;
 
+parameterSignatureTypeUsage:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  QMARK<QMARK, OptionalMark>?
+  (
+    identifier<IDENTIFIER, Identifier>
+    COLON
+  )?
+  typeUsage<TYPE, Type>;
+
 unsupportedTypeUsage:
   fakeSeparator;
+
+
+private topLevelTypeParameterDecl:
+  topLevelTypeAttribute?
+  topLevelTypeParameterName?;
+  
+
+private topLevelTypeAttribute:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*;
+
+private topLevelTypeParameterName:
+  IDENTIFIER
+  COLON;

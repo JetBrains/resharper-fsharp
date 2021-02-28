@@ -1,0 +1,27 @@
+﻿module M
+
+do
+    let _ = |(|(0)|(|(1)id ()|)|(2)|)|(3)
+    |(|(4)|(|(5)id ()|)|(6)|)|(7)
+
+do
+    let _ = |(|(8)|(|(9)1|)|(10)|)|(11)
+    |(|(12)|(|(13)1|)|(14)|)|(15)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1): ReSharper Dead Code: Redundant parentheses
+(2):<secondary> ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5): ReSharper Dead Code: Redundant parentheses
+(6):<secondary> ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
+(8): ReSharper Dead Code: Redundant parentheses
+(9): ReSharper Dead Code: Redundant parentheses
+(10):<secondary> ReSharper Dead Code: Redundant parentheses
+(11):<secondary> ReSharper Dead Code: Redundant parentheses
+(12): ReSharper Dead Code: Redundant parentheses
+(13): ReSharper Dead Code: Redundant parentheses
+(14):<secondary> ReSharper Dead Code: Redundant parentheses
+(15):<secondary> ReSharper Dead Code: Redundant parentheses

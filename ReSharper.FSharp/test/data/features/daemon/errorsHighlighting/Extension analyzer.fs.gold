@@ -30,6 +30,13 @@ module Module2 =
 module Module3 =
     [<|Extension|(4)>]
     let foo (_: int) = ()
+
+[<Extension>]
+module Module4 =
+    type System.String with
+        [<Extension>]
+        member _.M() = ()
+
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Extension type doesn't have any extension members
 (1): ReSharper Dead Code: Extension type doesn't have any extension members

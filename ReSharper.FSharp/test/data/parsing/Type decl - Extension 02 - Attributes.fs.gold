@@ -2,16 +2,16 @@
 IFSharpImplFile
   IAnonModuleDeclaration
     ITypeDeclarationGroup
-      IAttributeList
-        FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
-        IAttribute
-          ITypeReferenceName
-            FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-        FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
-      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-      FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITypeExtensionDeclaration
+        IAttributeList
+          FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+          IAttribute
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+          FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IAttributeList
           FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
           IAttribute

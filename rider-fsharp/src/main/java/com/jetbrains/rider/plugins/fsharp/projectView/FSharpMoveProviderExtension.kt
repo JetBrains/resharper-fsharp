@@ -1,37 +1,22 @@
 package com.jetbrains.rider.plugins.fsharp.projectView
 
 import com.intellij.openapi.project.Project
+import com.intellij.workspaceModel.ide.impl.virtualFile
 import com.jetbrains.rider.model.RdProjectFileDescriptor
+import com.jetbrains.rider.projectView.ProjectElementView
+import com.jetbrains.rider.projectView.ProjectEntityView
 import com.jetbrains.rider.projectView.moveProviders.extensions.MoveProviderExtension
 import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
 import com.jetbrains.rider.projectView.moveProviders.impl.NodeOrderType
 import com.jetbrains.rider.projectView.nodes.*
+import com.jetbrains.rider.projectView.utils.compareProjectModelEntities
+import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
+import com.jetbrains.rider.projectView.workspace.containingProjectEntity
+import com.jetbrains.rider.projectView.workspace.isProjectFile
+import com.jetbrains.rider.projectView.workspace.isProjectFolder
 import com.jetbrains.rider.util.idea.application
 
 class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(project) {
-
-    private fun ProjectModelNode.prevSibling() = getSibling { index -> index - 1 }
-    private fun ProjectModelNode.nextSibling() = getSibling { index -> index + 1 }
-
-    private fun ProjectModelNode.getSibling(indexFunc: (Int) -> Int): ProjectModelNode? {
-        val parent = parent ?: return null
-        val siblings = parent.getSortedChildren()
-        val index = siblings.indexOf(this)
-        val newIndex = indexFunc(index)
-        if (newIndex < 0 || newIndex > siblings.count() - 1)
-            return null
-        return siblings[newIndex]
-    }
-
-    private fun ProjectModelNode.getSortedChildren(performExpand: Boolean = true): List<ProjectModelNode> {
-        val comparator = Comparator<ProjectModelNode> { p0, p1 ->
-            if (p0 == null && p1 == null) return@Comparator 0
-            if (p0 == null) return@Comparator 1
-            if (p1 == null) return@Comparator -1
-            compareNodes(p0, p1)
-        }
-        return getChildren(performExpand = performExpand).sortedWith(comparator)
-    }
 
     companion object {
         const val CompileBeforeType: String = "CompileBefore"
@@ -42,41 +27,65 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
         }
     }
 
-    override fun supportOrdering(node: IProjectModelNode): NodeOrderType {
-        if (node is ProjectModelNode && isFSharpNode(node)) {
-            if (node.isProjectFile()) return NodeOrderType.BeforeAfter
-            if (node.isProjectFolder()) return NodeOrderType.BeforeAfterInside
-            return NodeOrderType.None
-        }
-        return super.supportOrdering(node)
+    private fun ProjectModelEntity.prevSibling() = getSibling { index -> index - 1 }
+    private fun ProjectModelEntity.nextSibling() = getSibling { index -> index + 1 }
+
+    private fun ProjectModelEntity.getSibling(indexFunc: (Int) -> Int): ProjectModelEntity? {
+        val parent = parentEntity ?: return null
+        val siblings = parent.getSortedChildren()
+        val index = siblings.indexOf(this)
+        val newIndex = indexFunc(index)
+        if (newIndex < 0 || newIndex > siblings.count() - 1)
+            return null
+        return siblings[newIndex]
     }
 
-    override fun allowPaste(nodes: Collection<ProjectModelNode>, relativeTo: IProjectModelNode, orderType: ActionOrderType): Boolean {
-        if (nodes.any { it.isProjectFolder() && it.containingProject()?.getVirtualFile()?.extension == "fsproj" })
+    private fun ProjectModelEntity.getSortedChildren(): List<ProjectModelEntity> {
+        val comparator = Comparator<ProjectModelEntity> { p0, p1 ->
+            if (p0 == null && p1 == null) return@Comparator 0
+            if (p0 == null) return@Comparator 1
+            if (p1 == null) return@Comparator -1
+            compareProjectModelEntities(project, p0, p1)
+        }
+        return childrenEntities.sortedWith(comparator).toList()
+    }
+
+    override fun supportOrdering(element: ProjectElementView): NodeOrderType {
+        if (element is ProjectEntityView && isFSharpNode(element.entity)) {
+            if (element.entity.isProjectFile()) return NodeOrderType.BeforeAfter
+            if (element.entity.isProjectFolder()) return NodeOrderType.BeforeAfterInside
+            return NodeOrderType.None
+        }
+        return super.supportOrdering(element)
+    }
+
+    override fun allowPaste(entities: Collection<ProjectModelEntity>, relativeTo: ProjectElementView, orderType: ActionOrderType): Boolean {
+        if (entities.any { it.isProjectFolder() && it.containingProjectEntity()?.url?.virtualFile?.extension == "fsproj" })
             return false
 
         if (orderType == ActionOrderType.None) {
-            return super.allowPaste(nodes, relativeTo, orderType)
+            return super.allowPaste(entities, relativeTo, orderType)
         }
 
-        if (relativeTo is ProjectModelNode && isFSharpNode(relativeTo)) {
-            val nodesItemType = getNodesItemType(nodes)
+        if (relativeTo is ProjectEntityView && isFSharpNode(relativeTo.entity)) {
+            val nodesItemType = getNodesItemType(entities)
             if (nodesItemType == FSharpItemType.Mix) return false
 
+            val relativeToEntity = relativeTo.entity
             when (orderType) {
                 ActionOrderType.Before -> {
                     when (nodesItemType) {
                         FSharpItemType.Default -> {
-                            if (relativeTo.isCompileBefore(ActionOrderType.Before))
+                            if (relativeToEntity.isCompileBefore(ActionOrderType.Before))
                                 return false
-                            if (relativeTo.prevSibling().isCompileAfter(ActionOrderType.After))
+                            if (relativeToEntity.prevSibling().isCompileAfter(ActionOrderType.After))
                                 return false
                             return true
                         }
                         FSharpItemType.CompileBefore ->
-                            return relativeTo.isCompileBefore(ActionOrderType.Before) ||
-                                    relativeTo.prevSibling().isCompileBefore(ActionOrderType.After)
-                        FSharpItemType.CompileAfter -> return relativeTo.isCompileAfter(ActionOrderType.Before)
+                            return relativeToEntity.isCompileBefore(ActionOrderType.Before) ||
+                                    relativeToEntity.prevSibling().isCompileBefore(ActionOrderType.After)
+                        FSharpItemType.CompileAfter -> return relativeToEntity.isCompileAfter(ActionOrderType.Before)
                         else -> {
                         }
                     }
@@ -84,16 +93,16 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
                 ActionOrderType.After -> {
                     when (nodesItemType) {
                         FSharpItemType.Default -> {
-                            if (relativeTo.isCompileAfter(ActionOrderType.After))
+                            if (relativeToEntity.isCompileAfter(ActionOrderType.After))
                                 return false
-                            if (relativeTo.nextSibling().isCompileBefore(ActionOrderType.Before))
+                            if (relativeToEntity.nextSibling().isCompileBefore(ActionOrderType.Before))
                                 return false
                             return true
                         }
-                        FSharpItemType.CompileBefore -> return relativeTo.isCompileBefore(ActionOrderType.After)
+                        FSharpItemType.CompileBefore -> return relativeToEntity.isCompileBefore(ActionOrderType.After)
                         FSharpItemType.CompileAfter ->
-                            return relativeTo.isCompileAfter(ActionOrderType.After) ||
-                                    relativeTo.nextSibling().isCompileAfter(ActionOrderType.Before)
+                            return relativeToEntity.isCompileAfter(ActionOrderType.After) ||
+                                    relativeToEntity.nextSibling().isCompileAfter(ActionOrderType.Before)
                         else -> {
                         }
                     }
@@ -102,14 +111,14 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
             }
 
         }
-        return super.allowPaste(nodes, relativeTo, orderType)
+        return super.allowPaste(entities, relativeTo, orderType)
     }
 
-    private fun getNodesItemType(nodes: Collection<ProjectModelNode>): FSharpItemType {
+    private fun getNodesItemType(entities: Collection<ProjectModelEntity>): FSharpItemType {
         var compileBeforeFound = false
         var compileAfterFound = false
         var other = false
-        for (node in nodes) {
+        for (node in entities) {
             if (node.isProjectFile()) {
                 when {
                     node.isCompileBefore(ActionOrderType.None) -> compileBeforeFound = true
@@ -118,7 +127,7 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
                 }
             }
             if (node.isProjectFolder()) {
-                when (getNodesItemType(node.getChildren(true, false))) {
+                when (getNodesItemType(node.childrenEntities.toList())) {
                     FSharpItemType.Default -> {
                         other = true
                     }
@@ -142,12 +151,12 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
         return FSharpItemType.Mix
     }
 
-    private fun isFSharpNode(node: ProjectModelNode): Boolean {
-        return node.containingProject()?.getVirtualFile()?.extension == "fsproj" ||
+    private fun isFSharpNode(entity: ProjectModelEntity): Boolean {
+        return entity.containingProjectEntity()?.url?.virtualFile?.extension == "fsproj" ||
                 application.isUnitTestMode // todo: workaround for dummy project?
     }
 
-    private fun ProjectModelNode?.isCompileBefore(orderType: ActionOrderType): Boolean {
+    private fun ProjectModelEntity?.isCompileBefore(orderType: ActionOrderType): Boolean {
         this ?: return false
         val descriptor = descriptor
         if (descriptor is RdProjectFileDescriptor) {
@@ -163,7 +172,7 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
         return false
     }
 
-    private fun ProjectModelNode?.isCompileAfter(orderType: ActionOrderType): Boolean {
+    private fun ProjectModelEntity?.isCompileAfter(orderType: ActionOrderType): Boolean {
         this ?: return false
         val descriptor = descriptor
         if (descriptor is RdProjectFileDescriptor) {

@@ -29,6 +29,8 @@ type FcsErrorsHighlightingTest() =
     [<TestFileExtension(FSharpScriptProjectFileType.FsxExtension)>]
     [<Test; Explicit>] member x.``Unused value in script``() = x.DoNamedTest()
 
+    [<Test>] member x.``Unused value - Operators 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Unused value - Partial pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Unused value 01 - Object expression``() = x.DoNamedTest()
 
@@ -58,3 +60,9 @@ type FcsErrorsHighlightingTest() =
 
     // Workaround for type-private tests as function bindings. Probably check attribute names instead?
     [<Test>] member x.``Ignored - Top level function with attributes 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Unexpected expression type 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Incomplete pattern - Match 01``() = x.DoNamedTest()
+    [<Test>] member x.``Incomplete pattern - Match lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Incomplete pattern - Pattern 01``() = x.DoNamedTest()

@@ -1,7 +1,0 @@
-﻿//${NEW_NAME:Zzz}
-module Module
-
-type Zzz =
-    | Zzz
-
-let a = Zzz

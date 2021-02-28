@@ -13,6 +13,10 @@
 
   <SeverityConfiguration>
     <Group name="HighlightingGroupIds.CodeRedundancy">
+      <Tag name="FSharpRedundantParens" default="WARNING">
+        <Title>Remove redundant parentheses</Title>
+        <Description>Parentheses can be safely removed without changing code semantics.</Description>
+      </Tag>
       <Tag name="FSharpRedundantOpen" default="WARNING">
         <Title>Redundant 'open' directive</Title>
         <Description>Open directive is not required by the code and can be safely removed.</Description>
@@ -64,6 +68,10 @@
       <Tag name="FSharpUseWildSelfId" default="SUGGESTION">
         <Title>Use `_` self id</Title>
         <Description>Use `_` self id.</Description>
+      </Tag>
+      <Tag name="FSharpRedundantStringInterpolation" default="SUGGESTION">
+        <Title>Redundant string interpolation</Title>
+        <Description>String interpolation expression without arguments is redundant.</Description>
       </Tag>
       <Tag name="FSharpInterpolatedString" default="SUGGESTION">
         <Title>Format string can be replaced with an interpolated string</Title>
@@ -118,6 +126,8 @@
     <Parameter type="FSharpIdentifierToken" name="identifier"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant identifier escaping"/>
+    <Range>identifier.GetHighlightingRange().StartOffsetRange().ExtendRight(2)</Range>
+    <SecondaryRanges>[| identifier.GetHighlightingRange().EndOffsetRange().ExtendLeft(2) |] :> _</SecondaryRanges>
     <QuickFix>RemoveRedundantBackticksFix</QuickFix>
   </Warning>
 
@@ -137,18 +147,31 @@
     <QuickFix>ConvertToUseFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" isSuppressedInTests="true">
+  <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" configurableSeverity="FSharpRedundantParens" isSuppressedInTests="true">
     <Parameter type="IParenExpr" name="parenExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
+    <Range>parenExpr.LeftParen.GetHighlightingRange()</Range>
+    <SecondaryRanges>secondaryRangesFromNode parenExpr.RightParen</SecondaryRanges>
     <QuickFix>RemoveRedundantParenExprFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantParenPat" isSuppressedInTests="true">
+  <Warning staticGroup="FSharpErrors" name="RedundantParenPat" configurableSeverity="FSharpRedundantParens">
     <Parameter type="IParenPat" name="parenPat"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
-    <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
+    <Range>parenPat.LeftParen.GetHighlightingRange()</Range>
+    <SecondaryRanges>secondaryRangesFromNode parenPat.RightParen</SecondaryRanges>
+    <QuickFix>RemoveRedundantParenPatFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantParenTypeUsage" configurableSeverity="FSharpRedundantParens">
+    <Parameter type="IParenTypeUsage" name="parenTypeUsage"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant parentheses"/>
+    <Range>parenTypeUsage.LeftParen.GetHighlightingRange()</Range>
+    <SecondaryRanges>secondaryRangesFromNode parenTypeUsage.RightParen</SecondaryRanges>
+    <QuickFix>RemoveRedundantParenTypeUsageFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantAttributeParens" configurableSeverity="FSharpRedundantAttributeParens">
@@ -248,6 +271,13 @@
     <Range>formatStringExpr.GetHighlightingRange()</Range>
     <Message value="Format string can be replaced with an interpolated string"/>
     <QuickFix>ReplaceWithInterpolatedStringFix</QuickFix>
+  </Warning>
+
+  <Warning name="RedundantStringInterpolation" configurableSeverity="FSharpRedundantStringInterpolation">
+    <Parameter type="IInterpolatedStringExpr" name="expr"/>
+    <Message value="Redundant string interpolation"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Range>expr.GetDollarSignRange()</Range>
   </Warning>
 
 </Errors>

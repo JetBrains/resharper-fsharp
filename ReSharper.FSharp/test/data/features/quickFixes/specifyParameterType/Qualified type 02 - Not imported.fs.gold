@@ -1,0 +1,5 @@
+﻿let f (t: System.Text.StringBuilder) = ()
+
+let g (t: System.Text.StringBuilder) =
+    t.AppendLine{caret}()
+    f t

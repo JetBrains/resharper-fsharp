@@ -46,8 +46,8 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
 
 
 [<SolutionInstanceComponent>]
-type FSharpProjectStructurePresenter
-        (host: ProjectModelViewHost, container: IFSharpItemsContainer, presenter: ProjectModelViewPresenter) =
+type FSharpProjectStructurePresenter(host: ProjectModelViewHost, container: IFSharpItemsContainer,
+        presenter: ProjectModelViewPresenter) =
 
     let presentItem (item: FSharpViewItem): RdProjectModelItemDescriptor =
         let key = container.TryGetSortKey(item) |> Option.toNullable

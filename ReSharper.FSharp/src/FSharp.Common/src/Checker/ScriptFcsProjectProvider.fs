@@ -12,8 +12,8 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Util
 
 [<SolutionComponent>]
-type ScriptFcsProjectProvider
-        (lifetime, logger: ILogger, checkerService: FSharpCheckerService, scriptSettings: FSharpScriptSettingsProvider) =
+type ScriptFcsProjectProvider(lifetime, logger: ILogger, checkerService: FSharpCheckerService,
+        scriptSettings: FSharpScriptSettingsProvider) =
 
     let getScriptOptionsLock = obj()
 

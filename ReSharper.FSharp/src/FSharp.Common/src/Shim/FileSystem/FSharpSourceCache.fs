@@ -25,10 +25,9 @@ type FSharpSource =
         RdFSharpSource(Encoding.UTF8.GetString(x.Source), x.Timestamp)
 
 [<SolutionComponent>]
-type FSharpSourceCache
-        (lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
-         solutionDocumentChangeProvider: SolutionDocumentChangeProvider,
-         fileExtensions: IProjectFileExtensions, logger: ILogger) =
+type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
+        solutionDocumentChangeProvider: SolutionDocumentChangeProvider, fileExtensions: IProjectFileExtensions,
+        logger: ILogger) =
     inherit FileSystemShimChangeProvider(Lifetime.Define(lifetime).Lifetime, changeManager)
 
     let files = ConcurrentDictionary<FileSystemPath, FSharpSource>()

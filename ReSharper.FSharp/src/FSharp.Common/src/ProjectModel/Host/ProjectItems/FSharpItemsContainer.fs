@@ -87,9 +87,8 @@ type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
 
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
 [<SolutionInstanceComponent>]
-type FSharpItemsContainer
-        (logger: ILogger, containerLoader: FSharpItemsContainerLoader, projectRefresher: IFSharpItemsContainerRefresher,
-         filterProvider: IItemTypeFilterProvider) =
+type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainerLoader,
+        projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider) =
 
     let locker = JetFastSemiReenterableRWLock()
     let projectMappings = lazy (containerLoader.GetMap())
@@ -152,7 +151,7 @@ type FSharpItemsContainer
         let refreshFolder folder =
             match folderToRefresh, folder with
             | None, _ | _, Project _ -> folderToRefresh <- Some folder
-            | Some (ProjectItem existingFolder), (ProjectItem newFolder) when
+            | Some (ProjectItem existingFolder), ProjectItem newFolder when
                     newFolder.LogicalPath.IsPrefixOf(existingFolder.LogicalPath) -> folderToRefresh <- Some folder
             | _ -> ()
 
@@ -1214,7 +1213,7 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
         | Some context -> context
         | _ -> base.CreateOrderingContext(modifiedItems, relativeItems, relativeToType)
 
-    member x.CreateModificationContext(modifiedViewItem, (relativeViewItem: obj), relativeToType) =
+    member x.CreateModificationContext(modifiedViewItem, relativeViewItem: obj, relativeToType) =
         let project, relativeElement =
             match relativeViewItem with
             | :? FSharpViewItem as viewItem -> viewItem.ProjectItem.GetProject(), Some viewItem

@@ -1,4 +1,16 @@
-﻿module M
+﻿AllowHighPrecedenceAppParens = True
+module M
+
+let [<Literal>] S = "X"
+
+[<CompiledName(S)>]
+let x = 123
+
+---------------------------------------------------------
+
+================
+AllowHighPrecedenceAppParens = False
+module M
 
 let [<Literal>] S = "X"
 

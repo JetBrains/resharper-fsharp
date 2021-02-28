@@ -298,15 +298,22 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION)
         mark
 
-    member x.StartType attrs typeParams constraints (lid: LongIdent) range =
-        let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, List.tryHead lid, range)
+    member x.StartType(attrs, typeParams, constraints, lid: LongIdent, range, typeTokenType) =
+        let startRange =
+            match attrs with
+            | attrList :: _ -> attrList.Range
+            | _ -> range
+
+        let mark = x.MarkTokenOrRange(typeTokenType, startRange)
+        x.ProcessAttributeLists(attrs)
+
         if not lid.IsEmpty then
             let id = lid.Head
             let idOffset = x.GetStartOffset id
 
             let typeParamsOffset =
                 match typeParams with
-                | TyparDecl(_, (Typar(id, _, _))) :: _ -> x.GetStartOffset id
+                | TyparDecl(_, Typar(id, _, _)) :: _ -> x.GetStartOffset id
                 | [] -> idOffset
 
             let paramsInBraces = idOffset < typeParamsOffset
@@ -318,7 +325,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
     member x.ProcessTypeParametersOfType typeParams constraints range paramsInBraces =
         match typeParams with
-        | TyparDecl(_, (Typar(IdentRange idRange, _, _))) :: _ ->
+        | TyparDecl(_, Typar(IdentRange idRange, _, _)) :: _ ->
             let mark = x.MarkTokenOrRange(FSharpTokenType.LESS, idRange)
             for p in typeParams do
                 x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
@@ -332,7 +339,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_LIST)
         | [] -> ()
 
-    member x.ProcessTypeParameter(TyparDecl(_, (Typar(IdentRange range, _, _))), elementType) =
+    member x.ProcessTypeParameter(TyparDecl(_, Typar(IdentRange range, _, _)), elementType) =
         x.MarkAndDone(range, elementType)
 
     member x.ProcessUnionCaseType(caseType, fieldElementType) =
@@ -456,7 +463,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         let lidWithDots = attr.TypeName
         x.ProcessNamedTypeReference(lidWithDots.Lid)
 
-        let (ExprRange argRange as argExpr) = attr.ArgExpr
+        let ExprRange argRange as argExpr = attr.ArgExpr
         if lidWithDots.Range <> argRange then
             // Arg range is the same when fake SynExpr.Const is added
             x.MarkChameleonExpression(argExpr)
@@ -494,6 +501,14 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     member x.ProcessImplicitCtorSimplePats(pats: SynSimplePats) =
         let range = pats.Range
         let paramMark = x.Mark(range)
+
+        match pats with
+        | SynSimplePats.SimplePats([], _) ->
+            x.MarkAndDone(range, ElementType.UNIT_PAT)
+            x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
+
+        | _ ->
+        
         let parenPatMark = x.Mark()
 
         match pats with
@@ -507,12 +522,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.Done(tupleMark, ElementType.TUPLE_PAT)
             x.AdvanceToTokenAndSkip(FSharpTokenType.RPAREN)
 
-        | SynSimplePats.Typed(pats, synType, _) ->
-            failwith "foo"
-            x.ProcessImplicitCtorSimplePats(pats)
-            x.ProcessType(synType)
-
-        | _ -> ()
+        | _ -> failwithf $"Unexpected simple pats: {pats}"
 
         x.Done(range, parenPatMark, ElementType.PAREN_PAT)
         x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
@@ -649,7 +659,45 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             // Produced on error
             ()
 
-        | _ -> failwithf "unexpected type: %A" synType
+        | _ -> x.AdvanceToEnd(synType.Range) // todo: mark error types
+
+    member x.ProcessSignatureType(SynValInfo(paramGroups, returnInfo), synType: SynType) =
+        let processParameterSig (SynArgInfo(attrs, isOptional, id)) (TypeRange range as synType) =
+            let mark =
+                match attrs with
+                | attrList :: _ -> x.Mark(attrList.Range)
+                | _ ->
+
+                let range = id |> Option.map (fun id -> id.idRange) |> Option.defaultValue range
+                if isOptional then
+                    x.MarkTokenOrRange(FSharpTokenType.QMARK, range)
+                else
+                    x.Mark(range)
+
+            x.ProcessAttributeLists(attrs)
+            x.ProcessType(synType)
+            x.Done(mark, ElementType.PARAMETER_SIGNATURE_TYPE_USAGE)
+
+        let processParameterGroup paramGroup synType =
+            match paramGroup, synType with
+            | _, SynType.Tuple(_, types, range) ->
+                let mark = x.Mark(range)
+                List.map snd types |> List.iter2 processParameterSig paramGroup
+                x.Done(mark, ElementType.TUPLE_TYPE_USAGE)
+            | [ param ], _ ->
+                processParameterSig param synType
+            | _ -> ()
+
+        let rec loop paramGroups returnInfo synType =
+            match paramGroups, synType with
+            | group :: rest, SynType.Fun(arg, returnType, range) ->
+                let mark = x.Mark(range)
+                processParameterGroup group arg
+                loop rest returnInfo returnType
+                x.Done(mark, ElementType.FUNCTION_TYPE_USAGE)
+            | _, _ -> processParameterSig returnInfo synType
+
+        loop paramGroups returnInfo synType
 
     member x.ProcessType(TypeRange range as synType) =
         match synType with
@@ -782,7 +830,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | _ -> expr
 
     member x.MarkChameleonExpression(expr: SynExpr) =
-        let (ExprRange range as expr) = x.FixExpresion(expr)
+        let ExprRange range as expr = x.FixExpresion(expr)
 
         let startOffset = x.GetStartOffset(range)
         let mark = x.Mark(startOffset)

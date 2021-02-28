@@ -19,7 +19,7 @@ IFSharpImplFile
             IReferenceExpr
               FSharpTokenType+ColonColonTokenElement(type:COLON_COLON, text:::)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IArrayOrListExpr
+            IListExpr
               FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
               FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"

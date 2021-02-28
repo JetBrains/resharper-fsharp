@@ -32,3 +32,8 @@ UsageRead TO: [R] let r2 = { r1 with F = r1.|F| + 1 } RANGE: (92,93) @ Write - R
 UsageRead TO: [R] let r2 = { r1 with F = |r1|.F + 1 } RANGE: (89,91) @ Write - Record 03 - Copy and update.fs
 
 
+Other
+---
+UsageOther TO: [O] let r2 = { r1 with F = r1.F |+| 1 } RANGE: (94,95) @ Write - Record 03 - Copy and update.fs
+
+

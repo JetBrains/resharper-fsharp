@@ -30,5 +30,7 @@ type RedundantNewAnalyzer() =
         | Some symbolUse ->
 
         let fcsEntity = symbolUse.Symbol.As<FSharpEntity>()
-        if isNotNull fcsEntity && not (FSharpResolveUtil.mayShadowPartially newExpr data fcsEntity) then
+        if isNull fcsEntity || isNull typeName.TypeArgumentList && fcsEntity.GenericParameters.Count <> 0 then () else
+
+        if not (FSharpResolveUtil.mayShadowPartially newExpr data fcsEntity) then
             consumer.AddHighlighting(RedundantNewWarning(newExpr))

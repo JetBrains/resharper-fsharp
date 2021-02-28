@@ -9,7 +9,6 @@ using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Daemon.CSharp.ContextHighlighters;
 using JetBrains.ReSharper.Feature.Services.Contexts;
 using JetBrains.ReSharper.Feature.Services.Daemon.Attributes;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -46,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
     {
       var psiView = psiDocumentRangeView.View<FSharpLanguage>();
       var document = psiDocumentRangeView.DocumentRangeFromMainDocument.Document;
-      var token = psiView.GetSelectedTreeNode<FSharpIdentifierToken>();
+      var token = psiView.GetSelectedTreeNode<IFSharpIdentifierToken>();
 
       if (token == null)
       {
@@ -75,8 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
       var ranges = new HashSet<DocumentRange>();
       AddUsagesRanges(symbol, ranges, checkResults, document, fsFile);
 
-      if (symbol is FSharpMemberOrFunctionOrValue mfv && mfv.IsConstructor &&
-          mfv.DeclaringEntity?.Value is FSharpEntity entity)
+      if (symbol is FSharpMemberOrFunctionOrValue { IsConstructor: true, DeclaringEntity: { Value: { } entity } })
         AddUsagesRanges(entity, ranges, checkResults, document, fsFile);
 
       foreach (var range in ranges)
@@ -117,7 +115,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
           }
         }
 
-        if (!(usageToken is FSharpIdentifierToken identToken))
+        if (!(usageToken is IFSharpIdentifierToken identToken))
           continue;
 
         var tokenType = identToken.GetTokenType();

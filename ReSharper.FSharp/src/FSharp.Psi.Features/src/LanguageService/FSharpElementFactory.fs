@@ -177,13 +177,13 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
                 |> String.concat " "
 
             let memberBinding = createMemberDecl "P" List.empty parametersSource
-            memberBinding.ParametersPatterns |> Seq.toList
+            memberBinding.ParametersDeclarations |> Seq.toList
 
         member x.CreateMemberBindingExpr(name, typeParameters, parameters) =
             let parsedParams = "()" |> List.replicate parameters.Length |> String.concat " "
             let memberDecl = createMemberDecl name typeParameters parsedParams
 
-            for realArg, fakeArg in Seq.zip parameters memberDecl.ParametersPatterns do
+            for realArg, fakeArg in Seq.zip parameters memberDecl.ParametersDeclarations do
                 ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
             memberDecl
 

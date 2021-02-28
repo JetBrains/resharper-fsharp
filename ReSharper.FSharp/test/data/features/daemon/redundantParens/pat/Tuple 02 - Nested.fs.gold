@@ -1,0 +1,9 @@
+﻿module Module
+
+for |(|(0)_, _|)|(1) in [] do ()
+for _, (_, _) in [] do ()
+for (_, _), _ in [] do ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

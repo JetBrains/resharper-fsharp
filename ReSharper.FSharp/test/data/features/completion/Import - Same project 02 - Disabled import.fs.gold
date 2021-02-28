@@ -1,0 +1,16 @@
+﻿
+#time
+ExtraTopLevelOperators
+FSharpTypeFunc
+RequiresExplicitTypeArgumentsAttribute
+tan
+tanh
+then
+to
+true
+truncate
+try
+tryUnbox
+type
+typedefof
+typeof{caret}

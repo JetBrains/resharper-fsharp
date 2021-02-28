@@ -52,3 +52,8 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Import - Anon module 04 - After comment``() = x.DoNamedTest()
 
     [<Test>] member x.``Import - Sibling namespace``() = x.DoNamedTest()
+
+    [<Test>] member x.``Import - Same project 01``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<FSharpOptions>, "EnableOutOfScopeCompletion", "false")>]
+    [<Test>] member x.``Import - Same project 02 - Disabled import``() = x.DoNamedTest()

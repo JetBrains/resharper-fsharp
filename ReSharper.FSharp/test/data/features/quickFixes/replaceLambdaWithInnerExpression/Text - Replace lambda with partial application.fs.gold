@@ -1,8 +1,6 @@
 ﻿module Test
 
-let f _ _ = ()
-
-let _ = |fun x -> f 1 x|(0)
+let _ = |fun x -> (fun _ _ -> 1) 1 x|(0)
 
 ------------------------------------------------
 0: Lambda can be simplified

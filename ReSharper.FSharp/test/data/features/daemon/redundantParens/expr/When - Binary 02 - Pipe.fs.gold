@@ -1,0 +1,38 @@
+﻿module M
+
+match () with
+| _ when |(|(0)true |> id|)|(1) -> ()
+| _ when |(|(2)true |> id|)|(3) |> id -> ()
+| _ when |(|(4)true |> id |> id|)|(5) -> ()
+| _ when |(|(6)|(|(7)true |> id|)|(8) |> id|)|(9) -> ()
+| _ when |(|(10)true |> (id |> id)|)|(11) -> ()
+
+| _ when |(|(12)id <| true|)|(13) -> ()
+| _ when id <| (id <| true) -> ()
+| _ when |(|(14)id <| id <| true|)|(15) -> ()
+| _ when |(|(16)id <| (id <| true)|)|(17) -> ()
+| _ when |(|(18)|(|(19)id <| id|)|(20) <| true|)|(21) -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7): ReSharper Dead Code: Redundant parentheses
+(8):<secondary> ReSharper Dead Code: Redundant parentheses
+(9):<secondary> ReSharper Dead Code: Redundant parentheses
+(10): ReSharper Dead Code: Redundant parentheses
+(11):<secondary> ReSharper Dead Code: Redundant parentheses
+(12): ReSharper Dead Code: Redundant parentheses
+(13):<secondary> ReSharper Dead Code: Redundant parentheses
+(14): ReSharper Dead Code: Redundant parentheses
+(15):<secondary> ReSharper Dead Code: Redundant parentheses
+(16): ReSharper Dead Code: Redundant parentheses
+(17):<secondary> ReSharper Dead Code: Redundant parentheses
+(18): ReSharper Dead Code: Redundant parentheses
+(19): ReSharper Dead Code: Redundant parentheses
+(20):<secondary> ReSharper Dead Code: Redundant parentheses
+(21):<secondary> ReSharper Dead Code: Redundant parentheses

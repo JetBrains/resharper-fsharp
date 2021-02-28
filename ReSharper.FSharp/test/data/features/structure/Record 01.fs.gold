@@ -2,5 +2,6 @@
  Module
   R
    Field:int
-   IDisposable
+   IDisposable start
     IDisposable.Dispose():void
+   IDisposable end

@@ -1,0 +1,8 @@
+﻿module Module
+
+type T =
+    member |__|(0).Position with get () = obj() and
+                            set _ = ()
+
+---------------------------------------------------------
+(0): ReSharper Suggestion: Use '_'

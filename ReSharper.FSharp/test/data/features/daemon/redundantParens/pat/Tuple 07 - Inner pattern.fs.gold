@@ -1,0 +1,30 @@
+﻿module Module
+
+let (a, b: int) = 1, 2
+let (a: int, b) = 1, 2
+
+for |(|(0)a, b: int|)|(1) in [] do ()
+for |(|(2)a: int, b|)|(3) in [] do ()
+
+match 1, 2 with
+| (a, b: int) -> ()
+| (a, b: int) when true -> ()
+| |(|(4)a: int, b|)|(5) -> ()
+
+function (a, b: int) -> ()
+function |(|(6)a: int, b|)|(7) -> ()
+
+try () with (a, b: int) -> ()
+try () with |(|(8)a: int, b|)|(9) -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
+(8): ReSharper Dead Code: Redundant parentheses
+(9):<secondary> ReSharper Dead Code: Redundant parentheses

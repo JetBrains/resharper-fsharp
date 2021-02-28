@@ -1,8 +1,10 @@
 ﻿using System;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -54,6 +56,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     private abstract class FixedTokenNodeElement : FSharpTokenBase
     {
+    }
+
+    private abstract class FixedIdentifierTokenNodeElement : FSharpTokenBase, IFSharpIdentifierToken
+    {
+      public string Name => GetText();
+      public ITokenNode IdentifierToken => this;
+      public TreeTextRange NameRange => this.GetTreeTextRange();
     }
 
     private class FixedTokenNodeType : FSharpTokenNodeType, IFixedTokenNodeType
@@ -121,7 +130,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     public const int BLOCK_COMMENT_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 4;
     public static readonly TokenNodeType BLOCK_COMMENT = new BlockCommentNodeType(BLOCK_COMMENT_NODE_TYPE_INDEX);
-    
+
     public const int CHAMELEON_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 5;
     public static readonly TokenNodeType CHAMELEON = new FSharpTokenNodeType("CHAMELEON", CHAMELEON_NODE_TYPE_INDEX);
 
@@ -282,17 +291,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         BIGNUM,
         NATIVEINT,
         UNATIVEINT);
-      
+
       CreateIdentifierTokenTypes = new NodeTypeSet(
-        IDENTIFIER,
-        SYMBOLIC_OP,
         AMP_AMP,
+        COLON_COLON,
+        GLOBAL,
         GREATER,
-        PLUS,
-        MINUS,
+        IDENTIFIER,
+        EQUALS,
         LESS,
         LPAREN_STAR_RPAREN,
-        GLOBAL);
+        MINUS,
+        PERCENT,
+        PERCENT_PERCENT,
+        PLUS,
+        QMARK,
+        QMARK_QMARK,
+        STAR,
+        SYMBOLIC_OP);
     }
   }
 }

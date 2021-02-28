@@ -65,11 +65,11 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
 
     if element.Mfv.IsCliEvent() then
         let attribute = context.CreateElementFactory().CreateAttribute("CLIEvent")
-        FSharpAttributesUtil.addAttributesListWithIndent true indent memberDeclaration
+        FSharpAttributesUtil.addOuterAttributeListWithIndent true indent memberDeclaration
         FSharpAttributesUtil.addAttribute memberDeclaration.AttributeLists.[0] attribute
 
     if element.AddTypes then
-        let lastParam = memberDeclaration.ParametersPatterns.LastOrDefault()
+        let lastParam = memberDeclaration.ParametersDeclarations.LastOrDefault()
         if isNull lastParam then () else
 
         let typeString = mfv.ReturnParameter.Type.Instantiate(element.Substitution)

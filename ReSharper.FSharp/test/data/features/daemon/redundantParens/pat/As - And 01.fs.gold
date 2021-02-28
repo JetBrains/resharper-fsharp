@@ -1,0 +1,8 @@
+﻿match [] with
+| a & (_ as a) -> ()
+| a & (_ as a) | a -> ()
+| |(|(0)_ as a|)|(1) & a -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

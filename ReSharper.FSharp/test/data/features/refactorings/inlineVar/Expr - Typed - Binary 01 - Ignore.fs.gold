@@ -1,0 +1,2 @@
+﻿do
+    (1: int) |> ignore

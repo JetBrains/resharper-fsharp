@@ -43,4 +43,4 @@ type SimplifyLambdaFix(warning: LambdaCanBeSimplifiedWarning) =
         deletePatternsFromEnd lambda redundantArgsCount
 
         if expr.StartLine = arrow.StartLine then
-            shiftExpr -indentDiff expr
+            shiftNode -indentDiff expr

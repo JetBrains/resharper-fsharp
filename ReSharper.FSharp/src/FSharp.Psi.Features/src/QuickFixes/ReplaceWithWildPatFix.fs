@@ -68,9 +68,6 @@ type ReplaceWithWildPatScopedFix(pat: IFSharpPattern, highlightingType) =
     new (warning: RedundantUnionCaseFieldPatternsWarning) =
         ReplaceWithWildPatScopedFix(warning.ParenPat, warning.GetType())
 
-    new (warning: RedundantParenPatWarning) =
-        ReplaceWithWildPatScopedFix(warning.ParenPat, warning.GetType())
-
     override x.Text = "Replace with '_'"
     override x.TryGetContextTreeNode() = pat :> _
 
@@ -127,7 +124,7 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
                     pat :> _, sprintf "'%s' pattern" patternText
 
                 | :? IParametersPatternDeclaration as p ->
-                    match BindingNavigator.GetByParametersPattern(p) with
+                    match BindingNavigator.GetByParametersDeclaration(p) with
                     | null -> pat :> _, "parameter list"
                     | binding -> binding :> _, "binding patterns"
 

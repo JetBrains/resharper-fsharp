@@ -8,7 +8,7 @@ IFSharpImplFile
             FSharpToken(type:INT32, text:1)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IReferenceExpr
-            FSharpIdentifierToken(type:PLUS, text:+)
+            FSharpTokenType+PlusTokenElement(type:PLUS, text:+)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ILiteralExpr
             FSharpToken(type:INT32, text:1)
