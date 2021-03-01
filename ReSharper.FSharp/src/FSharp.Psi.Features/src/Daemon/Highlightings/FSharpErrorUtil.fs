@@ -45,15 +45,15 @@ let getRefExprNameRange (refExpr: IReferenceExpr) =
     | null -> refExpr.GetHighlightingRange()
     | identifier -> identifier.GetHighlightingRange()
 
-let rec getUnusedExpr (expr: IFSharpExpression) =
+let rec getResultExpr (expr: IFSharpExpression) =
     match expr with
     | :? ILetOrUseExpr as letExpr ->
         let inExpr = letExpr.InExpression
-        if isNotNull inExpr then getUnusedExpr inExpr else expr
+        if isNotNull inExpr then getResultExpr inExpr else expr
 
     | :? ISequentialExpr as seqExpr ->
         let lastExpr = seqExpr.Expressions.LastOrDefault()
-        if isNotNull lastExpr then getUnusedExpr lastExpr else expr
+        if isNotNull lastExpr then getResultExpr lastExpr else expr
 
     | _ -> expr
 
