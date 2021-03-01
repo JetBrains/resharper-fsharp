@@ -152,6 +152,9 @@ type CSharpResolveTest() =
     [<Test>] member x.``Type Extension 15 - Compiled name``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 16 - Compiled name - Static``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type repr - Class 01 - Impl``() = x.DoNamedTest()
+    [<Test>] member x.``Type repr - Class 02 - Member``() = x.DoNamedTest()
+
     [<Test>] member x.``Generics - Methods 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Implementations - Explicit impl 01``() = x.DoNamedTest()

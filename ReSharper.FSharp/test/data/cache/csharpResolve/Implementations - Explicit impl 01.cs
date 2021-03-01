@@ -2,7 +2,7 @@
 {
   public Class1()
   {
-    var t = new Module.T();
+    using var t = new Module.T();
     t.Dispose();
     ((System.IDisposable) t).Dispose();
   }
