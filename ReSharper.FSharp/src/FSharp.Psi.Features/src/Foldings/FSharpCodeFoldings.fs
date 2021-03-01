@@ -1,12 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Foldings
 
-open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.SourceCodeServices.Structure
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.CodeFolding
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.TextControl.DocumentMarkup
@@ -47,7 +45,7 @@ type FSharpCodeFoldingProcess(logger: ILogger) =
         let lines = [| for line in 0 .. (int (document.GetLineCount().Minus1())) do
                         yield document.GetLineText(docLine line) |]
 
-        Structure.getOutliningRanges lines parseTree
+        getOutliningRanges lines parseTree
         |> Seq.distinctBy (fun x -> x.Range.StartLine)
         |> Seq.iter (fun x ->
             let textRange = getTextRange document x.CollapseRange

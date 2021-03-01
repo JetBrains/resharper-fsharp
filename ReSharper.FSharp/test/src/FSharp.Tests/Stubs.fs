@@ -1,10 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
-open System
-open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
 open JetBrains.Application.Components
-open JetBrains.DataFlow
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel

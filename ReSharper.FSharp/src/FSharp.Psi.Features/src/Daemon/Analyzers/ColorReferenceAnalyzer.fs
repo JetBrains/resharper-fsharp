@@ -11,7 +11,7 @@ type ColorReferenceAnalyzer() =
     inherit ElementProblemAnalyzer<IReferenceExpr>()
 
     override x.Run(expr, analyzerData, consumer) =
-        let visualElementHighlighter = analyzerData.GetData(FSharpErrorsStage.visualElementFactoryKey)
+        let visualElementHighlighter = analyzerData.GetData(visualElementFactoryKey)
         let info = visualElementHighlighter.CreateColorHighlightingInfo(expr)
         if isNotNull info then
             consumer.AddHighlighting(info.Highlighting, info.Range)

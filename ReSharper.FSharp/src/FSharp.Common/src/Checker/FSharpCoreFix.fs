@@ -22,10 +22,10 @@ let private tryFindFile dirs file =
                     if path.StartsWith("\"") && path.EndsWith("\"")
                     then path.Substring(1, path.Length - 2)
                     else path
-                 let dir = new DirectoryInfo(path)
+                 let dir = DirectoryInfo(path)
                  if not dir.Exists then ""
                  else
-                     let fi = new FileInfo(dir.FullName </> file)
+                     let fi = FileInfo(dir.FullName </> file)
                      if fi.Exists then fi.FullName
                      else ""
               with

@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private static bool CalcHasDefaultImplementation([CanBeNull] FSharpMemberOrFunctionOrValue mfv)
     {
-      if (mfv == null || !mfv.IsDispatchSlot)
+      if (!(mfv is { IsDispatchSlot: true }))
         return false;
 
       var logicalName = mfv.LogicalName;

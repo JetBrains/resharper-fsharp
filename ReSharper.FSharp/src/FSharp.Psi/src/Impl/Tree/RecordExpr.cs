@@ -6,7 +6,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
 
@@ -67,12 +66,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       var exprToGetBy = sequentialExpr ?? RecordExpr.IgnoreParentParens();
 
       var binding = BindingNavigator.GetByExpression(exprToGetBy);
-      if (binding == null || !(binding.HeadPattern is INamedPat namedPat))
+      if (!(binding is { HeadPattern: INamedPat namedPat }))
         return null;
 
       var mfv = namedPat.GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
       var returnParameterType = mfv?.ReturnParameter.Type;
-      if (returnParameterType == null || !returnParameterType.HasTypeDefinition)
+      if (!(returnParameterType is { HasTypeDefinition: true }))
         return null;
 
       var entity = returnParameterType.TypeDefinition;

@@ -187,26 +187,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
                 ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
             memberDecl
 
-        member x.CreateInterfaceImplementation(typeReferenceName, memberDeclarations, baseIndent) =
-            let lineEnding = typeReferenceName.GetLineEnding()
-            let memberIndent = baseIndent + typeReferenceName.GetIndentSize()
-
-            let memberSource = "interface I with\n    member _.P = ()"
-            let typeDecl = getTypeDecl memberSource
-            let interfaceImpl = typeDecl.TypeMembers.[0] :?> IInterfaceImplementation
-
-            ModificationUtil.ReplaceChild(interfaceImpl.TypeName, typeReferenceName) |> ignore
-            ModificationUtil.DeleteChildRange(interfaceImpl.WithKeyword.NextSibling, interfaceImpl.LastChild)
-
-            seq { for d in memberDeclarations do
-                      yield NewLine(lineEnding) :> ITreeNode
-                      yield Whitespace(memberIndent) :> _
-                      yield d :> _ }
-            |> addNodesAfter interfaceImpl.WithKeyword
-            |> ignore
-
-            interfaceImpl
-
         member x.CreateConstExpr(text) =
             getExpression text :?> _
 

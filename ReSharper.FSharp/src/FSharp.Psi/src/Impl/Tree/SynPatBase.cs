@@ -39,10 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return true;
 
         var referenceName = ReferenceName;
-        if (referenceName == null)
-          return false;
-
-        if (referenceName.Qualifier != null)
+        if (!(referenceName is { Qualifier: null }))
           return false;
 
         var name = referenceName.ShortName;

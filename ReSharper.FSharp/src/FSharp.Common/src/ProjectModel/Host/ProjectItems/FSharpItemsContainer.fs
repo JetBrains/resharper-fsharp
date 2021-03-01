@@ -1068,7 +1068,7 @@ type IFSharpItemsContainerRefresher =
     /// Update view item presentation (e.g. change sort key).
     abstract member UpdateFolder: IProjectMark * folder: FileSystemPath * identity: FSharpViewFolderIdentity -> unit
 
-    /// Used on changes we currenlty cannot process, e.g. Compile -> CompileBefore build action change.
+    /// Used on changes we currently cannot process, e.g. Compile -> CompileBefore build action change.
     abstract member ReloadProject: IProjectMark -> unit
 
     /// Select view item after a project structure change that could collapse the item parent folder.

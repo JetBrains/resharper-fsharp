@@ -11,7 +11,6 @@ open JetBrains.ProjectModel.Properties
 open JetBrains.ReSharper.Host.Features.Runtime
 open JetBrains.ReSharper.Host.Features.Toolset
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
 open JetBrains.ReSharper.Resources.Shell
@@ -158,8 +157,8 @@ type MonoFsiProvider() =
     let fsiRelativePath = RelativePath.Parse("lib/mono/fsharp") / defaultFsiName
     let fsiToolPathComparer =
         { new IEqualityComparer<FsiTool> with
-            member __.Equals(x, y) = x.Directory = y.Directory
-            member __.GetHashCode(obj) = obj.Directory.GetHashCode() }
+            member _.Equals(x, y) = x.Directory = y.Directory
+            member _.GetHashCode(obj) = obj.Directory.GetHashCode() }
 
     interface IFsiDirectoryProvider with
         member x.GetFsiTools(solution) =

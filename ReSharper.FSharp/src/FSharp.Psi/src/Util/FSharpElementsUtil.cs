@@ -145,7 +145,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       if (symbol is FSharpField field)
       {
-        if (field.IsAnonRecordField)
+        if (field.IsAnonRecordField && referenceExpression != null)
           return new FSharpAnonRecordFieldProperty(referenceExpression.Reference);
 
         if (field.IsUnionCaseField && field.DeclaringUnionCase?.Value is { } fieldUnionCase)

@@ -16,4 +16,4 @@ type FSharpContextActionBase(dataProvider: FSharpContextActionDataProvider) =
         null
 
     member x.IsAtTreeNode(node: ITreeNode) =
-        DataProviders.isAtTreeNode dataProvider node
+        isAtTreeNode dataProvider node

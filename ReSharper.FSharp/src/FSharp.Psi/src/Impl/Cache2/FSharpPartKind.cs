@@ -29,6 +29,6 @@
     AbbreviationOrSingleCaseUnion = 19,
     StructAbbreviationOrSingleCaseUnion = 20,
 
-    HiddenType = 100,
+    HiddenType = 100
   }
 }

@@ -95,33 +95,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
     }
 
     [NotNull]
-    public static string GetHighlightingAttributeId([NotNull] this FSharpSymbol symbol)
-    {
-      switch (symbol)
+    public static string GetHighlightingAttributeId([NotNull] this FSharpSymbol symbol) =>
+      symbol switch
       {
-        case FSharpEntity { IsUnresolved: false } entity:
-          return GetEntityHighlightingAttributeId(entity.GetAbbreviatedEntity());
+        FSharpEntity { IsUnresolved: false } entity => GetEntityHighlightingAttributeId(entity.GetAbbreviatedEntity()),
 
-        case FSharpMemberOrFunctionOrValue { IsUnresolved: false } mfv:
-          return GetMfvHighlightingAttributeId(mfv.AccessorProperty?.Value ?? mfv);
+        FSharpMemberOrFunctionOrValue { IsUnresolved: false } mfv => GetMfvHighlightingAttributeId(
+          mfv.AccessorProperty?.Value ?? mfv),
 
-        case FSharpField field:
-          return field.IsLiteral
-            ? FSharpHighlightingAttributeIdsModule.Literal
-            : FSharpHighlightingAttributeIdsModule.Field;
+        FSharpField field => field.IsLiteral
+          ? FSharpHighlightingAttributeIdsModule.Literal
+          : FSharpHighlightingAttributeIdsModule.Field,
 
-        case FSharpUnionCase _:
-          return FSharpHighlightingAttributeIdsModule.UnionCase;
+        FSharpUnionCase _ => FSharpHighlightingAttributeIdsModule.UnionCase,
+        FSharpGenericParameter _ => FSharpHighlightingAttributeIdsModule.TypeParameter,
+        FSharpActivePatternCase _ => FSharpHighlightingAttributeIdsModule.ActivePatternCase,
 
-        case FSharpGenericParameter _:
-          return FSharpHighlightingAttributeIdsModule.TypeParameter;
-
-        case FSharpActivePatternCase _:
-          return FSharpHighlightingAttributeIdsModule.ActivePatternCase;
-      }
-
-      // some highlighting is needed for tooltip provider
-      return FSharpHighlightingAttributeIdsModule.Value;
-    }
+        // some highlighting is needed for tooltip provider
+        _ => FSharpHighlightingAttributeIdsModule.Value
+      };
   }
 }

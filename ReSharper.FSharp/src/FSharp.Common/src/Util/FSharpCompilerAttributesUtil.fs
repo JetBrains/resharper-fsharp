@@ -2,7 +2,6 @@
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpCompilerAttributesUtil
 
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 
 [<Extension; CompiledName("GetCompilationMappingAttrInstanceFlag")>]
 let getCompilationMappingAttrInstanceFlag (attrInstance: IAttributeInstance) =

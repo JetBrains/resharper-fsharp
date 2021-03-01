@@ -1,6 +1,5 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
-open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Text
 open JetBrains.DataFlow
 open JetBrains.ProjectModel

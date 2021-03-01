@@ -144,10 +144,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         return true;
 
       var otherSymbol = otherMember.Mfv;
-      if (otherSymbol == null)
-        return false;
-
-      if (!otherSymbol.IsExtensionMember)
+      if (!(otherSymbol is { IsExtensionMember: true }))
         return false;
 
       var apparentEntity = mfv.ApparentEnclosingEntity;

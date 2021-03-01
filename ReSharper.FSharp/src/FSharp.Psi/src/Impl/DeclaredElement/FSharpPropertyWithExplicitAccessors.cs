@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       foreach (var declaration in GetDeclarations())
       {
         if (declaration is IMemberDeclaration member &&
-            member.AccessorDeclarations.TryGet(kind) is {DeclaredElement: IFSharpExplicitAccessor accessor} _)
+            member.AccessorDeclarations.TryGet(kind) is { DeclaredElement: IFSharpExplicitAccessor accessor })
           yield return accessor;
       }
     }
