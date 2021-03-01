@@ -44,6 +44,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected override byte SerializationTag =>
       (byte) FSharpPartKind.StructUnion;
 
+    public override IDeclaredType GetBaseClassType() => null;
+
     public bool HasHiddenInstanceFields => false;
     public bool IsReadonly => false;
     public bool IsByRefLike => false;
@@ -82,7 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       get
       {
-        if (!(GetDeclaration() is IFSharpTypeDeclaration decl && decl.TypeRepresentation is IUnionRepresentation repr))
+        if (!(GetDeclaration() is IFSharpTypeDeclaration { TypeRepresentation: IUnionRepresentation repr }))
           return EmptyList<IUnionCase>.Instance;
 
         var result = new LocalList<IUnionCase>();
@@ -95,14 +97,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public TreeNodeCollection<IUnionCaseDeclaration> CaseDeclarations =>
-      GetDeclaration() is IFSharpTypeDeclaration decl && decl.TypeRepresentation is IUnionRepresentation repr
+      GetDeclaration() is IFSharpTypeDeclaration { TypeRepresentation: IUnionRepresentation repr }
         ? repr.UnionCases
         : TreeNodeCollection<IUnionCaseDeclaration>.Empty;
 
 
     public override IEnumerable<ITypeMember> GetTypeMembers()
     {
-      if (HasNestedTypes || !(GetDeclaration() is IFSharpTypeDeclaration decl && decl.TypeRepresentation is IUnionRepresentation repr))
+      if (HasNestedTypes || !(GetDeclaration() is IFSharpTypeDeclaration { TypeRepresentation: IUnionRepresentation repr }))
         return base.GetTypeMembers();
 
       var fields = new FrugalLocalList<ITypeMember>();

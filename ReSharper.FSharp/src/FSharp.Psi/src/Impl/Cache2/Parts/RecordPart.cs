@@ -43,6 +43,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override TypeElement CreateTypeElement() =>
       new FSharpStruct(this);
 
+    public override IDeclaredType GetBaseClassType() => null;
+
     public bool HasHiddenInstanceFields => false;
     public bool IsReadonly => false;
     public bool IsByRefLike => false;
@@ -89,7 +91,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         : base.GetMemberPresenceFlag();
 
     public IList<ITypeOwner> Fields =>
-      GetDeclaration() is IFSharpTypeDeclaration decl && decl.TypeRepresentation is IRecordRepresentation repr
+      GetDeclaration() is IFSharpTypeDeclaration { TypeRepresentation: IRecordRepresentation repr }
         ? repr.GetFields()
         : EmptyList<ITypeOwner>.Instance;
 

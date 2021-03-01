@@ -1,0 +1,23 @@
+﻿using System;
+
+public class Class1
+{
+    public Class1()
+    {
+        IComparable<U1> u11 = U1.A;
+        IEquatable<U1> u12 = U1.A;
+
+        |IComparable<U2>|(0) u21 = |U2.A|(1);
+        |IEquatable<U2>|(2) u22 = |U2.A|(3);
+    }
+}
+
+---------------------------------------------------------
+(0):<secondary> ReSharper Underlined Error Highlighting: Cannot convert initializer type 'U2' to target type 'System.IComparable<U2>'
+(1): ReSharper Underlined Error Highlighting: Cannot convert source type 'U2' to target type 'System.IComparable<U2>'
+(2):<secondary> ReSharper Underlined Error Highlighting: Cannot convert initializer type 'U2' to target type 'System.IEquatable<U2>'
+(3): ReSharper Underlined Error Highlighting: Cannot convert source type 'U2' to target type 'System.IEquatable<U2>'
+P:U1.A
+P:U1.A
+P:U2.A
+P:U2.A
