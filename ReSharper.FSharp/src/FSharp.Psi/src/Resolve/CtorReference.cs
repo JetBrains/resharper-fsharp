@@ -11,6 +11,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     public override FSharpSymbol GetFSharpSymbol() =>
-      base.GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv && mfv.IsConstructor ? mfv : null;
+      base.GetFSharpSymbol() is FSharpMemberOrFunctionOrValue { IsConstructor: true } mfv ? mfv : null;
   }
 }

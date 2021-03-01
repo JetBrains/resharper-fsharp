@@ -86,7 +86,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
     {
       var isActivePatternCase = symbol is FSharpActivePatternCase;
       var isGreaterOp =
-        symbol is FSharpMemberOrFunctionOrValue mfv && mfv.LogicalName == StandardOperatorNames.GreaterThan;
+        symbol is FSharpMemberOrFunctionOrValue { LogicalName: StandardOperatorNames.GreaterThan };
 
       var symbolUsages = checkResults?.GetUsesOfSymbolInFile(symbol, null);
       if (symbolUsages == null)

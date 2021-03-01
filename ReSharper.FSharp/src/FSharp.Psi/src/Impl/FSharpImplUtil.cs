@@ -308,7 +308,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       // todo: climutable attr can be on anon part (`type R`)
       foreach (var part in typeElement.EnumerateParts())
-        if (part is IRecordPart recordPart && recordPart.CliMutable)
+        if (part is IRecordPart { CliMutable: true })
           return true;
 
       return false;
@@ -360,7 +360,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     [CanBeNull]
     public static FSharpUnionTagsClass GetUnionTagsClass([CanBeNull] this ITypeElement type) =>
-      GetPart<IUnionPart>(type) is UnionPartBase unionPart && !unionPart.IsSingleCase
+      GetPart<IUnionPart>(type) is UnionPartBase { IsSingleCase: false } unionPart
         ? new FSharpUnionTagsClass(unionPart.TypeElement)
         : null;
 
@@ -743,7 +743,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (fsExpr == null)
         return null;
 
-      while (fsExpr is IParenExpr parenExpr && parenExpr.InnerExpression != null)
+      while (fsExpr is IParenExpr { InnerExpression: { } } parenExpr)
         fsExpr = parenExpr.InnerExpression;
       return fsExpr;
     }
@@ -756,7 +756,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (fsPattern == null)
         return null;
 
-      while (fsPattern is IParenPat parenPat && parenPat.Pattern != null)
+      while (fsPattern is IParenPat { Pattern: { } } parenPat)
         fsPattern = parenPat.Pattern;
       return fsPattern;
     }

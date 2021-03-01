@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool IsExplicitImplementation =>
       InterfaceImplementationNavigator.GetByTypeMember(this) != null ||
-      ObjExprNavigator.GetByMemberDeclaration(this) is { } objExpr && objExpr.ArgExpression == null ||
+      ObjExprNavigator.GetByMemberDeclaration(this) is { ArgExpression: null } ||
       ObjExprNavigator.GetByInterfaceMember(this) != null;
 
     public bool IsIndexer => this.IsIndexer();

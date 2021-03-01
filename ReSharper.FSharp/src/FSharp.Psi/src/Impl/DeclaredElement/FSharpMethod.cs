@@ -25,6 +25,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override AccessRights GetAccessRights() => AccessRights.INTERNAL;
 
     public override bool IsStatic =>
-      GetDeclaration() is { } decl && decl.IsStatic;
+      GetDeclaration() is { IsStatic: true };
   }
 }

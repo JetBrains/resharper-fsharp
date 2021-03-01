@@ -97,7 +97,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       throw new NotImplementedException();
 
     public bool IsQualified =>
-      GetElement() is IFSharpQualifiableReferenceOwner referenceOwner && referenceOwner.IsQualified;
+      GetElement() is IFSharpQualifiableReferenceOwner { IsQualified: true };
 
     public FSharpSymbolReference QualifierReference =>
       GetElement() is IFSharpQualifiableReferenceOwner referenceOwner ? referenceOwner.QualifierReference : null;

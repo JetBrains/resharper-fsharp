@@ -55,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
         return FSharpHighlightingAttributeIdsModule.Event;
 
       if (mfv.IsImplicitConstructor || mfv.IsConstructor)
-        return mfv.DeclaringEntity?.Value is FSharpEntity declEntity && declEntity.IsValueType
+        return mfv.DeclaringEntity?.Value is { IsValueType: true }
           ? FSharpHighlightingAttributeIdsModule.Struct
           : FSharpHighlightingAttributeIdsModule.Class;
 
@@ -99,10 +99,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
     {
       switch (symbol)
       {
-        case FSharpEntity entity when !entity.IsUnresolved:
+        case FSharpEntity { IsUnresolved: false } entity:
           return GetEntityHighlightingAttributeId(entity.GetAbbreviatedEntity());
 
-        case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
+        case FSharpMemberOrFunctionOrValue { IsUnresolved: false } mfv:
           return GetMfvHighlightingAttributeId(mfv.AccessorProperty?.Value ?? mfv);
 
         case FSharpField field:
