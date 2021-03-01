@@ -50,7 +50,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_INTERPOLATED_STRING_EXPR = "";
     public const string IDS_ARRAY_OR_LIST_EXPR = "";
     public const string IDS_QUALIFIED_EXPR = "";
-    public const string IDS_REFERENCE_EXPR = "";
     public const string IDS_INDEXER_EXPR = "";
     public const string IDS_INDEXER_ARG = "";
     public const string IDS_APP_EXPR = "";

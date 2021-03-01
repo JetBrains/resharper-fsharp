@@ -94,10 +94,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (TryCreateLiteral(binding, chameleonExpr) is { } literal)
         return literal;
 
-      if (chameleonExpr.IsSimpleValueExpression())
-        return CreateValue(typeDeclaration);
-
-      return null;
+      return chameleonExpr.IsSimpleValueExpression()
+        ? CreateValue(typeDeclaration)
+        : null;
     }
 
     [CanBeNull]
@@ -122,8 +121,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [CanBeNull] public abstract IBindingLikeDeclaration Binding { get; }
 
     public bool CanBeMutable => Binding != null;
-    public override bool IsStatic => LetBindingsDeclarationNavigator.GetByBinding(Binding as IBinding)?.StaticKeyword != null;
-    
+
+    public override bool IsStatic =>
+      LetBindingsDeclarationNavigator.GetByBinding(Binding as IBinding)?.StaticKeyword != null;
+
     public virtual IEnumerable<IFSharpPattern> NestedPatterns =>
       EmptyList<IFSharpPattern>.Instance;
 

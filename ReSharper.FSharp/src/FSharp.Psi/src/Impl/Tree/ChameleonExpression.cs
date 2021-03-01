@@ -136,13 +136,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return null;
     }
 
-    public override ITreeNode FindNodeAt(TreeTextRange treeRange)
-    {
-      if (treeRange.IntersectsOrContacts(TreeTextRange.FromLength(GetTextLength())))
-        return base.FindNodeAt(treeRange);
-
-      return null;
-    }
+    public override ITreeNode FindNodeAt(TreeTextRange treeRange) =>
+      treeRange.IntersectsOrContacts(TreeTextRange.FromLength(GetTextLength()))
+        ? base.FindNodeAt(treeRange)
+        : null;
 
     public override void FindNodesAtInternal(TreeTextRange relativeRange, List<ITreeNode> result,
       bool includeContainingNodes)

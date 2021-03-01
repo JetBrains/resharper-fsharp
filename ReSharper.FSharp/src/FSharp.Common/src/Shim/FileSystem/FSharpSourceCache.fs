@@ -15,7 +15,6 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Rider.Model
 
 type FSharpSource =
     { Source: byte[]

@@ -27,7 +27,7 @@ type DelegatingFileSystemShimTest() =
             use tempFolderCookie = TemporaryDirectoryCookie.CreateFolder()
             let shim = LoggingShim(shim1name, lifetime, writer)
             let path = tempFolderCookie.Path / fakePath
-            Shim.FileSystem.GetLastWriteTimeShim(path.FullPath) |> ignore)
+            FileSystem.GetLastWriteTimeShim(path.FullPath) |> ignore)
 
     [<Test>]
     member x.``Multiple shims``() =
@@ -42,14 +42,14 @@ type DelegatingFileSystemShimTest() =
             let shim3 = LoggingShim(shim3name, lifetime3, writer)
 
             let path = tempFolderCookie.Path / fakePath
-            Shim.FileSystem.GetLastWriteTimeShim(path.FullPath) |> ignore)
+            FileSystem.GetLastWriteTimeShim(path.FullPath) |> ignore)
 
     member x.DoTest(action: Lifetime -> TextWriter -> unit) =
         x.ExecuteWithGold(fun writer ->
             x.RunGuarded(fun _ ->
                 Lifetime.Using(fun lifetime -> action lifetime writer)
 
-                match Shim.FileSystem with
+                match FileSystem with
                 | :? LoggingShim as loggingShim ->
                     failwithf "File system is still overriden by %s" loggingShim.Name
                 | _ -> ())) |> ignore

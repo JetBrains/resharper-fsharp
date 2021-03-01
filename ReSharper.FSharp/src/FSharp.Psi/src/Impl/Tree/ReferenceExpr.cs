@@ -34,8 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         {
           if (myReferences == null)
           {
-            if (SymbolReference == null)
-              SymbolReference = new FSharpSymbolReference(this);
+            SymbolReference ??= new FSharpSymbolReference(this);
 
             var appExpr = PrefixAppExprNavigator.GetByFunctionExpression(this.IgnoreParentParens());
             if (appExpr == null)

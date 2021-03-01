@@ -36,7 +36,7 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
         | SameLinePipeHints.Hide -> false
 
     let visitBinaryAppExpr binaryAppExpr (context: List<FSharpIdentifierToken * ITreeNode>) =
-        if not (FSharpExpressionUtil.isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
+        if not (isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
 
         match binaryAppExpr.LeftArgument with
         | null -> ()

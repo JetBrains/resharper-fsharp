@@ -18,12 +18,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
   public class FSharpParameterInfoContextFactory : IParameterInfoContextFactory
   {
     private const string OpName = "FSharpParameterInfoContextFactory";
-    private static readonly char[] ourPopupChars = {'(', ',', '<'};
+    private static readonly char[] PopupChars = {'(', ',', '<'};
 
     public bool ShouldPopup(DocumentOffset caretOffset, char c, ISolution solution,
       IContextBoundSettingsStore settingsStore)
     {
-      return ourPopupChars.Contains(c);
+      return PopupChars.Contains(c);
     }
 
     public IParameterInfoContext CreateContext(ISolution solution, DocumentOffset caretOffset,

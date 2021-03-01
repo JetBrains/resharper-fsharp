@@ -303,10 +303,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private class ParenMatcher : BracketMatcher
     {
-      private static readonly Pair<TokenNodeType, TokenNodeType>[] ourParens =
+      private static readonly Pair<TokenNodeType, TokenNodeType>[] Parens =
         {new Pair<TokenNodeType, TokenNodeType>(FSharpTokenType.LESS, FSharpTokenType.GREATER)};
 
-      public ParenMatcher() : base(ourParens)
+      public ParenMatcher() : base(Parens)
       {
       }
     }

@@ -2,7 +2,7 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
-  class FSharpNodeTypeIndexer : AbstractNodeTypeIndexer
+  internal class FSharpNodeTypeIndexer : AbstractNodeTypeIndexer
   {
     public static readonly FSharpNodeTypeIndexer Instance = new FSharpNodeTypeIndexer();
 

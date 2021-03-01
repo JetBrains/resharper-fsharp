@@ -63,8 +63,7 @@ let getMatchingParameter (expr: IFSharpExpression) =
             paramOwner.Parameters
             |> Seq.tryFind (fun param -> param.ShortName = namedArgRefExpr.Reference.GetName())
         else
-            let args = argsOwner.ParameterArguments
-            match args |> Seq.tryFindIndex (fun argExpr -> expr.Equals(argExpr)) with
+            match Seq.tryFindIndex expr.Equals argsOwner.ParameterArguments with
             | None -> None
             | Some paramIndex ->
 

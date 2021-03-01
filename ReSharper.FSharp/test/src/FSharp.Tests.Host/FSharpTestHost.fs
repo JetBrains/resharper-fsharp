@@ -40,7 +40,7 @@ type FSharpTestHost(lifetime: Lifetime, solution: ISolution, checkerService: FSh
         |> Option.map (fun options ->
             options.OtherOptions
             |> Array.choose (fun o -> if o.StartsWith("-r:") then Some (o.Substring("-r:".Length)) else None)
-            |> Array.map (fun s -> FileSystemPath.TryParse(s))
+            |> Array.map FileSystemPath.TryParse
             |> Array.filter (fun p -> not p.IsEmpty && directory.IsPrefixOf(p))
             |> Array.map (fun p -> p.Name)
             |> List)

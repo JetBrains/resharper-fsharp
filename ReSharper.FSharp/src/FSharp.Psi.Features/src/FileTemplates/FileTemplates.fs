@@ -102,7 +102,7 @@ type FSharpFileScopeProvider() =
 
 [<ScopeCategoryUIProvider(Priority = -20., ScopeFilter = ScopeFilter.Project)>]
 type FSharpProjectScopeCategoryUIProvider() as this =
-    inherit ScopeCategoryUIProvider(JetBrains.ProjectModel.Resources.ProjectModelThemedIcons.Fsharp.Id)
+    inherit ScopeCategoryUIProvider(ProjectModelThemedIcons.Fsharp.Id)
     do
         this.MainPoint <- InFSharpProjectScope()
         

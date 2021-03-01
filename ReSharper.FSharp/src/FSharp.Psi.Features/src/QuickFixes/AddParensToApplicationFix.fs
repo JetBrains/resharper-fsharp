@@ -2,7 +2,6 @@
 
 open System
 open System.Text.RegularExpressions
-open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
