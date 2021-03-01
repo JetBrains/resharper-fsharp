@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
@@ -12,7 +11,6 @@ using JetBrains.ReSharper.Psi.Impl.Search;
 using JetBrains.ReSharper.Psi.Impl.Search.SearchDomain;
 using JetBrains.ReSharper.Psi.Search;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
@@ -44,25 +42,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       // todo: type abbreviations
       if (declaredElement is IFSharpLocalDeclaration localDeclaration)
         return mySearchDomainFactory.CreateSearchDomain(localDeclaration.GetSourceFile());
-
-      if (declaredElement is IFSharpSymbolElement fsSymbolElement)
-      {
-        var fsSymbol = fsSymbolElement.Symbol;
-        if (!(fsSymbol is FSharpActivePatternCase activePatternCase))
-          return EmptySearchDomain.Instance;
-
-        if (fsSymbolElement is ResolvedFSharpSymbolElement)
-        {
-          var patternEntity = activePatternCase.Group.DeclaringEntity?.Value;
-          if (patternEntity != null)
-          {
-            var patternTypeElement = patternEntity.GetDeclaredElement(fsSymbolElement.Module);
-            return patternTypeElement != null
-              ? myClrSearchFactory.GetDeclaredElementSearchDomain(patternTypeElement)
-              : EmptySearchDomain.Instance;
-          }
-        }
-      }
 
       if (declaredElement is TopActivePatternCase activePatternCaseElement)
       {
@@ -102,30 +81,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public override NavigateTargets GetNavigateToTargets(IDeclaredElement element)
     {
-      if (element is ResolvedFSharpSymbolElement { Symbol: FSharpActivePatternCase activePatternCase } resolvedSymbolElement)
-      {
-        var activePattern = activePatternCase.Group;
-
-        var entityOption = activePattern.DeclaringEntity;
-        var patternNameOption = activePattern.Name;
-        if (entityOption == null || patternNameOption == null)
-          return NavigateTargets.Empty;
-
-        var typeElement = entityOption.Value.GetTypeElement(resolvedSymbolElement.Module);
-        var pattern = typeElement.EnumerateMembers(patternNameOption.Value, true).FirstOrDefault() as IDeclaredElement;
-        if (pattern is IFSharpTypeMember)
-        {
-          if (!(pattern.GetDeclarations().FirstOrDefault() is IFSharpDeclaration patternDecl))
-            return NavigateTargets.Empty;
-
-          var caseElement = patternDecl.GetActivePatternByIndex(activePatternCase.Index);
-          if (caseElement != null)
-            return new NavigateTargets(caseElement, false);
-        }
-        else if (pattern != null)
-          return new NavigateTargets(pattern, false);
-      }
-
       if (element is ISecondaryDeclaredElement { OriginElement: { } origin })
         return new NavigateTargets(origin, false);
 
