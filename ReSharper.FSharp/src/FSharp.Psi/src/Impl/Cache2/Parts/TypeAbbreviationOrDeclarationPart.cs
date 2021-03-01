@@ -1,6 +1,7 @@
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -33,6 +34,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override TypeElement CreateTypeElement() => new FSharpStruct(this);
     protected override byte SerializationTag => (byte) FSharpPartKind.StructAbbreviationOrSingleCaseUnion;
+
+    public override IDeclaredType GetBaseClassType() => null;
 
     public bool HasHiddenInstanceFields => false;
     public bool IsReadonly => false;

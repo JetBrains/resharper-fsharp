@@ -49,6 +49,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Unions 11 - Empty single case``() = x.DoNamedTest()
     [<Test>] member x.``Unions 12 - Empty single case - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Unions 13 - Empty single case - Members``() = x.DoNamedTest()
+    [<Test>] member x.``Unions 14 - ReferenceEquality``() = x.DoNamedTest()
 
     [<Test>] member x.``Simple types 01 - Members``() = x.DoNamedTest()
 
