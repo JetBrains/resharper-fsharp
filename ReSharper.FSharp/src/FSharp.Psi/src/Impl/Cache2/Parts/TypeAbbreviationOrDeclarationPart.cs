@@ -54,6 +54,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public bool IsUnionCase =>
-      GetDeclaration() is { } decl && decl.GetFSharpSymbol() is FSharpEntity entity && entity.IsFSharpUnion;
+      GetDeclaration() is { } decl && decl.GetFSharpSymbol() is FSharpEntity { IsFSharpUnion: true };
   }
 }

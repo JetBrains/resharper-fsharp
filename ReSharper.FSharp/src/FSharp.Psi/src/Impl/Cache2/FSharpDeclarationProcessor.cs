@@ -76,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         }
 
         if (seenLBrace && tokenType == FSharpTokenType.NEW)
-          if (fsFile.FindNodeAt(new TreeOffset(token.Start)) is ITokenNode node && node.Parent is IObjExpr objExpr)
+          if (fsFile.FindNodeAt(new TreeOffset(token.Start)) is ITokenNode { Parent: IObjExpr objExpr })
             objectExpressions.Add(objExpr);
 
         seenLBrace = false;

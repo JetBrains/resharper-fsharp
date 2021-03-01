@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       ExceptionDeclarationNavigator.GetByField(this);
 
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
-      type is FSharpEntity entity && entity.IsFSharpExceptionDeclaration ? entity.FSharpFields : null;
+      type is FSharpEntity { IsFSharpExceptionDeclaration: true } entity ? entity.FSharpFields : null;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       new FSharpUnionCaseField<ExceptionFieldDeclaration>(this);

@@ -42,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override AccessRights GetAccessRights() => AccessRights.INTERNAL;
 
     public bool IsMutable =>
-      GetDeclaration() is ITopReferencePat referencePat && referencePat.IsMutable;
+      GetDeclaration() is ITopReferencePat { IsMutable: true };
 
     public void SetIsMutable(bool value)
     {
@@ -52,10 +52,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public bool CanBeMutable =>
-      GetDeclaration() is ITopReferencePat referencePat && referencePat.CanBeMutable;
+      GetDeclaration() is ITopReferencePat { CanBeMutable: true };
 
     public override bool IsStatic => 
-      GetDeclaration() is { } decl && decl.IsStatic;
+      GetDeclaration() is { IsStatic: true };
   }
 
   internal class FSharpValField : FSharpFieldBase<ValFieldDeclaration>

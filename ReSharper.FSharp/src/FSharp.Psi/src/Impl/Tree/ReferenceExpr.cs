@@ -58,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public string QualifiedName =>
 //      todo: ignore parens for this and qualifier
-      Qualifier is IReferenceExpr qualifier && qualifier.QualifiedName is { } qualifierName
+      Qualifier is IReferenceExpr { QualifiedName: { } qualifierName }
         ? qualifierName + "." + ShortName
         : ShortName;
 
@@ -107,7 +107,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override FSharpSymbol GetFSharpSymbol() =>
       base.GetFSharpSymbol() switch
       {
-        FSharpMemberOrFunctionOrValue mfv when mfv.IsConstructor => mfv.DeclaringEntity?.Value,
+        FSharpMemberOrFunctionOrValue { IsConstructor: true } mfv => mfv.DeclaringEntity?.Value,
         // FSharpUnionCase unionCase => unionCase.ReturnType.TypeDefinition,
         _ => null
       };

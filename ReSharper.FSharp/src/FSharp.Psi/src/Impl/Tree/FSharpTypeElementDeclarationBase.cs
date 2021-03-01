@@ -69,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         if (child is ITypeDeclarationGroup typeDeclarationGroup)
           foreach (var typeDeclaration in typeDeclarationGroup.TypeDeclarations)
           {
-            if (typeDeclaration is ITypeExtensionDeclaration typeExtension && !typeExtension.IsTypePartDeclaration)
+            if (typeDeclaration is ITypeExtensionDeclaration { IsTypePartDeclaration: false } typeExtension)
             {
               foreach (var extensionMember in typeExtension.TypeMembers)
                 if (extensionMember is ITypeMemberDeclaration typeMemberDeclaration)

@@ -75,8 +75,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
             if (memberDeclaration is IConstructorDeclaration)
             {
               // todo: analyze tree and don't get declared elements here
-              if (memberDeclaration.DeclaredElement is IConstructor ctor &&
-                  ctor.IsParameterless && ctor.GetAccessRights() == AccessRights.PUBLIC)
+              if (memberDeclaration.DeclaredElement is IConstructor { IsParameterless: true } ctor &&
+                  ctor.GetAccessRights() == AccessRights.PUBLIC)
               {
                 myHasPublicDefaultCtor = true;
                 return true;

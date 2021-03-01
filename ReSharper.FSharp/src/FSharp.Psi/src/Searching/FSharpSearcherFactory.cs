@@ -56,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
           var patternEntity = activePatternCase.Group.DeclaringEntity?.Value;
           if (patternEntity != null)
           {
-            var patternTypeElement = FSharpElementsUtil.GetDeclaredElement(patternEntity, fsSymbolElement.Module);
+            var patternTypeElement = patternEntity.GetDeclaredElement(fsSymbolElement.Module);
             return patternTypeElement != null
               ? myClrSearchFactory.GetDeclaredElementSearchDomain(patternTypeElement)
               : EmptySearchDomain.Instance;
@@ -102,8 +102,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public override NavigateTargets GetNavigateToTargets(IDeclaredElement element)
     {
-      if (element is ResolvedFSharpSymbolElement resolvedSymbolElement &&
-          resolvedSymbolElement.Symbol is FSharpActivePatternCase activePatternCase)
+      if (element is ResolvedFSharpSymbolElement { Symbol: FSharpActivePatternCase activePatternCase } resolvedSymbolElement)
       {
         var activePattern = activePatternCase.Group;
 
@@ -127,7 +126,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
           return new NavigateTargets(pattern, false);
       }
 
-      if (element is ISecondaryDeclaredElement {OriginElement: { } origin})
+      if (element is ISecondaryDeclaredElement { OriginElement: { } origin })
         return new NavigateTargets(origin, false);
 
       if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.CanNavigateTo)
