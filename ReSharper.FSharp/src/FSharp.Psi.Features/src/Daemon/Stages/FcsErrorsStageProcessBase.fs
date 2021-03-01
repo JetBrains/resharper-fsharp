@@ -141,8 +141,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
 
             | Regex addTypeEquationMessage [expectedType; actualType] ->
-                let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                if isNotNull node then AddTypeEquationError(expectedType, actualType, node, error.Message) :> _
+                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                let expr = getResultExpr expr
+                if isNotNull expr then AddTypeEquationError(expectedType, actualType, expr, error.Message) :> _
                 else null
 
             | _ -> createGenericHighlighting error range
@@ -218,7 +219,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UnitTypeExpected ->
             let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            let expr = getUnusedExpr expr
+            let expr = getResultExpr expr
             UnitTypeExpectedWarning(expr, error.Message) :> _
 
         | UseBindingsIllegalInModules ->
@@ -277,7 +278,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | MissingErrorNumber when startsWith expressionIsAFunctionMessage error.Message ->
             let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            let expr = getUnusedExpr expr
+            let expr = getResultExpr expr
             FunctionValueUnexpectedWarning(expr, error.Message) :> _
 
         | NamespaceCannotContainValues ->
