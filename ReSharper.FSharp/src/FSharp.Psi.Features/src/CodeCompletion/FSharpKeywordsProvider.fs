@@ -40,26 +40,17 @@ type FSharpItemsProviderBase() =
 type FSharpKeywordsProvider() =
     inherit FSharpItemsProviderBase()
 
-    let lookupItems =
-        lazy
-            let hashDirectives =
-                [| KeywordSuffix.Quotes, [| "#load"; "#r"; "#I"; "#nowarn"; "#time" |]
-                   KeywordSuffix.None, [| "#if"; "#else"; "#endif" |] |]
-                |> Array.map (fun (suffix, directives) ->
-                    directives |> Array.map (fun d -> FSharpHashDirectiveLookupItem(d, suffix) :> TextLookupItemBase))
-                |> Array.concat
+    let hashDirectives =
+        [| KeywordSuffix.Quotes, [| "#load"; "#r"; "#I"; "#nowarn"; "#time" |]
+           KeywordSuffix.None, [| "#if"; "#else"; "#endif" |] |]
+        |> Array.map (fun (suffix, directives) -> directives |> Array.map (fun d -> d, suffix))
+        |> Array.concat
 
-            let keywords =
-                Keywords.KeywordsWithDescription
-                // todo: implement auto-popup completion strategy that will cover operators
-                |> List.filter (fun (keyword, _) -> not (PrettyNaming.IsOperatorName keyword))
-                |> List.map (fun (keyword, description) ->
-                    FSharpKeywordLookupItem(keyword, description, KeywordSuffix.None) :> TextLookupItemBase)
-                |> Array.ofList
-
-            Array.append keywords hashDirectives
-
-    member x.LookupItems = lookupItems.Value
+    let keywords =
+        Keywords.KeywordsWithDescription
+        // todo: implement auto-popup completion strategy that will cover operators
+        |> List.filter (fun (keyword, _) -> not (PrettyNaming.IsOperatorName keyword))
+        |> Array.ofList
 
     override x.IsAvailable _ = true
 
@@ -83,14 +74,20 @@ type FSharpKeywordsProvider() =
 
         if not fcsCompletionContext.PartialName.QualifyingIdents.IsEmpty then false else
 
-        for item in x.LookupItems do
+        for keyword, description in keywords do
+            let item = FSharpKeywordLookupItem(keyword, description)
+            item.InitializeRanges(context.Ranges, context.BasicContext)
+            collector.Add(item)
+
+        for keyword, suffix in hashDirectives do
+            let item = FSharpHashDirectiveLookupItem(keyword, suffix)
             item.InitializeRanges(context.Ranges, context.BasicContext)
             collector.Add(item)
 
         true
 
 
-type FSharpKeywordLookupItemBase(keyword, keywordSuffix) =
+type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
     inherit TextLookupItemBase()
 
     override x.Image = PsiSymbolsThemedIcons.Keyword.Id
@@ -116,8 +113,8 @@ type FSharpKeywordLookupItemBase(keyword, keywordSuffix) =
     interface IRiderAsyncCompletionLookupItem
 
 
-type FSharpKeywordLookupItem(keyword, description, suffix) =
-    inherit FSharpKeywordLookupItemBase(keyword, suffix)
+type FSharpKeywordLookupItem(keyword, description: string) =
+    inherit FSharpKeywordLookupItemBase(keyword, KeywordSuffix.None)
 
     interface IDescriptionProvidingLookupItem with
         member x.GetDescription() = RichTextBlock(description)
