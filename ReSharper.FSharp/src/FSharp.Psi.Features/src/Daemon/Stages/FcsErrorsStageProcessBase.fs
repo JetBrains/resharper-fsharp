@@ -43,6 +43,7 @@ module FSharpErrors =
     let [<Literal>] ValNotMutable = 27
     let [<Literal>] VarBoundTwice = 38
     let [<Literal>] UndefinedName = 39
+    let [<Literal>] ErrorFromAddingConstraint = 43
     let [<Literal>] UpcastUnnecessary = 66
     let [<Literal>] TypeTestUnnecessary = 67
     let [<Literal>] IndeterminateType = 72
@@ -178,6 +179,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             if isNotNull referenceOwner then UndefinedNameError(referenceOwner.Reference, error.Message) :> _ else
 
             UnresolvedHighlighting(error.Message, range) :> _
+
+        | ErrorFromAddingConstraint ->
+            createHighlightingFromNodeWithMessage ErrorFromAddingConstraintError range error
 
         | UpcastUnnecessary ->
             createHighlightingFromNode UpcastUnnecessaryWarning range
