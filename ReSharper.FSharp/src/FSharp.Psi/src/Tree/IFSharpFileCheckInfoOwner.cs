@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using FSharp.Compiler;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Symbols;
+using FSharp.Compiler.Syntax;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
@@ -22,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     [CanBeNull] FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
 
-    [CanBeNull] FSharpOption<SyntaxTree.ParsedInput> ParseTree { get; }
+    [CanBeNull] FSharpOption<ParsedInput> ParseTree { get; }
 
     [CanBeNull]
     FSharpSymbolUse GetSymbolUse(int offset);

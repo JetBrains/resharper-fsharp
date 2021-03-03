@@ -3,7 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Checker.FSharpCheckerExtensions
 
 open System.Threading
 open System.Threading.Tasks
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.Util.Logging
@@ -31,7 +31,7 @@ type FSharpChecker with
                     match checkFileAnswer with
                     | FSharpCheckFileAnswer.Aborted ->
                         if parseResults.ParseTree.IsNone then
-                            let creationErrors = parseResults.Errors
+                            let creationErrors = parseResults.Diagnostics
                             if not (Array.isEmpty creationErrors) then
                                 let logger = Logger.GetLogger<CheckResults>()
                                 logErrors logger "FCS aborted" creationErrors

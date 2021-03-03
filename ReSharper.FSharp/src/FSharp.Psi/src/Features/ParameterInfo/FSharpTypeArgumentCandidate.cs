@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.EditorServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Feature.Services.ParameterInfo;
@@ -11,9 +11,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
   public class FSharpTypeArgumentCandidate : FSharpParameterInfoCandidateBase
   {
     [NotNull] private readonly string myTypeName;
-    private readonly FSharpMethodGroupItem myCandidate;
+    private readonly MethodGroupItem myCandidate;
 
-    public FSharpTypeArgumentCandidate([NotNull] string typeName, [NotNull] FSharpMethodGroupItem candidate)
+    public FSharpTypeArgumentCandidate([NotNull] string typeName, [NotNull] MethodGroupItem candidate)
     {
       myTypeName = typeName;
       myCandidate = candidate;

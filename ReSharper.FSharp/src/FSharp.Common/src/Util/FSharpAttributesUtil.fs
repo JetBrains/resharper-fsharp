@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Util
 
 open System.Collections.Generic
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
 open JetBrains.Metadata.Reader.API
 open JetBrains.Util
 

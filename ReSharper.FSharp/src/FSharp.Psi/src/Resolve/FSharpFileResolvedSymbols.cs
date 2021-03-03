@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using FSharp.Compiler;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Symbols;
+using FSharp.Compiler.Text;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Metadata.Reader.API;
@@ -18,7 +19,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
-using PrettyNaming = FSharp.Compiler.PrettyNaming;
+using PrettyNaming = FSharp.Compiler.Syntax.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
@@ -104,7 +105,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       foreach (var symbolUse in symbolUses)
       {
         var symbol = symbolUse.Symbol;
-        var range = symbolUse.RangeAlternate;
+        var range = symbolUse.Range;
 
         var startOffset = document.GetOffset(range.Start);
         var endOffset = document.GetOffset(range.End);
@@ -150,7 +151,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             // Skip active pattern cases bindings as these have incorrect ranges.
             // Active pattern cases uses inside bindings are currently marked as bindings so check the range.
             // https://github.com/Microsoft/visualfsharp/issues/4423
-            if (Range.equals(activePatternCase.DeclarationLocation, range))
+            if (RangeModule.equals(activePatternCase.DeclarationLocation, range))
             {
               var activePatternId = fsFile.GetContainingNodeAt<ActivePatternId>(new TreeOffset(endOffset - 1));
               if (activePatternId == null)
@@ -265,7 +266,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       if (logicalName != null && PrettyNaming.IsMangledOpName(logicalName))
       {
-        var sourceName = PrettyNaming.DecompileOpName.Invoke(logicalName);
+        var sourceName = PrettyNaming.DecompileOpName(logicalName);
         var isUnary = sourceName.StartsWith("~", StringComparison.Ordinal);
         var sourceLength = isUnary ? sourceName.Length - 1 : sourceName.Length;
 

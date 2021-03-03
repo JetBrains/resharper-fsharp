@@ -1,6 +1,6 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypesUtil
 
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
 
 let getFunctionTypeArgs fcsType =
     let rec loop (fcsType: FSharpType) acc =

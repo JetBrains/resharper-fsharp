@@ -1,7 +1,7 @@
 [<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
 open JetBrains.Application.UI.Icons.ComposedIcons
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp

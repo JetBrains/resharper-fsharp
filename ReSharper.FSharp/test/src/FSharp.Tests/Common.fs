@@ -3,7 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 open System
 open System.Collections.Generic
 open System.Threading
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application.Components
 open JetBrains.Application.platforms
 open JetBrains.DataFlow

@@ -1,8 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open System
-open FSharp.Compiler
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.EditorServices
+open FSharp.Compiler.Syntax
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
@@ -74,7 +74,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
                 fsFile.Language.Is<FSharpScriptLanguage>() &&
                 fsFile.GetPsiModule() :? SandboxPsiModule
 
-            let isFsiModuleToSkip (item: FSharpDeclarationListItem) =
+            let isFsiModuleToSkip (item: DeclarationListItem) =
                 not (Array.isEmpty item.NamespaceToOpen) &&
                 item.Name.StartsWith(PrettyNaming.FsiDynamicModulePrefix, StringComparison.Ordinal)
 
@@ -123,7 +123,7 @@ type FSharpLookupItemsProvider(logger: ILogger) =
     inherit FSharpLookupItemsProviderBase(logger, false, fun checkResults ->
         let assemblySignature = checkResults.PartialAssemblySignature
         let getSymbolsAsync = async {
-            return AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full assemblySignature }
+            return AssemblyContent.GetAssemblySignatureContent AssemblyContentType.Full assemblySignature }
         getSymbolsAsync.RunAsTask())
 
     interface ICodeCompletionItemsProvider with

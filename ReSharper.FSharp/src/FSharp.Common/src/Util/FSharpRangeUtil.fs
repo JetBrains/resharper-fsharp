@@ -1,16 +1,16 @@
 [<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpRangeUtil
 
+open FSharp.Compiler.Text
 open JetBrains.Annotations
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Psi
 open JetBrains.Util
-open FSharp.Compiler.Range
 
 // FCS lines are 1-based.
 
 [<Extension; CompiledName("ToDocumentCoords")>]
-let getDocumentCoords (pos: pos) =
+let getDocumentCoords (pos: Position) =
     DocumentCoords(docLine (pos.Line - 1), docColumn pos.Column)
 
 [<Extension; CompiledName("GetDocumentOffset")>]
@@ -51,7 +51,7 @@ let getTreeTextRange (document: IDocument) (range: range) =
 let getPosFromCoords (coords: DocumentCoords) =
     let line = int coords.Line + 1
     let column = int coords.Column
-    mkPos line column
+    Position.mkPos line column
 
 [<Extension; CompiledName("GetPos")>]
 let getPosFromOffset (document: IDocument) offset =
@@ -79,7 +79,7 @@ let getEndOffset ([<NotNull>] document) (range: range) =
 let ofFileDocumentRange (documentRange: DocumentRange) (path: FileSystemPath) =
     let startPos = getPosFromDocumentOffset documentRange.StartOffset
     let endPos = getPosFromDocumentOffset documentRange.EndOffset
-    mkRange path.FullPath startPos endPos
+    Range.mkRange path.FullPath startPos endPos
 
 [<Extension; CompiledName("ToDocumentRange")>]
 let ofDocumentRange (documentRange: DocumentRange) =

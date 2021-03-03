@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
-open FSharp.Compiler.ErrorLogger
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Diagnostics
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
@@ -21,7 +20,7 @@ and TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger: ILogger) =
     let [<Literal>] opName = "TypeCheckErrorsStageProcess"
 
     override x.ShouldAddDiagnostic(error, range) =
-        base.ShouldAddDiagnostic(error, range) && error.Subcategory <> BuildPhaseSubcategory.Parse
+        base.ShouldAddDiagnostic(error, range) && error.Subcategory <> "parse"
 
     override x.Execute(committer) =
         match fsFile.GetParseAndCheckResults(false, opName) with
@@ -29,9 +28,9 @@ and TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger: ILogger) =
         | Some results ->
 
         let projectWarnings, fileErrors =
-            results.CheckResults.Errors
+            results.CheckResults.Diagnostics
             |> Array.partition (fun e ->
-                e.StartLineAlternate = 0 && e.EndLineAlternate = 0 && e.Severity = FSharpErrorSeverity.Warning)
+                e.StartLine = 0 && e.EndLine = 0 && e.Severity = FSharpDiagnosticSeverity.Warning)
 
         if not (Array.isEmpty projectWarnings) then
             // https://github.com/Microsoft/visualfsharp/issues/4030

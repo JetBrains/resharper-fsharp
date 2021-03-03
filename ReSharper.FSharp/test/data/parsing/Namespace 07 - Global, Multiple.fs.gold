@@ -4,11 +4,11 @@ IFSharpImplFile
     FSharpTokenType+NamespaceTokenElement(type:NAMESPACE, text:namespace)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
     FSharpIdentifierToken(type:IDENTIFIER, text:Ns1)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
   IGlobalNamespaceDeclaration
     FSharpTokenType+NamespaceTokenElement(type:NAMESPACE, text:namespace)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
     FSharpTokenType+GlobalTokenElement(type:GLOBAL, text:global)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

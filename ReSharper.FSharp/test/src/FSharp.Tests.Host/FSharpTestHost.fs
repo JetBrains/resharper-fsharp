@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open System.Collections.Generic
 open System.Linq
-open FSharp.Compiler.AbstractIL.Internal.Library
+open FSharp.Compiler.IO
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -52,8 +52,8 @@ type FSharpTestHost(lifetime: Lifetime, solution: ISolution, checkerService: FSh
         // We want to get events published by background checker.
         checkerService.Checker.ImplicitlyStartBackgroundWork <- true
 
-        let subscription = checkerService.Checker.ProjectChecked.Subscribe(fun (projectFilePath, _) ->
-            fsTestHost.ProjectChecked(projectFilePath))
+        let subscription = checkerService.Checker.ProjectChecked.Subscribe(fun projectOptions ->
+            fsTestHost.ProjectChecked(projectOptions.ProjectFileName))
         lifetime.OnTermination(fun _ -> subscription.Dispose()) |> ignore
 
         fsTestHost.GetLastModificationStamp.Set(FileSystem.GetLastWriteTimeShim)

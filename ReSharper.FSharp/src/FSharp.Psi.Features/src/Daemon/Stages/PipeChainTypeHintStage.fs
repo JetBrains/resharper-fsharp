@@ -2,8 +2,9 @@
 
 open System
 open System.Collections.Generic
-open FSharp.Compiler.Layout
-open FSharp.Compiler.SourceCodeServices
+open System.Text
+open FSharp.Compiler.EditorServices
+open FSharp.Compiler.Text
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
@@ -66,8 +67,11 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
 
     /// Formats a type parameter layout.
     /// Removes the "'T1 is " prefix from the layout string.
-    let formatTypeParamLayout (layout : Layout) =
-        let typeParamStr = showL layout
+    let formatTypeParamLayout (layout: TaggedText[]) =
+        let result = StringBuilder()
+        for text in layout do
+            result.Append(text.Text) |> ignore
+        let typeParamStr = result.ToString()
         let prefixToRemove = "'T1 is "
         if typeParamStr.StartsWith(prefixToRemove) then
             typeParamStr.Substring(prefixToRemove.Length)
@@ -81,11 +85,11 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
         for token, exprToAdorn in exprs do
             if daemonProcess.InterruptFlag then raise <| OperationCanceledException()
 
-            let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(checkResults, token)
+            let (ToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(checkResults, token)
 
             // The |> operator should have one overload and two type parameters
             match layouts with
-            | [ FSharpStructuredToolTipElement.Group [ { TypeMapping = [ argumentType; _ ] } ] ] ->
+            | [ ToolTipElement.Group [ { TypeMapping = [ argumentType; _ ] } ] ] ->
                 let returnTypeStr = formatTypeParamLayout argumentType
                 if returnTypeStr = null then () else
 

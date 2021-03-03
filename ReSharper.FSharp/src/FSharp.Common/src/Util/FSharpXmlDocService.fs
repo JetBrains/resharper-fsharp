@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 
 open System.Collections.Concurrent
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
 open JetBrains.Annotations
 open JetBrains.Application.Infra
 open JetBrains.ProjectModel
@@ -44,11 +44,11 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
     [<CanBeNull>]
     member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc) =
         match fsXmlDoc with
-        | FSharpXmlDoc.Text (s, _) ->
-            let text = s |> Array.map (fun s -> s.Trim()) |> String.concat "\n"
+        | FSharpXmlDoc.FromXmlText(xmlDoc) ->
+            let text = xmlDoc.UnprocessedLines |> Array.map (fun s -> s.Trim()) |> String.concat "\n"
             RichTextBlock(text)
 
-        | FSharpXmlDoc.XmlDocFileSignature (dllFile, memberName) ->
+        | FSharpXmlDoc.FromXmlFile (dllFile, memberName) ->
             getIndex dllFile
             |> Option.map (fun index ->
                 let summary = XMLDocUtil.ExtractSummary(index.GetXml(memberName))
