@@ -1,18 +1,17 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing.FcsSyntaxTreeUtil
 
-open FSharp.Compiler
-open FSharp.Compiler.SyntaxTree
-open FSharp.Compiler.Range
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.Text
 
 type SynBinding with
     member x.StartPos =
-        let (Binding(headPat = headPat)) = x
+        let (SynBinding(headPat = headPat)) = x
         headPat.Range.Start
 
 type SynField with
     member x.StartPos =
-        let (Field(attrs, _, id, _, _, _, _, range)) = x
+        let (SynField(attrs, _, id, _, _, _, _, range)) = x
         let range =
             match attrs, id with
             | attrList :: _, _ -> attrList.Range
@@ -23,27 +22,27 @@ type SynField with
 type SynMemberDefn with
     member x.OuterAttributes =
         match x with
-        | SynMemberDefn.Member(Binding(attributes = attrs), _)
-        | SynMemberDefn.AbstractSlot(ValSpfn(attributes = attrs), _, _)
+        | SynMemberDefn.Member(SynBinding(attributes = attrs), _)
+        | SynMemberDefn.AbstractSlot(SynValSig(attributes = attrs), _, _)
         | SynMemberDefn.AutoProperty(attributes = attrs)
-        | SynMemberDefn.ValField(Field(attributes = attrs), _) -> attrs
+        | SynMemberDefn.ValField(SynField(attributes = attrs), _) -> attrs
 
-        | SynMemberDefn.LetBindings(Binding(attributes = attrs) :: _, _, _, range) ->
+        | SynMemberDefn.LetBindings(SynBinding(attributes = attrs) :: _, _, _, range) ->
             match attrs with
             | [] -> []
             | head :: _ ->
 
             let letStart = range.Start
-            if posGeq head.Range.Start letStart then attrs else  
-            attrs |> List.takeWhile (fun attrList -> posLt attrList.Range.Start letStart)
+            if Position.posGeq head.Range.Start letStart then attrs else  
+            attrs |> List.takeWhile (fun attrList -> Position.posLt attrList.Range.Start letStart)
 
         | _ -> []
 
 type SynMemberSig with
     member x.OuterAttributes =
         match x with
-        | SynMemberSig.Member(ValSpfn(attributes = attrs), _, _)
-        | SynMemberSig.ValField(Field(attributes = attrs), _) -> attrs
+        | SynMemberSig.Member(SynValSig(attributes = attrs), _, _)
+        | SynMemberSig.ValField(SynField(attributes = attrs), _) -> attrs
         | _ -> []
 
     member x.Range =
@@ -72,22 +71,22 @@ let attrOwnerStartPos (attrLists: SynAttributeList list) (ownerRange: range) =
     match attrLists with
     | { Range = attrsRange } :: _ ->
         let attrsStart = attrsRange.Start
-        if posLt attrsStart ownerRange.Start then attrsStart else ownerRange.Start
+        if Position.posLt attrsStart ownerRange.Start then attrsStart else ownerRange.Start
     | _ -> ownerRange.Start
 
-let typeDefnGroupStartPos (bindings: SynTypeDefn list) (range: Range.range) =
+let typeDefnGroupStartPos (bindings: SynTypeDefn list) (range: Range) =
     match bindings with
-    | TypeDefn(ComponentInfo(attributes = attrs), _, _, _) :: _ -> attrOwnerStartPos attrs range
+    | SynTypeDefn(SynComponentInfo(attributes = attrs), _, _, _, _) :: _ -> attrOwnerStartPos attrs range
     | _ -> range.Start
 
-let typeSigGroupStartPos (bindings: SynTypeDefnSig list) (range: Range.range) =
+let typeSigGroupStartPos (bindings: SynTypeDefnSig list) (range: Range) =
     match bindings with
-    | TypeDefnSig(ComponentInfo(attributes = attrs), _, _, _) :: _ -> attrOwnerStartPos attrs range
+    | SynTypeDefnSig(SynComponentInfo(attributes = attrs), _, _, _) :: _ -> attrOwnerStartPos attrs range
     | _ -> range.Start
 
-let letBindingGroupStartPos (bindings: SynBinding list) (range: Range.range) =
+let letBindingGroupStartPos (bindings: SynBinding list) (range: Range) =
     match bindings with
-    | Binding(attributes = attrs) :: _ -> attrOwnerStartPos attrs range
+    | SynBinding(attributes = attrs) :: _ -> attrOwnerStartPos attrs range
     | _ -> range.Start
 
 
@@ -99,7 +98,7 @@ let rec skipGeneratedLambdas expr =
 
 and skipGeneratedMatch expr =
     match expr with
-    | SynExpr.Match(_, _, [ Clause(_, _, innerExpr, _, _) as clause ], matchRange) when
+    | SynExpr.Match(_, _, [ SynMatchClause(_, _, innerExpr, _, _) as clause ], matchRange) when
             matchRange.Start = clause.Range.Start ->
         skipGeneratedMatch innerExpr
     | _ -> expr
@@ -118,5 +117,5 @@ let getGeneratedAppArg (expr: SynExpr) =
 type SynArgPats with
     member x.IsEmpty =
         match x with
-        | Pats pats -> pats.IsEmpty
-        | NamePatPairs(idsAndPats, _) -> idsAndPats.IsEmpty
+        | SynArgPats.Pats pats -> pats.IsEmpty
+        | SynArgPats.NamePatPairs(idsAndPats, _) -> idsAndPats.IsEmpty

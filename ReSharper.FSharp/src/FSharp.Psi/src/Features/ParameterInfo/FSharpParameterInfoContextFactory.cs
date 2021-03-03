@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.EditorServices;
 using JetBrains.Annotations;
 using JetBrains.Application.Settings;
 using JetBrains.DocumentModel;
@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
 
       var document = caretOffset.Document;
       var coords = document.GetCoordsByOffset(caretOffset.Offset);
-      var paramInfoLocationsOption = parseResults.FindNoteworthyParamInfoLocations(coords.ToPos());
+      var paramInfoLocationsOption = parseResults.FindParameterLocations(coords.ToPos());
       if (paramInfoLocationsOption == null)
         return null;
 
@@ -66,7 +66,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
       return new FSharpParameterInfoContext(currentParamNumber, candidates, textRange, namedArgs);
     }
 
-    private static ICandidate[] CreateCandidates([NotNull] string rangeStartText, FSharpMethodGroup overloads,
+    private static ICandidate[] CreateCandidates([NotNull] string rangeStartText, MethodGroup overloads,
       int argsCount)
     {
       var methods = overloads.Methods;
@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
       }
     }
 
-    private static int GetParameterNumber(FSharpNoteworthyParamInfoLocations paramInfoLocations,
+    private static int GetParameterNumber(ParameterLocations paramInfoLocations,
       DocumentOffset documentCaretOffset)
     {
       var tupleEndLocations = paramInfoLocations.TupleEndLocations;

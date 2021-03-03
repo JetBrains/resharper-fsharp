@@ -1,6 +1,8 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.EditorServices
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.Tokenization
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -47,7 +49,7 @@ type FSharpKeywordsProvider() =
         |> Array.concat
 
     let keywords =
-        Keywords.KeywordsWithDescription
+        FSharpKeywords.KeywordsWithDescription
         // todo: implement auto-popup completion strategy that will cover operators
         |> List.filter (fun (keyword, _) -> not (PrettyNaming.IsOperatorName keyword))
         |> Array.ofList

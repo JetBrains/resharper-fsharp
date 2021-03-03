@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
 using JetBrains.Diagnostics;

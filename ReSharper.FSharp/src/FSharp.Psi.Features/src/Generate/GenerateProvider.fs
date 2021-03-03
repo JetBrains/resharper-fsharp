@@ -1,7 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 
 open System.Collections.Generic
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
 open JetBrains.Application.Progress
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Generate

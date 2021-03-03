@@ -1,5 +1,8 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Util
 
+open FSharp.Compiler.Diagnostics
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.Text
 open JetBrains.Annotations
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules
@@ -12,8 +15,6 @@ module rec CommonUtil =
     open System.Collections.Generic
     open System.Diagnostics
     open System.Text.RegularExpressions
-    open FSharp.Compiler
-    open FSharp.Compiler.SourceCodeServices
     open JetBrains.Application.UI.Icons.ComposedIcons
     open JetBrains.DataFlow
     open JetBrains.DocumentModel
@@ -27,7 +28,7 @@ module rec CommonUtil =
         | relativePath -> projectDirectory.Combine(relativePath)
 
     let concatErrors errors =
-        Seq.fold (fun s (e: FSharpErrorInfo) -> s + "\n" + e.Message) "" errors
+        Seq.fold (fun s (e: FSharpDiagnostic) -> s + "\n" + e.Message) "" errors
 
     let logErrors (logger: ILogger) message errors =
         logger.Warn("{0}: {1}", message, concatErrors errors)
@@ -35,7 +36,7 @@ module rec CommonUtil =
     [<CompiledName("DecompileOpName")>]
     let decompileOpName name =
         PrettyNaming.DecompileOpName name
-        
+
     type IDictionary<'TKey, 'TValue> with
         member x.remove (key: 'TKey) = x.Remove key |> ignore
         member x.add (key: 'TKey, value: 'TValue) = x.Add(key, value)
@@ -83,7 +84,7 @@ module rec CommonUtil =
     let inline docColumn (x: int) = Column.op_Explicit(x)
     let inline docCoords line column = DocumentCoords(docLine (line - 1), docColumn column)
 
-    type Range.range with
+    type Range with
         member inline x.GetStartLine()   = x.StartLine - 1 |> docLine
         member inline x.GetEndLine()     = x.EndLine - 1   |> docLine
 
@@ -156,8 +157,6 @@ module rec CommonUtil =
 
 [<AutoOpen>]
 module rec FcsUtil =
-    open FSharp.Compiler.SyntaxTree
-
     let inline (|ExprRange|) (expr: SynExpr) = expr.Range
     let inline (|PatRange|) (pat: SynPat) = pat.Range
     let inline (|IdentRange|) (id: Ident) = id.idRange

@@ -2,8 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System
 open System.Collections.Generic
-open FSharp.Compiler.SyntaxTree
-open FSharp.Compiler.Range
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.Text
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
@@ -220,7 +220,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | IdentRange idRange as id :: _ ->
             let mark =
                 match moduleKind with
-                | AnonModule ->
+                | SynModuleOrNamespaceKind.AnonModule ->
                     x.Mark()
 
                 | _ when attrs.IsEmpty ->
@@ -228,8 +228,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
                     // we try to locate the keyword followed by access modifiers.
                     let keywordTokenType =
                         match moduleKind with
-                        | NamedModule -> FSharpTokenType.MODULE
-                        | DeclaredNamespace -> FSharpTokenType.NAMESPACE
+                        | SynModuleOrNamespaceKind.NamedModule -> FSharpTokenType.MODULE
+                        | SynModuleOrNamespaceKind.DeclaredNamespace -> FSharpTokenType.NAMESPACE
                         | _ -> null
                     let startOffset = x.GetStartOffset(idRange)
                     x.AdvanceToTokenOrOffset(keywordTokenType, startOffset, range)
@@ -238,13 +238,13 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
                 | _ ->
                     x.MarkAndProcessAttributesOrIdOrRange(attrs, Some id, range)
 
-            if moduleKind <> AnonModule then
+            if moduleKind <> SynModuleOrNamespaceKind.AnonModule then
                 x.ProcessReferenceNameSkipLast(lid)
 
             let elementType =
                 match moduleKind with
-                | NamedModule -> ElementType.NAMED_MODULE_DECLARATION
-                | AnonModule -> ElementType.ANON_MODULE_DECLARATION
+                | SynModuleOrNamespaceKind.NamedModule -> ElementType.NAMED_MODULE_DECLARATION
+                | SynModuleOrNamespaceKind.AnonModule -> ElementType.ANON_MODULE_DECLARATION
                 | _ -> ElementType.NAMED_NAMESPACE_DECLARATION
 
             Some mark, elementType
@@ -252,7 +252,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | _ ->
 
         match moduleKind with
-        | GlobalNamespace ->
+        | SynModuleOrNamespaceKind.GlobalNamespace ->
             x.AdvanceToTokenOrRangeStart(FSharpTokenType.NAMESPACE, range)
             let mark = x.Mark()
             Some mark, ElementType.GLOBAL_NAMESPACE_DECLARATION
@@ -293,12 +293,12 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.ProcessType(typeName)
         x.Done(range, mark, ElementType.OPEN_STATEMENT)
 
-    member x.StartException(SynExceptionDefnRepr(_, UnionCase(caseType = unionCaseType), _, _, _, range)) =
+    member x.StartException(SynExceptionDefnRepr(_, SynUnionCase(caseType = unionCaseType), _, _, _, range)) =
         let mark = x.Mark(range)
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION)
         mark
 
-    member x.StartType(attrs, typeParams, constraints, lid: LongIdent, range, typeTokenType) =
+    member x.StartType(attrs: SynAttributes, typeParams, constraints, lid: LongIdent, range, typeTokenType) =
         let startRange =
             match attrs with
             | attrList :: _ -> attrList.Range
@@ -313,7 +313,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
             let typeParamsOffset =
                 match typeParams with
-                | TyparDecl(_, Typar(id, _, _)) :: _ -> x.GetStartOffset id
+                | SynTyparDecl(_, SynTypar(id, _, _)) :: _ -> x.GetStartOffset id
                 | [] -> idOffset
 
             let paramsInBraces = idOffset < typeParamsOffset
@@ -325,7 +325,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
     member x.ProcessTypeParametersOfType typeParams constraints range paramsInBraces =
         match typeParams with
-        | TyparDecl(_, Typar(IdentRange idRange, _, _)) :: _ ->
+        | SynTyparDecl(_, SynTypar(IdentRange idRange, _, _)) :: _ ->
             let mark = x.MarkTokenOrRange(FSharpTokenType.LESS, idRange)
             for p in typeParams do
                 x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
@@ -339,12 +339,12 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_LIST)
         | [] -> ()
 
-    member x.ProcessTypeParameter(TyparDecl(_, Typar(IdentRange range, _, _)), elementType) =
+    member x.ProcessTypeParameter(SynTyparDecl(_, SynTypar(IdentRange range, _, _)), elementType) =
         x.MarkAndDone(range, elementType)
 
     member x.ProcessUnionCaseType(caseType, fieldElementType) =
         match caseType with
-        | UnionCaseFields(fields) ->
+        | SynUnionCaseKind.Fields(fields) ->
             match fields with
             | field :: _ ->
                 let fieldListMark = x.Mark(field.StartPos)
@@ -354,20 +354,20 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             | _ -> ()
 
         // todo: used in FSharp.Core only, otherwise warning
-        | UnionCaseFullType _ -> ()
+        | SynUnionCaseKind.FullType _ -> ()
 
     member x.AddObjectModelTypeReprNode(kind: SynTypeDefnKind) =
         match kind with
-        | SynTypeDefnKind.TyconClass
-        | SynTypeDefnKind.TyconStruct
-        | SynTypeDefnKind.TyconInterface -> true
+        | SynTypeDefnKind.Class
+        | SynTypeDefnKind.Struct
+        | SynTypeDefnKind.Interface -> true
         | _ -> false
     
     member x.GetObjectModelTypeReprElementType(reprKind: SynTypeDefnKind) =
         match reprKind with
-        | TyconClass -> ElementType.CLASS_REPRESENTATION
-        | TyconInterface -> ElementType.INTERFACE_REPRESENTATION
-        | TyconStruct -> ElementType.STRUCT_REPRESENTATION
+        | SynTypeDefnKind.Class -> ElementType.CLASS_REPRESENTATION
+        | SynTypeDefnKind.Interface -> ElementType.INTERFACE_REPRESENTATION
+        | SynTypeDefnKind.Struct -> ElementType.STRUCT_REPRESENTATION
         | _ -> failwithf "Unexpected type representation kind: %A" reprKind
 
     member x.ProcessSimpleTypeRepresentation(repr) =
@@ -376,8 +376,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             let mark = x.Mark(range)
 
             if not fields.IsEmpty then
-                let (Field(range = firstFieldRange)) = fields.Head
-                let (Field(range = lastFieldRange)) = List.last fields
+                let (SynField(range = firstFieldRange)) = fields.Head
+                let (SynField(range = lastFieldRange)) = List.last fields
 
                 let fieldListMark = x.Mark(firstFieldRange)
                 for field in fields do
@@ -422,7 +422,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
         | _ -> failwithf "Unexpected simple type representation: %A" repr
 
-    member x.ProcessUnionCase(UnionCase(attrs, _, caseType, _, _, range)) =
+    member x.ProcessUnionCase(SynUnionCase(attrs, _, caseType, _, _, range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
         x.ProcessAttributeLists(attrs)
         x.ProcessUnionCaseType(caseType, ElementType.UNION_CASE_FIELD_DECLARATION)
@@ -430,7 +430,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
     member x.ProcessOuterAttrs(attrs: SynAttributeList list, range: range) =
         match attrs with
-        | { Range = r } as attributeList :: rest when posLt r.End range.Start ->
+        | { Range = r } as attributeList :: rest when Position.posLt r.End range.Start ->
             x.ProcessAttributeList(attributeList)
             x.ProcessOuterAttrs(rest, range)
 
@@ -471,12 +471,12 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
         x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
-    member x.ProcessEnumCase(EnumCase(attrs, _, _, _, range)) =
+    member x.ProcessEnumCase(SynEnumCase(attrs, _, _, _, range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
         x.ProcessAttributeLists(attrs)
         x.Done(range, mark, ElementType.ENUM_MEMBER_DECLARATION)
 
-    member x.ProcessField(Field(attrs, _, id, synType, _, _, _, range)) elementType =
+    member x.ProcessField(SynField(attrs, _, id, synType, _, _, _, range)) elementType =
         let mark =
             match attrs with
             | attrList :: _ ->
@@ -783,34 +783,34 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
     member x.ProcessTypeConstraint(typeConstraint: SynTypeConstraint) =
         match typeConstraint with
-        | WhereTyparIsValueType(typeParameter, _)
-        | WhereTyparIsReferenceType(typeParameter, _)
-        | WhereTyparIsUnmanaged(typeParameter, _)
-        | WhereTyparSupportsNull(typeParameter, _)
-        | WhereTyparIsComparable(typeParameter, _)
-        | WhereTyparIsEquatable(typeParameter, _) ->
+        | SynTypeConstraint.WhereTyparIsValueType(typeParameter, _)
+        | SynTypeConstraint.WhereTyparIsReferenceType(typeParameter, _)
+        | SynTypeConstraint.WhereTyparIsUnmanaged(typeParameter, _)
+        | SynTypeConstraint.WhereTyparSupportsNull(typeParameter, _)
+        | SynTypeConstraint.WhereTyparIsComparable(typeParameter, _)
+        | SynTypeConstraint.WhereTyparIsEquatable(typeParameter, _) ->
             x.ProcessTypeParameter(typeParameter)
 
-        | WhereTyparDefaultsToType(typeParameter, synType, _)
-        | WhereTyparSubtypeOfType(typeParameter, synType, _) ->
+        | SynTypeConstraint.WhereTyparDefaultsToType(typeParameter, synType, _)
+        | SynTypeConstraint.WhereTyparSubtypeOfType(typeParameter, synType, _) ->
             x.ProcessTypeParameter(typeParameter)
             x.ProcessType(synType)
 
-        | WhereTyparSupportsMember(typeParameterTypes, memberSig, _) ->
+        | SynTypeConstraint.WhereTyparSupportsMember(typeParameterTypes, memberSig, _) ->
             for synType in typeParameterTypes do
                 x.ProcessType(synType)
             match memberSig with
-            | SynMemberSig.Member(ValSpfn(synType = synType), _, _) ->
+            | SynMemberSig.Member(SynValSig(synType = synType), _, _) ->
                 x.ProcessType(synType)
             | _ -> ()
 
-        | WhereTyparIsEnum(typeParameter, synTypes, _)
-        | WhereTyparIsDelegate(typeParameter, synTypes, _) ->
+        | SynTypeConstraint.WhereTyparIsEnum(typeParameter, synTypes, _)
+        | SynTypeConstraint.WhereTyparIsDelegate(typeParameter, synTypes, _) ->
             x.ProcessTypeParameter(typeParameter)
             for synType in synTypes do
                 x.ProcessType(synType)
 
-    member x.ProcessTypeParameter(Typar(IdentRange range, _, _)) =
+    member x.ProcessTypeParameter(SynTypar(IdentRange range, _, _)) =
         let mark = x.Mark(range)
         x.MarkAndDone(range, ElementType.TYPE_PARAMETER_ID)
         x.Done(range, mark, ElementType.TYPE_REFERENCE_NAME)
@@ -821,7 +821,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         // where 1 is replaced with `1: int`. 
         // These fake nodes have original type specification ranges that are out of the actual expression ranges.
         match expr with
-        | SynExpr.Typed(inner, synType, range) when not (rangeContainsRange range synType.Range) -> inner
+        | SynExpr.Typed(inner, synType, range) when not (Range.rangeContainsRange range synType.Range) -> inner
         | _ -> expr
 
     member x.RemoveDoExpr(expr: SynExpr) =

@@ -1,8 +1,8 @@
-﻿using FSharp.Compiler.SourceCodeServices;
+﻿using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
-using static FSharp.Compiler.PrettyNaming;
+using static FSharp.Compiler.Syntax.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
 {

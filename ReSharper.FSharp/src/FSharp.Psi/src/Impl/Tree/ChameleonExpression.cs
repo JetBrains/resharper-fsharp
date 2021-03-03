@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using FSharp.Compiler;
+using FSharp.Compiler.Syntax;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ChameleonExpression
   {
-    public SyntaxTree.SynExpr SynExpr { get; private set; }
+    public SynExpr SynExpr { get; private set; }
 
     public int OriginalStartOffset { get; }
     public int OriginalLineStart { get; }
@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [NotNull] private readonly object mySyncObject = new object();
     private bool myOpened;
 
-    public ChameleonExpression([CanBeNull] SyntaxTree.SynExpr expr, int startOffset, int lineStart)
+    public ChameleonExpression([CanBeNull] SynExpr expr, int startOffset, int lineStart)
     {
       SynExpr = expr;
       OriginalStartOffset = startOffset;
@@ -149,7 +149,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public bool Check(Func<IFSharpExpression, bool> fsExprPredicate,
-      Func<SyntaxTree.SynExpr, bool> synExprPredicate)
+      Func<SynExpr, bool> synExprPredicate)
     {
       var synExpr = SynExpr;
       if (synExpr != null) return synExprPredicate(synExpr);

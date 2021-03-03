@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Foldings
 
-open FSharp.Compiler.SourceCodeServices.Structure
+open FSharp.Compiler.EditorServices.Structure
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.CodeFolding
 open JetBrains.ReSharper.Plugins.FSharp.Psi

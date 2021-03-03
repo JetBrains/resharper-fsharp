@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;

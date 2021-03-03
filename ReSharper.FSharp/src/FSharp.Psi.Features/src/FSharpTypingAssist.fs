@@ -2,9 +2,8 @@ module rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.TypingAssist
 
 open System
 open System.Collections.Generic
-open FSharp.Compiler.SyntaxTree
-open FSharp.Compiler.PrettyNaming
-open FSharp.Compiler.SourceCodeServices.AstTraversal
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.Application.CommandProcessing
 open JetBrains.Application.UI.ActionSystem.Text
 open JetBrains.Application.Settings
@@ -696,7 +695,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         let document = textControl.Document
         let visitor =
-            { new AstVisitorBase<_>() with
+            { new SyntaxVisitorBase<_>() with
                 member x.VisitExpr(_, _, defaultTraverse, expr) =
                     match expr with
 
@@ -720,7 +719,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                     | _ -> defaultTraverse expr }
 
         let documentCoords = document.GetCoordsByOffset(lexer.TokenStart)
-        match Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
+        match SyntaxTraversal.Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
         | None -> false
         | Some range ->
 
@@ -756,8 +755,8 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         let document = textControl.Document
         let visitor =
-            { new AstVisitorBase<_>() with
-                member x.VisitMatchClause(defaultTraverse, (SynMatchClause.Clause (pat, whenExpr, _, _, _) as mc)) =
+            { new SyntaxVisitorBase<_>() with
+                member x.VisitMatchClause(_, defaultTraverse, (SynMatchClause.SynMatchClause (pat, whenExpr, _, _, _) as mc)) =
                     match pat, whenExpr with
                     | _, Some (ExprRange range)
                     | PatRange range, None when getEndOffset document range = prevTokenEnd -> Some mc
@@ -768,9 +767,9 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                     defaultTraverse expr }
 
         let documentCoords = document.GetCoordsByOffset(lexer.TokenStart)
-        match Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
+        match SyntaxTraversal.Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
         | None -> false
-        | Some (SynMatchClause.Clause (_, _, _, range, _)) ->
+        | Some (SynMatchClause.SynMatchClause (_, _, _, range, _)) ->
 
         use cookie = LexerStateCookie.Create(lexer)
 
@@ -918,7 +917,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let mutable appExpr = None
         let mutable outerExpr = None
         let visitor =
-            { new AstVisitorBase<_>() with
+            { new SyntaxVisitorBase<_>() with
                 member x.VisitExpr(_, _, defaultTraverse, expr) =
                     match expr with
                     | SynExpr.App (_, false, leftExpr, rightExpr, range)
@@ -940,7 +939,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
                     | _ -> defaultTraverse expr }
 
-        Traverse(getPosFromCoords caretCoords, parseTree, visitor) |> ignore
+        SyntaxTraversal.Traverse(getPosFromCoords caretCoords, parseTree, visitor) |> ignore
         match appExpr, outerExpr with
         | None, _ -> false
         | Some expr, None
@@ -1010,7 +1009,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         let mutable foundError = false
         let visitor =
-            { new AstVisitorBase<_>() with
+            { new SyntaxVisitorBase<_>() with
                 member x.VisitExpr(path, _, defaultTraverse, expr) =
                     match expr with
                     | SynExpr.FromParseError _ -> foundError <- true
@@ -1022,7 +1021,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                     | _ -> defaultTraverse expr }
 
         let tokenCoords = document.GetCoordsByOffset(lexer.TokenStart)
-        match Traverse(getPosFromCoords tokenCoords, parseTree, visitor) with
+        match SyntaxTraversal.Traverse(getPosFromCoords tokenCoords, parseTree, visitor) with
         | None -> false
         | _ when not foundError -> false
 
@@ -1070,7 +1069,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let caretLine = caretCoords.Line
 
         let visitor =
-            { new AstVisitorBase<_>() with
+            { new SyntaxVisitorBase<_>() with
                 member x.VisitExpr(_, _, defaultTraverse, expr) =
                     if expr.Range.GetStartLine() <> caretLine then defaultTraverse expr else
 
@@ -1090,7 +1089,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
                     | _ -> defaultTraverse expr }
 
-        match Traverse(getPosFromCoords caretCoords, parseTree, visitor) with
+        match SyntaxTraversal.Traverse(getPosFromCoords caretCoords, parseTree, visitor) with
         | None -> false
         | Some range ->
 

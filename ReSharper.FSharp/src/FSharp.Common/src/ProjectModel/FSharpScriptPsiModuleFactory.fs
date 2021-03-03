@@ -5,7 +5,7 @@ open System.Collections.Generic
 open System.IO
 open System.Linq
 open System.Runtime.InteropServices
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
 open JetBrains.Application.Progress
 open JetBrains.Application.Threading

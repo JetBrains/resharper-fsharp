@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Occurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl

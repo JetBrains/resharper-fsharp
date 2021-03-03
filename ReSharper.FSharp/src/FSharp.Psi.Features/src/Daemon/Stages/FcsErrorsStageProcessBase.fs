@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
 open System
 open System.Collections.Generic
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -80,17 +80,17 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     let document = daemonProcess.Document
     let nodeSelectionProvider = FSharpTreeNodeSelectionProvider.Instance
 
-    let getDocumentRange (error: FSharpErrorInfo) =
-        if error.StartLineAlternate = 0 || error.ErrorNumber = ModuleOrNamespaceRequired then
+    let getDocumentRange (error: FSharpDiagnostic) =
+        if error.StartLine = 0 || error.ErrorNumber = ModuleOrNamespaceRequired then
             DocumentRange(document, TextRange(0, document.GetLineEndOffsetWithLineBreak(Line.O)))
         else
-            let startOffset = getDocumentOffset document (docCoords error.StartLineAlternate error.StartColumn)
-            let endOffset = getDocumentOffset document (docCoords error.EndLineAlternate error.EndColumn)
+            let startOffset = getDocumentOffset document (docCoords error.StartLine error.StartColumn)
+            let endOffset = getDocumentOffset document (docCoords error.EndLine error.EndColumn)
             DocumentRange(document, TextRange(startOffset, endOffset))
 
-    let createGenericHighlighting (error: FSharpErrorInfo) range: IHighlighting =
+    let createGenericHighlighting (error: FSharpDiagnostic) range: IHighlighting =
         match error.Severity with
-        | FSharpErrorSeverity.Warning -> WarningHighlighting(error.Message, range) :> _
+        | FSharpDiagnosticSeverity.Warning -> WarningHighlighting(error.Message, range) :> _
         | _ -> ErrorHighlighting(error.Message, range) :> _
 
     /// Finds node of the corresponding type in the range.
@@ -109,12 +109,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | null -> null
         | parent -> highlightingCtor parent :> _
 
-    let createHighlightingFromNodeWithMessage highlightingCtor range (error: FSharpErrorInfo): IHighlighting =
+    let createHighlightingFromNodeWithMessage highlightingCtor range (error: FSharpDiagnostic): IHighlighting =
         let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
         if isNotNull expr then highlightingCtor (expr, error.Message) :> _ else
         null
 
-    let createHighlightingFromParentNodeWithMessage highlightingCtor range (error: FSharpErrorInfo): IHighlighting =
+    let createHighlightingFromParentNodeWithMessage highlightingCtor range (error: FSharpDiagnostic): IHighlighting =
         match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
         | null -> null
         | node ->
@@ -133,7 +133,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | null -> null
         | node -> highlightingCtor(node) :> _
     
-    let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
+    let createHighlighting (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
         | TypeEquation ->
             match error.Message with
@@ -286,11 +286,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | _ -> createGenericHighlighting error range
 
-    abstract ShouldAddDiagnostic: error: FSharpErrorInfo * range: DocumentRange -> bool
-    default x.ShouldAddDiagnostic(error: FSharpErrorInfo, _) =
+    abstract ShouldAddDiagnostic: error: FSharpDiagnostic * range: DocumentRange -> bool
+    default x.ShouldAddDiagnostic(error: FSharpDiagnostic, _) =
         error.ErrorNumber <> UnrecognizedOption
 
-    member x.Execute(errors: FSharpErrorInfo[], committer: Action<DaemonStageResult>) =
+    member x.Execute(errors: FSharpDiagnostic[], committer: Action<DaemonStageResult>) =
         let highlightings = List(errors.Length)
         let errors =
             errors

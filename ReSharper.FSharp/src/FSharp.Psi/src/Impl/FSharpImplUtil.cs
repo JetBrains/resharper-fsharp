@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
@@ -29,7 +29,7 @@ using JetBrains.Util;
 using JetBrains.Util.Extension;
 using JetBrains.Util.Logging;
 using Microsoft.FSharp.Core;
-using PrettyNaming = FSharp.Compiler.PrettyNaming;
+using PrettyNaming = FSharp.Compiler.Syntax.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
@@ -162,7 +162,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           token.GetTokenType() is var tokenType && tokenType != FSharpTokenType.IDENTIFIER)
         return tokenType == FSharpTokenType.LPAREN_STAR_RPAREN
           ? "op_Multiply"
-          : PrettyNaming.CompileOpName.Invoke(name);
+          : PrettyNaming.CompileOpName(name);
 
       return name;
     }

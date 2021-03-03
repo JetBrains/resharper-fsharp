@@ -1,6 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi

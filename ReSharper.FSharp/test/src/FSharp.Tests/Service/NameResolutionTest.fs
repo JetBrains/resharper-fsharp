@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
 open JetBrains.Application.Components
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Checker

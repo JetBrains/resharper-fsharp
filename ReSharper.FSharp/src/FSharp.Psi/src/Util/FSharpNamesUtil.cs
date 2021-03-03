@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Core;
-using static FSharp.Compiler.PrettyNaming;
+using static FSharp.Compiler.Syntax.PrettyNaming;
 using static JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static IEnumerable<string> GetPossibleSourceNames([NotNull] IDeclaredElement element)
     {
       var name = element.ShortName;
-      var names = new HashSet<string> {name, DecompileOpName.Invoke(name)};
+      var names = new HashSet<string> {name, DecompileOpName(name)};
 
       if (element is IFSharpDeclaredElement fsDeclaredElement)
         names.Add(fsDeclaredElement.SourceName);

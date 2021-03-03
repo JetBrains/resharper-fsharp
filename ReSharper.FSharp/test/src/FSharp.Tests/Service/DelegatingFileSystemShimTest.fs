@@ -1,7 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System.IO
-open FSharp.Compiler.AbstractIL.Internal.Library
+open FSharp.Compiler.IO
 open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests

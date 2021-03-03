@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
 
 open System
 open System.Collections.Generic
-open FSharp.Compiler
+open FSharp.Compiler.Text
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -37,7 +37,7 @@ type FSharpBreakpointVariantsProvider() =
             let lineStart = document.GetLineStartOffset(docLine line)
             let lineEnd = document.GetLineEndOffsetWithLineBreak(docLine line)
 
-            let variants = Dictionary<Range.range, IBreakpoint>() 
+            let variants = Dictionary<range, IBreakpoint>() 
             for token in fsFile.FindTokensAt(TreeTextRange(TreeOffset(lineStart), TreeOffset(lineEnd))) do
                 let documentEndOffset = token.GetDocumentEndOffset()
                 let pos = getPosFromDocumentOffset documentEndOffset

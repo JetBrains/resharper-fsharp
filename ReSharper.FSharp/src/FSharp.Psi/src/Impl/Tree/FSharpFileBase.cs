@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using FSharp.Compiler;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Symbols;
+using FSharp.Compiler.Syntax;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
@@ -31,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       set => myParseResults.SetValue(this, value);
     }
 
-    public FSharpOption<SyntaxTree.ParsedInput> ParseTree => ParseResults?.Value.ParseTree;
+    public FSharpOption<ParsedInput> ParseTree => ParseResults?.Value.ParseTree;
 
     PsiLanguageType IFSharpFileCheckInfoOwner.LanguageType { get; set; }/* = FSharpLanguage.Instance;*/
 

@@ -1,4 +1,4 @@
-﻿using FSharp.Compiler.SourceCodeServices;
+﻿using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;

@@ -1,4 +1,4 @@
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
