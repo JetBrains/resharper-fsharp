@@ -66,6 +66,10 @@ let richTextR (taggedText: TaggedText[]) =
 
     result
 
+let isEmpty (taggedText: TaggedText[]) =
+    Array.isEmpty taggedText ||
+    Array.length taggedText = 1 && taggedText.[0].Text = ""
+
 let richTextJoin (sep : string) (parts : RichText seq) =
     let sep = RichText(sep, TextStyle.Default)
     parts |> Seq.fold (fun (result: RichText) part -> if result.IsEmpty then part else result + sep + part)

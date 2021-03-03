@@ -74,7 +74,8 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
 
             | ToolTipElement.Group(overloads) ->
                 overloads |> List.map (fun overload ->
-                    [ yield overload.MainDescription |> richTextR
+                    [ if not (isEmpty overload.MainDescription) then
+                          yield overload.MainDescription |> richTextR
 
                       if not overload.TypeMapping.IsEmpty then
                           yield overload.TypeMapping |> List.map richTextR |> richTextJoin "\n"
@@ -85,7 +86,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                       | xmlDocText -> yield xmlDocText.RichText
 
                       match overload.Remarks with
-                      | Some remarks ->
+                      | Some remarks when not (isEmpty remarks) ->
                           yield remarks |> richTextR
                       | _ -> () ]
                     |> richTextJoin "\n\n"))
