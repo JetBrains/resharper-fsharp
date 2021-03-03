@@ -1,0 +1,3 @@
+﻿do
+    let _ as _b{caret} = ()
+    ()

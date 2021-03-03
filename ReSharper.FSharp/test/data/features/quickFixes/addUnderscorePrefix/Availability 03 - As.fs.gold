@@ -1,0 +1,11 @@
+﻿module Module
+
+do
+    let _ as |b|(0) = ()
+    ()
+
+------------------------------------------------
+0: The value 'b' is unused
+QUICKFIXES:
+Remove unused 'as' pattern
+Rename to '_b'
