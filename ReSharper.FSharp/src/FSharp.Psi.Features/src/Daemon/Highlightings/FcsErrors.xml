@@ -80,8 +80,8 @@
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
-    <QuickFix>AddUnderscorePrefixFix</QuickFix>
     <QuickFix>RemoveUnusedNamedAsPatFix</QuickFix>
+    <QuickFix>AddUnderscorePrefixFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
