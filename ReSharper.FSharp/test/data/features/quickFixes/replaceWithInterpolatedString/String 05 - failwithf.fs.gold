@@ -1,0 +1,4 @@
+﻿module Module
+
+let foo = "foo"
+let s = failwithf ${caret}"Number is %d{10} and text is %s{foo}"
