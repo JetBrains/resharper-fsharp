@@ -68,3 +68,6 @@ type FcsErrorsHighlightingTest() =
     [<Test>] member x.``Incomplete pattern - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Incomplete pattern - Match lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``Incomplete pattern - Pattern 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Runtime coercion source sealed 01``() = x.DoNamedTest()
+    [<Test>] member x.``Runtime coercion source sealed 02``() = x.DoNamedTest()
