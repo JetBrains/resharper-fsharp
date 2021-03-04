@@ -4,10 +4,8 @@ open System.Text
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 
 type private StringManipulation =
@@ -45,8 +43,8 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
         let bracesToEscape =
             formatString
             |> Seq.indexed
-            |> Seq.filter (fun (i, c) -> c = '{' || c = '}')
-            |> Seq.map (fun (i, c) -> i, EscapeBrace c)
+            |> Seq.filter (fun (_, c) -> c = '{' || c = '}')
+            |> Seq.map (fun (i, c) -> i, EscapeBrace(c))
 
         // Order text manipulation operations in reverse (end of string -> start)
         // This ensures manipulations don't affect the index of subsequent manipulations
@@ -61,15 +59,15 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
                 manipulations
                 |> Seq.sumBy (function
                     | _, EscapeBrace _ -> 1
-                    | _, InsertInterpolation (_, exprText) -> 2 + exprText.Length)
+                    | _, InsertInterpolation(_, exprText) -> 2 + exprText.Length)
 
             StringBuilder(formatString, formatString.Length + 1 + extraCapacity)
 
         for index, manipulation in manipulations do
             match manipulation with
-            | EscapeBrace braceChar ->
+            | EscapeBrace(braceChar) ->
                 interpolatedSb.Insert(index, braceChar) |> ignore
-            | InsertInterpolation (formatSpecifier, exprText) ->
+            | InsertInterpolation(formatSpecifier, exprText) ->
                 let index =
                     // %O is the implied default in interpolated strings
                     if formatSpecifier = "%O" then

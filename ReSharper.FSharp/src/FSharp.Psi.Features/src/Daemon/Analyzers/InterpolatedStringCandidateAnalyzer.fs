@@ -28,13 +28,13 @@ type InterpolatedStringCandidateAnalyzer() =
             specifiers
         | data -> data
 
-    let isDisallowedStringLiteral (literalExpr : ILiteralExpr) =
+    let isDisallowedStringLiteral (literalExpr: ILiteralExpr) =
         let tokenType = getTokenType literalExpr.Literal
-        tokenType = FSharpTokenType.STRING ||
-        tokenType = FSharpTokenType.BYTEARRAY ||
-        tokenType = FSharpTokenType.VERBATIM_STRING ||
-        tokenType = FSharpTokenType.TRIPLE_QUOTED_STRING ||
-        tokenType = FSharpTokenType.REGULAR_INTERPOLATED_STRING
+        tokenType == FSharpTokenType.STRING ||
+        tokenType == FSharpTokenType.BYTEARRAY ||
+        tokenType == FSharpTokenType.VERBATIM_STRING ||
+        tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING ||
+        tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING
 
     override x.Run(prefixAppExpr, data, consumer) =
         if not data.IsFSharp50Supported then () else
@@ -43,10 +43,9 @@ type InterpolatedStringCandidateAnalyzer() =
         if isNull formatStringExpr then () else
 
         let tokenType = getTokenType formatStringExpr.Literal
-        if tokenType <> FSharpTokenType.STRING &&
-           tokenType <> FSharpTokenType.TRIPLE_QUOTED_STRING &&
-           tokenType <> FSharpTokenType.VERBATIM_STRING then ()
-        else
+        if tokenType != FSharpTokenType.STRING &&
+           tokenType != FSharpTokenType.TRIPLE_QUOTED_STRING &&
+           tokenType != FSharpTokenType.VERBATIM_STRING then () else
 
         match data.ParseAndCheckResults with
         | None -> ()
@@ -82,7 +81,7 @@ type InterpolatedStringCandidateAnalyzer() =
         // Check that the applied expressions do not contain disallowed string literals
         let anyDisallowedExprs =
             let isDisallowed =
-                if tokenType = FSharpTokenType.TRIPLE_QUOTED_STRING then
+                if tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING then
                     fun (literalExpr: ILiteralExpr) ->
                         getTokenType literalExpr.Literal = FSharpTokenType.TRIPLE_QUOTED_STRING
                 else
