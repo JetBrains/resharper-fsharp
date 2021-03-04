@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override string DeclaredElementName => NameIdentifier.GetSourceName();
 
     protected override IDeclaredElement CreateDeclaredElement() =>
-      TypeUsage is INamedTypeUsage namedTypeUsage && namedTypeUsage.ReferenceName is { } referenceName &&
+      TypeUsage is INamedTypeUsage { ReferenceName: { } referenceName } &&
       referenceName.Reference.Resolve().DeclaredElement == null
         ? new FSharpUnionCaseProperty(this)
         : null;
@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       TypeReferenceCanBeUnionCaseDeclaration(NamedTypeReferenceName);
 
     private static bool TypeReferenceCanBeUnionCaseDeclaration(IReferenceName referenceName) =>
-      referenceName != null && referenceName.Qualifier == null && referenceName.TypeArgumentList == null;
+      referenceName is { Qualifier: null } && referenceName.TypeArgumentList == null;
 
     public bool HasFields => false;
     public FSharpUnionCaseClass NestedType => null;

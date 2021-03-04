@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
-open FSharp.Compiler.SyntaxTree
-open FSharp.Compiler.PrettyNaming
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -24,7 +24,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
     member x.ProcessModuleMemberSignature(moduleMember) =
         match moduleMember with
-        | SynModuleSigDecl.NestedModule(ComponentInfo(attrs, _, _, lid, _, _, _, _), _, memberSigs, range) ->
+        | SynModuleSigDecl.NestedModule(SynComponentInfo(attrs, _, _, lid, _, _, _, _), _, memberSigs, range) ->
             let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, List.tryHead lid, range)
             for memberSig in memberSigs do
                 x.ProcessModuleMemberSignature(memberSig)
@@ -50,7 +50,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             x.ProcessNamedTypeReference(lid)
             x.MarkAndDone(range, ElementType.MODULE_ABBREVIATION_DECLARATION)
 
-        | SynModuleSigDecl.Val(ValSpfn(attrs, id, _, synType, arity, _, _, _, _, exprOption, _), range) ->
+        | SynModuleSigDecl.Val(SynValSig(attrs, id, _, synType, arity, _, _, _, _, exprOption, _), range) ->
             let valMark = x.MarkAndProcessAttributesOrIdOrRange(attrs, Some id, range)
 
             let patMark = x.Mark(id.idRange)
@@ -89,8 +89,8 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
         | _ -> ()
 
-    member x.ProcessTypeSignature(TypeDefnSig(info, repr, memberSigs, range), typeKeywordType) =
-        let (ComponentInfo(attrs, typeParams, constraints, lid, _, _, _, _)) = info
+    member x.ProcessTypeSignature(SynTypeDefnSig(info, repr, memberSigs, range), typeKeywordType) =
+        let (SynComponentInfo(attrs, typeParams, constraints, lid, _, _, _, _)) = info
 
         let mark = x.StartType(attrs, typeParams, constraints, lid, range, typeKeywordType)
         match repr with
@@ -122,7 +122,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
-        | SynMemberSig.Member(ValSpfn(attrs, id, _, synType, arity, _, _, _, _, _, _), flags, range) ->
+        | SynMemberSig.Member(SynValSig(attrs, id, _, synType, arity, _, _, _, _, _, _), flags, range) ->
             let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, Some id, range)
             x.ProcessSignatureType(arity, synType)
             let elementType =
@@ -130,11 +130,11 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
                     ElementType.ABSTRACT_MEMBER_DECLARATION
                 else
                     match flags.MemberKind with
-                    | MemberKind.Constructor -> ElementType.CONSTRUCTOR_SIGNATURE
+                    | SynMemberKind.Constructor -> ElementType.CONSTRUCTOR_SIGNATURE
                     | _ -> ElementType.MEMBER_SIGNATURE
             x.Done(range, mark, elementType)
 
-        | SynMemberSig.ValField(Field(attrs, _, id, synType, _, _, _, _), range) ->
+        | SynMemberSig.ValField(SynField(attrs, _, id, synType, _, _, _, _), range) ->
             if id.IsSome then
                 let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, id, range)
                 x.ProcessType(synType)

@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsWritable { get; }
 
     [NotNull]
-    private FSharpMemberOrFunctionOrValue GetProperty([NotNull] FSharpMemberOrFunctionOrValue prop)
+    private static FSharpMemberOrFunctionOrValue GetProperty([NotNull] FSharpMemberOrFunctionOrValue prop)
     {
       // Property returned in AccessorProperty currently returns HasSetterMethod = false.
       // Workaround it by getting mfv property from declaring entity.

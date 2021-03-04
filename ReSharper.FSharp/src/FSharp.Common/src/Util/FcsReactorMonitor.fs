@@ -27,8 +27,8 @@ type IMonitoredReactorOperation =
 module MonitoredReactorOperation =
     let empty opName =
         { new IMonitoredReactorOperation with
-            override __.Dispose () = ()
-            override __.OperationName = opName
+            override _.Dispose () = ()
+            override _.OperationName = opName
         }
 
 
@@ -141,9 +141,9 @@ type FcsReactorMonitor(lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTa
     member val SettingsProvider: FcsReactorMonitorSettingsProvider = null with get, set
 
     interface IFcsReactorMonitor with
-        override __.FcsBusyDelay = showDelay :> _
+        override _.FcsBusyDelay = showDelay :> _
 
-        override __.MonitorOperation opName =
+        override _.MonitorOperation opName =
             // Only monitor operations when trace logging is enabled
             if not (logger.IsEnabled LoggingLevel.TRACE) then
                 MonitoredReactorOperation.empty opName
@@ -154,37 +154,37 @@ type FcsReactorMonitor(lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTa
             operations.TryAdd(operationId, stackTrace) |> ignore
 
             { new IMonitoredReactorOperation with
-                override __.Dispose () = match operations.TryRemove operationId with _ -> ()
-                override __.OperationName = sprintf "{%d}%s" operationId opName
+                override _.Dispose () = match operations.TryRemove operationId with _ -> ()
+                override _.OperationName = sprintf "{%d}%s" operationId opName
             }
 
     interface IReactorListener with
-        override __.OnReactorPauseBeforeBackgroundWork pauseMillis =
+        override _.OnReactorPauseBeforeBackgroundWork pauseMillis =
             logger.Trace("Pausing before background work for {0:0.}ms", pauseMillis)
-        override __.OnReactorOperationStart userOpName opName opArg approxQueueLength =
+        override _.OnReactorOperationStart userOpName opName opArg approxQueueLength =
             logger.Verbose("--> {0}.{1} ({2}), queue length {3}", userOpName, opName, opArg, approxQueueLength)
             onOperationStart (userOpName + "." + opName) opArg
-        override __.OnReactorOperationEnd userOpName opName _opArg elapsed =
+        override _.OnReactorOperationEnd userOpName opName _opArg elapsed =
             let level =
                 if elapsed > showDelay.Value then LoggingLevel.WARN
                 else LoggingLevel.VERBOSE
             logger.LogMessage(level, "<-- {0}.{1}, took {2:0.}ms", userOpName, opName, elapsed.TotalMilliseconds)
             onOperationEnd ()
-        override __.OnReactorBackgroundStart bgUserOpName bgOpName bgOpArg =
+        override _.OnReactorBackgroundStart bgUserOpName bgOpName bgOpArg =
             // todo: do we want to show background steps too?
             logger.Trace("--> Background step {0}.{1} ({2})", bgUserOpName, bgOpName, bgOpArg)
-        override __.OnReactorBackgroundCancelled bgUserOpName bgOpName _bgOpArg =
+        override _.OnReactorBackgroundCancelled bgUserOpName bgOpName _bgOpArg =
             logger.Trace("<-- Background step {0}.{1}, was cancelled", bgUserOpName, bgOpName)
-        override __.OnReactorBackgroundEnd _bgUserOpName _bgOpName _bgOpArg elapsed =
+        override _.OnReactorBackgroundEnd _bgUserOpName _bgOpName _bgOpArg elapsed =
             let level =
                 if elapsed > showDelay.Value then LoggingLevel.WARN
                 else LoggingLevel.TRACE
             logger.LogMessage(level, "<-- Background step took {0:0.}ms", elapsed.TotalMilliseconds)
-        override __.OnSetBackgroundOp approxQueueLength =
+        override _.OnSetBackgroundOp approxQueueLength =
             logger.Trace("Enqueue start background, queue length {0}", approxQueueLength)
-        override __.OnCancelBackgroundOp () =
+        override _.OnCancelBackgroundOp () =
             logger.Trace("Trying to cancel any active background work...")
-        override __.OnEnqueueOp userOpName opName opArg approxQueueLength =
+        override _.OnEnqueueOp userOpName opName opArg approxQueueLength =
             logger.Trace("Enqueue: {0}.{1} ({2}), queue length {3}", userOpName, opName, opArg, approxQueueLength)
 
 and 
@@ -223,12 +223,12 @@ type FcsReactorMonitorStub() =
         member x.MonitorOperation opName = MonitoredReactorOperation.empty opName
 
     interface IReactorListener with
-        override __.OnReactorPauseBeforeBackgroundWork _ = ()
-        override __.OnReactorOperationStart _ _ _ _ = ()
-        override __.OnReactorOperationEnd _ _ _ _ = ()
-        override __.OnReactorBackgroundStart _ _ _ = ()
-        override __.OnReactorBackgroundCancelled _ _ _ = ()
-        override __.OnReactorBackgroundEnd _ _ _ _ = ()
-        override __.OnSetBackgroundOp _ = ()
-        override __.OnCancelBackgroundOp () = ()
-        override __.OnEnqueueOp _ _ _ _ = ()
+        override _.OnReactorPauseBeforeBackgroundWork _ = ()
+        override _.OnReactorOperationStart _ _ _ _ = ()
+        override _.OnReactorOperationEnd _ _ _ _ = ()
+        override _.OnReactorBackgroundStart _ _ _ = ()
+        override _.OnReactorBackgroundCancelled _ _ _ = ()
+        override _.OnReactorBackgroundEnd _ _ _ _ = ()
+        override _.OnSetBackgroundOp _ = ()
+        override _.OnCancelBackgroundOp () = ()
+        override _.OnEnqueueOp _ _ _ _ = ()

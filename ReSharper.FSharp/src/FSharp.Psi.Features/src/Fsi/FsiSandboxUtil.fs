@@ -1,7 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 
 open System.Collections.Generic
-open FSharp.Compiler
+open FSharp.Compiler.Syntax
 open JetBrains.ReSharper.Plugins.FSharp
 
 module FsiSandboxUtil =

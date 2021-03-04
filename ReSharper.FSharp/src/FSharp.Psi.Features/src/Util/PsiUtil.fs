@@ -1,7 +1,7 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 
-open FSharp.Compiler.Range
+open FSharp.Compiler.Text
 open JetBrains.Annotations
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel

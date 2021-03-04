@@ -19,13 +19,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       get
       {
         if (myReference == null)
-        {
           lock (this)
-          {
-            if (myReference == null)
-              myReference = CreateReference();
-          }
-        }
+            myReference ??= CreateReference();
 
         return myReference;
       }

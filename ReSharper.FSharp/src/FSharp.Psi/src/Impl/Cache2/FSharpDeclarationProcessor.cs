@@ -76,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         }
 
         if (seenLBrace && tokenType == FSharpTokenType.NEW)
-          if (fsFile.FindNodeAt(new TreeOffset(token.Start)) is ITokenNode node && node.Parent is IObjExpr objExpr)
+          if (fsFile.FindNodeAt(new TreeOffset(token.Start)) is ITokenNode { Parent: IObjExpr objExpr })
             objectExpressions.Add(objExpr);
 
         seenLBrace = false;
@@ -280,22 +280,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     private Part CreateObjectTypePart(IFSharpTypeOrExtensionDeclaration decl, bool isExtension) =>
       CreateObjectTypePart(decl, decl.TypePartKind, isExtension);
 
-    private Part CreateObjectTypePart(IFSharpTypeOrExtensionDeclaration decl, PartKind partKind, bool isExtension)
-    {
-      switch (partKind)
+    private Part CreateObjectTypePart(IFSharpTypeOrExtensionDeclaration decl, PartKind partKind, bool isExtension) =>
+      partKind switch
       {
-        case PartKind.Class:
-          return isExtension ? (Part) new ClassExtensionPart(decl, Builder) : new ClassPart(decl, Builder);
-        case PartKind.Struct:
-          return isExtension ? (Part) new StructExtensionPart(decl, Builder) : new StructPart(decl, Builder);
-        case PartKind.Interface:
-          return new InterfacePart(decl, Builder);
-        case PartKind.Enum:
-          return new EnumPart(decl, Builder);
-        default:
-          throw new ArgumentOutOfRangeException();
-      }
-    }
+        PartKind.Class => isExtension ? (Part) new ClassExtensionPart(decl, Builder) : new ClassPart(decl, Builder),
+        PartKind.Struct => isExtension ? (Part) new StructExtensionPart(decl, Builder) : new StructPart(decl, Builder),
+        PartKind.Interface => new InterfacePart(decl, Builder),
+        PartKind.Enum => new EnumPart(decl, Builder),
+        _ => throw new ArgumentOutOfRangeException()
+      };
 
     public override void VisitObjExpr(IObjExpr objExpr)
     {

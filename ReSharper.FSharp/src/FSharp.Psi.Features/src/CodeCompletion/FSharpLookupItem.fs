@@ -1,6 +1,8 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.EditorServices
+open FSharp.Compiler.Symbols
+open FSharp.Compiler.Tokenization
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.Lookup
@@ -9,6 +11,7 @@ open JetBrains.ReSharper.Host.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTaggedText
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -18,12 +21,12 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
+type FSharpLookupCandidate(description: RichText, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
     member x.Description = description
     member x.XmlDoc = xmlDoc
 
     interface ICandidate with
-        member x.GetSignature(_, _, _, _, _) = RichText(description)
+        member x.GetSignature(_, _, _, _, _) = description
         member x.GetDescription() = xmlDocService.GetXmlDoc(xmlDoc)
         member x.Matches _ = true
 
@@ -34,7 +37,7 @@ type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocServ
         member val IsFilteredOut = false with get, set
 
 
-type FSharpErrorLookupItem(item: FSharpDeclarationListItem) =
+type FSharpErrorLookupItem(item: DeclarationListItem) =
     inherit TextLookupItemBase()
 
     override x.Image = null
@@ -43,14 +46,14 @@ type FSharpErrorLookupItem(item: FSharpDeclarationListItem) =
 
     interface IDescriptionProvidingLookupItem with
         member x.GetDescription() =
-            let (FSharpToolTipText(tooltips)) = item.DescriptionText
+            let (ToolTipText(tooltips)) = item.Description
             tooltips
             |> List.tryHead
-            |> Option.bind (function | FSharpToolTipElement.CompositionError e -> Some (RichTextBlock(e)) | _ -> None)
+            |> Option.bind (function | ToolTipElement.CompositionError e -> Some (RichTextBlock(e)) | _ -> None)
             |> Option.toObj
 
 
-type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeCompletionContext) =
+type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
 
     let mutable candidates = Unchecked.defaultof<_>
@@ -70,14 +73,14 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
         match candidates with
         | null ->
             let result = LocalList<ICandidate>()
-            let (FSharpToolTipText(tooltips)) = item.DescriptionText
+            let (ToolTipText(tooltips)) = item.Description
             for tooltip in tooltips do
                 match tooltip with
-                | FSharpToolTipElement.Group(overloads) ->
+                | ToolTipElement.Group(overloads) ->
                     for overload in overloads do
-                        result.Add(FSharpLookupCandidate(overload.MainDescription, overload.XmlDoc, context.XmlDocService))
-                | FSharpToolTipElement.CompositionError error ->
-                    result.Add(FSharpLookupCandidate(error, FSharpXmlDoc.None, context.XmlDocService))
+                        result.Add(FSharpLookupCandidate(richTextR overload.MainDescription, overload.XmlDoc, context.XmlDocService))
+                | ToolTipElement.CompositionError error ->
+                    result.Add(FSharpLookupCandidate(RichText(error), FSharpXmlDoc.None, context.XmlDocService))
                 | _ -> ()
             candidates <- result.ResultingList()
             candidates
@@ -89,7 +92,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
         with _ -> null
 
     override x.Text =
-        PrettyNaming.QuoteIdentifierIfNeeded item.Name
+        FSharpKeywords.QuoteIdentifierIfNeeded item.Name
 
     override x.DisplayTypeName =
         try
@@ -106,7 +109,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
         let ns = item.NamespaceToOpen
         if ns.IsEmpty() then () else
 
-        let ns = ns |> Array.map Keywords.QuoteIdentifierIfNeeded |> String.concat "."
+        let ns = ns |> Array.map FSharpKeywords.QuoteIdentifierIfNeeded |> String.concat "."
 
         let solution = context.BasicContext.Solution
         solution.GetPsiServices().Files.CommitAllDocuments()    

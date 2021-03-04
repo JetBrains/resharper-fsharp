@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 
 open System
 open System.Collections.Generic
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Tokenization
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -110,7 +110,7 @@ type FSharpNamingService(language: FSharpLanguage) =
         |> dict
 
     override x.MangleNameIfNecessary(name, _) =
-        Keywords.QuoteIdentifierIfNeeded name
+        FSharpKeywords.QuoteIdentifierIfNeeded name
 
     override x.SuggestRoots(typ: IType, policyProvider: INamingPolicyProvider) =
         let roots = base.SuggestRoots(typ, policyProvider)

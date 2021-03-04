@@ -49,6 +49,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Unions 11 - Empty single case``() = x.DoNamedTest()
     [<Test>] member x.``Unions 12 - Empty single case - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Unions 13 - Empty single case - Members``() = x.DoNamedTest()
+    [<Test>] member x.``Unions 14 - ReferenceEquality``() = x.DoNamedTest()
 
     [<Test>] member x.``Simple types 01 - Members``() = x.DoNamedTest()
 
@@ -151,6 +152,9 @@ type CSharpResolveTest() =
     [<Test>] member x.``Type Extension 14 - C# extension 02``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 15 - Compiled name``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 16 - Compiled name - Static``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type repr - Class 01 - Impl``() = x.DoNamedTest()
+    [<Test>] member x.``Type repr - Class 02 - Member``() = x.DoNamedTest()
 
     [<Test>] member x.``Generics - Methods 01``() = x.DoNamedTest()
 

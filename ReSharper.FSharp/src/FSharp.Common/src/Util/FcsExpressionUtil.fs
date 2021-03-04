@@ -2,7 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Util.FcsExpressionUtil
 
 open System
-open FSharp.Compiler.SyntaxTree
+open FSharp.Compiler.Syntax
 
 [<Extension; CompiledName("IsSimpleValueExpression")>]
 let rec isSimpleValueExpression (synExpr: SynExpr) =

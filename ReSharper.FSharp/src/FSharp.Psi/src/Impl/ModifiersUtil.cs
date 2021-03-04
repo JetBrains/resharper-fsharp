@@ -64,12 +64,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       var decoration = typePart.Modifiers;
 
-      if (typePart.GetRoot() is FSharpProjectFilePart projectFilePart && projectFilePart.HasPairFile)
+      if (typePart.GetRoot() is FSharpProjectFilePart { HasPairFile: true })
         // We already know there's no type part in a signature file.
         // If there's a signature file then this type is hidden. 
         decoration.AccessRights = AccessRights.INTERNAL;
 
-      if (typePart is TypeAbbreviationOrDeclarationPartBase part && !part.IsUnionCase)
+      if (typePart is TypeAbbreviationOrDeclarationPartBase { IsUnionCase: false })
         // Type abbreviation is a union case declaration when its right part is a simple named type
         // that is not resolved to anything.
         // When the part is abbreviation, we modify it's visibility to hide from other languages.

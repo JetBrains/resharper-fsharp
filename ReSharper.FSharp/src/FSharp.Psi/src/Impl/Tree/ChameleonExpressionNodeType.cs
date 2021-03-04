@@ -1,5 +1,5 @@
 using System;
-using FSharp.Compiler;
+using FSharp.Compiler.Syntax;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.TreeBuilder;
 
@@ -21,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override CompositeElement Create(object data)
     {
-      var (expr, startOffset, lineStart) = (Tuple<SyntaxTree.SynExpr, int, int>) data;
+      var (expr, startOffset, lineStart) = (Tuple<SynExpr, int, int>) data;
       var chameleonExpression = new ChameleonExpression(expr, startOffset, lineStart);
       return chameleonExpression;
     }

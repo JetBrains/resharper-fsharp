@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System.Collections.Generic
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.CodeAnalysis
 open JetBrains.Annotations
 open JetBrains.Application.Settings
 open JetBrains.Application.Threading

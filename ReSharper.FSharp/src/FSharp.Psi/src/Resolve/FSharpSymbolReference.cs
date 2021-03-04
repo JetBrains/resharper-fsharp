@@ -1,5 +1,6 @@
 using System;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -97,7 +98,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       throw new NotImplementedException();
 
     public bool IsQualified =>
-      GetElement() is IFSharpQualifiableReferenceOwner referenceOwner && referenceOwner.IsQualified;
+      GetElement() is IFSharpQualifiableReferenceOwner { IsQualified: true };
 
     public FSharpSymbolReference QualifierReference =>
       GetElement() is IFSharpQualifiableReferenceOwner referenceOwner ? referenceOwner.QualifierReference : null;

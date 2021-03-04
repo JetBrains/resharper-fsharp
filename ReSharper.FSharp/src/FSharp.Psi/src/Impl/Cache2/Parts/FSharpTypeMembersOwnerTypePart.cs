@@ -4,6 +4,7 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -16,28 +17,38 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         declaration.TypeParameters, cacheBuilder)
     {
       var extendListShortNames = new FrugalLocalHashSet<string>();
-      foreach (var member in declaration.TypeMembersEnumerable)
+      extendListShortNames = ProcessMembers(declaration.TypeMembersEnumerable, extendListShortNames);
+
+      if (declaration is IFSharpTypeDeclaration { TypeRepresentation: IObjectModelTypeRepresentation repr })
+        extendListShortNames = ProcessMembers(repr.TypeMembersEnumerable, extendListShortNames);
+
+      ExtendsListShortNames = extendListShortNames.ToArray();
+    }
+
+    private static FrugalLocalHashSet<string> ProcessMembers(TreeNodeEnumerable<IFSharpTypeMemberDeclaration> members,
+      FrugalLocalHashSet<string> names)
+    {
+      foreach (var member in members)
       {
         var baseTypeIdentifier = (member as ITypeInherit)?.TypeName?.Identifier;
         if (baseTypeIdentifier != null)
         {
-          extendListShortNames.Add(baseTypeIdentifier.Name);
+          names.Add(baseTypeIdentifier.Name);
           continue;
         }
 
-        var interfaceImplTypeIdentifier = (member as IInterfaceImplementation)?.TypeName?.Identifier;
-        if (interfaceImplTypeIdentifier != null)
+        var interfaceImplIdentifier = (member as IInterfaceImplementation)?.TypeName?.Identifier;
+        if (interfaceImplIdentifier != null)
         {
-          extendListShortNames.Add(interfaceImplTypeIdentifier.Name);
+          names.Add(interfaceImplIdentifier.Name);
           continue;
         }
 
-        var interfaceInheritTypeIdentifier = (member as IInterfaceInherit)?.TypeName?.Identifier;
-        if (interfaceInheritTypeIdentifier != null)
-          extendListShortNames.Add(interfaceInheritTypeIdentifier.Name);
+        var interfaceInheritIdentifier = (member as IInterfaceInherit)?.TypeName?.Identifier;
+        if (interfaceInheritIdentifier != null) names.Add(interfaceInheritIdentifier.Name);
       }
 
-      ExtendsListShortNames = extendListShortNames.ToArray();
+      return names;
     }
 
     protected FSharpTypeMembersOwnerTypePart(IReader reader) : base(reader) =>

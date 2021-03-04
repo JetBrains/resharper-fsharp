@@ -2,7 +2,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
 open System.Runtime.InteropServices
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains
 open JetBrains.Annotations
@@ -69,13 +69,7 @@ type FSharpCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNo
         try
             let source = FSharpCheckerService.getSourceText document
             let fullPath = getFullPath path
-
-            let parseAsync =
-                if noCache then
-                    x.Checker.ParseFileNoCache(fullPath, source, parsingOptions)
-                else
-                    x.Checker.ParseFile(fullPath, source, parsingOptions)
-
+            let parseAsync = x.Checker.ParseFile(fullPath, source, parsingOptions, cache = not noCache)
             let parseResults = parseAsync.RunAsTask()
             Some parseResults
         with

@@ -12,8 +12,8 @@ type RemoveUnusedOpensTest() =
     
     [<Test>] member x.``Single open``() = x.DoNamedTest()
     [<Test>] member x.``Multiple opens``() = x.DoNamedTest()
-    [<Test>] member x.``Single open with semicolon``() = x.DoNamedTest()
-    [<Test>] member x.``Multiple opens with semicolon``() = x.DoNamedTest()
-    [<Test>] member x.``Multiple semicolons and spaces``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Single open with semicolon``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Multiple opens with semicolon``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Multiple semicolons and spaces``() = x.DoNamedTest()
     [<Test>] member x.``Multiple unused and used opens``() = x.DoNamedTest()
-    [<Test>] member x.``Open with line comment``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Open with line comment``() = x.DoNamedTest()

@@ -10,5 +10,5 @@ IFSharpImplFile
       FSharpIdentifierToken(type:IDENTIFIER, text:Ns2)
     FSharpTokenType+DotTokenElement(type:DOT, text:.)
     FSharpIdentifierToken(type:IDENTIFIER, text:Ns3)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

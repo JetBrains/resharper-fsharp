@@ -32,7 +32,7 @@ type FSharpPathReferenceProvider(sourceFile) =
             | :? ITokenNode as token when token.GetTokenType().IsStringLiteral ->
                 match element.Parent with
                 | :? IHashDirective as parent when parent.Args.FirstOrDefault() = token ->
-                    ReferenceCollection(new FSharpPathReference(token, sourceFile))
+                    ReferenceCollection(FSharpPathReference(token, sourceFile))
                 | _ -> ReferenceCollection.Empty
             | _ -> ReferenceCollection.Empty
 

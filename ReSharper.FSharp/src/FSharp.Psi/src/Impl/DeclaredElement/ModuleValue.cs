@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public bool IsMutable =>
-      GetDeclaration() is IMutableModifierOwner mutableModifierOwner && mutableModifierOwner.IsMutable;
+      GetDeclaration() is IMutableModifierOwner { IsMutable: true };
 
     public void SetIsMutable(bool value)
     {
@@ -21,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public bool CanBeMutable =>
-      GetDeclaration() is IMutableModifierOwner mutableModifierOwner && mutableModifierOwner.CanBeMutable;
+      GetDeclaration() is IMutableModifierOwner { CanBeMutable: true };
 
     public override bool IsStatic => true;
 

@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
-open FSharp.Compiler
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.EditorServices
+open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -87,7 +87,7 @@ type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
 
             let fcsCompletionContext =
                 fsFile.ParseTree |> Option.bind (fun parseTree ->
-                    UntypedParseImpl.TryGetCompletionContext(fcsPos, parseTree, lineText))
+                    ParsedInput.TryGetCompletionContext(fcsPos, parseTree, lineText))
 
             { PartialName = QuickParse.GetPartialLongNameEx(lineText, (int) coords.Column - 1)
               CompletionContext = fcsCompletionContext

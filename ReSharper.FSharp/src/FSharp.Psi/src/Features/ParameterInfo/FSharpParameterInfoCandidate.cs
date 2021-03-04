@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.EditorServices;
 using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Feature.Services.ParameterInfo;
 using JetBrains.UI.RichText;
@@ -9,9 +9,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
 {
   public class FSharpParameterInfoCandidate : FSharpParameterInfoCandidateBase
   {
-    private readonly FSharpMethodGroupItem myCandidate;
+    private readonly MethodGroupItem myCandidate;
 
-    public FSharpParameterInfoCandidate(FSharpMethodGroupItem candidate, bool isFiltered) : base(isFiltered)
+    public FSharpParameterInfoCandidate(MethodGroupItem candidate, bool isFiltered) : base(isFiltered)
     {
       myCandidate = candidate;
     }
@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
       return text.ToString();
     }
 
-    private static int[] SortParameters(FSharpMethodGroupItemParameter[] parameters, string[] namedArguments,
+    private static int[] SortParameters(MethodGroupItemParameter[] parameters, string[] namedArguments,
       out bool orderChanged)
     {
       var usedParams = new bool[parameters.Length];

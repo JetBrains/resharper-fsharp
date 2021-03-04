@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.EditorServices
 open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
@@ -30,6 +31,6 @@ type FSharpAssemblyContentProvider(lifetime, onSolutionCloseNotifier: OnSolution
                                   // get Content.Entities from it.
         
                   for fileName, signatures in assembliesByFileName do
-                      yield! AssemblyContentProvider.getAssemblyContent entityCache.Locking Public fileName signatures ]
+                      yield! AssemblyContent.GetAssemblyContent entityCache.Locking AssemblyContentType.Public fileName signatures ]
             }
         getEntitiesAsync.RunAsTask()

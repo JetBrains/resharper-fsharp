@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     private static TResult RunInterrupting<TResult>([NotNull] FSharpAsync<TResult> async,
       [CanBeNull] Action interruptChecker)
     {
-      interruptChecker = interruptChecker ?? ourDefaultInterruptCheck;
+      interruptChecker ??= ourDefaultInterruptCheck;
 
       var cancellationTokenSource = new CancellationTokenSource();
       var cancellationToken = cancellationTokenSource.Token;

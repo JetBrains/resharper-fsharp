@@ -2,7 +2,7 @@
 
 open System
 open System.Collections.Generic
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
@@ -206,7 +206,6 @@ type FcsProjectBuilder(checkerService: FSharpCheckerService, itemsContainer: IFS
               LoadTime = DateTime.Now
               OriginalLoadReferences = List.empty
               UnresolvedReferences = None
-              ExtraProjectInfo = None
               Stamp = None }
 
         let hasFSharpCoreReference options =

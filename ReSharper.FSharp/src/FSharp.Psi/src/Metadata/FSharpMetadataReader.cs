@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
-using FSharp.Compiler;
+using FSharp.Compiler.Text;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private static readonly Func<FSharpMetadataReader, object> ReadIlTypeFunc = reader => reader.ReadIlType();
     private static readonly Func<FSharpMetadataReader, object> ReadExpressionFunc = reader => reader.ReadExpression();
     private static readonly Func<FSharpMetadataReader, object> ReadValueRefFunc = reader => reader.ReadValueRef();
-    private static readonly Func<FSharpMetadataReader, Range.range> ReadRangeFunc = reader => reader.ReadRange();
+    private static readonly Func<FSharpMetadataReader, Range> ReadRangeFunc = reader => reader.ReadRange();
 
     private static readonly Func<FSharpMetadataReader, string> ReadUniqueStringFunc =
       reader => reader.ReadUniqueString();
@@ -757,14 +757,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return name;
     }
 
-    private Range.range ReadRange()
+    private Range ReadRange()
     {
       var filePath = ReadUniqueString();
       var startLine = ReadPackedInt();
       var startColumn = ReadPackedInt();
       var endLine = ReadPackedInt();
       var endColumn = ReadPackedInt();
-      return Range.mkRange(filePath, Range.mkPos(startLine, startColumn), Range.mkPos(endLine, endColumn));
+      return RangeModule.mkRange(filePath, PositionModule.mkPos(startLine, startColumn), PositionModule.mkPos(endLine, endColumn));
     }
 
     private object[] ReadAttributes()

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       UnionCaseDeclarationNavigator.GetByField(this);
 
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
-      type is FSharpUnionCase unionCase ? unionCase.UnionCaseFields : null;
+      type is FSharpUnionCase unionCase ? unionCase.Fields : null;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       new FSharpUnionCaseField<UnionCaseFieldDeclaration>(this);
@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       ExceptionDeclarationNavigator.GetByField(this);
 
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
-      type is FSharpEntity entity && entity.IsFSharpExceptionDeclaration ? entity.FSharpFields : null;
+      type is FSharpEntity { IsFSharpExceptionDeclaration: true } entity ? entity.FSharpFields : null;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       new FSharpUnionCaseField<ExceptionFieldDeclaration>(this);

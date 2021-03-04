@@ -1,6 +1,6 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree

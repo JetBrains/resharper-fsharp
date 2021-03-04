@@ -1,4 +1,4 @@
-﻿using FSharp.Compiler.SourceCodeServices;
+﻿using FSharp.Compiler.CodeAnalysis;
 using JetBrains.Annotations;
 using JetBrains.Util;
 

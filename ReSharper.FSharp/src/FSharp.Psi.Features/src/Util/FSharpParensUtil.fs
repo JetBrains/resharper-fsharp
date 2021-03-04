@@ -2,7 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpParensUtil
 
 open System
-open FSharp.Compiler
+open FSharp.Compiler.Syntax
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree

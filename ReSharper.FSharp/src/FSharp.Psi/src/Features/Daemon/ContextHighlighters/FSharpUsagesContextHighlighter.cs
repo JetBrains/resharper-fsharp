@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
@@ -86,7 +87,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
     {
       var isActivePatternCase = symbol is FSharpActivePatternCase;
       var isGreaterOp =
-        symbol is FSharpMemberOrFunctionOrValue mfv && mfv.LogicalName == StandardOperatorNames.GreaterThan;
+        symbol is FSharpMemberOrFunctionOrValue { LogicalName: StandardOperatorNames.GreaterThan };
 
       var symbolUsages = checkResults?.GetUsesOfSymbolInFile(symbol, null);
       if (symbolUsages == null)
@@ -94,7 +95,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
 
       foreach (var symbolUse in symbolUsages)
       {
-        var treeOffset = document.GetTreeEndOffset(symbolUse.RangeAlternate);
+        var treeOffset = document.GetTreeEndOffset(symbolUse.Range);
         var usageToken = fsFile.FindTokenAt(treeOffset - 1);
         if (usageToken == null)
           continue;
@@ -104,7 +105,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
           if (!(symbolUse.Symbol is FSharpActivePatternCase useSymbol))
             continue;
 
-          if (useSymbol.DeclarationLocation.Equals(symbolUse.RangeAlternate))
+          if (useSymbol.DeclarationLocation.Equals(symbolUse.Range))
           {
             var caseDeclaration = usageToken.GetContainingNode<IActivePatternId>()?.Cases[useSymbol.Index];
             if (caseDeclaration != null)

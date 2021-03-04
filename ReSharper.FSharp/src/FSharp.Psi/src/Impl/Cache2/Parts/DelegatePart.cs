@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -34,14 +34,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       (byte) FSharpPartKind.Delegate;
 
     public IParameter[] Parameters =>
-      GetDeclaration() is { } decl && decl.TypeRepresentation is IDelegateRepresentation repr
+      GetDeclaration() is { TypeRepresentation: IDelegateRepresentation repr }
         ? GetParameters(repr.DelegateSignature.DelegateArguments)
         : EmptyArray<IParameter>.Instance;
 
     internal IPsiModule Module => GetPsiModule();
 
     public IType ReturnType =>
-      GetDeclaration() is { } decl && decl.TypeRepresentation is IDelegateRepresentation repr
+      GetDeclaration() is { TypeRepresentation: IDelegateRepresentation repr }
         ? GetType(repr.DelegateSignature.DelegateReturnType, true)
         : TypeFactory.CreateUnknownType(Module);
 

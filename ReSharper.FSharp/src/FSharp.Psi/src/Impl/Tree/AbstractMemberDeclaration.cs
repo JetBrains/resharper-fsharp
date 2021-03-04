@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private static bool CalcHasDefaultImplementation([CanBeNull] FSharpMemberOrFunctionOrValue mfv)
     {
-      if (mfv == null || !mfv.IsDispatchSlot)
+      if (!(mfv is { IsDispatchSlot: true }))
         return false;
 
       var logicalName = mfv.LogicalName;

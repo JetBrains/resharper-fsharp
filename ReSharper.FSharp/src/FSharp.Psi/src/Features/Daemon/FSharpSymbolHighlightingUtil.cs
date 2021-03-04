@@ -1,8 +1,8 @@
-﻿using FSharp.Compiler.SourceCodeServices;
+﻿using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
-using static FSharp.Compiler.PrettyNaming;
+using static FSharp.Compiler.Syntax.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
 {
@@ -55,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
         return FSharpHighlightingAttributeIdsModule.Event;
 
       if (mfv.IsImplicitConstructor || mfv.IsConstructor)
-        return mfv.DeclaringEntity?.Value is FSharpEntity declEntity && declEntity.IsValueType
+        return mfv.DeclaringEntity?.Value is { IsValueType: true }
           ? FSharpHighlightingAttributeIdsModule.Struct
           : FSharpHighlightingAttributeIdsModule.Class;
 
@@ -95,33 +95,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
     }
 
     [NotNull]
-    public static string GetHighlightingAttributeId([NotNull] this FSharpSymbol symbol)
-    {
-      switch (symbol)
+    public static string GetHighlightingAttributeId([NotNull] this FSharpSymbol symbol) =>
+      symbol switch
       {
-        case FSharpEntity entity when !entity.IsUnresolved:
-          return GetEntityHighlightingAttributeId(entity.GetAbbreviatedEntity());
+        FSharpEntity { IsUnresolved: false } entity => GetEntityHighlightingAttributeId(entity.GetAbbreviatedEntity()),
 
-        case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
-          return GetMfvHighlightingAttributeId(mfv.AccessorProperty?.Value ?? mfv);
+        FSharpMemberOrFunctionOrValue { IsUnresolved: false } mfv => GetMfvHighlightingAttributeId(
+          mfv.AccessorProperty?.Value ?? mfv),
 
-        case FSharpField field:
-          return field.IsLiteral
-            ? FSharpHighlightingAttributeIdsModule.Literal
-            : FSharpHighlightingAttributeIdsModule.Field;
+        FSharpField field => field.IsLiteral
+          ? FSharpHighlightingAttributeIdsModule.Literal
+          : FSharpHighlightingAttributeIdsModule.Field,
 
-        case FSharpUnionCase _:
-          return FSharpHighlightingAttributeIdsModule.UnionCase;
+        FSharpUnionCase _ => FSharpHighlightingAttributeIdsModule.UnionCase,
+        FSharpGenericParameter _ => FSharpHighlightingAttributeIdsModule.TypeParameter,
+        FSharpActivePatternCase _ => FSharpHighlightingAttributeIdsModule.ActivePatternCase,
 
-        case FSharpGenericParameter _:
-          return FSharpHighlightingAttributeIdsModule.TypeParameter;
-
-        case FSharpActivePatternCase _:
-          return FSharpHighlightingAttributeIdsModule.ActivePatternCase;
-      }
-
-      // some highlighting is needed for tooltip provider
-      return FSharpHighlightingAttributeIdsModule.Value;
-    }
+        // some highlighting is needed for tooltip provider
+        _ => FSharpHighlightingAttributeIdsModule.Value
+      };
   }
 }

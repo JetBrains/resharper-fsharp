@@ -1,10 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
 
-open FSharp.Compiler
+open FSharp.Compiler.EditorServices
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree

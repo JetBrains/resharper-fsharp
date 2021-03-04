@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 using JetBrains.Util;
@@ -224,12 +223,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     public IBuffer Buffer => myLexer.Buffer;
 
-    private void LocateToken()
-    {
-      if (myCurrTokenType == null)
-        myCurrTokenType = LocateTokenImpl();
-    }
-    
+    private void LocateToken() =>
+      myCurrTokenType ??= LocateTokenImpl();
+
     private class PreprocessorState
     {    
       private enum PreprocessorElseState

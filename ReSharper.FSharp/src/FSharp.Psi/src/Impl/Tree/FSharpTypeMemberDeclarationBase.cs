@@ -25,9 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       get
       {
         lock (this)
-        {
           return myCachedName ?? (myCachedName = DeclaredElementName);
-        }
       }
     }
 

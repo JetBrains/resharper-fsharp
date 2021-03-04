@@ -1,5 +1,6 @@
 using System;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -35,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool IsExplicitImplementation =>
       InterfaceImplementationNavigator.GetByTypeMember(this) != null ||
-      ObjExprNavigator.GetByMemberDeclaration(this) is { } objExpr && objExpr.ArgExpression == null ||
+      ObjExprNavigator.GetByMemberDeclaration(this) is { ArgExpression: null } ||
       ObjExprNavigator.GetByInterfaceMember(this) != null;
 
     public bool IsIndexer => this.IsIndexer();
