@@ -1,0 +1,5 @@
+﻿module Module
+
+let f _ _ = ()
+
+let s = f ${caret}"%d{10} %s{foo}" "hi"

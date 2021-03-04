@@ -1,0 +1,4 @@
+﻿module Module
+
+let foo = "foo"
+let s = ${caret}"%d{10} %s{foo}"

@@ -87,6 +87,7 @@
     <Compile Include="src\Daemon\Analyzers\AppExpressionAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\LambdaAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\SelfIdAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\InterpolatedStringCandidateAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
@@ -201,6 +202,7 @@
     <Compile Include="src\QuickFixes\ReplaceWithAbbreviatedTypeFix.fs" />
     <Compile Include="src\QuickFixes\UseWildSelfIdFix.fs" />
     <Compile Include="src\QuickFixes\SpecifyParameterTypeFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithInterpolatedStringFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

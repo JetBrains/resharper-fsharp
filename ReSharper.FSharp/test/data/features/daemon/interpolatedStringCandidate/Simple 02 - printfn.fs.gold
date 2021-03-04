@@ -1,0 +1,7 @@
+﻿module Module
+
+let foo = "foo"
+let s = printfn |"Number is %d and text is %s"|(0) 10 foo
+
+---------------------------------------------------------
+(0): ReSharper Suggestion: Format string can be replaced with an interpolated string
