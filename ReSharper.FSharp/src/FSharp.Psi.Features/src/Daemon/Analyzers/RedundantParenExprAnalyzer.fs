@@ -13,13 +13,13 @@ type RedundantParenExprAnalyzer() =
     inherit ElementProblemAnalyzer<IParenExpr>()
 
     override x.Run(parenExpr, data, consumer) =
-        if data.GetData(redundantParenAnalysisEnabledKey) != BooleanBoxes.True then () else
         if isNull parenExpr.LeftParen || isNull parenExpr.RightParen then () else
+        let innerExpr = parenExpr.InnerExpression
 
-        let innerExpression = parenExpr.InnerExpression
-        if isNull innerExpression then () else
+        if isNull innerExpr then () else
+        if precedence innerExpr < 12 && data.GetData(redundantParensEnabledKey) != BooleanBoxes.True then () else
 
         let context = parenExpr.IgnoreParentParens()
 
-        if innerExpression :? IParenExpr || not (needsParens context innerExpression) then
+        if innerExpr :? IParenExpr || not (needsParens context innerExpr) then
             consumer.AddHighlighting(RedundantParenExprWarning(parenExpr))
