@@ -161,8 +161,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode FieldOrValueNotMutableError range
 
         | RuntimeCoercionSourceSealed ->
-            match nodeSelectionProvider.GetExpressionInRange<IFSharpExpression>(fsFile, range, false, null) with
-            | :? ITypedLikeExpr as expr -> RuntimeCoercionSourceSealedError(expr, error.Message) :> _
+            match fsFile.GetNode<IFSharpPattern>(range) with
+            | null -> createHighlightingFromNodeWithMessage RuntimeCoercionSourceSealedError range error
             | _ -> createGenericHighlighting error range
 
         | VarBoundTwice ->
