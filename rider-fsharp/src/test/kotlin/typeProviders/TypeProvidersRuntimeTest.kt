@@ -18,13 +18,16 @@ import withTypeProviders
 
 @Test
 class TypeProvidersRuntimeTest : BaseTestWithSolution() {
-    override fun getSolutionDirectoryName() = "TypeProviderLibrary"
+    override fun getSolutionDirectoryName() = "CoreTypeProviderLibrary"
     override val restoreNuGetPackages = true
 
     private val rdFcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
 
     @Test
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
+    @TestEnvironment(
+        toolset = ToolsetVersion.TOOLSET_16,
+        coreVersion = CoreVersion.DOT_NET_CORE_3_1,
+        solution = "TypeProviderLibrary")
     fun framework461() = doTest(".NET Framework 4.8")
 
     @Test
@@ -41,7 +44,8 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
 
     @Test
     @TestEnvironment(
-        toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_3_1,
+        toolset = ToolsetVersion.TOOLSET_16_CORE,
+        coreVersion = CoreVersion.DOT_NET_CORE_3_1,
         solution = "FscTypeProviderLibrary"
     )
     fun fsc() = doTest(".NET Framework 4.8")
