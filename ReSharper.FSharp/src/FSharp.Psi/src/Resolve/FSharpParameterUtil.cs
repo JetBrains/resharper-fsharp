@@ -1,5 +1,5 @@
 using System.Linq;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private static IDeclaredElement GetFieldDeclaredElement([NotNull] IReference reference,
       [NotNull] FSharpUnionCase unionCase, [NotNull] IFSharpReferenceOwner referenceOwner)
     {
-      var field = unionCase.UnionCaseFields.FirstOrDefault(f => f.Name == reference.GetName());
+      var field = unionCase.Fields.FirstOrDefault(f => f.Name == reference.GetName());
       return field?.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner);
     }
   }

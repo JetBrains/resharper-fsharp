@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
-open FSharp.Compiler.SourceCodeServices
-open FSharp.Compiler.SyntaxTree
+open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.Syntax
 open JetBrains.Annotations
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes

@@ -1,0 +1,3 @@
+module Module
+
+let s = sprintf """%d %O""" 5 """invalid"""

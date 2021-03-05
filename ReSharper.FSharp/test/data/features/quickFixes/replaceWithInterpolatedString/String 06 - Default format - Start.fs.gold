@@ -1,0 +1,3 @@
+﻿module Module
+
+let s = failwithf ${caret}"{10} specifier is at start"

@@ -19,5 +19,5 @@ and SyntaxErrorsStageProcess(fsFile: IFSharpFile, daemonProcess) =
 
     override x.Execute(committer) =
         match fsFile.CheckerService.ParseFile(daemonProcess.SourceFile) with
-        | Some parseResults -> x.Execute(parseResults.Errors, committer)
+        | Some parseResults -> x.Execute(parseResults.Diagnostics, committer)
         | _ -> ()

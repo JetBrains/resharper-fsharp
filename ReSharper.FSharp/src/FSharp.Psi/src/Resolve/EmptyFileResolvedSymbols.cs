@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Symbols;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve

@@ -1,8 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
 
-open FSharp.Compiler.SyntaxTree
-open FSharp.Compiler.Range
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.Text
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -28,15 +27,15 @@ type FSharpDebuggerLocalSymbolProvider() =
 
             let visitor =
                 let inline (|SuitableIdent|_|) (ident: Ident) = 
-                    if ident.idText = name && (posLt ident.idRange.End pos || posEq ident.idRange.End pos) then
+                    if ident.idText = name && (Position.posLt ident.idRange.End pos || Position.posEq ident.idRange.End pos) then
                         Some ident.idRange
                     else None
 
-                let updateDeclRange (range: range) =
+                let updateDeclRange (range: Range) =
                     match declRange with
                     | None -> 
                         declRange <- Some range
-                    | Some oldDeclRange when posGt range.Start oldDeclRange.Start ->
+                    | Some oldDeclRange when Position.posGt range.Start oldDeclRange.Start ->
                         declRange <- Some range
                     | _ -> ()
 
@@ -46,7 +45,7 @@ type FSharpDebuggerLocalSymbolProvider() =
                     | _ -> ()
                     defaultTraverse pat
 
-                { new AstTraversal.AstVisitorBase<_>() with
+                { new SyntaxVisitorBase<_>() with
                     member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = 
                         match expr with
                         | SynExpr.For(ident = SuitableIdent range) -> updateDeclRange range 
@@ -55,16 +54,16 @@ type FSharpDebuggerLocalSymbolProvider() =
                         | _ -> ()
                         defaultTraverse expr
 
-                    member this.VisitPat(defaultTraverse, pat) = visitPat pat defaultTraverse 
+                    member this.VisitPat(_, defaultTraverse, pat) = visitPat pat defaultTraverse 
 
-                    member this.VisitLetOrUse(_, _, bindings, range) =
-                        bindings |> List.tryPick (fun (Binding(headPat = headPat)) ->
+                    member this.VisitLetOrUse(_, _, _, bindings, range) =
+                        bindings |> List.tryPick (fun (SynBinding(headPat = headPat)) ->
                             visitPat headPat (fun _ -> None))
 
-                    member this.VisitMatchClause(defaultTraverse, (Clause(pat, _, _, _, _) as clause)) = 
+                    member this.VisitMatchClause(_, defaultTraverse, (SynMatchClause(pat, _, _, _, _) as clause)) = 
                         visitPat pat (fun _ -> None) |> Option.orElseWith (fun _ -> defaultTraverse clause) }
 
-            AstTraversal.Traverse(pos, parseTree, visitor) |> ignore
+            SyntaxTraversal.Traverse(pos, parseTree, visitor) |> ignore
 
             match declRange with
             | Some declRange ->

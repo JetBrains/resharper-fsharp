@@ -1,8 +1,8 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
-open FSharp.Compiler
-open FSharp.Compiler.SourceCodeServices
 open System
+open FSharp.Compiler.Symbols
+open FSharp.Compiler.Syntax
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util

@@ -2,7 +2,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.Renam
 
 open System
 open System.Linq
-open FSharp.Compiler.PrettyNaming
+open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.Application
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel

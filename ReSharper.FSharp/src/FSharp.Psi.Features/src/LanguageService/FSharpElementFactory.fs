@@ -1,7 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
-open FSharp.Compiler
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.Tokenization
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.Application.Settings
@@ -77,7 +78,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             if PrettyNaming.IsMangledOpName logicalName then
                 sprintf "( %s )" name
             else
-                Keywords.QuoteIdentifierIfNeeded name
+                FSharpKeywords.QuoteIdentifierIfNeeded name
 
         let memberSource = sprintf "member this.%s%s%s = failwith \"todo\"" name typeParametersSource parameters
         let typeDecl = getTypeDecl memberSource
@@ -164,7 +165,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
             let printParam (name, fcsType: FSharpType) =
-                let name = Keywords.QuoteIdentifierIfNeeded name
+                let name = FSharpKeywords.QuoteIdentifierIfNeeded name
                 if not addTypes then name else
 
                 let fcsType = fcsType.Format(displayContext)

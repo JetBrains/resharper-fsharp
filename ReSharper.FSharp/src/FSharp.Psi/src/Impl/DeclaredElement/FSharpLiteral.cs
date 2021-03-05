@@ -1,4 +1,4 @@
-﻿using FSharp.Compiler.SourceCodeServices;
+﻿using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Psi;

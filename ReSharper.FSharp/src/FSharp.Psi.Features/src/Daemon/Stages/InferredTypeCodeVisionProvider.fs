@@ -1,7 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System.Text
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.Symbols
 open JetBrains.Application
 open JetBrains.Application.UI.Components
 open JetBrains.Application.UI.PopupLayout

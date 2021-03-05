@@ -87,11 +87,15 @@ type RedundantParenPatAnalyzer() =
         let bindingPattern = getBindingPattern context
         BindingNavigator.GetByHeadPattern(bindingPattern)
 
-    let needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
+    let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
         match fsPattern with
-        | :? IListConsPat ->
-            isNotNull (ListConsPatNavigator.GetByHeadPattern(context)) ||
-            checkPrecedence context fsPattern
+        | :? IListConsPat as listConsPat ->
+            checkPrecedence context fsPattern ||
+
+            let headPat = listConsPat.HeadPattern
+            isNotNull headPat && needsParens context headPat ||
+
+            isNotNull (ListConsPatNavigator.GetByHeadPattern(context))
 
         | :? IAsPat ->
             isAtCompoundPatternRightSide context ||
@@ -103,6 +107,8 @@ type RedundantParenPatAnalyzer() =
             compoundPatternNeedsParens strictContext fsPattern
 
         | :? ITuplePat as tuplePat ->
+            checkPrecedence context fsPattern ||
+
             isNotNull (TuplePatNavigator.GetByPattern(context)) ||
 
             // todo: suggest moving parens to a single inner pattern?
@@ -110,31 +116,31 @@ type RedundantParenPatAnalyzer() =
             compoundPatternNeedsParens strictContext fsPattern ||
 
             let matchClause = MatchClauseNavigator.GetByPattern(context)
-            isNotNull matchClause && tuplePat.PatternsEnumerable.LastOrDefault() :? ITypedLikePat || 
-
-            checkPrecedence context fsPattern
+            isNotNull matchClause && tuplePat.PatternsEnumerable.LastOrDefault() :? ITypedLikePat
 
         | :? IParametersOwnerPat ->
-            isNotNull (BindingNavigator.GetByHeadPattern(context)) ||
-            isNotNull (ParametersOwnerPatNavigator.GetByParameter(context)) ||
+            checkPrecedence context fsPattern ||
 
-            checkPrecedence context fsPattern
+            isNotNull (BindingNavigator.GetByHeadPattern(context)) ||
+            isNotNull (ParametersOwnerPatNavigator.GetByParameter(context))
 
         | :? ITypedLikePat
         | :? IAttribPat ->
+            checkPrecedence context fsPattern ||
+
             isNotNull (BindingNavigator.GetByHeadPattern(getBindingPattern context)) ||
             isNotNull (LambdaParametersListNavigator.GetByPattern(context)) ||
             isNotNull (MatchClauseNavigator.GetByPattern(context)) ||
 
             let tuplePat = TuplePatNavigator.GetByPattern(context)
             let matchClause = MatchClauseNavigator.GetByPattern(tuplePat)
-            isNotNull matchClause && tuplePat.PatternsEnumerable.LastOrDefault() == context ||
-
-            checkPrecedence context fsPattern
+            isNotNull matchClause && tuplePat.PatternsEnumerable.LastOrDefault() == context
 
         | :? IWildPat -> false
 
         | _ ->
+
+        checkPrecedence context fsPattern ||
 
         // todo: add code style setting
         let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(context)
@@ -146,9 +152,7 @@ type RedundantParenPatAnalyzer() =
         // todo: add code style setting
         let memberDeclaration = MemberDeclarationNavigator.GetByParametersDeclaration(parameterDecl)
         isNotNull memberDeclaration && getNextSibling memberDeclaration.NameIdentifier == parameterDecl ||
-        isNotNull memberDeclaration && getNextSibling memberDeclaration.TypeParameterList == parameterDecl ||
-
-        checkPrecedence context fsPattern
+        isNotNull memberDeclaration && getNextSibling memberDeclaration.TypeParameterList == parameterDecl
 
     let escapesTuplePatParamDecl (context: IFSharpPattern) (innerPattern: IFSharpPattern) =
         match innerPattern with

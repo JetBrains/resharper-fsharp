@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System.Collections.Generic
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.EditorServices
 open JetBrains.ReSharper.Daemon.UsageChecking
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp

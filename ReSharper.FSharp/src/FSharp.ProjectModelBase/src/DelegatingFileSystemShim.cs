@@ -1,10 +1,11 @@
 using System;
 using System.IO;
 using System.Reflection;
+using FSharp.Compiler.IO;
 using JetBrains.Application.changes;
 using JetBrains.Lifetimes;
 using JetBrains.Util;
-using static FSharp.Compiler.AbstractIL.Internal.Library;
+using static FSharp.Compiler.IO.FileSystemAutoOpens;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
 {
@@ -16,15 +17,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     public abstract void Execute(ChangeEventArgs changeEventArgs);
   }
 
-  public class DelegatingFileSystemShim : Shim.IFileSystem
+  public class DelegatingFileSystemShim : IFileSystem
   {
-    private readonly Shim.IFileSystem myFileSystem;
+    private readonly IFileSystem myFileSystem;
 
     public DelegatingFileSystemShim(Lifetime lifetime)
     {
-      myFileSystem = Shim.FileSystem;
-      Shim.FileSystem = this;
-      lifetime.OnTermination(() => Shim.FileSystem = myFileSystem);
+      myFileSystem = FileSystem;
+      FileSystem = this;
+      lifetime.OnTermination(() => FileSystem = myFileSystem);
     }
 
     public virtual bool Exists(FileSystemPath path) =>

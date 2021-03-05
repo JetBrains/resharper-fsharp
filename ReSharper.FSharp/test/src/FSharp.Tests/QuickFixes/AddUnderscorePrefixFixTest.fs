@@ -12,6 +12,7 @@ type AddUnderscorePrefixFixTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/addUnderscorePrefix"
 
+    [<Test>] member x.``As 01``() = x.DoNamedTest()
     [<Test>] member x.``Let 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Partial pattern 01``() = x.DoNamedTest()
@@ -29,3 +30,4 @@ type AddUnderscorePrefixFixAvailabilityTest() =
 
     [<Test>] member x.``Availability 01 - Escaped name``() = x.DoNamedTest()
     [<Test>] member x.``Availability 02 - Params``() = x.DoNamedTest()
+    [<Test>] member x.``Availability 03 - As``() = x.DoNamedTest()

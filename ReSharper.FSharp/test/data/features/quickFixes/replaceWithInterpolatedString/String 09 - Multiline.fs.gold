@@ -1,0 +1,7 @@
+﻿module Module
+
+let s =
+    ${caret}"text
+        is %d{10}
+        indented }}
+        %s{foo}"

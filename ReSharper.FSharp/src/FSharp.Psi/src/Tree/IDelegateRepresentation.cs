@@ -1,4 +1,4 @@
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.Symbols;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {

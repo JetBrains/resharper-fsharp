@@ -1,6 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 
-open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Symbols
 
 type IFSharpGeneratorElement =
     abstract Mfv: FSharpMemberOrFunctionOrValue
