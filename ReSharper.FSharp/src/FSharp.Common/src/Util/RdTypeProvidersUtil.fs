@@ -4,7 +4,6 @@ module JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open FSharp.Compiler.AbstractIL.IL
 open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
 open FSharp.Compiler.ExtensionTyping
-open FSharp.Compiler.AbstractIL.Internal.Library
 
 type ILVersionInfo with
     [<Extension>]

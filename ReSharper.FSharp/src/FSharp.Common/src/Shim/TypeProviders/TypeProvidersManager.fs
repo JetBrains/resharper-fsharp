@@ -10,8 +10,8 @@ open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
 open Microsoft.FSharp.Core.CompilerServices
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.TcImportsHack
-open FSharp.Compiler.AbstractIL.Internal.Library
 open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
+open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
 
 type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = Dictionary<_, Dictionary<_, IProxyTypeProvider>>()
@@ -85,7 +85,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
             let envKey = $"{designTimeAssemblyNameString}+{resolutionEnvironment.resolutionFolder}"
             let result =
                 let fakeTcImports = getFakeTcImports(systemRuntimeContainsType)
-                connection.Execute(fun () ->
+                connection.ExecuteWithCatch(fun () ->
                     protocol.InstantiateTypeProvidersOfAssembly.Sync(
                         InstantiateTypeProvidersOfAssemblyParameters(
                             runTimeAssemblyFileName,

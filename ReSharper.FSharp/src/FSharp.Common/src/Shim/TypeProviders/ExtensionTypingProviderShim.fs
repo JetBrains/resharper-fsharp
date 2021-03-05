@@ -3,13 +3,12 @@
 open System
 open FSharp.Compiler
 open FSharp.Compiler.ExtensionTyping
-open FSharp.Compiler.Range
+open FSharp.Compiler.Text
 open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open Microsoft.FSharp.Core.CompilerServices
-open FSharp.Compiler.ErrorLogger
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
@@ -54,11 +53,12 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                                                        systemRuntimeContainsType: string -> bool,
                                                        systemRuntimeAssemblyVersion: Version,
                                                        compilerToolsPath: string list,
+                                                       logError: TypeProviderError -> unit,
                                                        m: range) =
             if not typeProvidersFeature.Value then
                defaultExtensionTypingProvider.InstantiateTypeProvidersOfAssembly(
                  runTimeAssemblyFileName, designTimeAssemblyNameString, resolutionEnvironment, isInvalidationSupported,
-                 isInteractive, systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath, m)
+                 isInteractive, systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath, logError, m)
             else
                 connect()
                 try
@@ -66,10 +66,8 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                      runTimeAssemblyFileName, designTimeAssemblyNameString, resolutionEnvironment, isInvalidationSupported,
                      isInteractive, systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath)
                 with
-                | :? TypeProviderError as tpe ->
-                    tpe.Iter(fun e -> errorR (NumberedError((e.Number, e.ContextualErrorMessage), m)))
-                    []
-                | e -> errorR(e)
+                //3053 (FSComp.SR.etTypeProviderConstructorException) - random error number
+                | e -> logError(TypeProviderError(3053, "", m, [e.Message]))
                        []
 
         member this.GetProvidedTypes(pn: IProvidedNamespace) =

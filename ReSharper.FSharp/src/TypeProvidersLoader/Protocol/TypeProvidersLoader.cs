@@ -5,8 +5,9 @@ using JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Core.CompilerServices;
-using Range = FSharp.Compiler.Range;
+using Range = FSharp.Compiler.Text.Range;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
@@ -18,6 +19,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 
   public class TypeProvidersLoader : ITypeProvidersLoader
   {
+    private readonly FSharpFunc<TypeProviderError, Unit> myLogError =
+      FSharpFunc<TypeProviderError, Unit>.FromConverter(e => throw new Exception(e.ContextualErrorMessage));
+
     public IEnumerable<ITypeProvider> InstantiateTypeProvidersOfAssembly(
       InstantiateTypeProvidersOfAssemblyParameters parameters)
     {
@@ -29,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       var typeProviders = ExtensionTyping.Shim.ExtensionTypingProvider.InstantiateTypeProvidersOfAssembly(
         parameters.RunTimeAssemblyFileName, parameters.DesignTimeAssemblyNameString,
         resolutionEnvironment, parameters.IsInvalidationSupported, parameters.IsInteractive, systemRuntimeContainsType,
-        systemRuntimeAssemblyVersion, compilerToolsPath, Range.range.Zero);
+        systemRuntimeAssemblyVersion, compilerToolsPath, myLogError, Range.Zero);
       return typeProviders;
     }
   }

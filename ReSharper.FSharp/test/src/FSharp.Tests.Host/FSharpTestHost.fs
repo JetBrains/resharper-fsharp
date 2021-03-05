@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open System.Collections.Generic
 open System.Linq
-open FSharp.Compiler.AbstractIL.Internal.Library
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Compiler.IO
 open JetBrains.Diagnostics
