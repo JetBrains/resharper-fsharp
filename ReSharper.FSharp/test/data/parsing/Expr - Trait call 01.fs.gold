@@ -1,0 +1,33 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDoStatement
+      FSharpTokenType+DoTokenElement(type:DO, text:do)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      IChameleonExpression
+        IReferenceExpr
+          ITraitCallExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
+            FSharpIdentifierToken(type:IDENTIFIER, text:T)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+ColonTokenElement(type:COLON, text::)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:P)
+            FSharpTokenType+ColonTokenElement(type:COLON, text::)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            INamedTypeUsage
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IReferenceExpr
+              FSharpIdentifierToken(type:IDENTIFIER, text:x)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          FSharpTokenType+DotTokenElement(type:DOT, text:.)
+          FSharpIdentifierToken(type:IDENTIFIER, text:Name)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
