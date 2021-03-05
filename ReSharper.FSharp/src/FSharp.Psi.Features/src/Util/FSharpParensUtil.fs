@@ -108,10 +108,15 @@ let operatorPrecedence (binaryApp: IBinaryAppExpr) =
 
 let precedence (expr: ITreeNode) =
     match expr with
+    | :? ILibraryOnlyExpr
+    | :? ITraitCallExpr -> 0
+
     | :? ILetOrUseExpr -> 1
 
-    | :? IIfThenElseExpr
+    | :? IForLikeExpr
+    | :? IIfExpr
     | :? IMatchClauseListOwnerExpr
+    | :? ITryLikeExpr
     | :? IWhileExpr -> 3
 
     // todo: type test, cast, typed
@@ -244,6 +249,7 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     | :? IIfThenElseExpr ->
         isNotNull (IfThenElseExprNavigator.GetByThenExpr(context)) ||
         isNotNull (ConditionOwnerExprNavigator.GetByConditionExpr(context)) ||
+        isNotNull (ForEachExprNavigator.GetByInExpression(context)) ||
         isNotNull (BinaryAppExprNavigator.GetByLeftArgument(context)) ||
         isNotNull (PrefixAppExprNavigator.GetByFunctionExpression(context)) ||
         isNotNull (TypedLikeExprNavigator.GetByExpression(context)) ||
