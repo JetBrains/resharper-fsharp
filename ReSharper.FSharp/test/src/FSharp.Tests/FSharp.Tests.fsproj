@@ -94,6 +94,7 @@
     <Compile Include="QuickFixes\ConvertTupleToArrayOrListElementsFixTest.fs" />
     <Compile Include="QuickFixes\ReplaceWithAbbreviatedTypeTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantParens.fs" />
+    <Compile Include="QuickFixes\AddParensToTypedLikeExprTest.fs" />
     <Compile Include="QuickFixes\SpecifyParameterTypeTest.fs" />
     <Compile Include="QuickFixes\ReplaceWithInterpolatedStringTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />

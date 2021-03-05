@@ -36,6 +36,7 @@ module FSharpErrors =
     let [<Literal>] TypeEquation = 1
     let [<Literal>] NotAFunction = 3
     let [<Literal>] FieldNotMutable = 5
+    let [<Literal>] RuntimeCoercionSourceSealed = 16
     let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] MatchIncomplete = 25
     let [<Literal>] RuleNeverMatched = 26
@@ -70,6 +71,7 @@ module FSharpErrors =
     let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
+    let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type "
 
     let [<Literal>] addTypeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
 
@@ -157,6 +159,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | FieldNotMutable ->
             createHighlightingFromNode FieldOrValueNotMutableError range
+
+        | RuntimeCoercionSourceSealed ->
+            match fsFile.GetNode<IFSharpPattern>(range) with
+            | null -> createHighlightingFromNodeWithMessage RuntimeCoercionSourceSealedError range error
+            | _ -> createGenericHighlighting error range
 
         | VarBoundTwice ->
             createHighlightingFromNode VarBoundTwiceError range
@@ -276,10 +283,17 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | EmptyRecordInvalid ->
             createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error
 
-        | MissingErrorNumber when startsWith expressionIsAFunctionMessage error.Message ->
-            let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            let expr = getResultExpr expr
-            FunctionValueUnexpectedWarning(expr, error.Message) :> _
+        | MissingErrorNumber ->
+            match error.Message with
+            | x when startsWith expressionIsAFunctionMessage x ->
+                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                let expr = getResultExpr expr
+                FunctionValueUnexpectedWarning(expr, error.Message) :> _
+
+            | x when startsWith typeConstraintMismatchMessage x ->
+                createHighlightingFromNodeWithMessage TypeConstraintMismatchError range error
+
+            | _ -> null
 
         | NamespaceCannotContainValues ->
             createHighlightingFromNode NamespaceCannotContainValuesError range

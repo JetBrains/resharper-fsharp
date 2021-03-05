@@ -1,0 +1,29 @@
+module Test
+
+let o = obj()
+let _ = |not |o|(1) :?> string|(0)
+let _ = ||not |o|(4) :> string|(2)|(3)
+
+------------------------------------------------
+0: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
+QUICKFIXES:
+Add parens to type cast
+1: This expression was expected to have type
+    'bool'    
+but here has type
+    'obj'    
+NO QUICKFIXES
+2: The type 'string' does not have any proper subtypes and need not be used as the target of a static coercion
+NO QUICKFIXES
+3: Type constraint mismatch. The type 
+    'bool'    
+is not compatible with type
+    'string'    
+
+QUICKFIXES:
+Add parens to type cast
+4: This expression was expected to have type
+    'bool'    
+but here has type
+    'obj'    
+NO QUICKFIXES

@@ -1,0 +1,6 @@
+﻿module Module
+
+let _ = (match 1 with | |:? string|(0) -> true): bool
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The type 'int' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
