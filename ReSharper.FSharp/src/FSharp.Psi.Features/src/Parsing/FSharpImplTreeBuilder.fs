@@ -699,6 +699,17 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
     member x.ProcessExpression(ExprRange range as expr) =
         match expr with
+        | SynExpr.TraitCall(_, traitSig, expr, _)
+        | SynExpr.Paren(expr = SynExpr.TraitCall(_, traitSig, expr, _)) ->
+            // todo: fix trait range
+            x.PushRange(range, ElementType.TRAIT_CALL_EXPR)
+
+            match traitSig with
+            | SynMemberSig.Member(SynValSig(synType = synType), _, _) -> x.ProcessType(synType)
+            | _ -> ()
+
+            x.ProcessExpression(expr)
+
         | SynExpr.Paren(expr = expr) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.PAREN_EXPR)
 
@@ -963,9 +974,6 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
         | SynExpr.AddressOf(_, expr, _, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.ADDRESS_OF_EXPR)
-
-        | SynExpr.TraitCall(_, _, expr, _) ->
-            x.PushRangeAndProcessExpression(expr, range, ElementType.TRAIT_CALL_EXPR)
 
         | SynExpr.JoinIn(expr1, _, expr2, _) ->
             x.PushRange(range, ElementType.JOIN_IN_EXPR)
