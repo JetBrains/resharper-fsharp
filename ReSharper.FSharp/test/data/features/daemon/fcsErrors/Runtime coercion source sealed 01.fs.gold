@@ -1,0 +1,6 @@
+﻿module Module
+
+let _ = |1 :?> string|(0)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The type 'int' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.

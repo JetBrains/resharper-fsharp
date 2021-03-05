@@ -1,0 +1,26 @@
+module Test
+
+let o = obj()
+let _ = |not not |o|(1) :?> string|(0)
+let _ = |not true |o|(3) :?> string|(2)
+
+------------------------------------------------
+0: This runtime coercion or type test from type
+    'a    
+ to 
+    string    
+involves an indeterminate type based on information prior to this program point. Runtime type tests are not allowed on some types. Further type annotations are needed.
+NO QUICKFIXES
+1: Unexpected argument
+QUICKFIXES:
+Add parens to 'not' application
+Remove unexpected argument
+2: This runtime coercion or type test from type
+    'a    
+ to 
+    string    
+involves an indeterminate type based on information prior to this program point. Runtime type tests are not allowed on some types. Further type annotations are needed.
+NO QUICKFIXES
+3: Unexpected argument
+QUICKFIXES:
+Remove unexpected argument

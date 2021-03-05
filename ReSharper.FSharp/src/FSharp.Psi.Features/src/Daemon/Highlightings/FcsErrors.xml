@@ -320,6 +320,28 @@
     <QuickFix>ReplaceWithAbbreviatedTypeFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="RuntimeCoercionSourceSealed">
+    <Parameter type="ITypedLikeExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="TypeConstraintMismatch">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="IndeterminateType">
     <Parameter type="IReferenceExpr" name="refExpr"/>
     <Message value="Lookup on object of indeterminate type based on information prior to this program point. A type annotation may be needed constrain the type of the object."/>

@@ -1,0 +1,79 @@
+module Test
+
+type A() =
+  class end
+
+[<Sealed>]
+type B() =
+  inherit A()
+  
+let a = A()
+let b = B()
+
+let _ = |not |a|(1) :? B|(0)
+let _ = ||not |a|(4) :> B|(2)|(3)
+let _ = |not |a|(6) :?> B|(5)
+
+let _ = |not |b|(8) :? A|(7)
+let _ = |not |b|(10) :> A|(9)
+let _ = |not |b|(12) :?> A|(11)
+
+------------------------------------------------
+0: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
+QUICKFIXES:
+Add parens to type test
+1: This expression was expected to have type
+    'bool'    
+but here has type
+    'A'    
+NO QUICKFIXES
+2: The type 'B' does not have any proper subtypes and need not be used as the target of a static coercion
+NO QUICKFIXES
+3: Type constraint mismatch. The type 
+    'bool'    
+is not compatible with type
+    'B'    
+
+QUICKFIXES:
+Add parens to type cast
+4: This expression was expected to have type
+    'bool'    
+but here has type
+    'A'    
+NO QUICKFIXES
+5: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
+QUICKFIXES:
+Add parens to type cast
+6: This expression was expected to have type
+    'bool'    
+but here has type
+    'A'    
+NO QUICKFIXES
+7: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
+QUICKFIXES:
+Add parens to type test
+8: This expression was expected to have type
+    'bool'    
+but here has type
+    'B'    
+NO QUICKFIXES
+9: Type constraint mismatch. The type 
+    'bool'    
+is not compatible with type
+    'A'    
+
+QUICKFIXES:
+Add parens to type cast
+10: This expression was expected to have type
+    'bool'    
+but here has type
+    'B'    
+NO QUICKFIXES
+11: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
+QUICKFIXES:
+Add parens to type cast
+12: This expression was expected to have type
+    'bool'    
+but here has type
+    'B'    
+NO QUICKFIXES
