@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Exceptions;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using JetBrains.Util.Concurrency;

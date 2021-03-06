@@ -11,7 +11,7 @@ open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
 open Microsoft.FSharp.Core.CompilerServices
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.TcImportsHack
 open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
-open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
+open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Exceptions
 
 type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = Dictionary<_, Dictionary<_, IProxyTypeProvider>>()

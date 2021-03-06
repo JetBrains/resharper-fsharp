@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Exceptions;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;

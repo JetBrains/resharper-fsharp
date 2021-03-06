@@ -8,6 +8,7 @@ open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Exceptions
 open Microsoft.FSharp.Core.CompilerServices
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
@@ -65,10 +66,9 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                     typeProvidersManager.GetOrCreate(
                      runTimeAssemblyFileName, designTimeAssemblyNameString, resolutionEnvironment, isInvalidationSupported,
                      isInteractive, systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath)
-                with
-                //3053 (FSComp.SR.etTypeProviderConstructorException) - random error number
-                | e -> logError(TypeProviderError(3053, "", m, [e.Message]))
-                       []
+                with :? TypeProvidersInstantiationException as e  ->
+                    logError(TypeProviderError(e.FcsNumber, "", m, [e.Message]))
+                    []
 
         member this.GetProvidedTypes(pn: IProvidedNamespace) =
             match pn with

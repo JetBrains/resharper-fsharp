@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FSharp.Compiler;
 using JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Exceptions;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Collections;
@@ -20,7 +21,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
   public class TypeProvidersLoader : ITypeProvidersLoader
   {
     private readonly FSharpFunc<TypeProviderError, Unit> myLogError =
-      FSharpFunc<TypeProviderError, Unit>.FromConverter(e => throw new Exception(e.ContextualErrorMessage));
+      FSharpFunc<TypeProviderError, Unit>.FromConverter(e =>
+        throw new TypeProvidersInstantiationException(e.ContextualErrorMessage, e.Number));
 
     public IEnumerable<ITypeProvider> InstantiateTypeProvidersOfAssembly(
       InstantiateTypeProvidersOfAssemblyParameters parameters)
