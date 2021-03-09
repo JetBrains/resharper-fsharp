@@ -81,7 +81,6 @@
     <Compile Include="QuickFixes\RemoveYieldTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantQualifierTest.fs" />
     <Compile Include="QuickFixes\AddExtensionAttributeTest.fs" />
-    <Compile Include="QuickFixes\RemoveRedundantParenExprTest.fs" />
     <Compile Include="QuickFixes\AddParensToApplicationTest.fs" />
     <Compile Include="QuickFixes\NamespaceToModuleTest.fs" />
     <Compile Include="QuickFixes\SimplifyListConsPatTest.fs" />

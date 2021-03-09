@@ -5,10 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-[<ElementProblemAnalyzer(typeof<IParenTypeUsage>, HighlightingTypes = [| typeof<RedundantParenTypeUsageWarning> |])>]
-type RedundantParenTypeUsageAnalyzer() =
-    inherit ElementProblemAnalyzer<IParenTypeUsage>()
-
+module RedundantParenTypeUsageAnalyzer =
     let applicable (typeUsage: ITypeUsage) =
         not (typeUsage :? IUnsupportedTypeUsage) // todo: remove when all FSC types usages are properly mapped
 
@@ -58,6 +55,12 @@ type RedundantParenTypeUsageAnalyzer() =
 
         | _ -> false
 
+open RedundantParenTypeUsageAnalyzer
+
+[<ElementProblemAnalyzer(typeof<IParenTypeUsage>, HighlightingTypes = [| typeof<RedundantParenTypeUsageWarning> |])>]
+type RedundantParenTypeUsageAnalyzer() =
+    inherit ElementProblemAnalyzer<IParenTypeUsage>()
+
     override this.Run(parenTypeUsage, _, consumer) =
         if isNull parenTypeUsage.LeftParen || isNull parenTypeUsage.RightParen then () else
 
@@ -66,3 +69,5 @@ type RedundantParenTypeUsageAnalyzer() =
 
         if typeUsage :? IParenTypeUsage || applicable typeUsage && not (needsParens context typeUsage) then
             consumer.AddHighlighting(RedundantParenTypeUsageWarning(parenTypeUsage))
+
+    interface IFSharpRedundantParenAnalyzer
