@@ -86,6 +86,8 @@ type RedundantParenExprTest() =
     [<Test>] member x.``Match - Clause expr - Seq 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Clause expr - Seq 02 - Semicolon``() = x.DoNamedTest()
 
+    [<Test>] member x.``New - App 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Paren 01``() = x.DoNamedTest()
     [<Test>] member x.``Paren 02``() = x.DoNamedTest()
 
