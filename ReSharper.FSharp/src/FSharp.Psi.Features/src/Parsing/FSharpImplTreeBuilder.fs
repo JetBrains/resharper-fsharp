@@ -421,7 +421,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             | [ IdentRange idRange as id ] ->
                 let mark = x.Mark(idRange)
                 if IsActivePatternName id.idText then
-                    x.ProcessActivePatternId(id, isLocal)
+                    x.ProcessActivePatternDecl(id, isLocal)
                 x.Done(idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
             | lid ->
                 x.ProcessReferenceName(lid)
@@ -446,7 +446,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 | SynPat.Wild(range) when Range.equals id.idRange range ->
                     let mark = x.Mark(id.idRange)
                     if IsActivePatternName id.idText then
-                        x.ProcessActivePatternId(id, isLocal)
+                        x.ProcessActivePatternDecl(id, isLocal)
                     x.Done(id.idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
                     if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
 
@@ -459,7 +459,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 | [ IdentRange idRange as id ] ->
                     let mark = x.Mark(idRange)
                     if IsActivePatternName id.idText then
-                        x.ProcessActivePatternId(id, isLocal)
+                        x.ProcessActivePatternDecl(id, isLocal)
                     x.Done(idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
                 | lid ->
                     x.ProcessReferenceName(lid)
@@ -709,6 +709,10 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             | _ -> ()
 
             x.ProcessExpression(expr)
+
+        | SynExpr.Paren(expr = SynExpr.Ident(ident)) when IsActivePatternName ident.idText ->
+            x.PushRange(range, ElementType.ACTIVE_PATTERN_EXPR)
+            x.ProcessActivePatternExpr(ident)
 
         | SynExpr.Paren(expr = expr) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.PAREN_EXPR)
@@ -1037,6 +1041,9 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushRange(range, ElementType.INTERPOLATED_STRING_EXPR)
             x.PushStepList(stringParts, interpolatedStringProcessor)
 
+    member x.ProcessActivePatternExpr(id) =
+        x.ProcessActivePatternId(id, null, ElementType.REFERENCE_EXPR, null)
+
     member x.ProcessAndLocalBinding(_, _, _, pat: SynPat, expr: SynExpr, _) =
         x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
         x.ProcessPat(pat, true, false)
@@ -1084,9 +1091,18 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         for _ in lid do
             marks.Push(x.Mark())
 
-        for IdentRange idRange in lid do
-            let range = if marks.Count <> 1 then idRange else range
-            x.Done(range, marks.Pop(), ElementType.REFERENCE_EXPR)
+        for id in lid do
+            let isLastId = marks.Count = 1
+            let range = if isLastId then range else id.idRange
+
+            let elementType =
+                if isLastId && IsActivePatternName id.idText then
+                    x.ProcessActivePatternExpr(id)
+                    ElementType.ACTIVE_PATTERN_EXPR
+                else
+                    ElementType.REFERENCE_EXPR
+
+            x.Done(range, marks.Pop(), elementType)
 
     member x.ProcessLongIdentifierAndQualifierExpression(ExprRange exprRange as expr, lid) =
         x.AdvanceToStart(exprRange)

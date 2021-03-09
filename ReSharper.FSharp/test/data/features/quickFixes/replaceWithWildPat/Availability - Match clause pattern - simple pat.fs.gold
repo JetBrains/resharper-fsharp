@@ -8,6 +8,9 @@ match (1, 2) with
 0: Redundant parentheses
 QUICKFIXES:
 Remove redundant parens
+--Remove redundant parens in file
+--Remove redundant parens in project
+--Remove redundant parens in solution
 1: The value 'x' is unused
 QUICKFIXES:
 Replace with '_'
@@ -19,3 +22,6 @@ Rename to '_x'
 2: Redundant parentheses
 QUICKFIXES:
 Remove redundant parens
+--Remove redundant parens in file
+--Remove redundant parens in project
+--Remove redundant parens in solution

@@ -548,18 +548,20 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         for param in typeParams do
             x.ProcessTypeParameter(param, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
 
-    member x.ProcessActivePatternId(IdentRange range, isLocal: bool) =
-        let idMark = x.Mark(range)
+    member x.ProcessActivePatternId(IdentRange range, activePatternElementType, caseElementType, wildElementType) =
+        let idMark =
+            if isNotNull activePatternElementType then
+                x.Mark(range)
+            else
+                -1
+
         let endOffset = x.GetEndOffset(range)
 
         while x.CurrentOffset < endOffset do
             let caseElementType =
                 let tokenType = x.Builder.GetTokenType()
-                if tokenType == FSharpTokenType.IDENTIFIER then
-                    if isLocal then ElementType.LOCAL_ACTIVE_PATTERN_CASE_DECLARATION
-                    else ElementType.TOP_ACTIVE_PATTERN_CASE_DECLARATION
-
-                elif tokenType == FSharpTokenType.UNDERSCORE then ElementType.ACTIVE_PATTERN_WILD_CASE else
+                if tokenType == FSharpTokenType.IDENTIFIER then caseElementType else
+                if tokenType == FSharpTokenType.UNDERSCORE then wildElementType else
                 null
 
             if isNotNull caseElementType then
@@ -567,7 +569,18 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
             x.AdvanceLexer()
 
-        x.Done(idMark, ElementType.ACTIVE_PATTERN_ID)
+        if isNotNull activePatternElementType then
+            x.Done(idMark, activePatternElementType)
+
+    member x.ProcessActivePatternDecl(id, isLocal) =
+        let caseElementType =
+            if isLocal then
+                ElementType.LOCAL_ACTIVE_PATTERN_CASE_DECLARATION
+            else
+                ElementType.TOP_ACTIVE_PATTERN_CASE_DECLARATION
+
+        x.ProcessActivePatternId(id, ElementType.ACTIVE_PATTERN_ID, caseElementType,
+            ElementType.ACTIVE_PATTERN_WILD_CASE)
 
     member x.ProcessTypeArgs(typeArgs, ltRange: range option, gtRange: range option, elementType) =
         match ltRange, typeArgs with
