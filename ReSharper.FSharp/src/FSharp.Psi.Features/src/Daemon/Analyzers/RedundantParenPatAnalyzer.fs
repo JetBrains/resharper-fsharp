@@ -7,10 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-[<ElementProblemAnalyzer(typeof<IParenPat>, HighlightingTypes = [| typeof<RedundantParenPatWarning> |])>]
-type RedundantParenPatAnalyzer() =
-    inherit ElementProblemAnalyzer<IParenPat>()
-
+module RedundantParenPatAnalyzer =
     let precedence (treeNode: ITreeNode) =
         match treeNode with
         | :? IAsPat -> 1
@@ -162,6 +159,12 @@ type RedundantParenPatAnalyzer() =
             | _ -> false
         | _ -> false
 
+open RedundantParenPatAnalyzer
+
+[<ElementProblemAnalyzer(typeof<IParenPat>, HighlightingTypes = [| typeof<RedundantParenPatWarning> |])>]
+type RedundantParenPatAnalyzer() =
+    inherit ElementProblemAnalyzer<IParenPat>()
+
     override x.Run(parenPat, _, consumer) =
         let innerPattern = parenPat.Pattern
         if isNull innerPattern then () else
@@ -171,3 +174,5 @@ type RedundantParenPatAnalyzer() =
 
         if innerPattern :? IParenPat || not (needsParens context innerPattern) && innerPattern.IsSingleLine then
             consumer.AddHighlighting(RedundantParenPatWarning(parenPat))
+
+    interface IFSharpRedundantParenAnalyzer

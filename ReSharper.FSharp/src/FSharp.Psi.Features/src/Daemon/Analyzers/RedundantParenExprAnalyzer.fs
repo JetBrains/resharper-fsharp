@@ -8,6 +8,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
 
+type IFSharpRedundantParenAnalyzer =
+    inherit IElementProblemAnalyzer
+
 [<ElementProblemAnalyzer(typeof<IParenExpr>, HighlightingTypes = [| typeof<RedundantParenExprWarning> |])>]
 type RedundantParenExprAnalyzer() =
     inherit ElementProblemAnalyzer<IParenExpr>()
@@ -23,3 +26,5 @@ type RedundantParenExprAnalyzer() =
 
         if innerExpr :? IParenExpr || not (needsParens context innerExpr) then
             consumer.AddHighlighting(RedundantParenExprWarning(parenExpr))
+
+    interface IFSharpRedundantParenAnalyzer
