@@ -1,22 +1,44 @@
 ﻿AllowHighPrecedenceAppParens = True
-module M
+module M =
+    let [<Literal>] S = "X"
 
-let [<Literal>] S = "X"
+[<CompiledName(M.S)>]
+let x1 = 123
+
+[<CompiledName (M.S)>]
+let x2 = 123
+
+open M
 
 [<CompiledName(S)>]
-let x = 123
+let x3 = 123
 
----------------------------------------------------------
-
-================
-AllowHighPrecedenceAppParens = False
-module M
-
-let [<Literal>] S = "X"
-
-[<CompiledName|(|(0)S|)|(1)>]
-let x = 123
-
+[<CompiledName |(|(0)S|)|(1)>]
+let x4 = 123
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant parentheses
 (1):<secondary> ReSharper Dead Code: Redundant parentheses
+
+================
+AllowHighPrecedenceAppParens = False
+module M =
+    let [<Literal>] S = "X"
+
+[<CompiledName(M.S)>]
+let x1 = 123
+
+[<CompiledName (M.S)>]
+let x2 = 123
+
+open M
+
+[<CompiledName|(|(0)S|)|(1)>]
+let x3 = 123
+
+[<CompiledName |(|(2)S|)|(3)>]
+let x4 = 123
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses

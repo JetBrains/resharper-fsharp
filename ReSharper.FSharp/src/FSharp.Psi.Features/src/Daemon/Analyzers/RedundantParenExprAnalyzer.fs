@@ -17,7 +17,7 @@ type RedundantParenExprAnalyzer() =
         let innerExpr = parenExpr.InnerExpression
 
         if isNull innerExpr then () else
-        if precedence innerExpr < 12 && data.GetData(redundantParensEnabledKey) != BooleanBoxes.True then () else
+        if precedence innerExpr < 13 && data.GetData(redundantParensEnabledKey) != BooleanBoxes.True then () else
 
         let context = parenExpr.IgnoreParentParens()
 

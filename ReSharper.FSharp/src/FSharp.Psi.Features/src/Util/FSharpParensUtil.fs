@@ -133,11 +133,12 @@ let precedence (expr: ITreeNode) =
         | _ -> 8
 
     | :? IDoLikeExpr -> 9
+    | :? INewExpr -> 10
 
     | :? IPrefixAppExpr as prefixApp ->
-        if isHighPrecedenceApp prefixApp then 11 else 10
+        if isHighPrecedenceApp prefixApp then 12 else 11
 
-    | :? IFSharpExpression -> 12
+    | :? IFSharpExpression -> 13
 
     | _ -> 0
 
@@ -146,7 +147,7 @@ let startsBlock (context: IFSharpExpression) =
     isNotNull (SetExprNavigator.GetByRightExpression(context))
 
 let getContextPrecedence (context: IFSharpExpression) =
-    if isNotNull (QualifiedExprNavigator.GetByQualifier(context)) then 11 else
+    if isNotNull (QualifiedExprNavigator.GetByQualifier(context)) then 12 else
 
     if startsBlock context then 0 else precedence context.Parent
 
@@ -288,15 +289,16 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
         checkPrecedence context expr
 
     | :? IReferenceExpr as refExpr ->
+        let qualifier = refExpr.Qualifier
         let typeArgumentList = refExpr.TypeArgumentList
 
         let attribute = AttributeNavigator.GetByExpression(context)
-        isNotNull attribute && (isNotNull attribute.Target || isNotNull typeArgumentList) ||
+        isNotNull attribute && (isNotNull attribute.Target || isNotNull typeArgumentList || isNotNull qualifier) ||
 
         isNotNull (AppExprNavigator.GetByArgument(context)) && getFirstQualifier refExpr :? IAppExpr ||
 
         // todo: tests
-        isNull typeArgumentList && isNull refExpr.Qualifier && PrettyNaming.IsOperatorName (refExpr.GetText()) ||
+        isNull typeArgumentList && isNull qualifier && PrettyNaming.IsOperatorName (refExpr.GetText()) ||
 
         checkPrecedence context expr
 

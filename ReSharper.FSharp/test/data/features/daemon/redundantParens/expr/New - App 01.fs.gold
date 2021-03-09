@@ -1,0 +1,10 @@
+﻿module M
+
+open System
+
+Console.WriteLine (new String(' ', 1))
+Console.WriteLine (new String|(|(0)(id [||])|)|(1))
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
