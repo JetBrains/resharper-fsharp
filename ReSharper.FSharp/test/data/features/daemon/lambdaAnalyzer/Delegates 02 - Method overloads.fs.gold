@@ -9,7 +9,7 @@ type A() =
 [<Extension>]
 type Extensions() =
     [<Extension>]
-    static member M2(_: int, a: Action<int>) = ()
+    static member M2(_: A, _: int, a: Action<int>) = ()
 
 let a = A()
 
