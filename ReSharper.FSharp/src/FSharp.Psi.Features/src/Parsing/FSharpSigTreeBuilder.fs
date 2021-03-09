@@ -56,7 +56,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             let patMark = x.Mark(id.idRange)
             let referenceNameMark = x.Mark()
             if IsActivePatternName id.idText then
-                x.ProcessActivePatternId(id, false)
+                x.ProcessActivePatternDecl(id, false)
             else
                 x.AdvanceToEnd(id.idRange)
 

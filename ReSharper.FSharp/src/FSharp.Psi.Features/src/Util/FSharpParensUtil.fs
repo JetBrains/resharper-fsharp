@@ -5,8 +5,8 @@ open System
 open FSharp.Compiler.Syntax
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -109,6 +109,7 @@ let operatorPrecedence (binaryApp: IBinaryAppExpr) =
 let precedence (expr: ITreeNode) =
     match expr with
     | :? ILibraryOnlyExpr
+    | :? IActivePatternExpr
     | :? ITraitCallExpr -> 0
 
     | :? ILetOrUseExpr -> 1

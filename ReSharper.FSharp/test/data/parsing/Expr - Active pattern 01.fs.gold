@@ -1,0 +1,14 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDoStatement
+      IChameleonExpression
+        IActivePatternExpr
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          FSharpTokenType+BarTokenElement(type:BAR, text:|)
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:Ident)
+          FSharpTokenType+BarTokenElement(type:BAR, text:|)
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

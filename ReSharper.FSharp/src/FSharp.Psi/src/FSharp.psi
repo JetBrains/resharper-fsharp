@@ -454,6 +454,7 @@ interface typedLikeExpr:
 
 interface qualifiedExpr:
   referenceExpr |
+  activePatternExpr |
   indexerExpr;
 
 interface ifExpr:
@@ -473,6 +474,21 @@ setExpr options { stubBase="UnitExpressionBase"; }:
   LARROW<LARROW, LArrow>
   fSharpExpression<RIGHT_EXPR, RightExpression>;
 
+activePatternExpr options { stubBase="FSharpExpressionBase"; }:
+  fSharpExpression<QUALIFIER_EXPR, Qualifier>
+  DOT<FSHARP_DELIMITER, Delimiter>
+  LPAREN
+  BAR
+  (
+    referenceExpr<CASE, CaseExpression>
+    BAR
+  )*
+  (
+    UNDERSCORE<UNDERSCORE, Underscore>
+    BAR
+  )?
+  RPAREN;
+
 interface indexerExpr:
   itemIndexerExpr |
   namedIndexerExpr;
@@ -490,6 +506,7 @@ namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
 }:
   // todo: maybe: refExpr?
   fSharpExpression<QUALIFIER_EXPR, Qualifier>
+  DOT<FSHARP_DELIMITER, Delimiter>
   indexerArg<INDEXER_ARG, IndexerArg>;
 
 indexerArgList:
