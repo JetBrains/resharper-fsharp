@@ -231,7 +231,16 @@ let rec needsParensInDeclExprContext (expr: IFSharpExpression) =
 
     | _ -> false
 
+let escapesTupleAppArg (context: IFSharpExpression) (innerExpr: IFSharpExpression) =
+    match innerExpr with
+    | :? IParenExpr as parenExpr ->
+        match parenExpr.InnerExpression with
+        | :? ITupleExpr -> isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(context))
+        | _ -> false
+    | _ -> false
+
 let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
+    if escapesTupleAppArg context expr then true else
     if expr :? IParenExpr then false else
 
     let expr = expr.IgnoreInnerParens()
@@ -241,11 +250,11 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     if isHighPrecedenceApp ParentPrefixAppExpr && isNotNull (QualifiedExprNavigator.GetByQualifier(ParentPrefixAppExpr)) then true else
 
     // todo: calc once?
-    let allowHighPrecedenceAppParens = 
+    let allowHighPrecedenceAppParens () = 
         let settingsStore = context.GetSettingsStoreWithEditorConfig()
         settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.AllowHighPrecedenceAppParens)
 
-    if isHighPrecedenceAppArg context && allowHighPrecedenceAppParens then true else
+    if isHighPrecedenceAppArg context && allowHighPrecedenceAppParens () then true else
 
     match expr with
     | :? IIfThenElseExpr ->

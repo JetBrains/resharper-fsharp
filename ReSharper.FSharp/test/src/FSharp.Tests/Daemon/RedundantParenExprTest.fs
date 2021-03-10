@@ -100,6 +100,8 @@ type RedundantParenExprTest() =
     [<Test>] member x.``Seq - Binary - Deindent 01``() = x.DoNamedTest()
     [<Test>] member x.``Seq - Fun - Deindent 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Tuple - App 01``() = x.DoNamedTest()
+
     [<Test>] member x.``When - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``When - Binary 02 - Pipe``() = x.DoNamedTest()
     [<Test>] member x.``When - If - Binary 01``() = x.DoNamedTest() // todo: parens

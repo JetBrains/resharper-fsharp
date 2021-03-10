@@ -1,0 +1,27 @@
+﻿module M
+
+T.M((1, 2))
+T.M((1, 2), 3)
+T.M(|(|(0)(1, 2)|)|(1), 3)
+
+T.M ((1, 2))
+T.M ((1, 2), 3)
+T.M (|(|(2)(1, 2)|)|(3), 3)
+
+M.f((1, 2))
+M.f((1, 2), 3)
+M.f(|(|(4)(1, 2)|)|(5), 3)
+
+M.f ((1, 2))
+M.f ((1, 2), 3)
+M.f (|(|(6)(1, 2)|)|(7), 3)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
