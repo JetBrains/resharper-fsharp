@@ -100,17 +100,19 @@ type LambdaAnalyzer() =
             if args.Count <= lambdaPos then false else
             let argDecl = args.[lambdaPos]
             let argDeclType = argDecl.Type
+
             let argIsDelegate =
                 argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
 
             if argIsDelegate then
                 let apparentEntity = m.ApparentEnclosingEntity
-                let hasOverload =
+                let mHasOverload =
                     apparentEntity.MembersFunctionsAndValues
-                    |> Seq.exists (fun x -> not (x.Equals(m)) &&
-                                            x.DisplayName = m.DisplayName &&
-                                            x.CurriedParameterGroups.[0].Count >= args.Count)
-                not hasOverload
+                    |> Seq.exists (fun x ->
+                        not (x.Equals(m)) &&
+                        x.DisplayName = m.DisplayName &&
+                        x.CurriedParameterGroups.[0].Count >= args.Count)
+                not mHasOverload
             else false
         | _ -> false
 
