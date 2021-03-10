@@ -106,11 +106,12 @@ type LambdaAnalyzer() =
 
             if argIsDelegate then
                 let apparentEntity = m.ApparentEnclosingEntity
+                let mName = m.DisplayName
                 let mHasOverload =
                     apparentEntity.MembersFunctionsAndValues
                     |> Seq.exists (fun x ->
                         not (x.Equals(m)) &&
-                        x.DisplayName = m.DisplayName &&
+                        x.DisplayName = mName &&
                         x.CurriedParameterGroups.[0].Count >= args.Count)
                 not mHasOverload
             else false
