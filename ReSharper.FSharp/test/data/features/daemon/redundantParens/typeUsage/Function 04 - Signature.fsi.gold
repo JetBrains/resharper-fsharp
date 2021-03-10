@@ -10,6 +10,10 @@ type I =
 
     member M1: int -> (int -> int) -> int
 
+val a: (int -> int)
+val b: int -> (int -> int)
+val b: int -> int -> (int -> int)
+
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant parentheses
 (1):<secondary> ReSharper Dead Code: Redundant parentheses
