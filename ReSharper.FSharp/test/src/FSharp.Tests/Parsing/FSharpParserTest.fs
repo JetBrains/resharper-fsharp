@@ -74,6 +74,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Record 04 - Attribute``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Struct 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Struct 02 - Fields``() = x.DoNamedTest()
 
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()

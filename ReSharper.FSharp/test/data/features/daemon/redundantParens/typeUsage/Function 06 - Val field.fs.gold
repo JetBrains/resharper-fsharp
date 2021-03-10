@@ -1,0 +1,24 @@
+﻿module Module
+
+type S =
+    struct
+        val a: (int -> int)
+        val b: int -> (int -> int)
+        val c: int -> int -> (int -> int)
+
+        val d: |(|(0)(int -> int)|)|(1)
+        val e: int -> |(|(2)(int -> int)|)|(3)
+        val f: int -> int -> |(|(4)(int -> int)|)|(5)
+
+        val g: (int -> |(|(6)int -> int|)|(7))
+    end
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses

@@ -54,7 +54,10 @@ module RedundantParenTypeUsageAnalyzer =
             isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(context)) ||
             isNotNull (CaseFieldDeclarationNavigator.GetByType(context)) ||
             isNotNull (IsInstPatNavigator.GetByType(ignoreParentCompoundTypes context)) ||
-            isNotNull (ReturnTypeInfoNavigator.GetByReturnType(getLongestReturnFromReturn context))
+
+            let longestReturn = getLongestReturnFromReturn context
+            isNotNull (ReturnTypeInfoNavigator.GetByReturnType(longestReturn)) ||
+            isNotNull (ValFieldDeclarationNavigator.GetByType(longestReturn))
 
         | :? IArrayTypeUsage ->
             isNotNull (IsInstPatNavigator.GetByType(ignoreParentCompoundTypes context))
