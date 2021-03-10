@@ -9,3 +9,7 @@ type I =
     member P2: (int -> (int -> int))
 
     member M1: int -> (int -> int) -> int
+
+val a: (int -> int)
+val b: int -> (int -> int)
+val b: int -> int -> (int -> int)
