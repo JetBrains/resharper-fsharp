@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       new ReferenceCollection(Reference);
 
     public IList<IArgument> ParameterArguments => myParameterArguments.GetValue(this,
-      () => FSharpArgumentsOwnerUtil.CalculateParameterArguments(this, new[] {ArgumentExpression}));
+      () => this.CalculateParameterArguments(new[] {ArgumentExpression}));
 
     public IList<IArgument> Arguments => ParameterArguments.WhereNotNull().ToList();
   }
