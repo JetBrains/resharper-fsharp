@@ -51,6 +51,7 @@
     <Compile Include="src\Shim\TypeProviders\TcImportsHack.fs" />
     <Compile Include="src\Shim\TypeProviders\TypeProvidersManager.fs" />
     <Compile Include="src\Shim\TypeProviders\ExtensionTypingProviderShim.fs" />
+    <Compile Include="src\Shim\TypeProviders\ZoneMarker.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
   </ItemGroup>
 
