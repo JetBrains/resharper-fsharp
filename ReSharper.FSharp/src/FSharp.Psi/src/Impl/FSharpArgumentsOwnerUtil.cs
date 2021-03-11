@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
   public static class FSharpArgumentsOwnerUtil
   {
-    public static IList<IArgument> CalculateParameterArguments(IFSharpReferenceOwner referenceOwner,
+    public static IList<IArgument> CalculateParameterArguments(this IFSharpReferenceOwner referenceOwner,
       IEnumerable<IFSharpExpression> appliedExpressions)
     {
       if (!(referenceOwner.Reference.GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
