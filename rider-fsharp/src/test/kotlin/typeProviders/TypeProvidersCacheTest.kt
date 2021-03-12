@@ -52,7 +52,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
             withOpenedEditor(project, sourceFile) {
                 waitForDaemon()
 
-                testDirectory.delete().shouldBeTrue()
+                testDirectory.deleteRecursively().shouldBeTrue()
                 typeWithLatency("//")
                 waitForDaemon()
 
