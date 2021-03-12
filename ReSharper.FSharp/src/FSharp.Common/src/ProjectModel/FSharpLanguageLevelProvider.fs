@@ -50,9 +50,6 @@ type FSharpLanguageLevelProjectProperty
 
     let getFSharpProjectConfiguration (project: IProject) targetFrameworkId =
         project.ProjectProperties.TryGetConfiguration<IFSharpProjectConfiguration>(targetFrameworkId)
-    
-    let (|Version|) (version: Version) =
-        version.Major, version.Minor
 
     let getLanguageLevelByToolsetVersion () =
         match solutionToolset.GetBuildTool() with
@@ -71,9 +68,9 @@ type FSharpLanguageLevelProjectProperty
     
     // todo: more versions
     let getLanguageLevelByCompilerVersion (fscVersion: Version): VersionMapping =
-        match fscVersion with
-        | Version (10, 1000) -> VersionMapping(FSharpLanguageLevel.FSharp47, FSharpLanguageLevel.FSharp50)
-        | Version (11, 0) -> VersionMapping(FSharpLanguageLevel.FSharp50, FSharpLanguageLevel.Preview)
+        match fscVersion.Major, fscVersion.Minor with
+        | 10, 1000 -> VersionMapping(FSharpLanguageLevel.FSharp47, FSharpLanguageLevel.FSharp50)
+        | 11, 0 -> VersionMapping(FSharpLanguageLevel.FSharp50, FSharpLanguageLevel.Preview)
         | _ -> null
 
     let getCompilerVersion (fscPath: FileSystemPath) =
@@ -140,7 +137,8 @@ type FSharpLanguageLevelProjectProperty
         | null -> getLanguageLevelByToolsetVersion ()
         | configuration -> convertToLanguageLevel configuration languageVersion
 
-    override this.ConvertToLanguageVersion(languageLevel) = FSharpLanguageLevel.toLanguageVersion languageLevel
+    override this.ConvertToLanguageVersion(languageLevel) =
+        FSharpLanguageLevel.toLanguageVersion languageLevel
 
     override this.GetOverriddenLanguageLevelFromSettings _ = Nullable()
 

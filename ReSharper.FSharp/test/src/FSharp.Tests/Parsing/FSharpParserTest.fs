@@ -65,6 +65,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Union 05 - Case attributes``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 06 - Fields``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Record - Field - Attributes 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - Field - Mutable 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - Field - Mutable 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Record 01 - Single line``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record 02 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record 03 - Multiline, semicolons``() = x.DoNamedTest()
@@ -288,6 +292,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Interpolated string 04 - Braces``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string 05 - Multiple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string 06 - Multiple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Nameof - Generic 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Nameof - Match 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Nameof 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Binding - Return type 01``() = x.DoNamedTest()
     [<Test>] member x.``Binding - Return type 02 - Attrs``() = x.DoNamedTest()

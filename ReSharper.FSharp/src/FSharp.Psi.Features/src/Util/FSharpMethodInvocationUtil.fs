@@ -2,8 +2,8 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocati
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 
@@ -15,6 +15,7 @@ let tryGetNamedArgRefExpr (expr: IFSharpExpression) =
     binaryAppExpr.LeftArgument.As<IReferenceExpr>()
 
 
+// todo: properties on return types
 let isNamedArgReference (expr: IFSharpExpression) =
     let refExpr = tryGetNamedArgRefExpr expr
     if isNull refExpr then false else
@@ -30,13 +31,9 @@ let tryGetNamedArg (expr: IFSharpExpression) =
     | null -> null
     | refExpr -> refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
 
-let getArgsOwner (expr: IFSharpExpression) =
-    let tupleExpr = TupleExprNavigator.GetByExpression(expr.IgnoreParentParens())
-    let exprContext = if isNull tupleExpr then expr else tupleExpr :> _
-    FSharpArgumentOwnerNavigator.GetByArgumentExpression(exprContext.IgnoreParentParens())
 
 let getMatchingParameter (expr: IFSharpExpression) =
-    let argsOwner = getArgsOwner(expr)
+    let argsOwner = expr.GetArgumentsOwner()
     if isNull argsOwner then null else
 
     let namedArgRefExpr = tryGetNamedArgRefExpr expr

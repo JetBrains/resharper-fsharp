@@ -21,6 +21,7 @@ type IntroduceVarTest() =
     [<Test>] member x.``Let 04 - After other``() = x.DoNamedTest()
     [<Test>] member x.``Let 05 - Nested indent``() = x.DoNamedTest()
 
+    [<Test>] member x.``Match - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Match 02 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Match 03 - Multiline``() = x.DoNamedTest()

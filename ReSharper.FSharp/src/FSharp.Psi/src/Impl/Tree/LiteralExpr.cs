@@ -119,6 +119,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           }
         }
 
+        if (literal is FSharpString fsString)
+          return fsString.ConstantValue;
+
         return ConstantValue.BAD_VALUE;
       }
     }

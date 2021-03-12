@@ -65,6 +65,14 @@
         <Title>Lambda expression can be replaced with built-in function</Title>
         <Description>Lambda expression can be replaced with built-in function.</Description>
       </Tag>
+      <Tag name="FSharpUseNameofExpression" default="SUGGESTION">
+        <Title>Use 'nameof' expression to reference name</Title>
+        <Description>Replace string literal with statically typed 'nameof' expression.</Description>
+      </Tag>
+      <Tag name="FSharpRedundantYields" default="WARNING">
+        <Title>Redundant `yield` keywords`</Title>
+        <Description>'yield' keywords are redundant and can be safely removed.</Description>
+      </Tag>
       <Tag name="FSharpUseWildSelfId" default="SUGGESTION">
         <Title>Use `_` self id</Title>
         <Description>Use `_` self id.</Description>
@@ -137,7 +145,7 @@
     <QuickFix>ConvertToUseFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" isSuppressedInTests="true">
+  <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" configurableSeverity="FSharpRedundantParens">
     <Parameter type="IParenExpr" name="parenExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
@@ -146,7 +154,7 @@
     <QuickFix>RemoveRedundantParenExprFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantParenPat" isSuppressedInTests="true">
+  <Warning staticGroup="FSharpErrors" name="RedundantParenPat" configurableSeverity="FSharpRedundantParens"> 
     <Parameter type="IParenPat" name="parenPat"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
@@ -251,6 +259,26 @@
     <Message value="Use '_'"/>
     <Range>selfId.GetDocumentRange()</Range>
     <QuickFix>UseWildSelfIdFix</QuickFix>
+  </Warning>
+
+  <Warning name="UseNameofExpression" configurableSeverity="FSharpUseNameofExpression">
+    <Parameter type="ILiteralExpr" name="literalExpr" />
+    <Parameter type="IReference" name="reference" />
+    <Message value="Use 'nameof' expression to reference '{0}' name">
+      <Argument>reference.GetName()</Argument>
+    </Message>
+    <Range>reference.GetDocumentRange()</Range>
+    <QuickFix>UseNameofExpressionFix</QuickFix>
+  </Warning>
+
+  <Warning name="RedundantYields" configurableSeverity="FSharpRedundantYields">
+    <Parameter type="ILiteralExpr" name="literalExpr" />
+    <Parameter type="IReference" name="reference" />
+    <Message value="Use 'nameof' expression to reference '{0}' name">
+      <Argument>reference.GetName()</Argument>
+    </Message>
+    <Range>reference.GetDocumentRange()</Range>
+    <!--    <QuickFix>UseNameofExpressionFix</QuickFix>-->
   </Warning>
 
 </Errors>

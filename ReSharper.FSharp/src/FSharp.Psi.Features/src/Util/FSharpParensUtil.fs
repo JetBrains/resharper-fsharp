@@ -118,7 +118,7 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     if isTopLevelContextExpr context then false else
 
     let appExpr = PrefixAppExprNavigator.GetByExpression(context)
-    if isHighPrecedenceApp appExpr && isHighPrecedenceAppRequired appExpr then true else
+    if isHighPrecedenceApp appExpr (*&& isHighPrecedenceAppRequired appExpr*) then true else
 
     match expr with
     | :? IReferenceExpr as refExpr when
@@ -152,7 +152,8 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
         false
 
     | :? IAppExpr | :? ITypedLikeExpr | :? IDoLikeExpr when
-            isNotNull (ConditionOwnerExprNavigator.GetByExpr(context)) ->
+            isNotNull (ConditionOwnerExprNavigator.GetByExpr(context)) ||
+            isNotNull (TupleExprNavigator.GetByExpression(context)) ->
         false
 
     | _ ->

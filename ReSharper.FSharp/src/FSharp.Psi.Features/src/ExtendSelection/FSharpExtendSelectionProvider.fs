@@ -226,6 +226,7 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
             else tokenText, left
 
         let text, start =
+            // todo: move somewhere
             let tokenType = token.GetTokenType()
             if tokenType.IsStringLiteral then
                 // todo: trim end if it actually ends with proper symbols?

@@ -51,6 +51,7 @@ module FSharpErrors =
     let [<Literal>] NoImplementationGiven = 365
     let [<Literal>] NoImplementationGivenWithSuggestion = 366
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
+    let [<Literal>] OnlyClassCanTakeValueArguments = 552
     let [<Literal>] LetAndForNonRecBindings = 576
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] ExpectedExpressionAfterLet = 588

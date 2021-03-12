@@ -85,6 +85,7 @@
     <Compile Include="src\Daemon\Analyzers\ListConsPatAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\AppExpressionAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\LambdaAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\UseNameofExpressionAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\SelfIdAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
@@ -197,6 +198,7 @@
     <Compile Include="src\QuickFixes\GenerateMissingOverridesFix.fs" />
     <Compile Include="src\QuickFixes\RemoveRedundantAttributeFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithAbbreviatedTypeFix.fs" />
+    <Compile Include="src\QuickFixes\UseNameofExpressionFix.fs" />
     <Compile Include="src\QuickFixes\UseWildSelfIdFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />

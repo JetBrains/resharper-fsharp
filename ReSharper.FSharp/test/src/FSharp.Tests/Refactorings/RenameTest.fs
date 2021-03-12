@@ -146,6 +146,8 @@ type FSharpRenameTest() =
     [<Test>] member x.``Active patterns - Unavailable``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Should start with upper case``() = x.DoNamedTest()
 
+//    [<Test; FSharpSignatureTest>] member x.``Active patterns - Signature 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Extensions - Optional - Instance 01``() = x.DoNamedTest()
     [<Test>] member x.``Extensions - Optional - Instance 02``() = x.DoNamedTest()
     [<Test>] member x.``Extensions - Optional - Instance 03 - Overloads 01``() = x.DoNamedTest()

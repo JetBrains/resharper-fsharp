@@ -6,13 +6,12 @@ open System
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
@@ -88,7 +87,7 @@ type LambdaAnalyzer() =
     let isImplicitlyConvertedToDelegate (lambda: ILambdaExpr) =
         let lambda = lambda.IgnoreParentParens()
         let appTuple = TupleExprNavigator.GetByExpression(lambda)
-        let app = getArgsOwner lambda
+        let app = lambda.GetArgumentsOwner()
 
         app :? IPrefixAppExpr && isNotNull app.Reference &&
         match app.Reference.GetFSharpSymbol() with

@@ -145,7 +145,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       if (symbol is FSharpField field)
       {
-        if (field.IsAnonRecordField)
+        if (field.IsAnonRecordField && referenceExpression != null)
           return new FSharpAnonRecordFieldProperty(referenceExpression.Reference);
 
         if (field.IsUnionCaseField && field.DeclaringUnionCase?.Value is { } fieldUnionCase)
@@ -312,8 +312,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         member.XMLDocId == mfvXmlDocId);
     }
 
-    private static IDeclaredElement GetLocalValueDeclaredElement(FSharpMemberOrFunctionOrValue mfv,
-      IFSharpReferenceOwner referenceExpression)
+    [CanBeNull]
+    public static IDeclaredElement GetLocalValueDeclaredElement([NotNull] this FSharpMemberOrFunctionOrValue mfv,
+      [CanBeNull] ITreeNode referenceExpression)
     {
       var declaration = FindNode<IFSharpDeclaration>(mfv.DeclarationLocation, referenceExpression);
       if (declaration is IFSharpLocalDeclaration localDeclaration)
