@@ -264,6 +264,17 @@
     <QuickFix>ToAbstractFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="NoImplementationGivenObjectExpression">
+    <Parameter type="IObjExpr" name="objExpr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>objExpr.GetNameDocumentRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateMissingOverridesFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="NoImplementationGivenInterface">
     <Parameter type="IInterfaceImplementation" name="impl"/>
     <Parameter type="string" name="fcsMessage"/>

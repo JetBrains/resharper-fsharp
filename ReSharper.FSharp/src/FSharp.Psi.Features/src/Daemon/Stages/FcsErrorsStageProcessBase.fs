@@ -192,6 +192,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | NoImplementationGiven
         | NoImplementationGivenWithSuggestion ->
             let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+            match box node with
+            | :? IObjExpr as objExpr ->
+                NoImplementationGivenObjectExpressionError(objExpr, error.Message) :> _
+
+            | _ ->
+            
             match node.Parent with
             | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == node ->
                 NoImplementationGivenTypeError(typeDecl, error.Message) :> _

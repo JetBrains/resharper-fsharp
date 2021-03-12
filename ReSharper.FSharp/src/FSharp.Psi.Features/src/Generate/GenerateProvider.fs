@@ -19,19 +19,29 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
+type GeneratorContextDeclaration =
+    | TypeDeclaration of decl: IFSharpTypeDeclaration
+    | ObjectExpresion of expr: IObjExpr
+    
+    member x.Declaration: IFSharpTypeElementDeclaration =
+        match x with
+        | TypeDeclaration decl -> decl :> _
+        | ObjectExpresion expr -> expr :> _
+
+
 [<AllowNullLiteral>]
-type FSharpGeneratorContext(kind, typeDecl: IFSharpTypeDeclaration) =
+type FSharpGeneratorContext(kind, decl: GeneratorContextDeclaration) =
     inherit GeneratorContextBase(kind)
 
-    member x.TypeDeclaration = typeDecl
+    member x.TypeDeclaration = decl.Declaration
 
     override x.Language = FSharpLanguage.Instance :> _
 
-    override x.Root = typeDecl :> _
+    override x.Root = x.TypeDeclaration :> _
     override val Anchor = null with get, set // todo
 
-    override x.PsiModule = typeDecl.GetPsiModule()
-    override x.Project = typeDecl.GetProject()
+    override x.PsiModule = x.TypeDeclaration.GetPsiModule()
+    override x.Project = x.TypeDeclaration.GetProject()
 
     override x.GetSelectionTreeRange() = TreeTextRange.InvalidRange // todo
 
@@ -44,7 +54,7 @@ type FSharpGeneratorContext(kind, typeDecl: IFSharpTypeDeclaration) =
         let typeDeclaration = treeNode.As<IFSharpTypeDeclaration>()
         if isNull typeDeclaration || isNull typeDeclaration.DeclaredElement then null else
 
-        FSharpGeneratorContext(kind, typeDeclaration)
+        FSharpGeneratorContext(kind, TypeDeclaration(typeDeclaration))
 
 
 and FSharpGeneratorWorkflowPointer(context: FSharpGeneratorContext) =

@@ -63,3 +63,5 @@ type GenerateMissingMembersFixTest() =
     [<Test>] member x.``Same name 01``() = x.DoNamedTest()
     [<Test>] member x.``Same name 02``() = x.DoNamedTest()
     [<Test>] member x.``Super 01 - Different type parameter name``() = x.DoNamedTest()
+
+//    [<Test>] member x.``Expr - Object expr 01``() = x.DoNamedTest()

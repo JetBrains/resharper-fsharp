@@ -101,6 +101,10 @@ type FSharpImportTypeHelper() =
         member x.ReferenceTargetCanBeType _ = true
         member x.ReferenceTargetIsUnlikelyBeType _ = false
 
+//        member this.CreateSymbolScope(context) =
+//            let symbolCache = context.GetPsiServices().Symbols
+//            symbolCache.GetAlternativeNameSymbolScope(context.GetPsiModule())
+
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpQuickFixUtilComponent() =
