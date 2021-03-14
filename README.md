@@ -1,8 +1,8 @@
 # F# language support in JetBrains Rider
 
 [![JetBrains official project](https://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
-[![Join the chat at https://gitter.im/JetBrains/fsharp-support](https://badges.gitter.im/JetBrains/fsharp-support.svg)](https://gitter.im/JetBrains/fsharp-support?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-![build-test](https://github.com/JetBrains/fsharp-support/workflows/build-test/badge.svg)
+[![Join the chat at https://gitter.im/JetBrains/resharper-fsharp](https://badges.gitter.im/JetBrains/resharper-fsharp.svg)](https://gitter.im/JetBrains/resharper-fsharp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![build-test](https://github.com/JetBrains/resharper-fsharp/workflows/build-test/badge.svg)
 
 F# support in Rider is implemented as a plugin made of two major components: 
 * ReSharper.Host plugin (referred to as the *backend*) that adds F# support to ReSharper and is implemented in ReSharper.FSharp solution. ReSharper.Host is a modification of ReSharper used as a language service that the IntelliJ Platform interacts with. The backend is written in F# and C#.
@@ -85,7 +85,7 @@ Gradle downloads a newer SDK from time to time. To force an update, run the `pre
 
 To debug the backend, attach debugger to the ReSharper.Host process launched via the `runIde` Gradle task. To debug the frontend, start the `runIde` task in Debug mode.
 
-Rider's JVM-based frontend and .NET-based backend communicate using RdProtocol with APIs available on both sides. For backend-frontend communication in plugins, RdProtocol should be used as well. Protocol model is defined in [this file](https://github.com/JetBrains/fsharp-support/blob/master/rider-fsharp/protocol/src/kotlin/model/RdFSharpModel.kt).
+Rider's JVM-based frontend and .NET-based backend communicate using RdProtocol with APIs available on both sides. For backend-frontend communication in plugins, RdProtocol should be used as well. Protocol model is defined in [this file](https://github.com/JetBrains/resharper-fsharp/blob/net211/rider-fsharp/protocol/src/kotlin/model/RdFSharpModel.kt).
 
 Running backend tests is not yet possible on macOS and Linux.
 
