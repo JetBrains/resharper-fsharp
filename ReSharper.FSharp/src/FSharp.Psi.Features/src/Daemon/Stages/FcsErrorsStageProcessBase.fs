@@ -181,7 +181,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             UnresolvedHighlighting(error.Message, range) :> _
 
         | ErrorFromAddingConstraint ->
-            createHighlightingFromNodeWithMessage ErrorFromAddingConstraintError range error
+            createHighlightingFromNodeWithMessage AddingConstraintError range error
 
         | UpcastUnnecessary ->
             createHighlightingFromNode UpcastUnnecessaryWarning range

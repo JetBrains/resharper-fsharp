@@ -350,7 +350,7 @@
     <QuickFix>SpecifyParameterTypeFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="ErrorFromAddingConstraint">
+  <Error staticGroup="FSharpErrors" name="AddingConstraint">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -358,7 +358,7 @@
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>ReplaceWithInequalityOperatorFix</QuickFix>
+    <QuickFix>ReplaceWithPredefinedOperatorFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="OnlyClassCanTakeValueArguments">
