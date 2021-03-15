@@ -21,7 +21,6 @@
     <Compile Include="src\Util\FSharpModulesUtil.fs" />
     <Compile Include="src\Util\FSharpNamingService.fs" />
     <Compile Include="src\Util\FSharpLambdaUtil.fs" />
-    <Compile Include="src\Util\FcsTaggedText.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
