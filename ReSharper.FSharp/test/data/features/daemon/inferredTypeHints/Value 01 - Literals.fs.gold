@@ -1,0 +1,34 @@
+﻿HideTypeNameHintsForImplicitlyTypedVariablesWhenTypeIsEvident = True
+let run () =
+    let x = 15
+    let y||(0) = failwith ""
+    let z = [1;2;3]
+    let u = [|1;2;3|]
+    let ts = 1, "hi", 10.
+    let disp = { new System.IDisposable with override __.Dispose () = () }
+    let dispB = disp :> obj
+    y + ""
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : string
+
+================
+HideTypeNameHintsForImplicitlyTypedVariablesWhenTypeIsEvident = False
+let run () =
+    let x||(0) = 15
+    let y||(1) = failwith ""
+    let z||(2) = [1;2;3]
+    let u||(3) = [|1;2;3|]
+    let ts||(4) = 1, "hi", 10.
+    let disp||(5) = { new System.IDisposable with override __.Dispose () = () }
+    let dispB||(6) = disp :> obj
+    y + ""
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : string
+(2): ReSharper Parameter Name Hint: : int list
+(3): ReSharper Parameter Name Hint: : int []
+(4): ReSharper Parameter Name Hint: : int * string * float
+(5): ReSharper Parameter Name Hint: : IDisposable
+(6): ReSharper Parameter Name Hint: : obj

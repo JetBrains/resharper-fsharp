@@ -1,0 +1,6 @@
+﻿type MySingleCaseDu = MySingleCaseDu of int
+let addFive (MySingleCaseDu value||(0)) =
+    value + 5
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int

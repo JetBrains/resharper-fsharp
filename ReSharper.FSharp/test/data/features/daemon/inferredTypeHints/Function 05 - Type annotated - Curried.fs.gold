@@ -1,0 +1,19 @@
+﻿ShowTypeNameHintsForImplicitlyTypedVariables = True
+let subtract x||(0) (y : int) =
+    x - y
+
+let l = fun x||(1) (y: int) -> x - y
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : int
+
+================
+ShowTypeNameHintsForImplicitlyTypedVariables = False
+let subtract x (y : int) =
+    x - y
+
+let l = fun x||(0) (y: int) -> x - y
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int

@@ -1,0 +1,6 @@
+﻿let run () =
+    let (Some x||(0)) = failwith ""
+    x + 15
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int

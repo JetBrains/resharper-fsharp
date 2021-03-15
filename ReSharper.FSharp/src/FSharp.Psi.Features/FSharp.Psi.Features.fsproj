@@ -62,6 +62,7 @@
     <Compile Include="src\Daemon\Stages\FSharpVcsCodeVisionRangesProviderStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpErrorsStage.fs" />
     <Compile Include="src\Daemon\Stages\PipeChainTypeHintStage.fs" />
+    <Compile Include="src\Daemon\Stages\InferredTypeHintStage.fs" />
     <Compile Include="src\Daemon\Stages\InferredTypeCodeVisionProvider.fs" />
     <Compile Include="src\Daemon\Stages\FSharpSyntaxHighlightingStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />

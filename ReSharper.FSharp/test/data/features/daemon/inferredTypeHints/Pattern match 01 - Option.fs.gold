@@ -1,0 +1,19 @@
+﻿ShowTypeNameHintsForPatternMatchingExpressions = True
+let sayHello nameOpt||(0) =
+    match nameOpt with
+    | None -> "Hi there"
+    | Some name||(1) -> "Hi, " + name
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : string option
+(1): ReSharper Parameter Name Hint: : string
+
+================
+ShowTypeNameHintsForPatternMatchingExpressions = False
+let sayHello nameOpt||(0) =
+    match nameOpt with
+    | None -> "Hi there"
+    | Some name -> "Hi, " + name
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : string option

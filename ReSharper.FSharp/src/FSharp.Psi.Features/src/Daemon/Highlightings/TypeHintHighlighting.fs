@@ -9,13 +9,8 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.TextControl.DocumentMarkup
 open JetBrains.UI.RichText
 
-[<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
-[<StaticSeverityHighlighting(Severity.INFO,
-     typeof<HighlightingGroupIds.IntraTextAdornments>,
-     AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
-     OverlapResolve = OverlapResolveKind.NONE,
-     ShowToolTipInStatusBar = false)>]
-type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
+[<AbstractClass>]
+type TypeHintHighlightingBase(typeNameString: string, range: DocumentRange, mode) =
     let text = RichText(": " + typeNameString)
 
     interface IHighlighting with
@@ -28,18 +23,19 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
         member x.TestOutput = text.Text
 
     member x.Text = text
+    member x.Mode = mode
     member x.IsValid() = not text.IsEmpty && not range.IsEmpty
 
 and [<SolutionComponent>] TypeHintAdornmentProvider() =
     interface IHighlighterIntraTextAdornmentProvider with
         member x.IsValid(highlighter) =
             match highlighter.UserData with
-            | :? TypeHintHighlighting as dm -> dm.IsValid()
+            | :? TypeHintHighlightingBase as dm -> dm.IsValid()
             | _ -> false
     
         member x.CreateDataModel(highlighter) =
             match highlighter.UserData with
-            | :? TypeHintHighlighting as thh ->
+            | :? TypeHintHighlightingBase as thh ->
                 { new IIntraTextAdornmentDataModel with
                     override x.Text = thh.Text
                     override x.HasContextMenu = false
@@ -51,6 +47,26 @@ and [<SolutionComponent>] TypeHintAdornmentProvider() =
                     override x.IconId = null
                     override x.IsPreceding = false
                     override x.Order = 0
-                    override x.InlayHintsMode = InlayHintsMode.Default
+                    override x.InlayHintsMode = thh.Mode
                 }
             | _ -> null
+
+
+[<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
+[<StaticSeverityHighlighting(Severity.INFO,
+     typeof<HighlightingGroupIds.IntraTextAdornments>,
+     AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
+     OverlapResolve = OverlapResolveKind.NONE,
+     ShowToolTipInStatusBar = false)>]
+type TypeHintHighlighting(typeNameString: string, range: DocumentRange, mode) =
+    inherit TypeHintHighlightingBase(typeNameString, range, mode)
+
+
+[<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
+[<StaticSeverityHighlighting(Severity.INFO,
+     typeof<HighlightingGroupIds.IntraTextAdornments>,
+     AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
+     OverlapResolve = OverlapResolveKind.NONE,
+     ShowToolTipInStatusBar = false)>]
+type PipeTypeHintHighlighting(typeNameString: string, range: DocumentRange) =
+    inherit TypeHintHighlightingBase(typeNameString, range, InlayHintsMode.Default)

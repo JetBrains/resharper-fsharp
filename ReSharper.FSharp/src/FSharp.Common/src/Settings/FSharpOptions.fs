@@ -152,7 +152,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         this.AddBoolOption((fun key -> key.FsiInteractiveEditor), RichText(FSharpExperimentalFeatures.fsiInteractiveEditor)) |> ignore
 
         this.AddHeader("Type hints")
-        let showPipeReturnTypes = this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null)
+        this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null) |> ignore
         do
             use _x = this.Indent()
             [
@@ -161,7 +161,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
             |> Seq.iter (fun checkbox ->
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), id)
             )
-        
+
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.EnableReactorMonitor), RichText(enableFcsReactorMonitor), null) |> ignore
         this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore

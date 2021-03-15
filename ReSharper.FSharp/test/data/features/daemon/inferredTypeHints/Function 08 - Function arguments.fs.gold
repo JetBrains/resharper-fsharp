@@ -1,0 +1,7 @@
+﻿let call f x||(0) =
+    let y||(1) = f (12, (15, [1; 2; 3])) * 15.
+    x f
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : (int * (int * int list) -> float) -> 'a
+(1): ReSharper Parameter Name Hint: : float

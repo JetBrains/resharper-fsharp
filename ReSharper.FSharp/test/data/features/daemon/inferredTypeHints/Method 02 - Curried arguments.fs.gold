@@ -1,0 +1,24 @@
+﻿ShowTypeNameHintsForLambdaExpressionParameters = True
+type C () =
+    member __.Add x||(0) y||(1) =
+        x + y
+
+    member __.LambdaProp = fun x||(2) y||(3) -> x + y
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : int
+(2): ReSharper Parameter Name Hint: : int
+(3): ReSharper Parameter Name Hint: : int
+
+================
+ShowTypeNameHintsForLambdaExpressionParameters = False
+type C () =
+    member __.Add x||(0) y||(1) =
+        x + y
+
+    member __.LambdaProp = fun x y -> x + y
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : int

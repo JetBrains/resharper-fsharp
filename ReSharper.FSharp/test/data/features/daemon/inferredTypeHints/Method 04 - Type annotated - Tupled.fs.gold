@@ -1,0 +1,21 @@
+﻿ShowTypeNameHintsForImplicitlyTypedVariables = True
+type C () =
+    member __.Subtract (x: int, y||(0)) =
+        x - y
+
+    member __.LambdaProp = fun (x: int, y||(1)) -> x - y
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : int
+
+================
+ShowTypeNameHintsForImplicitlyTypedVariables = False
+type C () =
+    member __.Subtract (x: int, y) =
+        x - y
+
+    member __.LambdaProp = fun (x: int, y||(0)) -> x - y
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
