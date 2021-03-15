@@ -126,7 +126,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         | decl ->
             failwithf "unexpected decl: %A" decl
 
-    member x.ProcessTypeDefn(SynTypeDefn(info, repr, members, _, range) as typeDefn, typeKeywordType) =
+    member x.ProcessTypeDefn(SynTypeDefn(info, repr, members, implicitCtor, range) as typeDefn, typeKeywordType) =
         let (SynComponentInfo(attrs, typeParams, constraints, lid , _, _, _, _)) = info
 
         match repr with
@@ -137,9 +137,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         let mark = x.StartType(attrs, typeParams, constraints, lid, range, typeKeywordType)
 
         // Mark primary constructor before type representation.
-        match repr with
-        | SynTypeDefnRepr.ObjectModel(_, (SynMemberDefn.ImplicitCtor _ as ctor :: _), _) ->
-            x.ProcessPrimaryConstructor(ctor)
+        match implicitCtor with
+        | Some ctor -> x.ProcessPrimaryConstructor(ctor)
         | _ -> ()
 
         match repr with

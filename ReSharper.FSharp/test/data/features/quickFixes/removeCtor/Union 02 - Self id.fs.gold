@@ -1,0 +1,2 @@
+﻿type U{caret} =
+    | A
