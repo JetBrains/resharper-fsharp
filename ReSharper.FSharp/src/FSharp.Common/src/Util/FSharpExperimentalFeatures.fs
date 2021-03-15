@@ -25,7 +25,6 @@ module FSharpExperimentalFeatures =
             member this.Dispose() =
                 cookies.Pop() |> ignore
 
-    type EnableInlineVarRefactoringCookie() = inherit EnableFeatureCookieBase<EnableInlineVarRefactoringCookie>()
     type EnableRedundantParenAnalysisCookie() = inherit EnableFeatureCookieBase<EnableRedundantParenAnalysisCookie>()
     type EnableFormatterCookie() = inherit EnableFeatureCookieBase<EnableFormatterCookie>()
 
@@ -40,13 +39,6 @@ type ProtocolSolutionExtensions =
 
 [<AbstractClass; Sealed; Extension>]
 type FSharpExperimentalFeaturesEx =
-    [<Extension>]
-    static member FSharpInlineVarRefactoringEnabled(solution: ISolution) =
-        if FSharpExperimentalFeatures.EnableInlineVarRefactoringCookie.Enabled then true else
-
-        let settingsProvider = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
-        settingsProvider.EnableInlineVarRefactoring.Value
-
     [<Extension>]
     static member FSharpPostfixTemplatesEnabled(solution: ISolution) =
         let settingsProvider = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
