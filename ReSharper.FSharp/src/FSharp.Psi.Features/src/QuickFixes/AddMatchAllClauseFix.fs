@@ -42,7 +42,7 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
                     let lineEnding = expr.GetLineEnding()
 
                     let lastClause = expr.Clauses.Last()
-                    if not (lastClause.IsSingleLine) && isAfterEmptyLine lastClause then
+                    if not lastClause.IsSingleLine && isAfterEmptyLine lastClause then
                         NewLine(lineEnding)
 
                     NewLine(lineEnding)

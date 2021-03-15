@@ -32,12 +32,12 @@ type FSharpMatchingBraceContextHighlighter() =
     override x.TryHighlightToLeft(consumer, selectedToken, _) =
         if x.IsRightBracket(selectedToken.GetTokenType()) then
             let selectedRange = selectedToken.GetDocumentRange()
-            highlight (x.FindMatchingLeftBracket(selectedToken)) consumer (selectedRange) (fun (a, b) -> b, a)
+            highlight (x.FindMatchingLeftBracket(selectedToken)) consumer selectedRange (fun (a, b) -> b, a)
 
     override x.TryHighlightToRight(consumer, selectedToken, _) =
         if x.IsLeftBracket(selectedToken.GetTokenType()) then
             let selectedRange = selectedToken.GetDocumentRange()
-            highlight (x.FindMatchingRightBracket(selectedToken)) consumer (selectedRange) id
+            highlight (x.FindMatchingRightBracket(selectedToken)) consumer selectedRange id
 
     override x.Match(token1, token2) =
         if token1 == FSharpTokenType.LPAREN then token2 == FSharpTokenType.RPAREN else

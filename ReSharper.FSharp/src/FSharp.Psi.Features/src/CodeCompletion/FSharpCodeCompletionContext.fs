@@ -89,7 +89,7 @@ type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
                 fsFile.ParseTree |> Option.bind (fun parseTree ->
                     ParsedInput.TryGetCompletionContext(fcsPos, parseTree, lineText))
 
-            { PartialName = QuickParse.GetPartialLongNameEx(lineText, (int) coords.Column - 1)
+            { PartialName = QuickParse.GetPartialLongNameEx(lineText, int coords.Column - 1)
               CompletionContext = fcsCompletionContext
               Coords = coords
               LineText = lineText

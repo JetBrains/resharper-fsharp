@@ -305,7 +305,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         setBindingExpression sourceExpr contextIndent letBindings
 
         let replacedUsages, sourceExpr =
-            data.Usages |> Seq.fold (fun ((replacedUsages, sourceExpr: IFSharpExpression) as acc) usage ->
+            data.Usages |> Seq.fold (fun (replacedUsages, sourceExpr: IFSharpExpression as acc) usage ->
                 let usage = usage.As<IFSharpExpression>()
                 if not (isValid usage) then acc else
 

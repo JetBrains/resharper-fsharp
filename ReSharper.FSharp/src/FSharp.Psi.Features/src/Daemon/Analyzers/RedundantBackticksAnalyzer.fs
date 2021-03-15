@@ -20,4 +20,4 @@ type RedundantBackticksAnalyzer() =
 
         let escaped = FSharpKeywords.QuoteIdentifierIfNeeded withoutBackticks
         if escaped.Length = withoutBackticks.Length then
-            consumer.AddHighlighting((RedundantBackticksWarning(identifier)))
+            consumer.AddHighlighting(RedundantBackticksWarning(identifier))

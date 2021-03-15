@@ -1634,7 +1634,7 @@ let findUnmatchedBracketToLeft (lexer: CachingLexer) offset minOffset =
 
         if FSharpTokenType.LeftBraces.[lexer.TokenType] then
             foundToken <- true
-        elif not (FSharpTokenType.RightBraces.[lexer.TokenType]) then
+        elif not FSharpTokenType.RightBraces.[lexer.TokenType] then
             lexer.Advance(-1)
 
     foundToken
@@ -1722,7 +1722,7 @@ let nextTokenIs predicate lexer =
     tokenIs 1 predicate lexer
 
 let prevTokenIs predicate lexer =
-    tokenIs (-1) predicate lexer
+    tokenIs -1 predicate lexer
 
 
 let tokenAtOffsetIs offset (predicate: ILexer -> bool) (lexer: CachingLexer) =

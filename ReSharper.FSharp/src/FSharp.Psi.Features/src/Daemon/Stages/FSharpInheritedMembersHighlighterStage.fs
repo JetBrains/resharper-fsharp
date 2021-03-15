@@ -50,7 +50,7 @@ type InheritedMembersStageProcess(fsFile, daemonProcess) =
         if isNotNull typeElement && typeElement.IsSealed then () else
 
         let inheritors = symbolScope.GetPossibleInheritors(typeDecl.CompiledName)
-        if not (Seq.exists (searchDomain.HasIntersectionWith) inheritors) then () else
+        if not (Seq.exists searchDomain.HasIntersectionWith inheritors) then () else
 
         let range = typeDecl.GetNameDocumentRange()
         result.Add(HighlightingInfo(range, TypeIsInheritedMarkOnGutter(typeDecl, range)))

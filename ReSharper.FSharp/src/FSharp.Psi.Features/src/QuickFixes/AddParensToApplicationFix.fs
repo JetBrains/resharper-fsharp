@@ -119,7 +119,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
         if isNull appOccurrence then () else       
 
-        let appData = Seq.head (appOccurrence.Entities)
+        let appData = Seq.head appOccurrence.Entities
 
         let argOccurrences =
             [ 1 .. Math.Min(appData.MaxArgsCount, appData.ArgCandidates.Length) ]
@@ -136,7 +136,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         if isNull argsOccurrence then () else
 
         appToApply <- appData.App
-        argsToApply <- Seq.head (argsOccurrence.Entities)
+        argsToApply <- Seq.head argsOccurrence.Entities
         base.Execute(solution, textControl)
 
     override x.ExecutePsiTransaction _ =
