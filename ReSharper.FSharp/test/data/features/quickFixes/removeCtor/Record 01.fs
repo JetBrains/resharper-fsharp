@@ -1,0 +1,2 @@
+type R{caret}() =
+    { F: int }

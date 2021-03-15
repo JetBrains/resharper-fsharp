@@ -48,25 +48,25 @@ module FSharpErrors =
     let [<Literal>] IndeterminateType = 72
     let [<Literal>] EnumMatchIncomplete = 104
     let [<Literal>] NamespaceCannotContainValues = 201
+    let [<Literal>] MissingErrorNumber = 193
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
     let [<Literal>] NoImplementationGiven = 365
     let [<Literal>] NoImplementationGivenWithSuggestion = 366
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
+    let [<Literal>] UseBindingsIllegalInModules = 524
+    let [<Literal>] OnlyClassCanTakeValueArguments = 552
     let [<Literal>] LetAndForNonRecBindings = 576
-    let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] ExpectedExpressionAfterLet = 588
     let [<Literal>] SuccessiveArgsShouldBeSpacedOrTupled = 597
     let [<Literal>] ConstructRequiresListArrayOrSequence = 747
     let [<Literal>] ConstructRequiresComputationExpression = 748
+    let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] EmptyRecordInvalid = 789
-    let [<Literal>] UseBindingsIllegalInModules = 524
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
     let [<Literal>] TypeAbbreviationsCannotHaveAugmentations = 964
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
-
-    let [<Literal>] MissingErrorNumber = 193
 
     let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
@@ -133,7 +133,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         match token.GetContainingNode() with
         | null -> null
-        | node -> highlightingCtor(node) :> _
+        | node -> highlightingCtor node :> _
     
     let createHighlighting (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
@@ -231,6 +231,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UseBindingsIllegalInModules ->
             createHighlightingFromNode UseBindingsIllegalInModulesWarning range
+
+        | OnlyClassCanTakeValueArguments ->
+            match fsFile.GetNode<IFSharpTypeDeclaration>(range) with
+            | null -> createGenericHighlighting error range
+            | typeDecl ->
+
+            match typeDecl.PrimaryConstructorDeclaration with
+            | null -> createGenericHighlighting error range
+            | ctorDecl -> OnlyClassCanTakeValueArgumentsError(ctorDecl) :> _
 
         | NoImplementationGiven
         | NoImplementationGivenWithSuggestion ->

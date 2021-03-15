@@ -379,6 +379,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Ctor - Primary 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary 02 - Modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary 03 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Primary 04 - Space``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Secondary - Parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Secondary - Parameters 02``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Secondary 01``() = x.DoNamedTest()
@@ -585,6 +586,9 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Pat - Char range 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - Ctor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - Ctor 02 - As``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union - Ctor 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Interface 02``() = x.DoNamedTest()

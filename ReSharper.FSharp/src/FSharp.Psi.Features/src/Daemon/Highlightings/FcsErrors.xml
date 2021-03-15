@@ -350,4 +350,12 @@
     <QuickFix>SpecifyParameterTypeFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="OnlyClassCanTakeValueArguments">
+    <Parameter type="IPrimaryConstructorDeclaration" name="ctorDecl"/>
+    <Message value="Only class and struct types may have constructors"/>
+    <Range>ctorDecl.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveConstructorFix</QuickFix>
+  </Error>
+
 </Errors>
