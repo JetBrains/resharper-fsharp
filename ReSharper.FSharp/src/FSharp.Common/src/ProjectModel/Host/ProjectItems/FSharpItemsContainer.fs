@@ -461,7 +461,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         let newFolderPart = addFolder folder.Parent (folder.SortKey + 1) folderPath itemsUpdater
 
         let oldParent = ProjectItem folder
-        getChildrenSorted (oldParent)
+        getChildrenSorted oldParent
         |> Seq.filter (fun item -> item.SortKey >= splitSortKey)
         |> Seq.iteri (fun i item ->
             item.ItemInfo.Parent <- newFolderPart
@@ -574,7 +574,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         folders.RemoveKey(oldLocation)
 
     let rec removeSplittedFolderIfEmpty folder folderPath folderRefresher itemUpdater =
-        let isFolderSplitted path = (folders.[path]).Count > 1
+        let isFolderSplitted path = folders.[path].Count > 1
 
         match folder with
         | ProjectItem (EmptyFolder (FolderItem (_, folderId)) as folderItem) when isFolderSplitted folderPath ->

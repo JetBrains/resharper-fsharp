@@ -58,7 +58,7 @@ type TestWithTwoProjectsBase() =
 
         let solutionFilePath =
             let path = FileSystemPath.TryParse(x.SolutionFileName)
-            if not (path.IsNullOrEmpty()) && not (path.IsAbsolute) then x.TestDataPath / path.AsRelative()
+            if not (path.IsNullOrEmpty()) && not path.IsAbsolute then x.TestDataPath / path.AsRelative()
             else path
 
         let cfg = BaseTestWithSolution.TestSolutionConfiguration(solutionFilePath, descriptors)

@@ -27,7 +27,7 @@ type IfToElifAction(dataProvider: FSharpContextActionDataProvider) =
 
         let ifExpr = ifExpr.As<IIfThenElseExpr>()
         let outerIfExpr = IfExprNavigator.GetByElseExpr(ifExpr)
-        if isNull ifExpr || isNull (outerIfExpr) then false else
+        if isNull ifExpr || isNull outerIfExpr then false else
 
         isNotNull outerIfExpr.ElseKeyword && x.IsAtTreeNode(ifExpr.IfKeyword)
 
