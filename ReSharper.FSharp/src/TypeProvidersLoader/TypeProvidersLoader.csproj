@@ -22,8 +22,6 @@
     <ItemGroup>
       <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
       <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
-      <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.7.0" />
-      <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.0" />
     </ItemGroup>
     
     <ItemGroup>
