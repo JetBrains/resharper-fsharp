@@ -30,7 +30,7 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
         solution = "TypeProviderLibrary")
     fun framework461() = doTest(".NET Framework 4.8")
 
-    @Test
+    @Test(enabled = false)
     @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_2_1)
     fun core21() = doTest(".NET Core 3.1")
 
@@ -42,7 +42,7 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
     @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_5)
     fun net5() = doTest(".NET 5")
 
-    @Test
+    @Test(enabled = false)
     @TestEnvironment(
         toolset = ToolsetVersion.TOOLSET_16_CORE,
         coreVersion = CoreVersion.DOT_NET_CORE_3_1,
