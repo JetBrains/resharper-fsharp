@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TypeProviderLibrary", "TypeProviderLibrary\TypeProviderLibrary.fsproj", "{DCE00951-82CE-4A47-A91C-B8046AEA6AE8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCE00951-82CE-4A47-A91C-B8046AEA6AE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCE00951-82CE-4A47-A91C-B8046AEA6AE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCE00951-82CE-4A47-A91C-B8046AEA6AE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCE00951-82CE-4A47-A91C-B8046AEA6AE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1FF29D3-472E-4DE0-84B5-F41757BFF75E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1FF29D3-472E-4DE0-84B5-F41757BFF75E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1FF29D3-472E-4DE0-84B5-F41757BFF75E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1FF29D3-472E-4DE0-84B5-F41757BFF75E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

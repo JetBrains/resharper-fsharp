@@ -3,7 +3,7 @@
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi</AssemblyName>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>$(CSharpLanguageVersion)</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

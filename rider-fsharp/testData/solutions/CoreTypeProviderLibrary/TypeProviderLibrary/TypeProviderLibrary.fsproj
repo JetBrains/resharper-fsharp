@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Library.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FSharp.Text.RegexProvider" Version="2.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae">
+        <HintPath>libs\TestTypeProviders.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

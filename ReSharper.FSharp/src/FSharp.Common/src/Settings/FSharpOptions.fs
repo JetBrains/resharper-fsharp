@@ -64,6 +64,7 @@ module FSharpExperimentalFeatures =
     let [<Literal>] redundantParenAnalysis = "Enable redundant paren analysis"
     let [<Literal>] formatter = "Enable F# code formatter"
     let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor"
+    let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process (Solution reload required)"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
@@ -81,7 +82,10 @@ type FSharpExperimentalFeatures =
       mutable Formatter: bool
       
       [<SettingsEntry(false, FSharpExperimentalFeatures.fsiInteractiveEditor); DefaultValue>]
-      mutable FsiInteractiveEditor: bool }
+      mutable FsiInteractiveEditor: bool
+      
+      [<SettingsEntry(true, FSharpExperimentalFeatures.outOfProcessTypeProviders)>]
+      mutable OutOfProcessTypeProviders: bool }
 
 
 [<AllowNullLiteral>]
@@ -115,6 +119,7 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSc
     member val EnablePostfixTemplates = base.GetValueProperty<bool>("PostfixTemplates")
     member val RedundantParensAnalysis = base.GetValueProperty<bool>("RedundantParensAnalysis")
     member val Formatter = base.GetValueProperty<bool>("Formatter")
+    member val OutOfProcessTypeProviders = base.GetValueProperty<bool>("OutOfProcessTypeProviders")
 
 
 module FSharpTypeHintOptions =
@@ -160,6 +165,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.EnableReactorMonitor), RichText(enableFcsReactorMonitor), null) |> ignore
         this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
+        this.AddBoolOption((fun key -> key.OutOfProcessTypeProviders), RichText(FSharpExperimentalFeatures.outOfProcessTypeProviders), null) |> ignore
 
         if configurations.IsInternalMode() then
             this.AddHeader("Experimental features options")
