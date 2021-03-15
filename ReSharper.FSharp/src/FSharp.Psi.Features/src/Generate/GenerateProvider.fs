@@ -31,7 +31,7 @@ type FSharpGeneratorContext(kind, typeDecl: IFSharpTypeDeclaration) =
     override val Anchor = null with get, set // todo
 
     override x.PsiModule = typeDecl.GetPsiModule()
-    override x.Project = typeDecl.GetProject()
+    override this.Solution = typeDecl.GetSolution()
 
     override x.GetSelectionTreeRange() = TreeTextRange.InvalidRange // todo
 
