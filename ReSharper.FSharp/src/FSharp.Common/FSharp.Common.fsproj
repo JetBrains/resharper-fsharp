@@ -35,6 +35,7 @@
     <Compile Include="src\Util\FcsExpressionUtil.fs" />
     <Compile Include="src\Util\FSharpExperimentalFeatures.fs" />
     <Compile Include="src\Util\FcsReactorMonitor.fs" />
+    <Compile Include="src\Util\FcsTaggedText.fs" />
     <Compile Include="src\Settings\FSharpOptionsPageBase.fs" />
     <Compile Include="src\Settings\FSharpOptions.fs" />
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
@@ -65,8 +66,7 @@
   </PropertyGroup>
 
   <Target Name="CopyFSharpCoreXmlDoc" AfterTargets="AfterBuild">
-    <Copy SourceFiles="$([System.IO.Path]::Combine($(NugetPackageRoot), $(FSharpCoreXmlDocRelativePath)))"
-          DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="$([System.IO.Path]::Combine($(NugetPackageRoot), $(FSharpCoreXmlDocRelativePath)))" DestinationFolder="$(OutDir)" />
   </Target>
 
   <ItemGroup>

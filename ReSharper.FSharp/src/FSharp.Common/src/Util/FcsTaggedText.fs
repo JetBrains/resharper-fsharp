@@ -1,4 +1,5 @@
-﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTaggedText
+﻿[<Extension>]
+module JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 
 open System
 open FSharp.Compiler.Text
@@ -47,6 +48,7 @@ let toTextStyle (tag: TextTag) =
 
 let emptyPresentation = RichTextBlock()
 
+[<Extension; CompiledName("ToRichText")>]
 let richTextR (taggedText: TaggedText[]) =
     let result = RichText()
 

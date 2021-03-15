@@ -1,7 +1,7 @@
-﻿using System.Text;
-using FSharp.Compiler.EditorServices;
+﻿using FSharp.Compiler.EditorServices;
 using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Feature.Services.ParameterInfo;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.UI.RichText;
 using JetBrains.Util;
 
@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
       out TextRange[] parameterRanges, out int[] mapToOriginalOrder, out ExtensionMethodInfo extensionMethodInfo)
     {
       var parameters = myCandidate.Parameters;
-      var text = new StringBuilder("(");
+      var text = new RichText("(");
       var newParameterRanges = new TextRange[parameters.Length];
       var parametersOrder = SortParameters(parameters, namedArguments, out var orderChanged);
 
@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
           var paramRangeStart = text.Length;
           if (orderChanged)
             text.Append("[");
-          text.Append(parameters[parametersOrder[i]].Display);
+          text.Append(parameters[parametersOrder[i]].Display.ToRichText());
           if (orderChanged)
             text.Append("]");
           var paramRangeEnd = text.Length;
@@ -42,12 +42,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
             text.Append(", ");
         }
 
-      text.Append(")" + myCandidate.ReturnTypeText);
+      text.Append(")" + myCandidate.ReturnTypeText.ToRichText());
 
       extensionMethodInfo = ExtensionMethodInfo.NoExtension;
       parameterRanges = newParameterRanges;
       mapToOriginalOrder = parametersOrder;
-      return text.ToString();
+      return text;
     }
 
     private static int[] SortParameters(MethodGroupItemParameter[] parameters, string[] namedArguments,
