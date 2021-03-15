@@ -19,7 +19,6 @@ type FSharpRefactoringLanguageService() =
         FSharpIntroduceVariable(workflow, solution, driver) :> _
 
     override x.CreateInlineVar(workflow, solution, driver) =
-        if not (solution.FSharpInlineVarRefactoringEnabled()) then null else
         FSharpInlineVariable(workflow, solution, driver) :> _
 
 and FSharpRefactoringsHelper() =
