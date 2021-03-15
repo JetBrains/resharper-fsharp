@@ -115,6 +115,19 @@ val pluginFiles = listOf(
         "FSharp.Psi/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi",
         "FSharp.Psi.Features/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi.Features")
 
+val typeProvidersFiles = listOf(
+        "FSharp.TypeProvidersProtocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.dll",
+        "FSharp.TypeProvidersProtocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.pdb",
+        "TypeProvidersLoader/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.exe",
+        "TypeProvidersLoader/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.pdb",
+        "TypeProvidersLoader/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.exe.config",
+        "TypeProvidersLoader/bin/$buildConfiguration/netcoreapp3.1/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.dll",
+        "TypeProvidersLoader/bin/$buildConfiguration/netcoreapp3.1/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.pdb",
+        "TypeProvidersLoader/bin/$buildConfiguration/netcoreapp3.1/tploader3.win.runtimeconfig.json",
+        "TypeProvidersLoader/bin/$buildConfiguration/netcoreapp3.1/tploader3.unix.runtimeconfig.json",
+        "TypeProvidersLoader/bin/$buildConfiguration/netcoreapp3.1/tploader5.win.runtimeconfig.json",
+        "TypeProvidersLoader/bin/$buildConfiguration/netcoreapp3.1/tploader5.unix.runtimeconfig.json")
+
 val dotNetSdkPath by lazy {
     val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
     if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
@@ -141,6 +154,9 @@ fun File.writeTextIfChanged(content: String) {
 configure<RdGenExtension> {
     val csOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.ProjectModelBase/src/Protocol")
     val ktOutput = File(repoRoot, "rider-fsharp/src/main/java/com/jetbrains/rider/plugins/fsharp/protocol")
+
+    val typeProviderServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProvidersProtocol/src/Server")
+    val typeProviderClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProvidersProtocol/src/Client")
 
     verbose = true
     hashFolder = "build/rdgen"
@@ -170,11 +186,26 @@ configure<RdGenExtension> {
         namespace = "JetBrains.Rider.Model"
         directory = "$csOutput"
     }
+
+    generator {
+        language = "csharp"
+        transform = "asis"
+        root = "model.RdFSharpTypeProvidersLoaderModel"
+        namespace = "JetBrains.Rider.FSharp.TypeProvidersProtocol.Server"
+        directory = "$typeProviderServerOutput"
+    }
+    generator {
+        language = "csharp"
+        transform = "reversed"
+        root = "model.RdFSharpTypeProvidersLoaderModel"
+        namespace = "JetBrains.Rider.FSharp.TypeProvidersProtocol.Client"
+        directory = "$typeProviderClientOutput"
+    }
 }
 
 tasks {
     withType<PrepareSandboxTask> {
-        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
+        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" } + typeProvidersFiles
         files = files.map { "$resharperPluginPath/src/$it" }
 
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {

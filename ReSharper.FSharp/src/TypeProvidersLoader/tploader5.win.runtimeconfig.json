@@ -1,0 +1,9 @@
+﻿{
+  "runtimeOptions": {
+    "tfm": "net5",
+    "framework": {
+      "name": "Microsoft.WindowsDesktop.App",
+      "version": "5.0.0"
+    }
+  }
+}
