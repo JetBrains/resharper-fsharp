@@ -41,10 +41,9 @@ type ScriptFcsProjectProvider(lifetime, logger: ILogger, checkerService: FSharpC
         let source = SourceText.ofString source
         lock getScriptOptionsLock (fun _ ->
             let getScriptOptionsAsync =
-                checkerService.Checker.GetProjectOptionsFromScript(
-                    path, source,
-                    otherFlags = otherFlags.Value.Value,
-                    assumeDotNetFramework = not PlatformUtil.IsRunningOnCore)
+                let targetNetFramework = not PlatformUtil.IsRunningOnCore && scriptSettings.TargetNetFramework.Value
+                checkerService.Checker.GetProjectOptionsFromScript(path, source,
+                    otherFlags = otherFlags.Value.Value, assumeDotNetFramework = targetNetFramework)
             try
                 let options, errors = getScriptOptionsAsync.RunAsTask()
                 if not errors.IsEmpty then
