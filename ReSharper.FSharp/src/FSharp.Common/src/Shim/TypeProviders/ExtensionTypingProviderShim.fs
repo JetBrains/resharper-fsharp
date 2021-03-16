@@ -4,6 +4,7 @@ open System
 open FSharp.Compiler
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Compiler.Text
+open FSharp.Core.CompilerServices
 open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -11,7 +12,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Exceptions
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
-open Microsoft.FSharp.Core.CompilerServices
 
 type IProxyExtensionTypingProvider =
     inherit IExtensionTypingProvider
@@ -23,32 +23,32 @@ type IProxyExtensionTypingProvider =
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         experimentalFeatures: FSharpExperimentalFeaturesProvider,
         typeProvidersLoadersFactory: TypeProvidersLoaderExternalProcessFactory) as this =
-    let solutionLifetime = solution.GetLifetime()
-    let defaultExtensionTypingProvider = ExtensionTypingProvider
-    let typeProvidersFeature = experimentalFeatures.OutOfProcessTypeProviders
+    let lifetime = solution.GetLifetime()
+    let defaultShim = ExtensionTypingProvider
+    let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
 
     let mutable connection: TypeProvidersConnection = null
-    let mutable outOfProcessLifetime: LifetimeDefinition = null
+    let mutable typeProvidersHostLifetime: LifetimeDefinition = null
     let mutable typeProvidersManager = Unchecked.defaultof<IProxyTypeProvidersManager>
 
     let isConnectionAlive () =
         isNotNull connection && connection.IsActive
 
     let terminateConnection () =
-        if isConnectionAlive() then outOfProcessLifetime.Terminate()
+        if isConnectionAlive() then typeProvidersHostLifetime.Terminate()
 
     let connect () =
         if not (isConnectionAlive ()) then
-            outOfProcessLifetime <- Lifetime.Define(solutionLifetime)
-            connection <- typeProvidersLoadersFactory.Create(outOfProcessLifetime.Lifetime).Run()
+            typeProvidersHostLifetime <- Lifetime.Define(lifetime)
+            connection <- typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime).Run()
             typeProvidersManager <- TypeProvidersManager(connection) :?> _
 
     do
-        solutionLifetime.Bracket((fun () -> ExtensionTypingProvider <- this),
-            fun () -> ExtensionTypingProvider <- defaultExtensionTypingProvider)
+        lifetime.Bracket((fun () -> ExtensionTypingProvider <- this),
+            fun () -> ExtensionTypingProvider <- defaultShim)
 
-        toolset.Changed.Advise(solutionLifetime, fun _ -> terminateConnection ())
-        typeProvidersFeature.Change.Advise(solutionLifetime, fun enabled ->
+        toolset.Changed.Advise(lifetime, fun _ -> terminateConnection ())
+        outOfProcess.Change.Advise(lifetime, fun enabled ->
             if enabled.HasNew && not enabled.New then terminateConnection ())
 
     interface IProxyExtensionTypingProvider with
@@ -57,9 +57,9 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                 isInvalidationSupported: bool, isInteractive: bool, systemRuntimeContainsType: string -> bool,
                 systemRuntimeAssemblyVersion: Version, compilerToolsPath: string list,
                 logError: TypeProviderError -> unit, m: range) =
-            if not typeProvidersFeature.Value then
-               defaultExtensionTypingProvider.InstantiateTypeProvidersOfAssembly( runTimeAssemblyFileName,
-                    designTimeAssemblyNameString, resolutionEnvironment, isInvalidationSupported, isInteractive,
+            if not outOfProcess.Value then
+               defaultShim.InstantiateTypeProvidersOfAssembly(runTimeAssemblyFileName, designTimeAssemblyNameString,
+                    resolutionEnvironment, isInvalidationSupported, isInteractive,
                     systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath, logError, m)
             else
                 connect()
@@ -74,22 +74,22 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         member this.GetProvidedTypes(pn: IProvidedNamespace) =
             match pn with
             | :? IProxyProvidedNamespace as pn -> pn.GetProvidedTypes()
-            | _ -> defaultExtensionTypingProvider.GetProvidedTypes(pn)
+            | _ -> defaultShim.GetProvidedTypes(pn)
 
         member this.ResolveTypeName(pn: IProvidedNamespace, typeName: string) =
             match pn with
             | :? IProxyProvidedNamespace as pn -> pn.ResolveProvidedTypeName typeName
-            | _ -> defaultExtensionTypingProvider.ResolveTypeName(pn, typeName)
+            | _ -> defaultShim.ResolveTypeName(pn, typeName)
 
         member this.GetInvokerExpression(provider: ITypeProvider, method: ProvidedMethodBase, args: ProvidedVar []) =
             match provider with
             | :? IProxyTypeProvider as tp -> tp.GetInvokerExpression(method, args)
-            | _ -> defaultExtensionTypingProvider.GetInvokerExpression(provider, method, args)
+            | _ -> defaultShim.GetInvokerExpression(provider, method, args)
 
         member this.DisplayNameOfTypeProvider(provider: ITypeProvider, fullName: bool) =
             match provider with
             | :? IProxyTypeProvider as tp -> tp.GetDisplayName fullName
-            | _ -> defaultExtensionTypingProvider.DisplayNameOfTypeProvider(provider, fullName)
+            | _ -> defaultShim.DisplayNameOfTypeProvider(provider, fullName)
 
         member this.RuntimeVersion() =
             if not (isConnectionAlive ()) then null else
