@@ -106,6 +106,7 @@ val libFiles = listOf(
         "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Core.dll",
         "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Core.xml",
         "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
+        "FSharp.Common/bin/$buildConfiguration/net461/FSharp.DependencyManager.Nuget.dll",
         "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Interactive.Settings.dll",
         "FSharp.Psi.Features/bin/$buildConfiguration/net461/Fantomas.dll")
 
