@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.UI.RichText
 open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
+open JetBrains.Util
 
 [<SettingsKey(typeof<Missing>, "F# settings")>]
 type FSharpSettings() = class end
@@ -46,6 +47,7 @@ type FSharpOptions =
 
 module FSharpScriptOptions =
     let [<Literal>] languageVersion = "Language version"
+    let [<Literal>] targetNetFramework = "Target .NET Framework"
     let [<Literal>] customDefines = "Custom defines"
 
 
@@ -53,6 +55,9 @@ module FSharpScriptOptions =
 type FSharpScriptOptions =
     { [<SettingsEntry(FSharpLanguageVersion.Default, FSharpScriptOptions.languageVersion)>]
       mutable LanguageVersion: FSharpLanguageVersion
+
+      [<SettingsEntry(false, FSharpScriptOptions.languageVersion)>]
+      mutable TargetNetFramework: bool
 
       [<SettingsEntry("", FSharpScriptOptions.customDefines)>]
       mutable CustomDefines: string }
@@ -62,8 +67,8 @@ module FSharpExperimentalFeatures =
     let [<Literal>] postfixTemplates = "Enable postfix templates"
     let [<Literal>] redundantParenAnalysis = "Enable redundant paren analysis"
     let [<Literal>] formatter = "Enable F# code formatter"
-    let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor"
-    let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process (Solution reload required)"
+    let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor (experimental)"
+    let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process (solution reload required)"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
@@ -104,6 +109,7 @@ type FSharpScriptSettingsProvider(lifetime, solution, settings, settingsSchema) 
     inherit FSharpSettingsProviderBase<FSharpScriptOptions>(lifetime, solution, settings, settingsSchema)
 
     member val LanguageVersion = base.GetValueProperty<FSharpLanguageVersion>("LanguageVersion")
+    member val TargetNetFramework = base.GetValueProperty<bool>("TargetNetFramework")
     member val CustomDefines = base.GetValueProperty<string>("CustomDefines")
 
 
@@ -144,19 +150,19 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
 
         this.AddHeader("Script editing")
         this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
+        if PlatformUtil.IsRunningUnderWindows then
+            this.AddBoolOption((fun key -> key.TargetNetFramework), RichText(FSharpScriptOptions.targetNetFramework)) |> ignore
         this.AddBoolOption((fun key -> key.FsiInteractiveEditor), RichText(FSharpExperimentalFeatures.fsiInteractiveEditor)) |> ignore
 
         this.AddHeader("Type hints")
-        let showPipeReturnTypes = this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null)
+        this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null) |> ignore
+
         do
-            use _x = this.Indent()
-            [
-                this.AddBoolOption((fun key -> key.HideSameLine), RichText(FSharpTypeHintOptions.hideSameLinePipe), null)
-            ]
+            use indent = this.Indent()
+            [ this.AddBoolOption((fun key -> key.HideSameLine), RichText(FSharpTypeHintOptions.hideSameLinePipe), null) ]
             |> Seq.iter (fun checkbox ->
-                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), id)
-            )
-        
+                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), id))
+
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.EnableReactorMonitor), RichText(enableFcsReactorMonitor), null) |> ignore
         this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
