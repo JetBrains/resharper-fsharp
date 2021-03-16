@@ -59,7 +59,6 @@ type FSharpScriptOptions =
 
 
 module FSharpExperimentalFeatures =
-    let [<Literal>] inlineVarRefactoring = "Enable inline var refactoring"
     let [<Literal>] postfixTemplates = "Enable postfix templates"
     let [<Literal>] redundantParenAnalysis = "Enable redundant paren analysis"
     let [<Literal>] formatter = "Enable F# code formatter"
@@ -69,10 +68,7 @@ module FSharpExperimentalFeatures =
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
 type FSharpExperimentalFeatures =
-    { [<SettingsEntry(false, FSharpExperimentalFeatures.inlineVarRefactoring)>]
-      mutable InlineVarRefactoring: bool
-
-      [<SettingsEntry(false, FSharpExperimentalFeatures.postfixTemplates)>]
+    { [<SettingsEntry(false, FSharpExperimentalFeatures.postfixTemplates)>]
       mutable PostfixTemplates: bool
 
       [<SettingsEntry(false, FSharpExperimentalFeatures.redundantParenAnalysis)>]
@@ -115,7 +111,6 @@ type FSharpScriptSettingsProvider(lifetime, solution, settings, settingsSchema) 
 type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpExperimentalFeatures>(lifetime, solution, settings, settingsSchema)
 
-    member val EnableInlineVarRefactoring = base.GetValueProperty<bool>("InlineVarRefactoring")
     member val EnablePostfixTemplates = base.GetValueProperty<bool>("PostfixTemplates")
     member val RedundantParensAnalysis = base.GetValueProperty<bool>("RedundantParensAnalysis")
     member val Formatter = base.GetValueProperty<bool>("Formatter")
@@ -169,7 +164,6 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
 
         if configurations.IsInternalMode() then
             this.AddHeader("Experimental features options")
-            this.AddBoolOption((fun key -> key.InlineVarRefactoring), RichText(FSharpExperimentalFeatures.inlineVarRefactoring), null) |> ignore
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
             this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
