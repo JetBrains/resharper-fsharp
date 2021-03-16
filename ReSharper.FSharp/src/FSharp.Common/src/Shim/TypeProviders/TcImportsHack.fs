@@ -41,6 +41,7 @@ module TcImportsHack =
     type FakeSystemRuntimeContainsTypeRef(fakeTcImports: Client.RdFakeTcImports) =
         member this.Value =
             let tcImports = FakeTcImports(fakeTcImports.DllInfos, fakeTcImports.Base)
+            // Requires explicit creation of lambda with 'tcImports' closure
             fun x -> tcImports.SystemRuntimeContainsType x
     
     // The type provider must not contain strong references to remote TcImport objects.
@@ -64,4 +65,5 @@ module TcImportsHack =
 
     let injectFakeTcImports (fakeTcImports: Client.RdFakeTcImports) =
         let systemRuntimeContainsTypeRef = FakeSystemRuntimeContainsTypeRef(fakeTcImports)
+        // Requires explicit creation of lambda with 'systemRuntimeContainsTypeRef' closure
         fun name -> systemRuntimeContainsTypeRef.Value name
