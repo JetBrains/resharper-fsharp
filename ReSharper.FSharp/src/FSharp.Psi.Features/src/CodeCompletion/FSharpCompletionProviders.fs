@@ -31,7 +31,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
 
     member x.IsAvailable(context: ISpecificCodeCompletionContext) =
         let fsContext = context.As<FSharpCodeCompletionContext>()
-        if isNull context then null else
+        if isNull fsContext then null else
 
         let tokenType = getTokenType fsContext.TokenAtCaret
         let tokenBeforeType = getTokenType fsContext.TokenBeforeCaret
