@@ -68,10 +68,10 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
             | :? IReferenceExpr as ref ->
                 match ref.Reference.GetFSharpSymbol() with
-                | :? FSharpMemberOrFunctionOrValue as value when
-                    let parameters = value.CurriedParameterGroups
+                | :? FSharpMemberOrFunctionOrValue as mfv when
+                    let parameters = mfv.CurriedParameterGroups
                     parameters.Count > 0 && parameters.[0].Count > 0 ->
-                        match value.FullTypeSafe with
+                        match mfv.FullTypeSafe with
                         | Some t -> List.length (FcsTypesUtil.getFunctionTypeArgs t) - 1
                         | None -> 0
                 | _ -> 0
@@ -105,7 +105,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         | [appData] ->
             match appData.App.IgnoreInnerParens() with
             | :? IReferenceExpr as refExpr when refExpr.ShortName <> SharedImplUtil.MISSING_DECLARATION_NAME -> 
-                $"Add parens to '%s{refExpr.ShortName}' application"
+                $"Add parens to '{refExpr.ShortName}' application"
 
             | :? ILambdaExpr -> "Add parens to lambda application"
             | _ -> "Add parens to application"

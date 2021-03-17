@@ -45,7 +45,7 @@ type AddParensToApplicationTest() =
 
             occurrences
             |> Array.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
-            |> Option.defaultWith (fun _ -> failwithf $"Could not find %s{occurrenceName} occurrence"))
+            |> Option.defaultWith (fun _ -> failwithf $"Could not find {occurrenceName} occurrence"))
 
         base.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile)
 
