@@ -12,10 +12,9 @@ type ReplaceWithPredefinedOperatorFix(error: AddingConstraintError) =
 
     let ref = error.Expr.As<IReferenceExpr>()
 
-    let fsharpOperator =
+    let predefinedOperator =
         match ref with
         | null -> SharedImplUtil.MISSING_DECLARATION_NAME
-        | ref when ref.IsQualified -> SharedImplUtil.MISSING_DECLARATION_NAME
         | ref ->
 
         match ref.ShortName with
@@ -26,12 +25,12 @@ type ReplaceWithPredefinedOperatorFix(error: AddingConstraintError) =
     override x.IsAvailable _ =
         isValid ref &&
         isNotNull (BinaryAppExprNavigator.GetByOperator(ref)) &&
-        fsharpOperator <> SharedImplUtil.MISSING_DECLARATION_NAME
+        predefinedOperator <> SharedImplUtil.MISSING_DECLARATION_NAME
 
-    override x.Text = $"Replace with '{fsharpOperator}'"
+    override x.Text = $"Replace with '{predefinedOperator}'"
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(ref.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        ref.SetName(fsharpOperator) |> ignore
+        ref.SetName(predefinedOperator) |> ignore
