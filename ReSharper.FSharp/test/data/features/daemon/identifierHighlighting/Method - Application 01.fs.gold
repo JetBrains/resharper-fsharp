@@ -1,0 +1,18 @@
+﻿type |T1|(0) =
+    static member |Method|(1)<|'a|(2)>() = ()
+
+module |Module|(3) =
+    type |T2|(4)() = class end
+
+let _ = |T1|(5).|Method|(6)<|Module|(7).|T2|(8)>
+
+---------------------------------------------------------
+(0): ReSharper F# Class Identifier: 
+(1): ReSharper F# Method Identifier: 
+(2): ReSharper F# Type Parameter Identifier: 
+(3): ReSharper F# Module Identifier: 
+(4): ReSharper F# Class Identifier: 
+(5): ReSharper F# Class Identifier: 
+(6): ReSharper F# Method Identifier: 
+(7): ReSharper F# Module Identifier: 
+(8): ReSharper F# Class Identifier: 
