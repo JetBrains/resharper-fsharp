@@ -46,6 +46,14 @@ module FSharpLanguageLevel =
         | FSharpLanguageLevel.Preview -> FSharpLanguageVersion.Preview
         | _ -> failwithf $"Unexpected language level: {level}"
 
+    let ofLanguageVersion (version: FSharpLanguageVersion) =
+        match version with
+        | FSharpLanguageVersion.FSharp46 -> FSharpLanguageLevel.FSharp46
+        | FSharpLanguageVersion.FSharp47 -> FSharpLanguageLevel.FSharp47
+        | FSharpLanguageVersion.FSharp50 -> FSharpLanguageLevel.FSharp50
+        | FSharpLanguageVersion.Preview -> FSharpLanguageLevel.Preview
+        | _ -> FSharpLanguageLevel.Latest
+
     let key = Key<Boxed<FSharpLanguageLevel>>("LanguageLevel")
 
     let private ofPsiModuleNoCache (psiModule: IPsiModule) =

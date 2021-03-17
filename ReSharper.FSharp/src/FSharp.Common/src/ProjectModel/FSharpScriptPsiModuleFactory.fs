@@ -22,7 +22,9 @@ open JetBrains.ProjectModel.Platforms
 open JetBrains.ProjectModel.model2.Assemblies.Impl
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Impl
@@ -506,3 +508,32 @@ type ScriptFileProperties() =
 type ScriptReferences =
     { Assemblies: ISet<FileSystemPath>
       Files: ISet<FileSystemPath> }
+
+
+[<SolutionFeaturePart>]
+type FSharpScriptLanguageLevelProvider(scriptSettingsProvider: FSharpScriptSettingsProvider) =
+    let getLanguageLevel () =
+        FSharpLanguageLevel.ofLanguageVersion scriptSettingsProvider.LanguageVersion.Value
+
+    interface ILanguageLevelProvider<FSharpLanguageLevel, FSharpLanguageVersion> with
+        member this.IsApplicable(psiModule) =
+            psiModule :? FSharpScriptPsiModule
+
+        member this.GetLanguageLevel _ =
+            getLanguageLevel ()
+
+        member this.ConvertToLanguageLevel(languageVersion, _) =
+            FSharpLanguageLevel.ofLanguageVersion languageVersion
+
+        member this.ConvertToLanguageVersion(languageLevel) =
+            FSharpLanguageLevel.toLanguageVersion languageLevel
+
+        member this.IsAvailable(languageLevel: FSharpLanguageLevel, _: IPsiModule): bool =
+            languageLevel <= getLanguageLevel ()
+
+        member this.TryGetLanguageVersion _ =
+            Nullable(scriptSettingsProvider.LanguageVersion.Value)
+
+        member this.IsAvailable(_: FSharpLanguageVersion, _: IPsiModule): bool = failwith "todo"
+        member this.LanguageLevelOverrider = failwith "todo"
+        member this.LanguageVersionModifier = failwith "todo"
