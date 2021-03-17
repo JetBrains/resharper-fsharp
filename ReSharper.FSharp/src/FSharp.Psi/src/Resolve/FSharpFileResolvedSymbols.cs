@@ -228,15 +228,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           var nameRange = FixRange(startOffset, endOffset, mfv?.LogicalName, buffer, lexer);
           startOffset = nameRange.StartOffset;
 
+          var isCtor = mfv is { IsConstructor: true };
+
           // workaround for implicit type usages (e.g. in members with optional params), visualfsharp#3933
-          if (CanIgnoreSymbol(symbol) &&
+          if (CanIgnoreSymbol(symbol, isCtor) &&
               !(lexer.FindTokenAt(nameRange.EndOffset - 1) && (lexer.TokenType?.IsIdentifier ?? false)))
             continue;
 
           // IsFromPattern helps in cases where fake value is created at range,
           // e.g. `fun Literal -> ()` has both pattern and binding symbols at pattern range. 
           if (symbolUse.IsFromPattern || !resolvedSymbols.Declarations.ContainsKey(startOffset))
+          {
+            if (resolvedSymbols.Uses.TryGetValue(startOffset, out var existingSymbol) && 
+                existingSymbol.SymbolUse.Symbol is FSharpEntity && !isCtor)
+              continue;
+
             resolvedSymbols.Uses[startOffset] = new FSharpResolvedSymbolUse(symbolUse, nameRange);
+          }
+
           if (symbolUse.IsFromPattern)
             resolvedSymbols.Declarations.Remove(startOffset);
         }
@@ -247,9 +256,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return resolvedSymbols;
     }
 
-    private static bool CanIgnoreSymbol([NotNull] FSharpSymbol symbol) =>
-      symbol is FSharpEntity || 
-      symbol is FSharpMemberOrFunctionOrValue mfv && (mfv.LogicalName == "op_RangeStep" || mfv.IsConstructor);
+    private static bool CanIgnoreSymbol([NotNull] FSharpSymbol symbol, bool isCtor) =>
+      isCtor ||
+      symbol is FSharpEntity ||
+      symbol is FSharpMemberOrFunctionOrValue { LogicalName: "op_RangeStep" };
 
     private TextRange FixRange(int startOffset, int endOffset, [CanBeNull] string logicalName, IBuffer buffer,
       CachingLexer lexer)
