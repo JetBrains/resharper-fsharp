@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypesUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -59,7 +60,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         let fcsType = expr.TryGetFcsType()
 
         if isNotNull fcsType && fcsType.IsFunctionType then
-            List.length (FcsTypesUtil.getFunctionTypeArgs fcsType) - 1
+            List.length (getFunctionTypeArgs fcsType) - 1
 
         else
             match expr.IgnoreInnerParens() with
@@ -72,7 +73,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
                     let parameters = mfv.CurriedParameterGroups
                     parameters.Count > 0 && parameters.[0].Count > 0 ->
                         match mfv.FullTypeSafe with
-                        | Some t -> List.length (FcsTypesUtil.getFunctionTypeArgs t) - 1
+                        | Some t -> List.length (getFunctionTypeArgs t) - 1
                         | None -> 0
                 | _ -> 0
             | _ -> 0
