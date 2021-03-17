@@ -20,3 +20,6 @@ A.M2(0, y = (fun x -> x))
 A.M3(0, (0, fun x -> x))
 A.M4(fun x -> x)
 A.UnresolvedM(fun x -> x)
+
+open System.Collections.ObjectModel
+ObservableCollection<int>().CollectionChanged(1, fun x -> x)

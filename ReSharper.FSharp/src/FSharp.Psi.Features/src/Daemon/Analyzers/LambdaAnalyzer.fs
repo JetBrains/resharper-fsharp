@@ -96,8 +96,13 @@ type LambdaAnalyzer() =
         | :? FSharpMemberOrFunctionOrValue as m ->
             m.IsMember &&
             let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
-            let args = m.CurriedParameterGroups.[0]
+
+            let parameterGroups = m.CurriedParameterGroups
+            if parameterGroups.Count = 0 then false else
+
+            let args = parameterGroups.[0]
             if args.Count <= lambdaPos then false else
+
             let argDecl = args.[lambdaPos]
             let argDeclType = argDecl.Type
 
@@ -105,12 +110,12 @@ type LambdaAnalyzer() =
                 argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
 
             if argIsDelegate then
-                let apparentEntity = m.ApparentEnclosingEntity
+                let mApparentEntity = m.ApparentEnclosingEntity
                 let mName = m.DisplayName
                 let mHasOverload =
-                    apparentEntity.MembersFunctionsAndValues
+                    mApparentEntity.MembersFunctionsAndValues
                     |> Seq.exists (fun x ->
-                        not (x.Equals(m)) &&
+                        not (x.Equals m) &&
                         x.DisplayName = mName &&
                         x.CurriedParameterGroups.[0].Count >= args.Count)
                 not mHasOverload
