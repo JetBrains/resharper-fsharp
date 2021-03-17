@@ -2,6 +2,7 @@
 
 open System
 open System.Text.RegularExpressions
+open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -59,10 +60,28 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
             let appExprFcsType = prefixAppExpr.ArgumentExpression.TryGetFcsType()
 
             let maxArgsCount =
-                if isNull appExprFcsType || not appExprFcsType.IsFunctionType then None else
+                if isNotNull appExprFcsType && appExprFcsType.IsFunctionType then
+                    let args = FcsTypesUtil.getFunctionTypeArgs appExprFcsType
+                    Some (List.length args - 1)
 
-                let args = FcsTypesUtil.getFunctionTypeArgs appExprFcsType
-                Some(args |> List.tail |> List.length)
+                else
+                    match prefixAppExpr.ArgumentExpression.IgnoreInnerParens() with
+                    | :? ILambdaExpr as lambda ->
+                        Some (lambda.PatternsEnumerable.Count())
+
+                    | :? IReferenceExpr as ref ->
+                        match ref.Reference.GetFSharpSymbol() with
+                        | :? FSharpMemberOrFunctionOrValue as value when
+                            let parameters = value.CurriedParameterGroups
+                            parameters.Count > 0 && parameters.[0].Count > 0 ->
+                                match value.FullTypeSafe with
+                                | Some t ->
+                                    let args = FcsTypesUtil.getFunctionTypeArgs t
+                                    Some (List.length args - 1)
+                                | None -> None
+                        | _ -> None
+
+                    | _ -> None
 
             let isApplicableApp =
                 Option.isSome maxArgsCount && not (List.isEmpty appliedExprsAcc)
@@ -88,7 +107,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         | [appData] ->
             match appData.App.IgnoreInnerParens() with
             | :? IReferenceExpr as refExpr when refExpr.ShortName <> SharedImplUtil.MISSING_DECLARATION_NAME -> 
-                sprintf "Add parens to '%s' application" refExpr.ShortName
+                $"Add parens to '%s{refExpr.ShortName}' application"
 
             | :? ILambdaExpr -> "Add parens to lambda application"
             | _ -> "Add parens to application"
