@@ -55,41 +55,39 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         | head :: tail -> createAppExpr factory (factory.CreateAppExpr(expr, head, true)) tail
         | [] -> expr
 
+    let getMaxArgsCount (expr: IFSharpExpression) =
+        let fcsType = expr.TryGetFcsType()
+
+        if isNotNull fcsType && fcsType.IsFunctionType then
+            List.length (FcsTypesUtil.getFunctionTypeArgs fcsType) - 1
+
+        else
+            match expr.IgnoreInnerParens() with
+            | :? ILambdaExpr as lambda ->
+                lambda.PatternsEnumerable.Count()
+
+            | :? IReferenceExpr as ref ->
+                match ref.Reference.GetFSharpSymbol() with
+                | :? FSharpMemberOrFunctionOrValue as value when
+                    let parameters = value.CurriedParameterGroups
+                    parameters.Count > 0 && parameters.[0].Count > 0 ->
+                        match value.FullTypeSafe with
+                        | Some t -> List.length (FcsTypesUtil.getFunctionTypeArgs t) - 1
+                        | None -> 0
+                | _ -> 0
+            | _ -> 0
+
     let findAppsWithoutParens prefixAppExpr =
         let rec collectAppliedExprsRec (prefixAppExpr: IPrefixAppExpr) prefixAppDataAcc appliedExprsAcc =
-            let appExprFcsType = prefixAppExpr.ArgumentExpression.TryGetFcsType()
-
-            let maxArgsCount =
-                if isNotNull appExprFcsType && appExprFcsType.IsFunctionType then
-                    let args = FcsTypesUtil.getFunctionTypeArgs appExprFcsType
-                    Some (List.length args - 1)
-
-                else
-                    match prefixAppExpr.ArgumentExpression.IgnoreInnerParens() with
-                    | :? ILambdaExpr as lambda ->
-                        Some (lambda.PatternsEnumerable.Count())
-
-                    | :? IReferenceExpr as ref ->
-                        match ref.Reference.GetFSharpSymbol() with
-                        | :? FSharpMemberOrFunctionOrValue as value when
-                            let parameters = value.CurriedParameterGroups
-                            parameters.Count > 0 && parameters.[0].Count > 0 ->
-                                match value.FullTypeSafe with
-                                | Some t ->
-                                    let args = FcsTypesUtil.getFunctionTypeArgs t
-                                    Some (List.length args - 1)
-                                | None -> None
-                        | _ -> None
-
-                    | _ -> None
+            let maxArgsCount = getMaxArgsCount prefixAppExpr.ArgumentExpression
 
             let isApplicableApp =
-                Option.isSome maxArgsCount && not (List.isEmpty appliedExprsAcc)
+                maxArgsCount > 0 && not (List.isEmpty appliedExprsAcc)
 
             let appDataAcc =
                 if isApplicableApp then
                     {| App = prefixAppExpr.ArgumentExpression
-                       MaxArgsCount = maxArgsCount.Value
+                       MaxArgsCount = maxArgsCount
                        ArgCandidates = appliedExprsAcc |} :: prefixAppDataAcc
                 else prefixAppDataAcc
 
