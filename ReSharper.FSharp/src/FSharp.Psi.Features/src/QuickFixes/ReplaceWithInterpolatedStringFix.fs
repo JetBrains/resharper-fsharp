@@ -1,16 +1,47 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open System.Text
+open JetBrains.Metadata.Reader.API
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type private StringManipulation =
-    | InsertInterpolation of formatSpecifier: string * exprText: string
+    | InsertInterpolation of formatSpecifier: string * expr: IFSharpExpression
     | EscapeBrace of braceChar: char
+
+[<RequireQualifiedAccess>]
+type SpecifierSkipPolicy =
+    | Skip
+    | SkipForKnownTypes
+    | SkipForTypes of typeNames: IClrTypeName[]
+
+module ReplaceWithInterpolatedStringFix =
+    let unsignedTypes =
+        [| PredefinedType.USHORT_FQN
+           PredefinedType.UINT_FQN
+           PredefinedType.ULONG_FQN |]
+
+    let simpleSpecifiers =
+        [| [| "%O" |], SpecifierSkipPolicy.Skip // %O is the implied default in interpolated strings
+           [| "%s"; "%d"; "%i" |], SpecifierSkipPolicy.SkipForKnownTypes
+           [| "%u" |], SpecifierSkipPolicy.SkipForTypes unsignedTypes |]
+        |> Array.map (fun (specifiers, policy) -> specifiers |> Array.map (fun s -> s, policy))
+        |> Array.concat
+        |> dict
+
+    let skipSpecifier (expr: IFSharpExpression) (specifier: string): bool =
+         specifier.Length = 2 &&
+
+         match simpleSpecifiers.TryGetValue(specifier) with
+         | true, SpecifierSkipPolicy.Skip -> true
+         | true, SpecifierSkipPolicy.SkipForKnownTypes -> expr :? IConstExpr
+         | _ -> false
 
 type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarning) =
     inherit FSharpScopedQuickFixBase()
@@ -36,7 +67,7 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
             warning.FormatSpecsAndExprs
             |> Seq.map (fun (specifierRange, expr) ->
                 let index = specifierRange.EndOffset.Offset - startOffset
-                index, InsertInterpolation (specifierRange.GetText(), expr.GetText()))
+                index, InsertInterpolation(specifierRange.GetText(), expr))
 
         let formatString = formatStringExpr.GetText()
 
@@ -59,7 +90,7 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
                 manipulations
                 |> Seq.sumBy (function
                     | _, EscapeBrace _ -> 1
-                    | _, InsertInterpolation(_, exprText) -> 2 + exprText.Length)
+                    | _, InsertInterpolation(_, exprText) -> 2 + exprText.GetTextLength())
 
             StringBuilder(formatString, formatString.Length + 1 + extraCapacity)
 
@@ -67,10 +98,10 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
             match manipulation with
             | EscapeBrace(braceChar) ->
                 interpolatedSb.Insert(index, braceChar) |> ignore
-            | InsertInterpolation(formatSpecifier, exprText) ->
+
+            | InsertInterpolation(specifier, expr) ->
                 let index =
-                    // %O is the implied default in interpolated strings
-                    if formatSpecifier = "%O" then
+                    if ReplaceWithInterpolatedStringFix.skipSpecifier expr specifier then
                         interpolatedSb.Remove(index - 2, 2) |> ignore
                         index - 2
                     else
@@ -78,8 +109,8 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
 
                 interpolatedSb
                     .Insert(index, '{')
-                    .Insert(index + 1, exprText)
-                    .Insert(index + 1 + exprText.Length, '}')
+                    .Insert(index + 1, expr.GetText())
+                    .Insert(index + 1 + expr.GetTextLength(), '}')
                 |> ignore
 
         let factory = formatStringExpr.CreateElementFactory()

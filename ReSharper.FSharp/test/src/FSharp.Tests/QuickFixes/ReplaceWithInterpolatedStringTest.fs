@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
@@ -12,8 +13,8 @@ type ReplaceWithInterpolatedStringTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceWithInterpolatedString"
 
-    [<Test>] member x.``String 01 - Single specifier``() = x.DoNamedTest()
-    [<Test>] member x.``String 02 - Many specifiers``() = x.DoNamedTest()
+    [<Test; ExecuteScopedQuickFixInFile>] member x.``String 01 - Single specifier``() = x.DoNamedTest()
+    [<Test; ExecuteScopedQuickFixInFile>] member x.``String 02 - Many specifiers``() = x.DoNamedTest()
     [<Test>] member x.``String 03 - Many specifiers with text``() = x.DoNamedTest()
     [<Test>] member x.``String 04 - Escape braces``() = x.DoNamedTest()
     [<Test>] member x.``String 05 - failwithf``() = x.DoNamedTest()

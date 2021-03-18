@@ -1,4 +1,4 @@
 ﻿module Module
 
 let foo = "foo"
-let s = ${caret}"""Number \n is %d{10} and text is %s{foo}"""
+let s = ${caret}"""Number \n is {10} and text is %s{foo}"""

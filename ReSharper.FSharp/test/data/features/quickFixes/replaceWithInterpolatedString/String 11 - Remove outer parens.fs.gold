@@ -2,4 +2,4 @@
 
 let f _ _ = ()
 
-let s = f ${caret}"%d{10} %s{foo}" "hi"
+let s = f ${caret}"{10} %s{foo}" "hi"
