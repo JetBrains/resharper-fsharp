@@ -1,3 +1,7 @@
 ﻿module Module
 
-let s = ${caret}"%d{10}"
+let s = ${caret}"{10}"
+let _ = $"%d{s.Length}"
+
+let i = 10
+let _ = $"%d{i}"

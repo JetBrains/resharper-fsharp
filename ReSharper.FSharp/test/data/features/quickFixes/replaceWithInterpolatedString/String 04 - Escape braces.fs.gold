@@ -1,4 +1,4 @@
 ﻿module Module
 
 let foo = "foo"
-let s = ${caret}"{{ is %d{10} and {{text}} is %s{foo}}}"
+let s = ${caret}"{{ is {10} and {{text}} is %s{foo}}}"

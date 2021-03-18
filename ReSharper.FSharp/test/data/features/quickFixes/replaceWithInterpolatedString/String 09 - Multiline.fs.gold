@@ -2,6 +2,6 @@
 
 let s =
     ${caret}"text
-        is %d{10}
+        is {10}
         indented }}
         %s{foo}"

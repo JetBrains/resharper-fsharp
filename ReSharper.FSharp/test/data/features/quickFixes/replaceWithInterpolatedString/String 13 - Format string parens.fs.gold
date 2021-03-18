@@ -1,4 +1,4 @@
 ﻿module Module
 
 let foo = "foo"
-let s = $"%d{{caret}10} %s{foo}"
+let s = $"{{caret}10} %s{foo}"
