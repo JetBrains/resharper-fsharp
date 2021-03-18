@@ -47,7 +47,7 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
 
             let timestamp = File.GetLastWriteTimeUtc(path.FullPath)
             source <- Some { Source = getText document; Timestamp = timestamp }
-            logger.Verbose("tryAddSource, add: {0}", path)
+            logger.Trace("Add: tryAddSource: {0}", path)
             files.[path] <- source.Value) |> ignore
 
         source
@@ -73,7 +73,7 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         | true, source -> new MemoryStream(source.Source) :> Stream
         | _ ->
 
-        logger.Warn("FileStreamReadShim miss: {0}", path)
+        logger.Trace("Miss: FileStreamReadShim miss: {0}", path)
         base.FileStreamReadShim(fileName)
 
     override x.GetLastWriteTime(path) =
@@ -83,7 +83,7 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         | true, source -> source.Timestamp
         | _ ->
 
-        logger.Warn("GetLastWriteTime miss: {0}", path)
+        logger.Trace("Miss: GetLastWriteTime: {0}", path)
         base.GetLastWriteTime(path)
 
     override x.Exists(path) =
@@ -94,7 +94,10 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
 
         match tryAddSource path with
         | Some _ -> true
-        | _ -> base.Exists(path)
+        | _ ->
+
+        logger.Trace("Miss: Exists: {0}", path)
+        base.Exists(path)
 
     member x.ProcessDocumentChange(change: DocumentChange) =
         let projectFile =
@@ -137,7 +140,7 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
                         let mutable fsSource = Unchecked.defaultof<_>
                         if files.TryGetValue(path, &fsSource) && text = fsSource.Source then () else
 
-                        logger.Verbose("ProcessProjectModelChange, add: {0}", path)
+                        logger.Trace("Add: Project Model change: {0}", path)
                         files.[path] <- { Source = text; Timestamp = DateTime.UtcNow } }
 
         visitor.VisitDelta(change)
