@@ -16,6 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       TypeProvidersContext typeProvidersContext)
     {
       myProvidedNamespace = providedNamespace;
+      var context = ProvidedTypeContextHolder.Create();
 
       myNestedNamespaces = new InterruptibleLazy<ProxyProvidedNamespace[]>(() =>
         providedNamespace.NestedNamespaces
@@ -25,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myProvidedTypes =
         new InterruptibleLazy<ProvidedType[]>(() =>
           typeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(providedNamespace.Types, typeProviderId,
-            null));
+            context));
     }
 
     public string NamespaceName => myProvidedNamespace.Name;

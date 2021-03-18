@@ -3,7 +3,7 @@
 open SimpleGenerativeProviderNamespace
 
 type S = SimpleGenerativeType
-type S1 = S.GenerativeSubtype
-
 let property1: string = S.GenerativeSubtype.Property
+
+type S1 = S.GenerativeSubtype
 let property2: string = S1.Property
