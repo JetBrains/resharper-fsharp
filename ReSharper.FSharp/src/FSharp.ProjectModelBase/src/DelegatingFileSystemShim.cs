@@ -5,6 +5,7 @@ using FSharp.Compiler.IO;
 using JetBrains.Application.changes;
 using JetBrains.Lifetimes;
 using JetBrains.Util;
+using JetBrains.Util.Logging;
 using static FSharp.Compiler.IO.FileSystemAutoOpens;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
@@ -19,6 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
   public class DelegatingFileSystemShim : IFileSystem
   {
+    private readonly ILogger myLogger = Logger.GetLogger<DelegatingFileSystemShim>();
     private readonly IFileSystem myFileSystem;
 
     public DelegatingFileSystemShim(Lifetime lifetime)
@@ -43,22 +45,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp
         ? shim.IsStableFile(path)
         : myFileSystem.IsStableFileHeuristic(path.FullPath);
 
-    [Obsolete("Use in tests only.")]
     public virtual DateTime GetLastWriteTimeShim(string fileName)
     {
       var path = FileSystemPath.TryParse(fileName);
-      return path.IsEmpty
+      var lastWriteTime = path.IsEmpty
         ? myFileSystem.GetLastWriteTimeShim(fileName)
         : GetLastWriteTime(path);
+
+      myLogger.Trace("Last write: {0}: {1}", fileName, lastWriteTime);
+      return lastWriteTime;
     }
 
-    [Obsolete("Use in tests only.")]
     public virtual bool SafeExists(string fileName)
     {
       var path = FileSystemPath.TryParse(fileName);
-      return path.IsEmpty
+      var exists = path.IsEmpty
         ? myFileSystem.SafeExists(fileName)
         : Exists(path);
+
+      myLogger.Trace("Exists: {0}: {1}", fileName, exists);
+      return exists;
     }
 
     public virtual byte[] ReadAllBytesShim(string fileName) => myFileSystem.ReadAllBytesShim(fileName);
