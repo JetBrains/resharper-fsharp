@@ -51,7 +51,7 @@ type DelegatingFileSystemShimTest() =
 
                 match FileSystem with
                 | :? LoggingShim as loggingShim ->
-                    failwithf "File system is still overriden by %s" loggingShim.Name
+                    failwithf $"File system is still overriden by {loggingShim.Name}"
                 | _ -> ())) |> ignore
 
 
@@ -59,15 +59,15 @@ type LoggingShim(name, lifetime: Lifetime, writer: TextWriter) =
     inherit DelegatingFileSystemShim(lifetime)
 
     do
-        lifetime.AddAction2(fun _ -> writer.WriteLine(sprintf "%s: End of lifetime" name))
+        lifetime.AddAction2(fun _ -> writer.WriteLine$"{name}: End of lifetime")
 
     member x.Name = name
 
     override x.GetLastWriteTime(path) =
-        writer.WriteLine(sprintf "%s: Get last write time (path): %O" name path.Name)
+        writer.WriteLine$"{name}: Get last write time (path): {path.Name}"
         base.GetLastWriteTime(path)
 
     override x.GetLastWriteTimeShim(fileName) =
         let path = FileSystemPath.Parse(fileName)
-        writer.WriteLine(sprintf "%s: Get last write time (string): %s" name path.Name)
+        writer.WriteLine$"{name}: Get last write time (string): {path.Name}"
         base.GetLastWriteTimeShim(fileName)

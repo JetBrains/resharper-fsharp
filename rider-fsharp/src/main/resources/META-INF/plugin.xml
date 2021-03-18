@@ -86,7 +86,7 @@
 
     <registryKey key="rider.fsharp.fcsBusyDelay.ms" description="Number of milliseconds that the FCS reactor must be busy for before showing a background task" defaultValue="5000" restartRequired="false"/>
 
-    <rdclient.traceScenarioHolder implementation="com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios"/>
+    <rd.platform.traceScenarioHolder implementation="com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios"/>
   </extensions>
 
   <actions>
