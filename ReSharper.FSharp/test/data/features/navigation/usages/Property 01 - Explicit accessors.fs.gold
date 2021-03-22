@@ -110,7 +110,7 @@ Occurrence's navigation result. Opened file: Property 01 - Explicit accessors.cs
 ------------------
 
 Occurrence's dump:
-TO: [R] static member A with set (_: int, _: int) (_: int) = T.|A|(0) <- 0 RANGE: (224,225) @ Property 01 - Explicit accessors.fs
+TO: [W] static member A with set (_: int, _: int) (_: int) = T.|A|(0) <- 0 RANGE: (224,225) @ Property 01 - Explicit accessors.fs
 Menu Item presentation: 
 Text: T.set_A      |... int, _: int) (_: int) = T.|A|(0) <- 0| (9)
 Shortcut text: in <Root Namespace>
@@ -128,7 +128,7 @@ Occurrence's navigation result. Opened file: Property 01 - Explicit accessors.fs
 ------------------
 
 Occurrence's dump:
-TO: [R] static member A with set (_: int, _: int, _: int, _: int) (_: int) = T.|A|(0, 0) <- 0 RANGE: (369,370) @ Property 01 - Explicit accessors.fs
+TO: [W] static member A with set (_: int, _: int, _: int, _: int) (_: int) = T.|A|(0, 0) <- 0 RANGE: (369,370) @ Property 01 - Explicit accessors.fs
 Menu Item presentation: 
 Text: T.set_A      |... int, _: int) (_: int) = T.|A|(0, 0) <- 0| (13)
 Shortcut text: in <Root Namespace>
