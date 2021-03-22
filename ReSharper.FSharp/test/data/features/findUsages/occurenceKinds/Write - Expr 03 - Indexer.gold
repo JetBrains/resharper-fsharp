@@ -1,0 +1,18 @@
+﻿Pattern
+---
+UsageOther TO: [O] let |a|: int[] = [||] RANGE: (21,22) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] let |b|: int[][] = [||] RANGE: (56,57) @ Write - Expr 03 - Indexer.fs
+
+
+Type argument
+---
+UsageTypeArgument TO: [O] let a: |int|[] = [||] RANGE: (24,27) @ Write - Expr 03 - Indexer.fs
+UsageTypeArgument TO: [O] let b: |int|[][] = [||] RANGE: (59,62) @ Write - Expr 03 - Indexer.fs
+
+
+Write access
+---
+UsageWrite TO: [W] |a|.[0] <- 1 RANGE: (38,39) @ Write - Expr 03 - Indexer.fs
+UsageWrite TO: [W] |b|.[0].[0] <- 1 RANGE: (75,76) @ Write - Expr 03 - Indexer.fs
+
+
