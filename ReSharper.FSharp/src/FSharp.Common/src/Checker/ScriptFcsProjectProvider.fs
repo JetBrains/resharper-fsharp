@@ -2,6 +2,7 @@
 
 open FSharp.Compiler.Text
 open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
@@ -11,7 +12,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Util
 
 [<SolutionComponent>]
-type ScriptFcsProjectProvider(lifetime, logger: ILogger, checkerService: FSharpCheckerService,
+type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerService: FcsCheckerService,
         scriptSettings: FSharpScriptSettingsProvider) =
 
     let getScriptOptionsLock = obj()

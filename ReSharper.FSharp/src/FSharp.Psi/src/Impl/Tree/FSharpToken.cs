@@ -52,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public IFSharpFile FSharpFile => (this.GetContainingFile() as IFSharpFile).NotNull();
 
-    public FSharpCheckerService CheckerService
+    public FcsCheckerService CheckerService
     {
       get => FSharpFile.CheckerService;
       set => throw new InvalidOperationException();

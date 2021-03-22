@@ -18,9 +18,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   public class FSharpCacheDeclarationProcessor : TreeNodeVisitor
   {
     protected readonly ICacheBuilder Builder;
-    private readonly FSharpCheckerService myCheckerService;
+    private readonly FcsCheckerService myCheckerService;
 
-    public FSharpCacheDeclarationProcessor(ICacheBuilder builder, FSharpCheckerService checkerService)
+    public FSharpCacheDeclarationProcessor(ICacheBuilder builder, FcsCheckerService checkerService)
     {
       Builder = builder;
       myCheckerService = checkerService;

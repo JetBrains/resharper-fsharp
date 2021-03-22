@@ -10,12 +10,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly FSharpFileResolvedSymbols[] myFileResolvedSymbols;
 
     public IPsiModule PsiModule { get; }
-    public FSharpCheckerService CheckerService { get; }
+    public FcsCheckerService CheckerService { get; }
     public IFcsProjectProvider FcsProjectProvider { get; }
 
     private readonly JetFastSemiReenterableRWLock myLock = new JetFastSemiReenterableRWLock();
 
-    public FSharpModuleResolvedSymbols(IPsiModule psiModule, int filesCount, FSharpCheckerService checkerService,
+    public FSharpModuleResolvedSymbols(IPsiModule psiModule, int filesCount, FcsCheckerService checkerService,
       IFcsProjectProvider fcsProjectProvider)
     {
       myFileResolvedSymbols = new FSharpFileResolvedSymbols[filesCount];

@@ -17,8 +17,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFileCheckInfoOwner
   {
     // ReSharper disable once NotNullMemberIsNotInitialized
-    public FSharpCheckerService FcsCheckerService { get; set; }
-    public FSharpCheckerService CheckerService => FcsCheckerService;
+    public FcsCheckerService FcsCheckerService { get; set; }
+    public FcsCheckerService CheckerService => FcsCheckerService;
 
     // ReSharper disable once NotNullMemberIsNotInitialized
     public IFSharpResolvedSymbolsCache ResolvedSymbolsCache { get; set; }

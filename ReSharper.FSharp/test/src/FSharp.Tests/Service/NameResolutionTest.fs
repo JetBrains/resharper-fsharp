@@ -39,7 +39,7 @@ type NameResolutionTest() =
     
     override x.DoTest(lifetime, _) =
         let textControl = x.OpenTextControl(lifetime)
-        let checkerService = x.ShellInstance.GetComponent<FSharpCheckerService>()
+        let checkerService = x.ShellInstance.GetComponent<FcsCheckerService>()
         let sourceFile = textControl.Document.GetPsiSourceFile(x.Solution)
 
         let name = BaseTestWithTextControl.GetSetting(textControl, Name).NotNull()

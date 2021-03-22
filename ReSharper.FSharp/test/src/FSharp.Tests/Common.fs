@@ -17,6 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework.Projects
@@ -101,7 +102,7 @@ type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsPro
 
 
 [<SolutionComponent>]
-type TestFcsProjectBuilder(checkerService: FSharpCheckerService, logger: ILogger) =
+type TestFcsProjectBuilder(checkerService: FcsCheckerService, logger: ILogger) =
     inherit FcsProjectBuilder(checkerService, Mock<_>().Object, logger)
 
     override x.GetProjectItemsPaths(project, targetFrameworkId) =
@@ -114,7 +115,7 @@ type TestFcsProjectBuilder(checkerService: FSharpCheckerService, logger: ILogger
 
 
 [<SolutionComponent>]
-type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FSharpCheckerService,
+type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerService,
         fcsProjectBuilder: FcsProjectBuilder, scriptFcsProjectProvider: IScriptFcsProjectProvider) as this =
     do
         checkerService.FcsProjectProvider <- this
@@ -132,7 +133,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FSharpCheckerSer
     interface IFcsProjectProvider with
         member x.HasPairFile _ = false
 
-        member x.GetProjectOptions(sourceFile) =
+        member x.GetProjectOptions(sourceFile: IPsiSourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then
                 scriptFcsProjectProvider.GetScriptOptions(sourceFile) else
 
@@ -175,3 +176,4 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FSharpCheckerSer
 
         member x.InvalidateReferencesToProject _ = false
         member x.HasFcsProjects = false
+        member this.GetProjectOptions(_: IPsiModule): FSharpProjectOptions option = failwith "todo"

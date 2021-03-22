@@ -31,9 +31,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly object myLock = new object();
 
     [NotNull] public IPsiSourceFile SourceFile { get; }
-    [NotNull] public FSharpCheckerService CheckerService { get; }
+    [NotNull] public FcsCheckerService CheckerService { get; }
 
-    public FSharpFileResolvedSymbols([NotNull] IPsiSourceFile sourceFile, [NotNull] FSharpCheckerService checkerService)
+    public FSharpFileResolvedSymbols([NotNull] IPsiSourceFile sourceFile, [NotNull] FcsCheckerService checkerService)
     {
       SourceFile = sourceFile;
       CheckerService = checkerService;

@@ -22,13 +22,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
   public class FSharpResolvedSymbolsCache : IPsiSourceFileCache, IFSharpResolvedSymbolsCache
   {
     public IPsiModules PsiModules { get; }
-    public FSharpCheckerService CheckerService { get; }
+    public FcsCheckerService CheckerService { get; }
     public IFcsProjectProvider FcsProjectProvider { get; }
 
     private readonly object myLock = new object();
     private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
 
-    public FSharpResolvedSymbolsCache(Lifetime lifetime, FSharpCheckerService checkerService, IPsiModules psiModules,
+    public FSharpResolvedSymbolsCache(Lifetime lifetime, FcsCheckerService checkerService, IPsiModules psiModules,
       IFcsProjectProvider fcsProjectProvider)
     {
       PsiModules = psiModules;

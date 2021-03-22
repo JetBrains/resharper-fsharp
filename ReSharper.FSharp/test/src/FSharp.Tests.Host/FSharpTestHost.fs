@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open System.Collections.Generic
 open System.Linq
-open FSharp.Compiler.ExtensionTyping
 open FSharp.Compiler.IO
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
@@ -18,7 +17,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<SolutionComponent>]
-type FSharpTestHost(lifetime: Lifetime, solution: ISolution, checkerService: FSharpCheckerService,
+type FSharpTestHost(lifetime: Lifetime, solution: ISolution, checkerService: FcsCheckerService,
         sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer) =
 
     let dumpSingleProjectMapping _ =

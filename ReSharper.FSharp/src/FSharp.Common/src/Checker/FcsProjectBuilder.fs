@@ -69,7 +69,7 @@ module ProjectOptions =
 
 
 [<SolutionComponent>]
-type FcsProjectBuilder(checkerService: FSharpCheckerService, itemsContainer: IFSharpItemsContainer, logger: ILogger) =
+type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer, logger: ILogger) =
 
     let itemsDelimiters = [| ';'; ','; ' ' |]
 

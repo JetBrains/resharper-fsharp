@@ -11,6 +11,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     TReturn Accept<TContext, TReturn>(TreeNodeVisitor<TContext, TReturn> visitor, TContext context);
 
     [NotNull] IFSharpFile FSharpFile { get; }
-    [NotNull] FSharpCheckerService CheckerService { get; }
+    [NotNull] FcsCheckerService CheckerService { get; }
   }
 }

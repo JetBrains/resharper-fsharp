@@ -14,9 +14,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   [Language(typeof(FSharpLanguage))]
   public class FSharpCacheProvider : ILanguageCacheProvider, ILanguageCacheInvalidator
   {
-    private readonly FSharpCheckerService myCheckerService;
+    private readonly FcsCheckerService myCheckerService;
 
-    public FSharpCacheProvider(FSharpCheckerService checkerService) =>
+    public FSharpCacheProvider(FcsCheckerService checkerService) =>
       myCheckerService = checkerService;
 
     public void BuildCache(IFile file, ICacheBuilder builder)

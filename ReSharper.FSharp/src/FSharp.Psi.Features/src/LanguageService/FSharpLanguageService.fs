@@ -24,7 +24,7 @@ open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLanguageService(languageType, constantValueService, cacheProvider: FSharpCacheProvider,
-        checkerService: FSharpCheckerService, formatter: FSharpCodeFormatter) =
+        checkerService: FcsCheckerService, formatter: FSharpCodeFormatter) =
     inherit LanguageService(languageType, constantValueService)
 
     let lexerFactory = FSharpLexerFactory()

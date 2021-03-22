@@ -31,16 +31,19 @@ module FcsProjectProvider =
     let isProjectModule (psiModule: IPsiModule) =
         psiModule :? IProjectPsiModule 
 
-    let getModuleProject (psiModule: IPsiModule) =
-        psiModule.ContainingProjectModule.As<IProject>()
+    let isMiscModule (psiModule: IPsiModule) =
+        psiModule.IsMiscFilesProjectModule()
 
     let isFSharpProject (projectModelModule: IModule) =
         match projectModelModule with
         | :? IProject as project -> project.IsFSharp // todo: check `isOpened`?
         | _ -> false
 
+    let getModuleProject (psiModule: IPsiModule) =
+        psiModule.ContainingProjectModule.As<IProject>()
+
     let isFSharpProjectModule (psiModule: IPsiModule) =
-        psiModule.IsValid() && isFSharpProject psiModule.ContainingProjectModule
+        psiModule.IsValid() && isFSharpProject psiModule.ContainingProjectModule // todo: remove isValid check?
 
     let [<Literal>] invalidateProjectChangeType =
         ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.TARGET_FRAMEWORK |||
@@ -53,7 +56,7 @@ module FcsProjectProvider =
 
 [<SolutionComponent>]
 type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
-        checkerService: FSharpCheckerService, fcsProjectBuilder: FcsProjectBuilder,
+        checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
         scriptFcsProjectProvider: IScriptFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
         fsFileService: IFSharpFileService, psiModules: IPsiModules, locks: IShellLocks, logger: ILogger) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
@@ -170,9 +173,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let getOrCreateFcsProjectForFile (sourceFile: IPsiSourceFile) =
         getOrCreateFcsProject sourceFile.PsiModule
 
-    let isMiscModule (psiModule: IPsiModule) =
-        psiModule.IsMiscFilesProjectModule()
-
     let isScriptLike file =
         fsFileService.IsScriptLike(file) || isMiscModule file.PsiModule || isNull (file.GetProject())        
 
@@ -181,27 +181,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             SourceFiles = [| sourceFile.GetLocation().FullPath |]
             ConditionalCompilationDefines = ImplicitDefines.scriptDefines
             IsExe = isScript }
-
-    let getProjectOptions (sourceFile: IPsiSourceFile) =
-        let psiModule = sourceFile.PsiModule
-
-        // Scripts belong to separate psi modules even when are in projects, project/misc module check is enough.
-        if isProjectModule psiModule && not (isMiscModule psiModule) then
-            match getOrCreateFcsProject psiModule with
-            | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectOptions
-            | _ -> None
-
-        elif psiModule :? FSharpScriptPsiModule then
-            scriptFcsProjectProvider.GetScriptOptions(sourceFile)
-
-        elif psiModule :? SandboxPsiModule then
-            let settings = sourceFile.GetSettingsStore()
-            if not (settings.GetValue(fun (s: FSharpExperimentalFeatures) -> s.FsiInteractiveEditor)) then None else
-
-            scriptFcsProjectProvider.GetScriptOptions(sourceFile)
-
-        else
-            None
 
     let invalidateProject (project: IProject) =
         for psiModule in psiModules.GetPsiModules(project) do
@@ -250,11 +229,34 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
          | _ -> ()
 
     interface IFcsProjectProvider with
-        member x.GetProjectOptions(sourceFile) =
+        member x.GetProjectOptions(sourceFile: IPsiSourceFile) =
+            let psiModule = sourceFile.PsiModule
+
+            // Scripts belong to separate psi modules even when are in projects, project/misc module check is enough.
+            if isFSharpProjectModule psiModule then
+                match getOrCreateFcsProject psiModule with
+                | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectOptions
+                | _ -> None
+
+            elif psiModule :? FSharpScriptPsiModule then
+                scriptFcsProjectProvider.GetScriptOptions(sourceFile)
+
+            elif psiModule :? SandboxPsiModule then
+                let settings = sourceFile.GetSettingsStore()
+                if not (settings.GetValue(fun (s: FSharpExperimentalFeatures) -> s.FsiInteractiveEditor)) then None else
+
+                scriptFcsProjectProvider.GetScriptOptions(sourceFile)
+
+            else
+                None
+
+        member x.GetProjectOptions(psiModule: IPsiModule) =
             locks.AssertReadAccessAllowed()
             processDirtyFcsProjects ()
 
-            getProjectOptions sourceFile
+            match getOrCreateFcsProject psiModule with
+            | Some fcsProject -> Some fcsProject.ProjectOptions
+            | _ -> None
 
         member x.HasPairFile(sourceFile) =
             locks.AssertReadAccessAllowed()

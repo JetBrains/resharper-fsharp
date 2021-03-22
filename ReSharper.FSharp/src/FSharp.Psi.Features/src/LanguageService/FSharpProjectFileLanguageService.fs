@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpMsBuildUtils
 open JetBrains.ReSharper.Psi
 
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
-type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FSharpCheckerService,
+type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FcsCheckerService,
         fsFileService: IFSharpFileService) =
     inherit ProjectFileLanguageService(projectFileType)
 
