@@ -51,6 +51,7 @@
     </ErrorsGen>
     <Compile Include="src\Daemon\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
     <Compile Include="src\Daemon\Stages\FSharpIdentifierTooltipProvider.fs" />
+    <Compile Include="src\Daemon\Stages\FSharpSyntaxHighlightingQuickDocTooltipRequest.fs" />
     <Compile Include="src\Daemon\Stages\FcsErrorsStageProcessBase.fs" />
     <Compile Include="src\Daemon\Stages\FSharpDaemonBehaviour.fs" />
     <Compile Include="src\Daemon\Stages\ScriptLoadPathsStage.fs" />
