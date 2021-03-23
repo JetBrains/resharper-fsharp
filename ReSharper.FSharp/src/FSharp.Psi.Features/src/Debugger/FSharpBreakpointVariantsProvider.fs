@@ -11,6 +11,13 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
+module FSharpBreakpointVariantsProvider =
+    let supportedFileExtensions =
+        [| FSharpProjectFileType.FsExtension
+           FSharpProjectFileType.MlExtension
+           FSharpScriptProjectFileType.FsxExtension
+           FSharpScriptProjectFileType.FsScriptExtension |]
+
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpBreakpointVariantsProvider() =
 
@@ -18,11 +25,7 @@ type FSharpBreakpointVariantsProvider() =
 
     interface IBreakpointVariantsProvider with
         member x.GetSupportedFileExtensions() =
-            // It's OK to create the list each time, it's called once per solution lifetime.
-            List([| FSharpProjectFileType.FsExtension
-                    FSharpProjectFileType.MlExtension
-                    FSharpScriptProjectFileType.FsxExtension
-                    FSharpScriptProjectFileType.FsScriptExtension |])
+            FSharpBreakpointVariantsProvider.supportedFileExtensions :> _
 
         member x.GetBreakpointVariants(file, line, _) =
             match file.GetPrimaryPsiFile().AsFSharpFile() with
@@ -37,13 +40,13 @@ type FSharpBreakpointVariantsProvider() =
             let lineStart = document.GetLineStartOffset(docLine line)
             let lineEnd = document.GetLineEndOffsetWithLineBreak(docLine line)
 
-            let variants = Dictionary<range, IBreakpoint>() 
+            let result = Dictionary<range, IBreakpoint>() 
             for token in fsFile.FindTokensAt(TreeTextRange(TreeOffset(lineStart), TreeOffset(lineEnd))) do
                 let documentEndOffset = token.GetDocumentEndOffset()
                 let pos = getPosFromDocumentOffset documentEndOffset
                 match parseResults.ValidateBreakpointLocation(pos) with
                 | Some range when range.StartLine - 1 = line ->
-                    if variants.ContainsKey(range) then () else
+                    if result.ContainsKey(range) then () else
 
                     let startOffset = getStartOffset document range
                     let endOffset = getEndOffset document range
@@ -55,10 +58,9 @@ type FSharpBreakpointVariantsProvider() =
                     // Multi-method breakpoints allow us to set up multiple breakpoints across multiple methods if they
                     // all point to the same place in the source code. This is the case e.g. for async CE (since there
                     // may be more than one function generated for a particular CE call).
-                    variants.[range] <- TextRangeBreakpoint(TextRange(startOffset, endOffset),
-                                                            text,
-                                                            containingFunctionName = null,
-                                                            isMultiMethodBreakpoint = true)
+                    result.[range] <-
+                        TextRangeBreakpoint(TextRange(startOffset, endOffset), text, containingFunctionName = null,
+                            isMultiMethodBreakpoint = true)
                 | _ -> ()
 
-            variants.Values.AsList()
+            result.Values :> _
