@@ -46,22 +46,22 @@ type FSharpExpressionEvaluationInfoProvider() =
         getTextToEvaluate expr
 
     interface IExpressionEvaluationInfoProvider with
-        member x.FindExpression(file, range, _) =
+        member x.FindExpression(file, range, _, _) =
             let expr = file.GetNode<IFSharpExpression>(range)
             let exprName = getTextToEvaluate expr
             if isNotNull exprName then
-                EvaluationExpressionInfo(expr, exprName, expr.GetText())
+                EvaluationExpressionInfo(expr, null, exprName, expr.GetText())
             else
                 let offset = range.StartOffset.Offset
                 let tokenOpt =
                     file.FindTokensAt(TreeTextRange(TreeOffset(offset - 1), TreeOffset(offset + 1)))
                     |> Seq.tryFind (fun t -> t.GetTokenType().IsIdentifier)
                 match tokenOpt with
-                | Some token ->
+                | Some(token) ->
                     let document = file.GetSourceFile().Document
                     let coords = document.GetCoordsByOffset(token.GetTreeStartOffset().Offset)
                     let lineText = document.GetLineText(coords.Line)
                     match QuickParse.GetCompleteIdentifierIsland false lineText (int coords.Column) with
-                    | Some (island, _, _) -> EvaluationExpressionInfo(token, island, token.GetText()) // todo: compiled names?
+                    | Some(island, _, _) -> EvaluationExpressionInfo(token, null, island, token.GetText()) // todo: compiled names?
                     | _ -> null
                 | _ -> null
