@@ -7,8 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest>]
-[<TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
+[<FSharpTest; TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
 type FSharpCodeFormatterTest() =
     inherit CodeFormatterWithExplicitSettingsTestBase<FSharpLanguage>()
 
@@ -37,6 +36,7 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Type decl - Enum 03``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 04 - Spaces``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 05 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 06 - Access modifiers``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Union 01``() = x.DoNamedTest()
 

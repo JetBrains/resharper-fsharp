@@ -32,6 +32,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     protected readonly NodeTypeSet Comments =
       new NodeTypeSet(FSharpTokenType.LINE_COMMENT, FSharpTokenType.BLOCK_COMMENT);
 
+    protected readonly NodeTypeSet AccessModifiers =
+      new NodeTypeSet(FSharpTokenType.PUBLIC, FSharpTokenType.INTERNAL, FSharpTokenType.PRIVATE);
+
     protected readonly NodeTypeSet ExpressionsWithChameleon =
       ElementBitsets.F_SHARP_EXPRESSION_BIT_SET.Union(ElementType.CHAMELEON_EXPRESSION);
 
@@ -63,7 +66,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Where(
           Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET),
           Left().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies((node, context) =>
-            node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.PRIVATE))
+            AccessModifiers[node.GetPreviousMeaningfulSibling()?.GetTokenType()]))
         .CloseNodeGetter((node, context) => node.Parent?.LastChild)
         .Return(IndentType.External)
         .Build();
