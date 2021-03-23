@@ -11,12 +11,12 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IEnumRepresentation
           IEnumCaseList
-            IEnumMemberDeclaration
+            IEnumCaseDeclaration
               FSharpIdentifierToken(type:IDENTIFIER, text:B)
               FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
               FSharpToken(type:INT32, text:0)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IEnumMemberDeclaration
+            IEnumCaseDeclaration
               FSharpTokenType+BarTokenElement(type:BAR, text:|)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpIdentifierToken(type:IDENTIFIER, text:C)

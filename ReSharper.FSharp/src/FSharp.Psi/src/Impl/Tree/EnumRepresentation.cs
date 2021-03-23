@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class EnumRepresentation
   {
-    public IReadOnlyList<ITypeMemberDeclaration> GetMemberDeclarations() => EnumMembers;
+    public IReadOnlyList<ITypeMemberDeclaration> GetMemberDeclarations() => EnumCases;
     public override PartKind TypePartKind => PartKind.Enum;
   }
 }

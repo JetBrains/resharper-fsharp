@@ -4,10 +4,10 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class EnumMemberDeclaration
+  internal partial class EnumCaseDeclaration
   {
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() => new FSharpEnumMember(this);
   }

@@ -2,8 +2,7 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IEnumMemberDeclaration : IFSharpTypeMemberDeclaration, ITypeMemberDeclaration
+  public partial interface IEnumCaseDeclaration : IFSharpTypeMemberDeclaration, ITypeMemberDeclaration
   {
-
   }
 }

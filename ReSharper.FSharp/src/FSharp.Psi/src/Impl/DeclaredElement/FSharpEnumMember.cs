@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpEnumMember : FSharpTypeMember<EnumMemberDeclaration>, IField
+  internal class FSharpEnumMember : FSharpTypeMember<EnumCaseDeclaration>, IField
   {
     public FSharpEnumMember([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
