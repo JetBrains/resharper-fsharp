@@ -26,6 +26,7 @@ type ReplaceWithInterpolatedStringTest() =
     [<Test>] member x.``String 11 - Remove outer parens``() = x.DoNamedTest()
     [<Test>] member x.``String 12 - sprintf piped``() = x.DoNamedTest()
     [<Test>] member x.``String 13 - Format string parens``() = x.DoNamedTest()
+    [<Test>] member x.``String 14 - Parentheses required``() = x.DoNamedTest()
 
     [<Test>] member x.``Triple Quoted String 01 - Many specifiers with text``() = x.DoNamedTest()
     [<Test>] member x.``Triple Quoted String 02 - Applied string literal``() = x.DoNamedTest()

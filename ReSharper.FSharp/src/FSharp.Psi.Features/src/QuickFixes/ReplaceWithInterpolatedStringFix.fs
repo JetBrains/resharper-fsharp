@@ -5,10 +5,12 @@ open JetBrains.Metadata.Reader.API
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type private StringManipulation =
@@ -31,8 +33,7 @@ module ReplaceWithInterpolatedStringFix =
         [| [| "%O" |], SpecifierSkipPolicy.Skip // %O is the implied default in interpolated strings
            [| "%s"; "%d"; "%i" |], SpecifierSkipPolicy.SkipForKnownTypes
            [| "%u" |], SpecifierSkipPolicy.SkipForTypes unsignedTypes |]
-        |> Array.map (fun (specifiers, policy) -> specifiers |> Array.map (fun s -> s, policy))
-        |> Array.concat
+        |> Array.collect (fun (specifiers, policy) -> specifiers |> Array.map (fun s -> s, policy))
         |> dict
 
     let skipSpecifier (expr: IFSharpExpression) (specifier: string): bool =
@@ -119,7 +120,9 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
         let interpolatedStringExpr = factory.CreateExpr(interpolatedSb.ToString())
 
         if isPredefinedFunctionRef "sprintf" prefixAppExpr.FunctionExpression then
-            ModificationUtil.ReplaceChild(outerPrefixAppExpr, interpolatedStringExpr) |> ignore
+            let newChild = ModificationUtil.ReplaceChild(outerPrefixAppExpr, interpolatedStringExpr)
+            if not (isWhitespace (newChild.GetPreviousToken())) then
+                ModificationUtil.AddChildBefore(newChild, Whitespace()) |> ignore
         else
             ModificationUtil.ReplaceChild(formatStringExpr, interpolatedStringExpr) |> ignore
             ModificationUtil.ReplaceChild(outerPrefixAppExpr, prefixAppExpr) |> ignore

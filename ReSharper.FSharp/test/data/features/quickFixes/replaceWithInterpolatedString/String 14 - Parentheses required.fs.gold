@@ -1,0 +1,4 @@
+﻿module Module
+
+let foo value =
+    invalidOp $"{caret}key has value '%s{value}'"
