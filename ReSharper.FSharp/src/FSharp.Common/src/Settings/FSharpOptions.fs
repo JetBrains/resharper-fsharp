@@ -24,7 +24,8 @@ type FSharpSettings() = class end
 
 [<AutoOpen>]
 module FSharpOptions =
-    let [<Literal>] backgroundTypeCheck = "Enable background type checking (not recommended)"
+    let [<Literal>] backgroundTypeCheck = "Enable background analysis (requires restart)"
+    let [<Literal>] skipImplementationAnalysis = "Skip implementation files analysis when possible (requires restart)"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
     let [<Literal>] enableFcsReactorMonitor = "Enable FCS monitor"
@@ -34,6 +35,9 @@ module FSharpOptions =
 type FSharpOptions =
     { [<SettingsEntry(false, backgroundTypeCheck); DefaultValue>]
       mutable BackgroundTypeCheck: bool
+
+      [<SettingsEntry(false, backgroundTypeCheck); DefaultValue>]
+      mutable SkipImplementationAnalysis: bool
 
       [<SettingsEntry(true, outOfScopeCompletion); DefaultValue>]
       mutable EnableOutOfScopeCompletion: bool
@@ -164,6 +168,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), id))
 
         this.AddHeader("FSharp.Compiler.Service options")
+        this.AddBoolOption((fun key -> key.SkipImplementationAnalysis), RichText(skipImplementationAnalysis), null) |> ignore
         this.AddBoolOption((fun key -> key.EnableReactorMonitor), RichText(enableFcsReactorMonitor), null) |> ignore
         this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
         this.AddBoolOption((fun key -> key.OutOfProcessTypeProviders), RichText(FSharpExperimentalFeatures.outOfProcessTypeProviders), null) |> ignore

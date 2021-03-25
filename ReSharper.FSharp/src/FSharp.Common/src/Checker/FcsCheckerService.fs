@@ -33,14 +33,15 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
 
-        let settingsEntry =
-            let settingsKey = settingsSchema.GetKey<FSharpOptions>()
-            settingsKey.TryFindEntryByMemberName("BackgroundTypeCheck") :?> SettingsScalarEntry
+        let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+        let settingsKey = settingsSchema.GetKey<FSharpOptions>()
 
-        let enableBgCheck =
-            settingsStore
-                .BindToContextLive(lifetime, ContextRange.ApplicationWide)
-                .GetValueProperty(lifetime, settingsEntry, null)
+        let getSettingProperty name =
+            let setting = settingsKey.TryFindEntryByMemberName(name) :?> SettingsScalarEntry
+            settingsStoreLive.GetValueProperty(lifetime, setting, null)
+
+        let enableBgCheck = getSettingProperty "BackgroundTypeCheck"
+        let skipImpl = getSettingProperty "SkipImplementationAnalysis"
 
         lazy
             let checker =
@@ -48,6 +49,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
                                      reactorListener = reactorMonitor,
+                                     enablePartialTypeChecking = skipImpl.Value,
                                      ImplicitlyStartBackgroundWork = enableBgCheck.Value)
 
             enableBgCheck.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue enabled) ->
