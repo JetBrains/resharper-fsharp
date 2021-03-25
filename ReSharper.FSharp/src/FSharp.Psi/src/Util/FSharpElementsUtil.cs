@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FSharp.Compiler.Symbols;
-using FSharp.Compiler.Text;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
@@ -24,6 +23,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
+using Range = FSharp.Compiler.Text.Range;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {

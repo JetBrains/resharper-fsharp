@@ -2,7 +2,6 @@
 
 open FSharp.Compiler.Diagnostics
 open FSharp.Compiler.Syntax
-open FSharp.Compiler.Text
 open JetBrains.Annotations
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules
@@ -15,6 +14,7 @@ module rec CommonUtil =
     open System.Collections.Generic
     open System.Diagnostics
     open System.Text.RegularExpressions
+    open FSharp.Compiler.Text
     open JetBrains.Application.UI.Icons.ComposedIcons
     open JetBrains.DataFlow
     open JetBrains.DocumentModel

@@ -11,6 +11,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
 using Microsoft.FSharp.Core;
+using Range = FSharp.Compiler.Text.Range;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 {
