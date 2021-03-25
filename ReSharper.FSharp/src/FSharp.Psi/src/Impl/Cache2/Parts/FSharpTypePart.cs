@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
           continue;
 
         var offset = member.GetTreeStartOffset().Offset;
-        methods.Add(new ExtensionMethodInfo(AnyCandidateType.INSTANCE, offset, member.DeclaredName) {Owner = this});
+        methods.Add(new ExtensionMethodInfo(AnyCandidateType.INSTANCE, offset, member.DeclaredName, this));
       }
 
       if (methods.IsEmpty())
@@ -84,7 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       var methods = new ExtensionMethodInfo[extensionMethodCount];
       for (var i = 0; i < extensionMethodCount; i++)
-        methods[i] = new ExtensionMethodInfo(reader) {Owner = this};
+        methods[i] = new ExtensionMethodInfo(reader, this);
       ExtensionMethodInfos = methods;
     }
 
