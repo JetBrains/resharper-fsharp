@@ -145,7 +145,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | Regex addTypeEquationMessage [expectedType; actualType] ->
                 let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
                 let expr = getResultExpr expr
-                if isNotNull expr then AddTypeEquationError(expectedType, actualType, expr, error.Message) :> _
+                if isNotNull expr then
+                    match expectedType with
+                    | "unit" -> createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
+                    | _ -> AddTypeEquationError(expectedType, actualType, expr, error.Message) :> _
                 else null
 
             | _ -> createGenericHighlighting error range
