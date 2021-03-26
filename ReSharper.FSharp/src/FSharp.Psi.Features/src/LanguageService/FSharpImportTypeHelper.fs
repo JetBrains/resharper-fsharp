@@ -111,6 +111,7 @@ type FSharpQuickFixUtilComponent() =
     member x.BindTo(reference: FSharpSymbolReference, typeElement: ITypeElement) =
         let referenceOwner = reference.GetElement()
         use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
+        use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
 
         FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, typeElement)
         if FSharpResolveUtil.resolvesToQualified typeElement reference FcsOpName then reference else
@@ -139,7 +140,7 @@ type FSharpQuickFixUtilComponent() =
         member x.AddImportsForExtensionMethod(reference, _) = reference
 
         member this.BindTo(reference, typeElement) =
-            this.BindTo(reference :?> _, typeElement) :> _
+            this.BindTo(reference :?> _, typeElement)
 
 
 // todo: ExtensionMethodImportUtilBase

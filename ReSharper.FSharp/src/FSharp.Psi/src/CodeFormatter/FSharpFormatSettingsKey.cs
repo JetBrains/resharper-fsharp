@@ -9,17 +9,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
   [EditorConfigKey("fsharp")]
   public class FSharpFormatSettingsKey : FormatSettingsKeyBase
   {
+    [SettingsEntry(WrapStyle.WRAP_IF_LONG, "Wrap invocation arguments")]
+    public WrapStyle WrapArgumentsStyle;
+
+    [SettingsEntry(ParsFormatStyle.INSIDE, "Indent method calls' parenthesis")]
+    public ParsFormatStyle IndentInvocationPars;
+
+    [SettingsEntry(false, "Call arguments by '('")]
+    public bool AlignFirstArgByParen;
+
+    
+    [SettingsEntry(false, "Prefer wrap after \"(\" in invocation")]                    public bool WrapAfterInvocationLparen;
+    [SettingsEntry(false, "Prefer wrap before \")\" in invocation")]                   public bool WrapBeforeInvocationRparen;
+
+    [EditorConfigEntryAlias("keep_existing_arrangement", EditorConfigAliasType.ReSharperGeneralized)]
+    [SettingsEntry(true, "Keep existing arrangement of parenthesis in invocation")]
+    public bool KeepExistingInvocationParensArrangement;
+
     [SettingsEntry(true, "Line break after type representation access modifier")]
     public bool LineBreakAfterTypeReprAccessModifier;
 
-    [SettingsEntry(true, "todo")]
-    public bool KeepExistingLineBreakInDoLikeExpr;
-    
-    [SettingsEntry(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE, "todo")]
-    public PlaceOnSameLineAsOwner DoLikeExprOnTheSameLine;
+    [SettingsEntry(true, "Keep line break after '=' in declarations")]
+    public bool KeepExistingLineBreakBeforeDeclarationBody;
 
-    [SettingsEntry(true, "Line break after '=' in types")]
-    public bool LineBreakAfterEqualsInTypeDecl;
+    [SettingsEntry(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE, "Line break after '=' in declarations")]
+    public PlaceOnSameLineAsOwner DeclarationBodyOnTheSameLine;
+
+    [SettingsEntry(true, "Keep line break in 'do'-like declarations")]
+    public bool KeepExistingLineBreakInDoLikeExpr;
+
+    [SettingsEntry(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE, "Line break in 'do'-like declarations")]
+    public PlaceOnSameLineAsOwner DoLikeExprOnTheSameLine;
 
     [SettingsEntry(1, "todo")]
     public int BlankLinesBeforeFirstTopLevelModuleMember;

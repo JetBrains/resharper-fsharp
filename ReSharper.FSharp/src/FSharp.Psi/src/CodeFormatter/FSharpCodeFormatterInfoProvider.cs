@@ -54,10 +54,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     {
       // todo: use parens rules for parens (closing bracket without indent)
       Describe<ContinuousIndentRule>()
-        .Name("ContinuousIndent")
-        .Where(Node().In(ElementBitsets.DO_LIKE_EXPR_BIT_SET.Union(ElementType.DO_STATEMENT,
-          ElementType.NESTED_MODULE_DECLARATION, ElementType.F_SHARP_TYPE_DECLARATION,
-          ElementType.ENUM_CASE_DECLARATION, ElementType.UNION_CASE_DECLARATION, ElementType.ATTRIBUTE_LIST)))
+        .Name("ContinuousIndent1")
+        .Where(Node().In(ElementBitsets.DO_LIKE_EXPR_BIT_SET.Union(ElementType.NESTED_MODULE_DECLARATION,
+          ElementType.F_SHARP_TYPE_DECLARATION, ElementType.ENUM_CASE_DECLARATION, ElementType.UNION_CASE_DECLARATION,
+          ElementType.ATTRIBUTE_LIST, ElementType.UNIT_EXPR, ElementType.UNIT_PAT, ElementType.LET_BINDINGS_DECLARATION, 
+          ElementType.MODULE_ABBREVIATION_DECLARATION)))
+        .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
+        .Build();
+
+      // todo: union with the previous rule
+      Describe<ContinuousIndentRule>()
+        .Name("ContinuousIndent2")
+        .Where(Node().In(ElementType.DO_STATEMENT).Satisfies(IsExplicitDo))
         .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
         .Build();
 
@@ -136,9 +144,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<IndentingRule>()
         .Name("DoDeclIndent")
         .Where(
-          Parent()
-            .HasType(ElementType.DO_STATEMENT)
-            .Satisfies((node, _) => !((IDoStatement) node).IsImplicit),
+          Parent().HasType(ElementType.DO_STATEMENT).Satisfies(IsExplicitDo),
           Node().HasRole(DoStatement.CHAMELEON_EXPR))
         .Return(IndentType.External)
         .Build();
@@ -192,19 +198,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     private void BlankLines()
     {
+      // todo: separate setting for enum like cases?
+      var declarations =
+        ElementBitsets.MODULE_MEMBER_BIT_SET
+          .Union(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET)
+          .Union(ElementType.F_SHARP_TYPE_DECLARATION);
+
       Describe<BlankLinesAroundNodeRule>()
         .AddNodesToGroupBefore(Node().In(Comments))
         .AddNodesToGroupAfter(Node().In(Comments))
-        // .AddNodesToGroupConditionally(Node().In(ElementBitsets.PREPROCESSOR_DIRECTIVE_BIT_SET // todo: check tree
-        //   // Regions are excepted because of separate BLANK_LINES_AROUND_REGION and BLANK_LINES_INSIDE_REGION
-        //   .Except(ElementType.START_REGION)
-        //   .Except(ElementType.END_REGION)))
-        .AllowedNodesBefore(Node().Satisfies((node, checker) => true))
+        .AllowedNodesBefore(Node().Satisfies((node, checker) => node.NodeType != FSharpTokenType.EQUALS))
         .AllowedNodesAfter(Node().Satisfies((node, checker) => true))
         .Priority(1)
         .StartAlternating()
-        .Name("BlankLinesAroundModuleMembers") // todo: rename option to decls
-        .Where(Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET.Union(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET)))
+        .Name("BlankLinesAroundModuleMembers")
+        .Where(Node().In(declarations))
         .MinBlankLines(it => it.BlankLinesAroundMultilineModuleMembers)
         .MinBlankLinesForSingleLine(it => it.BlankLinesAroundSingleLineModuleMember)
         .Build()
@@ -284,9 +292,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           Parent().In(ElementType.UNIT_EXPR, ElementType.UNIT_PAT),
           Left().In(FSharpTokenType.LPAREN),
           Right().In(FSharpTokenType.RPAREN))
-        .Return(IntervalFormatType.Empty)
+        .Return(IntervalFormatType.OnlyEmpty)
         .Build();
-      
+
       Describe<FormattingRule>()
         .Name("KeepUserLineBreaks")
         .FormatHighlighting(FormatterImplHelper.ProhibitHighlighting) // todo: other cases
@@ -306,28 +314,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Group(LineBreaksRuleGroup)
         .Name("LineBreakAfterTypeReprAccessModifier")
         .Where(
-          Parent().In(ElementBitsets.ENUM_LIKE_TYPE_REPRESENTATION_BIT_SET)
+          Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET)
             .Satisfies((node, context) => ((ISimpleTypeRepresentation) node).AccessModifier != null),
-          Right().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET))
+          Right().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET.Union(ElementType.RECORD_FIELD_DECLARATION)))
         .Switch(settings => settings.LineBreakAfterTypeReprAccessModifier,
           When(true).Return(IntervalFormatType.NewLine))
         .Build();
 
       // todo: type U = C of int
-      Describe<FormattingRule>()
-        .Group(LineBreaksRuleGroup)
-        .Name("LineBreakAfterEqualsInTypeDecl")
-        .Where(Parent().In(ElementType.F_SHARP_TYPE_DECLARATION),
-          Right().In(ElementBitsets.TYPE_REPRESENTATION_BIT_SET).Satisfies((node, context) =>
-            node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS))
-        .Switch(settings => settings.LineBreakAfterEqualsInTypeDecl, When(true).Return(IntervalFormatType.NewLine))
-        .Build();
+      // todo: single/nulti line module abbr
+      // Describe<FormattingRule>()
+      //   .Group(LineBreaksRuleGroup)
+      //   .Name("LineBreakAfterEqualsInTypeDecl")
+      //   .Where(Parent().In(ElementType.F_SHARP_TYPE_DECLARATION),
+      //     Right().In(ElementBitsets.TYPE_REPRESENTATION_BIT_SET).Satisfies((node, context) =>
+      //       node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS))
+      //   .Switch(settings => settings.LineBreakAfterEqualsInTypeDecl, When(true).Return(IntervalFormatType.NewLine))
+      //   .Build();
 
-      DescribeDoLikeClause(Node().In(ElementBitsets.DO_LIKE_EXPR_BIT_SET), key => key.DoLikeExprOnTheSameLine);
+      DescribeLineBreakInNode("Declarations", Node().In(ElementType.F_SHARP_TYPE_DECLARATION),
+        Node().In(ElementBitsets.TYPE_REPRESENTATION_BIT_SET).Satisfies((node, context) =>
+          node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS),
+        key => key.DeclarationBodyOnTheSameLine, key => key.KeepExistingLineBreakBeforeDeclarationBody);
 
-      DescribeDoLikeClause(
+      DescribeLineBreakInNode("DoLikeClause", Node().In(ElementBitsets.DO_LIKE_EXPR_BIT_SET),
+        Node().In(ExpressionsWithChameleon), key => key.DoLikeExprOnTheSameLine, 
+        key => key.KeepExistingLineBreakInDoLikeExpr);
+
+      DescribeLineBreakInNode("DoLikeClause", 
         Node().In(ElementType.DO_STATEMENT).Satisfies((node, context) => !((IDoStatement) node).IsImplicit),
-        key => key.DoLikeExprOnTheSameLine);
+        Node().In(ExpressionsWithChameleon), key => key.DoLikeExprOnTheSameLine,
+        key => key.KeepExistingLineBreakInDoLikeExpr);
 
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
@@ -377,44 +394,107 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build()
         .AndViceVersa()
         .Build();
+      
+      
+      var invocationRule = GetParsRuleBuilder()
+        // .SpacesBeforeLParSetting(x => x.SPACE_BEFORE_METHOD_CALL_PARENTHESES)
+        // .SpacesInsideParsSetting(x => x.SPACE_WITHIN_METHOD_CALL_PARENTHESES)
+        // .SpacesBeforeEmptyParsSetting(x => x.SPACE_BEFORE_EMPTY_METHOD_CALL_PARENTHESES)
+        // .SpacesInsideEmptyParsSetting(x => x.SPACE_WITHIN_EMPTY_METHOD_CALL_PARENTHESES)
+        .WrapSetting(x => x.WrapArgumentsStyle)
+
+        // todo: check style guides
+        // .MaxElementsOnLine(x => x.MAX_INVOCATION_ARGUMENTS_ON_LINE)
+
+        // .WrapBeforeLParSetting(x => x.WRAP_BEFORE_INVOCATION_LPAR)
+
+        .WrapAfterLParSetting(x => x.WrapAfterInvocationLparen)
+        .WrapBeforeRParSetting(x => x.WrapBeforeInvocationRparen)
+        .KeepExistingArrangementOfParsSetting(x => x.KeepExistingInvocationParensArrangement)
+        .IndentParsSetting(x => x.IndentInvocationPars)
+        .ChopAroundPars(true)
+        .KeepTogetherPolicy(KeepTogetherPolicy.ExceptTheOnlyElement)
+        .ExcellentPlaceToWrapAroundPars(true)
+        .StartAlternating();
+
+      invocationRule
+        .Name("INVOCATION_EXPRESSION()")
+        .Where(
+          Node()
+            .In(ElementType.PAREN_EXPR)
+            .Satisfies((node, checker) => true /*!NameofUtil.CanBeNameofOperatorIdentifier(((IInvocationExpression) node).InvokedExpression)*/) // todo: upper case rule from Fantomas
+            // .Or()
+            // .In(ElementType.OBJECT_CREATION_EXPRESSION)
+            // .Satisfies((node, checker) => ((IObjectCreationExpression) node).TypeUsage != null)
+            // .Or()
+            // .In(ElementType.CONSTRUCTOR_INITIALIZER, ElementType.EXTENDED_TYPE))
+            )
+        .CommaAndElementParent(ElementType.TUPLE_EXPR)
+        .Elements(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET)
+        // .DontChopIf(lpar => lpar.Parent != null && ((ICSharpArgumentsOwner) lpar.Parent).Arguments.Count <= 1)
+        .AlignSetting(x => x.AlignFirstArgByParen)
+        // .IndentByOneChar(true)
+        .Build();
     }
 
-    private void DescribeDoLikeClause(IBuilderAction<IBlankWithSinglePattern> builder,
-      Expression<Func<FSharpFormatSettingsKey, object>> setting)
+    private IBuilderWithProvider<CodeFormattingContext, FSharpFormatSettingsKey, ParenthesisRuleWithWrapping> GetParsRuleBuilder()
     {
-      var patternBlank = builder.BuildBlank();
+      return Describe<ParenthesisRuleWithWrapping>()
+        .LPar(FSharpTokenType.LPAREN)
+        .RPar(FSharpTokenType.RPAREN)
+        // .ParsSpacesHighlighting(FSharpFormatHighlightingIds.BadParensSpaces)
+        // .ParsLineBreaksHighlighting(CSharpFormatHighlightingIds.BadParensLineBreaks)
+        .Comma(FSharpTokenType.COMMA)
+        // .ListLineBreaksHighlighting(CSharpFormatHighlightingIds.BadListLineBreaks)
+        // .WrapBeforeCommaSetting(x => x.WRAP_BEFORE_COMMA)
+        .Comments(Comments)
+        // .ContIndentMultiplierSetting(x => x.CONTINUOUS_INDENT_MULTIPLIER)
+        // .UseContIndentSetting(x => x.USE_CONTINUOUS_INDENT_INSIDE_PARENS)
+        .WrapBeforeRParByDefault(false);
+    }
+
+    
+    private void DescribeLineBreakInNode(string name,
+      IBuilderAction<IBlankWithSinglePattern> containingNodesPattern,
+      IBuilderAction<IBlankWithSinglePattern> equalsBeforeNodesPattern,
+      Expression<Func<FSharpFormatSettingsKey, object>> onSameLine,
+      Expression<Func<FSharpFormatSettingsKey, object>> keepExistingLineBreak)
+    {
+      var containingNodes = containingNodesPattern.BuildBlank();
+      var equalsBeforeNodes = equalsBeforeNodesPattern.BuildBlank();
 
       Describe<WrapRule>()
-        .Name("DoLikeClauseWrap")
-        .Where(Node().Is(patternBlank))
-        .Switch(it => it.KeepExistingLineBreakInDoLikeExpr,
-          When(false).Switch(setting,
+        .Name($"{name}Wrap")
+        .Where(Node().Is(containingNodes))
+        .Switch(keepExistingLineBreak,
+          When(false).Switch(onSameLine,
             When(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE)
               .Return(WrapType.Chop | WrapType.PseudoStartBeforeExternal)))
         .Build();
 
       Describe<FormattingRule>()
-        .Name("DoLikeClauseNewLine")
+        .Name($"{name}NewLine")
         .Where(
-          Parent().Is(patternBlank), 
-          Right().In(ExpressionsWithChameleon))
+          Parent().Is(containingNodes), 
+          Right().Is(equalsBeforeNodes))
         .Group(LineBreaksRuleGroup | WrapRuleGroup)
-        .Switch(
-          it => it.KeepExistingLineBreakInDoLikeExpr,
+        .Switch(keepExistingLineBreak,
           When(true).Return(IntervalFormatType.DoNotRemoveUserNewLines),
           When(false)
-            .Switch(setting,
+            .Switch(onSameLine,
               When(PlaceOnSameLineAsOwner.NEVER).Return(IntervalFormatType.NewLine),
               When(PlaceOnSameLineAsOwner.ALWAYS).Return(IntervalFormatType.RemoveUserNewLines),
               When(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE)
                 .Return(IntervalFormatType.RemoveUserNewLines | IntervalFormatType.InsertNewLineConditionally)))
         .Build();
 
+      // todo: why does it work after comment and new line?
+
       Describe<FormattingRule>()
-        .Name("DoLikeClauseSpace")
+        .Name($"{name}Space")
         .Where(
-          Parent().Is(patternBlank),
-          Right().In(ExpressionsWithChameleon))
+          Parent().Is(containingNodes),
+          Right().Is(equalsBeforeNodes))
         .Group(SpaceRuleGroup)
         .Return(IntervalFormatType.Space)
         .Priority(3)
@@ -438,5 +518,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     private static bool IsPipeOperator(ITreeNode node, CodeFormattingContext context) =>
       node is IReferenceExpr refExpr && FSharpPredefinedType.PipeOperatorNames.Contains(refExpr.ShortName);
+
+    private static bool IsExplicitDo(ITreeNode node, CodeFormattingContext context) =>
+      node is IDoStatement { IsImplicit: false };
   }
 }

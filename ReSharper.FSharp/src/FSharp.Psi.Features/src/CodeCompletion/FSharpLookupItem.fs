@@ -15,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
@@ -64,7 +63,7 @@ type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionCo
         let psiServices = fsFile.GetPsiServices()
 
         use writeCookie = WriteLockCookie.Create(fsFile.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
+        use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, "Add open")
 
         addOpen offset fsFile context.BasicContext.ContextBoundSettingsStore ns

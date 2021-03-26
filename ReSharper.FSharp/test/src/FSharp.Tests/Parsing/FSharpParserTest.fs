@@ -11,7 +11,8 @@ type FSharpParserTest() =
 
     override x.RelativeTestDataPath = "parsing"
 
-    [<Test>] member x.``Module - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App 123``() = x.DoNamedTest()
+
     [<Test>] member x.``Module - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Anon 02``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level 01``() = x.DoNamedTest()
@@ -26,6 +27,11 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl group 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl group 02 - Attributes``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Abbreviation - Type args 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Abbreviation - Type args 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Abbreviation 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Abbreviation 02 - Qualified``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Exception 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest()

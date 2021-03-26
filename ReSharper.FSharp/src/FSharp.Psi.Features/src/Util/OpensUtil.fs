@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
@@ -105,23 +106,7 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
     let lineEnding = fsFile.GetLineEnding()
 
     let insertBeforeModuleMember (moduleMember: IModuleMember) =
-        let indent = moduleMember.Indent
-
-        addNodesBefore moduleMember [
-            // todo: add setting for adding space before first module member
-            // Add space before new opens group.
-            if not (moduleMember :? IOpenStatement) && not (isFirstChildOrAfterEmptyLine moduleMember) then
-                NewLine(lineEnding)
-
-            elementFactory.CreateOpenStatement(ns)
-            NewLine(lineEnding)
-            if indent > 0 then
-                Whitespace(indent)
-
-            // Add space after new opens group.
-            if not (moduleMember :? IOpenStatement) then
-                NewLine(lineEnding)
-        ] |> ignore
+        ModificationUtil.AddChildBefore(moduleMember, elementFactory.CreateOpenStatement(ns)) |> ignore
 
     let insertAfterAnchor (anchor: ITreeNode) indent =
         addNodesAfter anchor [

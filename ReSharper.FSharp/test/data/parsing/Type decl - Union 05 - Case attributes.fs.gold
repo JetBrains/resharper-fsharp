@@ -11,17 +11,16 @@ IFSharpImplFile
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         IUnionRepresentation
-          IUnionCaseList
-            IUnionCaseDeclaration
-              FSharpTokenType+BarTokenElement(type:BAR, text:|)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IAttributeList
-                FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
-                IAttribute
-                  ITypeReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:Foo1)
-                FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:A)
+          IUnionCaseDeclaration
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IAttributeList
+              FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+              IAttribute
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:Foo1)
+              FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:A)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

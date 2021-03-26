@@ -17,13 +17,23 @@ type FSharpCodeFormatterTest() =
         use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
+    [<Test>] member x.``Expr - App - Prefix 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Prefix 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module - Nested - Members``() = x.DoNamedTest()
+    [<Test>] member x.``Namespaces - Empty lines 01``() = x.DoNamedTest()
+    [<Test>] member x.``Namespaces - Empty lines 02 - Comment``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Do 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Tuple 02 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unit 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Unit 02 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Unit 03 - Comment``() = x.DoNamedTest()
 
-    [<Test>] member x.``Do 01``() = x.DoNamedTest()
-    [<Test>] member x.``Do 02 - Statement``() = x.DoNamedTest()
-    [<Test>] member x.``Do - Statement 02``() = x.DoNamedTest()
+    [<Test>] member x.``Statement - Do 01``() = x.DoNamedTest()
+    [<Test>] member x.``Statement - Expr 01 - Unit``() = x.DoNamedTest()
+
     [<Test>] member x.``Module - Nested``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Attributes 01``() = x.DoNamedTest()
@@ -31,12 +41,17 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Type decl - Attributes 03 - Type group``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Attributes 04 - Multiline list``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Enum - Access modifier 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum - Access modifier 02 - Single line``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Keep user line breaks``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 03``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 04 - Spaces``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 05 - Comment``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 06 - Access modifiers``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Group 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Group 02 - Nested``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Union 01``() = x.DoNamedTest()
 

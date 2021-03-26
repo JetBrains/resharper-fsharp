@@ -12,13 +12,12 @@ IFSharpImplFile
         IUnionRepresentation
           FSharpTokenType+PrivateTokenElement(type:PRIVATE, text:private)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IUnionCaseList
-            IUnionCaseDeclaration
-              FSharpIdentifierToken(type:IDENTIFIER, text:A)
+          IUnionCaseDeclaration
+            FSharpIdentifierToken(type:IDENTIFIER, text:A)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IUnionCaseDeclaration
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IUnionCaseDeclaration
-              FSharpTokenType+BarTokenElement(type:BAR, text:|)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:B)
+            FSharpIdentifierToken(type:IDENTIFIER, text:B)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
