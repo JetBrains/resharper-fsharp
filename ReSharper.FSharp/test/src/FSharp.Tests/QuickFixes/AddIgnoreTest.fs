@@ -53,3 +53,14 @@ type AddIgnoreTest() =
                 |> Option.defaultWith (fun _ -> failwithf "Could not find %s occurrence" occurrenceName))
 
         base.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile)
+
+
+[<FSharpTest>]
+type AddIgnoreAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/addIgnore"
+
+    [<Test>] member x.``Availability - Unexpected expression type``() = x.DoNamedTest()
+    [<Test>] member x.``Availability - If expression wrong type``() = x.DoNamedTest()
+    [<Test>] member x.``Availability - Else branch wrong type``() = x.DoNamedTest()

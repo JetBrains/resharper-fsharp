@@ -1,0 +1,12 @@
+module Test
+
+let _: unit = |1|(0)
+
+------------------------------------------------
+0: This expression was expected to have type
+    'unit'    
+but here has type
+    'int'    
+QUICKFIXES:
+Ignore value
+Introduce 'let' binding

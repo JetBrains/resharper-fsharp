@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
-type ConvertTupleToArrayOrListElementsFix(warning: AddTypeEquationError) =
+type ConvertTupleToArrayOrListElementsFix(warning: TypeEquationError) =
     inherit FSharpQuickFixBase()
 
     let regex = Regex("'\w\d*( \* '\w\d*)+")

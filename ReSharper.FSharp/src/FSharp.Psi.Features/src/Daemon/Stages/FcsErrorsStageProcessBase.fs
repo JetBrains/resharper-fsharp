@@ -73,7 +73,8 @@ module FSharpErrors =
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
     let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type "
 
-    let [<Literal>] addTypeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
+    let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
+    let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values of the same type as the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
 
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
@@ -142,10 +143,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | message when message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
                 createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
 
-            | Regex addTypeEquationMessage [expectedType; actualType] ->
+            | Regex typeEquationMessage [expectedType; actualType]
+            | Regex elseBranchHasWrongTypeMessage [expectedType; actualType] ->
                 let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
                 let expr = getResultExpr expr
-                if isNotNull expr then AddTypeEquationError(expectedType, actualType, expr, error.Message) :> _
+                if isNotNull expr then
+                    match expectedType with
+                    | "unit" -> createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
+                    | _ -> TypeEquationError(expectedType, actualType, expr, error.Message) :> _
                 else null
 
             | _ -> createGenericHighlighting error range
