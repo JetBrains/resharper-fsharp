@@ -16,7 +16,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     protected FileSystemShimChangeProvider(Lifetime lifetime, ChangeManager changeManager) : base(lifetime) =>
       changeManager.Changed2.Advise(lifetime, Execute);
 
-    public abstract void Execute(ChangeEventArgs changeEventArgs);
+    public virtual void Execute(ChangeEventArgs changeEventArgs)
+    {
+    }
   }
 
   public class DelegatingFileSystemShim : IFileSystem

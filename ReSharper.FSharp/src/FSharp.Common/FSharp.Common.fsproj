@@ -23,8 +23,6 @@
     <Compile Include="src\ProjectModel\Host\ProjectItems\FSharpItemsContainer.fs" />
     <Compile Include="src\ProjectModel\Host\ProjectItems\ProjectStructure.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectModelUtil.fs" />
-    <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
-    <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
     <Compile Include="src\Settings\FSharpOptionsPageBase.fs" />
     <Compile Include="src\Settings\FSharpOptions.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
@@ -47,6 +45,11 @@
     <Compile Include="src\Checker\ScriptFcsProjectProvider.fs" />
     <Compile Include="src\Checker\FcsProjectBuilder.fs" />
     <Compile Include="src\Checker\FcsProjectProvider.fs" />
+    <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
+    <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
+    <Compile Include="src\Shim\AssemblyReader\FcsModuleReaderCommonCache.fs" />
+    <Compile Include="src\Shim\AssemblyReader\ProjectFcsModuleReader.fs" />
+    <Compile Include="src\Shim\AssemblyReader\AssemblyReaderShim.fs" />
     <Compile Include="src\Shim\TypeProviders\TcImportsHack.fs" />
     <Compile Include="src\Shim\TypeProviders\TypeProvidersManager.fs" />
     <Compile Include="src\Shim\TypeProviders\ExtensionTypingProviderShim.fs" />

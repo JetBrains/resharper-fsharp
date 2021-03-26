@@ -26,6 +26,7 @@ type FSharpSettings() = class end
 module FSharpOptions =
     let [<Literal>] backgroundTypeCheck = "Enable background analysis (requires restart)"
     let [<Literal>] skipImplementationAnalysis = "Skip implementation files analysis when possible (requires restart)"
+    let [<Literal>] nonFSharpProjectInMemoryAnalysis = "Analyze C#/VB projects without build (requires restart)"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
     let [<Literal>] enableFcsReactorMonitor = "Enable FCS monitor"
@@ -38,6 +39,9 @@ type FSharpOptions =
 
       [<SettingsEntry(false, skipImplementationAnalysis); DefaultValue>]
       mutable SkipImplementationAnalysis: bool
+
+      [<SettingsEntry(false, nonFSharpProjectInMemoryAnalysis); DefaultValue>]
+      mutable NonFSharpProjectInMemoryAnalysis: bool
 
       [<SettingsEntry(true, outOfScopeCompletion); DefaultValue>]
       mutable EnableOutOfScopeCompletion: bool
@@ -178,6 +182,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
             this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
+            this.AddBool(nonFSharpProjectInMemoryAnalysis, fun key -> key.NonFSharpProjectInMemoryAnalysis)
 
 
 [<ShellComponent>]
@@ -194,3 +199,13 @@ type FSharpTypeHintOptionsStore(lifetime: Lifetime, settingsStore: ISettingsStor
             if typeHintOptionChanged then
                 highlightingSettingsManager.SettingsChanged.Fire(Nullable<_>(false))
         )
+
+
+module SettingsUtil =
+    let getEntry<'TKey> (settingsStore: ISettingsStore) name =
+        settingsStore.Schema.GetKey<'TKey>().TryFindEntryByMemberName(name) :?> SettingsScalarEntry
+
+    let getValue<'TKey, 'TValue> (settingsStore: ISettingsStore) name =
+        let entry = getEntry<'TKey> settingsStore name
+        let settingsStoreLive = settingsStore.BindToContextTransient(ContextRange.ApplicationWide)
+        settingsStoreLive.GetValue(entry, null) :?> 'TValue

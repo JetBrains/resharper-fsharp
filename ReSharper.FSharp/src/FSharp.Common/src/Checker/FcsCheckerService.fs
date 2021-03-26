@@ -28,16 +28,15 @@ module FcsCheckerService =
 
 [<ShellComponent; AllowNullLiteral>]
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-        settingsStore: ISettingsStore, settingsSchema: SettingsSchema, reactorMonitor: IFcsReactorMonitor) =
+        settingsStore: ISettingsStore, reactorMonitor: IFcsReactorMonitor) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
 
         let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
-        let settingsKey = settingsSchema.GetKey<FSharpOptions>()
 
         let getSettingProperty name =
-            let setting = settingsKey.TryFindEntryByMemberName(name) :?> SettingsScalarEntry
+            let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
             settingsStoreLive.GetValueProperty(lifetime, setting, null)
 
         let enableBgCheck = getSettingProperty "BackgroundTypeCheck"
