@@ -299,7 +299,7 @@
     <QuickFix>NamespaceToModuleFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="AddTypeEquation">
+  <Error staticGroup="FSharpErrors" name="TypeEquation">
     <Parameter type="string" name="expectedType"/>
     <Parameter type="string" name="actualType"/>
     <Parameter type="IFSharpExpression" name="expr"/>

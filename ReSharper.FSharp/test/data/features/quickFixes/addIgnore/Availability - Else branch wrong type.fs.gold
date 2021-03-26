@@ -1,0 +1,9 @@
+module Test
+
+if true then () else |1|(0)
+
+------------------------------------------------
+0: All branches of an 'if' expression must return values of the same type as the first branch, which here is 'unit'. This branch returns a value of type 'int'.
+QUICKFIXES:
+Ignore value
+Introduce 'let' binding
