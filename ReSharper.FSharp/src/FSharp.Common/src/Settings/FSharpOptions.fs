@@ -36,7 +36,7 @@ type FSharpOptions =
     { [<SettingsEntry(false, backgroundTypeCheck); DefaultValue>]
       mutable BackgroundTypeCheck: bool
 
-      [<SettingsEntry(false, backgroundTypeCheck); DefaultValue>]
+      [<SettingsEntry(false, skipImplementationAnalysis); DefaultValue>]
       mutable SkipImplementationAnalysis: bool
 
       [<SettingsEntry(true, outOfScopeCompletion); DefaultValue>]
