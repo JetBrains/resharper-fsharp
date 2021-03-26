@@ -62,3 +62,4 @@ type AddIgnoreAvailabilityTest() =
     override x.RelativeTestDataPath = "features/quickFixes/addIgnore"
 
     [<Test>] member x.``Availability - Unexpected expression type``() = x.DoNamedTest()
+    [<Test>] member x.``Availability - If expression``() = x.DoNamedTest()

@@ -1,0 +1,16 @@
+module Test
+
+type A() =
+    member _.M() = 1
+    member x.M1() =
+        if true then 
+            |x.M()|(0)
+
+------------------------------------------------
+0: This expression was expected to have type
+    'unit'    
+but here has type
+    'int'    
+QUICKFIXES:
+Ignore value
+Introduce 'let' binding
