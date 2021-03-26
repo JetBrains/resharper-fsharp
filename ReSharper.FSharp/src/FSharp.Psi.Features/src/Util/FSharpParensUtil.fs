@@ -6,8 +6,10 @@ open FSharp.Compiler.Syntax
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -231,13 +233,16 @@ let rec needsParensInDeclExprContext (expr: IFSharpExpression) =
 
     | _ -> false
 
-let escapesTupleAppArg (context: IFSharpExpression) (innerExpr: IFSharpExpression) =
-    match innerExpr with
+let escapesTupleAppArg (context: IFSharpExpression) (expr: IFSharpExpression) =
+    match expr with
     | :? IParenExpr as parenExpr ->
         match parenExpr.InnerExpression with
         | :? ITupleExpr -> isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(context))
         | _ -> false
     | _ -> false
+
+let literalsRequiringParens =
+    NodeTypeSet(FSharpTokenType.INT32, FSharpTokenType.IEEE32, FSharpTokenType.IEEE64)
 
 let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     if escapesTupleAppArg context expr then true else
@@ -365,6 +370,11 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
         isNotNull (TypedLikeExprNavigator.GetByExpression(context)) ||
 
         checkPrecedence context expr
+
+    | :? ILiteralExpr as literalExpr ->
+        // todo: check digits after dot: `1.0.Prop` is allowed, and `1.Prop` is not.
+        let tokenType = getTokenType literalExpr.Literal
+        literalsRequiringParens.[tokenType] && isNotNull (QualifiedExprNavigator.GetByQualifier(context))
 
     | _ ->
 
