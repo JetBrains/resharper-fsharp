@@ -1,0 +1,25 @@
+﻿(1).ToString()
+|(|(0)(1)|)|(1).ToString()
+
+|(|(2)1u|)|(3).ToString()
+|(|(4)|(|(5)1u|)|(6)|)|(7).ToString()
+
+(1.0).ToString()
+|(|(8)(1.0)|)|(9).ToString()
+
+(1.).ToString()
+|(|(10)(1.)|)|(11).ToString()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5): ReSharper Dead Code: Redundant parentheses
+(6):<secondary> ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
+(8): ReSharper Dead Code: Redundant parentheses
+(9):<secondary> ReSharper Dead Code: Redundant parentheses
+(10): ReSharper Dead Code: Redundant parentheses
+(11):<secondary> ReSharper Dead Code: Redundant parentheses

@@ -24,7 +24,8 @@ type RedundantParenExprTest() =
     
     [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Literals 01``() = x.DoNamedTest()
+    [<Test>] member x.``Literal 01``() = x.DoNamedTest()
+    [<Test>] member x.``Literal 02 - Qualified``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Local 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Top level 01``() = x.DoNamedTest()
