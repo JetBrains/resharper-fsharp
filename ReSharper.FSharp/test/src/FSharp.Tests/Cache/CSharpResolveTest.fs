@@ -16,7 +16,7 @@ open NUnit.Framework
 
 [<TestPackages(FSharpCorePackage)>]
 type CSharpResolveTest() =
-    inherit TestWithTwoProjectsBase()
+    inherit TestWithTwoProjectsBase(CSharpProjectFileType.CS_EXTENSION, FSharpProjectFileType.FsExtension)
 
     let highlightingManager = HighlightingSettingsManager.Instance
 
@@ -172,10 +172,7 @@ type CSharpResolveTest() =
 
     override x.RelativeTestDataPath = "cache/csharpResolve"
 
-    override x.MainFileExtension = CSharpProjectFileType.CS_EXTENSION
-    override x.SecondFileExtension = FSharpProjectFileType.FsExtension
-
-    override x.DoTest(project: IProject, secondProject: IProject) =
+    override x.DoTest(project: IProject, _: IProject) =
         x.Solution.GetPsiServices().Files.CommitAllDocuments()
         x.ExecuteWithGold(fun writer ->
             let projectFile = project.GetAllProjectFiles() |> Seq.exactlyOne

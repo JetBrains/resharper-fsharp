@@ -58,7 +58,8 @@ module FcsProjectProvider =
 type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
         scriptFcsProjectProvider: IScriptFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
-        fsFileService: IFSharpFileService, psiModules: IPsiModules, locks: IShellLocks, logger: ILogger) as this =
+        fsFileService: IFSharpFileService, psiModules: IPsiModules, modulePathProvider: ModulePathProvider,
+        locks: IShellLocks, logger: ILogger) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let locker = JetFastSemiReenterableRWLock()
@@ -124,6 +125,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         use lock = locker.UsingReadLock()
         tryGetValue psiModule fcsProjects
 
+    let createReferencedModule psiModule =
+        ReferencedModule.create modulePathProvider psiModule
+
     let rec createFcsProject (project: IProject) (psiModule: IPsiModule): FcsProject =
         match tryGetValue psiModule fcsProjects with
         | Some fcsProject -> fcsProject
@@ -153,7 +157,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         fcsProjects.[psiModule] <- fcsProject
 
         for referencedPsiModule in referencedProjectPsiModules do
-            let referencedModule = referencedModules.GetOrCreateValue(referencedPsiModule, ReferencedModule.Create)
+            let referencedModule = referencedModules.GetOrCreateValue(referencedPsiModule, createReferencedModule)
             referencedModule.ReferencingModules.Add(psiModule) |> ignore
 
         fcsProject

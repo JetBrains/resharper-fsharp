@@ -13,6 +13,7 @@
     <Compile Include="ZoneMarker.fs" />
     <Compile Include="TestWithTwoProjectsBase.fs" />
     <Compile Include="Service\DelegatingFileSystemShimTest.fs" />
+    <Compile Include="Service\AssemblyReaderTest.fs" />
     <Compile Include="Service\NameResolutionTest.fs" />
     <Compile Include="Service\StructureTest.fs" />
     <Compile Include="Service\IsFSharpAssemblyTest.fs" />

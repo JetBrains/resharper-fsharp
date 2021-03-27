@@ -15,11 +15,8 @@ open JetBrains.ReSharper.TestFramework
 open JetBrains.Util
 
 [<AbstractClass; FSharpTest>]
-type TestWithTwoProjectsBase() =
+type TestWithTwoProjectsBase(mainFileExtension: string, secondFileExtension: string) =
     inherit BaseTestWithSingleProject()
-
-    abstract MainFileExtension: string
-    abstract SecondFileExtension: string
 
     override x.ProjectName = base.ProjectName + ".MainProject"
 
@@ -44,14 +41,14 @@ type TestWithTwoProjectsBase() =
 
     override x.DoTestSolution([<ParamArray>] _names: string[]) =
         let baseFilePath = x.TestDataPath / x.TestName
-        let mainFile = baseFilePath.ChangeExtension(x.MainFileExtension)
-        let secondFile = baseFilePath.ChangeExtension(x.SecondFileExtension)
+        let mainFilePath = baseFilePath.ChangeExtension(mainFileExtension)
+        let secondFilePath = baseFilePath.ChangeExtension(secondFileExtension)
 
         let descriptors = Dictionary()
         let libs = x.GetReferencedAssemblies(x.GetTargetFrameworkId()).Distinct()
 
-        let mainDescriptor = x.CreateProjectDescriptor(x.ProjectName, mainFile, libs, x.ProjectGuid)
-        let secondDescriptor = x.CreateProjectDescriptor(x.SecondProjectName, secondFile, libs, x.SecondProjectGuid)
+        let mainDescriptor = x.CreateProjectDescriptor(x.ProjectName, mainFilePath, libs, x.ProjectGuid)
+        let secondDescriptor = x.CreateProjectDescriptor(x.SecondProjectName, secondFilePath, libs, x.SecondProjectGuid)
 
         descriptors.Add(mainDescriptor.First, mainDescriptor.Second)
         descriptors.Add(secondDescriptor.First, secondDescriptor.Second)

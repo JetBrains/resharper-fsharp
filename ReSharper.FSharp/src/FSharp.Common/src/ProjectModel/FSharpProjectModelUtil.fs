@@ -3,6 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.FSharpProjectModelUtil
 
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.Util
 
 let getResolveContext (resolveContextManager: PsiModuleResolveContextManager) project psiModule =
     resolveContextManager.GetOrCreateModuleResolveContext(project, psiModule, psiModule.TargetFrameworkId)
@@ -27,22 +28,18 @@ let getReferencedModules (psiModule: IPsiModule) =
         | _ -> true)
     |> Seq.map (fun reference -> reference.Module)
 
-let getModulePath (psiModule: IPsiModule) =
-    match psiModule with
-    | :? IAssemblyPsiModule as assemblyPsiModule ->
-        assemblyPsiModule.Assembly.Location
+module ModulePathProvider =
+    let outputPathKey = Key<FileSystemPath>("AssemblyReaderTest.outputPath")
 
-    | :? IProjectPsiModule as projectPsiModule ->
-        projectPsiModule.Project.GetOutputFilePath(projectPsiModule.TargetFrameworkId)
+[<SolutionComponent>]
+type ModulePathProvider() =
+    abstract GetModulePath: psiModule: IPsiModule -> FileSystemPath
+    default this.GetModulePath(psiModule) =
+        match psiModule with
+        | :? IAssemblyPsiModule as assemblyPsiModule ->
+            assemblyPsiModule.Assembly.Location
 
-    | _ -> FileSystemPath.Empty
+        | :? IProjectPsiModule as projectPsiModule ->
+            projectPsiModule.Project.GetOutputFilePath(projectPsiModule.TargetFrameworkId)
 
-let getModuleFullPath (psiModule: IPsiModule) =
-    let path = getModulePath psiModule
-    path.FullPath
-
-
-let getOutputPath (psiModule: IPsiModule) =
-    match psiModule.ContainingProjectModule with
-    | :? IProject as project -> project.GetOutputFilePath(psiModule.TargetFrameworkId)
-    | _ -> FileSystemPath.Empty
+        | _ -> FileSystemPath.Empty

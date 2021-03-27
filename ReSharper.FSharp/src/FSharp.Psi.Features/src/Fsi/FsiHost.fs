@@ -23,7 +23,7 @@ open JetBrains.Util
 
 [<SolutionComponent>]
 type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, fsiOptions: FsiOptionsProvider,
-        projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules, logger: ILogger) =
+        projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules, modulePathProvider: ModulePathProvider, logger: ILogger) =
 
     let stringArg = sprintf "--%s:%O"
     let boolArg option arg = sprintf "--%s%s" option (if arg then "+" else "-")
@@ -84,7 +84,8 @@ type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, 
             match psiModule with
             | :? IAssemblyPsiModule as assemblyModule -> assemblyFilter assemblyModule.Assembly
             | _ -> true)
-        |> Seq.map getModuleFullPath
+        |> Seq.map modulePathProvider.GetModulePath
+        |> Seq.map (fun path -> path.FullPath)
         |> List
 
     do

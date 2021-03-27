@@ -32,8 +32,9 @@ type ReferencedModule =
     { ReferencedPath: FileSystemPath
       ReferencingModules: HashSet<IPsiModule> }
 
-    static member Create(psiModule: IPsiModule) =
-        { ReferencedPath = getOutputPath psiModule
+module ReferencedModule =
+    let create (modulePathProvider: ModulePathProvider) (psiModule: IPsiModule) =
+        { ReferencedPath = modulePathProvider.GetModulePath(psiModule)
           ReferencingModules = HashSet() }
 
 
@@ -69,7 +70,8 @@ module ProjectOptions =
 
 
 [<SolutionComponent>]
-type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer, logger: ILogger) =
+type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer, logger: ILogger,
+        modulePathProvider: ModulePathProvider) =
 
     let itemsDelimiters = [| ';'; ','; ' ' |]
 
@@ -93,8 +95,8 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
     let getReferences psiModule =
         getReferencedModules psiModule
-        |> Seq.map getModuleFullPath
-        |> Seq.map (fun r -> "-r:" + r)
+        |> Seq.map modulePathProvider.GetModulePath
+        |> Seq.map (fun r -> "-r:" + r.FullPath)
 
     let getOutputType (outputType: ProjectOutputType) =
         match outputType with
@@ -158,9 +160,9 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
             let definedConstants = splitAndTrim itemsDelimiters cfg.DefineConstants
             otherOptions.AddRange(definedConstants |> Seq.map (fun c -> "--define:" + c))
 
-            otherOptions.Add("--target:" + getOutputType cfg.OutputType)
+            otherOptions.Add($"--target:{getOutputType cfg.OutputType}")
 
-            otherOptions.Add(sprintf "--warn:%d" cfg.WarningLevel)
+            otherOptions.Add$"--warn:{cfg.WarningLevel}"
 
             if cfg.TreatWarningsAsErrors then
                 otherOptions.Add("--warnaserror")
@@ -196,7 +198,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
 
         let projectOptions =
-            { ProjectFileName = sprintf "%O.%O.fsproj" project.ProjectFileLocation targetFrameworkId
+            { ProjectFileName = $"{project.ProjectFileLocation}.{targetFrameworkId}.fsproj"
               ProjectId = None
               SourceFiles = Array.map (fun (p: FileSystemPath ) -> p.FullPath) filePaths
               OtherOptions = otherOptions.ToArray()

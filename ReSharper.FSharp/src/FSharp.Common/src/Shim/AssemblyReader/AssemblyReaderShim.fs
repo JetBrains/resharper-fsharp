@@ -52,12 +52,14 @@ module AssemblyReaderShim =
         let extension = path.ExtensionNoDot
         equalsIgnoreCase "dll" extension || equalsIgnoreCase "exe" extension
 
+    let isEnabled settingsStore =
+        SettingsUtil.getValue<FSharpOptions, bool> settingsStore "NonFSharpProjectInMemoryAnalysis" ||
+        Shell.Instance.IsTestShell
 
 [<SolutionComponent>]
 type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
         cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, settingsStore: ISettingsStore) =
-    inherit AssemblyReaderShimBase(lifetime, changeManager,
-        SettingsUtil.getValue<FSharpOptions, bool> settingsStore "NonFSharpProjectInMemoryAnalysis")
+    inherit AssemblyReaderShimBase(lifetime, changeManager, AssemblyReaderShim.isEnabled settingsStore)
 
     // The shim is injected to get the expected shim shadowing chain, it's expected to be unused. 
     do assemblyInfoShim |> ignore
