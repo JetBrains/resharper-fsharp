@@ -34,3 +34,6 @@ type ReplaceWithInterpolatedStringTest() =
     [<Test>] member x.``Triple Quoted String 04 - Applied verbatim string``() = x.DoNamedTest()
 
     [<Test>] member x.``Verbatim String 01 - Many specifiers with text``() = x.DoNamedTest()
+
+    [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 02 - Nested parens``() = x.DoNamedTest()
