@@ -70,10 +70,15 @@ type InterpolatedStringCandidateAnalyzer() =
 
         // Find the outermost IPrefixAppExpr and all applied exprs (excluding the format string itself)
         let outerPrefixAppExpr, appliedExprs =
+            let getArgExpr (expr: IFSharpExpression) =
+                match expr.IgnoreInnerParens() with
+                | :? ITupleExpr as tupleExpr when tupleExpr != expr -> tupleExpr.Parent :?> IFSharpExpression
+                | expr -> expr
+
             let rec loop acc (expr: IPrefixAppExpr) =
                 match PrefixAppExprNavigator.GetByFunctionExpression (expr.IgnoreParentParens()) with
                 | null -> expr.IgnoreParentParens(), acc
-                | parent -> loop (parent.ArgumentExpression.IgnoreInnerParens() :: acc) parent
+                | parent -> loop (getArgExpr parent.ArgumentExpression :: acc) parent
             loop [] prefixAppExpr
 
         if appliedExprs.Length <> matchingFormatSpecsAndArity.Length then () else
