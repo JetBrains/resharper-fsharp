@@ -72,7 +72,9 @@ type InterpolatedStringCandidateAnalyzer() =
         let outerPrefixAppExpr, appliedExprs =
             let getArgExpr (expr: IFSharpExpression) =
                 match expr.IgnoreInnerParens() with
-                | :? ITupleExpr as tupleExpr when tupleExpr != expr -> tupleExpr.Parent :?> IFSharpExpression
+                | :? ITupleExpr as tupleExpr when
+                        tupleExpr != expr && not tupleExpr.IsStruct ->
+                    tupleExpr.Parent :?> IFSharpExpression
                 | expr -> expr
 
             let rec loop acc (expr: IPrefixAppExpr) =

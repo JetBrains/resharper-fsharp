@@ -35,5 +35,7 @@ type ReplaceWithInterpolatedStringTest() =
 
     [<Test>] member x.``Verbatim String 01 - Many specifiers with text``() = x.DoNamedTest()
 
+    [<Test>] member x.``Tuple - Struct 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Struct 02 - Nested parens``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 02 - Nested parens``() = x.DoNamedTest()

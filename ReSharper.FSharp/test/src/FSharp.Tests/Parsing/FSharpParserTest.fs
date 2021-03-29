@@ -118,8 +118,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Paren 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Quote 01 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Quote 02 - Untyped``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Tuple 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Tuple 03 - Struct``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Const - Numbers 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const - String 01``() = x.DoNamedTest()
@@ -497,6 +499,9 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Pattern - Null 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - QuoteExpr 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Tuple 02 - Struct``() = x.DoNamedTest()
 
 
 [<FSharpSignatureTest>]

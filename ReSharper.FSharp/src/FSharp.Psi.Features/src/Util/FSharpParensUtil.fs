@@ -298,6 +298,10 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     | :? ITupleExpr ->
         isNotNull (AttributeNavigator.GetByExpression(context)) ||
         isNotNull (TupleExprNavigator.GetByExpression(context)) ||
+
+        // todo: enable for {(struct (1, 2))}
+        isNotNull (InterpolatedStringExprNavigator.GetByInsert(context)) ||
+
         contextRequiresDeclExpr context ||
 
         checkPrecedence context expr

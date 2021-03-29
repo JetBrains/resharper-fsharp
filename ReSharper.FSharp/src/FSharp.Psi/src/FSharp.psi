@@ -590,10 +590,11 @@ typedExpr options { stubBase="FSharpExpressionBase"; }:
 
 tupleExpr options { stubBase="FSharpExpressionBase"; }:
   (
-    LPAREN
     STRUCT<STRUCT, StructKeyword>
+    LPAREN<LPAREN, LeftParen>
   )?
-  LIST fSharpExpression<EXPR, Expressions> SEP COMMA<FSHARP_COMMA, Commas>;
+  LIST fSharpExpression<EXPR, Expressions> SEP COMMA<FSHARP_COMMA, Commas>
+  RPAREN<RPAREN, RightParen>;
 
 interface recordLikeExpr:
   anonRecordExpr |
