@@ -1,0 +1,21 @@
+﻿module Module
+
+let _: Enum = enum 0
+let _: Class = |enum 0|(0)
+
+let _: EnumShort = |enum 0|(1)
+let _: EnumShort = |enum |0s|(2)|(3)
+
+
+System.Nullable<Enum>() |> ignore
+|System.Nullable<Class>|(4)() |> ignore
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The type 'Class' is not a CLI enum type
+(1): ReSharper Underlined Error Highlighting: The type 'int32' does not match the type 'int16'
+(2): ReSharper Underlined Error Highlighting: The type 'int32' does not match the type 'int16'
+(3): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int32'    
+but here has type
+    'int16'    
+(4): ReSharper Underlined Error Highlighting: A generic construct requires that the type 'Class' have a public default constructor

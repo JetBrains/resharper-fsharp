@@ -75,6 +75,7 @@ type AssemblyReaderTest() =
     override this.RelativeTestDataPath = "common/assemblyReaderShim"
 
     [<Test>] member x.``Type def - Class 01``() = x.DoNamedTest() // todo: test InternalsVisibleTo
+    [<Test>] member x.``Type def - Enum 01``() = x.DoNamedTest() // todo: wrong Class ctor error 
     [<Test>] member x.``Type def - Namespace 01``() = x.DoNamedTest()
 
     override this.DoTest(project: IProject, _: IProject) =
