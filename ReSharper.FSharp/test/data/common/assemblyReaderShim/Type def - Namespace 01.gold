@@ -1,0 +1,46 @@
+﻿module Module
+
+let _: Ns1.Class1 = null
+let _: Ns1.Ns2.Class2 = null
+
+let _: |Class1|(0) = null
+let _: |Class2|(1) = null
+
+module OpenNs1 =
+    open Ns1
+
+    let _: Class1 = null
+    let _: Ns2.Class2 = null
+    let _: |Class2|(2) = null
+
+    open Ns1.Ns2
+
+    let _: Class2 = null
+
+module OpenNs2 =
+    open Ns1.Ns2
+
+    let _: |Class1|(3) = null
+    let _: Class2 = null
+
+module OpenNs1Ns2 =
+    open |Ns2|(4)
+
+    let _: |Class1|(5) = null
+    let _: |Class2|(6) = null
+
+    open Ns1
+    open |Ns2|(7)
+
+    let _: Class1 = null
+    let _: Class2 = null
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: The type 'Class1' is not defined.
+(1): ReSharper Error Highlighting: The type 'Class2' is not defined.
+(2): ReSharper Error Highlighting: The type 'Class2' is not defined.
+(3): ReSharper Error Highlighting: The type 'Class1' is not defined.
+(4): ReSharper Error Highlighting: The namespace or module 'Ns2' is not defined.
+(5): ReSharper Error Highlighting: The type 'Class1' is not defined.
+(6): ReSharper Error Highlighting: The type 'Class2' is not defined.
+(7): ReSharper Underlined Error Highlighting: This declaration opens the namespace or module 'Ns1.Ns2' through a partially qualified path. Adjust this code to use the full path of the namespace. This change will make your code more robust as new constructs are added to the F# and CLI libraries.

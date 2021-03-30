@@ -12,7 +12,6 @@ open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
@@ -75,20 +74,24 @@ type AssemblyReaderTest() =
 
     override this.RelativeTestDataPath = "common/assemblyReaderShim"
 
-    [<Test>] member x.``Class 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type def - Class 01``() = x.DoNamedTest() // todo: test InternalsVisibleTo
+    [<Test>] member x.``Type def - Namespace 01``() = x.DoNamedTest()
 
     override this.DoTest(project: IProject, _: IProject) =
-        let shouldHighlight (highlighting: IHighlighting) =
-            highlighting :? FSharpErrorHighlightingBase
+        let solution = this.Solution
+        let manager = HighlightingSettingsManager.Instance
 
         this.ShellInstance.GetComponent<FcsCheckerService>().Checker.StopBackgroundCompile()
-        this.Solution.GetPsiServices().Files.CommitAllDocuments()
+        solution.GetPsiServices().Files.CommitAllDocuments()
 
         this.ExecuteWithGold(fun writer ->
             let projectFile = project.GetAllProjectFiles() |> Seq.exactlyOne
             let sourceFile = projectFile.ToSourceFiles().Single()
 
-            let daemon = TestHighlightingDumper(sourceFile, writer, null, fun hl _ _ -> shouldHighlight hl)
+            let daemon = TestHighlightingDumper(sourceFile, writer, null, fun highlighting sourceFile settingsStore ->
+                let severity = manager.GetSeverity(highlighting, sourceFile, solution, settingsStore)
+                severity = Severity.WARNING || severity = Severity.ERROR)
+
             daemon.DoHighlighting(DaemonProcessKind.VISIBLE_DOCUMENT)
             daemon.Dump()) |> ignore
 

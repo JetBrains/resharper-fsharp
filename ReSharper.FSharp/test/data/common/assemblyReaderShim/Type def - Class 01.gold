@@ -1,0 +1,9 @@
+﻿module Module
+
+let _: Public = null
+let _: |Internal|(0) = null
+let _: |Private|(1) = null
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The type 'Internal' is not accessible from this code location
+(1): ReSharper Underlined Error Highlighting: The type 'Private' is not accessible from this code location
