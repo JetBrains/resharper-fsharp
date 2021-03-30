@@ -76,6 +76,10 @@ type AssemblyReaderTest() =
 
     [<Test>] member x.``Type def - Class 01``() = x.DoNamedTest() // todo: test InternalsVisibleTo
     [<Test>] member x.``Type def - Enum 01``() = x.DoNamedTest() // todo: wrong Class ctor error 
+
+    [<Test>] member x.``Type def - Interface 01``() = x.DoNamedTest() 
+    [<Test>] member x.``Type def - Interface 02 - Super``() = x.DoNamedTest() // todo: members, type parameters 
+
     [<Test>] member x.``Type def - Namespace 01``() = x.DoNamedTest()
 
     override this.DoTest(project: IProject, _: IProject) =

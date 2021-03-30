@@ -15,6 +15,7 @@ open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Threading
 open JetBrains.Util
@@ -315,14 +316,20 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
             let typeAttributes = ProjectFcsModuleReader.mkTypeAttributes typeElement
             let extends = ProjectFcsModuleReader.extends psiModule typeElement
 
+            let implements =
+                typeElement.GetSuperTypesWithoutCircularDependent()
+                |> Array.filter (fun t -> t.GetTypeElement() :? IInterface)
+                |> Array.map (ProjectFcsModuleReader.mkType psiModule)
+                |> Array.toList
+
             let fields =
                 match typeElement with
                 | :? IEnum as enum -> mkILFields [ ProjectFcsModuleReader.mkEnumInstanceValue psiModule enum ]
                 | _ -> emptyILFields
 
             let typeDef = 
-                ILTypeDef(clrTypeName.ShortName, typeAttributes, ILTypeDefLayout.Auto, [], [], extends, emptyILMethods,
-                    emptyILTypeDefs, fields, emptyILMethodImpls, emptyILEvents, emptyILProperties,
+                ILTypeDef(clrTypeName.ShortName, typeAttributes, ILTypeDefLayout.Auto, implements, [], extends,
+                    emptyILMethods, emptyILTypeDefs, fields, emptyILMethodImpls, emptyILEvents, emptyILProperties,
                     emptyILSecurityDecls, emptyILCustomAttrs)
 
             typeDefs.[clrTypeName] <- typeDef
