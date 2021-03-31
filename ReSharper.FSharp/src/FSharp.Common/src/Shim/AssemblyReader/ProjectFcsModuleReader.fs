@@ -26,7 +26,7 @@ module ProjectFcsModuleReader =
     // todo: store in reader/cache, so it doesn't leak after solution close
     let cultures = DataIntern()
     let publicKeys = DataIntern()
-//    let literalValues = DataIntern()
+    let literalValues = DataIntern()
 
     let typeParameterCountStrings = [| "`0"; "`1"; "`2"; "`3"; "`4"; "`5"; "`6"; "`7" |]
     let typeParameterCountStringsCount = typeParameterCountStrings.Length
@@ -282,6 +282,77 @@ module ProjectFcsModuleReader =
         let attributes = FieldAttributes.Public ||| FieldAttributes.SpecialName ||| FieldAttributes.RTSpecialName
         ILFieldDef(name, fieldType, attributes, None, None, None, None, emptyILCustomAttrs)
 
+    let mkFieldAttributes (field: IField): FieldAttributes =
+        let accessRights =
+            match field.GetAccessRights() with
+            | AccessRights.PUBLIC -> FieldAttributes.Public
+            | AccessRights.INTERNAL -> FieldAttributes.Assembly
+            | AccessRights.PRIVATE -> FieldAttributes.Private
+            | AccessRights.PROTECTED -> FieldAttributes.Family
+            | AccessRights.PROTECTED_OR_INTERNAL -> FieldAttributes.FamORAssem
+            | AccessRights.PROTECTED_AND_INTERNAL -> FieldAttributes.FamANDAssem
+            | _ -> enum 0
+
+        accessRights |||
+        (if field.IsStatic then FieldAttributes.Static else enum 0) |||
+        (if field.IsReadonly then FieldAttributes.InitOnly else enum 0) |||
+        (if field.IsConstant || field.IsEnumMember then FieldAttributes.Literal else enum 0)
+
+    let literalTypes =
+        let unbox f = unbox >> f
+        [| PredefinedType.BOOLEAN_FQN, unbox ILFieldInit.Bool
+           PredefinedType.CHAR_FQN,    unbox ILFieldInit.Char
+           PredefinedType.SBYTE_FQN,   unbox ILFieldInit.Int8
+           PredefinedType.BYTE_FQN,    unbox ILFieldInit.UInt8
+           PredefinedType.SHORT_FQN,   unbox ILFieldInit.Int16
+           PredefinedType.USHORT_FQN,  unbox ILFieldInit.UInt16
+           PredefinedType.INT_FQN,     unbox ILFieldInit.Int32
+           PredefinedType.UINT_FQN,    unbox ILFieldInit.UInt32
+           PredefinedType.LONG_FQN,    unbox ILFieldInit.Int64
+           PredefinedType.ULONG_FQN,   unbox ILFieldInit.UInt64
+           PredefinedType.FLOAT_FQN,   unbox ILFieldInit.Single
+           PredefinedType.DOUBLE_FQN,  unbox ILFieldInit.Double |]
+        |> dict
+
+    let nullLiteralValue = Some ILFieldInit.Null
+
+    let getLiteralValue (value: ConstantValue) (valueType: IType): ILFieldInit option =
+        if value.IsBadValue() then None else
+        if value.IsNull() then nullLiteralValue else
+
+        // A separate case to prevent interning string literals.
+        if value.IsString() then Some(ILFieldInit.String (unbox value.Value)) else
+
+        match valueType with
+        | :? IDeclaredType as declaredType ->
+            let mutable literalType = Unchecked.defaultof<_>
+            match literalTypes.TryGetValue(declaredType.GetClrName(), &literalType) with
+            | true -> literalValues.Intern(Some(literalType value.Value))
+            | _ -> None
+        | _ -> None
+    
+    let mkField (psiModule: IPsiModule) (field: IField): ILFieldDef =
+        let name = field.ShortName
+        let attributes = mkFieldAttributes field
+
+        let fieldType = mkType psiModule field.Type
+        let data = None // todo: check FCS
+        let offset = None
+
+        let valueType =
+            if not field.IsEnumMember then field.Type else
+            match field.GetContainingType() with
+            | :? IEnum as enum -> enum.GetUnderlyingType()
+            | _ -> null
+
+        let value = field.ConstantValue
+        let literalValue = getLiteralValue value valueType
+
+        let marshal = None
+        let customAttrs = emptyILCustomAttrs // todo
+
+        ILFieldDef(name, fieldType, attributes, data, literalValue, offset, marshal, customAttrs)
+
 type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommonCache) =
     // todo: is it safe to keep symbolScope?
     let symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, false, true)
@@ -323,9 +394,24 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
                 |> Array.toList
 
             let fields =
-                match typeElement with
-                | :? IEnum as enum -> mkILFields [ ProjectFcsModuleReader.mkEnumInstanceValue psiModule enum ]
-                | _ -> emptyILFields
+                let fields =
+                    match typeElement with
+                    | :? IEnum as e -> e.EnumMembers
+                    | _ -> typeElement.Fields |> Seq.append typeElement.Constants
+
+                let fields =
+                    fields
+                    |> List.ofSeq
+                    |> List.map (ProjectFcsModuleReader.mkField psiModule)
+
+                let fieldDefs = 
+                    match typeElement with
+                    | :? IEnum as enum -> ProjectFcsModuleReader.mkEnumInstanceValue psiModule enum :: fields
+                    | _ -> fields
+
+                match fieldDefs with
+                | [] -> emptyILFields
+                | _ -> mkILFields fieldDefs
 
             let typeDef = 
                 ILTypeDef(clrTypeName.ShortName, typeAttributes, ILTypeDefLayout.Auto, implements, [], extends,

@@ -6,9 +6,41 @@ let _: Class = |enum 0|(0)
 let _: EnumShort = |enum 0|(1)
 let _: EnumShort = |enum |0s|(2)|(3)
 
+let _: EmptyEnum = enum 0
+let _: EnumWrongBaseType = enum 0
+
 
 System.Nullable<Enum>() |> ignore
 |System.Nullable<Class>|(4)() |> ignore
+
+
+match |Enum.A|(5) with
+| Enum.A -> ()
+| Enum.B -> ()
+|| Enum.C -> ()|(6)
+| Enum.D -> ()
+
+match |EnumShort.A|(7) with
+| EnumShort.A -> ()
+| EnumShort.B -> ()
+
+match |EnumWrongBaseType.A|(8) with
+| EnumWrongBaseType.A -> ()
+| EnumWrongBaseType.B -> ()
+
+match EnumWrongValueType.A with
+| |EnumWrongValueType.A|(9) -> ()
+
+match EnumOverflowValue.A with
+| |EnumOverflowValue.A|(10) -> ()
+| EnumOverflowValue.B -> ()
+
+match |EnumSameFields.A|(11) with
+| EnumSameFields.A -> ()
+
+match |EnumSameFields.A|(12) with
+| EnumSameFields.A -> ()
+|| EnumSameFields.A -> ()|(13)
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: The type 'Class' is not a CLI enum type
@@ -19,3 +51,12 @@ System.Nullable<Enum>() |> ignore
 but here has type
     'int16'    
 (4): ReSharper Underlined Error Highlighting: A generic construct requires that the type 'Class' have a public default constructor
+(5): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<Enum> (3)' may indicate a case not covered by the pattern(s).
+(6): ReSharper Dead Code: This rule will never be matched
+(7): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<EnumShort> (2s)' may indicate a case not covered by the pattern(s).
+(8): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<EnumWrongBaseType> (2)' may indicate a case not covered by the pattern(s).
+(9): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
+(10): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
+(11): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value 'EnumSameFields.A' may indicate a case not covered by the pattern(s).
+(12): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value 'EnumSameFields.A' may indicate a case not covered by the pattern(s).
+(13): ReSharper Dead Code: This rule will never be matched
