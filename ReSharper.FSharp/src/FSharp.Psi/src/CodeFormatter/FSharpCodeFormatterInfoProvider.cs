@@ -13,6 +13,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Services.Formatter;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CodeStyle;
+using JetBrains.ReSharper.Psi.CSharp.CodeStyle;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Tree;
@@ -62,6 +63,64 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
         .Build();
 
+      Describe<IndentingRule>()
+        .Name("NestedModuleMembersIndent")
+        .Where(
+          Node()
+            .In(ElementBitsets.MODULE_MEMBER_BIT_SET)
+            .Satisfies(IsFirstNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET)))
+        .CloseNodeGetter((node, context) => GetLastNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET, node))
+        .Calculate((node, context) =>
+        {
+          var treeNode = (ITreeNode) node;
+          if (treeNode == null || context == null)
+            return new ConstantOptionNode(new IndentOptionValue(IndentType.StartAtExternal | IndentType.EndAtExternal));
+
+          // var closingNode = RegionRuleBase.DoGetLastSiblingOrError(treeNode, context);
+          var closingNode = GetLastNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET, treeNode);
+          if (closingNode.GetTreeStartOffset() > context.LastNode.GetTreeStartOffset())
+          {
+            var indent = closingNode.CalcLineIndent(context.CodeFormatter, true);
+            return
+              new ConstantOptionNode(
+                new IndentOptionValue(
+                  IndentType.AbsoluteIndent | IndentType.StartAtExternal | IndentType.EndAtExternal |
+                  IndentType.NonSticky | IndentType.NonAdjustable,
+                  0,
+                  indent));
+
+          }
+          
+          return new ConstantOptionNode(new IndentOptionValue(IndentType.StartAtExternal | IndentType.EndAtExternal));
+
+          
+          // var outdent = false;
+          // if (!treeNode.ContainsLineBreak())
+          // {
+          //   for (var node1 = treeNode.PrevSibling; node1 != null; node1 = node1.PrevSibling)
+          //   {
+          //     if (node1.ContainsLineBreak())
+          //     {
+          //       if (node1 is IInterpolatedStringInsert)
+          //       {
+          //         outdent = true;
+          //       }
+          //
+          //       break;
+          //     }
+          //   }
+          // }
+          //
+          // var indent = treeNode.CalcLineIndent(context.CodeFormatter, false, false);
+          // return
+          //   new ConstantOptionNode(
+          //     new IndentOptionValue(
+          //       IndentType.AbsoluteIndent | IndentType.StartAtInternal | IndentType.EndAtExternal |
+          //       IndentType.NonSticky | IndentType.NonAdjustable,
+          //       outdent ? -1 : 0,
+          //       indent));
+        }).Build();
+      
       // todo: union with the previous rule
       Describe<ContinuousIndentRule>()
         .Name("ContinuousIndent2")
@@ -150,6 +209,45 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
     }
 
+    public static ITreeNode GetLastNodeOfTypeSet(NodeTypeSet nodeTypeSet, ITreeNode node)
+    {
+      var parent = node.Parent;
+      if (parent == null) return null;
+
+      ITreeNode result = null;
+      
+      
+      for (var i = parent.FirstChild; i != null; i = i.NextSibling)
+      {
+        if (nodeTypeSet[i.NodeType])
+        {
+          result = i;
+          // count++;
+          // if (count == 1 && i != node) return false;
+          // if (!mustBeManySuchNodes) return true;
+        }
+      }
+
+      return result;
+    }
+
+    
+    public static ITreeNode DoGetLastSiblingOrError(ITreeNode node, CodeFormattingContext context, bool stopBeforeError = false)
+    {
+      ITreeNode closingNode = node;
+      for (var i = node; i != null; i = i.NextSibling)
+      {
+        //if (i is IErrorElement) return i;
+
+        if (!context.CodeFormatter.IsWhitespaceToken(i))
+        {
+          closingNode = i;
+        }
+      }
+
+      return closingNode;
+    }
+    
     private void Aligning()
     {
       var alignmentRulesParameters = new[]

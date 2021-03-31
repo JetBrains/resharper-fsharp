@@ -1,10 +1,19 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open JetBrains.Diagnostics
+open JetBrains.DocumentModel
 open JetBrains.ReSharper.FeaturesTestFramework.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Files
+open JetBrains.ReSharper.Psi.CodeStyle
+open JetBrains.ReSharper.Psi.Transactions
+open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.TestFramework
+open JetBrains.TextControl
 open NUnit.Framework
 
 [<FSharpTest; TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
@@ -150,3 +159,32 @@ type FSharpCodeFormatterTest() =
 
     [<Test>] member x.``Type members 01``() = x.DoNamedTest()
     [<Test>] member x.``Type members 02 - Interface``() = x.DoNamedTest()
+
+[<FSharpTest; TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
+type FSharpFormatterSelectionTest() =
+    inherit BaseTestWithTextControl()
+
+    override x.DoNamedTest() =
+        use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
+        base.DoNamedTest()
+
+    override x.RelativeTestDataPath = "features/service/codeFormatter"
+
+    [<Test>] member x.``Selection 01``() = x.DoNamedTest()
+    
+    override this.DoTest(lifetime, _) =
+      let textControl = this.OpenTextControl(lifetime)
+      (
+          use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(this.Solution.GetPsiServices(), "Test")
+          let document = textControl.Document
+          let file = document.GetPsiSourceFile(this.Solution).NotNull("file")
+
+          Assertion.Assert(textControl.Selection.HasSelection(), "Selection is missing")
+
+          let selectionRange = textControl.Selection.OneDocRangeWithCaret()
+          let file = file.GetPrimaryPsiFile()
+          let treeTextRange = file.Translate(DocumentRange(document, selectionRange))
+          file.FormatFileRange(treeTextRange)
+//          transactionCookie.Commit() |> ignore
+      )
+      this.CheckTextControl(textControl)
