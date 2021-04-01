@@ -74,6 +74,9 @@ type AssemblyReaderTest() =
 
     override this.RelativeTestDataPath = "common/assemblyReaderShim"
 
+    [<Test>] member x.``Field 01``() = x.DoNamedTest() // todo: test InternalsVisibleTo
+    [<Test>] member x.``Field 02 - Inherit``() = x.DoNamedTest() // todo: test InternalsVisibleTo
+
     [<Test>] member x.``Type def - Class 01``() = x.DoNamedTest() // todo: test InternalsVisibleTo
     [<Test>] member x.``Type def - Enum 01``() = x.DoNamedTest() // todo: wrong Class ctor error 
 
