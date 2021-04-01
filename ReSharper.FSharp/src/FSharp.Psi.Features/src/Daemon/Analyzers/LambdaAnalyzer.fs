@@ -103,19 +103,20 @@ type LambdaAnalyzer() =
             argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
         | _ -> false
 
-    let isExpressionApplicable (expr: IFSharpExpression) =
+    let isApplicable (expr: IFSharpExpression) (pats: TreeNodeCollection<IFSharpPattern>) =
         match expr with
         | :? IPrefixAppExpr
         | :? IReferenceExpr
         | :? ITupleExpr
-        | :? IUnitExpr -> true
+        | :? IUnitExpr ->
+            if pats.Count = 1 && pats.First().IgnoreInnerParens() :? IUnitPat then false else true
         | _ -> false
 
     override x.Run(lambda, _, consumer) =
         let expr = lambda.Expression.IgnoreInnerParens()
-        if not (isExpressionApplicable expr) then () else
-
         let pats = lambda.Patterns
+
+        if not (isApplicable expr pats) then () else
 
         let warning = 
             match compareArgs pats expr with

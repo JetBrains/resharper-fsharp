@@ -1,5 +1,8 @@
 ﻿let f x y = ()
 
+fun () -> ()
+fun (()) -> ()
+
 fun x -> -x
 fun x -> ~~x
 

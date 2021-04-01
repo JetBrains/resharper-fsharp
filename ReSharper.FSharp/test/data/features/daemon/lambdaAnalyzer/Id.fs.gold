@@ -1,12 +1,10 @@
 ﻿|fun x -> x|(0)
-|fun () -> ()|(1)
-|fun (x, y) -> (x, y)|(2)
-|fun struct(a, b) -> struct(a, b|(3))
-|fun (a, b) (c, d, e) -> (c, d, e)|(4)
+|fun (x, y) -> (x, y)|(1)
+|fun struct(a, b) -> struct(a, b)|(2)
+|fun (a, b) (c, d, e) -> (c, d, e)|(3)
 
 ---------------------------------------------------------
 (0): ReSharper Hint: Lambda can be replaced with 'id'
 (1): ReSharper Hint: Lambda can be replaced with 'id'
 (2): ReSharper Hint: Lambda can be replaced with 'id'
-(3): ReSharper Hint: Lambda can be replaced with 'id'
-(4): ReSharper Hint: Lambda body can be replaced with 'id'
+(3): ReSharper Hint: Lambda body can be replaced with 'id'
