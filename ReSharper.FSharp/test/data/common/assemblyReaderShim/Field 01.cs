@@ -1,7 +1,10 @@
 public class Class
 {
   public static Class StaticField;
+  public static readonly Class StaticReadonlyField;
+
   public Class Field;
+  public readonly Class ReadonlyField;
 
   public static string StaticFieldString;
 

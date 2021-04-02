@@ -30,6 +30,17 @@ let _: float = c.|PrivateFieldDouble|(12)
 let _: float = Class.|PrivateFieldDouble|(13)
 let _: int = c.|PrivateStaticFieldInt|(14)
 
+
+Class.StaticField <- null
+|Class.StaticReadonlyField <- null|(15)
+c.Field <- null
+|c.ReadonlyField <- null|(16)
+
+|Class.Field|(17) <- null
+|Class.ReadonlyField|(18) <- null
+|c.StaticField|(19) <- null
+|c.StaticReadonlyField|(20) <- null
+
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Field 'Field' is not static
 (1): ReSharper Underlined Error Highlighting: A static field was used where an instance field is expected
@@ -46,3 +57,9 @@ let _: int = c.|PrivateStaticFieldInt|(14)
 (12): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PrivateFieldDouble'.
 (13): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PrivateFieldDouble'.
 (14): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PrivateStaticFieldInt'.
+(15): ReSharper Underlined Error Highlighting: This field is readonly
+(16): ReSharper Underlined Error Highlighting: This field is readonly
+(17): ReSharper Underlined Error Highlighting: Field 'Field' is not static
+(18): ReSharper Underlined Error Highlighting: Field 'ReadonlyField' is not static
+(19): ReSharper Underlined Error Highlighting: A static field was used where an instance field is expected
+(20): ReSharper Underlined Error Highlighting: A static field was used where an instance field is expected

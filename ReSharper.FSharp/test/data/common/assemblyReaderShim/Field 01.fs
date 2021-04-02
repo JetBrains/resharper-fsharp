@@ -29,3 +29,14 @@ let _: float = c.PrivateFieldDouble
 
 let _: float = Class.PrivateFieldDouble
 let _: int = c.PrivateStaticFieldInt
+
+
+Class.StaticField <- null
+Class.StaticReadonlyField <- null
+c.Field <- null
+c.ReadonlyField <- null
+
+Class.Field <- null
+Class.ReadonlyField <- null
+c.StaticField <- null
+c.StaticReadonlyField <- null

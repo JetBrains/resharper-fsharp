@@ -33,9 +33,11 @@ module ProjectFcsModuleReader =
 
     let mkTypeName (name: string) (paramsCount: int) =
         if paramsCount = 0 then name else
+
         let paramsCountString =
             if paramsCount >= typeParameterCountStringsCount then paramsCount.ToString() else
             typeParameterCountStrings.[paramsCount]
+
         name + paramsCountString
 
     let mkNameFromTypeNameAndParamsNumber (nameAndParametersCount: TypeNameAndTypeParameterNumber) =
@@ -151,11 +153,13 @@ module ProjectFcsModuleReader =
     
     let mkILScopeRef (fromModule: IPsiModule) (targetModule: IPsiModule): ILScopeRef =
         if fromModule == targetModule then ILScopeRef.Local else
+
         let assemblyName =
             match targetModule.ContainingProjectModule with
             | :? IAssembly as assembly -> assembly.AssemblyName
             | :? IProject as project -> project.GetOutputAssemblyNameInfo(targetModule.TargetFrameworkId)
             | _ -> failwithf $"mkIlScopeRef: {fromModule} -> {targetModule}"
+
         getAssemblyScope assemblyName
 
     let mkTypeRef (fromModule: IPsiModule) (typeElement: ITypeElement) =
@@ -208,7 +212,15 @@ module ProjectFcsModuleReader =
 //        typeRefCache.[clrTypeName.GetPersistent()] <- typeRef
         typeRef
 
-    
+    // todo: per-typedef cache
+    let getGlobalIndex (typeParameter: ITypeParameter) =
+        let mutable index = typeParameter.Index
+        let mutable parent = typeParameter.Owner.GetContainingType()
+        while isNotNull parent do
+            index <- index + parent.TypeParameters.Count
+            parent <- parent.GetContainingType()
+        index
+
     let mkType (fromModule: IPsiModule) (t: IType): ILType =
         if t.IsVoid() then ILType.Void else
 
@@ -223,8 +235,13 @@ module ProjectFcsModuleReader =
             | resolveResult ->
 
             match resolveResult.DeclaredElement with
-            | :? ITypeParameter ->
-                mkType fromModule (fromModule.GetPredefinedType().Object) // todo
+            | :? ITypeParameter as typeParameter ->
+                match typeParameter.Owner with
+                | null -> mkType fromModule (fromModule.GetPredefinedType().Object)
+                | _ ->
+
+                let index = getGlobalIndex typeParameter
+                ILType.TypeVar (uint16 index)
 
             | :? ITypeElement as typeElement ->
                 let typeArgs =
@@ -234,6 +251,7 @@ module ProjectFcsModuleReader =
 
                     domain
                     |> List.ofSeq
+                    |> List.sortBy getGlobalIndex
                     |> List.map (fun typeParameter -> mkType fromModule substitution.[typeParameter])
 
                 let typeRef = mkTypeRef fromModule typeElement
@@ -270,6 +288,29 @@ module ProjectFcsModuleReader =
         | :? IDelegate -> Some(mkType psiModule (psiModule.GetPredefinedType().MulticastDelegate))
 
         | _ -> None
+
+    let mkGenericVariance (variance: TypeParameterVariance): ILGenericVariance =
+        match variance with
+        | TypeParameterVariance.IN -> ILGenericVariance.ContraVariant
+        | TypeParameterVariance.OUT -> ILGenericVariance.CoVariant
+        | _ -> ILGenericVariance.NonVariant
+
+    let mkGenericParameterDef (psiModule: IPsiModule) (typeParameter: ITypeParameter): ILGenericParameterDef =
+        let typeConstraints =
+            typeParameter.TypeConstraints
+            |> List.ofSeq
+            |> List.map (mkType psiModule)
+
+        let attributes = storeILCustomAttrs emptyILCustomAttrs // todo
+
+        { Name = typeParameter.ShortName
+          Constraints = typeConstraints
+          Variance = mkGenericVariance typeParameter.Variance
+          HasReferenceTypeConstraint = typeParameter.IsReferenceType
+          HasNotNullableValueTypeConstraint = typeParameter.IsValueType
+          HasDefaultConstructorConstraint = typeParameter.HasDefaultConstructor
+          CustomAttrsStored = attributes
+          MetadataIndex = NoMetadataIdx }
 
     let mkEnumInstanceValue (psiModule: IPsiModule) (enum: IEnum): ILFieldDef =
         let name = "value__"
@@ -321,7 +362,7 @@ module ProjectFcsModuleReader =
         if value.IsNull() then nullLiteralValue else
 
         // A separate case to prevent interning string literals.
-        if value.IsString() then Some(ILFieldInit.String (unbox value.Value)) else
+        if value.IsString() then Some(ILFieldInit.String(unbox value.Value)) else
 
         match valueType with
         | :? IDeclaredType as declaredType ->
@@ -330,7 +371,9 @@ module ProjectFcsModuleReader =
             | true -> literalValues.Intern(Some(literalType value.Value))
             | _ -> None
         | _ -> None
-    
+
+    // todo: unfinished field test (e.g. missing `;`)
+
     let mkField (psiModule: IPsiModule) (field: IField): ILFieldDef =
         let name = field.ShortName
         let attributes = mkFieldAttributes field
@@ -341,6 +384,7 @@ module ProjectFcsModuleReader =
 
         let valueType =
             if not field.IsEnumMember then field.Type else
+
             match field.GetContainingType() with
             | :? IEnum as enum -> enum.GetUnderlyingType()
             | _ -> null
@@ -384,6 +428,11 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
         // For multiple types with the same name we'll get some random/first one here.
         // todo: add a test case
         | typeElement ->
+            let name =
+                match typeElement.GetContainingType() with
+                | null -> clrTypeName.FullName
+                | _ -> ProjectFcsModuleReader.mkNameFromClrTypeName clrTypeName
+
             let typeAttributes = ProjectFcsModuleReader.mkTypeAttributes typeElement
             let extends = ProjectFcsModuleReader.extends psiModule typeElement
 
@@ -392,6 +441,19 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
                 |> Array.filter (fun t -> t.GetTypeElement() :? IInterface)
                 |> Array.map (ProjectFcsModuleReader.mkType psiModule)
                 |> Array.toList
+
+            let nestedTypes =
+                let preTypeDefs =
+                    typeElement.NestedTypes
+                    |> Array.ofSeq
+                    |> Array.map (fun typeElement -> PreTypeDef(typeElement, this) :> ILPreTypeDef)
+                mkILTypeDefsComputed (fun _ -> preTypeDefs)
+
+            let genericParams =
+                typeElement.GetAllTypeParameters().ResultingList()
+                |> List.ofSeq
+                |> List.rev
+                |> List.map (ProjectFcsModuleReader.mkGenericParameterDef psiModule)
 
             let fields =
                 let fields =
@@ -414,8 +476,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
                 | _ -> mkILFields fieldDefs
 
             let typeDef = 
-                ILTypeDef(clrTypeName.ShortName, typeAttributes, ILTypeDefLayout.Auto, implements, [], extends,
-                    emptyILMethods, emptyILTypeDefs, fields, emptyILMethodImpls, emptyILEvents, emptyILProperties,
+                ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
+                    extends, emptyILMethods, nestedTypes, fields, emptyILMethodImpls, emptyILEvents, emptyILProperties,
                     emptyILSecurityDecls, emptyILCustomAttrs)
 
             typeDefs.[clrTypeName] <- typeDef
@@ -439,8 +501,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
 
                 let rec addTypes (ns: INamespace) =
                     for typeElement in ns.GetNestedTypeElements(symbolScope) do
-                        let clrTypeName = typeElement.GetClrName().GetPersistent() // todo: intern
-                        result.Add(PreTypeDef(clrTypeName, this))
+                        result.Add(PreTypeDef(typeElement, this))
                     for nestedNs in ns.GetNestedNamespaces(symbolScope) do
                         addTypes nestedNs
 
@@ -470,12 +531,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
 
 
 type PreTypeDef(clrTypeName: IClrTypeName, reader: ProjectFcsModuleReader) =
-    member x.Name =
-        let typeName = clrTypeName.TypeNames.Last() // todo: use clrTypeName.ShortName ? (check type params)
-        ProjectFcsModuleReader.mkNameFromTypeNameAndParamsNumber typeName
+    new (typeElement: ITypeElement, reader: ProjectFcsModuleReader) =
+        PreTypeDef(typeElement.GetClrName().GetPersistent(), reader) // todo: intern
 
     interface ILPreTypeDef with
-        member x.Name = x.Name
+        member x.Name =
+            let typeName = clrTypeName.TypeNames.Last() // todo: use clrTypeName.ShortName ? (check type params)
+            ProjectFcsModuleReader.mkNameFromTypeNameAndParamsNumber typeName
 
         member x.Namespace =
             if not (clrTypeName.TypeNames.IsSingle()) then [] else

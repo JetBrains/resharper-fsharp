@@ -1,0 +1,23 @@
+﻿module Module
+
+let _: Class.NestedPublic = null
+let _: Class.|NestedProtected|(0) = null
+let _: Class.|NestedInternal|(1) = null
+let _: Class.|NestedPrivate|(2) = null
+
+
+type T() =
+    |inherit Class()|(3)
+
+    let _: Class.NestedPublic = null
+    let _: Class.NestedProtected = null
+    let _: Class.|NestedInternal|(4) = null
+    let _: Class.|NestedPrivate|(5) = null
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: The type 'NestedProtected' is not defined.
+(1): ReSharper Error Highlighting: The type 'NestedInternal' is not defined.
+(2): ReSharper Error Highlighting: The type 'NestedPrivate' is not defined.
+(3): ReSharper Underlined Error Highlighting: No constructors are available for the type 'Class'
+(4): ReSharper Error Highlighting: The type 'NestedInternal' is not defined.
+(5): ReSharper Error Highlighting: The type 'NestedPrivate' is not defined.
