@@ -108,8 +108,7 @@ type LambdaAnalyzer() =
         | :? IPrefixAppExpr
         | :? IReferenceExpr
         | :? ITupleExpr
-        | :? IUnitExpr ->
-            if pats.Count = 1 && pats.First().IgnoreInnerParens() :? IUnitPat then false else true
+        | :? IUnitExpr -> not (pats.Count = 1 && pats.First().IgnoreInnerParens() :? IUnitPat)
         | _ -> false
 
     override x.Run(lambda, _, consumer) =
