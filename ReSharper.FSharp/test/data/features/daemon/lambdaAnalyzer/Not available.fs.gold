@@ -2,6 +2,7 @@
 
 fun () -> ()
 fun (()) -> ()
+fun () -> id ()
 
 fun x -> -x
 fun x -> ~~x
