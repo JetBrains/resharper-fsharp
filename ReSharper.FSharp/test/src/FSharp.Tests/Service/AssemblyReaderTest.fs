@@ -7,10 +7,12 @@ open JetBrains.Application.changes
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Daemon.Impl
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
@@ -74,13 +76,21 @@ type AssemblyReaderTest() =
 
     override this.RelativeTestDataPath = "common/assemblyReaderShim"
 
-    [<Test>] member x.``Field 01``() = x.DoNamedTest() // todo: test InternalsVisibleTo
-    [<Test>] member x.``Field 02 - Inherit``() = x.DoNamedTest() // todo: test InternalsVisibleTo
+     // todo: test InternalsVisibleTo
 
-    [<Test>] member x.``Type def - Class 01``() = x.DoNamedTest() // todo: test InternalsVisibleTo
-    [<Test>] member x.``Type def - Class 02 - Nested``() = x.DoNamedTest() // todo: wrong Class ctor error, test InternalsVisibleTo
+    [<Test>] member x.``Field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Field 02 - Inherit``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type def - Enum 01``() = x.DoNamedTest() // todo: wrong Class ctor error 
+    [<Test>] member x.``Method - Ctor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Ctor 02 - Param array``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Ctor 03 - Optional param``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type def - Class 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type def - Class 02 - Nested``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type def - Delegate 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type def - Enum 01``() = x.DoNamedTest() 
 
     [<Test>] member x.``Type def - Interface 01``() = x.DoNamedTest() 
     [<Test>] member x.``Type def - Interface 02 - Super``() = x.DoNamedTest() // todo: members, type parameters 
@@ -100,7 +110,12 @@ type AssemblyReaderTest() =
             let projectFile = project.GetAllProjectFiles() |> Seq.exactlyOne
             let sourceFile = projectFile.ToSourceFiles().Single()
 
-            let daemon = TestHighlightingDumper(sourceFile, writer, null, fun highlighting sourceFile settingsStore ->
+            let stages =
+                DaemonStageManager.GetInstance(solution).Stages
+                |> Seq.filter (fun stage -> stage :? TypeCheckErrorsStage)
+                |> List.ofSeq
+
+            let daemon = TestHighlightingDumper(sourceFile, writer, stages, fun highlighting sourceFile settingsStore ->
                 let severity = manager.GetSeverity(highlighting, sourceFile, solution, settingsStore)
                 severity = Severity.WARNING || severity = Severity.ERROR)
 

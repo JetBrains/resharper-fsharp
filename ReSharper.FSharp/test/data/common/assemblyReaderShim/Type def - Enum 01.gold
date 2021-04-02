@@ -50,7 +50,7 @@ match |EnumSameFields.A|(12) with
     'int32'    
 but here has type
     'int16'    
-(4): ReSharper Underlined Error Highlighting: A generic construct requires that the type 'Class' have a public default constructor
+(4): ReSharper Underlined Error Highlighting: A generic construct requires that the type 'Class' is a CLI or F# struct type
 (5): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<Enum> (3)' may indicate a case not covered by the pattern(s).
 (6): ReSharper Dead Code: This rule will never be matched
 (7): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<EnumShort> (2s)' may indicate a case not covered by the pattern(s).

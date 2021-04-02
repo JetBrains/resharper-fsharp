@@ -212,6 +212,33 @@ module ProjectFcsModuleReader =
 //        typeRefCache.[clrTypeName.GetPersistent()] <- typeRef
         typeRef
 
+    let mkMethodRef (psiModule: IPsiModule) (method: IFunction): ILMethodRef =
+        let typeRef =
+            let typeElement =
+                match method.GetContainingType() with
+                | null -> psiModule.GetPredefinedType().Object.GetTypeElement()
+                | typeElement -> typeElement
+
+            mkTypeRef psiModule typeElement
+
+        let callingConv = mkCallingConv method
+        let name = method.ShortName // todo: type parameter suffix?
+
+        let typeParamsCount =
+            match method with
+            | :? IMethod as method -> method.TypeParameters.Count
+            | _ -> 0
+
+        // todo: use method def when available? it'll save things like types calc and other things
+        let paramTypes =
+            method.Parameters
+            |> List.ofSeq
+            |> List.map (fun param -> mkType psiModule param.Type)
+
+        let returnType = mkType psiModule method.ReturnType
+
+        ILMethodRef.Create(typeRef, callingConv, name, typeParamsCount, paramTypes, returnType)
+
     // todo: per-typedef cache
     let getGlobalIndex (typeParameter: ITypeParameter) =
         let mutable index = typeParameter.Index
@@ -289,11 +316,33 @@ module ProjectFcsModuleReader =
 
         | _ -> None
 
+    let mkCompilerGeneratedAttribute (psiModule: IPsiModule) (attrType: IClrTypeName): ILAttribute =
+        let attrType = TypeFactory.CreateTypeByCLRName(attrType, NullableAnnotation.Unknown, psiModule)
+
+        match attrType.GetTypeElement() with
+        | null -> failwithf $"getting param array type element in {psiModule}" // todo: safer handling
+        | typeElement ->
+
+        let attrType = mkType psiModule attrType
+        let ctor = typeElement.Constructors.First(fun ctor -> ctor.IsParameterless) // todo: safer handling
+        let ctorMethodRef = mkMethodRef psiModule ctor
+
+        let methodSpec = ILMethodSpec.Create(attrType, ctorMethodRef, [])
+        ILAttribute.Decoded(methodSpec, [], [])
+
+    let paramArrayAttribute (psiModule: IPsiModule) =
+        mkCompilerGeneratedAttribute psiModule PredefinedType.PARAM_ARRAY_ATTRIBUTE_CLASS
+
+    let extensionAttribute (psiModule: IPsiModule) =
+        mkCompilerGeneratedAttribute psiModule PredefinedType.EXTENSION_ATTRIBUTE_CLASS
+
     let mkGenericVariance (variance: TypeParameterVariance): ILGenericVariance =
         match variance with
         | TypeParameterVariance.IN -> ILGenericVariance.ContraVariant
         | TypeParameterVariance.OUT -> ILGenericVariance.CoVariant
         | _ -> ILGenericVariance.NonVariant
+
+    // todo: test with same name parameter
 
     let mkGenericParameterDef (psiModule: IPsiModule) (typeParameter: ITypeParameter): ILGenericParameterDef =
         let typeConstraints =
@@ -357,6 +406,8 @@ module ProjectFcsModuleReader =
 
     let nullLiteralValue = Some ILFieldInit.Null
 
+    // todo: cache
+
     let getLiteralValue (value: ConstantValue) (valueType: IType): ILFieldInit option =
         if value.IsBadValue() then None else
         if value.IsNull() then nullLiteralValue else
@@ -396,6 +447,100 @@ module ProjectFcsModuleReader =
         let customAttrs = emptyILCustomAttrs // todo
 
         ILFieldDef(name, fieldType, attributes, data, literalValue, offset, marshal, customAttrs)
+
+    let methodSpecialNameAttrs =
+        MethodAttributes.SpecialName ||| MethodAttributes.RTSpecialName
+
+    let mkMethodAttributes (method: IFunction): MethodAttributes =
+        let accessRights =
+            match method.GetAccessRights() with
+            | AccessRights.PUBLIC -> MethodAttributes.Public
+            | AccessRights.INTERNAL -> MethodAttributes.Assembly
+            | AccessRights.PRIVATE -> MethodAttributes.Private
+            | AccessRights.PROTECTED -> MethodAttributes.Family
+            | AccessRights.PROTECTED_OR_INTERNAL -> MethodAttributes.FamORAssem
+            | AccessRights.PROTECTED_AND_INTERNAL -> MethodAttributes.FamANDAssem
+            | _ -> enum 0
+
+        accessRights |||
+        MethodAttributes.HideBySig |||
+        (if method.IsStatic then MethodAttributes.Static else enum 0) |||
+        (if method.IsSealed then MethodAttributes.Final else enum 0) |||
+        (if method.IsAbstract then MethodAttributes.Abstract else enum 0) |||
+        (if method.IsVirtual || method.IsAbstract then MethodAttributes.Virtual else enum 0) ||| // todo: test
+        (if not (method.GetHiddenMembers().IsEmpty()) then MethodAttributes.NewSlot else enum 0) ||| // todo: test
+        (if method :? IConstructor || method :? IAccessor then methodSpecialNameAttrs else enum 0)
+
+    let staticCallingConv = Callconv(ILThisConvention.Static, ILArgConvention.Default)
+    let instanceCallingConv = Callconv(ILThisConvention.Instance, ILArgConvention.Default)
+
+    let mkCallingConv (func: IFunction): ILCallingConv =
+        if func.IsStatic then staticCallingConv else instanceCallingConv
+
+    let mkParam (psiModule: IPsiModule) (param: IParameter): ILParameter =
+        let name = param.ShortName
+        let paramType = mkType psiModule param.Type
+
+        let defaultValue =
+            let defaultValue = param.GetDefaultValue()
+            if defaultValue.IsBadValue then None else
+            getLiteralValue defaultValue.ConstantValue defaultValue.DefaultTypeValue
+
+        // todo: other attrs
+        let attrs = [ if param.IsParameterArray then paramArrayAttribute psiModule ]
+
+        { Name = Some name // todo: intern?
+          Type = paramType
+          Default = defaultValue
+          Marshal = None // todo: used in infos.fs
+          IsIn = param.Kind.Equals(ParameterKind.INPUT) // todo: add test
+          IsOut = param.Kind.Equals(ParameterKind.OUTPUT) // todo: add test
+          IsOptional = param.IsOptional
+          CustomAttrsStored = attrs |> mkILCustomAttrs |> storeILCustomAttrs
+          MetadataIndex = NoMetadataIdx }
+    
+    let mkParams (psiModule: IPsiModule) (method: IFunction): ILParameter list =
+        method.Parameters
+        |> List.ofSeq
+        |> List.map (mkParam psiModule)
+
+    let voidReturn = mkILReturn ILType.Void
+    let methodBodyUnavailable = lazy MethodBody.NotAvailable
+
+    let mkMethod (psiModule: IPsiModule) (method: IFunction): ILMethodDef =
+        let name = method.ShortName // todo: type parameter suffix?
+        let methodAttrs = mkMethodAttributes method
+        let callingConv = mkCallingConv method
+        let parameters = mkParams psiModule method
+
+        let ret =
+            let returnType = method.ReturnType
+            if returnType.IsVoid() then voidReturn else
+
+            mkType psiModule returnType |> mkILReturn
+
+        let genericParams =
+            match method with
+            | :? IMethod as method ->
+                method.TypeParameters
+                |> List.ofSeq
+                |> List.map (mkGenericParameterDef psiModule)
+            | _ -> []
+
+        // todo: other attrs
+        let attrs =
+            match method with
+            | :? IMethod as method when method.IsExtensionMethod -> [ extensionAttribute psiModule ] // todo: test
+            | _ -> []
+            |> mkILCustomAttrs
+
+        let implAttributes = MethodImplAttributes.Managed
+        let body = methodBodyUnavailable
+        let securityDecls = emptyILSecurityDecls
+        let isEntryPoint = false
+
+        ILMethodDef(name, methodAttrs, implAttributes, callingConv, parameters, ret, body, isEntryPoint, genericParams,
+             securityDecls, attrs)
 
 type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommonCache) =
     // todo: is it safe to keep symbolScope?
@@ -442,6 +587,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
                 |> Array.map (ProjectFcsModuleReader.mkType psiModule)
                 |> Array.toList
 
+            let methods =
+                typeElement.GetMembers().OfType<IFunction>()
+                |> List.ofSeq
+                |> List.map (ProjectFcsModuleReader.mkMethod psiModule)
+                |> mkILMethods
+
             let nestedTypes =
                 let preTypeDefs =
                     typeElement.NestedTypes
@@ -477,7 +628,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
 
             let typeDef = 
                 ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
-                    extends, emptyILMethods, nestedTypes, fields, emptyILMethodImpls, emptyILEvents, emptyILProperties,
+                    extends, methods, nestedTypes, fields, emptyILMethodImpls, emptyILEvents, emptyILProperties,
                     emptyILSecurityDecls, emptyILCustomAttrs)
 
             typeDefs.[clrTypeName] <- typeDef

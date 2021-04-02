@@ -1,0 +1,11 @@
+﻿module Module
+
+Class.M()
+Class.M(1)
+Class.M(|1.0|(0))
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int'    
+but here has type
+    'float'    

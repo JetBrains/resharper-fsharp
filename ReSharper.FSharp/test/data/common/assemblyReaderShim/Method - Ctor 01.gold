@@ -1,0 +1,71 @@
+﻿module Module
+
+let _: DefaultCtor = DefaultCtor()
+let _: DefaultCtor = new DefaultCtor()
+
+type T1() =
+    inherit DefaultCtor()
+
+
+let _: ExplicitCtor = ExplicitCtor()
+let _: ExplicitCtor = new ExplicitCtor()
+
+type T2() =
+    inherit ExplicitCtor()
+
+
+let _: ExplicitCtorProtected = |ExplicitCtorProtected|(0)()
+let _: ExplicitCtorProtected = |new ExplicitCtorProtected()|(1)
+
+type T3() =
+    inherit ExplicitCtorProtected()
+
+
+let _: ExplicitCtorPrivate = |ExplicitCtorPrivate|(2)()
+let _: ExplicitCtorPrivate = |new ExplicitCtorPrivate()|(3)
+
+type T4() =
+    |inherit ExplicitCtorPrivate()|(4)
+
+
+let _: ExplicitCtorParam = ExplicitCtorParam(1)
+let _: ExplicitCtorParam = new ExplicitCtorParam(1)
+
+let _: ExplicitCtorParam = ExplicitCtorParam|()|(5)
+let _: ExplicitCtorParam = new ExplicitCtorParam|()|(6)
+
+
+let _: ExplicitCtorOverloads = ExplicitCtorOverloads()
+let _: ExplicitCtorOverloads = new ExplicitCtorOverloads()
+
+let _: ExplicitCtorOverloads = ExplicitCtorOverloads("")
+let _: ExplicitCtorOverloads = new ExplicitCtorOverloads("")
+
+let _: ExplicitCtorOverloads = ExplicitCtorOverloads(|1|(7))
+let _: ExplicitCtorOverloads = new ExplicitCtorOverloads(|1|(8))
+
+let _: ExplicitCtorOverloads = ExplicitCtorOverloads("", 1)
+let _: ExplicitCtorOverloads = new ExplicitCtorOverloads("", 1)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This type has no accessible object constructors
+(1): ReSharper Underlined Error Highlighting: Method or object constructor 'ExplicitCtorProtected' not found
+(2): ReSharper Underlined Error Highlighting: This type has no accessible object constructors
+(3): ReSharper Underlined Error Highlighting: Method or object constructor 'ExplicitCtorPrivate' not found
+(4): ReSharper Underlined Error Highlighting: Method or object constructor 'ExplicitCtorPrivate' not found
+(5): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int'    
+but here has type
+    'unit'    
+(6): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int'    
+but here has type
+    'unit'    
+(7): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'string'    
+but here has type
+    'int'    
+(8): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'string'    
+but here has type
+    'int'    
