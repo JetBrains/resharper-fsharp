@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System
 open JetBrains.Application.Components
-open JetBrains.Application.Settings
 open JetBrains.Application.changes
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
@@ -14,20 +13,18 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.TestFramework
 open JetBrains.Util
 open NUnit.Framework
 
 [<SolutionComponent>]
 type TestAssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
-        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, settingsStore: ISettingsStore) =
-    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, settingsStore)
+        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim) =
+    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, true)
 
     let mutable projectPath = FileSystemPath.Empty
     let mutable projectPsiModule = null
@@ -70,7 +67,7 @@ type TestModulePathProvider(shim: TestAssemblyReaderShim) =
 
     interface IHideImplementation<ModulePathProvider>
 
-[<FSharpTest; TestSetting(typeof<FSharpOptions>, "NonFSharpProjectInMemoryAnalysis", "true")>]
+[<FSharpTest>]
 type AssemblyReaderTest() =
     inherit TestWithTwoProjectsBase(FSharpProjectFileType.FsExtension, CSharpProjectFileType.CS_EXTENSION)
 

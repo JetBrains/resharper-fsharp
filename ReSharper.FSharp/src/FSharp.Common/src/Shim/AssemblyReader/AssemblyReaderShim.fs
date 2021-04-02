@@ -52,14 +52,11 @@ module AssemblyReaderShim =
         let extension = path.ExtensionNoDot
         equalsIgnoreCase "dll" extension || equalsIgnoreCase "exe" extension
 
-    let isEnabled settingsStore =
-        SettingsUtil.getValue<FSharpOptions, bool> settingsStore "NonFSharpProjectInMemoryAnalysis" ||
-        Shell.Instance.IsTestShell
 
 [<SolutionComponent>]
 type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
-        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, settingsStore: ISettingsStore) =
-    inherit AssemblyReaderShimBase(lifetime, changeManager, AssemblyReaderShim.isEnabled settingsStore)
+        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, isEnabled: bool) =
+    inherit AssemblyReaderShimBase(lifetime, changeManager, isEnabled)
 
     // The shim is injected to get the expected shim shadowing chain, it's expected to be unused. 
     do assemblyInfoShim |> ignore
@@ -87,6 +84,11 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         | _ -> ()
 
         reader
+
+    new (lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules, cache: FcsModuleReaderCommonCache,
+            assemblyInfoShim: AssemblyInfoShim, settingsStore: ISettingsStore) =
+        let isEnabled = SettingsUtil.getValue<FSharpOptions, bool> settingsStore "NonFSharpProjectInMemoryAnalysis"
+        AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, isEnabled)
 
     override this.GetLastWriteTime(path) =
         if not (this.IsEnabled && AssemblyReaderShim.isAssembly path) then base.GetLastWriteTime(path) else
