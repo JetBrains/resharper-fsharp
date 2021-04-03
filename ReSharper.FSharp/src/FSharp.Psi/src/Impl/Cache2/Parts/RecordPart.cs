@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.Util;
+using JetBrains.Util.DataStructures.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
@@ -45,7 +48,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override IDeclaredType GetBaseClassType() => null;
 
-    public bool HasHiddenInstanceFields => false;
+    public override IEnumerable<ITypeMember> GetTypeMembers()
+    {
+      var typeElement = TypeElement;
+      return CliMutable && typeElement != null
+        ? FixedList.Of(new DefaultConstructor(typeElement)).Concat(base.GetTypeMembers())
+        : base.GetTypeMembers();
+    }
+
     public bool IsReadonly => false;
     public bool IsByRefLike => false;
   }
