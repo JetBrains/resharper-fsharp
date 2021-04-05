@@ -23,5 +23,5 @@ type  ReplaceIfWithConditionOperandAvailabilityTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceIfWithCondition"
 
-    [<Test>] member x.``Text - Conditional operand``() = x.DoNamedTest()
-    [<Test>] member x.``Text - Conditional operand negation``() = x.DoNamedTest()
+    [<Test>] member x.``Text - Condition operand``() = x.DoNamedTest()
+    [<Test>] member x.``Text - Condition operand negation``() = x.DoNamedTest()
