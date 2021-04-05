@@ -78,8 +78,8 @@
         <Description>Format string can be replaced with an interpolated string.</Description>
       </Tag>
       <Tag name="FSharpIfCanBeReplacedWithConditionOperand" default="SUGGESTION">
-        <Title>If expression can be replaced with an interpolated string</Title>
-        <Description>If expression can be replaced with an interpolated string.</Description>
+        <Title>If expression can be replaced with its condition operand</Title>
+        <Description>If expression can be replaced with its condition operand.</Description>
       </Tag>
     </Group>
   </SeverityConfiguration>
