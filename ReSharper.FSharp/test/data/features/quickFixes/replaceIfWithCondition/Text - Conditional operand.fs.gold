@@ -1,0 +1,8 @@
+﻿module Test
+
+let _ = |if true then false else true|(0)
+
+------------------------------------------------
+0: 'if' expression can be replaced with condition operand negation
+QUICKFIXES:
+Replace by condition operand negation
