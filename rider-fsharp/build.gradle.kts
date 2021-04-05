@@ -131,7 +131,7 @@ val typeProvidersFiles = listOf(
 val externalFormatterFiles = listOf(
         "FSharp.ExternalFormatter.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Protocol.dll",
         "FSharp.ExternalFormatter.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Protocol.pdb",
-        "FSharp.ExternalFormatter/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.dll",
+        "FSharp.ExternalFormatter/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.exe",
         "FSharp.ExternalFormatter/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.runtimeconfig.json",
         "FSharp.ExternalFormatter/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.pdb",
         "FSharp.ExternalFormatter/bin/$buildConfiguration/net461/Fantomas.dll")

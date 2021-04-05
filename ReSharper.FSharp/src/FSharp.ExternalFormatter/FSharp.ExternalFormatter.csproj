@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net461</TargetFramework>
         <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter</AssemblyName>
+        <OutputType>Exe</OutputType>
         <SignAssembly>false</SignAssembly>
     </PropertyGroup>
 
