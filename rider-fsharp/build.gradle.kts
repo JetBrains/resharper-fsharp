@@ -107,8 +107,7 @@ val libFiles = listOf(
         "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Core.xml",
         "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
         "FSharp.Common/bin/$buildConfiguration/net461/FSharp.DependencyManager.Nuget.dll",
-        "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Interactive.Settings.dll",
-        "FSharp.Psi.Features/bin/$buildConfiguration/net461/Fantomas.dll")
+        "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Interactive.Settings.dll")
 
 val pluginFiles = listOf(
         "FSharp.ProjectModelBase/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
@@ -128,6 +127,14 @@ val typeProvidersFiles = listOf(
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader3.unix.runtimeconfig.json",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader5.win.runtimeconfig.json",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader5.unix.runtimeconfig.json")
+
+val externalFormatterFiles = listOf(
+        "FSharp.ExternalFormatter.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Protocol.dll",
+        "FSharp.ExternalFormatter.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Protocol.pdb",
+        "FSharp.ExternalFormatter/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.dll",
+        "FSharp.ExternalFormatter/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.runtimeconfig.json",
+        "FSharp.ExternalFormatter/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.pdb",
+        "FSharp.ExternalFormatter/bin/$buildConfiguration/net461/Fantomas.dll")
 
 val dotNetSdkPath by lazy {
     val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
@@ -158,6 +165,9 @@ configure<RdGenExtension> {
 
     val typeProviderClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Client")
     val typeProviderServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Server")
+
+    val externalFormatterServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.ExternalFormatter.Protocol/src/Server")
+    val externalFormatterClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.ExternalFormatter.Protocol/src/Client")
 
     verbose = true
     hashFolder = "build/rdgen"
@@ -202,11 +212,26 @@ configure<RdGenExtension> {
         namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Server"
         directory = "$typeProviderServerOutput"
     }
+
+    generator {
+        language = "csharp"
+        transform = "asis"
+        root = "model.RdFSharpExternalFormatterModel"
+        namespace = "JetBrains.Rider.FSharp.ExternalFormatter.Server"
+        directory = "$externalFormatterServerOutput"
+    }
+    generator {
+        language = "csharp"
+        transform = "reversed"
+        root = "model.RdFSharpExternalFormatterModel"
+        namespace = "JetBrains.Rider.FSharp.ExternalFormatter.Client"
+        directory = "$externalFormatterClientOutput"
+    }
 }
 
 tasks {
     withType<PrepareSandboxTask> {
-        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" } + typeProvidersFiles
+        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" } + typeProvidersFiles + externalFormatterFiles
         files = files.map { "$resharperPluginPath/src/$it" }
 
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {

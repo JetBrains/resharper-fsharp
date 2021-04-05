@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net461</TargetFramework>
+        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter</AssemblyName>
+        <SignAssembly>false</SignAssembly>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FSharp.ExternalFormatter.Protocol\FSharp.ExternalFormatter.Protocol.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="JetBrains.Fantomas" Version="$(FantomasVersion)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
+    <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props')" />
+</Project>
