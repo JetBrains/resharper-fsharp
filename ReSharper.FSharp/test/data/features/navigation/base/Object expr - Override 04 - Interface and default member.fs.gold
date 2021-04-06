@@ -1,13 +1,14 @@
-﻿-------------- offset 157 line 9 col 23 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-DEO: Envoy: Method:System.IDisposable.Dispose(), PsiLanguageType:UNKNOWN as Envoy: Method:System.IDisposable.Dispose(), PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
-Occurrence's navigation result. Opened file: IDisposable.cs
-------------------
-  {
-    [__DynamicallyInvokable]
-    void |CARET|Dispose();
-  }
-}
-------------------
+﻿## NavigateToBaseProvider activity:
+  Immediate result:
+    DEO: Envoy: Method:System.IDisposable.Dispose(), PsiLanguageType:UNKNOWN as Envoy: Method:System.IDisposable.Dispose(), PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    Navigation result:
+      opened file: IDisposable.cs
+      ------------------
+        {
+          [__DynamicallyInvokable]
+          void |CARET|Dispose();
+        }
+      }
+      ------------------
+
 

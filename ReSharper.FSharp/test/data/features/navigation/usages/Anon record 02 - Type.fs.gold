@@ -1,38 +1,27 @@
-﻿-------------- offset 44 line 4 col 5 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [W] {| |F| = 1 |} RANGE: (43,44) @ Anon record 02 - Type.fs
-Menu Item presentation: 
-Text: Module      |{| |F| = 1 |}| (4)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: {| F = 1 |}
+﻿## GotoUsagesProvider activity:
+  Async context menu shown `Usages of 'F'`:
+    TO: [W] {| |F| = 1 |} RANGE: (43,44) @ Anon record 02 - Type.fs
+    Menu item (enabled) :
+      icon: UsageWrite
+      text: Module      <font color="DarkRed">{| **F** = 1 |}</font><font color="HotTrack"> (4)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: {| **F** = 1 |}
+    Navigation result:
+      caret did not move
+    TO: [R] type R = {| |F|: int |} RANGE: (29,30) @ Anon record 02 - Type.fs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Module.R      <font color="DarkRed">type R = {| **F**: int |}</font><font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: type R = {| **F**: int |}
+    Navigation result:
+      opened file: Anon record 02 - Type.fs
+      ------------------
+      module Module
 
-Occurrence's navigation result. Opened file: Anon record 02 - Type.fs
-------------------
+      type R = {| |CARET|F: int |}
+      {| F = 1 |}
 
-type R = {| F: int |}
-{| F|CARET| = 1 |}
+      ------------------
 
-------------------
-
-Occurrence's dump:
-TO: [R] type R = {| |F|: int |} RANGE: (29,30) @ Anon record 02 - Type.fs
-Menu Item presentation: 
-Text: Module.R      |type R = {| |F|: int |}| (3)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: type R = {| F: int |}
-
-Occurrence's navigation result. Opened file: Anon record 02 - Type.fs
-------------------
-module Module
-
-type R = {| |CARET|F: int |}
-{| F = 1 |}
-
-------------------
 

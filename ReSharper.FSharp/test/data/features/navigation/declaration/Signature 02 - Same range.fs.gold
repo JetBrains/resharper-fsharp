@@ -1,38 +1,34 @@
-﻿-------------- offset 32 line 5 col 1 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] let |x| = 123 RANGE: (21,22) @ Signature 02 - Same range.fs
-Menu Item presentation: 
-Text: Signature 02 - Same range.fs| (3)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: let x = 123
+﻿## GotoDeclarationProvider activity:
+  Show context popup menu `Declarations of property 'x'`:
+    TO: [O] let |x| = 123 RANGE: (21,22) @ Signature 02 - Same range.fs
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Signature 02 - Same range.fs<font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <TestProject></font>
+      tooltip: let **x** = 123
+    Navigation result:
+      opened file: Signature 02 - Same range.fs
+      ------------------
+      module Module
 
-Occurrence's navigation result. Opened file: Signature 02 - Same range.fs
-------------------
-module Module
+      let |CARET|x = 123
 
-let |CARET|x = 123
+      x
+      ------------------
 
-x
-------------------
+    TO: [O] val |x|: int RANGE: (21,22) @ Signature 02 - Same range.fsi
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Signature 02 - Same range.fsi<font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <TestProject></font>
+      tooltip: val **x**: int
+    Navigation result:
+      opened file: Signature 02 - Same range.fsi
+      ------------------
+      module Module
 
-Occurrence's dump:
-TO: [O] val |x|: int RANGE: (21,22) @ Signature 02 - Same range.fsi
-Menu Item presentation: 
-Text: Signature 02 - Same range.fsi| (3)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: val x: int
+      val |CARET|x: int
 
-Occurrence's navigation result. Opened file: Signature 02 - Same range.fsi
-------------------
-module Module
+      ------------------
 
-val |CARET|x: int
-
-------------------
 

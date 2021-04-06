@@ -1,50 +1,40 @@
-﻿-------------- offset 90 line 6 col 19 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 03 - Default member and interface.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] abstract |P|: int RANGE: (25,26) @ Object expr - Override 03 - Default member and interface.fs
-Menu Item presentation: 
-Text: Object expr - Override 03 - Default member and interface.fs| (2)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: abstract P: int
+﻿## NavigateToBaseProvider activity:
+  Immediate result:
+    DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 03 - Default member and interface.fs
+    Navigation result:
+      caret did not move
+      Side effects during navigation:
+        Show global popup menu `Declarations of property 'P'`:
+          TO: [O] abstract |P|: int RANGE: (25,26) @ Object expr - Override 03 - Default member and interface.fs
+          Menu item (enabled) :
+            icon: Fsharp
+            text: Object expr - Override 03 - Default member and interface.fs<font color="HotTrack"> (2)</font>
+            tail: <font color="GrayText">in <TestProject></font>
+            tooltip: abstract **P**: int
+          Navigation result:
+            opened file: Object expr - Override 03 - Default member and interface.fs
+            ------------------
+            type T() =
+                abstract |CARET|P: int
+                default x.P = 1
 
-Occurrence's navigation result. Opened file: Object expr - Override 03 - Default member and interface.fs
-------------------
-type T() =
-    abstract |CARET|P: int
-    default x.P = 1
+            ------------------
 
-------------------
+          TO: [O] default x.|P| = 1 RANGE: (47,48) @ Object expr - Override 03 - Default member and interface.fs
+          Menu item (enabled) :
+            icon: Fsharp
+            text: Object expr - Override 03 - Default member and interface.fs<font color="HotTrack"> (3)</font>
+            tail: <font color="GrayText">in <TestProject></font>
+            tooltip: default x.**P** = 1
+          Navigation result:
+            opened file: Object expr - Override 03 - Default member and interface.fs
+            ------------------
+            type T() =
+                abstract P: int
+                default x.|CARET|P = 1
 
-Occurrence's dump:
-TO: [O] default x.|P| = 1 RANGE: (47,48) @ Object expr - Override 03 - Default member and interface.fs
-Menu Item presentation: 
-Text: Object expr - Override 03 - Default member and interface.fs| (3)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: default x.P = 1
+            { new T() with
+            ------------------
 
-Occurrence's navigation result. Opened file: Object expr - Override 03 - Default member and interface.fs
-------------------
-type T() =
-    abstract P: int
-    default x.|CARET|P = 1
 
-{ new T() with
-------------------
-
-Occurrence's navigation result. Opened file: Object expr - Override 03 - Default member and interface.fs
-------------------
-type T() =
-    abstract P: int
-    default x.|CARET|P = 1
-
-{ new T() with
-------------------
 

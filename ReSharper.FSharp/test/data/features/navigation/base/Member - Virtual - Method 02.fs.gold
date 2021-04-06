@@ -1,51 +1,41 @@
-﻿-------------- offset 152 line 11 col 17 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Member - Virtual - Method 02.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] abstract |M|: unit -> unit RANGE: (61,62) @ Member - Virtual - Method 02.fs
-Menu Item presentation: 
-Text: Member - Virtual - Method 02.fs| (5)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: abstract M: unit -> unit
+﻿## NavigateToBaseProvider activity:
+  Immediate result:
+    DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Member - Virtual - Method 02.fs
+    Navigation result:
+      caret did not move
+      Side effects during navigation:
+        Show global popup menu `Declarations of method 'M'`:
+          TO: [O] abstract |M|: unit -> unit RANGE: (61,62) @ Member - Virtual - Method 02.fs
+          Menu item (enabled) :
+            icon: Fsharp
+            text: Member - Virtual - Method 02.fs<font color="HotTrack"> (5)</font>
+            tail: <font color="GrayText">in <TestProject></font>
+            tooltip: abstract **M**: unit -> unit
+          Navigation result:
+            opened file: Member - Virtual - Method 02.fs
+            ------------------
+            [<AbstractClass>]
+            type A() =
+                abstract |CARET|M: unit -> unit
+                override x.M() = ()
 
-Occurrence's navigation result. Opened file: Member - Virtual - Method 02.fs
-------------------
-[<AbstractClass>]
-type A() =
-    abstract |CARET|M: unit -> unit
-    override x.M() = ()
+            ------------------
 
-------------------
+          TO: [O] override x.|M|() = () RANGE: (93,94) @ Member - Virtual - Method 02.fs
+          Menu item (enabled) :
+            icon: Fsharp
+            text: Member - Virtual - Method 02.fs<font color="HotTrack"> (6)</font>
+            tail: <font color="GrayText">in <TestProject></font>
+            tooltip: override x.**M**() = ()
+          Navigation result:
+            opened file: Member - Virtual - Method 02.fs
+            ------------------
+            type A() =
+                abstract M: unit -> unit
+                override x.|CARET|M() = ()
 
-Occurrence's dump:
-TO: [O] override x.|M|() = () RANGE: (93,94) @ Member - Virtual - Method 02.fs
-Menu Item presentation: 
-Text: Member - Virtual - Method 02.fs| (6)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: override x.M() = ()
+            type B() =
+            ------------------
 
-Occurrence's navigation result. Opened file: Member - Virtual - Method 02.fs
-------------------
-type A() =
-    abstract M: unit -> unit
-    override x.|CARET|M() = ()
 
-type B() =
-------------------
-
-Occurrence's navigation result. Opened file: Member - Virtual - Method 02.fs
-------------------
-type A() =
-    abstract M: unit -> unit
-    override x.|CARET|M() = ()
-
-type B() =
-------------------
 

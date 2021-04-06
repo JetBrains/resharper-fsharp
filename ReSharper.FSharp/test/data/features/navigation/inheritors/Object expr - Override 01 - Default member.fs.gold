@@ -1,31 +1,13 @@
-﻿-------------- offset 48 line 3 col 16 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-[*] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 01 - Default member.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] override x.|P| = 1 } RANGE: (89,90) @ Object expr - Override 01 - Default member.fs
-Menu Item presentation: 
-Text: Object expr - Override 01 - Default member.fs| (6)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: override x.P = 1 }
+﻿## GotoInheritorsProvider activity:
+  Immediate result:
+    [*] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 01 - Default member.fs
+    Navigation result:
+      opened file: Object expr - Override 01 - Default member.fs
+      ------------------
 
-Occurrence's navigation result. Opened file: Object expr - Override 01 - Default member.fs
-------------------
+      { new T() with
+            override x.|CARET|P = 1 }
 
-{ new T() with
-      override x.|CARET|P = 1 }
+      ------------------
 
-------------------
-
-Occurrence's navigation result. Opened file: Object expr - Override 01 - Default member.fs
-------------------
-
-{ new T() with
-      override x.|CARET|P = 1 }
-
-------------------
 

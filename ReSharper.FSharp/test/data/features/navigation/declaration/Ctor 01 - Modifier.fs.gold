@@ -1,28 +1,41 @@
-﻿-------------- offset 66 line 7 col 1 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
-MULTIPLE CANDIDATES EXECUTION:
---> CANDIDATE DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpSecondaryConstructor, PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpSecondaryConstructor, PsiLanguageType:F# RANGE: (0,0) @ Ctor 01 - Modifier.fs
-Immediate result: Occurrence's dump:
-TO: [O] internal |new| (x: int) = T() RANGE: (42,45) @ Ctor 01 - Modifier.fs
-Occurrence's navigation result. Opened file: Ctor 01 - Modifier.fs
-------------------
+﻿## GotoDeclarationProvider activity:
+  Multiple candidates execution (2):
+    Candidate:
+      Menu item (enabled) :
+        icon: u(PsiSymbolTypicalSizePlaceholder,Constructor,ModifiersInternal)
+        text: T(int) <font color="GrayText"> (in Module.T)</font>
+        tail: <font color="GrayText">TestProject</font>
+        tail icon: FsharpProject
+    Candidate execution:
+      Immediate result:
+        TO: [O] internal |new| (x: int) = T() RANGE: (42,45) @ Ctor 01 - Modifier.fs
+        Navigation result:
+          opened file: Ctor 01 - Modifier.fs
+          ------------------
 
-type T() =
-    internal |CARET|new (x: int) = T()
+          type T() =
+              internal |CARET|new (x: int) = T()
 
 
-------------------
+          ------------------
 
---> CANDIDATE DEO: Envoy: Class:Module+T, PsiLanguageType:F# as Envoy: Class:Module+T, PsiLanguageType:F# RANGE: (0,0) @ Ctor 01 - Modifier.fs
-Immediate result: Occurrence's dump:
-TO: [O] type |T|() = RANGE: (22,23) @ Ctor 01 - Modifier.fs
-Occurrence's navigation result. Opened file: Ctor 01 - Modifier.fs
-------------------
-module Module
+    Candidate:
+      Menu item (enabled) :
+        icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersPublic)
+        text: T <font color="GrayText"> (in Module)</font>
+        tail: <font color="GrayText">TestProject</font>
+        tail icon: FsharpProject
+    Candidate execution:
+      Immediate result:
+        TO: [O] type |T|() = RANGE: (22,23) @ Ctor 01 - Modifier.fs
+        Navigation result:
+          opened file: Ctor 01 - Modifier.fs
+          ------------------
+          module Module
 
-type |CARET|T() =
-    internal new (x: int) = T()
+          type |CARET|T() =
+              internal new (x: int) = T()
 
-------------------
+          ------------------
 
-END OF MULTIPLE CANDIDATES EXECUTION
+

@@ -1,12 +1,13 @@
--------------- offset 37 line 4 col 10 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-TO: [O] | |A| of int RANGE: (16,17) @ Union - Case - Single - Fields 01 - Expr.fs
-Occurrence's navigation result. Opened file: Union - Case - Single - Fields 01 - Expr.fs
-------------------
-type U =
-    | |CARET|A of int
+﻿## GotoDeclarationProvider activity:
+  Immediate result:
+    TO: [O] | |A| of int RANGE: (16,17) @ Union - Case - Single - Fields 01 - Expr.fs
+    Navigation result:
+      opened file: Union - Case - Single - Fields 01 - Expr.fs
+      ------------------
+      type U =
+          | |CARET|A of int
 
-let a = A 123
-------------------
+      let a = A 123
+      ------------------
+
 

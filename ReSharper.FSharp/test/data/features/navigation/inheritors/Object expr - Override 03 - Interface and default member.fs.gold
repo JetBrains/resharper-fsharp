@@ -1,31 +1,13 @@
-﻿-------------- offset 61 line 2 col 10 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-[*] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 03 - Interface and default member.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] member x.|Dispose|() = () } RANGE: (217,224) @ Object expr - Override 03 - Interface and default member.fs
-Menu Item presentation: 
-Text: Object expr - Override 03 - Interface and default member.fs| (12)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: member x.Dispose() = () }
+﻿## GotoInheritorsProvider activity:
+  Immediate result:
+    [*] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 03 - Interface and default member.fs
+    Navigation result:
+      opened file: Object expr - Override 03 - Interface and default member.fs
+      ------------------
 
-Occurrence's navigation result. Opened file: Object expr - Override 03 - Interface and default member.fs
-------------------
+        interface System.IDisposable with
+            member x.|CARET|Dispose() = () }
 
-  interface System.IDisposable with
-      member x.|CARET|Dispose() = () }
+      ------------------
 
-------------------
-
-Occurrence's navigation result. Opened file: Object expr - Override 03 - Interface and default member.fs
-------------------
-
-  interface System.IDisposable with
-      member x.|CARET|Dispose() = () }
-
-------------------
 

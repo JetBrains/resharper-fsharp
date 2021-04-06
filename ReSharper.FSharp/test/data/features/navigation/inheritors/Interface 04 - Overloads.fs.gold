@@ -1,33 +1,14 @@
-﻿-------------- offset 52 line 4 col 17 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-[*] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 04 - Overloads.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] member x.|Foo|(i: int) = () RANGE: (163,166) @ Interface 04 - Overloads.fs
-Menu Item presentation: 
-Text: Interface 04 - Overloads.fs| (9)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: member x.Foo(i: int) = ()
+﻿## GotoInheritorsProvider activity:
+  Immediate result:
+    [*] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 04 - Overloads.fs
+    Navigation result:
+      opened file: Interface 04 - Overloads.fs
+      ------------------
+      type T() =
+          interface IInterface with
+              member x.|CARET|Foo(i: int) = ()
+              member x.Foo(d: double) = ()
 
-Occurrence's navigation result. Opened file: Interface 04 - Overloads.fs
-------------------
-type T() =
-    interface IInterface with
-        member x.|CARET|Foo(i: int) = ()
-        member x.Foo(d: double) = ()
+      ------------------
 
-------------------
-
-Occurrence's navigation result. Opened file: Interface 04 - Overloads.fs
-------------------
-type T() =
-    interface IInterface with
-        member x.|CARET|Foo(i: int) = ()
-        member x.Foo(d: double) = ()
-
-------------------
 

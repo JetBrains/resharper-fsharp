@@ -1,31 +1,13 @@
-﻿-------------- offset 92 line 8 col 15 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-[*] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 07 - Implement multiple.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] member x.|P| = 1 RANGE: (153,154) @ Interface 07 - Implement multiple.fs
-Menu Item presentation: 
-Text: Interface 07 - Implement multiple.fs| (12)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: member x.P = 1
+﻿## GotoInheritorsProvider activity:
+  Immediate result:
+    [*] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 07 - Implement multiple.fs
+    Navigation result:
+      opened file: Interface 07 - Implement multiple.fs
+      ------------------
+      type T() =
+          interface IB with
+              member x.|CARET|P = 1
 
-Occurrence's navigation result. Opened file: Interface 07 - Implement multiple.fs
-------------------
-type T() =
-    interface IB with
-        member x.|CARET|P = 1
+      ------------------
 
-------------------
-
-Occurrence's navigation result. Opened file: Interface 07 - Implement multiple.fs
-------------------
-type T() =
-    interface IB with
-        member x.|CARET|P = 1
-
-------------------
 
