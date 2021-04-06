@@ -1,4 +1,5 @@
 ﻿using FSharp.ExternalFormatter.Protocol;
+using JetBrains.Collections.Viewable;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
@@ -39,6 +40,7 @@ namespace FSharp.ExternalFormatter
 
       model.FormatSelection.Set(FormatSelection);
       model.FormatDocument.Set(FormatDocument);
+      model.Exit.Advise(lifetime, Terminate);
 
       return model;
     }

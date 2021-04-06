@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using JetBrains.Application.Processes;
 using JetBrains.Application.Threading;
+using JetBrains.Core;
 using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
@@ -57,7 +58,8 @@ namespace FSharp.ExternalFormatter.Protocol
 
     protected override bool Shutdown(RdFSharpExternalFormatterModel model)
     {
-      return true; //todo
+      model.Proto.Scheduler.Queue(() => model.Exit.Fire(Unit.Instance));
+      return true;
     }
 
     public ExternalFormatterProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,

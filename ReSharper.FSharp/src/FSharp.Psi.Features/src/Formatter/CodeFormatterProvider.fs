@@ -6,6 +6,7 @@ open FSharp.Compiler.Text
 open FSharp.ExternalFormatter.Protocol
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.Rd.Tasks
 open JetBrains.Rider.FSharp.ExternalFormatter.Server
 
 [<SolutionComponent>]
@@ -53,10 +54,10 @@ type CodeFormatterProvider(solution: ISolution, externalFormatterFactory: Extern
         let args = RdFormatSelectionArgs(filePath, convertRange range, source, convertFormatSettings settings,
                                          convertParsingOptions options)
 
-        execute (fun () -> connection.ProtocolModel.FormatSelection.Sync(args))
+        execute (fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
 
     member x.FormatDocument(filePath: string, source: string, settings: FSharpFormatSettingsKey,
                             options: FSharpParsingOptions) =
         let args = RdFormatDocumentArgs(filePath, source, convertFormatSettings settings, convertParsingOptions options)
 
-        execute (fun () -> connection.ProtocolModel.FormatDocument.Sync(args))
+        execute (fun () -> connection.ProtocolModel.FormatDocument.Sync(args, RpcTimeouts.Maximal))

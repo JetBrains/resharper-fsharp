@@ -66,5 +66,7 @@ object RdFSharpExternalFormatterModel : Root() {
             field("formatConfig", rdFormatConfig)
             field("parsingOptions", rdParsingOptions)
         }, string)
+
+        signal("Exit", void)
     }
 }
