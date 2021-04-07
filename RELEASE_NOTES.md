@@ -1,5 +1,45 @@
 # Release notes
 
+## 2021.1
+
+### Refactorings
+
+* **New**: Inline Variable refactoring for local let bindings
+* Rename: when renaming a type that has an associated module with the same name, the module is also suggested to be renamed (and vice versa)
+* Introduce Variable: redundant parens are removed for some replaced expressions
+
+### Language version support
+
+* **New**: Allowed language level is calculated based on a project and the compiler used in the build
+    * Allows implementing analyzers and other features that use or suggest newer language features
+
+
+### Analyzers:
+
+* To Interpolated string suggestion + quick fix for F# 5.0+, by [@saul](https://github.com/saul) ([#221](https://github.com/JetBrains/fsharp-support/pull/221))
+* Replace `__` with `_` analyzer + quick fix for F# 4.7+
+* Redundant parens analyzer + quick fix for parens in patterns, types, and simple expressions
+* Various improvements to other analyzers and quick fixes
+
+### Quick fixes
+
+* Specify parameter type when it's inferred below
+* Use `;` list separator
+* Replace type abbreviation with abbreviated type in type augmentation
+
+### Type providers
+
+* Host type providers out-of-process
+    * Uses the same runtime as the build, fixes various issues previously occurred with the Rider runtime
+
+### Misc
+
+* Run icon for `main` methods
+* Use .NET Core references for scripts by default
+* Fixes in File Structure for interface/extension members
+* Various fixes in C# interop
+* Typing assists for braces in string interpolations
+
 ## 2020.1
 
 ### Inspections / analyzers
