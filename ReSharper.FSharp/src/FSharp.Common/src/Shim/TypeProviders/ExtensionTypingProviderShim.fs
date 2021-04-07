@@ -9,9 +9,9 @@ open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
-open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
-open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Exceptions
-open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
+open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
+open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions
+open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
 type IProxyExtensionTypingProvider =
     inherit IExtensionTypingProvider
@@ -22,7 +22,7 @@ type IProxyExtensionTypingProvider =
 [<SolutionComponent>]
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         experimentalFeatures: FSharpExperimentalFeaturesProvider,
-        typeProvidersLoadersFactory: TypeProvidersLoaderExternalProcessFactory) as this =
+        typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory) as this =
     let lifetime = solution.GetLifetime()
     let defaultShim = ExtensionTypingProvider
     let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders

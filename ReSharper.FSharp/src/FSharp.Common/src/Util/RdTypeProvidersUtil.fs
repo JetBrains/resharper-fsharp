@@ -2,8 +2,8 @@
 module JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 
 open FSharp.Compiler.AbstractIL.IL
-open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
 open FSharp.Compiler.ExtensionTyping
+open JetBrains.Rider.FSharp.TypeProviders.Protocol.Client
 
 type ILVersionInfo with
     [<Extension>]
@@ -13,7 +13,7 @@ type ILVersionInfo with
                   this.Build |> int,
                   this.Revision |> int)
 
-type JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdVersion with
+type JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdVersion with
     [<Extension>]
     member this.toVersion() =
         ILVersionInfo(this.Major |> uint16,
@@ -21,7 +21,7 @@ type JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdVersion with
                       this.Build |> uint16,
                       this.Revision |> uint16)
 
-type JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdPublicKey with
+type JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdPublicKey with
     [<Extension>]
     member this.toPublicKey() =
         if this.IsKey then PublicKey this.Data else
@@ -43,7 +43,7 @@ type ResolutionEnvironment with
                                 this.referencedAssemblies,
                                 this.temporaryFolder)
 
-type JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdResolutionEnvironment with
+type JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdResolutionEnvironment with
     [<Extension; CompiledName("ToResolutionEnvironment")>]
     member this.toResolutionEnvironment() =
          { resolutionFolder = this.ResolutionFolder;

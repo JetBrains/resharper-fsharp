@@ -2,7 +2,7 @@
 
 open System.Collections
 open System.Reflection
-open JetBrains.Rider.FSharp.TypeProvidersProtocol
+open JetBrains.Rider.FSharp.TypeProviders.Protocol
 
 module TcImportsHack =
     let bindAll =
@@ -28,17 +28,17 @@ module TcImportsHack =
     type FakeDllInfo(fileName: string) =
         member this.FileName = fileName
 
-    type FakeTcImportsBaseValue(baseFakeTcImports: Client.RdFakeTcImports) =
+    type FakeTcImportsBaseValue(baseFakeTcImports: Server.RdFakeTcImports) =
         member this.Value = FakeTcImports(baseFakeTcImports.DllInfos, baseFakeTcImports.Base)
 
-    and FakeTcImports(dllInfos: Client.RdFakeDllInfo[], baseFakeTcImports: Client.RdFakeTcImports) as this =
-        [<DefaultValue>] val mutable dllInfos: Client.RdFakeDllInfo[]
+    and FakeTcImports(dllInfos: Server.RdFakeDllInfo[], baseFakeTcImports: Server.RdFakeTcImports) as this =
+        [<DefaultValue>] val mutable dllInfos: Server.RdFakeDllInfo[]
         do this.dllInfos <- dllInfos
 
         member this.Base = FakeTcImportsBaseValue(baseFakeTcImports)
         member this.SystemRuntimeContainsType(_: string) = true // todo: smart implementation
         
-    type FakeSystemRuntimeContainsTypeRef(fakeTcImports: Client.RdFakeTcImports) =
+    type FakeSystemRuntimeContainsTypeRef(fakeTcImports: Server.RdFakeTcImports) =
         member this.Value =
             let tcImports = FakeTcImports(fakeTcImports.DllInfos, fakeTcImports.Base)
             // Don't simplify the lambda: `tcImports` is accessed via reflection in `getFakeTcImports`. 
@@ -50,7 +50,7 @@ module TcImportsHack =
     let getFakeTcImports (runtimeContainsType: 'a -> 'b) =
         let getDllInfos tcImports =
             [| for dllInfo in tcImports.GetField("dllInfos").GetElements() ->
-                   Server.RdFakeDllInfo(dllInfo.GetProperty("FileName") :?> _) |]
+                   Client.RdFakeDllInfo(dllInfo.GetProperty("FileName") :?> _) |]
             
         let tcImports =
             runtimeContainsType.GetField("systemRuntimeContainsTypeRef").GetProperty("Value").GetField("tcImports")                                
@@ -60,10 +60,10 @@ module TcImportsHack =
         let baseTcImports = tcImports.GetProperty("Base").GetProperty("Value")   
         let baseTcImportsDllInfos = getDllInfos baseTcImports
         
-        let fakeBaseTcImports = Server.RdFakeTcImports(null, baseTcImportsDllInfos)
-        Server.RdFakeTcImports(fakeBaseTcImports, tcImportsDllInfos)
+        let fakeBaseTcImports = Client.RdFakeTcImports(null, baseTcImportsDllInfos)
+        Client.RdFakeTcImports(fakeBaseTcImports, tcImportsDllInfos)
 
-    let injectFakeTcImports (fakeTcImports: Client.RdFakeTcImports) =
+    let injectFakeTcImports (fakeTcImports: Server.RdFakeTcImports) =
         let systemRuntimeContainsTypeRef = FakeSystemRuntimeContainsTypeRef(fakeTcImports)
         // Don't simplify the lambda: `systemRuntimeContainsTypeRef` is accessed via reflection in `getFakeTcImports`.
         fun name -> systemRuntimeContainsTypeRef.Value name

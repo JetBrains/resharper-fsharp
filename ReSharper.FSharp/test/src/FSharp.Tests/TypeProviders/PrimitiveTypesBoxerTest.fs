@@ -1,6 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.TypeProviders
 
-open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
+open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 open NUnit.Framework
 open System
 
