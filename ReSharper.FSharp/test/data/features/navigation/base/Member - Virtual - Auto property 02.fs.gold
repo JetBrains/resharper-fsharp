@@ -1,51 +1,41 @@
-﻿-------------- offset 144 line 11 col 19 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Member - Virtual - Auto property 02.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] abstract |P|: int RANGE: (61,62) @ Member - Virtual - Auto property 02.fs
-Menu Item presentation: 
-Text: Member - Virtual - Auto property 02.fs| (5)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: abstract P: int
+﻿## NavigateToBaseProvider activity:
+  Immediate result:
+    DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Member - Virtual - Auto property 02.fs
+    Navigation result:
+      caret did not move
+      Side effects during navigation:
+        Show global popup menu `Declarations of property 'P'`:
+          TO: [O] abstract |P|: int RANGE: (61,62) @ Member - Virtual - Auto property 02.fs
+          Menu item (enabled) :
+            icon: Fsharp
+            text: Member - Virtual - Auto property 02.fs<font color="HotTrack"> (5)</font>
+            tail: <font color="GrayText">in <TestProject></font>
+            tooltip: abstract **P**: int
+          Navigation result:
+            opened file: Member - Virtual - Auto property 02.fs
+            ------------------
+            [<AbstractClass>]
+            type A() =
+                abstract |CARET|P: int
+                override val P = 1
 
-Occurrence's navigation result. Opened file: Member - Virtual - Auto property 02.fs
-------------------
-[<AbstractClass>]
-type A() =
-    abstract |CARET|P: int
-    override val P = 1
+            ------------------
 
-------------------
+          TO: [O] override val |P| = 1 RANGE: (86,87) @ Member - Virtual - Auto property 02.fs
+          Menu item (enabled) :
+            icon: Fsharp
+            text: Member - Virtual - Auto property 02.fs<font color="HotTrack"> (6)</font>
+            tail: <font color="GrayText">in <TestProject></font>
+            tooltip: override val **P** = 1
+          Navigation result:
+            opened file: Member - Virtual - Auto property 02.fs
+            ------------------
+            type A() =
+                abstract P: int
+                override val |CARET|P = 1
 
-Occurrence's dump:
-TO: [O] override val |P| = 1 RANGE: (86,87) @ Member - Virtual - Auto property 02.fs
-Menu Item presentation: 
-Text: Member - Virtual - Auto property 02.fs| (6)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: override val P = 1
+            type B() =
+            ------------------
 
-Occurrence's navigation result. Opened file: Member - Virtual - Auto property 02.fs
-------------------
-type A() =
-    abstract P: int
-    override val |CARET|P = 1
 
-type B() =
-------------------
-
-Occurrence's navigation result. Opened file: Member - Virtual - Auto property 02.fs
-------------------
-type A() =
-    abstract P: int
-    override val |CARET|P = 1
-
-type B() =
-------------------
 

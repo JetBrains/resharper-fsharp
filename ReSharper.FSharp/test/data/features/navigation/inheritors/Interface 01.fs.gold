@@ -1,33 +1,14 @@
-﻿-------------- offset 32 line 3 col 16 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-[*] DEO: Envoy: Class:Module+T, PsiLanguageType:F# as Envoy: Class:Module+T, PsiLanguageType:F# RANGE: (0,0) @ Interface 01.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] type |T|() = RANGE: (66,67) @ Interface 01.fs
-Menu Item presentation: 
-Text: Interface 01.fs| (6)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: type T() =
+﻿## GotoInheritorsProvider activity:
+  Immediate result:
+    [*] DEO: Envoy: Class:Module+T, PsiLanguageType:F# as Envoy: Class:Module+T, PsiLanguageType:F# RANGE: (0,0) @ Interface 01.fs
+    Navigation result:
+      opened file: Interface 01.fs
+      ------------------
+          abstract Foo: int
 
-Occurrence's navigation result. Opened file: Interface 01.fs
-------------------
-    abstract Foo: int
+      type |CARET|T() =
+          interface IInterface with
+              member x.Foo = 123
+      ------------------
 
-type |CARET|T() =
-    interface IInterface with
-        member x.Foo = 123
-------------------
-
-Occurrence's navigation result. Opened file: Interface 01.fs
-------------------
-    abstract Foo: int
-
-type |CARET|T() =
-    interface IInterface with
-        member x.Foo = 123
-------------------
 

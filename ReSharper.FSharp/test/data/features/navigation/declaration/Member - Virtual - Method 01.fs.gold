@@ -1,39 +1,35 @@
-﻿-------------- offset 109 line 8 col 6 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] abstract |M|: unit -> unit RANGE: (61,62) @ Member - Virtual - Method 01.fs
-Menu Item presentation: 
-Text: Member - Virtual - Method 01.fs| (5)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: abstract M: unit -> unit
+﻿## GotoDeclarationProvider activity:
+  Show context popup menu `Declarations of method 'M'`:
+    TO: [O] abstract |M|: unit -> unit RANGE: (61,62) @ Member - Virtual - Method 01.fs
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Member - Virtual - Method 01.fs<font color="HotTrack"> (5)</font>
+      tail: <font color="GrayText">in <TestProject></font>
+      tooltip: abstract **M**: unit -> unit
+    Navigation result:
+      opened file: Member - Virtual - Method 01.fs
+      ------------------
+      [<AbstractClass>]
+      type A() =
+          abstract |CARET|M: unit -> unit
+          default x.M() = ()
 
-Occurrence's navigation result. Opened file: Member - Virtual - Method 01.fs
-------------------
-[<AbstractClass>]
-type A() =
-    abstract |CARET|M: unit -> unit
-    default x.M() = ()
+      ------------------
 
-------------------
+    TO: [O] default x.|M|() = () RANGE: (92,93) @ Member - Virtual - Method 01.fs
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Member - Virtual - Method 01.fs<font color="HotTrack"> (6)</font>
+      tail: <font color="GrayText">in <TestProject></font>
+      tooltip: default x.**M**() = ()
+    Navigation result:
+      opened file: Member - Virtual - Method 01.fs
+      ------------------
+      type A() =
+          abstract M: unit -> unit
+          default x.|CARET|M() = ()
 
-Occurrence's dump:
-TO: [O] default x.|M|() = () RANGE: (92,93) @ Member - Virtual - Method 01.fs
-Menu Item presentation: 
-Text: Member - Virtual - Method 01.fs| (6)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: default x.M() = ()
+      A().M()
+      ------------------
 
-Occurrence's navigation result. Opened file: Member - Virtual - Method 01.fs
-------------------
-type A() =
-    abstract M: unit -> unit
-    default x.|CARET|M() = ()
-
-A().M()
-------------------
 

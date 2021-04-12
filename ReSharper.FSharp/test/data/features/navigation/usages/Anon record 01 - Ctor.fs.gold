@@ -1,38 +1,26 @@
-﻿-------------- offset 21 line 3 col 5 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [W] {| |F| = 1 |} RANGE: (20,21) @ Anon record 01 - Ctor.fs
-Menu Item presentation: 
-Text: Module      |{| |F| = 1 |}| (3)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: {| F = 1 |}
+﻿## GotoUsagesProvider activity:
+  Async context menu shown `Usages of 'F'`:
+    TO: [W] {| |F| = 1 |} RANGE: (20,21) @ Anon record 01 - Ctor.fs
+    Menu item (enabled) :
+      icon: UsageWrite
+      text: Module      <font color="DarkRed">{| **F** = 1 |}</font><font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: {| **F** = 1 |}
+    Navigation result:
+      caret did not move
+    TO: [W] {| |F| = 1 |} RANGE: (33,34) @ Anon record 01 - Ctor.fs
+    Menu item (enabled) :
+      icon: UsageWrite
+      text: Module      <font color="DarkRed">{| **F** = 1 |}</font><font color="HotTrack"> (4)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: {| **F** = 1 |}
+    Navigation result:
+      opened file: Anon record 01 - Ctor.fs
+      ------------------
 
-Occurrence's navigation result. Opened file: Anon record 01 - Ctor.fs
-------------------
-module Module
+      {| F = 1 |}
+      {| |CARET|F = 1 |}
 
-{| F|CARET| = 1 |}
-{| F = 1 |}
+      ------------------
 
-------------------
-
-Occurrence's dump:
-TO: [W] {| |F| = 1 |} RANGE: (33,34) @ Anon record 01 - Ctor.fs
-Menu Item presentation: 
-Text: Module      |{| |F| = 1 |}| (4)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: {| F = 1 |}
-
-Occurrence's navigation result. Opened file: Anon record 01 - Ctor.fs
-------------------
-
-{| F = 1 |}
-{| |CARET|F = 1 |}
-
-------------------
 

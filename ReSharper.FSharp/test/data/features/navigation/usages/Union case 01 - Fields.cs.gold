@@ -1,56 +1,42 @@
-﻿-------------- offset 64 line 5 col 17 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [I] U u = U.|NewA|(123); RANGE: (60,64) @ Union case 01 - Fields.cs
-Menu Item presentation: 
-Text: Class1.Class1      |U u = U.|NewA|(123);| (5)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: U u = U.NewA(123);
+﻿## GotoUsagesProvider activity:
+  Async context menu shown `Usages of 'A'`:
+    TO: [I] U u = U.|NewA|(123); RANGE: (60,64) @ Union case 01 - Fields.cs
+    Menu item (enabled) :
+      icon: UsageInvocation
+      text: Class1.Class1      <font color="DarkRed">U u = U.**NewA**(123);</font><font color="HotTrack"> (5)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: U u = U.**NewA**(123);
+    Navigation result:
+      caret did not move
+    TO: [R] var isA = u.|IsA|; RANGE: (88,91) @ Union case 01 - Fields.cs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Class1.Class1      <font color="DarkRed">var isA = u.**IsA**;</font><font color="HotTrack"> (6)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: var isA = u.**IsA**;
+    Navigation result:
+      opened file: Union case 01 - Fields.cs
+      ------------------
+        {
+          U u = U.NewA(123);
+          var isA = u.|CARET|IsA;
+        }
+      }
+      ------------------
 
-Occurrence's navigation result. Opened file: Union case 01 - Fields.cs
-------------------
-  public Class1()
-  {
-    U u = U.NewA|CARET|(123);
-    var isA = u.IsA;
-  }
-------------------
+    TO: [R] let a = |A|(123) RANGE: (86,87) @ Union case 01 - Fields.fs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Module.a      <font color="DarkRed">let a = **A**(123)</font><font color="HotTrack"> (8)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: let a = **A**(123)
+    Navigation result:
+      opened file: Union case 01 - Fields.fs
+      ------------------
 
-Occurrence's dump:
-TO: [R] var isA = u.|IsA|; RANGE: (88,91) @ Union case 01 - Fields.cs
-Menu Item presentation: 
-Text: Class1.Class1      |var isA = u.|IsA|;| (6)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: var isA = u.IsA;
+      module Module =
+          let a = |CARET|A(123)
 
-Occurrence's navigation result. Opened file: Union case 01 - Fields.cs
-------------------
-  {
-    U u = U.NewA(123);
-    var isA = u.|CARET|IsA;
-  }
-}
-------------------
+      ------------------
 
-Occurrence's dump:
-TO: [R] let a = |A|(123) RANGE: (86,87) @ Union case 01 - Fields.fs
-Menu Item presentation: 
-Text: Module.a      |let a = |A|(123)| (8)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: let a = A(123)
-
-Occurrence's navigation result. Opened file: Union case 01 - Fields.fs
-------------------
-
-module Module =
-    let a = |CARET|A(123)
-
-------------------
 

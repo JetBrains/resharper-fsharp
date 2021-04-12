@@ -1,56 +1,42 @@
-﻿-------------- offset 31 line 3 col 15 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] let r1: |Record| = { Field = 1 } RANGE: (25,31) @ Record Ctor 02 - Compiled.fs
-Menu Item presentation: 
-Text: Module.r1      |let r1: |Record| = { Field = 1 }| (3)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: let r1: Record = { Field = 1 }
+﻿## GotoUsagesProvider activity:
+  Async context menu shown `Usages of 'Record'`:
+    TO: [O] let r1: Record = |{ Field = 1 }| RANGE: (34,47) @ Record Ctor 02 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsageInstanceCreation
+      text: Module.r1      <font color="DarkRed">let r1: Record = **{ Field = 1 }</font>**<font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: let r1: Record = **{ Field = 1 }**
+    Navigation result:
+      opened file: Record Ctor 02 - Compiled.fs
+      ------------------
+      module Module
 
-Occurrence's navigation result. Opened file: Record Ctor 02 - Compiled.fs
-------------------
-module Module
+      let r1: Record = |CARET|{ Field = 1 }
+      let r2 = { r1 with Field = 2 }
 
-let r1: Record|CARET| = { Field = 1 }
-let r2 = { r1 with Field = 2 }
+      ------------------
 
-------------------
+    TO: [O] let r1: |Record| = { Field = 1 } RANGE: (25,31) @ Record Ctor 02 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module.r1      <font color="DarkRed">let r1: **Record** = { Field = 1 }</font><font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: let r1: **Record** = { Field = 1 }
+    Navigation result:
+      caret did not move
+    TO: [O] let r2 = |{ r1 with Field = 2 }| RANGE: (58,79) @ Record Ctor 02 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module.r2      <font color="DarkRed">let r2 = **{ r1 with Field = 2 }</font>**<font color="HotTrack"> (4)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: let r2 = **{ r1 with Field = 2 }**
+    Navigation result:
+      opened file: Record Ctor 02 - Compiled.fs
+      ------------------
 
-Occurrence's dump:
-TO: [O] let r1: Record = |{ Field = 1 }| RANGE: (34,47) @ Record Ctor 02 - Compiled.fs
-Menu Item presentation: 
-Text: Module.r1      |let r1: Record = |{ Field = 1 }| (3)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: let r1: Record = { Field = 1 }
+      let r1: Record = { Field = 1 }
+      let r2 = |CARET|{ r1 with Field = 2 }
 
-Occurrence's navigation result. Opened file: Record Ctor 02 - Compiled.fs
-------------------
-module Module
+      ------------------
 
-let r1: Record = |CARET|{ Field = 1 }
-let r2 = { r1 with Field = 2 }
-
-------------------
-
-Occurrence's dump:
-TO: [O] let r2 = |{ r1 with Field = 2 }| RANGE: (58,79) @ Record Ctor 02 - Compiled.fs
-Menu Item presentation: 
-Text: Module.r2      |let r2 = |{ r1 with Field = 2 }| (4)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: let r2 = { r1 with Field = 2 }
-
-Occurrence's navigation result. Opened file: Record Ctor 02 - Compiled.fs
-------------------
-
-let r1: Record = { Field = 1 }
-let r2 = |CARET|{ r1 with Field = 2 }
-
-------------------
 

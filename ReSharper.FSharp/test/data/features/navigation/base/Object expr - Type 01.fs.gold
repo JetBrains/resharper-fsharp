@@ -1,29 +1,12 @@
-﻿-------------- offset 61 line 6 col 7 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-[*] DEO: Envoy: Class:Object expr - Type 01+A, PsiLanguageType:F# as Envoy: Class:Object expr - Type 01+A, PsiLanguageType:F# RANGE: (0,0) @ Object expr - Type 01.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] type |A|() = class end RANGE: (5,6) @ Object expr - Type 01.fs
-Menu Item presentation: 
-Text: Object expr - Type 01.fs| (1)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: type A() = class end
+﻿## NavigateToBaseProvider activity:
+  Immediate result:
+    [*] DEO: Envoy: Class:Object expr - Type 01+A, PsiLanguageType:F# as Envoy: Class:Object expr - Type 01+A, PsiLanguageType:F# RANGE: (0,0) @ Object expr - Type 01.fs
+    Navigation result:
+      opened file: Object expr - Type 01.fs
+      ------------------
+      type |CARET|A() = class end
 
-Occurrence's navigation result. Opened file: Object expr - Type 01.fs
-------------------
-type |CARET|A() = class end
+      type B() =
+      ------------------
 
-type B() =
-------------------
-
-Occurrence's navigation result. Opened file: Object expr - Type 01.fs
-------------------
-type |CARET|A() = class end
-
-type B() =
-------------------
 

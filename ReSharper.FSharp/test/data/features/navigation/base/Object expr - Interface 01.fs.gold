@@ -1,31 +1,13 @@
-﻿-------------- offset 65 line 5 col 17 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Interface 01.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] abstract |P|: int RANGE: (25,26) @ Object expr - Interface 01.fs
-Menu Item presentation: 
-Text: Object expr - Interface 01.fs| (2)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: abstract P: int
+﻿## NavigateToBaseProvider activity:
+  Immediate result:
+    DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Interface 01.fs
+    Navigation result:
+      opened file: Object expr - Interface 01.fs
+      ------------------
+      type I =
+            abstract |CARET|P: int
 
-Occurrence's navigation result. Opened file: Object expr - Interface 01.fs
-------------------
-type I =
-      abstract |CARET|P: int
+      { new I with
+      ------------------
 
-{ new I with
-------------------
-
-Occurrence's navigation result. Opened file: Object expr - Interface 01.fs
-------------------
-type I =
-      abstract |CARET|P: int
-
-{ new I with
-------------------
 

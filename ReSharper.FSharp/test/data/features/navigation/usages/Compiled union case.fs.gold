@@ -1,38 +1,26 @@
-﻿-------------- offset 19 line 3 col 3 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] |Ok| 123 RANGE: (17,19) @ Compiled union case.fs
-Menu Item presentation: 
-Text: Module      |Ok| 123| (3)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: Ok 123
+﻿## GotoUsagesProvider activity:
+  Async context menu shown `Usages of 'NewOk(…)'`:
+    TO: [O] |Ok| 123 RANGE: (17,19) @ Compiled union case.fs
+    Menu item (enabled) :
+      icon: UsageInstanceCreation
+      text: Module      **<font color="DarkRed">Ok** 123</font><font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: **Ok** 123
+    Navigation result:
+      caret did not move
+    TO: [O] |Ok| 123 RANGE: (25,27) @ Compiled union case.fs
+    Menu item (enabled) :
+      icon: UsageInstanceCreation
+      text: Module      **<font color="DarkRed">Ok** 123</font><font color="HotTrack"> (4)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: **Ok** 123
+    Navigation result:
+      opened file: Compiled union case.fs
+      ------------------
 
-Occurrence's navigation result. Opened file: Compiled union case.fs
-------------------
-module Module
+      Ok 123
+      |CARET|Ok 123
 
-Ok|CARET| 123
-Ok 123
+      ------------------
 
-------------------
-
-Occurrence's dump:
-TO: [O] |Ok| 123 RANGE: (25,27) @ Compiled union case.fs
-Menu Item presentation: 
-Text: Module      |Ok| 123| (4)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: Ok 123
-
-Occurrence's navigation result. Opened file: Compiled union case.fs
-------------------
-
-Ok 123
-|CARET|Ok 123
-
-------------------
 

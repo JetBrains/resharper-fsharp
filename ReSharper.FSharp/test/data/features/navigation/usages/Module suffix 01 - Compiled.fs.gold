@@ -1,38 +1,26 @@
-﻿-------------- offset 21 line 3 col 5 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] |List|.append |> ignore RANGE: (17,21) @ Module suffix 01 - Compiled.fs
-Menu Item presentation: 
-Text: Module      |List|.append |> ignore| (3)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: List.append |> ignore
+﻿## GotoUsagesProvider activity:
+  Async context menu shown `Usages of 'ListModule'`:
+    TO: [O] |List|.append |> ignore RANGE: (17,21) @ Module suffix 01 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module      **<font color="DarkRed">List**.append |> ignore</font><font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: **List**.append |> ignore
+    Navigation result:
+      caret did not move
+    TO: [O] |List|.append |> ignore RANGE: (40,44) @ Module suffix 01 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module      **<font color="DarkRed">List**.append |> ignore</font><font color="HotTrack"> (4)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: **List**.append |> ignore
+    Navigation result:
+      opened file: Module suffix 01 - Compiled.fs
+      ------------------
 
-Occurrence's navigation result. Opened file: Module suffix 01 - Compiled.fs
-------------------
-module Module
+      List.append |> ignore
+      |CARET|List.append |> ignore
 
-List|CARET|.append |> ignore
-List.append |> ignore
+      ------------------
 
-------------------
-
-Occurrence's dump:
-TO: [O] |List|.append |> ignore RANGE: (40,44) @ Module suffix 01 - Compiled.fs
-Menu Item presentation: 
-Text: Module      |List|.append |> ignore| (4)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: List.append |> ignore
-
-Occurrence's navigation result. Opened file: Module suffix 01 - Compiled.fs
-------------------
-
-List.append |> ignore
-|CARET|List.append |> ignore
-
-------------------
 

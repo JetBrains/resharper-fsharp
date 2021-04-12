@@ -1,33 +1,14 @@
-﻿-------------- offset 22 line 3 col 6 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-[*] DEO: Envoy: Class:Module+B, PsiLanguageType:F# as Envoy: Class:Module+B, PsiLanguageType:F# RANGE: (0,0) @ Types 01.fs
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.GotoInheritorsProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] type |B|() = RANGE: (46,47) @ Types 01.fs
-Menu Item presentation: 
-Text: Types 01.fs| (5)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: type B() =
+﻿## GotoInheritorsProvider activity:
+  Immediate result:
+    [*] DEO: Envoy: Class:Module+B, PsiLanguageType:F# as Envoy: Class:Module+B, PsiLanguageType:F# RANGE: (0,0) @ Types 01.fs
+    Navigation result:
+      opened file: Types 01.fs
+      ------------------
+      type A() = class end
 
-Occurrence's navigation result. Opened file: Types 01.fs
-------------------
-type A() = class end
+      type |CARET|B() =
+          inherit A()
 
-type |CARET|B() =
-    inherit A()
+      ------------------
 
-------------------
-
-Occurrence's navigation result. Opened file: Types 01.fs
-------------------
-type A() = class end
-
-type |CARET|B() =
-    inherit A()
-
-------------------
 

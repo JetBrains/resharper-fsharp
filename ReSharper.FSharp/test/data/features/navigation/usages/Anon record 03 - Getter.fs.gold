@@ -1,38 +1,26 @@
-﻿-------------- offset 30 line 3 col 14 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [R] ar.|F| RANGE: (42,43) @ Anon record 03 - Getter.fs
-Menu Item presentation: 
-Text: Module      |ar.|F| (4)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: ar.F
+﻿## GotoUsagesProvider activity:
+  Async context menu shown `Usages of 'F'`:
+    TO: [R] ar.|F| RANGE: (42,43) @ Anon record 03 - Getter.fs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Module      <font color="DarkRed">ar.**F</font>**<font color="HotTrack"> (4)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: ar.**F**
+    Navigation result:
+      opened file: Anon record 03 - Getter.fs
+      ------------------
 
-Occurrence's navigation result. Opened file: Anon record 03 - Getter.fs
-------------------
+      let ar = {| F = 1 |}
+      ar.|CARET|F
 
-let ar = {| F = 1 |}
-ar.|CARET|F
+      ------------------
 
-------------------
-
-Occurrence's dump:
-TO: [W] let ar = {| |F| = 1 |} RANGE: (29,30) @ Anon record 03 - Getter.fs
-Menu Item presentation: 
-Text: Module.ar      |let ar = {| |F| = 1 |}| (3)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: let ar = {| F = 1 |}
-
-Occurrence's navigation result. Opened file: Anon record 03 - Getter.fs
-------------------
-module Module
-
-let ar = {| |CARET|F = 1 |}
-ar.F
-
-------------------
+    TO: [W] let ar = {| |F| = 1 |} RANGE: (29,30) @ Anon record 03 - Getter.fs
+    Menu item (enabled) :
+      icon: UsageWrite
+      text: Module.ar      <font color="DarkRed">let ar = {| **F** = 1 |}</font><font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: let ar = {| **F** = 1 |}
+    Navigation result:
+      caret did not move
 

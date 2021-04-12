@@ -1,56 +1,42 @@
-﻿-------------- offset 61 line 5 col 14 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [R] U u = U.|B|; RANGE: (60,61) @ Union case 02 - Singleton.cs
-Menu Item presentation: 
-Text: Class1.Class1      |U u = U.|B|;| (5)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: U u = U.B;
+﻿## GotoUsagesProvider activity:
+  Async context menu shown `Usages of 'B'`:
+    TO: [R] U u = U.|B|; RANGE: (60,61) @ Union case 02 - Singleton.cs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Class1.Class1      <font color="DarkRed">U u = U.**B**;</font><font color="HotTrack"> (5)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: U u = U.**B**;
+    Navigation result:
+      caret did not move
+    TO: [R] var isB = u.|IsB|; RANGE: (80,83) @ Union case 02 - Singleton.cs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Class1.Class1      <font color="DarkRed">var isB = u.**IsB**;</font><font color="HotTrack"> (6)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: var isB = u.**IsB**;
+    Navigation result:
+      opened file: Union case 02 - Singleton.cs
+      ------------------
+        {
+          U u = U.B;
+          var isB = u.|CARET|IsB;
+        }
+      }
+      ------------------
 
-Occurrence's navigation result. Opened file: Union case 02 - Singleton.cs
-------------------
-  public Class1()
-  {
-    U u = U.B|CARET|;
-    var isB = u.IsB;
-  }
-------------------
+    TO: [R] let b = |B| RANGE: (86,87) @ Union case 02 - Singleton.fs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Module.b      <font color="DarkRed">let b = **B</font>**<font color="HotTrack"> (8)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: let b = **B**
+    Navigation result:
+      opened file: Union case 02 - Singleton.fs
+      ------------------
 
-Occurrence's dump:
-TO: [R] var isB = u.|IsB|; RANGE: (80,83) @ Union case 02 - Singleton.cs
-Menu Item presentation: 
-Text: Class1.Class1      |var isB = u.|IsB|;| (6)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: var isB = u.IsB;
+      module Module =
+          let b = |CARET|B
 
-Occurrence's navigation result. Opened file: Union case 02 - Singleton.cs
-------------------
-  {
-    U u = U.B;
-    var isB = u.|CARET|IsB;
-  }
-}
-------------------
+      ------------------
 
-Occurrence's dump:
-TO: [R] let b = |B| RANGE: (86,87) @ Union case 02 - Singleton.fs
-Menu Item presentation: 
-Text: Module.b      |let b = |B| (8)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: let b = B
-
-Occurrence's navigation result. Opened file: Union case 02 - Singleton.fs
-------------------
-
-module Module =
-    let b = |CARET|B
-
-------------------
 

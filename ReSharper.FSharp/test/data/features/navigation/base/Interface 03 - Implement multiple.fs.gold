@@ -1,79 +1,35 @@
-﻿-------------- offset 154 line 12 col 19 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
-Menu Item presentation: 
-Text: Module.IA | (in Module.IA)
-Shortcut text: TestProject
-Style: Enabled
-Mnemonic: 
-Tooltip: 
+﻿## NavigateToBaseProvider activity:
+  Show context popup menu `Base properties of 'P'`:
+    DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
+    Menu item (enabled) :
+      icon: u(PsiSymbolTypicalSizePlaceholder,Property,ModifiersRead,ModifiersAbstract,ModifiersPublic)
+      text: Module.IA <font color="GrayText"> (in Module.IA)</font>
+      tail: <font color="GrayText">TestProject</font>
+      tail icon: FsharpProject
+    Navigation result:
+      opened file: Interface 03 - Implement multiple.fs
+      ------------------
 
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] abstract |P|: int RANGE: (41,42) @ Interface 03 - Implement multiple.fs
-Menu Item presentation: 
-Text: Interface 03 - Implement multiple.fs| (4)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: abstract P: int
+      type IA =
+          abstract |CARET|P: int
 
-Occurrence's navigation result. Opened file: Interface 03 - Implement multiple.fs
-------------------
+      type IB =
+      ------------------
 
-type IA =
-    abstract |CARET|P: int
+    DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
+    Menu item (enabled) :
+      icon: u(PsiSymbolTypicalSizePlaceholder,Property,ModifiersRead,ModifiersAbstract,ModifiersPublic)
+      text: Module.IB <font color="GrayText"> (in Module.IB)</font>
+      tail: <font color="GrayText">TestProject</font>
+      tail icon: FsharpProject
+    Navigation result:
+      opened file: Interface 03 - Implement multiple.fs
+      ------------------
+      type IB =
+          inherit IA
+          abstract |CARET|P: int
 
-type IB =
-------------------
+      type T() =
+      ------------------
 
-Occurrence's navigation result. Opened file: Interface 03 - Implement multiple.fs
-------------------
-
-type IA =
-    abstract |CARET|P: int
-
-type IB =
-------------------
-
-Occurrence's dump:
-DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
-Menu Item presentation: 
-Text: Module.IB | (in Module.IB)
-Shortcut text: TestProject
-Style: Enabled
-Mnemonic: 
-Tooltip: 
-
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] abstract |P|: int RANGE: (91,92) @ Interface 03 - Implement multiple.fs
-Menu Item presentation: 
-Text: Interface 03 - Implement multiple.fs| (8)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: abstract P: int
-
-Occurrence's navigation result. Opened file: Interface 03 - Implement multiple.fs
-------------------
-type IB =
-    inherit IA
-    abstract |CARET|P: int
-
-type T() =
-------------------
-
-Occurrence's navigation result. Opened file: Interface 03 - Implement multiple.fs
-------------------
-type IB =
-    inherit IA
-    abstract |CARET|P: int
-
-type T() =
-------------------
 

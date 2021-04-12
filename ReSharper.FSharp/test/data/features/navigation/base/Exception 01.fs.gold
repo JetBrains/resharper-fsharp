@@ -1,75 +1,67 @@
-﻿-------------- offset 28 line 3 col 12 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-DEO: Envoy: Interface:System.Runtime.InteropServices._Exception, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.InteropServices._Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
-Menu Item presentation: 
-Text: _Exception | (in System.Runtime.InteropServices)
-Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
-Style: Enabled
-Mnemonic: 
-Tooltip: 
+﻿## NavigateToBaseProvider activity:
+  Show context popup menu `Base types of 'E'`:
+    DEO: Envoy: Interface:System.Runtime.InteropServices._Exception, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.InteropServices._Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    Menu item (enabled) :
+      icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
+      text: _Exception <font color="GrayText"> (in System.Runtime.InteropServices)</font>
+      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      tail icon: Assembly
+    Navigation result:
+      opened file: _Exception.cs
+      ------------------
+        [InterfaceType(ComInterfaceType.InterfaceIsDual)]
+        [CLSCompliant(false)]
+        public interface |CARET|_Exception
+        {
+          string ToString();
+      ------------------
 
-Occurrence's navigation result. Opened file: _Exception.cs
-------------------
-  [InterfaceType(ComInterfaceType.InterfaceIsDual)]
-  [CLSCompliant(false)]
-  public interface |CARET|_Exception
-  {
-    string ToString();
-------------------
+    [*] DEO: Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN as Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    Menu item (enabled) :
+      icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersPublic)
+      text: **Exception **<font color="GrayText"> (in System)</font>
+      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      tail icon: Assembly
+    Navigation result:
+      opened file: Exception.cs
+      ------------------
+        [__DynamicallyInvokable]
+        [Serializable]
+        public class |CARET|Exception : ISerializable, _Exception
+        {
+          [OptionalField]
+      ------------------
 
-Occurrence's dump:
-[*] DEO: Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN as Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
-Menu Item presentation: 
-Text: Exception | (in System)
-Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
-Style: Enabled
-Mnemonic: 
-Tooltip: 
+    DEO: Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    Menu item (enabled) :
+      icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
+      text: ISerializable <font color="GrayText"> (in System.Runtime.Serialization)</font>
+      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      tail icon: Assembly
+    Navigation result:
+      opened file: ISerializable.cs
+      ------------------
+      {
+        [ComVisible(true)]
+        public interface |CARET|ISerializable
+        {
+          [SecurityCritical]
+      ------------------
 
-Occurrence's navigation result. Opened file: Exception.cs
-------------------
-  [__DynamicallyInvokable]
-  [Serializable]
-  public class |CARET|Exception : ISerializable, _Exception
-  {
-    [OptionalField]
-------------------
+    [*] DEO: Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    Menu item (enabled) :
+      icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
+      text: **IStructuralEquatable **<font color="GrayText"> (in System.Collections)</font>
+      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      tail icon: Assembly
+    Navigation result:
+      opened file: IStructuralEquatable.cs
+      ------------------
+      {
+        [__DynamicallyInvokable]
+        public interface |CARET|IStructuralEquatable
+        {
+          [__DynamicallyInvokable]
+      ------------------
 
-Occurrence's dump:
-DEO: Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
-Menu Item presentation: 
-Text: ISerializable | (in System.Runtime.Serialization)
-Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
-Style: Enabled
-Mnemonic: 
-Tooltip: 
-
-Occurrence's navigation result. Opened file: ISerializable.cs
-------------------
-{
-  [ComVisible(true)]
-  public interface |CARET|ISerializable
-  {
-    [SecurityCritical]
-------------------
-
-Occurrence's dump:
-[*] DEO: Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
-Menu Item presentation: 
-Text: IStructuralEquatable | (in System.Collections)
-Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
-Style: Enabled
-Mnemonic: 
-Tooltip: 
-
-Occurrence's navigation result. Opened file: IStructuralEquatable.cs
-------------------
-{
-  [__DynamicallyInvokable]
-  public interface |CARET|IStructuralEquatable
-  {
-    [__DynamicallyInvokable]
-------------------
 

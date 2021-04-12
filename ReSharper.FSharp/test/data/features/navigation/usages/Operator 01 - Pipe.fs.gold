@@ -1,38 +1,26 @@
-﻿-------------- offset 21 line 4 col 1 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] ||>| ignore RANGE: (21,23) @ Operator 01 - Pipe.fs
-Menu Item presentation: 
-Text: Module      ||>| ignore| (4)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: |> ignore
+﻿## GotoUsagesProvider activity:
+  Async context menu shown `Usages of 'op_PipeRight(…)'`:
+    TO: [O] ||>| ignore RANGE: (21,23) @ Operator 01 - Pipe.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module      **<font color="DarkRed">|>** ignore</font><font color="HotTrack"> (4)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: **|>** ignore
+    Navigation result:
+      caret did not move
+    TO: [O] ||>| ignore RANGE: (32,34) @ Operator 01 - Pipe.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module      **<font color="DarkRed">|>** ignore</font><font color="HotTrack"> (5)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: **|>** ignore
+    Navigation result:
+      opened file: Operator 01 - Pipe.fs
+      ------------------
+      ()
+      |> ignore
+      |CARET||> ignore
 
-Occurrence's navigation result. Opened file: Operator 01 - Pipe.fs
-------------------
+      ------------------
 
-()
-|CARET||> ignore
-|> ignore
-
-------------------
-
-Occurrence's dump:
-TO: [O] ||>| ignore RANGE: (32,34) @ Operator 01 - Pipe.fs
-Menu Item presentation: 
-Text: Module      ||>| ignore| (5)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: |> ignore
-
-Occurrence's navigation result. Opened file: Operator 01 - Pipe.fs
-------------------
-()
-|> ignore
-|CARET||> ignore
-
-------------------
 

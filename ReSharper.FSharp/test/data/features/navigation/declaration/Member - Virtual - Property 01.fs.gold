@@ -1,39 +1,35 @@
-﻿-------------- offset 97 line 8 col 6 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] abstract |P|: int RANGE: (61,62) @ Member - Virtual - Property 01.fs
-Menu Item presentation: 
-Text: Member - Virtual - Property 01.fs| (5)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: abstract P: int
+﻿## GotoDeclarationProvider activity:
+  Show context popup menu `Declarations of property 'P'`:
+    TO: [O] abstract |P|: int RANGE: (61,62) @ Member - Virtual - Property 01.fs
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Member - Virtual - Property 01.fs<font color="HotTrack"> (5)</font>
+      tail: <font color="GrayText">in <TestProject></font>
+      tooltip: abstract **P**: int
+    Navigation result:
+      opened file: Member - Virtual - Property 01.fs
+      ------------------
+      [<AbstractClass>]
+      type A() =
+          abstract |CARET|P: int
+          default x.P = 1
 
-Occurrence's navigation result. Opened file: Member - Virtual - Property 01.fs
-------------------
-[<AbstractClass>]
-type A() =
-    abstract |CARET|P: int
-    default x.P = 1
+      ------------------
 
-------------------
+    TO: [O] default x.|P| = 1 RANGE: (83,84) @ Member - Virtual - Property 01.fs
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Member - Virtual - Property 01.fs<font color="HotTrack"> (6)</font>
+      tail: <font color="GrayText">in <TestProject></font>
+      tooltip: default x.**P** = 1
+    Navigation result:
+      opened file: Member - Virtual - Property 01.fs
+      ------------------
+      type A() =
+          abstract P: int
+          default x.|CARET|P = 1
 
-Occurrence's dump:
-TO: [O] default x.|P| = 1 RANGE: (83,84) @ Member - Virtual - Property 01.fs
-Menu Item presentation: 
-Text: Member - Virtual - Property 01.fs| (6)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: default x.P = 1
+      A().P
+      ------------------
 
-Occurrence's navigation result. Opened file: Member - Virtual - Property 01.fs
-------------------
-type A() =
-    abstract P: int
-    default x.|CARET|P = 1
-
-A().P
-------------------
 

@@ -1,38 +1,26 @@
-﻿-------------- offset 53 line 4 col 13 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] for |KeyValue| _ in m do () RANGE: (45,53) @ Compiled active pattern case.fs
-Menu Item presentation: 
-Text: Module      |for |KeyValue| _ in m do ()| (4)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: for KeyValue _ in m do ()
+﻿## GotoUsagesProvider activity:
+  Async context menu shown `Usages of 'KeyValue'`:
+    TO: [O] for |KeyValue| _ in m do () RANGE: (45,53) @ Compiled active pattern case.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module      <font color="DarkRed">for **KeyValue** _ in m do ()</font><font color="HotTrack"> (4)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: for **KeyValue** _ in m do ()
+    Navigation result:
+      caret did not move
+    TO: [O] for |KeyValue| _ in m do () RANGE: (72,80) @ Compiled active pattern case.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module      <font color="DarkRed">for **KeyValue** _ in m do ()</font><font color="HotTrack"> (5)</font>
+      tail: <font color="GrayText">in <Root Namespace></font>
+      tooltip: for **KeyValue** _ in m do ()
+    Navigation result:
+      opened file: Compiled active pattern case.fs
+      ------------------
+      let m = dict [123, ""]
+      for KeyValue _ in m do ()
+      for |CARET|KeyValue _ in m do ()
 
-Occurrence's navigation result. Opened file: Compiled active pattern case.fs
-------------------
+      ------------------
 
-let m = dict [123, ""]
-for KeyValue|CARET| _ in m do ()
-for KeyValue _ in m do ()
-
-------------------
-
-Occurrence's dump:
-TO: [O] for |KeyValue| _ in m do () RANGE: (72,80) @ Compiled active pattern case.fs
-Menu Item presentation: 
-Text: Module      |for |KeyValue| _ in m do ()| (5)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: for KeyValue _ in m do ()
-
-Occurrence's navigation result. Opened file: Compiled active pattern case.fs
-------------------
-let m = dict [123, ""]
-for KeyValue _ in m do ()
-for |CARET|KeyValue _ in m do ()
-
-------------------
 

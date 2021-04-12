@@ -1,13 +1,14 @@
-﻿-------------- offset 149 line 8 col 18 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
-Immediate result: Occurrence's dump:
-TO: [O] member x.|Dispose|() = () RANGE: (42,49) @ Own member vs interface.fs
-Occurrence's navigation result. Opened file: Own member vs interface.fs
-------------------
+﻿## GotoDeclarationProvider activity:
+  Immediate result:
+    TO: [O] member x.|Dispose|() = () RANGE: (42,49) @ Own member vs interface.fs
+    Navigation result:
+      opened file: Own member vs interface.fs
+      ------------------
 
-type T() =
-    member x.|CARET|Dispose() = ()
-    interface System.IDisposable with
-        member x.Dispose() = ()
-------------------
+      type T() =
+          member x.|CARET|Dispose() = ()
+          interface System.IDisposable with
+              member x.Dispose() = ()
+      ------------------
+
 

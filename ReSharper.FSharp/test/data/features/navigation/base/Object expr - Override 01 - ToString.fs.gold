@@ -1,57 +1,34 @@
-﻿-------------- offset 87 line 5 col 26 --------------------
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-DEO: Envoy: Method:System.Object.ToString(), PsiLanguageType:UNKNOWN as Envoy: Method:System.Object.ToString(), PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
-Menu Item presentation: 
-Text: Object | (in System.Object)
-Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
-Style: Enabled
-Mnemonic: 
-Tooltip: 
+﻿## NavigateToBaseProvider activity:
+  Show context popup menu `Base methods of 'ToString'`:
+    DEO: Envoy: Method:System.Object.ToString(), PsiLanguageType:UNKNOWN as Envoy: Method:System.Object.ToString(), PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    Menu item (enabled) :
+      icon: u(PsiSymbolTypicalSizePlaceholder,Method,ModifiersVirtual,ModifiersPublic)
+      text: Object <font color="GrayText"> (in System.Object)</font>
+      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      tail icon: Assembly
+    Navigation result:
+      opened file: Object.cs
+      ------------------
 
-Occurrence's navigation result. Opened file: Object.cs
-------------------
+          [__DynamicallyInvokable]
+          public virtual string |CARET|ToString() => this.GetType().ToString();
 
-    [__DynamicallyInvokable]
-    public virtual string |CARET|ToString() => this.GetType().ToString();
+          [TargetedPatchingOptOut("Performance critical to inline across NGen image boundaries")]
+      ------------------
 
-    [TargetedPatchingOptOut("Performance critical to inline across NGen image boundaries")]
-------------------
+    DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 01 - ToString.fs
+    Menu item (enabled) :
+      icon: u(PsiSymbolTypicalSizePlaceholder,Method,ModifiersPublic)
+      text: Object expr - Override 01 - ToString.T <font color="GrayText"> (in Object expr - Override 01 - ToString.T)</font>
+      tail: <font color="GrayText">TestProject</font>
+      tail icon: FsharpProject
+    Navigation result:
+      opened file: Object expr - Override 01 - ToString.fs
+      ------------------
+      type T() =
+          override x.|CARET|ToString() = ""
 
-Occurrence's dump:
-DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 01 - ToString.fs
-Menu Item presentation: 
-Text: Object expr - Override 01 - ToString.T | (in Object expr - Override 01 - ToString.T)
-Shortcut text: TestProject
-Style: Enabled
-Mnemonic: 
-Tooltip: 
+      { new T() with
+      ------------------
 
-+++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
-Occurrences provided for OccurrenceUtil:
-Occurrence's dump:
-TO: [O] override x.|ToString|() = "" RANGE: (27,35) @ Object expr - Override 01 - ToString.fs
-Menu Item presentation: 
-Text: Object expr - Override 01 - ToString.fs| (2)
-Shortcut text: in <TestProject>
-Style: Enabled
-Mnemonic: 
-Tooltip: override x.ToString() = ""
-
-Occurrence's navigation result. Opened file: Object expr - Override 01 - ToString.fs
-------------------
-type T() =
-    override x.|CARET|ToString() = ""
-
-{ new T() with
-------------------
-
-Occurrence's navigation result. Opened file: Object expr - Override 01 - ToString.fs
-------------------
-type T() =
-    override x.|CARET|ToString() = ""
-
-{ new T() with
-------------------
 
