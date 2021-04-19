@@ -3,10 +3,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.Application
 open JetBrains.Application.BuildScript
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Host.Env
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Psi
+open JetBrains.Rider.Backend.Env
 
 [<ShellComponent>]
 type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation, fileExtensions: IProjectFileExtensions) =

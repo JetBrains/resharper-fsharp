@@ -4,7 +4,7 @@ open System
 open System.Collections.Generic
 open JetBrains.Annotations
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Host.Features
+open JetBrains.ReSharper.Host.Core.Features
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings

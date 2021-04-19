@@ -9,8 +9,8 @@ open JetBrains.Metadata.Utils
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
 open JetBrains.Rd.Tasks
-open JetBrains.ReSharper.Host.Features.ProjectModel
-open JetBrains.ReSharper.Host.Features.ProjectModel.View
+open JetBrains.ReSharper.Host.Core.Features.ProjectModel.View
+open JetBrains.ReSharper.Host.Core.Features.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector

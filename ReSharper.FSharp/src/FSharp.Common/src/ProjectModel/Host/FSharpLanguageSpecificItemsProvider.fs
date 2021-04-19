@@ -6,9 +6,9 @@ open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Extensions
-open JetBrains.ReSharper.Host.Features.ProjectModel.View.EditProperties.Projects.MsBuild
-open JetBrains.ReSharper.Host.Features.ProjectModel.View.EditProperties.Projects.MsBuild.Providers
-open JetBrains.ReSharper.Host.Features.ProjectModel.View.EditProperties.Utils
+open JetBrains.ReSharper.Host.Core.Features.ProjectModel.View.EditProperties.Projects.MsBuild
+open JetBrains.ReSharper.Host.Core.Features.ProjectModel.View.EditProperties.Projects.MsBuild.Providers
+open JetBrains.ReSharper.Host.Core.Features.ProjectModel.View.EditProperties.Utils
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.Util
 
