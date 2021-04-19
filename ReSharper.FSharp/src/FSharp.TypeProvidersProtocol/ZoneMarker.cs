@@ -1,5 +1,5 @@
 ﻿using JetBrains.Application.BuildScript.Application.Zones;
-using JetBrains.ReSharper.Host.Product;
+using JetBrains.Rider.Backend.Product;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
 {

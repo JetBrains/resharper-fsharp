@@ -3,8 +3,8 @@ module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.Project
 open System
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Host.Features.ProjectModel.View
-open JetBrains.ReSharper.Host.Features.ProjectModel.View.Appenders.ProjectStructure
+open JetBrains.ReSharper.Host.Core.Features.ProjectModel.View
+open JetBrains.ReSharper.Host.Core.Features.ProjectModel.View.Appenders.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model

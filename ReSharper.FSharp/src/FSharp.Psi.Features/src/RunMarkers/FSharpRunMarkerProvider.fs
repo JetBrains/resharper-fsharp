@@ -2,7 +2,6 @@
 
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Host.Features.RunMarkers
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -10,6 +9,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Caches.SymbolCache
 open JetBrains.ReSharper.Psi.EntryPoints
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.Rider.Backend.Features.RunMarkers
 open JetBrains.Util
 
 let isEntryPoint (binding: ITopBinding) =

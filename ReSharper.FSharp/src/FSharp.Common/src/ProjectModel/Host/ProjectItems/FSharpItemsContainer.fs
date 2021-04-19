@@ -23,10 +23,10 @@ open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Update
 open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Feature.Services.Navigation.NavigationProviders
-open JetBrains.ReSharper.Host.Features.ProjectModel.View
-open JetBrains.ReSharper.Host.Features.ProjectModel.View.Appenders
-open JetBrains.ReSharper.Host.Features.ProjectModel.View.Ordering
-open JetBrains.ReSharper.Host.Features.Util.Tree
+open JetBrains.ReSharper.Host.Core.Features.ProjectModel.View
+open JetBrains.ReSharper.Host.Core.Features.ProjectModel.View.Appenders
+open JetBrains.ReSharper.Host.Core.Features.ProjectModel.View.Ordering
+open JetBrains.ReSharper.Host.Core.Features.Util.Tree
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi

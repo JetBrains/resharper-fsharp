@@ -6,7 +6,7 @@ using JetBrains.Lifetimes;
 using JetBrains.Platform.MsBuildHost;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.Packaging;
-using JetBrains.ReSharper.Host.Features.Toolset;
+using JetBrains.ReSharper.Host.Core.Features.Toolset;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
