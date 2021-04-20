@@ -17,7 +17,7 @@ buildscript {
     }
     dependencies {
         // https://www.myget.org/feed/rd-snapshots/package/maven/com.jetbrains.rd/rd-gen
-        classpath("com.jetbrains.rd:rd-gen:0.211.195")
+        classpath("com.jetbrains.rd:rd-gen:0.211.238")
     }
 }
 
@@ -27,7 +27,7 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.intellij") version "0.6.5"
+    id("org.jetbrains.intellij") version "0.7.2" // https://github.com/JetBrains/gradle-intellij-plugin/releases
     id("org.jetbrains.grammarkit") version "2018.1.7"
     id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
     kotlin("jvm") version "1.4.10"
@@ -235,8 +235,7 @@ tasks {
     // Initially introduced in:
     // https://github.com/JetBrains/ForTea/blob/master/Frontend/build.gradle.kts
     withType<RunIdeTask> {
-        // IDEs from SDK are launched with 512m by default, which is not enough for Rider.
-        // Rider uses this value when launched not from SDK.
+        // Match Rider's default heap size of 1.5Gb (default for runIde is 512Mb)
         maxHeapSize = "1500m"
     }
 
