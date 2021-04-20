@@ -1,9 +1,9 @@
 ﻿## NavigateToBaseProvider activity:
   Show context popup menu `Base properties of 'P'`:
-    DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
+    [×] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Property,ModifiersRead,ModifiersAbstract,ModifiersPublic)
-      text: Module.IA <font color="GrayText"> (in Module.IA)</font>
+      text: _Module.IA _<font color="GrayText"> (in Module.IA)</font>
       tail: <font color="GrayText">TestProject</font>
       tail icon: FsharpProject
     Navigation result:

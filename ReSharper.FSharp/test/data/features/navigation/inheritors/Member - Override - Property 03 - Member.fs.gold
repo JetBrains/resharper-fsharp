@@ -1,3 +1,13 @@
 ﻿## GotoInheritorsProvider activity:
-  Tooltip was shown: Implementing properties of 'P' were not found.
+  Immediate result:
+    [×] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Member - Override - Property 03 - Member.fs
+    Navigation result:
+      opened file: Member - Override - Property 03 - Member.fs
+      ------------------
+          inherit A()
+
+          member x.|CARET|P = 123
+
+      ------------------
+
 

@@ -90,10 +90,10 @@ type FSharpGoToInheritorsTest() =
     [<Test>] member x.``Member - Virtual - Property 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
-    [<Test>] member x.``Object expr - Interface 02 - Dispose``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Object expr - Interface 02 - Dispose``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Override 01 - Default member``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Override 02 - Default member and interface``() = x.DoNamedTest()
-    [<Test>] member x.``Object expr - Override 03 - Interface and default member``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Object expr - Override 03 - Interface and default member``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Type 01``() = x.DoNamedTest()
 
 
