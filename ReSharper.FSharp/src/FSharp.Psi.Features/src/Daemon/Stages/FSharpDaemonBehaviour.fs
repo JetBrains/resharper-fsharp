@@ -12,9 +12,12 @@ type FSharpDaemonBehaviour() =
         let properties = sourceFile.Properties
 
         if sourceFile.IsLanguageSupported<FSharpLanguage>() then
-            if not properties.ShouldBuildPsi then ErrorStripeRequestWithDescription.CreateNoneNoPsi(properties)
-            elif not properties.ProvidesCodeModel then ErrorStripeRequestWithDescription.CreateNoneNoCodeModel(properties)
-            else ErrorStripeRequestWithDescription.StripeAndErrors
+            if not properties.ShouldBuildPsi then
+                ErrorStripeRequestWithDescription.CreateNoneNoPsi(properties)
+            elif not properties.ProvidesCodeModel then
+                ErrorStripeRequestWithDescription.CreateNoneNoCodeModel(properties)
+            else
+                ErrorStripeRequestWithDescription.StripeAndErrors
 
         else ErrorStripeRequestWithDescription.None("The file does not support F# language")
 
