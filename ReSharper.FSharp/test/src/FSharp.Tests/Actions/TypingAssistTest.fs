@@ -309,6 +309,7 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``Backticks 04 - Before ident``() = x.DoNamedTest()
     [<Test>] member x.``Backticks 05 - Before keyword``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks 06 - Eof``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type LineIndentsTest() =
