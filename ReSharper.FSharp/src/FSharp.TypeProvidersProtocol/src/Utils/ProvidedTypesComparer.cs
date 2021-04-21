@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
     {
     }
 
-    private static bool GetFullNameFast(ProvidedType x, out string fullName)
+    private static bool TryGetFullName(ProvidedType x, out string fullName)
     {
       try
       {
@@ -38,8 +38,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
     //Errors when getting .FullName and .Assembly are logged during Rd-model creation for ProvidedType
     public bool Equals(ProvidedType x, ProvidedType y)
     {
-      var xResult = GetFullNameFast(x, out var xFullName);
-      var yResult = GetFullNameFast(y, out var yFullName);
+      var xResult = TryGetFullName(x, out var xFullName);
+      var yResult = TryGetFullName(y, out var yFullName);
 
       if (xResult != yResult) return false;
       if (GetAssemblyNameSafe(x) != GetAssemblyNameSafe(y)) return false;
