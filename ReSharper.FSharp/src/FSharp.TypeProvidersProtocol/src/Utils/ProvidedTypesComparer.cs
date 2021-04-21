@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
@@ -36,7 +35,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
       }
     }
 
-    [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
     public bool Equals(ProvidedType x, ProvidedType y)
     {
       var xResult = GetFullNameFast(x, out var xFullName);
@@ -46,6 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
       if (GetAssemblyNameSafe(x) != GetAssemblyNameSafe(y)) return false;
       if (xResult) return xFullName == yFullName;
 
+      // ReSharper disable PossibleNullReferenceException
       if (x.Name != y.Name) return false;
       if (x.Namespace != y.Namespace) return false;
 
