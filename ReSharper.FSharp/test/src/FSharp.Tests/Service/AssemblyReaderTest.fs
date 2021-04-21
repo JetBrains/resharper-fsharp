@@ -86,6 +86,8 @@ type AssemblyReaderTest() =
 
     [<Test>] member x.``Type def - Class 01``() = x.DoNamedTest()
     [<Test>] member x.``Type def - Class 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Type def - Class 03 - Abstract``() = x.DoNamedTest()
+    [<Test>] member x.``Type def - Class 04 - Interface impl``() = x.DoNamedTest()
 
     [<Test>] member x.``Type def - Delegate 01``() = x.DoNamedTest()
 

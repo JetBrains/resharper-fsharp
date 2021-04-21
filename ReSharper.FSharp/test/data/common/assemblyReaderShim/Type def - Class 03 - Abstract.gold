@@ -1,0 +1,19 @@
+﻿module Module
+
+type T1() =
+    inherit Class()
+
+    override this.M1() = ()
+    override this.|M2|(0)() = ()
+
+
+type T2() =
+    inherit B()
+
+    override this.M1() = ()
+    override this.M2() = ()
+    override this.M3() = ()
+    override this.M4() = ()
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: No abstract or interface member was found that corresponds to this override

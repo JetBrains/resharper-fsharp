@@ -1,0 +1,20 @@
+﻿module Module
+
+open System
+
+do
+    use c1 = new Class1()
+    c1.Dispose()
+    (c1 :> IDisposable).Dispose()
+    
+    use c2 = new Class2()
+    c2.|Dispose|(0)()
+    (c2 :> IDisposable).Dispose()
+
+    use c3 = new Class3()
+    c3.|Dispose|(1)()
+    (c3 :> IDisposable).Dispose()
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: The type 'Class2' does not define the field, constructor or member 'Dispose'.
+(1): ReSharper Error Highlighting: The type 'Class3' does not define the field, constructor or member 'Dispose'.

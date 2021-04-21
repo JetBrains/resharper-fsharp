@@ -7,8 +7,18 @@ type IInherit2 =
     interface |IInterface|(0)
 
 
+type EmptyType() =
+    interface IEmptyInterface
+
+let e = EmptyType()
+e :> IEmptyInterface |> ignore
+e :> IEmptyBaseInterface |> ignore
+
+
 type Type() =
-    interface IInterface
+    interface IInterface with
+        member this.M1() = ()
+        member this.M2(i: int) = ()
 
 let t = Type()
 t :> IInterface |> ignore

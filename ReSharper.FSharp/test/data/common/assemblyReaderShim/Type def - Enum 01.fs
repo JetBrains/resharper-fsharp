@@ -41,3 +41,10 @@ match EnumSameFields.A with
 match EnumSameFields.A with
 | EnumSameFields.A -> ()
 | EnumSameFields.A -> ()
+
+
+type InheritEnum() =
+    inherit Enum()
+
+type InheritClass() =
+    inherit Class()
