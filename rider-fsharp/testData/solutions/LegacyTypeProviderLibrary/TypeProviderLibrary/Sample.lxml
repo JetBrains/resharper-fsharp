@@ -1,0 +1,16 @@
+<ContinuousStructure CoordSystem="0">
+  <Properties>
+    <Excitation Name="ex-1" Type="0" Excite="0,1,0">
+      <Primitives>
+        <Box Priority="0">
+          <P1 X="-10" Y="-10" Z="0">
+          </P1>
+          <P2 X="10" Y="10" Z="0">
+          </P2>
+        </Box>
+      </Primitives>
+    </Excitation>
+    <Excitation Type="1">
+    </Excitation>
+  </Properties>
+</ContinuousStructure>

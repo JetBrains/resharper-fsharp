@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "LegacyTypeProviderLibrary", "TypeProviderLibrary\LegacyTypeProviderLibrary.fsproj", "{72413044-334A-496B-B587-7F2C857D94A1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{72413044-334A-496B-B587-7F2C857D94A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72413044-334A-496B-B587-7F2C857D94A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72413044-334A-496B-B587-7F2C857D94A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72413044-334A-496B-B587-7F2C857D94A1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

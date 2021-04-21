@@ -29,6 +29,10 @@ class TypeProvidersTest : BaseTestWithSolution() {
     @Test
     fun providersErrors() = doTest("ProvidersErrors")
 
+    @Test(description = "RIDER-60909")
+    @TestEnvironment(solution = "LegacyTypeProviderLibrary")
+    fun legacyTypeProviders() = doTest("LegacyTypeProviders")
+
     private fun doTest(fileName: String) {
         withTypeProviders {
             withOpenedEditor(project, "TypeProviderLibrary/$fileName.fs") {
