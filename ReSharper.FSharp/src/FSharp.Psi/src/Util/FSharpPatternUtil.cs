@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       {
         fsPattern = parent;
 
-        if (parent is IOrPat)
+        if (parent is IOrPat || parent is IAndsPat)
           canBePartial = true;
       }
 

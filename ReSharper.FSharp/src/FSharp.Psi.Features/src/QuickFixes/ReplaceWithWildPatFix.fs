@@ -15,6 +15,11 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
+// todo: combine with RemoveUnusedNamedAsPat:
+//   match () with
+//   | _ as a & _
+//   | a & _ -> ()
+
 module ReplaceWithWildPat =
     let replaceWithWildPat (pat: IFSharpPattern) =
         if isIdentifierOrKeyword (pat.GetPreviousToken()) then

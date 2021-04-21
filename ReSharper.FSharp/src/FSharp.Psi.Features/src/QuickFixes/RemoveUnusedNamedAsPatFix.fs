@@ -6,6 +6,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
+// todo: combine with ReplaceWithWildPat:
+//   match () with
+//   | _ as a & _
+//   | a & _ -> ()
+
 type RemoveUnusedNamedAsPatFix(warning: UnusedValueWarning) =
     inherit FSharpQuickFixBase()
 

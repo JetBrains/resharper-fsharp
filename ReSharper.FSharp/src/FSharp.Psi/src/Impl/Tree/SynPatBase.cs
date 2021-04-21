@@ -135,7 +135,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class AndsPat
   {
     public override IEnumerable<IFSharpPattern> NestedPatterns =>
-      EmptyList<IFSharpPattern>.Instance;
+      Patterns.SelectMany(pat => pat.NestedPatterns);
   }
 
   internal partial class ArrayPat

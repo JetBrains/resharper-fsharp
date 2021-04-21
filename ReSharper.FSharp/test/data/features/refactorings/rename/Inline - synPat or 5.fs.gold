@@ -1,0 +1,5 @@
+﻿module Module
+
+match () with
+| _ & zzz
+| _ & zzz -> zzz
