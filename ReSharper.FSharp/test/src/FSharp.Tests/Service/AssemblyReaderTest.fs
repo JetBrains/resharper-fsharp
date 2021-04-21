@@ -33,6 +33,8 @@ type TestAssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, ps
     member this.PsiModule = projectPsiModule
     member this.Path = projectPath
 
+    override this.DebugReadRealAssemblies = false
+
     member this.CreateProjectCookie(path: FileSystemPath, psiModule: IPsiModule) =
         projectPath <- path
         projectPsiModule <- psiModule

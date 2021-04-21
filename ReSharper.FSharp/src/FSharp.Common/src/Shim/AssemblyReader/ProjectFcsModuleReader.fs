@@ -448,8 +448,10 @@ module ProjectFcsModuleReader =
 
         ILFieldDef(name, fieldType, attributes, data, literalValue, offset, marshal, customAttrs)
 
-    let methodSpecialNameAttrs =
-        MethodAttributes.SpecialName ||| MethodAttributes.RTSpecialName
+    let methodSpecialNameAttrs = MethodAttributes.SpecialName ||| MethodAttributes.RTSpecialName
+
+    // todo: different attrs in class vs interface?
+    let methodAbstractAttrs = MethodAttributes.Abstract ||| MethodAttributes.NewSlot ||| MethodAttributes.Virtual
 
     let mkMethodAttributes (method: IFunction): MethodAttributes =
         let accessRights =
@@ -466,8 +468,8 @@ module ProjectFcsModuleReader =
         MethodAttributes.HideBySig |||
         (if method.IsStatic then MethodAttributes.Static else enum 0) |||
         (if method.IsSealed then MethodAttributes.Final else enum 0) |||
-        (if method.IsAbstract then MethodAttributes.Abstract else enum 0) |||
-        (if method.IsVirtual || method.IsAbstract then MethodAttributes.Virtual else enum 0) ||| // todo: test
+        (if method.IsAbstract then methodAbstractAttrs else enum 0) |||
+        (if method.IsVirtual then MethodAttributes.Virtual else enum 0) ||| // todo: test
         (if not (method.GetHiddenMembers().IsEmpty()) then MethodAttributes.NewSlot else enum 0) ||| // todo: test
         (if method :? IConstructor || method :? IAccessor then methodSpecialNameAttrs else enum 0)
 
@@ -558,6 +560,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
 
     member this.Timestamp = timestamp
     member this.PsiModule = psiModule
+
+    member val RealModuleReader: ILModuleReader option = None with get, set
 
     member this.CreateTypeDef(clrTypeName: IClrTypeName) =
         use lock = locker.UsingWriteLock()
@@ -677,7 +681,11 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
             moduleDef <- Some newModuleDef
             newModuleDef
 
-        member this.Dispose() = ()
+        member this.Dispose() =
+            match this.RealModuleReader with
+            | Some(moduleReader) -> moduleReader.Dispose()
+            | _ -> ()
+
         member this.ILAssemblyRefs = []
 
 

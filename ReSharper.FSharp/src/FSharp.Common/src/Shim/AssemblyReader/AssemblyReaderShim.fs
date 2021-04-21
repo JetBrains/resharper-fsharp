@@ -58,6 +58,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, isEnabled: bool) =
     inherit AssemblyReaderShimBase(lifetime, changeManager, isEnabled)
 
+    static let debugReadRealAssemblies = false
+
     // The shim is injected to get the expected shim shadowing chain, it's expected to be unused. 
     do assemblyInfoShim |> ignore
 
@@ -90,6 +92,9 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         let isEnabled = SettingsUtil.getValue<FSharpOptions, bool> settingsStore "NonFSharpProjectInMemoryAnalysis"
         AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, isEnabled)
 
+    abstract DebugReadRealAssemblies: bool
+    default this.DebugReadRealAssemblies = true
+
     override this.GetLastWriteTime(path) =
         if not (this.IsEnabled && AssemblyReaderShim.isAssembly path) then base.GetLastWriteTime(path) else
 
@@ -109,5 +114,12 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             base.GetModuleReader(path, readerOptions) else
 
         match getOrCreateReader path with
-        | ReferencedAssembly.ProjectOutput reader -> reader :> _
-        | _ -> base.GetModuleReader(path, readerOptions)
+        | ReferencedAssembly.Ignored -> base.GetModuleReader(path, readerOptions)
+        | ReferencedAssembly.ProjectOutput reader ->
+
+        if debugReadRealAssemblies && reader.RealModuleReader.IsNone then
+            try
+                reader.RealModuleReader <- Some(this.DefaultReader.GetILModuleReader(path.FullPath, readerOptions))
+            with _ -> ()
+
+        reader :> _

@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
   {
     public bool IsEnabled { get; }
 
-    private readonly IAssemblyReader myDefaultReader;
+    protected readonly IAssemblyReader DefaultReader;
 
     protected AssemblyReaderShimBase(Lifetime lifetime, ChangeManager changeManager, bool isEnabled) 
       : base(lifetime, changeManager)
@@ -19,20 +19,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       if (!isEnabled)
         return;
 
-      myDefaultReader = AssemblyReader;
+      DefaultReader = AssemblyReader;
       AssemblyReader = this;
-      lifetime.OnTermination(() => AssemblyReader = myDefaultReader);
+      lifetime.OnTermination(() => AssemblyReader = DefaultReader);
     }
 
     protected virtual ILModuleReader GetModuleReader(FileSystemPath path, ILReaderOptions readerOptions) =>
-      myDefaultReader.GetILModuleReader(path.FullPath, readerOptions);
+      DefaultReader.GetILModuleReader(path.FullPath, readerOptions);
 
     public ILModuleReader GetILModuleReader(string filename, ILReaderOptions readerOptions)
     {
       var path = FileSystemPath.TryParse(filename);
       return !path.IsEmpty
         ? GetModuleReader(path, readerOptions)
-        : myDefaultReader.GetILModuleReader(filename, readerOptions);
+        : DefaultReader.GetILModuleReader(filename, readerOptions);
     }
   }
 
