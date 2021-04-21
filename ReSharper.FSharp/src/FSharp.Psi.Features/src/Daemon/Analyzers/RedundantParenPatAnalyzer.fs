@@ -38,17 +38,19 @@ module RedundantParenPatAnalyzer =
 
         null
 
-    let rec isAtCompoundPatternRightSide pat =
+    let rec isAtCompoundPatternRightSide (pat: IFSharpPattern) =
         if isNull pat then false else
 
         if isNotNull (OrPatNavigator.GetByPattern2(pat)) then true else
         if isNotNull (ListConsPatNavigator.GetByTailPattern(pat)) then true else
 
         let tuplePat = TuplePatNavigator.GetByPattern(pat)
-        if isNotNull tuplePat && tuplePat.PatternsEnumerable.FirstOrDefault() != pat then true else
+        if isNotNull tuplePat then
+            tuplePat.PatternsEnumerable.FirstOrDefault() != pat || isAtCompoundPatternRightSide tuplePat else
 
         let andsPat = AndsPatNavigator.GetByPattern(pat)
-        if isNotNull andsPat && andsPat.PatternsEnumerable.FirstOrDefault() != pat then true else
+        if isNotNull andsPat then
+            andsPat.PatternsEnumerable.FirstOrDefault() != pat || isAtCompoundPatternRightSide andsPat else
 
         let parent = getParentPatternFromLeftSide pat
         isAtCompoundPatternRightSide parent

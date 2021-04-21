@@ -18,6 +18,7 @@ type RedundantParenPatTest() =
     [<Test>] member x.``And 01``() = x.DoNamedTest()
 
     [<Test>] member x.``As - And 01``() = x.DoNamedTest()
+    [<Test>] member x.``As - And 02``() = x.DoNamedTest()
     [<Test>] member x.``As - Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``As - Let 01``() = x.DoNamedTest()
     [<Test>] member x.``As - List cons 01``() = x.DoNamedTest()
@@ -27,6 +28,7 @@ type RedundantParenPatTest() =
     [<Test>] member x.``As - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``As - Tuple 02 - List cons``() = x.DoNamedTest()
     [<Test>] member x.``As - Tuple 03 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``As - Tuple 04 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``As - Typed 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Const 01``() = x.DoNamedTest()
