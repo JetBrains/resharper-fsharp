@@ -35,6 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
       }
     }
 
+    //Errors when getting .FullName and .Assembly are logged during Rd-model creation for ProvidedType
     public bool Equals(ProvidedType x, ProvidedType y)
     {
       var xResult = GetFullNameFast(x, out var xFullName);
