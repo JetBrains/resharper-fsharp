@@ -254,6 +254,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         Builder.AddDeclaredMemberName(declaredName);
     }
 
+    public override void VisitIlAssemblyRepresentation(IIlAssemblyRepresentation repr) =>
+      Builder.StartPart(new ClassPart(repr.TypeDeclaration, Builder));
+
     public override void VisitModuleAbbreviationDeclaration(IModuleAbbreviationDeclaration decl)
     {
       Builder.StartPart(new HiddenTypePart(decl, Builder));

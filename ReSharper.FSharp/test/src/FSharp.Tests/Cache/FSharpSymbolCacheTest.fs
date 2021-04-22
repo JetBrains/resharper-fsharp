@@ -76,6 +76,8 @@ type FSharpSymbolCacheTest() =
     [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Extension 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Il 01``() = x.DoNamedTest()
     
     override x.DoTest(_: Lifetime, _: IProject) =
         let psiServices = x.Solution.GetPsiServices()

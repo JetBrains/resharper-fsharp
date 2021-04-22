@@ -1,0 +1,7 @@
+﻿Project Files:Il 01.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:Module->Class:Module
+  ClassPart:T->Class:Module+T
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [T]: Class:Module+T[TestProject]

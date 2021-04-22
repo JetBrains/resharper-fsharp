@@ -983,7 +983,8 @@ interface typeRepresentation:
   simpleTypeRepresentation |
   objectModelTypeRepresentation |
   delegateRepresentation |
-  typeAbbreviationRepresentation;
+  typeAbbreviationRepresentation |
+  ilAssemblyRepresentation;
 
 interface simpleTypeRepresentation:
   enumLikeTypeRepresentation |
@@ -1168,6 +1169,13 @@ typeUsageOrUnionCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclar
 }:
   typeUsage<TYPE, TypeUsage>
   unionCaseFieldDeclarationList<FIELD_DECLARATION_LIST, FieldList>?; // for generating common interface
+
+ilAssemblyRepresentation  options { stubBase="TypeRepresentationBase"; }:
+  LPAREN
+  HASH
+  STRING // todo: KEYWORD_STRING
+  HASH
+  RPAREN;
 
 moduleAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<moduleAbbreviationDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };

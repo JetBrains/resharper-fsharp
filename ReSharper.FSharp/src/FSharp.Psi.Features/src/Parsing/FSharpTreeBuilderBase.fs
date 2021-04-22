@@ -420,6 +420,9 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         // Empty type `type T`
         | SynTypeDefnSimpleRepr.None _ -> ()
 
+        | SynTypeDefnSimpleRepr.LibraryOnlyILAssembly(_, range) ->
+            x.MarkAndDone(range, ElementType.IL_ASSEMBLY_REPRESENTATION)
+
         | _ -> failwithf "Unexpected simple type representation: %A" repr
 
     member x.ProcessUnionCase(SynUnionCase(attrs, _, caseType, _, _, range)) =

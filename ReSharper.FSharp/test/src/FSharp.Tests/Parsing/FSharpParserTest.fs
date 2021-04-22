@@ -39,6 +39,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Delegate 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Il 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Type parameters - Constraints 01 - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 02 - Member``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 03 - Or``() = x.DoNamedTest()
