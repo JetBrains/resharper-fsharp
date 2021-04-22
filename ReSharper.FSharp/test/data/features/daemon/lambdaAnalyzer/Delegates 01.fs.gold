@@ -21,6 +21,9 @@ A.M3(0, (0, |fun x -> x|(8)))
 A.M4(|fun x -> x|(9))
 A.UnresolvedM(|fun x -> x|(10))
 
+open System.Collections.ObjectModel
+ObservableCollection<int>().CollectionChanged(1, |fun x -> x|(11))
+
 ---------------------------------------------------------
 (0): ReSharper Hint: Lambda can be replaced with 'id'
 (1): ReSharper Hint: Lambda can be replaced with 'id'
@@ -33,3 +36,4 @@ A.UnresolvedM(|fun x -> x|(10))
 (8): ReSharper Hint: Lambda can be replaced with 'id'
 (9): ReSharper Hint: Lambda can be replaced with 'id'
 (10): ReSharper Hint: Lambda can be replaced with 'id'
+(11): ReSharper Hint: Lambda can be replaced with 'id'

@@ -96,11 +96,30 @@ type LambdaAnalyzer() =
         | :? FSharpMemberOrFunctionOrValue as m ->
             m.IsMember &&
             let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
-            let args = m.CurriedParameterGroups
-            if args.[0].Count <= lambdaPos then false else
-            let argDecl = args.[0].[lambdaPos]
+
+            let parameterGroups = m.CurriedParameterGroups
+            if parameterGroups.Count = 0 then false else
+
+            let args = parameterGroups.[0]
+            if args.Count <= lambdaPos then false else
+
+            let argDecl = args.[lambdaPos]
             let argDeclType = argDecl.Type
-            argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
+
+            let argIsDelegate =
+                argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
+
+            if argIsDelegate then
+                let mApparentEntity = m.ApparentEnclosingEntity
+                let mName = m.DisplayName
+                let mHasOverload =
+                    mApparentEntity.MembersFunctionsAndValues
+                    |> Seq.exists (fun x ->
+                        not (x.Equals m) &&
+                        x.DisplayName = mName &&
+                        x.CurriedParameterGroups.[0].Count >= args.Count)
+                not mHasOverload
+            else false
         | _ -> false
 
     let isApplicable (expr: IFSharpExpression) (pats: TreeNodeCollection<IFSharpPattern>) =

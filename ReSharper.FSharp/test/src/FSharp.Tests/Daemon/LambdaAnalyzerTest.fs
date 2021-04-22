@@ -25,7 +25,8 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Id``() = x.DoNamedTest()
     [<Test>] member x.``Fst``() = x.DoNamedTest()
     [<Test>] member x.``Snd``() = x.DoNamedTest()
-    [<Test>] member x.``Delegates``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates 01``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates 02 - Method overloads``() = x.DoNamedTest()
     [<Test>] member x.``Delegates - Not available``() = x.DoNamedTest()
     [<Test>] member x.``Not available``() = x.DoNamedTest()
 
