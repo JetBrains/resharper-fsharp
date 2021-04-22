@@ -1,0 +1,69 @@
+﻿module Module
+
+let _: int = Class.StaticGet
+let _: int = Class.StaticGetSet
+let _: int = |Class.StaticSet|(0)
+
+||Class.StaticGet|(1)|(2) <- 1
+Class.StaticGetSet <- 1
+Class.StaticSet <- 1
+
+
+let _: int = Class.StaticExpressionBody
+||Class.StaticExpressionBody|(3)|(4) <- 1
+
+let _: int = Class.StaticProp
+Class.StaticProp <- 1
+
+
+let c = Class()
+
+let _: int = c.Get
+let _: int = c.GetSet
+let _: int = c.GetGet
+let _: int = c.GetInit
+let _: int = |c.Init|(5)
+
+||c.Get|(6)|(7) <- 1
+c.GetSet <- 1
+||c.GetGet|(8)|(9) <- 1
+c.GetInit <- 1
+c.Init <- 1
+
+
+let _: int = |Class.SetWithoutBody|(10)
+Class.SetWithoutBody <- 1
+
+let _: int = |Class.InitWithoutBody|(11)
+Class.InitWithoutBody <- 1
+
+let _: int = |Class.WrongAccessorName1|(12)
+||Class.WrongAccessorName1|(13)|(14) <- 1
+
+let _: int = Class.WrongAccessorName2
+||Class.WrongAccessorName2|(15)|(16) <- 1
+
+let _: int = |Class.NoAccessors|(17)
+||Class.NoAccessors|(18)|(19) <- 1
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Property 'StaticSet' is not readable
+(1): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
+(2): ReSharper Underlined Error Highlighting: Property 'StaticGet' cannot be set
+(3): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
+(4): ReSharper Underlined Error Highlighting: Property 'StaticExpressionBody' cannot be set
+(5): ReSharper Underlined Error Highlighting: Property 'Init' is not readable
+(6): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
+(7): ReSharper Underlined Error Highlighting: Property 'Get' cannot be set
+(8): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
+(9): ReSharper Underlined Error Highlighting: Property 'GetGet' cannot be set
+(10): ReSharper Underlined Error Highlighting: Property 'SetWithoutBody' is not readable
+(11): ReSharper Underlined Error Highlighting: Property 'InitWithoutBody' is not readable
+(12): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' is not readable
+(13): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' cannot be set
+(14): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' is not readable
+(15): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
+(16): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName2' cannot be set
+(17): ReSharper Underlined Error Highlighting: Property 'NoAccessors' is not readable
+(18): ReSharper Underlined Error Highlighting: Property 'NoAccessors' cannot be set
+(19): ReSharper Underlined Error Highlighting: Property 'NoAccessors' is not readable

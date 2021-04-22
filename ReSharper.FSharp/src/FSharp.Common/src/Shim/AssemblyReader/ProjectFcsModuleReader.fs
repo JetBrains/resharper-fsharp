@@ -448,8 +448,6 @@ module ProjectFcsModuleReader =
 
         ILFieldDef(name, fieldType, attributes, data, literalValue, offset, marshal, customAttrs)
 
-    let methodSpecialNameAttrs = MethodAttributes.SpecialName ||| MethodAttributes.RTSpecialName
-
     // todo: different attrs in class vs interface?
     let methodAbstractAttrs = MethodAttributes.Abstract ||| MethodAttributes.NewSlot ||| MethodAttributes.Virtual
 
@@ -471,13 +469,16 @@ module ProjectFcsModuleReader =
         (if method.IsAbstract then methodAbstractAttrs else enum 0) |||
         (if method.IsVirtual then MethodAttributes.Virtual else enum 0) ||| // todo: test
         (if not (method.GetHiddenMembers().IsEmpty()) then MethodAttributes.NewSlot else enum 0) ||| // todo: test
-        (if method :? IConstructor || method :? IAccessor then methodSpecialNameAttrs else enum 0)
+        (if method :? IConstructor || method :? IAccessor then MethodAttributes.SpecialName else enum 0)
 
     let staticCallingConv = Callconv(ILThisConvention.Static, ILArgConvention.Default)
     let instanceCallingConv = Callconv(ILThisConvention.Instance, ILArgConvention.Default)
 
     let mkCallingConv (func: IFunction): ILCallingConv =
         if func.IsStatic then staticCallingConv else instanceCallingConv
+
+    let mkCallingThisConv (func: IModifiersOwner): ILThisConvention =
+        if func.IsStatic then ILThisConvention.Static else ILThisConvention.Instance
 
     let mkParam (psiModule: IPsiModule) (param: IParameter): ILParameter =
         let name = param.ShortName
@@ -543,6 +544,31 @@ module ProjectFcsModuleReader =
 
         ILMethodDef(name, methodAttrs, implAttributes, callingConv, parameters, ret, body, isEntryPoint, genericParams,
              securityDecls, attrs)
+
+    let mkProperty (psiModule: IPsiModule) (property: IProperty): ILPropertyDef =
+        let name = property.ShortName
+
+        let attrs = enum 0 // todo
+        let callConv = mkCallingThisConv property
+        let propertyType = mkType psiModule property.Type
+        let init = None // todo
+
+        let args =
+            property.Parameters
+            |> List.ofSeq
+            |> List.map (fun p -> mkType psiModule p.Type)
+
+        let setter =
+            match property.Setter with
+            | null -> None
+            | setter -> Some(mkMethodRef psiModule setter)
+
+        let getter =
+            match property.Getter with
+            | null -> None
+            | getter -> Some(mkMethodRef psiModule getter)
+
+        ILPropertyDef(name, attrs, setter, getter, callConv, propertyType, init, args, emptyILCustomAttrs)
 
 type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommonCache) =
     // todo: is it safe to keep symbolScope?
@@ -630,9 +656,15 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
                 | [] -> emptyILFields
                 | _ -> mkILFields fieldDefs
 
+            let properties =
+                typeElement.Properties
+                |> List.ofSeq
+                |> List.map (ProjectFcsModuleReader.mkProperty psiModule)
+                |> mkILProperties
+
             let typeDef = 
                 ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
-                    extends, methods, nestedTypes, fields, emptyILMethodImpls, emptyILEvents, emptyILProperties,
+                    extends, methods, nestedTypes, fields, emptyILMethodImpls, emptyILEvents, properties,
                     emptyILSecurityDecls, emptyILCustomAttrs)
 
             typeDefs.[clrTypeName] <- typeDef

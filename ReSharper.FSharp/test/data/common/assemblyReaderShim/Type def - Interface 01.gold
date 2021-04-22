@@ -19,6 +19,8 @@ type Type() =
     interface IInterface with
         member this.M1() = ()
         member this.M2(i: int) = ()
+        member this.P1 = 1
+        member this.P2 = 1
 
 let t = Type()
 t :> IInterface |> ignore
