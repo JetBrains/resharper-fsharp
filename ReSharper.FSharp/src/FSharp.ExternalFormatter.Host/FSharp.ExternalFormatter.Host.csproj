@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net461</TargetFramework>
-        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter</AssemblyName>
+        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host</AssemblyName>
         <OutputType>Exe</OutputType>
         <SignAssembly>false</SignAssembly>
     </PropertyGroup>
@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.runtimeconfig.json">
+      <None Update="JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host.runtimeconfig.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

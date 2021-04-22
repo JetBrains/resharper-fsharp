@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace FSharp.ExternalFormatter
+namespace FSharp.ExternalFormatter.Host
 {
   public static class ExternalFormatterAssemblyResolver
   {

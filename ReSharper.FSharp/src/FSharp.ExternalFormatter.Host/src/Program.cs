@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FSharp.ExternalFormatter
+namespace FSharp.ExternalFormatter.Host
 {
   public static class Program
   {

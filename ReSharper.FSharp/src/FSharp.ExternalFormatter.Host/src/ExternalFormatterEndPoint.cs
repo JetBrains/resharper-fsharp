@@ -9,7 +9,7 @@ using JetBrains.Util;
 using JetBrains.Util.Logging;
 using JetBrains.Rd.Tasks;
 
-namespace FSharp.ExternalFormatter
+namespace FSharp.ExternalFormatter.Host
 {
   internal class ExternalFormatterEndPoint : ProtocolEndPoint<RdFSharpExternalFormatterModel, RdSimpleDispatcher>
   {

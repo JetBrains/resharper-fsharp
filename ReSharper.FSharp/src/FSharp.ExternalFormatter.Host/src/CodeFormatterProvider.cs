@@ -6,7 +6,7 @@ using JetBrains.Rider.FSharp.ExternalFormatter.Client;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
 
-namespace FSharp.ExternalFormatter
+namespace FSharp.ExternalFormatter.Host
 {
   internal interface ICodeFormatterProvider
   {
@@ -42,7 +42,8 @@ namespace FSharp.ExternalFormatter
         options.LightSyntax, false, false);
 
     private FormatConfig.FormatConfig Convert(RdFormatConfig config) =>
-      new FormatConfig.FormatConfig(config.IndentSize, config.MaxLineLength, myDefaultFormatConfig.SemicolonAtEndOfLine,
+      new FormatConfig.FormatConfig(config.IndentSize, config.MaxLineLength,
+        myDefaultFormatConfig.SemicolonAtEndOfLine,
         config.SpaceBeforeParameter, config.SpaceBeforeLowercaseInvocation, config.SpaceBeforeUppercaseInvocation,
         config.SpaceBeforeClassConstructor, config.SpaceBeforeMember, config.SpaceBeforeColon, config.SpaceAfterComma,
         config.SpaceBeforeSemicolon, config.SpaceAfterSemicolon, config.IndentOnTryWith, config.SpaceAroundDelimiter,
