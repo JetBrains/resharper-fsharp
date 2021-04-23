@@ -204,6 +204,7 @@
     <Compile Include="src\QuickFixes\AddParensToTypedLikeExprFix.fs" />
     <Compile Include="src\QuickFixes\SpecifyParameterTypeFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithInterpolatedStringFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithPredefinedOperatorFix.fs" />
     <Compile Include="src\QuickFixes\RemoveConstructorFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />

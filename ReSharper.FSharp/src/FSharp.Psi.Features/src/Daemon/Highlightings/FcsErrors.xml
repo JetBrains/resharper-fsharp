@@ -350,6 +350,17 @@
     <QuickFix>SpecifyParameterTypeFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="AddingConstraint">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithPredefinedOperatorFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="OnlyClassCanTakeValueArguments">
     <Parameter type="IPrimaryConstructorDeclaration" name="ctorDecl"/>
     <Message value="Only class and struct types may have constructors"/>

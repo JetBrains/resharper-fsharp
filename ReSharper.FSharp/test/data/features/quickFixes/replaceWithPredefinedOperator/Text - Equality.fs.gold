@@ -1,0 +1,8 @@
+module Test
+
+let _ = 1 |==|(0) 2
+
+------------------------------------------------
+0: The type 'int' does not support the operator '=='
+QUICKFIXES:
+Replace with '='
