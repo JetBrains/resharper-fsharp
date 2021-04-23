@@ -2,11 +2,13 @@
 
 open System
 open System.Text.RegularExpressions
+open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypesUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -54,23 +56,39 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         | head :: tail -> createAppExpr factory (factory.CreateAppExpr(expr, head, true)) tail
         | [] -> expr
 
+    let getMaxArgsCount (expr: IFSharpExpression) =
+        let fcsType = expr.TryGetFcsType()
+
+        if isNotNull fcsType && fcsType.IsFunctionType then
+            List.length (getFunctionTypeArgs fcsType) - 1
+
+        else
+            match expr.IgnoreInnerParens() with
+            | :? ILambdaExpr as lambda ->
+                lambda.PatternsEnumerable.Count()
+
+            | :? IReferenceExpr as ref ->
+                match ref.Reference.GetFSharpSymbol() with
+                | :? FSharpMemberOrFunctionOrValue as mfv when
+                    let parameters = mfv.CurriedParameterGroups
+                    parameters.Count > 0 && parameters.[0].Count > 0 ->
+                        match mfv.FullTypeSafe with
+                        | Some t -> List.length (getFunctionTypeArgs t) - 1
+                        | None -> 0
+                | _ -> 0
+            | _ -> 0
+
     let findAppsWithoutParens prefixAppExpr =
         let rec collectAppliedExprsRec (prefixAppExpr: IPrefixAppExpr) prefixAppDataAcc appliedExprsAcc =
-            let appExprFcsType = prefixAppExpr.ArgumentExpression.TryGetFcsType()
-
-            let maxArgsCount =
-                if isNull appExprFcsType || not appExprFcsType.IsFunctionType then None else
-
-                let args = FcsTypesUtil.getFunctionTypeArgs appExprFcsType
-                Some(args |> List.tail |> List.length)
+            let maxArgsCount = getMaxArgsCount prefixAppExpr.ArgumentExpression
 
             let isApplicableApp =
-                Option.isSome maxArgsCount && not (List.isEmpty appliedExprsAcc)
+                maxArgsCount > 0 && not (List.isEmpty appliedExprsAcc)
 
             let appDataAcc =
                 if isApplicableApp then
                     {| App = prefixAppExpr.ArgumentExpression
-                       MaxArgsCount = maxArgsCount.Value
+                       MaxArgsCount = maxArgsCount
                        ArgCandidates = appliedExprsAcc |} :: prefixAppDataAcc
                 else prefixAppDataAcc
 
@@ -88,7 +106,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         | [appData] ->
             match appData.App.IgnoreInnerParens() with
             | :? IReferenceExpr as refExpr when refExpr.ShortName <> SharedImplUtil.MISSING_DECLARATION_NAME -> 
-                sprintf "Add parens to '%s' application" refExpr.ShortName
+                $"Add parens to '{refExpr.ShortName}' application"
 
             | :? ILambdaExpr -> "Add parens to lambda application"
             | _ -> "Add parens to application"

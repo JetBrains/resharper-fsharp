@@ -27,6 +27,9 @@ type AddParensToApplicationTest() =
     [<Test>] member x.``First arg is application``() = x.DoNamedTest()
     [<Test>] member x.``Application with not enough args``() = x.DoNamedTest()
     [<Test>] member x.``Long ident application``() = x.DoNamedTest()
+    [<Test>] member x.``Type constructor 01 - Union case``() = x.DoNamedTest()
+    [<Test>] member x.``Type constructor 02 - Exception``() = x.DoNamedTest()
+    [<Test>] member x.``Type constructor 03 - With lambda application``() = x.DoNamedTest()
 
     override x.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile) =
         let appOccurrenceName = QuickFixTestBase.GetSetting(textControl, AppOccurrenceName)
@@ -42,7 +45,7 @@ type AddParensToApplicationTest() =
 
             occurrences
             |> Array.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
-            |> Option.defaultWith (fun _ -> failwithf "Could not find %s occurrence" occurrenceName))           
+            |> Option.defaultWith (fun _ -> failwithf $"Could not find {occurrenceName} occurrence"))
 
         base.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile)
 
