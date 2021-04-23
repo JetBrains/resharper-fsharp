@@ -1,0 +1,3 @@
+﻿// ${DIRECTION:Right}
+
+exception E of b: double * int

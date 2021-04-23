@@ -1,0 +1,4 @@
+// ${DIRECTION:Left}
+
+type U =
+    | A of a: int * double{caret}
