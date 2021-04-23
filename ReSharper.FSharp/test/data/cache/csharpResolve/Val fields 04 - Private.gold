@@ -1,0 +1,18 @@
+﻿public class Class
+{
+  public Class()
+  {
+    var t = new T();
+
+    int i1 = t.Public;
+    int i2 = t.ImplicitPublic;
+    int i3 = t.|Private|(0);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access private field 'Private' here
+M:T.#ctor
+F:T.Public
+F:T.ImplicitPublic
+F:T.Private

@@ -10,5 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() => new FSharpValField(this);
+
+    public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
   }
 }

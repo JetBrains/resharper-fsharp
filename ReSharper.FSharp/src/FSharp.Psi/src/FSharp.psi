@@ -1392,6 +1392,8 @@ valFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; 
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
   VAL<VAL, ValKeyword>
+  MUTABLE<MUTABLE, MutableKeyword>?
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   IDENTIFIER<IDENTIFIER, Identifier>
   COLON<FSHARP_COLON, Colon>
   typeUsage<TYPE, Type>;

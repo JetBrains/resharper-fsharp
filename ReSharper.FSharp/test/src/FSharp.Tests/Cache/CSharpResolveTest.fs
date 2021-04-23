@@ -71,8 +71,9 @@ type CSharpResolveTest() =
     [<Test>] member x.``Delegates 07 - CompiledName``() = x.DoNamedTest()
 
     [<Test>] member x.``Val fields 01``() = x.DoNamedTest()
-    [<Test>] member x.``Val fields 02, compiled name ignored``() = x.DoNamedTest()
-    [<Test>] member x.``Val fields 03, struct``() = x.DoNamedTest()
+    [<Test>] member x.``Val fields 02 - compiled name ignored``() = x.DoNamedTest()
+    [<Test>] member x.``Val fields 03 - struct``() = x.DoNamedTest()
+    [<Test>] member x.``Val fields 04 - Private``() = x.DoNamedTest()
 
     [<Test>] member x.``Auto properties 01``() = x.DoNamedTest()
     [<Test>] member x.``Auto properties 02, compiled name``() = x.DoNamedTest()
