@@ -23,7 +23,7 @@ open JetBrains.Util
 
 [<SolutionComponent>]
 type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, fsiOptions: FsiOptionsProvider,
-        projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules) =
+        projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules, logger: ILogger) =
 
     let stringArg = sprintf "--%s:%O"
     let boolArg option arg = sprintf "--%s%s" option (if arg then "+" else "-")
@@ -44,6 +44,9 @@ type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, 
             else
                 fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
 
+        let fsiPath = fsiPath.FullPath
+        let fsiRuntime = fsi.Runtime
+
         let args =
             [| yield! stringArrayArgs fsiOptions.FsiArgs.Value
                yield! stringArrayArgs fsiOptions.FsiInternalArgs.Value
@@ -57,10 +60,13 @@ type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, 
                    yield stringArg "fsi-server-output-codepage" Encoding.UTF8.CodePage
                    yield stringArg "fsi-server-input-codepage"  Encoding.UTF8.CodePage
 
-               if fsi.Runtime <> RdFsiRuntime.Core then
+               if fsiRuntime <> RdFsiRuntime.Core then
                    yield stringArg "fsi-server-lcid" Thread.CurrentThread.CurrentUICulture.LCID |]
 
-        RdFsiSessionInfo(fsiPath.FullPath, fsi.Runtime, fsi.IsCustom, List(args), fsiOptions.FixOptionsForDebug.Value)
+        logger.Info("New fsi session params:\n  path: {0}\n  runtime: {1}\n  args: {2}",
+            fsiPath, fsiRuntime, String.concat ", " args)
+
+        RdFsiSessionInfo(fsiPath, fsiRuntime, fsi.IsCustom, List(args), fsiOptions.FixOptionsForDebug.Value)
 
     let assemblyFilter (assembly: IPsiAssembly) =
         let assemblyName = assembly.AssemblyName
