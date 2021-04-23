@@ -5,13 +5,13 @@ open System.Collections.Generic
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Core.CompilerServices
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.TcImportsHack
-open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
-open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
-open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Exceptions
-open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
+open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
+open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
+open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions
+open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.Rd.Tasks
-open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
+open JetBrains.Rider.FSharp.TypeProviders.Protocol.Client
 
 type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = Dictionary<_, Dictionary<_, IProxyTypeProvider>>()

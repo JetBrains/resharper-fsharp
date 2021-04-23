@@ -69,7 +69,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
-    <ProjectReference Include="..\FSharp.TypeProvidersProtocol\FSharp.TypeProvidersProtocol.csproj" />
+    <ProjectReference Include="..\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj" />
   </ItemGroup>
 
   <ItemGroup>

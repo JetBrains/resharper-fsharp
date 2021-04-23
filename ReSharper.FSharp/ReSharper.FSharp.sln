@@ -21,9 +21,9 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests.Host", "test\s
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Common.Tests", "test\src\FSharp.Common.Tests\FSharp.Common.Tests.fsproj", "{83C5104C-057E-4AF8-B3FE-3437968CA621}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeProvidersLoader", "src\TypeProvidersLoader\TypeProvidersLoader.csproj", "{4EB01188-F511-4991-9A0F-604EE28E8F9B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Host", "src\FSharp.TypeProviders.Host\FSharp.TypeProviders.Host.csproj", "{4EB01188-F511-4991-9A0F-604EE28E8F9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProvidersProtocol", "src\FSharp.TypeProvidersProtocol\FSharp.TypeProvidersProtocol.csproj", "{912A7F5F-73F2-4DFE-B81A-C13A4F58F31C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Protocol", "src\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj", "{912A7F5F-73F2-4DFE-B81A-C13A4F58F31C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
