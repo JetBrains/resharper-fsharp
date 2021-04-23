@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 // todo: move xmldoc
 
 type RearrangeableCaseFieldDeclaration(field: ICaseFieldDeclaration) =
-    inherit RearrangeableElementSwap<ICaseFieldDeclaration>(field, "field declaration", Direction.LeftRight)
+    inherit RearrangeableElementSwap<ICaseFieldDeclaration>(field, "case field declaration", Direction.LeftRight)
 
     override this.GetSiblings() =
         UnionCaseFieldDeclarationListNavigator.GetByField(field).NotNull().Fields :> _
@@ -18,3 +18,17 @@ type RearrangeableCaseFieldDeclarationProvider() =
 
     override this.CreateElement(field: ICaseFieldDeclaration): IRearrangeable =
         RearrangeableCaseFieldDeclaration(field) :> _
+
+
+type RearrangeableRecordFieldDeclaration(field: IRecordFieldDeclaration) =
+    inherit RearrangeableElementSwap<IRecordFieldDeclaration>(field, "record field declaration", Direction.All)
+
+    override this.GetSiblings() =
+        RecordFieldDeclarationListNavigator.GetByFieldDeclaration(field).NotNull().FieldDeclarations :> _
+
+[<RearrangeableElementType>]
+type RearrangeableRecordFieldDeclarationProvider() =
+    inherit RearrangeableSingleElementBase<IRecordFieldDeclaration>.TypeBase()
+
+    override this.CreateElement(field: IRecordFieldDeclaration): IRearrangeable =
+        RearrangeableRecordFieldDeclaration(field) :> _

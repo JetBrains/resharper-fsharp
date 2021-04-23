@@ -18,6 +18,12 @@ type RearrangeCodeTest() =
     override x.RelativeTestDataPath = "features/rearrangeCode"
 
     [<Test>] member x.``Field - Exception 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Field - Record - Down 01``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Record - Down 02 - Semicolon``() = x.DoNamedTest()
+    [<Test; Explicit("Fix Direction.All")>] member x.``Field - Record - Right 01``() = x.DoNamedTest()
+    [<Test; Explicit("Fix Direction.All")>] member x.``Field - Record - Right 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Field - Union case - Left 01``() = x.DoNamedTest()
     [<Test>] member x.``Field - Union case - Left 02 - Can't move``() = x.DoNamedTest()
     [<Test>] member x.``Field - Union case - Right 01``() = x.DoNamedTest()

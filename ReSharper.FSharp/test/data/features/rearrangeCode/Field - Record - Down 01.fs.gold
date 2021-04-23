@@ -1,0 +1,5 @@
+﻿// ${DIRECTION:Down}
+
+type R =
+    { F2: double
+      F1: int }
