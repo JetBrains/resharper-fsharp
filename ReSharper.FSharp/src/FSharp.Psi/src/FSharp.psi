@@ -1074,6 +1074,7 @@ enumCaseList:
 enumCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<enumCaseDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
+  BAR<BAR, Bar>?
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   identifier<IDENTIFIER, Identifier>;
 
@@ -1119,6 +1120,7 @@ unionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ex
   get { methodName="Attributes" path=<unionCaseDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Fields" path=<unionCaseDeclaration:FIELD_DECLARATION_LIST/unionCaseFieldDeclarationList:FIELD_DECLARATION> };
 }:
+  BAR<BAR, Bar>?
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   identifier<IDENTIFIER, Identifier>

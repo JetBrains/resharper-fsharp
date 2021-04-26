@@ -1,0 +1,3 @@
+﻿// ${DIRECTION:Down}
+
+type U = | B of int | A

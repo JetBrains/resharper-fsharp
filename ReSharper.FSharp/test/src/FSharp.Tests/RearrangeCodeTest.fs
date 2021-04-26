@@ -17,6 +17,9 @@ type RearrangeCodeTest() =
 
     override x.RelativeTestDataPath = "features/rearrangeCode"
 
+    [<Test>] member x.``Enum case 01``() = x.DoNamedTest()
+    [<Test; Explicit("XmlDoc is not in range")>] member x.``Enum case 02 - Xml doc``() = x.DoNamedTest()
+
     [<Test>] member x.``Field - Exception 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Field - Record - Down 01``() = x.DoNamedTest()
@@ -30,6 +33,12 @@ type RearrangeCodeTest() =
     [<Test>] member x.``Field - Union case - Right 02 - Can't move``() = x.DoNamedTest()
     [<Test>] member x.``Field - Union case - Separate line 01``() = x.DoNamedTest()
     [<Test>] member x.``Field - Union case - Separate line 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union case - No bar 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - No bar 02 - Single line``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - No bar 03 - Wrong indent``() = x.DoNamedTest()
+    [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union case 02``() = x.DoNamedTest()
 
     override this.DoTest(lifetime: Lifetime, testProject: IProject) =
         let textControl = this.OpenTextControl(lifetime)

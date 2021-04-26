@@ -596,6 +596,7 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Type decl - Record - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record - Ctor 02 - As``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union - Ctor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union - No bar - Attribute 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Interface 02``() = x.DoNamedTest()
