@@ -1215,12 +1215,14 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         // todo: insert pair brace in `$"{ {caret} }"` 
 
-        let mutable lexer = Unchecked.defaultof<_>
-        let textControl = context.TextControl
-        let typedPos = textControl.Caret.Offset() - 1
-        if x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(typedPos) then
-            base.AutoInsertRBraceInStringInterpolation(textControl, lexer, typedPos, interpolatedStrings,
-                skipCloseBrackets, FSharpTokenType.RBRACE) |> ignore
+        if context.Char = '{' then
+            let mutable lexer = Unchecked.defaultof<_>
+            let textControl = context.TextControl
+            let typedPos = textControl.Caret.Offset() - 1
+            if x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(typedPos) then
+                base.AutoInsertRBraceInStringInterpolation(textControl, lexer, typedPos, interpolatedStrings,
+                    skipCloseBrackets, FSharpTokenType.RBRACE) |> ignore
+
         true
 
     member x.HandleRightBracket(context: ITypingContext) =
