@@ -10,7 +10,7 @@ open JetBrains.Application.UI.Tooltips
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.CodeInsights
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Host.Core.Features.Services
+open JetBrains.RdBackend.Common.Features.Services
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree

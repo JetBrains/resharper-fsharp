@@ -8,8 +8,8 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.NuGet.Packaging
 open JetBrains.ProjectModel.Platforms
 open JetBrains.ProjectModel.Properties
-open JetBrains.ReSharper.Host.Core.Features.Runtime
-open JetBrains.ReSharper.Host.Core.Features.Toolset
+open JetBrains.RdBackend.Common.Features.Runtime
+open JetBrains.RdBackend.Common.Features.Toolset
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings

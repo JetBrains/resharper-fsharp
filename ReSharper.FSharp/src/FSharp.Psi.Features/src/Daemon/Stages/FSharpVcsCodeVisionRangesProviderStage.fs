@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Host.Core.Features.CodeInsights.Stages.Vcs
+open JetBrains.RdBackend.Common.Features.CodeInsights.Stages.Vcs
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree

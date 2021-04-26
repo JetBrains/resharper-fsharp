@@ -15,7 +15,7 @@ open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Host.Core.Features.BackgroundTasks
+open JetBrains.RdBackend.Common.Features.BackgroundTasks
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.Util
 

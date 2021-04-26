@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open JetBrains.ReSharper.Daemon.SyntaxHighlighting
-open JetBrains.ReSharper.Host.Core.Features.SyntaxHighlighting
+open JetBrains.RdBackend.Common.Features.SyntaxHighlighting
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
