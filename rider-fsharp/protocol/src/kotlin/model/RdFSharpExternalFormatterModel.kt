@@ -9,12 +9,14 @@ import java.io.File
 @Suppress("unused")
 object RdFSharpExternalFormatterModel : Root() {
 
-    private val rdParsingOptions = structdef {
-        field("sourceFiles", array(string))
+    private val rdFcsParsingOptions = structdef {
+        field("lastSourceFile", string)
         field("lightSyntax", bool.nullable)
+        field("conditionalCompilationDefines", array(string))
+        field("isExe", bool)
     }
 
-    private val rdRange = structdef {
+    private val rdFcsRange = structdef {
         field("fileName", string)
         field("startLine", int)
         field("startCol", int)
@@ -22,7 +24,7 @@ object RdFSharpExternalFormatterModel : Root() {
         field("endCol", int)
     }
 
-    private val rdFormatConfig = structdef {
+    private val rdFantomasFormatConfig = structdef {
         field("indentSize", int)
         field("maxLineLength", int)
         field("spaceBeforeParameter", bool)
@@ -51,20 +53,18 @@ object RdFSharpExternalFormatterModel : Root() {
         field("alternativeLongMemberDefinitions", bool)
     }
 
-    init {
-        call("formatSelection", structdef("rdFormatSelectionArgs") {
-            field("fileName", string)
-            field("range", rdRange)
-            field("source", string)
-            field("formatConfig", rdFormatConfig)
-            field("parsingOptions", rdParsingOptions)
-        }, string)
+    private val rdFormatArgs = basestruct {
+        field("fileName", string)
+        field("source", string)
+        field("formatConfig", rdFantomasFormatConfig)
+        field("parsingOptions", rdFcsParsingOptions)
+        field("newLineText", string)
+    }
 
-        call("formatDocument", structdef("rdFormatDocumentArgs") {
-            field("fileName", string)
-            field("source", string)
-            field("formatConfig", rdFormatConfig)
-            field("parsingOptions", rdParsingOptions)
+    init {
+        call("formatDocument", structdef("rdFormatDocumentArgs") extends rdFormatArgs {}, string)
+        call("formatSelection", structdef("rdFormatSelectionArgs") extends rdFormatArgs {
+            field("range", rdFcsRange)
         }, string)
 
         signal("Exit", void)

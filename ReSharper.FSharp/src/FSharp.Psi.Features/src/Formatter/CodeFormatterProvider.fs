@@ -26,10 +26,10 @@ type CodeFormatterProvider(solution: ISolution, externalFormatterFactory: Extern
         connection.Execute(action)
 
     let convertRange (range: range) =
-        RdRange(range.FileName, range.StartLine, range.StartColumn, range.EndLine, range.EndColumn)
+        RdFcsRange(range.FileName, range.StartLine, range.StartColumn, range.EndLine, range.EndColumn)
 
     let convertFormatSettings (settings: FSharpFormatSettingsKey) =
-        RdFormatConfig
+        RdFantomasFormatConfig
             (settings.INDENT_SIZE, settings.WRAP_LIMIT, settings.SpaceBeforeParameter,
              settings.SpaceBeforeLowercaseInvocation, settings.SpaceBeforeUppercaseInvocation,
              settings.SpaceBeforeClassConstructor, settings.SpaceBeforeMember, settings.SpaceBeforeColon,
@@ -47,17 +47,17 @@ type CodeFormatterProvider(solution: ISolution, externalFormatterFactory: Extern
             | Some x -> Nullable<bool> x
             | None -> Nullable<bool>()
 
-        RdParsingOptions(options.SourceFiles, lightSyntax)
+        RdFcsParsingOptions(Array.last options.SourceFiles, lightSyntax,
+                            List.toArray options.ConditionalCompilationDefines, options.IsExe)
 
-    member x.FormatSelection(filePath: string, range: range, source: string, settings: FSharpFormatSettingsKey,
-                             options: FSharpParsingOptions) =
-        let args = RdFormatSelectionArgs(filePath, convertRange range, source, convertFormatSettings settings,
-                                         convertParsingOptions options)
+    member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
+        let args = RdFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
+                                         convertParsingOptions options, newLineText)
 
         execute (fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
 
-    member x.FormatDocument(filePath: string, source: string, settings: FSharpFormatSettingsKey,
-                            options: FSharpParsingOptions) =
-        let args = RdFormatDocumentArgs(filePath, source, convertFormatSettings settings, convertParsingOptions options)
+    member x.FormatDocument(filePath, source, settings, options, newLineText) =
+        let args = RdFormatDocumentArgs(filePath, source, convertFormatSettings settings, convertParsingOptions options,
+                                        newLineText)
 
         execute (fun () -> connection.ProtocolModel.FormatDocument.Sync(args, RpcTimeouts.Maximal))

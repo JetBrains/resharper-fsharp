@@ -8,13 +8,7 @@ using Microsoft.FSharp.Control;
 
 namespace FSharp.ExternalFormatter.Host
 {
-  internal interface ICodeFormatterProvider
-  {
-    string FormatSelection(RdFormatSelectionArgs args);
-    string FormatDocument(RdFormatDocumentArgs args);
-  }
-
-  internal class BundledCodeFormatter : ICodeFormatterProvider
+  internal class ExternalCodeFormatter
   {
     private readonly FSharpChecker myChecker =
       FSharpChecker.Create(null, null, null, null, null, null, null, null, null, null);
@@ -26,24 +20,24 @@ namespace FSharp.ExternalFormatter.Host
           CodeFormatter.FormatSelectionAsync(args.FileName, Convert(args.Range),
             SourceOrigin.SourceOrigin.NewSourceString(args.Source), Convert(args.FormatConfig),
             Convert(args.ParsingOptions), myChecker), null, null)
-        .Result;
+        .Result.Replace("\r\n", args.NewLineText);
 
     public string FormatDocument(RdFormatDocumentArgs args) =>
       FSharpAsync.StartAsTask(
           CodeFormatter.FormatDocumentAsync(args.FileName, SourceOrigin.SourceOrigin.NewSourceString(args.Source),
             Convert(args.FormatConfig), Convert(args.ParsingOptions), myChecker), null, null)
-        .Result;
+        .Result.Replace("\r\n", args.NewLineText);
 
-    private static Range Convert(RdRange range) =>
+    private static Range Convert(RdFcsRange range) =>
       CodeFormatter.MakeRange(range.FileName, range.StartLine, range.StartCol, range.EndLine, range.EndCol);
 
-    private static FSharpParsingOptions Convert(RdParsingOptions options) =>
-      new FSharpParsingOptions(options.SourceFiles, FSharpList<string>.Empty, FSharpDiagnosticOptions.Default, false,
-        options.LightSyntax, false, false);
+    private static FSharpParsingOptions Convert(RdFcsParsingOptions options) =>
+      new FSharpParsingOptions(new[] {options.LastSourceFile},
+        ListModule.OfArray(options.ConditionalCompilationDefines), FSharpDiagnosticOptions.Default, false,
+        options.LightSyntax, false, options.IsExe);
 
-    private FormatConfig.FormatConfig Convert(RdFormatConfig config) =>
-      new FormatConfig.FormatConfig(config.IndentSize, config.MaxLineLength,
-        myDefaultFormatConfig.SemicolonAtEndOfLine,
+    private FormatConfig.FormatConfig Convert(RdFantomasFormatConfig config) =>
+      new FormatConfig.FormatConfig(config.IndentSize, config.MaxLineLength, myDefaultFormatConfig.SemicolonAtEndOfLine,
         config.SpaceBeforeParameter, config.SpaceBeforeLowercaseInvocation, config.SpaceBeforeUppercaseInvocation,
         config.SpaceBeforeClassConstructor, config.SpaceBeforeMember, config.SpaceBeforeColon, config.SpaceAfterComma,
         config.SpaceBeforeSemicolon, config.SpaceAfterSemicolon, config.IndentOnTryWith, config.SpaceAroundDelimiter,

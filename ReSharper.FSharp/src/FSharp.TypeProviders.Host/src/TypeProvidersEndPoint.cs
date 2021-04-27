@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
 
     protected override string ProtocolName => "Out-of-Process Type Providers Host";
 
-    public TypeProvidersEndPoint() : base(ProtocolConstants.TypeProvidersHostPid)
+    public TypeProvidersEndPoint() : base(TypeProvidersProtocolConstants.TypeProvidersHostPid)
     {
     }
 

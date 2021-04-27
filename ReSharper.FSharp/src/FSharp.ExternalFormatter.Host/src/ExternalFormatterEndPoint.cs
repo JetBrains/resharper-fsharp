@@ -13,12 +13,12 @@ namespace FSharp.ExternalFormatter.Host
 {
   internal class ExternalFormatterEndPoint : ProtocolEndPoint<RdFSharpExternalFormatterModel, RdSimpleDispatcher>
   {
-    private readonly ICodeFormatterProvider myCodeFormatter;
+    private readonly ExternalCodeFormatter myCodeFormatter;
     protected override string ProtocolName => "External Formatter Host";
 
-    public ExternalFormatterEndPoint() : base(ProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE)
+    public ExternalFormatterEndPoint() : base(FantomasProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE)
     {
-      myCodeFormatter = new BundledCodeFormatter();
+      myCodeFormatter = new ExternalCodeFormatter();
     }
 
     protected override RdSimpleDispatcher InitDispatcher(Lifetime lifetime, ILogger logger) =>

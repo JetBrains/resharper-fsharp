@@ -30,13 +30,13 @@ namespace FSharp.ExternalFormatter.Protocol
 
     protected override ProcessStartInfo GetProcessStartInfo(int port)
     {
-      var launchPath = GetType().Assembly.GetPath().Directory.Combine(ProtocolConstants.PROCESS_FILENAME);
-      Assertion.Assert(launchPath.ExistsFile, $"can't find '{ProtocolConstants.PROCESS_FILENAME}'");
+      var launchPath = GetType().Assembly.GetPath().Directory.Combine(FantomasProtocolConstants.PROCESS_FILENAME);
+      Assertion.Assert(launchPath.ExistsFile, $"can't find '{FantomasProtocolConstants.PROCESS_FILENAME}'");
 
       return new ProcessStartInfo
       {
         Arguments =
-          $"{port} \"{ProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
+          $"{port} \"{FantomasProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
         FileName = launchPath.FullPath
       };
     }
@@ -50,7 +50,7 @@ namespace FSharp.ExternalFormatter.Protocol
           Environment.GetEnvironmentVariable("RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS")
         },
         {
-          ProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE,
+          FantomasProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE,
           Process.GetCurrentProcess().Id.ToString()
         },
       };

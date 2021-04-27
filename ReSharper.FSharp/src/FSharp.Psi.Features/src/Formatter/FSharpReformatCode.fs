@@ -61,20 +61,15 @@ type FSharpReformatCode() =
                 if isNotNull rangeMarker then
                     try
                         let range = ofDocumentRange rangeMarker.DocumentRange
-
                         let formatted =
-                            codeFormatterProvider
-                                .FormatSelection(filePath, range, text, settings, parsingOptions)
-                                .Replace("\r\n", newLineText)
+                            codeFormatterProvider.FormatSelection(filePath, range, text, settings, parsingOptions, newLineText)
                         let offset = rangeMarker.DocumentRange.StartOffset.Offset
                         let oldLength = rangeMarker.DocumentRange.Length
                         Some(DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide))
                     with _ -> None
                 else
                     let formatted =
-                        codeFormatterProvider
-                            .FormatDocument(filePath, text, settings, parsingOptions)
-                            .Replace("\r\n", newLineText)
+                        codeFormatterProvider.FormatDocument(filePath, text, settings, parsingOptions, newLineText)
                     Some(DocumentChange(document, 0, text.Length, formatted, stamp, modificationSide))
 
             match change with
