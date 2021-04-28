@@ -5,6 +5,7 @@
         <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host</AssemblyName>
         <OutputType>Exe</OutputType>
         <SignAssembly>false</SignAssembly>
+        <LangVersion>$(CSharpLanguageVersion)</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
