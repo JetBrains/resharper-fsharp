@@ -1,0 +1,36 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    ITypeDeclarationGroup
+      IFSharpTypeDeclaration
+        FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpIdentifierToken(type:IDENTIFIER, text:U)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IUnionRepresentation
+          FSharpTokenType+PrivateTokenElement(type:PRIVATE, text:private)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
+          IUnionCaseList
+            IUnionCaseDeclaration
+              DocComment(type:LINE_COMMENT, text:/// Aa)
+              NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+              Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
+              FSharpTokenType+BarTokenElement(type:BAR, text:|)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpIdentifierToken(type:IDENTIFIER, text:A)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
+            IUnionCaseDeclaration
+              DocComment(type:LINE_COMMENT, text:/// Bb)
+              NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+              Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
+              FSharpTokenType+BarTokenElement(type:BAR, text:|)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpIdentifierToken(type:IDENTIFIER, text:B)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

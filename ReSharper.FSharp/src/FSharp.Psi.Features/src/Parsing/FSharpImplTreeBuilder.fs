@@ -29,8 +29,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             x.ProcessTopLevelDeclaration(decl)
         x.FinishFile(mark, ElementType.F_SHARP_IMPL_FILE)
 
-    member x.ProcessTopLevelDeclaration(SynModuleOrNamespace(lid, _, moduleKind, decls, _, attrs, _, range)) =
-        let mark, elementType = x.StartTopLevelDeclaration(lid, attrs, moduleKind, range)
+    member x.ProcessTopLevelDeclaration(moduleOrNamespace) =
+        let (SynModuleOrNamespace(lid, _, moduleKind, decls, XmlDoc xmlDoc, attrs, _, range)) = moduleOrNamespace
+        let mark, elementType = x.StartTopLevelDeclaration(lid, attrs, moduleKind, xmlDoc, range)
         for decl in decls do
             x.ProcessModuleMemberDeclaration(decl)
         x.EnsureMembersAreFinished()
@@ -47,14 +48,16 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 x.Done(range, mark, elementType)
 
         match moduleMember with
-        | SynModuleDecl.NestedModule(SynComponentInfo(attrs, _, _, lid, _, _, _, _), _ ,decls, _, range) ->
-            let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, List.tryHead lid, range)
+        | SynModuleDecl.NestedModule(SynComponentInfo(attrs, _, _, lid, XmlDoc xmlDoc, _, _, _), _ ,decls, _, range) ->
+            let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, List.tryHead lid, range)
             for decl in decls do
                 x.ProcessModuleMemberDeclaration(decl)
             x.Done(range, mark, ElementType.NESTED_MODULE_DECLARATION)
 
         | SynModuleDecl.Types(typeDefns, range) ->
-            let mark = x.Mark(typeDefnGroupStartPos typeDefns range)
+            let startRange, xmlDoc = typeDefnGroupStartRange typeDefns range
+            x.AdvanceToXmlDocDeclarationStart(xmlDoc, null, startRange)
+            let mark = x.Mark()
             match typeDefns with
             | [] -> ()
             | primary :: secondary ->
@@ -72,7 +75,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             x.ProcessOpenDeclTarget(openDeclTarget, range)
 
         | SynModuleDecl.Let(_, bindings, range) ->
-            let letMark = x.Mark(letBindingGroupStartPos bindings range)
+            let startRange, xmlDoc = letBindingGroupStartRange bindings range
+            x.AdvanceToXmlDocDeclarationStart(xmlDoc, null, startRange)
+            let letMark = x.Mark()
             match bindings with
             | [] -> ()
             | SynBinding(attributes = attrs) :: _ ->
@@ -127,14 +132,14 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             failwithf "unexpected decl: %A" decl
 
     member x.ProcessTypeDefn(SynTypeDefn(info, repr, members, implicitCtor, range) as typeDefn, typeKeywordType) =
-        let (SynComponentInfo(attrs, typeParams, constraints, lid , _, _, _, _)) = info
+        let (SynComponentInfo(attrs, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
 
         match repr with
         | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.Augmentation, _, _) ->
             x.ProcessTypeExtensionDeclaration(typeDefn, attrs)
         | _ ->
 
-        let mark = x.StartType(attrs, typeParams, constraints, lid, range, typeKeywordType)
+        let mark = x.StartType(attrs, xmlDoc, typeParams, constraints, lid, range, typeKeywordType)
 
         // Mark primary constructor before type representation.
         match implicitCtor with
@@ -175,7 +180,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
     member x.ProcessTypeMemberList(members: SynMemberDefn list, elementType) =
         match members with
         | m :: _ ->
-            let memberListMark = x.MarkAttributesOrIdOrRangeStart(m.OuterAttributes, None, m.Range)
+            let memberListMark = x.MarkAttributesOrIdOrRangeStart(m.OuterAttributes, m.XmlDoc, None, m.Range)
             for m in members do
                 x.ProcessTypeMember(m)
             x.EnsureMembersAreFinished()
@@ -183,8 +188,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         | _ -> ()
 
     member x.ProcessTypeExtensionDeclaration(SynTypeDefn(info, _, members, _, range), attrs) =
-        let (SynComponentInfo(_, typeParams, constraints, lid , _, _, _, _)) = info
-        let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, List.tryHead lid, range)
+        let (SynComponentInfo(_, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
+        let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, List.tryHead lid, range)
 
         // Skipping the last name to have the identifier out of qualifier reference name. 
         x.ProcessReferenceNameSkipLast(lid)
@@ -199,13 +204,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
     member x.ProcessPrimaryConstructor(typeMember: SynMemberDefn) =
         match typeMember with
-        | SynMemberDefn.ImplicitCtor(_, attrs, args, selfId, _, range) ->
+        | SynMemberDefn.ImplicitCtor(_, attrs, args, selfId, XmlDoc xmlDoc, range) ->
 
             // Skip spaces inside `T ()` range 
             while (isNotNull x.TokenType && x.TokenType.IsWhitespace) && not x.Eof do
                 x.AdvanceLexer()
 
-            let mark = x.MarkAndProcessAttributesOrIdOrRange(typeMember.OuterAttributes, None, typeMember.Range)
+            let mark = x.MarkAndProcessAttributesOrIdOrRange(typeMember.OuterAttributes, xmlDoc, None, typeMember.Range)
             x.ProcessAttributeLists(attrs)
             x.ProcessImplicitCtorSimplePats(args)
             x.ProcessCtorSelfId(selfId)
@@ -220,6 +225,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         | _ ->
 
         let outerAttrs = typeMember.OuterAttributes
+        let xmlDoc = typeMember.XmlDoc
 
         let mark =
             match unfinishedDeclaration with
@@ -228,7 +234,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 unfinishedDeclaration <- None
                 mark
             | _ ->
-                x.MarkAndProcessAttributesOrIdOrRange(outerAttrs, None, typeMember.Range)
+                x.MarkAndProcessAttributesOrIdOrRange(outerAttrs, xmlDoc, None, typeMember.Range)
 
         let memberType =
             match typeMember with
@@ -384,7 +390,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         | Some(SynBindingReturnInfo(returnType, range, attrs)) ->
 
         let startOffset = x.GetStartOffset(range)
-        x.AdvanceToTokenOrOffset(FSharpTokenType.COLON, startOffset, range)
+        x.AdvanceToTokenOrOffset(FSharpTokenType.COLON, startOffset)
 
         let mark = x.Mark()
         x.ProcessAttributeLists(attrs)

@@ -106,7 +106,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       }
 
       public override bool IsFiltered => true;
-      public override LeafElementBase Create(string text) => new FSharpComment(this, text);
+
+      public override LeafElementBase Create(string text) =>
+        text.Length > 2 && text[2] == '/' && (text.Length == 3 || text[3] != '/')
+          ? new DocComment(this, text)
+          : new FSharpComment(this, text);
     }
 
     private sealed class BlockCommentNodeType : FSharpTokenNodeType

@@ -1,0 +1,35 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    ITypeDeclarationGroup
+      IFSharpTypeDeclaration
+        DocComment(type:LINE_COMMENT, text:/// A)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        IAttributeList
+          FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+          IAttribute
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:A)
+          FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        DocComment(type:LINE_COMMENT, text:/// B)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpIdentifierToken(type:IDENTIFIER, text:T)
+        IPrimaryConstructorDeclaration
+          IParametersPatternDeclaration
+            IUnitPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IClassRepresentation
+          FSharpTokenType+ClassTokenElement(type:CLASS, text:class)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+EndTokenElement(type:END, text:end)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

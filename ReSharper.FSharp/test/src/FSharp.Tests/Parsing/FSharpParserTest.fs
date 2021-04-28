@@ -13,6 +13,17 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Module - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Anon 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module - Nested - XmlDoc 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Nested - XmlDoc 02``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Nested - XmlDoc 03``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Nested 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module - Top level - XmlDoc 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Top level - XmlDoc 02 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Top level - XmlDoc 03 - Multiple blocks``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Top level - XmlDoc 04 - Attributes before``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Top level - XmlDoc 05 - Attributes before``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
@@ -26,6 +37,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl group 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl group 02 - Attributes``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Exception - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 03 - Members``() = x.DoNamedTest()
@@ -38,6 +50,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Delegate - Ctor 02 - Parameter``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - XmlDoc 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - XmlDoc 02 - Multiple lines``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - XmlDoc 03 - Attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - XmlDoc 04 - Multiple blocks``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Il 01``() = x.DoNamedTest()
 
@@ -56,6 +73,7 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl - Empty 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Enum - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 01 - With first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Without first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 03 - Case attributes``() = x.DoNamedTest()
@@ -63,6 +81,10 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Union - XmlDoc 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union - XmlDoc 02 - Multiple cases``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union - XmlDoc 03 - Private repr``() = x.DoNamedTest()
+    [<Test; Explicit("Fix no-bar case")>] member x.``Type decl - Union - XmlDoc 04 - No bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 02 - Modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 03 - No first bar``() = x.DoNamedTest()
@@ -70,6 +92,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Union 05 - Case attributes``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 06 - Fields``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Record - XmlDoc 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - XmlDoc 02 - Attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - XmlDoc 03 - Wrong range``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record 01 - Single line``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record 02 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record 03 - Multiline, semicolons``() = x.DoNamedTest()
@@ -380,6 +405,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Ctor - Primary - Parameters 05 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary - Parameters 06``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary - Self id 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Primary - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary 02 - Modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary 03 - Attributes``() = x.DoNamedTest()
@@ -432,6 +458,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Member - Operator 03 - Subtract``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Operator 04 - Divide``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Auto Property - XmlDoc 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Auto Property - XmlDoc 02 - Attribute``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Auto Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Auto Property 02``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Auto Property 03``() = x.DoNamedTest()
@@ -466,6 +494,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Module member - Extern 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Extern 02 - Access modifier``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module member - Let - XmlDoc 01``() = x.DoNamedTest()
+    [<Test; Explicit("Remove extra space")>] member x.``Module member - Let - XmlDoc 02 - Multiple blocks``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Let - Inline 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()

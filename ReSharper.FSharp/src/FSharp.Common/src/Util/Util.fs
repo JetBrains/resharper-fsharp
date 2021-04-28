@@ -167,6 +167,9 @@ module rec FcsUtil =
 
     let inline (|LongIdentLid|) (lid: LongIdentWithDots) = lid.Lid
 
+    let (|XmlDoc|) (preXmlDoc: PreXmlDoc) =
+        preXmlDoc.ToXmlDoc(false, None)
+
 
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =

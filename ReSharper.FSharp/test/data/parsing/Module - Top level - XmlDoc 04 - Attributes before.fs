@@ -1,0 +1,6 @@
+
+[<A>]
+/// A
+module Module
+
+()

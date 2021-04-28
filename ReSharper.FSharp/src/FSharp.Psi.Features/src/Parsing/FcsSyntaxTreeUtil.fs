@@ -3,6 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing.FcsSyntaxTreeUtil
 
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Text
+open JetBrains.ReSharper.Plugins.FSharp.Util
 
 type SynBinding with
     member x.StartPos =
@@ -18,6 +19,10 @@ type SynField with
             | _, Some id -> id.idRange
             | _ -> range
         range.Start
+
+    member x.XmlDoc =
+        let (SynField(_, _, _, _, _, XmlDoc xmlDoc, _, _)) = x
+        xmlDoc
 
 type SynMemberDefn with
     member x.OuterAttributes =
@@ -38,12 +43,28 @@ type SynMemberDefn with
 
         | _ -> []
 
+    member x.XmlDoc =
+        match x with
+        | SynMemberDefn.Member(SynBinding(xmlDoc = xmlDoc), _)
+        | SynMemberDefn.ImplicitCtor(xmlDoc = xmlDoc)
+        | SynMemberDefn.LetBindings(SynBinding(xmlDoc = xmlDoc) :: _, _, _, _)
+        | SynMemberDefn.AbstractSlot(SynValSig(xmlDoc = xmlDoc), _, _)
+        | SynMemberDefn.ValField(SynField(xmlDoc = xmlDoc), _)
+        | SynMemberDefn.AutoProperty(xmlDoc = xmlDoc) -> xmlDoc.ToXmlDoc(false, None)
+        | _ -> XmlDoc.Empty
+
 type SynMemberSig with
     member x.OuterAttributes =
         match x with
         | SynMemberSig.Member(SynValSig(attributes = attrs), _, _)
         | SynMemberSig.ValField(SynField(attributes = attrs), _) -> attrs
         | _ -> []
+
+    member x.XmlDoc =
+        match x with
+        | SynMemberSig.Member(SynValSig(xmlDoc = xmlDoc), _, _)
+        | SynMemberSig.ValField(SynField(xmlDoc = xmlDoc), _) -> xmlDoc.ToXmlDoc(false, None)
+        | _ -> XmlDoc.Empty
 
     member x.Range =
         match x with
@@ -67,27 +88,47 @@ type SynSimplePat with
         | SynSimplePat.Attrib(range = range) -> range
 
 
-let attrOwnerStartPos (attrLists: SynAttributeList list) (ownerRange: range) =
+let posMin pos1 pos2 =
+    if Position.posLt pos1 pos2 then pos1 else pos2
+
+let rangeStartPosMin (range1: range) (range2: range) =
+    posMin range1.Start range2.Start
+
+let rangeStartMin (range1: range) (range2: range) =
+    if Position.posLt range1.Start range2.Start then range1 else range2
+
+
+let attrOwnerStartRange (attrLists: SynAttributeList list) (xmlDoc: XmlDoc) (ownerRange: range) =
     match attrLists with
     | { Range = attrsRange } :: _ ->
-        let attrsStart = attrsRange.Start
-        if Position.posLt attrsStart ownerRange.Start then attrsStart else ownerRange.Start
-    | _ -> ownerRange.Start
+        if xmlDoc.IsEmpty then
+            rangeStartMin attrsRange ownerRange, XmlDoc.Empty
+        else
+            rangeStartMin xmlDoc.Range (rangeStartMin attrsRange ownerRange), xmlDoc
 
-let typeDefnGroupStartPos (bindings: SynTypeDefn list) (range: Range) =
-    match bindings with
-    | SynTypeDefn(SynComponentInfo(attributes = attrs), _, _, _, _) :: _ -> attrOwnerStartPos attrs range
-    | _ -> range.Start
+    | _ ->
+        if xmlDoc.IsEmpty then
+            ownerRange, XmlDoc.Empty
+        else
+            rangeStartMin ownerRange xmlDoc.Range, xmlDoc
 
-let typeSigGroupStartPos (bindings: SynTypeDefnSig list) (range: Range) =
+let typeDefnGroupStartRange (bindings: SynTypeDefn list) (range: Range) =
     match bindings with
-    | SynTypeDefnSig(SynComponentInfo(attributes = attrs), _, _, _) :: _ -> attrOwnerStartPos attrs range
-    | _ -> range.Start
+    | SynTypeDefn(SynComponentInfo(attributes = attrs; xmlDoc = XmlDoc xmlDoc), _, _, _, _) :: _ ->
+        attrOwnerStartRange attrs xmlDoc range
+    | _ -> range, XmlDoc.Empty
 
-let letBindingGroupStartPos (bindings: SynBinding list) (range: Range) =
+let typeSigGroupStartRange (bindings: SynTypeDefnSig list) (range: Range) =
     match bindings with
-    | SynBinding(attributes = attrs) :: _ -> attrOwnerStartPos attrs range
-    | _ -> range.Start
+    | SynTypeDefnSig(SynComponentInfo(attributes = attrs; xmlDoc = XmlDoc xmlDoc), _, _, _) :: _ ->
+        attrOwnerStartRange attrs xmlDoc range
+    | _ -> range, XmlDoc.Empty
+
+let letBindingGroupStartRange (bindings: SynBinding list) (range: Range) =
+    match bindings with
+    | SynBinding(attributes = attrs; xmlDoc = XmlDoc xmlDoc) :: _ ->
+        attrOwnerStartRange attrs xmlDoc range
+    | _ -> range, XmlDoc.Empty
 
 
 let rec skipGeneratedLambdas expr =

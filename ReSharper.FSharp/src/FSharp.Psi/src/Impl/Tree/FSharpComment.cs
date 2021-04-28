@@ -1,6 +1,8 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -81,6 +83,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
         return string.Empty;
       }
+    }
+  }
+
+  internal class DocComment : FSharpComment
+  {
+    public DocComment([NotNull] TokenNodeType nodeType, [NotNull] string text) : base(nodeType, text)
+    {
     }
   }
 }

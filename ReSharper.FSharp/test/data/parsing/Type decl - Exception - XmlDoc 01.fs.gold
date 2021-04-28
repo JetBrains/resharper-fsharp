@@ -1,0 +1,11 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExceptionDeclaration
+      DocComment(type:LINE_COMMENT, text:/// E)
+      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+      FSharpTokenType+ExceptionTokenElement(type:EXCEPTION, text:exception)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      FSharpIdentifierToken(type:IDENTIFIER, text:E)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
