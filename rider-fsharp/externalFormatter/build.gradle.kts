@@ -10,7 +10,7 @@ var baseVersion = ext.properties["build.baseVersion"]
 
 intellij {
     type = "RD"
-    version = "$baseVersion-SNAPSHOT"
+    localPath = file("../build/riderRD-$baseVersion-SNAPSHOT").absolutePath
     instrumentCode = false
     downloadSources = false
 }
