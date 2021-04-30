@@ -18,16 +18,30 @@ type FSharpCodeFormatterTest() =
         use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
-    [<Test>] member x.``Top binding indent 01 - No indent``() = x.DoNamedTest()
-    [<Test>] member x.``Top binding indent 02 - Correct indent``() = x.DoNamedTest()
-    [<Test>] member x.``Top binding indent 03 - Big indent``() = x.DoNamedTest()
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Top binding indent 01 - No indent``() = x.DoNamedTest()
 
-    [<Test>] member x.``Local binding indent 01 - No indent``() = x.DoNamedTest()
-    [<Test>] member x.``Local binding indent 02 - Correct indent``() = x.DoNamedTest()
-    [<Test>] member x.``Local binding indent 03 - Big indent``() = x.DoNamedTest()
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Top binding indent 02 - Correct indent``() = x.DoNamedTest()
 
-    [<Test>] member x.``Let module decl binding indent 01 - Correct indent``() = x.DoNamedTest()
-    [<Test>] member x.``Let expr binding indent 01 - Correct indent``() = x.DoNamedTest()
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Top binding indent 03 - Big indent``() = x.DoNamedTest()
+
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Local binding indent 01 - No indent``() = x.DoNamedTest()
+
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Local binding indent 02 - Correct indent``() = x.DoNamedTest()
+
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Local binding indent 03 - Big indent``() = x.DoNamedTest()
+
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Let module decl binding indent 01 - Correct indent``() = x.DoNamedTest()
+
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Let expr binding indent 01 - Correct indent``() = x.DoNamedTest()
+
     [<Test>] member x.``Nested module decl name indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Named module decl name indent 01 - Correct indent``() = x.DoNamedTest()
 

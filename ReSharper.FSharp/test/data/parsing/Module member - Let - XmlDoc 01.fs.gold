@@ -3,11 +3,11 @@ IFSharpImplFile
   IAnonModuleDeclaration
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     ILetBindingsDeclaration
-      DocComment(type:LINE_COMMENT, text:/// F)
-      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-      FSharpTokenType+LetTokenElement(type:LET, text:let)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding
+        DocComment(type:LINE_COMMENT, text:/// F)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        FSharpTokenType+LetTokenElement(type:LET, text:let)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         ITopReferencePat
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:f)

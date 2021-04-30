@@ -130,7 +130,7 @@ anonModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
 
 // Module members
 
-interface moduleMember:
+interface moduleMember  options { customParseFunction; noInternalParseFunction; }:
   nestedModuleDeclaration |
   typeDeclarationGroup |
   exceptionDeclaration |
@@ -142,15 +142,8 @@ interface moduleMember:
   hashDirective |
   bindingSignature;
 
-letBindingsDeclaration options { stubBase="DummyDeclaration"; } extras {
-  get { methodName="Attributes" path=<letBindingsDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-}:
-  attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  STATIC<STATIC, StaticKeyword>?
-  letOrUse{LET, BindingKeyword}
-  INLINE<INLINE, InlineKeyword>?
-  REC<REC, RecKeyword>?
-  LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>;
+letBindingsDeclaration options { stubBase="DummyDeclaration"; }:
+  binding<BINDING, Bindings>*;
 
 bindingSignature extras {
   get { methodName="Attributes" path=<bindingSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -185,6 +178,15 @@ topBinding extras {
   get { methodName="ParameterPatterns" path=<topBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  STATIC<STATIC, StaticKeyword>?
+  (
+    letOrUse{LET, BindingKeyword}
+    |
+    AND<LET, BindingKeyword>
+  )
+  INLINE<INLINE, InlineKeyword>?
+  REC<REC, RecKeyword>?
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -197,6 +199,15 @@ localBinding extras {
   get { methodName="Attributes" path=<localBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="ParameterPatterns" path=<localBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  STATIC<STATIC, StaticKeyword>?
+  (
+    letOrUse{LET, BindingKeyword}
+    |
+    AND<LET, BindingKeyword>
+  )
+  INLINE<INLINE, InlineKeyword>?
+  REC<REC, RecKeyword>?
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
@@ -758,8 +769,6 @@ binaryAppExpr options { stubBase="FSharpExpressionBase"; } extras {
 letOrUseExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="BoundExpressions" path=<letOrUseExpr:BINDING/localBinding:EXPR> };
 }:
-  letOrUse{LET, BindingKeyword}
-  REC<REC, RecKeyword>?
   LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>  
   IN<IN, InKeyword>?
   fSharpExpression<IN_EXPR, InExpression>;

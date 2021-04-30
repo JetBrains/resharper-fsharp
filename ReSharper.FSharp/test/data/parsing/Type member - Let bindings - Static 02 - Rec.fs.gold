@@ -17,13 +17,13 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         ITypeMemberDeclarationList
           ILetBindingsDeclaration
-            FSharpTokenType+StaticTokenElement(type:STATIC, text:static)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+LetTokenElement(type:LET, text:let)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+RecTokenElement(type:REC, text:rec)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ITopBinding
+              FSharpTokenType+StaticTokenElement(type:STATIC, text:static)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+LetTokenElement(type:LET, text:let)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+RecTokenElement(type:REC, text:rec)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ITopReferencePat
                 IExpressionReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:f)
@@ -40,9 +40,9 @@ IFSharpImplFile
                   FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-            FSharpTokenType+AndTokenElement(type:AND, text:and)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ITopBinding
+              FSharpTokenType+AndTokenElement(type:AND, text:and)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ITopReferencePat
                 IExpressionReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:g)

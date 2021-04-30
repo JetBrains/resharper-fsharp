@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       NameIdentifier.GetMemberNameIdentifierRange();
 
     public TreeNodeCollection<IAttribute> Attributes =>
-      this.GetBinding()?.AllAttributes ??
+      this.GetBinding()?.Attributes ??
       TreeNodeCollection<IAttribute>.Empty;
   }
 }

@@ -19,7 +19,7 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         let attributeLists = binding.AttributeLists
         if not attributeLists.IsEmpty then attributeLists.First() else
 
-        FSharpAttributesUtil.addOuterAttributeList false binding
+        FSharpAttributesUtil.addAttributeListToLetBinding false binding
         binding.AttributeLists.[0]
 
     let rec isSimplePattern (fsPattern: IFSharpPattern): bool =
@@ -38,14 +38,6 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
             let referenceName = attr.ReferenceName
             isNotNull referenceName && referenceName.ShortName = "Literal")
 
-    let rec isLiteralBinding (binding: IBinding): bool =
-        if hasLiteralAttribute binding.AttributesEnumerable then true else
-
-        let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
-        if isNull letBindings || letBindings.Bindings.[0] != binding then false else
-
-        hasLiteralAttribute letBindings.AttributesEnumerable
-
     override x.Text = "To literal"
 
     override x.IsAvailable _ =
@@ -57,7 +49,7 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         if not (isValid binding && binding.GetNameRange().Contains(&selectedRange)) then false else
 
         if not (isSimplePattern binding.HeadPattern) then false else
-        if isLiteralBinding binding then false else
+        if hasLiteralAttribute binding.AttributesEnumerable then false else
 
         let expr = binding.Expression
         isNotNull expr && expr.IsConstantValue()

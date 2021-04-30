@@ -2,11 +2,11 @@
 IFSharpImplFile
   IAnonModuleDeclaration
     ILetBindingsDeclaration
-      FSharpTokenType+LetTokenElement(type:LET, text:let)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      FSharpTokenType+InlineTokenElement(type:INLINE, text:inline)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding
+        FSharpTokenType+LetTokenElement(type:LET, text:let)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+InlineTokenElement(type:INLINE, text:inline)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         ITopReferencePat
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:f)

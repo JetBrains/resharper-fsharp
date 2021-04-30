@@ -7,9 +7,9 @@ IFSharpImplFile
       Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
       IChameleonExpression
         ILetOrUseExpr
-          FSharpTokenType+LetTokenElement(type:LET, text:let)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ILocalBinding
+            FSharpTokenType+LetTokenElement(type:LET, text:let)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ILocalReferencePat
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:X)

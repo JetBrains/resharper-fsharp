@@ -2,6 +2,9 @@
 {
   public partial interface IBinding
   {
+    bool IsInline { get; }
+    void SetIsInline(bool value);
+
     bool HasParameters { get; }
   }
 }

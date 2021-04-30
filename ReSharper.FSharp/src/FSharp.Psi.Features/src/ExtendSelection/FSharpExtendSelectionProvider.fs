@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ExtendSelection
 
 open System
 open JetBrains.Application.Settings
-open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Editor
 open JetBrains.ReSharper.Feature.Services.SelectEmbracingConstruct
 open JetBrains.ReSharper.Plugins.FSharp
@@ -10,7 +9,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
@@ -64,7 +62,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             let binding = BindingNavigator.GetByExpression(expr)
             let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
             if isNotNull letExpr then
-                FSharpExtendSelectionProvider.CreateLetBindingSelection(fsFile, letExpr, binding) else
+                FSharpBindingSelection(fsFile, binding, letExpr) :> _ else
 
             null
 
@@ -78,39 +76,10 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
         | :? IBinding as binding ->
             let letBindings = LetBindingsNavigator.GetByBinding(binding)
             if isNotNull letBindings then
-                FSharpExtendSelectionProvider.CreateLetBindingSelection(fsFile, letBindings, binding) else
+                FSharpBindingSelection(fsFile, binding, letBindings) :> _ else
 
             null
 
-        | :? IAttributeList as attrList ->
-            let letBindings = LetBindingsDeclarationNavigator.GetByAttributeList(attrList)
-            if isNotNull letBindings then
-                FSharpExtendSelectionProvider.CreateLetBindingSelection(fsFile, letBindings) else
-
-            null
-        
-        | :? ITokenNode as token ->
-            match token.Parent with
-            | :? ILetBindings as letExpr ->
-                let bindings = letExpr.Bindings
-                if bindings.IsEmpty then null else
-
-                let binding = letExpr.Bindings.[0]
-                if token.GetTreeStartOffset().Offset < binding.GetTreeStartOffset().Offset then
-                    FSharpExtendSelectionProvider.CreateLetBindingSelection(fsFile, letExpr, binding) else
-
-                if getTokenType token != FSharpTokenType.AND then null else
-
-                let letExpr = letExpr.As<ILetBindings>().NotNull()
-                let separatorIndex = letExpr.Separators.IndexOf(token)
-                if separatorIndex = -1 then null else
-                
-                let bindingIndex = separatorIndex + 1
-                if bindingIndex >= bindings.Count then null else
-
-                FSharpExtendSelectionProvider.CreateLetBindingSelection(fsFile, letExpr, bindings.[bindingIndex])
-
-            | _ -> null
         | _ -> null
 
     static member FindBetterNode(fsFile, node: ITreeNode) =
@@ -119,25 +88,6 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
         if not (shouldTryFindBetterNode node) then null else
         FSharpExtendSelectionProvider.ExtendNodeSelection(fsFile, node)
-
-    static member CreateLetBindingSelection(fsFile, letBindings: ILetBindings): ISelectedRange =
-        let bindings = letBindings.Bindings
-        if bindings.IsEmpty then null else
-        FSharpExtendSelectionProvider.CreateLetBindingSelection(fsFile, letBindings, bindings.[0])
-
-    static member CreateLetBindingSelection(fsFile, letExpr: ILetBindings, binding): ISelectedRange =
-        let bindings = letExpr.Bindings
-        if bindings.[0] == binding then
-            FSharpLetExprBindingSelection(fsFile, letExpr, letExpr.FirstChild, binding) :> _ else
-
-        let letBindings = letExpr.As<ILetBindings>()
-        if isNull letBindings then null else
-
-        let index = bindings.IndexOf(binding) - 1
-        let separators = letBindings.Separators
-        if index = -1 || index >= separators.Count then null else
-
-        FSharpLetExprBindingSelection(fsFile, letBindings, separators.[index], binding) :> _
 
     interface ISelectEmbracingConstructProvider with
         member x.IsAvailable(sourceFile) =
@@ -265,8 +215,8 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
             FSharpTreeNodeSelection(fsFile, token) :> _
 
 
-and FSharpLetExprBindingSelection(fsFile: IFSharpFile, letBindings: ILetBindings, first: ITreeNode, last: ITreeNode) =
-    inherit FSharpTreeRangeSelection(fsFile, first, last)
+and FSharpBindingSelection(fsFile: IFSharpFile, binding: IBinding, letBindings: ILetBindings) =
+    inherit FSharpTreeRangeSelection(fsFile, binding, binding)
 
     override x.Parent =
         match letBindings with

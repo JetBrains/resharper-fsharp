@@ -21,9 +21,9 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
           ITypeMemberDeclarationList
             ILetBindingsDeclaration
-              FSharpTokenType+LetTokenElement(type:LET, text:let)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ITopBinding
+                FSharpTokenType+LetTokenElement(type:LET, text:let)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 ITopReferencePat
                   IExpressionReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:x)
@@ -40,9 +40,9 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         ITypeMemberDeclarationList
           ILetBindingsDeclaration
-            FSharpTokenType+LetTokenElement(type:LET, text:let)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ITopBinding
+              FSharpTokenType+LetTokenElement(type:LET, text:let)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ITopReferencePat
                 IExpressionReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:y)

@@ -9,13 +9,21 @@ type ToRecursiveLetBindingsActionExecuteTest() =
     override x.ExtraPath = "toRecursiveLetBindings"
 
     [<Test>] member x.``Module - Simple 01``() = x.DoNamedTest()
-    [<Test>] member x.``Module - Space 01``() = x.DoNamedTest()
+
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Module - Space 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Module - Next line 01``() = x.DoNamedTest()
-    [<Test>] member x.``Module - Next line 02``() = x.DoNamedTest()
+
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Module - Next line 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Module - Alignment 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expression - Simple 01``() = x.DoNamedTest()
-    [<Test>] member x.``Expression - Next line 01``() = x.DoNamedTest()
+
+    [<Test; Explicit("Merge formatter branch")>]
+    member x.``Expression - Next line 01``() = x.DoNamedTest()
 
 type ToRecursiveLetBindingsActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<ToRecursiveLetBindingsAction>()

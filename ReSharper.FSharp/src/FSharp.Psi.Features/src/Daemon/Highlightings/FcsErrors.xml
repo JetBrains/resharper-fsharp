@@ -158,15 +158,15 @@
 
   <Error staticGroup="FSharpErrors" name="LetAndForNonRecBindings">
     <Parameter type="ILetBindings" name="letBindings"/>
-    <Range>(letBindings.Separators |> Seq.tryHead |> Option.defaultWith (fun _ -> letBindings.BindingKeyword)).GetHighlightingRange()</Range>
+    <Range>getSecondBindingKeyword letBindings</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings"/>
     <QuickFix>ToRecursiveLetBindingsFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="LocalClassBindingsCannotBeInline">
-    <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
-    <Range>letBindings.InlineKeyword.GetHighlightingRange()</Range>
+    <Parameter type="ITopBinding" name="binding"/>
+    <Range>binding.InlineKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Class local bindings cannot be inline"/>
     <QuickFix>RemoveInlineFix</QuickFix>

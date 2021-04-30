@@ -1,13 +1,18 @@
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class LetBindingsDeclaration
   {
-    public bool IsRecursive => RecKeyword != null;
+    public IBinding FirstBinding => BindingsEnumerable.FirstOrDefault();
+    public ITokenNode BindingKeyword => FirstBinding?.BindingKeyword;
+
+    public bool IsRecursive => FirstBinding?.RecKeyword != null;
+
     public bool IsUse => BindingKeyword?.GetTokenType() == FSharpTokenType.USE;
 
     public void SetIsRecursive(bool value)
@@ -15,22 +20,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!value)
         throw new System.NotImplementedException();
 
-      BindingKeyword.NotNull().AddTokenAfter(FSharpTokenType.REC);
-    }
-
-    public bool IsInline => InlineKeyword != null;
-
-    public void SetIsInline(bool value)
-    {
-      if (value)
-        throw new System.NotImplementedException();
-
       using var _ = WriteLockCookie.Create(IsPhysical());
-      var inlineKeyword = InlineKeyword;
-      if (inlineKeyword.PrevSibling is Whitespace whitespace)
-        ModificationUtil.DeleteChildRange(whitespace, inlineKeyword);
-      else
-        ModificationUtil.DeleteChild(inlineKeyword);
+
+      FirstBinding.NotNull().BindingKeyword.AddTokenAfter(FSharpTokenType.REC);
     }
   }
 }

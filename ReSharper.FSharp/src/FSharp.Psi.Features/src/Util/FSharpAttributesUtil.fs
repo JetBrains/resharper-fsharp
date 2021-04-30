@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util.Extension
 
 let addAttribute (attributeList: IAttributeList) (attribute: IAttribute) =
@@ -113,24 +114,45 @@ let removeAttributeOrList (attr: IAttribute) =
         removeAttributeFromList attr
 
 
-let addOuterAttributeListWithIndent addNewLine (indent: int) (decl: IFSharpTreeNode) =
-    addNodesBefore decl.FirstChild [
-        decl.CreateElementFactory().CreateEmptyAttributeList()
-        if addNewLine then
-            NewLine(decl.GetLineEnding())
+let addAttributeListWithIndent newLine (indent: int) (anchor: ITreeNode) =
+    addNodesBefore anchor [
+        anchor.CreateElementFactory().CreateEmptyAttributeList()
+        if newLine then
+            NewLine(anchor.GetLineEnding())
             Whitespace(indent)
         else
             Whitespace()
     ] |> ignore
 
-let addOuterAttributeList addNewLine (decl: IFSharpTreeNode) =
-    addOuterAttributeListWithIndent addNewLine decl.Indent decl
+let addOuterAttributeListWithIndent newLine (indent: int) (anchor: ITreeNode) =
+    addAttributeListWithIndent newLine indent anchor.FirstChild
 
-let addAttributeList (decl: IFSharpTypeOrExtensionDeclaration) =
+let addOuterAttributeList newLine (decl: ITreeNode) =
+    addAttributeListWithIndent newLine decl.Indent decl.FirstChild
+
+let addAttributeList newLine (anchor: ITreeNode) =
+    addAttributeListWithIndent newLine anchor.Indent anchor
+
+
+let addAttributeListToTypeDeclaration (decl: IFSharpTypeOrExtensionDeclaration) =
     addNodesAfter decl.TypeKeyword [
         Whitespace()
         decl.CreateElementFactory().CreateEmptyAttributeList()
     ] |> ignore
+
+let addAttributeListToLetBinding newLine (binding: IBinding) =
+    if newLine then
+        addOuterAttributeList true binding
+    else
+        let inlineKeyword = binding.InlineKeyword
+        if isNotNull inlineKeyword then
+            addAttributeList false inlineKeyword else
+
+        let headPattern = binding.HeadPattern
+        if isNotNull headPattern then
+            addAttributeList false headPattern else
+
+        addOuterAttributeList false binding
 
 
 let isOuterAttributeList (typeDecl: IFSharpTypeOrExtensionDeclaration) (attrList: IAttributeList) =
@@ -147,7 +169,7 @@ let getTypeDeclarationAttributeList (typeDecl: #IFSharpTypeOrExtensionDeclaratio
     else
         let attributeLists = typeDecl.AttributeLists
         if attributeLists.IsEmpty then
-            addAttributeList typeDecl
+            addAttributeListToTypeDeclaration typeDecl
         typeDecl.AttributeLists.[0]
 
 let resolvesToType (clrTypeName: IClrTypeName) (attr: IAttribute) =

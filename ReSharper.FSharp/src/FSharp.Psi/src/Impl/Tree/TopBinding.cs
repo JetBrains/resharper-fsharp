@@ -2,10 +2,11 @@ using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -24,29 +25,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IDeclaredElement IDeclaration.DeclaredElement => DeclaredElement;
 
     public string DeclaredName => SharedImplUtil.MISSING_DECLARATION_NAME;
-
-    public TreeNodeCollection<IAttribute> AllAttributes
-    {
-      get
-      {
-        var attributes = Attributes;
-
-        var letBindings = LetBindingsDeclarationNavigator.GetByBinding(this);
-        if (letBindings == null)
-          return attributes;
-
-        if (letBindings.BindingsEnumerable.FirstOrDefault() != this)
-          return attributes;
-
-        var letAttributes = letBindings.Attributes;
-        if (letAttributes.IsEmpty)
-          return attributes;
-
-        return attributes.IsEmpty
-          ? letAttributes
-          : attributes.Prepend(letAttributes).ToTreeNodeCollection();
-      }
-    }
 
     public TreeTextRange GetNameRange()
     {
@@ -67,6 +45,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public void SetName(string name)
     {
+    }
+
+    public bool IsInline => InlineKeyword != null;
+
+    public void SetIsInline(bool value)
+    {
+      if (value)
+        throw new System.NotImplementedException();
+
+      using var _ = WriteLockCookie.Create(IsPhysical());
+      var inlineKeyword = InlineKeyword;
+      if (inlineKeyword.PrevSibling is Whitespace whitespace)
+        ModificationUtil.DeleteChildRange(whitespace, inlineKeyword);
+      else
+        ModificationUtil.DeleteChild(inlineKeyword);
     }
 
     public bool IsMutable => MutableKeyword != null;

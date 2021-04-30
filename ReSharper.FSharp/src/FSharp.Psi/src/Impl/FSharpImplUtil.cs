@@ -593,21 +593,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return;
 
       name = NamingManager.GetNamingLanguageService(fsIdentifier.Language).MangleNameIfNecessary(name);
-      using (WriteLockCookie.Create(fsIdentifier.IsPhysical()))
-        LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
+      using var _ = WriteLockCookie.Create(fsIdentifier.IsPhysical());
+      LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
     }
 
     public static void AddTokenAfter([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
     {
       using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
-      ModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
+      LowLevelModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
+      LowLevelModificationUtil.AddChildAfter(anchor, new Whitespace());
     }
 
-    public static void AddTokenBefore([NotNull] ITreeNode anchor, [NotNull] TokenNodeType tokenType)
+    public static void AddTokenBefore([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
     {
       using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
-      var space = ModificationUtil.AddChildBefore(anchor, new Whitespace());
-      ModificationUtil.AddChildBefore(space, tokenType.CreateLeafElement());
+      LowLevelModificationUtil.AddChildBefore(anchor, tokenType.CreateLeafElement());
+      LowLevelModificationUtil.AddChildBefore(anchor, new Whitespace());
     }
     
     public static IList<ITypeElement> ToTypeElements(this IList<IClrTypeName> names, IPsiModule psiModule)

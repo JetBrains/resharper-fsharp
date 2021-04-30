@@ -11,6 +11,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 
+let getDocumentRange (node: #ITreeNode) =
+    node.GetHighlightingRange()
+
 let secondaryRangesFromNode (node: #ITreeNode) =
     match node with
     | null -> Seq.empty<DocumentRange>
@@ -120,3 +123,14 @@ let getInterfaceImplHeaderRange (interfaceImpl: IInterfaceImplementation) =
         | withKeyword -> withKeyword :> ITreeNode
 
     getTreeNodesDocumentRange interfaceImpl.InterfaceKeyword last
+
+let getSecondBindingKeyword (bindings: ILetBindings) =
+    let bindings = bindings.Bindings
+    if Seq.isEmpty bindings then DocumentRange.InvalidRange else
+
+    bindings
+    |> Seq.tail
+    |> Seq.tryHead
+    |> Option.bind (fun b -> Option.ofObj b.BindingKeyword)
+    |> Option.map getDocumentRange 
+    |> Option.defaultValue DocumentRange.InvalidRange

@@ -99,8 +99,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         x.Done(caseMark, elementType)
 
     member x.MarkTokenOrRange(tokenType, range: range) =
-        let rangeStart = x.GetStartOffset(range)
-        x.AdvanceToTokenOrOffset(tokenType, rangeStart)
+        x.AdvanceToTokenOrPos(tokenType, range.Start)
         x.Mark()
 
     member x.AdvanceToOffset(offset) =
@@ -108,10 +107,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.AdvanceLexer()
 
     member x.AdvanceToTokenOrRangeStart(tokenType: TokenNodeType, range: range) =
-        x.AdvanceToTokenOrOffset(tokenType, x.GetStartOffset(range))
+        x.AdvanceToTokenOrPos(tokenType, range.Start)
 
     member x.AdvanceToTokenOrRangeEnd(tokenType: TokenNodeType, range: range) =
-        x.AdvanceToTokenOrOffset(tokenType, x.GetEndOffset(range))
+        x.AdvanceToTokenOrPos(tokenType, range.End)
 
     member x.AdvanceToXmlDoc(xmlDoc: XmlDoc, maxPos: pos) =
         x.AdvanceToStart(xmlDoc.Range)
@@ -121,7 +120,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         while x.CurrentOffset < maxOffset && not (x.TokenType == FSharpTokenType.LINE_COMMENT && startsWith "///" (x.Builder.GetTokenText())) do
             x.AdvanceLexer()
 
-    member x.AdvanceToTokenOrOffset(tokenType: TokenNodeType, maxOffset: int) =
+    member x.AdvanceToTokenOrPos(tokenType: TokenNodeType, pos: pos) =
+        let maxOffset = x.GetOffset(pos)
         while x.CurrentOffset < maxOffset && x.TokenType != tokenType && not x.Eof do
             x.AdvanceLexer()
 
@@ -353,8 +353,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             for typeConstraint in constraints do
                 x.ProcessTypeConstraint(typeConstraint)
             if paramsInBraces then
-                let endOffset = x.GetEndOffset(range)
-                x.AdvanceToTokenOrOffset(FSharpTokenType.GREATER, endOffset)
+                x.AdvanceToTokenOrPos(FSharpTokenType.GREATER, range.End)
                 if x.Builder.GetTokenType() == FSharpTokenType.GREATER then
                     x.AdvanceLexer()
             x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_LIST)

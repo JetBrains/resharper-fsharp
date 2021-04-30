@@ -18,7 +18,7 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
 
     let declaration =
         let attributeOwner: IFSharpTypeMemberDeclaration =
-            match LetBindingsDeclarationNavigator.GetByAttribute(warning.Attr) with
+            match LetBindingsDeclarationNavigator.GetByBinding(BindingNavigator.GetByAttribute(warning.Attr)) with
             | null -> MemberDeclarationNavigator.GetByAttribute(warning.Attr) :> _
             | letModuleDec -> letModuleDec :> _
         if isNotNull attributeOwner then attributeOwner.GetContainingTypeDeclaration() else null

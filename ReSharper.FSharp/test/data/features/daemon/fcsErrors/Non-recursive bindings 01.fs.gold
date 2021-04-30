@@ -1,0 +1,7 @@
+﻿module Module
+
+let foo x = 1
+|and|(0) bar x = 1
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings

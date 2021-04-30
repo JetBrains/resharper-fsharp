@@ -17,11 +17,11 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         ITypeMemberDeclarationList
           ILetBindingsDeclaration
-            FSharpTokenType+StaticTokenElement(type:STATIC, text:static)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+LetTokenElement(type:LET, text:let)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ITopBinding
+              FSharpTokenType+StaticTokenElement(type:STATIC, text:static)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+LetTokenElement(type:LET, text:let)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ITopReferencePat
                 IExpressionReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:x)

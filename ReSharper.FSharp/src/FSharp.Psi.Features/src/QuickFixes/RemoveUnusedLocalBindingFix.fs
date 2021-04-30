@@ -87,11 +87,28 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
 
             let rangeToDelete =
                 if bindingIndex = 0 then
-                    let andKeyword = letBindings.Separators.[0]
-                    TreeRange(getFirstMatchingNodeBefore isInlineSpaceOrComment binding, andKeyword)
+                    let copyRange =
+                        let startNode =
+                            let staticKeyword = binding.StaticKeyword
+                            if isNotNull staticKeyword then staticKeyword else binding.BindingKeyword.NotNull()
+
+                        let endNode =
+                            let recKeyword = binding.RecKeyword
+                            if isNotNull recKeyword then recKeyword else
+
+                            let inlineKeyword = binding.InlineKeyword
+                            if isNotNull inlineKeyword then inlineKeyword else
+
+                            binding.BindingKeyword.NotNull()
+
+                        TreeRange(startNode, endNode)
+
+                    let secondBindingKeyword = bindings.[1].BindingKeyword.NotNull()
+                    ModificationUtil.ReplaceChildRange(TreeRange(secondBindingKeyword), copyRange) |> ignore
+
+                    TreeRange(getFirstMatchingNodeBefore isInlineSpaceOrComment binding, bindings.[1].PrevSibling)
                 else
-                    let andKeyword = letBindings.Separators.[bindingIndex - 1]
-                    let rangeStart = getFirstMatchingNodeBefore isInlineSpaceOrComment andKeyword
+                    let rangeStart = getFirstMatchingNodeBefore isInlineSpaceOrComment binding
 
                     let rangeEnd =
                         binding

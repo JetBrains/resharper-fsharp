@@ -13,7 +13,7 @@ open JetBrains.Rider.Backend.Features.RunMarkers
 open JetBrains.Util
 
 let isEntryPoint (binding: ITopBinding) =
-    let attribute = binding.AllAttributes.GetAttribute("EntryPoint")
+    let attribute = binding.Attributes.GetAttribute("EntryPoint")
     if isNull attribute then false else
 
     // todo: check attr resolves to FSharpPredefinedType.entryPointAttrTypeName
@@ -66,7 +66,7 @@ type FSharpRunMarkerProvider() =
                 if isNull parametersOwner then () else
 
                 let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
-                if letBindings.IsInline || isNull (ModuleDeclarationNavigator.GetByMember(letBindings)) then () else
+                if binding.IsInline || isNull (ModuleDeclarationNavigator.GetByMember(letBindings)) then () else
 
                 if showMarkerOnStaticMethods && isApplicableMethod binding then
                     addHighlighting binding RunMarkerAttributeIds.RUN_METHOD_MARKER_ID

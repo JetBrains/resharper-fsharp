@@ -44,8 +44,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         ("NestedModuleDeclaration", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.MODULE_MEMBER),
         ("TopBinding", ElementType.TOP_BINDING, TopBinding.CHAMELEON_EXPR),
         ("LocalBinding", ElementType.LOCAL_BINDING, LocalBinding.EXPR),
-        ("LetModuleDeclBinding", ElementType.LET_BINDINGS_DECLARATION, LetBindingsDeclaration.BINDING),
-        ("LetExprBinding", ElementType.LET_OR_USE_EXPR, LetOrUseExpr.BINDING),
         ("NestedModuleDeclName", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.IDENTIFIER),
         ("NamedModuleDeclName", ElementType.NAMED_MODULE_DECLARATION, NamedModuleDeclaration.IDENTIFIER),
       };

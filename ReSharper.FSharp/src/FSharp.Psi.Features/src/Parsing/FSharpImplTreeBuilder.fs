@@ -78,16 +78,19 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             let startRange, xmlDoc = letBindingGroupStartRange bindings range
             x.AdvanceToXmlDocDeclarationStart(xmlDoc, null, startRange)
             let letMark = x.Mark()
-            match bindings with
-            | [] -> ()
-            | SynBinding(attributes = attrs) :: _ ->
-                x.ProcessOuterAttrs(attrs, range)
 
             // `extern` declarations are represented as normal `let` bindings with fake rhs expressions in FCS AST.
             // This is a workaround to mark such declarations and not to mark the non-existent expressions inside it.
-            x.AdvanceToStart(range)
             match bindings with
-            | [SynBinding(returnInfo = returnInfo)] when x.TokenType == FSharpTokenType.EXTERN ->
+            | [SynBinding(attributes = attrs; returnInfo = returnInfo; expr = expr)] when
+                    Range.equals range expr.Range ->
+
+                x.ProcessOuterAttrs(attrs, range)
+                x.AdvanceToStart(range)
+                Assertion.Assert(x.TokenType == FSharpTokenType.EXTERN, "Expecting EXTERN, got: {0}", x.TokenType)
+                let attrs = x.SkipOuterAttrs(attrs, range)
+                x.ProcessAttributeLists(attrs)
+
                 match returnInfo with
                 | Some(SynBindingReturnInfo(attributes = attrs)) ->
                     x.ProcessAttributeLists(attrs)
@@ -97,8 +100,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
             | _ ->
 
-            for binding in bindings do
-                x.ProcessTopLevelBinding(binding, range)
+            x.ProcessTopLevelBindings(bindings)
             x.Done(range, letMark, ElementType.LET_BINDINGS_DECLARATION)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
@@ -234,7 +236,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 unfinishedDeclaration <- None
                 mark
             | _ ->
-                x.MarkAndProcessAttributesOrIdOrRange(outerAttrs, xmlDoc, None, typeMember.Range)
+                match typeMember with
+                | SynMemberDefn.LetBindings _ ->
+                    x.MarkAttributesOrIdOrRangeStart(outerAttrs, xmlDoc, None, typeMember.Range)
+                | _ ->
+                    x.MarkAndProcessAttributesOrIdOrRange(outerAttrs, xmlDoc, None, typeMember.Range)
 
         let memberType =
             match typeMember with
@@ -264,9 +270,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 x.MarkChameleonExpression(expr)
                 ElementType.DO_STATEMENT
 
-            | SynMemberDefn.LetBindings(bindings, _, _, range) ->
-                for binding in bindings do
-                    x.ProcessTopLevelBinding(binding, range)
+            | SynMemberDefn.LetBindings(bindings, _, _, _) ->
+                x.ProcessTopLevelBindings(bindings)
                 ElementType.LET_BINDINGS_DECLARATION
 
             | SynMemberDefn.AbstractSlot(SynValSig(explicitValDecls = typeParams; synType = synType; arity = arity), _, range) ->
@@ -389,8 +394,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         | None -> ()
         | Some(SynBindingReturnInfo(returnType, range, attrs)) ->
 
-        let startOffset = x.GetStartOffset(range)
-        x.AdvanceToTokenOrOffset(FSharpTokenType.COLON, startOffset)
+        x.AdvanceToTokenOrPos(FSharpTokenType.COLON, range.Start)
 
         let mark = x.Mark()
         x.ProcessAttributeLists(attrs)
@@ -605,7 +609,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             if Position.posGt r.End outerRange.Start then attrs else
             x.SkipOuterAttrs(rest, outerRange)
 
-    member x.ProcessTopLevelBinding(SynBinding(_, kind, _, _, attrs, _, _ , headPat, returnInfo, expr, _, _) as binding, letRange) =
+    member x.ProcessTopLevelBinding(binding) =
+        let (SynBinding(_, kind, _, _, attrs, _, _ , headPat, returnInfo, expr, _, _)) = binding
+
+        let mark = x.Mark()
         let expr = x.FixExpresion(expr)
 
         match kind with
@@ -613,21 +620,22 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         | SynBindingKind.Do -> x.MarkChameleonExpression(expr)
         | _ ->
 
-        let mark =
-            let attrs = x.SkipOuterAttrs(attrs, letRange)
-            match attrs with
-            | [] -> x.Mark(binding.StartPos)
-            | { Range = r } :: _ ->
-                let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, r)
-                x.ProcessAttributeLists(attrs)
-                mark
-
+        x.ProcessAttributeLists(attrs)
         x.ProcessPat(headPat, false, true)
         x.ProcessReturnInfo(returnInfo)
         x.MarkChameleonExpression(expr)
 
         x.Done(binding.RangeOfBindingWithRhs, mark, ElementType.TOP_BINDING)
 
+    member x.ProcessTopLevelBindings(bindings) =
+        match bindings with
+        | [] -> ()
+        | binding :: rest ->
+
+        x.ProcessTopLevelBinding(binding)
+        for binding in rest do
+            x.AdvanceToTokenOrPos(FSharpTokenType.AND, binding.StartPos)
+            x.ProcessTopLevelBinding(binding)
 
 [<Struct>]
 type BuilderStep =
@@ -643,22 +651,22 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
     inherit FSharpImplTreeBuilder(lexer, document, [], lifetime, projectedOffset, lineShift)
 
     let nextSteps = Stack<BuilderStep>()
+ 
+    member x.ProcessLocalBinding(binding, isSecondary) =
+        let (SynBinding(_, kind, _, _, attrs, _, _, headPat, returnInfo, expr, _, _)) = binding
 
-    member x.ProcessLocalBinding(SynBinding(_, kind, _, _, attrs, _, _, headPat, returnInfo, expr, _, _) as binding) =
+        if isSecondary then
+            x.AdvanceToTokenOrPos(FSharpTokenType.AND, binding.StartPos)
+
         let expr = x.FixExpresion(expr)
+        let mark = x.Mark()
 
         match kind with
         | SynBindingKind.StandaloneExpression
         | SynBindingKind.Do -> x.ProcessExpression(expr)
         | _ ->
 
-        let mark =
-            match attrs with
-            | [] -> x.Mark(binding.StartPos)
-            | { Range = r } :: _ ->
-                let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, r)
-                x.ProcessAttributeLists(attrs)
-                mark
+        x.ProcessAttributeLists(attrs)
 
         x.PushRangeForMark(binding.RangeOfBindingWithRhs, mark, ElementType.LOCAL_BINDING)
         x.ProcessPat(headPat, true, true)
@@ -1139,12 +1147,12 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         match clauses with
         | [] -> ()
         | [ binding ] ->
-            x.ProcessLocalBinding(binding)
+            x.ProcessLocalBinding(binding, false)
 
         | binding :: bindings ->
-            x.PushStepList(bindings, bindingListProcessor)
-            x.ProcessLocalBinding(binding)
-    
+            x.PushStepList(bindings, secondaryBindingListProcessor)
+            x.ProcessLocalBinding(binding, false)
+
     member x.ProcessExpressionList(exprs) =
         match exprs with
         | [] -> ()
@@ -1378,11 +1386,11 @@ type ExpressionListProcessor() =
         builder.ProcessExpression(expr)
 
 
-type BindingListProcessor() =
+type SecondaryBindingListProcessor() =
     inherit StepListProcessorBase<SynBinding>()
 
     override x.Process(binding, builder) =
-        builder.ProcessLocalBinding(binding)
+        builder.ProcessLocalBinding(binding, true)
 
 
 type AndLocalBindingListProcessor() =
@@ -1486,7 +1494,7 @@ module BuilderStepProcessors =
     let anonRecordBindingListRepresentationProcessor = AnonRecordBindingListRepresentationProcessor() 
 
     let expressionListProcessor = ExpressionListProcessor()
-    let bindingListProcessor = BindingListProcessor()
+    let secondaryBindingListProcessor = SecondaryBindingListProcessor()
     let andLocalBindingListProcessor = AndLocalBindingListProcessor()
     let recordFieldBindingListProcessor = RecordFieldBindingListProcessor()
     let anonRecordFieldBindingListProcessor = AnonRecordFieldBindingListProcessor()

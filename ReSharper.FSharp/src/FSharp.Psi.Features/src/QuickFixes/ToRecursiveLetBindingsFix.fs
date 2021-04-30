@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 type ToRecursiveLetBindingsFix(error: LetAndForNonRecBindingsError) =
     inherit FSharpQuickFixBase()
@@ -12,5 +13,4 @@ type ToRecursiveLetBindingsFix(error: LetAndForNonRecBindingsError) =
     override x.IsAvailable _ = isValid letBindings
 
     override x.ExecutePsiTransaction _ =
-        use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
-        letBindings.SetIsRecursive(true)
+        ToRecursiveLetBindingsAction.Execute(letBindings)

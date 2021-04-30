@@ -17,19 +17,19 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         ITypeMemberDeclarationList
           ILetBindingsDeclaration
-            IAttributeList
-              FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
-              IAttribute
-                ITypeReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-              FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
-            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-            FSharpTokenType+LetTokenElement(type:LET, text:let)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+RecTokenElement(type:REC, text:rec)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ITopBinding
+              IAttributeList
+                FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+                IAttribute
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+                FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+              NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+              Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+              FSharpTokenType+LetTokenElement(type:LET, text:let)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+RecTokenElement(type:REC, text:rec)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IAttributeList
                 FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
                 IAttribute
@@ -50,9 +50,9 @@ IFSharpImplFile
                   FSharpToken(type:INT32, text:1)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-            FSharpTokenType+AndTokenElement(type:AND, text:and)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ITopBinding
+              FSharpTokenType+AndTokenElement(type:AND, text:and)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IAttributeList
                 FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
                 IAttribute

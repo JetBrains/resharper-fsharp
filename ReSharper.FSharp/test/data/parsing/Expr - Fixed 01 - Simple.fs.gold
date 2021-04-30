@@ -6,9 +6,9 @@ IFSharpImplFile
         IParenExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           ILetOrUseExpr
-            FSharpTokenType+UseTokenElement(type:USE, text:use)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ILocalBinding
+              FSharpTokenType+UseTokenElement(type:USE, text:use)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ILocalReferencePat
                 IExpressionReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:x)

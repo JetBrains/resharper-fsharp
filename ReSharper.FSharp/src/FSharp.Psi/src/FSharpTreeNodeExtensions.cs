@@ -8,11 +8,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   public static class FSharpTreeNodeExtensions
   {
     [NotNull]
-    public static IFSharpLanguageService GetFSharpLanguageService([NotNull] this IFSharpTreeNode treeNode) =>
+    public static IFSharpLanguageService GetFSharpLanguageService([NotNull] this ITreeNode treeNode) =>
       treeNode.GetPsiServices().GetComponent<LanguageManager>().GetService<IFSharpLanguageService>(treeNode.Language);
 
     [NotNull]
-    public static IFSharpElementFactory CreateElementFactory([NotNull] this IFSharpTreeNode treeNode) =>
+    public static IFSharpElementFactory CreateElementFactory([NotNull] this ITreeNode treeNode) =>
       treeNode.GetFSharpLanguageService().CreateElementFactory(treeNode.GetPsiModule());
 
     public static bool IsFSharpSigFile([NotNull] this ITreeNode treeNode) =>

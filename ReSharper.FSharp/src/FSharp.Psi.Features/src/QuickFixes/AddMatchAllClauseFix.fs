@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 [<RequireQualifiedAccess>]
@@ -30,7 +31,7 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         let factory = expr.CreateElementFactory()
-        use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
+        use disableFormatter = new DisableCodeFormatter()
 
         let isSingleLineMatch = expr.IsSingleLine
 
@@ -46,6 +47,7 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
                         NewLine(lineEnding)
 
                     NewLine(lineEnding)
+                    Whitespace(lastClause.Indent) // may be wrong in some cases
                 else
                     Whitespace()
                 factory.CreateMatchClause()

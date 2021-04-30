@@ -2,9 +2,9 @@
 IFSharpImplFile
   IAnonModuleDeclaration
     ILetBindingsDeclaration
-      FSharpTokenType+LetTokenElement(type:LET, text:let)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding
+        FSharpTokenType+LetTokenElement(type:LET, text:let)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IParenPat
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           IParametersOwnerPat

@@ -230,6 +230,7 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - Assert 01 - Simple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - LetOrUse - Attributes 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - LetOrUse 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Trait call 01``() = x.DoNamedTest()

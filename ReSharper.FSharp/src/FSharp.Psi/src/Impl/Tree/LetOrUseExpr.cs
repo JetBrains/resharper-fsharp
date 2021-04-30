@@ -1,12 +1,17 @@
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class LetOrUseExpr
   {
-    public bool IsRecursive => RecKeyword != null;
+    public IBinding FirstBinding => BindingsEnumerable.FirstOrDefault();
+    public ITokenNode BindingKeyword => FirstBinding?.BindingKeyword;
+
+    public bool IsRecursive => FirstBinding?.RecKeyword != null;
 
     public bool IsUse => 
       BindingKeyword?.GetTokenType() is var tokenType && 

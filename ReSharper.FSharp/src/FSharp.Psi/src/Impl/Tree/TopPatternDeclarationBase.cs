@@ -102,7 +102,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [CanBeNull]
     private IDeclaredElement TryCreateLiteral([NotNull] IBinding binding, [NotNull] IChameleonExpression chameleonExpr)
     {
-      if (!binding.AllAttributes.HasAttribute("Literal"))
+      if (!binding.Attributes.HasAttribute("Literal"))
         return null;
 
       return chameleonExpr.IsLiteralExpression()
@@ -123,7 +123,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool CanBeMutable => Binding != null;
 
     public override bool IsStatic =>
-      LetBindingsDeclarationNavigator.GetByBinding(Binding as IBinding)?.StaticKeyword != null;
+      (Binding as IBinding)?.StaticKeyword != null;
 
     public virtual IEnumerable<IFSharpPattern> NestedPatterns =>
       EmptyList<IFSharpPattern>.Instance;
