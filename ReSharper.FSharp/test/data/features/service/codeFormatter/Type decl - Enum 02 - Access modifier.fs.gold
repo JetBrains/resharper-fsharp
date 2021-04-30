@@ -1,0 +1,113 @@
+﻿LineBreakAfterTypeReprAccessModifier = True
+  LineBreakAfterEqualsInTypeDecl = True
+namespace Namespace
+
+type E1 =
+  private
+    | A = 0
+    | B = 1
+
+type E2 =
+  private
+    | A = 0
+    | B = 1
+
+type E3 =
+  private
+    | A = 1
+    | B = 2
+
+type E4 =
+  private
+    | A = 1
+    | B = 2
+
+type E6 =
+  private
+    | A = 0
+    | B = 1
+
+type E7 =
+  private
+    A = 0
+    | B = 1
+================
+  LineBreakAfterEqualsInTypeDecl = False
+namespace Namespace
+
+type E1 =
+  private
+    | A = 0
+    | B = 1
+
+type E2 =
+  private
+    | A = 0
+    | B = 1
+
+type E3 = private
+            | A = 1
+            | B = 2
+
+type E4 = private
+            | A = 1
+            | B = 2
+
+type E6 = private
+            | A = 0
+            | B = 1
+
+type E7 = private
+            A = 0
+            | B = 1
+================
+LineBreakAfterTypeReprAccessModifier = False
+  LineBreakAfterEqualsInTypeDecl = True
+namespace Namespace
+
+type E1 =
+  private
+    | A = 0
+    | B = 1
+
+type E2 =
+  private | A = 0
+          | B = 1
+
+type E3 =
+  private
+    | A = 1
+    | B = 2
+
+type E4 =
+  private | A = 1
+          | B = 2
+
+type E6 =
+  private | A = 0 | B = 1
+
+type E7 =
+  private A = 0 | B = 1
+================
+  LineBreakAfterEqualsInTypeDecl = False
+namespace Namespace
+
+type E1 =
+  private
+    | A = 0
+    | B = 1
+
+type E2 =
+  private | A = 0
+          | B = 1
+
+type E3 = private
+            | A = 1
+            | B = 2
+
+type E4 = private | A = 1
+                  | B = 2
+
+type E6 = private | A = 0 | B = 1
+
+type E7 = private A = 0 | B = 1

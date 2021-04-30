@@ -56,8 +56,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
         | SynModuleDecl.Types(typeDefns, range) ->
             let startRange, xmlDoc = typeDefnGroupStartRange typeDefns range
-            x.AdvanceToXmlDocDeclarationStart(xmlDoc, null, startRange)
-            let mark = x.Mark()
+            let mark = x.MarkXmlDocOwner(xmlDoc, null, startRange)
             match typeDefns with
             | [] -> ()
             | primary :: secondary ->
@@ -76,8 +75,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
         | SynModuleDecl.Let(_, bindings, range) ->
             let startRange, xmlDoc = letBindingGroupStartRange bindings range
-            x.AdvanceToXmlDocDeclarationStart(xmlDoc, null, startRange)
-            let letMark = x.Mark()
+            let letMark = x.MarkXmlDocOwner(xmlDoc, null, startRange)
 
             // `extern` declarations are represented as normal `let` bindings with fake rhs expressions in FCS AST.
             // This is a workaround to mark such declarations and not to mark the non-existent expressions inside it.

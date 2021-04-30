@@ -1,0 +1,31 @@
+﻿unaffected by LineBreakAfterTypeReprAccessModifier
+  LineBreakAfterEqualsInTypeDecl = True
+namespace Namespace
+
+type E1 =
+  | A = 0
+  | B = 1
+
+type E2 =
+  | A = 0
+  | B = 1
+
+type E3 =
+  | A = 0 | B = 1
+
+type E4 =
+  A = 0 | B = 1
+================
+  LineBreakAfterEqualsInTypeDecl = False
+namespace Namespace
+
+type E1 =
+  | A = 0
+  | B = 1
+
+type E2 = | A = 0
+          | B = 1
+
+type E3 = | A = 0 | B = 1
+
+type E4 = A = 0 | B = 1

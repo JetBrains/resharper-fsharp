@@ -1071,13 +1071,8 @@ interface enumCaseLikeDeclaration:
   enumCaseDeclaration |
   unionCaseDeclaration;
 
-enumRepresentation options { stubBase="TypeRepresentationBase"; } extras {
-  get { methodName="EnumCases" path=<enumRepresentation:ENUM_CASE_LIST/enumCaseList:ENUM_CASE> };
-}:
+enumRepresentation options { stubBase="TypeRepresentationBase"; }:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  enumCaseList<ENUM_CASE_LIST, EnumCaseList>;
-
-enumCaseList:
   enumCaseDeclaration<ENUM_CASE, EnumCases>*;
 
 enumCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
@@ -1109,13 +1104,8 @@ recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase
   typeUsage<TYPE, Type>;
 
 
-unionRepresentation options { stubBase="TypeRepresentationBase"; } extras {
-  get { methodName="UnionCases" path=<unionRepresentation:UNION_CASE_LIST/unionCaseList:UNION_CASE> };
-}:
+unionRepresentation options { stubBase="TypeRepresentationBase"; }:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  unionCaseList<UNION_CASE_LIST, UnionCaseList>;
-
-unionCaseList:
   unionCaseDeclaration<UNION_CASE, UnionCases>*;
 
 
