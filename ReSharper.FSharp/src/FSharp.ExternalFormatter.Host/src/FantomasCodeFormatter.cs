@@ -8,7 +8,7 @@ using Microsoft.FSharp.Control;
 
 namespace FSharp.ExternalFormatter.Host
 {
-  internal class ExternalCodeFormatter
+  internal class FantomasCodeFormatter
   {
     private readonly FSharpChecker myChecker =
       FSharpChecker.Create(null, null, null, null, null, null, null, null, null, null);
