@@ -37,7 +37,7 @@ namespace FSharp.ExternalFormatter.Host
         options.LightSyntax, false, options.IsExe);
 
     private FormatConfig.FormatConfig Convert(RdFantomasFormatConfig config) =>
-      new FormatConfig.FormatConfig(config.IndentSize, config.MaxLineLength, myDefaultFormatConfig.SemicolonAtEndOfLine,
+      new FormatConfig.FormatConfig(config.IndentSize, config.MaxLineLength, config.SemicolonAtEndOfLine,
         config.SpaceBeforeParameter, config.SpaceBeforeLowercaseInvocation, config.SpaceBeforeUppercaseInvocation,
         config.SpaceBeforeClassConstructor, config.SpaceBeforeMember, config.SpaceBeforeColon, config.SpaceAfterComma,
         config.SpaceBeforeSemicolon, config.SpaceAfterSemicolon, config.IndentOnTryWith, config.SpaceAroundDelimiter,

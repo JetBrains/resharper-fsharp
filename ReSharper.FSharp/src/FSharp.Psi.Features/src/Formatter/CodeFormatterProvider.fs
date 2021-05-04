@@ -39,7 +39,8 @@ type CodeFormatterProvider(solution: ISolution, externalFormatterFactory: Extern
              settings.MaxValueBindingWidth, settings.MaxFunctionBindingWidth,
              settings.MultilineBlockBracketsOnSameColumn, settings.NewlineBetweenTypeDefinitionAndMembers,
              settings.KeepIfThenInSameLine, settings.MaxElmishWidth, settings.SingleArgumentWebMode,
-             settings.AlignFunctionSignatureToIndentation, settings.AlternativeLongMemberDefinitions)
+             settings.AlignFunctionSignatureToIndentation, settings.AlternativeLongMemberDefinitions,
+             settings.SemicolonAtEndOfLine)
 
     let convertParsingOptions (options: FSharpParsingOptions) =
         let lightSyntax =

@@ -51,6 +51,7 @@ object RdFSharpExternalFormatterModel : Root() {
         field("singleArgumentWebMode", bool)
         field("alignFunctionSignatureToIndentation", bool)
         field("alternativeLongMemberDefinitions", bool)
+        field("semicolonAtEndOfLine", bool)
     }
 
     private val rdFormatArgs = basestruct {
