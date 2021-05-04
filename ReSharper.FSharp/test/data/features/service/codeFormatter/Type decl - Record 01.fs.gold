@@ -1,0 +1,60 @@
+﻿DeclarationBodyOnTheSameLine = NEVER
+  unaffected by KeepExistingLineBreakBeforeDeclarationBody
+namespace Namespace
+
+type R1 =
+  { F: int }
+
+type R2 =
+  { F1: int
+    F2: int }
+
+type R3 =
+  { F: int }
+================
+DeclarationBodyOnTheSameLine = IF_OWNER_IS_SINGLE_LINE
+  KeepExistingLineBreakBeforeDeclarationBody = True
+namespace Namespace
+
+type R1 =
+  { F: int }
+
+type R2 =
+  { F1: int
+    F2: int }
+
+type R3 = { F: int }
+================
+  KeepExistingLineBreakBeforeDeclarationBody = False
+namespace Namespace
+
+type R1 = { F: int }
+
+type R2 =
+  { F1: int
+    F2: int }
+
+type R3 = { F: int }
+================
+DeclarationBodyOnTheSameLine = ALWAYS
+  KeepExistingLineBreakBeforeDeclarationBody = True
+namespace Namespace
+
+type R1 =
+  { F: int }
+
+type R2 =
+  { F1: int
+    F2: int }
+
+type R3 = { F: int }
+================
+  KeepExistingLineBreakBeforeDeclarationBody = False
+namespace Namespace
+
+type R1 = { F: int }
+
+type R2 = { F1: int
+            F2: int }
+
+type R3 = { F: int }

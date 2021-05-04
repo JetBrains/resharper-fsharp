@@ -1,5 +1,5 @@
-﻿unaffected by LineBreakAfterTypeReprAccessModifier
-  LineBreakAfterEqualsInTypeDecl = True
+﻿DeclarationBodyOnTheSameLine = NEVER
+  unaffected by KeepExistingLineBreakBeforeDeclarationBody
 namespace Namespace
 
 type E1 =
@@ -15,8 +15,12 @@ type E3 =
 
 type E4 =
   A = 0 | B = 1
+
+type E5 =
+  | A = 0 | B = 1
 ================
-  LineBreakAfterEqualsInTypeDecl = False
+DeclarationBodyOnTheSameLine = IF_OWNER_IS_SINGLE_LINE
+  KeepExistingLineBreakBeforeDeclarationBody = True
 namespace Namespace
 
 type E1 =
@@ -29,3 +33,56 @@ type E2 = | A = 0
 type E3 = | A = 0 | B = 1
 
 type E4 = A = 0 | B = 1
+
+type E5 =
+  | A = 0 | B = 1
+================
+  KeepExistingLineBreakBeforeDeclarationBody = False
+namespace Namespace
+
+type E1 =
+  | A = 0
+  | B = 1
+
+type E2 =
+  | A = 0
+  | B = 1
+
+type E3 = | A = 0 | B = 1
+
+type E4 = A = 0 | B = 1
+
+type E5 = | A = 0 | B = 1
+================
+DeclarationBodyOnTheSameLine = ALWAYS
+  KeepExistingLineBreakBeforeDeclarationBody = True
+namespace Namespace
+
+type E1 =
+  | A = 0
+  | B = 1
+
+type E2 = | A = 0
+          | B = 1
+
+type E3 = | A = 0 | B = 1
+
+type E4 = A = 0 | B = 1
+
+type E5 =
+  | A = 0 | B = 1
+================
+  KeepExistingLineBreakBeforeDeclarationBody = False
+namespace Namespace
+
+type E1 = | A = 0
+          | B = 1
+
+type E2 = | A = 0
+          | B = 1
+
+type E3 = | A = 0 | B = 1
+
+type E4 = A = 0 | B = 1
+
+type E5 = | A = 0 | B = 1

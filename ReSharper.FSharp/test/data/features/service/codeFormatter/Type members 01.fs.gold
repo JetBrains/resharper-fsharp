@@ -1,7 +1,6 @@
 ﻿module Module
 
-type B() =
-  class end
+type B() = class end
 
 type A(a) =
   inherit B()

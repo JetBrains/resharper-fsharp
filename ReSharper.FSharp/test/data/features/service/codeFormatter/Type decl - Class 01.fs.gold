@@ -1,0 +1,60 @@
+﻿DeclarationBodyOnTheSameLine = NEVER
+  unaffected by KeepExistingLineBreakBeforeDeclarationBody
+namespace Namespace
+
+type T1() =
+  class end
+
+type T2() =
+  class
+  end
+
+type T3() =
+  class end
+================
+DeclarationBodyOnTheSameLine = IF_OWNER_IS_SINGLE_LINE
+  KeepExistingLineBreakBeforeDeclarationBody = True
+namespace Namespace
+
+type T1() =
+  class end
+
+type T2() =
+  class
+  end
+
+type T3() = class end
+================
+  KeepExistingLineBreakBeforeDeclarationBody = False
+namespace Namespace
+
+type T1() = class end
+
+type T2() =
+  class
+  end
+
+type T3() = class end
+================
+DeclarationBodyOnTheSameLine = ALWAYS
+  KeepExistingLineBreakBeforeDeclarationBody = True
+namespace Namespace
+
+type T1() =
+  class end
+
+type T2() =
+  class
+  end
+
+type T3() = class end
+================
+  KeepExistingLineBreakBeforeDeclarationBody = False
+namespace Namespace
+
+type T1() = class end
+
+type T2() = class
+  end
+
+type T3() = class end

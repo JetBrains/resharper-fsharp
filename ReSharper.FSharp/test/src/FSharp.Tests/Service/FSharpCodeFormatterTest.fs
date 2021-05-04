@@ -7,8 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest>]
-[<TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
+[<FSharpTest; TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
 type FSharpCodeFormatterTest() =
     inherit CodeFormatterWithExplicitSettingsTestBase<FSharpLanguage>()
 
@@ -18,8 +17,10 @@ type FSharpCodeFormatterTest() =
         use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Class 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Access modifier``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record 01``() = x.DoNamedTest()
 
     [<Test; Explicit("Merge formatter branch")>]
     member x.``Top binding indent 01 - No indent``() = x.DoNamedTest()

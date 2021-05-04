@@ -1,4 +1,5 @@
 ﻿{
   LineBreakAfterTypeReprAccessModifier: all,
-  LineBreakAfterEqualsInTypeDecl: all,
+  DeclarationBodyOnTheSameLine: all,
+  KeepExistingLineBreakBeforeDeclarationBody: all
 }

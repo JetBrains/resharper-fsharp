@@ -12,8 +12,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [SettingsEntry(true, "Line break after type representation access modifier")]
     public bool LineBreakAfterTypeReprAccessModifier;
 
-    [SettingsEntry(true, "Line break after '=' in types")]
-    public bool LineBreakAfterEqualsInTypeDecl;
+    [SettingsEntry(true, "Keep line break after '=' in declarations")]
+    public bool KeepExistingLineBreakBeforeDeclarationBody;
+
+    [SettingsEntry(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE, "Place declaration body on the same line")]
+    public PlaceOnSameLineAsOwner DeclarationBodyOnTheSameLine;
 
     [SettingsEntry(false, "Semicolon at end of line")]
     [EditorConfigEntryAlias("semicolon_at_end_of_line", EditorConfigAliasType.LanguageSpecific)]

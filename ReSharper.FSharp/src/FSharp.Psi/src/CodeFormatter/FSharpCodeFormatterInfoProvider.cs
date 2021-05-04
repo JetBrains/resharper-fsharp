@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Calculated.Interface;
 using JetBrains.Application.Threading;
@@ -10,6 +12,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Services.Formatter;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Tree;
@@ -227,28 +230,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           Parent()
             .In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET)
             .Satisfies((node, context) => ((ISimpleTypeRepresentation) node).AccessModifier != null),
-          Right().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET))
-        .Switch(settings => settings.LineBreakAfterTypeReprAccessModifier, 
+          Right().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies(IsFirstNodeOfItsType))
+        .Switch(settings => settings.LineBreakAfterTypeReprAccessModifier,
           When(true).Return(IntervalFormatType.NewLine))
         .Build();
 
-      // todo: single line types: `type U = C of int`
-      Describe<FormattingRule>()
-        .Group(LineBreaksRuleGroup)
-        .Name("LineBreakAfterEqualsInTypeDecl")
-        .Where(Parent().In(ElementType.F_SHARP_TYPE_DECLARATION),
-          Right().In(ElementBitsets.TYPE_REPRESENTATION_BIT_SET).Satisfies((node, context) =>
-            node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS))
-        .Switch(settings => settings.LineBreakAfterEqualsInTypeDecl, When(true).Return(IntervalFormatType.NewLine))
-        .Build();
-      
+      DescribeLineBreakInNode("TypeDeclaration", Node().In(ElementType.F_SHARP_TYPE_DECLARATION),
+        Node().In(ElementBitsets.TYPE_REPRESENTATION_BIT_SET).Satisfies((node, context) =>
+          node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS),
+        key => key.DeclarationBodyOnTheSameLine, key => key.KeepExistingLineBreakBeforeDeclarationBody);
+
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
         .Name("SpaceAfterImplicitConstructorDecl")
         .Where(Left().HasType(ElementType.PRIMARY_CONSTRUCTOR_DECLARATION))
         .Return(IntervalFormatType.Space)
         .Build();
-      
+
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
         .Name("SpacesInMemberConstructorDecl")
@@ -300,6 +298,65 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           Parent().HasType(parameters.parentType),
           Node().HasRole(parameters.childRole))
         .Return(IndentType.External)
+        .Build();
+    }
+
+    private void DescribeLineBreakInNode(string name,
+      IBuilderAction<IBlankWithSinglePattern> containingNodesPattern,
+      IBuilderAction<IBlankWithSinglePattern> equalsBeforeNodesPattern,
+      Expression<Func<FSharpFormatSettingsKey, object>> onSameLine,
+      Expression<Func<FSharpFormatSettingsKey, object>> keepExistingLineBreak)
+    {
+      var containingNodes = containingNodesPattern.BuildBlank();
+      var equalsBeforeNodes = equalsBeforeNodesPattern.BuildBlank();
+
+      Describe<WrapRule>()
+        .Name($"{name}Wrap")
+        .Where(Node().Is(containingNodes))
+        .Switch(keepExistingLineBreak,
+          When(false).Switch(onSameLine,
+            When(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE)
+              .Return(WrapType.Chop | WrapType.PseudoStartBeforeExternal)))
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name($"{name}NewLine")
+        .Where(
+          Parent().Is(containingNodes),
+          Right().Is(equalsBeforeNodes))
+        .Group(LineBreaksRuleGroup | WrapRuleGroup)
+        .Switch(keepExistingLineBreak,
+          When(true)
+            .Switch(onSameLine,
+              When(PlaceOnSameLineAsOwner.NEVER).Return(IntervalFormatType.NewLine),
+              When(PlaceOnSameLineAsOwner.ALWAYS, PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE)
+                .Return(IntervalFormatType.DoNotRemoveUserNewLines)),
+          When(false)
+            .Switch(onSameLine,
+              When(PlaceOnSameLineAsOwner.NEVER).Return(IntervalFormatType.NewLine),
+              When(PlaceOnSameLineAsOwner.ALWAYS).Return(IntervalFormatType.RemoveUserNewLines),
+              When(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE)
+                .Return(IntervalFormatType.RemoveUserNewLines | IntervalFormatType.InsertNewLineConditionally)))
+        .Build();
+
+      // initial impl (keeps formatting instead of keeping existing line break only):
+        // .Switch(keepExistingLineBreak,
+        // When(true).Return(IntervalFormatType.DoNotRemoveUserNewLines),
+        // When(false)
+        //   .Switch(onSameLine,
+        //     When(PlaceOnSameLineAsOwner.NEVER).Return(IntervalFormatType.NewLine),
+        //     When(PlaceOnSameLineAsOwner.ALWAYS).Return(IntervalFormatType.RemoveUserNewLines),
+        //     When(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE)
+        //       .Return(IntervalFormatType.RemoveUserNewLines | IntervalFormatType.InsertNewLineConditionally)))
+
+      Describe<FormattingRule>()
+        .Name($"{name}Space")
+        .Where(
+          Parent().Is(containingNodes),
+          Right().Is(equalsBeforeNodes))
+        .Group(SpaceRuleGroup)
+        .Return(IntervalFormatType.Space)
+        .Priority(3)
         .Build();
     }
 
