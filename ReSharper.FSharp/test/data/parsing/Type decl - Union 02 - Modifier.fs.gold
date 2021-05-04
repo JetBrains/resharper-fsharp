@@ -14,16 +14,15 @@ IFSharpImplFile
           FSharpTokenType+PrivateTokenElement(type:PRIVATE, text:private)
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
-          IUnionCaseList
-            IUnionCaseDeclaration
-              FSharpTokenType+BarTokenElement(type:BAR, text:|)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:A)
-            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
-            IUnionCaseDeclaration
-              FSharpTokenType+BarTokenElement(type:BAR, text:|)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:B)
+          IUnionCaseDeclaration
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:A)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
+          IUnionCaseDeclaration
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:B)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

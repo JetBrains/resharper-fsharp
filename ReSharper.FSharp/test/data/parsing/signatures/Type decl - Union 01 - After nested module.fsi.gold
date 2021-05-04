@@ -45,27 +45,26 @@ IFSharpSigFile
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         IUnionRepresentation
-          IUnionCaseList
-            IUnionCaseDeclaration
-              FSharpTokenType+BarTokenElement(type:BAR, text:|)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:NotYetDone)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+OfTokenElement(type:OF, text:of)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IUnionCaseFieldDeclarationList
-                IUnionCaseFieldDeclaration
-                  IParenTypeUsage
-                    FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                    INamedTypeUsage
-                      ITypeReferenceName
-                        FSharpIdentifierToken(type:IDENTIFIER, text:Eventually)
-                        IPrefixAppTypeArgumentList
-                          FSharpTokenType+LessTokenElement(type:LESS, text:<)
-                          INamedTypeUsage
-                            ITypeReferenceName
-                              FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                          FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
-                    FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IUnionCaseDeclaration
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:NotYetDone)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+OfTokenElement(type:OF, text:of)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IUnionCaseFieldDeclarationList
+              IUnionCaseFieldDeclaration
+                IParenTypeUsage
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  INamedTypeUsage
+                    ITypeReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:Eventually)
+                      IPrefixAppTypeArgumentList
+                        FSharpTokenType+LessTokenElement(type:LESS, text:<)
+                        INamedTypeUsage
+                          ITypeReferenceName
+                            FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                        FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

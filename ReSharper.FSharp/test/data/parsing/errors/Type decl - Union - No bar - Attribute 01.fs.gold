@@ -15,22 +15,21 @@ IFSharpImplFile
           FSharpIdentifierToken(type:IDENTIFIER, text:A)
           FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IUnionCaseList
-            IUnionCaseDeclaration
-              FSharpIdentifierToken(type:IDENTIFIER, text:A)
-            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-            IUnionCaseDeclaration
-              FSharpTokenType+BarTokenElement(type:BAR, text:|)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:B)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+OfTokenElement(type:OF, text:of)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IUnionCaseFieldDeclarationList
-                IUnionCaseFieldDeclaration
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
+          IUnionCaseDeclaration
+            FSharpIdentifierToken(type:IDENTIFIER, text:A)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+          IUnionCaseDeclaration
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:B)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+OfTokenElement(type:OF, text:of)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IUnionCaseFieldDeclarationList
+              IUnionCaseFieldDeclaration
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

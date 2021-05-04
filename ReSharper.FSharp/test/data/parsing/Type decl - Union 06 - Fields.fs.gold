@@ -11,45 +11,44 @@ IFSharpImplFile
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         IUnionRepresentation
-          IUnionCaseList
-            IUnionCaseDeclaration
-              FSharpTokenType+BarTokenElement(type:BAR, text:|)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:A)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+OfTokenElement(type:OF, text:of)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IUnionCaseFieldDeclarationList
-                IUnionCaseFieldDeclaration
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
-            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-            IUnionCaseDeclaration
-              FSharpTokenType+BarTokenElement(type:BAR, text:|)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:B)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+OfTokenElement(type:OF, text:of)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IUnionCaseFieldDeclarationList
-                IUnionCaseFieldDeclaration
-                  FSharpIdentifierToken(type:IDENTIFIER, text:named)
-                  FSharpTokenType+ColonTokenElement(type:COLON, text::)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
+          IUnionCaseDeclaration
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:A)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+OfTokenElement(type:OF, text:of)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IUnionCaseFieldDeclarationList
+              IUnionCaseFieldDeclaration
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+          IUnionCaseDeclaration
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:B)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+OfTokenElement(type:OF, text:of)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IUnionCaseFieldDeclarationList
+              IUnionCaseFieldDeclaration
+                FSharpIdentifierToken(type:IDENTIFIER, text:named)
+                FSharpTokenType+ColonTokenElement(type:COLON, text::)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                FSharpTokenType+StarTokenElement(type:STAR, text:*)
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+StarTokenElement(type:STAR, text:*)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IUnionCaseFieldDeclaration
+                FSharpIdentifierToken(type:IDENTIFIER, text:other)
+                FSharpTokenType+ColonTokenElement(type:COLON, text::)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                IUnionCaseFieldDeclaration
-                  FSharpIdentifierToken(type:IDENTIFIER, text:other)
-                  FSharpTokenType+ColonTokenElement(type:COLON, text::)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
