@@ -29,6 +29,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     {
     }
 
+    protected readonly NodeTypeSet Comments =
+      new NodeTypeSet(FSharpTokenType.LINE_COMMENT, FSharpTokenType.BLOCK_COMMENT);
+
     protected readonly NodeTypeSet AccessModifiers =
       new NodeTypeSet(FSharpTokenType.PUBLIC, FSharpTokenType.INTERNAL, FSharpTokenType.PRIVATE);
 
@@ -39,6 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Indenting();
       Aligning();
       Formatting();
+      BlankLines();
     }
 
     public override ProjectFileType MainProjectFileType => FSharpProjectFileType.Instance;
@@ -194,7 +198,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .ToList()
         .ForEach(DescribeSimpleAlignmentRule);
 
-      Describe<IndentingRule>().Name("EnumCaseLikeDeclarations")
+      Describe<IndentingRule>()
+        .Name("EnumCaseLikeDeclarations")
         .Where(Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET),
           Left().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies(IsFirstNodeOfItsType))
         .CloseNodeGetter((node, context) => node.Parent?.LastChild)
@@ -288,6 +293,58 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build()
         .AndViceVersa()
         .Build();
+    }
+
+    private void BlankLines()
+    {
+      Describe<BlankLinesAroundNodeRule>()
+         .AddNodesToGroupBefore(Node().In(Comments))
+         .AddNodesToGroupAfter(Node().In(Comments))
+         .AllowedNodesBefore(Node().Satisfies((node, checker) => true))
+         .AllowedNodesAfter(Node().Satisfies((node, checker) => true))
+         .Priority(1)
+         .StartAlternating()
+         .Name("BlankLinesAroundModuleMembers") // todo: rename option to decls
+         .Where(Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET.Union(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Union(ElementBitsets.F_SHARP_TYPE_MEMBER_DECLARATION_BIT_SET))) //todo: except primary ctor
+         .MinBlankLines(it => it.BlankLinesAroundMultilineModuleMembers)
+         .MinBlankLinesForSingleLine(it => it.BlankLinesAroundSingleLineModuleMember)
+         .Build()
+         .Name("BlankLinesAroundDifferentModuleMemberTypes")
+         .Where(Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET))
+         .MinBlankLines(it => it.BlankLinesAroundDifferentModuleMembers)
+         .AdditionalCheckForBlankLineAfter((node, context) =>
+           node.GetNextMeaningfulSibling()?.NodeType is var nodeType &&
+           nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType]) // todo: why check bitset?
+         .AdditionalCheckForBlankLineBefore((node, context) =>
+           node.GetPreviousMeaningfulSibling()?.NodeType is var nodeType &&
+           nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType])
+         .Build()
+         .Name("BlankLinesBeforeFirstTopLevelModuleMember")
+         .Where(
+           Parent().In(ElementBitsets.TOP_LEVEL_MODULE_LIKE_DECLARATION_BIT_SET),
+           Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET)
+             .Satisfies(IsFirstNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET)))
+         .MinBlankLinesBefore(it => it.BlankLinesBeforeFirstMemberInTopLevelModule)
+         .Build()
+         .Name("BlankLinesBeforeFirstNestedModuleMember")
+         .Where(
+           Parent().In(ElementType.NESTED_MODULE_DECLARATION),
+           Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET)
+             .Satisfies(IsFirstNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET)))
+         .MinBlankLinesBefore(it => it.BlankLinesBeforeFirstMemberInNestedModule)
+         .Build()
+         .Name("BlankLinesAroundModules")
+         .Where(Node().In(ElementBitsets.TOP_LEVEL_MODULE_LIKE_DECLARATION_BIT_SET))
+         .MinBlankLines(it => it.BlankLineAroundTopLevelModules)
+         .Build();
+
+       // todo: test sig files
+       Describe<BlankLinesRule>()
+         .Name("BlankLinesInDecls")
+         .Group(MaxLineBreaks)
+         .Where(Parent().In(ElementBitsets.MODULE_LIKE_DECLARATION_BIT_SET.Union(ElementBitsets.F_SHARP_FILE_BIT_SET))) // todo: why file bitset is needed?
+         .SwitchBlankLines(it => it.KeepMaxBlankLineAroundModuleMembers, true, BlankLineLimitKind.LimitMaximumMild) // todo: what does mild mean?
+         .Build();
     }
 
     private void DescribeSimpleIndentingRule((string name, CompositeNodeType parentType, short childRole) parameters)

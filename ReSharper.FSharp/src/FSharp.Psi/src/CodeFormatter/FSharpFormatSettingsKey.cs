@@ -18,6 +18,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [SettingsEntry(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE, "Place declaration body on the same line")]
     public PlaceOnSameLineAsOwner DeclarationBodyOnTheSameLine;
 
+    [SettingsEntry(2, "todo")]
+    public int BlankLineAroundTopLevelModules;
+
+    [SettingsEntry(1, "todo")]
+    public int BlankLinesBeforeFirstMemberInTopLevelModule;
+
+    [SettingsEntry(0, "todo")]
+    public int BlankLinesBeforeFirstMemberInNestedModule;
+
+    [SettingsEntry(0, "todo")]
+    public int BlankLinesAroundSingleLineModuleMember;
+
+    [SettingsEntry(1, "todo")]
+    public int BlankLinesAroundMultilineModuleMembers;
+
+    [SettingsEntry(1, "todo")]
+    public int BlankLinesAroundDifferentModuleMembers;
+
+    [SettingsEntry(2, "todo")]
+    public int KeepMaxBlankLineAroundModuleMembers;
+
     [SettingsEntry(false, "Semicolon at end of line")]
     [EditorConfigEntryAlias("semicolon_at_end_of_line", EditorConfigAliasType.LanguageSpecific)]
     public bool SemicolonAtEndOfLine;

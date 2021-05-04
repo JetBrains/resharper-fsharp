@@ -17,6 +17,9 @@ type FSharpCodeFormatterTest() =
         use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
+    [<Test>] member x.``Blank lines - Namespace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Blank lines - Namespace 02 - Comment``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Class 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Access modifier``() = x.DoNamedTest()
