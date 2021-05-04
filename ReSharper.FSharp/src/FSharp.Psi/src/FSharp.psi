@@ -151,6 +151,7 @@ bindingSignature extras {
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   VAL<VAL, BindingKeyword>
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   INLINE<INLINE, InlineKeyword>?
   MUTABLE<MUTABLE, MutableKeyword>?
   referencePat<HEAD_PATTERN, HeadPattern>
@@ -188,6 +189,7 @@ topBinding extras {
   REC<REC, RecKeyword>?
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
@@ -210,6 +212,7 @@ localBinding extras {
   REC<REC, RecKeyword>?
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*

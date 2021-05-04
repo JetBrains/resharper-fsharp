@@ -12,6 +12,9 @@ type ToLiteralTest() =
     [<Test>] member x.``Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Existing attributes``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Existing attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Let 04 - Mutable``() = x.DoNamedTest()
+    [<Test>] member x.``Let 05 - Private``() = x.DoNamedTest()
+    [<Test>] member x.``Let 06 - Mutable private``() = x.DoNamedTest()
 
 type ToLiteralAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<ToLiteralAction>()

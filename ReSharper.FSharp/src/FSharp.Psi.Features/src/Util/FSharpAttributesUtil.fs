@@ -148,6 +148,14 @@ let addAttributeListToLetBinding newLine (binding: IBinding) =
         if isNotNull inlineKeyword then
             addAttributeList false inlineKeyword else
 
+        let mutableKeyword = binding.MutableKeyword
+        if isNotNull mutableKeyword then
+            addAttributeList false mutableKeyword else
+
+        let accessModifier = binding.AccessModifier
+        if isNotNull accessModifier then
+            addAttributeList false accessModifier else
+
         let headPattern = binding.HeadPattern
         if isNotNull headPattern then
             addAttributeList false headPattern else
