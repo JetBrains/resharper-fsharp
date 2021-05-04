@@ -1,7 +1,7 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
-    IDoStatement
+    IExpressionStatement
       IChameleonExpression
         IObjExpr
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)

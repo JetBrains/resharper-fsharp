@@ -3,7 +3,7 @@ IFSharpImplFile
   IAnonModuleDeclaration
     FSharpTokenType+IfTokenElement(type:IF, text:if)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-    IDoStatement
+    IExpressionStatement
       IChameleonExpression
         IFromErrorExpr
           IReferenceExpr

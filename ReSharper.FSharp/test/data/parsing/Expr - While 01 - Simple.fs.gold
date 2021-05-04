@@ -1,7 +1,7 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
-    IDoStatement
+    IExpressionStatement
       IChameleonExpression
         IWhileExpr
           FSharpTokenType+WhileTokenElement(type:WHILE, text:while)

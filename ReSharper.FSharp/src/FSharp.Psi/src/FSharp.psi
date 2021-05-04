@@ -138,7 +138,7 @@ interface moduleMember  options { customParseFunction; noInternalParseFunction; 
   externDeclaration |
   moduleAbbreviationDeclaration |
   openStatement |
-  doStatement |
+  doLikeStatement |
   hashDirective |
   bindingSignature;
 
@@ -1474,12 +1474,23 @@ openStatement:
   TYPE<TYPE, TypeKeyword>?
   typeReferenceName<TYPE_REFERENCE, ReferenceName>;
 
+interface doLikeStatement:
+  doStatement |
+  expressionStatement;
+
 doStatement options { stubBase="DummyDeclaration"; } extras {
     get { methodName="Attributes" path=<doStatement:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
     get { methodName="Expression" path=<doStatement:CHAMELEON_EXPR/chameleonExpression:EXPR> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   DO<DO, DoKeyword>?
+  chameleonExpression<CHAMELEON_EXPR, DoExpression>;
+
+expressionStatement options { stubBase="DummyDeclaration"; } extras {
+    get { methodName="Attributes" path=<expressionStatement:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+    get { methodName="Expression" path=<expressionStatement:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   chameleonExpression<CHAMELEON_EXPR, DoExpression>;
 
 

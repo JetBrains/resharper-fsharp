@@ -13,7 +13,7 @@ type A(a) =
 
   member x.B() = ()
 
-  abstract member C : unit -> unit
+  abstract member C: unit -> unit
   default x.C() = ()
 
   member val D = ()

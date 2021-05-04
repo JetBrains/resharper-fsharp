@@ -156,8 +156,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
         if isNotNull letBindings then letBindings :> _ else
 
-        let doStmt = DoStatementNavigator.GetByExpression(contextExpr)
-        if isNotNull doStmt && doStmt.IsImplicit then doStmt :> _ else null
+        let exprStmt = ExpressionStatementNavigator.GetByExpression(contextExpr)
+        if isNotNull exprStmt then exprStmt :> _ else null
 
     let createBinding (context: IFSharpExpression) (contextDecl: IModuleMember) name: ILetBindings =
         let elementFactory = context.CreateElementFactory()
@@ -253,7 +253,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             typeDeclaration.DeclaredElement
 
         let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
-        let contextIsImplicitDo = sourceExpr == contextExpr && contextDecl :? IDoStatement
+        let contextIsImplicitDo = sourceExpr == contextExpr && contextDecl :? IDoLikeStatement
         let isInSingleLineContext = isNull contextDecl && isSingleLineContext contextExpr
 
         let isInSeqExpr =

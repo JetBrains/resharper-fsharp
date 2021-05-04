@@ -49,13 +49,13 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let moduleMember = getModuleMember source
         moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations.[0] :?> IFSharpTypeDeclaration
 
-    let getDoDecl source =
+    let getExpressionStatement source =
         let moduleMember = getModuleMember source
-        moduleMember.As<IDoStatement>().NotNull()
+        moduleMember.As<IExpressionStatement>().NotNull()
 
     let getExpression source =
-        let doDecl = getDoDecl source
-        doDecl.Expression.NotNull()
+        let exprStatement = getExpressionStatement source
+        exprStatement.Expression.NotNull()
 
     let createAppExpr addSpace =
         let space = if addSpace then " " else ""
@@ -63,7 +63,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         getExpression source :?> IPrefixAppExpr
 
     let createLetBinding bindingName =
-        let source = sprintf "do (let %s = ())" bindingName
+        let source = sprintf "(let %s = ())" bindingName
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
@@ -85,10 +85,10 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         typeDecl.TypeMembers.[0] :?> IMemberDeclaration
 
     let createAttributeList attrName: IAttributeList =
-            let source = sprintf "[<%s>] ()" attrName
-            let doDecl = getDoDecl source
-            doDecl.AttributeLists.[0]
-            
+        let source = sprintf "[<%s>] ()" attrName
+        let exprStatement = getExpressionStatement source
+        exprStatement.AttributeLists.[0]
+
     let createTypeUsage usage: ITypeUsage =
         let expr = createLetBinding (sprintf "(a: %s)" usage)
         expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().Type
@@ -225,7 +225,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             getExpression (typeReference.GetText()) :?> _
 
         member x.CreateReferenceExpr(name) =
-            let source = sprintf "do %s" name
+            let source = sprintf "%s" name
             getExpression source :?> IReferenceExpr
 
         member x.CreateForEachExpr(expr) =

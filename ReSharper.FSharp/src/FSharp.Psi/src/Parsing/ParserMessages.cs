@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_ENUM_CASE_LIKE_DECLARATION = "";
     public const string IDS_UNION_CASE_LIKE_DECLARATION = "";
     public const string IDS_CASE_FIELD_DECLARATION = "";
-    public const string IDS_F_SHARP_TYPE_MEMBER_DECLARATION = "";
+    public const string IDS_DO_LIKE_STATEMENT = "";
     public const string IDS_OVERRIDABLE_MEMBER_DECLARATION = "";
     public const string IDS_INHERIT_MEMBER = "";
     public const string IDS_CONSTRUCTOR_SIGNATURE_OR_DECLARATION = "";
@@ -34,7 +34,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_NAMED_PAT = "";
     public const string IDS_TYPED_LIKE_PAT = "";
     public const string IDS_ARRAY_OR_LIST_PAT = "";
-    public const string IDS_LET_BINDINGS = "";
     public const string IDS_BINDING = "";
     public const string IDS_BINDING_LIKE_DECLARATION = "";
     public const string IDS_IDENT_OR_OP_NAME = "";

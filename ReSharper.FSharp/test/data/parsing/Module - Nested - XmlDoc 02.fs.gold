@@ -5,7 +5,7 @@ IFSharpImplFile
     DocComment(type:LINE_COMMENT, text:/// A)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    IDoStatement
+    IExpressionStatement
       IChameleonExpression
         IUnitExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
@@ -22,7 +22,7 @@ IFSharpImplFile
       FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-      IDoStatement
+      IExpressionStatement
         IChameleonExpression
           IUnitExpr
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()

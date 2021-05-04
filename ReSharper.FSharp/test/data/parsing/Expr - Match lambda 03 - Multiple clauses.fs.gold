@@ -1,7 +1,7 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
-    IDoStatement
+    IExpressionStatement
       IChameleonExpression
         IMatchLambdaExpr
           FSharpTokenType+FunctionTokenElement(type:FUNCTION, text:function)

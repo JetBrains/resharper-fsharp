@@ -174,8 +174,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Name("DoDeclIndent")
         .Where(
           Parent()
-            .HasType(ElementType.DO_STATEMENT)
-            .Satisfies((node, _) => !((IDoStatement) node).IsImplicit),
+            .HasType(ElementType.DO_STATEMENT),
           Node().HasRole(DoStatement.CHAMELEON_EXPR))
         .Return(IndentType.External)
         .Build();

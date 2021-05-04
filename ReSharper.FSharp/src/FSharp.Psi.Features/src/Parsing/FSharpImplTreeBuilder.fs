@@ -116,7 +116,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
             let expr = x.RemoveDoExpr(expr)
             x.MarkChameleonExpression(expr)
-            x.Done(range, mark, ElementType.DO_STATEMENT)
+
+            let elementType = if range = expr.Range then ElementType.EXPRESSION_STATEMENT else ElementType.DO_STATEMENT
+            x.Done(range, mark, elementType)
 
         | SynModuleDecl.Attributes(attributeLists, range) ->
             let mark = x.Mark(range)
