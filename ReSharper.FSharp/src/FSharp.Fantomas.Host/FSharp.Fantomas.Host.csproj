@@ -2,14 +2,14 @@
 
     <PropertyGroup>
         <TargetFramework>net461</TargetFramework>
-        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host</AssemblyName>
+        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</AssemblyName>
         <OutputType>Exe</OutputType>
-        <SignAssembly>false</SignAssembly>
         <LangVersion>$(CSharpLanguageVersion)</LangVersion>
+        <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FSharp.ExternalFormatter.Protocol\FSharp.ExternalFormatter.Protocol.csproj" />
+      <ProjectReference Include="..\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host.runtimeconfig.json">
+      <None Update="JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.runtimeconfig.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

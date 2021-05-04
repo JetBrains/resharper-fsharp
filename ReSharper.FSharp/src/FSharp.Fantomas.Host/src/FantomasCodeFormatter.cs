@@ -2,11 +2,11 @@ using Fantomas;
 using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Diagnostics;
 using FSharp.Compiler.Text;
-using JetBrains.Rider.FSharp.ExternalFormatter.Client;
+using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
 
-namespace FSharp.ExternalFormatter.Host
+namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
   internal class FantomasCodeFormatter
   {

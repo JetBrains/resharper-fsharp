@@ -9,23 +9,22 @@ using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
 using JetBrains.Rd;
-using JetBrains.Rider.FSharp.ExternalFormatter.Server;
+using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client;
 using JetBrains.Util;
 
-namespace FSharp.ExternalFormatter.Protocol
+namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 {
-  public class
-    ExternalFormatterProcess : ProtocolExternalProcess<RdFSharpExternalFormatterModel, ExternalFormatterConnection>
+  public class FantomasProcess : ProtocolExternalProcess<RdFantomasModel, FantomasConnection>
   {
     protected override string Name => "External Formatter";
 
-    protected override RdFSharpExternalFormatterModel CreateModel(Lifetime lifetime, IProtocol protocol) =>
-      new RdFSharpExternalFormatterModel(lifetime, protocol);
+    protected override RdFantomasModel CreateModel(Lifetime lifetime, IProtocol protocol) =>
+      new RdFantomasModel(lifetime, protocol);
 
-    protected override ExternalFormatterConnection CreateConnection(Lifetime lifetime,
-      RdFSharpExternalFormatterModel model, IProtocol protocol, StartupOutputWriter outputWriter, int processId,
+    protected override FantomasConnection CreateConnection(Lifetime lifetime,
+      RdFantomasModel model, IProtocol protocol, StartupOutputWriter outputWriter, int processId,
       Signal<int> processUnexpectedExited) =>
-      new ExternalFormatterConnection(lifetime, model, protocol, outputWriter, processId,
+      new FantomasConnection(lifetime, model, protocol, outputWriter, processId,
         processUnexpectedExited);
 
     protected override ProcessStartInfo GetProcessStartInfo(int port)
@@ -56,13 +55,13 @@ namespace FSharp.ExternalFormatter.Protocol
       };
     }
 
-    protected override bool Shutdown(RdFSharpExternalFormatterModel model)
+    protected override bool Shutdown(RdFantomasModel model)
     {
       model.Proto.Scheduler.Queue(() => model.Exit.Fire(Unit.Instance));
       return true;
     }
 
-    public ExternalFormatterProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
+    public FantomasProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
       IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request)
       : base(lifetime, logger, locks, processInfoPatcher, request)
     {

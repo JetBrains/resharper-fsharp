@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace FSharp.ExternalFormatter.Host
+namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
   public static class Program
   {
     public static void Main(string[] args)
     {
-      AppDomain.CurrentDomain.AssemblyResolve += ExternalFormatterAssemblyResolver.Resolve;
+      AppDomain.CurrentDomain.AssemblyResolve += RiderAssemblyResolver.Resolve;
       MainInternal(args);
     }
 

@@ -7,7 +7,7 @@ import com.jetbrains.rd.generator.nova.csharp.CSharp50Generator
 import java.io.File
 
 @Suppress("unused")
-object RdFSharpExternalFormatterModel : Root() {
+object RdFantomasModel : Root() {
 
     private val rdFcsParsingOptions = structdef {
         field("lastSourceFile", string)

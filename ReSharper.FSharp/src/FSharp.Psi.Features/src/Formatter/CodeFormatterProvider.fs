@@ -3,15 +3,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
-open FSharp.ExternalFormatter.Protocol
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.Rd.Tasks
-open JetBrains.Rider.FSharp.ExternalFormatter.Server
+open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client
+open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 
 [<SolutionComponent>]
-type CodeFormatterProvider(solution: ISolution, externalFormatterFactory: ExternalFormatterProcessFactory) =
-    let mutable connection: ExternalFormatterConnection = null
+type CodeFormatterProvider(solution: ISolution, fantomasFactory: FantomasProcessFactory) =
+    let mutable connection: FantomasConnection = null
 
     let isConnectionAlive () =
         isNotNull connection && connection.IsActive
@@ -19,7 +19,7 @@ type CodeFormatterProvider(solution: ISolution, externalFormatterFactory: Extern
     let connect () =
         if isConnectionAlive () then () else
         let formatterHostLifetime = Lifetime.Define(solution.GetLifetime())
-        connection <- externalFormatterFactory.Create(formatterHostLifetime.Lifetime).Run()
+        connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime).Run()
 
     let execute (action: unit -> string) =
         connect ()

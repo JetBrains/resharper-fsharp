@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace FSharp.ExternalFormatter.Host
+namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
-  public static class ExternalFormatterAssemblyResolver
+  public static class RiderAssemblyResolver
   {
     private const string AdditionalProbingPathsEnvVar = "RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS";
     private static readonly List<string> OurAdditionalProbingPaths = new List<string>();
 
-    static ExternalFormatterAssemblyResolver()
+    static RiderAssemblyResolver()
     {
       var paths = Environment.GetEnvironmentVariable(AdditionalProbingPathsEnvVar);
       if (string.IsNullOrWhiteSpace(paths)) return;

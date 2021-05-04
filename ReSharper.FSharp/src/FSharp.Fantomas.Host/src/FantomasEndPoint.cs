@@ -1,17 +1,17 @@
-﻿using FSharp.ExternalFormatter.Protocol;
-using JetBrains.Collections.Viewable;
+﻿using JetBrains.Collections.Viewable;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
 using JetBrains.Platform.RdFramework.ExternalProcess.Util;
 using JetBrains.Rd.Impl;
-using JetBrains.Rider.FSharp.ExternalFormatter.Client;
 using JetBrains.Util;
 using JetBrains.Rd.Tasks;
+using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol;
+using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
 
-namespace FSharp.ExternalFormatter.Host
+namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
-  internal class ExternalFormatterEndPoint : ProtocolEndPoint<RdFSharpExternalFormatterModel, RdSimpleDispatcher>
+  internal class ExternalFormatterEndPoint : ProtocolEndPoint<RdFantomasModel, RdSimpleDispatcher>
   {
     private readonly FantomasCodeFormatter myCodeFormatter;
     protected override string ProtocolName => "External Formatter Host";
@@ -27,9 +27,9 @@ namespace FSharp.ExternalFormatter.Host
     protected override void InitLogger(Lifetime lifetime, string path) =>
       ProtocolEndPointUtil.InitLogger(path, lifetime, LoggingLevel.TRACE);
 
-    protected override RdFSharpExternalFormatterModel InitModel(Lifetime lifetime, JetBrains.Rd.Impl.Protocol protocol)
+    protected override RdFantomasModel InitModel(Lifetime lifetime, JetBrains.Rd.Impl.Protocol protocol)
     {
-      var model = new RdFSharpExternalFormatterModel(lifetime, protocol);
+      var model = new RdFantomasModel(lifetime, protocol);
 
       model.FormatSelection.Set(FormatSelection);
       model.FormatDocument.Set(FormatDocument);

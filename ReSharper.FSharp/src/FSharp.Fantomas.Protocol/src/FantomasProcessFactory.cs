@@ -5,16 +5,16 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.Util;
 
-namespace FSharp.ExternalFormatter.Protocol
+namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 {
   [SolutionComponent]
-  public class ExternalFormatterProcessFactory
+  public class FantomasProcessFactory
   {
     [NotNull] private readonly ISolutionProcessStartInfoPatcher mySolutionProcessStartInfoPatcher;
     [NotNull] private readonly ILogger myLogger;
     [NotNull] private readonly IShellLocks myShellLocks;
 
-    public ExternalFormatterProcessFactory(
+    public FantomasProcessFactory(
       [NotNull] ISolutionProcessStartInfoPatcher solutionProcessStartInfoPatcher,
       [NotNull] ILogger logger,
       [NotNull] IShellLocks shellLocks)
@@ -24,9 +24,9 @@ namespace FSharp.ExternalFormatter.Protocol
       myShellLocks = shellLocks;
     }
 
-    public ExternalFormatterProcess Create(Lifetime lifetime)
+    public FantomasProcess Create(Lifetime lifetime)
     {
-      return new ExternalFormatterProcess(lifetime,
+      return new FantomasProcess(lifetime,
         myLogger,
         myShellLocks,
         mySolutionProcessStartInfoPatcher,

@@ -128,13 +128,13 @@ val typeProvidersFiles = listOf(
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader5.win.runtimeconfig.json",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader5.unix.runtimeconfig.json")
 
-val externalFormatterFiles = listOf(
-        "FSharp.ExternalFormatter.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Protocol.dll",
-        "FSharp.ExternalFormatter.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Protocol.pdb",
-        "FSharp.ExternalFormatter.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host.exe",
-        "FSharp.ExternalFormatter.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host.runtimeconfig.json",
-        "FSharp.ExternalFormatter.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host.pdb",
-        "FSharp.ExternalFormatter.Host/bin/$buildConfiguration/net461/Fantomas.dll")
+val fantomasFiles = listOf(
+        "FSharp.Fantomas.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.dll",
+        "FSharp.Fantomas.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.pdb",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.exe",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.runtimeconfig.json",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/Fantomas.dll")
 
 val dotNetSdkPath by lazy {
     val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
@@ -166,8 +166,8 @@ configure<RdGenExtension> {
     val typeProviderClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Client")
     val typeProviderServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Server")
 
-    val externalFormatterServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.ExternalFormatter.Protocol/src/Server")
-    val externalFormatterClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.ExternalFormatter.Protocol/src/Client")
+    val fantomasServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.Fantomas.Protocol/src/Server")
+    val fantomasClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.Fantomas.Protocol/src/Client")
 
     verbose = true
     hashFolder = "build/rdgen"
@@ -216,22 +216,22 @@ configure<RdGenExtension> {
     generator {
         language = "csharp"
         transform = "asis"
-        root = "model.RdFSharpExternalFormatterModel"
-        namespace = "JetBrains.Rider.FSharp.ExternalFormatter.Server"
-        directory = "$externalFormatterServerOutput"
+        root = "model.RdFantomasModel"
+        namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client"
+        directory = "$fantomasClientOutput"
     }
     generator {
         language = "csharp"
         transform = "reversed"
-        root = "model.RdFSharpExternalFormatterModel"
-        namespace = "JetBrains.Rider.FSharp.ExternalFormatter.Client"
-        directory = "$externalFormatterClientOutput"
+        root = "model.RdFantomasModel"
+        namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server"
+        directory = "$fantomasServerOutput"
     }
 }
 
 tasks {
     withType<PrepareSandboxTask> {
-        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" } + typeProvidersFiles + externalFormatterFiles
+        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" } + typeProvidersFiles + fantomasFiles
         files = files.map { "$resharperPluginPath/src/$it" }
 
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {

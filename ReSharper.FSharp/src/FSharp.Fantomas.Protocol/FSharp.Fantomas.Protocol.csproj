@@ -3,7 +3,8 @@
     <PropertyGroup>
         <TargetFramework>net461</TargetFramework>
         <LangVersion>$(CSharpLanguageVersion)</LangVersion>
-        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Protocol</AssemblyName>
+        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol</AssemblyName>
+        <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol</RootNamespace>
     </PropertyGroup>
 
     <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />

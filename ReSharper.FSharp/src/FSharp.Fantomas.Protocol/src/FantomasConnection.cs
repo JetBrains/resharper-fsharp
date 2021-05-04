@@ -2,13 +2,13 @@
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
 using JetBrains.Rd;
-using JetBrains.Rider.FSharp.ExternalFormatter.Server;
+using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client;
 
-namespace FSharp.ExternalFormatter.Protocol
+namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 {
-  public class ExternalFormatterConnection : ProtocolConnection<RdFSharpExternalFormatterModel>
+  public class FantomasConnection : ProtocolConnection<RdFantomasModel>
   {
-    public ExternalFormatterConnection(Lifetime lifetime, RdFSharpExternalFormatterModel protocolModel,
+    public FantomasConnection(Lifetime lifetime, RdFantomasModel protocolModel,
       IProtocol protocol, StartupOutputWriter startupOutputWriter, int processId, ISignal<int> processUnexpectedExited)
       : base(lifetime, protocolModel, protocol, startupOutputWriter, processId, processUnexpectedExited)
     {

@@ -25,9 +25,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Host",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Protocol", "src\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj", "{912A7F5F-73F2-4DFE-B81A-C13A4F58F31C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.ExternalFormatter.Host", "src\FSharp.ExternalFormatter.Host\FSharp.ExternalFormatter.Host.csproj", "{CF12A71A-1296-418B-8C0A-CC4B398AAB16}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Fantomas.Host", "src\FSharp.Fantomas.Host\FSharp.Fantomas.Host.csproj", "{CF12A71A-1296-418B-8C0A-CC4B398AAB16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.ExternalFormatter.Protocol", "src\FSharp.ExternalFormatter.Protocol\FSharp.ExternalFormatter.Protocol.csproj", "{D8DE097E-04DC-4A9B-88BF-10923FF44F8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Fantomas.Protocol", "src\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj", "{D8DE097E-04DC-4A9B-88BF-10923FF44F8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
