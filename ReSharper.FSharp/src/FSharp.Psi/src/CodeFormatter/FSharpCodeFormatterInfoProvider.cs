@@ -92,6 +92,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .ToList()
         .ForEach(DescribeSimpleIndentingRule);
 
+      Describe<ContinuousIndentRule>()
+        .Name("ContinuousIndent")
+        .Where(Node().In(ElementType.UNIT_EXPR, ElementType.UNIT_PAT))
+        .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
+        .Build();
+      
       Describe<IndentingRule>()
         .Name("SimpleTypeRepr_Accessibility")
         .Where(
@@ -224,6 +230,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     private void Formatting()
     {
       Describe<FormattingRule>()
+        .Name("DeclarationsSpaces")
+        .Group(SpaceRuleGroup)
+        .Where(Parent().In(ElementType.ENUM_CASE_DECLARATION, ElementType.UNION_CASE_DECLARATION,
+          ElementType.UNION_CASE_FIELD_DECLARATION_LIST))
+        .Return(IntervalFormatType.Space)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("SpaceBeforeColon")
+        .Group(SpaceRuleGroup)
+        .Where(Right().In(FSharpTokenType.COLON))
+        .Switch(it => it.SpaceBeforeColon, SpaceOptionsBuilders)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("NoSpaceInUnit")
+        .Group(SpaceRuleGroup)
+        .Where(
+          Parent().In(ElementType.UNIT_EXPR, ElementType.UNIT_PAT),
+          Left().In(FSharpTokenType.LPAREN),
+          Right().In(FSharpTokenType.RPAREN))
+        .Return(IntervalFormatType.OnlyEmpty)
+        .Build();
+
+      Describe<FormattingRule>()
         .Group(LineBreaksRuleGroup)
         .Name("LineBreakAfterTypeReprAccessModifier")
         .Where(
@@ -340,14 +371,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
 
       // initial impl (keeps formatting instead of keeping existing line break only):
-        // .Switch(keepExistingLineBreak,
-        // When(true).Return(IntervalFormatType.DoNotRemoveUserNewLines),
-        // When(false)
-        //   .Switch(onSameLine,
-        //     When(PlaceOnSameLineAsOwner.NEVER).Return(IntervalFormatType.NewLine),
-        //     When(PlaceOnSameLineAsOwner.ALWAYS).Return(IntervalFormatType.RemoveUserNewLines),
-        //     When(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE)
-        //       .Return(IntervalFormatType.RemoveUserNewLines | IntervalFormatType.InsertNewLineConditionally)))
+      // .Switch(keepExistingLineBreak,
+      // When(true).Return(IntervalFormatType.DoNotRemoveUserNewLines),
+      // When(false)
+      //   .Switch(onSameLine,
+      //     When(PlaceOnSameLineAsOwner.NEVER).Return(IntervalFormatType.NewLine),
+      //     When(PlaceOnSameLineAsOwner.ALWAYS).Return(IntervalFormatType.RemoveUserNewLines),
+      //     When(PlaceOnSameLineAsOwner.IF_OWNER_IS_SINGLE_LINE)
+      //       .Return(IntervalFormatType.RemoveUserNewLines | IntervalFormatType.InsertNewLineConditionally)))
 
       Describe<FormattingRule>()
         .Name($"{name}Space")

@@ -17,10 +17,17 @@ type FSharpCodeFormatterTest() =
         use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
+    [<Test>] member x.``Expr - Unit 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Unit 01``() = x.DoNamedTest() // todo: move right paren further?
+
     [<Test>] member x.``Type decl - Class 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Access modifier``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 03 - Spaces``() = x.DoNamedTest() // todo: add spaces in decl start
+
     [<Test>] member x.``Type decl - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union 01 - Spaces``() = x.DoNamedTest()
 
     [<Test; Explicit("Merge formatter branch")>]
     member x.``Top binding indent 01 - No indent``() = x.DoNamedTest()
