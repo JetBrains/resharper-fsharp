@@ -85,8 +85,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         new NodeTypeSet(
           ElementType.UNIT_EXPR,
           ElementType.UNIT_PAT,
-          ElementType.TOP_BINDING,
+
+          ElementType.ARRAY_TYPE_USAGE, 
+          ElementType.FUNCTION_TYPE_USAGE, 
+          ElementType.NAMED_TYPE_USAGE,
+
           ElementType.LOCAL_BINDING,
+          ElementType.TOP_BINDING,
+
+          ElementType.EXPRESSION_REFERENCE_NAME,
+          ElementType.TYPE_REFERENCE_NAME,
+
           ElementType.UNION_CASE_DECLARATION,
           ElementType.ENUM_CASE_DECLARATION,
           ElementType.F_SHARP_TYPE_DECLARATION,
@@ -103,7 +112,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<IndentingRule>()
         .Name("SimpleTypeRepr_Accessibility")
         .Where(
-          Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET),
+          Parent().In(ElementBitsets.ENUM_LIKE_TYPE_REPRESENTATION_BIT_SET),
           Left().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies((node, context) =>
             AccessModifiers[node.GetPreviousMeaningfulSibling()?.GetTokenType()]))
         .CloseNodeGetter((node, context) => node.Parent?.LastChild)
@@ -199,6 +208,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .ToList()
         .ForEach(DescribeSimpleAlignmentRule);
 
+      var aligningNodes =
+        new NodeTypeSet(
+          ElementType.ARRAY_TYPE_USAGE,
+          ElementType.NAMED_TYPE_USAGE,
+          ElementType.TUPLE_TYPE_USAGE,
+          ElementType.EXPRESSION_REFERENCE_NAME,
+          ElementType.TYPE_REFERENCE_NAME);
+
+      Describe<IndentingRule>()
+        .Name("FunctionTypeUsageIndent")
+        .Where(Node().In(ElementType.FUNCTION_TYPE_USAGE).Satisfies((node, context) =>
+          !(node.Parent is IFunctionTypeUsage)))
+        .Return(IndentType.AlignThrough)
+        .Build();
+
+      Describe<IndentingRule>()
+        .Name("SimpleAlignment")
+        .Where(Node().In(aligningNodes))
+        .Return(IndentType.AlignThrough)
+        .Build();
+
       Describe<IndentingRule>().Name("EnumCaseLikeDeclarations")
         .Where(Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET),
           Left().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies(IsFirstNodeOfItsType))
@@ -228,11 +258,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     private void Formatting()
     {
+      var nodesWithSpaces =
+        new NodeTypeSet(
+          ElementType.ENUM_CASE_DECLARATION,
+          ElementType.UNION_CASE_DECLARATION,
+          ElementType.UNION_CASE_FIELD_DECLARATION_LIST,
+          ElementType.FUNCTION_TYPE_USAGE,
+          ElementType.TUPLE_TYPE_USAGE);
+
       Describe<FormattingRule>()
         .Name("DeclarationsSpaces")
         .Group(SpaceRuleGroup)
-        .Where(Parent().In(ElementType.ENUM_CASE_DECLARATION, ElementType.UNION_CASE_DECLARATION,
-          ElementType.UNION_CASE_FIELD_DECLARATION_LIST))
+        .Where(Parent().In(nodesWithSpaces))
         .Return(IntervalFormatType.Space)
         .Build();
 
@@ -253,6 +290,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Return(IntervalFormatType.OnlyEmpty)
         .Build();
 
+      Describe<FormattingRule>()
+        .Name("NoSpaceInArrayTypeUsage")
+        .Group(SpaceRuleGroup)
+        .Where(
+          Parent().In(ElementType.ARRAY_TYPE_USAGE),
+          Left().In(ElementBitsets.TYPE_USAGE_BIT_SET),
+          Right().In(FSharpTokenType.LBRACK))
+        .Return(IntervalFormatType.Empty)
+        .Build();
+      
       Describe<FormattingRule>()
         .Group(LineBreaksRuleGroup)
         .Name("LineBreakAfterTypeReprAccessModifier")

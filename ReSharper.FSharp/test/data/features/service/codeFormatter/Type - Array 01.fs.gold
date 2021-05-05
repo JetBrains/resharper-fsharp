@@ -1,0 +1,14 @@
+﻿namespace Namespace
+
+type T1 = int[]
+type T2 = int[]
+
+type T3 = int
+            []
+
+type T4 = int
+            []
+            []
+
+
+type T5 = (int * int)[]
