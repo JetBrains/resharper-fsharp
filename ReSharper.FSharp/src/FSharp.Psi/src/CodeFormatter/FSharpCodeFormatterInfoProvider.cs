@@ -403,6 +403,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
     }
 
+    private void DescribeLineBreakInDeclarationWithEquals(string name,
+      IBuilderAction<IBlankWithSinglePattern> declarationPattern,
+      ChildBuilder<IBlankWithSinglePattern, NodePatternBlank> equalsBeforeNodesPattern) =>
+      DescribeLineBreakInNode(name, declarationPattern, equalsBeforeNodesPattern.Satisfies((node, context) =>
+          node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS),
+        key => key.DeclarationBodyOnTheSameLine, key => key.KeepExistingLineBreakBeforeDeclarationBody);
+
     private void DescribeLineBreakInNode(string name,
       IBuilderAction<IBlankWithSinglePattern> containingNodesPattern,
       IBuilderAction<IBlankWithSinglePattern> equalsBeforeNodesPattern,
