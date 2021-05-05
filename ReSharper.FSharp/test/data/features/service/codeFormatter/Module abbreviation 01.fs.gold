@@ -1,0 +1,21 @@
+﻿DeclarationBodyOnTheSameLine = NEVER
+  unaffected by KeepExistingLineBreakBeforeDeclarationBody
+module M1 =
+  A
+
+module M2 =
+  A
+
+================
+DeclarationBodyOnTheSameLine = IF_OWNER_IS_SINGLE_LINE,ALWAYS
+  KeepExistingLineBreakBeforeDeclarationBody = True
+module M1 = A
+
+module M2 =
+  A
+
+================
+  KeepExistingLineBreakBeforeDeclarationBody = False
+module M1 = A
+
+module M2 = A

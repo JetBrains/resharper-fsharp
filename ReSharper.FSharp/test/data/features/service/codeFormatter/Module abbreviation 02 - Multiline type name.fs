@@ -1,0 +1,2 @@
+module M = A.
+               B

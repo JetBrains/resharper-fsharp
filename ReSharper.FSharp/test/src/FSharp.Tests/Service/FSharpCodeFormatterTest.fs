@@ -24,6 +24,11 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Blank lines - Module members 01 - Different kinds``() = x.DoNamedTest()
     [<Test>] member x.``Blank lines - Namespace 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module abbreviation 01``() = x.DoNamedTest()
+
+    [<Test; Explicit("Fix indent in type name")>]
+    member x.``Module abbreviation 02 - Multiline type name``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Class 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Enum 01``() = x.DoNamedTest()
@@ -111,7 +116,6 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Union declaration indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Union declaration indent 02 - Modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type abbreviation declaration indent 01 - Correct indent``() = x.DoNamedTest()
-    [<Test>] member x.``Module abbreviation declaration indent 01 - Correct indent``() = x.DoNamedTest()
 
     [<Test>] member x.``Match clauses alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Sequential expr alignment 01 - No separators``() = x.DoNamedTest()

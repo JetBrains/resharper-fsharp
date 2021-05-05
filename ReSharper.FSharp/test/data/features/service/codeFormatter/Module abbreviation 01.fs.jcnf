@@ -1,0 +1,4 @@
+﻿{
+  DeclarationBodyOnTheSameLine: all,
+  KeepExistingLineBreakBeforeDeclarationBody: all
+}

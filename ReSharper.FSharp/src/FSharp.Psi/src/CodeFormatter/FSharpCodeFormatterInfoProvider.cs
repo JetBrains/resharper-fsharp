@@ -52,8 +52,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       var bindingAndModuleDeclIndentingRulesParameters = new[]
       {
         ("NestedModuleDeclaration", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.MODULE_MEMBER),
-        ("TopBinding", ElementType.TOP_BINDING, TopBinding.CHAMELEON_EXPR),
-        ("LocalBinding", ElementType.LOCAL_BINDING, LocalBinding.EXPR),
         ("NestedModuleDeclName", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.IDENTIFIER),
         ("NamedModuleDeclName", ElementType.NAMED_MODULE_DECLARATION, NamedModuleDeclaration.IDENTIFIER),
       };
@@ -86,7 +84,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         ("InterfaceReprTypeMemberList", ElementType.INTERFACE_REPRESENTATION, InterfaceRepresentation.MEMBER_LIST),
         ("ExceptionMemberList", ElementType.EXCEPTION_DECLARATION, ExceptionDeclaration.MEMBER_LIST),
         ("InterfaceImplMemberList", ElementType.INTERFACE_IMPLEMENTATION, InterfaceImplementation.MEMBER_LIST),
-        ("ModuleAbbreviationDeclaration", ElementType.MODULE_ABBREVIATION_DECLARATION, ModuleAbbreviationDeclaration.TYPE_REFERENCE),
       };
 
       bindingAndModuleDeclIndentingRulesParameters
@@ -103,7 +100,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           ElementType.LOCAL_BINDING,
           ElementType.UNION_CASE_DECLARATION,
           ElementType.ENUM_CASE_DECLARATION,
-          ElementType.F_SHARP_TYPE_DECLARATION);
+          ElementType.F_SHARP_TYPE_DECLARATION,
+          ElementType.MODULE_ABBREVIATION_DECLARATION);
 
       Describe<ContinuousIndentRule>()
         .Name("ContinuousIndent")
@@ -279,10 +277,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           When(true).Return(IntervalFormatType.NewLine))
         .Build();
 
-      DescribeLineBreakInNode("TypeDeclaration", Node().In(ElementType.F_SHARP_TYPE_DECLARATION),
-        Node().In(ElementBitsets.TYPE_REPRESENTATION_BIT_SET).Satisfies((node, context) =>
-          node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS),
-        key => key.DeclarationBodyOnTheSameLine, key => key.KeepExistingLineBreakBeforeDeclarationBody);
+      DescribeLineBreakInDeclarationWithEquals("TypeDeclaration",
+        Node().In(ElementType.F_SHARP_TYPE_DECLARATION),
+        Node().In(ElementBitsets.TYPE_REPRESENTATION_BIT_SET));
+
+      DescribeLineBreakInDeclarationWithEquals("ModuleAbbreviation",
+        Node().In(ElementType.MODULE_ABBREVIATION_DECLARATION),
+        Node().In(ElementType.TYPE_REFERENCE_NAME));
 
       Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
