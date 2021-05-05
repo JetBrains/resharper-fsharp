@@ -15,23 +15,22 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        ITypeMemberDeclarationList
-          IAutoPropertyDeclaration
-            FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+        IAutoPropertyDeclaration
+          FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+ValTokenElement(type:VAL, text:val)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:P)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IChameleonExpression
+            ILiteralExpr
+              FSharpToken(type:INT32, text:1)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IAccessorsNamesClause
+            FSharpTokenType+WithTokenElement(type:WITH, text:with)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+ValTokenElement(type:VAL, text:val)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpIdentifierToken(type:IDENTIFIER, text:P)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IChameleonExpression
-              ILiteralExpr
-                FSharpToken(type:INT32, text:1)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IAccessorsNamesClause
-              FSharpTokenType+WithTokenElement(type:WITH, text:with)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:get)
+            FSharpIdentifierToken(type:IDENTIFIER, text:get)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

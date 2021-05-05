@@ -20,30 +20,29 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
-        ITypeMemberDeclarationList
-          IMemberDeclaration
-            FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+        IMemberDeclaration
+          FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+PrivateTokenElement(type:PRIVATE, text:private)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IWildSelfId
+            FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+          FSharpTokenType+DotTokenElement(type:DOT, text:.)
+          FSharpIdentifierToken(type:IDENTIFIER, text:A)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+WithTokenElement(type:WITH, text:with)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IAccessorDeclaration
+            FSharpIdentifierToken(type:IDENTIFIER, text:get)
+            IParametersPatternDeclaration
+              IUnitPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+PrivateTokenElement(type:PRIVATE, text:private)
+            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IWildSelfId
-              FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-            FSharpTokenType+DotTokenElement(type:DOT, text:.)
-            FSharpIdentifierToken(type:IDENTIFIER, text:A)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+WithTokenElement(type:WITH, text:with)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IAccessorDeclaration
-              FSharpIdentifierToken(type:IDENTIFIER, text:get)
-              IParametersPatternDeclaration
-                IUnitPat
-                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IChameleonExpression
-                ILiteralExpr
-                  FSharpToken(type:INT32, text:0)
+            IChameleonExpression
+              ILiteralExpr
+                FSharpToken(type:INT32, text:0)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

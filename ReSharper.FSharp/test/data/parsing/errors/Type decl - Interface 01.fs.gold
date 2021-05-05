@@ -19,21 +19,20 @@ IFSharpImplFile
           FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-        ITypeMemberDeclarationList
-          IInterfaceImplementation
-            FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpIdentifierToken(type:IDENTIFIER, text:T2)
-            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-            FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ITypeReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:I)
+        IInterfaceImplementation
+          FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:T2)
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+          FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ITypeReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:I)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     ILetBindingsDeclaration

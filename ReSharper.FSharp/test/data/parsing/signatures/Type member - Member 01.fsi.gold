@@ -15,36 +15,35 @@ IFSharpSigFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        ITypeMemberDeclarationList
-          IMemberSignature
-            FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpIdentifierToken(type:IDENTIFIER, text:P)
-            FSharpTokenType+ColonTokenElement(type:COLON, text::)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IMemberSignature
+          FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:P)
+          FSharpTokenType+ColonTokenElement(type:COLON, text::)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IParameterSignatureTypeUsage
+            INamedTypeUsage
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:int)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IMemberSignature
+          FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:M)
+          FSharpTokenType+ColonTokenElement(type:COLON, text::)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IFunctionTypeUsage
             IParameterSignatureTypeUsage
               INamedTypeUsage
                 ITypeReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:int)
-          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-          Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-          IMemberSignature
-            FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpIdentifierToken(type:IDENTIFIER, text:M)
-            FSharpTokenType+ColonTokenElement(type:COLON, text::)
+            FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IFunctionTypeUsage
-              IParameterSignatureTypeUsage
-                INamedTypeUsage
-                  ITypeReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IParameterSignatureTypeUsage
-                INamedTypeUsage
-                  ITypeReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:unit)
+            IParameterSignatureTypeUsage
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:unit)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

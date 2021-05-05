@@ -43,7 +43,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
         | SynModuleSigDecl.Exception(SynExceptionSig(exn, members, range), _) ->
             let mark = x.StartException(exn)
-            x.ProcessTypeMemberList(members, ElementType.MEMBER_DECLARATION_LIST)
+            x.ProcessTypeMembers(members)
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
 
         | SynModuleSigDecl.ModuleAbbrev(IdentRange range, lid, _) ->
@@ -100,25 +100,20 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
         | SynTypeDefnSigRepr.ObjectModel(kind, members, _) ->
             if x.AddObjectModelTypeReprNode(kind) then
                 let mark = x.Mark(range)
-                x.ProcessTypeMemberList(members, ElementType.TYPE_MEMBER_DECLARATION_LIST)
+                x.ProcessTypeMembers(members)
                 let elementType = x.GetObjectModelTypeReprElementType(kind)
                 x.Done(range, mark, elementType)
             else
-                x.ProcessTypeMemberList(members, ElementType.TYPE_MEMBER_DECLARATION_LIST)
+                x.ProcessTypeMembers(members)
 
         | _ -> failwithf "Unexpected simple type representation: %A" repr
 
-        x.ProcessTypeMemberList(memberSigs, ElementType.TYPE_MEMBER_DECLARATION_LIST)
+        x.ProcessTypeMembers(memberSigs)
         x.Done(range, mark, ElementType.F_SHARP_TYPE_DECLARATION)
 
-    member x.ProcessTypeMemberList(members: SynMemberSig list, elementType) =
-        match members with
-        | m :: _ ->
-            let mark = x.MarkAttributesOrIdOrRangeStart(m.OuterAttributes, m.XmlDoc, None, m.Range)
-            for m in members do
-                x.ProcessTypeMemberSignature(m)
-            x.Done(mark, elementType)
-        | _ -> ()
+    member x.ProcessTypeMembers(members: SynMemberSig list) =
+        for m in members do
+            x.ProcessTypeMemberSignature(m)
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with

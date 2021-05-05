@@ -67,7 +67,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
         | SynModuleDecl.Exception(SynExceptionDefn(exn, members, range), _) ->
             let mark = x.StartException(exn)
-            x.ProcessTypeMemberList(members, ElementType.MEMBER_DECLARATION_LIST)
+            x.ProcessTypeMembers(members)
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
 
         | SynModuleDecl.Open(openDeclTarget, range) ->
@@ -168,26 +168,21 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
             if x.AddObjectModelTypeReprNode(kind) then
                 let mark = x.Mark(reprRange)
-                x.ProcessTypeMemberList(members, ElementType.TYPE_MEMBER_DECLARATION_LIST)
+                x.ProcessTypeMembers(members)
                 let elementType = x.GetObjectModelTypeReprElementType(kind)
                 x.Done(reprRange, mark, elementType)
             else
-                x.ProcessTypeMemberList(members, ElementType.TYPE_MEMBER_DECLARATION_LIST)
+                x.ProcessTypeMembers(members)
 
         | _ -> failwithf "Unexpected simple type representation: %A" repr
 
-        x.ProcessTypeMemberList(members, ElementType.TYPE_MEMBER_DECLARATION_LIST)
+        x.ProcessTypeMembers(members)
         x.Done(range, mark, ElementType.F_SHARP_TYPE_DECLARATION)
 
-    member x.ProcessTypeMemberList(members: SynMemberDefn list, elementType) =
-        match members with
-        | m :: _ ->
-            let memberListMark = x.MarkAttributesOrIdOrRangeStart(m.OuterAttributes, m.XmlDoc, None, m.Range)
-            for m in members do
-                x.ProcessTypeMember(m)
-            x.EnsureMembersAreFinished()
-            x.Done(memberListMark, elementType)
-        | _ -> ()
+    member x.ProcessTypeMembers(members: SynMemberDefn list) =
+        for m in members do
+            x.ProcessTypeMember(m)
+        x.EnsureMembersAreFinished()
 
     member x.ProcessTypeExtensionDeclaration(SynTypeDefn(info, _, members, _, range), attrs) =
         let (SynComponentInfo(_, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
@@ -201,7 +196,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         for typeConstraint in constraints do
             x.ProcessTypeConstraint(typeConstraint)
 
-        x.ProcessTypeMemberList(members, ElementType.TYPE_MEMBER_DECLARATION_LIST)
+        x.ProcessTypeMembers(members)
         x.Done(range, mark, ElementType.TYPE_EXTENSION_DECLARATION)
 
     member x.ProcessPrimaryConstructor(typeMember: SynMemberDefn) =
@@ -252,7 +247,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             | SynMemberDefn.Interface(interfaceType, interfaceMembersOpt , _) ->
                 x.ProcessTypeAsTypeReferenceName(interfaceType)
                 match interfaceMembersOpt with
-                | Some(members) -> x.ProcessTypeMemberList(members, ElementType.MEMBER_DECLARATION_LIST)
+                | Some(members) -> x.ProcessTypeMembers(members)
                 | _ -> ()
                 ElementType.INTERFACE_IMPLEMENTATION
 
@@ -797,7 +792,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushRange(range, ElementType.OBJ_EXPR)
             x.ProcessTypeAsTypeReferenceName(synType)
             x.PushStepList(interfaceImpls, interfaceImplementationListProcessor)
-            x.PushStep(bindings, memberDeclarationListProcessor)
+            x.PushStepList(bindings, objectExpressionMemberListProcessor)
 
             match args with
             | Some(expr, _) -> x.ProcessExpression(expr)
@@ -1170,7 +1165,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
     member x.ProcessInterfaceImplementation(SynInterfaceImpl(interfaceType, bindings, range)) =
         x.PushRange(range, ElementType.INTERFACE_IMPLEMENTATION)
         x.ProcessTypeAsTypeReferenceName(interfaceType)
-        x.PushStep(bindings, memberDeclarationListProcessor)
+        x.PushStepList(bindings, objectExpressionMemberListProcessor)
 
     member x.ProcessSynIndexerArg(arg) =
         match arg with
@@ -1435,17 +1430,6 @@ type InterfaceImplementationListProcessor() =
     override x.Process(interfaceImpl, builder) =
         builder.ProcessInterfaceImplementation(interfaceImpl)
 
-type MemberDeclarationListProcessor() =
-    inherit StepProcessorBase<SynBinding list>()
-
-    override x.Process(bindings, builder) =
-        match bindings with
-        | SynBinding(range = rangeStart) :: _ ->
-            let item = { Mark = builder.Mark(rangeStart); ElementType = ElementType.MEMBER_DECLARATION_LIST }
-            builder.PushStep(item, endNodeProcessor)
-        | _ -> ()
-        builder.PushStepList(bindings, objectExpressionMemberListProcessor)
-
 
 type IndexerArgListProcessor() =
     inherit StepListProcessorBase<SynIndexerArg>()
@@ -1501,6 +1485,5 @@ module BuilderStepProcessors =
     let matchClauseListProcessor = MatchClauseListProcessor()
     let objectExpressionMemberListProcessor = ObjectExpressionMemberListProcessor()
     let interfaceImplementationListProcessor = InterfaceImplementationListProcessor()
-    let memberDeclarationListProcessor = MemberDeclarationListProcessor()
     let indexerArgListProcessor = IndexerArgListProcessor()
     let interpolatedStringProcessor = InterpolatedStringProcessor()

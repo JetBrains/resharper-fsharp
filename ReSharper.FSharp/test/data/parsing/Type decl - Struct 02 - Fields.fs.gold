@@ -19,12 +19,39 @@ IFSharpImplFile
           FSharpTokenType+StructTokenElement(type:STRUCT, text:struct)
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
-          ITypeMemberDeclarationList
-            IValFieldDeclaration
-              FSharpTokenType+ValTokenElement(type:VAL, text:val)
+          IValFieldDeclaration
+            FSharpTokenType+ValTokenElement(type:VAL, text:val)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:a)
+            FSharpTokenType+ColonTokenElement(type:COLON, text::)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IParenTypeUsage
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IFunctionTypeUsage
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
+          IValFieldDeclaration
+            FSharpTokenType+ValTokenElement(type:VAL, text:val)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:b)
+            FSharpTokenType+ColonTokenElement(type:COLON, text::)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IFunctionTypeUsage
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:a)
-              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IParenTypeUsage
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
@@ -39,34 +66,6 @@ IFSharpImplFile
                     ITypeReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:int)
                 FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
-            IValFieldDeclaration
-              FSharpTokenType+ValTokenElement(type:VAL, text:val)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:b)
-              FSharpTokenType+ColonTokenElement(type:COLON, text::)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IFunctionTypeUsage
-                INamedTypeUsage
-                  ITypeReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
-                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                IParenTypeUsage
-                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                  IFunctionTypeUsage
-                    INamedTypeUsage
-                      ITypeReferenceName
-                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                    FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
-                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                    INamedTypeUsage
-                      ITypeReferenceName
-                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
           FSharpTokenType+EndTokenElement(type:END, text:end)

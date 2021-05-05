@@ -15,31 +15,30 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        ITypeMemberDeclarationList
-          IMemberDeclaration
-            FSharpTokenType+StaticTokenElement(type:STATIC, text:static)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+LparenStarRparenTokenElement(type:LPAREN_STAR_RPAREN, text:(*))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IParenPat
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                ITuplePat
-                  IWildPat
-                    FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-                  FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  IWildPat
-                    FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IChameleonExpression
-              IUnitExpr
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        IMemberDeclaration
+          FSharpTokenType+StaticTokenElement(type:STATIC, text:static)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+LparenStarRparenTokenElement(type:LPAREN_STAR_RPAREN, text:(*))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IParametersPatternDeclaration
+            IParenPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              ITuplePat
+                IWildPat
+                  FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+                FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                IWildPat
+                  FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IChameleonExpression
+            IUnitExpr
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

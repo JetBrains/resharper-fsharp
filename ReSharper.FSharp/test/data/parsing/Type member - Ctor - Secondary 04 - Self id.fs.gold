@@ -15,30 +15,29 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        ITypeMemberDeclarationList
-          ISecondaryConstructorDeclaration
-            FSharpTokenType+NewTokenElement(type:NEW, text:new)
+        ISecondaryConstructorDeclaration
+          FSharpTokenType+NewTokenElement(type:NEW, text:new)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IParametersPatternDeclaration
+            IParenPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IWildPat
+                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ICtorSelfId
+            FSharpTokenType+AsTokenElement(type:AS, text:as)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IParenPat
+            FSharpIdentifierToken(type:IDENTIFIER, text:t)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IChameleonExpression
+            IPrefixAppExpr
+              IReferenceExpr
+                FSharpIdentifierToken(type:IDENTIFIER, text:T)
+              IUnitExpr
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                IWildPat
-                  FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
                 FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ICtorSelfId
-              FSharpTokenType+AsTokenElement(type:AS, text:as)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:t)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IChameleonExpression
-              IPrefixAppExpr
-                IReferenceExpr
-                  FSharpIdentifierToken(type:IDENTIFIER, text:T)
-                IUnitExpr
-                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

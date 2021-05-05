@@ -50,55 +50,45 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       get
       {
         var result = new List<ITypeMemberDeclaration>();
-        ProcessChildren(result, this);
-        return result.AsReadOnly();
-      }
-    }
+        foreach (var child in this.Children())
+        {
+          if (child is ITypeMemberDeclaration m)
+            result.Add(m);
 
-    private static void ProcessChildren(List<ITypeMemberDeclaration> result, ITreeNode node)
-    {
-      foreach (var child in node.Children())
-      {
-        if (child is ITypeMemberDeclaration m)
-          result.Add(m);
+          if (child is IInterfaceImplementation interfaceImplementation)
+            foreach (var implementedMember in interfaceImplementation.TypeMembers)
+              result.Add(implementedMember);
 
-        if (child is IInterfaceImplementation interfaceImplementation)
-          foreach (var implementedMember in interfaceImplementation.TypeMembers)
-            result.Add(implementedMember);
-
-        if (child is ITypeDeclarationGroup typeDeclarationGroup)
-          foreach (var typeDeclaration in typeDeclarationGroup.TypeDeclarations)
-          {
-            if (typeDeclaration is ITypeExtensionDeclaration { IsTypePartDeclaration: false } typeExtension)
+          if (child is ITypeDeclarationGroup typeDeclarationGroup)
+            foreach (var typeDeclaration in typeDeclarationGroup.TypeDeclarations)
             {
-              foreach (var extensionMember in typeExtension.TypeMembers)
-                if (extensionMember is ITypeMemberDeclaration typeMemberDeclaration)
-                  result.Add(typeMemberDeclaration);
+              if (typeDeclaration is ITypeExtensionDeclaration { IsTypePartDeclaration: false } typeExtension)
+              {
+                foreach (var extensionMember in typeExtension.TypeMembers)
+                  if (extensionMember is ITypeMemberDeclaration typeMemberDeclaration)
+                    result.Add(typeMemberDeclaration);
+              }
+              else
+                result.Add(typeDeclaration);
             }
-            else
-              result.Add(typeDeclaration);
-          }
 
-        if (child is IMemberSignatureOrDeclaration {IsIndexer: false} memberDeclaration)
-          foreach (var accessor in memberDeclaration.AccessorDeclarations)
-            if (accessor.IsExplicit)
-              result.Add(accessor);
+          if (child is IMemberSignatureOrDeclaration {IsIndexer: false} memberDeclaration)
+            foreach (var accessor in memberDeclaration.AccessorDeclarations)
+              if (accessor.IsExplicit)
+                result.Add(accessor);
 
-        if (child is ILetBindingsDeclaration let)
-          foreach (var binding in let.Bindings)
-            ProcessBinding(binding, result);
+          if (child is ILetBindingsDeclaration @let)
+            foreach (var binding in @let.Bindings)
+              ProcessBinding(binding, result);
 
-        if (child is IBindingSignature bindingSignature)
-          ProcessBinding(bindingSignature, result);
+          if (child is IBindingSignature bindingSignature)
+            ProcessBinding(bindingSignature, result);
 
-        if (child is IUnionCaseFieldDeclarationList fieldDeclarationList)
-          result.AddRange(fieldDeclarationList.FieldsEnumerable);
+          if (child is IUnionCaseFieldDeclarationList fieldDeclarationList)
+            result.AddRange(fieldDeclarationList.FieldsEnumerable);
+        }
 
-        if (child is ITypeMemberDeclarationList typeMemberDeclarationList)
-          ProcessChildren(result, typeMemberDeclarationList);
-
-        if (child is IMemberDeclarationList memberDeclarationList)
-          ProcessChildren(result, memberDeclarationList);
+        return result.AsReadOnly();
       }
     }
 

@@ -10,29 +10,28 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        ITypeMemberDeclarationList
-          IAutoPropertyDeclaration
-            DocComment(type:LINE_COMMENT, text:/// A)
-            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-            IAttributeList
-              FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
-              IAttribute
-                ITypeReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:A)
-              FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
-            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-            FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+ValTokenElement(type:VAL, text:val)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpIdentifierToken(type:IDENTIFIER, text:P)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IChameleonExpression
-              ILiteralExpr
-                FSharpToken(type:INT32, text:1)
+        IAutoPropertyDeclaration
+          DocComment(type:LINE_COMMENT, text:/// A)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+          IAttributeList
+            FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+            IAttribute
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:A)
+            FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+          FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+ValTokenElement(type:VAL, text:val)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:P)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IChameleonExpression
+            ILiteralExpr
+              FSharpToken(type:INT32, text:1)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

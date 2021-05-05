@@ -76,19 +76,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         ("MatchExpr_With", ElementType.MATCH_EXPR, MatchExpr.WITH),
       };
 
-      var typeDeclarationIndentingRulesParameters = new[]
-      {
-        ("TypeDeclarationMemberList", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.MEMBER_LIST),
-        ("ClassReprTypeMemberList", ElementType.CLASS_REPRESENTATION, ClassRepresentation.MEMBER_LIST),
-        ("StructReprTypeMemberList", ElementType.STRUCT_REPRESENTATION, StructRepresentation.MEMBER_LIST),
-        ("InterfaceReprTypeMemberList", ElementType.INTERFACE_REPRESENTATION, InterfaceRepresentation.MEMBER_LIST),
-        ("ExceptionMemberList", ElementType.EXCEPTION_DECLARATION, ExceptionDeclaration.MEMBER_LIST),
-        ("InterfaceImplMemberList", ElementType.INTERFACE_IMPLEMENTATION, InterfaceImplementation.MEMBER_LIST),
-      };
-
       bindingAndModuleDeclIndentingRulesParameters
         .Union(fsExprIndentingRulesParameters)
-        .Union(typeDeclarationIndentingRulesParameters)
         .ToList()
         .ForEach(DescribeSimpleIndentingRule);
 
@@ -101,6 +90,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           ElementType.UNION_CASE_DECLARATION,
           ElementType.ENUM_CASE_DECLARATION,
           ElementType.F_SHARP_TYPE_DECLARATION,
+          ElementType.INTERFACE_IMPLEMENTATION,
           ElementType.MODULE_ABBREVIATION_DECLARATION);
 
       Describe<ContinuousIndentRule>()
@@ -203,8 +193,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         ("BinaryExpr", ElementType.BINARY_APP_EXPR),
         ("RecordDeclaration", ElementType.RECORD_FIELD_DECLARATION_LIST),
         ("RecordExprBindings", ElementType.RECORD_FIELD_BINDING_LIST),
-        ("MemberDeclarationList", ElementType.MEMBER_DECLARATION_LIST),
-        ("TypeMemberDeclarationList", ElementType.TYPE_MEMBER_DECLARATION_LIST),
       };
 
       alignmentRulesParameters
