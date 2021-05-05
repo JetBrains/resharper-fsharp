@@ -1,0 +1,22 @@
+﻿namespace Namespace
+
+type U1 =
+    |A
+    | B of int
+    | C
+    |
+      D
+      of
+      a: int
+    | E of
+      int * int
+    /// F
+    | F of
+      int * int
+
+type
+ U2
+  =
+ |
+   A of
+       int

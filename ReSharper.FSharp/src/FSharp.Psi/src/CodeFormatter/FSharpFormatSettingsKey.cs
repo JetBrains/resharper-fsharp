@@ -9,6 +9,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
   [EditorConfigKey("fsharp")]
   public class FSharpFormatSettingsKey : FormatSettingsKeyBase
   {
+    [SettingsEntry(2, "todo")]
+    public int BlankLineAroundTopLevelModules;
+
+    [SettingsEntry(0, "todo")]
+    public int BlankLinesAroundSingleLineModuleMember;
+
+    [SettingsEntry(1, "todo")]
+    public int BlankLinesAroundMultilineModuleMembers;
+
+    [SettingsEntry(1, "todo")]
+    public int BlankLinesAroundDifferentModuleMemberKinds;
+
+    [SettingsEntry(2, "todo")]
+    public int KeepMaxBlankLineAroundModuleMembers;
+
+    [SettingsEntry(1, "todo")]
+    public int BlankLinesBeforeFirstModuleMemberInTopLevelModule;
+
+    [SettingsEntry(0, "todo")]
+    public int BlankLinesBeforeFirstModuleMemberInNestedModule;
+
     [SettingsEntry(true, "Line break after type representation access modifier")]
     public bool LineBreakAfterTypeReprAccessModifier;
 

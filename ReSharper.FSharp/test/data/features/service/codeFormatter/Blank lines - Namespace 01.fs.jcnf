@@ -1,0 +1,5 @@
+{
+  BlankLineAroundTopLevelModules: [0, 1],
+  BlankLinesBeforeFirstModuleMemberInTopLevelModule: [0, 1],
+  KeepMaxBlankLineAroundModuleMembers: [0, 1, 2]
+}

@@ -1,0 +1,76 @@
+﻿unaffected by BlankLineAroundTopLevelModules
+  BlankLinesBeforeFirstModuleMemberInNestedModule = 0
+    KeepMaxBlankLineAroundModuleMembers = 0
+namespace Ns
+
+module Nested1 =
+  type T = int
+
+module Nested2 =
+  type T = int
+
+module Nested3 =
+  type T = int
+================
+    KeepMaxBlankLineAroundModuleMembers = 1
+namespace Ns
+
+module Nested1 =
+
+  type T = int
+
+module Nested2 =
+
+  type T = int
+
+module Nested3 =
+  type T = int
+================
+    KeepMaxBlankLineAroundModuleMembers = 2
+namespace Ns
+
+module Nested1 =
+
+  type T = int
+
+module Nested2 =
+
+
+  type T = int
+
+
+module Nested3 =
+  type T = int
+================
+  BlankLinesBeforeFirstModuleMemberInNestedModule = 1
+    KeepMaxBlankLineAroundModuleMembers = 0,1
+namespace Ns
+
+module Nested1 =
+
+  type T = int
+
+module Nested2 =
+
+  type T = int
+
+module Nested3 =
+
+  type T = int
+================
+    KeepMaxBlankLineAroundModuleMembers = 2
+namespace Ns
+
+module Nested1 =
+
+  type T = int
+
+module Nested2 =
+
+
+  type T = int
+
+
+module Nested3 =
+
+  type T = int

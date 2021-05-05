@@ -1,0 +1,124 @@
+﻿BlankLinesAroundDifferentModuleMemberKinds = 0
+  BlankLinesAroundSingleLineModuleMember = 0
+    BlankLinesAroundMultilineModuleMembers = 0
+module Module
+
+open System
+open System
+let a = 1
+let b = 2
+let c =
+  3
+
+open System
+open System
+let a =
+  1
+let b = 2
+================
+    BlankLinesAroundMultilineModuleMembers = 1
+module Module
+
+open System
+open System
+let a = 1
+let b = 2
+
+let c =
+  3
+
+open System
+open System
+
+let a =
+  1
+
+let b = 2
+================
+  BlankLinesAroundSingleLineModuleMember = 1
+    unaffected by BlankLinesAroundMultilineModuleMembers
+module Module
+
+open System
+
+open System
+
+let a = 1
+
+let b = 2
+
+let c =
+  3
+
+open System
+
+open System
+
+let a =
+  1
+
+let b = 2
+================
+BlankLinesAroundDifferentModuleMemberKinds = 1
+  BlankLinesAroundSingleLineModuleMember = 0
+    BlankLinesAroundMultilineModuleMembers = 0
+module Module
+
+open System
+open System
+
+let a = 1
+let b = 2
+let c =
+  3
+
+open System
+open System
+
+let a =
+  1
+let b = 2
+================
+    BlankLinesAroundMultilineModuleMembers = 1
+module Module
+
+open System
+open System
+
+let a = 1
+let b = 2
+
+let c =
+  3
+
+open System
+open System
+
+let a =
+  1
+
+let b = 2
+================
+  BlankLinesAroundSingleLineModuleMember = 1
+    unaffected by BlankLinesAroundMultilineModuleMembers
+module Module
+
+open System
+
+open System
+
+let a = 1
+
+let b = 2
+
+let c =
+  3
+
+open System
+
+open System
+
+let a =
+  1
+
+let b = 2

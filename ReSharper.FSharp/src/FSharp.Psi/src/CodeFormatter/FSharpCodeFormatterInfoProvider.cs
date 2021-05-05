@@ -32,6 +32,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     protected readonly NodeTypeSet AccessModifiers =
       new NodeTypeSet(FSharpTokenType.PUBLIC, FSharpTokenType.INTERNAL, FSharpTokenType.PRIVATE);
 
+    protected readonly NodeTypeSet Comments =
+      new NodeTypeSet(FSharpTokenType.LINE_COMMENT, FSharpTokenType.BLOCK_COMMENT);
+
     protected override void Initialize()
     {
       base.Initialize();
@@ -39,6 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Indenting();
       Aligning();
       Formatting();
+      BlankLines();
     }
 
     public override ProjectFileType MainProjectFileType => FSharpProjectFileType.Instance;
@@ -76,7 +80,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       var typeDeclarationIndentingRulesParameters = new[]
       {
-        ("TypeDeclarationRepr", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.TYPE_REPR),
         ("TypeDeclarationMemberList", ElementType.F_SHARP_TYPE_DECLARATION, FSharpTypeDeclaration.MEMBER_LIST),
         ("ClassReprTypeMemberList", ElementType.CLASS_REPRESENTATION, ClassRepresentation.MEMBER_LIST),
         ("StructReprTypeMemberList", ElementType.STRUCT_REPRESENTATION, StructRepresentation.MEMBER_LIST),
@@ -92,12 +95,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .ToList()
         .ForEach(DescribeSimpleIndentingRule);
 
+      var continuousIndentNodes =
+        new NodeTypeSet(
+          ElementType.UNIT_EXPR,
+          ElementType.UNIT_PAT,
+          ElementType.UNION_CASE_DECLARATION,
+          ElementType.ENUM_CASE_DECLARATION,
+          ElementType.F_SHARP_TYPE_DECLARATION);
+
       Describe<ContinuousIndentRule>()
         .Name("ContinuousIndent")
-        .Where(Node().In(ElementType.UNIT_EXPR, ElementType.UNIT_PAT))
+        .Where(Node().In(continuousIndentNodes))
         .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
+        .AddException(Node().Satisfies((node, context) => node is DocComment))
         .Build();
-      
+
       Describe<IndentingRule>()
         .Name("SimpleTypeRepr_Accessibility")
         .Where(
@@ -317,6 +329,63 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Return(IntervalFormatType.OnlySpace)
         .Build()
         .AndViceVersa()
+        .Build();
+    }
+
+    private void BlankLines()
+    {
+      var declarations =
+        ElementBitsets.MODULE_MEMBER_BIT_SET
+          .Union(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET)
+          .Union(ElementType.F_SHARP_TYPE_DECLARATION);
+
+      Describe<BlankLinesAroundNodeRule>()
+        .AddNodesToGroupBefore(Node().In(Comments))
+        .AddNodesToGroupAfter(Node().In(Comments))
+        .AllowedNodesBefore(Node().Satisfies((node, checker) => true))
+        .AllowedNodesAfter(Node().Satisfies((node, checker) => true))
+        .Priority(1)
+        .StartAlternating()
+        .Name("BlankLinesAroundDeclarations")
+        .Where(Node().In(declarations))
+        .MinBlankLines(it => it.BlankLinesAroundMultilineModuleMembers)
+        .MinBlankLinesForSingleLine(it => it.BlankLinesAroundSingleLineModuleMember)
+        .Build()
+        .Name("BlankLinesAroundDifferentModuleMemberKinds")
+        .Where(Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET))
+        .MinBlankLines(it => it.BlankLinesAroundDifferentModuleMemberKinds)
+        .AdditionalCheckForBlankLineAfter((node, context) =>
+          node.GetNextMeaningfulSibling()?.NodeType is var nodeType &&
+          nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType])
+        .AdditionalCheckForBlankLineBefore((node, context) =>
+          node.GetPreviousMeaningfulSibling()?.NodeType is var nodeType &&
+          nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType])
+        .Build()
+        .Name("BlankLinesBeforeFirstTopLevelModuleMember")
+        .Where(
+          Parent().In(ElementBitsets.TOP_LEVEL_MODULE_LIKE_DECLARATION_BIT_SET),
+          Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET)
+            .Satisfies(IsFirstNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET, false)))
+        .MinBlankLinesBefore(it => it.BlankLinesBeforeFirstModuleMemberInTopLevelModule)
+        .Build()
+        .Name("BlankLinesBeforeFirstNestedModuleMember")
+        .Where(
+          Parent().In(ElementType.NESTED_MODULE_DECLARATION),
+          Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET)
+            .Satisfies(IsFirstNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET, false)))
+        .MinBlankLinesBefore(it => it.BlankLinesBeforeFirstModuleMemberInNestedModule)
+        .Build()
+        .Name("BlankLinesAroundModules")
+        .Where(Node().In(ElementBitsets.TOP_LEVEL_MODULE_LIKE_DECLARATION_BIT_SET))
+        .MinBlankLines(it => it.BlankLineAroundTopLevelModules)
+        .Build();
+
+      // todo: test sig files
+      Describe<BlankLinesRule>()
+        .Name("BlankLinesInDecls")
+        .Group(MaxLineBreaks)
+        .Where(Parent().In(ElementBitsets.MODULE_LIKE_DECLARATION_BIT_SET.Union(ElementBitsets.F_SHARP_FILE_BIT_SET)))
+        .SwitchBlankLines(it => it.KeepMaxBlankLineAroundModuleMembers, true, BlankLineLimitKind.LimitMaximumMild)
         .Build();
     }
 

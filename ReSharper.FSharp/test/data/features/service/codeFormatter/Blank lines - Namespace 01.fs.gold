@@ -1,0 +1,134 @@
+﻿BlankLineAroundTopLevelModules = 0
+  BlankLinesBeforeFirstModuleMemberInTopLevelModule = 0
+    KeepMaxBlankLineAroundModuleMembers = 0
+namespace Ns1
+type T = int
+namespace Ns2
+type T = int
+namespace Ns3
+type T = int
+================
+    KeepMaxBlankLineAroundModuleMembers = 1
+namespace Ns1
+
+type T = int
+namespace Ns2
+
+type T = int
+
+namespace Ns3
+type T = int
+================
+    KeepMaxBlankLineAroundModuleMembers = 2
+namespace Ns1
+
+type T = int
+namespace Ns2
+
+type T = int
+
+
+namespace Ns3
+type T = int
+================
+  BlankLinesBeforeFirstModuleMemberInTopLevelModule = 1
+    KeepMaxBlankLineAroundModuleMembers = 0
+namespace Ns1
+
+type T = int
+namespace Ns2
+
+type T = int
+namespace Ns3
+
+type T = int
+================
+    KeepMaxBlankLineAroundModuleMembers = 1
+namespace Ns1
+
+type T = int
+namespace Ns2
+
+type T = int
+
+namespace Ns3
+
+type T = int
+================
+    KeepMaxBlankLineAroundModuleMembers = 2
+namespace Ns1
+
+type T = int
+namespace Ns2
+
+type T = int
+
+
+namespace Ns3
+
+type T = int
+================
+BlankLineAroundTopLevelModules = 1
+  BlankLinesBeforeFirstModuleMemberInTopLevelModule = 0
+    KeepMaxBlankLineAroundModuleMembers = 0
+namespace Ns1
+type T = int
+
+namespace Ns2
+type T = int
+
+namespace Ns3
+type T = int
+================
+    KeepMaxBlankLineAroundModuleMembers = 1
+namespace Ns1
+
+type T = int
+
+namespace Ns2
+
+type T = int
+
+namespace Ns3
+type T = int
+================
+    KeepMaxBlankLineAroundModuleMembers = 2
+namespace Ns1
+
+type T = int
+
+namespace Ns2
+
+type T = int
+
+
+namespace Ns3
+type T = int
+================
+  BlankLinesBeforeFirstModuleMemberInTopLevelModule = 1
+    KeepMaxBlankLineAroundModuleMembers = 0,1
+namespace Ns1
+
+type T = int
+
+namespace Ns2
+
+type T = int
+
+namespace Ns3
+
+type T = int
+================
+    KeepMaxBlankLineAroundModuleMembers = 2
+namespace Ns1
+
+type T = int
+
+namespace Ns2
+
+type T = int
+
+
+namespace Ns3
+
+type T = int

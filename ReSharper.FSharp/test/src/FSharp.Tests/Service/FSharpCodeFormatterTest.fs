@@ -20,6 +20,10 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Expr - Unit 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Unit 01``() = x.DoNamedTest() // todo: move right paren further?
 
+    [<Test>] member x.``Blank lines - Module - Nested 01``() = x.DoNamedTest()
+    [<Test>] member x.``Blank lines - Module members 01 - Different kinds``() = x.DoNamedTest()
+    [<Test>] member x.``Blank lines - Namespace 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Class 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Enum 01``() = x.DoNamedTest()
@@ -28,6 +32,7 @@ type FSharpCodeFormatterTest() =
 
     [<Test>] member x.``Type decl - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 01 - Spaces``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union 02 - Indent``() = x.DoNamedTest()
 
     [<Test; Explicit("Merge formatter branch")>]
     member x.``Top binding indent 01 - No indent``() = x.DoNamedTest()
