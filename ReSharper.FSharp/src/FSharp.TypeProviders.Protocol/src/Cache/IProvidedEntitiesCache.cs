@@ -24,13 +24,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
   {
     protected readonly TypeProvidersContext TypeProvidersContext;
     protected readonly IDictionary<int, T> Entities;
-    private readonly IDictionary<int, List<int>> myEntitiesPerProvider;
+    protected readonly IDictionary<int, List<int>> EntitiesPerProvider;
 
     protected ProvidedEntitiesCacheBase(TypeProvidersContext typeProvidersContext)
     {
       TypeProvidersContext = typeProvidersContext;
       Entities = new Dictionary<int, T>();
-      myEntitiesPerProvider = new Dictionary<int, List<int>>();
+      EntitiesPerProvider = new Dictionary<int, List<int>>();
     }
 
     public T GetOrCreate(int key, int typeProviderId, ProvidedTypeContextHolder context)
@@ -77,22 +77,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     public void Remove(int typeProviderId)
     {
-      if (!myEntitiesPerProvider.TryGetValue(typeProviderId, out var entities)) return;
+      if (!EntitiesPerProvider.TryGetValue(typeProviderId, out var entities)) return;
 
       foreach (var id in entities)
         Entities.Remove(id);
 
-      myEntitiesPerProvider.Remove(typeProviderId);
+      EntitiesPerProvider.Remove(typeProviderId);
     }
 
     private void AttachToTypeProvider(int typeProviderId, int key, T value)
     {
       Entities.Add(key, value);
 
-      if (!myEntitiesPerProvider.TryGetValue(typeProviderId, out var entities))
+      if (!EntitiesPerProvider.TryGetValue(typeProviderId, out var entities))
       {
         entities = new List<int>();
-        myEntitiesPerProvider.Add(typeProviderId, entities);
+        EntitiesPerProvider.Add(typeProviderId, entities);
       }
 
       entities.Add(key);
