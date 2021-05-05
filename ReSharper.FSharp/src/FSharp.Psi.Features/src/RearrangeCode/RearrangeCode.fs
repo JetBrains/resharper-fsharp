@@ -40,7 +40,7 @@ type RearrangeableRecordFieldDeclarationProvider() =
 
 
 type RearrangeableEnumCaseLikeDeclaration(caseDeclaration: IEnumCaseLikeDeclaration) =
-    inherit RearrangeableElementSwap<IEnumCaseLikeDeclaration>(caseDeclaration, "union case declaration", Direction.All)
+    inherit RearrangeableElementSwap<IEnumCaseLikeDeclaration>(caseDeclaration, "enum case like declaration", Direction.All)
 
     let addBarIfNeeded (caseDeclaration: IEnumCaseLikeDeclaration) =
         if isNull caseDeclaration.Bar && isNotNull caseDeclaration.FirstChild then
@@ -55,8 +55,8 @@ type RearrangeableEnumCaseLikeDeclaration(caseDeclaration: IEnumCaseLikeDeclarat
         | :? IUnionCaseDeclaration as caseDeclaration ->
             UnionRepresentationNavigator.GetByUnionCase(caseDeclaration).NotNull().UnionCases |> Seq.cast
 
-        | :? IEnumCaseDeclaration as caseD ->
-            EnumRepresentationNavigator.GetByEnumCase(caseD).NotNull().EnumCases |> Seq.cast
+        | :? IEnumCaseDeclaration as caseDeclaration ->
+            EnumRepresentationNavigator.GetByEnumCase(caseDeclaration).NotNull().EnumCases |> Seq.cast
 
         | _ -> failwithf $"Unexpected declaration: {caseDeclaration}"
 

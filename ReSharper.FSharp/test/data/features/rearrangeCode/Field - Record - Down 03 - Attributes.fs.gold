@@ -1,0 +1,7 @@
+﻿// ${DIRECTION:Down}
+
+type R =
+    { [<F2>]
+      F2: double
+      [<F1>]
+      F1: int }

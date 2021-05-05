@@ -18,12 +18,14 @@ type RearrangeCodeTest() =
     override x.RelativeTestDataPath = "features/rearrangeCode"
 
     [<Test>] member x.``Enum case 01``() = x.DoNamedTest()
-    [<Test; Explicit("XmlDoc is not in range")>] member x.``Enum case 02 - Xml doc``() = x.DoNamedTest()
+    [<Test>] member x.``Enum case 02 - Xml doc``() = x.DoNamedTest()
 
     [<Test>] member x.``Field - Exception 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Field - Record - Down 01``() = x.DoNamedTest()
     [<Test>] member x.``Field - Record - Down 02 - Semicolon``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Record - Down 03 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Record - Down 04 - Attributes and XmlDoc``() = x.DoNamedTest()
     [<Test; Explicit("Fix Direction.All")>] member x.``Field - Record - Right 01``() = x.DoNamedTest()
     [<Test; Explicit("Fix Direction.All")>] member x.``Field - Record - Right 02``() = x.DoNamedTest()
 
