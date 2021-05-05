@@ -99,6 +99,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         new NodeTypeSet(
           ElementType.UNIT_EXPR,
           ElementType.UNIT_PAT,
+          ElementType.TOP_BINDING,
+          ElementType.LOCAL_BINDING,
           ElementType.UNION_CASE_DECLARATION,
           ElementType.ENUM_CASE_DECLARATION,
           ElementType.F_SHARP_TYPE_DECLARATION);
