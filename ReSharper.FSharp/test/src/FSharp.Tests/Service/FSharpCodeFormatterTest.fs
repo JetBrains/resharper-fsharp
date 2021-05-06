@@ -17,7 +17,11 @@ type FSharpCodeFormatterTest() =
         use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
+    [<Test>] member x.``Expr - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unit 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Tuple 01``() = x.DoNamedTest() // todo: move right paren further?
+    [<Test>] member x.``Pattern - Tuple 02``() = x.DoNamedTest() // todo: move right paren further?
     [<Test>] member x.``Pattern - Unit 01``() = x.DoNamedTest() // todo: move right paren further?
 
     [<Test>] member x.``Type - Array 01``() = x.DoNamedTest() // todo: nested array indent?
@@ -37,12 +41,16 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Namespace 02 - Global``() = x.DoNamedTest()
 
     [<Test>] member x.``Module abbreviation 01``() = x.DoNamedTest()
+    [<Test>] member x.``Open 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Class 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Access modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 03 - Spaces``() = x.DoNamedTest() // todo: add spaces in decl start
+
+    [<Test>] member x.``Type decl - Exception 01``() = x.DoNamedTest() // todo: add spaces in decl start
+    [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest() // todo: add spaces in decl start
 
     [<Test>] member x.``Type decl - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 01 - Spaces``() = x.DoNamedTest()

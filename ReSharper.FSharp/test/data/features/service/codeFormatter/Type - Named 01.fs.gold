@@ -8,7 +8,24 @@ type T2 = int
 type T3 = System.
             String
 
-type T4 = System
+type T4 = System.
+            Collections.
+            Generic.
+            List
+
+
+type T5 = System
             .String
 
-type T5 = (int * int) list
+type T6 = System
+            .Collections
+            .Generic
+            .List
+
+type T7 = System.Collections.Generic
+            .List
+
+type T8 = System.Collections
+            .Generic.List
+
+type T9 = (int * int) list

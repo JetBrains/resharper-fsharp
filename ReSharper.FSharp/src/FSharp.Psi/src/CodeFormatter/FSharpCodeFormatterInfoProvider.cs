@@ -56,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           Parent().In(ElementBitsets.DECLARED_MODULE_LIKE_DECLARATION_BIT_SET),
           Node().In(
             AccessModifiers.Union(
-              FSharpTokenType.REC, FSharpTokenType.DOT, 
+              FSharpTokenType.REC, FSharpTokenType.DOT,
               FSharpTokenType.IDENTIFIER, FSharpTokenType.GLOBAL,
               ElementType.TYPE_REFERENCE_NAME, ElementType.EXPRESSION_REFERENCE_NAME)))
         .Return(IndentType.External)
@@ -99,9 +99,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           ElementType.LOCAL_BINDING,
           ElementType.TOP_BINDING,
 
+          ElementType.OPEN_STATEMENT,
           ElementType.EXPRESSION_REFERENCE_NAME,
           ElementType.TYPE_REFERENCE_NAME,
-
+          ElementType.EXCEPTION_DECLARATION,
           ElementType.UNION_CASE_DECLARATION,
           ElementType.ENUM_CASE_DECLARATION,
           ElementType.F_SHARP_TYPE_DECLARATION,
@@ -280,10 +281,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
 
       Describe<FormattingRule>()
+        .Name("SpaceAfterColon")
+        .Group(SpaceRuleGroup)
+        .Where(Left().In(FSharpTokenType.COLON))
+        .Return(IntervalFormatType.Space)
+        .Build();
+
+      Describe<FormattingRule>()
         .Name("SpaceBeforeColon")
         .Group(SpaceRuleGroup)
         .Where(Right().In(FSharpTokenType.COLON))
         .Switch(it => it.SpaceBeforeColon, SpaceOptionsBuilders)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("SpaceAfterComma")
+        .Group(SpaceRuleGroup)
+        .Where(Left().In(FSharpTokenType.COMMA))
+        .Switch(it => it.SpaceAfterComma, SpaceOptionsBuilders)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("NoSpaceBeforeComma")
+        .Group(SpaceRuleGroup)
+        .Where(Right().In(FSharpTokenType.COMMA))
+        .Return(IntervalFormatType.Empty)
         .Build();
 
       Describe<FormattingRule>()

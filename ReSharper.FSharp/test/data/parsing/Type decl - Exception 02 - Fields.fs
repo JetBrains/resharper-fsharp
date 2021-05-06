@@ -1,1 +1,1 @@
-exception E of int
+exception E of int * b: int

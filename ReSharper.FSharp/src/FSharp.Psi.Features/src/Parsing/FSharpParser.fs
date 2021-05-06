@@ -69,14 +69,15 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
         member this.ParseFSharpFile(noCache) = parseFile noCache
         member this.ParseFile() = parseFile false :> _
 
-        member this.ParseExpression(chameleonExpr: IChameleonExpression, document) =
-            let document = if isNotNull document then document else chameleonExpr.GetSourceFile().Document
+        member this.ParseExpression(chameleonExpr: IChameleonExpression, syntheticDocument) =
+            let isSyntheticDocument = isNotNull syntheticDocument
+            let document = if isSyntheticDocument then syntheticDocument else chameleonExpr.GetSourceFile().Document
 
             let projectedOffset, lineShift =
                 let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
                 let offsetShift = projectedOffset - chameleonExpr.OriginalStartOffset
 
-                if offsetShift = 0 then
+                if offsetShift = 0 && isSyntheticDocument then
                     projectedOffset, 0
                 else
                     let startLine = chameleonExpr.GetDocumentStartOffset().ToDocumentCoords().Line

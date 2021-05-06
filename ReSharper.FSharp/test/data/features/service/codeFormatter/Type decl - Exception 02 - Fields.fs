@@ -1,0 +1,9 @@
+﻿module Module
+
+exception E1 of int
+
+exception E2 of a: int
+
+exception E3 of a:int*b:int
+
+exception E4 of a  :  int  *  b  :  int
