@@ -49,15 +49,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     private void Indenting()
     {
-      var bindingAndModuleDeclIndentingRulesParameters = new[]
+      // todo: use continuous indent
+      Describe<IndentingRule>()
+        .Name("ModuleLikeHeaderIndent")
+        .Where(
+          Parent().In(ElementBitsets.DECLARED_MODULE_LIKE_DECLARATION_BIT_SET),
+          Node().In(
+            AccessModifiers.Union(
+              FSharpTokenType.REC, FSharpTokenType.DOT, 
+              FSharpTokenType.IDENTIFIER, FSharpTokenType.GLOBAL,
+              ElementType.TYPE_REFERENCE_NAME, ElementType.EXPRESSION_REFERENCE_NAME)))
+        .Return(IndentType.External)
+        .Build();
+
+      var simpleIndentingNodes = new[]
       {
         ("NestedModuleDeclaration", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.MODULE_MEMBER),
-        ("NestedModuleDeclName", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.IDENTIFIER),
-        ("NamedModuleDeclName", ElementType.NAMED_MODULE_DECLARATION, NamedModuleDeclaration.IDENTIFIER),
-      };
-
-      var fsExprIndentingRulesParameters = new[]
-      {
         ("ForExpr", ElementType.FOR_EXPR, ForExpr.DO_EXPR),
         ("ForEachExpr", ElementType.FOR_EACH_EXPR, ForEachExpr.DO_EXPR),
         ("WhileExpr", ElementType.WHILE_EXPR, WhileExpr.DO_EXPR),
@@ -76,8 +83,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         ("MatchExpr_With", ElementType.MATCH_EXPR, MatchExpr.WITH),
       };
 
-      bindingAndModuleDeclIndentingRulesParameters
-        .Union(fsExprIndentingRulesParameters)
+      simpleIndentingNodes
         .ToList()
         .ForEach(DescribeSimpleIndentingRule);
 
@@ -86,8 +92,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           ElementType.UNIT_EXPR,
           ElementType.UNIT_PAT,
 
-          ElementType.ARRAY_TYPE_USAGE, 
-          ElementType.FUNCTION_TYPE_USAGE, 
+          ElementType.ARRAY_TYPE_USAGE,
+          ElementType.FUNCTION_TYPE_USAGE,
           ElementType.NAMED_TYPE_USAGE,
 
           ElementType.LOCAL_BINDING,
@@ -299,7 +305,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           Right().In(FSharpTokenType.LBRACK))
         .Return(IntervalFormatType.Empty)
         .Build();
-      
+
       Describe<FormattingRule>()
         .Group(LineBreaksRuleGroup)
         .Name("LineBreakAfterTypeReprAccessModifier")

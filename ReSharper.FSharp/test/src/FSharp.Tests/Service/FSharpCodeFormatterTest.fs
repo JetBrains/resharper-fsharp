@@ -29,6 +29,11 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Blank lines - Module members 01 - Different kinds``() = x.DoNamedTest()
     [<Test>] member x.``Blank lines - Namespace 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module - Top 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Top 02``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 02 - Global``() = x.DoNamedTest()
+
     [<Test>] member x.``Module abbreviation 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Class 01``() = x.DoNamedTest()

@@ -96,11 +96,7 @@ interface declaredModuleDeclaration:
 namedNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
   NAMESPACE<NAMESPACE, ModuleOrNamespaceKeyword>
   REC<REC, RecKeyword>?
-  (
-    referenceName<REFERENCE_NAME, QualifierReferenceName>
-    DOT<FSHARP_DELIMITER, Delimiter>
-  )?
-  fSharpIdentifier<IDENTIFIER, Identifier>
+  topLevelNamedDeclarationName
   moduleMember<MODULE_MEMBER, Members>*;
 
 globalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
@@ -114,14 +110,17 @@ namedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } 
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MODULE<MODULE, ModuleOrNamespaceKeyword>
-  REC<REC, RecKeyword>?
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  REC<REC, RecKeyword>?
+  topLevelNamedDeclarationName
+  moduleMember<MODULE_MEMBER, Members>*;
+
+private topLevelNamedDeclarationName:
   (
     referenceName<REFERENCE_NAME, QualifierReferenceName>
     DOT<FSHARP_DELIMITER, Delimiter>
   )?
-  fSharpIdentifier<IDENTIFIER, Identifier>
-  moduleMember<MODULE_MEMBER, Members>*;
+  fSharpIdentifier<IDENTIFIER, Identifier>;
 
 anonModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
   moduleMember<MODULE_MEMBER, Members>*;
@@ -1009,8 +1008,8 @@ nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MODULE<MODULE, ModuleOrNamespaceKeyword>
-  REC<REC, RecKeyword>?
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  REC<REC, RecKeyword>?
   identifier<IDENTIFIER, Identifier>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   moduleMember<MODULE_MEMBER, Members>*;
