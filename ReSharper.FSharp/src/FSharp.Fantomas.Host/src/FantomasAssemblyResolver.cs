@@ -5,12 +5,12 @@ using System.Reflection;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
-  public static class RiderAssemblyResolver
+  public static class FantomasAssemblyResolver
   {
     private const string AdditionalProbingPathsEnvVar = "RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS";
     private static readonly List<string> OurAdditionalProbingPaths = new List<string>();
 
-    static RiderAssemblyResolver()
+    static FantomasAssemblyResolver()
     {
       var paths = Environment.GetEnvironmentVariable(AdditionalProbingPathsEnvVar);
       if (string.IsNullOrWhiteSpace(paths)) return;

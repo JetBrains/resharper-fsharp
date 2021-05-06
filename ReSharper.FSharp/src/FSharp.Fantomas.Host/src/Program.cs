@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
   {
     public static void Main(string[] args)
     {
-      AppDomain.CurrentDomain.AssemblyResolve += RiderAssemblyResolver.Resolve;
+      AppDomain.CurrentDomain.AssemblyResolve += FantomasAssemblyResolver.Resolve;
       MainInternal(args);
     }
 
