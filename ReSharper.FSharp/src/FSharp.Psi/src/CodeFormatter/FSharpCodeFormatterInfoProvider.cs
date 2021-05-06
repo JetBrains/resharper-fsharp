@@ -380,6 +380,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     {
       var declarations =
         ElementBitsets.MODULE_MEMBER_BIT_SET
+          .Union(ElementBitsets.BINDING_BIT_SET)
           .Union(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET)
           .Union(ElementType.F_SHARP_TYPE_DECLARATION);
 

@@ -27,6 +27,8 @@ type FSharpCodeFormatterTest() =
 
     [<Test>] member x.``Blank lines - Module - Nested 01``() = x.DoNamedTest()
     [<Test>] member x.``Blank lines - Module members 01 - Different kinds``() = x.DoNamedTest()
+    [<Test>] member x.``Blank lines - Module members 02 - Type groups``() = x.DoNamedTest()
+    [<Test>] member x.``Blank lines - Module members 03 - Binding groups``() = x.DoNamedTest()
     [<Test>] member x.``Blank lines - Namespace 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Module - Top 01``() = x.DoNamedTest()
