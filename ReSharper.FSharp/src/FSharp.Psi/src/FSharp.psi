@@ -174,33 +174,21 @@ interface binding:
   localBinding;
 
 topBinding extras {
-  get { methodName="Expression" path=<topBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   get { methodName="Attributes" path=<topBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="Expression" path=<topBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   get { methodName="ParameterPatterns" path=<topBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
-  attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  STATIC<STATIC, StaticKeyword>?
-  (
-    letOrUse{LET, BindingKeyword}
-    |
-    AND<LET, BindingKeyword>
-  )
-  INLINE<INLINE, InlineKeyword>?
-  REC<REC, RecKeyword>?
-  attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  MUTABLE<MUTABLE, MutableKeyword>?
-  accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  fSharpPattern<HEAD_PATTERN, HeadPattern>
-  typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
-  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
-  EQUALS<EQUALS, EqualsToken>
+  bindingHeader
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
 localBinding extras {
   get { methodName="Attributes" path=<localBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="ParameterPatterns" path=<localBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
+  bindingHeader
+  fSharpExpression<EXPR, Expression>;
+
+private bindingHeader:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
   (
@@ -217,8 +205,7 @@ localBinding extras {
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
-  EQUALS<EQUALS, EqualsToken>
-  fSharpExpression<EXPR, Expression>;
+  EQUALS<EQUALS, EqualsToken>;
 
 returnTypeInfo extras {
   get { methodName="Attributes" path=<returnTypeInfo:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
