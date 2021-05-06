@@ -14,7 +14,7 @@ type FSharpRenameTest() =
     override x.RelativeTestDataPath = "features/refactorings/rename"
 
     override x.ProvideOccurrencesData(occurrences, _, _, _) =
-        // When multiple overloads are available, we want to rename initial element.
+        // When multiple overloads are available, we want to rename the initial element.
         // Current occurrences are:
         // "Rename initial element"
         // "Rename with overloads"
@@ -84,8 +84,13 @@ type FSharpRenameTest() =
     [<Test>] member x.``Ctor params 02``() = x.DoNamedTest()
     [<Test>] member x.``Ctor params 03``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type private binding - function``() = x.DoNamedTest()
-    [<Test>] member x.``Type private binding - value``() = x.DoNamedTest()
+    [<Test>] member x.``Type private binding - Function - Shadowed 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type private binding - Function - Shadowed 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type private binding - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type private binding - Value - Shadowed 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type private binding - Value - Shadowed 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type private binding - Value - Shadowed 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type private binding - Value 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Types - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Record 02 - Struct``() = x.DoNamedTest()
