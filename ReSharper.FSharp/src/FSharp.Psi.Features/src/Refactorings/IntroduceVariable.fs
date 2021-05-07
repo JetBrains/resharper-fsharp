@@ -90,6 +90,16 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             let range = TreeRange(contextExpr)
             {| ReplaceRange = range; InRange = range; AddNewLine = true |}
 
+    static let canInsertBeforeRightOperand (binaryAppExpr: IBinaryAppExpr) =
+        // Don't move up from "blocks" after empty non-code line separators.
+        // todo: allow choosing scope?
+
+        let leftArgument = binaryAppExpr.LeftArgument
+        let rightArgument = binaryAppExpr.RightArgument
+        isNotNull leftArgument && isNotNull rightArgument &&
+
+        leftArgument.Indent = rightArgument.Indent && leftArgument.EndLine + docLine 1 < rightArgument.StartLine
+
     let rec getExprToInsertBefore (expr: IFSharpExpression): IFSharpExpression =
         let expr = expr.IgnoreParentParens()
 
@@ -122,14 +132,11 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         | :? IBinaryAppExpr as binaryAppExpr when
                 binaryAppExpr.RightArgument == expr && isNotNull binaryAppExpr.LeftArgument ->
-            let leftArgument = binaryAppExpr.LeftArgument
-
-            if leftArgument.Indent = expr.Indent && leftArgument.EndLine + docLine 1 < expr.StartLine then
-                // Don't move up from "blocks" after empty non-code line separators.
-                // todo: allow choosing scope?
+            if canInsertBeforeRightOperand binaryAppExpr then
                 expr
             else
                 // Try going up from the left part instead.
+                let leftArgument = binaryAppExpr.LeftArgument
                 match leftArgument.IgnoreInnerParens() with
                 | :? IBinaryAppExpr as binaryAppExpr when isNotNull binaryAppExpr.RightArgument ->
                     getExprToInsertBefore binaryAppExpr.RightArgument
@@ -500,6 +507,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         if not (isAllowedContext expr) then false else
         isValidExpr expr
 
+    static member CanInsertBeforeRightOperand(binaryAppExpr: IBinaryAppExpr) =
+        canInsertBeforeRightOperand binaryAppExpr
 
 type FSharpIntroduceVarHelper() =
     inherit IntroduceVariableHelper()

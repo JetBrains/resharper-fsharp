@@ -1,8 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
-open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -10,7 +7,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.UI.RichText
 
 type AddIgnoreFix(expr: IFSharpExpression) =
     inherit FSharpQuickFixBase()
@@ -55,21 +51,14 @@ type AddIgnoreFix(expr: IFSharpExpression) =
     override x.IsAvailable _ = isValid expr
 
     override x.Execute(solution, textControl) =
-        match suggestInnerExpression expr with
-        | Some(innerExpression, text) when isNotNull innerExpression ->
-            let occurrences =
-                [| innerExpression, text
-                   expr, "Whole expression" |]
-                |> Array.map (fun (expr, text) ->
-                    let getRange (expr: IFSharpExpression) = [| expr.GetNavigationRange() |]
-                    WorkflowPopupMenuOccurrence(RichText(text), RichText.Empty, expr, getRange))
-
-            let occurrence =
-                let popupMenu = solution.GetComponent<WorkflowPopupMenu>()
-                popupMenu.ShowPopup(textControl.Lifetime, occurrences, CustomHighlightingKind.Other, textControl, null)
-
-            expr <- occurrence.Entities |> Seq.tryHead |> Option.toObj
-        | _ -> ()
+        expr <-
+            match suggestInnerExpression expr with
+            | Some(innerExpression, text) when isNotNull innerExpression ->
+                let occurrences =
+                    [| innerExpression, text
+                       expr, "Whole expression" |]
+                x.SelectExpression(occurrences, solution, textControl)
+            | _ -> expr
 
         if isNotNull expr then
             base.Execute(solution, textControl)
