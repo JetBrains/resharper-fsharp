@@ -72,7 +72,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache
         IdsCache
           .OrderBy(t => t.Key.FullName)
           .Select(t =>
-            $"{t.Value.id} {t.Key.FullName} tps: {string.Join("|", t.Value.referencingProviders.OrderBy().ToArray())} " +
+            $"{t.Key.FullName} tps: {string.Join("|", t.Value.referencingProviders.OrderBy().ToArray())} " +
             $"(from {t.Key.Assembly.GetLogName()})"));
   }
 
@@ -85,9 +85,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache
     public override string Dump() =>
       "Provided Assemblies:\n" + string.Join("\n",
         IdsCache
-          .Select(t => (Id: t.Value.id, Name: t.Key.GetLogName(),
-            Providers: t.Value.referencingProviders.OrderBy().ToArray()))
+          .Select(t => (Name: t.Key.GetLogName(), Providers: t.Value.referencingProviders.OrderBy().ToArray()))
           .OrderBy(t => t.Name)
-          .Select(t => $"{t.Id} {t.Name} tps: {string.Join("|", t.Providers)}"));
+          .Select(t => $"{t.Name} tps: {string.Join("|", t.Providers)}"));
   }
 }
