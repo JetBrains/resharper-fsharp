@@ -1,4 +1,0 @@
-namespace Namespace
-
-module Module =
-()

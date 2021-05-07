@@ -53,7 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<IndentingRule>()
         .Name("ModuleLikeHeaderIndent")
         .Where(
-          Parent().In(ElementBitsets.DECLARED_MODULE_LIKE_DECLARATION_BIT_SET),
+          Parent().In(ElementBitsets.TOP_LEVEL_MODULE_LIKE_DECLARATION_BIT_SET),
           Node().In(
             AccessModifiers.Union(
               FSharpTokenType.REC, FSharpTokenType.DOT,
@@ -64,7 +64,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       var simpleIndentingNodes = new[]
       {
-        ("NestedModuleDeclaration", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.MODULE_MEMBER),
         ("ForExpr", ElementType.FOR_EXPR, ForExpr.DO_EXPR),
         ("ForEachExpr", ElementType.FOR_EACH_EXPR, ForEachExpr.DO_EXPR),
         ("WhileExpr", ElementType.WHILE_EXPR, WhileExpr.DO_EXPR),
@@ -99,9 +98,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           ElementType.LOCAL_BINDING,
           ElementType.TOP_BINDING,
 
-          ElementType.OPEN_STATEMENT,
           ElementType.EXPRESSION_REFERENCE_NAME,
           ElementType.TYPE_REFERENCE_NAME,
+
+          ElementType.NESTED_MODULE_DECLARATION,
+          ElementType.OPEN_STATEMENT,
           ElementType.EXCEPTION_DECLARATION,
           ElementType.UNION_CASE_DECLARATION,
           ElementType.ENUM_CASE_DECLARATION,
@@ -113,8 +114,81 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Name("ContinuousIndent")
         .Where(Node().In(continuousIndentNodes))
         .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
-        .AddException(Node().Satisfies((node, context) => node is DocComment))
+        .AddException(Node().In(FSharpTokenType.LINE_COMMENT).Satisfies((node, context) => node is DocComment))
         .Build();
+
+      // External: starts/ends at first/last node in interval
+      // Internal: skips first/last node in interval
+
+      Describe<IndentingRule>()
+        .Name("NestedModuleMembersIndent")
+        .Where(
+          Parent().In(ElementType.NESTED_MODULE_DECLARATION),
+          Node()
+            .In(ElementBitsets.MODULE_MEMBER_BIT_SET.Union(Comments))
+            .Satisfies((node, context) =>
+              {
+                // Find comment preceding a module member only (i.e. don't use comment before `=`)
+
+                var parent = node.Parent;
+                if (parent == null) return false;
+
+                var foundComment = false;
+                var ourNodeIsComment = false;
+
+                for (var i = parent.FirstChild; i != null; i = i.NextSibling)
+                {
+                  if (Comments[i.NodeType])
+                  {
+                    if (i == node)
+                    {
+                      if (foundComment)
+                        return false;
+
+                      ourNodeIsComment = true;
+                    }
+
+                    foundComment = true;
+                    continue;
+                  }
+
+                  if (ElementBitsets.MODULE_MEMBER_BIT_SET[i.NodeType])
+                    return i == node && !foundComment || ourNodeIsComment;
+
+                  if (!i.IsWhitespaceToken())
+                  {
+                    foundComment = false;
+                    if (ourNodeIsComment)
+                      return false;
+                  }
+                }
+
+                return false;
+              }))
+        .CloseNodeGetter((node, context) => GetLastNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET, node))
+        .Calculate((node, context) => // node is Left()/Node()
+        {
+          var treeNode = (ITreeNode) node;
+          // Formatter engine passes nulls once for caching internal/external intervals as an optimization.
+          if (treeNode == null || context == null)
+            return new ConstantOptionNode(new IndentOptionValue(IndentType.StartAtExternal | IndentType.EndAtExternal));
+
+          var closingNode = GetLastNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET, treeNode);
+          if (closingNode.GetTreeStartOffset() > context.LastNode.GetTreeStartOffset())
+            return
+              new ConstantOptionNode(
+                new IndentOptionValue(
+                  IndentType.AbsoluteIndent | IndentType.StartAtExternal | IndentType.EndAtExternal |
+                  IndentType.NonSticky | IndentType.NonAdjustable,
+                  0, closingNode.CalcLineIndent(context.CodeFormatter, true)));
+
+          // todo: try using the following for nodes without further indent:
+          //     IndentType.NoIndentAtExternal
+          //     or maybe startAtExt + multiplier 0
+
+          return new ConstantOptionNode(
+            new IndentOptionValue(IndentType.NoIndentAtExternal | IndentType.EndAtExternal | IndentType.NonSticky));
+        }).Build();
 
       Describe<IndentingRule>()
         .Name("SimpleTypeRepr_Accessibility")
@@ -196,6 +270,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           Node().HasRole(DoStatement.CHAMELEON_EXPR))
         .Return(IndentType.External)
         .Build();
+    }
+
+    public static ITreeNode GetLastNodeOfTypeSet(NodeTypeSet nodeTypeSet, ITreeNode node)
+    {
+      var parent = node.Parent;
+      if (parent == null) return null;
+
+      ITreeNode result = null;
+
+      for (var i = parent.FirstChild; i != null; i = i.NextSibling)
+        if (nodeTypeSet[i.NodeType])
+          result = i;
+
+      return result;
     }
 
     private void Aligning()

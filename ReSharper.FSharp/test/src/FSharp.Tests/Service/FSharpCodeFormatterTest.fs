@@ -20,8 +20,8 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Expr - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unit 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Pattern - Tuple 01``() = x.DoNamedTest() // todo: move right paren further?
-    [<Test>] member x.``Pattern - Tuple 02``() = x.DoNamedTest() // todo: move right paren further?
+    [<Test>] member x.``Pattern - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Tuple 02``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Unit 01``() = x.DoNamedTest() // todo: move right paren further?
 
     [<Test>] member x.``Type - Array 01``() = x.DoNamedTest() // todo: nested array indent?
@@ -35,6 +35,8 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Blank lines - Module members 03 - Binding groups``() = x.DoNamedTest()
     [<Test>] member x.``Blank lines - Namespace 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module - Nested - Members``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Nested 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top 02``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
@@ -49,8 +51,8 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Type decl - Enum 02 - Access modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 03 - Spaces``() = x.DoNamedTest() // todo: add spaces in decl start
 
-    [<Test>] member x.``Type decl - Exception 01``() = x.DoNamedTest() // todo: add spaces in decl start
-    [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest() // todo: add spaces in decl start
+    [<Test>] member x.``Type decl - Exception 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 01 - Spaces``() = x.DoNamedTest()
@@ -64,13 +66,6 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Local binding indent 03 - Big indent``() = x.DoNamedTest()
     [<Test>] member x.``Let module decl binding indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Let expr binding indent 01 - Correct indent``() = x.DoNamedTest()
-
-    [<Test>] member x.``Nested module decl name indent 01 - Correct indent``() = x.DoNamedTest()
-    [<Test>] member x.``Named module decl name indent 01 - Correct indent``() = x.DoNamedTest()
-
-    [<Test>] member x.``Nested module indent 01 - No indent``() = x.DoNamedTest()
-    [<Test>] member x.``Nested module indent 02 - Correct indent``() = x.DoNamedTest()
-    [<Test>] member x.``Nested module indent 03 - Big indent``() = x.DoNamedTest()
 
     [<Test>] member x.``For expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``For expr indent 02 - No indent``() = x.DoNamedTest()
