@@ -27,9 +27,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     public override string Dump() =>
       "Provided Assemblies:\n" + string.Join("\n",
-        Entities
-          .Select(t => (t.Key, Name: t.Value.GetLogName()))
+        EntitiesPerProvider
+          .SelectMany(kvp => kvp.Value
+            .Select(entityId => Entities[entityId])
+            .Select(entity => (tpId: kvp.Key, Name: entity.GetLogName())))
           .OrderBy(t => t.Name)
-          .Select(t => $"{t.Key} {t.Name}"));
+          .Select(t => $"{t.tpId} {t.Name}"));
   }
 }
