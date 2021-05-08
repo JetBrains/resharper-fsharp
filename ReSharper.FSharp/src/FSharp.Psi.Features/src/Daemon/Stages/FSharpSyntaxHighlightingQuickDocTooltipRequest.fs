@@ -1,8 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open JetBrains.ProjectModel
+open JetBrains.RdBackend.Common.Features.Daemon.Tooltips.Request
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.Rider.Backend.Features.Daemon.Tooltips.Request
 open JetBrains.TextControl.DocumentMarkup
 
 [<SolutionComponent>]
