@@ -28,12 +28,12 @@ val resharperPluginPath = File(repoRoot, "ReSharper.FSharp")
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
 val pluginFiles = listOf(
-        "FSharp.ExternalFormatter.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Protocol.dll",
-        "FSharp.ExternalFormatter.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Protocol.pdb",
-        "FSharp.ExternalFormatter.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host.exe",
-        "FSharp.ExternalFormatter.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host.runtimeconfig.json",
-        "FSharp.ExternalFormatter.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ExternalFormatter.Host.pdb",
-        "FSharp.ExternalFormatter.Host/bin/$buildConfiguration/net461/Fantomas.dll")
+        "FSharp.Fantomas.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.dll",
+        "FSharp.Fantomas.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.pdb",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.exe",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.runtimeconfig.json",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/Fantomas.dll")
 
 tasks {
     withType<BuildSearchableOptionsTask> {

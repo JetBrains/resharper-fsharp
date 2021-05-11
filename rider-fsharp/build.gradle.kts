@@ -77,7 +77,7 @@ intellij {
     downloadSources = false
 
     // rider-plugins-appender - workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
-    setPlugins(project(":externalFormatter"), "rider-plugins-appender")
+    setPlugins(project(":rider-fantomas"), "rider-plugins-appender")
 }
 
 repositories.forEach {
