@@ -1,0 +1,4 @@
+﻿type T() =
+    member _{caret}.P =
+        let __ = ()
+        __ |> ignore
