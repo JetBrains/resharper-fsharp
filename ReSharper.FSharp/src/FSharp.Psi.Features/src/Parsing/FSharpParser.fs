@@ -13,7 +13,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
-open JetBrains.ReSharper.Psi.Tree
 
 type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sourceFile: IPsiSourceFile,
         checkerService: FcsCheckerService, symbolsCache: IFSharpResolvedSymbolsCache) =
@@ -80,7 +79,7 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
                 if offsetShift = 0 && isSyntheticDocument then
                     projectedOffset, 0
                 else
-                    let startLine = chameleonExpr.GetDocumentStartOffset().ToDocumentCoords().Line
+                    let startLine = document.GetCoordsByOffset(projectedOffset).Line
                     let lineShift = int startLine - chameleonExpr.SynExpr.Range.StartLine + 1
 
                     let lineStartShift = document.GetLineStartOffset(startLine) - chameleonExpr.OriginalLineStart
