@@ -19,7 +19,7 @@ module FSharpGlobalUtil =
 
     let someUnit = Some ()
 
-    let (|IsNonNull|_|) value =
+    let (|NotNull|_|) value =
         if isNotNull value then Some value else None
 
 
