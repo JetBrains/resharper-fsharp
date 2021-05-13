@@ -8,10 +8,10 @@
         <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</RootNamespace>
     </PropertyGroup>
 
+    <!-- TODO: needed for 461 (because the default is x86), remove for netstandard/net5 -->
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <PlatformTarget>AnyCPU</PlatformTarget>
     </PropertyGroup>
-
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <PlatformTarget>AnyCPU</PlatformTarget>
     </PropertyGroup>
