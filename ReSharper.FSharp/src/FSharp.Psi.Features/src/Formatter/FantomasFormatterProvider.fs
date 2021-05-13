@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client
 open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 
 [<SolutionComponent>]
-type CodeFormatterProvider(solution: ISolution, fantomasFactory: FantomasProcessFactory) =
+type FantomasFormatterProvider(solution: ISolution, fantomasFactory: FantomasProcessFactory) =
     let mutable connection: FantomasConnection = null
 
     let isConnectionAlive () =

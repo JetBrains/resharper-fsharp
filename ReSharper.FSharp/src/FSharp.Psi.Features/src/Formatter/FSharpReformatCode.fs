@@ -47,7 +47,7 @@ type FSharpReformatCode() =
             let settings = sourceFile.GetSettingsStoreWithEditorConfig()
             let languageService = fsFile.Language.LanguageServiceNotNull()
             let formatter = languageService.CodeFormatter
-            let codeFormatterProvider = solution.GetComponent<CodeFormatterProvider>()
+            let codeFormatterProvider = solution.GetComponent<FantomasFormatterProvider>()
 
             let settings =
                 formatter.GetFormatterSettings(solution, sourceFile, settings, false) :?> FSharpFormatSettingsKey
