@@ -2,12 +2,12 @@
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
+using JetBrains.Platform.RdFramework.ExternalProcess.Util;
 using JetBrains.Rd.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
 {
@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
 
     protected override string ProtocolName => "Out-of-Process Type Providers Host";
 
-    public TypeProvidersEndPoint() : base(ProtocolConstants.TypeProvidersHostPid)
+    public TypeProvidersEndPoint() : base(TypeProvidersProtocolConstants.TypeProvidersHostPid)
     {
     }
 
@@ -30,12 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
 
     protected override void InitLogger(Lifetime lifetime, string path)
     {
-      LogManager.Instance.SetConfig(new XmlLogConfigModel());
-      var logPath = FileSystemPath.TryParse(path);
-      if (logPath.IsNullOrEmpty()) return;
-
-      var logEventListener = new FileLogEventListener(logPath);
-      LogManager.Instance.AddOmnipresentLogger(lifetime, logEventListener, LoggingLevel.TRACE);
+      ProtocolEndPointUtil.InitLogger(path, lifetime, LoggingLevel.TRACE);
       Logger.Log(LoggingLevel.INFO, $"Process Runtime: {RuntimeInformation.FrameworkDescription}");
     }
 

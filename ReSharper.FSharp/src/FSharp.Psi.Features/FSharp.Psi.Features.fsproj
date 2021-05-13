@@ -105,6 +105,7 @@
     <Compile Include="src\Search\FSharpGeneratedElementsSearch.fs" />
     <Compile Include="src\Search\RecordCtorSearch.fs" />
     <Compile Include="src\ExtendSelection\FSharpExtendSelectionProvider.fs" />
+    <Compile Include="src\Formatter\FantomasFormatterProvider.fs" />
     <Compile Include="src\Formatter\FSharpReformatCode.fs" />
     <Compile Include="src\Fsi\FsiSandboxUtil.fs" />
     <Compile Include="src\Fsi\FsiOptions.fs" />
@@ -230,11 +231,11 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
-    <PackageReference Include="JetBrains.Fantomas" Version="$(FantomasVersion)" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
   </ItemGroup>
 

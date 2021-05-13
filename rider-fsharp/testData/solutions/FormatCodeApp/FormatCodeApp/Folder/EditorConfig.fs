@@ -1,0 +1,3 @@
+﻿module EditorConfig
+
+    type A() = class end

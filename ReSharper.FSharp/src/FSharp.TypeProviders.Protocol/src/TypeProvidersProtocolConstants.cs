@@ -3,7 +3,7 @@ using JetBrains.Util.Logging;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 {
-  public static class ProtocolConstants
+  public static class TypeProvidersProtocolConstants
   {
     public const string TypeProvidersHostPid = "TypeProvidersHost";
 

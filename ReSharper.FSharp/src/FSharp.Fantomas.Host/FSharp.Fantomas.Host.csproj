@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net461</TargetFramework>
+        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</AssemblyName>
+        <OutputType>Exe</OutputType>
+        <LangVersion>$(CSharpLanguageVersion)</LangVersion>
+        <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</RootNamespace>
+    </PropertyGroup>
+
+    <!-- TODO: needed for 461 (because the default is x86), remove for netstandard/net5 -->
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <PlatformTarget>AnyCPU</PlatformTarget>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <PlatformTarget>AnyCPU</PlatformTarget>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="JetBrains.Fantomas" Version="$(FantomasVersion)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
+    <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props')" />
+</Project>

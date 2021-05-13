@@ -47,8 +47,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     private ProcessStartInfo GetCoreProcessStartInfo(int port, FileSystemPath basePath)
     {
       var sdkMajorVersion = myNuGetVersion.Major < 3 ? 3 : myNuGetVersion.Major;
-      var runtimeConfigPath = basePath.Combine(ProtocolConstants.CoreRuntimeConfigFilename(sdkMajorVersion));
-      var fileSystemPath = basePath.Combine(ProtocolConstants.TypeProvidersHostCoreFilename);
+      var runtimeConfigPath = basePath.Combine(TypeProvidersProtocolConstants.CoreRuntimeConfigFilename(sdkMajorVersion));
+      var fileSystemPath = basePath.Combine(TypeProvidersProtocolConstants.TypeProvidersHostCoreFilename);
       var dotnetArgs = $"--runtimeconfig \"{runtimeConfigPath}\"";
 
       Assertion.Assert(fileSystemPath.ExistsFile, $"can't find '{fileSystemPath.FullPath}'");
@@ -57,7 +57,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       var processStartInfo = new ProcessStartInfo
       {
         Arguments =
-          $"{dotnetArgs} \"{fileSystemPath.FullPath}\" {port} \"{ProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
+          $"{dotnetArgs} \"{fileSystemPath.FullPath}\" {port} \"{TypeProvidersProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
         FileName = "exec"
       };
 
@@ -66,13 +66,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     private static ProcessStartInfo GetFrameworkProcessStartInfo(int port, FileSystemPath basePath)
     {
-      var fileSystemPath = basePath.Combine(ProtocolConstants.TypeProvidersHostFrameworkFilename);
+      var fileSystemPath = basePath.Combine(TypeProvidersProtocolConstants.TypeProvidersHostFrameworkFilename);
       Assertion.Assert(fileSystemPath.ExistsFile, $"can't find '{fileSystemPath.FullPath}'");
 
       var processStartInfo = new ProcessStartInfo
       {
         Arguments =
-          $"{port} \"{ProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
+          $"{port} \"{TypeProvidersProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
         FileName = fileSystemPath.FullPath
       };
 
@@ -88,7 +88,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
           Environment.GetEnvironmentVariable("RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS")
         },
         {
-          ProtocolConstants.TypeProvidersHostPid,
+          TypeProvidersProtocolConstants.TypeProvidersHostPid,
           Process.GetCurrentProcess().Id.ToString()
         }
       };
