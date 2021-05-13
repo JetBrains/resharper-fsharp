@@ -17,9 +17,13 @@ type FSharpCodeFormatterTest() =
         use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
+    [<Test>] member x.``Expr - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unit 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - Tuple - IsInst 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Tuple - ListCons 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Tuple - Align 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Tuple 02``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Unit 01``() = x.DoNamedTest() // todo: move right paren further?
@@ -106,15 +110,12 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``IfThenElse expr indent 02``() = x.DoNamedTest()
     [<Test>] member x.``IfThenElse expr indent 03 - Elif``() = x.DoNamedTest()
 
-    [<Test>] member x.``Match expr indent 01 - Expr at new line``() = x.DoNamedTest()
-    [<Test>] member x.``Match expr indent 02 - With at new line``() = x.DoNamedTest()
-
     [<Test>] member x.``MatchClause expr indent 01``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 02 - TryWith``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 03 - TryWith - Clause on the same line``() = x.DoNamedTest()
-    [<Test>] member x.``MatchClause expr indent 04 - Unindented last clause``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``MatchClause expr indent 04 - Unindented last clause``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 05 - Wrong indent in last clause``() = x.DoNamedTest()
-    [<Test>] member x.``MatchClause expr indent 06 - When``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``MatchClause expr indent 06 - When``() = x.DoNamedTest()
 
     [<Test>] member x.``Lambda expr indent 01 - Without offset``() = x.DoNamedTest()
     [<Test>] member x.``Lambda expr indent 02 - With offset``() = x.DoNamedTest()
@@ -128,7 +129,6 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Union declaration indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Union declaration indent 02 - Modifier``() = x.DoNamedTest()
 
-    [<Test>] member x.``Match clauses alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Sequential expr alignment 01 - No separators``() = x.DoNamedTest()
     [<Test>] member x.``Sequential expr alignment 02 - Separators``() = x.DoNamedTest()
     [<Test>] member x.``Binary expr alignment 01``() = x.DoNamedTest()

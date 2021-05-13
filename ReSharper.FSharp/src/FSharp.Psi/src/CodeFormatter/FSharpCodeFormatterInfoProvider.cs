@@ -89,6 +89,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       var continuousIndentNodes =
         new NodeTypeSet(
           ElementType.UNIT_EXPR,
+
+          ElementType.ARRAY_PAT,
+          ElementType.CHAR_RANGE_PAT,
+          ElementType.IS_INST_PAT,
+          ElementType.LIST_CONS_PAT,
+          ElementType.LIST_PAT,
+          ElementType.TYPED_PAT,
           ElementType.UNIT_PAT,
 
           ElementType.ARRAY_TYPE_USAGE,
@@ -101,6 +108,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           ElementType.EXPRESSION_REFERENCE_NAME,
           ElementType.TYPE_REFERENCE_NAME,
 
+          ElementType.MATCH_CLAUSE,
           ElementType.NESTED_MODULE_DECLARATION,
           ElementType.OPEN_STATEMENT,
           ElementType.EXCEPTION_DECLARATION,
@@ -305,9 +313,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       var aligningNodes =
         new NodeTypeSet(
+          ElementType.TUPLE_PAT,
+
           ElementType.ARRAY_TYPE_USAGE,
           ElementType.NAMED_TYPE_USAGE,
           ElementType.TUPLE_TYPE_USAGE,
+
           ElementType.EXPRESSION_REFERENCE_NAME,
           ElementType.TYPE_REFERENCE_NAME);
 
@@ -355,9 +366,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     {
       var nodesWithSpaces =
         new NodeTypeSet(
+          ElementType.MATCH_EXPR,
+          
+          ElementType.CHAR_RANGE_PAT,
+          ElementType.IS_INST_PAT,
+          ElementType.LIST_CONS_PAT,
+          ElementType.TYPED_PAT,
+
+          ElementType.MATCH_CLAUSE,
+
           ElementType.ENUM_CASE_DECLARATION,
           ElementType.UNION_CASE_DECLARATION,
           ElementType.UNION_CASE_FIELD_DECLARATION_LIST,
+
           ElementType.FUNCTION_TYPE_USAGE,
           ElementType.TUPLE_TYPE_USAGE);
 
