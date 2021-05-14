@@ -275,24 +275,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     private void Aligning()
     {
-      var alignmentRulesParameters = new[]
-      {
-        ("MatchClauses", ElementType.MATCH_EXPR),
-        ("UnionRepresentation", ElementType.UNION_REPRESENTATION),
-        ("EnumCases", ElementType.ENUM_REPRESENTATION),
-        ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
-        ("BinaryExpr", ElementType.BINARY_APP_EXPR),
-        ("RecordDeclaration", ElementType.RECORD_FIELD_DECLARATION_LIST),
-        ("RecordExprBindings", ElementType.RECORD_FIELD_BINDING_LIST),
-      };
-
-      alignmentRulesParameters
-        .ToList()
-        .ForEach(DescribeSimpleAlignmentRule);
-
       var aligningNodes =
         new NodeTypeSet(
+          ElementType.BINARY_APP_EXPR,
+          ElementType.MATCH_EXPR,
           ElementType.TUPLE_EXPR,
+          ElementType.SEQUENTIAL_EXPR,
 
           ElementType.TUPLE_PAT,
 
@@ -301,16 +289,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           ElementType.TUPLE_TYPE_USAGE,
 
           ElementType.EXPRESSION_REFERENCE_NAME,
-          ElementType.TYPE_REFERENCE_NAME);
+          ElementType.TYPE_REFERENCE_NAME,
 
-      DescribeNestedAlignment<IPrefixAppExpr>("PrefixAppAlignment", ElementType.PREFIX_APP_EXPR);
-      DescribeNestedAlignment<IFunctionTypeUsage>("FunctionTypeUsageAlignment", ElementType.FUNCTION_TYPE_USAGE);
+          ElementType.RECORD_FIELD_BINDING_LIST,
+          ElementType.RECORD_FIELD_DECLARATION_LIST,
+
+          ElementType.ENUM_REPRESENTATION,
+          ElementType.UNION_REPRESENTATION);
 
       Describe<IndentingRule>()
         .Name("SimpleAlignment")
         .Where(Node().In(aligningNodes))
         .Return(IndentType.AlignThrough)
         .Build();
+
+      DescribeNestedAlignment<IPrefixAppExpr>("PrefixAppAlignment", ElementType.PREFIX_APP_EXPR);
+      DescribeNestedAlignment<IFunctionTypeUsage>("FunctionTypeUsageAlignment", ElementType.FUNCTION_TYPE_USAGE);
 
       DescribeChildrenAlignment<IArrayOrListPat>(
         ElementBitsets.ARRAY_OR_LIST_PAT_BIT_SET,
@@ -669,15 +663,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Group(SpaceRuleGroup)
         .Return(IntervalFormatType.Space)
         .Priority(3)
-        .Build();
-    }
-
-    private void DescribeSimpleAlignmentRule((string name, CompositeNodeType nodeType) parameters)
-    {
-      Describe<IndentingRule>()
-        .Name(parameters.name + "Alignment")
-        .Where(Node().HasType(parameters.nodeType))
-        .Return(IndentType.AlignThrough)
         .Build();
     }
 
