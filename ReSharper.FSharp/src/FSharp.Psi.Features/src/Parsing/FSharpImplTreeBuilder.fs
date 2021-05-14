@@ -493,9 +493,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 x.ProcessListLikePat(pats, isLocal)
                 ElementType.TUPLE_PAT
 
-            | SynPat.ArrayOrList(_, pats, _) ->
+            | SynPat.ArrayOrList(isArray, pats, _) ->
                 x.ProcessListLikePat(pats, isLocal)
-                ElementType.LIST_PAT
+                if isArray then ElementType.ARRAY_PAT else ElementType.LIST_PAT
 
             | SynPat.Const(SynConst.Unit, _)
             | SynPat.Paren(SynPat.Const(SynConst.Unit, _), _) ->
