@@ -246,7 +246,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Where(
           Parent().HasType(ElementType.MATCH_CLAUSE),
           Node().HasRole(MatchClause.WHEN_CLAUSE))
-        .Return(IndentType.External, 2)
+        .Return(IndentType.External)
         .Build();
 
       Describe<IndentingRule>()

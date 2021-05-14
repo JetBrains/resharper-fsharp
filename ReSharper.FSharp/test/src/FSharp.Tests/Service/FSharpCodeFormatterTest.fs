@@ -116,7 +116,7 @@ type FSharpCodeFormatterTest() =
 
     [<Test>] member x.``MatchClause expr indent 02 - TryWith``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 03 - TryWith - Clause on the same line``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``MatchClause expr indent 06 - When``() = x.DoNamedTest()
+    [<Test>] member x.``MatchClause expr indent 06 - When``() = x.DoNamedTest()
 
     [<Test>] member x.``Lambda expr indent 01 - Without offset``() = x.DoNamedTest()
     [<Test>] member x.``Lambda expr indent 02 - With offset``() = x.DoNamedTest()
