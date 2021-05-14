@@ -21,6 +21,11 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Expr - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unit 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - List 01 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - List 02``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - List 03``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Pattern - List 04``() = x.DoNamedTest()
+
     [<Test>] member x.``Pattern - Tuple - IsInst 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Tuple - ListCons 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Tuple - Align 01``() = x.DoNamedTest()
@@ -95,9 +100,9 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Lazy expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Lazy expr indent 03 - Big indent``() = x.DoNamedTest()
 
-    [<Test>] member x.``Comp expr indent 01 - Correct indent``() = x.DoNamedTest()
-    [<Test>] member x.``Comp expr indent 02 - No indent``() = x.DoNamedTest()
-    [<Test>] member x.``Comp expr indent 03 - Big indent``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Comp expr indent 01 - Correct indent``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Comp expr indent 02 - No indent``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Comp expr indent 03 - Big indent``() = x.DoNamedTest()
 
     [<Test>] member x.``Set expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Set expr indent 02 - No indent``() = x.DoNamedTest()
@@ -122,7 +127,6 @@ type FSharpCodeFormatterTest() =
 
     [<Test>] member x.``PrefixApp expr indent 01``() = x.DoNamedTest()
     [<Test>] member x.``PrefixApp expr indent 02``() = x.DoNamedTest()
-    [<Test>] member x.``PrefixApp expr indent - Comp expr 01``() = x.DoNamedTest()
     [<Test>] member x.``PrefixApp expr indent - Comp expr 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Enum declaration indent 01 - Correct indent``() = x.DoNamedTest()

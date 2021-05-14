@@ -1,0 +1,11 @@
+﻿// ${DIRECTION:Right}
+
+match Some (),
+      [] with | _ -> ()
+
+              | _ -> [1
+                      2] |> ignore
+
+              | _ -> ignore
+                       [1
+                        2]

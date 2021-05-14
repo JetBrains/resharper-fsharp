@@ -1,6 +1,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.RearrangeCode.RearrangeCode
 
 open System
+open System.Runtime.InteropServices
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.RearrangeCode
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -27,6 +28,63 @@ type RearrangeableCaseFieldDeclarationProvider() =
         fun l -> l.FieldsEnumerable)
 
 
+[<AbstractClass>]
+type FSharpRearrangeableElementSwap<'T when 'T: not struct and 'T :> ITreeNode>(node, title, direction,
+        [<Optional; DefaultParameterValue(true)>] enableFormatter) =
+    inherit RearrangeableElementSwap<'T>(node, title, direction)
+
+    abstract BeforeSwap: child: 'T * target: 'T -> unit
+    default this.BeforeSwap(_, _) = ()
+
+    override this.Swap(child, target) =
+        if enableFormatter then
+            use enableFormatterCookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
+            this.BeforeSwap(child, target)
+            base.Swap(child, target)
+        else
+            this.BeforeSwap(child, target)
+            base.Swap(child, target)
+
+
+type FSharpRearrangeableSingleElementBase<'TNode, 'TParent when
+        'TNode: not struct and 'TNode: null and 'TNode :> ITreeNode and
+        'TParent: not struct and 'TParent: null and 'TParent :> ITreeNode>(parentGetter: 'TNode -> 'TParent,
+            elementCreator: 'TNode * 'TParent -> IRearrangeable) =
+    inherit RearrangeableSingleElementBase<'TNode>.TypeBase()
+
+    override this.CreateElement(node: 'TNode): IRearrangeable =
+        match parentGetter node with
+        | null -> null
+        | parent -> elementCreator (node, parent)
+
+let rearrangeable (value: #IRearrangeable) =
+    value :> IRearrangeable
+
+
+type RearrangeableTuplePattern(fsPattern: IFSharpPattern, tuplePat: ITuplePat) =
+    inherit FSharpRearrangeableElementSwap<IFSharpPattern>(fsPattern, "tuple pattern", Direction.LeftRight)
+
+    override this.GetSiblings() =
+        tuplePat.PatternsEnumerable :> _
+
+[<RearrangeableElementType>]
+type RearrangeableTuplePatternProvider() =
+    inherit FSharpRearrangeableSingleElementBase<IFSharpPattern, ITuplePat>(TuplePatNavigator.GetByPattern,
+        RearrangeableTuplePattern >> rearrangeable)
+
+
+type RearrangeableTupleExpr(fsExpr: IFSharpExpression, tuplePat: ITupleExpr) =
+    inherit FSharpRearrangeableElementSwap<IFSharpExpression>(fsExpr, "tuple expr", Direction.LeftRight)
+
+    override this.GetSiblings() =
+        tuplePat.ExpressionsEnumerable :> _
+
+[<RearrangeableElementType>]
+type RearrangeableTupleExprProvider() =
+    inherit FSharpRearrangeableSingleElementBase<IFSharpExpression, ITupleExpr>(TupleExprNavigator.GetByExpression,
+        RearrangeableTupleExpr >> rearrangeable)
+
+
 [<RearrangeableElementType>]
 type RearrangeableRecordFieldDeclarationProvider() =
     inherit FSharpRearrangeableSimpleSwap<IRecordFieldDeclaration, IRecordFieldDeclarationList>(
@@ -35,7 +93,8 @@ type RearrangeableRecordFieldDeclarationProvider() =
 
 
 type RearrangeableEnumCaseLikeDeclaration(decl: IEnumCaseLikeDeclaration) =
-    inherit RearrangeableElementSwap<IEnumCaseLikeDeclaration>(decl, "enum case like declaration", Direction.All)
+    inherit FSharpRearrangeableElementSwap<IEnumCaseLikeDeclaration>(decl, "enum case like declaration", Direction.All,
+        false)
 
     let addBarIfNeeded (caseDeclaration: IEnumCaseLikeDeclaration) =
         if isNull caseDeclaration.Bar && isNotNull caseDeclaration.FirstChild then
@@ -55,11 +114,9 @@ type RearrangeableEnumCaseLikeDeclaration(decl: IEnumCaseLikeDeclaration) =
 
         | _ -> failwithf $"Unexpected declaration: {decl}"
 
-    override this.Swap(child, target) =
+    override this.BeforeSwap(child, target) =
         addBarIfNeeded child
         addBarIfNeeded target
-
-        base.Swap(child, target)
 
 [<RearrangeableElementType>]
 type RearrangeableEnumCaseLikeDeclarationProvider() =
@@ -70,7 +127,7 @@ type RearrangeableEnumCaseLikeDeclarationProvider() =
 
 
 type RearrangeableMatchClause(matchClause: IMatchClause, matchExpr: IMatchLikeExpr) =
-    inherit RearrangeableElementSwap<IMatchClause>(matchClause, "match clause", Direction.All)
+    inherit FSharpRearrangeableElementSwap<IMatchClause>(matchClause, "match clause", Direction.All)
 
     let isLastClause (clause: IMatchClause) =
         clause == matchExpr.Clauses.Last()
@@ -118,11 +175,9 @@ type RearrangeableMatchClause(matchClause: IMatchClause, matchExpr: IMatchLikeEx
                     Whitespace(clauseIndent)
             ] |> ignore
     
-    override this.Swap(child, target) =
+    override this.BeforeSwap(child, target) =
         addIndent child
         addIndent target
-
-        base.Swap(child, target)
 
     override this.GetSiblings() =
         matchExpr.Clauses :> _

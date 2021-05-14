@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using JetBrains.Application.Settings;
@@ -88,6 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       var continuousIndentNodes =
         new NodeTypeSet(
+          ElementType.PREFIX_APP_EXPR,
           ElementType.UNIT_EXPR,
 
           ElementType.ARRAY_PAT,
@@ -313,6 +315,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       var aligningNodes =
         new NodeTypeSet(
+          ElementType.PREFIX_APP_EXPR,
+          ElementType.TUPLE_EXPR,
+
           ElementType.TUPLE_PAT,
 
           ElementType.ARRAY_TYPE_USAGE,
@@ -334,6 +339,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Where(Node().In(aligningNodes))
         .Return(IndentType.AlignThrough)
         .Build();
+
+      DescribeChildrenAlignment<IArrayOrListPat>(
+        ElementBitsets.ARRAY_OR_LIST_PAT_BIT_SET,
+        ElementBitsets.F_SHARP_PATTERN_BIT_SET,
+        pat => pat.PatternsEnumerable);
+
+      DescribeChildrenAlignment<IMatchClauseListOwnerExpr>(
+        ElementType.MATCH_EXPR,
+        ElementType.MATCH_CLAUSE,
+        pat => pat.ClausesEnumerable);
 
       Describe<IndentingRule>().Name("EnumCaseLikeDeclarations")
         .Where(Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET),
@@ -361,6 +376,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
             When(false).Return(IndentType.Outdent | IndentType.External)))
         .Build();
     }
+
+    private void DescribeChildrenAlignment<TParent>(IBuilderAction<IBlankWithSinglePattern> parentPattern,
+      IBuilderAction<IBlankWithSinglePattern> nodeParent, Func<TParent, IEnumerable<ITreeNode>> childrenGetter) =>
+      Describe<IndentingRule>()
+        .Name("ListLikePatLikeAlignment")
+        .Where(parentPattern, nodeParent)
+        .CloseNodeGetter((node, context) => childrenGetter((TParent) node.Parent).LastOrDefault())
+        .Return(IndentType.AlignThrough)
+        .Build();
+
+    private void DescribeChildrenAlignment<TParent>(NodeTypeSet parent, NodeTypeSet children,
+      Func<TParent, IEnumerable<ITreeNode>> childrenGetter) =>
+      DescribeChildrenAlignment(
+        Parent().In(parent), Node().In(children).Satisfies(IsFirstNodeOfTypeSet(children, false)), childrenGetter);
+
+    private void DescribeChildrenAlignment<TParent>(NodeType parent, NodeType children,
+      Func<TParent, IEnumerable<ITreeNode>> childrenGetter) =>
+      DescribeChildrenAlignment(
+        Parent().In(parent), Node().In(children).Satisfies(IsFirstNodeOfItsType), childrenGetter);
 
     private void Formatting()
     {
@@ -411,20 +445,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
 
       Describe<FormattingRule>()
-        .Name("NoSpaceBeforeComma")
+        .Name("NoSpaceBeforeSeparators")
         .Group(SpaceRuleGroup)
-        .Where(Right().In(FSharpTokenType.COMMA))
+        .Where(Right().In(FSharpTokenType.COMMA, FSharpTokenType.SEMICOLON, FSharpTokenType.SEMICOLON_SEMICOLON))
         .Return(IntervalFormatType.Empty)
         .Build();
 
+      DescribeEmptyOnlyFormatting(ElementType.UNIT_EXPR, FSharpTokenType.LPAREN, FSharpTokenType.RPAREN);
+
+      DescribeEmptyOnlyFormatting(ElementType.ARRAY_PAT, FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK);
+      DescribeEmptyOnlyFormatting(ElementType.LIST_PAT, FSharpTokenType.LBRACK, FSharpTokenType.RBRACK);
+      DescribeEmptyOnlyFormatting(ElementType.UNIT_PAT, FSharpTokenType.LPAREN, FSharpTokenType.RPAREN);
+
       Describe<FormattingRule>()
-        .Name("NoSpaceInUnit")
+        .Name("SpaceInLists")
         .Group(SpaceRuleGroup)
         .Where(
-          Parent().In(ElementType.UNIT_EXPR, ElementType.UNIT_PAT),
-          Left().In(FSharpTokenType.LPAREN),
-          Right().In(FSharpTokenType.RPAREN))
-        .Return(IntervalFormatType.OnlyEmpty)
+          Parent().In(ElementBitsets.ARRAY_OR_LIST_PAT_BIT_SET).Satisfies((node, context) =>
+            !(node is IArrayOrListPat arrayOrListPat && arrayOrListPat.PatternsEnumerable.IsEmpty())))
+        .Return(IntervalFormatType.Space)
         .Build();
 
       Describe<FormattingRule>()
@@ -506,6 +545,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .AndViceVersa()
         .Build();
     }
+
+    private void DescribeEmptyOnlyFormatting(IBuilderAction<IBlankWithSinglePattern> parent, NodeType left, 
+      NodeType right) =>
+      Describe<FormattingRule>()
+        .Name("SpaceInLists")
+        .Group(SpaceRuleGroup)
+        .Where(parent, Left().In(left), Right().In(right))
+        .Return(IntervalFormatType.OnlyEmpty)
+        .Build();
+
+    private void DescribeEmptyOnlyFormatting(NodeType parent, NodeType left, NodeType right) =>
+      DescribeEmptyOnlyFormatting(Parent().In(parent), left, right);
 
     private void BlankLines()
     {

@@ -1,0 +1,5 @@
+﻿// ${DIRECTION:Right}
+
+let Some b,
+    a = [| 1
+           2 |]

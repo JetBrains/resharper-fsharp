@@ -17,6 +17,13 @@ type RearrangeCodeTest() =
 
     override x.RelativeTestDataPath = "features/rearrangeCode"
 
+    [<Test>] member x.``Expr - Tuple - Match 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Tuple - Match 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Tuple - Match 03``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Tuple 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Enum case 01``() = x.DoNamedTest()
     [<Test>] member x.``Enum case 02 - Xml doc``() = x.DoNamedTest()
 
