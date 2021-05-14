@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     private ProcessStartInfo GetCoreProcessStartInfo(int port, FileSystemPath basePath)
     {
-      var sdkMajorVersion = myNuGetVersion.Major < 3 ? 3 : myNuGetVersion.Major;
+      var sdkMajorVersion = myNuGetVersion.Major.Clamp(3, 6);
       var runtimeConfigPath = basePath.Combine(TypeProvidersProtocolConstants.CoreRuntimeConfigFilename(sdkMajorVersion));
       var fileSystemPath = basePath.Combine(TypeProvidersProtocolConstants.TypeProvidersHostCoreFilename);
       var dotnetArgs = $"--runtimeconfig \"{runtimeConfigPath}\"";

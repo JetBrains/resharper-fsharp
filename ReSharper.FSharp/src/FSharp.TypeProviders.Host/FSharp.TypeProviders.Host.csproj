@@ -41,6 +41,12 @@
       <None Update="tploader5.win.runtimeconfig.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="tploader6.unix.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="tploader6.win.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />

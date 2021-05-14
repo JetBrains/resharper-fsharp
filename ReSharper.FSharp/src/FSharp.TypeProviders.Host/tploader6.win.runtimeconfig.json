@@ -1,0 +1,10 @@
+﻿{
+  "runtimeOptions": {
+    "tfm": "net6",
+    "framework": {
+      "name": "Microsoft.WindowsDesktop.App",
+      "version": "6.0.0-preview",
+      "rollForward": "Minor"
+    }
+  }
+}

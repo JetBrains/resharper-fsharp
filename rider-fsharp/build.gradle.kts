@@ -126,7 +126,9 @@ val typeProvidersFiles = listOf(
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader3.win.runtimeconfig.json",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader3.unix.runtimeconfig.json",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader5.win.runtimeconfig.json",
-        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader5.unix.runtimeconfig.json")
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader5.unix.runtimeconfig.json",
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader6.win.runtimeconfig.json",
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader6.unix.runtimeconfig.json")
 
 val fantomasFiles = listOf(
         "FSharp.Fantomas.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.dll",
