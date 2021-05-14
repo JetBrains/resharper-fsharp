@@ -89,7 +89,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       var continuousIndentNodes =
         new NodeTypeSet(
-          ElementType.PREFIX_APP_EXPR,
           ElementType.UNIT_EXPR,
 
           ElementType.ARRAY_PAT,
@@ -122,9 +121,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       Describe<ContinuousIndentRule>()
         .Name("ContinuousIndent")
-        .Where(Node().In(continuousIndentNodes))
+        .Where(Node().In(continuousIndentNodes).Or().In(ElementType.PREFIX_APP_EXPR).Satisfies((node, context) =>
+          !(node.Parent is IPrefixAppExpr)))
         .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
         .AddException(Node().In(FSharpTokenType.LINE_COMMENT).Satisfies((node, context) => node is DocComment))
+        .AddException(Node().In(ElementType.COMPUTATION_EXPR).Satisfies((node, context) => 
+          !node.HasNewLineBefore(context.CodeFormatter)))
         .Build();
 
       // External: starts/ends at first/last node in interval
@@ -222,18 +224,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
 
       Describe<IndentingRule>()
-        .Name("PrefixAppExprIndent")
-        .Where(
-          Parent().HasType(ElementType.PREFIX_APP_EXPR),
-          Node()
-            .HasRole(PrefixAppExpr.ARG_EXPR)
-            .Satisfies((node, context) =>
-              !(node is IComputationExpr) ||
-              !node.ContainsLineBreak(context.CodeFormatter)))
-        .Return(IndentType.External)
-        .Build();
-
-      Describe<IndentingRule>()
         .Name("ElseExprIndent")
         .Where(
           Parent().In(ElementType.IF_THEN_ELSE_EXPR, ElementType.ELIF_EXPR),
@@ -315,7 +305,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       var aligningNodes =
         new NodeTypeSet(
-          ElementType.PREFIX_APP_EXPR,
           ElementType.TUPLE_EXPR,
 
           ElementType.TUPLE_PAT,
@@ -327,12 +316,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           ElementType.EXPRESSION_REFERENCE_NAME,
           ElementType.TYPE_REFERENCE_NAME);
 
-      Describe<IndentingRule>()
-        .Name("FunctionTypeUsageIndent")
-        .Where(Node().In(ElementType.FUNCTION_TYPE_USAGE).Satisfies((node, context) =>
-          !(node.Parent is IFunctionTypeUsage)))
-        .Return(IndentType.AlignThrough)
-        .Build();
+      DescribeNestedAlignment<IPrefixAppExpr>("PrefixAppAlignment", ElementType.PREFIX_APP_EXPR);
+      DescribeNestedAlignment<IFunctionTypeUsage>("FunctionTypeUsageAlignment", ElementType.FUNCTION_TYPE_USAGE);
 
       Describe<IndentingRule>()
         .Name("SimpleAlignment")
@@ -376,6 +361,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
             When(false).Return(IndentType.Outdent | IndentType.External)))
         .Build();
     }
+
+    private void DescribeNestedAlignment<T>(string title, NodeType nodeType) =>
+      Describe<IndentingRule>()
+        .Name(title)
+        .Where(Node().In(nodeType).Satisfies((node, context) => !(node.Parent is T)))
+        .Return(IndentType.AlignThrough)
+        .Build();
 
     private void DescribeChildrenAlignment<TParent>(IBuilderAction<IBlankWithSinglePattern> parentPattern,
       IBuilderAction<IBlankWithSinglePattern> nodeParent, Func<TParent, IEnumerable<ITreeNode>> childrenGetter) =>

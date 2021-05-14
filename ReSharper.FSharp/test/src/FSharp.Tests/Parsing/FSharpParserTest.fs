@@ -178,6 +178,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - ForEach - Range 02 - Step``() = x.DoNamedTest()
     [<Test>] member x.``Expr - ForEach 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - CompExpr - Arg 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - Range 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - Range 02 - Step``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr 01 - Return``() = x.DoNamedTest()
@@ -264,6 +265,7 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - App - Logic 01 - And``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Logic 02 - Or``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Nested 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - App - Precedence 01 - High``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Precedence 02 - Low``() = x.DoNamedTest()

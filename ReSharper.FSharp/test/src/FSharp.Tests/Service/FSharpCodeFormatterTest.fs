@@ -17,6 +17,8 @@ type FSharpCodeFormatterTest() =
         use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
         base.DoNamedTest()
 
+    [<Test>] member x.``Expr - App - CompExpr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Nested 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unit 01``() = x.DoNamedTest()
@@ -100,10 +102,6 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Lazy expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Lazy expr indent 03 - Big indent``() = x.DoNamedTest()
 
-    [<Test; Explicit>] member x.``Comp expr indent 01 - Correct indent``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Comp expr indent 02 - No indent``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Comp expr indent 03 - Big indent``() = x.DoNamedTest()
-
     [<Test>] member x.``Set expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Set expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Set expr indent 03 - Big indent``() = x.DoNamedTest()
@@ -124,10 +122,6 @@ type FSharpCodeFormatterTest() =
 
     [<Test>] member x.``Lambda expr indent 01 - Without offset``() = x.DoNamedTest()
     [<Test>] member x.``Lambda expr indent 02 - With offset``() = x.DoNamedTest()
-
-    [<Test>] member x.``PrefixApp expr indent 01``() = x.DoNamedTest()
-    [<Test>] member x.``PrefixApp expr indent 02``() = x.DoNamedTest()
-    [<Test>] member x.``PrefixApp expr indent - Comp expr 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Enum declaration indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Union declaration indent 01 - Correct indent``() = x.DoNamedTest()
