@@ -125,8 +125,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           !(node.Parent is IPrefixAppExpr)))
         .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
         .AddException(Node().In(FSharpTokenType.LINE_COMMENT).Satisfies((node, context) => node is DocComment))
-        .AddException(Node().In(ElementType.COMPUTATION_EXPR).Satisfies((node, context) => 
+        .AddException(Node().In(ElementType.COMPUTATION_EXPR).Satisfies((node, context) =>
           !node.HasNewLineBefore(context.CodeFormatter)))
+        .AddException(
+          // todo: add setting
+          Parent().In(ElementType.MATCH_CLAUSE).Satisfies(IsLastNodeOfItsType),
+          Node().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET).Satisfies((node, context) =>
+            AreAligned(node, node.Parent, context.CodeFormatter)))
         .Build();
 
       // External: starts/ends at first/last node in interval
@@ -233,24 +238,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
             .Or()
             .HasRole(ElifExpr.ELSE_CLAUSE)
             .Satisfies(IndentElseExpr))
-        .Return(IndentType.External)
-        .Build();
-
-      Describe<IndentingRule>()
-        .Name("MatchClauseExprIndent")
-        .Where(
-          Node().HasRole(MatchClause.EXPR),
-          Parent()
-            .HasType(ElementType.MATCH_CLAUSE)
-            .Satisfies((node, context) =>
-            {
-              if (!(node is IMatchClause matchClause))
-                return false;
-
-              var expr = matchClause.Expression;
-              return !IsLastNodeOfItsType(node, context) ||
-                     !AreAligned(matchClause, expr, context.CodeFormatter);
-            }))
         .Return(IndentType.External)
         .Build();
 

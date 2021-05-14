@@ -20,6 +20,7 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Expr - App - CompExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Nested 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Match 02 - Last clause expr``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unit 01``() = x.DoNamedTest()
 
@@ -113,11 +114,8 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``IfThenElse expr indent 02``() = x.DoNamedTest()
     [<Test>] member x.``IfThenElse expr indent 03 - Elif``() = x.DoNamedTest()
 
-    [<Test>] member x.``MatchClause expr indent 01``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 02 - TryWith``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 03 - TryWith - Clause on the same line``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``MatchClause expr indent 04 - Unindented last clause``() = x.DoNamedTest()
-    [<Test>] member x.``MatchClause expr indent 05 - Wrong indent in last clause``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``MatchClause expr indent 06 - When``() = x.DoNamedTest()
 
     [<Test>] member x.``Lambda expr indent 01 - Without offset``() = x.DoNamedTest()
