@@ -16,7 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 {
   public class FantomasProcess : ProtocolExternalProcess<RdFantomasModel, FantomasConnection>
   {
-    protected override string Name => "External Formatter";
+    protected override string Name => "Fantomas";
+    private static readonly FileSystemPath ExecutableDirectory = typeof(FantomasProcess).Assembly.GetPath().Directory;
 
     protected override RdFantomasModel CreateModel(Lifetime lifetime, IProtocol protocol) =>
       new RdFantomasModel(lifetime, protocol);
@@ -29,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 
     protected override ProcessStartInfo GetProcessStartInfo(int port)
     {
-      var launchPath = GetType().Assembly.GetPath().Directory.Combine(FantomasProtocolConstants.PROCESS_FILENAME);
+      var launchPath = ExecutableDirectory.Combine(FantomasProtocolConstants.PROCESS_FILENAME);
       Assertion.Assert(launchPath.ExistsFile, $"can't find '{FantomasProtocolConstants.PROCESS_FILENAME}'");
 
       return new ProcessStartInfo
@@ -51,6 +52,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
         {
           FantomasProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE,
           Process.GetCurrentProcess().Id.ToString()
+        },
+        {
+          "FSHARP_FANTOMAS_ASSEMBLIES_PATH",
+          ExecutableDirectory.FullPath
         },
       };
     }

@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static void MainInternal(string[] args)
     {
-      var endPoint = new ExternalFormatterEndPoint();
+      var endPoint = new FantomasEndPoint();
 
       var portValue = args[0];
       var logPath = string.Empty;

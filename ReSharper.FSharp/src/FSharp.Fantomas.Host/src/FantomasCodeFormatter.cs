@@ -1,17 +1,17 @@
 using Fantomas;
-using FSharp.Compiler.CodeAnalysis;
-using FSharp.Compiler.Diagnostics;
-using FSharp.Compiler.Text;
+using FSharp.Compiler;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
+using Range = FSharp.Compiler.Range.range;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
   internal class FantomasCodeFormatter
   {
     private readonly FSharpChecker myChecker =
-      FSharpChecker.Create(null, null, null, null, null, null, null, null, null, null);
+      FSharpChecker.Create(null, null, null, null, null, null, null, null);
 
     private readonly FormatConfig.FormatConfig myDefaultFormatConfig = FormatConfig.FormatConfig.Default;
 
@@ -33,8 +33,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static FSharpParsingOptions Convert(RdFcsParsingOptions options) =>
       new FSharpParsingOptions(new[] {options.LastSourceFile},
-        ListModule.OfArray(options.ConditionalCompilationDefines), FSharpDiagnosticOptions.Default, false,
-        options.LightSyntax, false, options.IsExe);
+        ListModule.OfArray(options.ConditionalCompilationDefines), ErrorLogger.FSharpErrorSeverityOptions.Default,
+        false, options.LightSyntax, false, options.IsExe);
 
     private FormatConfig.FormatConfig Convert(RdFantomasFormatConfig config) =>
       new FormatConfig.FormatConfig(config.IndentSize, config.MaxLineLength, config.SemicolonAtEndOfLine,

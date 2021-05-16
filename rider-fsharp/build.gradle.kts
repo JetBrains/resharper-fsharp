@@ -134,6 +134,7 @@ val fantomasFiles = listOf(
         "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.exe",
         "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.runtimeconfig.json",
         "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/FSharp.Compiler.Service.dll",
         "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/Fantomas.dll")
 
 val dotNetSdkPath by lazy {
@@ -231,8 +232,9 @@ configure<RdGenExtension> {
 
 tasks {
     withType<PrepareSandboxTask> {
-        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" } + typeProvidersFiles + fantomasFiles
+        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" } + typeProvidersFiles
         files = files.map { "$resharperPluginPath/src/$it" }
+        val fantomasFiles = fantomasFiles.map { "$resharperPluginPath/src/$it" }
 
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {
             val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/bin/$buildConfiguration/net461"
@@ -244,16 +246,22 @@ tasks {
             from(it) { into("${intellij.pluginName}/dotnet") }
         }
 
+        fantomasFiles.forEach {
+            from(it) { into("${intellij.pluginName}/dotnet/fantomas") }
+        }
+
         into("${intellij.pluginName}/projectTemplates") {
             from("projectTemplates")
         }
 
         doLast {
-            files.forEach {
-                val file = file(it)
+            fun validateFile(path: String, destFolder: String) {
+                val file = file(path)
                 if (!file.exists()) throw RuntimeException("File $file does not exist")
-                logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/dotnet")
+                logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/$destFolder")
             }
+            files.forEach { validateFile(it, "dotnet") }
+            fantomasFiles.forEach { validateFile(it, "dotnet/fantomas") }
         }
     }
 

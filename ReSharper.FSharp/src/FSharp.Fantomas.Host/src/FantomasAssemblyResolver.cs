@@ -8,14 +8,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
   public static class FantomasAssemblyResolver
   {
     private const string AdditionalProbingPathsEnvVar = "RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS";
+    private const string FantomasAssembliesPathEnvVar = "FSHARP_FANTOMAS_ASSEMBLIES_PATH";
     private static readonly List<string> OurAdditionalProbingPaths = new List<string>();
 
     static FantomasAssemblyResolver()
     {
-      var paths = Environment.GetEnvironmentVariable(AdditionalProbingPathsEnvVar);
-      if (string.IsNullOrWhiteSpace(paths)) return;
+      var fantomasPath = Environment.GetEnvironmentVariable(FantomasAssembliesPathEnvVar);
+      var riderPaths = Environment.GetEnvironmentVariable(AdditionalProbingPathsEnvVar);
+      if (string.IsNullOrWhiteSpace(fantomasPath))
+        throw new ArgumentException("Argument IsNullOrWhiteSpace", FantomasAssembliesPathEnvVar);
+      if (string.IsNullOrWhiteSpace(riderPaths))
+        throw new ArgumentException("Argument IsNullOrWhiteSpace", AdditionalProbingPathsEnvVar);
 
-      foreach (var path in paths.Split(';'))
+      OurAdditionalProbingPaths.Add(fantomasPath);
+      foreach (var path in riderPaths.Split(';'))
       {
         if (!string.IsNullOrEmpty(path)) OurAdditionalProbingPaths.Add(path);
       }
@@ -29,9 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       {
         var assemblyPath = Path.Combine(path, assemblyName);
         if (!File.Exists(assemblyPath)) continue;
-
-        var assembly = Assembly.LoadFrom(assemblyPath);
-        return assembly;
+        return Assembly.LoadFrom(assemblyPath);
       }
 
       Console.Error.Write($"\nFailed to resolve assembly by name '{eventArgs.Name}'" +
