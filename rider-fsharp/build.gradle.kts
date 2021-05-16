@@ -113,7 +113,8 @@ val pluginFiles = listOf(
         "FSharp.ProjectModelBase/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
         "FSharp.Common/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Common",
         "FSharp.Psi/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi",
-        "FSharp.Psi.Features/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi.Features")
+        "FSharp.Psi.Features/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
+        "FSharp.Fantomas.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol")
 
 val typeProvidersFiles = listOf(
         "FSharp.TypeProviders.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.dll",
@@ -129,8 +130,6 @@ val typeProvidersFiles = listOf(
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader5.unix.runtimeconfig.json")
 
 val fantomasFiles = listOf(
-        "FSharp.Fantomas.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.dll",
-        "FSharp.Fantomas.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.pdb",
         "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.exe",
         "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.runtimeconfig.json",
         "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
@@ -247,7 +246,7 @@ tasks {
         }
 
         fantomasFiles.forEach {
-            from(it) { into("${intellij.pluginName}/dotnet/fantomas") }
+            from(it) { into("${intellij.pluginName}/fantomas") }
         }
 
         into("${intellij.pluginName}/projectTemplates") {
@@ -261,7 +260,7 @@ tasks {
                 logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/$destFolder")
             }
             files.forEach { validateFile(it, "dotnet") }
-            fantomasFiles.forEach { validateFile(it, "dotnet/fantomas") }
+            fantomasFiles.forEach { validateFile(it, "fantomas") }
         }
     }
 
