@@ -9,6 +9,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
   [EditorConfigKey("fsharp")]
   public class FSharpFormatSettingsKey : FormatSettingsKeyBase
   {
+    [SettingsEntry(EmptyBlockStyle.TOGETHER_SAME_LINE, "todo")]
+    public EmptyBlockStyle EmptyBlockStyle;
+
+    // [EditorConfigEntryAlias("brace_style", EditorConfigAliasType.ReSharperGeneralized)]
+    [SettingsEntry(BraceFormatStyleEx.PICO, "Type and namespace declaration")]
+    public BraceFormatStyleEx TypeDeclarationBraces;
+    
+    
     [SettingsEntry(2, "todo")]
     public int BlankLineAroundTopLevelModules;
 

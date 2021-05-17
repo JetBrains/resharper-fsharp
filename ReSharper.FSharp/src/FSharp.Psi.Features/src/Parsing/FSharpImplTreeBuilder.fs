@@ -744,12 +744,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushType(synType)
             x.ProcessExpression(expr)
 
-        | SynExpr.Tuple(isStruct, exprs, _, _) ->
-            if isStruct then
-                x.AdvanceToTokenOrRangeStart(FSharpTokenType.STRUCT, range)
-            else
-                x.AdvanceToStart(range)
-
+        | SynExpr.Tuple(_, exprs, _, range) ->
+            x.AdvanceToStart(range)
             x.PushRangeForMark(range, x.Mark(), ElementType.TUPLE_EXPR)
             x.ProcessExpressionList(exprs)
 

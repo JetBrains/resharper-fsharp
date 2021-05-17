@@ -44,10 +44,42 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Aligning();
       Formatting();
       BlankLines();
+      // Braces();
     }
 
     public override ProjectFileType MainProjectFileType => FSharpProjectFileType.Instance;
 
+    private void Braces()
+    {
+      var bracesRule = Describe<BracesRule>()
+        .LPar(FSharpTokenType.LBRACE)
+        .RPar(FSharpTokenType.RBRACE)
+        .EmptyBlockSetting(it => it.EmptyBlockStyle)
+        //.SpacesInsideParsSetting(it => it.SPACE_WITHING_EMPTY_BRACES)
+        // .SpacesInsideEmptyParsSetting(it => it.SPACE_WITHING_EMPTY_BRACES)
+        .ProhibitBlankLinesNearBracesInBsdStyle(false)
+        // .MaxBlankLinesBeforeLBraceSetting(it => it.KEEP_BLANK_LINES_IN_DECLARATIONS)
+        // .RemoveBlankLinesInsideBracesSetting(it => it.REMOVE_BLANK_LINES_NEAR_BRACES_IN_DECLARATIONS)
+        .MaxBlankLinesInsideSetting(it => it.KeepMaxBlankLineAroundModuleMembers) // todo: use separate settings
+        // .LineBreaksForEmptyParsHighlighting(CSharpFormatHighlightingIds.BadEmptyBracesLineBreaks)
+        // .ParsBlankLinesHighlighting(CSharpFormatHighlightingIds.IncorrectBlankLinesNearBraces)
+        // .ParsSpacesHighlighting(CSharpFormatHighlightingIds.BadBracesSpaces)
+        //.Priority(2)
+        .StartAlternating();
+
+      bracesRule.Name("TYPE_DECLARATION_BRACES")
+        .Where(
+          // Node().In(ElementType.RECORD_REPRESENTATION),
+          Parent().In(ElementType.RECORD_REPRESENTATION))
+        .BraceSetting(it => it.TypeDeclarationBraces)
+        // .InsertBlankLinesInsideBracesSetting(it => it.BLANK_LINES_INSIDE_TYPE)
+        .Priority(2)
+        // .ParsIndentingHighlighting(CSharpFormatHighlightingIds.BadDeclarationBracesIndent)
+        // .ParsLineBreaksHighlighting(CSharpFormatHighlightingIds.BadDeclarationBracesLineBreaks)
+        .Build();
+
+    }
+    
     private void Indenting()
     {
       // todo: use continuous indent

@@ -30,11 +30,10 @@ type FSharpChecker with
                 return
                     match checkFileAnswer with
                     | FSharpCheckFileAnswer.Aborted ->
-                        if parseResults.ParseTree.IsNone then
-                            let creationErrors = parseResults.Diagnostics
-                            if not (Array.isEmpty creationErrors) then
-                                let logger = Logger.GetLogger<CheckResults>()
-                                logErrors logger "FCS aborted" creationErrors
+                        let creationErrors = parseResults.Diagnostics
+                        if not (Array.isEmpty creationErrors) then
+                            let logger = Logger.GetLogger<CheckResults>()
+                            logErrors logger "FCS aborted" creationErrors
 
                         None
                     | FSharpCheckFileAnswer.Succeeded(checkFileResults) ->
@@ -54,12 +53,6 @@ type FSharpChecker with
                 else
                     return StillRunning t
             }
-
-        let bindParsedInput(results: (FSharpParseFileResults * FSharpCheckFileResults) option) =
-            match results with
-            | Some(parseResults, checkResults) when parseResults.ParseTree.IsSome ->
-                Some (parseResults, checkResults)
-            | _ -> None
 
         async {
             match x.TryGetRecentCheckResultsForFile(path, options, source) with
@@ -85,4 +78,3 @@ type FSharpChecker with
             | StillRunning worker ->
                 return! Async.AwaitTask worker
         }
-        |> map bindParsedInput
