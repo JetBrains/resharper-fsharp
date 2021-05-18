@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using JetBrains.Diagnostics;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
@@ -15,10 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     {
       var fantomasPath = Environment.GetEnvironmentVariable(FantomasAssembliesPathEnvVar);
       var riderPaths = Environment.GetEnvironmentVariable(AdditionalProbingPathsEnvVar);
-      if (string.IsNullOrWhiteSpace(fantomasPath))
-        throw new ArgumentException("Argument IsNullOrWhiteSpace", FantomasAssembliesPathEnvVar);
-      if (string.IsNullOrWhiteSpace(riderPaths))
-        throw new ArgumentException("Argument IsNullOrWhiteSpace", AdditionalProbingPathsEnvVar);
+      Assertion.Assert(!string.IsNullOrWhiteSpace(fantomasPath), $"{FantomasAssembliesPathEnvVar} IsNullOrWhiteSpace");
+      Assertion.Assert(!string.IsNullOrWhiteSpace(riderPaths), $"{AdditionalProbingPathsEnvVar} IsNullOrWhiteSpace");
 
       OurAdditionalProbingPaths.Add(fantomasPath);
       foreach (var path in riderPaths.Split(';'))
