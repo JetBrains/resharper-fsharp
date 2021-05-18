@@ -30,5 +30,5 @@ IFSharpSigFile
                   FSharpIdentifierToken(type:IDENTIFIER, text:int)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
-      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

@@ -10,5 +10,5 @@ IFSharpSigFile
       FSharpToken(type:PP_REFERENCE, text:#r)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       FSharpString(type:STRING, text:"hello")
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

@@ -2,6 +2,7 @@
 
 open FSharp.Compiler.Diagnostics
 open FSharp.Compiler.Syntax
+open FSharp.Compiler.Xml
 open JetBrains.Annotations
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules

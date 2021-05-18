@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using FSharp.Compiler.IO;
 using JetBrains.Application.changes;
 using JetBrains.Lifetimes;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
+using Microsoft.FSharp.Core;
 using static FSharp.Compiler.IO.FileSystemAutoOpens;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
@@ -30,10 +31,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       lifetime.OnTermination(() => FileSystem = myFileSystem);
     }
 
-    public virtual bool Exists(FileSystemPath path) =>
+    public virtual bool ExistsFile(FileSystemPath path) =>
       myFileSystem is DelegatingFileSystemShim shim
-        ? shim.Exists(path)
-        : myFileSystem.SafeExists(path.FullPath);
+        ? shim.ExistsFile(path)
+        : myFileSystem.FileExistsShim(path.FullPath);
 
     public virtual DateTime GetLastWriteTime(FileSystemPath path) =>
       myFileSystem is DelegatingFileSystemShim shim
@@ -44,6 +45,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       myFileSystem is DelegatingFileSystemShim shim
         ? shim.IsStableFile(path)
         : myFileSystem.IsStableFileHeuristic(path.FullPath);
+
+    public virtual string GetDirectoryNameShim(string path) =>
+      myFileSystem.GetDirectoryNameShim(path);
 
     public virtual DateTime GetLastWriteTimeShim(string fileName)
     {
@@ -56,30 +60,52 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       return lastWriteTime;
     }
 
-    public virtual bool SafeExists(string fileName)
+    public virtual DateTime GetCreationTimeShim(string path) =>
+      myFileSystem.GetCreationTimeShim(path);
+
+    public virtual void CopyShim(string src, string dest, bool overwrite) =>
+      myFileSystem.CopyShim(src, dest, overwrite);
+
+    public virtual bool FileExistsShim(string fileName)
     {
       var path = FileSystemPath.TryParse(fileName);
       var exists = path.IsEmpty
-        ? myFileSystem.SafeExists(fileName)
-        : Exists(path);
+        ? myFileSystem.FileExistsShim(fileName)
+        : ExistsFile(path);
 
       myLogger.Trace("Exists: {0}: {1}", fileName, exists);
       return exists;
     }
 
-    public virtual byte[] ReadAllBytesShim(string fileName) => myFileSystem.ReadAllBytesShim(fileName);
-    public virtual Stream FileStreamReadShim(string fileName) => myFileSystem.FileStreamReadShim(fileName);
-    public virtual Stream FileStreamCreateShim(string fileName) => myFileSystem.FileStreamCreateShim(fileName);
+    public virtual void FileDeleteShim(string fileName) => myFileSystem.FileDeleteShim(fileName);
+    public virtual DirectoryInfo DirectoryCreateShim(string path) => myFileSystem.DirectoryCreateShim(path);
+    public virtual bool DirectoryExistsShim(string path) => myFileSystem.DirectoryExistsShim(path);
+    public virtual void DirectoryDeleteShim(string path) => myFileSystem.DirectoryDeleteShim(path);
+
+    public virtual IEnumerable<string> EnumerateFilesShim(string path, string pattern) =>
+      myFileSystem.EnumerateFilesShim(path, path);
+
+    public virtual IEnumerable<string> EnumerateDirectoriesShim(string path) =>
+      myFileSystem.EnumerateDirectoriesShim(path);
+
+    public virtual ByteMemory OpenFileForReadShim(string filePath, FSharpOption<bool> useMemoryMappedFile, 
+      FSharpOption<bool> shouldShadowCopy) =>
+      myFileSystem.OpenFileForReadShim(filePath, useMemoryMappedFile, shouldShadowCopy);
+
+    public virtual Stream OpenFileForWriteShim(string filePath, FSharpOption<FileMode> fileMode,
+      FSharpOption<FileAccess> fileAccess, FSharpOption<FileShare> fileShare) =>
+      myFileSystem.OpenFileForWriteShim(filePath, fileMode, fileAccess, fileShare);
+
     public virtual string GetFullPathShim(string fileName) => myFileSystem.GetFullPathShim(fileName);
+
+    public virtual string GetFullFilePathInDirectoryShim(string dir, string fileName) =>
+      myFileSystem.GetFullFilePathInDirectoryShim(dir, fileName);
+
     public virtual bool IsPathRootedShim(string path) => myFileSystem.IsPathRootedShim(path);
+    public virtual string NormalizePathShim(string path) => myFileSystem.NormalizePathShim(path);
     public virtual bool IsInvalidPathShim(string filename) => myFileSystem.IsInvalidPathShim(filename);
     public virtual string GetTempPathShim() => myFileSystem.GetTempPathShim();
-    public virtual void FileDelete(string fileName) => myFileSystem.FileDelete(fileName);
-    public virtual Assembly AssemblyLoadFrom(string fileName) => myFileSystem.AssemblyLoadFrom(fileName);
-    public virtual Assembly AssemblyLoad(AssemblyName assemblyName) => myFileSystem.AssemblyLoad(assemblyName);
     public virtual bool IsStableFileHeuristic(string fileName) => myFileSystem.IsStableFileHeuristic(fileName);
-
-    public virtual Stream FileStreamWriteExistingShim(string fileName) =>
-      myFileSystem.FileStreamWriteExistingShim(fileName);
+    public virtual IAssemblyLoader AssemblyLoader => myFileSystem.AssemblyLoader;
   }
 }

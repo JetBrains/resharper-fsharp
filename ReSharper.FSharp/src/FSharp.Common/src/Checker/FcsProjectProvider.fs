@@ -143,7 +143,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             |> Seq.map (fun referencedPsiModule ->
                 let referencedProject = referencedPsiModule.ContainingProjectModule :?> _
                 let referencedFcsProject = createFcsProject referencedProject referencedPsiModule
-                referencedFcsProject.OutputPath.FullPath, referencedFcsProject.ProjectOptions)
+                let path = referencedFcsProject.OutputPath.FullPath
+                FSharpReferencedProject.CreateFSharp(path, referencedFcsProject.ProjectOptions))
             |> Seq.toArray
 
         let fcsProjectOptions = { fcsProject.ProjectOptions with ReferencedProjects = referencedFcsProjects }

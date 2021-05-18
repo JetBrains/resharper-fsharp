@@ -5,6 +5,7 @@ open System.IO
 open System.Collections.Concurrent
 open System.Runtime.InteropServices
 open System.Text
+open FSharp.Compiler.IO
 open JetBrains.Application.changes
 open JetBrains.Diagnostics
 open JetBrains.DocumentManagers
@@ -65,16 +66,16 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         | Some v -> source <- v; true
         | _ -> false
 
-    override x.FileStreamReadShim(fileName) =
+    override x.OpenFileForReadShim(fileName, useMemoryMappedFile, shouldShadowCopy) =
         let path = FileSystemPath.TryParse(fileName)
-        if not (isApplicable path) then base.FileStreamReadShim(fileName) else
+        if not (isApplicable path) then base.OpenFileForReadShim(fileName, useMemoryMappedFile, shouldShadowCopy) else
 
         match x.TryGetSource(path) with
-        | true, source -> new MemoryStream(source.Source) :> Stream
+        | true, source -> ByteMemory.FromArray(source.Source)
         | _ ->
 
         logger.Trace("Miss: FileStreamReadShim miss: {0}", path)
-        base.FileStreamReadShim(fileName)
+        base.OpenFileForReadShim(fileName, useMemoryMappedFile, shouldShadowCopy)
 
     override x.GetLastWriteTime(path) =
         if not (isApplicable path) then base.GetLastWriteTime(path) else
@@ -86,8 +87,8 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         logger.Trace("Miss: GetLastWriteTime: {0}", path)
         base.GetLastWriteTime(path)
 
-    override x.Exists(path) =
-        if not (isApplicable path) then base.Exists(path) else
+    override x.ExistsFile(path) =
+        if not (isApplicable path) then base.ExistsFile(path) else
         match files.TryGetValue(path) with
         | true, _ -> true
         | _ ->
@@ -97,7 +98,7 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         | _ ->
 
         logger.Trace("Miss: Exists: {0}", path)
-        base.Exists(path)
+        base.ExistsFile(path)
 
     member x.ProcessDocumentChange(change: DocumentChange) =
         let projectFile =

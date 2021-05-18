@@ -49,5 +49,5 @@ IFSharpSigFile
           FSharpTokenType+ClassTokenElement(type:CLASS, text:class)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+EndTokenElement(type:END, text:end)
-      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

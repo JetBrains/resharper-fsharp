@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open System.Collections.Generic
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Text
+open FSharp.Compiler.Xml
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing

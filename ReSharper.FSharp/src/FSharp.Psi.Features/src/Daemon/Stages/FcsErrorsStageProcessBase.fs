@@ -224,7 +224,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 UnusedValueWarning(pat) :> _
 
         | RuleNeverMatched ->
-            createHighlightingFromParentNode RuleNeverMatchedWarning range
+            let matchClause = fsFile.GetNode<IMatchClause>(range)
+            if isNull matchClause then createGenericHighlighting error range else
+            RuleNeverMatchedWarning(matchClause) :> _
 
         | MatchIncomplete ->
             let fsPattern = fsFile.GetNode<IFSharpPattern>(range)

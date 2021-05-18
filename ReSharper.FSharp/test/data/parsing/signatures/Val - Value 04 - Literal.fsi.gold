@@ -31,5 +31,5 @@ IFSharpSigFile
       IChameleonExpression
         ILiteralExpr
           FSharpToken(type:INT32, text:1)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

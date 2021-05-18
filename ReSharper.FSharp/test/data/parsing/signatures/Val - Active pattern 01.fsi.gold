@@ -34,5 +34,5 @@ IFSharpSigFile
           INamedTypeUsage
             ITypeReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:bool)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

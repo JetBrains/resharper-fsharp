@@ -97,7 +97,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
         | SynTypeDefnSigRepr.Simple(simpleRepr, _) ->
             x.ProcessSimpleTypeRepresentation(simpleRepr)
 
-        | SynTypeDefnSigRepr.ObjectModel(kind, members, _) ->
+        | SynTypeDefnSigRepr.ObjectModel(kind, members, range) ->
             if x.AddObjectModelTypeReprNode(kind) then
                 let mark = x.Mark(range)
                 x.ProcessTypeMembers(members)
