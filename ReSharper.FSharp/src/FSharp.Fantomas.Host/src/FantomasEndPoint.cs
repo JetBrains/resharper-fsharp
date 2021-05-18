@@ -11,12 +11,12 @@ using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
-  internal class ExternalFormatterEndPoint : ProtocolEndPoint<RdFantomasModel, RdSimpleDispatcher>
+  internal class FantomasEndPoint : ProtocolEndPoint<RdFantomasModel, RdSimpleDispatcher>
   {
     private readonly FantomasCodeFormatter myCodeFormatter;
-    protected override string ProtocolName => "External Formatter Host";
+    protected override string ProtocolName => "Fantomas Host";
 
-    public ExternalFormatterEndPoint() : base(FantomasProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE)
+    public FantomasEndPoint() : base(FantomasProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE)
     {
       myCodeFormatter = new FantomasCodeFormatter();
     }

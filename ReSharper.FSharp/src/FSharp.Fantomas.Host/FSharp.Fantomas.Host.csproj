@@ -6,6 +6,7 @@
         <OutputType>Exe</OutputType>
         <LangVersion>$(CSharpLanguageVersion)</LangVersion>
         <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</RootNamespace>
+        <SignAssembly>false</SignAssembly>
     </PropertyGroup>
 
     <!-- TODO: needed for 461 (because the default is x86), remove for netstandard/net5 -->
@@ -21,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="JetBrains.Fantomas" Version="$(FantomasVersion)" />
+      <PackageReference Include="Fantomas" Version="4.4.0" />
     </ItemGroup>
 
     <ItemGroup>

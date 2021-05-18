@@ -10,7 +10,6 @@
   <PropertyGroup>
     <FSharpCompilerServiceVersion>2021.1.7</FSharpCompilerServiceVersion>
     <FSharpCoreVersion>5.0.0</FSharpCoreVersion>
-    <FantomasVersion>2021.1.0</FantomasVersion>
     <ValueTupleVersion>4.5.0</ValueTupleVersion>
   </PropertyGroup>
 
