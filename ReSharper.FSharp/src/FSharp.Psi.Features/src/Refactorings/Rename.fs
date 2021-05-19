@@ -4,6 +4,7 @@ open System
 open System.Linq
 open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.Application
+open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.IDE.UI.Extensions.Validation
@@ -14,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -77,16 +79,17 @@ type FSharpAnonRecordFieldAtomicRename(declaredElement, newName) =
 
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpRenameHelper(namingService: FSharpNamingService) =
+type FSharpRenameHelper(namingService: FSharpNamingService, settingsStore: ISettingsStore) =
     inherit RenameHelperBase()
 
     override x.IsLanguageSupported = true
 
     override x.IsCheckResolvedTo(_, newDeclaredElement) =
-        // We have to change the reference so it resolves to the new element.
-        // We don't, however, want to actually resolve it and to wait for FCS to type check all the needed projects
-        // so assume it's resolved as a workaround.
-        newDeclaredElement.PresentationLanguage.Is<FSharpLanguage>()
+        // Assume the reference is resolved to prevent waiting for FCS type checks.
+        newDeclaredElement.PresentationLanguage.Is<FSharpLanguage>() ||
+
+        AssemblyReaderShim.isEnabled settingsStore &&
+        AssemblyReaderShim.supportedLanguages.Contains(newDeclaredElement.PresentationLanguage)
 
     override x.IsLocalRename(element: IDeclaredElement) =
         if not (element :? IFSharpLocalDeclaration) then false else

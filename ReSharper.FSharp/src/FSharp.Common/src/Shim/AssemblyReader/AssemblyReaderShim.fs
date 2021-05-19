@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 
 open System
 open System.Collections.Concurrent
+open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.Application.changes
 open JetBrains.Lifetimes
@@ -11,9 +12,12 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.CSharp
 open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Psi.VB
 open JetBrains.ReSharper.Resources.Shell
 
 [<RequireQualifiedAccess>]
@@ -55,6 +59,15 @@ module AssemblyReaderShim =
         let extension = path.ExtensionNoDot
         equalsIgnoreCase "dll" extension || equalsIgnoreCase "exe" extension
 
+    [<CompiledName("IsEnabled")>]
+    let isEnabled settingsStore =
+        SettingsUtil.getValue<FSharpOptions, bool> settingsStore "NonFSharpProjectInMemoryAnalysis"
+
+    [<CompiledName("SupportedLanguages")>]
+    let supportedLanguages =
+        [| CSharpLanguage.Instance :> PsiLanguageType
+           VBLanguage.Instance :> _ |]
+        |> HashSet
 
 [<SolutionComponent>]
 type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
@@ -92,7 +105,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     new (lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules, cache: FcsModuleReaderCommonCache,
             assemblyInfoShim: AssemblyInfoShim, settingsStore: ISettingsStore) =
-        let isEnabled = SettingsUtil.getValue<FSharpOptions, bool> settingsStore "NonFSharpProjectInMemoryAnalysis"
+        let isEnabled = AssemblyReaderShim.isEnabled settingsStore
         AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, isEnabled)
 
     abstract DebugReadRealAssemblies: bool

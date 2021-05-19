@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
@@ -86,7 +87,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     private static bool CanBindTo(IDeclaredElement element) =>
-      element is IFSharpDeclaredElement || element is ITypeParameter;
+      element.PresentationLanguage.Is<FSharpLanguage>() ||
+
+      AssemblyReaderShimModule.IsEnabled(element.GetPsiServices().SettingsStore) &&
+      AssemblyReaderShimModule.SupportedLanguages.Contains(element.PresentationLanguage);
 
     public override IReference BindTo(IDeclaredElement element, ISubstitution substitution)
     {
