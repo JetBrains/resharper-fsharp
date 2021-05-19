@@ -13,6 +13,7 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Impl.Special
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Util
@@ -545,6 +546,34 @@ module ProjectFcsModuleReader =
         ILMethodDef(name, methodAttrs, implAttributes, callingConv, parameters, ret, body, isEntryPoint, genericParams,
              securityDecls, attrs)
 
+    let mkEvent (psiModule: IPsiModule) (event: IEvent): ILEventDef =
+        let eventType =
+            let eventType = event.Type
+            if eventType.IsUnknown then None else
+            Some(mkType psiModule eventType)
+
+        let name = event.ShortName
+        let attributes = enum 0 // Not used by FCS.
+
+        let addMethod =
+            let adder = event.Adder
+            if isNotNull adder then adder else ImplicitAccessor(event, AccessorKind.ADDER) :> _
+            |> mkMethodRef psiModule
+
+        let removeMethod =
+            let remover = event.Remover
+            if isNotNull remover then remover else ImplicitAccessor(event, AccessorKind.REMOVER) :> _
+            |> mkMethodRef psiModule
+
+        let fireMethod =
+            match event.Raiser with
+            | null -> None
+            | adder -> Some(mkMethodRef psiModule adder)
+
+        let otherMethods = []
+        let customAttrs = emptyILCustomAttrs
+        ILEventDef(eventType, name, attributes, addMethod, removeMethod, fireMethod, otherMethods, customAttrs)
+
     let mkProperty (psiModule: IPsiModule) (property: IProperty): ILPropertyDef =
         let name = property.ShortName
 
@@ -662,9 +691,15 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
                 |> List.map (ProjectFcsModuleReader.mkProperty psiModule)
                 |> mkILProperties
 
+            let events =
+                typeElement.Events
+                |> List.ofSeq
+                |> List.map (ProjectFcsModuleReader.mkEvent psiModule)
+                |> mkILEvents
+
             let typeDef = 
                 ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
-                    extends, methods, nestedTypes, fields, emptyILMethodImpls, emptyILEvents, properties,
+                    extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
                     emptyILSecurityDecls, emptyILCustomAttrs)
 
             typeDefs.[clrTypeName] <- typeDef

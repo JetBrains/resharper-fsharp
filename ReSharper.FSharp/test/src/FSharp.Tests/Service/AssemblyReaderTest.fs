@@ -77,6 +77,8 @@ type AssemblyReaderTest() =
 
      // todo: test InternalsVisibleTo
 
+    [<Test>] member x.``Event 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Field 01``() = x.DoNamedTest()
     [<Test>] member x.``Field 02 - Inherit``() = x.DoNamedTest()
 
