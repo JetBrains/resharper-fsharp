@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 
+open System
 open System.Collections.Concurrent
 open JetBrains.Application.Settings
 open JetBrains.Application.changes
@@ -10,6 +11,8 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.Caches
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 
@@ -123,3 +126,26 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             with _ -> ()
 
         reader :> _
+
+    member this.GetModuleReader(pm: IPsiModule): ReferencedAssembly =
+        match assemblyReadersByModule.TryGetValue(pm) with
+        | true, reader -> reader
+        | _ -> ReferencedAssembly.Ignored
+
+[<SolutionComponent>]
+type SymbolCacheListener(lifetime: Lifetime, symbolCache: ISymbolCache, readerShim: AssemblyReaderShim) =
+    let typePartChanged =
+        Action<_>(fun (typePart: TypePart) ->
+            match readerShim.GetModuleReader(typePart.GetPsiModule()) with
+            | ReferencedAssembly.ProjectOutput reader ->
+                let clrTypeName = typePart.TypeElement.GetClrName()
+                reader.InvalidateTypeDef(clrTypeName)
+            | _ -> ())
+    do
+        lifetime.Bracket(
+            Func<_>(fun _ -> symbolCache.add_OnAfterTypePartAdded(typePartChanged)),
+            Action(fun _-> symbolCache.remove_OnAfterTypePartAdded(typePartChanged)))
+
+        lifetime.Bracket(
+            Func<_>(fun _ -> symbolCache.add_OnBeforeTypePartRemoved(typePartChanged)),
+            Action(fun _ -> symbolCache.remove_OnBeforeTypePartRemoved(typePartChanged)))

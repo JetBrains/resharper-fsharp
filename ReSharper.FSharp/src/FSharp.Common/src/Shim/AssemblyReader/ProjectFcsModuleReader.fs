@@ -670,6 +670,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
             typeDefs.[clrTypeName] <- typeDef
             typeDef
 
+    member this.InvalidateTypeDef(clrTypeName: IClrTypeName) =
+        use lock = locker.UsingWriteLock()
+        typeDefs.TryRemove(clrTypeName) |> ignore
+        moduleDef <- None
+        timestamp <- DateTime.UtcNow
+
     interface ILModuleReader with
         member this.ILModuleDef =
             match moduleDef with
