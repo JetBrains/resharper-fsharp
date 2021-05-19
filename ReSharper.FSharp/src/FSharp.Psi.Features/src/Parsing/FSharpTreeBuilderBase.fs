@@ -409,7 +409,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             let representationMark =
                 match cases with
                 | [] -> x.Mark(range)
-                | SynEnumCase(_, _, _, XmlDoc xmlDoc, _) :: _ ->
+                | SynEnumCase(_, _, _, _, XmlDoc xmlDoc, _) :: _ ->
                     x.MarkXmlDocOwner(xmlDoc, null, range)
 
             for case in cases do
@@ -491,7 +491,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
         x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
-    member x.ProcessEnumCase(SynEnumCase(attrs, _, _, XmlDoc xmlDoc, range)) =
+    member x.ProcessEnumCase(SynEnumCase(attrs, _, _, _, XmlDoc xmlDoc, range)) =
         let mark = x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.BAR, range)
         x.ProcessAttributeLists(attrs)
         x.Done(range, mark, ElementType.ENUM_CASE_DECLARATION)
