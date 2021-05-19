@@ -432,6 +432,9 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type member - Do 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Let bindings - XmlDoc 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Let bindings - XmlDoc 02 - Attrs``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Let bindings - XmlDoc 03 - Attrs``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Let bindings - Static 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Let bindings - Static 02 - Rec``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Let bindings 01``() = x.DoNamedTest()

@@ -207,7 +207,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             while (isNotNull x.TokenType && x.TokenType.IsWhitespace) && not x.Eof do
                 x.AdvanceLexer()
 
-            let mark = x.MarkAndProcessAttributesOrIdOrRange(typeMember.OuterAttributes, xmlDoc, None, typeMember.Range)
+            let mark = x.MarkAndProcessAttributesOrIdOrRange(typeMember.Attributes, xmlDoc, None, typeMember.Range)
             x.ProcessAttributeLists(attrs)
             x.ProcessImplicitCtorSimplePats(args)
             x.ProcessCtorSelfId(selfId)
@@ -221,9 +221,6 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         | SynMemberDefn.ImplicitCtor _ -> ()
         | _ ->
 
-        let outerAttrs = typeMember.OuterAttributes
-        let xmlDoc = typeMember.XmlDoc
-
         let mark =
             match unfinishedDeclaration with
             | Some(mark, unfinishedRange, _) when unfinishedRange = typeMember.Range ->
@@ -231,11 +228,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 unfinishedDeclaration <- None
                 mark
             | _ ->
-                match typeMember with
-                | SynMemberDefn.LetBindings _ ->
-                    x.MarkAttributesOrIdOrRangeStart(outerAttrs, xmlDoc, None, typeMember.Range)
-                | _ ->
-                    x.MarkAndProcessAttributesOrIdOrRange(outerAttrs, xmlDoc, None, typeMember.Range)
+                let mark = x.MarkXmlDocOwner(typeMember.XmlDoc, null, typeMember.Range)
+                x.ProcessAttributeLists(typeMember.Attributes)
+                mark
 
         let memberType =
             match typeMember with

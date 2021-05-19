@@ -12,6 +12,7 @@ type SynBinding with
         headPat.Range.Start
 
 type SynField with
+    // todo: xmlDoc
     member x.StartPos =
         let (SynField(attrs, _, id, _, _, _, _, range)) = x
         let range =
@@ -26,22 +27,12 @@ type SynField with
         xmlDoc
 
 type SynMemberDefn with
-    member x.OuterAttributes =
+    member x.Attributes =
         match x with
         | SynMemberDefn.Member(SynBinding(attributes = attrs), _)
         | SynMemberDefn.AbstractSlot(SynValSig(attributes = attrs), _, _)
         | SynMemberDefn.AutoProperty(attributes = attrs)
         | SynMemberDefn.ValField(SynField(attributes = attrs), _) -> attrs
-
-        | SynMemberDefn.LetBindings(SynBinding(attributes = attrs) :: _, _, _, range) ->
-            match attrs with
-            | [] -> []
-            | head :: _ ->
-
-            let letStart = range.Start
-            if Position.posGeq head.Range.Start letStart then attrs else  
-            attrs |> List.takeWhile (fun attrList -> Position.posLt attrList.Range.Start letStart)
-
         | _ -> []
 
     member x.XmlDoc =
@@ -55,25 +46,11 @@ type SynMemberDefn with
         | _ -> XmlDoc.Empty
 
 type SynMemberSig with
-    member x.OuterAttributes =
-        match x with
-        | SynMemberSig.Member(SynValSig(attributes = attrs), _, _)
-        | SynMemberSig.ValField(SynField(attributes = attrs), _) -> attrs
-        | _ -> []
-
     member x.XmlDoc =
         match x with
         | SynMemberSig.Member(SynValSig(xmlDoc = xmlDoc), _, _)
         | SynMemberSig.ValField(SynField(xmlDoc = xmlDoc), _) -> xmlDoc.ToXmlDoc(false, None)
         | _ -> XmlDoc.Empty
-
-    member x.Range =
-        match x with
-        | SynMemberSig.Member(_, _, range)
-        | SynMemberSig.ValField(_, range)
-        | SynMemberSig.Inherit(_, range)
-        | SynMemberSig.Interface(_, range) -> range
-        | _ -> range.Zero
 
 type SynSimplePats with
     member x.Range =
@@ -99,6 +76,12 @@ let rangeStartMin (range1: range) (range2: range) =
     if Position.posLt range1.Start range2.Start then range1 else range2
 
 
+let xmlDocOwnerStartRange (xmlDoc: XmlDoc) (ownerRange: range) =
+    if xmlDoc.IsEmpty then
+        ownerRange, XmlDoc.Empty
+    else
+        rangeStartMin ownerRange xmlDoc.Range, xmlDoc
+
 let attrOwnerStartRange (attrLists: SynAttributeList list) (xmlDoc: XmlDoc) (ownerRange: range) =
     match attrLists with
     | { Range = attrsRange } :: _ ->
@@ -108,21 +91,18 @@ let attrOwnerStartRange (attrLists: SynAttributeList list) (xmlDoc: XmlDoc) (own
             rangeStartMin xmlDoc.Range (rangeStartMin attrsRange ownerRange), xmlDoc
 
     | _ ->
-        if xmlDoc.IsEmpty then
-            ownerRange, XmlDoc.Empty
-        else
-            rangeStartMin ownerRange xmlDoc.Range, xmlDoc
+        xmlDocOwnerStartRange xmlDoc ownerRange
 
 let typeDefnGroupStartRange (bindings: SynTypeDefn list) (range: Range) =
     match bindings with
-    | SynTypeDefn(SynComponentInfo(attributes = attrs; xmlDoc = XmlDoc xmlDoc), _, _, _, _) :: _ ->
-        attrOwnerStartRange attrs xmlDoc range
+    | SynTypeDefn(SynComponentInfo(xmlDoc = XmlDoc xmlDoc), _, _, _, _) :: _ ->
+        xmlDocOwnerStartRange xmlDoc range
     | _ -> range, XmlDoc.Empty
 
 let typeSigGroupStartRange (bindings: SynTypeDefnSig list) (range: Range) =
     match bindings with
-    | SynTypeDefnSig(SynComponentInfo(attributes = attrs; xmlDoc = XmlDoc xmlDoc), _, _, _) :: _ ->
-        attrOwnerStartRange attrs xmlDoc range
+    | SynTypeDefnSig(SynComponentInfo(xmlDoc = XmlDoc xmlDoc), _, _, _) :: _ ->
+        xmlDocOwnerStartRange xmlDoc range
     | _ -> range, XmlDoc.Empty
 
 let letBindingGroupStartRange (bindings: SynBinding list) (range: Range) =

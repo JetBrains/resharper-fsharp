@@ -264,8 +264,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         if mark.IsSome then
             x.Done(mark.Value, elementType)
 
-    member x.MarkAndProcessAttributesOrIdOrRangeImpl(attrs: SynAttributes, xmlDoc: XmlDoc, id: Ident option,
-            range: range, markAttrs) =
+    member x.MarkAndProcessAttributesOrIdOrRange(attrs: SynAttributes, xmlDoc: XmlDoc, id: Ident option, range: range) =
         match attrs with
              | attrList :: _ ->
                  let minPos =
@@ -273,8 +272,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
                      if xmlDoc.IsEmpty then attrsRange.Start else posMin xmlDoc.Range.Start attrsRange.Start
 
                  let mark = x.Mark(minPos)
-                 if markAttrs then
-                    x.ProcessAttributeLists(attrs)
+                 x.ProcessAttributeLists(attrs)
                  mark
 
              | _ ->
@@ -289,19 +287,6 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
                      x.Mark(minDeclOrIdRange)
                  else
                     x.MarkXmlDocOwner(xmlDoc, null, minDeclOrIdRange)
-
-//                 let minPos = if xmlDoc.IsEmpty then range.Start else posMin xmlDoc.Range.Start range.Start
-//                 match id with
-//                 | Some(IdentRange idRange) ->
-//                     x.Mark(posMin idRange.Start minPos)
-//                 | None ->
-//                     x.Mark(minPos)
-
-    member x.MarkAndProcessAttributesOrIdOrRange(attrs: SynAttributes, xmlDoc: XmlDoc, id: Ident option, range: range) =
-        x.MarkAndProcessAttributesOrIdOrRangeImpl(attrs, xmlDoc, id, range, true)
-
-    member x.MarkAttributesOrIdOrRangeStart(attrs: SynAttributes, xmlDoc: XmlDoc, id: Ident option, range: range) =
-        x.MarkAndProcessAttributesOrIdOrRangeImpl(attrs, xmlDoc, id, range, false)
 
     member x.ProcessOpenDeclTarget(openDeclTarget, range) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
