@@ -46,8 +46,8 @@ type TestAssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, ps
                 projectPsiModule <- null
                 reader <- Unchecked.defaultof<_> }
 
-    override this.Exists(path) =
-        path = projectPath || base.Exists(path)
+    override this.ExistsFile(path) =
+        path = projectPath || base.ExistsFile(path)
 
     override this.GetLastWriteTime(path) =
         if path = projectPath then DateTime.MinValue else base.GetLastWriteTime(path)

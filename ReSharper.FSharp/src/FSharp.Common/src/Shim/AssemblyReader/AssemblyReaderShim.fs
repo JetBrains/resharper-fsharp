@@ -102,12 +102,12 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         | ReferencedAssembly.ProjectOutput reader -> reader.Timestamp
         | _ -> base.GetLastWriteTime(path)
 
-    override this.Exists(path) =
-        if not (this.IsEnabled && AssemblyReaderShim.isAssembly path) then base.Exists(path) else
+    override this.ExistsFile(path) =
+        if not (this.IsEnabled && AssemblyReaderShim.isAssembly path) then base.ExistsFile(path) else
 
         match getOrCreateReader path with
         | ReferencedAssembly.ProjectOutput _ -> true
-        | _ -> base.Exists(path)
+        | _ -> base.ExistsFile(path)
 
     override this.GetModuleReader(path, readerOptions) =
         if not (this.IsEnabled && AssemblyReaderShim.isAssembly path) then
