@@ -100,28 +100,31 @@ repositories.forEach {
 
 val repoRoot = projectDir.parentFile!!
 val resharperPluginPath = File(repoRoot, "ReSharper.FSharp")
+
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
+val primaryTargetFramework = "net472"
+val outputRelativePath = "bin/$buildConfiguration/$primaryTargetFramework"
 
 val libFiles = listOf(
-        "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Core.dll",
-        "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Core.xml",
-        "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
-        "FSharp.Common/bin/$buildConfiguration/net461/FSharp.DependencyManager.Nuget.dll",
-        "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Interactive.Settings.dll")
+        "FSharp.Common/$outputRelativePath/FSharp.Core.dll",
+        "FSharp.Common/$outputRelativePath/FSharp.Core.xml",
+        "FSharp.Common/$outputRelativePath/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
+        "FSharp.Common/$outputRelativePath/FSharp.DependencyManager.Nuget.dll",
+        "FSharp.Common/$outputRelativePath/FSharp.Compiler.Interactive.Settings.dll")
 
 val pluginFiles = listOf(
-        "FSharp.ProjectModelBase/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
-        "FSharp.Common/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Common",
-        "FSharp.Psi/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi",
-        "FSharp.Psi.Features/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
-        "FSharp.Fantomas.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol")
+        "FSharp.ProjectModelBase/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
+        "FSharp.Common/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Common",
+        "FSharp.Psi/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi",
+        "FSharp.Psi.Features/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
+        "FSharp.Fantomas.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol")
 
 val typeProvidersFiles = listOf(
-        "FSharp.TypeProviders.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.dll",
-        "FSharp.TypeProviders.Protocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.pdb",
-        "FSharp.TypeProviders.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe",
-        "FSharp.TypeProviders.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.pdb",
-        "FSharp.TypeProviders.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe.config",
+        "FSharp.TypeProviders.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.dll",
+        "FSharp.TypeProviders.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.pdb",
+        "FSharp.TypeProviders.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe",
+        "FSharp.TypeProviders.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.pdb",
+        "FSharp.TypeProviders.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe.config",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Core.dll",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Core.pdb",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.netcoreapp31.win.runtimeconfig.json",
@@ -132,11 +135,11 @@ val typeProvidersFiles = listOf(
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.net6.unix.runtimeconfig.json")
 
 val fantomasFiles = listOf(
-        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.exe",
-        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.runtimeconfig.json",
-        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
-        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/FSharp.Compiler.Service.dll",
-        "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/Fantomas.dll")
+        "FSharp.Fantomas.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.exe",
+        "FSharp.Fantomas.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.runtimeconfig.json",
+        "FSharp.Fantomas.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
+        "FSharp.Fantomas.Host/$outputRelativePath/FSharp.Compiler.Service.dll",
+        "FSharp.Fantomas.Host/$outputRelativePath/Fantomas.dll")
 
 val dotNetSdkPath by lazy {
     val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
@@ -238,7 +241,7 @@ tasks {
         val fantomasFiles = fantomasFiles.map { "$resharperPluginPath/src/$it" }
 
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {
-            val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/bin/$buildConfiguration/net461"
+            val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/$outputRelativePath"
             val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
             files = files + listOf("$testHostName.dll", "$testHostName.pdb")
         }
