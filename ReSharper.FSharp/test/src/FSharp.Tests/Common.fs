@@ -46,7 +46,9 @@ module PackageReferences =
 
 
 type FSharpTestAttribute(extension) =
-    inherit Attribute()
+    inherit TestPackagesAttribute()
+
+    member val ReferenceFSharpCore = true with get, set
 
     new () =
         FSharpTestAttribute(FSharpProjectFileType.FsExtension)
@@ -73,7 +75,11 @@ type FSharpTestAttribute(extension) =
         member x.Process(path, properties, projectDescriptor) =
             if FSharpTestAttribute.extensions.Contains(path.ExtensionWithDot) then
                 for targetFrameworkId in projectDescriptor.ProjectProperties.ActiveConfigurations.TargetFrameworkIds do
-                    properties.SetBuildAction(BuildAction.COMPILE, targetFrameworkId)  
+                    properties.SetBuildAction(BuildAction.COMPILE, targetFrameworkId)
+
+    override this.GetPackages _ =
+        [| if this.ReferenceFSharpCore then
+               TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
 
 type FSharpSignatureTestAttribute() =
     inherit FSharpTestAttribute(FSharpSignatureProjectFileType.FsiExtension)

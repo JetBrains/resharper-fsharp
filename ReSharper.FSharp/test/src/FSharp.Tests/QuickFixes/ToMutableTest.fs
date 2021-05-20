@@ -2,12 +2,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 // todo: add test with signature files
 
-[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 type ToMutableFixTest() =
     inherit FSharpQuickFixTestBase<ToMutableFix>()
 

@@ -2,10 +2,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 type ImportTypeTest() =
     inherit FSharpQuickFixTestBase<ImportTypeFix>()
 

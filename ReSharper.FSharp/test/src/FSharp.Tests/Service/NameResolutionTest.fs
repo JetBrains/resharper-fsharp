@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 type NameResolutionTest() =
     inherit BaseTestWithTextControl()
 

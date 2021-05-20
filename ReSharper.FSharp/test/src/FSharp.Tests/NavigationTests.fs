@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<AbstractClass; FSharpTest; TestPackages(FSharpCorePackage)>]
+[<AbstractClass; FSharpTest>]
 type FSharpContextSearchTestBase(extraPath) =
     inherit AllNavigationProvidersTestBase()
 

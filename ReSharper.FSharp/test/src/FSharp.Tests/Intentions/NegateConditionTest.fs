@@ -2,10 +2,9 @@
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 type NegateIfConditionTest() =
     inherit FSharpContextActionExecuteTestBase<NegateIfConditionAction>()
 
@@ -18,7 +17,7 @@ type NegateIfConditionTest() =
     [<Test>] member x.``Expr - = 02 - Not``() = x.DoNamedTest()
     [<Test>] member x.``Expr - = 03 - Nested``() = x.DoNamedTest()
 
-[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 type NegateWhileConditionTest() =
     inherit FSharpContextActionExecuteTestBase<NegateWhileConditionAction>()
 

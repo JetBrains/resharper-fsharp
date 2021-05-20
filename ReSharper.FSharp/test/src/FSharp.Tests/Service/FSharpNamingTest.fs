@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 type FSharpNamingTest() =
     inherit BaseTestWithTextControl()
 

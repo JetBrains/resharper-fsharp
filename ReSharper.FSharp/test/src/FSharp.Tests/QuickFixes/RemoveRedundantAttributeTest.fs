@@ -1,12 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages(FSharpCorePackage)>]
 type RemoveRedundantAttributeTest() =
     inherit FSharpQuickFixTestBase<RemoveRedundantAttributeFix>()
 

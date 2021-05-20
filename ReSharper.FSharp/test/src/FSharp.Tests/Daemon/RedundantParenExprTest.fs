@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 [<TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
 [<TestSettings("{AllowHighPrecedenceAppParens:All}")>]
 type RedundantParenExprTest() =

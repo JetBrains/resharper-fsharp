@@ -1,8 +1,11 @@
 ﻿module Test
 
-let _ = |fun x -> id x|(0)
+let _ = |fun x -> |id|(1) x|(0)
 
 ------------------------------------------------
 0: Lambda can be replaced with 'id'
 QUICKFIXES:
 Replace lambda with 'id'
+1: Redundant application
+QUICKFIXES:
+Remove 'id'

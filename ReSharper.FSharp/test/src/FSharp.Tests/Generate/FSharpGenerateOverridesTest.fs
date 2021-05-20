@@ -2,10 +2,9 @@
 
 open JetBrains.ReSharper.FeaturesTestFramework.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 type FSharpGenerateOverridesTest() =
     inherit GenerateTestBase()
 

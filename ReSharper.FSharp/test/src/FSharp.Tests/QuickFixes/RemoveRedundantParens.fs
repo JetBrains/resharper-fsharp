@@ -3,7 +3,6 @@
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -35,7 +34,7 @@ type RemoveRedundantPatParenTest() =
     [<Test>] member x.``No space 02 - After``() = x.DoNamedTest()
 
 
-[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 type RemoveRedundantTypeUsageParenTest() =
     inherit FSharpQuickFixTestBase<RemoveRedundantParenTypeUsageFix>()
 

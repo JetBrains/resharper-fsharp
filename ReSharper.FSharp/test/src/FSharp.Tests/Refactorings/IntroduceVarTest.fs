@@ -2,10 +2,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Refactorings
 
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Refactorings.Test.Common
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 type IntroduceVarTest() =
     inherit IntroduceVariableTestBase()
 

@@ -2,12 +2,10 @@
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
-open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages(FSharpCorePackage)>]
 type SpecifyTypesActionTest() =
     inherit FSharpContextActionExecuteTestBase<FunctionAnnotationAction>()
 
@@ -49,7 +47,6 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Function - Caret on let binding``() = x.DoNamedTest()
 
 
-[<TestPackages(FSharpCorePackage)>]
 type SpecifyTypesActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<FunctionAnnotationAction>()
 

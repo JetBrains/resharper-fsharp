@@ -4,10 +4,9 @@ open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages(FSharpCorePackage); HighlightOnly(typeof<InterpolatedStringCandidateWarning>)>]
+[<HighlightOnly(typeof<InterpolatedStringCandidateWarning>)>]
 type InterpolatedStringCandidateTest() =
     inherit FSharpHighlightingTestBase()
 
