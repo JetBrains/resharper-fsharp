@@ -17,6 +17,7 @@ open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
 open JetBrains.RdBackend.Common.Features.BackgroundTasks
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.Rider.Backend.Features.BackgroundTasks
 open JetBrains.Util
 
 type IMonitoredReactorOperation =
