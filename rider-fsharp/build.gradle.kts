@@ -124,10 +124,12 @@ val typeProvidersFiles = listOf(
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe.config",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Core.dll",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Core.pdb",
-        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader3.win.runtimeconfig.json",
-        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader3.unix.runtimeconfig.json",
-        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader5.win.runtimeconfig.json",
-        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader5.unix.runtimeconfig.json")
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.netcoreapp31.win.runtimeconfig.json",
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.netcoreapp31.unix.runtimeconfig.json",
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.net5.win.runtimeconfig.json",
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.net5.unix.runtimeconfig.json",
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.net6.win.runtimeconfig.json",
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.net6.unix.runtimeconfig.json")
 
 val fantomasFiles = listOf(
         "FSharp.Fantomas.Host/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.exe",

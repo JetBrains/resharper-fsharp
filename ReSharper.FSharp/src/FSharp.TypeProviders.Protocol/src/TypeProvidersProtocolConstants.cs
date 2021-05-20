@@ -1,4 +1,5 @@
-﻿using JetBrains.Util;
+﻿using System;
+using JetBrains.Util;
 using JetBrains.Util.Logging;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
@@ -14,7 +15,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Core.dll";
 
     public static string CoreRuntimeConfigFilename(int majorVersion) =>
-      $"tploader{majorVersion}.{(PlatformUtil.IsRunningUnderWindows ? "win" : "unix")}.runtimeconfig.json";
+      "tploader." +
+      majorVersion switch
+      {
+        3 => "netcoreapp31",
+        var x when x == 5 || x == 6 => $"net{x}",
+        var x => throw new InvalidOperationException($"Wrong runtime version '{x}'")
+      } +
+      $".{(PlatformUtil.IsRunningUnderWindows ? "win" : "unix")}.runtimeconfig.json";
 
     public static readonly FileSystemPath LogFolder = Logger.LogFolderPath.Combine("TypeProvidersHost");
   }
