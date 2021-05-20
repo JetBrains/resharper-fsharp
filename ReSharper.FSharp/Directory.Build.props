@@ -18,8 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -30,12 +29,12 @@
   <Import Project="$(MSBuildThisFileDirectory)..\rider-fsharp\build\DotNetSdkPath.generated.props" />
 
   <PropertyGroup>
-    <Subplatforms>$(DotNetSdkPath)\Build</Subplatforms>
+    <Subplatform>$(DotNetSdkPath)\Build\SubplatformReference</Subplatform>
 
-    <PlatformSdkSubplatform>$(Subplatforms)\SubplatformReference.Platform_Sdk.Props</PlatformSdkSubplatform>
-    <PsiFeaturesSubplatform>$(Subplatforms)\SubplatformReference.Psi.Features_src.Props</PsiFeaturesSubplatform>
-    <PsiFeaturesTestSubplatform>$(Subplatforms)\SubplatformReference.Psi.Features_test_Framework.Props</PsiFeaturesTestSubplatform>
-    <RdBackendCommonSubplatform>$(Subplatforms)\SubplatformReference.Rider_RdBackend.Common.Props</RdBackendCommonSubplatform>
-    <RiderBackendSubplatform>$(Subplatforms)\SubplatformReference.Rider_Rider.Backend.Props</RiderBackendSubplatform>
+    <PlatformSdkSubplatform>$(Subplatform).Platform_Sdk.Props</PlatformSdkSubplatform>
+    <PsiFeaturesSubplatform>$(Subplatform).Psi.Features_src.Props</PsiFeaturesSubplatform>
+    <PsiFeaturesTestSubplatform>$(Subplatform).Psi.Features_test_Framework.Props</PsiFeaturesTestSubplatform>
+    <RdBackendCommonSubplatform>$(Subplatform).Rider_RdBackend.Common.Props</RdBackendCommonSubplatform>
+    <RiderBackendSubplatform>$(Subplatform).Rider_Rider.Backend.Props</RiderBackendSubplatform>
   </PropertyGroup>
 </Project>

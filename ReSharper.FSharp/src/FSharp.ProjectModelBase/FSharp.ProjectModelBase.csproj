@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase</AssemblyName>
     <LangVersion>$(CSharpLanguageVersion)</LangVersion>
