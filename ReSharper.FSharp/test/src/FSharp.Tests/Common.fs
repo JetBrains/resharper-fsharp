@@ -20,6 +20,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.TestFramework
+open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Moq
@@ -31,8 +32,8 @@ do()
 
 module FSharpTestAttribute =
     let extensions =
-        [ FSharpProjectFileType.FsExtension
-          FSharpSignatureProjectFileType.FsiExtension ]
+        [| FSharpProjectFileType.FsExtension
+           FSharpSignatureProjectFileType.FsiExtension |]
         |> HashSet
 
     let targetFrameworkId =
@@ -50,8 +51,12 @@ type FSharpTestAttribute(extension) =
     new () =
         FSharpTestAttribute(FSharpProjectFileType.FsExtension)
 
-    interface ITestPlatformProvider with
+    interface ITestTargetFrameworkIdProvider with
         member x.GetTargetFrameworkId() = FSharpTestAttribute.targetFrameworkId
+        member this.Inherits = false
+
+    interface ITestMsCorLibFlagProvider with
+        member this.GetMsCorLibFlag() = ReferenceDlls.MsCorLib
 
     interface ITestFileExtensionProvider with
         member x.Extension = extension
