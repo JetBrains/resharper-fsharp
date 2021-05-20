@@ -12,6 +12,6 @@
         <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
     </ItemGroup>
 
-    <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_RdBackend.Common.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_RdBackend.Common.Props')" />
-    <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props')" />
+    <Import Project="$(RdBackendCommonSubplatform)" Condition="Exists('$(RdBackendCommonSubplatform)')" />
+    <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
 </Project>

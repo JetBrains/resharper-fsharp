@@ -28,4 +28,14 @@
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\rider-fsharp\build\DotNetSdkPath.generated.props" />
+
+  <PropertyGroup>
+    <Subplatforms>$(DotNetSdkPath)\Build</Subplatforms>
+
+    <PlatformSdkSubplatform>$(Subplatforms)\SubplatformReference.Platform_Sdk.Props</PlatformSdkSubplatform>
+    <PsiFeaturesSubplatform>$(Subplatforms)\SubplatformReference.Psi.Features_src.Props</PsiFeaturesSubplatform>
+    <PsiFeaturesTestSubplatform>$(Subplatforms)\SubplatformReference.Psi.Features_test_Framework.Props</PsiFeaturesTestSubplatform>
+    <RdBackendCommonSubplatform>$(Subplatforms)\SubplatformReference.Rider_RdBackend.Common.Props</RdBackendCommonSubplatform>
+    <RiderBackendSubplatform>$(Subplatforms)\SubplatformReference.Rider_Rider.Backend.Props</RiderBackendSubplatform>
+  </PropertyGroup>
 </Project>

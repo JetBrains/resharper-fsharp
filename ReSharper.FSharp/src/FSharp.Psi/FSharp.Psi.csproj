@@ -30,6 +30,6 @@
   <ItemGroup>
     <CsLex Include="src\Parsing\Lexing\fsharpLexer.lex" References="src\Parsing\Lexing\FSharpRules.lex" />
   </ItemGroup>
-  
-  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
+
+  <Import Project="$(PsiFeaturesSubplatform)" Condition="Exists('$(PsiFeaturesSubplatform)')" />
 </Project>

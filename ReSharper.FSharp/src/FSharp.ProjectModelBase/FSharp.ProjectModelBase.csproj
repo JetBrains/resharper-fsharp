@@ -10,6 +10,6 @@
     <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
   </ItemGroup>
-  
-  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
+
+  <Import Project="$(PsiFeaturesSubplatform)" Condition="Exists('$(PsiFeaturesSubplatform)')" />
 </Project>
