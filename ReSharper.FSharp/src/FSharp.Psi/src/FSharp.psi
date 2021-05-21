@@ -960,7 +960,7 @@ fSharpTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } e
   primaryConstructorDeclaration<PRIMARY_CTOR_DECL, PrimaryConstructorDeclaration>?
   EQUALS<FSHARP_EQUALS, EqualsToken>
   typeRepresentation<TYPE_REPR, TypeRepresentation>?
-  fSharpTypeMemberDeclaration<MEMBER_DECL, TypeMembers>*;
+  typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*;
 
 interface typeRepresentation:
   simpleTypeRepresentation |
@@ -984,17 +984,17 @@ interface objectModelTypeRepresentation:
 
 classRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
   CLASS<CLASS, ClassKeyword>
-  fSharpTypeMemberDeclaration<MEMBER_DECL, TypeMembers>*
+  typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*
   END;
 
 structRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
   STRUCT<STRUCT, StructKeyword>
-  fSharpTypeMemberDeclaration<MEMBER_DECL, TypeMembers>*
+  typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*
   END;
 
 interfaceRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
   INTERFACE<INTERFACE, InterfaceKeyword>
-  fSharpTypeMemberDeclaration<MEMBER_DECL, TypeMembers>*
+  typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*
   END;
 
 interface fSharpTypeOldDeclaration:
@@ -1032,7 +1032,7 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   WITH<WITH, WithKeyword>
-  fSharpTypeMemberDeclaration<MEMBER_DECL, TypeMembers>*;
+  typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*;
 
 interface enumCaseLikeDeclaration:
   enumCaseDeclaration |
@@ -1092,7 +1092,7 @@ unionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ex
   identifier<IDENTIFIER, Identifier>
   unionCaseFieldDeclarationList<FIELD_DECLARATION_LIST, FieldList>?
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+  typeBodyMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 unionCaseFieldDeclarationList:
   caseFieldDeclaration<FIELD_DECLARATION, Fields>*;
@@ -1156,7 +1156,7 @@ moduleAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBa
   typeReferenceName<TYPE_REFERENCE, TypeName>
   // todo: remove rules below
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+  typeBodyMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 interface activePatternCaseDeclaration:
   activePatternNamedCaseDeclaration |
@@ -1182,14 +1182,18 @@ delegateRepresentation options { stubBase="TypeRepresentationBase"; }:
   typeUsage<TYPE, Type>;
 
 interface fSharpTypeMemberDeclaration:
-  constructorSignatureOrDeclaration |
+  primaryConstructorDeclaration |
+  typeBodyMemberDeclaration;
+
+interface typeBodyMemberDeclaration:
+  secondaryConstructorDeclaration |
+  constructorSignature |
   inheritMember |
   interfaceImplementation |
   valFieldDeclaration |
   letBindingsDeclaration |
   overridableMemberDeclaration |
-  doStatement |
-  otherTypeMember;
+  doStatement;
 
 interface overridableMemberDeclaration:
   abstractMemberDeclaration |

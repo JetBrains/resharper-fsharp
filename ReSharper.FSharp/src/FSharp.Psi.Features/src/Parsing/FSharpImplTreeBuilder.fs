@@ -332,14 +332,14 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                     x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
                     ElementType.MEMBER_DECLARATION
 
-                | _ -> ElementType.OTHER_TYPE_MEMBER
+                | _ -> ElementType.MEMBER_DECLARATION
 
             | SynPat.Named _ ->
                 // In some cases patterns for static members inside records are represented this way.
                 x.ProcessMemberDeclaration(None, SynArgPats.Pats [], returnInfo, expr, range)
                 ElementType.MEMBER_DECLARATION
 
-            | _ -> ElementType.OTHER_TYPE_MEMBER
+            | _ -> ElementType.MEMBER_DECLARATION
 
         match valData with
         | SynValData(Some(flags), _, _) when
