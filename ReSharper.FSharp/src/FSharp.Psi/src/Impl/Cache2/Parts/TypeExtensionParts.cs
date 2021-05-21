@@ -9,8 +9,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal class ClassExtensionPart : FSharpTypeMembersOwnerTypePart, Class.IClassPart
   {
-    public ClassExtensionPart([NotNull] IFSharpTypeOldDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder)
+    public ClassExtensionPart([NotNull] IFSharpTypeOrExtensionDeclaration declaration,
+      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
     {
     }
 
@@ -29,8 +29,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
   internal class StructExtensionPart : FSharpTypeMembersOwnerTypePart, Struct.IStructPart
   {
-    public StructExtensionPart([NotNull] IFSharpTypeOldDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder)
+    public StructExtensionPart([NotNull] IFSharpTypeOrExtensionDeclaration declaration,
+      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
     {
     }
 

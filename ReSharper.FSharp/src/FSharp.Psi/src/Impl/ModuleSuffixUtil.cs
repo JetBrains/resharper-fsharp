@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
   {
     [CanBeNull]
     public static INestedModuleDeclaration GetAssociatedModuleDeclaration(
-      [NotNull] this IFSharpTypeOldDeclaration typeDeclaration)
+      [NotNull] this IFSharpTypeDeclaration typeDeclaration)
     {
       if (!(typeDeclaration.Parent is IModuleLikeDeclaration parentModule))
         return null;
@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       foreach (var declaration in typeElement.GetDeclarations())
       {
-        if (!(declaration is IFSharpTypeOldDeclaration typeDeclaration))
+        if (!(declaration is IFSharpTypeDeclaration typeDeclaration))
           continue;
 
         var moduleDeclaration = typeDeclaration.GetAssociatedModuleDeclaration();

@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     [CanBeNull]
-    public IFSharpTypeOldDeclaration GetAssociatedTypeDeclaration(out string sourceName)
+    public IFSharpTypeOrExtensionDeclaration GetAssociatedTypeDeclaration(out string sourceName)
     {
       sourceName = null;
 

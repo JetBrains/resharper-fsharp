@@ -67,7 +67,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public override IDeclaration GetTypeParameterDeclaration(int index) =>
-      index < TypeParameterNumber && GetDeclaration() is IFSharpTypeOldDeclaration declaration
+      index < TypeParameterNumber && GetDeclaration() is IFSharpTypeOrExtensionDeclaration declaration
         ? declaration.TypeParameters[index]
         : null;
 

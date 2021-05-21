@@ -68,7 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected RecordPartBase([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
     {
-      CliMutable = declaration.HasAttribute("CLIMutable");
+      CliMutable = declaration.Attributes.HasAttribute("CLIMutable");
       RepresentationAccessRights = declaration.GetRepresentationAccessRights();
     }
 

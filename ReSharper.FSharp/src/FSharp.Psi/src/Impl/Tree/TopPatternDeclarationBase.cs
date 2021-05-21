@@ -43,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (typeDeclaration == null)
         return null;
 
-      if (typeDeclaration is IFSharpTypeOldDeclaration)
+      if (typeDeclaration is IFSharpTypeDeclaration)
       {
         if ((!mfv.CurriedParameterGroups.IsEmpty() || !mfv.GenericParameters.IsEmpty()) && !mfv.IsMutable)
           return new FSharpTypePrivateMethod(declaration);
@@ -80,7 +80,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         if (this.TryCreateOperator() is { } opDeclaredElement)
           return opDeclaredElement;
 
-        return typeDeclaration is IFSharpTypeOldDeclaration
+        return typeDeclaration is IFSharpTypeDeclaration
           ? (IDeclaredElement) new FSharpTypePrivateMethod(this)
           : new ModuleFunction(this);
       }
@@ -112,7 +112,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     [NotNull]
     private IDeclaredElement CreateValue(ITypeDeclaration typeDeclaration) =>
-      typeDeclaration is IFSharpTypeOldDeclaration
+      typeDeclaration is IFSharpTypeDeclaration
         ? (IDeclaredElement) new FSharpTypePrivateField(this)
         : new ModuleValue(this);
 

@@ -2,6 +2,6 @@
 {
   public partial interface INestedModuleDeclaration
   {
-    IFSharpTypeOldDeclaration GetAssociatedTypeDeclaration(out string sourceName);
+    IFSharpTypeOrExtensionDeclaration GetAssociatedTypeDeclaration(out string sourceName);
   }
 }

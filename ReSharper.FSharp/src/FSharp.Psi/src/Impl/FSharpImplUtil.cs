@@ -221,7 +221,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       clrName.Append(declaration.CompiledName);
 
-      var typeDeclaration = declaration as IFSharpTypeOldDeclaration;
+      var typeDeclaration = declaration as IFSharpTypeDeclaration;
       if (typeDeclaration?.TypeParameters.Count > 0)
         clrName.Append("`" + typeDeclaration.TypeParameters.Count);
 
@@ -582,9 +582,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static bool HasAttribute(this TreeNodeCollection<IAttribute> attributes, [NotNull] string shortName) =>
       GetAttribute(attributes, shortName) != null;
-
-    public static bool HasAttribute([NotNull] this IFSharpTypeOldDeclaration typeDeclaration, [NotNull] string shortName) =>
-      HasAttribute(typeDeclaration.Attributes, shortName);
 
     public static void ReplaceIdentifier([CanBeNull] this IFSharpIdentifierLikeNode fsIdentifier, string name)
     {
