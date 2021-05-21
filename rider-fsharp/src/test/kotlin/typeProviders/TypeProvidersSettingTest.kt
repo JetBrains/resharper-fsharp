@@ -22,7 +22,7 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
     override val restoreNuGetPackages = true
     private val rdFcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
 
-    @Test
+    @Test(enabled = false)
     fun enableTypeProvidersSetting() {
         val sourceFile = "TypeProviderLibrary/Library.fs"
 
