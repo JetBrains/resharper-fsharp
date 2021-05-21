@@ -115,6 +115,12 @@ and FSharpDotSelection(fsFile, offset, selectBetterToken, useCamelHumps) =
         let tokenType = token.GetTokenType()
         tokenType.IsConstantLiteral || tokenType.IsStringLiteral
 
+    override this.IsPrevTokenBetter(prevToken, tokenNode) =
+        let tokenType = tokenNode.GetTokenType()
+        tokenType == FSharpTokenType.GREATER && not (this.IsSpaceToken(prevToken)) ||
+
+        base.IsPrevTokenBetter(prevToken, tokenNode)
+
     override x.IsSpaceToken(token) = token.GetTokenType().IsWhitespace
     override x.IsNewLineToken(token) = token.GetTokenType() == FSharpTokenType.NEW_LINE
 
