@@ -30,16 +30,18 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 %unicode
 
 %{
-  private int myNestedCommentLevel = 0;
-  private int myParenLevel = 0;
-  private int myTokenLength;
-  private int myBrackLevel = 0;
 
-  private Stack<FSharpLexerInterpolatedStringState> myInterpolatedStringStates =
-        new Stack<FSharpLexerInterpolatedStringState>();
+  private int myNestedCommentLevel;
+  private int myParenLevel;
+  private int myTokenLength;
+  private int myBrackLevel;
+
+  private Stack<FSharpLexerInterpolatedStringState> myInterpolatedStringStates = new Stack<>();
+
 %}
 
 %{
+
   // for sharing rules with ReSharper
   private IElementType MakeToken(IElementType type) {
     return type;
@@ -47,10 +49,6 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 
   private IElementType FindKeywordByCurrentToken() {
     return FSharpKeywordsMap.findKeyword(zzBuffer, zzStartRead, zzMarkedPos);
-  }
-
-  private IElementType FindReservedKeywordByCurrentToken() {
-    return FSharpReservedKeywordsMap.findKeyword(zzBuffer, zzStartRead, zzMarkedPos);
   }
 
   private int level() {
@@ -69,13 +67,15 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     FSharpLexerInterpolatedStringState interpolatedStringState = new FSharpLexerInterpolatedStringState(
       kind,
       previousContext,
-      new Stack<InterpolatedStringStackItem>()
+      new Stack<>()
     );
     myInterpolatedStringStates.push(interpolatedStringState);
   }
 
   private void FinishInterpolatedString()
   {
+    assert !myInterpolatedStringStates.isEmpty();
+
     FSharpLexerInterpolatedStringState interpolatedStringState = myInterpolatedStringStates.peek();
     FSharpLexerContext prevContext = interpolatedStringState.getPreviousLexerContext();
 
@@ -127,6 +127,9 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     }
   }
 
+  public boolean isRestartableState() {
+    return myInterpolatedStringStates.isEmpty() && myNestedCommentLevel == 0 && myBrackLevel == 0;
+  }
 
   private void InitBlockComment() {
     if (yystate() == LINE) {
@@ -150,8 +153,6 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 
   private IElementType InitIdent() {
     IElementType keyword = FindKeywordByCurrentToken();
-    // use if you need to separate the reserved keyword
-    // IElementType reservedKeyword = FindReservedKeywordByCurrentToken();
     return MakeToken(keyword != null ? keyword : IDENT);
   }
 
