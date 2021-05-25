@@ -52,6 +52,13 @@ type internal TypeProvidersCache() =
         if not hasValue then failwith $"Cannot get type provider {id} from TypeProvidersCache"
         else proxyTypeProvidersPerId.[id]
 
+    member x.GetProvidersLocations() =
+        typeProvidersPerAssembly.Keys
+        |> Seq.map snd
+        |> Seq.distinct
+        |> Seq.map FileSystemPath.Parse
+        |> HashSet
+
     member x.Dump() =
         let typeProviders =
             proxyTypeProvidersPerId
@@ -72,8 +79,10 @@ type IProxyTypeProvidersManager =
         isInteractive: bool *
         systemRuntimeContainsType: (string -> bool) *
         systemRuntimeAssemblyVersion: Version *
-        compilerToolsPath: string list -> ITypeProvider list
+        compilerToolsPath: string list *
+        shadowCopyDesignTimeAssembly: bool -> ITypeProvider list
 
+    abstract member GetAssemblies: unit -> HashSet<FileSystemPath>
     abstract member Dump: unit -> string
 
 type TypeProvidersManager(connection: TypeProvidersConnection) =
@@ -89,8 +98,8 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
                 resolutionEnvironment: ResolutionEnvironment, isInvalidationSupported: bool, isInteractive: bool,
                 systemRuntimeContainsType: string -> bool, systemRuntimeAssemblyVersion: Version,
-                compilerToolsPath: string list) =
-            let envKey = $"{designTimeAssemblyNameString}+{resolutionEnvironment.resolutionFolder}"
+                compilerToolsPath: string list, shadowCopyDesignTimeAssembly) =
+            let envKey = (designTimeAssemblyNameString, resolutionEnvironment.resolutionFolder)
 
             let result =
                 let fakeTcImports = getFakeTcImports systemRuntimeContainsType
@@ -100,7 +109,8 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
                         InstantiateTypeProvidersOfAssemblyParameters(runTimeAssemblyFileName,
                             designTimeAssemblyNameString, resolutionEnvironment.toRdResolutionEnvironment(),
                             isInvalidationSupported, isInteractive, systemRuntimeAssemblyVersion.ToString(),
-                            compilerToolsPath |> Array.ofList, fakeTcImports), RpcTimeouts.Maximal))
+                            compilerToolsPath |> Array.ofList, fakeTcImports, shadowCopyDesignTimeAssembly),
+                        RpcTimeouts.Maximal))
 
             let typeProviderProxies =
                 [ for tp in result.TypeProviders ->
@@ -117,3 +127,6 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
 
         member this.Dump() =
             $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"
+
+        member this.GetAssemblies() =
+            typeProviders.GetProvidersLocations()

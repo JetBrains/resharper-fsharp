@@ -77,7 +77,6 @@ object RdFSharpTypeProvidersModel : Root() {
 
     private val RdTypeProviderProcessModel = aggregatedef("RdTypeProviderProcessModel") {
         signal("Invalidate", int)
-        call("InvalidateExternalTP", int, void)
         call("GetProvidedNamespaces", int, array(RdProvidedNamespace))
         call("Dispose", int, void)
         call("GetCustomAttributes", structdef("GetCustomAttributesArgs") {
@@ -144,6 +143,7 @@ object RdFSharpTypeProvidersModel : Root() {
         field("SystemRuntimeAssemblyVersion", string)
         field("CompilerToolsPath", array(string))
         field("FakeTcImports", RdFakeTcImports)
+        field("ShadowCopyDesignTimeAssembly", bool)
     }
 
     private val RdFakeDllInfo = structdef {

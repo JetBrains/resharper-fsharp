@@ -55,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     public TypeProvidersContext(ILogger logger)
     {
       Logger = logger;
-      TypeProvidersLoader = new TypeProvidersLoader();
+      TypeProvidersLoader = new TypeProvidersLoader(logger);
 
       TypeProvidersCache = new TypeProvidersCache();
       ProvidedTypesCache = new ProvidedTypesCache(ProvidedTypesComparer.Instance);

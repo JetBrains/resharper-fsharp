@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
   {
     public static void Main(string[] args)
     {
-      AppDomain.CurrentDomain.AssemblyResolve += RiderPluginAssemblyResolver.Resolve;
+      AppDomain.CurrentDomain.AssemblyResolve += TypeProvidersAssemblyResolver.Resolve;
       MainInternal(args);
     }
 

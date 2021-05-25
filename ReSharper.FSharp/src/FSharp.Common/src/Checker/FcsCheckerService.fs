@@ -23,6 +23,7 @@ open JetBrains.ReSharper.Psi.CSharp
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.VB
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 module FcsCheckerService =
@@ -145,6 +146,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             |> Seq.iter x.InvalidateFcsProject
 
     member x.InvalidateFcsProjects(solution: ISolution, isApplicable: IProject -> bool) =
+        use lock = ReadLockCookie.Create()
         if checker.IsValueCreated then
             solution.GetAllProjects()
             |> Seq.filter isApplicable

@@ -71,6 +71,7 @@ module FSharpExperimentalFeatures =
     let [<Literal>] formatter = "Enable F# code formatter"
     let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor (experimental)"
     let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process (solution reload required)"
+    let [<Literal>] hostTypeProvidersFromTempFolder = "Host type providers from Temp folder"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
@@ -88,7 +89,10 @@ type FSharpExperimentalFeatures =
       mutable FsiInteractiveEditor: bool
 
       [<SettingsEntry(true, FSharpExperimentalFeatures.outOfProcessTypeProviders)>]
-      mutable OutOfProcessTypeProviders: bool }
+      mutable OutOfProcessTypeProviders: bool
+
+      [<SettingsEntry(false, FSharpExperimentalFeatures.hostTypeProvidersFromTempFolder)>]
+      mutable HostTypeProvidersFromTempFolder: bool }
 
 
 [<AllowNullLiteral>]
@@ -123,6 +127,7 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSc
     member val RedundantParensAnalysis = base.GetValueProperty<bool>("RedundantParensAnalysis")
     member val Formatter = base.GetValueProperty<bool>("Formatter")
     member val OutOfProcessTypeProviders = base.GetValueProperty<bool>("OutOfProcessTypeProviders")
+    member val HostTypeProvidersFromTempFolder = base.GetValueProperty<bool>("HostTypeProvidersFromTempFolder")
 
 
 [<SolutionInstanceComponent>]
@@ -175,6 +180,11 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.SkipImplementationAnalysis), RichText(skipImplementationAnalysis), null) |> ignore
         this.AddBoolOption((fun key -> key.OutOfProcessTypeProviders), RichText(FSharpExperimentalFeatures.outOfProcessTypeProviders), null) |> ignore
+        do
+            use indent = this.Indent()
+            [ this.AddBoolOption((fun key -> key.HostTypeProvidersFromTempFolder), RichText(FSharpExperimentalFeatures.hostTypeProvidersFromTempFolder), null) ]
+            |> Seq.iter (fun checkbox ->
+                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.OutOfProcessTypeProviders), id))
 
         if configurations.IsInternalMode() then
             this.AddHeader("Experimental features options")

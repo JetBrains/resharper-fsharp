@@ -49,8 +49,13 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         }.nullable)
         call("dumpSingleProjectMapping", void, string)
         call("dumpSingleProjectLocalReferences", void, immutableList(string))
-        call("TypeProvidersRuntimeVersion", void, string.nullable)
-        call("DumpTypeProvidersProcess", void, string)
+        call("typeProvidersRuntimeVersion", void, string.nullable)
+        call("dumpTypeProvidersProcess", void, string)
+    }
+
+    private val RdFSharpTypeProvidersHost = aggregatedef("RdFSharpTypeProvidersHost") {
+        call("restartTypeProviders", void, void)
+        call("isLaunched", void, bool)
     }
 
     init {
@@ -59,7 +64,8 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         setting(CSharp50Generator.Namespace, "JetBrains.ReSharper.Plugins.FSharp")
 
         field("fSharpInteractiveHost", RdFSharpInteractiveHost)
-        field("fsharpTestHost", RdFSharpTestHost)
+        field("fSharpTestHost", RdFSharpTestHost)
+        field("fSharpTypeProvidersHost", RdFSharpTypeProvidersHost)
         property("fcsBusyDelayMs", int)
     }
 }
