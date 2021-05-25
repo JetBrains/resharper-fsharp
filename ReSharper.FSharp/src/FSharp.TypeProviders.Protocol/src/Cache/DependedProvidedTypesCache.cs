@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     }
 
     protected override ProvidedType[] CreateBatch((int, TKey)[] _, int __,
-      (ProvidedTypeContextHolder, TArg) additionalParameter) => throw new System.NotImplementedException();
+      (ProvidedTypeContextHolder, TArg) parameters) => throw new System.NotImplementedException();
 
     public override string Dump() => throw new System.NotImplementedException();
   }

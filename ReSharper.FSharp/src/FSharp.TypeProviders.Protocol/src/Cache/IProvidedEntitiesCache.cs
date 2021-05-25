@@ -126,7 +126,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     protected abstract bool KeyHasValue(TKey key);
     protected abstract T Create(TKey key, int typeProviderId, TParam parameters);
-    protected abstract T[] CreateBatch(TKey[] keys, int typeProviderId, TParam additionalParameter);
+    protected abstract T[] CreateBatch(TKey[] keys, int typeProviderId, TParam parameters);
     public abstract string Dump();
   }
 }
