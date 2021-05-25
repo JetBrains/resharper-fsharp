@@ -77,9 +77,9 @@
         <Title>Format string can be replaced with an interpolated string</Title>
         <Description>Format string can be replaced with an interpolated string.</Description>
       </Tag>
-      <Tag name="FSharpIfCanBeReplacedWithConditionOperand" default="SUGGESTION">
-        <Title>If expression can be replaced with its condition operand</Title>
-        <Description>If expression can be replaced with its condition operand.</Description>
+      <Tag name="FSharpIfCanBeReplacedByConditionOperand" default="SUGGESTION">
+        <Title>If expression can be replaced by its condition operand</Title>
+        <Description>If expression can be replaced by its condition operand.</Description>
       </Tag>
     </Group>
   </SeverityConfiguration>
@@ -284,14 +284,14 @@
     <Range>expr.GetDollarSignRange()</Range>
   </Warning>
 
-  <Warning name="IfCanBeReplacedWithConditionOperand" configurableSeverity="FSharpIfCanBeReplacedWithConditionOperand">
+  <Warning name="IfCanBeReplacedByConditionOperand" configurableSeverity="FSharpIfCanBeReplacedByConditionOperand">
     <Parameter type="IIfThenElseExpr" name="expr"/>
     <Parameter type="bool" name="needNegation"/>
     <Message value="{0}">
-      <Argument>getIfCanBeReplacedWithConditionOperandWarningText needNegation</Argument>
+      <Argument>getIfCanBeReplacedByConditionOperandWarningText needNegation</Argument>
     </Message>
     <Range>expr.GetDocumentRange()</Range>
-    <QuickFix>ReplaceIfWithConditionOperand</QuickFix>
+    <QuickFix>ReplaceIfByConditionOperandFix</QuickFix>
   </Warning>
 
 </Errors>

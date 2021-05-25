@@ -11,8 +11,8 @@ type IfExpressionAnalyzerTest() =
 
     override x.HighlightingPredicate(highlighting, _, _) =
         match highlighting with
-        | :? IfCanBeReplacedWithConditionOperandWarning -> true
+        | :? IfCanBeReplacedByConditionOperandWarning -> true
         | _ -> false
 
-    [<Test>] member x.``Simple``() = x.DoNamedTest()
-    [<Test>] member x.``Not available``() = x.DoNamedTest()
+    [<Test>] member x.``Replace if by condition operand 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Replace if by condition operand 02 - Not available``() = x.DoNamedTest()
