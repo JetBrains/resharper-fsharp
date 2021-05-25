@@ -105,8 +105,9 @@
     <Compile Include="src\Search\FSharpGeneratedElementsSearch.fs" />
     <Compile Include="src\Search\RecordCtorSearch.fs" />
     <Compile Include="src\ExtendSelection\FSharpExtendSelectionProvider.fs" />
-    <Compile Include="src\Formatter\FantomasFormatterProvider.fs" />
-    <Compile Include="src\Formatter\FSharpReformatCode.fs" />
+    <Compile Include="src\CodeCleanup\FantomasFormatterProvider.fs" />
+    <Compile Include="src\CodeCleanup\FSharpReformatCode.fs" />
+    <Compile Include="src\CodeCleanup\OptimizeImports.fs" />
     <Compile Include="src\Fsi\FsiSandboxUtil.fs" />
     <Compile Include="src\Fsi\FsiOptions.fs" />
     <Compile Include="src\Fsi\FsiDetector.fs" />

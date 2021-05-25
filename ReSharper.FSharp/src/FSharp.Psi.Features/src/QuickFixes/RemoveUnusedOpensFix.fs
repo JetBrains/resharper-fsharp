@@ -21,8 +21,6 @@ type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
         member x.FileCollectorInfo = FileCollectorInfo.WithoutCaretFix
 
         member x.ExecuteAction(highlightingInfos, _, _) =
-            use writeLock = WriteLockCookie.Create(true)
-            use disableFormatter = new DisableCodeFormatter()
             for highlightingInfo in highlightingInfos do
                 match highlightingInfo.Highlighting.As<UnusedOpenWarning>() with
                 | null -> ()

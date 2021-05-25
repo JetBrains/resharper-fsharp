@@ -12,8 +12,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 let toQualifiedList (fsFile: IFSharpFile) (declaredElement: IClrDeclaredElement) =
@@ -81,6 +83,9 @@ let tryGetOpen (moduleDecl: IModuleLikeDeclaration) namespaceName =
     |> Seq.tryFind (fun x -> x.ReferenceName.QualifiedName = namespaceName)
 
 let removeOpen (openStatement: IOpenStatement) =
+    use writeLock = WriteLockCookie.Create(true)
+    use disableFormatter = new DisableCodeFormatter()
+
     let first = getFirstMatchingNodeBefore isInlineSpaceOrComment openStatement
     let last =
         openStatement
