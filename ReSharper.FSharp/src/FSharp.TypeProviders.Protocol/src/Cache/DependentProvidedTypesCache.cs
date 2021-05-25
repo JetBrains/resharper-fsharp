@@ -5,12 +5,12 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 {
-  public class DependedProvidedTypesCache<TKey, TArg> :
+  public class DependentProvidedTypesCache<TKey, TArg> :
     ProvidedEntitiesCacheBase<ProvidedType, (int, TKey), (ProvidedTypeContextHolder context, TArg rdArg)>
   {
     private readonly IRdCall<TArg, int> myGetIdCall;
 
-    public DependedProvidedTypesCache(TypeProvidersContext typeProvidersContext, IRdCall<TArg, int> getIdCall) : base(
+    public DependentProvidedTypesCache(TypeProvidersContext typeProvidersContext, IRdCall<TArg, int> getIdCall) : base(
       typeProvidersContext) => myGetIdCall = getIdCall;
 
     protected override bool KeyHasValue((int, TKey) key) => true;

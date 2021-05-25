@@ -14,20 +14,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
       ProvidedTypesCache = new ProvidedTypesCache(this);
       ProvidedAssembliesCache = new ProvidedAssembliesCache(this);
       GenericProvidedTypesCache =
-        new DependedProvidedTypesCache<string, MakeGenericTypeArgs>(this, ProvidedTypeProtocol.MakeGenericType);
+        new DependentProvidedTypesCache<string, MakeGenericTypeArgs>(this, ProvidedTypeProtocol.MakeGenericType);
       AppliedProvidedTypesCache =
-        new DependedProvidedTypesCache<string, ApplyStaticArgumentsParameters>(this,
+        new DependentProvidedTypesCache<string, ApplyStaticArgumentsParameters>(this,
           ProvidedTypeProtocol.ApplyStaticArguments);
       ArrayProvidedTypesCache =
-        new DependedProvidedTypesCache<int, MakeArrayTypeArgs>(this, ProvidedTypeProtocol.MakeArrayType);
+        new DependentProvidedTypesCache<int, MakeArrayTypeArgs>(this, ProvidedTypeProtocol.MakeArrayType);
     }
 
     public TypeProvidersConnection Connection { get; }
     public ProvidedTypesCache ProvidedTypesCache { get; }
     public ProvidedAssembliesCache ProvidedAssembliesCache { get; }
-    public DependedProvidedTypesCache<string, MakeGenericTypeArgs> GenericProvidedTypesCache { get; }
-    public DependedProvidedTypesCache<string, ApplyStaticArgumentsParameters> AppliedProvidedTypesCache { get; }
-    public DependedProvidedTypesCache<int, MakeArrayTypeArgs> ArrayProvidedTypesCache { get; }
+    public DependentProvidedTypesCache<string, MakeGenericTypeArgs> GenericProvidedTypesCache { get; }
+    public DependentProvidedTypesCache<string, ApplyStaticArgumentsParameters> AppliedProvidedTypesCache { get; }
+    public DependentProvidedTypesCache<int, MakeArrayTypeArgs> ArrayProvidedTypesCache { get; }
     public IProvidedCustomAttributeProvider ProvidedCustomAttributeProvider { get; }
 
     private RdProvidedTypeProcessModel ProvidedTypeProtocol => Connection.ProtocolModel.RdProvidedTypeProcessModel;
