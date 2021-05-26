@@ -6,7 +6,6 @@ import com.intellij.openapi.util.registry.RegistryValue
 import com.intellij.openapi.util.registry.RegistryValueListener
 import com.jetbrains.rd.util.reactive.IOptProperty
 import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
-import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 
 class FSharpHost(project: Project) : LifetimedProjectComponent(project) {
@@ -20,10 +19,14 @@ class FSharpHost(project: Project) : LifetimedProjectComponent(project) {
         initRegistryValue(fcsBusyDelayRegistryKey, RegistryValue::asInteger, fSharpModel.fcsBusyDelayMs)
     }
 
-    private fun <T : Any> initRegistryValue(registryKey: String, registryToValue: (registryValue: RegistryValue) -> T, property: IOptProperty<T>) {
+    private fun <T : Any> initRegistryValue(
+        registryKey: String,
+        registryToValue: (registryValue: RegistryValue) -> T,
+        property: IOptProperty<T>
+    ) {
         val registryValue = Registry.get(registryKey)
         property.set(registryToValue(registryValue))
-        registryValue.addListener(object : RegistryValueListener.Adapter() {
+        registryValue.addListener(object : RegistryValueListener {
             override fun afterValueChanged(value: RegistryValue) {
                 property.set(registryToValue(value))
             }
