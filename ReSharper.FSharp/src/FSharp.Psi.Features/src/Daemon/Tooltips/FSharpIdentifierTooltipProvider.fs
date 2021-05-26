@@ -1,4 +1,4 @@
-module JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
+module JetBrains.ReSharper.Plugins.FSharp.Daemon.Tooltips
 
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices

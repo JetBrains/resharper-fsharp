@@ -50,9 +50,10 @@
       <SubType>Designer</SubType>
     </ErrorsGen>
     <Compile Include="src\Daemon\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
-    <Compile Include="src\Daemon\Stages\FSharpIdentifierTooltipProvider.fs" />
-    <Compile Include="src\Daemon\Stages\FSharpSyntaxHighlightingQuickDocTooltipRequest.fs" />
-    <Compile Include="src\Daemon\Stages\FSharpQuickDocSuppressor.fs" />
+    <Compile Include="src\Daemon\Tooltips\FSharpIdentifierTooltipProvider.fs" />
+    <Compile Include="src\Daemon\Tooltips\FSharpSyntaxHighlightingQuickDocTooltipRequest.fs" />
+    <Compile Include="src\Daemon\Tooltips\FSharpQuickDocSuppressor.fs" />
+    <Compile Include="src\Daemon\Tooltips\ZoneMarker.fs" />
     <Compile Include="src\Daemon\Stages\FcsErrorsStageProcessBase.fs" />
     <Compile Include="src\Daemon\Stages\FSharpDaemonBehaviour.fs" />
     <Compile Include="src\Daemon\Stages\ScriptLoadPathsStage.fs" />
