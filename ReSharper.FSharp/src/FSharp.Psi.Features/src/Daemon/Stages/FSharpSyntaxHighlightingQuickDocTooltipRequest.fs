@@ -7,11 +7,14 @@ open JetBrains.TextControl.DocumentMarkup
 
 [<SolutionComponent>]
 type FSharpSyntaxHighlightingQuickDocTooltipRequest() =
+    member x.ShouldShowToolTipAsQuickDoc(highlighter: IHighlighter, _) =
+        if highlighter.UserData :? FSharpIdentifierHighlighting then
+            RiderTooltipAction.SHOW_AS_QUICK_DOC
+        else
+            RiderTooltipAction.UNSURE
+
     interface IRiderQuickDocTooltipRequest with
-        member x.ShouldShowToolTipAsQuickDoc(highlighter: IHighlighter, _) =
-            if highlighter.UserData :? FSharpIdentifierHighlighting then
-                RiderTooltipAction.SHOW_AS_QUICK_DOC
-            else
-                RiderTooltipAction.UNSURE
+        member x.ShouldShowToolTipAsQuickDoc(highlighter: IHighlighter, dataContext) =
+            x.ShouldShowToolTipAsQuickDoc(highlighter, dataContext)
 
         member x.Priority = 2000
