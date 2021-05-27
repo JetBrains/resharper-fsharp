@@ -18,10 +18,10 @@ open JetBrains.Util
 module UnusedOpensStageProcess =
     let [<Literal>] opName = "UnusedOpensStageProcess"
 
-    let lines = Dictionary<int, string>()
-
     let getUnusedOpens (fsFile: IFSharpFile) (interruptChecker: Action): IOpenStatement[] =
         let document = fsFile.GetSourceFile().Document
+
+        let lines = Dictionary<int, string>()
 
         let getLine line =
             let line = line - 1
@@ -41,6 +41,7 @@ module UnusedOpensStageProcess =
                 // todo: remove this check after FCS update, https://github.com/dotnet/fsharp/pull/10510
                 if isNull openDirective.TypeKeyword then
                     highlightings.Add(openDirective)
+
         highlightings.AsArray()
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |], StagesAfter = [| typeof<CollectUsagesStage> |])>]
@@ -57,6 +58,7 @@ and UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess) 
     override x.Execute(committer) =
         let interruptChecker = daemonProcess.CreateInterruptChecker()
         let unusedOpens = UnusedOpensStageProcess.getUnusedOpens fsFile interruptChecker
+        if Array.isEmpty unusedOpens then () else
 
         let seldomInterruptChecker = x.SeldomInterruptChecker
         unusedOpens
@@ -64,4 +66,5 @@ and UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess) 
             seldomInterruptChecker.CheckForInterrupt()
             let range = openDirective.GetHighlightingRange()
             HighlightingInfo(range, UnusedOpenWarning(openDirective)))
-        |> (DaemonStageResult >> committer.Invoke)
+        |> DaemonStageResult
+        |> committer.Invoke
