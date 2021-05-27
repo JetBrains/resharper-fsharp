@@ -11,7 +11,7 @@ open JetBrains.Rider.Backend.Features.QuickDoc.Impl
 open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
 
-[<SolutionComponent>]
+//[<SolutionComponent>]
 type FSharpQuickDocSuppressor(request: FSharpSyntaxHighlightingQuickDocTooltipRequest,
         quickDocManager: RiderQuickDocHighlighterManager) =
     inherit QuickDocSuppressorBase()
