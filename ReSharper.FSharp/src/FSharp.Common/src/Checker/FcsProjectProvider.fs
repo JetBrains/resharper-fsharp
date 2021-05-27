@@ -311,6 +311,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         member x.InvalidateDirty() =
             processDirtyFcsProjects ()
 
+        member this.GetFcsProject(psiModule) =
+            getOrCreateFcsProject psiModule
+
 /// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
 [<SolutionComponent>]
 type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,

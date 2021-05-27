@@ -12,21 +12,9 @@ open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
-
-type FcsProject =
-    { OutputPath: FileSystemPath
-      FileIndices: Dictionary<FileSystemPath, int>
-      ProjectOptions: FSharpProjectOptions
-      ParsingOptions: FSharpParsingOptions
-      ImplementationFilesWithSignatures: ISet<FileSystemPath> }
-
-    member x.IsKnownFile(sourceFile: IPsiSourceFile) =
-        x.FileIndices.ContainsKey(sourceFile.GetLocation())
-
 
 type ReferencedModule =
     { ReferencedPath: FileSystemPath

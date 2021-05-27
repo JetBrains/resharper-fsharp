@@ -60,7 +60,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
 
     /// Type definitions imported by FCS.
     let typeDefs = ConcurrentDictionary<IClrTypeName, ILTypeDef>()
-    
+
+//    let usedTypeNames = Dictionary<string, IClrTypeName>()
+
     // todo: store in reader/cache, so it doesn't leak after solution close
     let cultures = DataIntern()
     let publicKeys = DataIntern()
@@ -368,10 +370,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
         let methodSpec = ILMethodSpec.Create(attrType, ctorMethodRef, [])
         ILAttribute.Decoded(methodSpec, [], [])
 
-    let paramArrayAttribute =
+    let paramArrayAttribute () =
         mkCompilerGeneratedAttribute PredefinedType.PARAM_ARRAY_ATTRIBUTE_CLASS
 
-    let extensionAttribute =
+    let extensionAttribute () =
         mkCompilerGeneratedAttribute PredefinedType.EXTENSION_ATTRIBUTE_CLASS
 
     let mkGenericVariance (variance: TypeParameterVariance): ILGenericVariance =
@@ -519,7 +521,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
             getLiteralValue defaultValue.ConstantValue defaultValue.DefaultTypeValue
 
         // todo: other attrs
-        let attrs = [ if param.IsParameterArray then paramArrayAttribute ]
+        let attrs = [ if param.IsParameterArray then paramArrayAttribute () ]
 
         { Name = Some(name) // todo: intern?
           Type = paramType
@@ -562,7 +564,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
         // todo: other attrs
         let attrs =
             match method with
-            | :? IMethod as method when method.IsExtensionMethod -> [ extensionAttribute ] // todo: test
+            | :? IMethod as method when method.IsExtensionMethod -> [ extensionAttribute () ] // todo: test
             | _ -> []
             |> mkILCustomAttrs
 
@@ -632,8 +634,26 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
 
     member val RealModuleReader: ILModuleReader option = None with get, set
 
+    member this.ForceCreateTypeDefs(): unit =
+        let rec traverseTypes (ns: INamespace) =
+            for typeElement in ns.GetNestedTypeElements(symbolScope) do
+                visitType typeElement
+            for nestedNs in ns.GetNestedNamespaces(symbolScope) do
+                traverseTypes nestedNs
+
+        and visitType (typeElement: ITypeElement) =
+            this.CreateTypeDef(typeElement.GetClrName().GetPersistent()) |> ignore
+            Seq.iter visitType typeElement.NestedTypes
+
+        traverseTypes symbolScope.GlobalNamespace
+
     member this.CreateTypeDef(clrTypeName: IClrTypeName) =
         use lock = locker.UsingWriteLock()
+
+        match typeDefs.TryGetValue(clrTypeName) with
+        | NotNull typeDef -> typeDef
+        | _ ->
+
         use cookie = ReadLockCookie.Create()
         use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
@@ -719,6 +739,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
             typeDefs.[clrTypeName] <- typeDef
             typeDef
 
+    // todo: change to shortName
     member this.InvalidateTypeDef(clrTypeName: IClrTypeName) =
         use lock = locker.UsingWriteLock()
         typeDefs.TryRemove(clrTypeName) |> ignore
