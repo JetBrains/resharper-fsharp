@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     protected override MemberDecoration Modifiers => Parts.GetModifiers();
     public string SourceName => this.GetSourceName();
-    
+
     public override IList<ITypeElement> GetSuperTypeElements()
     {
       var result = new HashSet<ITypeElement>();
@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
           result.AddRange(fsPart.GetSuperTypeElements());
       return result.ToArray();
     }
-    
+
     public IList<ITypeParameter> AllTypeParameters =>
       this.GetAllTypeParametersReversed();
   }

@@ -26,14 +26,14 @@ type FSharpDebuggerLocalSymbolProvider() =
             let mutable declRange = None
 
             let visitor =
-                let inline (|SuitableIdent|_|) (ident: Ident) = 
+                let inline (|SuitableIdent|_|) (ident: Ident) =
                     if ident.idText = name && (Position.posLt ident.idRange.End pos || Position.posEq ident.idRange.End pos) then
                         Some ident.idRange
                     else None
 
                 let updateDeclRange (range: Range) =
                     match declRange with
-                    | None -> 
+                    | None ->
                         declRange <- Some range
                     | Some oldDeclRange when Position.posGt range.Start oldDeclRange.Start ->
                         declRange <- Some range
@@ -41,26 +41,26 @@ type FSharpDebuggerLocalSymbolProvider() =
 
                 let visitPat pat defaultTraverse =
                     match pat with
-                    | SynPat.Named(_, SuitableIdent range, false, _, _) -> updateDeclRange range 
+                    | SynPat.Named(_, SuitableIdent range, false, _, _) -> updateDeclRange range
                     | _ -> ()
                     defaultTraverse pat
 
                 { new SyntaxVisitorBase<_>() with
-                    member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = 
+                    member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) =
                         match expr with
-                        | SynExpr.For(ident = SuitableIdent range) -> updateDeclRange range 
+                        | SynExpr.For(ident = SuitableIdent range) -> updateDeclRange range
                         | SynExpr.ForEach(pat = pat) -> visitPat pat ignore
                         | SynExpr.App(argExpr = SynExpr.Ident (SuitableIdent range)) -> updateDeclRange range
                         | _ -> ()
                         defaultTraverse expr
 
-                    member this.VisitPat(_, defaultTraverse, pat) = visitPat pat defaultTraverse 
+                    member this.VisitPat(_, defaultTraverse, pat) = visitPat pat defaultTraverse
 
                     member this.VisitLetOrUse(_, _, _, bindings, range) =
                         bindings |> List.tryPick (fun (SynBinding(headPat = headPat)) ->
                             visitPat headPat (fun _ -> None))
 
-                    member this.VisitMatchClause(_, defaultTraverse, (SynMatchClause(pat, _, _, _, _) as clause)) = 
+                    member this.VisitMatchClause(_, defaultTraverse, (SynMatchClause(pat, _, _, _, _) as clause)) =
                         visitPat pat (fun _ -> None) |> Option.orElseWith (fun _ -> defaultTraverse clause) }
 
             SyntaxTraversal.Traverse(pos, parseTree, visitor) |> ignore

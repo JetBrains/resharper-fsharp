@@ -37,11 +37,11 @@ let getIndexerArgListRange (indexerExpr: IItemIndexerExpr) =
 
 let getLetTokenText (token: ITokenNode) =
     let tokenType = getTokenType token
-    let tokenType = if isNull tokenType then FSharpTokenType.LET else tokenType 
+    let tokenType = if isNull tokenType then FSharpTokenType.LET else tokenType
     tokenType.TokenRepresentation
 
 let getNodeRanges (exprs: #ITreeNode seq) =
-    exprs |> Seq.map (fun x -> x.GetHighlightingRange()) 
+    exprs |> Seq.map (fun x -> x.GetHighlightingRange())
 
 let getRefExprNameRange (refExpr: IReferenceExpr) =
     match refExpr.Identifier with
@@ -77,7 +77,7 @@ let getQualifierRange (element: ITreeNode) =
 
     | _ -> DocumentRange.InvalidRange
 
-/// Assuming `|>` or `<|` were resolved beforehand. 
+/// Assuming `|>` or `<|` were resolved beforehand.
 let getFunctionApplicationRange (appExpr: IAppExpr) =
     match appExpr, appExpr.FunctionExpression with
     | :? IPrefixAppExpr, funExpr -> funExpr.GetHighlightingRange()
@@ -117,7 +117,7 @@ let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
     | _ -> "Lambda can be simplified"
 
 let getInterfaceImplHeaderRange (interfaceImpl: IInterfaceImplementation) =
-    let last = 
+    let last =
         match interfaceImpl.WithKeyword with
         | null -> interfaceImpl.TypeName :> ITreeNode
         | withKeyword -> withKeyword :> ITreeNode
@@ -132,5 +132,5 @@ let getSecondBindingKeyword (bindings: ILetBindings) =
     |> Seq.tail
     |> Seq.tryHead
     |> Option.bind (fun b -> Option.ofObj b.BindingKeyword)
-    |> Option.map getDocumentRange 
+    |> Option.map getDocumentRange
     |> Option.defaultValue DocumentRange.InvalidRange

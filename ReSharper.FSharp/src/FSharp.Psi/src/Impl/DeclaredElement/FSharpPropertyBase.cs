@@ -9,7 +9,6 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  
   internal abstract class FSharpPropertyMemberBase<TDeclaration> : FSharpPropertyBase<TDeclaration>
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
@@ -96,10 +95,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsAuto => false;
     public virtual bool IsDefault => false;
 
-    public override bool Equals(object obj) => 
+    public override bool Equals(object obj) =>
       obj is IProperty && base.Equals(obj);
 
-    public override int GetHashCode() => 
+    public override int GetHashCode() =>
       ShortName.GetHashCode();
   }
 }

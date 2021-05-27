@@ -170,7 +170,7 @@ type FSharpOverridableMembersProvider() =
                     Some (memberInstance.Member, mfvInstance))
                 |> Seq.toList)
 
-        let needsTypesAnnotations = 
+        let needsTypesAnnotations =
             overridableMemberInstances
             |> List.distinctBy (fst >> getTestDescriptor)
             |> List.map snd

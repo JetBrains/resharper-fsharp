@@ -6,8 +6,8 @@ open System
 
 module PrimitiveTypesBoxerTest =
 
-    type ColorEnum = Red = 0 | Blue = 1  
-    
+    type ColorEnum = Red = 0 | Blue = 1
+
     let testData = [
         TestCaseData(SByte.MaxValue).SetName("SByte").Returns(SByte.MaxValue)
         TestCaseData(Int16.MaxValue).SetName("Short").Returns(Int16.MaxValue)
@@ -29,6 +29,6 @@ module PrimitiveTypesBoxerTest =
 
     [<TestCaseSource(nameof testData)>]
     let ``Server Boxing-Unboxing`` obj = PrimitiveTypesBoxer.BoxToServerStaticArg(obj).Unbox()
-    
+
     [<TestCaseSource(nameof testData)>]
     let ``Client Boxing-Unboxing`` obj = PrimitiveTypesBoxer.BoxToClientStaticArg(obj).Unbox()

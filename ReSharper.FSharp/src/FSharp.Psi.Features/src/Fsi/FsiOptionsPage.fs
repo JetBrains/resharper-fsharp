@@ -27,7 +27,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
         iconHost: IconHostBase) as this =
     inherit FSharpOptionsPageBase(lifetime, optionsPageContext, settings)
 
-    let (|FsiTool|) (obj: obj) = obj :?> FsiTool 
+    let (|FsiTool|) (obj: obj) = obj :?> FsiTool
 
     let Not = Func<_,_>(not)
 

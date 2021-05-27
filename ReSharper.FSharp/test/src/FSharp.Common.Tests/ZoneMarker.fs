@@ -20,7 +20,7 @@ type IFSharpTestsZone =
     inherit ITestsEnvZone
 
 [<ZoneActivator>]
-type PsiFeatureTestZoneActivator() = 
+type PsiFeatureTestZoneActivator() =
     interface IActivate<PsiFeatureTestZone> with
         member x.ActivatorEnabled() = true
 
@@ -36,5 +36,5 @@ type FSharpFileServiceStub() =
     interface IHideImplementation<FSharpFileService>
 
 [<SetUpFixture>]
-type PsiFeaturesTestEnvironmentAssembly() = 
+type PsiFeaturesTestEnvironmentAssembly() =
     inherit ExtensionTestEnvironmentAssembly<IFSharpTestsZone>()

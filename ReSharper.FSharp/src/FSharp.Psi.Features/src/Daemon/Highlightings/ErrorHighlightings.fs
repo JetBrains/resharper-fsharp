@@ -10,7 +10,7 @@ type FSharpErrors() =
     class end
 
 [<AbstractClass>]
-type FSharpErrorHighlightingBase(message, range: DocumentRange) = 
+type FSharpErrorHighlightingBase(message, range: DocumentRange) =
     interface IHighlighting with
         member x.ToolTip = message
         member x.ErrorStripeToolTip = message
@@ -39,10 +39,10 @@ type UnresolvedHighlighting(message, range) =
     inherit FSharpErrorHighlightingBase(message, range)
 
 
-[<StaticSeverityHighlighting(Severity.WARNING, typeof<HighlightingGroupIds.IdentifierHighlightings>, 
+[<StaticSeverityHighlighting(Severity.WARNING, typeof<HighlightingGroupIds.IdentifierHighlightings>,
                              AttributeId = AnalysisHighlightingAttributeIds.DEADCODE,
                              OverlapResolve = OverlapResolveKind.NONE)>]
-type UnusedHighlighting(message, range) = 
+type UnusedHighlighting(message, range) =
     inherit FSharpErrorHighlightingBase(message, range)
 
 

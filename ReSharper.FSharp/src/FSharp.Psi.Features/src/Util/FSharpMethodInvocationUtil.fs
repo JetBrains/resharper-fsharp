@@ -21,7 +21,7 @@ let isNamedArgReference (expr: IFSharpExpression) =
 
     match refExpr.Reference.GetFSharpSymbol() with
     | :? FSharpParameter -> true
-    | :? FSharpField as fsField -> fsField.IsUnionCaseField 
+    | :? FSharpField as fsField -> fsField.IsUnionCaseField
     | _ -> false
 
 

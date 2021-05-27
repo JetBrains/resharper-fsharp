@@ -40,7 +40,7 @@ type FSharpBreakpointVariantsProvider() =
             let lineStart = document.GetLineStartOffset(docLine line)
             let lineEnd = document.GetLineEndOffsetWithLineBreak(docLine line)
 
-            let result = Dictionary<range, IBreakpoint>() 
+            let result = Dictionary<range, IBreakpoint>()
             for token in fsFile.FindTokensAt(TreeTextRange(TreeOffset(lineStart), TreeOffset(lineEnd))) do
                 let documentEndOffset = token.GetDocumentEndOffset()
                 let pos = getPosFromDocumentOffset documentEndOffset

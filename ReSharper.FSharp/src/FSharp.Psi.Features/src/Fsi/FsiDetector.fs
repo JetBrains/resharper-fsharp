@@ -62,7 +62,7 @@ type FsiTool =
         | RdFsiRuntime.Mono, false -> monoFsiName
         | _, true  -> defaultAnyCpuFsiName
         | _, false -> defaultFsiName
-    
+
     member x.GetFsiPath(useAnyCpu) =
         match x.Runtime with
         | RdFsiRuntime.Core -> CoreFsiProvider.FsiPath
@@ -171,7 +171,7 @@ type MonoFsiProvider() =
                         let fsiTool = FsiTool.Create("Current Mono toolset", fsiPath.Directory)
                         tools.Add(fsiTool) |> ignore
                         yield fsiTool
-    
+
                 let monoRuntimeDetector = Shell.Instance.GetComponent<MonoRuntimeDetector>()
                 for runtime in monoRuntimeDetector.DetectMonoRuntimes() do
                     let fsiPath = runtime.RootPath / fsiRelativePath

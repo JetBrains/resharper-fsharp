@@ -54,7 +54,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool CanBeMutable =>
       GetDeclaration() is ITopReferencePat { CanBeMutable: true };
 
-    public override bool IsStatic => 
+    public override bool IsStatic =>
       GetDeclaration() is { IsStatic: true };
   }
 

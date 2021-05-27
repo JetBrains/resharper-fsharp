@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     Brace,
     Bracket
   }
-  
+
   public struct FSharpLexerInterpolatedStringState
   {
     public FSharpInterpolatedStringKind Kind;

@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
     protected readonly IAssemblyReader DefaultReader;
 
-    protected AssemblyReaderShimBase(Lifetime lifetime, ChangeManager changeManager, bool isEnabled) 
+    protected AssemblyReaderShimBase(Lifetime lifetime, ChangeManager changeManager, bool isEnabled)
       : base(lifetime, changeManager)
     {
       IsEnabled = isEnabled;

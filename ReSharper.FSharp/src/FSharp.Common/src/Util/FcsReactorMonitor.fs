@@ -188,12 +188,12 @@ type FcsReactorMonitor(lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTa
         override _.OnEnqueueOp userOpName opName opArg approxQueueLength =
             logger.Trace("Enqueue: {0}.{1} ({2}), queue length {3}", userOpName, opName, opArg, approxQueueLength)
 
-and 
+and
     [<SolutionComponent; AllowNullLiteral>]
     FcsReactorMonitorSettingsProvider(lifetime, solution, monitor: IFcsReactorMonitor, settings,
         settingsSchema) as this =
     inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
-    
+
     let isEnabledProperty = base.GetValueProperty<bool>("EnableReactorMonitor")
 
     do

@@ -48,7 +48,7 @@ type FSharpOptions =
 
       [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
       mutable TopLevelOpenCompletion: bool
-      
+
       [<SettingsEntry(false, enableFcsReactorMonitor); DefaultValue>]
       mutable EnableReactorMonitor: bool }
 
@@ -89,10 +89,10 @@ type FSharpExperimentalFeatures =
 
       [<SettingsEntry(false, FSharpExperimentalFeatures.formatter)>]
       mutable Formatter: bool
-      
+
       [<SettingsEntry(false, FSharpExperimentalFeatures.fsiInteractiveEditor); DefaultValue>]
       mutable FsiInteractiveEditor: bool
-      
+
       [<SettingsEntry(true, FSharpExperimentalFeatures.outOfProcessTypeProviders)>]
       mutable OutOfProcessTypeProviders: bool }
 

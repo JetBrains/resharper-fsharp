@@ -56,7 +56,7 @@ module AssemblyReaderShim =
         let projectAndTargetFrameworkId = psiModules.TryGetProjectAndTargetFrameworkIdByOutputAssembly(path)
         if isNull projectAndTargetFrameworkId then null else
 
-        let project, targetFrameworkId = projectAndTargetFrameworkId 
+        let project, targetFrameworkId = projectAndTargetFrameworkId
         if not (isSupportedProject project) then null else
 
         psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
@@ -85,7 +85,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         checkerService.AssemblyReaderShim <- this
         lifetime.OnTermination(fun _ -> checkerService.AssemblyReaderShim <- Unchecked.defaultof<_>) |> ignore
 
-    // The shim is injected to get the expected shim shadowing chain, it's expected to be unused. 
+    // The shim is injected to get the expected shim shadowing chain, it's expected to be unused.
     do assemblyInfoShim |> ignore
 
     let locker = JetFastSemiReenterableRWLock()
@@ -115,7 +115,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             | :? IProjectPsiModule as referencedModule ->
                 if visited.Contains(referencedModule) then false else
 
-                let hasReference = 
+                let hasReference =
                     referencedModule.Project.IsFSharp ||
                     hasTransitiveReferencesToFSharpProjects referencedModule
 

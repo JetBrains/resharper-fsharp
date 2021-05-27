@@ -15,7 +15,7 @@ type FSharpNamingTest() =
     inherit BaseTestWithTextControl()
 
     override x.RelativeTestDataPath = "features/naming"
-    
+
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Tuple``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Literal - Module``() = x.DoNamedTest()

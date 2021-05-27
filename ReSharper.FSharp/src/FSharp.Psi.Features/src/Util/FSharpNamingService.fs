@@ -75,7 +75,7 @@ type FSharpNamingService(language: FSharpLanguage) =
 
     let pipeLeftOperatorNames =
         [| "<|"; "<||"; "<|||" |] |> HashSet
-    
+
     let withWords words (nameRoot: NameRoot) =
         NameRoot(Array.ofList words, nameRoot.PluralityKind, nameRoot.IsFinalPresentation)
 
@@ -181,7 +181,7 @@ type FSharpNamingService(language: FSharpLanguage) =
 
         | :? ITypedExpr as typedExpr ->
             x.SuggestRoots(typedExpr.Expression, useExpectedTypes, policyProvider)
-        
+
         | :? IReferenceExpr as referenceExpr ->
             match referenceExpr.Qualifier.IgnoreInnerParens() with
             | :? IReferenceExpr as qualifierExpr ->
@@ -284,9 +284,9 @@ type FSharpNamingService(language: FSharpLanguage) =
 
             let declaredElement = reference.Resolve().DeclaredElement.As<IAttributesOwner>()
             if isNull declaredElement || not (isCompiledUnionCase declaredElement) then () else
-            if declaredElement.GetContainingType().GetClrName() <> typeName then () else 
+            if declaredElement.GetContainingType().GetClrName() <> typeName then () else
 
-            x.AddExtraNames(namesCollection, parametersOwner)            
+            x.AddExtraNames(namesCollection, parametersOwner)
         | _ -> ()
 
     override x.GetAbbreviation(root) =
@@ -321,7 +321,7 @@ module FSharpNamingService =
 
         // Type element is not null when checking names for declaration in a module/class.
         // Consider all member names used.
-        // todo: type private let binding allow shadowing 
+        // todo: type private let binding allow shadowing
         if isNotNull containingTypeElement then
             addUsedNames containingTypeElement.MemberNames
 
@@ -329,7 +329,7 @@ module FSharpNamingService =
         let scopedNames = Dictionary<string, int>()
 
         let addScopeForPatterns (patterns: IFSharpPattern seq) (scopeExpr: IFSharpExpression) =
-            if isNull scopeExpr || Seq.isEmpty patterns then () else 
+            if isNull scopeExpr || Seq.isEmpty patterns then () else
 
             let newNames = List()
             for fsPattern in patterns do

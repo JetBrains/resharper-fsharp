@@ -49,7 +49,7 @@ type internal TypeProvidersCache() =
         proxyTypeProvidersPerId.[id]
 
     member x.Dump() =
-        let typeProviders = 
+        let typeProviders =
             proxyTypeProvidersPerId
             |> Seq.map (fun t -> t.Key, t.Value.GetDisplayName(true))
             |> Seq.sortBy snd

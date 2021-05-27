@@ -236,10 +236,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             continue;
 
           // IsFromPattern helps in cases where fake value is created at range,
-          // e.g. `fun Literal -> ()` has both pattern and binding symbols at pattern range. 
+          // e.g. `fun Literal -> ()` has both pattern and binding symbols at pattern range.
           if (symbolUse.IsFromPattern || !resolvedSymbols.Declarations.ContainsKey(startOffset))
           {
-            if (resolvedSymbols.Uses.TryGetValue(startOffset, out var existingSymbol) && 
+            if (resolvedSymbols.Uses.TryGetValue(startOffset, out var existingSymbol) &&
                 existingSymbol.SymbolUse.Symbol is FSharpEntity && !isCtor)
               continue;
 

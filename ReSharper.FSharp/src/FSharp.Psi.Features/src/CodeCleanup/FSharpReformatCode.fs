@@ -42,7 +42,7 @@ type FSharpReformatCode() =
             let document = sourceFile.Document :?> DocumentBase
             let text = document.GetText()
             let checkerService = fsFile.CheckerService
-            
+
             let solution = fsFile.GetSolution()
             let settings = sourceFile.GetSettingsStoreWithEditorConfig()
             let languageService = fsFile.Language.LanguageServiceNotNull()
@@ -57,7 +57,7 @@ type FSharpReformatCode() =
             let newLineText = sourceFile.DetectLineEnding().GetPresentation()
             let parsingOptions = checkerService.FcsProjectProvider.GetParsingOptions(sourceFile)
 
-            let change = 
+            let change =
                 if isNotNull rangeMarker then
                     try
                         let range = ofDocumentRange rangeMarker.DocumentRange

@@ -66,7 +66,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       if (typePart.GetRoot() is FSharpProjectFilePart { HasPairFile: true })
         // We already know there's no type part in a signature file.
-        // If there's a signature file then this type is hidden. 
+        // If there's a signature file then this type is hidden.
         decoration.AccessRights = AccessRights.INTERNAL;
 
       if (typePart is TypeAbbreviationOrDeclarationPartBase { IsUnionCase: false })

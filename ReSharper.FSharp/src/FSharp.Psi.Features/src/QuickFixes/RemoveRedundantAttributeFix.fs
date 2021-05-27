@@ -16,7 +16,7 @@ type RemoveRedundantAttributeFix(warning: RedundantRequireQualifiedAccessAttribu
     override x.Text = "Remove redundant attribute"
 
     override x.IsAvailable _ =
-        isValid attr && isNotNull (AttributeListNavigator.GetByAttribute(attr)) 
+        isValid attr && isNotNull (AttributeListNavigator.GetByAttribute(attr))
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(attr.IsPhysical())

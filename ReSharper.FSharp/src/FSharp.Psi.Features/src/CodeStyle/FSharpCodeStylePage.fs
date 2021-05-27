@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Resources.Resources.Icons
 
 [<CodePreviewPreparatorComponent>]
-type FSharpCodePreviewPreparator() = 
+type FSharpCodePreviewPreparator() =
     inherit CodePreviewPreparator()
 
     override x.Language = FSharpLanguage.Instance :> _

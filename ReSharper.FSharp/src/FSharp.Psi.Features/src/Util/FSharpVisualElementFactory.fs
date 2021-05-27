@@ -41,7 +41,7 @@ type FSharpVisualElementFactory() =
         let argExpression = appExpr.ArgumentExpression.IgnoreInnerParens().As<ITupleExpr>()
         if isNull argExpression then null else
 
-        let args = 
+        let args =
             argExpression.Expressions
             |> Seq.cast
             |> Seq.toArray

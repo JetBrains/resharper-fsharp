@@ -65,6 +65,6 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
 
         chosenLetBindings <- Seq.head occurrence.Entities
         base.Execute(solution, textControl)
-    
+
     override x.ExecutePsiTransaction _ =
         ToRecursiveLetBindingsAction.Execute(chosenLetBindings)

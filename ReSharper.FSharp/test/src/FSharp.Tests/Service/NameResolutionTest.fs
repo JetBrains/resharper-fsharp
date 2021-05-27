@@ -36,7 +36,7 @@ type NameResolutionTest() =
     [<Test>] member x.``Function 01 - Name of type``() = x.DoNamedTest()
 
     [<Test>] member x.``Module 01``() = x.DoNamedTest()
-    
+
     override x.DoTest(lifetime, _) =
         let textControl = x.OpenTextControl(lifetime)
         let checkerService = x.ShellInstance.GetComponent<FcsCheckerService>()

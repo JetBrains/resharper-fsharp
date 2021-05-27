@@ -286,7 +286,7 @@ type AssociatedTypeRenameEvaluator() =
                     | containingType ->
                         containingType.NestedTypes :> _
 
-                let associatedModule = 
+                let associatedModule =
                     containingEntityNestedTypes |> Seq.tryFind (fun typeElement ->
                         let fsModule = typeElement.As<IFSharpModule>()
 

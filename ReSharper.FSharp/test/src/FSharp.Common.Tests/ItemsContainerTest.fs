@@ -32,7 +32,7 @@ let projectDirectory = FileSystemPath.Parse(@"C:\Solution\Project")
 let solutionMark = SolutionMarkFactory.Create(projectDirectory.Combine("Solution.sln"))
 let projectMark = DummyProjectMark(solutionMark, "Project", Guid.Empty, projectDirectory.Combine("Project.fsproj"))
 
-let projectPath (relativePath: string) = projectDirectory / relativePath 
+let projectPath (relativePath: string) = projectDirectory / relativePath
 
 
 let (|NormalizedPath|) (path: FileSystemPath) =
@@ -245,7 +245,7 @@ type FSharpItemsContainerTest() =
         x.DoContainerModificationTest(([]: string list),
             fun container _ ->
                 container.OnAddFile("Compile", "File1", null, None))
-    
+
     [<Test>]
     member x.``Add file 02 - No relative``() =
         x.DoContainerModificationTest(([]: string list),
@@ -338,7 +338,7 @@ type FSharpItemsContainerTest() =
               "File4" ],
             "File5",
             "Folder/File3")
-    
+
     [<Test>]
     member x.``Add file 12 - Before first file in nested folder``() =
         x.DoAddFileRelativeBeforeTest(
@@ -695,8 +695,8 @@ type FSharpItemsContainerTest() =
     member x.``Create modification context 06 - CompileBefore``() =
         x.DoCreateModificationContextTest(
             [ createItem "Compile"       "Folder[1]/File3"
-              createItem "CompileAfter"  "File5" 
-              createItem "CompileAfter"  "File6" 
+              createItem "CompileAfter"  "File5"
+              createItem "CompileAfter"  "File6"
               createItem "CompileBefore" "File1"
               createItem "Compile"       "Folder[1]/File4"
               createItem "CompileBefore" "File2" ])
@@ -879,18 +879,18 @@ type FSharpItemsContainerTest() =
 
     member x.DoAddFileRelativeAfterTest(items: string list, filePath, relativeAfter) =
         x.DoAddFileRelativeToTests(items, filePath, null, relativeAfter)
-    
+
     member x.DoAddFileRelativeToTests(items: string list, filePath, relativeBefore, relativeAfter) =
         x.ExecuteWithGold(fun writer ->
             let mutable addBeforeDump: string = null
             let mutable addAfterDump: string = null
-    
+
             if isNotNull relativeBefore then
               addBeforeDump <- x.DoAddFileImpl(items, filePath, relativeBefore, RelativeToType.Before, writer, true)
-    
+
             if isNotNull relativeAfter then
               addAfterDump <- x.DoAddFileImpl(items, filePath, relativeAfter, RelativeToType.After, writer, isNull relativeBefore )
-    
+
             if (isNotNull addBeforeDump && isNotNull addAfterDump) then
               writer.WriteLine(sprintf "Dumps are equal: %O" (addBeforeDump.Equals(addAfterDump, StringComparison.Ordinal))))
         |> ignore
@@ -908,12 +908,12 @@ type FSharpItemsContainerTest() =
         container.Dump(stringWriter)
         writer.WriteLine()
         writer.WriteLine(stringWriter.ToString())
-    
+
         stringWriter.ToString()
 
     member x.DoContainerModificationTest(items: string list, action: LoggingFSharpItemsContainer -> TextWriter -> unit, ?dump) =
         x.DoContainerModificationTest(items |> List.map (createItem "Compile"), action, ?dump = dump)
-    
+
     member x.DoContainerModificationTests(items: string list, actions: (LoggingFSharpItemsContainer -> TextWriter -> unit) list, ?dump) =
         x.DoContainerModificationTests(items |> List.map (createItem "Compile"), actions, ?dump = dump)
 
@@ -925,10 +925,10 @@ type FSharpItemsContainerTest() =
         x.ExecuteWithGold(fun writer ->
             let container = createContainer items writer
             container.Dump(writer)
-    
+
             writer.WriteLine()
             writer.WriteLine("=======")
-    
+
             for action in actions do
                 action container writer
                 writer.WriteLine()
@@ -953,7 +953,7 @@ type FSharpItemsContainerTest() =
                     let mutable identString = ""
                     let ident () =
                         identString <- identString + "  "
-            
+
                     for viewItem in createViewItems solutionItems item do
                         let name = viewItem.ProjectItem.Name
                         let sortKey = container.TryGetSortKey(viewItem)
@@ -964,7 +964,7 @@ type FSharpItemsContainerTest() =
                             ident ()
                         | FSharpViewFile _ ->
                             container.TryGetParentFolderIdentity(viewItem)
-                            |> sprintf " ParentFolderIdentity=%O" 
+                            |> sprintf " ParentFolderIdentity=%O"
                             |> writer.WriteLine
 
             let dumpParentFolders items solutionItems =

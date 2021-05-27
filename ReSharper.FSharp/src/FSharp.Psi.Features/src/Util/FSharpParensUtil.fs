@@ -194,7 +194,7 @@ let rec getFirstQualifier (expr: IQualifiedExpr) =
 
 
 //let private canBeTopLevelArgInHighPrecedenceApp (expr: IFSharpExpression) =
-//    // todo: check `ignore{| Field = 1 + 1 |}.Field` vs `ignore[].Head` 
+//    // todo: check `ignore{| Field = 1 + 1 |}.Field` vs `ignore[].Head`
 //    expr :? IArrayOrListExpr || expr :? IObjExpr || expr :? IRecordLikeExpr
 
 let isHighPrecedenceAppArg context =
@@ -255,7 +255,7 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     if isHighPrecedenceApp ParentPrefixAppExpr && isNotNull (QualifiedExprNavigator.GetByQualifier(ParentPrefixAppExpr)) then true else
 
     // todo: calc once?
-    let allowHighPrecedenceAppParens () = 
+    let allowHighPrecedenceAppParens () =
         let settingsStore = context.GetSettingsStoreWithEditorConfig()
         settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.AllowHighPrecedenceAppParens)
 
@@ -292,7 +292,7 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
         let opExpr = if isNull binaryAppExpr then null else binaryAppExpr.Operator
 
         isNotNull opExpr && opExpr.Indent <> matchExpr.Indent ||
-        
+
         false
 
     | :? ITupleExpr ->

@@ -104,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
     public bool IsDeclaration => true;
     public override IEnumerable<IFSharpPattern> NestedPatterns => Pattern?.NestedPatterns.Prepend(this) ?? new[] {this};
-    
+
     public bool IsMutable => Binding?.IsMutable ?? false;
 
     public void SetIsMutable(bool value)

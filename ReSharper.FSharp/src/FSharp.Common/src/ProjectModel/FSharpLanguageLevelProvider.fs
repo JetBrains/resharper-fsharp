@@ -48,7 +48,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
 
     let getFSharpProjectConfiguration (project: IProject) targetFrameworkId =
         project.ProjectProperties.TryGetConfiguration<IFSharpProjectConfiguration>(targetFrameworkId)
-    
+
     let (|Version|) (version: Version) =
         version.Major, version.Minor
 
@@ -66,7 +66,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
     let getVersionMappingByToolset () =
         let languageLevel = getLanguageLevelByToolsetVersion ()
         VersionMapping(languageLevel, languageLevel)
-    
+
     // todo: more versions
     let getLanguageLevelByCompilerVersion (fscVersion: Version): VersionMapping =
         match fscVersion with

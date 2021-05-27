@@ -33,10 +33,10 @@ type FSharpProjectPropertiesBuilder(projectPropertiesRequests) =
         base.BuildProjectConfiguration(rdProjectDescriptor, project, configuration)
 
         let languageVersion = project.GetPropertyValueIgnoreCase(MSBuildProjectUtil.LanguageVersionProperty)
-        let languageVersion = FSharpLanguageVersion.parseCompilationOption languageVersion 
+        let languageVersion = FSharpLanguageVersion.parseCompilationOption languageVersion
 
         let configuration = configuration.As<IFSharpProjectConfiguration>()
-        configuration.LanguageVersion <- languageVersion 
+        configuration.LanguageVersion <- languageVersion
 
 
 [<SolutionComponent>]

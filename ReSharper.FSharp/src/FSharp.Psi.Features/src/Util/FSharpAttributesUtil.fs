@@ -19,7 +19,7 @@ let addAttribute (attributeList: IAttributeList) (attribute: IAttribute) =
     if attributeList.Attributes.Count > 1 then
         addNodesAfter attribute [
             FSharpTokenType.SEMICOLON.CreateLeafElement()
-            if not (isWhitespace attribute.NextSibling) then 
+            if not (isWhitespace attribute.NextSibling) then
                 Whitespace()
         ] |> ignore
 

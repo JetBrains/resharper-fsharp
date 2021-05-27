@@ -7,7 +7,7 @@ type StringAnalyzerTest() =
     inherit FSharpHighlightingTestBase()
 
     override x.RelativeTestDataPath = "features/daemon/strings"
-    
+
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? StringEscapeCharacterHighlighting
 

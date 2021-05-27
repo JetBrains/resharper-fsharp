@@ -29,7 +29,7 @@ open JetBrains.Util
 [<AutoOpen>]
 module FcsProjectProvider =
     let isProjectModule (psiModule: IPsiModule) =
-        psiModule :? IProjectPsiModule 
+        psiModule :? IProjectPsiModule
 
     let isMiscModule (psiModule: IPsiModule) =
         psiModule.IsMiscFilesProjectModule()
@@ -179,7 +179,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         getOrCreateFcsProject sourceFile.PsiModule
 
     let isScriptLike file =
-        fsFileService.IsScriptLike(file) || isMiscModule file.PsiModule || isNull (file.GetProject())        
+        fsFileService.IsScriptLike(file) || isMiscModule file.PsiModule || isNull (file.GetProject())
 
     let getParsingOptionsForSingleFile ([<NotNull>] sourceFile: IPsiSourceFile) isScript =
         { FSharpParsingOptions.Default with
@@ -190,7 +190,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let invalidateProject (project: IProject) =
         for psiModule in psiModules.GetPsiModules(project) do
             dirtyModules.Add(psiModule) |> ignore
-    
+
     member x.FcsProjectInvalidated = fcsProjectInvalidated
 
     member x.ProcessChange(obj: ChangeEventArgs) =
@@ -295,7 +295,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 let path = sourceFile.GetLocation()
                 tryGetValue path fsProject.FileIndices)
             |> Option.defaultWith (fun _ -> -1)
-        
+
         member x.ModuleInvalidated = x.FcsProjectInvalidated :> _
 
         member x.InvalidateReferencesToProject(project: IProject) =

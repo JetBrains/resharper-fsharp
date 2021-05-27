@@ -21,7 +21,7 @@ type RedundantParenExprTest() =
 
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? RedundantParenExprWarning
-    
+
     [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Literal 01``() = x.DoNamedTest()

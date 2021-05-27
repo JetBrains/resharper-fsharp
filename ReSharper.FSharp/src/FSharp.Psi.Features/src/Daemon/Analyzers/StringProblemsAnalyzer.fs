@@ -78,7 +78,7 @@ type FSharpStringLexerBase(buffer) =
     inherit StringLexerBase(buffer)
 
     member x.Position with get () = base.Position and
-                           set value = base.Position <- value  
+                           set value = base.Position <- value
 
 
 type RegularStringLexer(buffer) =
@@ -106,7 +106,7 @@ type RegularStringLexer(buffer) =
         | 'u' -> x.ProcessHexEscapeSequence(4)
         | 'U' -> x.ProcessLongHexEscapeSequence()
         | 'x' -> x.ProcessHexEscapeSequence(2)
-        | c when Char.IsDigit(c) -> x.ProcessNumericCharSequence() 
+        | c when Char.IsDigit(c) -> x.ProcessNumericCharSequence()
         | '"' | '\'' | '\\' | 'b' | 'n' | 'r' | 't' | 'a' | 'f' | 'v' -> StringTokenTypes.ESCAPE_CHARACTER
         | _ -> StringTokenTypes.CHARACTER
 
@@ -196,7 +196,7 @@ type TripleQuoteInterpolatedStringLexer(buffer) =
     inherit TripleQuoteStringLexer(buffer)
 
     override x.StartOffset = 4
-    
+
     override x.AdvanceInternal() =
         match InterpolatedStringLexer.advance x with
         | null -> base.AdvanceInternal()

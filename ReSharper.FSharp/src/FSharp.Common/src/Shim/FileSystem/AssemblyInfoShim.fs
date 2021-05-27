@@ -11,7 +11,7 @@ type AssemblyInfoShim(lifetime: Lifetime, fsSourceCache: FSharpSourceCache,
         assemblyExistsService: AssemblyExistsService, toolset: ISolutionToolset) =
     inherit DelegatingFileSystemShim(lifetime)
 
-    // The shim is injected to get the expected shim shadowing chain, it's expected to be unused. 
+    // The shim is injected to get the expected shim shadowing chain, it's expected to be unused.
     do fsSourceCache |> ignore
 
     let isSupported (path: FileSystemPath) =

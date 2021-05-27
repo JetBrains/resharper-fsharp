@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     [CanBeNull]
     FSharpSymbolUse GetFSharpSymbolUse();
-    
+
     /// Name used in F# source code.
     [NotNull] string SourceName { get; }
 

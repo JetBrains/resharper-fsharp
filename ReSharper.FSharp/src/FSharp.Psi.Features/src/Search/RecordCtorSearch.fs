@@ -45,7 +45,7 @@ and RecordCtorReferenceSearcher(recordTypeElements, findCandidates) =
         let elements = DeclaredElementsSet(Seq.cast recordTypeElements)
         let processor = RecordCtorReferenceProcessor(treeNode, findCandidates, consumer, elements, names)
         processor.Run() = FindExecution.Stop
-    
+
     interface IDomainSpecificSearcher with
         member x.ProcessProjectItem(sourceFile, consumer) =
             sourceFile.GetPsiFiles<FSharpLanguage>()

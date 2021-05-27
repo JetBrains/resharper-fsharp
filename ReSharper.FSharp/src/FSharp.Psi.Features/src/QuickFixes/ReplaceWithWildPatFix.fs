@@ -122,7 +122,7 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
             let (scopeNode: ITreeNode), scopeText =
                 match pat.Parent with
                 | :? IMatchClause ->
-                    let patternText = 
+                    let patternText =
                         match pat with
                         | :? IParametersOwnerPat as owner -> owner.ReferenceName.ShortName
                         | _ -> "match clause"

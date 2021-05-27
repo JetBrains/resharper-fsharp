@@ -69,7 +69,7 @@ type FSharpPathCompletionContextProvider() =
             argValue.Substring(0, caretValueOffset).LastIndexOfAny(FileSystemDefinition.SeparatorChars)
 
         let rangesStart =
-            let separatorLength = if prevSeparatorValueOffset < 0 then 0 else 1 
+            let separatorLength = if prevSeparatorValueOffset < 0 then 0 else 1
             valueOffset + (max prevSeparatorValueOffset 0) + separatorLength
 
         let replaceRangeEnd =
@@ -99,7 +99,7 @@ type FSharpPathCompletionProvider() =
         if isNull hashDirective then None else
 
         let hastToken = hashDirective.HashToken
-        if isNull hastToken then None else 
+        if isNull hastToken then None else
 
         let hashTokenText = hashDirective.HashToken.GetText()
         if hashTokenText.Length < 2 then None else

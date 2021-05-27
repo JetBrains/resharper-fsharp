@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       }
       return token;
     }
-    
+
     private TokenNodeType Restore(LexerState stackElem)
     {
       myLexer.CurrentPosition = stackElem.CachingLexerState;
@@ -180,13 +180,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         ? myState.Condition ? PreprocessActiveBranch() : PreprocessInactiveBranch()
         : null);
     }
-  
+
     object ILexer.CurrentPosition
     {
       get => CurrentPosition;
       set => CurrentPosition = (int) value;
     }
-  
+
     public int CurrentPosition
     {
       get => myLexer.CurrentPosition;
@@ -227,7 +227,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       myCurrTokenType ??= LocateTokenImpl();
 
     private class PreprocessorState
-    {    
+    {
       private enum PreprocessorElseState
       {
         BeforeElse,

@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       myRdTypeProvider = rdTypeProvider;
       myTypeProvidersContext = typeProvidersContext;
 
-      // ReSharper disable once CoVariantArrayConversion                                                                              
+      // ReSharper disable once CoVariantArrayConversion
       myProvidedNamespaces = new InterruptibleLazy<IProvidedNamespace[]>(
         myTypeProvidersContext.Connection
           .ExecuteWithCatch(() => RdTypeProviderProcessModel.GetProvidedNamespaces.Sync(EntityId, RpcTimeouts.Maximal))

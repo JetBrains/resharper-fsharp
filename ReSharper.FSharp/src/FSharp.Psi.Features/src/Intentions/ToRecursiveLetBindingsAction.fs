@@ -32,7 +32,7 @@ type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider)
             if isNotNull expr && expr.StartLine = letBindings.StartLine then
                 shiftNode 4 binding.Expression)
 
-    
+
     override x.ExecutePsiTransaction(_, _) =
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
         ToRecursiveLetBindingsAction.Execute(letBindings)

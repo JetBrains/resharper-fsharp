@@ -174,7 +174,7 @@ type RearrangeableMatchClause(matchClause: IMatchClause, matchExpr: IMatchLikeEx
                     NewLine(lineEnding)
                     Whitespace(clauseIndent)
             ] |> ignore
-    
+
     override this.BeforeSwap(child, target) =
         addIndent child
         addIndent target

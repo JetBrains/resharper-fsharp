@@ -15,7 +15,7 @@ type FSharpLanguageLevel =
     /// Anon records
     | FSharp46 = 46
 
-    /// Implicit yield, wild pat self id, constructor/static method parameters deindent 
+    /// Implicit yield, wild pat self id, constructor/static method parameters deindent
     | FSharp47 = 47
 
     /// String interpolation, nameof, open types
@@ -57,7 +57,7 @@ module FSharpLanguageLevel =
     let key = Key<Boxed<FSharpLanguageLevel>>("LanguageLevel")
 
     let private ofPsiModuleNoCache (psiModule: IPsiModule) =
-        let levelProvider = 
+        let levelProvider =
             psiModule.GetPsiServices()
                 .GetComponent<SolutionFeaturePartsContainer>()
                 .GetFeatureParts<ILanguageLevelProvider<FSharpLanguageLevel, FSharpLanguageVersion>>(fun p ->
@@ -86,8 +86,8 @@ module FSharpLanguageVersion =
 
         match langVersion with
         | IgnoreCase "Default" -> FSharpLanguageVersion.Default
-        | IgnoreCase "LatestMajor" -> FSharpLanguageVersion.LatestMajor 
-        | IgnoreCase "Latest" -> FSharpLanguageVersion.Latest 
+        | IgnoreCase "LatestMajor" -> FSharpLanguageVersion.LatestMajor
+        | IgnoreCase "Latest" -> FSharpLanguageVersion.Latest
         | IgnoreCase "Preview" -> FSharpLanguageVersion.Preview
 
         | "4.6" -> FSharpLanguageVersion.FSharp46

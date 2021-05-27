@@ -7,12 +7,12 @@ open NUnit.Framework
 [<FSharpTest>]
 type RemoveUnexpectedArgumentsTest() =
     inherit FSharpQuickFixTestBase<RemoveUnexpectedArgumentsFix>()
-    
+
     override x.RelativeTestDataPath = "features/quickFixes/removeUnexpectedArguments"
-    
+
     [<Test>] member x.``Simple - with unit args``() = x.DoNamedTest()
     [<Test>] member x.``Function 1 - one arg``() = x.DoNamedTest()
-    [<Test>] member x.``Function 2 - in expression``() = x.DoNamedTest()    
+    [<Test>] member x.``Function 2 - in expression``() = x.DoNamedTest()
     [<Test>] member x.``Function 3 - many args``() = x.DoNamedTest()
     [<Test>] member x.``Function 4 - expression args``() = x.DoNamedTest()
     [<Test>] member x.``Function 5 - several errors in single line 1``() = x.DoNamedTest()

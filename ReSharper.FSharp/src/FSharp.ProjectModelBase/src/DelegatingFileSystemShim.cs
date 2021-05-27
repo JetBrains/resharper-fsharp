@@ -90,7 +90,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     public virtual IEnumerable<string> EnumerateDirectoriesShim(string path) =>
       myFileSystem.EnumerateDirectoriesShim(path);
 
-    public virtual ByteMemory OpenFileForReadShim(string filePath, FSharpOption<bool> useMemoryMappedFile, 
+    public virtual ByteMemory OpenFileForReadShim(string filePath, FSharpOption<bool> useMemoryMappedFile,
       FSharpOption<bool> shouldShadowCopy) =>
       myFileSystem.OpenFileForReadShim(filePath, useMemoryMappedFile, shouldShadowCopy);
 

@@ -180,7 +180,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         x.ResolveNameAtLocation(context.GetSourceFile(), List.ofSeq names, coords, opName)
 
 
-type FSharpParseAndCheckResults = 
+type FSharpParseAndCheckResults =
     { ParseResults: FSharpParseFileResults
       CheckResults: FSharpCheckFileResults }
 

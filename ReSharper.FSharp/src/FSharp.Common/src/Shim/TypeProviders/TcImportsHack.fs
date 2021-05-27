@@ -37,13 +37,13 @@ module TcImportsHack =
 
         member this.Base = FakeTcImportsBaseValue(baseFakeTcImports)
         member this.SystemRuntimeContainsType(_: string) = true // todo: smart implementation
-        
+
     type FakeSystemRuntimeContainsTypeRef(fakeTcImports: Server.RdFakeTcImports) =
         member this.Value =
             let tcImports = FakeTcImports(fakeTcImports.DllInfos, fakeTcImports.Base)
-            // Don't simplify the lambda: `tcImports` is accessed via reflection in `getFakeTcImports`. 
+            // Don't simplify the lambda: `tcImports` is accessed via reflection in `getFakeTcImports`.
             fun x -> tcImports.SystemRuntimeContainsType x
-    
+
     // The type provider must not contain strong references to remote TcImport objects.
     // The legacy Type Provider SDK gets dllInfos data from the 'systemRuntimeContainsType' closure.
     // This hack allows you to pull this data for transfer between processes.
@@ -51,15 +51,15 @@ module TcImportsHack =
         let getDllInfos tcImports =
             [| for dllInfo in tcImports.GetField("dllInfos").GetElements() ->
                    Client.RdFakeDllInfo(dllInfo.GetProperty("FileName") :?> _) |]
-            
+
         let tcImports =
-            runtimeContainsType.GetField("systemRuntimeContainsTypeRef").GetProperty("Value").GetField("tcImports")                                
+            runtimeContainsType.GetField("systemRuntimeContainsTypeRef").GetProperty("Value").GetField("tcImports")
 
         let tcImportsDllInfos = getDllInfos tcImports
-            
-        let baseTcImports = tcImports.GetProperty("Base").GetProperty("Value")   
+
+        let baseTcImports = tcImports.GetProperty("Base").GetProperty("Value")
         let baseTcImportsDllInfos = getDllInfos baseTcImports
-        
+
         let fakeBaseTcImports = Client.RdFakeTcImports(null, baseTcImportsDllInfos)
         Client.RdFakeTcImports(fakeBaseTcImports, tcImportsDllInfos)
 

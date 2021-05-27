@@ -92,7 +92,7 @@ type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, 
         let rdFsiHost = solution.RdFSharpModel().FSharpInteractiveHost
         rdFsiHost.RequestNewFsiSessionInfo.Set(getNewFsiSessionInfo)
         rdFsiHost.GetProjectReferences.Set(getProjectReferences)
-          
+
         rdFsiHost.FsiTools.PrepareCommands.Set(FsiSandboxUtil.prepareCommands)
 
         fsiOptions.MoveCaretOnSendLine.FlowInto(lifetime, rdFsiHost.MoveCaretOnSendLine)

@@ -145,7 +145,7 @@ let patternName (pattern: FSharpActivePatternGroup) =
     let joinedNames = String.concat "|" pattern.Names
     let wildCase = if pattern.IsTotal then "|" else "_|"
     "|" + joinedNames + wildCase
-    
+
 [<Extension; CompiledName("GetAbbreviatedEntity")>]
 let rec getAbbreviatedEntity (entity: FSharpEntity) =
     if entity.IsFSharpAbbreviation && entity.AbbreviatedType.HasTypeDefinition then

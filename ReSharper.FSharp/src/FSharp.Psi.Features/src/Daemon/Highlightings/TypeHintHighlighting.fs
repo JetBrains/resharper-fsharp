@@ -36,7 +36,7 @@ and [<SolutionComponent>] TypeHintAdornmentProvider() =
             match highlighter.UserData with
             | :? TypeHintHighlighting as dm -> dm.IsValid()
             | _ -> false
-    
+
         member x.CreateDataModel(highlighter) =
             match highlighter.UserData with
             | :? TypeHintHighlighting as thh ->

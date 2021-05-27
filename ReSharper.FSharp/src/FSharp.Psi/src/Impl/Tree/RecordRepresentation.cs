@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return result;
     }
 
-    public IReadOnlyList<ITypeMemberDeclaration> GetMemberDeclarations() => 
+    public IReadOnlyList<ITypeMemberDeclaration> GetMemberDeclarations() =>
       FieldDeclarations.AsIReadOnlyList();
 
     public override PartKind TypePartKind => TypeDeclaration.GetSimpleTypeKindFromAttributes();

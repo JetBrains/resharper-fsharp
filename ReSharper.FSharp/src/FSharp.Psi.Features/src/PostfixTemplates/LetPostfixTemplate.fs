@@ -34,7 +34,7 @@ and LetPostfixTemplateBehavior(info) =
     inherit FSharpPostfixTemplateBehaviorBase(info)
 
     static member val PreventIntroduceVarKey = Key("PreventIntroduceVarKey")
-    
+
     override x.ExpandPostfix(context) =
         let psiModule = context.PostfixContext.PsiModule
         let psiServices = psiModule.GetPsiServices()
@@ -54,7 +54,7 @@ and LetPostfixTemplateBehavior(info) =
             let replaced = ModificationUtil.ReplaceChild(refExpr, letOrUseExpr)
             replaced.UserData.PutKey(LetPostfixTemplateBehavior.PreventIntroduceVarKey)
             replaced :> _)
-            
+
     override x.AfterComplete(textControl, node, _) =
         if not (node.UserData.HasKey(LetPostfixTemplateBehavior.PreventIntroduceVarKey)) then
             FSharpIntroduceVariable.IntroduceVar(node :?> _, textControl) else

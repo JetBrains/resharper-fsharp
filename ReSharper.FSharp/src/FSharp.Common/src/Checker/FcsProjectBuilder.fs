@@ -208,7 +208,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
             not (hasFSharpCoreReference options || options.OtherOptions |> Array.contains "--compiling-fslib")
 
         let options =
-            if shouldAddFSharpCore projectOptions then 
+            if shouldAddFSharpCore projectOptions then
                 { projectOptions with
                     OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore projectOptions.OtherOptions }
             else projectOptions

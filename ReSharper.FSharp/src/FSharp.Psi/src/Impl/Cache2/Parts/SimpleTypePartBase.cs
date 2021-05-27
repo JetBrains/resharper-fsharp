@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal abstract class SimpleTypePartBase : FSharpTypeMembersOwnerTypePart, ISimpleTypePart
   {
-    protected SimpleTypePartBase([NotNull] IFSharpTypeOrExtensionDeclaration declaration, 
+    protected SimpleTypePartBase([NotNull] IFSharpTypeOrExtensionDeclaration declaration,
       [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
     {
     }

@@ -9,7 +9,7 @@ type RemoveYieldTest() =
     inherit FSharpQuickFixTestBase<RemoveYieldFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/removeYield"
-    
+
     [<Test>] member x.``Return 01``() = x.DoNamedTest()
     [<Test>] member x.``Return 02 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Return 03 - New line``() = x.DoNamedTest()

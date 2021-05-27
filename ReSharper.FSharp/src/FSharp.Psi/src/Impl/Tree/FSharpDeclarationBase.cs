@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual void SetName(string name) =>
       throw new InvalidOperationException("Use IFSharpDeclaration.SetName(string, ChangeNameKind)");
 
-    public virtual void SetName(string name, ChangeNameKind changeNameKind) => 
+    public virtual void SetName(string name, ChangeNameKind changeNameKind) =>
       NameIdentifier.ReplaceIdentifier(name);
   }
 }

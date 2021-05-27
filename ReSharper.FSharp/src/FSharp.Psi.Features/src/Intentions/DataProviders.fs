@@ -26,7 +26,7 @@ let isAtModuleDeclarationKeyword (dataProvider: IContextActionDataProvider) (dec
     if isNull moduleToken then false else
 
     let ranges = DisjointedTreeTextRange.From(moduleToken)
-    
+
     match declaration with
     | :? IGlobalNamespaceDeclaration as globalNs -> ranges.Then(globalNs.GlobalKeyword)
     | _ -> ranges.Then(declaration.NameIdentifier)

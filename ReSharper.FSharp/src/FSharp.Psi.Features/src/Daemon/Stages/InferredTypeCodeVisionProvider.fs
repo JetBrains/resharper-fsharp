@@ -25,7 +25,7 @@ module FSharpInferredTypeHighlighting =
     let [<Literal>] Id = "CodeInsights"
 
 [<StaticSeverityHighlighting(
-    Severity.INFO, typeof<HighlightingGroupIds.CodeInsights>, 
+    Severity.INFO, typeof<HighlightingGroupIds.CodeInsights>,
     AttributeId = FSharpInferredTypeHighlighting.Id, OverlapResolve = OverlapResolveKind.NONE)>]
 type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider) =
     inherit CodeInsightsHighlighting(range, text, "", "Copy inferred type", provider, null, null)

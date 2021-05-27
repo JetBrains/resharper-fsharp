@@ -266,13 +266,13 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             removePsiModule psiModule
 
             psiModule.LifetimeDefinition.Terminate()
-            let changeBuilder = PsiModuleChangeBuilder() 
+            let changeBuilder = PsiModuleChangeBuilder()
             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Removed)
             changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed)
             changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance))
 
     member x.GetPsiModulesForPath(path) =
-        getPsiModulesForPath path 
+        getPsiModulesForPath path
 
     member x.TargetFrameworkId =
         targetFrameworkId
@@ -283,7 +283,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         | null -> ()
         | change ->
             let path = change.ProjectFile.Location
-            if scriptsReferences.ContainsKey(path) then 
+            if scriptsReferences.ContainsKey(path) then
                 updateReferences path change.Document
 
     member x.Dump(writer: TextWriter) =
@@ -308,7 +308,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         member x.Execute _ = null
 
 
-/// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc). 
+/// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc).
 type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, changeManager) as this =
     inherit DelegatingProjectPsiModuleHandler(handler)
 
@@ -342,7 +342,7 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, 
         | _ -> handler.OnProjectFileChanged(projectFile, oldLocation, changeType, changeBuilder)
 
     override x.GetPsiSourceFilesFor(projectFile) =
-        let defaultSourceFiles = handler.GetPsiSourceFilesFor(projectFile) 
+        let defaultSourceFiles = handler.GetPsiSourceFilesFor(projectFile)
 
         let mutable sourceFile = Unchecked.defaultof<IPsiSourceFile>
         match sourceFiles.TryGetValue(projectFile.Location, &sourceFile) with
@@ -351,7 +351,7 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, 
                 yield sourceFile
                 yield! defaultSourceFiles
             }
-        | _ -> defaultSourceFiles 
+        | _ -> defaultSourceFiles
 
     override x.InternalsVisibleTo(moduleTo, moduleFrom) =
         moduleTo :? FSharpScriptPsiModule && moduleFrom :? FSharpScriptPsiModule ||
@@ -363,7 +363,7 @@ type FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, moduleId, a
     inherit ConcurrentUserDataHolder()
 
     let lifetimeDefinition = Lifetime.Define(lifetime)
-    let lifetime = lifetimeDefinition.Lifetime 
+    let lifetime = lifetimeDefinition.Lifetime
 
     let psiServices = solution.GetPsiServices()
     let psiModules = solution.PsiModules()

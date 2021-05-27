@@ -25,7 +25,7 @@ open JetBrains.Util
 
 type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbols) =
     let [<Literal>] opName = "FSharpLookupItemsProviderBase"
-    
+
     member x.GetDefaultRanges(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext as context -> context.Ranges | _ -> null
 
@@ -70,7 +70,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
             let addImportItems = settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion)
 
             let skipFsiModules =
-                // Workaround for FSI_0123 modules generated in sandboxes 
+                // Workaround for FSI_0123 modules generated in sandboxes
                 fsFile.Language.Is<FSharpScriptLanguage>() &&
                 fsFile.GetPsiModule() :? SandboxPsiModule
 

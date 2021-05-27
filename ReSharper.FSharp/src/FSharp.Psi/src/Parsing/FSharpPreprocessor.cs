@@ -86,7 +86,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     private bool Visit(ErrorExpression errorExpr) => false;
 
     private class ExpressionParser
-    {    
+    {
       private static readonly NodeTypeSet ourSkippedTokens = new NodeTypeSet(
         FSharpTokenType.WHITESPACE,
         FSharpTokenType.PP_IF_SECTION);
@@ -157,7 +157,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       {
         switch (TokenType())
         {
-          case null: return new ErrorExpression(); 
+          case null: return new ErrorExpression();
           case var token when token == FSharpTokenType.PP_NOT:
             myLexer.Advance();
             return ParseNotExpression().Not();

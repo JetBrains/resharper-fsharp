@@ -105,7 +105,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         match appCandidates with
         | [appData] ->
             match appData.App.IgnoreInnerParens() with
-            | :? IReferenceExpr as refExpr when refExpr.ShortName <> SharedImplUtil.MISSING_DECLARATION_NAME -> 
+            | :? IReferenceExpr as refExpr when refExpr.ShortName <> SharedImplUtil.MISSING_DECLARATION_NAME ->
                 $"Add parens to '{refExpr.ShortName}' application"
 
             | :? ILambdaExpr -> "Add parens to lambda application"
@@ -135,7 +135,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
         let appOccurrence = showPopup appOccurrences AddParensToApplicationFix.AppPopupName
 
-        if isNull appOccurrence then () else       
+        if isNull appOccurrence then () else
 
         let appData = Seq.head appOccurrence.Entities
 

@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public FSharpEntity Delegate => TypeDeclaration.GetFSharpSymbol() as FSharpEntity;
     public FSharpDelegateSignature DelegateSignature => Delegate.FSharpDelegateSignature;
 
-    public IReadOnlyList<ITypeMemberDeclaration> GetMemberDeclarations() => 
+    public IReadOnlyList<ITypeMemberDeclaration> GetMemberDeclarations() =>
       EmptyList<ITypeMemberDeclaration>.Instance;
 
     public override PartKind TypePartKind => PartKind.Delegate;

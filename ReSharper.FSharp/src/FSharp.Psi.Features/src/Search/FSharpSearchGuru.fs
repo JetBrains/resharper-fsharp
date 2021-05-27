@@ -20,7 +20,7 @@ type FSharpSearchGuru(fsProjectOptionsProvider: IFcsProjectProvider) =
         match fsElement with
         | :? ITypeElement as typeElement -> typeElement
         | fsElement -> fsElement.GetContainingType()
-    
+
     interface ISearchGuru with
         member x.IsAvailable _ = true
         member x.BuzzWordFilter(_, words) = words

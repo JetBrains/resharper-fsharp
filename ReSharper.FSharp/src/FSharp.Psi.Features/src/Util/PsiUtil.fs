@@ -58,7 +58,7 @@ type IFile with
 
 type FSharpLanguage with
     member x.FSharpLanguageService =
-        x.LanguageService().As<IFSharpLanguageService>()        
+        x.LanguageService().As<IFSharpLanguageService>()
 
 
 type ITreeNode with
@@ -88,7 +88,7 @@ type ITreeNode with
 
     member x.GetEndLine(document: IDocument) =
         document.GetCoordsByOffset(x.GetDocumentEndOffset().Offset).Line
-    
+
     member x.StartLine = x.GetStartLine(x.GetSourceFile().Document)
     member x.EndLine = x.GetEndLine(x.GetSourceFile().Document)
 
@@ -161,7 +161,7 @@ let isFirstChild (node: ITreeNode) =
 let isLastChild (node: ITreeNode) =
     let parent = getParent node
     isNotNull parent && parent.LastChild == node
-    
+
 let skipMatchingNodesAfter predicate (node: ITreeNode): ITreeNode =
     let nextSibling = node.NextSibling
     if isNull nextSibling then node else
@@ -183,7 +183,7 @@ let skipMatchingNodesBefore predicate (node: ITreeNode) =
             skip node.PrevSibling
         else
             node
-    
+
     skip prevSibling
 
 
@@ -302,7 +302,7 @@ let isOnlyMeaningfulNodeOnLine (node: ITreeNode) =
 module PsiModificationUtil =
     /// Wraps ModificationUtil.ReplaceChild and ignores the resulting replaced node.
     /// Use ModificationUtil.ReplaceChild if resulting node is needed.
-    /// 
+    ///
     /// Warning: newChild should not be child of oldChild.
     let replace oldChild newChild =
         ModificationUtil.ReplaceChild(oldChild, newChild) |> ignore
@@ -323,7 +323,7 @@ module PsiModificationUtil =
 
     let deleteChild child =
         ModificationUtil.DeleteChild(child)
-        
+
     let replaceRangeWithNode first last replaceNode =
         ModificationUtil.ReplaceChildRange(TreeRange(first, last), TreeRange(replaceNode)) |> ignore
 
@@ -448,7 +448,7 @@ let rec tryFindRootPrefixAppWhereExpressionIsFunc ([<CanBeNull>] expr: IFSharpEx
 let rec getAllExpressionArgs (expr: IFSharpExpression) =
     let mutable currentExpr = expr
     seq {
-        while isNotNull currentExpr do        
+        while isNotNull currentExpr do
             let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(currentExpr.IgnoreParentParens())
             if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
                 currentExpr <- prefixApp

@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override bool UseBaseNameForSingleField => true;
 
-    protected override IUnionCaseLikeDeclaration FieldOwnerDeclaration => 
+    protected override IUnionCaseLikeDeclaration FieldOwnerDeclaration =>
       UnionCaseDeclarationNavigator.GetByField(this);
 
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override bool UseBaseNameForSingleField => false;
 
-    protected override IUnionCaseLikeDeclaration FieldOwnerDeclaration => 
+    protected override IUnionCaseLikeDeclaration FieldOwnerDeclaration =>
       ExceptionDeclarationNavigator.GetByField(this);
 
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>

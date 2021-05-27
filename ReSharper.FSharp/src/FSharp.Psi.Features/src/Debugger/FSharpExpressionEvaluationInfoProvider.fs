@@ -38,7 +38,7 @@ type FSharpExpressionEvaluationInfoProvider() =
             if argsText |> Seq.exists isNull then null else
 
             let argsText = String.concat "," argsText
-            qualifier + "[" + argsText + "]"            
+            qualifier + "[" + argsText + "]"
 
         | _ -> null
 

@@ -171,7 +171,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string GetSourceName([CanBeNull] this IIdentifier identifier) =>
       identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
-    [NotNull] 
+    [NotNull]
     public static string GetSourceName([CanBeNull] this ITreeNode treeNode) =>
       GetSourceName(treeNode as IIdentifier);
 
@@ -201,7 +201,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : range;
     }
 
-    
+
     [NotNull]
     public static string MakeClrName([NotNull] this IFSharpTypeElementDeclaration declaration)
     {
@@ -337,7 +337,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         ICompiledElement compiled when compiled.IsFromFSharpAssembly() => compiled.IsCompiledException(),
         _ => false
       };
-    
+
     public static bool IsUnion([NotNull] this ITypeElement typeElement) =>
       typeElement switch
       {
@@ -346,7 +346,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         _ => false
       };
 
-    public static bool IsUnionCase([NotNull] this ITypeElement typeElement) => 
+    public static bool IsUnionCase([NotNull] this ITypeElement typeElement) =>
       typeElement switch
       {
         IFSharpTypeElement fsTypeElement => fsTypeElement.GetPart<UnionCasePart>() != null,
@@ -393,7 +393,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       Assertion.Assert(moduleTypeElement.IsCompiledModule(), "moduleTypeElement.IsCompiledModule()");
 
       bool IsAssociatedType(ITypeElement t) =>
-        !t.Equals(moduleTypeElement) && t.TypeParameters.Count == 0 && 
+        !t.Equals(moduleTypeElement) && t.TypeParameters.Count == 0 &&
         !t.IsCompiledModule() && t.GetSourceName() == sourceName;
 
       var containingType = moduleTypeElement.GetContainingType();
@@ -474,7 +474,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         ? ModifiersUtil.GetAccessRights(repr.AccessModifier)
         : AccessRights.PUBLIC;
 
-    public static PartKind GetSimpleTypeKindFromAttributes(this IFSharpTypeDeclaration decl) => 
+    public static PartKind GetSimpleTypeKindFromAttributes(this IFSharpTypeDeclaration decl) =>
       GetTypeKind(decl.Attributes, out var kind) ? kind : PartKind.Class; // todo struct or class only
 
     public static bool GetTypeKind(TreeNodeCollection<IAttribute> attributes, out PartKind fSharpPartKind)
@@ -607,7 +607,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       LowLevelModificationUtil.AddChildBefore(anchor, tokenType.CreateLeafElement());
       LowLevelModificationUtil.AddChildBefore(anchor, new Whitespace());
     }
-    
+
     public static IList<ITypeElement> ToTypeElements(this IList<IClrTypeName> names, IPsiModule psiModule)
     {
       var result = new List<ITypeElement>(names.Count);
@@ -707,12 +707,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       };
     }
 
-    public static bool RequiresQualifiedAccess([NotNull] this ITypeElement typeElement) => 
+    public static bool RequiresQualifiedAccess([NotNull] this ITypeElement typeElement) =>
       typeElement.GetAccessType() == ModuleMembersAccessKind.RequiresQualifiedAccess;
 
     [CanBeNull]
     private static T GetOutermostNode<T, TMatchingNode>([CanBeNull] this T node)
-      where T : class, ITreeNode 
+      where T : class, ITreeNode
       where TMatchingNode : class, T
     {
       if (node == null) return null;
@@ -745,7 +745,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         fsExpr = parenExpr.InnerExpression;
       return fsExpr;
     }
-    
+
     public static IFSharpPattern IgnoreParentParens([CanBeNull] this IFSharpPattern fsPattern) =>
       fsPattern.GetOutermostNode<IFSharpPattern, IParenPat>();
 
@@ -758,9 +758,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         fsPattern = parenPat.Pattern;
       return fsPattern;
     }
-    
+
     [NotNull]
-    public static IFSharpReferenceOwner SetName([NotNull] this IFSharpReferenceOwner referenceOwner, 
+    public static IFSharpReferenceOwner SetName([NotNull] this IFSharpReferenceOwner referenceOwner,
       [NotNull] string name)
     {
       if (referenceOwner.FSharpIdentifier?.IdentifierToken is { } id)
@@ -800,7 +800,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return result;
     }
 
-    
+
     public static ModuleMembersAccessKind GetAccessType([NotNull] this IDeclaredModuleDeclaration moduleDeclaration)
     {
       var autoOpen = false;
@@ -851,7 +851,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       using (CompilationContextCookie.GetOrCreate(decl.GetPsiModule().GetContextFromModule()))
         return cache.GetOrCreateDeclaredElement(decl, factory);
     }
-    
+
     public static bool IsIndexer(this IMemberSignatureOrDeclaration decl) =>
       decl.SourceName == StandardMemberNames.DefaultIndexerName && decl.SourceName == decl.CompiledName;
 

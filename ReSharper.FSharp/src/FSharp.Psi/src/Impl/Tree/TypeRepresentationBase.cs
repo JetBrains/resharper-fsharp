@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public IFSharpTypeDeclaration TypeDeclaration =>
       FSharpTypeDeclarationNavigator.GetByTypeRepresentation((ITypeRepresentation) this);
-    
+
     public virtual PartKind TypePartKind => PartKind.Class;
   }
 }

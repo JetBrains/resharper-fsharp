@@ -107,7 +107,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         if isNull parent then expr else
 
         match parent with
-        | :? IConditionOwnerExpr as conditionOwnerExpr when conditionOwnerExpr.ConditionExpr != expr -> expr 
+        | :? IConditionOwnerExpr as conditionOwnerExpr when conditionOwnerExpr.ConditionExpr != expr -> expr
         | :? IForLikeExpr as forLikeExpr when forLikeExpr.DoExpression == expr -> expr
         | :? ISequentialExpr | :? ILambdaExpr | :? ITryLikeExpr -> expr
 
@@ -175,7 +175,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
     let isSingleLineContext (context: ITreeNode): bool =
         let contextParent = context.Parent
-        if not contextParent.IsSingleLine then false else 
+        if not contextParent.IsSingleLine then false else
 
         match contextParent with
         | :? IMatchClause as matchClause ->
@@ -190,7 +190,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         | :? IIfThenElseExpr | :? ILambdaExpr | :? ITryLikeExpr | :? IWhenExprClause -> true
         | _ -> false
-    
+
     let getMoveToNewLineInfo (contextExpr: IFSharpExpression) =
         let requiresMultilineExpr (parent: ITreeNode) =
             match parent with
@@ -243,7 +243,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
     override x.Process(data) =
         // Replace the actual source expression with the outer-most expression among usages,
-        // since it's needed for calculating a common node to replace. 
+        // since it's needed for calculating a common node to replace.
         let sourceExpr = data.Usages |> Seq.minBy (fun u -> u.GetTreeStartOffset().Offset) :?> IFSharpExpression
         let commonParentExpr = getCommonParentExpr data sourceExpr
 
@@ -317,7 +317,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 if not (isValid usage) then acc else
 
                 let usageIsSourceExpr = usage == sourceExpr
-                
+
                 if usageIsSourceExpr && (removeSourceExpr || replaceSourceExprNode) then
                     // Ignore this usage, it's going to be removed via replacing tree ranges later.
                     acc else
@@ -330,7 +330,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                     let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(argExpr)
                     let funExpr = if isNotNull appExpr then appExpr.FunctionExpression else null
 
-                    if argExpr != usage && isNotNull funExpr && funExpr.NextSibling != argExpr then argExpr else usage 
+                    if argExpr != usage && isNotNull funExpr && funExpr.NextSibling != argExpr then argExpr else usage
 
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
 
@@ -354,7 +354,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         | Some indent -> moveToNewLine contextExpr indent
         | _ -> ()
 
-        let letBindings: ILetBindings = 
+        let letBindings: ILetBindings =
             match letBindings with
             | :? ILetOrUseExpr when replaceSourceExprNode ->
                 let letBindings = ModificationUtil.ReplaceChild(sourceExpr, letBindings)
@@ -437,7 +437,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 |> Seq.toArray
 
             [| binding.HeadPattern :> ITreeNode |]
-            |> Array.append replacedNodes 
+            |> Array.append replacedNodes
 
         let nameExpression = NameSuggestionsExpression(names)
         let hotspotsRegistry = HotspotsRegistry(solution.GetPsiServices())

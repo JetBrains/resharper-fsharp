@@ -5,9 +5,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   public class FSharpLexerFactory : ILexerFactory
   {
-    public ILexer CreateLexer(IBuffer buffer)
-    {
-      return new FSharpLexer(buffer);
-    }
+    public ILexer CreateLexer(IBuffer buffer) =>
+      new FSharpLexer(buffer);
   }
 }

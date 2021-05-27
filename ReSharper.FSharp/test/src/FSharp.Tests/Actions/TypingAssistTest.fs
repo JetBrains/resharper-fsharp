@@ -107,7 +107,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 74 - Enter in parens``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Enter after error 01 - If``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 02 - If``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 03 - If``() = x.DoNamedTest()
@@ -122,7 +122,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter after error 12 - After then and elif``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 13 - After for in do``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 14 - After for do``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Enter in comment 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter in comment 02``() = x.DoNamedTest()
     [<Test>] member x.``Enter in comment 03``() = x.DoNamedTest()
@@ -179,7 +179,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Backspace - String - Triple quote 07``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - String - Verbatim 01 - Empty``() = x.DoNamedTest()
 
-    
+
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
     [<Test>] member x.``Space 03 - Inside empty quotation, typed``() = x.DoNamedTest()
@@ -269,7 +269,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Attributes 03 - Type right angle``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Attributes 04 - Type right angle, left bracket``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Attributes 05 - File start``() = x.DoNamedTest()
-      
+
     [<Test>] member x.``Brackets - Arrays 01 - Type left bar``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Arrays 02 - Type left bar before space``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Arrays 03 - Type left bar in multiline list``() = x.DoNamedTest()
@@ -290,7 +290,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``At 08 - Inside empty typed quotations and spaces 06``() = x.DoNamedTest()
     [<Test>] member x.``At 09 - Inside empty typed quotations and spaces 07``() = x.DoNamedTest()
     [<Test>] member x.``At 10 - Inside empty typed quotations and spaces 08``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Brackets - Surround 01``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Surround 02``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Surround 03``() = x.DoNamedTest()
@@ -339,7 +339,7 @@ type LineIndentsTestBase() =
     member x.CachingLexerService =
         x.Solution.GetComponent<CachingLexerService>()
 
-    abstract DoLineTest: TextWriter * ITextControl * Line -> unit 
+    abstract DoLineTest: TextWriter * ITextControl * Line -> unit
 
     override x.DoTest(lifetime: Lifetime, project: IProject) =
         let textControl = x.OpenTextControl(lifetime)

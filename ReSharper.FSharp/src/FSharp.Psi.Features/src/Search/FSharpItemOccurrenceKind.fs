@@ -56,7 +56,7 @@ type FSharpItemOccurenceKindProvider() =
                    isNotNull (InterfaceImplementationNavigator.GetByTypeName(typeReferenceName)) ||
                    isNotNull (ObjExprNavigator.GetByTypeName(typeReferenceName)) then
                     [| OccurrenceKind.ExtendedType |] :> _ else
-            
+
                 if isNotNull (OpenStatementNavigator.GetByReferenceName(typeReferenceName)) then
                     [| FSharpOccurrenceKinds.import |] :> _ else
 

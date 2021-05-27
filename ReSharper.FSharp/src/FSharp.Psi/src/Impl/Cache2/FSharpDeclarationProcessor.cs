@@ -143,7 +143,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
-    public override void VisitMemberDeclaration(IMemberDeclaration decl) => 
+    public override void VisitMemberDeclaration(IMemberDeclaration decl) =>
       Builder.AddDeclaredMemberName(decl.CompiledName);
 
     public override void VisitMemberSignature(IMemberSignature decl) =>
@@ -151,7 +151,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitTypeDeclarationGroup(ITypeDeclarationGroup typeDeclarationGroupParam)
     {
-      foreach (var typeDeclaration in typeDeclarationGroupParam.TypeDeclarationsEnumerable) 
+      foreach (var typeDeclaration in typeDeclarationGroupParam.TypeDeclarationsEnumerable)
         typeDeclaration.Accept(this);
     }
 
@@ -180,11 +180,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitLetBindingsDeclaration(ILetBindingsDeclaration letBindings)
     {
-      foreach (var binding in letBindings.Bindings) 
+      foreach (var binding in letBindings.Bindings)
         ProcessBinding(binding);
     }
 
-    public override void VisitBindingSignature(IBindingSignature binding) => 
+    public override void VisitBindingSignature(IBindingSignature binding) =>
       ProcessBinding(binding);
 
     public override void VisitExceptionDeclaration(IExceptionDeclaration decl)
@@ -197,7 +197,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitObjectModelTypeRepresentation(IObjectModelTypeRepresentation repr) =>
       Builder.StartPart(CreateObjectTypePart(repr.TypeDeclaration, repr.TypePartKind, false));
 
-    public override void VisitEnumRepresentation(IEnumRepresentation repr) => 
+    public override void VisitEnumRepresentation(IEnumRepresentation repr) =>
       Builder.StartPart(new EnumPart(repr.TypeDeclaration, Builder));
 
     public override void VisitRecordRepresentation(IRecordRepresentation decl)

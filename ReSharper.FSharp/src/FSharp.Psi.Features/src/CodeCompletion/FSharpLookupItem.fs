@@ -112,7 +112,7 @@ type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionCo
         let ns = ns |> Array.map FSharpKeywords.QuoteIdentifierIfNeeded |> String.concat "."
 
         let solution = context.BasicContext.Solution
-        solution.GetPsiServices().Files.CommitAllDocuments()    
+        solution.GetPsiServices().Files.CommitAllDocuments()
         addOpen ns
 
     override x.GetDisplayName() =

@@ -34,7 +34,7 @@ and FSharpTargetsDiagnosticMessage private (title, message) =
         let osName = platformName PlatformUtil.RuntimePlatform
         let url = sprintf "https://fsharp.org/use/%s/" osName
         let link = RiderContextNotificationHelper.MakeLink(url, "install F# SDK")
-        let message = "F# SDK or project dependencies are missing. " + 
+        let message = "F# SDK or project dependencies are missing. " +
                       sprintf "Try restoring NuGet packages; if the problem persists, please %s." link
         FSharpTargetsDiagnosticMessage(messageTitle, message)
 
@@ -50,7 +50,7 @@ type FSharpProjectTypeGuidAnalyzer() =
             if projectMark :? VirtualProjectMark then EmptyArray.Instance :> _ else
 
             if projectMark.Location.ExtensionNoDot <> FsprojExtension then EmptyArray.Instance :> _ else
-            if isFSharpGuid projectMark.TypeGuid || projectMark.Guid = Guid.Empty then EmptyArray.Instance :> _ else 
+            if isFSharpGuid projectMark.TypeGuid || projectMark.Guid = Guid.Empty then EmptyArray.Instance :> _ else
 
             FSharpWrongProjectTypeGuid.InstanceCollection
 

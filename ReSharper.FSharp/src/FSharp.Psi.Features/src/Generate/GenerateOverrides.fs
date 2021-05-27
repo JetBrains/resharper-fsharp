@@ -53,7 +53,7 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
     let factory = context.CreateElementFactory()
     let settingsStore = context.GetSettingsStoreWithEditorConfig()
     let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
-    
+
     let paramGroups =
         if mfv.IsProperty then [] else
         factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, element.AddTypes, element.DisplayContext)

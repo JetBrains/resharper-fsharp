@@ -42,7 +42,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
 
     override x.IsAvailable _ =
         let fcsEntity = impl.FcsEntity
-        isNotNull fcsEntity && fcsEntity.IsInterface 
+        isNotNull fcsEntity && fcsEntity.IsInterface
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(impl.IsPhysical())
@@ -72,7 +72,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             |> Seq.concat
             |> HashSet
 
-        let allInterfaceMembers = 
+        let allInterfaceMembers =
             getInterfaces interfaceType |> List.collect (fun fcsEntityInstance ->
                 fcsEntityInstance.Entity.MembersFunctionsAndValues
                 |> Seq.map (fun mfv -> FcsMfvInstance.create mfv displayContext fcsEntityInstance.Substitution)
@@ -81,7 +81,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
         let needsTypesAnnotations =
             GenerateOverrides.getMembersNeedingTypeAnnotations allInterfaceMembers
 
-        let membersToGenerate = 
+        let membersToGenerate =
             allInterfaceMembers
             |> List.filter (fun mfvInstance ->
                 not (mfvInstance.Mfv.IsAccessor()) &&

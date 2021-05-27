@@ -32,7 +32,7 @@ let private tryFindFile dirs file =
               | _ -> "")
           |> Seq.filter ((<>) "")
           |> Seq.cache
-      if not (Seq.isEmpty files) then Some(Seq.head files) 
+      if not (Seq.isEmpty files) then Some(Seq.head files)
       else None
 
 let fsharpCoreOpt =

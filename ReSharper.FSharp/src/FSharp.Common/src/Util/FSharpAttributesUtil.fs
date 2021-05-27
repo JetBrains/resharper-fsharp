@@ -9,7 +9,7 @@ open JetBrains.Util
 type FcsAttributeUtil =
     [<Extension>]
     static member GetClrName(attr: FSharpAttribute) = attr.AttributeType.QualifiedBaseName
-    
+
     [<Extension>]
     static member HasAttributeInstance(attrs: IList<FSharpAttribute>, clrName: string) =
         attrs |> Seq.exists (fun a -> a.GetClrName() = clrName)

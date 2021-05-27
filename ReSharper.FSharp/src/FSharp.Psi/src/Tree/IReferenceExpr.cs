@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     [NotNull] string ShortName { get; }
 
     /// Workaround for pseudo-resolve during parts creation needing to look at qualified names like
-    /// CompilationRepresentationFlags.ModuleSuffix. 
+    /// CompilationRepresentationFlags.ModuleSuffix.
     [CanBeNull] string QualifiedName { get; }
   }
 }

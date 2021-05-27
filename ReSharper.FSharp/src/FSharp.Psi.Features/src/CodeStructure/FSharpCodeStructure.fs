@@ -47,7 +47,7 @@ type FSharpCodeStructureProvider() =
                 processTypeDeclaration typeDecl cases parent
 
             | :? IRecordRepresentation as recordDecl ->
-                let fields = Seq.cast recordDecl.FieldDeclarations 
+                let fields = Seq.cast recordDecl.FieldDeclarations
                 processTypeDeclaration typeDecl fields parent
 
             | _ ->
@@ -213,7 +213,7 @@ type NamedIdentifierOwner(treeNode: INameIdentifierOwner, parent, iconId) =
         | ident -> ident.GetDocumentRange()
 
     member val Aspect = NameIdentifierOwnerNodeAspect(treeNode, iconId)
-    
+
     override x.TreeNode = treeNodePointer.GetTreeNode() :> _
     override x.Language = FSharpLanguage.Instance :> _
     override x.GetFileStructureAspect() = x.Aspect :> _

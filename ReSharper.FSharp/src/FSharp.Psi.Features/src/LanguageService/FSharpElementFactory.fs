@@ -280,7 +280,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateTypeUsage(typeUsage: string) : ITypeUsage =
             createTypeUsage typeUsage
-    
+
         member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"
             let expr = getExpression source
@@ -293,7 +293,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             addParensIfNeeded rightArg |> ignore
 
             expr
-  
+
         member x.CreateExpressionReferenceName(name) =
             let source = sprintf "let %s = ()" name
             let letBindings = getModuleMember source :?> ILetBindingsDeclaration

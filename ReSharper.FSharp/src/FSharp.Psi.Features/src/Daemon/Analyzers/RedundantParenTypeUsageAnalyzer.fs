@@ -74,7 +74,7 @@ type RedundantParenTypeUsageAnalyzer() =
         if isNull parenTypeUsage.LeftParen || isNull parenTypeUsage.RightParen then () else
 
         let typeUsage = parenTypeUsage.InnerTypeUsage
-        let context = typeUsage.IgnoreParentParens()  
+        let context = typeUsage.IgnoreParentParens()
 
         if typeUsage :? IParenTypeUsage || applicable typeUsage && not (needsParens context typeUsage) then
             consumer.AddHighlighting(RedundantParenTypeUsageWarning(parenTypeUsage))

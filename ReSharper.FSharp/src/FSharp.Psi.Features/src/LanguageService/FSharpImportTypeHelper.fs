@@ -40,7 +40,7 @@ type FSharpImportTypeHelper() =
             let sourceFile = context.GetSourceFile()
             let psiModule = context.GetPsiModule()
 
-            let containingModules = 
+            let containingModules =
                 reference.GetElement().ContainingNodes<IModuleLikeDeclaration>().ToEnumerable()
                 |> Seq.map (fun decl -> decl.DeclaredElement)
                 |> Seq.filter isNotNull
@@ -131,7 +131,7 @@ type FSharpQuickFixUtilComponent() =
         let settings = fsFile.GetSettingsStoreWithEditorConfig()
         addOpen (referenceOwner.GetDocumentStartOffset()) fsFile settings nameToOpen
         reference
-    
+
     interface IFSharpQuickFixUtilComponent with
         member x.BindTo(reference, typeElement, _, _) =
             x.BindTo(reference :?> _, typeElement) :> _

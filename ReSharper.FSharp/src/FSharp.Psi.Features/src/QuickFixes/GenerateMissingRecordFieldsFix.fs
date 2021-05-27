@@ -38,7 +38,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
     override x.IsAvailable _ =
         if not (isValid recordExpr) then false else
-        if isNull recordExpr.LeftBrace || isNull recordExpr.RightBrace then false else 
+        if isNull recordExpr.LeftBrace || isNull recordExpr.RightBrace then false else
 
         match recordExpr.Reference with
         | null -> failwith "Could not get reference"

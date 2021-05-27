@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Psi
 
 [<Language(typeof<FSharpScriptLanguage>)>]
 type SandboxDocumentLanguageSupportFSharpScript() =
-    interface ISandboxDocumentLanguageSupport with 
+    interface ISandboxDocumentLanguageSupport with
         member x.DocumentFileExtension = FSharpScriptProjectFileType.FsxExtension
         member x.ProjectFileType = FSharpScriptProjectFileType.Instance :> ProjectFileType
         member x.SetupSandboxFile(_, _, _) = ()

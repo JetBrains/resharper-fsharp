@@ -62,7 +62,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
             x.Done(referenceNameMark, ElementType.EXPRESSION_REFERENCE_NAME)
             x.Done(patMark, ElementType.TOP_REFERENCE_PAT)
-            
+
             let (SynValInfo(_, SynArgInfo(returnAttrs, _, _))) = arity
 
             let returnInfoStart =

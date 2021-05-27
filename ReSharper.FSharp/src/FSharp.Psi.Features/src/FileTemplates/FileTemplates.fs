@@ -29,7 +29,7 @@ type InFSharpProjectScope() =
 
     override x.PresentableShortName = name
     override x.GetDefaultUID() = scopeGuid
-    
+
     interface IMainScopePoint with
         member x.QuickListUID = quickListGuid
         member x.QuickListTitle = name
@@ -42,7 +42,7 @@ type InFSharpFile() =
     let scopeGuid = Guid("AD4734E3-3BDB-4187-AA4C-BB6322BDB319")
     let quickListGuid = Guid("4623E5C4-FF8A-4EC6-81EF-054B553D886C")
 
-    static let extensions = 
+    static let extensions =
         [ FSharpProjectFileType.FsExtension
           FSharpProjectFileType.MlExtension
           FSharpSignatureProjectFileType.FsiExtension
@@ -105,7 +105,7 @@ type FSharpProjectScopeCategoryUIProvider() as this =
     inherit ScopeCategoryUIProvider(ProjectModelThemedIcons.Fsharp.Id)
     do
         this.MainPoint <- InFSharpProjectScope()
-        
+
     override x.BuildAllPoints() = [InFSharpProjectScope() :> ITemplateScopePoint] :> _
     override x.CategoryCaption = "F#"
 

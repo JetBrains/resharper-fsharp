@@ -21,7 +21,7 @@ type ToMutableFixTest() =
     [<Test; Explicit>] member x.``Val - Parameter pattern 01 - Union case param``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Val - Parameter pattern 02 - Function param``() = x.DoNamedTest()
     [<Test>] member x.``Val - Parameter pattern 03 - Typed``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``TopAsPat``() = x.DoNamedTest()
     [<Test>] member x.``LocalAsPat``() = x.DoNamedTest()
 

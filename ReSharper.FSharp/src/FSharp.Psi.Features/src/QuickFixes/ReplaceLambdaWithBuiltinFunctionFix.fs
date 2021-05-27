@@ -27,7 +27,7 @@ type ReplaceLambdaWithBuiltinFunctionFix(warning: LambdaCanBeReplacedWithBuiltin
         use writeCookie = WriteLockCookie.Create(exprToReplace.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
         let factory = exprToReplace.CreateElementFactory()
-        
+
         let prevToken = exprToReplace.GetPreviousToken()
         let nextToken = exprToReplace.GetNextToken()
 

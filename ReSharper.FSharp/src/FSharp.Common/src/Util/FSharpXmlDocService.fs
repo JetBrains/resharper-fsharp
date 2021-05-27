@@ -39,7 +39,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
                         XmlDocIndex(dllPath.ChangeExtension(ExtensionConstants.Xml), true, psiConfig, xmlDocThread))
                 indexCache.[dllFile] <- index
                 Some index
-            | _ -> None) 
+            | _ -> None)
 
     [<CanBeNull>]
     member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc) =

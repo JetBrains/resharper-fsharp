@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     /// while opening chameleon expressions.
     [CanBeNull]
     IDocument StandaloneDocument { get; set; }
-    
+
     PsiLanguageType LanguageType { get; set; }
   }
 }

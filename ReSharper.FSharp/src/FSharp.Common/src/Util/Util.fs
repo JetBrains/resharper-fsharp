@@ -184,8 +184,8 @@ module rec FSharpMsBuildUtils =
         let [<Literal>] folderItemType = "Folder"
 
     module BuildActions =
-        let compileBefore = BuildAction.GetOrCreate(compileBeforeItemType)  
-        let compileAfter = BuildAction.GetOrCreate(compileAfterItemType)  
+        let compileBefore = BuildAction.GetOrCreate(compileBeforeItemType)
+        let compileAfter = BuildAction.GetOrCreate(compileAfterItemType)
 
     let isCompileBefore itemType =
         equalsIgnoreCase compileBeforeItemType itemType

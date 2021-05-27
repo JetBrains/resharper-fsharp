@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   {
     [CanBeNull]
     public static IBinaryAppExpr GetByArgument([CanBeNull] IFSharpExpression param) =>
-      GetByLeftArgument(param) ?? 
+      GetByLeftArgument(param) ??
       GetByRightArgument(param);
   }
 }

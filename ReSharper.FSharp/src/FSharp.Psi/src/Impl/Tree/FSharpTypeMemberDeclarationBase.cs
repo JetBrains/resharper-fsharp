@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [CanBeNull] private volatile string myCachedName;
 
     protected abstract string DeclaredElementName { get; }
-    
+
     protected override void ClearCachedData()
     {
       base.ClearCachedData();

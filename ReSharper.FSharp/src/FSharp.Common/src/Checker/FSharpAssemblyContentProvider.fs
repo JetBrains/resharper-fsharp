@@ -29,7 +29,7 @@ type FSharpAssemblyContentProvider(lifetime, onSolutionCloseNotifier: OnSolution
                       |> Seq.toList
                       |> List.rev // if mscorlib.dll is the first then FSC raises exception when we try to
                                   // get Content.Entities from it.
-        
+
                   for fileName, signatures in assembliesByFileName do
                       yield! AssemblyContent.GetAssemblyContent entityCache.Locking AssemblyContentType.Public fileName signatures ]
             }

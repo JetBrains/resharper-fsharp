@@ -108,7 +108,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override MemberDecoration Modifiers { get; }
 
     /// Most F# elements are considered partial as an easy way
-    /// to support signatures, intrinsic type extensions and virtual members. 
+    /// to support signatures, intrinsic type extensions and virtual members.
     public override bool CanBePartial => true;
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName)
@@ -121,7 +121,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       var psiModule = GetPsiModule();
       var entityAttrs = entity.Attributes;
-      
+
       if (entityAttrs.Count == 0)
         return EmptyList<IAttributeInstance>.Instance;
 
@@ -138,7 +138,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (AttributeClassNames.Contains(clrTypeName.ShortName))
         return false;
 
-      // todo: get entity without getting declaration 
+      // todo: get entity without getting declaration
       var entity = GetDeclaration()?.GetFSharpSymbol() as FSharpEntity;
       return entity?.Attributes.HasAttributeInstance(clrTypeName.FullName) ?? false;
     }

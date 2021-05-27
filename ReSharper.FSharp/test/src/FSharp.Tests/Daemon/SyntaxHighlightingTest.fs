@@ -10,5 +10,5 @@ type SyntaxHighlightingTest() =
 
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? ReSharperSyntaxHighlighting
-    
+
     [<Test>] member x.``Inactive preprocessor branch 01``() = x.DoNamedTest()

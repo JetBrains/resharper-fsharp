@@ -12,7 +12,7 @@ type SelfIdAnalyzer() =
 
     let hasUsages (expr: IFSharpExpression) =
         isNotNull expr &&
-        
+
         let nameUsages = FSharpNamingService.getUsedNamesUsages expr EmptyList.Instance null false
         nameUsages.ContainsKey("__")
 

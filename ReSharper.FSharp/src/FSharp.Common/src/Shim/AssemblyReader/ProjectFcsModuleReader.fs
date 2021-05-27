@@ -170,7 +170,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
             | culture -> cultures.Intern(Some(culture))
 
         ILAssemblyRef.Create(name, hash, publicKey, retargetable, version, locale)
-    
+
     let getAssemblyScopeRef (assemblyName: AssemblyNameInfo): ILScopeRef =
         let mutable scopeRef = Unchecked.defaultof<_>
         match assemblyRefs.TryGetValue(assemblyName, &scopeRef) with
@@ -314,7 +314,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
     let mkCallingThisConv (func: IModifiersOwner): ILThisConvention =
         if func.IsStatic then ILThisConvention.Static else ILThisConvention.Instance
 
-    
+
     let mkMethodRef (method: IFunction): ILMethodRef =
         let typeRef =
             let typeElement =
@@ -532,7 +532,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
           IsOptional = param.IsOptional
           CustomAttrsStored = attrs |> mkILCustomAttrs |> storeILCustomAttrs
           MetadataIndex = NoMetadataIdx }
-    
+
     let mkParams (method: IFunction): ILParameter list =
         method.Parameters
         |> List.ofSeq
@@ -710,7 +710,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
                     |> List.ofSeq
                     |> List.map mkField
 
-                let fieldDefs = 
+                let fieldDefs =
                     match typeElement with
                     | :? IEnum as enum -> mkEnumInstanceValue enum :: fields
                     | _ -> fields
@@ -731,7 +731,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
                 |> List.map mkEvent
                 |> mkILEvents
 
-            let typeDef = 
+            let typeDef =
                 ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
                     extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
                     emptyILSecurityDecls, emptyILCustomAttrs)

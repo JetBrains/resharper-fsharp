@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpBlockCommentActionProvider() = 
+type FSharpBlockCommentActionProvider() =
     interface IBlockCommentActionProvider with
 
         member x.StartBlockCommentMarker = "(*"
@@ -16,7 +16,7 @@ type FSharpBlockCommentActionProvider() =
         member x.NestedStartBlockCommentMarker = null
         member x.NestedEndBlockCommentMarker = null
 
-        member x.GetBlockComment(token) = 
+        member x.GetBlockComment(token) =
             if token.GetTokenType() == FSharpTokenType.BLOCK_COMMENT then
                 TextRange(token.GetDocumentStartOffset().Offset, token.GetDocumentEndOffset().Offset)
             else
@@ -26,7 +26,7 @@ type FSharpBlockCommentActionProvider() =
             disableAllProviders <- false
             true
 
-        member x.InsertBlockCommentPosition(token, position) = 
+        member x.InsertBlockCommentPosition(token, position) =
             let tokenType = token.GetTokenType()
             if tokenType == FSharpTokenType.LINE_COMMENT then position else
 

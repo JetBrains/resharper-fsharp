@@ -26,22 +26,22 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
             match projectItem with
             | :? IProjectFolder as projectFolder ->
                 let parentFolder = projectFolder.ParentFolder.NotNull()
-    
+
                 container.CreateFoldersWithParents(projectFolder)
                 |> List.ofSeq
                 |> List.map (fun (viewFolder, parentOpt) ->
                     ProjectStructureItem(viewFolder, parentOpt |> getParent parentFolder)) :> _
-    
+
             | :? IProjectFile as projectFile ->
                 let item = FSharpViewFile projectFile
                 let parentFolder = projectFile.ParentFolder.NotNull()
-    
+
                 let parentViewFolder =
                     container.TryGetParentFolderIdentity(item)
                     |> Option.map (fun identity -> FSharpViewFolder (parentFolder, identity))
                     |> getParent parentFolder
                 [| ProjectStructureItem(item, parentViewFolder) |] :> _
-    
+
             | _ -> null
 
 

@@ -60,7 +60,7 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
         match fsCompletionContext.TokenBeforeCaret with
         | identifier when
                 isNotNull identifier &&
- 
+
                 let parent = identifier.Parent
                 (parent :? IFSharpExpression || parent :? IReferenceName) ->
             FSharpPostfixTemplateContext(identifier, executionContext)
@@ -92,7 +92,7 @@ type FSharpPostfixTemplateBehaviorBase(info) =
 
         null
 
-    
+
     let getParentExpression (token: IFSharpTreeNode): IFSharpExpression =
         match token with
         | TokenType FSharpTokenType.RESERVED_LITERAL_FORMATS _ ->

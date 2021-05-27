@@ -27,7 +27,7 @@ type LambdaAnalyzer() =
         | :? ITuplePat as tuplePat -> Seq.exists (patIsUsed nameUsages excludedUseExpr) tuplePat.PatternsEnumerable
         | :? ILocalReferencePat as refPat ->
             nameUsages.GetValuesSafe(refPat.SourceName)
-            |> Seq.exists (fun u -> isNotNull u && not (excludedUseExpr.Contains(u))) 
+            |> Seq.exists (fun u -> isNotNull u && not (excludedUseExpr.Contains(u)))
         | _ -> false
 
     let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
@@ -83,7 +83,7 @@ type LambdaAnalyzer() =
             | x -> hasMatches, i = pats.Count, x
 
         compareArgsRec expr 0 null
-    
+
     let isImplicitlyConvertedToDelegate (lambda: ILambdaExpr) =
         let lambda = lambda.IgnoreParentParens()
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
@@ -136,7 +136,7 @@ type LambdaAnalyzer() =
 
         if not (isApplicable expr pats) then () else
 
-        let warning = 
+        let warning =
             match compareArgs pats expr with
             | true, true, replaceCandidate ->
                 LambdaCanBeReplacedWithInnerExpressionWarning(lambda, replaceCandidate) :> IHighlighting

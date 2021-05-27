@@ -66,7 +66,7 @@ type AddIgnoreFix(expr: IFSharpExpression) =
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        
+
         let ignoreApp = expr.CreateElementFactory().CreateIgnoreApp(expr, shouldAddNewLine expr)
 
         let replaced = ModificationUtil.ReplaceChild(expr, ignoreApp).As<IBinaryAppExpr>()

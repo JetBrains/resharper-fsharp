@@ -126,7 +126,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         match parent.GetContainingNode() with
         | null -> null
         | grandparent -> highlightingCtor grandparent :> _
-    
+
     let createHighlightingFromNodeWithMessage highlightingCtor range (error: FSharpDiagnostic): IHighlighting =
         let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
         if isNotNull expr then highlightingCtor (expr, error.Message) :> _ else
@@ -150,7 +150,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         match token.GetContainingNode() with
         | null -> null
         | node -> highlightingCtor node :> _
-    
+
     let createHighlighting (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
         | TypeEquation ->

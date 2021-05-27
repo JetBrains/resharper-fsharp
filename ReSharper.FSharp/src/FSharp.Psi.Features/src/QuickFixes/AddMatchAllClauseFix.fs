@@ -37,7 +37,7 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
 
         let addToNewLine = not isSingleLineMatch // todo: cover more cases
 
-        let clause = 
+        let clause =
             addNodesAfter expr.LastChild [
                 if addToNewLine then
                     let lineEnding = expr.GetLineEnding()

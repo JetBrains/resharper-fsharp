@@ -51,10 +51,10 @@ type FSharpInlineVariable(workflow, solution, driver) =
 
         let indentShift = referenceOwner.Indent - exprIndent
         shiftNode indentShift exprCopy
-        
+
         let newExpr = ModificationUtil.ReplaceChild(referenceOwner, exprCopy)
         addParensIfNeeded newExpr |> ignore
- 
+
     override x.Ignore _ = false
 
     override x.RemoveVariableDeclaration(decl) =
@@ -86,7 +86,7 @@ type FSharpInlineVarAnalyser(workflow) =
     inherit InlineVarAnalyserBase(workflow)
 
     let [<Literal>] cannotInline = "Cannot inline value."
-    
+
     let mutable inlineExpr = null
     let mutable inlineReferences = null
 

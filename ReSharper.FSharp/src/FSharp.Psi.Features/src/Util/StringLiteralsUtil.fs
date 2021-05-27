@@ -95,7 +95,7 @@ let getStringEndingQuotesOffset (tokenType: TokenNodeType) =
     | TripleQuoteInterpolatedStringEnd -> 3
     | ByteArray
     | VerbatimByteArray -> 2
-    | literalType -> failwithf "Unexpected string literal %O" literalType 
+    | literalType -> failwithf "Unexpected string literal %O" literalType
 
 
 let emptyString = "\"\""

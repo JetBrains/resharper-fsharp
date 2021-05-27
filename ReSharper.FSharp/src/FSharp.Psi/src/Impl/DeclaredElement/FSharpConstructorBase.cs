@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsDefault => false;
     public bool IsParameterless => Parameters.IsEmpty();
 
-    public override bool Equals(object obj) => 
+    public override bool Equals(object obj) =>
       obj is IConstructor && base.Equals(obj);
 
     public override int GetHashCode() => ShortName.GetHashCode();

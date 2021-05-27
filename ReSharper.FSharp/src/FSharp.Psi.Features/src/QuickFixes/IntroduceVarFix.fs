@@ -10,7 +10,7 @@ type IntroduceVarFix(expr: IFSharpExpression) =
     inherit FSharpQuickFixBase()
 
     let mutable expr = expr
-    
+
     let suggestInnerExpression (expr: IFSharpExpression) =
         let binaryAppExpr = expr.As<IBinaryAppExpr>()
         if isNotNull binaryAppExpr && FSharpIntroduceVariable.CanInsertBeforeRightOperand(binaryAppExpr) then
@@ -39,7 +39,7 @@ type IntroduceVarFix(expr: IFSharpExpression) =
         let expressions =
             [| expr, "Whole expression"
                innerExpression, "Last operand" |]
-            
+
         x.SelectExpression(expressions, solution, textControl)
 
     override x.Execute(solution, textControl) =

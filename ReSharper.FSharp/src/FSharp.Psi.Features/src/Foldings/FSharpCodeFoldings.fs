@@ -66,7 +66,6 @@ type FSharpCodeFoldingProcess(logger: ILogger) =
             let highlightingId = getFoldingAttrId x.Scope
             let documentRange = DocumentRange(document, textRange)
             context.AddDefaultPriorityFolding(highlightingId, documentRange, placeholder))
-                
 
     interface ICodeFoldingProcessor with
         member x.InteriorShouldBeProcessed(_,_) = false

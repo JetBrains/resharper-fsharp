@@ -27,7 +27,7 @@ type RemoveRedundantQualifierFix(warning: RedundantQualifierWarning) =
             | _ -> failwithf "Unexpected qualifier owner: %O" qualifierOwner
 
         ModificationUtil.DeleteChildRange(qualifier, getLastMatchingNodeAfter isInlineSpace delimiter)
-    
+
     override x.Text = "Remove redundant qualifier"
 
     override x.IsAvailable _ =

@@ -77,7 +77,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
 
-    // todo: named case fields have FSharpParameter symbols in resolve cache 
+    // todo: named case fields have FSharpParameter symbols in resolve cache
     [CanBeNull] public FSharpField Field => Symbol as FSharpField;
     [CanBeNull] protected virtual FSharpType FieldType => Field?.FieldType;
 

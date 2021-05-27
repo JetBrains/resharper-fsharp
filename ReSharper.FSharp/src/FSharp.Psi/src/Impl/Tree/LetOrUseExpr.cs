@@ -13,8 +13,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool IsRecursive => FirstBinding?.RecKeyword != null;
 
-    public bool IsUse => 
-      BindingKeyword?.GetTokenType() is var tokenType && 
+    public bool IsUse =>
+      BindingKeyword?.GetTokenType() is var tokenType &&
       (tokenType == FSharpTokenType.USE || tokenType == FSharpTokenType.USE_BANG);
 
     public void SetIsRecursive(bool value)
@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       BindingKeyword.NotNull().AddTokenAfter(FSharpTokenType.REC);
     }
 
-    public override IType Type() => 
+    public override IType Type() =>
       InExpression?.Type() ?? base.Type();
   }
 }

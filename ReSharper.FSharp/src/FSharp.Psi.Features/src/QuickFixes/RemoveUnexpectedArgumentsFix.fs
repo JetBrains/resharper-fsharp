@@ -19,7 +19,7 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
 
     let expr = warning.Expr
     let prefixApp = warning.PrefixApp
-    
+
     override x.Text =
         if prefixApp.FunctionExpression == expr then RemoveUnexpectedArgument else RemoveUnexpectedArguments
 
@@ -31,6 +31,6 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
         let firstUnexpectedArg = PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression
         let commentNodeCandidate = skipMatchingNodesBefore isWhitespace firstUnexpectedArg
         let updatedRoot = ModificationUtil.ReplaceChild(prefixApp, expr.Copy())
-        
+
         if commentNodeCandidate != expr then
             addNodesAfter updatedRoot (TreeRange(expr.NextSibling, commentNodeCandidate)) |> ignore

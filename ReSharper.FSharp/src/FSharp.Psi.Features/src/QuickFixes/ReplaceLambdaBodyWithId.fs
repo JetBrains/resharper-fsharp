@@ -23,7 +23,7 @@ type ReplaceLambdaBodyWithIdFix(warning: LambdaBodyCanBeReplacedWithIdWarning) =
         use writeCookie = WriteLockCookie.Create(lambda.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
         let factory = lambda.CreateElementFactory()
-                
+
         deletePatternsFromEnd lambda 1
 
         lambda.SetExpression(factory.CreateReferenceExpr("id")) |> ignore

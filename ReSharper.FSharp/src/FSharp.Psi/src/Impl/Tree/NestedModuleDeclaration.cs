@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       foreach (var moduleMember in parentModule.Members)
       {
         // Only type declarations are taken into account, exception declarations are ignored.
-        if (!(moduleMember is ITypeDeclarationGroup typeDeclarationGroup)) 
+        if (!(moduleMember is ITypeDeclarationGroup typeDeclarationGroup))
           continue;
 
         foreach (var typeDeclaration in typeDeclarationGroup.TypeDeclarations)

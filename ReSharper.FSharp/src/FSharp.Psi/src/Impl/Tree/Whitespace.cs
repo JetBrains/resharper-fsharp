@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public Whitespace() : this(1)
     {
     }
-    
+
     public override bool IsNewLine => false;
   }
 

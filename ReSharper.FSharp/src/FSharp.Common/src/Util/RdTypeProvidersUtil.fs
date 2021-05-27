@@ -32,7 +32,7 @@ type PublicKey with
     member this.toRdPublicKey() =
         match this with
         | PublicKey key -> RdPublicKey(true, key)
-        | PublicKeyToken token -> RdPublicKey(false, token) 
+        | PublicKeyToken token -> RdPublicKey(false, token)
 
 type ResolutionEnvironment with
     [<Extension>]
@@ -50,4 +50,4 @@ type JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdResolutionEnvironmen
            outputFile = Option.ofObj(this.OutputFile);
            showResolutionMessages = this.ShowResolutionMessages;
            referencedAssemblies = this.ReferencedAssemblies;
-           temporaryFolder = this.TemporaryFolder }                        
+           temporaryFolder = this.TemporaryFolder }

@@ -140,7 +140,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         Some fcsProject.ProjectOptions
 
     interface IHideImplementation<FcsProjectProvider>
-    
+
     interface IFcsProjectProvider with
         member x.HasPairFile _ = false
 

@@ -47,7 +47,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     override x.SkipWhitespaces() = ()
 
     member x.AdvanceLexer() = x.Builder.AdvanceLexer() |> ignore
-    
+
     member x.AdvanceToStart(range: range) =
         x.AdvanceToOffset(x.GetStartOffset(range))
 
@@ -64,11 +64,11 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     member x.Mark(pos: pos) =
         x.AdvanceTo(pos)
         x.Mark()
-    
+
     member x.Mark(offset: int) =
         x.AdvanceToOffset(offset)
         x.Mark()
-    
+
     member x.Mark() =
         /// The base member is protected and cannot be used in closures.
         base.Mark()
@@ -210,7 +210,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
     member x.GetTreeNode() =
         x.GetTree() :> ITreeNode
-    
+
     member x.FinishFile(mark, fileType) =
         while not x.Eof do
             x.AdvanceLexer()
@@ -276,7 +276,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
                  mark
 
              | _ ->
-                 let minDeclOrIdRange = 
+                 let minDeclOrIdRange =
                      match id with
                      | Some(IdentRange idRange) ->
                          rangeStartMin idRange range
@@ -366,7 +366,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | SynTypeDefnKind.Struct
         | SynTypeDefnKind.Interface -> true
         | _ -> false
-    
+
     member x.GetObjectModelTypeReprElementType(reprKind: SynTypeDefnKind) =
         match reprKind with
         | SynTypeDefnKind.Class -> ElementType.CLASS_REPRESENTATION
@@ -499,7 +499,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
 
         | _ ->
-        
+
         let parenPatMark = x.Mark()
 
         match pats with
@@ -824,7 +824,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     member x.FixExpresion(expr: SynExpr) =
         // A fake SynExpr.Typed node is added for binding with return type specification like in the following
         // member x.Prop: int = 1
-        // where 1 is replaced with `1: int`. 
+        // where 1 is replaced with `1: int`.
         // These fake nodes have original type specification ranges that are out of the actual expression ranges.
         match expr with
         | SynExpr.Typed(inner, synType, range) when not (Range.rangeContainsRange range synType.Range) -> inner

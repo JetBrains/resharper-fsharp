@@ -9,7 +9,7 @@ type RemoveUnusedOpensTest() =
     inherit FSharpQuickFixTestBase<RemoveUnusedOpensFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/removeUnusedOpens"
-    
+
     [<Test>] member x.``Single open``() = x.DoNamedTest()
     [<Test>] member x.``Multiple opens``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Single open with semicolon``() = x.DoNamedTest()

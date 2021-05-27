@@ -11,7 +11,7 @@ type RedundantAttributeAnalyzerTest() =
 
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? RedundantAttributeSuffixWarning
-        
+
     [<Test>] member x.``Single attribute 01 - Redundant suffix``() = x.DoNamedTest()
     [<Test>] member x.``Single attribute 02 - Needed suffix``() = x.DoNamedTest()
     [<Test>] member x.``Single attribute 03 - With constructor``() = x.DoNamedTest()

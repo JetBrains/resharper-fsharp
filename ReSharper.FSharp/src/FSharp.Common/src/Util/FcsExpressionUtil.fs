@@ -12,7 +12,7 @@ let rec isSimpleValueExpression (synExpr: SynExpr) =
     | SynExpr.ArrayOrList _ | SynExpr.ArrayOrListOfSeqExpr _
     | SynExpr.ObjExpr _ | SynExpr.New _
     | SynExpr.Record _ | SynExpr.AnonRecd _
-    | SynExpr.Do _ | SynExpr.Lazy _ | SynExpr.TypeTest _ 
+    | SynExpr.Do _ | SynExpr.Lazy _ | SynExpr.TypeTest _
     | SynExpr.For _ | SynExpr.ForEach _ | SynExpr.While _ -> true
     | _ -> false
 

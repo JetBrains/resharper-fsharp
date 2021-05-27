@@ -11,7 +11,7 @@ type FSharpCompletionTest() =
     inherit CodeCompletionTestBase()
 
     override x.RelativeTestDataPath = "features/completion"
-    
+
     override x.TestType = CodeCompletionTestType.Action
 
     [<Test>] member x.``Basic 01 - Replace``() = x.DoNamedTest()

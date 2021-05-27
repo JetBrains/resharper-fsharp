@@ -8,7 +8,7 @@ type ToMutableFix(error: FieldOrValueNotMutableError) =
     inherit FSharpQuickFixBase()
 
     let refExpr = error.RefExpr
-    
+
     override x.Text = "Make " + refExpr.Identifier.GetSourceName() + " mutable"
 
     override x.IsAvailable _ =

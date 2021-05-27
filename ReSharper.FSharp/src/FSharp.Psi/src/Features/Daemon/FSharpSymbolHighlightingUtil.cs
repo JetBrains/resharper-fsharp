@@ -38,13 +38,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
 
       if (entity.IsClass)
         return FSharpHighlightingAttributeIdsModule.Class;
-      
+
       if (entity.IsValueType || entity.HasMeasureParameter())
         return FSharpHighlightingAttributeIdsModule.Struct;
 
       if (entity.IsFSharpAbbreviation && entity.AbbreviatedType.IsFunctionType)
         return FSharpHighlightingAttributeIdsModule.Delegate;
-      
+
       return FSharpHighlightingAttributeIdsModule.Class;
     }
 
