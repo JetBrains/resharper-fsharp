@@ -23,8 +23,8 @@ open NUnit.Framework
 
 [<SolutionComponent>]
 type TestAssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
-        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim) =
-    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, true)
+        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService) =
+    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, true, checkerService)
 
     let mutable projectPath = FileSystemPath.Empty
     let mutable projectPsiModule = null

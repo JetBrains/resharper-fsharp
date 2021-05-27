@@ -132,11 +132,11 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         checkerService.FcsProjectProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
-    let getFcsProject (sourceFile: IPsiSourceFile) =
-        fcsProjectBuilder.BuildFcsProject(sourceFile.PsiModule, sourceFile.GetProject())
+    let getFcsProject (psiModule: IPsiModule) =
+        fcsProjectBuilder.BuildFcsProject(psiModule, psiModule.ContainingProjectModule.As<IProject>())
 
     let getProjectOptions (sourceFile: IPsiSourceFile) =
-        let fcsProject = getFcsProject sourceFile
+        let fcsProject = getFcsProject sourceFile.PsiModule
         Some fcsProject.ProjectOptions
 
     interface IHideImplementation<FcsProjectProvider>
@@ -177,7 +177,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member x.GetFileIndex(sourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then 0 else
 
-            let fcsProject = getFcsProject sourceFile
+            let fcsProject = getFcsProject sourceFile.PsiModule
             match fcsProject.FileIndices.TryGetValue(sourceFile.GetLocation()) with
             | true, index -> index
             | _ -> -1
@@ -188,3 +188,5 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member x.InvalidateReferencesToProject _ = false
         member x.HasFcsProjects = false
         member this.GetProjectOptions(_: IPsiModule): FSharpProjectOptions option = failwith "todo"
+
+        member this.GetFcsProject(psiModule) = Some (getFcsProject psiModule)
