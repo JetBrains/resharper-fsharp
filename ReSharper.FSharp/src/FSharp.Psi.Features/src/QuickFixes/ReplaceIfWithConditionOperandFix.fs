@@ -8,15 +8,15 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type ReplaceIfByConditionOperandFix(warning: IfCanBeReplacedByConditionOperandWarning) =
+type ReplaceIfWithConditionOperandFix(warning: IfCanBeReplacedWithConditionOperandWarning) =
     inherit FSharpQuickFixBase()
 
     let expr = warning.Expr
     let needNegation = warning.NeedNegation
 
     override this.Text =
-        if needNegation then "Replace by condition operand negation"
-        else "Replace by condition operand"
+        if needNegation then "Replace with condition operand negation"
+        else "Replace with condition operand"
 
     override this.IsAvailable _ = isValid expr
 

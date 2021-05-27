@@ -211,7 +211,7 @@
     <Compile Include="src\QuickFixes\ReplaceWithInterpolatedStringFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithPredefinedOperatorFix.fs" />
     <Compile Include="src\QuickFixes\RemoveConstructorFix.fs" />
-    <Compile Include="src\QuickFixes\ReplaceIfWithConditionOperand.fs" />
+    <Compile Include="src\QuickFixes\ReplaceIfWithConditionOperandFix.fs" />
     <Compile Include="src\QuickFixes\AddInstanceMemberSelfIdFix.fs" />
     <Compile Include="src\QuickFixes\ToStaticMemberFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />

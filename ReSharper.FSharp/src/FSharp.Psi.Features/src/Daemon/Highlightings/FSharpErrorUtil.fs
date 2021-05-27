@@ -116,9 +116,9 @@ let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
         sprintf "Lambda can be replaced with '%s'" x.QualifiedName
     | _ -> "Lambda can be simplified"
 
-let getIfCanBeReplacedByConditionOperandWarningText needNegation =
-    if needNegation then "'if' expression can be replaced by condition operand negation"
-    else "'if' expression can be replaced by condition operand"
+let getIfCanBeReplacedWithConditionOperandWarningText needNegation =
+    if needNegation then "'if' expression can be replaced with condition operand negation"
+    else "'if' expression can be replaced with condition operand"
 
 let getInterfaceImplHeaderRange (interfaceImpl: IInterfaceImplementation) =
     let last =

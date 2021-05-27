@@ -3,6 +3,6 @@
 let _ = |if true then true else false|(0)
 
 ------------------------------------------------
-0: 'if' expression can be replaced by condition operand
+0: 'if' expression can be replaced with condition operand
 QUICKFIXES:
-Replace by condition operand
+Replace with condition operand

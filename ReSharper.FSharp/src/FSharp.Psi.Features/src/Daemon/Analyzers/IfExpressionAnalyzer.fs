@@ -9,28 +9,33 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
 [<ElementProblemAnalyzer([| typeof<IIfThenElseExpr> |],
-                         HighlightingTypes = [| typeof<IfCanBeReplacedByConditionOperandWarning> |])>]
+                         HighlightingTypes = [| typeof<IfCanBeReplacedWithConditionOperandWarning> |])>]
 type IfExpressionAnalyzer() =
     inherit ElementProblemAnalyzer<IIfThenElseExpr>()
 
     override this.Run(expr, _, consumer) =
-        if not (skipMatchingNodesAfter isWhitespace expr.ThenKeyword == expr.ThenExpr) ||
-           not (skipMatchingNodesAfter isWhitespace expr.ThenExpr == expr.ElseKeyword) ||
-           not (skipMatchingNodesAfter isWhitespace expr.ElseKeyword == expr.ElseExpr) then () else
+        let thenExpr = expr.ThenExpr
+        let elseExpr = expr.ElseExpr
 
-        let thenExpr = expr.ThenExpr.IgnoreInnerParens()
-        let elseExpr = expr.ElseExpr.IgnoreInnerParens()
+        match thenExpr.IgnoreInnerParens(), elseExpr.IgnoreInnerParens() with
+        | :? ILiteralExpr as thenLiteral, (:? ILiteralExpr as elseLiteral) ->
+            let thenToken = getTokenType thenLiteral.Literal
+            let elseToken = getTokenType elseLiteral.Literal
 
-        match thenExpr, elseExpr with
-        | :? ILiteralExpr as thenExpr, (:? ILiteralExpr as elseExpr) ->
-            let thenToken = getTokenType thenExpr.Literal
-            let elseToken = getTokenType elseExpr.Literal
+            let highlighting =
+                if thenToken == FSharpTokenType.TRUE && elseToken == FSharpTokenType.FALSE then
+                    IfCanBeReplacedWithConditionOperandWarning(expr, false)
+                elif thenToken == FSharpTokenType.FALSE && elseToken == FSharpTokenType.TRUE then
+                    IfCanBeReplacedWithConditionOperandWarning(expr, true)
+                else null
 
-            if thenToken = FSharpTokenType.TRUE &&
-               elseToken = FSharpTokenType.FALSE then
-                consumer.AddHighlighting(IfCanBeReplacedByConditionOperandWarning(expr, false))
+            if (isNotNull highlighting &&
+                let thenKeyword = expr.ThenKeyword
+                let elseKeyword = expr.ElseKeyword
+                isNotNull thenKeyword && isNotNull elseKeyword &&
+                (skipMatchingNodesAfter isWhitespace thenKeyword == thenExpr) &&
+                (skipMatchingNodesAfter isWhitespace thenExpr == elseKeyword) &&
+                (skipMatchingNodesAfter isWhitespace elseKeyword == elseExpr))
+            then consumer.AddHighlighting(highlighting)
 
-            elif thenToken = FSharpTokenType.FALSE &&
-                 elseToken = FSharpTokenType.TRUE then
-                consumer.AddHighlighting(IfCanBeReplacedByConditionOperandWarning(expr, true))
         | _ -> ()

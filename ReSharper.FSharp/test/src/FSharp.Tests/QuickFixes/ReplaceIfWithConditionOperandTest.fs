@@ -6,10 +6,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
-type ReplaceIfByConditionOperandTest() =
-    inherit FSharpQuickFixTestBase<ReplaceIfByConditionOperandFix>()
+type ReplaceIfWithConditionOperandTest() =
+    inherit FSharpQuickFixTestBase<ReplaceIfWithConditionOperandFix>()
 
-    override x.RelativeTestDataPath = "features/quickFixes/replaceIfByConditionOperand"
+    override x.RelativeTestDataPath = "features/quickFixes/replaceIfWithConditionOperand"
 
     [<Test>] member x.``Condition operand 01``() = x.DoNamedTest()
     [<Test>] member x.``Condition operand 02 - Multiline``() = x.DoNamedTest()
@@ -18,10 +18,10 @@ type ReplaceIfByConditionOperandTest() =
 
 
 [<FSharpTest>]
-type  ReplaceIfByConditionOperandAvailabilityTest() =
+type  ReplaceIfWithConditionOperandAvailabilityTest() =
     inherit QuickFixAvailabilityTestBase()
 
-    override x.RelativeTestDataPath = "features/quickFixes/replaceIfByConditionOperand"
+    override x.RelativeTestDataPath = "features/quickFixes/replaceIfWithConditionOperand"
 
     [<Test>] member x.``Text - Condition operand``() = x.DoNamedTest()
     [<Test>] member x.``Text - Condition operand negation``() = x.DoNamedTest()
