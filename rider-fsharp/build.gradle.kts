@@ -329,7 +329,7 @@ tasks {
         }
         val rerunSuccessfulTests = false
         outputs.upToDateWhen { !rerunSuccessfulTests }
-        ignoreFailures = true
+        ignoreFailures = buildCounter != 9999
     }
 
     create("writeDotNetSdkPathProps") {
