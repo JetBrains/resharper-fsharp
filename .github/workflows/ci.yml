@@ -53,6 +53,8 @@ jobs:
       - name: Test Plugin Frontend
         working-directory: ./rider-fsharp
         run: ./gradlew test
+        env:
+          LOCAL_ENV_RUN: true
 
       - name: Stop Gradle Daemon # to collect Gradle cache
         working-directory: ./rider-fsharp
