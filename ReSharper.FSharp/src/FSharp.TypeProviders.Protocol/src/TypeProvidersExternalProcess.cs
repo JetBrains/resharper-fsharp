@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         processUnexpectedExited);
     }
 
-    protected override ProcessStartInfo GetProcessStartInfo(int port)
+    protected override ProcessStartInfo GetProcessStartInfo(Lifetime lifetime, int port)
     {
       var basePath = GetType().Assembly.GetPath().Directory;
 

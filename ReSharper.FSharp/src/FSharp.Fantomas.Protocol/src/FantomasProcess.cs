@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
       new FantomasConnection(lifetime, model, protocol, outputWriter, processId,
         processUnexpectedExited);
 
-    protected override ProcessStartInfo GetProcessStartInfo(int port)
+    protected override ProcessStartInfo GetProcessStartInfo(Lifetime lifetime, int port)
     {
       var launchPath = FantomasDirectory.Combine(FantomasProtocolConstants.PROCESS_FILENAME);
       Assertion.Assert(launchPath.ExistsFile, $"can't find '{launchPath}'");
