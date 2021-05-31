@@ -105,7 +105,7 @@
     <action id="SendFsiRefs" class="com.jetbrains.rider.plugins.fsharp.services.fsi.SendProjectReferencesToFsiAction" icon="/icons/fsharpConsole.png">
       <add-to-group group-id="SolutionExplorerPopupMenu.Repl"/>
     </action>
-    <action id="RestartTypeProvidersAction" class="com.jetbrains.rider.plugins.fsharp.services.typeProviders.RestartTypeProvidersAction" icon="/icons/Fsharp.svg">
+    <action id="Rider.Plugins.FSharp.RestartTypeProviders" class="com.jetbrains.rider.plugins.fsharp.services.typeProviders.RestartTypeProvidersAction" icon="/icons/Fsharp.svg">
       <add-to-group group-id="ToolsMenu" anchor="after" relative-to-action="Rider.Plugins.FSharp.FsiGroup"/>
     </action>
   </actions>
