@@ -58,3 +58,5 @@ type FSharpExtendSelectionTest() =
     [<Test>] member x.``Greater 01``() = x.DoNamedTest()
     [<Test>] member x.``Greater 02``() = x.DoNamedTest()
     [<Test>] member x.``Greater 03``() = x.DoNamedTest()
+    [<Test>] member x.``Less 01``() = x.DoNamedTest()
+    [<Test>] member x.``Plus 01``() = x.DoNamedTest()

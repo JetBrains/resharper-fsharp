@@ -117,7 +117,8 @@ and FSharpDotSelection(fsFile, offset, selectBetterToken, useCamelHumps) =
 
     override this.IsPrevTokenBetter(prevToken, tokenNode) =
         let tokenType = tokenNode.GetTokenType()
-        tokenType == FSharpTokenType.GREATER && not (this.IsSpaceToken(prevToken)) ||
+        let isIdentifierLikeToken = FSharpTokenType.Identifiers.[tokenType]
+        isIdentifierLikeToken && tokenType != FSharpTokenType.IDENTIFIER && not (this.IsSpaceToken(prevToken)) ||
 
         base.IsPrevTokenBetter(prevToken, tokenNode)
 
