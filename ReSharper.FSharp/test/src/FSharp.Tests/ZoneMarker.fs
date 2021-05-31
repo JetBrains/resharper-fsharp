@@ -14,13 +14,11 @@ type IFSharpTestsZone =
 
 [<ZoneActivator>]
 type PsiFeatureTestZoneActivator() =
-    interface IActivate<PsiFeatureTestZone> with
-        member x.ActivatorEnabled() = true
+    interface IActivate<PsiFeatureTestZone>
 
 [<ZoneActivator>]
 type FSharpZoneActivator() =
-    interface IActivate<ILanguageFSharpZone> with
-        member x.ActivatorEnabled() = true
+    interface IActivate<ILanguageFSharpZone>
 
 [<SetUpFixture>]
 type PsiFeaturesTestEnvironmentAssembly() =

@@ -97,8 +97,7 @@ type MyTestSolutionToolset(lifetime: Lifetime, logger: ILogger) =
 
 [<ZoneActivator>]
 type SolutionHostZoneActivator() =
-    interface IActivate<IHostSolutionZone> with
-        member x.ActivatorEnabled() = true
+    interface IActivate<IHostSolutionZone>
 
 
 [<SolutionInstanceComponent>]
