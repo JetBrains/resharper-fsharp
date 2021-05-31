@@ -19,13 +19,13 @@
         <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
         <ProjectReference Include="..\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj" />
     </ItemGroup>
-    
+
     <ItemGroup>
       <Content Include="app.config">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
-    
+
     <ItemGroup>
       <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
       <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
