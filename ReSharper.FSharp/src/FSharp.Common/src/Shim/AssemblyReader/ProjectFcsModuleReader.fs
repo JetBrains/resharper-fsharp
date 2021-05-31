@@ -12,8 +12,10 @@ open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.Properties.Managed
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Impl.Special
+open JetBrains.ReSharper.Psi.Impl.Types
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Util
@@ -59,9 +61,30 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
     let mutable timestamp = DateTime.MinValue
 
     /// Type definitions imported by FCS.
-    let typeDefs = ConcurrentDictionary<IClrTypeName, ILTypeDef>()
+    let typeDefs = ConcurrentDictionary<IClrTypeName, ILTypeDef>() // todo: use non-concurrent, add locks
+    let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
 
-//    let usedTypeNames = Dictionary<string, IClrTypeName>()
+    let typeUsedNames = OneToSetMap<IClrTypeName, string>()
+    let usedNamesToTypes = OneToSetMap<string, IClrTypeName>()
+
+    let usedFSharpModulesToTypes = OneToSetMap<IPsiModule, IClrTypeName>() // todo: record F#->F# chains
+
+    let mutable currentTypeName: IClrTypeName = null
+    let mutable currentTypeUnresolvedUsedNames: ISet<string> = null
+
+    let recordUsedType (typeElement: ITypeElement) =
+        if typeElement :? ITypeParameter then () else // todo: check this
+
+        let typeElementModule = typeElement.Module
+        if not (typeElementModule :? IProjectPsiModule) then () else
+
+        if typeElement.PresentationLanguage.Is<FSharpLanguage>() then
+            let fsProjectModule = typeElementModule
+            usedFSharpModulesToTypes.Add(fsProjectModule, currentTypeName) |> ignore
+        else
+            let shortName = typeElement.ShortName
+            usedNamesToTypes.Add(shortName, currentTypeName) |> ignore
+            typeUsedNames.Add(currentTypeName, shortName) |> ignore
 
     // todo: store in reader/cache, so it doesn't leak after solution close
     let cultures = DataIntern()
@@ -100,8 +123,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
         let extends = None
         let nestedTypes = emptyILTypeDefs
 
-        ILTypeDef(
-             name, attributes, layout, implements, genericParams, extends, emptyILMethods, nestedTypes,
+        ILTypeDef(name, attributes, layout, implements, genericParams, extends, emptyILMethods, nestedTypes,
              emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, emptyILSecurityDecls,
              emptyILCustomAttrs)
 
@@ -196,6 +218,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
         let clrTypeName = typeElement.GetClrName()
         let targetModule = typeElement.Module
 
+        recordUsedType typeElement
+
         let typeRefCache =
             if psiModule == targetModule then localTypeRefs else
             getAssemblyTypeRefCache targetModule
@@ -258,7 +282,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
         | :? IDeclaredType as declaredType ->
             match declaredType.Resolve() with
             | :? EmptyResolveResult ->
-                // todo: store unresolved type short name to invalidate the type def when that type appears
+                match declaredType with
+                | :? ISimplifiedIdTypeInfo as simpleTypeInfo ->
+                    let shortName = simpleTypeInfo.GetShortName()
+                    if isNotNull shortName then
+                        currentTypeUnresolvedUsedNames.Add(shortName) |> ignore
+                | _ -> ()
+
                 // todo: add per-module singletons for predefines types
                 mkType (psiModule.GetPredefinedType().Object)
 
@@ -634,7 +664,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
 
     member val RealModuleReader: ILModuleReader option = None with get, set
 
-    member this.ForceCreateTypeDefs(): unit =
+    member this.CreateAllTypeDefs(): unit =
+        // todo: keep upToDate/dirty flag, don't do this if not needed
         let rec traverseTypes (ns: INamespace) =
             for typeElement in ns.GetNestedTypeElements(symbolScope) do
                 visitType typeElement
@@ -653,6 +684,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
         match typeDefs.TryGetValue(clrTypeName) with
         | NotNull typeDef -> typeDef
         | _ ->
+
+        currentTypeName <- clrTypeName
+        currentTypeUnresolvedUsedNames <- HashSet()
 
         use cookie = ReadLockCookie.Create()
         use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
@@ -736,16 +770,31 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
                     extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
                     emptyILSecurityDecls, emptyILCustomAttrs)
 
+            currentTypeName <- null
+            currentTypeUnresolvedUsedNames <- null
+
+            clrNamesByShortNames.Add(typeElement.ShortName, clrTypeName)
             typeDefs.[clrTypeName] <- typeDef
             typeDef
 
-    // todo: change to shortName
+    member this.GetClrTypeNamesByShortName(shortName: string) =
+        clrNamesByShortNames.GetValuesSafe(shortName)
+
+    // todo: change to shortName, update short names dict too
     member this.InvalidateTypeDef(clrTypeName: IClrTypeName) =
         use lock = locker.UsingWriteLock()
         typeDefs.TryRemove(clrTypeName) |> ignore
         moduleDef <- None
         timestamp <- DateTime.UtcNow
 
+    member this.InvalidateReferencingTypes(referencedName: string) =
+        for referencingTypeName in usedNamesToTypes.GetValuesSafe(referencedName) do
+            this.InvalidateTypeDef(referencingTypeName)
+
+    member this.InvalidateTypesReferencingFSharpModule(fsharpProjectModule: IPsiModule) =
+        for referencingTypeName in usedFSharpModulesToTypes.GetValuesSafe(fsharpProjectModule) do
+            this.InvalidateTypeDef(referencingTypeName)
+    
     interface ILModuleReader with
         member this.ILModuleDef =
             match moduleDef with
