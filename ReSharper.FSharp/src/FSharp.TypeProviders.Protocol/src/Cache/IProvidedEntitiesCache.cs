@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     protected readonly ConcurrentDictionary<TKey, T> Entities;
     protected readonly IDictionary<int, List<TKey>> EntitiesPerProvider;
     private readonly object myEntitiesPerProviderLockObj = new object();
-    private SpinWaitLock myLock;
+    private SpinWaitLock myEntitiesLock;
 
     protected ProvidedEntitiesCacheBase(TypeProvidersContext typeProvidersContext)
     {
@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
       try
       {
-        myLock.Enter();
+        myEntitiesLock.Enter();
         if (Entities.TryGetValue(key, out providedEntity)) return providedEntity;
         providedEntity = Create(key, typeProviderId, parameters);
         AttachToTypeProvider(typeProviderId, key, providedEntity);
@@ -53,7 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
       }
       finally
       {
-        myLock.Exit();
+        myEntitiesLock.Exit();
       }
     }
 
@@ -72,7 +72,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
         if (group.Key)
           foreach (var (key, i) in group)
           {
-            if (!KeyHasValue(key)) return null;
+            if (!KeyHasValue(key)) continue;
             Assertion.Assert(Entities.TryGetValue(key, out var providedEntity),
               "Possible concurrent Remove(typeProviderId) call");
             entities[i] = providedEntity;
