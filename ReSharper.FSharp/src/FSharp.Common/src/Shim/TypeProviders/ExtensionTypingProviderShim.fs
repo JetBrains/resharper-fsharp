@@ -78,7 +78,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         let rdTypeProvidersHost = solution.RdFSharpModel().FSharpTypeProvidersHost
 
         rdTypeProvidersHost.RestartTypeProviders.Set(restart)
-        rdTypeProvidersHost.IsLaunched.Set(fun _ -> isNotNull connection)
+        rdTypeProvidersHost.IsLaunched.Set(fun _ -> outOfProcess.Value && isNotNull connection)
 
     interface IProxyExtensionTypingProvider with
         member this.InstantiateTypeProvidersOfAssembly(runTimeAssemblyFileName: string,
