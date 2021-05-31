@@ -64,7 +64,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         setting(CSharp50Generator.Namespace, "JetBrains.ReSharper.Plugins.FSharp")
 
         field("fSharpInteractiveHost", RdFSharpInteractiveHost)
-        field("fSharpTestHost", RdFSharpTestHost)
+        field("fsharpTestHost", RdFSharpTestHost)
         field("fSharpTypeProvidersHost", RdFSharpTypeProvidersHost)
         property("fcsBusyDelayMs", int)
     }

@@ -60,7 +60,7 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
         currentCulture.Name
 
     do
-        let fsTestHost = solution.RdFSharpModel().FSharpTestHost
+        let fsTestHost = solution.RdFSharpModel().FsharpTestHost
 
         fsTestHost.GetLastModificationStamp.Set(FileSystem.GetLastWriteTimeShim)
         fsTestHost.GetSourceCache.Set(sourceCache.GetRdFSharpSource)
