@@ -49,7 +49,7 @@ module ProjectFcsModuleReader =
     let mkNameFromClrTypeName (clrTypeName: IClrTypeName) =
         mkTypeName clrTypeName.ShortName clrTypeName.TypeParametersCount
 
-type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommonCache) =
+type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache) =
     // todo: is it safe to keep symbolScope?
     let symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, false, true)
 
@@ -85,11 +85,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
             let shortName = typeElement.ShortName
             usedNamesToTypes.Add(shortName, currentTypeName) |> ignore
             typeUsedNames.Add(currentTypeName, shortName) |> ignore
-
-    // todo: store in reader/cache, so it doesn't leak after solution close
-    let cultures = DataIntern()
-    let publicKeys = DataIntern()
-    let literalValues = DataIntern()
 
     let assemblyRefs = ConcurrentDictionary<AssemblyNameInfo, ILScopeRef>()
 
@@ -178,8 +173,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
             | null ->
                 match assemblyName.GetPublicKey() with
                 | null -> None
-                | key -> publicKeys.Intern(Some(PublicKey.PublicKey(key)))
-            | bytes -> publicKeys.Intern(Some(PublicKey.PublicKeyToken(bytes)))
+                | key -> cache.PublicKeys.Intern(Some(PublicKey.PublicKey(key)))
+            | bytes -> cache.PublicKeys.Intern(Some(PublicKey.PublicKeyToken(bytes)))
 
         let version =
             match assemblyName.Version with
@@ -189,7 +184,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
         let locale =
             match assemblyName.Culture with
             | null | "neutral" -> None
-            | culture -> cultures.Intern(Some(culture))
+            | culture -> cache.Cultures.Intern(Some(culture))
 
         ILAssemblyRef.Create(name, hash, publicKey, retargetable, version, locale)
 
@@ -489,7 +484,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, _cache: FcsModuleReaderCommon
         | :? IDeclaredType as declaredType ->
             let mutable literalType = Unchecked.defaultof<_>
             match literalTypes.TryGetValue(declaredType.GetClrName(), &literalType) with
-            | true -> literalValues.Intern(Some(literalType value.Value))
+            | true -> cache.LiteralValues.Intern(Some(literalType value.Value))
             | _ -> None
         | _ -> None
 
