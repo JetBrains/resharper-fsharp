@@ -17,9 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       var portValue = args[0];
       var logPath = string.Empty;
       if (args.Length > 1)
-      {
         logPath = args[1];
-      }
 
       endPoint.Start(portValue, logPath);
     }

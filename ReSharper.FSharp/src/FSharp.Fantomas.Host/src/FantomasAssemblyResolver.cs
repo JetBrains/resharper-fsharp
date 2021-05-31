@@ -7,26 +7,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
   public static class FantomasAssemblyResolver
   {
-    private const string AdditionalProbingPathsEnvVar = "RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS";
+    private const string RiderAdditionalProbingPathsEnvVar = "RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS";
     private const string FantomasAssembliesPathEnvVar = "FSHARP_FANTOMAS_ASSEMBLIES_PATH";
     private static readonly List<string> OurAdditionalProbingPaths = new List<string>();
 
     static FantomasAssemblyResolver()
     {
       var fantomasPath = Environment.GetEnvironmentVariable(FantomasAssembliesPathEnvVar);
-      var riderPaths = Environment.GetEnvironmentVariable(AdditionalProbingPathsEnvVar);
+      var riderPaths = Environment.GetEnvironmentVariable(RiderAdditionalProbingPathsEnvVar);
 
-      // Cannot use Assertion.Assert in resolver constructor since it is a part of JetBrains.Diagnostics, which requires resolve
+      // Cannot use Assertion.Assert in resolver since it's a part of JetBrains.Diagnostics which requires resolve.
       if (string.IsNullOrWhiteSpace(fantomasPath))
         throw new ArgumentException("Argument IsNullOrWhiteSpace", FantomasAssembliesPathEnvVar);
       if (string.IsNullOrWhiteSpace(riderPaths))
-        throw new ArgumentException("Argument IsNullOrWhiteSpace", AdditionalProbingPathsEnvVar);
+        throw new ArgumentException("Argument IsNullOrWhiteSpace", RiderAdditionalProbingPathsEnvVar);
 
       OurAdditionalProbingPaths.Add(fantomasPath);
       foreach (var path in riderPaths.Split(';'))
-      {
-        if (!string.IsNullOrEmpty(path)) OurAdditionalProbingPaths.Add(path);
-      }
+        if (!string.IsNullOrEmpty(path))
+          OurAdditionalProbingPaths.Add(path);
     }
 
     public static Assembly Resolve(object sender, ResolveEventArgs eventArgs)
