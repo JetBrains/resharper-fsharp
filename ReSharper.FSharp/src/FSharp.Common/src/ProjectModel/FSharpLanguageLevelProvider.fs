@@ -2,11 +2,13 @@
 
 open System
 open System.Collections.Concurrent
+open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
+open JetBrains.RdBackend.Common.Features.ProjectModel.View.EditProperties.Projects.MsBuild.Extensions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Impl
@@ -142,11 +144,33 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
 
     override this.GetOverriddenLanguageLevelFromSettings _ = Nullable()
 
-    override this.IsAvailable(_: FSharpLanguageVersion, _: IProject, _: TargetFrameworkId): bool = failwith "todo"
-    override this.TryParseCompilationOption _ = failwith "todo"
-    override this.ConvertToCompilationOption _ = failwith "todo"
+    override this.IsAvailable(languageVersion: FSharpLanguageVersion, project: IProject,
+            targetFrameworkId: TargetFrameworkId) =
+        if languageVersion = FSharpLanguageVersion.Default then true else
+
+        let latestAvailableLanguageLevel = this.GetLatestAvailableLanguageLevel(project, targetFrameworkId)
+
+        match languageVersion with
+        | FSharpLanguageVersion.Latest
+        | FSharpLanguageVersion.LatestMajor
+        | FSharpLanguageVersion.Preview -> latestAvailableLanguageLevel >= FSharpLanguageLevel.FSharp47
+        | _ ->
+
+        let languageLevel = this.ConvertToLanguageLevel(languageVersion, project, targetFrameworkId)
+        languageLevel <= latestAvailableLanguageLevel
+
+    override this.TryParseCompilationOption(version) =
+        FSharpLanguageVersion.tryParseCompilationOption FSharpLanguageVersion.Default version
+        |> Option.toNullable
+
+    override this.ConvertToCompilationOption(version: FSharpLanguageVersion) =
+        FSharpLanguageVersion.toCompilerOptionValue version
+
     override this.SetOverridenLanguageLevelInSettings(_, _) = failwith "todo"
-    override this.GetPresentation(_, _, _, _) = failwith "todo"
+
+    override this.GetPresentation(version, _, _, _) =
+        FSharpLanguageVersion.toString version
+
     override this.GetLatestAvailableLanguageLevel _ = failwith "todo"
 
 [<SolutionFeaturePart>]
@@ -177,3 +201,23 @@ type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProp
         member this.IsAvailable(_: FSharpLanguageVersion, _: IPsiModule): bool = failwith "todo"
         member this.LanguageLevelOverrider = failwith "todo"
         member this.LanguageVersionModifier = failwith "todo"
+
+[<ShellFeaturePart>]
+type FSharpLanguageSpecificItemsProvider() =
+    inherit LanguageSpecificItemsProviderBase<FSharpLanguageVersion, FSharpLanguageLevel>()
+
+    static let specialVersions =
+        [| FSharpLanguageVersion.Default
+           FSharpLanguageVersion.LatestMajor
+           FSharpLanguageVersion.Latest
+           FSharpLanguageVersion.Preview |]
+
+    override this.IsApplicable(project: IProject) =
+        project.ProjectProperties :? FSharpProjectProperties && base.IsApplicable(project)
+
+    override this.GetAvailableLanguageVersions(projectProperty, project, targetFrameworkId) =
+        EnumEx.GetValues<FSharpLanguageVersion>()
+        |> Seq.filter (fun version -> not (Array.contains version specialVersions))
+        |> Seq.filter (fun version -> projectProperty.IsAvailable(version, project, targetFrameworkId))
+        |> Seq.append specialVersions
+        |> Seq.toList :> _
