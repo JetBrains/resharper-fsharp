@@ -19,11 +19,11 @@ do()
 type IFSharpTestsZone =
     inherit ITestsEnvZone
 
-[<ZoneActivator>]
+[<ZoneActivator(Lifecycle.DemandReclaimable, Creation.AnyThread, Access.AnyThread)>]
 type PsiFeatureTestZoneActivator() =
     interface IActivate<PsiFeatureTestZone>
 
-[<ZoneActivator>]
+[<ZoneActivator(Lifecycle.DemandReclaimable, Creation.AnyThread, Access.AnyThread)>]
 type FSharpZoneActivator() =
     interface IActivate<ILanguageFSharpZone>
 

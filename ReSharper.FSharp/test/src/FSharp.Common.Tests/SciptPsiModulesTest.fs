@@ -95,7 +95,7 @@ type MyTestSolutionToolset(lifetime: Lifetime, logger: ILogger) =
         member x.GetBuildTool() = buildTool
         member x.Changed = changed :> _
 
-[<ZoneActivator>]
+[<ZoneActivator(Lifecycle.DemandReclaimable, Creation.AnyThread, Access.AnyThread)>]
 type SolutionHostZoneActivator() =
     interface IActivate<IHostSolutionZone>
 
