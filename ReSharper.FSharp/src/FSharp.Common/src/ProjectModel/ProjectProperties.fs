@@ -42,7 +42,7 @@ type FSharpProjectConfiguration() as this =
         let fsConfiguration = otherConfiguration.As<IFSharpProjectConfiguration>()
         if isNull fsConfiguration then false else
 
-        fsConfiguration.LanguageVersion <- fsConfiguration.LanguageVersion
+        configuration.LanguageVersion <- fsConfiguration.LanguageVersion
         base.UpdateFrom(otherConfiguration)
 
 
@@ -52,12 +52,12 @@ type FSharpProjectProperties =
     val mutable targetPlatformData: TargetPlatformData
     val buildSettings: FSharpBuildSettings
 
-    new(projectTypeGuids: ICollection<_>, factoryGuid, targetFrameworkIds, targetPlatformData, dotNetCoreSDK) =
+    new (projectTypeGuids: ICollection<_>, factoryGuid, targetFrameworkIds, targetPlatformData, dotNetCoreSDK) =
         { inherit ProjectPropertiesBase<_>(projectTypeGuids, factoryGuid, targetFrameworkIds, dotNetCoreSDK)
           buildSettings = FSharpBuildSettings()
           targetPlatformData = targetPlatformData }
 
-    new(factoryGuid, [<Optional; DefaultParameterValue(null: TargetPlatformData)>] targetPlatformData) =
+    new (factoryGuid, [<Optional; DefaultParameterValue(null: TargetPlatformData)>] targetPlatformData) =
         { inherit ProjectPropertiesBase<_>(factoryGuid)
           buildSettings = FSharpBuildSettings()
           targetPlatformData = targetPlatformData }
@@ -107,6 +107,11 @@ and FSharpBuildSettings() =
 
         base.Dump(writer, indent)
 
+    override this.UpdateFrom(settings) =
+        match settings with
+        | :? FSharpBuildSettings -> base.UpdateFrom(settings)
+        | _ -> false
+
 
 [<ShellComponent>]
 type FSharpProjectApplicableProvider() =
@@ -142,7 +147,7 @@ type FSharpProjectPropertiesFactory() =
 
     override x.CreateProjectProperties(parameters) =
         FSharpProjectProperties(parameters.ProjectTypeGuids, factoryGuid, parameters.TargetFrameworkIds,
-                                parameters.TargetPlatformData, parameters.DotNetCorePlatform) :> _
+            parameters.TargetPlatformData, parameters.DotNetCorePlatform) :> _
 
     static member CreateProjectProperties(targetFrameworkIds): IProjectProperties =
         FSharpProjectProperties(projectTypeGuids, factoryGuid, targetFrameworkIds, null, null) :> _
