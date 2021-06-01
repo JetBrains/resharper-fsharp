@@ -369,4 +369,13 @@
     <QuickFix>RemoveConstructorFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="InstanceMemberRequiresTarget">
+    <Parameter type="IMemberDeclaration" name="memberDecl"/>
+    <Message value="Instance member requires a parameter to represent the object"/>
+    <Range>memberDecl.Identifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddInstanceMemberSelfIdFix</QuickFix>
+    <QuickFix>ToStaticMemberFix</QuickFix>
+  </Error>
+
 </Errors>

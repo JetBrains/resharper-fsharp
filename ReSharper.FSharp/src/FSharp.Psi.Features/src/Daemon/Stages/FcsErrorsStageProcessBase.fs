@@ -60,6 +60,7 @@ module FSharpErrors =
     let [<Literal>] LetAndForNonRecBindings = 576
     let [<Literal>] ExpectedExpressionAfterLet = 588
     let [<Literal>] SuccessiveArgsShouldBeSpacedOrTupled = 597
+    let [<Literal>] InstanceMemberRequiresTarget = 673
     let [<Literal>] ConstructRequiresListArrayOrSequence = 747
     let [<Literal>] ConstructRequiresComputationExpression = 748
     let [<Literal>] FieldRequiresAssignment = 764
@@ -307,6 +308,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | SuccessiveArgsShouldBeSpacedOrTupled ->
             createHighlightingFromNode SuccessiveArgsShouldBeSpacedOrTupledError range
+
+        | InstanceMemberRequiresTarget ->
+            match fsFile.GetNode<IMemberDeclaration>(range) with
+            | null -> null
+            | memberDecl -> InstanceMemberRequiresTargetError(memberDecl) :> _
 
         | ConstructRequiresListArrayOrSequence ->
             createHighlightingFromNode YieldRequiresSeqExpressionError range

@@ -23,4 +23,4 @@ type UseWildSelfIdFix(warning: UseWildSelfIdWarning) =
         use disableFormatter = new DisableCodeFormatter()
 
         let factory = selfId.CreateElementFactory()
-        ModificationUtil.ReplaceChild(selfId, factory.CreateWildSelfId()) |> ignore
+        ModificationUtil.ReplaceChild(selfId, factory.CreateSelfId("_")) |> ignore

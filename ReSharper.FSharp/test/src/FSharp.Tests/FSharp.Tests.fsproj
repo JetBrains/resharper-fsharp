@@ -100,6 +100,8 @@
     <Compile Include="QuickFixes\UseWildSelfIdTest.fs" />
     <Compile Include="QuickFixes\ReplaceWithPredefinedOperatorTest.fs" />
     <Compile Include="QuickFixes\RemoveCtorTest.fs" />
+    <Compile Include="QuickFixes\AddInstanceMemberSelfIdTest.fs" />
+    <Compile Include="QuickFixes\ToStaticMemberTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

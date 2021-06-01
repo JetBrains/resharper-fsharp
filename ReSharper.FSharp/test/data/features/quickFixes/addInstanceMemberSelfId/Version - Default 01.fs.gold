@@ -1,0 +1,4 @@
+﻿module Say
+
+type T() =
+    member _.{caret}M() = ()

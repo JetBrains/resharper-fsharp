@@ -109,10 +109,10 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let binding = letBindings.Bindings.First()
             binding.HeadPattern :?> _
 
-        member x.CreateWildSelfId() =
-            let typeDecl = getTypeDecl "member _.P = 1"
+        member x.CreateSelfId(name: string) =
+            let typeDecl = getTypeDecl $"member {name}.P = 1"
             let memberDecl = typeDecl.TypeMembers.[0] :?> IMemberDeclaration
-            memberDecl.SelfId :?> IWildSelfId
+            memberDecl.SelfId
 
         member x.CreateIgnoreApp(expr, newLine) =
             let source = "() |> ignore"

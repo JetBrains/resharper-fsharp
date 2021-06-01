@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IOpenStatement CreateOpenStatement(string ns);
 
     IWildPat CreateWildPat();
-    IWildSelfId CreateWildSelfId();
+    IMemberSelfId CreateSelfId(string name);
 
     IParenExpr CreateParenExpr();
     IConstExpr CreateConstExpr(string text);
