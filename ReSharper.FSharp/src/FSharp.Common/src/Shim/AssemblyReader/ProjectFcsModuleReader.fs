@@ -86,24 +86,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             usedNamesToTypes.Add(shortName, currentTypeName) |> ignore
             typeUsedNames.Add(currentTypeName, shortName) |> ignore
 
-    let assemblyRefs = ConcurrentDictionary<AssemblyNameInfo, ILScopeRef>()
-
-    /// References to types in the same module.
-    let localTypeRefs = ConcurrentDictionary<IClrTypeName, ILTypeRef>()
-
-    /// References to types in a different assemblies (currently keyed by primary psi module).
-    let assemblyTypeRefs = ConcurrentDictionary<IPsiModule, ConcurrentDictionary<IClrTypeName, ILTypeRef>>()
-
-    let getAssemblyTypeRefCache (targetModule: IPsiModule) =
-        let mutable cache = Unchecked.defaultof<_>
-        match assemblyTypeRefs.TryGetValue(targetModule, &cache) with
-        | true -> cache
-        | _ ->
-
-        let cache = ConcurrentDictionary()
-        assemblyTypeRefs.[targetModule] <- cache
-        cache
-
     let isDll (project: IProject) (targetFrameworkId: TargetFrameworkId) =
         let projectProperties = project.ProjectProperties
         match projectProperties.ActiveConfigurations.TryGetConfiguration(targetFrameworkId) with
@@ -190,12 +172,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let getAssemblyScopeRef (assemblyName: AssemblyNameInfo): ILScopeRef =
         let mutable scopeRef = Unchecked.defaultof<_>
-        match assemblyRefs.TryGetValue(assemblyName, &scopeRef) with
+        match cache.AssemblyRefs.TryGetValue(assemblyName, &scopeRef) with
         | true -> scopeRef
         | _ ->
 
         let assemblyRef = ILScopeRef.Assembly(createAssemblyScopeRef assemblyName)
-        assemblyRefs.[assemblyName] <- assemblyRef
+        cache.AssemblyRefs.[assemblyName] <- assemblyRef
         assemblyRef
 
     let mkILScopeRef (targetModule: IPsiModule): ILScopeRef =
@@ -209,57 +191,66 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         getAssemblyScopeRef assemblyName
 
-    let mkTypeRef (typeElement: ITypeElement) =
+    
+    let internTypeRef (typeRefCache: IDictionary<_, _>) scopeRef (clrTypeName: IClrTypeName) enclosing name =
+        let typeRef = ILTypeRef.Create(scopeRef, enclosing, name)
+        typeRefCache.[clrTypeName.GetPersistent()] <- typeRef
+        typeRef
+
+    let internTypeRefAtScope typeRefCache scopeRef clrTypeName (typeRef: ILTypeRef) =
+        internTypeRef typeRefCache scopeRef clrTypeName typeRef.Enclosing typeRef.Name
+
+    let createTypeRef typeRefCache scopeRef (typeElement: ITypeElement) (clrTypeName: IClrTypeName) =
+        let containingType = typeElement.GetContainingType()
+
+        let enclosingTypes =
+            match containingType with
+            | null -> []
+            | _ ->
+
+            let enclosingTypeNames =
+                containingType.GetClrName().TypeNames
+                |> List.ofSeq
+                |> List.map ProjectFcsModuleReader.mkNameFromTypeNameAndParamsNumber
+
+            // The namespace is later split back by FCS during module import.
+            // todo: rewrite this in FCS: add extension point, provide split namespaces
+            let ns = clrTypeName.GetNamespaceName()
+            if ns.IsEmpty() then enclosingTypeNames else
+
+            match enclosingTypeNames with
+            | hd :: tl -> String.Concat(ns, ".", hd) :: tl
+            | [] -> failwithf $"mkTypeRef: {clrTypeName}"
+
+        let name =
+            match containingType with
+            | null -> clrTypeName.FullName
+            | _ -> ProjectFcsModuleReader.mkNameFromClrTypeName clrTypeName
+
+        internTypeRef typeRefCache scopeRef clrTypeName enclosingTypes name
+
+    let mkTypeRef (typeElement: ITypeElement): ILTypeRef =
         let clrTypeName = typeElement.GetClrName()
         let targetModule = typeElement.Module
+        let isLocalRef = psiModule == targetModule
 
         recordUsedType typeElement
 
         let typeRefCache =
-            if psiModule == targetModule then localTypeRefs else
-            getAssemblyTypeRefCache targetModule
+            if isLocalRef then cache.LocalTypeRefs else cache.GetOrCreateAssemblyTypeRefCache(targetModule)
 
         let mutable typeRef = Unchecked.defaultof<_>
-        match typeRefCache.TryGetValue(clrTypeName, &typeRef) with
-        | true -> typeRef
-        | _ ->
+        if typeRefCache.TryGetValue(clrTypeName, &typeRef) then typeRef else
+
+        if isLocalRef && cache.TryGetAssemblyTypeRef(psiModule, clrTypeName, &typeRef) then
+            internTypeRefAtScope typeRefCache ILScopeRef.Local clrTypeName typeRef else
 
         let scopeRef = mkILScopeRef targetModule
 
-        let typeRef =
-            if psiModule != targetModule && localTypeRefs.TryGetValue(clrTypeName, &typeRef) then
-                ILTypeRef.Create(scopeRef, typeRef.Enclosing, typeRef.Name) else
+        if not isLocalRef && cache.LocalTypeRefs.TryGetValue(clrTypeName, &typeRef) then
+            internTypeRefAtScope typeRefCache scopeRef clrTypeName typeRef else
 
-            let containingType = typeElement.GetContainingType()
-
-            let enclosingTypes =
-                match containingType with
-                | null -> []
-                | _ ->
-
-                let enclosingTypeNames =
-                    containingType.GetClrName().TypeNames
-                    |> List.ofSeq
-                    |> List.map ProjectFcsModuleReader.mkNameFromTypeNameAndParamsNumber
-
-                // The namespace is later split back by FCS during module import.
-                // todo: rewrite this in FCS: add extension point, provide split namespaces
-                let ns = clrTypeName.GetNamespaceName()
-                if ns.IsEmpty() then enclosingTypeNames else
-
-                match enclosingTypeNames with
-                | hd :: tl -> String.Concat(ns, ".", hd) :: tl
-                | [] -> failwithf $"mkTypeRef: {clrTypeName}"
-
-            let name =
-                match containingType with
-                | null -> clrTypeName.FullName
-                | _ -> ProjectFcsModuleReader.mkNameFromClrTypeName clrTypeName
-
-            ILTypeRef.Create(scopeRef, enclosingTypes, name)
-
-//        typeRefCache.[clrTypeName.GetPersistent()] <- typeRef
-        typeRef
+        createTypeRef typeRefCache scopeRef typeElement clrTypeName
 
     // todo: per-typedef cache
     let getGlobalIndex (typeParameter: ITypeParameter) =
