@@ -103,8 +103,8 @@ type FSharpLanguageLevelAttribute(languageLevel: FSharpLanguageLevel) =
 
 
 [<SolutionComponent>]
-type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider) =
-    inherit FSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider)
+type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim) =
+    inherit FSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim)
 
     override x.Invalidate _ =
         x.PsiModulesCaches.Clear()

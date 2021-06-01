@@ -5,6 +5,7 @@ open System.Collections.Concurrent
 open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.Application.changes
+open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.Metadata.Reader.API
@@ -207,9 +208,13 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         result <- reader
         true
 
+    let moduleInvalidated = new Signal<IPsiModule>(lifetime, "AssemblyReaderShim.ModuleInvalidated")
+
     // todo: invalidate for particular referencing module only?
     let invalidateDirtyDependencies () =
         Assertion.Assert(locker.IsWriteLockHeld, "locker.IsWriteLockHeld")
+
+        let invalidatedModules = HashSet()
 
         for dirtyModule in dirtyTypesInModules.Keys do
             let mutable dirtyModuleReader = Unchecked.defaultof<_>
@@ -226,6 +231,9 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                     referencingModuleReader.InvalidateReferencingTypes(typeName.ShortName)
 
                 referencingModuleReader.InvalidateTypesReferencingFSharpModule(dirtyModule)
+
+                if invalidatedModules.Add(referencingModule) then
+                    moduleInvalidated.Fire(referencingModule)
 
         dirtyTypesInModules.Clear()
 
@@ -249,6 +257,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     abstract DebugReadRealAssemblies: bool
     default this.DebugReadRealAssemblies = false
+
+    member val ModuleInvalidated = moduleInvalidated
 
     override this.GetLastWriteTime(path) =
         if not (this.IsEnabled && AssemblyReaderShim.isAssembly path) then base.GetLastWriteTime(path) else

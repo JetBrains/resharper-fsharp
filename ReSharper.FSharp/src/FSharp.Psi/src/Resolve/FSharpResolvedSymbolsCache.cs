@@ -9,6 +9,7 @@ using JetBrains.DocumentManagers.impl;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Files.SandboxFiles;
@@ -29,13 +30,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
 
     public FSharpResolvedSymbolsCache(Lifetime lifetime, FcsCheckerService checkerService, IPsiModules psiModules,
-      IFcsProjectProvider fcsProjectProvider)
+      IFcsProjectProvider fcsProjectProvider, AssemblyReaderShim assemblyReaderShim)
     {
       PsiModules = psiModules;
       CheckerService = checkerService;
       FcsProjectProvider = fcsProjectProvider;
 
       fcsProjectProvider.ModuleInvalidated.Advise(lifetime, Invalidate);
+      assemblyReaderShim.ModuleInvalidated.Advise(lifetime, Invalidate);
     }
 
     private static bool IsApplicable(IPsiSourceFile sourceFile) =>
@@ -48,6 +50,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         PsiModulesCaches.Remove(psiModule);
         if (psiModule.IsValid())
           InvalidateReferencingModules(psiModule);
+        else
+          PsiModulesCaches.Remove(psiModule);
       }
     }
 
@@ -56,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (PsiModulesCaches.IsEmpty())
         return;
 
-      // todo: reuse FcsProjectProvider references
+      // todo: reuse FcsProjectProvider/AssemblyReaderShim references
       using (CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule()))
       {
         var resolveContext = CompilationContextCookie.GetContext();
