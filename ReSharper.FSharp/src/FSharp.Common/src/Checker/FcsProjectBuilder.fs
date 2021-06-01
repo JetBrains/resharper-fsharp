@@ -198,28 +198,13 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
               UnresolvedReferences = None
               Stamp = None }
 
-        let hasFSharpCoreReference options =
-            options.OtherOptions
-            |> Seq.exists (fun s ->
-                s.StartsWith("-r:", StringComparison.Ordinal) &&
-                s.EndsWith("FSharp.Core.dll", StringComparison.Ordinal))
-
-        let shouldAddFSharpCore options =
-            not (hasFSharpCoreReference options || options.OtherOptions |> Array.contains "--compiling-fslib")
-
-        let options =
-            if shouldAddFSharpCore projectOptions then
-                { projectOptions with
-                    OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore projectOptions.OtherOptions }
-            else projectOptions
-
         let parsingOptions, errors =
-            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray options.OtherOptions)
+            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
 
         let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalCompilationDefines
 
         let parsingOptions = { parsingOptions with
-                                    SourceFiles = options.SourceFiles
+                                    SourceFiles = projectOptions.SourceFiles
                                     ConditionalCompilationDefines = defines }
 
         if not errors.IsEmpty then
