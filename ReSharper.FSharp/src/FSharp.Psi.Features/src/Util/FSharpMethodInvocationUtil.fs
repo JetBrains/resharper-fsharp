@@ -36,7 +36,7 @@ let getArgsOwner (expr: IFSharpExpression) =
     FSharpArgumentOwnerNavigator.GetByArgumentExpression(exprContext.IgnoreParentParens())
 
 let getMatchingParameter (expr: IFSharpExpression) =
-    let argsOwner = getArgsOwner(expr)
+    let argsOwner = getArgsOwner expr
     if isNull argsOwner then null else
 
     let namedArgRefExpr = tryGetNamedArgRefExpr expr
@@ -58,6 +58,7 @@ let getMatchingParameter (expr: IFSharpExpression) =
     if isNull paramOwner then null else
 
     let param =
+        let parameters = paramOwner.Parameters
         if isNotNull namedArgRefExpr then
             // If this is a named argument, but FCS couldn't match it, try matching ourselves by name
             paramOwner.Parameters
@@ -67,9 +68,15 @@ let getMatchingParameter (expr: IFSharpExpression) =
             | None -> None
             | Some paramIndex ->
 
-            let invokingExtensionMethod = mfv.IsExtensionMember && Some mfv.ApparentEnclosingEntity <> mfv.DeclaringEntity
+            let invokingExtensionMethod =
+                mfv.IsExtensionMember && Some mfv.ApparentEnclosingEntity <> mfv.DeclaringEntity
+
             let offset = if invokingExtensionMethod then 1 else 0
-            Some paramOwner.Parameters.[paramIndex + offset]
+            let paramIndex = paramIndex + offset
+            if paramIndex <= parameters.Count then
+                Some(parameters.[paramIndex])
+            else
+                None
 
     // Skip unnamed parameters
     match param with
