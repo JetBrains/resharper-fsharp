@@ -7,7 +7,7 @@ open JetBrains.TextControl.DocumentMarkup
 [<RequireQualifiedAccess>]
 module FSharpHighlightingAttributeIds =
     let [<Literal>] GroupId = "F#"
-    let [<Literal>] LayerSyntaxPlusOne = 2001 // HighlighterLayer.ADDITIONAL_SYNTAX + 1
+    let [<Literal>] LayerSyntaxPlusOne = 3001 // HighlighterLayer.ADDITIONAL_SYNTAX + 1
     let [<Literal>] VsPriorityPlusOne = 41 // VSPriority.IDENTIFIERS + 1
 
     let [<Literal>] Keyword = "ReSharper F# Keyword"
@@ -123,7 +123,7 @@ type FSharpSettingsNamesProvider() =
       FSharpHighlightingAttributeIds.EscapeCharacter1,
       FallbackAttributeId = DefaultLanguageAttributeIds.STRING_ESCAPE_CHARACTER_1,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
-      Layer = FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
+      Layer = enum FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
       VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
       EffectType = EffectType.TEXT, ForegroundColor = "#FF007F", DarkForegroundColor = "#E07A00");
 
@@ -131,7 +131,7 @@ type FSharpSettingsNamesProvider() =
       FSharpHighlightingAttributeIds.EscapeCharacter2,
       FallbackAttributeId = DefaultLanguageAttributeIds.STRING_ESCAPE_CHARACTER_2,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
-      Layer = FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
+      Layer = enum FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
       VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
       EffectType = EffectType.TEXT, ForegroundColor = "#FF66B2", DarkForegroundColor = "#FF8D1C");
 
@@ -319,7 +319,7 @@ type FSharpSettingsNamesProvider() =
       FallbackAttributeId = DefaultLanguageAttributeIds.MUTABLE_LOCAL_VARIABLE,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Values//Mutable value",
-      Layer = FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
+      Layer = enum FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
       VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
       EffectType = EffectType.TEXT,
       FontStyle = FontStyle.Bold);
