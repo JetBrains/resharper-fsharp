@@ -56,6 +56,11 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``Expr - If 01 - Let``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Indexer - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Indexer - Expr 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Indexer - Range 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Indexer - Range 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Space - Not needed``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Space - Both 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Space - After 01 - Parens``() = x.DoNamedTest()

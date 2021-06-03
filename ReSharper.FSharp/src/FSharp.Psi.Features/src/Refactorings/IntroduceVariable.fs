@@ -142,6 +142,10 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                     getExprToInsertBefore binaryAppExpr.RightArgument
                 | _ -> getExprToInsertBefore leftArgument
 
+        | :? IIndexerArg as indexerArg ->
+            let indexerExpr = ItemIndexerExprNavigator.GetByArg(indexerArg)
+            if isNull indexerExpr then expr else indexerExpr :> _
+
         | :? IFSharpExpression as parentExpr -> getExprToInsertBefore parentExpr
         | _ -> expr
 
