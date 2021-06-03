@@ -81,7 +81,7 @@ let getMatchingParameter (expr: IFSharpExpression) =
 
             let offset = if invokingExtensionMethod then 1 else 0
             let paramIndex = paramIndex + offset
-            if paramIndex <= parameters.Count then
+            if paramIndex < parameters.Count then
                 Some(parameters.[paramIndex])
             else
                 None
