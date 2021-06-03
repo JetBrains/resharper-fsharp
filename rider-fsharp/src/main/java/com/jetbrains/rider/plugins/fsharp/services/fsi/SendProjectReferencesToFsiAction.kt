@@ -12,7 +12,7 @@ import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.isProject
 
-class SendProjectReferencesToFsiAction : ProjectViewActionBase("Send project references", "Send project references") {
+class SendProjectReferencesToFsiAction : ProjectViewActionBase() {
     override fun actionPerformedInternal(entity: ProjectModelEntity, project: Project) {
         val id = entity.getId(project) ?: return
         val fSharpInteractiveHost = project.solution.rdFSharpModel.fSharpInteractiveHost
