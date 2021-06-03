@@ -10,7 +10,9 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 let tryGetNamedArgRefExpr (expr: IFSharpExpression) =
     let binaryAppExpr = expr.As<IBinaryAppExpr>()
     if isNull binaryAppExpr then null else
-    if binaryAppExpr.Operator.Reference.GetName() <> "=" then null else
+
+    let operatorExpr = binaryAppExpr.Operator
+    if isNull operatorExpr || operatorExpr.Reference.GetName() <> "=" then null else
 
     binaryAppExpr.LeftArgument.As<IReferenceExpr>()
 
