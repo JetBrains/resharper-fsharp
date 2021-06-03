@@ -8,7 +8,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class NewExpr
+  internal partial class NewExpr : IFSharpReferenceOwner
   {
     private readonly CachedPsiValue<IList<IArgument>> myParameterArguments = new FileCachedPsiValue<IList<IArgument>>();
     public FSharpSymbolReference Reference { get; private set; }
@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       new ReferenceCollection(Reference);
 
     public IList<IArgument> ParameterArguments => myParameterArguments.GetValue(this,
-      () => this.CalculateParameterArguments(new[] {ArgumentExpression}));
+      () => this.CalculateParameterArguments(new[] { ArgumentExpression }));
 
     public IList<IArgument> Arguments => ParameterArguments.WhereNotNull().ToList();
   }

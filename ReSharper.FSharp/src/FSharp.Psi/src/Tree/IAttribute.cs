@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IAttribute : IFSharpArgumentsOwner
+  public partial interface IAttribute : IFSharpArgumentsOwner, IFSharpReferenceOwner
   {
   }
 }

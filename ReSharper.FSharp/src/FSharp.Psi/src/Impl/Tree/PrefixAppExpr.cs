@@ -13,8 +13,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     private readonly CachedPsiValue<IList<IArgument>> myParameterArguments = new FileCachedPsiValue<IList<IArgument>>();
 
-    public FSharpSymbolReference Reference => InvokedReferenceExpression?.Reference;
-
     public IReferenceExpr InvokedReferenceExpression
     {
       get
@@ -35,8 +33,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public IFSharpIdentifier FSharpIdentifier => InvokedReferenceExpression?.Identifier;
-
-    public IFSharpReferenceOwner SetName(string name) => this;
 
     public FSharpSymbolReference InvokedFunctionReference
     {
@@ -79,8 +75,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IList<IArgument> Arguments => ParameterArguments.Where(arg => arg != null).ToList();
 
     public IList<IArgument> ParameterArguments => myParameterArguments.GetValue(this,
-      () => InvokedReferenceExpression != null
-        ? this.CalculateParameterArguments(AppliedExpressions)
+      () => InvokedReferenceExpression is { } invokedReferenceExpression
+        ? invokedReferenceExpression.CalculateParameterArguments(AppliedExpressions)
         : EmptyList<IArgument>.InstanceList);
   }
 }

@@ -37,6 +37,12 @@ let getArgsOwner (expr: IFSharpExpression) =
     let exprContext = if isNull tupleExpr then expr else tupleExpr :> _
     FSharpArgumentOwnerNavigator.GetByArgumentExpression(exprContext.IgnoreParentParens())
 
+let getReference (fsArgsOwner: IFSharpArgumentsOwner) =
+    match fsArgsOwner with
+    | :? IFSharpReferenceOwner as refOwner -> refOwner.Reference
+    | :? IPrefixAppExpr as prefixAppExpr -> prefixAppExpr.InvokedFunctionReference
+    | _ -> null
+
 let getMatchingParameter (expr: IFSharpExpression) =
     let argsOwner = getArgsOwner expr
     if isNull argsOwner then null else
@@ -50,7 +56,7 @@ let getMatchingParameter (expr: IFSharpExpression) =
 
     if isNotNull namedParam then namedParam else
 
-    let symbolReference = argsOwner.Reference
+    let symbolReference = getReference argsOwner
     if isNull symbolReference then null else
 
     let mfv = symbolReference.GetFSharpSymbol().As<FSharpMemberOrFunctionOrValue>()

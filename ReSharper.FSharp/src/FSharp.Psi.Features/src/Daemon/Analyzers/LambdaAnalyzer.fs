@@ -91,8 +91,10 @@ type LambdaAnalyzer() =
         let appTuple = TupleExprNavigator.GetByExpression(argExpr)
         let app = getArgsOwner argExpr
 
-        app :? IPrefixAppExpr && isNotNull app.Reference &&
-        match app.Reference.GetFSharpSymbol() with
+        let reference = getReference app
+        app :? IPrefixAppExpr && isNotNull reference &&
+
+        match reference.GetFSharpSymbol() with
         | :? FSharpMemberOrFunctionOrValue as m ->
             m.IsMember &&
             let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
