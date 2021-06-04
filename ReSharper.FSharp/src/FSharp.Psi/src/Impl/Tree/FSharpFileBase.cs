@@ -32,7 +32,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       set => myParseResults.SetValue(this, value);
     }
 
-    public FSharpOption<ParsedInput> ParseTree => ParseResults?.Value.ParseTree;
+    public FSharpOption<ParsedInput> ParseTree =>
+      ParseResults?.Value.ParseTree is { } parseTree
+        ? FSharpOption<ParsedInput>.Some(parseTree)
+        : FSharpOption<ParsedInput>.None;
 
     PsiLanguageType IFSharpFileCheckInfoOwner.LanguageType { get; set; }/* = FSharpLanguage.Instance;*/
 
