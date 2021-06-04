@@ -7,7 +7,7 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 {
-  internal class ProvidedAssembliesCache : ProvidedEntitiesCacheBase<ProvidedAssembly>
+  public class ProvidedAssembliesCache : ProvidedEntitiesCacheBase<ProvidedAssembly, int, ProvidedTypeContextHolder>
   {
     private RdProvidedAssemblyProcessModel ProvidedAssembliesProcessModel =>
       TypeProvidersContext.Connection.ProtocolModel.RdProvidedAssemblyProcessModel;
@@ -16,7 +16,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     {
     }
 
-    protected override ProvidedAssembly Create(int key, int typeProviderId, ProvidedTypeContextHolder context)
+    protected override bool KeyHasValue(int key) => key != ProvidedConst.DefaultId;
+
+    protected override ProvidedAssembly Create(int key, int typeProviderId, ProvidedTypeContextHolder parameters)
       => ProxyProvidedAssembly.Create(
         TypeProvidersContext.Connection.ExecuteWithCatch(() =>
           ProvidedAssembliesProcessModel.GetProvidedAssembly.Sync(key)),

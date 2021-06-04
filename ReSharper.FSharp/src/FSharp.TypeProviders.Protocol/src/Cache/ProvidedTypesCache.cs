@@ -7,7 +7,7 @@ using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 {
-  internal class ProvidedTypesCache : ProvidedEntitiesCacheBase<ProxyProvidedType>
+  public class ProvidedTypesCache : ProvidedEntitiesCacheBase<ProxyProvidedType, int, ProvidedTypeContextHolder>
   {
     private RdProvidedTypeProcessModel ProvidedTypeProcessModel =>
       TypeProvidersContext.Connection.ProtocolModel.RdProvidedTypeProcessModel;
@@ -15,6 +15,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     public ProvidedTypesCache(TypeProvidersContext typeProvidersContext) : base(typeProvidersContext)
     {
     }
+
+    protected override bool KeyHasValue(int key) => key != ProvidedConst.DefaultId;
 
     protected override ProxyProvidedType Create(int key, int typeProviderId,
       ProvidedTypeContextHolder context) =>
