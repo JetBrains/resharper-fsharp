@@ -1,0 +1,9 @@
+﻿namespace Ns
+
+module Module =
+
+    open System.Runtime.InteropServices
+
+    [<Optional{caret}>]
+    module Nested = 
+       ()

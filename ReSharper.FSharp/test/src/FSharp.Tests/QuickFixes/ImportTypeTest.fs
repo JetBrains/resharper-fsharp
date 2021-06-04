@@ -1,7 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Intentions.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -22,6 +24,12 @@ type ImportTypeTest() =
 
     [<Test>] member x.``Type arguments - Count 01``() = x.DoNamedTest()
     [<Test>] member x.``Module name - Escaped 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nested Module - Attribute 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Nested Module - Attribute 02 - Prefer nested``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Nested Module - Attribute 03 - Nested modules``() = x.DoNamedTest()
 
     [<Test>] member x.``Qualifiers - Expr - Imported 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Expr - Imported 02 - Nested``() = x.DoNamedTest()

@@ -1,0 +1,7 @@
+﻿namespace Ns
+
+open System.Runtime.InteropServices
+
+[<Optional{caret}>]
+module Module = 
+   ()

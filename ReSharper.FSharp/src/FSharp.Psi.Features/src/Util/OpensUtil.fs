@@ -61,7 +61,13 @@ let rec getModuleToOpen (typeElement: ITypeElement): IClrDeclaredElement =
 
 let findModuleToInsert (fsFile: IFSharpFile) (offset: DocumentOffset) (settings: IContextBoundSettingsStore) =
     if not (settings.GetValue(fun key -> key.TopLevelOpenCompletion)) then
-        fsFile.GetNode<IModuleLikeDeclaration>(offset)
+        match fsFile.GetNode<IModuleLikeDeclaration>(offset) with
+        | :? IDeclaredModuleLikeDeclaration as moduleDecl when
+                let keyword = moduleDecl.ModuleOrNamespaceKeyword
+                isNotNull keyword && keyword.GetTreeStartOffset().Offset < offset.Offset ->
+            moduleDecl :> IModuleLikeDeclaration
+        | moduleDecl ->
+            moduleDecl.GetContainingNode<IModuleLikeDeclaration>()
     else
         match fsFile.GetNode<ITopLevelModuleLikeDeclaration>(offset) with
         | null -> fsFile.GetNode<IAnonModuleDeclaration>(offset) :> _
