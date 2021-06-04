@@ -58,17 +58,15 @@ module FcsProjectProvider =
 type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
         scriptFcsProjectProvider: IScriptFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
-        fsFileService: IFSharpFileService, psiModules: IPsiModules, modulePathProvider: ModulePathProvider,
-        locks: IShellLocks, logger: ILogger) as this =
+        fsFileService: IFSharpFileService, fsItemsContainer: FSharpItemsContainer,
+        modulePathProvider: ModulePathProvider, locks: IShellLocks, logger: ILogger) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let locker = JetFastSemiReenterableRWLock()
 
     let fcsProjects = Dictionary<IPsiModule, FcsProject>()
     let referencedModules = Dictionary<IPsiModule, ReferencedModule>()
-
-    // todo: keep standalone projects
-//    let fcsStandaloneProjects = Dictionary<IPsiModule, FSharpProjectOptions>() // todo
+    let projectsPsiModules = OneToSetMap<IModule, IPsiModule>()
 
     let dirtyModules = HashSet<IPsiModule>()
     let fcsProjectInvalidated = new Signal<IPsiModule>(lifetime, "FcsProjectInvalidated")
@@ -93,12 +91,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         referencedModules.Remove(psiModule) |> ignore
         fcsProjects.Remove(psiModule) |> ignore
-        dirtyModules.Remove(psiModule) |> ignore
 
-        if not (psiModule.IsValid()) then
-            let project = psiModule.ContainingProjectModule.As<IProject>()
-            if isNotNull project then
-                solution.GetComponent<FSharpItemsContainer>().RemoveProject(project)
+        projectsPsiModules.Remove(psiModule.ContainingProjectModule, psiModule) |> ignore
+
+        dirtyModules.Remove(psiModule) |> ignore
 
         // todo: remove removed psiModules? (don't we remove them anyway?) (standalone projects only?)
         logger.Trace("Done invalidating project: {0}", psiModule)
@@ -155,6 +151,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         let fcsProject = { fcsProject with ProjectOptions = fcsProjectOptions }
 
         fcsProjects.[psiModule] <- fcsProject
+        projectsPsiModules.Add(project, psiModule) |> ignore
 
         for referencedPsiModule in referencedProjectPsiModules do
             let referencedModule = referencedModules.GetOrCreateValue(referencedPsiModule, createReferencedModule)
@@ -188,7 +185,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             IsExe = isScript }
 
     let invalidateProject (project: IProject) =
-        for psiModule in psiModules.GetPsiModules(project) do
+        for psiModule in projectsPsiModules.GetValuesSafe(project) do
             dirtyModules.Add(psiModule) |> ignore
 
     member x.FcsProjectInvalidated = fcsProjectInvalidated
@@ -212,6 +209,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
              if project.IsFSharp then
                  if change.ContainsChangeType(invalidateProjectChangeType) then
                      invalidateProject project
+                     
+                     if change.IsRemoved then
+                        fsItemsContainer.RemoveProject(project)
 
                  elif change.IsSubtreeChanged then
                      let mutable invalidate = false
