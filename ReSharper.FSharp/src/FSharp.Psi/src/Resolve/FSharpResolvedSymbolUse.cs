@@ -16,5 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       SymbolUse = symbolUse;
       Range = range;
     }
+
+    public override string ToString() =>
+      SymbolUse.ToString();
   }
 }
