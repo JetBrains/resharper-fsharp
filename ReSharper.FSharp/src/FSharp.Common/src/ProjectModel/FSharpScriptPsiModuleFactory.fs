@@ -15,6 +15,7 @@ open JetBrains.DocumentManagers
 open JetBrains.DocumentManagers.impl
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
+open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
@@ -402,7 +403,7 @@ type FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, moduleId, a
     member x.AddReference(path: FileSystemPath) =
         solution.Locks.AssertWriteAccessAllowed()
         if not (assemblyCookies.ContainsKey(path)) then
-            assemblyCookies.Add(path, assemblyFactory.AddRef(path, moduleId, this.ResolveContext))
+            assemblyCookies.Add(path, assemblyFactory.AddRef(AssemblyLocation(path), moduleId, this.ResolveContext))
 
     member x.RemoveReference(path: FileSystemPath) =
         solution.Locks.AssertWriteAccessAllowed()

@@ -37,7 +37,7 @@ type ModulePathProvider() =
     default this.GetModulePath(psiModule) =
         match psiModule with
         | :? IAssemblyPsiModule as assemblyPsiModule ->
-            assemblyPsiModule.Assembly.Location
+            assemblyPsiModule.Assembly.Location.AssemblyPhysicalPath
 
         | :? IProjectPsiModule as projectPsiModule ->
             projectPsiModule.Project.GetOutputFilePath(projectPsiModule.TargetFrameworkId)
