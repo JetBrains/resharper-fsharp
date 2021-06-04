@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
     }
 
-    public IFSharpFileResolvedSymbols GetResolvedSymbols(IPsiSourceFile sourceFile) =>
-      EmptyFileResolvedSymbols.Instance;
+    public IFcsFileResolvedSymbols GetResolvedSymbols(IPsiSourceFile sourceFile) =>
+      EmptyFcsFileResolvedSymbols.Instance;
   }
 }

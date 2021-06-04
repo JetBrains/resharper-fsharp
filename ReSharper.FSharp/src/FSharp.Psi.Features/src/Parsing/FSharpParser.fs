@@ -15,7 +15,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 
 type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sourceFile: IPsiSourceFile,
-        checkerService: FcsCheckerService, symbolsCache: IFSharpResolvedSymbolsCache) =
+        checkerService: FcsCheckerService, symbolsCache: IFcsResolvedSymbolsCache) =
 
     let tryCreateTreeBuilder lexer lifetime =
         Option.map (fun (parseResults: FSharpParseFileResults) ->

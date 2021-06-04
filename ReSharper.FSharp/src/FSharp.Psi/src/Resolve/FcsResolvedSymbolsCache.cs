@@ -20,7 +20,7 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   [SolutionComponent]
-  public class FSharpResolvedSymbolsCache : IPsiSourceFileCache, IFSharpResolvedSymbolsCache
+  public class FcsResolvedSymbolsCache : IPsiSourceFileCache, IFcsResolvedSymbolsCache
   {
     public IPsiModules PsiModules { get; }
     public FcsCheckerService CheckerService { get; }
@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly object myLock = new object();
     private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
 
-    public FSharpResolvedSymbolsCache(Lifetime lifetime, FcsCheckerService checkerService, IPsiModules psiModules,
+    public FcsResolvedSymbolsCache(Lifetime lifetime, FcsCheckerService checkerService, IPsiModules psiModules,
       IFcsProjectProvider fcsProjectProvider, AssemblyReaderShim assemblyReaderShim)
     {
       PsiModules = psiModules;
@@ -170,7 +170,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     protected readonly IDictionary<IPsiModule, FSharpModuleResolvedSymbols> PsiModulesCaches =
       new Dictionary<IPsiModule, FSharpModuleResolvedSymbols>();
 
-    private IFSharpFileResolvedSymbols GetOrCreateResolvedSymbols(IPsiSourceFile sourceFile) =>
+    private IFcsFileResolvedSymbols GetOrCreateResolvedSymbols(IPsiSourceFile sourceFile) =>
       GetModuleResolvedSymbols(sourceFile).GetResolvedSymbols(sourceFile);
 
     [NotNull]
@@ -206,10 +206,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public FSharpSymbolUse GetSymbolDeclaration(IPsiSourceFile sourceFile, int offset) =>
       GetOrCreateResolvedSymbols(sourceFile).GetSymbolDeclaration(offset);
 
-    public IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols(IPsiSourceFile sourceFile) =>
+    public IReadOnlyList<FcsResolvedSymbolUse> GetAllDeclaredSymbols(IPsiSourceFile sourceFile) =>
       GetOrCreateResolvedSymbols(sourceFile).GetAllDeclaredSymbols();
 
-    public IReadOnlyList<FSharpResolvedSymbolUse> GetAllResolvedSymbols(IPsiSourceFile sourceFile) =>
+    public IReadOnlyList<FcsResolvedSymbolUse> GetAllResolvedSymbols(IPsiSourceFile sourceFile) =>
       GetOrCreateResolvedSymbols(sourceFile).GetAllResolvedSymbols();
 
     public FSharpSymbol GetSymbol(IPsiSourceFile sourceFile, int offset) =>

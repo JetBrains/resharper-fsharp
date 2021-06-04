@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     [NotNull] FcsCheckerService FcsCheckerService { get; set; }
 
-    [NotNull] IFSharpResolvedSymbolsCache ResolvedSymbolsCache { get; set; }
+    [NotNull] IFcsResolvedSymbolsCache ResolvedSymbolsCache { get; set; }
 
     [CanBeNull] FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
 
@@ -35,10 +35,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     FSharpSymbol GetSymbol(int offset);
 
     [NotNull]
-    IReadOnlyList<FSharpResolvedSymbolUse> GetAllResolvedSymbols(FSharpCheckFileResults checkResults = null);
+    IReadOnlyList<FcsResolvedSymbolUse> GetAllResolvedSymbols(FSharpCheckFileResults checkResults = null);
 
     [NotNull]
-    IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null);
+    IReadOnlyList<FcsResolvedSymbolUse> GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null);
 
     /// Documents are currently used in F# files parsing for getting line index info.
     /// This property is only set in FSharpElementFactory to make the document accessible without having source file

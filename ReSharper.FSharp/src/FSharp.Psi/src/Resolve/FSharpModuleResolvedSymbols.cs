@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   public class FSharpModuleResolvedSymbols : IFSharpModuleResolvedSymbols
   {
-    private readonly FSharpFileResolvedSymbols[] myFileResolvedSymbols;
+    private readonly FcsFileResolvedSymbols[] myFileResolvedSymbols;
 
     public IPsiModule PsiModule { get; }
     public FcsCheckerService CheckerService { get; }
@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public FSharpModuleResolvedSymbols(IPsiModule psiModule, int filesCount, FcsCheckerService checkerService,
       IFcsProjectProvider fcsProjectProvider)
     {
-      myFileResolvedSymbols = new FSharpFileResolvedSymbols[filesCount];
+      myFileResolvedSymbols = new FcsFileResolvedSymbols[filesCount];
 
       PsiModule = psiModule;
       CheckerService = checkerService;
@@ -39,13 +39,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       }
     }
 
-    private FSharpFileResolvedSymbols TryGetResolvedSymbols(int fileIndex)
+    private FcsFileResolvedSymbols TryGetResolvedSymbols(int fileIndex)
     {
       using (myLock.UsingReadLock())
         return myFileResolvedSymbols[fileIndex];
     }
 
-    public IFSharpFileResolvedSymbols GetResolvedSymbols(IPsiSourceFile sourceFile)
+    public IFcsFileResolvedSymbols GetResolvedSymbols(IPsiSourceFile sourceFile)
     {
       var fileIndex = FcsProjectProvider.GetFileIndex(sourceFile);
       var fileResolvedSymbols = TryGetResolvedSymbols(fileIndex);
@@ -58,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         if (fileResolvedSymbols != null)
           return fileResolvedSymbols;
 
-        fileResolvedSymbols = new FSharpFileResolvedSymbols(sourceFile, CheckerService);
+        fileResolvedSymbols = new FcsFileResolvedSymbols(sourceFile, CheckerService);
         myFileResolvedSymbols[fileIndex] = fileResolvedSymbols;
       }
 

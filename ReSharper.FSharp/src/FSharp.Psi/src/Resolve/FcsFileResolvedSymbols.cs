@@ -23,7 +23,7 @@ using PrettyNaming = FSharp.Compiler.Syntax.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
-  public class FSharpFileResolvedSymbols : IFSharpFileResolvedSymbols
+  public class FcsFileResolvedSymbols : IFcsFileResolvedSymbols
   {
     private const string OpName = "FSharpFileResolvedSymbols";
 
@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     [NotNull] public IPsiSourceFile SourceFile { get; }
     [NotNull] public FcsCheckerService CheckerService { get; }
 
-    public FSharpFileResolvedSymbols([NotNull] IPsiSourceFile sourceFile, [NotNull] FcsCheckerService checkerService)
+    public FcsFileResolvedSymbols([NotNull] IPsiSourceFile sourceFile, [NotNull] FcsCheckerService checkerService)
     {
       SourceFile = sourceFile;
       CheckerService = checkerService;
@@ -70,13 +70,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return resolvedSymbols.Declarations.TryGetValue(offset)?.SymbolUse;
     }
 
-    public IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols()
+    public IReadOnlyList<FcsResolvedSymbolUse> GetAllDeclaredSymbols()
     {
       var resolvedSymbols = GetResolvedSymbols();
       return resolvedSymbols.Declarations.Values.AsChunkIReadOnlyList();
     }
 
-    public IReadOnlyList<FSharpResolvedSymbolUse> GetAllResolvedSymbols()
+    public IReadOnlyList<FcsResolvedSymbolUse> GetAllResolvedSymbols()
     {
       var resolvedSymbols = GetResolvedSymbols();
       return resolvedSymbols.Uses.Values.AsChunkIReadOnlyList();
@@ -168,12 +168,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
               var (caseStart, caseEnd) = caseDeclaration.GetTreeTextRange();
               var caseStartOffset = caseStart.Offset;
               var caseTextRange = new TextRange(caseStartOffset, caseEnd.Offset);
-              resolvedSymbols.Declarations[caseStartOffset] = new FSharpResolvedSymbolUse(symbolUse, caseTextRange);
+              resolvedSymbols.Declarations[caseStartOffset] = new FcsResolvedSymbolUse(symbolUse, caseTextRange);
               continue;
             }
 
             var caseUseInBindingRange = new TextRange(startOffset, endOffset);
-            resolvedSymbols.Uses[startOffset] = new FSharpResolvedSymbolUse(symbolUse, caseUseInBindingRange);
+            resolvedSymbols.Uses[startOffset] = new FcsResolvedSymbolUse(symbolUse, caseUseInBindingRange);
             continue;
           }
           else
@@ -188,7 +188,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             : FixRange(startOffset, endOffset, null, buffer, lexer);
           startOffset = textRange.StartOffset;
 
-          resolvedSymbols.Declarations[startOffset] = new FSharpResolvedSymbolUse(symbolUse, textRange);
+          resolvedSymbols.Declarations[startOffset] = new FcsResolvedSymbolUse(symbolUse, textRange);
           resolvedSymbols.Uses.Remove(startOffset);
         }
         else
@@ -243,7 +243,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
                 existingSymbol.SymbolUse.Symbol is FSharpEntity && !isCtor)
               continue;
 
-            resolvedSymbols.Uses[startOffset] = new FSharpResolvedSymbolUse(symbolUse, nameRange);
+            resolvedSymbols.Uses[startOffset] = new FcsResolvedSymbolUse(symbolUse, nameRange);
           }
 
           if (symbolUse.IsFromPattern)
@@ -302,13 +302,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       public static readonly ResolvedSymbols Empty = new ResolvedSymbols();
 
-      [NotNull] internal readonly CompactMap<int, FSharpResolvedSymbolUse> Declarations;
-      [NotNull] internal readonly CompactMap<int, FSharpResolvedSymbolUse> Uses;
+      [NotNull] internal readonly CompactMap<int, FcsResolvedSymbolUse> Declarations;
+      [NotNull] internal readonly CompactMap<int, FcsResolvedSymbolUse> Uses;
 
       public ResolvedSymbols(int symbolUsesCount = 0)
       {
-        Declarations = new CompactMap<int, FSharpResolvedSymbolUse>(symbolUsesCount / 4);
-        Uses = new CompactMap<int, FSharpResolvedSymbolUse>(symbolUsesCount);
+        Declarations = new CompactMap<int, FcsResolvedSymbolUse>(symbolUsesCount / 4);
+        Uses = new CompactMap<int, FcsResolvedSymbolUse>(symbolUsesCount);
       }
     }
 

@@ -31,7 +31,7 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
 
     let getSymbolsCache (psiModule: IPsiModule) =
         if isNull psiModule then null else
-        psiModule.GetSolution().GetComponent<IFSharpResolvedSymbolsCache>()
+        psiModule.GetSolution().GetComponent<IFcsResolvedSymbolsCache>()
 
     override x.IsCaseSensitive = true
     override x.SupportTypeMemberCache = true

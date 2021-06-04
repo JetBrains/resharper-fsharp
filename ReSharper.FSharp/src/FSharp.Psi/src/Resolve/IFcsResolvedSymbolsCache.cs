@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
-  public interface IFSharpResolvedSymbolsCache
+  public interface IFcsResolvedSymbolsCache
   {
     [CanBeNull]
     FSharpSymbolUse GetSymbolUse(IPsiSourceFile sourceFile, int offset);
@@ -15,10 +15,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     FSharpSymbolUse GetSymbolDeclaration(IPsiSourceFile sourceFile, int offset);
 
     [NotNull]
-    IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols(IPsiSourceFile sourceFile);
+    IReadOnlyList<FcsResolvedSymbolUse> GetAllDeclaredSymbols(IPsiSourceFile sourceFile);
 
     [NotNull]
-    IReadOnlyList<FSharpResolvedSymbolUse> GetAllResolvedSymbols(IPsiSourceFile sourceFile);
+    IReadOnlyList<FcsResolvedSymbolUse> GetAllResolvedSymbols(IPsiSourceFile sourceFile);
 
     [CanBeNull]
     FSharpSymbol GetSymbol(IPsiSourceFile sourceFile, int offset);

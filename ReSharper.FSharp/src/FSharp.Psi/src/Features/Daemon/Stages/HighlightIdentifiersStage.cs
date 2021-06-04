@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
     public HighlightIdentifiersStageProcess([NotNull] IFSharpFile fsFile, [NotNull] IDaemonProcess process)
       : base(fsFile, process) => myDocument = process.Document;
 
-    private void AddHighlightings(IEnumerable<FSharpResolvedSymbolUse> symbolsUses,
+    private void AddHighlightings(IEnumerable<FcsResolvedSymbolUse> symbolsUses,
       ICollection<HighlightingInfo> highlightings)
     {
       foreach (var resolvedSymbolUse in symbolsUses)
