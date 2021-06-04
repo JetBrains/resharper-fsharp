@@ -50,8 +50,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         PsiModulesCaches.Remove(psiModule);
         if (psiModule.IsValid())
           InvalidateReferencingModules(psiModule);
-        else
-          PsiModulesCaches.Remove(psiModule);
       }
     }
 
