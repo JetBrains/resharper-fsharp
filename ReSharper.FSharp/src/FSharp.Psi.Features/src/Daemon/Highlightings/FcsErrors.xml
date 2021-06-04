@@ -292,9 +292,9 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="NamespaceCannotContainValues">
-    <Parameter type="IFSharpIdentifier" name="identifier"/>
+    <Parameter type="IFSharpTreeNode" name="node"/>
     <Message value="Namespaces cannot contain values or functions"/>
-    <Range>identifier.GetHighlightingRange()</Range>
+    <Range>node.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>NamespaceToModuleFix</QuickFix>
   </Error>

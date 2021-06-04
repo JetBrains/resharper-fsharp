@@ -11,7 +11,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 type NamespaceToModuleFix(error: NamespaceCannotContainValuesError) =
     inherit FSharpQuickFixBase()
 
-    let namespaceDeclaration = error.Identifier.GetContainingNamespaceDeclaration()
+    let node = error.Node
+    let namespaceDeclaration = node.GetContainingNamespaceDeclaration()
 
     override x.Text = "Convert namespace to module"
 
@@ -19,10 +20,10 @@ type NamespaceToModuleFix(error: NamespaceCannotContainValuesError) =
         match namespaceDeclaration with
         | null -> false
         | :? IGlobalNamespaceDeclaration -> false
-        | _ -> isValid error.Identifier
+        | _ -> isValid node
 
     override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(error.Identifier.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(node.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
         convertNamespaceToModule namespaceDeclaration
