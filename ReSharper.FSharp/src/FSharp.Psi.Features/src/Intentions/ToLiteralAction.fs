@@ -61,6 +61,6 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
 
         let attributeList = getAttributeList binding
         let attribute = binding.CreateElementFactory().CreateAttribute("Literal")
-        FSharpAttributesUtil.addAttribute attributeList attribute
+        FSharpAttributesUtil.addAttribute attributeList attribute |> ignore
 
         null

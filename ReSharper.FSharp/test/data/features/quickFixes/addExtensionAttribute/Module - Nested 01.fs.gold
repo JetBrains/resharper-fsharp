@@ -1,8 +1,8 @@
-namespace Test
+﻿namespace Ns
 
 open System.Runtime.CompilerServices
 
+[<Extension>]
 module Module =
-
     [<{caret}Extension>]
-    let a() = 5
+    let f x = 5

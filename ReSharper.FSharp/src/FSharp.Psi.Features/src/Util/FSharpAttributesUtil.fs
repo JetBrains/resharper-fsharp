@@ -23,6 +23,8 @@ let addAttribute (attributeList: IAttributeList) (attribute: IAttribute) =
                 Whitespace()
         ] |> ignore
 
+    attribute
+
 
 let addAttributeAfter (anchor: IAttribute) (attribute: IAttribute) =
     let anchor, seenSemi =

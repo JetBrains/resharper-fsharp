@@ -1,9 +1,8 @@
-namespace Test
+﻿namespace Ns
 
 open System.Runtime.CompilerServices
 
 [<Extension>]
-module Module =
-
+type T() =
     [<{caret}Extension>]
-    let a() = 5
+    static member M() = ()

@@ -10,9 +10,10 @@ type AddExtensionAttributeTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/addExtensionAttribute"
 
-    [<Test>] member x.``Module``() = x.DoNamedTest()
-    [<Test>] member x.``Type``() = x.DoNamedTest()
-    [<Test>] member x.``Attribute namespace - add``() = x.DoNamedTest()
-    [<Test>] member x.``On type member``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Nested 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Nested 02 - Add open``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Top level 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Top level 02``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Root module - not available``() = x.DoNamedTest()
+    [<Test>] member x.``Type member 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member 02 - Add open``() = x.DoNamedTest()

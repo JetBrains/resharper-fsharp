@@ -55,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     private static bool IsNamespaceQualifierRequired([NotNull] FSharpSymbolReference reference)
     {
-      var attribute = reference.GetTreeNode().GetContainingNode<IAttribute>();
+      var attribute = reference.GetTreeNode().GetContainingNode<IAttribute>(true);
       return NamedModuleDeclarationNavigator.GetByAttribute(attribute) != null;
     }
 

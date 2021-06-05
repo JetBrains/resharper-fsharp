@@ -23,4 +23,4 @@ type ToAbstractFix(error: NoImplementationGivenTypeError) =
 
         let attributeList = getTypeDeclarationAttributeList typeDecl
         let attribute = typeDecl.CreateElementFactory().CreateAttribute("AbstractClass")
-        addAttribute attributeList attribute
+        addAttribute attributeList attribute |> ignore

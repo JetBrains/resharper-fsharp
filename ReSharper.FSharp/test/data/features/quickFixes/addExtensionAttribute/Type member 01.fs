@@ -1,8 +1,7 @@
-namespace Test
+namespace Ns
 
 open System.Runtime.CompilerServices
 
-type TestType() =
-
+type T() =
     [<{caret}Extension>]
-    static member a() = 5
+    static member M() = ()
