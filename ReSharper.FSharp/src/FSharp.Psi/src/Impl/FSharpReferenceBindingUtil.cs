@@ -38,15 +38,55 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string SuggestShortReferenceName(string sourceName, PsiLanguageType language) =>
       NamingManager.GetNamingLanguageService(language).MangleNameIfNecessary(sourceName);
 
+    [CanBeNull]
+    private static INamespace GetNamespace([NotNull] IClrDeclaredElement declaredElement)
+    {
+      if (declaredElement is ITypeElement typeElement)
+        return typeElement.GetContainingNamespace();
+
+      if (declaredElement.GetContainingType() is { } containingType)
+        return containingType.GetContainingNamespace();
+
+      if (declaredElement is INamespace ns)
+        return ns.GetContainingNamespace();
+
+      return null;
+    }
+
+    private static bool IsNamespaceQualifierRequired([NotNull] FSharpSymbolReference reference)
+    {
+      var attribute = reference.GetTreeNode().GetContainingNode<IAttribute>();
+      return NamedModuleDeclarationNavigator.GetByAttribute(attribute) != null;
+    }
+
+    private static void SetNamespaceQualifiesIfNeeded([NotNull] FSharpSymbolReference reference,
+      [NotNull] IClrDeclaredElement declaredElement)
+    {
+      if (!IsNamespaceQualifierRequired(reference))
+        return;
+
+      var ns = GetNamespace(declaredElement);
+      if (ns == null || ns.IsRootNamespace)
+        return;
+
+      reference.SetQualifier(ns);
+    }
+
     public static void SetRequiredQualifiers([NotNull] FSharpSymbolReference reference,
       [NotNull] IClrDeclaredElement declaredElement)
     {
       var containingType = declaredElement.GetContainingType();
       if (containingType == null)
+      {
+        SetNamespaceQualifiesIfNeeded(reference, declaredElement);
         return;
+      }
 
       if (containingType.IsModule() && !containingType.RequiresQualifiedAccess())
+      {
+        SetNamespaceQualifiesIfNeeded(reference, containingType);
         return;
+      }
 
       reference.SetQualifier(containingType);
     }

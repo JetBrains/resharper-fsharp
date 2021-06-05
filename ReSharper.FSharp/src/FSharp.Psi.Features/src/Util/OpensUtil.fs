@@ -170,6 +170,13 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
         |> Seq.tail
         |> Seq.tryHead
         |> Option.iter insertBeforeModuleMember
+
+    | :? IDeclaredModuleDeclaration as moduleDecl when
+            let keyword = moduleDecl.ModuleOrNamespaceKeyword
+            isNotNull keyword && keyword.GetTreeStartOffset().Offset > offset.Offset ->
+        // Don't insert open after the reference.
+        ()
+
     | _ ->
 
     match Seq.tryHead moduleDecl.MembersEnumerable with
