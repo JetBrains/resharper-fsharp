@@ -19,12 +19,12 @@ type IfExpressionAnalyzer() =
 
         match thenExpr.IgnoreInnerParens(), elseExpr.IgnoreInnerParens() with
         | :? ILiteralExpr as thenLiteral, (:? ILiteralExpr as elseLiteral) ->
-            let thenToken = getTokenType thenLiteral.Literal
-            let elseToken = getTokenType elseLiteral.Literal
+            let thenTokenType = getTokenType thenLiteral.Literal
+            let elseTokenType = getTokenType elseLiteral.Literal
 
             let createHighlighting =
-                thenToken == FSharpTokenType.TRUE && elseToken == FSharpTokenType.FALSE ||
-                thenToken == FSharpTokenType.FALSE && elseToken == FSharpTokenType.TRUE
+                thenTokenType == FSharpTokenType.TRUE && elseTokenType == FSharpTokenType.FALSE ||
+                thenTokenType == FSharpTokenType.FALSE && elseTokenType == FSharpTokenType.TRUE
 
             if (createHighlighting &&
                 let thenKeyword = expr.ThenKeyword
@@ -33,7 +33,7 @@ type IfExpressionAnalyzer() =
                 (skipMatchingNodesAfter isWhitespace thenKeyword == thenExpr) &&
                 (skipMatchingNodesAfter isWhitespace thenExpr == elseKeyword) &&
                 (skipMatchingNodesAfter isWhitespace elseKeyword == elseExpr)) then
-                let highlighting = ExpressionCanBeReplacedWithConditionWarning(expr, thenToken == FSharpTokenType.FALSE)
+                let highlighting = ExpressionCanBeReplacedWithConditionWarning(expr, thenTokenType == FSharpTokenType.FALSE)
                 consumer.AddHighlighting(highlighting)
 
         | _ -> ()
