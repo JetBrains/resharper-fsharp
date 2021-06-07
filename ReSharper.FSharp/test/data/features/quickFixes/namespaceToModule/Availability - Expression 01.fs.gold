@@ -1,8 +1,0 @@
-namespace N
-
-|1 + 1|(0)
-
-------------------------------------------------
-0: Namespaces cannot contain expressions
-QUICKFIXES:
-Convert namespace to module
