@@ -291,10 +291,18 @@
     <QuickFix>RemoveYieldFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="NamespaceCannotContainValues">
-    <Parameter type="IFSharpTreeNode" name="node"/>
-    <Message value="Namespaces cannot contain values or functions"/>
-    <Range>node.GetHighlightingRange()</Range>
+  <Error staticGroup="FSharpErrors" name="NamespaceCannotContainBindings">
+    <Parameter type="IBinding" name="binding"/>
+    <Message value="Namespaces cannot contain bindings"/>
+    <Range>binding.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>NamespaceToModuleFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="NamespaceCannotContainExpressions">
+    <Parameter type="IDoLikeStatement" name="expr"/>
+    <Message value="Namespaces cannot contain expressions"/>
+    <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>NamespaceToModuleFix</QuickFix>
   </Error>

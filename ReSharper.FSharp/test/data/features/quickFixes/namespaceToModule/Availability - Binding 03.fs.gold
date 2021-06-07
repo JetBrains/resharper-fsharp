@@ -1,0 +1,8 @@
+namespace N
+
+|let (Some x) = ()|(0)
+
+------------------------------------------------
+0: Namespaces cannot contain bindings
+QUICKFIXES:
+Convert namespace to module

@@ -336,7 +336,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | _ -> null
 
         | NamespaceCannotContainValues ->
-            createHighlightingFromNode NamespaceCannotContainValuesError range
+            let binding = fsFile.GetNode<IBinding>(range)
+            if isNotNull binding then NamespaceCannotContainBindingsError(binding) :> _ else
+
+            let expr = fsFile.GetNode<IDoLikeStatement>(range)
+            if isNotNull expr then NamespaceCannotContainExpressionsError(expr) :> _ else null
 
         | _ -> createGenericHighlighting error range
 
