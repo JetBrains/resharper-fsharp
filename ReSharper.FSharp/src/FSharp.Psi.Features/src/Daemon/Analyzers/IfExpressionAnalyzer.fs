@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
 [<ElementProblemAnalyzer([| typeof<IIfThenElseExpr> |],
-                         HighlightingTypes = [| typeof<IfCanBeReplacedWithConditionOperandWarning> |])>]
+                         HighlightingTypes = [| typeof<ExpressionCanBeReplacedWithConditionWarning> |])>]
 type IfExpressionAnalyzer() =
     inherit ElementProblemAnalyzer<IIfThenElseExpr>()
 
@@ -33,7 +33,7 @@ type IfExpressionAnalyzer() =
                 (skipMatchingNodesAfter isWhitespace thenKeyword == thenExpr) &&
                 (skipMatchingNodesAfter isWhitespace thenExpr == elseKeyword) &&
                 (skipMatchingNodesAfter isWhitespace elseKeyword == elseExpr)) then
-                let highlighting = IfCanBeReplacedWithConditionOperandWarning(expr, thenToken == FSharpTokenType.FALSE)
+                let highlighting = ExpressionCanBeReplacedWithConditionWarning(expr, thenToken == FSharpTokenType.FALSE)
                 consumer.AddHighlighting(highlighting)
 
         | _ -> ()

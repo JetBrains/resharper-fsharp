@@ -1,0 +1,10 @@
+﻿|if true then true else false|(0)
+|if true then false else true|(1)
+|if true then(true)else(false)|(2)
+|if true then (true) else (false)|(3)
+
+---------------------------------------------------------
+(0): ReSharper Suggestion: Expression can be replaced with condition
+(1): ReSharper Suggestion: Expression can be replaced with condition negation
+(2): ReSharper Suggestion: Expression can be replaced with condition
+(3): ReSharper Suggestion: Expression can be replaced with condition

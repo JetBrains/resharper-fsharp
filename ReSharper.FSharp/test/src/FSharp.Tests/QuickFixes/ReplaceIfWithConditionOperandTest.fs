@@ -6,22 +6,22 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
-type ReplaceIfWithConditionOperandTest() =
-    inherit FSharpQuickFixTestBase<ReplaceIfWithConditionOperandFix>()
+type ReplaceWithConditionTest() =
+    inherit FSharpQuickFixTestBase<ReplaceWithConditionFix>()
 
-    override x.RelativeTestDataPath = "features/quickFixes/replaceIfWithConditionOperand"
+    override x.RelativeTestDataPath = "features/quickFixes/replaceWithCondition"
 
-    [<Test>] member x.``Condition operand 01``() = x.DoNamedTest()
-    [<Test>] member x.``Condition operand 02 - Multiline``() = x.DoNamedTest()
-    [<Test>] member x.``Condition operand negation 01``() = x.DoNamedTest()
-    [<Test>] member x.``Condition operand negation 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Condition 01``() = x.DoNamedTest()
+    [<Test>] member x.``Condition 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Condition negation 01``() = x.DoNamedTest()
+    [<Test>] member x.``Condition negation 02 - Multiline``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
-type  ReplaceIfWithConditionOperandAvailabilityTest() =
+type  ReplaceWithConditionAvailabilityTest() =
     inherit QuickFixAvailabilityTestBase()
 
-    override x.RelativeTestDataPath = "features/quickFixes/replaceIfWithConditionOperand"
+    override x.RelativeTestDataPath = "features/quickFixes/replaceWithCondition"
 
-    [<Test>] member x.``Text - Condition operand``() = x.DoNamedTest()
-    [<Test>] member x.``Text - Condition operand negation``() = x.DoNamedTest()
+    [<Test>] member x.``Text - Condition``() = x.DoNamedTest()
+    [<Test>] member x.``Text - Condition negation``() = x.DoNamedTest()
