@@ -6,19 +6,21 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpPropertyWithExplicitAccessors : FSharpPropertyBase<IMemberSignatureOrDeclaration>, IFSharpProperty
+  internal class FSharpPropertyWithExplicitAccessors : FSharpPropertyBase<IMemberSignatureOrDeclaration>,
+    IFSharpProperty
   {
     public FSharpPropertyWithExplicitAccessors(IMemberSignatureOrDeclaration declaration) : base(declaration)
     {
     }
 
-    public override bool IsReadable => Getters.Any();
-    public override bool IsWritable => Setters.Any();
+    public override bool IsReadable => FSharpExplicitGetters.Any();
+    public override bool IsWritable => FSharpExplicitSetters.Any();
+
     public override AccessRights GetAccessRights() => AccessRights.PRIVATE;
     public AccessRights RepresentationAccessRights => base.GetAccessRights();
 
-    public IEnumerable<IFSharpExplicitAccessor> Getters => GetAccessors(AccessorKind.GETTER);
-    public IEnumerable<IFSharpExplicitAccessor> Setters => GetAccessors(AccessorKind.SETTER);
+    public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitGetters => GetAccessors(AccessorKind.GETTER);
+    public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitSetters => GetAccessors(AccessorKind.SETTER);
 
     private IEnumerable<IFSharpExplicitAccessor> GetAccessors(AccessorKind kind)
     {
