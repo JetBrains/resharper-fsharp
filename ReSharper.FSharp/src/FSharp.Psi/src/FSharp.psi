@@ -1659,6 +1659,7 @@ namedTypeUsage:
 
 tupleTypeUsage:
   topLevelTypeParameterDecl
+  STRUCT<STRUCT, StructKeyword>?
   typeUsage<ITEM, Items>
   (
     STAR

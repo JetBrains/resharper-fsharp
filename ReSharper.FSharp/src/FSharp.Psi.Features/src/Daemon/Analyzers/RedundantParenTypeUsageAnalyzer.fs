@@ -31,12 +31,15 @@ module RedundantParenTypeUsageAnalyzer =
         if isNotNull parentTypeUsage && not (applicable parentTypeUsage) then true else
 
         match typeUsage with
-        | :? ITupleTypeUsage ->
+        | :? ITupleTypeUsage as tupleTypeUsage ->
             // todo: rewrite when top-level-types are supported
             let functionTypeUsage = FunctionTypeUsageNavigator.GetByReturnTypeUsage(context)
             if isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(context)) then true else
             if isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(functionTypeUsage)) then true else
             if isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(getLongestReturnFromArg context)) then true else
+
+            let isStruct = isNotNull tupleTypeUsage.StructKeyword
+            if isStruct && isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(context)) then true else
 
             isNotNull (TupleTypeUsageNavigator.GetByItem(context)) ||
             isNotNull (ArrayTypeUsageNavigator.GetByType(context)) ||

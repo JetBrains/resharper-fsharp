@@ -5,6 +5,11 @@ type TT2 = (int * int) * int
 type TT3 = int * (int * int)
 type TT4 = (int -> int) * (int -> int)
 
+type TT1 = (struct (int * int))
+type TT2 = |(|(2)(struct (int * int))|)|(3)
+
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant parentheses
 (1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
