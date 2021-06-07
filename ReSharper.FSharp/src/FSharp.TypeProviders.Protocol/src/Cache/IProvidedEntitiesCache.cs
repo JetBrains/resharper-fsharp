@@ -73,8 +73,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
           foreach (var (key, i) in group)
           {
             if (!KeyHasValue(key)) continue;
-            Assertion.Assert(Entities.TryGetValue(key, out var providedEntity),
-              "Possible concurrent Remove(typeProviderId) call");
+            Entities.TryGetValue(key, out var providedEntity);
+            Assertion.AssertNotNull(providedEntity, "Possible concurrent Remove(typeProviderId) call");
             entities[i] = providedEntity;
           }
 
