@@ -356,6 +356,7 @@
     <Range>refExpr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>SpecifyParameterTypeFix</QuickFix>
+    <QuickFix>SpecifyPropertyTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="AddingConstraint">

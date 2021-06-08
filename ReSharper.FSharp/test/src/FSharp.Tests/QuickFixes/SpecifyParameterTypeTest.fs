@@ -9,7 +9,7 @@ open NUnit.Framework
 type SpecifyParameterTypeTest() =
     inherit FSharpQuickFixTestBase<SpecifyParameterTypeFix>()
 
-    override x.RelativeTestDataPath = "features/quickFixes/specifyParameterType"
+    override x.RelativeTestDataPath = "features/quickFixes/specifyType"
 
     [<Test>] member x.``Ref 01``() = x.DoNamedTest()
     [<Test>] member x.``Ref 02 - Parens``() = x.DoNamedTest()
@@ -24,3 +24,11 @@ type SpecifyParameterTypeTest() =
 
     [<Test>] member x.``Qualified type 01 - Rqa``() = x.DoNamedTest()
     [<Test>] member x.``Qualified type 02 - Not imported``() = x.DoNamedTest()
+
+[<FSharpTest>]
+type SpecifyPropertyTypeTest() =
+    inherit FSharpQuickFixTestBase<SpecifyPropertyTypeFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/specifyType"
+
+    [<Test>] member x.``Property 01``() = x.DoNamedTest()

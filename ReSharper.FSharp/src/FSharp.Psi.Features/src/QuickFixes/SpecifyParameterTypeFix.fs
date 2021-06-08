@@ -6,38 +6,91 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Impl.Special
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Util
 
-type SpecifyParameterTypeFix(error: IndeterminateTypeError) =
+[<AbstractClass>]
+type SpecifyParameterTypeFixBase(error: IndeterminateTypeError) =
     inherit FSharpQuickFixBase()
 
-    let refExpr = error.RefExpr
-    let qualifierRefExpr = if isNotNull refExpr then refExpr.Qualifier.As<IReferenceExpr>() else null
+    member val QualifierRefExpr =
+        let refExpr = error.RefExpr
+        if isNotNull refExpr then refExpr.Qualifier.As<IReferenceExpr>() else null
 
-    override this.Text = $"Annotate '{qualifierRefExpr.ShortName}' type"
+    override this.Text = $"Annotate '{this.QualifierRefExpr.ShortName}' type"
+
+    abstract IsApplicable: mfv: FSharpMemberOrFunctionOrValue -> bool
+    abstract IsApplicable: declaredElement: IDeclaredElement -> bool
+    abstract IsApplicable: decl: IDeclaration -> bool
+
+    abstract SpecifyType: decl: IDeclaration * mfv: FSharpMemberOrFunctionOrValue * displayContext: FSharpDisplayContext -> unit
 
     override this.IsAvailable _ =
-        isValid qualifierRefExpr && isNull qualifierRefExpr.Qualifier &&
+        isValid this.QualifierRefExpr &&
 
-        let reference = qualifierRefExpr.Reference
+        let reference = this.QualifierRefExpr.Reference
         let mfv = reference.GetFSharpSymbol().As<FSharpMemberOrFunctionOrValue>()
-        isNotNull mfv && not mfv.IsModuleValueOrMember && not mfv.FullType.IsGenericParameter &&
+        isNotNull mfv && not mfv.FullType.IsGenericParameter && this.IsApplicable(mfv) &&
 
+        let declaredElement = reference.Resolve().DeclaredElement
+        isNotNull declaredElement && this.IsApplicable(declaredElement) &&
+
+        let declarations = declaredElement.GetDeclarations()
+        declarations.Count = 1 && this.IsApplicable(declarations.[0])
+
+    override this.ExecutePsiTransaction _ =
+        use writeCookie = WriteLockCookie.Create(this.QualifierRefExpr.IsPhysical())
+
+        let reference = this.QualifierRefExpr.Reference
+        let declaration = reference.Resolve().DeclaredElement.GetDeclarations().[0]
+
+        let symbolUse = reference.GetSymbolUse()
+        let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+
+        this.SpecifyType(declaration, mfv, symbolUse.DisplayContext)
+
+
+type SpecifyParameterTypeFix(error: IndeterminateTypeError) =
+    inherit SpecifyParameterTypeFixBase(error)
+
+    override this.IsApplicable(mfv: FSharpMemberOrFunctionOrValue) =
+        not mfv.IsModuleValueOrMember
+
+    override this.IsApplicable(de: IDeclaredElement) =
         let pat =
-            let refPat = reference.Resolve().DeclaredElement.As<ILocalReferencePat>().IgnoreParentParens()
+            let refPat = de.As<ILocalReferencePat>().IgnoreParentParens()
             match TuplePatNavigator.GetByPattern(refPat).IgnoreParentParens() with
             | null -> refPat
             | tuplePat -> tuplePat
 
         isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(pat))
 
-    override this.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(refExpr.IsPhysical())
+    override this.IsApplicable(decl: IDeclaration) =
+        decl :? ILocalReferencePat
 
-        let reference = refExpr.QualifierReference
-        let refPat = reference.Resolve().DeclaredElement.As<ILocalReferencePat>()
+    override this.SpecifyType(decl, mfv, d) =
+        let decl = decl :?> ILocalReferencePat
+        SpecifyTypes.specifyParameterType d mfv.FullType decl
 
-        let symbolUse = reference.GetSymbolUse()
-        let fcsSymbol = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
 
-        SpecifyTypes.specifyParameterType symbolUse.DisplayContext fcsSymbol.FullType refPat
+type SpecifyPropertyTypeFix(error: IndeterminateTypeError) =
+    inherit SpecifyParameterTypeFixBase(error)
+
+    override this.IsApplicable(_: FSharpMemberOrFunctionOrValue) = true
+
+    override this.IsApplicable(declaredElement: IDeclaredElement) =
+        let fsProperty = declaredElement.As<IFSharpProperty>()
+        isNotNull fsProperty && fsProperty.Getter :? ImplicitAccessor &&
+        fsProperty.FSharpExplicitGetters.IsEmpty() && fsProperty.FSharpExplicitSetters.IsEmpty()
+
+    override this.IsApplicable(decl: IDeclaration) =
+        match decl with
+        | :? IMemberDeclaration as decl -> isNull decl.ReturnTypeInfo
+        | _ -> false
+
+    override this.SpecifyType(decl, mfv, displayContext) =
+        let memberDecl = decl :?> IMemberDeclaration
+        SpecifyTypes.specifyPropertyType displayContext mfv.FullType memberDecl

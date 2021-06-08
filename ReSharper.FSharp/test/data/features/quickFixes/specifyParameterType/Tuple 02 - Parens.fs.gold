@@ -1,3 +1,0 @@
-﻿let f ((x: string, y)) =
-    x.Contains{caret}("")
-    "".Insert(1, x)
