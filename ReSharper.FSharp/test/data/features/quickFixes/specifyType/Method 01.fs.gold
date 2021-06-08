@@ -1,0 +1,4 @@
+﻿type T() =
+    static member M(x: string) =
+        x.Contains{caret}("")
+        "".Insert(1, x)
