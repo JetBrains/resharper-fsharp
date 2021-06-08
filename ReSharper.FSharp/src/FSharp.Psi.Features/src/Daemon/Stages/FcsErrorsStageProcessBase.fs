@@ -54,6 +54,7 @@ module FSharpErrors =
     let [<Literal>] UnrecognizedOption = 243
     let [<Literal>] NoImplementationGiven = 365
     let [<Literal>] NoImplementationGivenWithSuggestion = 366
+    let [<Literal>] MemberIsNotAccessible = 491
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
     let [<Literal>] UseBindingsIllegalInModules = 524
     let [<Literal>] OnlyClassCanTakeValueArguments = 552
@@ -283,6 +284,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 NoImplementationGivenInterfaceError(impl, error.Message) :> _
 
             | _ -> createGenericHighlighting error range
+
+        | MemberIsNotAccessible ->
+            createHighlightingFromNode MemberIsNotAccessibleError range
 
         | UseBindingsIllegalInImplicitClassConstructors ->
             createHighlightingFromNode UseKeywordIllegalInPrimaryCtorError range

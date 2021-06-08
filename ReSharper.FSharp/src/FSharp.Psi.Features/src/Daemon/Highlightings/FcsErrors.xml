@@ -387,4 +387,12 @@
     <QuickFix>ToStaticMemberFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="MemberIsNotAccessible">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message value="Protected members cannot be accessed from closures"/>
+    <Range>refExpr.Identifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>IntroduceVarFix</QuickFix>
+  </Error>
+
 </Errors>

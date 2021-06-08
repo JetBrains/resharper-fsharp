@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -30,3 +31,9 @@ type IntroduceVarTest() =
     [<Test>] member x.``Module - Do 01 - Implicit``() = x.DoNamedTest()
     [<Test>] member x.``Module - Do 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Module - Do 03 - Function``() = x.DoNamedTest()
+
+    [<TestReferences("../../../assemblies/ProtectedMembers.dll")>]
+    [<Test>] member x.``Protected 01``() = x.DoNamedTest()
+
+    [<TestReferences("../../../assemblies/ProtectedMembers.dll")>]
+    [<Test>] member x.``Base 01``() = x.DoNamedTest()

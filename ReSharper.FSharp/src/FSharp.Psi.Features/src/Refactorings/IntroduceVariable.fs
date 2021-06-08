@@ -32,7 +32,12 @@ open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
-type FSharpIntroduceVariable(workflow, solution, driver) =
+type FSharpIntroduceVariableWorkflow(solution, escapeLambdas: bool) =
+    inherit IntroduceVariableWorkflow(solution, null)
+
+    member val EscapeLambdas = escapeLambdas
+
+type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, driver) =
     inherit IntroduceVariableBase(workflow, solution, driver)
 
     /// Applies to case where source expression is the node to replace and is the last expression in a block,
@@ -100,6 +105,11 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         leftArgument.Indent = rightArgument.Indent && leftArgument.EndLine + docLine 1 < rightArgument.StartLine
 
+    let rec getOutermostLambda (node: IFSharpExpression) =
+        match node.GetContainingNode<ILambdaExpr>() with
+        | null -> node
+        | lambdaExpr -> getOutermostLambda lambdaExpr
+
     let rec getExprToInsertBefore (expr: IFSharpExpression): IFSharpExpression =
         let expr = expr.IgnoreParentParens()
 
@@ -159,6 +169,12 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         let contextExpr = sourceExpr.PathToRoot() |> Seq.find (fun n -> n.Parent == commonParent)
         contextExpr :?> _
+
+    let getSafeParentExprToInsertBefore (parent: IFSharpExpression) =
+        match workflow with
+        | :? FSharpIntroduceVariableWorkflow as fsWorkflow when fsWorkflow.EscapeLambdas ->
+            getOutermostLambda parent
+        | _ -> parent
 
     let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
         let binding = BindingNavigator.GetByExpression(contextExpr)
@@ -249,10 +265,11 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         // Replace the actual source expression with the outer-most expression among usages,
         // since it's needed for calculating a common node to replace.
         let sourceExpr = data.Usages |> Seq.minBy (fun u -> u.GetTreeStartOffset().Offset) :?> IFSharpExpression
-        let commonParentExpr = getCommonParentExpr data sourceExpr
+        let commonParent = getCommonParentExpr data sourceExpr
+        let safeParentToInsertBefore = getSafeParentExprToInsertBefore commonParent
 
-        // `contextDecl` is not null when expression is bound to a module/type let binding
-        let contextExpr = getExprToInsertBefore commonParentExpr
+        // `contextDecl` is not null when expression is bound to a module/type let binding.
+        let contextExpr = getExprToInsertBefore safeParentToInsertBefore
         let contextDecl = getContextDeclaration contextExpr
 
         let containingTypeElement =
@@ -455,9 +472,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         IntroduceVariableResult(hotspotsRegistry, caretTarget.CreateTreeElementPointer())
 
-    static member IntroduceVar(expr: IFSharpExpression, textControl: ITextControl, ?removeSourceExpr) =
-        let removeSourceExpr = defaultArg removeSourceExpr false
-
+    static member IntroduceVar(expr: IFSharpExpression, textControl: ITextControl, removeSourceExpr, escapeLambdas) =
         let name = "FSharpIntroduceVar"
         let solution = expr.GetSolution()
 
@@ -476,7 +491,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         if removeSourceExpr then
             expr.UserData.PutKey(FSharpIntroduceVariable.ExpressionToRemoveKey)
 
-        let workflow = IntroduceVariableWorkflow(solution, null)
+        let workflow = FSharpIntroduceVariableWorkflow(solution, escapeLambdas)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
     static member CanIntroduceVar(expr: IFSharpExpression) =

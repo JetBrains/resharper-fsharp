@@ -1,0 +1,10 @@
+﻿module Module
+
+type T() =
+    inherit Class()
+
+    member x.P =
+        let thisProtectedProp = x.ProtectedProp
+        fun _ ->
+            {selstart}thisProtectedProp{selend}
+        |> ignore
