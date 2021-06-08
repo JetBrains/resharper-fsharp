@@ -12,10 +12,10 @@ type ReplaceWithConditionFix(warning: ExpressionCanBeReplacedWithConditionWarnin
     inherit FSharpQuickFixBase()
 
     let expr = warning.Expr
-    let needNegation = warning.NeedNegation
+    let needsNegation = warning.NeedsNegation
 
     override this.Text =
-        if needNegation then "Replace with condition negation"
+        if needsNegation then "Replace with condition negation"
         else "Replace with condition"
 
     override this.IsAvailable _ = isValid expr
@@ -25,7 +25,7 @@ type ReplaceWithConditionFix(warning: ExpressionCanBeReplacedWithConditionWarnin
         use disableFormatter = new DisableCodeFormatter()
 
         let newExpr =
-            if needNegation then createLogicallyNegatedExpression expr.ConditionExpr else expr.ConditionExpr
+            if needsNegation then createLogicallyNegatedExpression expr.ConditionExpr else expr.ConditionExpr
 
         let ifExprIndent = expr.Indent
         let newExprIndent = newExpr.Indent

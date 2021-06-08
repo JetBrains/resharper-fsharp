@@ -286,10 +286,10 @@
 
   <Warning name="ExpressionCanBeReplacedWithCondition" configurableSeverity="FSharpExpressionCanBeReplacedWithCondition">
     <Parameter type="IIfThenElseExpr" name="expr"/>
-    <Parameter type="bool" name="needNegation"/>
+    <Parameter type="bool" name="needsNegation"/>
     <Message value="{0}">
       <Argument>
-        if needNegation then "Expression can be replaced with condition negation"
+        if needsNegation then "Expression can be replaced with condition negation"
         else "Expression can be replaced with condition"
       </Argument>
     </Message>
