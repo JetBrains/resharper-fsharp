@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 
-type IntroduceVarFix(expr: IFSharpExpression) =
+type IntroduceVarFix(expr: IFSharpExpression, escapeLambdas) =
     inherit FSharpQuickFixBase()
 
     let mutable expr = expr
@@ -19,13 +19,21 @@ type IntroduceVarFix(expr: IFSharpExpression) =
             null
 
     new (warning: UnitTypeExpectedWarning) =
-        IntroduceVarFix(warning.Expr)
+        IntroduceVarFix(warning.Expr, false)
 
     new (warning: FunctionValueUnexpectedWarning) =
-        IntroduceVarFix(warning.Expr)
+        IntroduceVarFix(warning.Expr, false)
 
     new (error: UnitTypeExpectedError) =
-        IntroduceVarFix(error.Expr)
+        IntroduceVarFix(error.Expr, false)
+
+    // for protected/base members access in lambda
+    new () =
+        // todo: check object expressions?
+        // todo: check no local values are moved out of scope
+        //   * implement for properties only at first?
+        //   * for method calls: check that values are defined outside lambda
+        IntroduceVarFix(null, true)
 
     override x.Text = "Introduce 'let' binding"
 
@@ -49,4 +57,4 @@ type IntroduceVarFix(expr: IFSharpExpression) =
         base.Execute(solution, textControl)
 
         textControl.Selection.SetRange(expr.GetDocumentRange().TextRange)
-        FSharpIntroduceVariable.IntroduceVar(expr, textControl, true)
+        FSharpIntroduceVariable.IntroduceVar(expr, textControl, true, escapeLambdas)

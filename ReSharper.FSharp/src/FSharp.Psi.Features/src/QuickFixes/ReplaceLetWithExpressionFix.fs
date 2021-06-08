@@ -23,15 +23,16 @@ type ReplaceLetWithExpressionFix(error: ExpectedExpressionAfterLetError) =
         else
             removeDanglingIn node.Parent
 
-    override x.Text =
-        let tokenText = getLetTokenText letExpr.BindingKeyword
-        sprintf "Replace '%s' with expression" tokenText
+    override x.Text = $"Replace '{getLetTokenText letExpr.BindingKeyword}' with expression"
 
     override x.IsAvailable _ =
         isValid letExpr &&
 
         let bindings = letExpr.Bindings
-        bindings.Count = 1 && isValid bindings.[0].Expression
+        bindings.Count = 1 &&
+
+        let binding = bindings.[0]
+        isValid binding.Expression && binding.ParametersDeclarationsEnumerable.IsEmpty()
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(letExpr.IsPhysical())

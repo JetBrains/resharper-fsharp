@@ -57,7 +57,7 @@ and LetPostfixTemplateBehavior(info) =
 
     override x.AfterComplete(textControl, node, _) =
         if not (node.UserData.HasKey(LetPostfixTemplateBehavior.PreventIntroduceVarKey)) then
-            FSharpIntroduceVariable.IntroduceVar(node :?> _, textControl) else
+            FSharpIntroduceVariable.IntroduceVar(node :?> _, textControl, false, false) else
 
         match node.As<ILetOrUseExpr>() with
         | null -> ()

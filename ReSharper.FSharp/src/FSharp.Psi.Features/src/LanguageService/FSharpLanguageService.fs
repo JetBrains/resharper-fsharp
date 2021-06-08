@@ -76,7 +76,7 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
         // todo: invocations, partial applications
         match declaredElement with
         | :? IField
-        | :? IProperty
+        | :? IProperty // todo: unionCaseProp?
         | :? IFSharpAnonRecordFieldProperty ->
             ReferenceAccessType.READ
 

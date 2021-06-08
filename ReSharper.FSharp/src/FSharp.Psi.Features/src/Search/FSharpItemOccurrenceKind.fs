@@ -67,6 +67,7 @@ type FSharpItemOccurenceKindProvider() =
                 if isNull namedTypeUsage then EmptyList.Instance :> _ else
 
                 // todo: return type in `a -> b`
+                // todo: use C# occurrence kind
                 if isNotNull (ReturnTypeInfoNavigator.GetByReturnType(namedTypeUsage)) then
                     [| FSharpOccurrenceKinds.typeSpecification |] :> _ else
 

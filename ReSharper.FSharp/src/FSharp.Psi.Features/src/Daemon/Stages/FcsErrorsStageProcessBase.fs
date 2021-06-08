@@ -71,6 +71,7 @@ module FSharpErrors =
     let [<Literal>] UnusedThisVariable = 1183
 
     let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
+    let [<Literal>] undefinedGetSliceMessageSuffix = " does not define the field, constructor or member 'GetSlice'."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
     let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type "
@@ -153,9 +154,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | node -> highlightingCtor node :> _
 
     let createHighlighting (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
+        let message = error.Message
         match error.ErrorNumber with
         | TypeEquation ->
-            match error.Message with
+            match message with
             | message when message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
                 createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
 
@@ -166,7 +168,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 if isNotNull expr then
                     match expectedType with
                     | "unit" -> createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
-                    | _ -> TypeEquationError(expectedType, actualType, expr, error.Message) :> _
+                    | _ -> TypeEquationError(expectedType, actualType, expr, message) :> _
                 else null
 
             | _ -> createGenericHighlighting error range
@@ -190,15 +192,17 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode VarBoundTwiceError range
 
         | UndefinedName ->
-            if (endsWith undefinedIndexerMessageSuffix error.Message &&
-                    let indexer = fsFile.GetNode<IItemIndexerExpr>(range) in isNotNull indexer) then
+            let isUndefinedIndexerText =
+                endsWith undefinedIndexerMessageSuffix message || endsWith undefinedGetSliceMessageSuffix message
+
+            if isUndefinedIndexerText && isNotNull (fsFile.GetNode<IItemIndexerExpr>(range)) then
                 UndefinedIndexerError(fsFile.GetNode(range)) :> _ else
 
             let identifier = fsFile.GetNode(range)
             let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
-            if isNotNull referenceOwner then UndefinedNameError(referenceOwner.Reference, error.Message) :> _ else
+            if isNotNull referenceOwner then UndefinedNameError(referenceOwner.Reference, message) :> _ else
 
-            UnresolvedHighlighting(error.Message, range) :> _
+            UnresolvedHighlighting(message, range) :> _
 
         | ErrorFromAddingConstraint ->
             createHighlightingFromNodeWithMessage AddingConstraintError range error
@@ -214,7 +218,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UnusedValue ->
             match fsFile.GetNode<INamedPat>(range) with
-            | null -> UnusedHighlighting(error.Message, range) :> _
+            | null -> UnusedHighlighting(message, range) :> _
             | pat ->
 
             let binding = TopBindingNavigator.GetByHeadPattern(pat)
@@ -253,7 +257,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | UnitTypeExpected ->
             let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
             let expr = getResultExpr expr
-            UnitTypeExpectedWarning(expr, error.Message) :> _
+            UnitTypeExpectedWarning(expr, message) :> _
 
         | UseBindingsIllegalInModules ->
             createHighlightingFromNode UseBindingsIllegalInModulesWarning range
@@ -272,15 +276,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
             match node.Parent with
             | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == node ->
-                NoImplementationGivenTypeError(typeDecl, error.Message) :> _
+                NoImplementationGivenTypeError(typeDecl, message) :> _
 
             | :? IInterfaceImplementation as impl when impl.TypeName == node ->
-                NoImplementationGivenInterfaceError(impl, error.Message) :> _
+                NoImplementationGivenInterfaceError(impl, message) :> _
 
             | :? ITypeReferenceName as typeName when
                     isNotNull (InterfaceImplementationNavigator.GetByTypeName(typeName)) ->
                 let impl = InterfaceImplementationNavigator.GetByTypeName(typeName)
-                NoImplementationGivenInterfaceError(impl, error.Message) :> _
+                NoImplementationGivenInterfaceError(impl, message) :> _
 
             | _ -> createGenericHighlighting error range
 
@@ -324,11 +328,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error
 
         | MissingErrorNumber ->
-            match error.Message with
+            match message with
             | x when startsWith expressionIsAFunctionMessage x ->
                 let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
                 let expr = getResultExpr expr
-                FunctionValueUnexpectedWarning(expr, error.Message) :> _
+                FunctionValueUnexpectedWarning(expr, message) :> _
 
             | x when startsWith typeConstraintMismatchMessage x ->
                 createHighlightingFromNodeWithMessage TypeConstraintMismatchError range error

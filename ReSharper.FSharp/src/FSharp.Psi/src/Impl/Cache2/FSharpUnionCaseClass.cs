@@ -8,7 +8,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpUnionCaseClass : FSharpClass, IFSharpGeneratedFromUnionCase
+  public class FSharpUnionCaseClass : FSharpClass, IFSharpGeneratedFromUnionCase // todo: should be IUnionCase?
   {
     public FSharpUnionCaseClass([NotNull] IClassPart part) : base(part)
     {
