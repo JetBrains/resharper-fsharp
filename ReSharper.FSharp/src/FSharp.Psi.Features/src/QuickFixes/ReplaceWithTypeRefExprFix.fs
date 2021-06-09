@@ -12,7 +12,7 @@ type ReplaceWithTypeRefExprFix(error: MemberIsStaticError) =
 
     let refExpr = error.RefExpr
 
-    override this.Text = "Replace with abbreviated type"
+    override this.Text = "Access via type name"
 
     override this.IsAvailable _ =
         isValid refExpr && refExpr.Reference.HasFcsSymbol &&
