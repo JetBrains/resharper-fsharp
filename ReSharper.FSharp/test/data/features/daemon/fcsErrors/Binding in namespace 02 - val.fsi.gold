@@ -1,0 +1,6 @@
+namespace N
+
+|val x: int|(0)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Namespaces cannot contain bindings

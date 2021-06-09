@@ -1,0 +1,3 @@
+module N
+
+val x{caret}: int
