@@ -18,15 +18,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       get
       {
         var funExpr = (IPrefixAppExpr) this;
-        while (funExpr.FunctionExpression.IgnoreInnerParens() is IPrefixAppExpr appExpr)
-        {
+        while (funExpr.FunctionExpression.IgnoreInnerParens() is IPrefixAppExpr appExpr) 
           funExpr = appExpr;
-        }
 
         if (!(funExpr.FunctionExpression.IgnoreInnerParens() is IReferenceExpr referenceExpr))
-        {
           return null;
-        }
 
         return referenceExpr;
       }

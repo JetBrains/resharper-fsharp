@@ -197,8 +197,7 @@ type FSharpTypeHintOptionsStore(lifetime: Lifetime, settingsStore: ISettingsStor
                 |> Seq.exists (fun changedEntry -> changedEntry.Parent = settingsKey)
 
             if typeHintOptionChanged then
-                highlightingSettingsManager.SettingsChanged.Fire(Nullable<_>(false))
-        )
+                highlightingSettingsManager.SettingsChanged.Fire(Nullable(false)))
 
 
 module SettingsUtil =

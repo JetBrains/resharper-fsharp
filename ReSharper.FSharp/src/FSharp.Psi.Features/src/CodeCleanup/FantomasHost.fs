@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
-open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains.Lifetimes
@@ -10,7 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client
 open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 
 [<SolutionComponent>]
-type FantomasFormatterProvider(solution: ISolution, fantomasFactory: FantomasProcessFactory) =
+type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) =
     let mutable connection: FantomasConnection = null
 
     let isConnectionAlive () =
@@ -29,8 +28,7 @@ type FantomasFormatterProvider(solution: ISolution, fantomasFactory: FantomasPro
         RdFcsRange(range.FileName, range.StartLine, range.StartColumn, range.EndLine, range.EndColumn)
 
     let convertFormatSettings (settings: FSharpFormatSettingsKey) =
-        RdFantomasFormatConfig
-            (settings.INDENT_SIZE, settings.WRAP_LIMIT, settings.SpaceBeforeParameter,
+        RdFantomasFormatConfig(settings.INDENT_SIZE, settings.WRAP_LIMIT, settings.SpaceBeforeParameter,
              settings.SpaceBeforeLowercaseInvocation, settings.SpaceBeforeUppercaseInvocation,
              settings.SpaceBeforeClassConstructor, settings.SpaceBeforeMember, settings.SpaceBeforeColon,
              settings.SpaceAfterComma, settings.SpaceBeforeSemicolon, settings.SpaceAfterSemicolon,
@@ -43,22 +41,20 @@ type FantomasFormatterProvider(solution: ISolution, fantomasFactory: FantomasPro
              settings.SemicolonAtEndOfLine)
 
     let convertParsingOptions (options: FSharpParsingOptions) =
-        let lightSyntax =
-            match options.LightSyntax with
-            | Some x -> Nullable<bool> x
-            | None -> Nullable<bool>()
-
+        let lightSyntax = Option.toNullable options.LightSyntax
         RdFcsParsingOptions(Array.last options.SourceFiles, lightSyntax,
-                            List.toArray options.ConditionalCompilationDefines, options.IsExe)
+            List.toArray options.ConditionalCompilationDefines, options.IsExe)
 
     member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
-        let args = RdFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
-                                         convertParsingOptions options, newLineText)
+        let args =
+            RdFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
+                convertParsingOptions options, newLineText)
 
         execute (fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
 
     member x.FormatDocument(filePath, source, settings, options, newLineText) =
-        let args = RdFormatDocumentArgs(filePath, source, convertFormatSettings settings, convertParsingOptions options,
-                                        newLineText)
+        let args =
+            RdFormatDocumentArgs(filePath, source, convertFormatSettings settings, convertParsingOptions options,
+                newLineText)
 
         execute (fun () -> connection.ProtocolModel.FormatDocument.Sync(args, RpcTimeouts.Maximal))

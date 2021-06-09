@@ -34,46 +34,41 @@ type FSharpReformatCode() =
             let fsFile = sourceFile.FSharpFile
             if isNull fsFile then () else
 
-            match fsFile.ParseTree with // todo: completion on enter after with
+            match fsFile.ParseTree with
             | None -> ()
             | Some _ ->
 
             let filePath = sourceFile.GetLocation().FullPath
             let document = sourceFile.Document :?> DocumentBase
             let text = document.GetText()
-            let checkerService = fsFile.CheckerService
 
             let solution = fsFile.GetSolution()
             let settings = sourceFile.GetSettingsStoreWithEditorConfig()
-            let languageService = fsFile.Language.LanguageServiceNotNull()
-            let formatter = languageService.CodeFormatter
-            let codeFormatterProvider = solution.GetComponent<FantomasFormatterProvider>()
-
-            let settings =
-                formatter.GetFormatterSettings(solution, sourceFile, settings, false) :?> FSharpFormatSettingsKey
+            let formatter = fsFile.Language.LanguageServiceNotNull().CodeFormatter
+            let settings = formatter.GetFormatterSettings(solution, sourceFile, settings, false) :?> _
+            let fantomasHost = solution.GetComponent<FantomasHost>()
 
             let stamp = document.LastModificationStamp
             let modificationSide = TextModificationSide.NotSpecified
             let newLineText = sourceFile.DetectLineEnding().GetPresentation()
-            let parsingOptions = checkerService.FcsProjectProvider.GetParsingOptions(sourceFile)
+            let parsingOptions = fsFile.CheckerService.FcsProjectProvider.GetParsingOptions(sourceFile)
 
             let change =
                 if isNotNull rangeMarker then
                     try
                         let range = ofDocumentRange rangeMarker.DocumentRange
                         let formatted =
-                            codeFormatterProvider.FormatSelection(filePath, range, text, settings, parsingOptions, newLineText)
+                            fantomasHost.FormatSelection(filePath, range, text, settings, parsingOptions, newLineText)
                         let offset = rangeMarker.DocumentRange.StartOffset.Offset
                         let oldLength = rangeMarker.DocumentRange.Length
                         Some(DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide))
                     with _ -> None
                 else
-                    let formatted =
-                        codeFormatterProvider.FormatDocument(filePath, text, settings, parsingOptions, newLineText)
+                    let formatted = fantomasHost.FormatDocument(filePath, text, settings, parsingOptions, newLineText)
                     Some(DocumentChange(document, 0, text.Length, formatted, stamp, modificationSide))
 
             match change with
-            | Some change ->
+            | Some(change) ->
                 use cookie = WriteLockCookie.Create()
                 document.ChangeDocument(change, TimeStamp.NextValue)
                 sourceFile.GetPsiServices().Files.CommitAllDocuments()
