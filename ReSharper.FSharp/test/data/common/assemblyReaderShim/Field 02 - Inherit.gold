@@ -12,7 +12,7 @@ type T() =
     let _: Class = |Class.Field|(1)
 
     let _: Class = t.Field
-    let _: Class = |t.StaticField|(2)
+    let _: Class = t.|StaticField|(2)
 
 
     let _: string = Class.StaticFieldString
@@ -22,7 +22,7 @@ type T() =
     let _: int16 = t.ProtectedFieldShort
 
     let _: int16 = |Class.ProtectedFieldShort|(3)
-    let _: bool = |t.ProtectedStaticFieldBool|(4)
+    let _: bool = t.|ProtectedStaticFieldBool|(4)
 
 
     let _: int = Class.|InternalStaticFieldInt|(5)
@@ -41,9 +41,9 @@ type T() =
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Field 'Field' is not static
 (1): ReSharper Underlined Error Highlighting: Field 'Field' is not static
-(2): ReSharper Underlined Error Highlighting: A static field was used where an instance field is expected
+(2): ReSharper Underlined Error Highlighting: 'StaticField' is static
 (3): ReSharper Underlined Error Highlighting: Field 'ProtectedFieldShort' is not static
-(4): ReSharper Underlined Error Highlighting: A static field was used where an instance field is expected
+(4): ReSharper Underlined Error Highlighting: 'ProtectedStaticFieldBool' is static
 (5): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'InternalStaticFieldInt'.
 (6): ReSharper Error Highlighting: The type 'T' does not define the field, constructor or member 'InternalFieldDouble'.
 (7): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'InternalFieldDouble'.

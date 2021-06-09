@@ -212,6 +212,7 @@
     <Compile Include="src\QuickFixes\RemoveConstructorFix.fs" />
     <Compile Include="src\QuickFixes\AddInstanceMemberSelfIdFix.fs" />
     <Compile Include="src\QuickFixes\ToStaticMemberFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithTypeRefExprFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

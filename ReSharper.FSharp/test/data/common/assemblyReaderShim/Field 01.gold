@@ -4,7 +4,7 @@ let c: Class = Class.StaticField
 let _: Class = |Class.Field|(0)
 
 let _: Class = c.Field
-let _: Class = |c.StaticField|(1)
+let _: Class = c.|StaticField|(1)
 
 
 let _: string = Class.StaticFieldString
@@ -14,7 +14,7 @@ let _: bool = |Class.ProtectedStaticFieldBool|(2)
 let _: int16 = |c.ProtectedFieldShort|(3)
 
 let _: int16 = ||Class.ProtectedFieldShort|(4)|(5)
-let _: bool = |c.ProtectedStaticFieldBool|(6)
+let _: bool = c.|ProtectedStaticFieldBool|(6)
 
 
 let _: int = Class.|InternalStaticFieldInt|(7)
@@ -38,17 +38,17 @@ c.Field <- null
 
 |Class.Field|(17) <- null
 |Class.ReadonlyField|(18) <- null
-|c.StaticField|(19) <- null
-|c.StaticReadonlyField|(20) <- null
+c.|StaticField|(19) <- null
+c.|StaticReadonlyField|(20) <- null
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Field 'Field' is not static
-(1): ReSharper Underlined Error Highlighting: A static field was used where an instance field is expected
+(1): ReSharper Underlined Error Highlighting: 'StaticField' is static
 (2): ReSharper Underlined Error Highlighting: The struct or class field 'ProtectedStaticFieldBool' is not accessible from this code location
 (3): ReSharper Underlined Error Highlighting: The struct or class field 'ProtectedFieldShort' is not accessible from this code location
 (4): ReSharper Underlined Error Highlighting: Field 'ProtectedFieldShort' is not static
 (5): ReSharper Underlined Error Highlighting: The struct or class field 'ProtectedFieldShort' is not accessible from this code location
-(6): ReSharper Underlined Error Highlighting: A static field was used where an instance field is expected
+(6): ReSharper Underlined Error Highlighting: 'ProtectedStaticFieldBool' is static
 (7): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'InternalStaticFieldInt'.
 (8): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'InternalFieldDouble'.
 (9): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'InternalFieldDouble'.
@@ -61,5 +61,5 @@ c.Field <- null
 (16): ReSharper Underlined Error Highlighting: This field is readonly
 (17): ReSharper Underlined Error Highlighting: Field 'Field' is not static
 (18): ReSharper Underlined Error Highlighting: Field 'ReadonlyField' is not static
-(19): ReSharper Underlined Error Highlighting: A static field was used where an instance field is expected
-(20): ReSharper Underlined Error Highlighting: A static field was used where an instance field is expected
+(19): ReSharper Underlined Error Highlighting: 'StaticField' is static
+(20): ReSharper Underlined Error Highlighting: 'StaticReadonlyField' is static

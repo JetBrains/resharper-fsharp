@@ -102,6 +102,7 @@
     <Compile Include="QuickFixes\RemoveCtorTest.fs" />
     <Compile Include="QuickFixes\AddInstanceMemberSelfIdTest.fs" />
     <Compile Include="QuickFixes\ToStaticMemberTest.fs" />
+    <Compile Include="QuickFixes\ReplaceWithTypeRefExprTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

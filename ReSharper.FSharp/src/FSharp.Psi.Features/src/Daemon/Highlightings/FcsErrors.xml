@@ -395,4 +395,14 @@
     <QuickFix>IntroduceVarFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="MemberIsStatic">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message value="'{0}' is static">
+      <Argument>refExpr.ShortName</Argument>
+    </Message>
+    <Range>refExpr.Identifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithTypeRefExprFix</QuickFix>
+  </Error>
+
 </Errors>

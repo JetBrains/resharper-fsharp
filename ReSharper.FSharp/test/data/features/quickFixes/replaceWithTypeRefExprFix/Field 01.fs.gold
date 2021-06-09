@@ -1,0 +1,7 @@
+﻿module Module
+
+type S() =
+    static val F: int
+ 
+let s = S()
+S.F{caret}

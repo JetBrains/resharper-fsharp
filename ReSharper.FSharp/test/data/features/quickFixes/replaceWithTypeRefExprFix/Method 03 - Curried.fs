@@ -1,0 +1,4 @@
+type Type() =
+    static member M() () = 1
+   
+Type().M{caret} () ()

@@ -55,17 +55,20 @@ module FSharpErrors =
     let [<Literal>] NoImplementationGiven = 365
     let [<Literal>] NoImplementationGivenWithSuggestion = 366
     let [<Literal>] MemberIsNotAccessible = 491
+    let [<Literal>] MethodIsNotAnInstanceMethod = 493
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
     let [<Literal>] UseBindingsIllegalInModules = 524
     let [<Literal>] OnlyClassCanTakeValueArguments = 552
     let [<Literal>] LetAndForNonRecBindings = 576
     let [<Literal>] ExpectedExpressionAfterLet = 588
     let [<Literal>] SuccessiveArgsShouldBeSpacedOrTupled = 597
+    let [<Literal>] StaticFieldUsedWhenInstanceFieldExpected = 627
     let [<Literal>] InstanceMemberRequiresTarget = 673
     let [<Literal>] ConstructRequiresListArrayOrSequence = 747
     let [<Literal>] ConstructRequiresComputationExpression = 748
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] EmptyRecordInvalid = 789
+    let [<Literal>] PropertyIsStatic = 809
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
     let [<Literal>] TypeAbbreviationsCannotHaveAugmentations = 964
     let [<Literal>] UnusedValue = 1182
@@ -288,8 +291,23 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | MemberIsNotAccessible ->
             createHighlightingFromNode MemberIsNotAccessibleError range
 
+        | MethodIsNotAnInstanceMethod ->
+            let refExpr = nodeSelectionProvider.GetExpressionInRange<IReferenceExpr>(fsFile, range, false, null)
+            if isNotNull refExpr then MemberIsStaticError(refExpr) :> _ else
+
+            let appExpr = nodeSelectionProvider.GetExpressionInRange<IPrefixAppExpr>(fsFile, range, false, null)
+            if isNull appExpr then null else
+
+            let appRefExpr = appExpr.FunctionExpression.As<IReferenceExpr>()
+            if isNotNull appRefExpr then MemberIsStaticError(appRefExpr) :> _ else
+
+            null
+
         | UseBindingsIllegalInImplicitClassConstructors ->
             createHighlightingFromNode UseKeywordIllegalInPrimaryCtorError range
+
+        | PropertyIsStatic ->
+            createHighlightingFromNode MemberIsStaticError range
 
         | LocalClassBindingsCannotBeInline ->
             createHighlightingFromParentNode LocalClassBindingsCannotBeInlineError range
@@ -312,6 +330,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | SuccessiveArgsShouldBeSpacedOrTupled ->
             createHighlightingFromNode SuccessiveArgsShouldBeSpacedOrTupledError range
+
+        | StaticFieldUsedWhenInstanceFieldExpected ->
+            createHighlightingFromNode MemberIsStaticError range
 
         | InstanceMemberRequiresTarget ->
             match fsFile.GetNode<IMemberDeclaration>(range) with

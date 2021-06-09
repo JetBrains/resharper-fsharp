@@ -1,0 +1,5 @@
+module Module =
+    type T() =
+        static member P = 1
+
+    T().P{caret}
