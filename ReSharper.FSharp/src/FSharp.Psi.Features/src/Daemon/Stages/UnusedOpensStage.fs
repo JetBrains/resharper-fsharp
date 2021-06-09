@@ -58,7 +58,6 @@ and UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess) 
     override x.Execute(committer) =
         let interruptChecker = daemonProcess.CreateInterruptChecker()
         let unusedOpens = UnusedOpensStageProcess.getUnusedOpens fsFile interruptChecker
-        if Array.isEmpty unusedOpens then () else
 
         let seldomInterruptChecker = x.SeldomInterruptChecker
         unusedOpens
