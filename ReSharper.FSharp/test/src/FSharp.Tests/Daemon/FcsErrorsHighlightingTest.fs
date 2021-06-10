@@ -47,6 +47,7 @@ type FcsErrorsHighlightingTest() =
     [<Test>] member x.``Undefined indexer 01``() = x.DoNamedTest()
     [<Test>] member x.``Undefined indexer 02 - Undefined id``() = x.DoNamedTest()
     [<Test>] member x.``Undefined indexer 03 - Item Id``() = x.DoNamedTest()
+    [<Test>] member x.``Undefined indexer 04 - GetSlice``() = x.DoNamedTest()
 
     [<Test>] member x.``Unexpected args 01 - single arg``() = x.DoNamedTest()
     [<Test>] member x.``Unexpected args 02 - many args``() = x.DoNamedTest()

@@ -1,0 +1,6 @@
+﻿module Module
+
+"".|[1..2, 1]|(0)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression

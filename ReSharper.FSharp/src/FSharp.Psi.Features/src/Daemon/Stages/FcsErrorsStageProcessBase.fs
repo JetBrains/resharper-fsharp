@@ -75,6 +75,7 @@ module FSharpErrors =
     let [<Literal>] UnusedThisVariable = 1183
 
     let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
+    let [<Literal>] undefinedGetSliceMessageSuffix = " does not define the field, constructor or member 'GetSlice'."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
     let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type "
@@ -194,15 +195,18 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode VarBoundTwiceError range
 
         | UndefinedName ->
-            if (endsWith undefinedIndexerMessageSuffix error.Message &&
-                    let indexer = fsFile.GetNode<IItemIndexerExpr>(range) in isNotNull indexer) then
+            let message = error.Message
+            let isUndefinedIndexerText =
+                endsWith undefinedIndexerMessageSuffix message || endsWith undefinedGetSliceMessageSuffix message
+
+            if isUndefinedIndexerText && isNotNull (fsFile.GetNode<IItemIndexerExpr>(range)) then
                 UndefinedIndexerError(fsFile.GetNode(range)) :> _ else
 
             let identifier = fsFile.GetNode(range)
             let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
-            if isNotNull referenceOwner then UndefinedNameError(referenceOwner.Reference, error.Message) :> _ else
+            if isNotNull referenceOwner then UndefinedNameError(referenceOwner.Reference, message) :> _ else
 
-            UnresolvedHighlighting(error.Message, range) :> _
+            UnresolvedHighlighting(message, range) :> _
 
         | ErrorFromAddingConstraint ->
             createHighlightingFromNodeWithMessage AddingConstraintError range error
