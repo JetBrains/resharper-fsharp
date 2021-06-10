@@ -29,17 +29,14 @@ and NotPostfixTemplateBehavior(info) =
     inherit FSharpPostfixTemplateBehaviorBase(info)
 
     override x.ExpandPostfix(context) =
-        let psiModule = context.PostfixContext.PsiModule
-        let psiServices = psiModule.GetPsiServices()
-
+        let psiServices = context.PostfixContext.PsiModule.GetPsiServices()
         psiServices.Transactions.Execute(x.ExpandCommandName, fun _ ->
             let node = context.Expression :?> IFSharpTreeNode
-            let elementFactory = node.CreateElementFactory()
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
             use disableFormatter = new DisableCodeFormatter()
             let refExpr = x.GetExpression(context)
 
-            let appExpr = elementFactory.CreateAppExpr("not", refExpr)
+            let appExpr = node.CreateElementFactory().CreateAppExpr("not", refExpr)
             let appExpr = ModificationUtil.ReplaceChild(refExpr, appExpr)
 
             addParensIfNeeded appExpr.ArgumentExpression |> ignore

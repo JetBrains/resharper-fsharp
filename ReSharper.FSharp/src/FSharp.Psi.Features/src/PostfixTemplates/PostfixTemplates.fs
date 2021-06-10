@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -16,13 +17,13 @@ open JetBrains.Util
 open JetBrains.Util.Extension
 
 [<AllowNullLiteral>]
-type FSharpPostfixTemplateContext(treeNode: ITreeNode, executionContext: PostfixTemplateExecutionContext) as this =
-    inherit PostfixTemplateContext(treeNode, executionContext)
+type FSharpPostfixTemplateContext(node: ITreeNode, executionContext: PostfixTemplateExecutionContext) =
+    inherit PostfixTemplateContext(node, executionContext)
 
-    override x.Language = FSharpLanguage.Instance :> _
+    override this.Language = FSharpLanguage.Instance :> _
 
-    override x.GetAllExpressionContexts() =
-        [| FSharpPostfixExpressionContext(this, treeNode) :> PostfixExpressionContext |] :> _
+    override this.GetAllExpressionContexts() =
+        [| FSharpPostfixExpressionContext(this, node) :> PostfixExpressionContext |] :> _
 
 
 and FSharpPostfixExpressionContext(postfixContext, expression) =
@@ -32,15 +33,12 @@ and FSharpPostfixExpressionContext(postfixContext, expression) =
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpPostfixTemplateContextFactory() =
     interface IPostfixTemplateContextFactory with
-        member x.GetReparseStrings() = EmptyArray.Instance
+        member this.GetReparseStrings() = EmptyArray.Instance
 
-        member x.TryCreate(treeNode, executionContext) =
-            if isNull treeNode then null else
+        member this.TryCreate(node, executionContext) =
+            if isNull node || not (executionContext.Solution.FSharpPostfixTemplatesEnabled()) then null else
 
-            let solution = executionContext.Solution
-            if not (solution.FSharpPostfixTemplatesEnabled()) then null else
-
-            FSharpPostfixTemplateContext(treeNode, executionContext) :> _
+            FSharpPostfixTemplateContext(node, executionContext) :> _
 
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -48,24 +46,25 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
     inherit PostfixTemplatesItemProviderBase<FSharpCodeCompletionContext, FSharpPostfixTemplateContext>(
         templatesManager, sessionExecutor, usageStatistics)
 
-    override x.TryCreatePostfixContext(fsCompletionContext) =
+    let isApplicableToken (token: ITreeNode) =
+        let tokenType = getTokenType token
+        tokenType == FSharpTokenType.DOT ||
+        tokenType == FSharpTokenType.IEEE64 ||
+        tokenType == FSharpTokenType.DECIMAL ||
+        tokenType == FSharpTokenType.RESERVED_LITERAL_FORMATS ||
+        tokenType == FSharpTokenType.IDENTIFIER && getTokenType token.PrevSibling == FSharpTokenType.DOT
+
+    override this.TryCreatePostfixContext(fsCompletionContext) =
         let context = fsCompletionContext.BasicContext
         let solution = context.Solution
-
         if not (solution.FSharpPostfixTemplatesEnabled()) then null else
+
+        let token = fsCompletionContext.TokenBeforeCaret
+        if isNull token || not (token.Parent :? IFSharpExpression && isApplicableToken token) then null else
 
         let settings = context.ContextBoundSettingsStore
         let executionContext = PostfixTemplateExecutionContext(solution, context.TextControl, settings, "__")
-
-        match fsCompletionContext.TokenBeforeCaret with
-        | identifier when
-                isNotNull identifier &&
-
-                let parent = identifier.Parent
-                (parent :? IFSharpExpression || parent :? IReferenceName) ->
-            FSharpPostfixTemplateContext(identifier, executionContext)
-
-        | _ -> null
+        FSharpPostfixTemplateContext(token, executionContext)
 
 
 [<AbstractClass>]
@@ -74,7 +73,10 @@ type FSharpPostfixTemplateBehaviorBase(info) =
 
     let rec getContainingArgExpr (expr: IFSharpExpression) =
         match PrefixAppExprNavigator.GetByArgumentExpression(expr) with
-        | null -> expr
+        | null ->
+            match BinaryAppExprNavigator.GetByRightArgument(expr) with
+            | null -> expr
+            | binaryAppExpr -> binaryAppExpr :> _
         | appExpr -> getContainingArgExpr appExpr
 
     let getContainingTypeExpression (typeName: IReferenceName) =
@@ -121,7 +123,7 @@ type FSharpPostfixTemplateBehaviorBase(info) =
 
         | _ -> null
 
-    member x.GetExpression(context: PostfixExpressionContext) =
+    member this.GetExpression(context: PostfixExpressionContext) =
         let token = context.Expression :?> IFSharpTreeNode
         let parent = getParentExpression token
         getContainingArgExpr parent

@@ -31,35 +31,29 @@ and MatchPostfixTemplateBehavior(info) =
     inherit FSharpPostfixTemplateBehaviorBase(info)
 
     override x.ExpandPostfix(context) =
-        let psiModule = context.PostfixContext.PsiModule
-        let psiServices = psiModule.GetPsiServices()
+        let psiServices = context.PostfixContext.PsiModule.GetPsiServices()
 
         psiServices.Transactions.Execute(x.ExpandCommandName, fun _ ->
             let node = context.Expression :?> IFSharpTreeNode
-            let elementFactory = node.CreateElementFactory()
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
             use disableFormatter = new DisableCodeFormatter()
+
             let expr = x.GetExpression(context)
-            let appExpr = elementFactory.CreateMatchExpr(expr)
+            let appExpr = expr.CreateElementFactory().CreateMatchExpr(expr)
             ModificationUtil.ReplaceChild(expr, appExpr) :> ITreeNode)
 
     override x.AfterComplete(textControl, node, _) =
-        match node.As<IMatchExpr>() with
-        | null -> ()
-        | matchExpr ->
-
-        let templatesManager = LiveTemplatesManager.Instance
-        let solution = info.ExecutionContext.Solution
+        let matchExpr = node.As<IMatchExpr>()
+        if isNull matchExpr then () else
 
         let matchClause = matchExpr.Clauses.[0]
         let hotspotInfos =
-            let pattern = matchClause.Pattern
             let templateField = TemplateField("Foo", SimpleHotspotExpression(null), 0)
-            HotspotInfo(templateField, pattern.GetDocumentRange(), KeepExistingText = true)
+            HotspotInfo(templateField, matchClause.Pattern.GetDocumentRange(), KeepExistingText = true)
 
         let hotspotSession =
-            templatesManager.CreateHotspotSessionAtopExistingText(
-                solution, matchClause.Expression.GetDocumentEndOffset(), textControl,
+            LiveTemplatesManager.Instance.CreateHotspotSessionAtopExistingText(
+                info.ExecutionContext.Solution, matchClause.Expression.GetDocumentEndOffset(), textControl,
                 LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
 
-        hotspotSession.Execute()
+        hotspotSession.ExecuteAndForget()

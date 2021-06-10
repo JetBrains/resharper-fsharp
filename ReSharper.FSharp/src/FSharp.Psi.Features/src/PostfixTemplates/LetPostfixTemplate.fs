@@ -30,7 +30,7 @@ and LetPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
     inherit PostfixTemplateInfo("let", expressionContext)
 
 
-and LetPostfixTemplateBehavior(info) =
+and LetPostfixTemplateBehavior(info) as this =
     inherit FSharpPostfixTemplateBehaviorBase(info)
 
     static member val PreventIntroduceVarKey = Key("PreventIntroduceVarKey")
@@ -45,13 +45,13 @@ and LetPostfixTemplateBehavior(info) =
             let elementFactory = node.CreateElementFactory()
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
             use disableFormatter = new DisableCodeFormatter()
-            let refExpr = x.GetExpression(context)
+            let expr = this.GetExpression(context)
 
-            if (FSharpIntroduceVariable.CanIntroduceVar(refExpr)) then refExpr :> ITreeNode else
+            if (FSharpIntroduceVariable.CanIntroduceVar(expr)) then expr :> ITreeNode else
 
             let letOrUseExpr = elementFactory.CreateLetBindingExpr("_")
-            setBindingExpression refExpr refExpr.Indent letOrUseExpr
-            let replaced = ModificationUtil.ReplaceChild(refExpr, letOrUseExpr)
+            setBindingExpression expr expr.Indent letOrUseExpr
+            let replaced = ModificationUtil.ReplaceChild(expr, letOrUseExpr)
             replaced.UserData.PutKey(LetPostfixTemplateBehavior.PreventIntroduceVarKey)
             replaced :> _)
 
@@ -59,12 +59,8 @@ and LetPostfixTemplateBehavior(info) =
         if not (node.UserData.HasKey(LetPostfixTemplateBehavior.PreventIntroduceVarKey)) then
             FSharpIntroduceVariable.IntroduceVar(node :?> _, textControl, false, false) else
 
-        match node.As<ILetOrUseExpr>() with
-        | null -> ()
-        | letExpr ->
-
-        let templatesManager = LiveTemplatesManager.Instance
-        let solution = info.ExecutionContext.Solution
+        let letExpr = node.As<ILetOrUseExpr>()
+        if isNull letExpr then () else
 
         let hotspotInfos =
             let headPattern = letExpr.Bindings.[0].HeadPattern
@@ -72,8 +68,8 @@ and LetPostfixTemplateBehavior(info) =
             HotspotInfo(templateField, headPattern.GetDocumentRange(), KeepExistingText = true)
 
         let hotspotSession =
-            templatesManager.CreateHotspotSessionAtopExistingText(
-                solution, letExpr.GetDocumentEndOffset(), textControl,
+            LiveTemplatesManager.Instance.CreateHotspotSessionAtopExistingText(
+                info.ExecutionContext.Solution, letExpr.GetDocumentEndOffset(), textControl,
                 LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
 
-        hotspotSession.Execute()
+        hotspotSession.ExecuteAndForget()

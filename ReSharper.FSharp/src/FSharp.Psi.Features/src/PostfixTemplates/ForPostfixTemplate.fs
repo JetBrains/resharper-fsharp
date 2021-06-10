@@ -36,30 +36,24 @@ and ForPostfixTemplateBehavior(info) =
 
         psiServices.Transactions.Execute(x.ExpandCommandName, fun _ ->
             let node = context.Expression :?> IFSharpTreeNode
-            let elementFactory = node.CreateElementFactory()
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
             use disableFormatter = new DisableCodeFormatter()
-            let refExpr = x.GetExpression(context)
 
-            let forEachExpr = elementFactory.CreateForEachExpr(refExpr)
+            let refExpr = x.GetExpression(context)
+            let forEachExpr = refExpr.CreateElementFactory().CreateForEachExpr(refExpr)
             ModificationUtil.ReplaceChild(refExpr, forEachExpr) :> ITreeNode)
 
     override x.AfterComplete(textControl, node, _) =
-        match node.As<IForEachExpr>() with
-        | null -> ()
-        | forEachExpr ->
-
-        let templatesManager = LiveTemplatesManager.Instance
-        let solution = info.ExecutionContext.Solution
+        let forEachExpr = node.As<IForEachExpr>()
+        if isNull forEachExpr then () else
 
         let hotspotInfos =
-            let headPattern = forEachExpr.Pattern
             let templateField = TemplateField("Foo", SimpleHotspotExpression(null), 0)
-            HotspotInfo(templateField, headPattern.GetDocumentRange(), KeepExistingText = true)
+            HotspotInfo(templateField, forEachExpr.Pattern.GetDocumentRange(), KeepExistingText = true)
 
         let hotspotSession =
-            templatesManager.CreateHotspotSessionAtopExistingText(
-                solution, forEachExpr.GetDocumentEndOffset(), textControl,
+            LiveTemplatesManager.Instance.CreateHotspotSessionAtopExistingText(
+                info.ExecutionContext.Solution, forEachExpr.GetDocumentEndOffset(), textControl,
                 LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
 
-        hotspotSession.Execute()
+        hotspotSession.ExecuteAndForget()
