@@ -86,7 +86,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
             |> List.filter (fun mfvInstance ->
                 not (mfvInstance.Mfv.IsAccessor()) &&
 
-                let xmlDocId = FSharpElementsUtil.GetXmlDocId(mfvInstance.Mfv)
+                let xmlDocId = mfvInstance.Mfv.GetXmlDocId()
                 not (implementedMembers.Contains(xmlDocId)))
             |> List.sortBy (fun mfvInstance -> mfvInstance.Mfv.LogicalName) // todo: better sorting?
             |> List.map (fun mfvInstance -> mfvInstance, needsTypesAnnotations.Contains(mfvInstance.Mfv))

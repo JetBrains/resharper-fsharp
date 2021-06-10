@@ -28,7 +28,7 @@ using Range = FSharp.Compiler.Text.Range;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   /// Maps FSharpSymbol elements (produced by FSharp.Compiler.Service) to declared elements.
-  public static class FSharpElementsUtil
+  public static class FcsSymbolMappingUtil
   {
     [CanBeNull]
     public static ITypeElement GetTypeElement([NotNull] this FSharpEntity entity, [NotNull] IPsiModule psiModule)
@@ -426,7 +426,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (mfv == null)
         return EmptyList<IParameter>.Instance;
 
-      var module = function.Module;
       var paramGroups = mfv.CurriedParameterGroups;
       var isFsExtension = mfv.IsExtensionMember;
       var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit;
@@ -434,7 +433,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (!isFsExtension && isVoidReturn)
         return EmptyArray<IParameter>.Instance;
 
-      var paramsCount = GetElementsCount(paramGroups);
+      var paramsCount = paramGroups.Sum(list => list.Count);
       if (paramsCount == 0)
         return EmptyList<IParameter>.Instance;
 
@@ -442,7 +441,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var methodParams = new List<IParameter>(paramsCount);
       if (isFsExtension && mfv.IsInstanceMember)
       {
-        var typeElement = mfv.ApparentEnclosingEntity.GetTypeElement(module);
+        var typeElement = mfv.ApparentEnclosingEntity.GetTypeElement(function.Module);
 
         var type =
           typeElement != null
@@ -458,17 +457,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       foreach (var paramsGroup in paramGroups)
       foreach (var param in paramsGroup)
         methodParams.Add(new FSharpMethodParameter(param, function, methodParams.Count,
-          param.Type.MapType(typeParameters, module, true)));
+          param.Type.MapType(typeParameters, function.Module, true)));
 
       return methodParams;
-    }
-
-    private static int GetElementsCount<T>([NotNull] IEnumerable<IList<T>> lists)
-    {
-      var count = 0;
-      foreach (var list in lists)
-        count += list.Count;
-      return count;
     }
   }
 }

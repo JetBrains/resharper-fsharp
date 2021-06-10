@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   /// <summary>
   /// Map FSharpType elements (as seen by FSharp.Compiler.Service) to IType types.
   /// </summary>
-  public static class FSharpTypesUtil
+  public static class FcsTypeMappingUtil
   {
     [CanBeNull]
     public static IDeclaredType MapBaseType([NotNull] this FSharpEntity entity, IList<ITypeParameter> typeParams,
@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         : TypeFactory.CreateUnknownType(psiModule);
 
     [NotNull]
-    public static IEnumerable<IDeclaredType> GetSuperTypes([NotNull] FSharpEntity entity,
+    public static IEnumerable<IDeclaredType> GetSuperTypes([NotNull] this FSharpEntity entity,
       IList<ITypeParameter> typeParams, [NotNull] IPsiModule psiModule)
     {
       var interfaces = entity.DeclaredInterfaces;
