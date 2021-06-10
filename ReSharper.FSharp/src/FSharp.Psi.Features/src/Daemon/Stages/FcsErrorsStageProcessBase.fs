@@ -365,7 +365,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | _ -> null
 
         | NamespaceCannotContainValues ->
-            let binding = fsFile.GetNode<IBinding>(range)
+            let binding = fsFile.GetNode<IBindingLikeDeclaration>(range)
             if isNotNull binding then NamespaceCannotContainBindingsError(binding) :> _ else
 
             let expr = fsFile.GetNode<IDoLikeStatement>(range)

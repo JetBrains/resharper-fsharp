@@ -60,7 +60,8 @@ type FcsErrorsHighlightingTest() =
 
     [<Test>] member x.``Upcast unnecessary 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Binding in namespace``() = x.DoNamedTest()
+    [<Test>] member x.``Binding in namespace 01``() = x.DoNamedTest()
+    [<Test; FSharpSignatureTest>] member x.``Binding in namespace 02 - val``() = x.DoNamedTest()
     [<Test>] member x.``Expression in namespace``() = x.DoNamedTest()
 
     [<Test>] member x.``No implementation given 01 - Interface``() = x.DoNamedTest()

@@ -13,6 +13,7 @@ type NamespaceToModuleTest() =
     [<Test>] member x.``Binding 01``() = x.DoNamedTest()
     [<Test>] member x.``Binding 02``() = x.DoNamedTest()
     [<Test>] member x.``Binding 03``() = x.DoNamedTest()
+    [<Test; FSharpSignatureTest>] member x.``Binding 04 - val``() = x.DoNamedTest()
     [<Test>] member x.``Expression 01``() = x.DoNamedTest()
     [<Test>] member x.``Expression 02 - do``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Global namespace``() = x.DoNamedTest()
