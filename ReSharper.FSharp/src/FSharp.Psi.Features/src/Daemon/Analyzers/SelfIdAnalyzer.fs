@@ -20,12 +20,8 @@ type SelfIdAnalyzer() =
         if selfId.SourceName <> "__" || not data.IsFSharp47Supported then () else
 
         let memberDeclaration = MemberDeclarationNavigator.GetBySelfId(selfId)
-        if isNull memberDeclaration then () else
+        if isNull memberDeclaration || hasUsages memberDeclaration.Expression then () else
 
-        if (hasUsages memberDeclaration.Expression) then () else
-
-        let accessorDeclarations = memberDeclaration.AccessorDeclarations
-        if not (Seq.isEmpty accessorDeclarations) &&
-                accessorDeclarations |> Seq.exists (fun decl -> hasUsages decl.BodyExpression.Expression) then () else
-
-        consumer.AddHighlighting(UseWildSelfIdWarning(selfId))
+        let accessorDecls = memberDeclaration.AccessorDeclarationsEnumerable
+        if Seq.isEmpty accessorDecls || not (accessorDecls |> Seq.exists (fun decl -> hasUsages decl.Expression)) then
+            consumer.AddHighlighting(UseWildSelfIdWarning(selfId))

@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override IList<IParameter> Parameters => this.GetParameters(Mfv);
 
     private bool HasPublicAccessor(AccessorKind kind) =>
-      GetDeclaration()?.AccessorDeclarations.TryGet(kind) is { } declaration &&
+      GetDeclaration()?.AccessorDeclarationsEnumerable.TryGet(kind) is { } declaration &&
       declaration.GetAccessRights() == AccessRights.PUBLIC;
 
     public override bool Equals(object obj)
