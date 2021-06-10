@@ -77,6 +77,10 @@
         <Title>Format string can be replaced with an interpolated string</Title>
         <Description>Format string can be replaced with an interpolated string.</Description>
       </Tag>
+      <Tag name="FSharpExpressionCanBeReplacedWithCondition" default="SUGGESTION">
+        <Title>'if' expression can be replaced with its condition</Title>
+        <Description>'if' expression can be replaced with its condition.</Description>
+      </Tag>
     </Group>
   </SeverityConfiguration>
 
@@ -278,6 +282,19 @@
     <Message value="Redundant string interpolation"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>expr.GetDollarSignRange()</Range>
+  </Warning>
+
+  <Warning name="ExpressionCanBeReplacedWithCondition" configurableSeverity="FSharpExpressionCanBeReplacedWithCondition">
+    <Parameter type="IIfThenElseExpr" name="expr"/>
+    <Parameter type="bool" name="needsNegation"/>
+    <Message value="{0}">
+      <Argument>
+        if needsNegation then "Expression can be replaced with condition negation"
+        else "Expression can be replaced with condition"
+      </Argument>
+    </Message>
+    <Range>expr.GetDocumentRange()</Range>
+    <QuickFix>ReplaceWithConditionFix</QuickFix>
   </Warning>
 
 </Errors>

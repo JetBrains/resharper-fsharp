@@ -47,6 +47,7 @@
     <Compile Include="Daemon\AppExprAnalyzerTest.fs" />
     <Compile Include="Daemon\LambdaAnalyzerTest.fs" />
     <Compile Include="Daemon\InterpolatedStringCandidateTest.fs" />
+    <Compile Include="Daemon\IfExpressionAnalyzerTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\FSharpQuickFixTestBase.fs" />
@@ -100,6 +101,7 @@
     <Compile Include="QuickFixes\UseWildSelfIdTest.fs" />
     <Compile Include="QuickFixes\ReplaceWithPredefinedOperatorTest.fs" />
     <Compile Include="QuickFixes\RemoveCtorTest.fs" />
+    <Compile Include="QuickFixes\ReplaceIfWithConditionOperandTest.fs" />
     <Compile Include="QuickFixes\AddInstanceMemberSelfIdTest.fs" />
     <Compile Include="QuickFixes\ToStaticMemberTest.fs" />
     <Compile Include="QuickFixes\ReplaceWithTypeRefExprTest.fs" />

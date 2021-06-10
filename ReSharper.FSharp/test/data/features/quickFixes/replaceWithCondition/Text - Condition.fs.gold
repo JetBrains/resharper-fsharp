@@ -1,0 +1,8 @@
+﻿module Test
+
+let _ = |if true then true else false|(0)
+
+------------------------------------------------
+0: Expression can be replaced with condition
+QUICKFIXES:
+Replace with condition
