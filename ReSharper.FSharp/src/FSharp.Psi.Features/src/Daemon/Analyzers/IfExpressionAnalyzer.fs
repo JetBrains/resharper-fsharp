@@ -26,14 +26,16 @@ type IfExpressionAnalyzer() =
                 thenTokenType == FSharpTokenType.TRUE && elseTokenType == FSharpTokenType.FALSE ||
                 thenTokenType == FSharpTokenType.FALSE && elseTokenType == FSharpTokenType.TRUE
 
-            if (createHighlighting &&
-                let thenKeyword = expr.ThenKeyword
-                let elseKeyword = expr.ElseKeyword
-                isNotNull thenKeyword && isNotNull elseKeyword &&
-                (skipMatchingNodesAfter isWhitespace thenKeyword == thenExpr) &&
-                (skipMatchingNodesAfter isWhitespace thenExpr == elseKeyword) &&
-                (skipMatchingNodesAfter isWhitespace elseKeyword == elseExpr)) then
-                let highlighting = ExpressionCanBeReplacedWithConditionWarning(expr, thenTokenType == FSharpTokenType.FALSE)
-                consumer.AddHighlighting(highlighting)
+            if not createHighlighting then () else
+
+            let thenKeyword = expr.ThenKeyword
+            let elseKeyword = expr.ElseKeyword
+            if isNotNull thenKeyword && isNotNull elseKeyword &&
+               skipMatchingNodesAfter isWhitespace thenKeyword == thenExpr &&
+               skipMatchingNodesAfter isWhitespace thenExpr == elseKeyword &&
+               skipMatchingNodesAfter isWhitespace elseKeyword == elseExpr
+            then
+                let needsNegation = thenTokenType == FSharpTokenType.FALSE
+                consumer.AddHighlighting(ExpressionCanBeReplacedWithConditionWarning(expr, needsNegation))
 
         | _ -> ()
