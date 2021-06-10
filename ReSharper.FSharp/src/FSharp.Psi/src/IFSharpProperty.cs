@@ -7,6 +7,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   public interface IFSharpProperty : IProperty, IRepresentationAccessRightsOwner
   {
+    public bool HasExplicitAccessors { get; }
+    public IEnumerable<IFSharpExplicitAccessor> GetExplicitAccessors();
+
     [NotNull] public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitGetters { get; }
     [NotNull] public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitSetters { get; }
   }

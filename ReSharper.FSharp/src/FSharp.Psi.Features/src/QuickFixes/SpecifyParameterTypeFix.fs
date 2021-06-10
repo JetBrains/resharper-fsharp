@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Impl.Special
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Util
 
 [<AbstractClass>]
 type SpecifyParameterTypeFixBase(error: IndeterminateTypeError) =
@@ -83,8 +82,7 @@ type SpecifyPropertyTypeFix(error: IndeterminateTypeError) =
 
     override this.IsApplicable(declaredElement: IDeclaredElement) =
         let fsProperty = declaredElement.As<IFSharpProperty>()
-        isNotNull fsProperty && fsProperty.Getter :? ImplicitAccessor &&
-        fsProperty.FSharpExplicitGetters.IsEmpty() && fsProperty.FSharpExplicitSetters.IsEmpty()
+        isNotNull fsProperty && fsProperty.Getter :? ImplicitAccessor && not fsProperty.HasExplicitAccessors
 
     override this.IsApplicable(decl: IDeclaration) =
         match decl with

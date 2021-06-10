@@ -899,5 +899,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       return new FSharpProperty<IMemberSignatureOrDeclaration>(decl, mfv);
     }
+
+    [CanBeNull]
+    public static IAccessorDeclaration TryGet(this IEnumerable<IAccessorDeclaration> accessors, AccessorKind kind)
+    {
+      foreach (var accessor in accessors)
+        if (accessor.Kind == kind)
+          return accessor;
+      return null;
+    }
   }
 }

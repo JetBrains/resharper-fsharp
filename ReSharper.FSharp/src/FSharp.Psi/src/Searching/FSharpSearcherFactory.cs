@@ -74,8 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         return new[] {new RelatedDeclaredElement(parameter)};
 
       if (element is IFSharpProperty property)
-        return property.FSharpExplicitGetters.Concat(property.FSharpExplicitSetters)
-          .Select(member => new RelatedDeclaredElement(member));
+        return property.GetExplicitAccessors().Select(member => new RelatedDeclaredElement(member));
 
       return EmptyList<RelatedDeclaredElement>.Instance;
     }

@@ -470,14 +470,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         count += list.Count;
       return count;
     }
-
-    [CanBeNull]
-    public static IAccessorDeclaration TryGet(this IEnumerable<IAccessorDeclaration> accessors, AccessorKind kind)
-    {
-      foreach (var accessor in accessors)
-        if (accessor.Kind == kind)
-          return accessor;
-      return null;
-    }
   }
 }

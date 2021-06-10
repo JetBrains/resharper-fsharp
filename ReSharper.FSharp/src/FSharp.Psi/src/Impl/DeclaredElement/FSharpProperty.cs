@@ -20,6 +20,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public AccessRights RepresentationAccessRights => GetAccessRights();
 
+    public bool HasExplicitAccessors => false;
+    public IEnumerable<IFSharpExplicitAccessor> GetExplicitAccessors() => EmptyList<IFSharpExplicitAccessor>.Instance;
+
     public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitGetters => EmptyList<IFSharpExplicitAccessor>.Instance;
     public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitSetters => EmptyList<IFSharpExplicitAccessor>.Instance;
   }

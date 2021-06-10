@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -19,17 +18,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override AccessRights GetAccessRights() => AccessRights.PRIVATE;
     public AccessRights RepresentationAccessRights => base.GetAccessRights();
 
-    public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitGetters => GetAccessors(AccessorKind.GETTER);
-    public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitSetters => GetAccessors(AccessorKind.SETTER);
+    public bool HasExplicitAccessors =>
+      GetDeclarations().Any(decl =>
+        decl is IMemberDeclaration memberDecl && memberDecl.AccessorDeclarationsEnumerable.Any());
 
-    private IEnumerable<IFSharpExplicitAccessor> GetAccessors(AccessorKind kind)
+    public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitGetters => GetExplicitAccessors(AccessorKind.GETTER);
+    public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitSetters => GetExplicitAccessors(AccessorKind.SETTER);
+
+    public IEnumerable<IFSharpExplicitAccessor> GetExplicitAccessors()
     {
       foreach (var declaration in GetDeclarations())
-      {
-        if (declaration is IMemberDeclaration member &&
-            member.AccessorDeclarations.TryGet(kind) is { DeclaredElement: IFSharpExplicitAccessor accessor })
-          yield return accessor;
-      }
+        if (declaration is IMemberDeclaration member)
+          foreach (var accessorDeclaration in member.AccessorDeclarationsEnumerable)
+            if (accessorDeclaration is { DeclaredElement: IFSharpExplicitAccessor accessor })
+              yield return accessor;
     }
+
+    private IEnumerable<IFSharpExplicitAccessor> GetExplicitAccessors(AccessorKind kind) =>
+      GetExplicitAccessors().Where(accessor => accessor.Kind == kind);
   }
 }
