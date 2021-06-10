@@ -1053,10 +1053,10 @@ enumCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; 
 recordRepresentation options { stubBase="TypeRepresentationBase"; } extras {
   get { methodName="FieldDeclarations" path=<recordRepresentation:FIELD_DECLARATION_LIST/recordFieldDeclarationList:FIELD_DECLARATION> };
 }:
-  LBRACE
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  LBRACE<LEFT_BRACE, LeftBrace>
   recordFieldDeclarationList<FIELD_DECLARATION_LIST, FieldDeclarationList>
-  RBRACE;
+  RBRACE<RIGHT_BRACE, RightBrace>;
 
 recordFieldDeclarationList:
   recordFieldDeclaration<FIELD_DECLARATION, FieldDeclarations>*;

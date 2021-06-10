@@ -44,9 +44,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Aligning();
       Formatting();
       BlankLines();
+      Braces();
     }
 
     public override ProjectFileType MainProjectFileType => FSharpProjectFileType.Instance;
+
+    private void Braces()
+    {
+      var bracesRule = Describe<BracesRule>()
+        .LPar(FSharpTokenType.LBRACE)
+        .RPar(FSharpTokenType.RBRACE)
+        .FormatBeforeParent(true)
+        .DisableParentAlignment(false)
+        .ProhibitBlankLinesNearBracesInBsdStyle(false)
+        .MaxBlankLinesInsideSetting(it => it.KeepMaxBlankLineAroundModuleMembers) // todo: use separate settings
+        .MustHaveIndentIfOnNewLine(true)
+        .StartAlternating();
+
+      bracesRule.Name("RecordReprBraces")
+        .Where(Parent().In(ElementType.RECORD_REPRESENTATION))
+        .BraceSetting(it => it.TypeDeclarationBraces)
+        .Priority(2)
+        .Build();
+    }
 
     private void Indenting()
     {
@@ -341,6 +361,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           When(true).Switch(settings => settings.NeverOutdentPipeOperators,
             When(false).Return(IndentType.Outdent | IndentType.External)))
         .Build();
+
+      Describe<IndentingRule>()
+        .Name("RecordReprAccessibility")
+        .Where(Node().In(ElementType.RECORD_REPRESENTATION).Satisfies((node, context) =>
+          ((RecordRepresentation)node).AccessModifier != null &&
+          ((RecordRepresentation)node).LeftBrace.HasNewLineBefore(context.CodeFormatter)))
+        .Return(IndentType.AlignThrough)
+        .Build();
     }
 
     private void DescribeNestedAlignment<T>(string title, NodeType nodeType) =>
@@ -374,7 +402,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       var nodesWithSpaces =
         new NodeTypeSet(
           ElementType.MATCH_EXPR,
-          
+
           ElementType.CHAR_RANGE_PAT,
           ElementType.IS_INST_PAT,
           ElementType.LIST_CONS_PAT,
@@ -519,7 +547,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
     }
 
-    private void DescribeEmptyOnlyFormatting(IBuilderAction<IBlankWithSinglePattern> parent, NodeType left, 
+    private void DescribeEmptyOnlyFormatting(IBuilderAction<IBlankWithSinglePattern> parent, NodeType left,
       NodeType right) =>
       Describe<FormattingRule>()
         .Name("SpaceInLists")

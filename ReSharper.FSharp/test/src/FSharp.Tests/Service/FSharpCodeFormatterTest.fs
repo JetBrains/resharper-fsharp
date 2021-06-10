@@ -66,7 +66,9 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Type decl - Exception 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type decl - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record 01``() = x.DoNamedTest() // todo: fix KeepExistingLineBreakBeforeDeclarationBody
+    [<Test>] member x.``Type decl - Record 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record 03``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 01 - Spaces``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 02 - Indent``() = x.DoNamedTest()
 
@@ -129,9 +131,6 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Sequential expr alignment 02 - Separators``() = x.DoNamedTest()
     [<Test>] member x.``Binary expr alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Binary expr alignment 02 - Pipe operator``() = x.DoNamedTest()
-    [<Test>] member x.``Record declaration alignment 01``() = x.DoNamedTest()
-    [<Test>] member x.``Record declaration alignment 02 - Semicolons``() = x.DoNamedTest()
-    [<Test>] member x.``Record declaration alignment 03 - Mutable``() = x.DoNamedTest()
     [<Test>] member x.``Record expr alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Record expr alignment 02 - Copy``() = x.DoNamedTest()
     [<Test>] member x.``Anon record expr alignment 01``() = x.DoNamedTest()
