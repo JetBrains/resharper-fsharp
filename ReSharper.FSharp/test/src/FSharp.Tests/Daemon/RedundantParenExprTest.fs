@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -16,7 +17,7 @@ type RedundantParenExprTest() =
     override x.RelativeTestDataPath = "features/daemon/redundantParens/expr"
 
     override x.DoTest(lifetime, project) =
-        use cookie = FSharpExperimentalFeatures.EnableRedundantParenAnalysisCookie.Create()
+        use cookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.RedundantParenAnalysis)
         base.DoTest(lifetime, project)
 
     override x.HighlightingPredicate(highlighting, _, _) =

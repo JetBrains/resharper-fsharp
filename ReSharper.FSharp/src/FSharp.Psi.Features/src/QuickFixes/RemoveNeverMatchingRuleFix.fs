@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -26,7 +27,7 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
 
     override x.ExecutePsiTransaction _ =
         let clause = warning.MatchClause
-        use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
+        use enableFormatter = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         use writeLock = WriteLockCookie.Create(clause.IsPhysical())
         removeMatchClause clause
 
@@ -35,7 +36,7 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
         member x.FileCollectorInfo = FileCollectorInfo.Default
 
         member x.ExecuteAction(highlightingInfos, _, _) =
-            use enableFormatter = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
+            use enableFormatter = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
 
             for highlightingInfo in highlightingInfos do
                 match highlightingInfo.Highlighting.As<RuleNeverMatchedWarning>() with

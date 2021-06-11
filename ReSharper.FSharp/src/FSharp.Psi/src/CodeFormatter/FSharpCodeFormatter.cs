@@ -68,7 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       if (task.FirstElement == null)
         return new TreeRange(firstElement, lastElement);
 
-      if (!firstElement.FSharpFormatterEnabled())
+      if (!firstElement.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.Formatter))
         return new TreeRange(firstElement, lastElement);
 
       var formatterSettings = GetFormattingSettings(task.FirstElement, parameters, myFormatterInfoProvider);

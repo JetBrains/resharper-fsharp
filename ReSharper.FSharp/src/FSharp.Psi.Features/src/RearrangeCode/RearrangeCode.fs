@@ -4,6 +4,7 @@ open System
 open System.Runtime.InteropServices
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.RearrangeCode
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -38,7 +39,7 @@ type FSharpRearrangeableElementSwap<'T when 'T: not struct and 'T :> ITreeNode>(
 
     override this.Swap(child, target) =
         if enableFormatter then
-            use enableFormatterCookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
+            use enableFormatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
             this.BeforeSwap(child, target)
             base.Swap(child, target)
         else

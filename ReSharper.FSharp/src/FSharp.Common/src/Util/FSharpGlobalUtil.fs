@@ -41,3 +41,17 @@ module IgnoreAll =
         member _.Delay(f) = f ()
 
     let ignoreAll = IgnoreAllBuilder()
+
+
+namespace JetBrains.ReSharper.Plugins.FSharp
+
+open JetBrains.Annotations
+open JetBrains.ProjectModel
+open JetBrains.RdBackend.Common.Features
+
+[<AbstractClass; Sealed; Extension>]
+type ProtocolSolutionExtensions =
+    [<Extension; CanBeNull>]
+    static member RdFSharpModel(solution: ISolution) =
+        try solution.GetProtocolSolution().GetRdFSharpModel()
+        with _ -> null

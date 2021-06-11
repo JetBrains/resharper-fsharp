@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.FeaturesTestFramework.Formatter
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -14,7 +15,7 @@ type FSharpCodeFormatterTest() =
     override x.RelativeTestDataPath = "features/service/codeFormatter"
 
     override x.DoNamedTest() =
-        use cookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
+        use cookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         base.DoNamedTest()
 
     [<Test>] member x.``Expr - App - CompExpr 01``() = x.DoNamedTest()

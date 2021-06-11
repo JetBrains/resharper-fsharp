@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open JetBrains.ReSharper.Daemon.VisualElements
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -42,7 +43,8 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
 
         let solution = fsFile.GetSolution()
         let redundantParensAnalysisEnabled =
-            if solution.FSharpRedundantParenAnalysisEnabled() then BooleanBoxes.True else BooleanBoxes.False
+            let isEnabled = solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.RedundantParenAnalysis)
+            if isEnabled then BooleanBoxes.True else BooleanBoxes.False
 
         analyzerData.PutData(redundantParensEnabledKey, redundantParensAnalysisEnabled)
 

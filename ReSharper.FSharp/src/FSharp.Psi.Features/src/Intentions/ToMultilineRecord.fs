@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -35,7 +36,7 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
         let lineEnding = recordExpr.FSharpFile.GetLineEnding()
 
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
-        use enableFormatterCookie = FSharpExperimentalFeatures.EnableFormatterCookie.Create()
+        use enableFormatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
 
         let bindings = recordExpr.FieldBindings
         let firstBinding = bindings.[0]

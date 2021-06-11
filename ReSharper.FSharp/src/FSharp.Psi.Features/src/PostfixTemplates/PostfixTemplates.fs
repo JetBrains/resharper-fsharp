@@ -5,6 +5,7 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -36,7 +37,10 @@ type FSharpPostfixTemplateContextFactory() =
         member this.GetReparseStrings() = EmptyArray.Instance
 
         member this.TryCreate(node, executionContext) =
-            if isNull node || not (executionContext.Solution.FSharpPostfixTemplatesEnabled()) then null else
+            if isNull node then null else
+
+            let solution = executionContext.Solution
+            if not (solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.PostfixTemplates)) then null else
 
             FSharpPostfixTemplateContext(node, executionContext) :> _
 
@@ -57,7 +61,7 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
     override this.TryCreatePostfixContext(fsCompletionContext) =
         let context = fsCompletionContext.BasicContext
         let solution = context.Solution
-        if not (solution.FSharpPostfixTemplatesEnabled()) then null else
+        if not (solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.PostfixTemplates)) then null else
 
         let token = fsCompletionContext.TokenBeforeCaret
         if isNull token || not (token.Parent :? IFSharpExpression && isApplicableToken token) then null else
