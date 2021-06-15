@@ -359,6 +359,15 @@
     <QuickFix>SpecifyPropertyTypeFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="IndexerIndeterminateType">
+    <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
+    <Message value="The operator 'expr.[idx]' has been used on an object of indeterminate type based on information prior to this program point."/>
+    <Range>indexerExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>SpecifyParameterTypeFix</QuickFix>
+    <QuickFix>SpecifyPropertyTypeFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="AddingConstraint">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>

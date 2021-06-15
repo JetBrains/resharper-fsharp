@@ -66,6 +66,7 @@ module FSharpErrors =
     let [<Literal>] InstanceMemberRequiresTarget = 673
     let [<Literal>] ConstructRequiresListArrayOrSequence = 747
     let [<Literal>] ConstructRequiresComputationExpression = 748
+    let [<Literal>] ObjectOfIndeterminateTypeUsedRequireTypeConstraint = 752
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] PropertyIsStatic = 809
@@ -325,6 +326,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UnusedThisVariable ->
             createHighlightingFromParentNode UnusedThisVariableWarning range
+
+        | ObjectOfIndeterminateTypeUsedRequireTypeConstraint ->
+            createHighlightingFromNode IndexerIndeterminateTypeError range
 
         | FieldRequiresAssignment ->
             createHighlightingFromNodeWithMessage FieldRequiresAssignmentError range error

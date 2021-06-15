@@ -11,6 +11,8 @@ type SpecifyParameterTypeTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/specifyType"
 
+    [<Test>] member x.``Indexer 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Ref 01``() = x.DoNamedTest()
     [<Test>] member x.``Ref 02 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Ref 03 - Parens``() = x.DoNamedTest()
