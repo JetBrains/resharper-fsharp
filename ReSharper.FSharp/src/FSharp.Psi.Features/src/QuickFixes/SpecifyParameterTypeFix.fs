@@ -12,11 +12,10 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 [<AbstractClass>]
-type SpecifyParameterTypeFixBase(error: IndeterminateTypeError) =
+type SpecifyParameterTypeFixBase(refExpr: IQualifiedExpr) =
     inherit FSharpQuickFixBase()
 
     member val QualifierRefExpr =
-        let refExpr = error.RefExpr
         if isNotNull refExpr then refExpr.Qualifier.As<IReferenceExpr>() else null
 
     override this.Text = $"Annotate '{this.QualifierRefExpr.ShortName}' type"
@@ -52,8 +51,14 @@ type SpecifyParameterTypeFixBase(error: IndeterminateTypeError) =
         this.SpecifyType(declaration, mfv, symbolUse.DisplayContext)
 
 
-type SpecifyParameterTypeFix(error: IndeterminateTypeError) =
-    inherit SpecifyParameterTypeFixBase(error)
+type SpecifyParameterTypeFix(qualifiedExpr: IQualifiedExpr) =
+    inherit SpecifyParameterTypeFixBase(qualifiedExpr)
+
+    new (error: IndeterminateTypeError) =
+        SpecifyParameterTypeFix(error.RefExpr)
+
+    new (error: IndexerIndeterminateTypeError) =
+        SpecifyParameterTypeFix(error.IndexerExpr)
 
     override this.IsApplicable(mfv: FSharpMemberOrFunctionOrValue) =
         not mfv.IsModuleValueOrMember
@@ -75,8 +80,14 @@ type SpecifyParameterTypeFix(error: IndeterminateTypeError) =
         SpecifyTypes.specifyParameterType d mfv.FullType decl
 
 
-type SpecifyPropertyTypeFix(error: IndeterminateTypeError) =
-    inherit SpecifyParameterTypeFixBase(error)
+type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =
+    inherit SpecifyParameterTypeFixBase(qualifiedExpr)
+
+    new (error: IndeterminateTypeError) =
+        SpecifyPropertyTypeFix(error.RefExpr)
+
+    new (error: IndexerIndeterminateTypeError) =
+        SpecifyPropertyTypeFix(error.IndexerExpr)
 
     override this.IsApplicable(_: FSharpMemberOrFunctionOrValue) = true
 
