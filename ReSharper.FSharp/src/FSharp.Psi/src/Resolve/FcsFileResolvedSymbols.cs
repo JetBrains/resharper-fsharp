@@ -259,7 +259,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private static bool CanIgnoreSymbol([NotNull] FSharpSymbol symbol, bool isCtor) =>
       isCtor ||
       symbol is FSharpEntity ||
-      symbol is FSharpMemberOrFunctionOrValue { LogicalName: "op_RangeStep" };
+      symbol is FSharpMemberOrFunctionOrValue { LogicalName: var n } && (n == "op_RangeStep" || n == "GetReverseIndex");
 
     private TextRange FixRange(int startOffset, int endOffset, [CanBeNull] string logicalName, IBuffer buffer,
       CachingLexer lexer)

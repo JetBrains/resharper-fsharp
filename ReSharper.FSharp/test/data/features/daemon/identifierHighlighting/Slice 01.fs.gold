@@ -1,0 +1,8 @@
+﻿#nowarn "57"
+
+let |l|(0) = []
+|l|(1).[^1]
+
+---------------------------------------------------------
+(0): ReSharper F# Value Identifier: 
+(1): ReSharper F# Value Identifier: 
