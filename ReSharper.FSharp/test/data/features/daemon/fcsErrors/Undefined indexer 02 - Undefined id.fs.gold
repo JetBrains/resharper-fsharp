@@ -3,5 +3,5 @@
 ||n|(1).[1]|(0)
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: The operator 'expr.[idx]' has been used on an object of indeterminate type based on information prior to this program point. Consider adding further type constraints
+(0): ReSharper Underlined Error Highlighting: The operator 'expr.[idx]' has been used on an object of indeterminate type based on information prior to this program point.
 (1): ReSharper Error Highlighting: The value or constructor 'n' is not defined.
