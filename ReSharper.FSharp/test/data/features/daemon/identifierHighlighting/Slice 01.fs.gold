@@ -1,8 +1,32 @@
 ﻿#nowarn "57"
 
 let |l|(0) = []
+
 |l|(1).[^1]
+|l|(2).[..1]
+|l|(3).[1..]
+
+let |a|(4): |int|(5)[,] = |Unchecked|(6).|defaultof|(7)<_>
+
+|a|(8).[1, *]
+|a|(9).[^1.., *]
+|a|(10).[*, 1]
+|a|(11).[*, ..^1]
+|a|(12).[*, *]
+|a|(13).[*]
 
 ---------------------------------------------------------
 (0): ReSharper F# Value Identifier: 
 (1): ReSharper F# Value Identifier: 
+(2): ReSharper F# Value Identifier: 
+(3): ReSharper F# Value Identifier: 
+(4): ReSharper F# Value Identifier: 
+(5): ReSharper F# Struct Identifier: 
+(6): ReSharper F# Module Identifier: 
+(7): ReSharper F# Function Identifier: 
+(8): ReSharper F# Value Identifier: 
+(9): ReSharper F# Value Identifier: 
+(10): ReSharper F# Value Identifier: 
+(11): ReSharper F# Value Identifier: 
+(12): ReSharper F# Value Identifier: 
+(13): ReSharper F# Value Identifier: 

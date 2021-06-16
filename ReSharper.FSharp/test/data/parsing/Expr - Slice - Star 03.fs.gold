@@ -5,12 +5,18 @@ IFSharpImplFile
       IChameleonExpression
         IItemIndexerExpr
           IReferenceExpr
-            FSharpIdentifierToken(type:IDENTIFIER, text:foo)
+            FSharpIdentifierToken(type:IDENTIFIER, text:l)
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           IIndexerArgList
             FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
             IIndexerArg
+              IWholeRangeExpr
+                FSharpTokenType+StarTokenElement(type:STAR, text:*)
+            FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IIndexerArg
               ILiteralExpr
                 FSharpToken(type:INT32, text:1)
             FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

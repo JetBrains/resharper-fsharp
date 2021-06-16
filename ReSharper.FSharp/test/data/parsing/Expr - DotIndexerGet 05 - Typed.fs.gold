@@ -9,7 +9,7 @@ IFSharpImplFile
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           IIndexerArgList
             FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-            IIndexerArgExpr
+            IIndexerArg
               ITypedExpr
                 IReferenceExpr
                   FSharpIdentifierToken(type:IDENTIFIER, text:a)

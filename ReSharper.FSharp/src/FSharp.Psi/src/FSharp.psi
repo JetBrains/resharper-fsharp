@@ -403,7 +403,7 @@ interface fSharpExpression:
   arrayOrListExpr |
   objExpr |
   forLikeExpr |
-  rangeSequenceExpr |
+  rangeLikeExpr |
   computationExpr |
   lambdaExpr |
   matchLikeExpr |
@@ -427,6 +427,12 @@ interface fSharpExpression:
   interpolatedStringExpr |
   libraryOnlyExpr |
   fromErrorExpr;
+
+interface rangeLikeExpr:
+  beginningSliceExpr |
+  endSliceExpr |
+  wholeRangeExpr |
+  rangeExpr;
 
 interface doLikeExpr:
   doExpr |
@@ -514,19 +520,10 @@ indexerArgList:
   LIST indexerArg<INDEXER_ARG, IndexerArgs> SEP COMMA<FSHARP_COMMA, Commas>
   RBRACK;
 
-interface indexerArg:
-  indexerArgExpr |
-  indexerArgRange;
-
-indexerArgExpr  extras {
-  get { methodName="Expressions" path=<indexerArgExpr:EXPR> };
+indexerArg extras {
+  get { methodName="Expressions" path=<indexerArg:EXPR> };
 }:
   fSharpExpression<EXPR, Expression>;
-
-indexerArgRange:
-  fSharpExpression<EXPR, Expressions>
-  DOT_DOT
-  fSharpExpression<EXPR, Expressions>;
 
 interface castExpr:
   upcastExpr |
@@ -924,14 +921,28 @@ fixedExpr options { stubBase="FSharpExpressionBase"; }:
   FIXED<KEYWORD, Keyword>
   fSharpExpression<EXPR, Expression>;
 
-rangeSequenceExpr options { stubBase="FSharpExpressionBase"; }:
+rangeExpr options { stubBase="FSharpExpressionBase"; }:
+  SYMBOLIC_OP? // todo: add DOT_DOT_HAT
   fSharpExpression<FROM_EXPR, FromExpr>
   (
     DOT_DOT
     fSharpExpression<STEP_EXPR, StepExpr>
   )?
   DOT_DOT
+  SYMBOLIC_OP?
   fSharpExpression<TO_EXPR, ToExpr>;
+
+beginningSliceExpr options { stubBase="FSharpExpressionBase"; }:
+  (DOT_DOT | symbolicOp)
+  fSharpExpression<TO_EXPR, ToExpr>;
+
+endSliceExpr options { stubBase="FSharpExpressionBase"; }:
+  SYMBOLIC_OP?
+  fSharpExpression<TO_EXPR, ToExpr>
+  DOT_DOT;
+
+wholeRangeExpr options { stubBase="FSharpExpressionBase"; }:
+  STAR;
 
 chameleonExpression:
   fSharpExpression<EXPR, Expression>;

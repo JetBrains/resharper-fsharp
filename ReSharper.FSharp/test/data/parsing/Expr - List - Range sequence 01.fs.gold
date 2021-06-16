@@ -9,7 +9,7 @@ IFSharpImplFile
         IListExpr
           FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRangeSequenceExpr
+          IRangeExpr
             ILiteralExpr
               FSharpToken(type:INT32, text:1)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

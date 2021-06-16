@@ -821,7 +821,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         x.MarkAndDone(range, ElementType.TYPE_PARAMETER_ID)
         x.Done(range, mark, ElementType.TYPE_REFERENCE_NAME)
 
-    member x.FixExpresion(expr: SynExpr) =
+    member x.FixExpression(expr: SynExpr) =
         // A fake SynExpr.Typed node is added for binding with return type specification like in the following
         // member x.Prop: int = 1
         // where 1 is replaced with `1: int`.
@@ -836,7 +836,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | _ -> expr
 
     member x.MarkChameleonExpression(expr: SynExpr) =
-        let ExprRange range as expr = x.FixExpresion(expr)
+        let ExprRange range as expr = x.FixExpression(expr)
 
         let startOffset = x.GetStartOffset(range)
         let mark = x.Mark(startOffset)

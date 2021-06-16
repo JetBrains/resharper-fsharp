@@ -513,7 +513,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             | :? IParenExpr as parenExpr ->
                 isValidExpr parenExpr.InnerExpression
 
-            | :? IRangeSequenceExpr | :? IComputationExpr | :? IYieldOrReturnExpr -> false
+            | :? IRangeLikeExpr | :? IComputationExpr | :? IYieldOrReturnExpr -> false
 
             | _ -> true
 

@@ -184,6 +184,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - CompExpr 01 - Return``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - CompExpr - AndBang 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - CompExpr - For 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Lambda 01 - Single id``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 02 - Single wild``() = x.DoNamedTest()
@@ -329,6 +330,16 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - LetOrUseBang 02 - Group``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Typeof 01 - Type parameter``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Slice - Beginning 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Slice - Beginning 02 - Negative``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Slice - End 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Slice - End 02 - Negative``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Slice - Negative 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Slice - Star 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Slice - Star 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Slice - Star 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Slice - Star 04``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Interpolated string 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string 02``() = x.DoNamedTest()

@@ -136,6 +136,9 @@ let getGeneratedAppArg (expr: SynExpr) =
     | SynExpr.App(_, false, func, arg, _) when func.Range.IsSynthetic -> arg
     | _ -> expr
 
+let (|GeneratedAppArg|) expr =
+    getGeneratedAppArg expr
+
 type SynArgPats with
     member x.IsEmpty =
         match x with

@@ -225,14 +225,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             }
           }
 
-          var nameRange = FixRange(startOffset, endOffset, mfv?.LogicalName, buffer, lexer);
+          var mfvLogicalName = mfv?.LogicalName;
+          var nameRange = FixRange(startOffset, endOffset, mfvLogicalName, buffer, lexer);
           startOffset = nameRange.StartOffset;
 
           var isCtor = mfv is { IsConstructor: true };
 
           // workaround for implicit type usages (e.g. in members with optional params), visualfsharp#3933
-          if (CanIgnoreSymbol(symbol, isCtor) &&
+          if ((CanIgnoreSymbol(symbol, isCtor) || CanIgnoreMfv(mfvLogicalName)) &&
               !(lexer.FindTokenAt(nameRange.EndOffset - 1) && (lexer.TokenType?.IsIdentifier ?? false)))
+            continue;
+
+          if (mfvLogicalName == "GetReverseIndex" && lexer.TokenType == FSharpTokenType.SYMBOLIC_OP)
             continue;
 
           // IsFromPattern helps in cases where fake value is created at range,
@@ -257,9 +261,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     private static bool CanIgnoreSymbol([NotNull] FSharpSymbol symbol, bool isCtor) =>
-      isCtor ||
-      symbol is FSharpEntity ||
-      symbol is FSharpMemberOrFunctionOrValue { LogicalName: var n } && (n == "op_RangeStep" || n == "GetReverseIndex");
+      isCtor || symbol is FSharpEntity;
+
+    private static bool CanIgnoreMfv([CanBeNull] string n) =>
+      n == "op_Range" || n == "op_RangeStep" || n == "GetReverseIndex" || n == "GetSlice";
 
     private TextRange FixRange(int startOffset, int endOffset, [CanBeNull] string logicalName, IBuffer buffer,
       CachingLexer lexer)

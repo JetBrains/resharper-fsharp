@@ -50,7 +50,10 @@ type IdentifierHighlightingTest() =
 
     [<Test>] member x.``Functions 02``() = x.DoNamedTest()
 
-    [<Test>] member x.``Computation expressions``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - CompExpr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - CompExpr - For 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Seq - for 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Units of measure``() = x.DoNamedTest()
 

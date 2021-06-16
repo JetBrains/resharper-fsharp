@@ -603,7 +603,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         let (SynBinding(_, kind, _, _, attrs, _, _ , headPat, returnInfo, expr, _, _)) = binding
 
         let mark = x.Mark()
-        let expr = x.FixExpresion(expr)
+        let expr = x.FixExpression(expr)
 
         match kind with
         | SynBindingKind.StandaloneExpression
@@ -648,7 +648,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         if isSecondary then
             x.AdvanceToTokenOrPos(FSharpTokenType.AND, binding.StartPos)
 
-        let expr = x.FixExpresion(expr)
+        let expr = x.FixExpression(expr)
         let mark = x.Mark()
 
         match kind with
@@ -939,7 +939,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushExpression(expr2)
             x.PushRange(Range.unionRanges lid.Range expr1.Range, ElementType.NAMED_INDEXER_EXPR)
             x.ProcessLongIdentifierExpression(lid.Lid, lid.Range)
-            x.PushRange(expr1.Range, ElementType.INDEXER_ARG_EXPR)
+            x.PushRange(expr1.Range, ElementType.INDEXER_ARG)
             x.ProcessExpression(expr1)
 
         | SynExpr.DotNamedIndexedPropertySet(expr1, lid, expr2, expr3, _) ->
@@ -1078,7 +1078,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushRange(appRange, ElementType.COMPUTATION_EXPR)
 
         let seqMark = x.Mark(fromRange)
-        x.PushRangeForMark(toRange, seqMark, ElementType.RANGE_SEQUENCE_EXPR)
+        x.PushRangeForMark(toRange, seqMark, ElementType.RANGE_EXPR)
         x.PushExpression(toExpr)
 
         match stepExpr with
@@ -1165,16 +1165,32 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
     member x.ProcessSynIndexerArg(arg) =
         match arg with
         | SynIndexerArg.One(ExprRange range as expr, _, _) ->
-            x.PushRange(range, ElementType.INDEXER_ARG_EXPR)
+            x.PushRange(range, ElementType.INDEXER_ARG)
             x.PushExpression(getGeneratedAppArg expr)
 
-        | SynIndexerArg.Two(expr1, _, expr2, _, range1, range2) ->
-            x.PushRange(Range.unionRanges range1 range2, ElementType.INDEXER_ARG_RANGE)
-            x.PushExpression(getGeneratedAppArg expr2)
-            x.PushExpression(getGeneratedAppArg expr1)
+        | SynIndexerArg.Two(GeneratedAppArg expr1, _, GeneratedAppArg expr2, _, range1, range2) ->
+            let indexerRange = Range.unionRanges range1 range2
+            x.PushRange(indexerRange, ElementType.INDEXER_ARG)
+
+            let range1 = expr1.Range
+            let range2 = expr2.Range
+
+            match range1.IsSynthetic, range2.IsSynthetic with
+            | true, true ->
+                x.MarkAndDone(range1, ElementType.WHOLE_RANGE_EXPR)
+            | true, false ->
+                x.PushRange(indexerRange, ElementType.BEGINNING_SLICE_EXPR)
+                x.PushExpression(expr2)
+            | false, true ->
+                x.PushRange(indexerRange, ElementType.END_SLICE_EXPR)
+                x.PushExpression(expr1)
+            | _ ->
+                x.PushRange(indexerRange, ElementType.RANGE_EXPR)
+                x.PushExpression(expr2)
+                x.PushExpression(expr1)
 
     member x.PushNamedIndexerArgExpression(expr) =
-        let wrappedArgExpr = { Expression = expr; ElementType = ElementType.INDEXER_ARG_EXPR }
+        let wrappedArgExpr = { Expression = expr; ElementType = ElementType.INDEXER_ARG }
         x.PushStep(wrappedArgExpr, wrapExpressionProcessor)
 
     member x.ProcessRecordFieldBindingList(fields: (RecordFieldName * SynExpr option * BlockSeparator option) list) =
@@ -1246,9 +1262,6 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         x.PushRangeForMark(range, mark, ElementType.WHEN_EXPR_CLAUSE)
 
         x.ProcessExpression(whenExpr)
-
-    member x.ProcessIndexerArg(arg: SynIndexerArg) =
-        x.ProcessExpressionList(arg.Exprs)
 
 [<AbstractClass>]
 type StepProcessorBase<'TStep>() =
