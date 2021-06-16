@@ -933,7 +933,7 @@ rangeExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<TO_EXPR, ToExpr>;
 
 beginningSliceExpr options { stubBase="FSharpExpressionBase"; }:
-  (DOT_DOT | symbolicOp)
+  (DOT_DOT | SYMBOLIC_OP)
   fSharpExpression<TO_EXPR, ToExpr>;
 
 endSliceExpr options { stubBase="FSharpExpressionBase"; }:
