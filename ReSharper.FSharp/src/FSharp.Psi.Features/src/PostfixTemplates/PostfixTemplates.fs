@@ -59,6 +59,8 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
         tokenType == FSharpTokenType.IDENTIFIER && getTokenType token.PrevSibling == FSharpTokenType.DOT
 
     override this.TryCreatePostfixContext(fsCompletionContext) =
+        if fsCompletionContext.NodeInFile.IsFSharpSigFile() then null else
+
         let context = fsCompletionContext.BasicContext
         let solution = context.Solution
         if not (solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.PostfixTemplates)) then null else

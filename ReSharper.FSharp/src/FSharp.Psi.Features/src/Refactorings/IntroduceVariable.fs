@@ -497,7 +497,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
     static member CanIntroduceVar(expr: IFSharpExpression) =
         if not (isValid expr) || expr.IsFSharpSigFile() then false else
 
-        let rec isValidExpr (expr: IFSharpExpression) =
+        let rec isAllowedExpr (expr: IFSharpExpression) =
             if FSharpMethodInvocationUtil.isNamedArgReference expr then false else
 
             match expr with
@@ -511,7 +511,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 not (declaredElement :? ITypeElement || declaredElement :? INamespace)
 
             | :? IParenExpr as parenExpr ->
-                isValidExpr parenExpr.InnerExpression
+                isAllowedExpr parenExpr.InnerExpression
 
             | :? IRangeLikeExpr | :? IComputationExpr | :? IYieldOrReturnExpr -> false
 
@@ -519,12 +519,10 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
         let isAllowedContext (expr: IFSharpExpression) =
             let topLevelExpr = skipIntermediateParentsOfSameType<IFSharpExpression>(expr)
-            if isNotNull (AttributeNavigator.GetByExpression(topLevelExpr)) then false else
-
-            true
+            isNull (AttributeNavigator.GetByExpression(topLevelExpr))
 
         if not (isAllowedContext expr) then false else
-        isValidExpr expr
+        isAllowedExpr expr
 
     static member CanInsertBeforeRightOperand(binaryAppExpr: IBinaryAppExpr) =
         canInsertBeforeRightOperand binaryAppExpr

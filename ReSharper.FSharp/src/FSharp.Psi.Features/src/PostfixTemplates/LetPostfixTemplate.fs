@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -15,7 +16,14 @@ type LetPostfixTemplate() =
         member this.CreateBehavior(info) = LetPostfixTemplateBehavior(info) :> _
 
         member this.TryCreateInfo(context) =
-            LetPostfixTemplateInfo(context.AllExpressions.[0]) :> _
+            let context = context.AllExpressions.[0]
+            let node = context.Expression
+            if isNull node then null else
+
+            let expr = node.Parent.As<IFSharpExpression>()
+            if not (FSharpIntroduceVariable.CanIntroduceVar(expr)) then null else
+
+            LetPostfixTemplateInfo(context) :> _
 
 and LetPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
     inherit PostfixTemplateInfo("let", expressionContext)
