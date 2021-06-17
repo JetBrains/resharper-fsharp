@@ -15,12 +15,10 @@ open JetBrains.ReSharper.Resources.Shell
 
 [<PostfixTemplate("match", "Pattern match expression", "match expr with | _ -> ()")>]
 type MatchPostfixTemplate() =
-    interface IPostfixTemplate with
-        member x.Language = FSharpLanguage.Instance :> _
-        member x.CreateBehavior(info) = MatchPostfixTemplateBehavior(info) :> _
+    inherit FSharpPostfixTemplateBase()
 
-        member x.TryCreateInfo(context) =
-            MatchPostfixTemplateInfo(context.AllExpressions.[0]) :> _
+    override x.CreateBehavior(info) = MatchPostfixTemplateBehavior(info) :> _
+    override x.TryCreateInfo(context) = MatchPostfixTemplateInfo(context.AllExpressions.[0]) :> _
 
 
 and MatchPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =

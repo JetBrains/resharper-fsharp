@@ -16,12 +16,11 @@ open JetBrains.ReSharper.Resources.Shell
 
 [<PostfixTemplate("for", "Iterates over enumerable collection", "for _ in expr do ()")>]
 type ForPostfixTemplate() =
-    interface IPostfixTemplate with
-        member x.Language = FSharpLanguage.Instance :> _
-        member x.CreateBehavior(info) = ForPostfixTemplateBehavior(info) :> _
+    inherit FSharpPostfixTemplateBase()
 
-        member x.TryCreateInfo(context) =
-            ForPostfixTemplateInfo(context.AllExpressions.[0]) :> _
+    override x.CreateBehavior(info) = ForPostfixTemplateBehavior(info) :> _
+    override x.TryCreateInfo(context) = ForPostfixTemplateInfo(context.AllExpressions.[0]) :> _
+
 
 and ForPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
     inherit PostfixTemplateInfo("for", expressionContext)

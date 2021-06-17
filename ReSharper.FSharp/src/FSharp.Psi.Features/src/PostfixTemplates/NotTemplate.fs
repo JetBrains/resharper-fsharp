@@ -13,12 +13,10 @@ open JetBrains.ReSharper.Resources.Shell
 
 [<PostfixTemplate("not", "Apply not function", "not (expr)")>]
 type NotPostfixTemplate() =
-    interface IPostfixTemplate with
-        member x.Language = FSharpLanguage.Instance :> _
-        member x.CreateBehavior(info) = NotPostfixTemplateBehavior(info) :> _
+    inherit FSharpPostfixTemplateBase()
 
-        member x.TryCreateInfo(context) =
-            NotPostfixTemplateInfo(context.AllExpressions.[0]) :> _
+    override x.CreateBehavior(info) = NotPostfixTemplateBehavior(info) :> _
+    override x.TryCreateInfo(context) = NotPostfixTemplateInfo(context.AllExpressions.[0]) :> _
 
 
 and NotPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =

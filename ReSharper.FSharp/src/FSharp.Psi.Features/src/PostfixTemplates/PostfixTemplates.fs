@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
 open System
 open JetBrains.Diagnostics
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
@@ -38,10 +39,6 @@ type FSharpPostfixTemplateContextFactory() =
 
         member this.TryCreate(node, executionContext) =
             if isNull node then null else
-
-            let solution = executionContext.Solution
-            if not (solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.PostfixTemplates)) then null else
-
             FSharpPostfixTemplateContext(node, executionContext) :> _
 
 
@@ -61,15 +58,12 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
     override this.TryCreatePostfixContext(fsCompletionContext) =
         if fsCompletionContext.NodeInFile.IsFSharpSigFile() then null else
 
-        let context = fsCompletionContext.BasicContext
-        let solution = context.Solution
-        if not (solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.PostfixTemplates)) then null else
-
         let token = fsCompletionContext.TokenBeforeCaret
         if isNull token || not (token.Parent :? IFSharpExpression && isApplicableToken token) then null else
 
+        let context = fsCompletionContext.BasicContext
         let settings = context.ContextBoundSettingsStore
-        let executionContext = PostfixTemplateExecutionContext(solution, context.TextControl, settings, "__")
+        let executionContext = PostfixTemplateExecutionContext(context.Solution, context.TextControl, settings, "__")
         FSharpPostfixTemplateContext(token, executionContext)
 
 
@@ -133,3 +127,25 @@ type FSharpPostfixTemplateBehaviorBase(info) =
         let token = context.Expression :?> IFSharpTreeNode
         let parent = getParentExpression token
         getContainingArgExpr parent
+
+
+[<AbstractClass>]
+type FSharpPostfixTemplateBase() =
+    member this.Language = FSharpLanguage.Instance
+
+    abstract CreateBehavior: PostfixTemplateInfo -> PostfixTemplateBehavior
+    abstract TryCreateInfo: PostfixTemplateContext -> PostfixTemplateInfo
+
+    abstract IsEnabled: ISolution -> bool
+    default this.IsEnabled(solution) =
+        solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.PostfixTemplates)
+
+    interface IPostfixTemplate with
+        member this.Language = this.Language :> _
+        member this.CreateBehavior(info) = this.CreateBehavior(info)
+
+        member this.TryCreateInfo(context) =
+            if this.IsEnabled(context.PsiModule.GetSolution()) then
+                this.TryCreateInfo(context)
+            else
+                null
