@@ -12,6 +12,12 @@ open JetBrains.ReSharper.Resources.Shell
 type LetPostfixTemplate() =
     inherit FSharpPostfixTemplateBase()
 
+    let isApplicableParent (tokenParent: ITreeNode) =
+        match tokenParent with
+        | :? IFSharpExpression as fsExpr -> FSharpIntroduceVariable.CanIntroduceVar(fsExpr)
+        | :? ITypeUsage as typeUsage -> FSharpPostfixTemplates.isApplicableTypeUsage typeUsage
+        | _ -> false
+
     override this.IsEnabled _ = true
 
     override this.CreateBehavior(info) =
@@ -20,10 +26,7 @@ type LetPostfixTemplate() =
     override this.TryCreateInfo(context) =
         let context = context.AllExpressions.[0]
         let node = context.Expression
-        if isNull node then null else
-
-        let expr = node.Parent.As<IFSharpExpression>()
-        if not (FSharpIntroduceVariable.CanIntroduceVar(expr)) then null else
+        if isNull node || not (isApplicableParent node.Parent) then null else
 
         LetPostfixTemplateInfo(context) :> _
 

@@ -18,6 +18,13 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 open JetBrains.Util.Extension
 
+module FSharpPostfixTemplates =
+    let isApplicableTypeUsage (typeUsage: ITypeUsage) =
+        let typeUsage = skipIntermediateParentsOfSameType<ITypeUsage> typeUsage
+        let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
+        isNotNull typedExpr
+
+
 [<AllowNullLiteral>]
 type FSharpPostfixTemplateContext(node: ITreeNode, executionContext: PostfixTemplateExecutionContext) =
     inherit PostfixTemplateContext(node, executionContext)
@@ -55,11 +62,17 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
         tokenType == FSharpTokenType.RESERVED_LITERAL_FORMATS ||
         tokenType == FSharpTokenType.IDENTIFIER && getTokenType token.PrevSibling == FSharpTokenType.DOT
 
+    let isApplicableParent (parent: ITreeNode): bool =
+        match parent with
+        | :? IFSharpExpression -> true
+        | :? ITypeUsage as typeUsage -> FSharpPostfixTemplates.isApplicableTypeUsage typeUsage
+        | _ -> false
+
     override this.TryCreatePostfixContext(fsCompletionContext) =
         if fsCompletionContext.NodeInFile.IsFSharpSigFile() then null else
 
         let token = fsCompletionContext.TokenBeforeCaret
-        if isNull token || not (token.Parent :? IFSharpExpression && isApplicableToken token) then null else
+        if isNull token || not (isApplicableParent token.Parent && isApplicableToken token) then null else
 
         let context = fsCompletionContext.BasicContext
         let settings = context.ContextBoundSettingsStore
