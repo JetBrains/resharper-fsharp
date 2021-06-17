@@ -34,36 +34,36 @@ module RedundantParenTypeUsageAnalyzer =
         | :? ITupleTypeUsage as tupleTypeUsage ->
             // todo: rewrite when top-level-types are supported
             let functionTypeUsage = FunctionTypeUsageNavigator.GetByReturnTypeUsage(context)
-            if isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(context)) then true else
-            if isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(functionTypeUsage)) then true else
-            if isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(getLongestReturnFromArg context)) then true else
+            if isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(context)) then true else
+            if isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(functionTypeUsage)) then true else
+            if isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(getLongestReturnFromArg context)) then true else
 
             let isStruct = isNotNull tupleTypeUsage.StructKeyword
             if isStruct && isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(context)) then true else
 
             isNotNull (TupleTypeUsageNavigator.GetByItem(context)) ||
-            isNotNull (ArrayTypeUsageNavigator.GetByType(context)) ||
-            isNotNull (PostfixAppTypeArgumentListNavigator.GetByType(context)) ||
-            isNotNull (IsInstPatNavigator.GetByType(context)) ||
-            isNotNull (CaseFieldDeclarationNavigator.GetByType(context)) ||
-            isNotNull (IsInstPatNavigator.GetByType(ignoreParentCompoundTypes context))
+            isNotNull (ArrayTypeUsageNavigator.GetByTypeUsage(context)) ||
+            isNotNull (PostfixAppTypeArgumentListNavigator.GetByTypeUsage(context)) ||
+            isNotNull (IsInstPatNavigator.GetByTypeUsage(context)) ||
+            isNotNull (CaseFieldDeclarationNavigator.GetByTypeUsage(context)) ||
+            isNotNull (IsInstPatNavigator.GetByTypeUsage(ignoreParentCompoundTypes context))
 
         | :? IFunctionTypeUsage ->
             isNotNull (TupleTypeUsageNavigator.GetByItem(context)) ||
             isNotNull (FunctionTypeUsageNavigator.GetByArgumentTypeUsage(context)) ||
-            isNotNull (ArrayTypeUsageNavigator.GetByType(context)) ||
-            isNotNull (PostfixAppTypeArgumentListNavigator.GetByType(context)) ||
-            isNotNull (IsInstPatNavigator.GetByType(context)) ||
-            isNotNull (ParameterSignatureTypeUsageNavigator.GetByType(context)) ||
-            isNotNull (CaseFieldDeclarationNavigator.GetByType(context)) ||
-            isNotNull (IsInstPatNavigator.GetByType(ignoreParentCompoundTypes context)) ||
+            isNotNull (ArrayTypeUsageNavigator.GetByTypeUsage(context)) ||
+            isNotNull (PostfixAppTypeArgumentListNavigator.GetByTypeUsage(context)) ||
+            isNotNull (IsInstPatNavigator.GetByTypeUsage(context)) ||
+            isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(context)) ||
+            isNotNull (CaseFieldDeclarationNavigator.GetByTypeUsage(context)) ||
+            isNotNull (IsInstPatNavigator.GetByTypeUsage(ignoreParentCompoundTypes context)) ||
 
             let longestReturn = getLongestReturnFromReturn context
             isNotNull (ReturnTypeInfoNavigator.GetByReturnType(longestReturn)) ||
-            isNotNull (ValFieldDeclarationNavigator.GetByType(longestReturn))
+            isNotNull (ValFieldDeclarationNavigator.GetByTypeUsage(longestReturn))
 
         | :? IArrayTypeUsage ->
-            isNotNull (IsInstPatNavigator.GetByType(ignoreParentCompoundTypes context))
+            isNotNull (IsInstPatNavigator.GetByTypeUsage(ignoreParentCompoundTypes context))
 
         | _ -> false
 

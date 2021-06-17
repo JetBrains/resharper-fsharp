@@ -25,9 +25,7 @@ type FSharpImportTypeHelper() =
 
     let isApplicable (context: IFSharpReferenceOwner) =
         let referenceName = context.As<ITypeReferenceName>()
-        if isNotNull (OpenStatementNavigator.GetByReferenceName(referenceName)) then false else
-
-        true
+        not (isNotNull (OpenStatementNavigator.GetByReferenceName(referenceName)))
 
     interface IImportTypeHelper with
         member x.FindTypeCandidates(reference, importTypeCacheFactory) =
@@ -84,11 +82,10 @@ type FSharpImportTypeHelper() =
             let referenceName = context.As<ITypeArgumentOwner>()
             if isNotNull referenceName then
                 let typeArgumentList = referenceName.TypeArgumentList
-                if isNull typeArgumentList || typeArgumentList.Types.Count = 0 then () else
+                if isNull typeArgumentList || typeArgumentList.TypeUsages.Count = 0 then () else
 
-                let typesCount = typeArgumentList.Types.Count
+                let typesCount = typeArgumentList.TypeUsages.Count
                 candidates <- candidates |> Seq.filter (fun c -> c.TypeParameters.Count = typesCount)
-
 
             let typeReferenceName = context.As<ITypeReferenceName>()
             if isNotNull (AttributeNavigator.GetByReferenceName(typeReferenceName)) then
@@ -139,7 +136,7 @@ type FSharpQuickFixUtilComponent() =
         member x.AddImportsForExtensionMethod(reference, _) = reference
 
         member this.BindTo(reference, typeElement) =
-            this.BindTo(reference :?> _, typeElement) :> _
+            this.BindTo(reference :?> _, typeElement)
 
 
 // todo: ExtensionMethodImportUtilBase

@@ -70,16 +70,16 @@ type FSharpItemOccurenceKindProvider() =
                 if isNotNull (ReturnTypeInfoNavigator.GetByReturnType(namedTypeUsage)) then
                     [| FSharpOccurrenceKinds.typeSpecification |] :> _ else
 
-                if isNotNull (AnonRecordFieldNavigator.GetByType(namedTypeUsage)) ||
-                   isNotNull (RecordFieldDeclarationNavigator.GetByType(namedTypeUsage)) ||
-                   isNotNull (CaseFieldDeclarationNavigator.GetByType(namedTypeUsage)) then
+                if isNotNull (AnonRecordFieldNavigator.GetByTypeUsage(namedTypeUsage)) ||
+                   isNotNull (RecordFieldDeclarationNavigator.GetByTypeUsage(namedTypeUsage)) ||
+                   isNotNull (CaseFieldDeclarationNavigator.GetByTypeUsage(namedTypeUsage)) then
                     [| OccurrenceKind.FieldTypeDeclaration |] :> _ else
 
-                if isNotNull (TypedPatNavigator.GetByType(namedTypeUsage)) ||
-                   isNotNull (TypedExprNavigator.GetByType(namedTypeUsage)) then
+                if isNotNull (TypedPatNavigator.GetByTypeUsage(namedTypeUsage)) ||
+                   isNotNull (TypedExprNavigator.GetByTypeUsage(namedTypeUsage)) then
                     [| FSharpOccurrenceKinds.typeSpecification |] :> _ else
 
-                if isNotNull (IsInstPatNavigator.GetByType(namedTypeUsage)) ||
+                if isNotNull (IsInstPatNavigator.GetByTypeUsage(namedTypeUsage)) ||
                    isNotNull (TypeTestExprNavigator.GetByTypeUsage(namedTypeUsage)) then
                     [| CSharpSpecificOccurrenceKinds.TypeChecking |] :> _ else
 
@@ -89,9 +89,9 @@ type FSharpItemOccurenceKindProvider() =
                 if isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(namedTypeUsage)) then
                     [| FSharpOccurrenceKinds.typeAbbreviation |] :> _ else
 
-                if isNotNull (TypeArgumentListNavigator.GetByType(namedTypeUsage)) ||
+                if isNotNull (TypeArgumentListNavigator.GetByTypeUsage(namedTypeUsage)) ||
                    isNotNull (TupleTypeUsageNavigator.GetByItem(namedTypeUsage)) ||
-                   isNotNull (ArrayTypeUsageNavigator.GetByType(namedTypeUsage)) then
+                   isNotNull (ArrayTypeUsageNavigator.GetByTypeUsage(namedTypeUsage)) then
                     [| CSharpSpecificOccurrenceKinds.TypeArgument |] :> _ else
 
                 EmptyList.Instance :> _

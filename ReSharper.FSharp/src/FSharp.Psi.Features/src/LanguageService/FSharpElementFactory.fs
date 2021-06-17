@@ -91,7 +91,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
     let createTypeUsage usage: ITypeUsage =
         let expr = createLetBinding (sprintf "(a: %s)" usage)
-        expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().Type
+        expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().TypeUsage
 
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
@@ -269,7 +269,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let typedPat = expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>()
 
             ModificationUtil.ReplaceChild(typedPat.Pattern, pattern.Copy()) |> ignore
-            ModificationUtil.ReplaceChild(typedPat.Type, typeUsage) |> ignore
+            ModificationUtil.ReplaceChild(typedPat.TypeUsage, typeUsage) |> ignore
             typedPat
 
         member x.CreateReturnTypeInfo(typeUsage: ITypeUsage): IReturnTypeInfo =

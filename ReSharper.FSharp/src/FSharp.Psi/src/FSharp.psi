@@ -299,7 +299,7 @@ interface arrayOrListPat:
 typedPat options { stubBase="FSharpPatternBase"; }:
   fSharpPattern<PATTERN, Pattern>
   COLON<FSHARP_COLON, Colon>
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 attribPat options { stubBase="FSharpPatternBase"; } extras {
   get { methodName="Attributes" path=<attribPat:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -350,7 +350,7 @@ optionalValPat options { stubBase="FSharpPatternBase"; }:
 
 isInstPat options { stubBase="FSharpPatternBase"; }:
   COLON_QMARK
-  typeUsage<SYN_TYPE, Type>;
+  typeUsage<SYN_TYPE, TypeUsage>;
 
 listConsPat options { stubBase="FSharpPatternBase"; }:
   fSharpPattern<PATTERN1, HeadPattern>
@@ -583,7 +583,7 @@ literalExpr options { stubBase="FSharpExpressionBase"; }:
 typedExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>
   COLON<FSHARP_COLON, Colon>
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 tupleExpr options { stubBase="FSharpExpressionBase"; }:
   (
@@ -1079,7 +1079,7 @@ recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase
   MUTABLE<MUTABLE, MutableKeyword>?
   IDENTIFIER<IDENTIFIER, Identifier>
   COLON<FSHARP_COLON, Colon>
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 
 unionRepresentation options { stubBase="TypeRepresentationBase"; }:
@@ -1114,11 +1114,11 @@ interface caseFieldDeclaration:
 
 unionCaseFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>?
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 exceptionFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>?
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 
 exceptionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
@@ -1190,7 +1190,7 @@ activePatternWildCase:
 delegateRepresentation options { stubBase="TypeRepresentationBase"; }:
   DELEGATE
   OF
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 interface fSharpTypeMemberDeclaration:
   primaryConstructorDeclaration |
@@ -1285,7 +1285,7 @@ constructorSignature options { stubBase="ConstructorDeclarationBase"; }:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   NEW<NEW, NewKeyword>
   COLON
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 secondaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
   get { methodName="Expression" path=<secondaryConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
@@ -1339,7 +1339,7 @@ memberSignature  options { stubBase="FSharpProperTypeMemberDeclarationBase"; } e
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   COLON
-  typeUsage<TYPE, Type>
+  typeUsage<TYPE, TypeUsage>
   accessorDecls?;
 
 private accessorDecls:
@@ -1365,7 +1365,7 @@ abstractMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationB
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   COLON
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 valFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<valFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -1377,7 +1377,7 @@ valFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; 
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   IDENTIFIER<IDENTIFIER, Identifier>
   COLON<FSHARP_COLON, Colon>
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 autoPropertyDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }  extras {
   get { methodName="Expression" path=<autoPropertyDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
@@ -1614,16 +1614,16 @@ interface typeArgumentList:
 
 postfixAppTypeArgumentList:
   (
-    typeUsage<TYPE, Types>
+    typeUsage<TYPE, TypeUsages>
   |
     LPAREN
-    LIST typeUsage<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
+    LIST typeUsage<TYPE, TypeUsages> SEP COMMA<FSHARP_COMMA, Commas>
     RPAREN
  );
 
 prefixAppTypeArgumentList:
   LESS<LESS,LAngle>
-  LIST typeUsage<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
+  LIST typeUsage<TYPE, TypeUsages> SEP COMMA<FSHARP_COMMA, Commas>
   GREATER<GREATER,RAngle>;
 
 
@@ -1688,11 +1688,11 @@ anonRecordTypeUsage:
 anonRecordField:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   COLON<FSHARP_COLON, Colon>
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 arrayTypeUsage:
   topLevelTypeParameterDecl
-  typeUsage<TYPE, Type>
+  typeUsage<TYPE, TypeUsage>
   LBRACK
   RBRACK;
 
@@ -1719,7 +1719,7 @@ parameterSignatureTypeUsage:
     identifier<IDENTIFIER, Identifier>
     COLON
   )?
-  typeUsage<TYPE, Type>;
+  typeUsage<TYPE, TypeUsage>;
 
 unsupportedTypeUsage:
   fakeSeparator;

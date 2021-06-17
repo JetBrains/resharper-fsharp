@@ -80,15 +80,8 @@ type FSharpPostfixTemplateBehaviorBase(info) =
         | appExpr -> getContainingArgExpr appExpr
 
     let getContainingTypeExpression (typeName: IReferenceName) =
-        match NamedTypeUsageNavigator.GetByReferenceName(typeName.As()) with
-        | null -> null
-        | namedTypeUsage ->
-
-        let castExpr = CastExprNavigator.GetByTypeUsage(namedTypeUsage)
-        if isNotNull castExpr then
-            getContainingArgExpr castExpr else
-
-        let typedExpr = TypedExprNavigator.GetByType(namedTypeUsage)
+        let namedTypeUsage = NamedTypeUsageNavigator.GetByReferenceName(typeName.As())
+        let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(namedTypeUsage)
         if isNotNull typedExpr then
             getContainingArgExpr typedExpr else
 

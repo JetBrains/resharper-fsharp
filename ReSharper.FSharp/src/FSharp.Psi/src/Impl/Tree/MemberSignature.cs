@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      if (Type is IFunctionTypeUsage)
+      if (TypeUsage is IFunctionTypeUsage)
         return this.CreateMethod();
 
       return GetFSharpSymbol() is { } fcsSymbol
