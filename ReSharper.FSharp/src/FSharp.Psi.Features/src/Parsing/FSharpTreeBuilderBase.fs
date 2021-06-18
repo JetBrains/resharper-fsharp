@@ -633,6 +633,16 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | SynType.LongIdent(lid) ->
             x.ProcessNamedTypeReference(lid.Lid)
 
+        | SynType.App(SynType.Var(_, varRange), ltRange, typeArgs, _, gtRange, isPostfix, range) ->
+            let mark = x.Mark(range)
+            if isPostfix then
+                x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.POSTFIX_APP_TYPE_ARGUMENT_LIST)
+                x.MarkAndDone(varRange, ElementType.TYPE_PARAMETER_ID)
+            else
+                x.MarkAndDone(varRange, ElementType.TYPE_PARAMETER_ID)
+                x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
+            x.Done(range, mark, ElementType.TYPE_REFERENCE_NAME)
+
         | SynType.App(typeName, ltRange, typeArgs, _, gtRange, isPostfix, range) ->
             let lid =
                 match typeName with
