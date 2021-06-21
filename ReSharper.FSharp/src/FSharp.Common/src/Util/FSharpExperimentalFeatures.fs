@@ -12,6 +12,7 @@ type ExperimentalFeature =
     | Formatter
     | PostfixTemplates
     | RedundantParenAnalysis
+    | AssemblyReaderShim
 
 type FSharpExperimentalFeatureCookie(feature: ExperimentalFeature) =
     static let cookies = OneToListMap<ExperimentalFeature, IDisposable>()
@@ -31,12 +32,14 @@ type FSharpExperimentalFeatureCookie(feature: ExperimentalFeature) =
 [<AbstractClass; Sealed; Extension>]
 type FSharpExperimentalFeatures() =
     static let isEnabledInSettings (solution: ISolution) feature =
-        let provider = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
+        let experimentalFeatures = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
+        let fsOptions = solution.GetComponent<FSharpOptionsProvider>()
 
         match feature with
-        | ExperimentalFeature.Formatter -> provider.RedundantParensAnalysis.Value
-        | ExperimentalFeature.PostfixTemplates -> provider.EnablePostfixTemplates.Value
-        | ExperimentalFeature.RedundantParenAnalysis -> provider.RedundantParensAnalysis.Value
+        | ExperimentalFeature.Formatter -> experimentalFeatures.RedundantParensAnalysis.Value
+        | ExperimentalFeature.PostfixTemplates -> experimentalFeatures.EnablePostfixTemplates.Value
+        | ExperimentalFeature.RedundantParenAnalysis -> experimentalFeatures.RedundantParensAnalysis.Value
+        | ExperimentalFeature.AssemblyReaderShim -> fsOptions.NonFSharpProjectInMemoryAnalysis.Value
 
     [<Extension>]
     static member IsFSharpExperimentalFeatureEnabled(solution: ISolution, feature: ExperimentalFeature) =
@@ -45,4 +48,4 @@ type FSharpExperimentalFeatures() =
     [<Extension>]
     static member IsFSharpExperimentalFeatureEnabled(node: ITreeNode, feature: ExperimentalFeature) =
         let solution = node.GetSolution()
-        FSharpExperimentalFeatureCookie.IsEnabled(feature) || isEnabledInSettings solution feature
+        FSharpExperimentalFeatures.IsFSharpExperimentalFeatureEnabled(solution, feature)

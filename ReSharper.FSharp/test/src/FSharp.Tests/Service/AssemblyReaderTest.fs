@@ -22,9 +22,10 @@ open JetBrains.Util
 open NUnit.Framework
 
 [<SolutionComponent>]
-type TestAssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
-        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService) =
-    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, true, checkerService)
+type TestAssemblyReaderShim(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
+        psiModules: IPsiModules, cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim,
+        checkerService: FcsCheckerService) =
+    inherit AssemblyReaderShim(lifetime, solution, changeManager, psiModules, cache, assemblyInfoShim, checkerService)
 
     let mutable projectPath = FileSystemPath.Empty
     let mutable projectPsiModule = null
@@ -131,6 +132,7 @@ type AssemblyReaderTest() =
     override this.DoTest(lifetime: Lifetime, project: IProject) =
         let path = this.SecondProject.Location / (this.SecondProjectName + ".dll")
         let psiModule = this.SecondProject.GetPsiModules().SingleItem().NotNull()
+        use assemblyReaderCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.AssemblyReaderShim)
         use cookie = this.Solution.GetComponent<TestAssemblyReaderShim>().CreateProjectCookie(path, psiModule)
 
         base.DoTest(lifetime, project)

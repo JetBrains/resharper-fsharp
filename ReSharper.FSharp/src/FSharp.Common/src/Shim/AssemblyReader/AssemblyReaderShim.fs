@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open System
 open System.Collections.Concurrent
 open System.Collections.Generic
-open JetBrains.Application.Settings
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
@@ -81,10 +80,12 @@ module AssemblyReaderShim =
         |> HashSet
 
 [<SolutionComponent>]
-type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
-        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, isEnabled: bool,
-        checkerService: FcsCheckerService) as this =
-    inherit AssemblyReaderShimBase(lifetime, changeManager, isEnabled)
+type AssemblyReaderShim(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, psiModules: IPsiModules,
+        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService) as this =
+    inherit AssemblyReaderShimBase(lifetime, changeManager)
+
+    let isEnabled () =
+        FSharpExperimentalFeatures.IsFSharpExperimentalFeatureEnabled(solution, ExperimentalFeature.AssemblyReaderShim)
 
     do
         checkerService.AssemblyReaderShim <- this
@@ -250,32 +251,27 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
             allTypesCreated.Add(dependencyModule) |> ignore
 
-    new (lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules, cache: FcsModuleReaderCommonCache,
-            assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService, settingsStore: ISettingsStore) =
-        let isEnabled = AssemblyReaderShim.isEnabled settingsStore
-        AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, isEnabled, checkerService)
-
     abstract DebugReadRealAssemblies: bool
     default this.DebugReadRealAssemblies = false
 
     member val ModuleInvalidated = moduleInvalidated
 
     override this.GetLastWriteTime(path) =
-        if not (this.IsEnabled && AssemblyReaderShim.isAssembly path) then base.GetLastWriteTime(path) else
+        if not (isEnabled () && AssemblyReaderShim.isAssembly path) then base.GetLastWriteTime(path) else
 
         match getOrCreateReaderFromPath path with
         | ReferencedAssembly.ProjectOutput reader -> reader.Timestamp
         | _ -> base.GetLastWriteTime(path)
 
     override this.ExistsFile(path) =
-        if not (this.IsEnabled && AssemblyReaderShim.isAssembly path) then base.ExistsFile(path) else
+        if not (isEnabled () && AssemblyReaderShim.isAssembly path) then base.ExistsFile(path) else
 
         match getOrCreateReaderFromPath path with
         | ReferencedAssembly.ProjectOutput _ -> true
         | _ -> base.ExistsFile(path)
 
     override this.GetModuleReader(path, readerOptions) =
-        if not (this.IsEnabled && AssemblyReaderShim.isAssembly path) then
+        if not (isEnabled () && AssemblyReaderShim.isAssembly path) then
             base.GetModuleReader(path, readerOptions) else
 
         match getOrCreateReaderFromPath path with
@@ -305,7 +301,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     interface IFcsAssemblyReaderShim with
         member this.PrepareDependencies(psiModule) =
-            if not this.IsEnabled then () else
+            if not (isEnabled ()) then () else
 
             use lock = locker.UsingWriteLock()
 

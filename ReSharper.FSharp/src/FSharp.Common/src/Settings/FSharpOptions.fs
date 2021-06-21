@@ -131,6 +131,13 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSc
     member val OutOfProcessTypeProviders = base.GetValueProperty<bool>("OutOfProcessTypeProviders")
 
 
+[<SolutionInstanceComponent>]
+type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
+    inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
+
+    member val NonFSharpProjectInMemoryAnalysis = base.GetValueProperty<bool>("NonFSharpProjectInMemoryAnalysis")
+
+
 module FSharpTypeHintOptions =
     let [<Literal>] pipeReturnTypes = "Show return type hints in |> chains"
 

@@ -8,17 +8,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 {
   public abstract class AssemblyReaderShimBase : FileSystemShimChangeProvider, IAssemblyReader
   {
-    public bool IsEnabled { get; }
-
     protected readonly IAssemblyReader DefaultReader;
 
-    protected AssemblyReaderShimBase(Lifetime lifetime, ChangeManager changeManager, bool isEnabled)
+    protected AssemblyReaderShimBase(Lifetime lifetime, ChangeManager changeManager)
       : base(lifetime, changeManager)
     {
-      IsEnabled = isEnabled;
-      if (!isEnabled)
-        return;
-
       DefaultReader = AssemblyReader;
       AssemblyReader = this;
       lifetime.OnTermination(() => AssemblyReader = DefaultReader);
