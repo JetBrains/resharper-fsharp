@@ -51,6 +51,7 @@ module ProjectOptions =
 
     [<RequireQualifiedAccess>]
     module ImplicitDefines =
+        // todo: don't pass to FCS, only use in internal lexing; these defines added by FCS too
         let sourceDefines = [ "EDITING"; "COMPILED" ]
         let scriptDefines = [ "EDITING"; "INTERACTIVE" ]
 

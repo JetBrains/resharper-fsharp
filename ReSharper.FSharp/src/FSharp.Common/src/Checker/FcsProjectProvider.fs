@@ -182,6 +182,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         { FSharpParsingOptions.Default with
             SourceFiles = [| sourceFile.GetLocation().FullPath |]
             ConditionalCompilationDefines = ImplicitDefines.scriptDefines
+            IsInteractive = isScript
             IsExe = isScript }
 
     let invalidateProject (project: IProject) =
