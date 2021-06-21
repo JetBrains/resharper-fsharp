@@ -166,11 +166,17 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
                     cfg.OutputType = ProjectOutputType.CONSOLE_EXE
                 | _ -> false
 
-            let project = sourceFile.GetProject().NotNull()
-            let paths = fcsProjectBuilder.GetProjectItemsPaths(project, targetFrameworkId) |> Array.map (fst >> string)
+            let paths =
+                if isScript then
+                    [| sourceFile.GetLocation().FullPath |]
+                else
+                    let project = sourceFile.GetProject().NotNull()
+                    fcsProjectBuilder.GetProjectItemsPaths(project, targetFrameworkId) |> Array.map (fst >> string)
+            let defines = if isScript then ImplicitDefines.scriptDefines else ImplicitDefines.sourceDefines
 
             { FSharpParsingOptions.Default with
                 SourceFiles = paths
+                ConditionalCompilationDefines = defines
                 IsExe = isExe
                 IsInteractive = isScript }
 

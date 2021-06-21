@@ -46,6 +46,7 @@ type FSharpTargetsProjectLoadModificator() =
 [<AutoOpen>]
 module ProjectOptions =
     let sandboxParsingOptions =
+        // todo: add implicit defines
         { FSharpParsingOptions.Default with SourceFiles = [| "Sandbox.fs" |] }
 
     [<RequireQualifiedAccess>]

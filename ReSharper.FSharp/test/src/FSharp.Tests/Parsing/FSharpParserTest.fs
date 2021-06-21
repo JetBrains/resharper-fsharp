@@ -563,6 +563,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Pattern - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Tuple 02 - Struct``() = x.DoNamedTest()
 
+    [<Test>] member x.``Implicit defines 01``() = x.DoNamedTest()
+    [<Test; FSharpScriptTest>] member x.``Implicit defines 02 - Script``() = x.DoNamedTest()
+
 
 [<FSharpSignatureTest>]
 type FSharpSignatureParserTest() =

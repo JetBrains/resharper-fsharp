@@ -1,0 +1,20 @@
+﻿Language: PsiLanguageType:F# Script
+IFSharpImplFile
+  IAnonModuleDeclaration
+    FSharpTokenType+PpIfSectionTokenElement(type:PP_IF_SECTION, text:#if)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpToken(type:PP_CONDITIONAL_SYMBOL, text:COMPILED)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    FSharpDeadCodeToken(type:DEAD_CODE, text:())
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    FSharpTokenType+PpElseSectionTokenElement(type:PP_ELSE_SECTION, text:#else)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    IExpressionStatement
+      IChameleonExpression
+        IUnitExpr
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  FSharpTokenType+PpEndifTokenElement(type:PP_ENDIF, text:#endif)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
