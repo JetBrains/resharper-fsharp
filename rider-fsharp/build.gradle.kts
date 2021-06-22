@@ -117,16 +117,15 @@ val pluginFiles = listOf(
         "FSharp.Common/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Common",
         "FSharp.Psi/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi",
         "FSharp.Psi.Features/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
-        "FSharp.Fantomas.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol")
+        "FSharp.Fantomas.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol",
+        "FSharp.TypeProviders.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol")
 
 val typeProvidersFiles = listOf(
-        "FSharp.TypeProviders.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.dll",
-        "FSharp.TypeProviders.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.pdb",
         "FSharp.TypeProviders.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe",
         "FSharp.TypeProviders.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.pdb",
         "FSharp.TypeProviders.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe.config",
-        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Core.dll",
-        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Core.pdb",
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.NetCore.dll",
+        "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.NetCore.pdb",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.netcoreapp31.win.runtimeconfig.json",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.netcoreapp31.unix.runtimeconfig.json",
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.net5.win.runtimeconfig.json",
@@ -236,9 +235,10 @@ configure<RdGenExtension> {
 
 tasks {
     withType<PrepareSandboxTask> {
-        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" } + typeProvidersFiles
+        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
         files = files.map { "$resharperPluginPath/src/$it" }
         val fantomasFiles = fantomasFiles.map { "$resharperPluginPath/src/$it" }
+        val typeProvidersFiles = typeProvidersFiles.map { "$resharperPluginPath/src/$it" }
 
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {
             val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/$outputRelativePath"
@@ -254,6 +254,10 @@ tasks {
             from(it) { into("${intellij.pluginName}/fantomas") }
         }
 
+        typeProvidersFiles.forEach {
+            from(it) { into("${intellij.pluginName}/typeProviders") }
+        }
+
         into("${intellij.pluginName}/projectTemplates") {
             from("projectTemplates")
         }
@@ -266,6 +270,7 @@ tasks {
             }
             files.forEach { validateFile(it, "dotnet") }
             fantomasFiles.forEach { validateFile(it, "fantomas") }
+            typeProvidersFiles.forEach { validateFile(it, "typeProviders") }
         }
     }
 
