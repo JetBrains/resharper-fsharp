@@ -39,12 +39,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         processUnexpectedExited);
     }
 
-    protected override ProcessStartInfo GetProcessStartInfo(Lifetime lifetime, int port)
-    {
-      return myRequest.RuntimeType == JetProcessRuntimeType.DotNetCore
+    protected override ProcessStartInfo GetProcessStartInfo(Lifetime lifetime, int port) =>
+      myRequest.RuntimeType == JetProcessRuntimeType.DotNetCore
         ? GetCoreProcessStartInfo(port, TypeProvidersDirectory)
         : GetFrameworkProcessStartInfo(port, TypeProvidersDirectory);
-    }
 
     private ProcessStartInfo GetCoreProcessStartInfo(int port, FileSystemPath basePath)
     {
