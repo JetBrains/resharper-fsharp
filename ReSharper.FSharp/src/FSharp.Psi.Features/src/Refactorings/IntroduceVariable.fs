@@ -511,9 +511,13 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 not (declaredElement :? ITypeElement || declaredElement :? INamespace)
 
             | :? IParenExpr as parenExpr ->
+                isNull (NewExprNavigator.GetByArgumentExpression(expr)) &&
                 isAllowedExpr parenExpr.InnerExpression
 
             | :? IRangeLikeExpr | :? IComputationExpr | :? IYieldOrReturnExpr -> false
+
+            | :? ITupleExpr ->
+                isNull (NewExprNavigator.GetByArgumentExpression(ParenExprNavigator.GetByInnerExpression(expr)))
 
             | _ -> true
 

@@ -54,6 +54,9 @@ type IntroduceVarTest() =
     [<Test>] member x.``Expr - Lambda 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - New 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - New 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - If 01 - Let``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Indexer - Expr 01``() = x.DoNamedTest()
@@ -119,3 +122,6 @@ type IntroduceVarTest() =
     [<Test>] member x.``Not allowed - Named arg 01``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Named arg 02 - Unit``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Named arg 03 - Union case field``() = x.DoNamedTest()
+
+    [<Test>] member x.``Not allowed - NewExpr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - NewExpr 02``() = x.DoNamedTest()
