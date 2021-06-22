@@ -246,31 +246,28 @@ tasks {
             files = files + listOf("$testHostName.dll", "$testHostName.pdb")
         }
 
-        files.forEach {
-            from(it) { into("${intellij.pluginName}/dotnet") }
+        fun moveToPlugin(files: List<String>, destFolder: String) {
+            files.forEach {
+                from(it) { into("${intellij.pluginName}/$destFolder") }
+            }
         }
 
-        fantomasFiles.forEach {
-            from(it) { into("${intellij.pluginName}/fantomas") }
-        }
-
-        typeProvidersFiles.forEach {
-            from(it) { into("${intellij.pluginName}/typeProviders") }
-        }
-
-        into("${intellij.pluginName}/projectTemplates") {
-            from("projectTemplates")
-        }
+        moveToPlugin(files, "dotnet")
+        moveToPlugin(fantomasFiles, "fantomas")
+        moveToPlugin(typeProvidersFiles, "typeProviders")
+        moveToPlugin(listOf("projectTemplates"), "projectTemplates")
 
         doLast {
-            fun validateFile(path: String, destFolder: String) {
-                val file = file(path)
-                if (!file.exists()) throw RuntimeException("File $file does not exist")
-                logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/$destFolder")
+            fun validateFiles(files: List<String>, destFolder: String) {
+                files.forEach {
+                    val file = file(it)
+                    if (!file.exists()) throw RuntimeException("File $file does not exist")
+                    logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/$destFolder")
+                }
             }
-            files.forEach { validateFile(it, "dotnet") }
-            fantomasFiles.forEach { validateFile(it, "fantomas") }
-            typeProvidersFiles.forEach { validateFile(it, "typeProviders") }
+            validateFiles(files, "dotnet")
+            validateFiles(fantomasFiles, "fantomas")
+            validateFiles(typeProvidersFiles, "typeProviders")
         }
     }
 

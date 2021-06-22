@@ -24,6 +24,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       } +
       $".{(PlatformUtil.IsRunningUnderWindows ? "win" : "unix")}.runtimeconfig.json";
 
-    public static readonly FileSystemPath LogFolder = Logger.LogFolderPath.Combine("TypeProvidersHost");
+    public static readonly FileSystemPath LogFolder = Logger.LogFolderPath / "TypeProvidersHost";
   }
 }
