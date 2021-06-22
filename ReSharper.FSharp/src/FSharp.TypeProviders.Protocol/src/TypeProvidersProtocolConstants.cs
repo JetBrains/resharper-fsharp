@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe";
 
     public static string TypeProvidersHostCoreFilename =>
-      "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Core.dll";
+      "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.NetCore.dll";
 
     public static string CoreRuntimeConfigFilename(int majorVersion) =>
       "tploader." +
@@ -24,6 +24,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       } +
       $".{(PlatformUtil.IsRunningUnderWindows ? "win" : "unix")}.runtimeconfig.json";
 
-    public static readonly FileSystemPath LogFolder = Logger.LogFolderPath.Combine("TypeProvidersHost");
+    public static readonly FileSystemPath LogFolder = Logger.LogFolderPath / "TypeProvidersHost";
   }
 }

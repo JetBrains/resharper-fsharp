@@ -21,7 +21,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     private readonly JetProcessRuntimeRequest myRequest;
     private readonly NuGetVersion myNuGetVersion;
     private Lifetime myLifetime;
+
     protected override string Name => "Out-of-Process TypeProviders";
+
+    private static readonly FileSystemPath TypeProvidersDirectory =
+      typeof(TypeProvidersExternalProcess).Assembly.GetPath().Directory.Parent / "typeProviders";
 
     protected override RdFSharpTypeProvidersModel CreateModel(Lifetime lifetime, IProtocol protocol) =>
       new RdFSharpTypeProvidersModel(lifetime, protocol);
@@ -35,20 +39,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         processUnexpectedExited);
     }
 
-    protected override ProcessStartInfo GetProcessStartInfo(Lifetime lifetime, int port)
-    {
-      var basePath = GetType().Assembly.GetPath().Directory;
-
-      return myRequest.RuntimeType == JetProcessRuntimeType.DotNetCore
-        ? GetCoreProcessStartInfo(port, basePath)
-        : GetFrameworkProcessStartInfo(port, basePath);
-    }
+    protected override ProcessStartInfo GetProcessStartInfo(Lifetime lifetime, int port) =>
+      myRequest.RuntimeType == JetProcessRuntimeType.DotNetCore
+        ? GetCoreProcessStartInfo(port, TypeProvidersDirectory)
+        : GetFrameworkProcessStartInfo(port, TypeProvidersDirectory);
 
     private ProcessStartInfo GetCoreProcessStartInfo(int port, FileSystemPath basePath)
     {
       var sdkMajorVersion = myNuGetVersion.Major.Clamp(3, 6);
-      var runtimeConfigPath = basePath.Combine(TypeProvidersProtocolConstants.CoreRuntimeConfigFilename(sdkMajorVersion));
-      var fileSystemPath = basePath.Combine(TypeProvidersProtocolConstants.TypeProvidersHostCoreFilename);
+      var runtimeConfigPath = basePath / TypeProvidersProtocolConstants.CoreRuntimeConfigFilename(sdkMajorVersion);
+      var fileSystemPath = basePath / TypeProvidersProtocolConstants.TypeProvidersHostCoreFilename;
       var dotnetArgs = $"--runtimeconfig \"{runtimeConfigPath}\"";
 
       Assertion.Assert(fileSystemPath.ExistsFile, $"can't find '{fileSystemPath.FullPath}'");
@@ -66,7 +66,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     private static ProcessStartInfo GetFrameworkProcessStartInfo(int port, FileSystemPath basePath)
     {
-      var fileSystemPath = basePath.Combine(TypeProvidersProtocolConstants.TypeProvidersHostFrameworkFilename);
+      var fileSystemPath = basePath / TypeProvidersProtocolConstants.TypeProvidersHostFrameworkFilename;
       Assertion.Assert(fileSystemPath.ExistsFile, $"can't find '{fileSystemPath.FullPath}'");
 
       var processStartInfo = new ProcessStartInfo
