@@ -28,8 +28,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
 
     protected override void CollectHighlightings(IPsiView psiView, MatchingHighlightingsConsumer consumer)
     {
-      TryConsumeHighlighting<ITypeParameterOfTypeList>(psiView, consumer, _ => _.LAngle, _ => _.RAngle);
-      TryConsumeHighlighting<ITypeParameterOfMethodList>(psiView, consumer, _ => _.LAngle, _ => _.RAngle);
+      TryConsumeHighlighting<IPostfixTypeParameterDeclarationList>(psiView, consumer, _ => _.LAngle, _ => _.RAngle);
+      TryConsumeHighlighting<IPrefixTypeParameterDeclarationList>(psiView, consumer, _ => _.LParen, _ => _.RParen);
 
       TryConsumeHighlighting<IPrefixAppTypeArgumentList>(psiView, consumer, _ => _.LAngle, _ => _.RAngle);
     }

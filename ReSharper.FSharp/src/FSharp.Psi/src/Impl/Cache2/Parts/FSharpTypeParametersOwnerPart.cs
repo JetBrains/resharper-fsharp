@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     private readonly string[] myTypeParameterNames;
 
     protected FSharpTypeParametersOwnerPart([NotNull] T declaration, MemberDecoration memberDecoration,
-      TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
+      TreeNodeCollection<ITypeParameterDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder.Intern(declaration.CompiledName), memberDecoration, typeParameters.Count,
         cacheBuilder)
     {
@@ -43,16 +43,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         myTypeParameterNames[index] = reader.ReadString();
     }
 
-    protected override void AssignDeclaredElement(ICachedDeclaration2 declaration)
+    protected override void AssignDeclaredElement(ICachedDeclaration2 cachedDeclaration)
     {
-      base.AssignDeclaredElement(declaration);
+      base.AssignDeclaredElement(cachedDeclaration);
 
       var parameters = TypeElement?.TypeParameters;
       if (parameters == null || parameters.IsEmpty())
         return;
 
-      var typeDeclaration = (T) declaration;
-      var typeParameterDeclarations = typeDeclaration.TypeParameters;
+      if (!(cachedDeclaration is IFSharpTypeOrExtensionDeclaration declaration)) return;
+
+      var typeParameterDeclarations = declaration.TypeParameterDeclarations;
       var parametersCount = Math.Min(parameters.Count, typeParameterDeclarations.Count);
 
       for (var i = 0; i < parametersCount; i++)
@@ -68,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override IDeclaration GetTypeParameterDeclaration(int index) =>
       index < TypeParameterNumber && GetDeclaration() is IFSharpTypeOrExtensionDeclaration declaration
-        ? declaration.TypeParameters[index]
+        ? declaration.TypeParameterDeclarations[index]
         : null;
 
     public override string GetTypeParameterName(int index) =>

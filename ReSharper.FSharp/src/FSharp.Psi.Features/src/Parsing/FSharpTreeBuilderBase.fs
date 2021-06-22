@@ -303,7 +303,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION)
         mark
 
-    member x.StartType(attrs: SynAttributes, xmlDoc, typeParams, constraints, lid: LongIdent, range, typeTokenType) =
+    member x.StartType(attrs: SynAttributes, xmlDoc, typeParams: SynTyparDecls option, constraints, lid: LongIdent, range, typeTokenType) =
         let startRange =
             match attrs with
             | attrList :: _ -> attrList.Range
@@ -314,34 +314,41 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
 
         if not lid.IsEmpty then
             let id = lid.Head
-            let idOffset = x.GetStartOffset id
 
-            let typeParamsOffset =
-                match typeParams with
-                | SynTyparDecl(_, SynTypar(id, _, _)) :: _ -> x.GetStartOffset id
-                | [] -> idOffset
+            match typeParams with
+            | Some(typeParams) -> x.ProcessTypeParameters(typeParams, true)
+            | _ -> ()
 
-            let paramsInBraces = idOffset < typeParamsOffset
-            x.ProcessTypeParametersOfType typeParams constraints range paramsInBraces
+            x.ProcessConstraints(constraints)
 
             // Needs to advance past id range due to implicit ctor range in class includes id.
             x.AdvanceToEnd(id.idRange)
         mark
 
-    member x.ProcessTypeParametersOfType typeParams constraints range paramsInBraces =
-        match typeParams with
-        | SynTyparDecl(_, SynTypar(IdentRange idRange, _, _)) :: _ ->
-            let mark = x.MarkTokenOrRange(FSharpTokenType.LESS, idRange)
-            for p in typeParams do
-                x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
-            for typeConstraint in constraints do
-                x.ProcessTypeConstraint(typeConstraint)
-            if paramsInBraces then
-                x.AdvanceToTokenOrPos(FSharpTokenType.GREATER, range.End)
-                if x.Builder.GetTokenType() == FSharpTokenType.GREATER then
-                    x.AdvanceLexer()
-            x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_LIST)
-        | [] -> ()
+    member x.ProcessTypeParameters(typeParams: SynTyparDecls, isForType) =
+        let range = typeParams.Range
+        let mark = x.Mark(range)
+
+        let typeParameterElementType =
+            if isForType then
+                ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION
+            else
+                ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION
+
+        for p in typeParams.TyparDecls do
+            x.ProcessTypeParameter(p, typeParameterElementType)
+        x.ProcessConstraints(typeParams.Constraints)
+
+        let typeParameterListElementType =
+            match typeParams with
+            | SynTyparDecls.PostfixList _ -> ElementType.POSTFIX_TYPE_PARAMETER_DECLARATION_LIST
+            | _ -> ElementType.PREFIX_TYPE_PARAMETER_DECLARATION_LIST
+
+        x.Done(range, mark, typeParameterListElementType)
+
+    member x.ProcessConstraints(constraints) =
+        for typeConstraint in constraints do
+            x.ProcessTypeConstraint(typeConstraint)
 
     member x.ProcessTypeParameter(SynTyparDecl(_, SynTypar(IdentRange range, _, _)), elementType) =
         x.MarkAndDone(range, elementType)
@@ -536,10 +543,6 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.ProcessAttributeLists(attrs)
             x.ProcessImplicitCtorParam(pat)
             x.Done(range, mark, ElementType.ATTRIB_PAT)
-
-    member x.ProcessTypeMemberTypeParams(SynValTyparDecls(typeParams, _, _)) =
-        for param in typeParams do
-            x.ProcessTypeParameter(param, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
 
     member x.ProcessActivePatternId(IdentRange range, activePatternElementType, caseElementType, wildElementType) =
         let idMark =
@@ -798,6 +801,9 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.Done(range, mark, ElementType.PAREN_TYPE_USAGE)
 
     member x.ProcessTypeConstraint(typeConstraint: SynTypeConstraint) =
+        let range = typeConstraint.Range
+        let mark = x.Mark(range)
+
         match typeConstraint with
         | SynTypeConstraint.WhereTyparIsValueType(typeParameter, _)
         | SynTypeConstraint.WhereTyparIsReferenceType(typeParameter, _)
@@ -825,6 +831,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.ProcessTypeParameter(typeParameter)
             for synType in synTypes do
                 x.ProcessType(synType)
+
+        x.Done(range, mark, ElementType.TYPE_CONSTRAINT)
 
     member x.ProcessTypeParameter(SynTypar(IdentRange range, _, _)) =
         let mark = x.Mark(range)

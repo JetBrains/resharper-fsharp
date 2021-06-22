@@ -56,9 +56,6 @@ type FSharpTestHost(lifetime: Lifetime, solution: ISolution, checkerService: Fcs
     do
         let fsTestHost = solution.RdFSharpModel().FsharpTestHost
 
-        // We want to get events published by background checker.
-        checkerService.Checker.ImplicitlyStartBackgroundWork <- true
-
         let subscription = checkerService.Checker.ProjectChecked.Subscribe(fun projectOptions ->
             fsTestHost.ProjectChecked(projectOptions.ProjectFileName))
         lifetime.OnTermination(fun _ -> subscription.Dispose()) |> ignore

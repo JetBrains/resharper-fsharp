@@ -43,7 +43,7 @@ type FcsProject =
 
 [<ShellComponent; AllowNullLiteral>]
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-        settingsStore: ISettingsStore, reactorMonitor: IFcsReactorMonitor) =
+        settingsStore: ISettingsStore) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -54,7 +54,6 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
             settingsStoreLive.GetValueProperty(lifetime, setting, null)
 
-        let enableBgCheck = getSettingProperty "BackgroundTypeCheck"
         let skipImpl = getSettingProperty "SkipImplementationAnalysis"
 
         lazy
@@ -62,12 +61,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
                 FSharpChecker.Create(projectCacheSize = 200,
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
-                                     reactorListener = reactorMonitor,
-                                     enablePartialTypeChecking = skipImpl.Value,
-                                     ImplicitlyStartBackgroundWork = enableBgCheck.Value)
-
-            enableBgCheck.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue enabled) ->
-                checker.ImplicitlyStartBackgroundWork <- enabled)
+                                     enablePartialTypeChecking = skipImpl.Value)
 
             checker
 
@@ -80,7 +74,6 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     member val AssemblyReaderShim = Unchecked.defaultof<IFcsAssemblyReaderShim> with get, set
 
     member x.Checker = checker.Value
-    member x.FcsReactorMonitor = reactorMonitor
 
     member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
         try
@@ -114,10 +107,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
         x.AssemblyReaderShim.PrepareDependencies(sourceFile.PsiModule)
 
-        use op = reactorMonitor.MonitorOperation opName
-
         // todo: don't cancel the computation when file didn't change
-        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, op.OperationName).RunAsTask() with
+        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask() with
         | Some (parseResults, checkResults) ->
             logger.Trace("ParseAndCheckFile: finish {0}, {1}", path, opName)
             Some { ParseResults = parseResults; CheckResults = checkResults }
@@ -145,7 +136,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
     member x.InvalidateFcsProject(fcsProjectOptions: FSharpProjectOptions) =
         if checker.IsValueCreated then
-            checker.Value.InvalidateConfiguration(fcsProjectOptions, false)
+            checker.Value.InvalidateConfiguration(fcsProjectOptions)
 
     member x.InvalidateFcsProject(project: IProject) =
         if checker.IsValueCreated then

@@ -33,7 +33,7 @@ IFSharpSigFile
         FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:Eventually)
-        ITypeParameterOfTypeList
+        IPostfixTypeParameterDeclarationList
           FSharpTokenType+LessTokenElement(type:LESS, text:<)
           ITypeParameterOfTypeDeclaration
             FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')

@@ -24,7 +24,7 @@ type ReplaceWithAbbreviatedTypeFix(error: TypeAbbreviationsCannotHaveAugmentatio
         isValid typeDecl &&
 
         // todo: fix parameter list range
-        isNull typeDecl.TypeParameterList &&
+        typeDecl.TypeParameterDeclarations.IsEmpty &&
 
         let fcsEntity = typeDecl.GetFSharpSymbol().As<FSharpEntity>()
         isNotNull fcsEntity
@@ -36,7 +36,7 @@ type ReplaceWithAbbreviatedTypeFix(error: TypeAbbreviationsCannotHaveAugmentatio
         | null -> ()
         | referenceName -> ModificationUtil.DeleteChildRange(referenceName, typeDecl.Identifier)
 
-        match typeDecl.TypeParameterList with
+        match typeDecl.TypeParameterDeclarationList with
         | null -> ()
         | typeParameterList -> ModificationUtil.DeleteChild(typeParameterList)
 

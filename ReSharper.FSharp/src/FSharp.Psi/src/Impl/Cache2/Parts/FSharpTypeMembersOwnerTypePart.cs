@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected FSharpTypeMembersOwnerTypePart([NotNull] IFSharpTypeOldDeclaration declaration,
       [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.Attributes),
-        declaration.TypeParameters, cacheBuilder)
+        declaration.TypeParameterDeclarations, cacheBuilder)
     {
       var extendListShortNames = new FrugalLocalHashSet<string>();
       extendListShortNames = ProcessMembers(declaration.TypeMembersEnumerable, extendListShortNames);

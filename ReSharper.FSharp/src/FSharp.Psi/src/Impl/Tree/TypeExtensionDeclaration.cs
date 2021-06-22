@@ -10,7 +10,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TypeExtensionDeclaration : IFSharpTypeParametersOwnerDeclaration
+  internal partial class TypeExtensionDeclaration
   {
     [CanBeNull] private TypeAugmentation myTypeAugmentation;
     public FSharpSymbolReference Reference { get; protected set; }
@@ -81,5 +81,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool IsPrimary =>
       TypeKeyword?.GetTokenType() == FSharpTokenType.TYPE;
-  }
+
+    public ITypeParameterDeclarationList TypeParameterDeclarationList =>
+      (ITypeParameterDeclarationList) PrefixTypeParameterList ?? PostfixTypeParameterList;
+
+    public override TreeNodeCollection<ITypeParameterDeclaration> TypeParameterDeclarations =>
+      TypeParameterDeclarationList?.TypeParameters ??
+      TreeNodeCollection<ITypeParameterDeclaration>.Empty;  }
 }

@@ -67,11 +67,15 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         | _ -> false
 
     override x.OpenFileForReadShim(fileName, useMemoryMappedFile, shouldShadowCopy) =
+        // todo: don't set values, fix in FCS
+        let shouldShadowCopy = defaultArg shouldShadowCopy false
+        let useMemoryMappedFile = defaultArg useMemoryMappedFile false
+
         let path = FileSystemPath.TryParse(fileName)
         if not (isApplicable path) then base.OpenFileForReadShim(fileName, useMemoryMappedFile, shouldShadowCopy) else
 
         match x.TryGetSource(path) with
-        | true, source -> ByteMemory.FromArray(source.Source)
+        | true, source -> ByteMemory.FromArray(source.Source).AsStream()
         | _ ->
 
         logger.Trace("Miss: FileStreamReadShim miss: {0}", path)

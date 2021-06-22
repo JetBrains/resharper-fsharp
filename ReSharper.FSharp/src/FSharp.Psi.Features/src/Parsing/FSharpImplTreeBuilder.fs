@@ -188,11 +188,17 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         let (SynComponentInfo(_, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
         let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, List.tryHead lid, range)
 
-        // Skipping the last name to have the identifier out of qualifier reference name.
-        x.ProcessReferenceNameSkipLast(lid)
+        match typeParams with
+        | Some(SynTyparDecls.PrefixList _ | SynTyparDecls.SinglePrefix _ as typeParams) ->
+            x.ProcessTypeParameters(typeParams, true)
+            x.ProcessReferenceNameSkipLast(lid)
+        | Some(typeParams) ->
+            x.ProcessReferenceNameSkipLast(lid)
+            x.ProcessTypeParameters(typeParams, true)
+        | _ ->
+            x.ProcessReferenceNameSkipLast(lid)
 
-        x.ProcessTypeParametersOfType typeParams constraints range false
-        // todo: check this; add rename test
+        // todo: add rename test
         for typeConstraint in constraints do
             x.ProcessTypeConstraint(typeConstraint)
 
@@ -264,12 +270,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 x.ProcessTopLevelBindings(bindings)
                 ElementType.LET_BINDINGS_DECLARATION
 
-            | SynMemberDefn.AbstractSlot(SynValSig(explicitValDecls = typeParams; synType = synType; arity = arity), _, range) ->
+            | SynMemberDefn.AbstractSlot(SynValSig(explicitValDecls = typeParams; synType = synType; arity = arity), _, _) ->
                 match typeParams with
-                | SynValTyparDecls(typeParams, _, constraints) ->
-                    x.ProcessTypeParametersOfType typeParams constraints range true
-                    for typeConstraint in constraints do
-                        x.ProcessTypeConstraint(typeConstraint)
+                | SynValTyparDecls(Some(typeParams), _) ->
+                    x.ProcessTypeParameters(typeParams, false)
+                | _ -> ()
                 x.ProcessSignatureType(arity, synType)
                 ElementType.ABSTRACT_MEMBER_DECLARATION
 
@@ -314,7 +319,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                             ElementType.MEMBER_DECLARATION
                         | _ ->
 
-                        x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
+                        x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr)
                         ElementType.MEMBER_DECLARATION
 
                 | selfId :: _ :: _ ->
@@ -329,14 +334,14 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                         ElementType.MEMBER_DECLARATION
                     | _ ->
 
-                    x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
+                    x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr)
                     ElementType.MEMBER_DECLARATION
 
                 | _ -> ElementType.MEMBER_DECLARATION
 
             | SynPat.Named _ ->
                 // In some cases patterns for static members inside records are represented this way.
-                x.ProcessMemberDeclaration(None, SynArgPats.Pats [], returnInfo, expr, range)
+                x.ProcessMemberDeclaration(None, SynArgPats.Pats [], returnInfo, expr)
                 ElementType.MEMBER_DECLARATION
 
             | _ -> ElementType.MEMBER_DECLARATION
@@ -391,10 +396,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         x.ProcessType(returnType)
         x.Done(range, mark, ElementType.RETURN_TYPE_INFO)
 
-    member x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range) =
+    member x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr) =
         match typeParamsOpt with
-        | Some(SynValTyparDecls(typeParams, _, constraints)) ->
-            x.ProcessTypeParametersOfType typeParams constraints range true // todo: of type?..
+        | Some(SynValTyparDecls(Some(typeParams), _)) ->
+            x.ProcessTypeParameters(typeParams, false)
         | _ -> ()
 
         x.ProcessMemberParams(memberParams, true, true) // todo: should check isLocal
@@ -429,10 +434,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             x.Done(patMark, elementType)
 
             match typars with
-            | Some(SynValTyparDecls(typarDecls, _, _)) ->
-                for typarDecl in typarDecls do
+            | Some(SynValTyparDecls(Some(typarDecls), _)) ->
+                for typarDecl in typarDecls.TyparDecls do
                     x.ProcessTypeParameter(typarDecl, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
-            | None -> ()
+                x.ProcessConstraints(typarDecls.Constraints)
+            | _ -> ()
 
             x.ProcessMemberParams(args, true, true)
 

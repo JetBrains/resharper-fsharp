@@ -66,7 +66,7 @@ type FSharpChecker with
                 // No stale results available, wait for fresh results
                 return! parseAndCheckFile
 
-            | Some (parseResults, checkFileResults, cachedVersion) when allowStale && cachedVersion = version ->
+            | Some (parseResults, checkFileResults, cachedVersion) when allowStale && cachedVersion = int64 version ->
                 // Avoid queueing on the reactor thread by using the recent results
                 return Some (parseResults, checkFileResults)
 

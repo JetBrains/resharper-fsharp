@@ -3,5 +3,6 @@
   public partial interface IFSharpTypeOrExtensionDeclaration
   {
     bool IsPrimary { get; }
+    ITypeParameterDeclarationList TypeParameterDeclarationList { get; }
   }
 }

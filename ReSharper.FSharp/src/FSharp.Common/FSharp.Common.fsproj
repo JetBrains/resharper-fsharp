@@ -32,7 +32,6 @@
     <Compile Include="src\Util\FSharpHighlightingAttributeIds.fs" />
     <Compile Include="src\Util\FcsExpressionUtil.fs" />
     <Compile Include="src\Util\FSharpExperimentalFeatures.fs" />
-    <Compile Include="src\Util\FcsReactorMonitor.fs" />
     <Compile Include="src\Util\FcsTaggedText.fs" />
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />

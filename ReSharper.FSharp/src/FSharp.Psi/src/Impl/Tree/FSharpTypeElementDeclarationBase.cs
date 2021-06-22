@@ -152,5 +152,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         element?.SubTreeChanged(element, PsiChangedElementType.SourceContentsChanged);
       }
     }
+
+    public virtual TreeNodeCollection<ITypeParameterDeclaration> TypeParameterDeclarations =>
+      TreeNodeCollection<ITypeParameterDeclaration>.Empty;
   }
 }

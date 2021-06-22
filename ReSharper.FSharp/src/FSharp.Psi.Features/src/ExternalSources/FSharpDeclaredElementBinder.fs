@@ -29,7 +29,7 @@ type FSharpDeclaredElementBinder() =
         let typeParametersOwner = typeElement.As<ITypeParametersOwner>()
         if isNull typeParametersOwner then () else
 
-        (typeParametersOwner.TypeParameters, typeDecl.TypeParameters) ||> Seq.iter2 (fun typeParam typeParamDecl ->
+        (typeParametersOwner.TypeParameters, typeDecl.TypeParameterDeclarations) ||> Seq.iter2 (fun typeParam typeParamDecl ->
             let cachedDecl = typeParamDecl.As<ICachedDeclaration2>()
             if isNotNull cachedDecl then
                 cachedDecl.CacheDeclaredElement <- typeParam)

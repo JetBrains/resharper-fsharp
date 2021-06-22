@@ -10,6 +10,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_DECLARED_MODULE_DECLARATION = "";
     public const string IDS_F_SHARP_TYPE_OLD_DECLARATION = "";
     public const string IDS_F_SHARP_TYPE_OR_EXTENSION_DECLARATION = "";
+    public const string IDS_TYPE_PARAMETER_DECLARATION_LIST = "";
+    public const string IDS_PREFIX_TYPE_PARAMETER_DECLARATION_LIST = "";
+    public const string IDS_TYPE_PARAMETER_DECLARATION = "";
+    public const string IDS_TYPE_CONSTRAINT = "";
     public const string IDS_OBJECT_MODEL_TYPE_REPRESENTATION = "";
     public const string IDS_ENUM_CASE_LIKE_DECLARATION = "";
     public const string IDS_UNION_CASE_LIKE_DECLARATION = "";

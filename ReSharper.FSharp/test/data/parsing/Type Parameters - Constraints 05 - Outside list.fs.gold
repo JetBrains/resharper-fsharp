@@ -11,25 +11,31 @@ IFSharpImplFile
           ITypeParameterOfTypeDeclaration
             FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
             FSharpIdentifierToken(type:IDENTIFIER, text:T)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          ITypeConstraint
-            ITypeReferenceName
-              ITypeParameterId
-                FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-                FSharpIdentifierToken(type:IDENTIFIER, text:T)
-            FSharpTokenType+ColonTokenElement(type:COLON, text::)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+StructTokenElement(type:STRUCT, text:struct)
           FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        ITypeConstraint
+          ITypeReferenceName
+            ITypeParameterId
+              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+              FSharpIdentifierToken(type:IDENTIFIER, text:T)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+ColonGreaterTokenElement(type:COLON_GREATER, text::>)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          INamedTypeUsage
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:I)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        IClassRepresentation
-          FSharpTokenType+ClassTokenElement(type:CLASS, text:class)
+        IDoStatement
+          FSharpTokenType+DoTokenElement(type:DO, text:do)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+EndTokenElement(type:END, text:end)
+          IChameleonExpression
+            IUnitExpr
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           continue;
 
         foreach (var typeDeclaration in typeDeclarationGroup.TypeDeclarations)
-          if (typeDeclaration.CompiledName == sourceName && typeDeclaration.TypeParameters.IsEmpty)
+          if (typeDeclaration.CompiledName == sourceName && typeDeclaration.TypeParameterDeclarations.IsEmpty)
             return typeDeclaration;
       }
 

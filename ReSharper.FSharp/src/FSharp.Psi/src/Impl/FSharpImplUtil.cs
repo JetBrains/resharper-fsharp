@@ -222,8 +222,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       clrName.Append(declaration.CompiledName);
 
       var typeDeclaration = declaration as IFSharpTypeDeclaration;
-      if (typeDeclaration?.TypeParameters.Count > 0)
-        clrName.Append("`" + typeDeclaration.TypeParameters.Count);
+      var typeParametersCount = typeDeclaration?.TypeParameterDeclarations.Count ?? 0;
+      if (typeParametersCount > 0)
+        clrName.Append("`" + typeParametersCount);
 
       return clrName.ToString();
     }
@@ -522,7 +523,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     [NotNull]
     public static TypeAugmentation GetTypeAugmentationInfo([NotNull] ITypeExtensionDeclaration declaration)
     {
-      var extensionNameInfo = new NameAndParametersCount(declaration.SourceName, declaration.TypeParameters.Count);
+      var extensionNameInfo = 
+        new NameAndParametersCount(declaration.SourceName, declaration.TypeParameterDeclarations.Count);
+
       var declaredTypeNames = new Dictionary<NameAndParametersCount, TypeAugmentation>();
 
       void RecordName(IFSharpTypeOldDeclaration typeDeclaration)
@@ -536,7 +539,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (compiledName == SharedImplUtil.MISSING_DECLARATION_NAME)
           return;
 
-        var parametersCount = typeDeclaration.TypeParameters.Count;
+        var parametersCount = typeDeclaration.TypeParameterDeclarations.Count;
         var augmentationInfo =
           TypeAugmentation.NewTypePart(compiledName, parametersCount, typeDeclaration.TypePartKind);
 

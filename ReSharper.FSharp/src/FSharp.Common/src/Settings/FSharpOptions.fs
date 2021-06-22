@@ -34,10 +34,7 @@ module FSharpOptions =
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]
 type FSharpOptions =
-    { [<SettingsEntry(false, backgroundTypeCheck); DefaultValue>]
-      mutable BackgroundTypeCheck: bool
-
-      [<SettingsEntry(false, skipImplementationAnalysis); DefaultValue>]
+    { [<SettingsEntry(false, skipImplementationAnalysis); DefaultValue>]
       mutable SkipImplementationAnalysis: bool
 
       [<SettingsEntry(false, nonFSharpProjectInMemoryAnalysis); DefaultValue>]
@@ -47,10 +44,7 @@ type FSharpOptions =
       mutable EnableOutOfScopeCompletion: bool
 
       [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
-      mutable TopLevelOpenCompletion: bool
-
-      [<SettingsEntry(false, enableFcsReactorMonitor); DefaultValue>]
-      mutable EnableReactorMonitor: bool }
+      mutable TopLevelOpenCompletion: bool }
 
 
 module FSharpScriptOptions =
@@ -180,8 +174,6 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
 
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.SkipImplementationAnalysis), RichText(skipImplementationAnalysis), null) |> ignore
-        this.AddBoolOption((fun key -> key.EnableReactorMonitor), RichText(enableFcsReactorMonitor), null) |> ignore
-        this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
         this.AddBoolOption((fun key -> key.OutOfProcessTypeProviders), RichText(FSharpExperimentalFeatures.outOfProcessTypeProviders), null) |> ignore
 
         if configurations.IsInternalMode() then

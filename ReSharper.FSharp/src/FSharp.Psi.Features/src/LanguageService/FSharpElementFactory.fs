@@ -323,4 +323,4 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let typeDeclaration =
                 moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations.[0] :?> IFSharpTypeDeclaration
 
-            typeDeclaration.TypeParameterList
+            typeDeclaration.TypeParameterDeclarationList

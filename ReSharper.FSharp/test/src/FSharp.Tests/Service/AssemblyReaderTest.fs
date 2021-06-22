@@ -110,7 +110,6 @@ type AssemblyReaderTest() =
         let solution = this.Solution
         let manager = HighlightingSettingsManager.Instance
 
-        this.ShellInstance.GetComponent<FcsCheckerService>().Checker.StopBackgroundCompile()
         solution.GetPsiServices().Files.CommitAllDocuments()
 
         this.ExecuteWithGold(fun writer ->

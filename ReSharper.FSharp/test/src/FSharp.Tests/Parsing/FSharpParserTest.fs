@@ -42,6 +42,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 03 - Members``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Extension - Type parameters 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Extension - Type parameters 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Extension - Type parameters 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Extension - Type parameters 04``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Extension - Type parameters 05``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Extension 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Extension 02 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Extension 03 - Member attributes``() = x.DoNamedTest()
@@ -62,6 +67,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Type parameters - Constraints 02 - Member``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 03 - Or``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 04 - Or and member``() = x.DoNamedTest()
+    [<Test>] member x.``Type Parameters - Constraints 05 - Outside list``() = x.DoNamedTest()
+    [<Test>] member x.``Type Parameters 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Attributes 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Attributes 02``() = x.DoNamedTest()
@@ -476,6 +483,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Member - Operator 03 - Subtract``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Operator 04 - Divide``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Member - Type parameters 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Type parameters 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member - Auto Property - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Auto Property - XmlDoc 02 - Attribute``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Auto Property 01``() = x.DoNamedTest()
@@ -515,6 +525,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Module member - Let - XmlDoc 01``() = x.DoNamedTest()
     [<Test; Explicit("Remove extra space")>] member x.``Module member - Let - XmlDoc 02 - Multiple blocks``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Let - Inline 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Let - Type parameters 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 02 - Qualifier``() = x.DoNamedTest()
