@@ -72,16 +72,6 @@ let contextRequiresParens (context: IFSharpExpression) =
     isNotNull (TypeInheritNavigator.GetByCtorArgExpression(context))
 
 
-let isHighPrecedenceApp (appExpr: IPrefixAppExpr) =
-    if isNull appExpr then false else
-
-    let funExpr = appExpr.FunctionExpression
-    let argExpr = appExpr.ArgumentExpression
-
-    // todo: attribute arg :(
-    isNotNull funExpr && isNotNull argExpr && funExpr.NextSibling == argExpr
-
-
 let (|Prefix|_|) (other: string) (str: string) =
     if str.StartsWith(other, StringComparison.Ordinal) then someUnit else None
 
@@ -138,7 +128,7 @@ let precedence (expr: ITreeNode) =
     | :? INewExpr -> 10
 
     | :? IPrefixAppExpr as prefixApp ->
-        if isHighPrecedenceApp prefixApp then 12 else 11
+        if prefixApp.IsHighPrecedence then 12 else 11
 
     | :? IFSharpExpression -> 13
 
@@ -251,8 +241,9 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     let expr = expr.IgnoreInnerParens()
     if isNull expr|| contextRequiresParens context then true else
 
-    let ParentPrefixAppExpr = PrefixAppExprNavigator.GetByArgumentExpression(context)
-    if isHighPrecedenceApp ParentPrefixAppExpr && isNotNull (QualifiedExprNavigator.GetByQualifier(ParentPrefixAppExpr)) then true else
+    let parentPrefixAppExpr = PrefixAppExprNavigator.GetByArgumentExpression(context)
+    if isNotNull parentPrefixAppExpr && parentPrefixAppExpr.IsHighPrecedence &&
+            isNotNull (QualifiedExprNavigator.GetByQualifier(parentPrefixAppExpr)) then true else
 
     // todo: calc once?
     let allowHighPrecedenceAppParens () =

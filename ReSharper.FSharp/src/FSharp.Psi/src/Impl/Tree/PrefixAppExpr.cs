@@ -13,6 +13,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     private readonly CachedPsiValue<IList<IArgument>> myParameterArguments = new FileCachedPsiValue<IList<IArgument>>();
 
+    public bool IsHighPrecedence =>
+      FunctionExpression is { } funExpr && ArgumentExpression is { } argExpr && funExpr.NextSibling == argExpr;
+
     public IReferenceExpr InvokedReferenceExpression
     {
       get
