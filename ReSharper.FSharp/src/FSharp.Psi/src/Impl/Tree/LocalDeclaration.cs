@@ -69,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
   }
 
-  internal abstract class LocalPatternDeclarationBase : LocalDeclarationBase
+  internal abstract class LocalPatternDeclarationBase : LocalDeclarationBase, IFSharpPatternDeclaredElement
   {
     public TreeNodeCollection<IAttribute> Attributes =>
       TreeNodeCollection<IAttribute>.Empty;

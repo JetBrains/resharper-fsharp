@@ -92,13 +92,7 @@ let removeOpen (openStatement: IOpenStatement) =
     use writeLock = WriteLockCookie.Create(true)
     use disableFormatter = new DisableCodeFormatter()
 
-    let first = getFirstMatchingNodeBefore isInlineSpaceOrComment openStatement
-    let last =
-        openStatement
-        |> skipSemicolonsAndWhiteSpacesAfter
-        |> getThisOrNextNewLine
-
-    deleteChildRange first last
+    removeModuleMember openStatement
 
 let isSystemNs ns =
     ns = "System" || startsWith "System." ns

@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class ModuleFunction : FSharpMethodBase<TopPatternDeclarationBase>
+  internal class ModuleFunction : FSharpMethodBase<TopPatternDeclarationBase>, ITopLevelPatternDeclaredElement
   {
     public ModuleFunction([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {

@@ -16,7 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsStatic => GetContainingType() is IFSharpModule || base.IsStatic;
   }
 
-  internal class FSharpTypePrivateMethod : FSharpMethodBase<FSharpProperTypeMemberDeclarationBase>, ITypePrivateMember
+  internal class FSharpTypePrivateMethod : FSharpMethodBase<FSharpProperTypeMemberDeclarationBase>, ITypePrivateMember,
+    ITopLevelPatternDeclaredElement
   {
     public FSharpTypePrivateMethod([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {

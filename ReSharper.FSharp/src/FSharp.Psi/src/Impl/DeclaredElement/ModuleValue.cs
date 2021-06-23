@@ -4,7 +4,8 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class ModuleValue : FSharpPropertyBase<TopPatternDeclarationBase>, IMutableModifierOwner
+  internal class ModuleValue : FSharpPropertyBase<TopPatternDeclarationBase>, IMutableModifierOwner,
+    ITopLevelPatternDeclaredElement
   {
     public ModuleValue([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {

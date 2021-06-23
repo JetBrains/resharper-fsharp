@@ -1,10 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Refactorings.Workflow
+open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpRefactoringLanguageService() =
@@ -27,10 +27,10 @@ and FSharpRefactoringsHelper() =
     override x.CreateInlineVarAnalyser(workflow) =
         FSharpInlineVarAnalyser(workflow) :> _
 
-    override x.IsLocalVariable(declaredElement) =
-        let refPat = declaredElement.As<ILocalReferencePat>()
-        if isNull refPat then false else
+    override this.CanInlineVariable(declaredElement) =
+        let patternDeclaredElement = declaredElement.As<IFSharpPatternDeclaredElement>()
+        isNotNull patternDeclaredElement &&
 
-        let binding = BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())
-        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
-        isNotNull letExpr
+        let decl = patternDeclaredElement.GetDeclarations().SingleItem()
+        let binding = BindingNavigator.GetByHeadPattern(decl.As<IReferencePat>())
+        isNotNull binding && binding.ParametersDeclarationsEnumerable.IsEmpty()

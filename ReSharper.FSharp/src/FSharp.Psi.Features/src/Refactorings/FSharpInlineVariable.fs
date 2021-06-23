@@ -58,25 +58,28 @@ type FSharpInlineVariable(workflow, solution, driver) =
     override x.Ignore _ = false
 
     override x.RemoveVariableDeclaration(decl) =
-        let refPat = decl.As<ILocalReferencePat>()
-        let binding = BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())
-        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
-
-        let inKeyword = letExpr.InKeyword
-        let lastNode: ITreeNode = if isNotNull inKeyword then inKeyword :> _ else binding :> _
-
-        let first =
-            skipMatchingNodesAfter isInlineSpaceOrComment lastNode
-            |> getThisOrNextNewLine
-            |> skipMatchingNodesAfter isInlineSpace
-
-        let last = letExpr.LastChild
-
-        use cookie = WriteLockCookie.Create(letExpr.IsPhysical())
+        use cookie = WriteLockCookie.Create(decl.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        ModificationUtil.AddChildRangeBefore(letExpr, TreeRange(first, last)) |> ignore
-        ModificationUtil.DeleteChild(letExpr)
+        let refPat = decl.As<IReferencePat>()
+        let binding = BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())
+        match LetBindingsNavigator.GetByBinding(binding) with
+        | :? ILetOrUseExpr as letExpr ->
+            let inKeyword = letExpr.InKeyword
+            let lastNode: ITreeNode = if isNotNull inKeyword then inKeyword :> _ else binding :> _
+
+            let first =
+                skipMatchingNodesAfter isInlineSpaceOrComment lastNode
+                |> getThisOrNextNewLine
+                |> skipMatchingNodesAfter isInlineSpace
+
+            ModificationUtil.AddChildRangeBefore(letExpr, TreeRange(first, letExpr.LastChild)) |> ignore
+            ModificationUtil.DeleteChild(letExpr)
+
+        | :? ILetBindingsDeclaration as letDecl ->
+            removeModuleMember letDecl
+
+        | _ -> ()
 
     override x.RemoveAssignment(expr) =
         exprIndent <- expr.Indent
@@ -97,20 +100,29 @@ type FSharpInlineVarAnalyser(workflow) =
     override x.AssignmentExpression = inlineExpr
 
     override x.Run(declaredElement, _, references) =
-        let refPat = declaredElement.As<ILocalReferencePat>()
+        let refPat = declaredElement.GetDeclarations().SingleItem().As<IReferencePat>()
         if isNull refPat then Pair(false, cannotInline) else
+
+        let isTopLevel = declaredElement :? ITopLevelPatternDeclaredElement
 
         let binding = BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())
         if isNull binding || isNull binding.Expression then Pair(false, cannotInline) else
 
         if binding.ParametersDeclarationsEnumerable.Any() then Pair(false, "Cannot inline function.") else
 
-        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
-        if isNull letExpr || letExpr.Bindings.Count <> 1 || isNull letExpr.InExpression then Pair(false, cannotInline) else
+        let letBindings = LetBindingsNavigator.GetByBinding(binding)
+        if isNull letBindings || letBindings.Bindings.Count <> 1 then Pair(false, cannotInline) else
+
+        let letExpr = letBindings.As<ILetOrUseExpr>()
+        if isNotNull letExpr && isNull letExpr.InExpression then Pair(false, cannotInline) else
 
         references
         |> Seq.tryPick (fun reference ->
-            let expr = reference.GetTreeNode().As<IReferenceExpr>().IgnoreParentParens()
+            let treeNode = reference.GetTreeNode()
+            if isTopLevel && treeNode.GetContainingFile() != refPat.GetContainingFile() then
+                Some "Value has non-local usages." else
+
+            let expr = treeNode.As<IReferenceExpr>().IgnoreParentParens()
             if isNull expr then None else
 
             if isNotNull (SetExprNavigator.GetByLeftExpression(expr)) then

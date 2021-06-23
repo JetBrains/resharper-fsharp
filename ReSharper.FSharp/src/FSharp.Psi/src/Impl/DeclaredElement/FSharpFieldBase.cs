@@ -30,7 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public int? FixedBufferSize => null;
   }
 
-  internal class FSharpTypePrivateField : FSharpFieldBase<TopPatternDeclarationBase>, IMutableModifierOwner, ITypePrivateMember
+  internal class FSharpTypePrivateField : FSharpFieldBase<TopPatternDeclarationBase>, IMutableModifierOwner,
+    ITypePrivateMember, ITopLevelPatternDeclaredElement
   {
     public FSharpTypePrivateField([NotNull] TopPatternDeclarationBase declaration) : base(declaration)
     {

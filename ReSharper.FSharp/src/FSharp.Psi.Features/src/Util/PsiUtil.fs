@@ -348,6 +348,15 @@ module PsiModificationUtil =
             Whitespace(indent)
         ] |> ignore
 
+    let removeModuleMember (moduleMember: IModuleMember) =
+        let first = getFirstMatchingNodeBefore isInlineSpaceOrComment moduleMember
+        let last =
+            moduleMember
+            |> skipSemicolonsAndWhiteSpacesAfter
+            |> getThisOrNextNewLine
+
+        deleteChildRange first last
+
 let getPrevNodeOfType nodeType (node: ITreeNode) =
     let mutable prev = node.PrevSibling
     while prev.NodeType != nodeType do
