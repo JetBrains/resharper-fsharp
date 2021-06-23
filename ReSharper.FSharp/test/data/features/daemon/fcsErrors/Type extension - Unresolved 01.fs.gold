@@ -1,0 +1,7 @@
+﻿module Module
+
+type 'T |A|(0) with
+    member x.P = 1
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: The type 'A' is not defined.

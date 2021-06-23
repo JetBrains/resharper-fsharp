@@ -77,3 +77,5 @@ type FcsErrorsHighlightingTest() =
 
     [<Test>] member x.``Runtime coercion source sealed 01``() = x.DoNamedTest()
     [<Test>] member x.``Runtime coercion source sealed 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type extension - Unresolved 01``() = x.DoNamedTest()

@@ -125,6 +125,8 @@ type FSharpRenameTest() =
     [<Test>] member x.``Type parameters - Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Type reference 01``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type parameters - Constraints 02 - Function``() = x.DoNamedTest()
+    [<Test>] member x.``Type parameters - Constraints 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Active patterns - Local - Partial 01 - Decl``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Local - Partial 02 - Pattern``() = x.DoNamedTest()

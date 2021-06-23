@@ -1,0 +1,8 @@
+﻿module Module
+
+type zzz = int
+
+type R<'T when 'T :> zzz> = class end
+
+let f<'a when 'a :> zzz> () =
+    ()

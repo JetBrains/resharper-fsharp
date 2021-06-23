@@ -198,7 +198,6 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
         | _ ->
             x.ProcessReferenceNameSkipLast(lid)
 
-        // todo: add rename test
         for typeConstraint in constraints do
             x.ProcessTypeConstraint(typeConstraint)
 
