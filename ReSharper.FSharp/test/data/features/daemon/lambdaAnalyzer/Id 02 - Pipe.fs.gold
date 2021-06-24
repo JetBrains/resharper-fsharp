@@ -1,0 +1,8 @@
+﻿x ||> (fun x -> x)|(0)
+|(fun x -> x)|(1) x
+|(fun x -> x) <||(2) x
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant application
+(1): ReSharper Dead Code: Redundant application
+(2): ReSharper Dead Code: Redundant application

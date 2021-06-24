@@ -98,9 +98,12 @@ let getFunctionExpr (appExpr: IAppExpr) =
         | _ -> null
     | _ -> null
 
-let getReferenceExprName (expr: IFSharpExpression) =
+let getExprPresentableName (expr: IFSharpExpression) =
     match expr.IgnoreInnerParens() with
-    | :? IReferenceExpr as refExpr -> refExpr.ShortName
+    | :? IReferenceExpr as refExpr -> $"'{refExpr.ShortName}'"
+    | :? ILambdaExpr -> "lambda"
+    | :? ITypeTestExpr -> "type test"
+    | :? ICastExpr -> "type cast"
     | _ -> SharedImplUtil.MISSING_DECLARATION_NAME
 
 let rec isSimpleQualifiedName (expr: IReferenceExpr) =

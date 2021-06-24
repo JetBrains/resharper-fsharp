@@ -7,12 +7,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 type ReplaceAppExprWithArgFix(warning: RedundantApplicationWarning) =
     inherit ReplaceWithInnerTreeNodeFixBase(warning.AppExpr, warning.ArgExpr)
 
-    let appExpr = warning.AppExpr
-    let funExpr = getFunctionExpr appExpr
+    let funExpr = getFunctionExpr warning.AppExpr
 
     override x.Text =
-        let name = getReferenceExprName funExpr
-        sprintf "Remove '%s'" name
+        $"Remove %s{getExprPresentableName funExpr}"
 
     override x.IsAvailable(dataHolder) =
         base.IsAvailable(dataHolder) && isValid funExpr

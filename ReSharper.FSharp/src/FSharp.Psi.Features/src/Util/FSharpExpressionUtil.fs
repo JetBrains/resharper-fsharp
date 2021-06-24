@@ -53,6 +53,26 @@ let isPredefinedFunctionApp name (expr: #IFSharpExpression) (arg: outref<IFSharp
 
     | _ -> false
 
+let isFunctionInApp (expr: #IFSharpExpression) (funExpr: outref<IAppExpr>) (arg: outref<IFSharpExpression>) =
+    let prefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(expr)
+    if isNotNull prefixAppExpr then
+        funExpr <- prefixAppExpr
+        arg <- prefixAppExpr.ArgumentExpression
+        true else
+
+    let binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(expr)
+    if isNotNull binaryAppExpr && isPredefinedInfixOpApp "|>" binaryAppExpr then
+        funExpr <- binaryAppExpr
+        arg <- binaryAppExpr.LeftArgument
+        true else
+
+    let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(expr)
+    if isNotNull binaryAppExpr && isPredefinedInfixOpApp "<|" binaryAppExpr then
+        funExpr <- binaryAppExpr
+        arg <- binaryAppExpr.RightArgument
+        true else
+
+    false
 
 let getPossibleFunctionAppReferenceExpr (expr: IFSharpExpression) =
     match expr with

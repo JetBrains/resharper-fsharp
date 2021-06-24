@@ -11,15 +11,17 @@ type LambdaAnalyzerTest() =
 
     override x.HighlightingPredicate(highlighting, _, _) =
         match highlighting with
-        | :? LambdaCanBeSimplifiedWarning
         | :? LambdaCanBeReplacedWithInnerExpressionWarning
+        | :? LambdaCanBeSimplifiedWarning
         | :? LambdaBodyCanBeReplacedWithIdWarning
-        | :? LambdaCanBeReplacedWithBuiltinFunctionWarning -> true
+        | :? LambdaCanBeReplacedWithBuiltinFunctionWarning
+        | :? RedundantApplicationWarning -> true
         | _ -> false
 
     [<Test>] member x.``Application``() = x.DoNamedTest()
     [<Test>] member x.``Partial application``() = x.DoNamedTest()
-    [<Test>] member x.``Id``() = x.DoNamedTest()
+    [<Test>] member x.``Id 01``() = x.DoNamedTest()
+    [<Test>] member x.``Id 02 - Pipe``() = x.DoNamedTest()
     [<Test>] member x.``Fst``() = x.DoNamedTest()
     [<Test>] member x.``Snd``() = x.DoNamedTest()
     [<Test>] member x.``Delegates 01``() = x.DoNamedTest()

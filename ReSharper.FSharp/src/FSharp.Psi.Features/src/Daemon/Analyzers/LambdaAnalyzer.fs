@@ -18,7 +18,8 @@ open JetBrains.Util
                          HighlightingTypes = [| typeof<LambdaBodyCanBeReplacedWithIdWarning>
                                                 typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>
                                                 typeof<LambdaCanBeReplacedWithInnerExpressionWarning>
-                                                typeof<LambdaCanBeSimplifiedWarning> |])>]
+                                                typeof<LambdaCanBeSimplifiedWarning>
+                                                typeof<RedundantApplicationWarning> |])>]
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
 
@@ -147,18 +148,25 @@ type LambdaAnalyzer() =
             | _ ->
 
             if pats.Count = 1 then
-                let pat = pats.First().IgnoreInnerParens()
-                if compareArg pat expr then LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "id") :> _ else
-
-                match pat with
-                | :? ITuplePat as pat when not pat.IsStruct && pat.PatternsEnumerable.CountIs(2) ->
-                    let tuplePats = pat.Patterns
-                    if compareArg tuplePats.[0] expr then
-                        LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "fst") :> _
-                    elif compareArg tuplePats.[1] expr then
-                        LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "snd") :> _
-                    else null
-                | _ -> null
+                let pat = pats.[0].IgnoreInnerParens()
+                if compareArg pat expr then
+                    let expr = lambda.IgnoreParentParens()
+                    let mutable funExpr = Unchecked.defaultof<_>
+                    let mutable arg = Unchecked.defaultof<_>
+                    if isFunctionInApp expr &funExpr &arg then
+                        RedundantApplicationWarning(funExpr, arg) :> _
+                    else
+                        LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "id") :> _
+                else
+                    match pat with
+                    | :? ITuplePat as pat when not pat.IsStruct && pat.PatternsEnumerable.CountIs(2) ->
+                        let tuplePats = pat.Patterns
+                        if compareArg tuplePats.[0] expr then
+                            LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "fst") :> _
+                        elif compareArg tuplePats.[1] expr then
+                            LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "snd") :> _
+                        else null
+                    | _ -> null
 
             elif compareArg (pats.LastOrDefault()) expr then LambdaBodyCanBeReplacedWithIdWarning(lambda) :>_
             else null

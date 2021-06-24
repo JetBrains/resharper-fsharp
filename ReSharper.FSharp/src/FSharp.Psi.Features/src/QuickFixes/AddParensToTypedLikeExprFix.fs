@@ -22,10 +22,7 @@ type AddParensToTypedLikeExprFix(typedLikeExpr: ITypedLikeExpr) =
         AddParensToTypedLikeExprFix(error.Expr.As<ITypedLikeExpr>())
 
     override x.Text =
-        match typedLikeExpr with
-        | :? ICastExpr -> "Add parens to type cast"
-        | :? ITypeTestExpr -> "Add parens to type test"
-        | _ -> ""
+        $"Add parens to {getExprPresentableName typedLikeExpr}"
 
     override x.IsAvailable _ = isValid expr
 

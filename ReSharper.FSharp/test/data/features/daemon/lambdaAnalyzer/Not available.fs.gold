@@ -2,7 +2,7 @@
 
 fun () -> ()
 fun (()) -> ()
-fun () -> id ()
+fun () -> |id|(0) ()
 
 fun x -> -x
 fun x -> ~~x
@@ -12,7 +12,7 @@ fun x -> f x 1
 
 fun x y -> x
 fun x y -> y x
-fun x y -> id x
+fun x y -> |id|(1) x
 fun x y -> f y x
 
 fun (a, b) -> f b
@@ -37,3 +37,5 @@ fun b -> A.b
 fun A.b -> A.b
 
 ---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant application
+(1): ReSharper Dead Code: Redundant application
