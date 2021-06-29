@@ -21,7 +21,7 @@ let isNamedArgReference (expr: IFSharpExpression) =
     let refExpr = tryGetNamedArgRefExpr expr
     if isNull refExpr then false else
 
-    match refExpr.Reference.GetFSharpSymbol() with
+    match refExpr.Reference.GetFcsSymbol() with
     | :? FSharpParameter -> true
     | :? FSharpField as fsField -> fsField.IsUnionCaseField
     | _ -> false
@@ -59,7 +59,7 @@ let getMatchingParameter (expr: IFSharpExpression) =
     let symbolReference = getReference argsOwner
     if isNull symbolReference then null else
 
-    let mfv = symbolReference.GetFSharpSymbol().As<FSharpMemberOrFunctionOrValue>()
+    let mfv = symbolReference.GetFcsSymbol().As<FSharpMemberOrFunctionOrValue>()
     if isNull mfv then null else
 
     let paramOwner = symbolReference.Resolve().DeclaredElement.As<IParametersOwner>()

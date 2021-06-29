@@ -27,8 +27,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         if (!(PrefixAppExprNavigator.GetByArgumentExpression(parenExpr)?.FunctionExpression is IReferenceExpr expr))
           return null;
 
-        var fsSymbol = expr.Reference.GetFSharpSymbol();
-        switch (fsSymbol)
+        var fcsSymbol = expr.Reference.GetFcsSymbol();
+        switch (fcsSymbol)
         {
           case FSharpUnionCase unionCase:
             return GetFieldDeclaredElement(reference, unionCase, referenceOwner);
@@ -48,7 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         if (parametersOwnerPat == null)
           return null;
 
-        return parametersOwnerPat.ReferenceName.Reference.GetFSharpSymbol() is FSharpUnionCase unionCase
+        return parametersOwnerPat.ReferenceName.Reference.GetFcsSymbol() is FSharpUnionCase unionCase
           ? GetFieldDeclaredElement(reference, unionCase, referenceOwner)
           : null;
       }

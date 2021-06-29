@@ -81,10 +81,10 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
             ReferenceAccessType.READ
 
         | :? IFSharpLocalDeclaration as localDecl ->
-            let fsSymbol = localDecl.GetFSharpSymbol()
-            if not (fsSymbol :? FSharpMemberOrFunctionOrValue) then ReferenceAccessType.OTHER else
+            let fcsSymbol = localDecl.GetFcsSymbol()
+            if not (fcsSymbol :? FSharpMemberOrFunctionOrValue) then ReferenceAccessType.OTHER else
 
-            let mfv = fsSymbol :?> FSharpMemberOrFunctionOrValue
+            let mfv = fcsSymbol :?> FSharpMemberOrFunctionOrValue
             if not mfv.FullType.IsFunctionType then ReferenceAccessType.READ else
 
             ReferenceAccessType.OTHER

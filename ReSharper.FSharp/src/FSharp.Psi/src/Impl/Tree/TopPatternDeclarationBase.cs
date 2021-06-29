@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (TryCreateDeclaredElementFast(typeDeclaration) is { } declaredElement)
         return declaredElement;
 
-      return GetFSharpSymbol() is { } fcsSymbol
+      return GetFcsSymbol() is { } fcsSymbol
         ? CreateDeclaredElement(fcsSymbol)
         : null;
     }

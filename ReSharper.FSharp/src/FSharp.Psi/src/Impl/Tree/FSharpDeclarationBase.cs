@@ -12,10 +12,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public abstract string CompiledName { get; }
     public virtual string SourceName => NameIdentifier.GetSourceName();
 
-    public virtual FSharpSymbol GetFSharpSymbol() =>
-      GetFSharpSymbolUse()?.Symbol;
+    public virtual FSharpSymbol GetFcsSymbol() =>
+      GetFcsSymbolUse()?.Symbol;
 
-    public FSharpSymbolUse GetFSharpSymbolUse() =>
+    public FSharpSymbolUse GetFcsSymbolUse() =>
       GetSymbolDeclaration(GetNameIdentifierRange());
 
     protected virtual FSharpSymbolUse GetSymbolDeclaration(TreeTextRange identifierRange) =>

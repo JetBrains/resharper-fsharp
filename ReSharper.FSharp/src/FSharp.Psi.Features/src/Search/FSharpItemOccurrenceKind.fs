@@ -118,7 +118,7 @@ type FSharpItemOccurenceKindProvider() =
                 if element :? IConstructor then
                     [| OccurrenceKind.NewInstanceCreation |] :> _ else
 
-                match symbolReference.GetFSharpSymbol() with
+                match symbolReference.GetFcsSymbol() with
                 | :? FSharpUnionCase ->
                     [| OccurrenceKind.NewInstanceCreation |] :> _
 

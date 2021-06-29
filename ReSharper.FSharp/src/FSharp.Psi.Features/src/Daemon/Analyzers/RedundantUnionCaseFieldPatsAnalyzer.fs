@@ -21,6 +21,6 @@ type RedundantUnionCaseFieldPatsAnalyzer() =
     override x.Run(pat, _, consumer) =
         let parenPat = pat.ParametersEnumerable.SingleItem.As<IParenPat>()
         if isNotNull parenPat && isApplicable parenPat then
-            match pat.ReferenceName.Reference.GetFSharpSymbol() with
+            match pat.ReferenceName.Reference.GetFcsSymbol() with
             | :? FSharpUnionCase -> consumer.AddHighlighting(RedundantUnionCaseFieldPatternsWarning(parenPat))
             | _ -> ()

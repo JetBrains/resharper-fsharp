@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (TypeUsage is IFunctionTypeUsage)
         return this.CreateMethod();
 
-      return GetFSharpSymbol() is { } fcsSymbol
+      return GetFcsSymbol() is { } fcsSymbol
         ? CreateDeclaredElement(fcsSymbol)
         : null;
     }

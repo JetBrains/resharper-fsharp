@@ -103,8 +103,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public override FSharpSymbol GetFSharpSymbol() =>
-      base.GetFSharpSymbol() switch
+    public override FSharpSymbol GetFcsSymbol() =>
+      base.GetFcsSymbol() switch
       {
         FSharpMemberOrFunctionOrValue { IsConstructor: true } mfv => mfv.DeclaringEntity?.Value,
         // FSharpUnionCase unionCase => unionCase.ReturnType.TypeDefinition,

@@ -116,7 +116,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         let refPat = binding.HeadPattern.As<IReferencePat>()
         if isNull refPat then () else
 
-        let symbolUse = refPat.GetFSharpSymbolUse()
+        let symbolUse = refPat.GetFcsSymbolUse()
         if isNull symbolUse then () else
 
         let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue

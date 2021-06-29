@@ -99,13 +99,13 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
             for param in group do
                 if not isFirstParam then append builder " * "
 
-                let fsType = param.Type
+                let fcsType = param.Type
                 let addParens =
-                    fsType.IsFunctionType ||
-                    fsType.IsTupleType && group.Count > 1
+                    fcsType.IsFunctionType ||
+                    fcsType.IsTupleType && group.Count > 1
 
                 if addParens then append builder "("
-                append builder (fsType.Format(displayContext))
+                append builder (fcsType.Format(displayContext))
                 if addParens then append builder ")"
 
                 isFirstParam <- false
@@ -132,7 +132,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         let namedPat = headPattern.As<INamedPat>()
         if isNull namedPat then () else
 
-        let symbolUse = (headPattern :?> IFSharpDeclaration).GetFSharpSymbolUse()
+        let symbolUse = (headPattern :?> IFSharpDeclaration).GetFcsSymbolUse()
         if isNull symbolUse then () else
 
         match symbolUse.Symbol with
@@ -148,7 +148,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
     override x.VisitMemberDeclaration(decl, consumer) =
         if isNotNull (ObjExprNavigator.GetByMember(decl)) then () else
 
-        let symbolUse = decl.GetFSharpSymbolUse()
+        let symbolUse = decl.GetFcsSymbolUse()
         if isNull symbolUse then () else
 
         match symbolUse.Symbol with

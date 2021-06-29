@@ -79,8 +79,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
       if (IsMangledOpName(mfv.LogicalName))
         return FSharpHighlightingAttributeIdsModule.Operator;
 
-      var fsType = mfv.FullType;
-      if (fsType.IsFunctionType || mfv.IsTypeFunction || fsType.IsAbbreviation && fsType.AbbreviatedType.IsFunctionType)
+      var fcsType = mfv.FullType;
+      if (fcsType.IsFunctionType || mfv.IsTypeFunction || fcsType.IsAbbreviation && fcsType.AbbreviatedType.IsFunctionType)
         return mfv.IsMutable
           ? FSharpHighlightingAttributeIdsModule.MutableFunction
           : FSharpHighlightingAttributeIdsModule.Function;
@@ -88,7 +88,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
       if (mfv.IsMutable || mfv.IsRefCell())
         return FSharpHighlightingAttributeIdsModule.MutableValue;
 
-      if (fsType.HasTypeDefinition && fsType.TypeDefinition is var mfvTypeEntity && mfvTypeEntity.IsByRef)
+      if (fcsType.HasTypeDefinition && fcsType.TypeDefinition is var mfvTypeEntity && mfvTypeEntity.IsByRef)
         return FSharpHighlightingAttributeIdsModule.MutableValue;
 
       return FSharpHighlightingAttributeIdsModule.Value;

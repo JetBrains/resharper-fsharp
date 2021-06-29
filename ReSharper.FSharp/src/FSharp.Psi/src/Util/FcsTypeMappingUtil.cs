@@ -63,12 +63,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
     }
 
-    private static bool HasGenericTypeParams([NotNull] FSharpType fsType)
+    private static bool HasGenericTypeParams([NotNull] FSharpType fcsType)
     {
-      if (fsType.IsGenericParameter)
+      if (fcsType.IsGenericParameter)
         return true;
 
-      foreach (var typeArg in fsType.GenericArguments)
+      foreach (var typeArg in fcsType.GenericArguments)
         if (typeArg.IsGenericParameter || HasGenericTypeParams(typeArg))
           return true;
 
@@ -76,41 +76,41 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    private static FSharpType GetStrippedType([NotNull] FSharpType type)
+    private static FSharpType GetStrippedType([NotNull] FSharpType fcsType)
     {
       try
       {
-        return type.StrippedType;
+        return fcsType.StrippedType;
       }
       catch (Exception e)
       {
-        Logger.LogMessage(LoggingLevel.WARN, "Getting stripped type: {0}", type);
+        Logger.LogMessage(LoggingLevel.WARN, "Getting stripped type: {0}", fcsType);
         Logger.LogExceptionSilently(e);
         return null;
       }
     }
 
     [NotNull]
-    public static IType MapType([NotNull] this FSharpType fsType, [NotNull] IList<ITypeParameter> typeParams,
+    public static IType MapType([NotNull] this FSharpType fcsType, [NotNull] IList<ITypeParameter> typeParams,
       [NotNull] IPsiModule psiModule, bool isFromMethod = false, bool isFromReturn = false)
     {
-      var type = GetStrippedType(fsType);
+      var type = GetStrippedType(fcsType);
       if (type == null || type.IsUnresolved)
         return TypeFactory.CreateUnknownType(psiModule);
 
       // F# 4.0 specs 18.1.3
       try
       {
-        // todo: check type vs fsType
-        if (isFromMethod && type.IsNativePtr && !HasGenericTypeParams(fsType))
+        // todo: check type vs fcsType
+        if (isFromMethod && type.IsNativePtr && !HasGenericTypeParams(fcsType))
         {
-          var argType = GetSingleTypeArgument(fsType, typeParams, psiModule, true);
+          var argType = GetSingleTypeArgument(fcsType, typeParams, psiModule, true);
           return TypeFactory.CreatePointerType(argType);
         }
       }
       catch (Exception e)
       {
-        Logger.LogMessage(LoggingLevel.WARN, "Could not map pointer type: {0}", fsType);
+        Logger.LogMessage(LoggingLevel.WARN, "Could not map pointer type: {0}", fcsType);
         Logger.LogExceptionSilently(e);
       }
 
@@ -161,28 +161,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         : TypeFactory.CreateUnknownType(psiModule);
     }
 
-    public static IType MapType([NotNull] this FSharpType fsType, [NotNull] ITreeNode treeNode) =>
+    public static IType MapType([NotNull] this FSharpType fcsType, [NotNull] ITreeNode treeNode) =>
       // todo: get external type parameters
-      MapType(fsType, EmptyList<ITypeParameter>.Instance, treeNode.GetPsiModule());
+      MapType(fcsType, EmptyList<ITypeParameter>.Instance, treeNode.GetPsiModule());
 
     [NotNull]
-    private static IType GetSingleTypeArgument([NotNull] FSharpType fsType, IList<ITypeParameter> typeParams,
+    private static IType GetSingleTypeArgument([NotNull] FSharpType fcsType, IList<ITypeParameter> typeParams,
       IPsiModule psiModule, bool isFromMethod)
     {
-      var genericArgs = fsType.GenericArguments;
+      var genericArgs = fcsType.GenericArguments;
       Assertion.Assert(genericArgs.Count == 1, "genericArgs.Count == 1");
       return GetTypeArgumentType(genericArgs[0], typeParams, psiModule, isFromMethod);
     }
 
     [NotNull]
     private static IDeclaredType GetTypeWithSubstitution([NotNull] ITypeElement typeElement,
-      IList<FSharpType> fsTypeArgs, [NotNull] IList<ITypeParameter> typeParams, [NotNull] IPsiModule psiModule,
+      IList<FSharpType> fcsTypeArgs, [NotNull] IList<ITypeParameter> typeParams, [NotNull] IPsiModule psiModule,
       bool isFromMethod)
     {
       var typeParamsCount = typeElement.GetAllTypeParameters().Count;
       var typeArgs = new IType[typeParamsCount];
       for (var i = 0; i < typeParamsCount; i++)
-        typeArgs[i] = GetTypeArgumentType(fsTypeArgs[i], typeParams, psiModule, isFromMethod);
+        typeArgs[i] = GetTypeArgumentType(fcsTypeArgs[i], typeParams, psiModule, isFromMethod);
 
       return TypeFactory.CreateType(typeElement, typeArgs);
     }
@@ -208,8 +208,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     public static ParameterKind MapParameterKind([NotNull] this FSharpParameter param)
     {
-      var fsType = param.Type;
-      if (fsType.HasTypeDefinition && fsType.TypeDefinition is var entity && entity.IsByRef)
+      var fcsType = param.Type;
+      if (fcsType.HasTypeDefinition && fcsType.TypeDefinition is var entity && entity.IsByRef)
       {
         if (param.IsOut || entity.LogicalName == "outref`1")
           return ParameterKind.OUTPUT;

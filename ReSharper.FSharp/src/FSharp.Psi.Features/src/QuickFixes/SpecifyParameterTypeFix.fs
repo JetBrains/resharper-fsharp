@@ -30,7 +30,7 @@ type SpecifyParameterTypeFixBase(refExpr: IQualifiedExpr) =
         isValid this.QualifierRefExpr &&
 
         let reference = this.QualifierRefExpr.Reference
-        let mfv = reference.GetFSharpSymbol().As<FSharpMemberOrFunctionOrValue>()
+        let mfv = reference.GetFcsSymbol().As<FSharpMemberOrFunctionOrValue>()
         isNotNull mfv && not mfv.FullType.IsGenericParameter && this.IsApplicable(mfv) &&
 
         let declaredElement = reference.Resolve().DeclaredElement

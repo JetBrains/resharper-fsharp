@@ -22,7 +22,7 @@ type GenerateMissingOverridesFix(error: NoImplementationGivenTypeError) =
     override x.Text = "Generate missing members"
 
     override this.IsAvailable _ =
-        isValid typeDecl && isNotNull (typeDecl.GetFSharpSymbol())
+        isValid typeDecl && isNotNull (typeDecl.GetFcsSymbol())
 
     override x.Execute(solution, textControl) =
         let workflow = GenerateImplementationsWorkflow()

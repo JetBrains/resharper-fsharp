@@ -56,7 +56,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
                     FSharpTypeDeclarationNavigator.GetByTypeRepresentation(repr)
                 | decl -> decl
 
-            let fcsEntity = typeDeclaration.GetFSharpSymbol() :?> FSharpEntity
+            let fcsEntity = typeDeclaration.GetFcsSymbol() :?> FSharpEntity
             fcsEntity.DeclaredInterfaces |> Seq.find (fun e ->
                 e.HasTypeDefinition && e.TypeDefinition.IsEffectivelySameAs(impl.FcsEntity))
 

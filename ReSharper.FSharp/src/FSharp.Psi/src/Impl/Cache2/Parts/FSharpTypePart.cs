@@ -116,7 +116,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (AttributeClassNames.IsEmpty())
         return EmptyList<IAttributeInstance>.Instance;
 
-      if (!(GetDeclaration()?.GetFSharpSymbol() is FSharpEntity entity))
+      if (!(GetDeclaration()?.GetFcsSymbol() is FSharpEntity entity))
         return EmptyList<IAttributeInstance>.Instance;
 
       var psiModule = GetPsiModule();
@@ -139,7 +139,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         return false;
 
       // todo: get entity without getting declaration
-      var entity = GetDeclaration()?.GetFSharpSymbol() as FSharpEntity;
+      var entity = GetDeclaration()?.GetFcsSymbol() as FSharpEntity;
       return entity?.Attributes.HasAttributeInstance(clrTypeName.FullName) ?? false;
     }
 

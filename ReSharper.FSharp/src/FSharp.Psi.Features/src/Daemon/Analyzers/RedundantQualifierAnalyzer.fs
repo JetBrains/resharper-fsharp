@@ -32,7 +32,7 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
     let referenceName = referenceOwner.As<IReferenceName>()
     if isNotNull referenceName && isInOpen referenceName then false else
 
-    let fcsSymbol = reference.GetFSharpSymbol()
+    let fcsSymbol = reference.GetFcsSymbol()
     if isNull fcsSymbol then false else
 
     let fcsSymbol: FSharpSymbol =

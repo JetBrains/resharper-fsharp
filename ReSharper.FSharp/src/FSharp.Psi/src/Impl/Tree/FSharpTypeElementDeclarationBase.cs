@@ -19,19 +19,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public IEnumerable<IDeclaredType> SuperTypes => GetFSharpSymbol() is FSharpEntity entity
+    public IEnumerable<IDeclaredType> SuperTypes => GetFcsSymbol() is FSharpEntity entity
       ? entity.GetSuperTypes(TypeParameters, GetPsiModule())
       : EmptyList<IDeclaredType>.Instance;
 
     /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public IDeclaredType BaseClassType => GetFSharpSymbol() is FSharpEntity entity
+    public IDeclaredType BaseClassType => GetFcsSymbol() is FSharpEntity entity
       ? entity.MapBaseType(TypeParameters, GetPsiModule())
       : null;
 
-    public override FSharpSymbol GetFSharpSymbol()
+    public override FSharpSymbol GetFcsSymbol()
     {
-      var symbol = base.GetFSharpSymbol();
+      var symbol = base.GetFcsSymbol();
       if (symbol is FSharpEntity || symbol is FSharpUnionCase)
         return symbol;
 

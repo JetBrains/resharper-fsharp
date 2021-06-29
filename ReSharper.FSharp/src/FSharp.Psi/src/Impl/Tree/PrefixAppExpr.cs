@@ -42,10 +42,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return null;
 
         var reference = referenceExpr.Reference;
-        var fsSymbol = reference.GetFSharpSymbol();
+        var fcsSymbol = reference.GetFcsSymbol();
 
         // todo: union cases, exceptions
-        if (!(fsSymbol is FSharpMemberOrFunctionOrValue mfv))
+        if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv))
           return null;
 
         var paramGroups = mfv.CurriedParameterGroups;

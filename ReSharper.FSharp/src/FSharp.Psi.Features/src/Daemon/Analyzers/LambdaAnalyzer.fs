@@ -95,7 +95,7 @@ type LambdaAnalyzer() =
         let reference = getReference app
         app :? IPrefixAppExpr && isNotNull reference &&
 
-        match reference.GetFSharpSymbol() with
+        match reference.GetFcsSymbol() with
         | :? FSharpMemberOrFunctionOrValue as m ->
             m.IsMember &&
             let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0

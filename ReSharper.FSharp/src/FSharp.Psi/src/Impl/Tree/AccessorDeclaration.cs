@@ -17,16 +17,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override string CompiledName => DeclaredElementName;
     public override string SourceName => DeclaredElementName;
 
-    public override FSharpSymbol GetFSharpSymbol()
+    public override FSharpSymbol GetFcsSymbol()
     {
-      var mfv = OwnerMember?.GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
+      var mfv = OwnerMember?.GetFcsSymbol() as FSharpMemberOrFunctionOrValue;
       var members = mfv?.DeclaringEntity?.Value.MembersFunctionsAndValues;
 
       var range = mfv?.DeclarationLocation;
       return members?.FirstOrDefault(m => m.LogicalName == CompiledName && m.DeclarationLocation.Equals(range));
     }
 
-    protected override IDeclaredElement CreateDeclaredElement() => CreateDeclaredElement(GetFSharpSymbol());
+    protected override IDeclaredElement CreateDeclaredElement() => CreateDeclaredElement(GetFcsSymbol());
 
     protected override IDeclaredElement CreateDeclaredElement([CanBeNull] FSharpSymbol fcsSymbol) =>
       fcsSymbol is FSharpMemberOrFunctionOrValue mfv && (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)

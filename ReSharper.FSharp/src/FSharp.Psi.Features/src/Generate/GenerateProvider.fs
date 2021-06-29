@@ -112,10 +112,10 @@ type FSharpOverridableMembersProvider() =
         let typeElement = typeDeclaration.DeclaredElement
         if not (canHaveOverrides typeElement) then () else
 
-        let fcsEntity = typeDeclaration.GetFSharpSymbol().As<FSharpEntity>()
+        let fcsEntity = typeDeclaration.GetFcsSymbol().As<FSharpEntity>()
         if isNull fcsEntity then () else
 
-        let displayContext = typeDeclaration.GetFSharpSymbolUse().DisplayContext
+        let displayContext = typeDeclaration.GetFcsSymbolUse().DisplayContext
 
         let rec getBaseTypes (fcsEntity: FSharpEntity) =
             let rec loop acc (fcsType: FSharpType) =

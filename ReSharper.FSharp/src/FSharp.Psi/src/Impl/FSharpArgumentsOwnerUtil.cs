@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static IList<IArgument> CalculateParameterArguments(this IFSharpReferenceOwner referenceOwner,
       IEnumerable<IFSharpExpression> appliedExpressions)
     {
-      if (!(referenceOwner.Reference.GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
+      if (!(referenceOwner.Reference.GetFcsSymbol() is FSharpMemberOrFunctionOrValue mfv))
         return EmptyList<IArgument>.Instance;
 
       var paramGroups = mfv.CurriedParameterGroups;

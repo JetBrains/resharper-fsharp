@@ -22,7 +22,7 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
         | :? IReferenceExpr as ref ->
             let declaredElement = ref.Reference.Resolve().DeclaredElement
 
-            match ref.Reference.GetFSharpSymbol() with
+            match ref.Reference.GetFcsSymbol() with
             | :? FSharpField as field ->
                 field.IsMutable ||
 

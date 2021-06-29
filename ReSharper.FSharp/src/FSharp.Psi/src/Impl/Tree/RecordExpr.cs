@@ -53,7 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public override FSharpSymbol GetFSharpSymbol()
+    public override FSharpSymbol GetFcsSymbol()
     {
       var symbolUse = GetSymbolUse();
       if (symbolUse?.Symbol is FSharpField field)
@@ -69,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!(binding is { HeadPattern: INamedPat namedPat }))
         return null;
 
-      var mfv = namedPat.GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
+      var mfv = namedPat.GetFcsSymbol() as FSharpMemberOrFunctionOrValue;
       var returnParameterType = mfv?.ReturnParameter.Type;
       if (!(returnParameterType is { HasTypeDefinition: true }))
         return null;

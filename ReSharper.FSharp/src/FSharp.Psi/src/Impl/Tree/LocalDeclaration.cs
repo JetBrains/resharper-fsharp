@@ -43,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
+        if (!(GetFcsSymbol() is FSharpMemberOrFunctionOrValue mfv))
           return TypeFactory.CreateUnknownType(Module);
 
         var typeParameters =

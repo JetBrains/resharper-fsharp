@@ -128,7 +128,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       get
       {
         var declaration = GetDeclaration();
-        var symbol = declaration?.GetFSharpSymbol();
+        var symbol = declaration?.GetFcsSymbol();
 
         return symbol != null
           ? GetActualSymbol(symbol)
@@ -137,12 +137,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public FSharpSymbolUse SymbolUse =>
-      GetDeclaration()?.GetFSharpSymbolUse();
+      GetDeclaration()?.GetFcsSymbolUse();
 
     [NotNull]
-    protected IType GetType([CanBeNull] FSharpType fsType) =>
-      fsType != null
-        ? fsType.MapType(AllTypeParameters, Module)
+    protected IType GetType([CanBeNull] FSharpType fcsType) =>
+      fcsType != null
+        ? fcsType.MapType(AllTypeParameters, Module)
         : TypeFactory.CreateUnknownType(Module);
   }
 }

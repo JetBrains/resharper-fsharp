@@ -166,7 +166,7 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
         match pat with
         | :? IWildPat as wildPat -> wildPat.TryGetFcsType()
         | :? IReferencePat as refPat ->
-            match refPat.GetFSharpSymbol() with
+            match refPat.GetFcsSymbol() with
             | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.FullType
             | _ -> Unchecked.defaultof<_>
         | _ -> Unchecked.defaultof<_>

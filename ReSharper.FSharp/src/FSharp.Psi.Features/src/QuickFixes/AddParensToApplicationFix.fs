@@ -68,7 +68,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
                 lambda.PatternsEnumerable.Count()
 
             | :? IReferenceExpr as ref ->
-                match ref.Reference.GetFSharpSymbol() with
+                match ref.Reference.GetFcsSymbol() with
                 | :? FSharpMemberOrFunctionOrValue as mfv when
                     let parameters = mfv.CurriedParameterGroups
                     parameters.Count > 0 && parameters.[0].Count > 0 ->

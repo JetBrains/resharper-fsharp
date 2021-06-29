@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public FSharpAnonRecordFieldProperty(FSharpSymbolReference reference) =>
       Reference = reference;
 
-    public FSharpField FcsField => Reference.GetFSharpSymbol() as FSharpField;
+    public FSharpField FcsField => Reference.GetFcsSymbol() as FSharpField;
     public FSharpAnonRecordTypeDetails AnonType => FcsField.AnonRecordFieldDetails.Item1;
 
     public override string ShortName => Reference.GetName();

@@ -22,10 +22,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   {
     /// May take long time due to waiting for FCS. Symbol is cached in declaration.
     [CanBeNull]
-    FSharpSymbol GetFSharpSymbol();
+    FSharpSymbol GetFcsSymbol();
 
     [CanBeNull]
-    FSharpSymbolUse GetFSharpSymbolUse();
+    FSharpSymbolUse GetFcsSymbolUse();
 
     /// Name used in F# source code.
     [NotNull] string SourceName { get; }

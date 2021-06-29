@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
     }
 
-    public override FSharpSymbol GetFSharpSymbol()
+    public override FSharpSymbol GetFcsSymbol()
     {
       var token = myOwner.FSharpIdentifier?.IdentifierToken;
       if (token == null)

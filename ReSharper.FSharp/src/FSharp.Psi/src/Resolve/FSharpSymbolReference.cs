@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ? fsIdentifier.NameRange.StartOffset
         : myOwner.GetTreeStartOffset();
 
-    public virtual FSharpSymbol GetFSharpSymbol() =>
+    public virtual FSharpSymbol GetFcsSymbol() =>
       GetSymbolUse()?.Symbol;
 
     public bool HasFcsSymbol => GetSymbolUse() != null;
@@ -43,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (!myOwner.IsValid())
         return ResolveResultWithInfo.Ignore;
 
-      var symbol = GetFSharpSymbol();
+      var symbol = GetFcsSymbol();
       var element = symbol?.GetDeclaredElement(myOwner.GetPsiModule(), myOwner);
 
       return element != null
