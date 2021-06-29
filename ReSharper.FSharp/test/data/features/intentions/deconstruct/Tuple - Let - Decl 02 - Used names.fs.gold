@@ -1,0 +1,2 @@
+﻿let i1 = 1
+let i, i2, i3{caret} = 1, 2, 3

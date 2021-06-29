@@ -62,10 +62,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let source = sprintf "()%s()" space
         getExpression source :?> IPrefixAppExpr
 
-    let createLetBinding bindingName =
-        let source = sprintf "(let %s = ())" bindingName
-        let newExpr = getExpression source
+    let createLetExpr patternText =
+        let newExpr = getExpression $"(let {patternText} = ())"
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
+
+    let createLetDecl patternText =
+        getModuleMember $"let {patternText} = ()" :?> ILetBindingsDeclaration
 
     let createMemberDecl logicalName typeParameters parameters =
         let typeParametersSource =
@@ -90,7 +92,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         exprStatement.AttributeLists.[0]
 
     let createTypeUsage usage: ITypeUsage =
-        let expr = createLetBinding (sprintf "(a: %s)" usage)
+        let expr = createLetExpr (sprintf "(a: %s)" usage)
         expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().TypeUsage
 
     interface IFSharpElementFactory with
@@ -157,10 +159,10 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             appExpr
 
         member x.CreateLetBindingExpr(bindingName) =
-            createLetBinding bindingName
+            createLetExpr bindingName
 
-        member x.CreateLetModuleDecl(bindingName) =
-            let source = sprintf "let %s = ()" bindingName
+        member x.CreateLetModuleDecl(patternText) =
+            let source = $"let {patternText} = ()"
             getModuleMember source :?> ILetBindingsDeclaration
 
         member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
@@ -256,8 +258,16 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
 
+        member x.CreatePattern(text, topLevel) =
+            let letBindings: ILetBindings =
+                match topLevel with
+                | true -> createLetDecl text :> _
+                | _ -> createLetExpr text :> _
+    
+            letBindings.Bindings.[0].HeadPattern
+
         member x.CreateParenPat() =
-            let expr = createLetBinding "(())"
+            let expr = createLetExpr "(())"
             expr.Bindings.[0].HeadPattern.As<IParenPat>()
 
         member x.CreateTypedPat(pattern, typeUsage: ITypeUsage) =
@@ -265,7 +275,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let spaceBeforeColon = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon)
             let preColonSpace = if spaceBeforeColon then " " else ""
 
-            let expr = createLetBinding (sprintf "(_%s: _)" preColonSpace)
+            let expr = createLetExpr (sprintf "(_%s: _)" preColonSpace)
             let typedPat = expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>()
 
             ModificationUtil.ReplaceChild(typedPat.Pattern, pattern.Copy()) |> ignore
@@ -273,7 +283,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             typedPat
 
         member x.CreateReturnTypeInfo(typeUsage: ITypeUsage): IReturnTypeInfo =
-            let expr = createLetBinding "_: _"
+            let expr = createLetExpr "_: _"
             let returnTypeInfo = expr.Bindings.[0].ReturnTypeInfo
             ModificationUtil.ReplaceChild(returnTypeInfo.ReturnType, typeUsage) |> ignore
             returnTypeInfo

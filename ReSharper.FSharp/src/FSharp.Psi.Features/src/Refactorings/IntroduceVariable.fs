@@ -272,14 +272,6 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let contextExpr = getExprToInsertBefore safeParentToInsertBefore
         let contextDecl = getContextDeclaration contextExpr
 
-        let containingTypeElement =
-            if isNull contextDecl then null else
-
-            let typeDeclaration = contextDecl.GetContainingTypeDeclaration()
-            if isNull typeDeclaration then null else
-
-            typeDeclaration.DeclaredElement
-
         let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
         let contextIsImplicitDo = sourceExpr == contextExpr && contextDecl :? IDoLikeStatement
         let isInSingleLineContext = isNull contextDecl && isSingleLineContext contextExpr
@@ -302,6 +294,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
         let addSpaceNearIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
 
+        let containingTypeElement = getContainingType contextDecl
         let usedNames = getUsedNames contextExpr data.Usages containingTypeElement true
         let names = getNames usedNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"

@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static IEnumerable<IFSharpPattern> GetPartialDeclarations([NotNull] this IFSharpPattern fsPattern)
     {
       if (!(fsPattern is INamedPat namedPattern))
-        return new[] {fsPattern};
+        return new[] { fsPattern };
 
       var canBePartial = false;
 
@@ -24,10 +24,34 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (!canBePartial)
-        return new[] {namedPattern};
+        return new[] { namedPattern };
 
       return fsPattern.NestedPatterns.Where(pattern =>
         pattern is INamedPat namedPat && namedPat.SourceName == namedPattern.SourceName && pattern.IsDeclaration);
+    }
+
+    [CanBeNull]
+    public static IBindingLikeDeclaration GetBinding([CanBeNull] this IFSharpPattern pat)
+    {
+      if (pat == null)
+        return null;
+
+      var node = pat.Parent;
+      while (node != null)
+      {
+        switch (node)
+        {
+          case IFSharpPattern _:
+            node = node.Parent;
+            break;
+          case IBindingLikeDeclaration binding:
+            return binding;
+          default:
+            return null;
+        }
+      }
+
+      return null;
     }
   }
 }

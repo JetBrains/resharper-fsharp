@@ -438,13 +438,27 @@ module FSharpNamingService =
             }
 
         match SequentialExprNavigator.GetByExpression(contextExpr) with
-        | null -> contextExpr.ProcessThisAndDescendants(processor)
+        | null ->
+            match contextExpr with
+            | null -> ()
+            | contextExpr -> contextExpr.ProcessThisAndDescendants(processor)
         | seqExpr ->
             seqExpr.ExpressionsEnumerable
             |> Seq.skipWhile ((!=) contextExpr)
             |> Seq.iter (fun expr -> expr.ProcessThisAndDescendants(processor))
 
         usedNames
+
+    let getContainingType (moduleMember: IModuleMember) =
+        if isNull moduleMember then null else
+
+        let typeDeclaration = moduleMember.GetContainingTypeDeclaration()
+        if isNull typeDeclaration then null else typeDeclaration.DeclaredElement
+
+    let getPatternContainingType (pattern: IFSharpPattern) =
+        let binding = BindingNavigator.GetByHeadPattern(pattern)
+        let letDecl = LetBindingsDeclarationNavigator.GetByBinding(binding)
+        getContainingType letDecl
 
     let getUsedNames contextExpr usages containingTypeElement checkFcsSymbols: ISet<string> =
         let usedNames = getUsedNamesUsages contextExpr usages containingTypeElement checkFcsSymbols

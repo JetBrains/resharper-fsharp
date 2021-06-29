@@ -131,6 +131,7 @@
     <Compile Include="src\Generate\GenerateProvider.fs" />
     <Compile Include="src\Intentions\DataProviders.fs" />
     <Compile Include="src\Intentions\FSharpContextActionBase.fs" />
+    <Compile Include="src\Intentions\Deconstruction.fs" />
     <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
     <Compile Include="src\Intentions\ToMultilineRecord.fs" />
     <Compile Include="src\Intentions\ToRecursiveModuleAction.fs" />
