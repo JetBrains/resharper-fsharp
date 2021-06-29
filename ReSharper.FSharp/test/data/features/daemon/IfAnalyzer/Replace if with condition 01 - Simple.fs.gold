@@ -4,7 +4,7 @@
 |if true then (true) else (false)|(3)
 
 ---------------------------------------------------------
-(0): ReSharper Suggestion: Expression can be replaced with condition
-(1): ReSharper Suggestion: Expression can be replaced with condition negation
-(2): ReSharper Suggestion: Expression can be replaced with condition
-(3): ReSharper Suggestion: Expression can be replaced with condition
+(0): ReSharper Hint: Expression can be replaced with condition
+(1): ReSharper Hint: Expression can be replaced with condition negation
+(2): ReSharper Hint: Expression can be replaced with condition
+(3): ReSharper Hint: Expression can be replaced with condition

@@ -77,7 +77,7 @@
         <Title>Format string can be replaced with an interpolated string</Title>
         <Description>Format string can be replaced with an interpolated string.</Description>
       </Tag>
-      <Tag name="FSharpExpressionCanBeReplacedWithCondition" default="SUGGESTION">
+      <Tag name="FSharpExpressionCanBeReplacedWithCondition" default="HINT">
         <Title>'if' expression can be replaced with its condition</Title>
         <Description>'if' expression can be replaced with its condition.</Description>
       </Tag>
