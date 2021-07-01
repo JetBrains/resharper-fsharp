@@ -76,4 +76,9 @@ type InlineVarTest() =
 
     [<Test>] member x.``Not available - AddressOf 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Set - Indexer 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Set - Indexer 02 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Set - Indexer 03 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Set - Indexer 04 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Set 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Set 02 - Parens``() = x.DoNamedTest()

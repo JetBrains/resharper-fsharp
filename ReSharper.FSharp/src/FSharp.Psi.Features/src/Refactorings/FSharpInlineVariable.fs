@@ -125,7 +125,10 @@ type FSharpInlineVarAnalyser(workflow) =
             let expr = treeNode.As<IReferenceExpr>().IgnoreParentParens()
             if isNull expr then None else
 
-            if isNotNull (SetExprNavigator.GetByLeftExpression(expr)) then
+            let setExpr = SetExprNavigator.GetByLeftExpression(expr)
+            let indexerExpr = IndexerExprNavigator.GetByQualifier(expr).IgnoreParentParens()
+            let indexerSetExpr = SetExprNavigator.GetByLeftExpression(indexerExpr).IgnoreParentParens()
+            if isNotNull setExpr || isNotNull indexerSetExpr then
                 Some "Value has write usages." else
 
             if isNotNull (AddressOfExprNavigator.GetByExpression(expr)) then
