@@ -59,12 +59,12 @@ type FSharpNamingService(language: FSharpLanguage) =
            "char", "c"
            "int32", "i"
            "string", "s"
-           "bool", "b"
+           "boolean", "b"
            "byte", "b"
            "int16", "s"
            "uint32", "u"
-           "double", "d"
-           "single", "s"
+           "double", "f"
+           "single", "f"
            "long", "l"
            "namespace", "ns"
            "list", "l" |]
@@ -309,7 +309,7 @@ type FSharpNamingService(language: FSharpLanguage) =
 
 module FSharpNamingService =
     let getUsedNamesUsages
-            (contextExpr: IFSharpExpression) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
+            (contextExprs: IFSharpExpression list) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
             checkFcsSymbols =
 
         let usages = HashSet(usages)
@@ -437,15 +437,18 @@ module FSharpNamingService =
                         scopes.Pop() |> ignore
             }
 
-        match SequentialExprNavigator.GetByExpression(contextExpr) with
-        | null ->
-            match contextExpr with
-            | null -> ()
-            | contextExpr -> contextExpr.ProcessThisAndDescendants(processor)
-        | seqExpr ->
-            seqExpr.ExpressionsEnumerable
-            |> Seq.skipWhile ((!=) contextExpr)
-            |> Seq.iter (fun expr -> expr.ProcessThisAndDescendants(processor))
+        let processExpr expr =
+            match SequentialExprNavigator.GetByExpression(expr) with
+            | null ->
+                match expr with
+                | null -> ()
+                | expr -> expr.ProcessThisAndDescendants(processor)
+            | seqExpr ->
+                seqExpr.ExpressionsEnumerable
+                |> Seq.skipWhile ((!=) expr)
+                |> Seq.iter (fun expr -> expr.ProcessThisAndDescendants(processor))
+
+        List.iter processExpr contextExprs
 
         usedNames
 
@@ -460,8 +463,8 @@ module FSharpNamingService =
         let letDecl = LetBindingsDeclarationNavigator.GetByBinding(binding)
         getContainingType letDecl
 
-    let getUsedNames contextExpr usages containingTypeElement checkFcsSymbols: ISet<string> =
-        let usedNames = getUsedNamesUsages contextExpr usages containingTypeElement checkFcsSymbols
+    let getUsedNames (contextExprs: IFSharpExpression list) usages containingTypeElement checkFcsSymbols: ISet<string> =
+        let usedNames = getUsedNamesUsages contextExprs usages containingTypeElement checkFcsSymbols
         HashSet(usedNames.Keys) :> _
 
     let createEmptyNamesCollection (fsTreeNode: IFSharpTreeNode) =
@@ -471,6 +474,14 @@ module FSharpNamingService =
 
     let getEntryOptions () =
         EntryOptions(PluralityKinds.Unknown, SubrootPolicy.Decompose, PredefinedPrefixPolicy.Remove)
+
+    let addNames (name: string) (context: ITreeNode) (namesCollection: INamesCollection) =
+        if isNotNull name then
+            let namingRule = NamingRule(NamingStyleKind = NamingStyleKinds.aaBb)
+            let nameParser = context.GetPsiServices().Naming.Parsing
+            let root = nameParser.Parse(name, namingRule, context.Language, context.GetSourceFile()).GetRoot()
+            namesCollection.Add(root, getEntryOptions ())
+        namesCollection
 
     let addNamesForType (t: IType) (namesCollection: INamesCollection) =
         namesCollection.Add(t, getEntryOptions ())

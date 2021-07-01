@@ -1,4 +1,4 @@
-﻿Suggested names: boolean
+﻿Suggested names: b
 do
   match () with
-  | _ when let boolean = true in boolean -> ()  
+  | _ when let b = true in b -> ()  

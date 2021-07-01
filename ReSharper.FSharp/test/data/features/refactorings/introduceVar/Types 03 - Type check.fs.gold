@@ -1,2 +1,2 @@
-﻿Suggested names: boolean
-let boolean = 1 :? int
+﻿Suggested names: b
+let b = 1 :? int

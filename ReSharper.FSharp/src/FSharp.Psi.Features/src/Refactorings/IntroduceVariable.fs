@@ -295,7 +295,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let addSpaceNearIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
 
         let containingTypeElement = getContainingType contextDecl
-        let usedNames = getUsedNames contextExpr data.Usages containingTypeElement true
+        let usedNames = getUsedNames [contextExpr] data.Usages containingTypeElement true
         let names = getNames usedNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
 

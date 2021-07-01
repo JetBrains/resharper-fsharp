@@ -1,0 +1,6 @@
+﻿type T() =
+    let i = 0
+
+    member this.M((i1, b{caret}): int * bool) =
+        let _ = i
+        ()

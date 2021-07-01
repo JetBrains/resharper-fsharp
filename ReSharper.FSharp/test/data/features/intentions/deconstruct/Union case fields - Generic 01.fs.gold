@@ -1,0 +1,5 @@
+﻿type GU<'T> =
+    | C of 'T * int
+
+match C(1, 2) with
+| C (i, i1{caret}) -> ()

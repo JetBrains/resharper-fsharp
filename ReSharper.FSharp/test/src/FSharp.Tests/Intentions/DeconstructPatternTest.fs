@@ -11,14 +11,26 @@ type DeconstructPatternTest() =
 
     [<Test>] member x.``Tuple - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Lambda 02 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Lambda 03 - Used names``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Let - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Let - Decl 02 - Used names``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Let - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Let - Expr 02 - Used names``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Let - Expr 03 - Used``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Match 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Match 02 - Used names``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Member 01 - Used names``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Parameter owner 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Wild - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Wild - Expr 01``() = x.DoNamedTest()
 
-    [<Test; ActionNotAvailable>] member x.``Not available - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Union case fields - Generic 01``() = x.DoNamedTest() // todo: better field name
+    [<Test>] member x.``Union case fields - Generic 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union case fields - Generic 03 - Array``() = x.DoNamedTest()
+    [<Test>] member x.``Union case fields 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union case fields 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union case fields 03``() = x.DoNamedTest()
+
+    [<Test; ActionNotAvailable>] member x.``Not available - Type 01``() = x.DoNamedTest()

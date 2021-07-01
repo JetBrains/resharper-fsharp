@@ -69,7 +69,7 @@ type LambdaAnalyzer() =
                     let funExpr = app.FunctionExpression
                     let usedNames =
                         if isNotNull nameUsages then nameUsages else
-                        FSharpNamingService.getUsedNamesUsages funExpr EmptyList.Instance null false
+                        FSharpNamingService.getUsedNamesUsages [funExpr] EmptyList.Instance null false
 
                     if not (patIsUsed usedNames argExpr pat) then
                         compareArgsRec funExpr (i + 1) usedNames
