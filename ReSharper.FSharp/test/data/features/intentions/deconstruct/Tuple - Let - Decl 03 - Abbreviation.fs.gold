@@ -1,0 +1,3 @@
+﻿type Abbr = int * string
+
+let i, s{caret}: Abbr = 1, ""

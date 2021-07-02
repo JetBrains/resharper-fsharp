@@ -14,6 +14,7 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Tuple - Lambda 03 - Used names``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Let - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Let - Decl 02 - Used names``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Let - Decl 03 - Abbreviation``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Let - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Let - Expr 02 - Used names``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Let - Expr 03 - Used``() = x.DoNamedTest()

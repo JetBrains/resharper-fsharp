@@ -268,6 +268,7 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
         if isNull pattern || not (isApplicablePattern pattern) then Seq.empty else
 
         let fcsType = getPatternFcsType pattern
+        let fcsType = getAbbreviatedType fcsType
         if isNull fcsType then Seq.empty else
 
         if fcsType.IsTupleType then

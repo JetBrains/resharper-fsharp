@@ -155,7 +155,7 @@ let rec getAbbreviatedEntity (entity: FSharpEntity) =
 
 [<Extension; CompiledName("GetAbbreviatedType")>]
 let rec getAbbreviatedType (fcsType: FSharpType) =
-    if fcsType.IsAbbreviation then
+    if isNotNull fcsType && fcsType.IsAbbreviation then
         getAbbreviatedType fcsType.AbbreviatedType
     else
         fcsType
@@ -177,7 +177,7 @@ type FcsEntityInstance =
 module FcsEntityInstance =
     let create fcsType =
         let fcsType = getAbbreviatedType fcsType
-        if not fcsType.HasTypeDefinition then Unchecked.defaultof<_> else
+        if isNull fcsType || not fcsType.HasTypeDefinition then Unchecked.defaultof<_> else
 
         let fcsEntity = fcsType.TypeDefinition
         let substitution = Seq.zip fcsEntity.GenericParameters fcsType.GenericArguments |> Seq.toList
