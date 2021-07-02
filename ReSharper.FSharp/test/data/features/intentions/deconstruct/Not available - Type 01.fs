@@ -1,2 +1,2 @@
-type T(t{caret}: int * string) =
-    class end
+let f x{caret} =
+    ()

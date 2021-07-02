@@ -119,7 +119,8 @@ type FSharpOverridableMembersProvider() =
 
         let rec getBaseTypes (fcsEntity: FSharpEntity) =
             let rec loop acc (fcsType: FSharpType) =
-                let acc = FcsEntityInstance.create fcsType :: acc
+                let fcsEntityInstance = FcsEntityInstance.create fcsType
+                let acc = if isNotNull fcsEntityInstance then fcsEntityInstance :: acc else acc
 
                 match fcsType.BaseType with
                 | Some baseType when baseType.HasTypeDefinition -> loop acc baseType

@@ -290,7 +290,7 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
             DeconstructAction(deconstruction).ToContextActionIntentions() :> _
         else
             let fcsEntityInstance = FcsEntityInstance.create fcsType
-            if fcsEntityInstance.Entity.IsFSharpUnion then
+            if isNotNull fcsEntityInstance && fcsEntityInstance.Entity.IsFSharpUnion then
                 let fcsUnionCases = fcsEntityInstance.Entity.UnionCases
                 if fcsUnionCases.Count <> 1 then Seq.empty else
 
@@ -310,7 +310,7 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
                 if isNull fcsType then Seq.empty else
 
                 let fcsEntityInstance = FcsEntityInstance.create fcsType
-                if not fcsEntityInstance.Entity.IsFSharpUnion then Seq.empty else
+                if isNotNull fcsEntityInstance && not fcsEntityInstance.Entity.IsFSharpUnion then Seq.empty else
 
                 let components = createUnionCaseFieldDeconstructions pattern fcsUnionCase fcsEntityInstance
                 let deconstruction = DeconstructionFromUnionCaseFields(parametersOwnerPat, components)

@@ -177,6 +177,8 @@ type FcsEntityInstance =
 module FcsEntityInstance =
     let create fcsType =
         let fcsType = getAbbreviatedType fcsType
+        if not fcsType.HasTypeDefinition then Unchecked.defaultof<_> else
+
         let fcsEntity = fcsType.TypeDefinition
         let substitution = Seq.zip fcsEntity.GenericParameters fcsType.GenericArguments |> Seq.toList
 

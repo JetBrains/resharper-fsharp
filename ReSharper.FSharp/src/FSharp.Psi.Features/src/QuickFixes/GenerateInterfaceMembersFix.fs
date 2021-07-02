@@ -36,6 +36,7 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
         fcsType.AllInterfaces
         |> Seq.filter (fun t -> t.HasTypeDefinition)
         |> Seq.map FcsEntityInstance.create
+        |> Seq.filter isNotNull
         |> Seq.toList
 
     override x.Text = "Generate missing members"
