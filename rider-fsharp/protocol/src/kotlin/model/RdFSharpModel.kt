@@ -37,7 +37,6 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
 
     private val RdFSharpTestHost = aggregatedef("RdFSharpTestHost") {
         sink("fileChecked", string).async
-        sink("projectChecked", string).async
         sink("fcsProjectInvalidated", structdef("RdFcsProject") {
             field("projectName", string)
             field("targetFramework", string)

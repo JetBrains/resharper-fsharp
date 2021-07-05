@@ -4,7 +4,6 @@ open System.Collections.Generic
 open System.Linq
 open FSharp.Compiler.IO
 open JetBrains.Diagnostics
-open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.Rd.Tasks
 open JetBrains.ReSharper.Plugins.FSharp
@@ -17,8 +16,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<SolutionComponent>]
-type FSharpTestHost(lifetime: Lifetime, solution: ISolution, checkerService: FcsCheckerService,
-        sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer) =
+type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer) =
 
     let dumpSingleProjectMapping _ =
         let projectMapping =
@@ -55,10 +53,6 @@ type FSharpTestHost(lifetime: Lifetime, solution: ISolution, checkerService: Fcs
 
     do
         let fsTestHost = solution.RdFSharpModel().FsharpTestHost
-
-        let subscription = checkerService.Checker.ProjectChecked.Subscribe(fun projectOptions ->
-            fsTestHost.ProjectChecked(projectOptions.ProjectFileName))
-        lifetime.OnTermination(fun _ -> subscription.Dispose()) |> ignore
 
         fsTestHost.GetLastModificationStamp.Set(FileSystem.GetLastWriteTimeShim)
         fsTestHost.GetSourceCache.Set(sourceCache.GetRdFSharpSource)

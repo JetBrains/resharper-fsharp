@@ -1,28 +1,20 @@
 
-import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
-import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CompletionTestBase
+import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
-import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
 import com.jetbrains.rider.test.scriptingApi.completeWithTab
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.waitForCompletion
-import com.jetbrains.rdclient.util.idea.waitAndPump
-import com.jetbrains.rd.util.lifetime.Lifetime
-import com.jetbrains.rider.test.enums.CoreVersion
 import org.testng.annotations.Test
-import java.time.Duration
 
 @Test
 @TestEnvironment(coreVersion = CoreVersion.DEFAULT)
 class FSharpCompletionTest : CompletionTestBase() {
     override fun getSolutionDirectoryName() = "CoreConsoleApp"
     override val restoreNuGetPackages = true
-
-    private val rdFcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
-    private var isFcsReady = false
 
     @Test(enabled = false)
     fun namespaceKeyword() = doTest("na")
@@ -34,21 +26,10 @@ class FSharpCompletionTest : CompletionTestBase() {
     @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE)
     fun listModuleValue() = doTest("filt")
 
-    private fun waitForFcs() {
-        waitAndPump(Lifetime.Eternal, { isFcsReady }, Duration.ofSeconds(60000))
-    }
-
     private fun doTest(typed: String) {
-        rdFcsHost.projectChecked.advise(Lifetime.Eternal) { project ->
-            isFcsReady = true
-            frameworkLogger.info("FCS: $project checked")
-        }
-
-        isFcsReady = false
         dumpOpenedEditor("Program.fs", "Program.fs") {
-            isFcsReady = false
+            waitForDaemon()
             typeWithLatency(typed)
-            waitForFcs()
             callBasicCompletion()
             waitForCompletion()
             completeWithTab()
