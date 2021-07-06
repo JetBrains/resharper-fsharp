@@ -15,4 +15,7 @@ class FSharpHoverDocTest : HoverDocTestBase() {
 
     @Test
     fun `test hover docs for a parameter`() = doTest("Program.fs", "Program.fs")
+
+    @Test
+    fun `test xml doc with symbol reference`() = doTest("Program.fs", "Program.fs")
 }
