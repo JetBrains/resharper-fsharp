@@ -1,0 +1,4 @@
+﻿// ${DIRECTION:Right}
+
+match 1, 2 with
+| c, (a as b) -> ()

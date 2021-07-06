@@ -185,15 +185,7 @@ type DeconstructAction(deconstruction: IDeconstruction) =
 
             | _ -> null, Unchecked.defaultof<_>
 
-        let pattern: IFSharpPattern =
-            let contextPattern = pattern.IgnoreParentParens()
-            if contextPattern == pattern && RedundantParenPatAnalyzer.needsParens contextPattern pattern then
-                let parenPattern = factory.CreatePattern("(_)", false) :?> IParenPat
-                let patternCopy = pattern.Copy()
-                let parenPattern = ModificationUtil.ReplaceChild(pattern, parenPattern)
-                parenPattern.SetPattern(patternCopy)
-            else
-                pattern
+        let pattern = RedundantParenPatAnalyzer.addParensIfNeeded pattern
 
         let itemPatterns: seq<IFSharpPattern> =
             match pattern with

@@ -6,6 +6,8 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.RearrangeCode
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -13,6 +15,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Util
 
 type FSharpRearrangeableSimpleSwap<'TNode, 'TParent when
         'TNode: not struct and 'TNode :> ITreeNode and
@@ -65,8 +68,33 @@ let rearrangeable (value: #IRearrangeable) =
 type RearrangeableTuplePattern(fsPattern: IFSharpPattern, tuplePat: ITuplePat) =
     inherit FSharpRearrangeableElementSwap<IFSharpPattern>(fsPattern, "tuple pattern", Direction.LeftRight)
 
+    let updateParens (pattern: IFSharpPattern) =
+        match pattern with
+        | :? IAsPat as asPat ->
+            RedundantParenPatAnalyzer.addParensIfNeeded asPat
+
+        | :? IParenPat as parenPat ->
+            match parenPat.Pattern.IgnoreInnerParens() with
+            | :? IAsPat as asPat ->
+                let contextPattern = parenPat.IgnoreParentParens()
+                if RedundantParenPatAnalyzer.needsParens contextPattern asPat then pattern else
+
+                use writeLockCookie = WriteLockCookie.Create(pattern.IsPhysical())
+                ModificationUtil.ReplaceChild(contextPattern, asPat) :> _
+            | _ -> pattern
+
+        | _ -> pattern
+
     override this.GetSiblings() =
         tuplePat.PatternsEnumerable :> _
+
+    override this.Swap(child, target) =
+        let newChild = base.Swap(child, target) |> updateParens
+
+        let siblings = this.GetSiblings()
+        CollectionUtil.GetPrevious(siblings, newChild) |> updateParens |> ignore
+        CollectionUtil.GetNext(siblings, newChild) |> updateParens |> ignore
+        newChild
 
 [<RearrangeableElementType>]
 type RearrangeableTuplePatternProvider() =

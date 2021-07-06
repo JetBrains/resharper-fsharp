@@ -5,7 +5,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 
 module RedundantParenPatAnalyzer =
     let precedence (treeNode: ITreeNode) =
@@ -160,6 +162,19 @@ module RedundantParenPatAnalyzer =
             | :? ITuplePat -> isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context))
             | _ -> false
         | _ -> false
+
+    let addParensIfNeeded (pattern: IFSharpPattern) =
+        if isNull pattern then pattern else
+
+        use writeLockCookie = WriteLockCookie.Create(pattern.IsPhysical())
+        let contextPattern = pattern.IgnoreParentParens()
+        if contextPattern == pattern && needsParens contextPattern pattern then
+            let parenPattern = pattern.CreateElementFactory().CreatePattern("(_)", false) :?> IParenPat
+            let patternCopy = pattern.Copy()
+            let parenPattern = ModificationUtil.ReplaceChild(pattern, parenPattern)
+            parenPattern.SetPattern(patternCopy)
+        else
+            pattern
 
 open RedundantParenPatAnalyzer
 

@@ -22,6 +22,9 @@ type RearrangeCodeTest() =
     [<Test>] member x.``Expr - Tuple - Match 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - Or 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Tuple - As 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Tuple - As 02``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Tuple - As 03 - Remove parens``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Tuple 02``() = x.DoNamedTest()
 
