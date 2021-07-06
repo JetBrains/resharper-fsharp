@@ -73,6 +73,30 @@ type RearrangeableTuplePatternProvider() =
     inherit FSharpRearrangeableSingleElementBase<IFSharpPattern, ITuplePat>(TuplePatNavigator.GetByPattern,
         RearrangeableTuplePattern >> rearrangeable)
 
+type RearrangeableOrPattern(fsPattern: IFSharpPattern, orPat: IOrPat) =
+    inherit FSharpRearrangeableElementSwap<IFSharpPattern>(fsPattern, "or pattern", Direction.LeftRight)
+
+    override this.GetSiblings() =
+        [| orPat.Pattern1; orPat.Pattern2 |] :> _
+
+[<RearrangeableElementType>]
+type RearrangeableOrPatternProvider() =
+    inherit FSharpRearrangeableSingleElementBase<IFSharpPattern, IOrPat>(OrPatNavigator.GetByPattern,
+        RearrangeableOrPattern >> rearrangeable)
+
+
+
+type RearrangeableAndPattern(fsPattern: IFSharpPattern, andsPat: IAndsPat) =
+    inherit FSharpRearrangeableElementSwap<IFSharpPattern>(fsPattern, "and pattern", Direction.LeftRight)
+
+    override this.GetSiblings() =
+        andsPat.PatternsEnumerable :> _
+
+[<RearrangeableElementType>]
+type RearrangeableAndPatternProvider() =
+    inherit FSharpRearrangeableSingleElementBase<IFSharpPattern, IAndsPat>(AndsPatNavigator.GetByPattern,
+        RearrangeableAndPattern >> rearrangeable)
+
 
 type RearrangeableTupleExpr(fsExpr: IFSharpExpression, tuplePat: ITupleExpr) =
     inherit FSharpRearrangeableElementSwap<IFSharpExpression>(fsExpr, "tuple expr", Direction.LeftRight)
@@ -87,10 +111,23 @@ type RearrangeableTupleExprProvider() =
 
 
 [<RearrangeableElementType>]
+type RearrangeableLambdaParamPatternProvider() =
+    inherit FSharpRearrangeableSimpleSwap<IFSharpPattern, ILambdaExpr>(
+        "lambda parameter", Direction.LeftRight, LambdaExprNavigator.GetByPattern,
+        fun lambdaExpr -> lambdaExpr.PatternsEnumerable)
+
+
+[<RearrangeableElementType>]
 type RearrangeableRecordFieldDeclarationProvider() =
     inherit FSharpRearrangeableSimpleSwap<IRecordFieldDeclaration, IRecordFieldDeclarationList>(
         "record field declaration", Direction.All, RecordFieldDeclarationListNavigator.GetByFieldDeclaration,
         fun l -> l.FieldDeclarationsEnumerable)
+
+[<RearrangeableElementType>]
+type RearrangeableFunctionParameterProvider() =
+    inherit FSharpRearrangeableSimpleSwap<IParametersPatternDeclaration, IBinding>(
+        "function parameter", Direction.LeftRight, BindingNavigator.GetByParametersDeclaration,
+        fun binding -> binding.ParametersDeclarationsEnumerable)
 
 
 type RearrangeableEnumCaseLikeDeclaration(decl: IEnumCaseLikeDeclaration) =

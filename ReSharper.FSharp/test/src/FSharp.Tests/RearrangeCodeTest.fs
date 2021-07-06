@@ -21,6 +21,7 @@ type RearrangeCodeTest() =
     [<Test>] member x.``Expr - Tuple - Match 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Tuple - Match 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - Or 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Tuple 02``() = x.DoNamedTest()
 
@@ -60,6 +61,12 @@ type RearrangeCodeTest() =
     [<Test>] member x.``Match clause - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - Match - Fix indent 01``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - Match - Fix indent 02 - Multiline``() = x.DoNamedTest()
+
+    [<Test>] member x.``Parameter - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Function 02``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Function 03``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Function 04``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Lambda 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case - No bar 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case - No bar 02 - Single line``() = x.DoNamedTest()

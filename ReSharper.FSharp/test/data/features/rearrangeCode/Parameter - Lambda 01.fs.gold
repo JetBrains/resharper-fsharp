@@ -1,0 +1,3 @@
+﻿// ${DIRECTION:Right}
+
+fun b a -> ()
