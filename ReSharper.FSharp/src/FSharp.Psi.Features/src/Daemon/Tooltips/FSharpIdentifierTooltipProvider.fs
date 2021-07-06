@@ -27,6 +27,15 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         (RichText.Empty, text.GetFormattedParts()) ||> Seq.fold (fun result part ->
             result.Append(part.Text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\n", "<br>"), part.Style))
 
+    //todo: remove explicit formatting with HTML
+    let asDefinition (text: RichText) = "<div class='definition'><pre style='word-wrap: break-word; white-space: pre-wrap;'>" + (richTextEscapeToHtml text) + "</pre></div>"
+
+    let asContent (text: RichText) = "<div class='content'>" + (richTextEscapeToHtml text) + "</div>"
+
+    let createToolTip (header: RichText) (body: RichText) =
+        if body.IsEmpty then asContent header else
+        (asDefinition header).Append(body)
+
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
     static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: IFSharpIdentifierToken) =
@@ -65,33 +74,36 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         match fsFile.GetParseAndCheckResults(true, opName) with
         | None -> emptyPresentation
         | Some results ->
+            let (ToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(results.CheckResults, token)
 
-        let (ToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(results.CheckResults, token)
+            layouts |> List.collect (function
+                | ToolTipElement.None
+                | ToolTipElement.CompositionError _ -> []
 
-        layouts |> List.collect (function
-            | ToolTipElement.None
-            | ToolTipElement.CompositionError _ -> []
+                | ToolTipElement.Group(overloads) ->
+                    overloads |> List.map (fun overload ->
+                        let header =
+                            [ if not (isEmpty overload.MainDescription) then
+                                yield overload.MainDescription |> richTextR
 
-            | ToolTipElement.Group(overloads) ->
-                overloads |> List.map (fun overload ->
-                    [ if not (isEmpty overload.MainDescription) then
-                          yield overload.MainDescription |> richTextR
+                              if not overload.TypeMapping.IsEmpty then
+                                yield overload.TypeMapping |> List.map richTextR |> richTextJoin "\n" ]
+                            |> richTextJoin "\n\n"
 
-                      if not overload.TypeMapping.IsEmpty then
-                          yield overload.TypeMapping |> List.map richTextR |> richTextJoin "\n"
+                        let body =
+                            [ match xmlDocService.GetXmlDoc(overload.XmlDoc, false) with
+                              | null -> ()
+                              | xmlDocText when xmlDocText.Text.IsNullOrWhitespace() -> ()
+                              | xmlDocText -> yield xmlDocText.RichText
 
-                      match xmlDocService.GetXmlDoc(overload.XmlDoc) with
-                      | null -> ()
-                      | xmlDocText when xmlDocText.Text.IsNullOrWhitespace() -> ()
-                      | xmlDocText -> yield xmlDocText.RichText
+                              match overload.Remarks with
+                              | Some remarks when not (isEmpty remarks) ->
+                                yield remarks |> richTextR |> asContent
+                              | _ -> () ]
+                            |> richTextJoin "\n\n"
 
-                      match overload.Remarks with
-                      | Some remarks when not (isEmpty remarks) ->
-                          yield remarks |> richTextR
-                      | _ -> () ]
-                    |> richTextJoin "\n\n"))
-        |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
-        |> richTextEscapeToHtml
-        |> RichTextBlock
+                        createToolTip header body))
+            |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
+            |> RichTextBlock
 
     interface IFSharpIdentifierTooltipProvider
