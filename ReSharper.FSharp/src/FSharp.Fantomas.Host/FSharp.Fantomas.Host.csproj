@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Fantomas" Version="4.5.0-beta-004" />
+      <PackageReference Include="Fantomas" Version="4.5.0" />
     </ItemGroup>
 
     <ItemGroup>
