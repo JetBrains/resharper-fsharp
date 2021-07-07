@@ -445,19 +445,18 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
         let elementType =
             match pat with
-            | SynPat.Named(pat, id, _, _, _) ->
-                match pat with
-                | SynPat.Wild(range) when Range.equals id.idRange range ->
-                    let mark = x.Mark(id.idRange)
-                    if IsActivePatternName id.idText then
-                        x.ProcessActivePatternDecl(id, isLocal)
-                    x.Done(id.idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
-                    if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
+            | SynPat.Named(id, _, _, _) ->
+                let mark = x.Mark(id.idRange)
+                if IsActivePatternName id.idText then
+                    x.ProcessActivePatternDecl(id, isLocal)
+                x.Done(id.idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
+                if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
 
-                | _ ->
-                    x.ProcessPat(pat, isLocal, false)
-                    if isLocal then ElementType.LOCAL_AS_PAT else ElementType.TOP_AS_PAT
-
+            // todo: rhs patterns
+            | SynPat.As(lhsPat, _, _) ->
+                x.ProcessPat(lhsPat, isLocal, false)
+                if isLocal then ElementType.LOCAL_AS_PAT else ElementType.TOP_AS_PAT
+            
             | SynPat.LongIdent(lid, _, _, args, _, _) ->
                 match lid.Lid with
                 | [ IdentRange idRange as id ] ->

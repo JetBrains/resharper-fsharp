@@ -41,7 +41,7 @@ type FSharpDebuggerLocalSymbolProvider() =
 
                 let visitPat pat defaultTraverse =
                     match pat with
-                    | SynPat.Named(_, SuitableIdent range, false, _, _) -> updateDeclRange range
+                    | SynPat.Named(SuitableIdent range, false, _, _) -> updateDeclRange range
                     | _ -> ()
                     defaultTraverse pat
 

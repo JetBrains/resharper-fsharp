@@ -430,7 +430,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
     let insertNewLineAt textControl indent trimAfterCaret =
         use command = this.CommandProcessor.UsingCommand("New Line")
         let insertPos = trimTrailingSpaces textControl trimAfterCaret
-        let text = this.GetNewLineText(textControl) + String(' ', indent)
+        let text = this.GetNewLineText(textControl) + System.String(' ', indent)
         insertText textControl insertPos text "Indent on Enter"
 
     let insertIndentFromLine textControl line =
@@ -823,8 +823,8 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                 let line = getContinuedIndentLine textControl leftBracketStartOffset LeadingParenContinuesLine.Yes
                 getLineWhitespaceIndent textControl line
 
-        let baseIndentString = x.GetNewLineText(textControl) + String(' ', baseIndentLength)
-        let indentString = baseIndentString + String(' ',  getIndentSize textControl)
+        let baseIndentString = x.GetNewLineText(textControl) + System.String(' ', baseIndentLength)
+        let indentString = baseIndentString + System.String(' ',  getIndentSize textControl)
 
         if lastElementEndOffset = leftBracketEndOffset then
             let newText =
@@ -1517,7 +1517,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         if additionalSpaces > 0 then
             let replaceRange = TextRange(startOffset, endOffset)
-            document.ReplaceText(replaceRange, String(' ', additionalSpaces))
+            document.ReplaceText(replaceRange, System.String(' ', additionalSpaces))
 
         elif startOffset <> endOffset then
             document.DeleteText(TextRange(startOffset, endOffset))
