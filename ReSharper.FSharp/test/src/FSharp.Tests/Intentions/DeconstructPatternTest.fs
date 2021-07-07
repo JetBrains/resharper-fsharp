@@ -25,9 +25,11 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Tuple - Wild - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Wild - Expr 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Union case - Single - Let 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Let 02``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Union case fields - Generic 01``() = x.DoNamedTest() // todo: better field name
+    [<Test>] member x.``Union case fields - Generic 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case fields - Generic 02``() = x.DoNamedTest()
     [<Test>] member x.``Union case fields - Generic 03 - Array``() = x.DoNamedTest()
     [<Test>] member x.``Union case fields 01``() = x.DoNamedTest()
@@ -36,3 +38,4 @@ type DeconstructPatternTest() =
 
     [<Test; ActionNotAvailable>] member x.``Not available - Constructor param 01``() = x.DoNamedTest()
     [<Test; ActionNotAvailable>] member x.``Not available - Type 01``() = x.DoNamedTest()
+    [<Test; ActionNotAvailable>] member x.``Not available - Union case - Single no fields``() = x.DoNamedTest()

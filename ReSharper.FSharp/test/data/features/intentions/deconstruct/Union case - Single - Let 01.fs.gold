@@ -1,0 +1,4 @@
+﻿type U =
+    | A of field: int
+
+let (A field{caret}) = A 1

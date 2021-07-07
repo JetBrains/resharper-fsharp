@@ -181,6 +181,8 @@ type DeconstructAction(deconstruction: IDeconstruction) =
                     pattern.Pattern :?> IParametersOwnerPat
 
                 let parametersOwnerPat = ModificationUtil.ReplaceChild(pat, parametersOwnerPat)
+                let parametersOwnerPat = RedundantParenPatAnalyzer.addParensIfNeeded parametersOwnerPat
+                let parametersOwnerPat = parametersOwnerPat :?> IParametersOwnerPat
                 ModificationUtil.ReplaceChild(parametersOwnerPat.Parameters.[0], pattern), names
 
             | _ -> null, Unchecked.defaultof<_>
@@ -289,7 +291,8 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
 
                 let fcsUnionCase = fcsUnionCases.[0]
                 let components = createUnionCaseFieldDeconstructions pattern fcsUnionCase fcsEntityInstance
-                
+                if components.IsEmpty then Seq.empty else
+
                 let deconstruction = DeconstructionFromUnionCase(fcsUnionCase.Name, pattern, components)
                 DeconstructAction(deconstruction).ToContextActionIntentions() :> _
             else
