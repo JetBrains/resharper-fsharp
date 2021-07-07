@@ -27,7 +27,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         (RichText.Empty, text.GetFormattedParts()) ||> Seq.fold (fun result part ->
             result.Append(part.Text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\n", "<br>"), part.Style))
 
-    //todo: remove explicit formatting with HTML
+    //todo: move all the html related code to the platform
     let asDefinition (text: RichText) = "<div class='definition'><pre style='word-wrap: break-word; white-space: pre-wrap;'>" + (richTextEscapeToHtml text) + "</pre></div>"
 
     let asContent (text: RichText) = "<div class='content'>" + (richTextEscapeToHtml text) + "</div>"

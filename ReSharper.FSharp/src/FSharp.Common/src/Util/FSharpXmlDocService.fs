@@ -21,16 +21,15 @@ open JetBrains.Util
 type FSharpXmlDocHtmlPresenter(theming: ITheming, factory: XmlDocSectionFactory) =
     inherit XmlDocHtmlPresenter(theming, factory)
 
-    let crefManager =
+    static let сrefManager =
         { new CrefManager() with
             member x.Process(cref, _, _, _, _) = XmlDocPresenterUtil.ProcessCref(cref)
             member x.Create _ = null }
 
     member x.Run(node: XmlNode) =
         let result = RichText()
-        let declaredElement = null.As<DeclaredElementInstance>()
         XmlDocHtmlPresenter
-            .ConvertProcessor(node, null, declaredElement, false, FSharpLanguage.Instance, crefManager, factory, theming)
+            .ConvertProcessor(node, null, null :> DeclaredElementInstance, false, FSharpLanguage.Instance, сrefManager, factory, theming)
             .AppendTextBody(result, true)
         result
 
@@ -67,9 +66,11 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
         let xmlNode =
             match fsXmlDoc with
             | FSharpXmlDoc.FromXmlText(xmlDoc) ->
-                let xmlDocument = XmlDocument()
-                xmlDocument.LoadXml("<root>" + xmlDoc.GetXmlText() + "</root>")
-                xmlDocument.SelectSingleNode("root")
+                try
+                    let xmlDocument = XmlDocument()
+                    xmlDocument.LoadXml("<root>" + xmlDoc.GetXmlText() + "</root>")
+                    xmlDocument.SelectSingleNode("root")
+                with _ -> null
 
             | FSharpXmlDoc.FromXmlFile (dllFile, memberName) ->
                 getIndex dllFile
