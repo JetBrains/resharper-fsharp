@@ -11,7 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
@@ -37,7 +36,8 @@ type DeconstructionFromTuple(pattern: IFSharpPattern, components: IDeconstructio
         member this.Components = this.Components :> _
         member this.Type = TypeFactory.CreateUnknownType(this.Pattern.GetPsiModule()) :> _
 
-type DeconstructionFromUnionCaseFields(pattern: IParametersOwnerPat, components: IDeconstructionComponent list) =
+type DeconstructionFromUnionCaseFields(name: string, pattern: IParametersOwnerPat, components: IDeconstructionComponent list) =
+    member val Name = name
     member val Pattern = pattern
     member val Components = components
 
@@ -204,7 +204,7 @@ type DeconstructAction(deconstruction: IDeconstruction) =
     override this.Text =
         match deconstruction with
         | :? DeconstructionFromTuple -> "Deconstruct tuple"
-        | :? DeconstructionFromUnionCaseFields -> "Deconstruct union case fields"
+        | :? DeconstructionFromUnionCaseFields as d -> $"Deconstruct '{d.Name}' fields"
         | :? DeconstructionFromUnionCase as d -> $"Deconstruct '{d.Name}' union case"
         | _ -> invalidOp $"Unexpected deconstruction: {deconstruction}"
 
@@ -306,5 +306,5 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
                 if isNotNull fcsEntityInstance && not fcsEntityInstance.Entity.IsFSharpUnion then Seq.empty else
 
                 let components = createUnionCaseFieldDeconstructions pattern fcsUnionCase fcsEntityInstance
-                let deconstruction = DeconstructionFromUnionCaseFields(parametersOwnerPat, components)
+                let deconstruction = DeconstructionFromUnionCaseFields(fcsUnionCase.Name, parametersOwnerPat, components)
                 DeconstructAction(deconstruction).ToContextActionIntentions() :> _
