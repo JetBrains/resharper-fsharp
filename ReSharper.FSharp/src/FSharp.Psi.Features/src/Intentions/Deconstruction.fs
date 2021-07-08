@@ -211,7 +211,7 @@ type DeconstructAction(deconstruction: IDeconstruction) =
         | _ -> invalidOp $"Unexpected deconstruction: {deconstruction}"
 
 
-[<ContextAction(Name = "Deconstruct variable",
+[<ContextAction(Name = "Deconstruct variable", Group = "F#",
                 Description = "Deconstructs pattern into multiple positional components")>]
 type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(provider)
