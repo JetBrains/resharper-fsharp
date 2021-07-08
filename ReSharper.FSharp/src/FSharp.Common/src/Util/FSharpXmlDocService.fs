@@ -66,11 +66,13 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
         let xmlNode =
             match fsXmlDoc with
             | FSharpXmlDoc.FromXmlText(xmlDoc) ->
+                let xmlDocument = XmlDocument()
                 try
-                    let xmlDocument = XmlDocument()
                     xmlDocument.LoadXml("<root>" + xmlDoc.GetXmlText() + "</root>")
                     xmlDocument.SelectSingleNode("root")
-                with _ -> null
+                with e ->
+                    xmlDocument.LoadXml("<summary>" + e.Message + "</summary>")
+                    xmlDocument :> _
 
             | FSharpXmlDoc.FromXmlFile (dllFile, memberName) ->
                 getIndex dllFile
