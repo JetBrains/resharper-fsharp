@@ -27,7 +27,7 @@ type FSharpLookupCandidate(description: RichText, xmlDoc: FSharpXmlDoc, xmlDocSe
 
     interface ICandidate with
         member x.GetSignature(_, _, _, _, _) = description
-        member x.GetDescription() = xmlDocService.GetXmlDoc(xmlDoc)
+        member x.GetDescription() = xmlDocService.GetXmlDoc(xmlDoc, true)
         member x.Matches _ = true
 
         member x.GetParametersInfo(_, _) = ()
@@ -144,7 +144,7 @@ type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionCo
             let isNullOrWhiteSpace = RichTextBlock.IsNullOrWhiteSpace
 
             let mainDescription = RichTextBlock(candidate.Description)
-            match context.XmlDocService.GetXmlDoc(candidate.XmlDoc) with
+            match context.XmlDocService.GetXmlDoc(candidate.XmlDoc, true) with
             | null -> ()
             | xmlDoc ->
                 if not (isNullOrWhiteSpace mainDescription || isNullOrWhiteSpace xmlDoc) then

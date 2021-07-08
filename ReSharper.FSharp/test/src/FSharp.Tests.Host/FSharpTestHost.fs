@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open System.Collections.Generic
+open System.Globalization
 open System.Linq
 open FSharp.Compiler.IO
 open JetBrains.Diagnostics
@@ -51,6 +52,13 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
     let dumpTypeProvidersProcess _ =
         solution.GetComponent<IProxyExtensionTypingProvider>().DumpTypeProvidersProcess()
 
+    let getCultureInfoAndSetNew (culture: string) =
+        let currentCulture = CultureInfo.CurrentUICulture
+        let newCulture = CultureInfo.GetCultureInfo(culture)
+        CultureInfo.DefaultThreadCurrentUICulture <- newCulture
+        CultureInfo.CurrentUICulture <- newCulture
+        currentCulture.Name
+
     do
         let fsTestHost = solution.RdFSharpModel().FsharpTestHost
 
@@ -60,3 +68,4 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
         fsTestHost.DumpSingleProjectLocalReferences.Set(dumpSingleProjectLocalReferences)
         fsTestHost.TypeProvidersRuntimeVersion.Set(typeProvidersRuntimeVersion)
         fsTestHost.DumpTypeProvidersProcess.Set(dumpTypeProvidersProcess)
+        fsTestHost.GetCultureInfoAndSetNew.Set(getCultureInfoAndSetNew)

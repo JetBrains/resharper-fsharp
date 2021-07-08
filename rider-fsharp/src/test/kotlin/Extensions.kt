@@ -4,7 +4,6 @@ import com.jetbrains.rider.inTests.TestHost
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.base.BaseTestWithSolution
-import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.scriptingApi.dumpSevereHighlighters
 import java.io.PrintStream
 
@@ -31,4 +30,14 @@ fun BaseTestWithSolution.withTypeProviders(function: () -> Unit) {
 
 fun withEditorConfig(project: Project, function: () -> Unit) {
     withSetting(project, "CodeStyle/EditorConfig/EnableEditorConfigSupport", function)
+}
+
+fun withCultureInfo(project: Project, culture: String, function: () -> Unit) {
+    val getCultureInfoAndSetNew = project.solution.rdFSharpModel.fsharpTestHost.getCultureInfoAndSetNew
+    val oldCulture = getCultureInfoAndSetNew.sync(culture)
+    try {
+        function()
+    } finally {
+        getCultureInfoAndSetNew.sync(oldCulture)
+    }
 }

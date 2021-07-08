@@ -42,6 +42,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
             field("targetFramework", string)
         })
         call("getLastModificationStamp", string, dateTime)
+        call("getCultureInfoAndSetNew", string, string)
         call("getSourceCache", string, structdef("RdFSharpSource") {
             field("source", string)
             field("timestamp", dateTime)

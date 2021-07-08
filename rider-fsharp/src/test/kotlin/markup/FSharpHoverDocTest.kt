@@ -4,6 +4,7 @@ import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.HoverDocTestBase
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import org.testng.annotations.Test
+import withCultureInfo
 
 @TestEnvironment(solution = "CoreConsoleApp", toolset = ToolsetVersion.TOOLSET_16_CORE)
 class FSharpHoverDocTest : HoverDocTestBase() {
@@ -15,4 +16,14 @@ class FSharpHoverDocTest : HoverDocTestBase() {
 
     @Test
     fun `test hover docs for a parameter`() = doTest("Program.fs", "Program.fs")
+
+    @Test
+    fun `test xml doc with symbol reference`() = doTest("Program.fs", "Program.fs")
+
+    @Test
+    fun `test xml doc parsing error`() {
+        withCultureInfo(project, "en-US") {
+            doTest("Program.fs", "Program.fs")
+        }
+    }
 }

@@ -1,0 +1,3 @@
+<span style="color:#000080"><div class='definition'><pre style='word-wrap: break-word; white-space: pre-wrap;'></span><span style="color:#000080">val</span> fiboRec : <span style="color:#000000">_arg1</span>:<span style="color:#000000">int64</span> -&gt; <span style="color:#000000">int64</pre></div></span><table class='sections'><tr><td valign='top' class='section'><p>Exceptions:</td><td valign='top'><p><b>System.OverflowException</b> &ndash; can throw</td></table>
+
+<div class='content'>Full name: <span style="color:#000000">Program</span>.<span style="color:#000000">fiboRec</div></span>
