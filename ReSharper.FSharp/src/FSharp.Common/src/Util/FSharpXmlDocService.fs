@@ -4,7 +4,6 @@ open System.Collections.Concurrent
 open System.Xml
 open FSharp.Compiler.Symbols
 open JetBrains.Annotations
-open JetBrains.Application
 open JetBrains.Application.Infra
 open JetBrains.Application.UI.Components.Theming
 open JetBrains.ProjectModel
@@ -17,8 +16,7 @@ open JetBrains.ReSharper.Psi.XmlIndex
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-[<ShellComponent>]
-type FSharpXmlDocHtmlPresenter(theming: ITheming, factory: XmlDocSectionFactory) =
+type internal FSharpXmlDocHtmlPresenter(theming: ITheming, factory: XmlDocSectionFactory) =
     inherit XmlDocHtmlPresenter(theming, factory)
 
     static let сrefManager =
@@ -35,9 +33,11 @@ type FSharpXmlDocHtmlPresenter(theming: ITheming, factory: XmlDocSectionFactory)
 
 [<SolutionComponent>]
 type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread, psiConfig: IPsiConfiguration,
-        psiModules: IPsiModules, assemblyInfoDatabase: AssemblyInfoDatabase, xmlDocPresenter: FSharpXmlDocHtmlPresenter) =
+        psiModules: IPsiModules, assemblyInfoDatabase: AssemblyInfoDatabase, theming: ITheming, factory: XmlDocSectionFactory) =
 
     let indexCache = ConcurrentDictionary<string, XmlDocIndex>()
+
+    let xmlDocPresenter = FSharpXmlDocHtmlPresenter(theming, factory)
 
     let getIndex dllFile =
         indexCache.TryGetValue(dllFile)
