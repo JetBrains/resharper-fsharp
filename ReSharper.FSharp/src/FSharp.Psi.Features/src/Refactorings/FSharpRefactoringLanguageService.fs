@@ -34,3 +34,6 @@ and FSharpRefactoringsHelper() =
         let decl = patternDeclaredElement.GetDeclarations().SingleItem()
         let binding = BindingNavigator.GetByHeadPattern(decl.As<IReferencePat>())
         isNotNull binding && binding.ParametersDeclarationsEnumerable.IsEmpty()
+
+    override this.IsValidIntroduceInnerExpression(expr) =
+        FSharpIntroduceVariable.IsValidInnerExpression(expr)

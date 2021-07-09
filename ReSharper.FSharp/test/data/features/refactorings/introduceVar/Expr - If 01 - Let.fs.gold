@@ -2,8 +2,9 @@
 module Module
 
 if true then
+    let i = 1
     let a =
-        let i = 1
+        i
     ()
 else
     ()

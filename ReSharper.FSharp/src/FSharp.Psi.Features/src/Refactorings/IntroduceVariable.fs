@@ -512,7 +512,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 isNull (NewExprNavigator.GetByArgumentExpression(expr)) &&
                 isAllowedExpr parenExpr.InnerExpression
 
-            | :? IRangeLikeExpr | :? IComputationExpr | :? IYieldOrReturnExpr -> false
+            | :? IRangeLikeExpr | :? IComputationExpr | :? IYieldOrReturnExpr | :? IFromErrorExpr -> false
 
             | :? ITupleExpr ->
                 isNull (NewExprNavigator.GetByArgumentExpression(ParenExprNavigator.GetByInnerExpression(expr)))
@@ -526,23 +526,25 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         if not (isAllowedContext expr) then false else
         isAllowedExpr expr
 
+    static member IsValidInnerExpression(expr: IExpression) =
+        let expr = expr.As<IFSharpExpression>()
+        if isNull expr then false else
+
+        match expr with
+        | :? ILetOrUseExpr
+        | :? ISequentialExpr -> false
+        | _ ->
+
+        let aprExpr = PrefixAppExprNavigator.GetByArgumentExpression(expr)
+        not (isNotNull aprExpr && aprExpr.IsHighPrecedence)
+
     static member CanInsertBeforeRightOperand(binaryAppExpr: IBinaryAppExpr) =
         canInsertBeforeRightOperand binaryAppExpr
 
 type FSharpIntroduceVarHelper() =
     inherit IntroduceVariableHelper()
 
-    let isExpressionToRemove (expr: ITreeNode) =
-        expr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey)
-
     override x.IsLanguageSupported = true
 
     override x.CheckAvailability(node) =
-        let expr = node.As<IFSharpExpression>()
-        if isNull expr || expr :? IFromErrorExpr then false else
-
-        expr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey) ||
-        FSharpIntroduceVariable.CanIntroduceVar(expr)
-
-    override x.CheckOccurrence(expr, occurrence) =
-        isExpressionToRemove occurrence || not (isExpressionToRemove expr)
+        FSharpIntroduceVariable.CanIntroduceVar(node.As<IFSharpExpression>())
