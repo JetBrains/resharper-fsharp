@@ -42,12 +42,12 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         if isConnectionAlive () then () else
 
         lock createProcessLockObj (fun () ->
+            if isConnectionAlive () then () else
 
-        if isConnectionAlive () then () else
-
-        typeProvidersHostLifetime <- Lifetime.Define(lifetime)
-        connection <- typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime).Run()
-        typeProvidersManager <- TypeProvidersManager(connection) :?> _)
+            typeProvidersHostLifetime <- Lifetime.Define(lifetime)
+            let newConnection = typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime).Run()
+            typeProvidersManager <- TypeProvidersManager(newConnection) :?> _
+            connection <- newConnection)
 
     do
         lifetime.Bracket((fun () -> ExtensionTypingProvider <- this),
