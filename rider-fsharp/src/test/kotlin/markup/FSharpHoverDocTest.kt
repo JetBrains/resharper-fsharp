@@ -21,6 +21,9 @@ class FSharpHoverDocTest : HoverDocTestBase() {
     fun `test xml doc with symbol reference`() = doTest("Program.fs", "Program.fs")
 
     @Test
+    fun `test empty xml doc`() = doTest("Program.fs", "Program.fs")
+
+    @Test
     fun `test xml doc parsing error`() {
         withCultureInfo(project, "en-US") {
             doTest("Program.fs", "Program.fs")

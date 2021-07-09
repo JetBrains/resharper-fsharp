@@ -93,7 +93,6 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                         let body =
                             [ match xmlDocService.GetXmlDoc(overload.XmlDoc, false) with
                               | null -> ()
-                              | xmlDocText when xmlDocText.Text.IsNullOrWhitespace() -> ()
                               | xmlDocText -> yield xmlDocText.RichText
 
                               match overload.Remarks with
