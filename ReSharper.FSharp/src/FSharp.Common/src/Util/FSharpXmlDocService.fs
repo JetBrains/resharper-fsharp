@@ -81,7 +81,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
 
             | FSharpXmlDoc.None -> null
 
-        if isNull xmlNode then null else
+        if isNull xmlNode || xmlNode.InnerText.IsNullOrWhitespace() then null else
 
         if summaryOnly then
             let summary = XMLDocUtil.ExtractSummary(xmlNode)
