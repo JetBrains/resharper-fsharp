@@ -1,0 +1,7 @@
+﻿Suggested names: int32s, l
+module Nested =
+    let int32s = 
+      [1
+       2]
+    let x =
+        int32s

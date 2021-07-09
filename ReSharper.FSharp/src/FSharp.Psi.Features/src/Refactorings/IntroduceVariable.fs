@@ -136,6 +136,11 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             let recordExpr = RecordLikeExprNavigator.GetByFieldBinding(fieldBinding)
             getExprToInsertBefore recordExpr
 
+        | :? ILocalBinding as binding when
+                isNotNull (LetOrUseExprNavigator.GetByBinding(binding)) &&
+                binding.ParameterPatternsEnumerable.IsEmpty() ->
+            LetOrUseExprNavigator.GetByBinding(binding) :> _
+
         | :? ILetOrUseExpr as letExpr ->
             Assertion.Assert(letExpr.InExpression == expr, "letExpr.InExpression == expr")
             expr
@@ -165,7 +170,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let seqExpr = commonParent.As<ISequentialExpr>()
         if isNull seqExpr then commonParent else
 
-        if sourceExpr.Parent == commonParent then sourceExpr else
+        if sourceExpr.Parent == commonParent || sourceExpr == commonParent then sourceExpr else
 
         let contextExpr = sourceExpr.PathToRoot() |> Seq.find (fun n -> n.Parent == commonParent)
         contextExpr :?> _
@@ -319,7 +324,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let lineEnding = sourceExpr.GetLineEnding()
         let elementFactory = sourceExpr.CreateElementFactory()
 
-        let indentShift = contextExpr.Indent - sourceExpr.Indent
+        let indentShift = contextIndent - sourceExpr.Indent
         shiftNode indentShift sourceExpr
 
         let letBindings = createBinding contextExpr contextDecl name

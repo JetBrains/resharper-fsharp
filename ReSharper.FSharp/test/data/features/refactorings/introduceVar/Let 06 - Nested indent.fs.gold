@@ -1,0 +1,5 @@
+﻿Suggested names: i
+do
+  let x _ =
+      let i = 1
+  ()
