@@ -26,8 +26,9 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
     let lifetime = solution.GetLifetime()
     let defaultShim = ExtensionTypingProvider
     let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
+    let createProcessLockObj = obj()
 
-    let mutable connection: TypeProvidersConnection = null
+    let [<VolatileField>] mutable connection: TypeProvidersConnection = null
     let mutable typeProvidersHostLifetime: LifetimeDefinition = null
     let mutable typeProvidersManager = Unchecked.defaultof<IProxyTypeProvidersManager>
 
@@ -38,10 +39,15 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         if isConnectionAlive() then typeProvidersHostLifetime.Terminate()
 
     let connect () =
-        if not (isConnectionAlive ()) then
-            typeProvidersHostLifetime <- Lifetime.Define(lifetime)
-            connection <- typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime).Run()
-            typeProvidersManager <- TypeProvidersManager(connection) :?> _
+        if isConnectionAlive () then () else
+
+        lock createProcessLockObj (fun () ->
+
+        if isConnectionAlive () then () else
+
+        typeProvidersHostLifetime <- Lifetime.Define(lifetime)
+        connection <- typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime).Run()
+        typeProvidersManager <- TypeProvidersManager(connection) :?> _)
 
     do
         lifetime.Bracket((fun () -> ExtensionTypingProvider <- this),
