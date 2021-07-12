@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 
 open System
 open System.Collections.Generic
+open FSharp.Compiler.Symbols
 open FSharp.Compiler.Tokenization
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -45,6 +46,206 @@ module Traverse =
             tryTraverseExprPath rest tupleItems.[n]
 
         | _ -> null
+
+module FSharpNamingService =
+    let getUsedNamesUsages
+            (contextExprs: IFSharpExpression list) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
+            checkFcsSymbols =
+
+        let usages = HashSet(usages)
+        let usedNames = OneToListMap<string, ITreeNode>()
+
+        let addUsedNames names =
+            for name in names do
+                usedNames.Add(name, null)
+
+        // Type element is not null when checking names for declaration in a module/class.
+        // Consider all member names used.
+        // todo: type private let binding allow shadowing
+        if isNotNull containingTypeElement then
+            addUsedNames containingTypeElement.MemberNames
+
+        let scopes = Stack()
+        let scopedNames = Dictionary<string, int>()
+
+        let addScopeForPatterns (patterns: IFSharpPattern seq) (scopeExpr: IFSharpExpression) =
+            if isNull scopeExpr || Seq.isEmpty patterns then () else
+
+            let newNames = List()
+            for fsPattern in patterns do
+                for decl in fsPattern.Declarations do
+                    if isNull decl.DeclaredElement then () else
+
+                    let name = decl.DeclaredName
+                    if name <> SharedImplUtil.MISSING_DECLARATION_NAME then
+                        newNames.Add(name)
+
+            if not (newNames.IsEmpty()) then
+                scopes.Push({| Expr = scopeExpr; Names = newNames :> IList<_> |})
+
+        let processor =
+            { new IRecursiveElementProcessor with
+                member x.ProcessingIsFinished = false
+
+                member x.InteriorShouldBeProcessed(treeNode) =
+                    not (usages.Contains(treeNode))
+
+                member x.ProcessBeforeInterior(treeNode) =
+                    if not (scopes.IsEmpty()) then
+                        let scope = scopes.Peek()
+                        let fsExpr = treeNode.As<IFSharpExpression>()
+                        if scope.Expr == fsExpr then
+                            for name in scope.Names do
+                                scopedNames.[name] <-
+                                    let mutable count = Unchecked.defaultof<_>
+                                    if scopedNames.TryGetValue(name, &count) then count + 1 else 1
+
+                    match treeNode with
+                    | :? IReferenceExpr as refExpr ->
+                        if usages.Contains(refExpr) then
+                            // Scoped names can't be used when their scope contains usage expressions
+                            // in Introduce Var since the introduced name would get shadowed.
+                            addUsedNames scopedNames.Keys
+                            scopedNames.Clear() else
+
+                        if isNotNull refExpr.Qualifier then () else
+
+                        let name = refExpr.ShortName
+                        if name = SharedImplUtil.MISSING_DECLARATION_NAME ||
+                                scopedNames.ContainsKey(name) || usedNames.ContainsKey(name) then () else
+
+                        if not checkFcsSymbols || refExpr.Reference.HasFcsSymbol then
+                            usedNames.Add(name, refExpr)
+
+                    | :? ILetOrUseExpr as letExpr ->
+                        let patterns = letExpr.BindingsEnumerable |> Seq.map (fun b -> b.HeadPattern)
+                        addScopeForPatterns patterns letExpr.InExpression
+
+                    | :? IBinding as binding ->
+                        let headPattern = binding.HeadPattern
+                        if isNull headPattern then () else
+
+                        let bindingExpression = binding.Expression
+                        if isNull bindingExpression then () else
+
+                        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
+                        if isNull letExpr then () else
+
+                        let patterns =
+                            let parameters = binding.ParametersDeclarationsEnumerable
+                            if parameters.IsEmpty() then [| binding.HeadPattern |] :> IFSharpPattern seq else
+
+                            let parameters = parameters |> Seq.map (fun paramDecl -> paramDecl.Pattern)
+                            if letExpr.IsRecursive then
+                                Seq.append [| headPattern |] parameters
+                            else
+                                parameters
+
+                        addScopeForPatterns patterns bindingExpression
+
+                    | :? ILambdaExpr as lambdaExpr ->
+                        addScopeForPatterns lambdaExpr.PatternsEnumerable lambdaExpr.Expression
+
+                    | :? IMatchClause as matchClause ->
+                        addScopeForPatterns [| matchClause.Pattern |] matchClause.Expression
+
+                    | :? IForEachExpr as forEachExpr ->
+                        addScopeForPatterns [| forEachExpr.Pattern |] forEachExpr.DoExpression
+
+                    | :? IForExpr as forExpr ->
+                        if isNull forExpr.DoExpression then () else
+
+                        let name = forExpr.Identifier.GetSourceName()
+                        if name <> SharedImplUtil.MISSING_DECLARATION_NAME then
+                            scopes.Push({| Expr = forExpr.DoExpression; Names = [| name |] |})
+
+                    | _ -> ()
+
+                member x.ProcessAfterInterior(treeNode) =
+                    let fsExpr = treeNode.As<IFSharpExpression>()
+                    if scopes.IsEmpty() then () else
+
+                    let scope = scopes.Peek()
+                    if scope.Expr == fsExpr then
+                        for name in scope.Names do
+                            let mutable count = Unchecked.defaultof<_>
+                            if scopedNames.TryGetValue(name, &count) then
+                                match count with
+                                | 1 -> scopedNames.Remove(name) |> ignore
+                                | count -> scopedNames.[name] <- count - 1
+
+                        scopes.Pop() |> ignore
+            }
+
+        let processExpr expr =
+            match SequentialExprNavigator.GetByExpression(expr) with
+            | null ->
+                match expr with
+                | null -> ()
+                | expr -> expr.ProcessThisAndDescendants(processor)
+            | seqExpr ->
+                seqExpr.ExpressionsEnumerable
+                |> Seq.skipWhile ((!=) expr)
+                |> Seq.iter (fun expr -> expr.ProcessThisAndDescendants(processor))
+
+        List.iter processExpr contextExprs
+
+        usedNames
+
+    let getContainingType (moduleMember: IModuleMember) =
+        if isNull moduleMember then null else
+
+        let typeDeclaration = moduleMember.GetContainingTypeDeclaration()
+        if isNull typeDeclaration then null else typeDeclaration.DeclaredElement
+
+    let getPatternContainingType (pattern: IFSharpPattern) =
+        let binding = BindingNavigator.GetByHeadPattern(pattern)
+        let letDecl = LetBindingsDeclarationNavigator.GetByBinding(binding)
+        getContainingType letDecl
+
+    let getUsedNames (contextExprs: IFSharpExpression list) usages containingTypeElement checkFcsSymbols: ISet<string> =
+        let usedNames = getUsedNamesUsages contextExprs usages containingTypeElement checkFcsSymbols
+        HashSet(usedNames.Keys) :> _
+
+    let createEmptyNamesCollection (fsTreeNode: IFSharpTreeNode) =
+        let sourceFile = fsTreeNode.GetSourceFile()
+        let namingManager = sourceFile.GetSolution().GetPsiServices().Naming
+        namingManager.Suggestion.CreateEmptyCollection(PluralityKinds.Unknown, fsTreeNode.Language, true, sourceFile)
+
+    let getEntryOptions () =
+        EntryOptions(PluralityKinds.Unknown, SubrootPolicy.Decompose, PredefinedPrefixPolicy.Remove)
+
+    let addNames (name: string) (context: ITreeNode) (namesCollection: INamesCollection) =
+        if isNotNull name then
+            let namingRule = NamingRule(NamingStyleKind = NamingStyleKinds.aaBb)
+            let nameParser = context.GetPsiServices().Naming.Parsing
+            let root = nameParser.Parse(name, namingRule, context.Language, context.GetSourceFile()).GetRoot()
+            namesCollection.Add(root, getEntryOptions ())
+        namesCollection
+
+    let addNamesForType (t: IType) (namesCollection: INamesCollection) =
+        namesCollection.Add(t, getEntryOptions ())
+        namesCollection
+
+    let addNamesForExpression (expr: IFSharpExpression) (namesCollection: INamesCollection) =
+        namesCollection.Add(expr, getEntryOptions ())
+        namesCollection
+
+    let prepareNamesCollection
+            (usedNames: ISet<string>) (fsTreeNode: IFSharpTreeNode) (namesCollection: INamesCollection) =
+
+        let sourceFile = fsTreeNode.GetSourceFile()
+        let namingManager = namesCollection.Solution.GetPsiServices().Naming
+
+        let settingsStore = fsTreeNode.GetSettingsStoreWithEditorConfig()
+        let elementKind = NamedElementKinds.Locals
+        let descriptor = ElementKindOfElementType.LOCAL_VARIABLE
+        let namingRule =
+            namingManager.Policy.GetDefaultRule(sourceFile, fsTreeNode.Language, settingsStore, elementKind, descriptor)
+
+        let usedNamesFilter = Func<_,_>(usedNames.Contains >> not)
+        let suggestionOptions = SuggestionOptions(null, DefaultName = "foo", UsedNamesFilter = usedNamesFilter)
+        namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =
@@ -271,6 +472,51 @@ type FSharpNamingService(language: FSharpLanguage) =
 
         | _ -> ()
 
+        let getParameterOwnerPat (pattern: IFSharpPattern) =
+            let parametersOwner = ParametersOwnerPatNavigator.GetByParameter(pattern.IgnoreParentParens())
+            if isNotNull parametersOwner then parametersOwner else
+
+            let tuplePat = TuplePatNavigator.GetByPattern(fsPattern.IgnoreParentParens())
+            ParametersOwnerPatNavigator.GetByParameter(tuplePat.IgnoreParentParens())
+
+        let getUnionCaseFieldIndex (pattern: IFSharpPattern) (parametersOwnerPat: IParametersOwnerPat) =
+            let pattern = pattern.IgnoreParentParens()
+
+            let singleParam = parametersOwnerPat.ParametersEnumerable.SingleItem
+            if singleParam == pattern then 0 else
+
+            let tuplePat = singleParam.IgnoreInnerParens().As<ITuplePat>()
+            if isNull tuplePat then -1 else
+
+            tuplePat.Patterns.IndexOf(pattern)
+
+        let addUnionCaseFieldName () =
+            let parametersOwner = getParameterOwnerPat fsPattern
+            if isNull parametersOwner then () else
+
+            let referenceName = parametersOwner.ReferenceName
+            if isNull referenceName then () else
+
+            let reference = referenceName.Reference
+            if isNull reference then () else
+
+            match reference.GetFcsSymbol() with
+            | :? FSharpUnionCase as fcsUnionCase ->
+                let indexOf = getUnionCaseFieldIndex fsPattern parametersOwner
+                let fcsFields = fcsUnionCase.Fields
+
+                let isSingle = fcsFields.Count = 1
+                let defaultItemName = if isSingle then "Item" else $"Item{indexOf + 1}"
+
+                if indexOf >= 0 && indexOf < fcsFields.Count then
+                    let fcsField = fcsFields.[indexOf]
+                    let name = fcsField.Name
+                    if name <> defaultItemName then
+                        FSharpNamingService.addNames name fsPattern namesCollection |> ignore
+            | _ -> ()
+
+        addUnionCaseFieldName ()
+
         match fsPattern with
         | :? INamedPat as namedPat ->
             let parametersOwner = ParametersOwnerPatNavigator.GetByParameter(namedPat.IgnoreParentParens())
@@ -306,203 +552,3 @@ type FSharpNamingService(language: FSharpLanguage) =
             NamedElementKinds.Locals
         else
             base.GetNamedElementKind(element)
-
-module FSharpNamingService =
-    let getUsedNamesUsages
-            (contextExprs: IFSharpExpression list) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
-            checkFcsSymbols =
-
-        let usages = HashSet(usages)
-        let usedNames = OneToListMap<string, ITreeNode>()
-
-        let addUsedNames names =
-            for name in names do
-                usedNames.Add(name, null)
-
-        // Type element is not null when checking names for declaration in a module/class.
-        // Consider all member names used.
-        // todo: type private let binding allow shadowing
-        if isNotNull containingTypeElement then
-            addUsedNames containingTypeElement.MemberNames
-
-        let scopes = Stack()
-        let scopedNames = Dictionary<string, int>()
-
-        let addScopeForPatterns (patterns: IFSharpPattern seq) (scopeExpr: IFSharpExpression) =
-            if isNull scopeExpr || Seq.isEmpty patterns then () else
-
-            let newNames = List()
-            for fsPattern in patterns do
-                for decl in fsPattern.Declarations do
-                    if isNull decl.DeclaredElement then () else
-
-                    let name = decl.DeclaredName
-                    if name <> SharedImplUtil.MISSING_DECLARATION_NAME then
-                        newNames.Add(name)
-
-            if not (newNames.IsEmpty()) then
-                scopes.Push({| Expr = scopeExpr; Names = newNames :> IList<_> |})
-
-        let processor =
-            { new IRecursiveElementProcessor with
-                member x.ProcessingIsFinished = false
-
-                member x.InteriorShouldBeProcessed(treeNode) =
-                    not (usages.Contains(treeNode))
-
-                member x.ProcessBeforeInterior(treeNode) =
-                    if not (scopes.IsEmpty()) then
-                        let scope = scopes.Peek()
-                        let fsExpr = treeNode.As<IFSharpExpression>()
-                        if scope.Expr == fsExpr then
-                            for name in scope.Names do
-                                scopedNames.[name] <-
-                                    let mutable count = Unchecked.defaultof<_>
-                                    if scopedNames.TryGetValue(name, &count) then count + 1 else 1
-
-                    match treeNode with
-                    | :? IReferenceExpr as refExpr ->
-                        if usages.Contains(refExpr) then
-                            // Scoped names can't be used when their scope contains usage expressions
-                            // in Introduce Var since the introduced name would get shadowed.
-                            addUsedNames scopedNames.Keys
-                            scopedNames.Clear() else
-
-                        if isNotNull refExpr.Qualifier then () else
-
-                        let name = refExpr.ShortName
-                        if name = SharedImplUtil.MISSING_DECLARATION_NAME ||
-                                scopedNames.ContainsKey(name) || usedNames.ContainsKey(name) then () else
-
-                        if not checkFcsSymbols || refExpr.Reference.HasFcsSymbol then
-                            usedNames.Add(name, refExpr)
-
-                    | :? ILetOrUseExpr as letExpr ->
-                        let patterns = letExpr.BindingsEnumerable |> Seq.map (fun b -> b.HeadPattern)
-                        addScopeForPatterns patterns letExpr.InExpression
-
-                    | :? IBinding as binding ->
-                        let headPattern = binding.HeadPattern
-                        if isNull headPattern then () else
-
-                        let bindingExpression = binding.Expression
-                        if isNull bindingExpression then () else
-
-                        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
-                        if isNull letExpr then () else
-
-                        let patterns =
-                            let parameters = binding.ParametersDeclarationsEnumerable
-                            if parameters.IsEmpty() then [| binding.HeadPattern |] :> IFSharpPattern seq else
-
-                            let parameters = parameters |> Seq.map (fun paramDecl -> paramDecl.Pattern)
-                            if letExpr.IsRecursive then
-                                Seq.append [| headPattern |] parameters
-                            else
-                                parameters
-
-                        addScopeForPatterns patterns bindingExpression
-
-                    | :? ILambdaExpr as lambdaExpr ->
-                        addScopeForPatterns lambdaExpr.PatternsEnumerable lambdaExpr.Expression
-
-                    | :? IMatchClause as matchClause ->
-                        addScopeForPatterns [| matchClause.Pattern |] matchClause.Expression
-
-                    | :? IForEachExpr as forEachExpr ->
-                        addScopeForPatterns [| forEachExpr.Pattern |] forEachExpr.DoExpression
-
-                    | :? IForExpr as forExpr ->
-                        if isNull forExpr.DoExpression then () else
-
-                        let name = forExpr.Identifier.GetSourceName()
-                        if name <> SharedImplUtil.MISSING_DECLARATION_NAME then
-                            scopes.Push({| Expr = forExpr.DoExpression; Names = [| name |] |})
-
-                    | _ -> ()
-
-                member x.ProcessAfterInterior(treeNode) =
-                    let fsExpr = treeNode.As<IFSharpExpression>()
-                    if scopes.IsEmpty() then () else
-
-                    let scope = scopes.Peek()
-                    if scope.Expr == fsExpr then
-                        for name in scope.Names do
-                            let mutable count = Unchecked.defaultof<_>
-                            if scopedNames.TryGetValue(name, &count) then
-                                match count with
-                                | 1 -> scopedNames.Remove(name) |> ignore
-                                | count -> scopedNames.[name] <- count - 1
-
-                        scopes.Pop() |> ignore
-            }
-
-        let processExpr expr =
-            match SequentialExprNavigator.GetByExpression(expr) with
-            | null ->
-                match expr with
-                | null -> ()
-                | expr -> expr.ProcessThisAndDescendants(processor)
-            | seqExpr ->
-                seqExpr.ExpressionsEnumerable
-                |> Seq.skipWhile ((!=) expr)
-                |> Seq.iter (fun expr -> expr.ProcessThisAndDescendants(processor))
-
-        List.iter processExpr contextExprs
-
-        usedNames
-
-    let getContainingType (moduleMember: IModuleMember) =
-        if isNull moduleMember then null else
-
-        let typeDeclaration = moduleMember.GetContainingTypeDeclaration()
-        if isNull typeDeclaration then null else typeDeclaration.DeclaredElement
-
-    let getPatternContainingType (pattern: IFSharpPattern) =
-        let binding = BindingNavigator.GetByHeadPattern(pattern)
-        let letDecl = LetBindingsDeclarationNavigator.GetByBinding(binding)
-        getContainingType letDecl
-
-    let getUsedNames (contextExprs: IFSharpExpression list) usages containingTypeElement checkFcsSymbols: ISet<string> =
-        let usedNames = getUsedNamesUsages contextExprs usages containingTypeElement checkFcsSymbols
-        HashSet(usedNames.Keys) :> _
-
-    let createEmptyNamesCollection (fsTreeNode: IFSharpTreeNode) =
-        let sourceFile = fsTreeNode.GetSourceFile()
-        let namingManager = sourceFile.GetSolution().GetPsiServices().Naming
-        namingManager.Suggestion.CreateEmptyCollection(PluralityKinds.Unknown, fsTreeNode.Language, true, sourceFile)
-
-    let getEntryOptions () =
-        EntryOptions(PluralityKinds.Unknown, SubrootPolicy.Decompose, PredefinedPrefixPolicy.Remove)
-
-    let addNames (name: string) (context: ITreeNode) (namesCollection: INamesCollection) =
-        if isNotNull name then
-            let namingRule = NamingRule(NamingStyleKind = NamingStyleKinds.aaBb)
-            let nameParser = context.GetPsiServices().Naming.Parsing
-            let root = nameParser.Parse(name, namingRule, context.Language, context.GetSourceFile()).GetRoot()
-            namesCollection.Add(root, getEntryOptions ())
-        namesCollection
-
-    let addNamesForType (t: IType) (namesCollection: INamesCollection) =
-        namesCollection.Add(t, getEntryOptions ())
-        namesCollection
-
-    let addNamesForExpression (expr: IFSharpExpression) (namesCollection: INamesCollection) =
-        namesCollection.Add(expr, getEntryOptions ())
-        namesCollection
-
-    let prepareNamesCollection
-            (usedNames: ISet<string>) (fsTreeNode: IFSharpTreeNode) (namesCollection: INamesCollection) =
-
-        let sourceFile = fsTreeNode.GetSourceFile()
-        let namingManager = namesCollection.Solution.GetPsiServices().Naming
-
-        let settingsStore = fsTreeNode.GetSettingsStoreWithEditorConfig()
-        let elementKind = NamedElementKinds.Locals
-        let descriptor = ElementKindOfElementType.LOCAL_VARIABLE
-        let namingRule =
-            namingManager.Policy.GetDefaultRule(sourceFile, fsTreeNode.Language, settingsStore, elementKind, descriptor)
-
-        let usedNamesFilter = Func<_,_>(usedNames.Contains >> not)
-        let suggestionOptions = SuggestionOptions(null, DefaultName = "foo", UsedNamesFilter = usedNamesFilter)
-        namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()

@@ -45,6 +45,13 @@ type FSharpNamingTest() =
     [<Test>] member x.``Pipe - Left 01``() = x.DoNamedTest()
     [<Test>] member x.``Pipe - Left 02 - Nested``() = x.DoNamedTest()
 
+    [<Test>] member x.``Union case field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union case field 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union case field 03``() = x.DoNamedTest()
+    [<Test>] member x.``Union case field 04``() = x.DoNamedTest()
+    [<Test>] member x.``Union case field 05``() = x.DoNamedTest()
+    [<Test>] member x.``Union case field 06``() = x.DoNamedTest()
+
     [<Test>] member x.``Wild - Let - Top 01``() = x.DoNamedTest()
     [<Test>] member x.``Wild - Let - Top 02 - StringBuilder``() = x.DoNamedTest()
     [<Test>] member x.``Wild - Let - Top 03 - Method``() = x.DoNamedTest()
