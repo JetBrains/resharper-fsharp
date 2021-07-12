@@ -414,4 +414,12 @@
     <QuickFix>ReplaceWithTypeRefExprFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="CantTakeAddressOfExpression">
+    <Parameter type="IAddressOfExpr" name="expr"/>
+    <Message value="Can't take address of expression"/>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>IntroduceVarFix</QuickFix>
+  </Error>
+
 </Errors>

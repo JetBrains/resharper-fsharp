@@ -32,10 +32,11 @@ open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
-type FSharpIntroduceVariableWorkflow(solution, escapeLambdas: bool) =
+type FSharpIntroduceVariableWorkflow(solution, escapeLambdas: bool, addMutable: bool) =
     inherit IntroduceVariableWorkflow(solution, null)
 
     member val EscapeLambdas = escapeLambdas
+    member val Mutable = addMutable
 
 type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, driver) =
     inherit IntroduceVariableBase(workflow, solution, driver)
@@ -330,6 +331,11 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let letBindings = createBinding contextExpr contextDecl name
         setBindingExpression sourceExpr contextIndent letBindings
 
+        match workflow with
+        | :? FSharpIntroduceVariableWorkflow as fsWorkflow when fsWorkflow.Mutable ->
+            letBindings.Bindings.[0].SetIsMutable(true)
+        | _ -> ()
+
         let replacedUsages, sourceExpr =
             data.Usages |> Seq.fold (fun (replacedUsages, sourceExpr: IFSharpExpression as acc) usage ->
                 let usage = usage.As<IFSharpExpression>()
@@ -470,7 +476,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
         IntroduceVariableResult(hotspotsRegistry, caretTarget.CreateTreeElementPointer())
 
-    static member IntroduceVar(expr: IFSharpExpression, textControl: ITextControl, removeSourceExpr, escapeLambdas) =
+    static member IntroduceVar(expr: IFSharpExpression, textControl: ITextControl, removeSourceExpr, escapeLambdas,
+            addMutable) =
         let name = "FSharpIntroduceVar"
         let solution = expr.GetSolution()
 
@@ -489,7 +496,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         if removeSourceExpr then
             expr.UserData.PutKey(FSharpIntroduceVariable.ExpressionToRemoveKey)
 
-        let workflow = FSharpIntroduceVariableWorkflow(solution, escapeLambdas)
+        let workflow = FSharpIntroduceVariableWorkflow(solution, escapeLambdas, addMutable)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
     static member CanIntroduceVar(expr: IFSharpExpression) =

@@ -15,6 +15,7 @@ type FcsErrorsHighlightingTest() =
     [<Test>] member x.``No errors 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline range``() = x.DoNamedTest()
 
+    [<Test>] member x.``Cant take address of expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Non-recursive bindings 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Syntax errors 01``() = x.DoNamedTest()

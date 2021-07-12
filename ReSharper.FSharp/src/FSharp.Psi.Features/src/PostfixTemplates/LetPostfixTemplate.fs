@@ -43,4 +43,4 @@ and LetPostfixTemplateBehavior(info) =
             this.GetExpression(context) :> ITreeNode)
 
     override this.AfterComplete(textControl, node, _) =
-        FSharpIntroduceVariable.IntroduceVar(node :?> _, textControl, false, false)
+        FSharpIntroduceVariable.IntroduceVar(node :?> _, textControl, false, false, false)

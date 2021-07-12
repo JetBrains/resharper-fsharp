@@ -1,0 +1,6 @@
+﻿module Module
+
+|&"".ToString()|(0) |> ignore
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Can't take address of expression

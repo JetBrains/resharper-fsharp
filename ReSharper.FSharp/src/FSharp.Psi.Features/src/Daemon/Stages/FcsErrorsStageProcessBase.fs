@@ -74,6 +74,7 @@ module FSharpErrors =
     let [<Literal>] TypeAbbreviationsCannotHaveAugmentations = 964
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
+    let [<Literal>] CantTakeAddressOfExpression = 3236
 
     let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
     let [<Literal>] undefinedGetSliceMessageSuffix = " does not define the field, constructor or member 'GetSlice'."
@@ -326,6 +327,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UnusedThisVariable ->
             createHighlightingFromParentNode UnusedThisVariableWarning range
+
+        | CantTakeAddressOfExpression ->
+            createHighlightingFromNode CantTakeAddressOfExpressionError range
 
         | ObjectOfIndeterminateTypeUsedRequireTypeConstraint ->
             createHighlightingFromNode IndexerIndeterminateTypeError range

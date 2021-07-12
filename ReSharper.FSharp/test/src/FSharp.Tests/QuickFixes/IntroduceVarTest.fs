@@ -32,6 +32,8 @@ type IntroduceVarTest() =
     [<Test>] member x.``Module - Do 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Module - Do 03 - Function``() = x.DoNamedTest()
 
+    [<Test>] member x.``AddressOf 01``() = x.DoNamedTest()
+
     [<TestReferences("../../../assemblies/ProtectedMembers.dll")>]
     [<Test>] member x.``Protected 01``() = x.DoNamedTest()
 

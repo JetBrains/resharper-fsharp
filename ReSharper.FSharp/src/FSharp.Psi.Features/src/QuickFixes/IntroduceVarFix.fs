@@ -10,7 +10,7 @@ module IntroduceVarFix =
     let [<Literal>] introduceVarText = "Introduce 'let' binding"
     let [<Literal>] introduceVarOutsideLambdaText = "Introduce 'let' binding outside lambda"
 
-type IntroduceVarFix(expr: IFSharpExpression, escapeLambdas, text) =
+type IntroduceVarFix(expr: IFSharpExpression, removeExpr, escapeLambdas, addMutable, text) =
     inherit FSharpQuickFixBase()
 
     let mutable expr = expr
@@ -23,17 +23,20 @@ type IntroduceVarFix(expr: IFSharpExpression, escapeLambdas, text) =
             null
 
     new (warning: UnitTypeExpectedWarning) =
-        IntroduceVarFix(warning.Expr, false, IntroduceVarFix.introduceVarText)
+        IntroduceVarFix(warning.Expr, true, false, false, IntroduceVarFix.introduceVarText)
 
     new (warning: FunctionValueUnexpectedWarning) =
-        IntroduceVarFix(warning.Expr, false, IntroduceVarFix.introduceVarText)
+        IntroduceVarFix(warning.Expr, true, false, false, IntroduceVarFix.introduceVarText)
 
     new (error: UnitTypeExpectedError) =
-        IntroduceVarFix(error.Expr, false, IntroduceVarFix.introduceVarText)
+        IntroduceVarFix(error.Expr, true, false, false, IntroduceVarFix.introduceVarText)
+
+    new (error: CantTakeAddressOfExpressionError) =
+        IntroduceVarFix(error.Expr.Expression, false, false, true, IntroduceVarFix.introduceVarText)
 
     new (error: MemberIsNotAccessibleError) =
         // todo: method calls: check that values are defined outside lambda
-        IntroduceVarFix(error.RefExpr, true, IntroduceVarFix.introduceVarOutsideLambdaText)
+        IntroduceVarFix(error.RefExpr, false, true, false, IntroduceVarFix.introduceVarOutsideLambdaText)
 
     override x.Text = text
 
@@ -56,7 +59,5 @@ type IntroduceVarFix(expr: IFSharpExpression, escapeLambdas, text) =
 
         base.Execute(solution, textControl)
 
-        let removeExpr = not escapeLambdas
-
         textControl.Selection.SetRange(expr.GetDocumentRange().TextRange)
-        FSharpIntroduceVariable.IntroduceVar(expr, textControl, removeExpr, escapeLambdas)
+        FSharpIntroduceVariable.IntroduceVar(expr, textControl, removeExpr, escapeLambdas, addMutable)
