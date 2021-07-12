@@ -16,28 +16,23 @@ open JetBrains.ReSharper.Psi.XmlIndex
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-type internal FSharpXmlDocHtmlPresenter(theming: ITheming, factory: XmlDocSectionFactory) =
-    inherit XmlDocHtmlPresenter(theming, factory)
+[<SolutionComponent>]
+type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread, psiConfig: IPsiConfiguration,
+        psiModules: IPsiModules, assemblyInfoDatabase: AssemblyInfoDatabase, theming: ITheming, factory: XmlDocSectionFactory) =
 
     static let сrefManager =
         { new CrefManager() with
             member x.Process(cref, _, _, _, _) = XmlDocPresenterUtil.ProcessCref(cref)
             member x.Create _ = null }
 
-    member x.Run(node: XmlNode) =
+    let indexCache = ConcurrentDictionary<string, XmlDocIndex>()
+
+    let formatXmlDoc (node: XmlNode) =
         let result = RichText()
         XmlDocHtmlPresenter
             .ConvertProcessor(node, null, null :> DeclaredElementInstance, false, FSharpLanguage.Instance, сrefManager, factory, theming)
             .AppendTextBody(result, true)
         result
-
-[<SolutionComponent>]
-type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread, psiConfig: IPsiConfiguration,
-        psiModules: IPsiModules, assemblyInfoDatabase: AssemblyInfoDatabase, theming: ITheming, factory: XmlDocSectionFactory) =
-
-    let indexCache = ConcurrentDictionary<string, XmlDocIndex>()
-
-    let xmlDocPresenter = FSharpXmlDocHtmlPresenter(theming, factory)
 
     let getIndex dllFile =
         indexCache.TryGetValue(dllFile)
@@ -87,4 +82,4 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
             let summary = XMLDocUtil.ExtractSummary(xmlNode)
             XmlDocRichTextPresenter.Run(summary, false, FSharpLanguage.Instance)
         else
-            xmlDocPresenter.Run(xmlNode) |> RichTextBlock
+            xmlNode |> formatXmlDoc |> RichTextBlock
