@@ -1,7 +1,8 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 
 open System
-open System.Collections.Generic
+open System.Collections.Concurrent
+open System.Threading
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Core.CompilerServices
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.TcImportsHack
@@ -14,8 +15,8 @@ open JetBrains.Rd.Tasks
 open JetBrains.Rider.FSharp.TypeProviders.Protocol.Client
 
 type internal TypeProvidersCache() =
-    let typeProvidersPerAssembly = Dictionary<_, Dictionary<_, IProxyTypeProvider>>()
-    let proxyTypeProvidersPerId = Dictionary<_, IProxyTypeProvider>()
+    let typeProvidersPerAssembly = ConcurrentDictionary<_, ConcurrentDictionary<_, IProxyTypeProvider>>()
+    let proxyTypeProvidersPerId = ConcurrentDictionary<_, _>()
 
     let rec addTypeProvider envKey (tp: IProxyTypeProvider) =
         let fullName = tp.GetDisplayName(fullName = true)
@@ -27,26 +28,29 @@ type internal TypeProvidersCache() =
                 oldTp.Dispose()
                 addTypeProvider envKey tp
             | false, _ ->
-                assemblyCache.Add(fullName, tp)
-                proxyTypeProvidersPerId.Add(tp.EntityId, tp)
+                assemblyCache.TryAdd(fullName, tp) |> ignore
+                proxyTypeProvidersPerId.TryAdd(tp.EntityId, tp) |> ignore
                 tp.Disposed.Add(fun _ -> removeTypeProvider envKey tp)
         | false, _ ->
-            typeProvidersPerAssembly.Add(envKey, Dictionary())
+            typeProvidersPerAssembly.TryAdd(envKey, ConcurrentDictionary()) |> ignore
             addTypeProvider envKey tp
 
     and removeTypeProvider envKey (tp: IProxyTypeProvider) =
         // Removes types in a unified manner, may also be disposed by FCS.
-        typeProvidersPerAssembly.[envKey].Remove(tp.GetDisplayName(true)) |> ignore
-        proxyTypeProvidersPerId.Remove(tp.EntityId) |> ignore
+        typeProvidersPerAssembly.[envKey].TryRemove(tp.GetDisplayName(true)) |> ignore
+        proxyTypeProvidersPerId.TryRemove(tp.EntityId) |> ignore
 
         if typeProvidersPerAssembly.[envKey].Count = 0 then
-            typeProvidersPerAssembly.Remove(envKey) |> ignore
+            typeProvidersPerAssembly.TryRemove(envKey) |> ignore
 
     member x.Add(envKey, tp) =
         addTypeProvider envKey tp
 
     member x.Get(id) =
-        proxyTypeProvidersPerId.[id]
+        let hasValue = SpinWait.SpinUntil((fun () -> proxyTypeProvidersPerId.ContainsKey id), 15_000)
+
+        if not hasValue then failwith $"Cannot get type provider {id} from TypeProvidersCache"
+        else proxyTypeProvidersPerId.[id]
 
     member x.Dump() =
         let typeProviders =

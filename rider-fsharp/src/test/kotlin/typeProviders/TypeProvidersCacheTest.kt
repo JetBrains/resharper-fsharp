@@ -77,10 +77,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
             withOpenedEditor(project, sourceFile) {
                 waitForDaemon()
                 typeWithLatency("//")
-                waitForDaemon()
-                executeWithGold(testGoldFile) {
-                    dumpTypeProviders(it)
-                }
+                checkTypeProviders()
             }
         }
     }
