@@ -45,6 +45,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp
         ? shim.IsStableFile(path)
         : myFileSystem.IsStableFileHeuristic(path.FullPath);
 
+    public virtual Stream ReadFile(FileSystemPath path) =>
+      myFileSystem is DelegatingFileSystemShim shim
+        ? shim.ReadFile(path)
+        : myFileSystem.FileStreamReadShim(path.FullPath);
+
+    public virtual Stream FileStreamReadShim(string fileName)
+    {
+      var path = FileSystemPath.TryParse(fileName);
+      var stream = path.IsEmpty
+        ? myFileSystem.FileStreamReadShim(fileName)
+        : ReadFile(path);
+
+      myLogger.Trace("Read file: {0}", fileName);
+      return stream;
+    }
+
     public virtual DateTime GetLastWriteTimeShim(string fileName)
     {
       var path = FileSystemPath.TryParse(fileName);
@@ -68,7 +84,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     }
 
     public virtual byte[] ReadAllBytesShim(string fileName) => myFileSystem.ReadAllBytesShim(fileName);
-    public virtual Stream FileStreamReadShim(string fileName) => myFileSystem.FileStreamReadShim(fileName);
     public virtual Stream FileStreamCreateShim(string fileName) => myFileSystem.FileStreamCreateShim(fileName);
     public virtual string GetFullPathShim(string fileName) => myFileSystem.GetFullPathShim(fileName);
     public virtual bool IsPathRootedShim(string path) => myFileSystem.IsPathRootedShim(path);

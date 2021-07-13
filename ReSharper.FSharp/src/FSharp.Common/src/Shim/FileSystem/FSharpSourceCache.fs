@@ -65,16 +65,15 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         | Some v -> source <- v; true
         | _ -> false
 
-    override x.FileStreamReadShim(fileName) =
-        let path = FileSystemPath.TryParse(fileName)
-        if not (isApplicable path) then base.FileStreamReadShim(fileName) else
+    override x.ReadFile(path) =
+        if not (isApplicable path) then base.ReadFile(path) else
 
         match x.TryGetSource(path) with
         | true, source -> new MemoryStream(source.Source) :> Stream
         | _ ->
 
         logger.Trace("Miss: FileStreamReadShim miss: {0}", path)
-        base.FileStreamReadShim(fileName)
+        base.ReadFile(path)
 
     override x.GetLastWriteTime(path) =
         if not (isApplicable path) then base.GetLastWriteTime(path) else
