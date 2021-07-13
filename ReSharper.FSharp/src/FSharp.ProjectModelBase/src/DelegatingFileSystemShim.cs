@@ -1,9 +1,11 @@
 using System;
+using System.IO;
 using FSharp.Compiler.IO;
 using JetBrains.Application.changes;
 using JetBrains.Lifetimes;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
+using Microsoft.FSharp.Core;
 using static FSharp.Compiler.IO.FileSystemAutoOpens;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
@@ -44,6 +46,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       myFileSystem is DelegatingFileSystemShim shim
         ? shim.IsStableFile(path)
         : myFileSystem.IsStableFileHeuristic(path.FullPath);
+
+    public virtual Stream ReadFile(FileSystemPath path, bool useMemoryMappedFile, bool shouldShadowCopy) =>
+      myFileSystem is DelegatingFileSystemShim shim
+        ? shim.ReadFile(path, useMemoryMappedFile, shouldShadowCopy)
+        : myFileSystem.OpenFileForReadShim(path.FullPath, useMemoryMappedFile, shouldShadowCopy);
+
+    public override Stream OpenFileForReadShim(string filePath, FSharpOption<bool> useMemoryMappedFile,
+      FSharpOption<bool> shouldShadowCopy)
+    {
+      // todo: don't set values, fix in FCS
+      var memoryMappedFile = useMemoryMappedFile?.Value ?? false;
+      var shadowCopy = shouldShadowCopy?.Value ?? false;
+
+      var path = FileSystemPath.TryParse(filePath);
+      var stream = path.IsEmpty
+        ? myFileSystem.OpenFileForReadShim(filePath, useMemoryMappedFile, shouldShadowCopy)
+        : ReadFile(path, memoryMappedFile, shadowCopy);
+
+      myLogger.Trace("Read file: {0}", filePath);
+      return stream;
+    }
 
     public override DateTime GetLastWriteTimeShim(string fileName)
     {

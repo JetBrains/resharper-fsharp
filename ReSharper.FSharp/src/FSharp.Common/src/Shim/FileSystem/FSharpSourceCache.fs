@@ -5,7 +5,6 @@ open System.IO
 open System.Collections.Concurrent
 open System.Runtime.InteropServices
 open System.Text
-open FSharp.Compiler.IO
 open JetBrains.Application.changes
 open JetBrains.Diagnostics
 open JetBrains.DocumentManagers
@@ -66,20 +65,15 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         | Some v -> source <- v; true
         | _ -> false
 
-    override x.OpenFileForReadShim(fileName, useMemoryMappedFile, shouldShadowCopy) =
-        // todo: don't set values, fix in FCS
-        let shouldShadowCopy = defaultArg shouldShadowCopy false
-        let useMemoryMappedFile = defaultArg useMemoryMappedFile false
+    override this.ReadFile(path, useMemoryMappedFile, shouldShadowCopy) =
+        if not (isApplicable path) then base.ReadFile(path, useMemoryMappedFile, shouldShadowCopy) else
 
-        let path = FileSystemPath.TryParse(fileName)
-        if not (isApplicable path) then base.OpenFileForReadShim(fileName, useMemoryMappedFile, shouldShadowCopy) else
-
-        match x.TryGetSource(path) with
-        | true, source -> ByteMemory.FromArray(source.Source).AsStream()
+        match this.TryGetSource(path) with
+        | true, source -> new MemoryStream(source.Source) :> _
         | _ ->
 
         logger.Trace("Miss: FileStreamReadShim miss: {0}", path)
-        base.OpenFileForReadShim(fileName, useMemoryMappedFile, shouldShadowCopy)
+        base.ReadFile(path, useMemoryMappedFile, shouldShadowCopy)
 
     override x.GetLastWriteTime(path) =
         if not (isApplicable path) then base.GetLastWriteTime(path) else
