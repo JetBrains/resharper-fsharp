@@ -114,11 +114,10 @@ val pluginFiles = listOf(
         "FSharp.ProjectModelBase/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
         "FSharp.Common/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Common",
         "FSharp.Psi/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi",
-        "FSharp.Psi.Features/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi.Features")
+        "FSharp.Psi.Features/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
+        "FSharp.TypeProvidersProtocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol")
 
 val typeProvidersFiles = listOf(
-        "FSharp.TypeProvidersProtocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.dll",
-        "FSharp.TypeProvidersProtocol/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.pdb",
         "TypeProvidersLoader/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.exe",
         "TypeProvidersLoader/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.pdb",
         "TypeProvidersLoader/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.exe.config",
@@ -206,8 +205,9 @@ configure<RdGenExtension> {
 
 tasks {
     withType<PrepareSandboxTask> {
-        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" } + typeProvidersFiles
+        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
         files = files.map { "$resharperPluginPath/src/$it" }
+        val typeProvidersFiles = typeProvidersFiles.map { "$resharperPluginPath/src/$it" }
 
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {
             val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/bin/$buildConfiguration/net461"
@@ -219,6 +219,10 @@ tasks {
             from(it) { into("${intellij.pluginName}/dotnet") }
         }
 
+        typeProvidersFiles.forEach {
+            from(it) { into("${intellij.pluginName}/typeProviders") }
+        }
+
         into("${intellij.pluginName}/projectTemplates") {
             from("projectTemplates")
         }
@@ -228,6 +232,12 @@ tasks {
                 val file = file(it)
                 if (!file.exists()) throw RuntimeException("File $file does not exist")
                 logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/dotnet")
+            }
+
+            typeProvidersFiles.forEach {
+                val file = file(it)
+                if (!file.exists()) throw RuntimeException("File $file does not exist")
+                logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/typeProviders")
             }
         }
     }
