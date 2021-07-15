@@ -67,19 +67,26 @@ type FSharpLiteralType =
         if tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE then FSharpLiteralType.TripleQuoteInterpolatedStringMiddle else
         if tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END then FSharpLiteralType.TripleQuoteInterpolatedStringEnd else
 
-        failwithf "Token %O is not a string literal" tokenType
+        if tokenType == FSharpTokenType.UNFINISHED_STRING then FSharpLiteralType.RegularString else
+        if tokenType == FSharpTokenType.UNFINISHED_VERBATIM_STRING then FSharpLiteralType.VerbatimString else
+        if tokenType == FSharpTokenType.UNFINISHED_TRIPLE_QUOTED_STRING then FSharpLiteralType.TripleQuoteString else
+        if tokenType == FSharpTokenType.UNFINISHED_REGULAR_INTERPOLATED_STRING then FSharpLiteralType.InterpolatedString else
+        if tokenType == FSharpTokenType.UNFINISHED_VERBATIM_INTERPOLATED_STRING then FSharpLiteralType.VerbatimInterpolatedString else
+        if tokenType == FSharpTokenType.UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING then FSharpLiteralType.TripleQuoteInterpolatedString else
+
+        failwithf $"Token {tokenType} is not a string literal"
 
 
 let private assertStringTokenType (tokenType: TokenNodeType) =
-    if isNull tokenType || not FSharpTokenType.Strings.[tokenType] then
-        failwithf "Got token type: %O" tokenType
+    if not FSharpTokenType.Strings.[tokenType] then
+        failwithf $"Got token type: {tokenType}"
 
 
 let getStringEndingQuote tokenType =
     assertStringTokenType tokenType
     if tokenType == FSharpTokenType.CHARACTER_LITERAL then '\'' else '\"'
 
-let getStringEndingQuotesOffset (tokenType: TokenNodeType) =
+let getStringEndingQuotesLength (tokenType: TokenNodeType) =
     assertStringTokenType tokenType
 
     match tokenType.GetLiteralType() with
@@ -95,7 +102,7 @@ let getStringEndingQuotesOffset (tokenType: TokenNodeType) =
     | TripleQuoteInterpolatedStringEnd -> 3
     | ByteArray
     | VerbatimByteArray -> 2
-    | literalType -> failwithf "Unexpected string literal %O" literalType
+    | _ -> 0
 
 
 let emptyString = "\"\""

@@ -1314,7 +1314,9 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         let skipEndQuote (lexer: CachingLexer) =
             typedChar = getStringEndingQuote lexer.TokenType &&
-            offset >= lexer.TokenEnd - getStringEndingQuotesOffset lexer.TokenType
+
+            let endingQuotesLength = getStringEndingQuotesLength lexer.TokenType
+            endingQuotesLength > 0 && offset >= lexer.TokenEnd - endingQuotesLength
 
         let skipEscapedQuoteInVerbatim (lexer: CachingLexer) =
             lexer.TokenType == FSharpTokenType.VERBATIM_STRING && typedChar = '\"' // todo: isv

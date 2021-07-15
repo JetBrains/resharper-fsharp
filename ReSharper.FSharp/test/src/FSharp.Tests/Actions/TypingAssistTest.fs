@@ -198,6 +198,8 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``Quotes - Adding third quote``() = x.DoNamedTest()
 
+    [<Test>] member x.``Quotes - Pair quotes - Triple quote 01``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes - Triple quote 02 - Interpolated``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 01 - Before code``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 02 - Insert pair``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 03 - Insert pair inside string``() = x.DoNamedTest()
