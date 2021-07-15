@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       TypeReferenceCanBeUnionCaseDeclaration(NamedTypeReferenceName);
 
     private static bool TypeReferenceCanBeUnionCaseDeclaration(IReferenceName referenceName) =>
-      referenceName is { Qualifier: null } && referenceName.TypeArgumentList == null;
+      referenceName is { Identifier: { }, Qualifier: null, TypeArgumentList: null };
 
     public bool HasFields => false;
     public FSharpUnionCaseClass NestedType => null;
