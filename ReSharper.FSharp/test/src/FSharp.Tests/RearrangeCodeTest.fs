@@ -47,6 +47,8 @@ type RearrangeCodeTest() =
     [<Test>] member x.``Field - Union case - Separate line 01``() = x.DoNamedTest()
     [<Test>] member x.``Field - Union case - Separate line 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Match clause - Last - Down - Not applicable - Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match clause - Last - Down - Not applicable - Seq 01``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - Last - Down 01``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - Last - Down 02 - Multiline``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Match clause - Last - Down 03 - Lambda body``() = x.DoNamedTest()

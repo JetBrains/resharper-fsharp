@@ -269,6 +269,15 @@ type RearrangeableMatchClause(matchClause: IMatchClause, matchExpr: IMatchLikeEx
 
         match isLastClause matchClause, matchClause.Expression, missingIndent matchClause, direction with
         | true, NotNull expr, _, Direction.Down ->
+            let seqExpr = SequentialExprNavigator.GetByExpression(matchExpr)
+            let seqExprs = if isNotNull seqExpr then seqExpr.Expressions else TreeNodeCollection.Empty
+            if not seqExprs.IsEmpty && matchExpr != seqExprs.LastOrDefault() then false else
+
+            let matchExprStmt = ExpressionStatementNavigator.GetByExpression(matchExpr)
+            let moduleDecl = ModuleDeclarationNavigator.GetByMember(matchExprStmt)
+            let moduleMembers = if isNotNull moduleDecl then moduleDecl.Members else TreeNodeCollection.Empty
+            if not moduleMembers.IsEmpty && matchExprStmt != moduleMembers.LastOrDefault() then false else
+
             let arrow = matchClause.RArrow
             isNotNull arrow && arrow.StartLine.Plus1() >= expr.StartLine
         | true, NotNull _, true, Direction.Up -> true
