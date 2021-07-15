@@ -11,6 +11,7 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Tasks
 open JetBrains.Rd.Tasks
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
@@ -23,12 +24,12 @@ type IProxyExtensionTypingProvider =
 
     abstract RuntimeVersion: unit -> string
     abstract DumpTypeProvidersProcess: unit -> string
+    abstract TerminateConnection: unit -> unit
 
 [<SolutionComponent>]
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         experimentalFeatures: FSharpExperimentalFeaturesProvider,
         checkerService: FcsCheckerService, daemon: IDaemon, psiFiles: IPsiFiles,
-        scheduler: ISolutionLoadTasksScheduler,
         typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory) as this =
     let lifetime = solution.GetLifetime()
     let defaultShim = ExtensionTypingProvider
@@ -137,5 +138,4 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
 
             $"{inProcessDump}\n\n{outOfProcessDump}"
 
-    interface IDisposable with
-        member this.Dispose() = terminateConnection ()
+        member this.TerminateConnection() = terminateConnection()

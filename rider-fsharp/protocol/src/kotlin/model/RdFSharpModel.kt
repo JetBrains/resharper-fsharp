@@ -51,6 +51,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         call("dumpSingleProjectLocalReferences", void, immutableList(string))
         call("typeProvidersRuntimeVersion", void, string.nullable)
         call("dumpTypeProvidersProcess", void, string)
+        call("killTypeProvidersProcess", void, void)
     }
 
     private val RdFSharpTypeProvidersHost = aggregatedef("RdFSharpTypeProvidersHost") {

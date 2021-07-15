@@ -2,6 +2,7 @@
 
 open System
 open System.Collections.Concurrent
+open System.Collections.Generic
 open System.Threading
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Core.CompilerServices

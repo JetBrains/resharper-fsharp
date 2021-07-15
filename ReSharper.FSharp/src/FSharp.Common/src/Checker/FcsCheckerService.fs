@@ -146,8 +146,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             |> Seq.iter x.InvalidateFcsProject
 
     member x.InvalidateFcsProjects(solution: ISolution, isApplicable: IProject -> bool) =
-        use lock = ReadLockCookie.Create()
         if checker.IsValueCreated then
+            use lock = ReadLockCookie.Create()
             solution.GetAllProjects()
             |> Seq.filter isApplicable
             |> Seq.iter x.InvalidateFcsProject

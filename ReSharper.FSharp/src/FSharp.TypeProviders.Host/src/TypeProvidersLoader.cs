@@ -26,10 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     private readonly ILogger myLogger;
     private readonly Dictionary<string, string> myShadowCopyMapping = new Dictionary<string, string>();
 
-    public TypeProvidersLoader(ILogger logger)
-    {
-      myLogger = logger;
-    }
+    public TypeProvidersLoader(ILogger logger) => myLogger = logger;
 
     private readonly FSharpFunc<TypeProviderError, Unit> myLogError =
       FSharpFunc<TypeProviderError, Unit>.FromConverter(e =>
@@ -56,7 +53,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
       var systemRuntimeAssemblyVersion = Version.Parse(parameters.SystemRuntimeAssemblyVersion);
       var compilerToolsPath = ListModule.OfSeq(parameters.CompilerToolsPath);
 
-      // todo: comment
+      // We assume that to check the type provider, its developer will reference the type provider design-time assembly in the project.
+      // In this case, RunTimeAssemblyFileName will be the same as DesignTimeAssemblyNameString.
       var designTimeAssembly = parameters.ShadowCopyDesignTimeAssembly
         ? GetAssemblyShadowCopy(parameters.RunTimeAssemblyFileName)
         : parameters.DesignTimeAssemblyNameString;

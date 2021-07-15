@@ -59,6 +59,10 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
         CultureInfo.CurrentUICulture <- newCulture
         currentCulture.Name
 
+    let killTypeProvidersProcess _ =
+        solution.GetComponent<IProxyExtensionTypingProvider>().TerminateConnection()
+        JetBrains.Core.Unit.Instance
+
     do
         let fsTestHost = solution.RdFSharpModel().FsharpTestHost
 
@@ -69,3 +73,4 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
         fsTestHost.TypeProvidersRuntimeVersion.Set(typeProvidersRuntimeVersion)
         fsTestHost.DumpTypeProvidersProcess.Set(dumpTypeProvidersProcess)
         fsTestHost.GetCultureInfoAndSetNew.Set(getCultureInfoAndSetNew)
+        fsTestHost.KillTypeProvidersProcess.Set(killTypeProvidersProcess)
