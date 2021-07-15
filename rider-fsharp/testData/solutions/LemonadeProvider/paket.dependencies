@@ -1,0 +1,9 @@
+storage: packages
+source https://nuget.org/api/v2
+
+frameworks: net461
+
+nuget FSharp.Core 4.3.4
+
+github fsprojects/FSharp.TypeProviders.SDK:f4aca36af04aa84b16ec04df6f6bf55ac2f17a73 src/ProvidedTypes.fsi
+github fsprojects/FSharp.TypeProviders.SDK:f4aca36af04aa84b16ec04df6f6bf55ac2f17a73 src/ProvidedTypes.fs

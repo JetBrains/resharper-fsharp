@@ -1,0 +1,9 @@
+STORAGE: PACKAGES
+RESTRICTION: == net461
+NUGET
+  remote: https://www.nuget.org/api/v2
+    FSharp.Core (4.3.4)
+GITHUB
+  remote: fsprojects/FSharp.TypeProviders.SDK
+    src/ProvidedTypes.fs (f4aca36af04aa84b16ec04df6f6bf55ac2f17a73)
+    src/ProvidedTypes.fsi (f4aca36af04aa84b16ec04df6f6bf55ac2f17a73)

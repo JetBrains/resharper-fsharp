@@ -111,8 +111,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
       return new InstantiationResult(rdTypeProviders.ToArray(), cachedIds.ToArray());
     }
 
-    private static Unit Die(Unit _)
+    private Unit Die(Unit _)
     {
+      myTypeProvidersContext.TypeProvidersLoader.Dispose();
       Environment.Exit(0);
       return Unit.Instance;
     }

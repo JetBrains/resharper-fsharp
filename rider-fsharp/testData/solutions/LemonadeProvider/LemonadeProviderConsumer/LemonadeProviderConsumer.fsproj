@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net461</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Library.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="LemonadeProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\LemonadeProvider.DesignTime\bin\Debug\net461\LemonadeProvider.DesignTime.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

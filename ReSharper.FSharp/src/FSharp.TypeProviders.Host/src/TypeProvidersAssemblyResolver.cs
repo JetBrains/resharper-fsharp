@@ -5,12 +5,12 @@ using System.Reflection;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
 {
-  public static class RiderPluginAssemblyResolver
+  public static class TypeProvidersAssemblyResolver
   {
     private const string AdditionalProbingPathsEnvVar = "RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS";
     private static readonly List<string> OurAdditionalProbingPaths = new List<string>();
 
-    static RiderPluginAssemblyResolver()
+    static TypeProvidersAssemblyResolver()
     {
       var paths = Environment.GetEnvironmentVariable(AdditionalProbingPathsEnvVar);
       if (string.IsNullOrWhiteSpace(paths)) return;

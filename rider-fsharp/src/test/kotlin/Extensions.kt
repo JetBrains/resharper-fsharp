@@ -17,17 +17,19 @@ fun com.intellij.openapi.editor.Editor.dumpTypeProviders(stream: PrintStream) {
     }
 }
 
-fun withSetting(project: Project, setting: String, function: () -> Unit) {
-    TestHost.getInstance(project.protocolHost).setSetting(setting, "true")
+fun withSettings(project: Project, settings: List<String>, function: () -> Unit) {
+    settings.forEach { TestHost.getInstance(project.protocolHost).setSetting(it, "true") }
     try {
         function()
     } finally {
-        TestHost.getInstance(project.protocolHost).setSetting(setting, "false")
+        settings.forEach { TestHost.getInstance(project.protocolHost).setSetting(it, "false") }
     }
 }
 
-fun BaseTestWithSolution.withTypeProviders(function: () -> Unit) {
-    withSetting(project, "FSharp/FSharpOptions/FSharpExperimentalFeatures/OutOfProcessTypeProviders/@EntryValue") {
+fun BaseTestWithSolution.withTypeProviders(shadowCopyMode: Boolean = false, function: () -> Unit) {
+    val settings = mutableListOf("FSharp/FSharpOptions/FSharpExperimentalFeatures/OutOfProcessTypeProviders/@EntryValue")
+    if (shadowCopyMode) settings.add("FSharp/FSharpOptions/FSharpExperimentalFeatures/HostTypeProvidersFromTempFolder/@EntryValue")
+    withSettings(project, settings) {
         try {
             function()
         } finally {
@@ -40,7 +42,7 @@ fun BaseTestWithSolution.withTypeProviders(function: () -> Unit) {
 }
 
 fun withEditorConfig(project: Project, function: () -> Unit) {
-    withSetting(project, "CodeStyle/EditorConfig/EnableEditorConfigSupport", function)
+    withSettings(project, listOf("CodeStyle/EditorConfig/EnableEditorConfigSupport"), function)
 }
 
 fun withCultureInfo(project: Project, culture: String, function: () -> Unit) {
