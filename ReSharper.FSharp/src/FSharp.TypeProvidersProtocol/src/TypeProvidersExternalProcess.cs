@@ -23,6 +23,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
     private Lifetime myLifetime;
     protected override string Name => "Out-of-Process TypeProviders";
 
+    private static readonly FileSystemPath TypeProvidersDirectory =
+      typeof(TypeProvidersExternalProcess).Assembly.GetPath().Directory.Parent / "typeProviders";
+
     protected override RdFSharpTypeProvidersLoaderModel CreateModel(Lifetime lifetime, IProtocol protocol) =>
       new RdFSharpTypeProvidersLoaderModel(lifetime, protocol);
 
@@ -35,14 +38,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
         processUnexpectedExited);
     }
 
-    protected override ProcessStartInfo GetProcessStartInfo(int port)
-    {
-      var basePath = GetType().Assembly.GetPath().Directory;
-
-      return myRequest.RuntimeType == JetProcessRuntimeType.DotNetCore
-        ? GetCoreProcessStartInfo(port, basePath)
-        : GetFrameworkProcessStartInfo(port, basePath);
-    }
+    protected override ProcessStartInfo GetProcessStartInfo(int port) =>
+      myRequest.RuntimeType == JetProcessRuntimeType.DotNetCore
+        ? GetCoreProcessStartInfo(port, TypeProvidersDirectory)
+        : GetFrameworkProcessStartInfo(port, TypeProvidersDirectory);
 
     private ProcessStartInfo GetCoreProcessStartInfo(int port, FileSystemPath basePath)
     {
