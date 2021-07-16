@@ -260,6 +260,12 @@ public interface FSharpTokenType {
             UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING
     );
 
+    TokenSet INTERPOLATED_STRING_ENDS = TokenSet.create(
+            REGULAR_INTERPOLATED_STRING_END,
+            VERBATIM_INTERPOLATED_STRING_END,
+            TRIPLE_QUOTE_INTERPOLATED_STRING_END
+    );
+
     TokenSet COMMENTS = TokenSet.create(
             SHEBANG,
             BLOCK_COMMENT

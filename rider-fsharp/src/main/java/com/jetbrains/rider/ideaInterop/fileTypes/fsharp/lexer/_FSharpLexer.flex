@@ -31,12 +31,12 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 
 %{
 
-  private int myNestedCommentLevel;
-  private int myParenLevel;
-  private int myTokenLength;
-  private int myBrackLevel;
+  public int myNestedCommentLevel;
+  public int myParenLevel;
+  public int myTokenLength;
+  public int myBrackLevel;
 
-  private Stack<FSharpLexerInterpolatedStringState> myInterpolatedStringStates = new Stack<>();
+  public Stack<FSharpLexerInterpolatedStringState> myInterpolatedStringStates = new Stack<>();
 
 %}
 
