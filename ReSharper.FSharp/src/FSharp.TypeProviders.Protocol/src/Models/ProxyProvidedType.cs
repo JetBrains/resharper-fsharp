@@ -268,11 +268,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
       foreach (var ilTypeRef in lookupIlTypeRef)
         if (!newLookupIlTypeRef.ContainsKey(ilTypeRef.Key))
-          newLookupIlTypeRef.Add(ilTypeRef.Key, ilTypeRef.Value);
+          newLookupIlTypeRef.TryAdd(ilTypeRef.Key, ilTypeRef.Value);
 
       foreach (var tyconRef in lookupTyconRef)
         if (!newLookupTyconRef.ContainsKey(tyconRef.Key))
-          newLookupTyconRef.Add(tyconRef.Key, tyconRef.Value);
+          newLookupTyconRef.TryAdd(tyconRef.Key, tyconRef.Value);
 
       myContext.Context = context;
       return this;
