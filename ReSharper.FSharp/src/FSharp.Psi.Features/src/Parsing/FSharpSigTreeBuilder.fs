@@ -7,8 +7,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
-type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
-    inherit FSharpTreeBuilderBase(sourceFile, lexer, lifetime)
+type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
+    inherit FSharpTreeBuilderBase(sourceFile, lexer, lifetime, path)
 
     override x.CreateFSharpFile() =
         let mark = x.Mark()

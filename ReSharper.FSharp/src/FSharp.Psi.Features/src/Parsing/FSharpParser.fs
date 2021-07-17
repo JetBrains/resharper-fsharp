@@ -21,12 +21,12 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
         Option.map (fun (parseResults: FSharpParseFileResults) ->
             match parseResults.ParseTree  with
             | ParsedInput.ImplFile(ParsedImplFileInput(modules = decls)) ->
-                FSharpImplTreeBuilder(lexer, document, decls, lifetime) :> FSharpTreeBuilderBase
+                FSharpImplTreeBuilder(lexer, document, decls, lifetime, path) :> FSharpTreeBuilderBase
             | ParsedInput.SigFile(ParsedSigFileInput(modules = sigs)) ->
-                FSharpSigTreeBuilder(lexer, document, sigs, lifetime) :> FSharpTreeBuilderBase)
+                FSharpSigTreeBuilder(lexer, document, sigs, lifetime, path) :> FSharpTreeBuilderBase)
 
     let createFakeBuilder lexer lifetime =
-        { new FSharpTreeBuilderBase(lexer, document, lifetime) with
+        { new FSharpTreeBuilderBase(lexer, document, lifetime, path) with
             override x.CreateFSharpFile() =
                 x.FinishFile(x.Mark(), ElementType.F_SHARP_IMPL_FILE) }
 
@@ -89,7 +89,7 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
             Lifetime.Using(fun lifetime ->
                 // todo: cover error cases where fsImplFile or multiple expressions may be returned
                 let treeBuilder =
-                    FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lineShift)
+                    FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffset, lineShift)
 
                 treeBuilder.ProcessTopLevelExpression(chameleonExpr.SynExpr)
                 treeBuilder.GetTreeNode()) :?> IFSharpExpression

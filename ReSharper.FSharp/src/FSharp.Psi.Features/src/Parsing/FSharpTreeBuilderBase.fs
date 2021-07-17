@@ -4,6 +4,8 @@ open System.Collections.Generic
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Text
 open FSharp.Compiler.Xml
+open JetBrains.Application.Environment
+open JetBrains.Application.Environment.Helpers
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
@@ -15,9 +17,10 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.TreeBuilder
+open JetBrains.ReSharper.Resources.Shell
 
 [<AbstractClass>]
-type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset, lineShift) =
+type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: FileSystemPath, projectedOffset, lineShift) =
     inherit TreeBuilderBase(lifetime, lexer)
 
     // FCS ranges are 1-based.
@@ -30,8 +33,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     let getLineOffset line =
         lineOffsets.[line + lineShift]
 
-    new (sourceFile, lexer, lifetime) =
-        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0, 0)
+    new (sourceFile, lexer, lifetime, path) =
+        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, path, 0, 0)
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 
@@ -856,9 +859,16 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
     member x.MarkChameleonExpression(expr: SynExpr) =
         let ExprRange range as expr = x.FixExpression(expr)
 
+        let isInternalMode () =
+            let productConfigurations = Shell.Instance.GetComponent<RunsProducts.ProductConfigurations>()
+            productConfigurations.IsInternalMode()
+
+        let dumpFileContent () =
+            if isInternalMode () then $"\nContent: {document.GetText()}" else ""
+
         let startOffset = x.GetStartOffset(range)
         let mark = x.Mark(startOffset)
-        Assertion.Assert(x.CurrentOffset = startOffset, "x.CurrentOffset = startOffset")
+        Assertion.Assert(x.CurrentOffset = startOffset, $"Can't convert FCS tree expression in {path} at {range}.{dumpFileContent ()}")
 
         // Replace all tokens with single chameleon token.
         let tokenMark = x.Mark(range)

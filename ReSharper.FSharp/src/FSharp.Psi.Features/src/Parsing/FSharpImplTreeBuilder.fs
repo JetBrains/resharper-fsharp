@@ -11,8 +11,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
-type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, lineShift) =
-    inherit FSharpTreeBuilderBase(lexer, document, lifetime, projectedOffset, lineShift)
+type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffset, lineShift) =
+    inherit FSharpTreeBuilderBase(lexer, document, lifetime, path, projectedOffset, lineShift)
 
     /// FCS splits some declarations into separate fake ones:
     ///   * property declaration when both getter and setter bodies are present
@@ -20,8 +20,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
     let mutable unfinishedDeclaration: (int * range * CompositeNodeType) option = None
     let mutable isFinishingDeclaration = false
 
-    new (lexer, document, decls, lifetime) =
-        FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0, 0)
+    new (lexer, document, decls, lifetime, path) =
+        FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, 0, 0)
 
     override x.CreateFSharpFile() =
         let mark = x.Mark()
@@ -641,8 +641,8 @@ and IBuilderStepProcessor =
     abstract Process: step: obj * builder: FSharpExpressionTreeBuilder -> unit
 
 
-type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lineShift) =
-    inherit FSharpImplTreeBuilder(lexer, document, [], lifetime, projectedOffset, lineShift)
+type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffset, lineShift) =
+    inherit FSharpImplTreeBuilder(lexer, document, [], lifetime, path, projectedOffset, lineShift)
 
     let nextSteps = Stack<BuilderStep>()
 
