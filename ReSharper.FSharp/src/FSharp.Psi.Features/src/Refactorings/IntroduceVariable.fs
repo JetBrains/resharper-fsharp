@@ -499,7 +499,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let workflow = FSharpIntroduceVariableWorkflow(solution, escapeLambdas, addMutable)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
-    static member CanIntroduceVar(expr: IFSharpExpression) =
+    static member CanIntroduceVar(expr: IFSharpExpression, checkRefExprElementResolved: bool) =
         if not (isValid expr) || expr.IsFSharpSigFile() then false else
 
         let rec isAllowedExpr (expr: IFSharpExpression) =
@@ -512,8 +512,16 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
                 if PrettyNaming.IsOperatorName shortName then false else
 
-                let declaredElement = refExpr.Reference.Resolve().DeclaredElement
-                not (declaredElement :? ITypeElement || declaredElement :? INamespace)
+                // todo: always check
+                if not checkRefExprElementResolved then
+                    let declaredElement = refExpr.Reference.Resolve().DeclaredElement
+                    not (declaredElement :? ITypeElement || declaredElement :? INamespace)
+                else
+                    let element = refExpr.Reference.Resolve().DeclaredElement
+                    if isNull element || element :? ITypeElement || element :? INamespace then false else
+
+                    let qualifierReference = refExpr.QualifierReference
+                    isNull qualifierReference || isNotNull (qualifierReference.Resolve().DeclaredElement)
 
             | :? IParenExpr as parenExpr ->
                 isNull (NewExprNavigator.GetByArgumentExpression(expr)) &&
@@ -554,4 +562,4 @@ type FSharpIntroduceVarHelper() =
     override x.IsLanguageSupported = true
 
     override x.CheckAvailability(node) =
-        FSharpIntroduceVariable.CanIntroduceVar(node.As<IFSharpExpression>())
+        FSharpIntroduceVariable.CanIntroduceVar(node.As<IFSharpExpression>(), false)

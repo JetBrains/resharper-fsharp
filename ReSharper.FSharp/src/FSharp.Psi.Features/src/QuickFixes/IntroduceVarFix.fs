@@ -41,7 +41,7 @@ type IntroduceVarFix(expr: IFSharpExpression, removeExpr, escapeLambdas, addMuta
     override x.Text = text
 
     override x.IsAvailable _ =
-        FSharpIntroduceVariable.CanIntroduceVar(expr)
+        FSharpIntroduceVariable.CanIntroduceVar(expr, false)
 
     member x.SelectExpression(solution, textControl) =
         let innerExpression = suggestInnerExpression expr
