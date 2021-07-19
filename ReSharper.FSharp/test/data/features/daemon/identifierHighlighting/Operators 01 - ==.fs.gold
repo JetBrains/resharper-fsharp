@@ -10,21 +10,21 @@ module |Id|(4) =
     |``op_EqualsEquals``|(7)
 
 module |ParamsOp|(8) =
-    let (|==|(9)) |_|(10) |_|(11) = ()
-    1 |==|(12) 2
-    |op_EqualsEquals|(13) 1 2
-    |``op_EqualsEquals``|(14) 1 2
+    let (|==|(9)) _ _ = ()
+    1 |==|(10) 2
+    |op_EqualsEquals|(11) 1 2
+    |``op_EqualsEquals``|(12) 1 2
 
-module |ParamsIdent|(15) =
-    let |op_EqualsEquals|(16) |_|(17) |_|(18) = ()
-    1 |==|(19) 2
-    |op_EqualsEquals|(20) 1 2
-    |``op_EqualsEquals``|(21) 1 2
+module |ParamsIdent|(13) =
+    let |op_EqualsEquals|(14) _ _ = ()
+    1 |==|(15) 2
+    |op_EqualsEquals|(16) 1 2
+    |``op_EqualsEquals``|(17) 1 2
 
-module |ModuleQualifier|(22) =
-    let _ = |Op|(23).(|==|(24))
-    let _ = |Op|(25).|op_EqualsEquals|(26)
-    let _ = |Op|(27).|``op_EqualsEquals``|(28)
+module |ModuleQualifier|(18) =
+    let _ = |Op|(19).(|==|(20))
+    let _ = |Op|(21).|op_EqualsEquals|(22)
+    let _ = |Op|(23).|``op_EqualsEquals``|(24)
 
 ---------------------------------------------------------
 (0): ReSharper F# Module Identifier: 
@@ -37,22 +37,18 @@ module |ModuleQualifier|(22) =
 (7): ReSharper F# Operator Identifier: 
 (8): ReSharper F# Module Identifier: 
 (9): ReSharper F# Operator Identifier: 
-(10): ReSharper F# Value Identifier: 
-(11): ReSharper F# Value Identifier: 
+(10): ReSharper F# Operator Identifier: 
+(11): ReSharper F# Operator Identifier: 
 (12): ReSharper F# Operator Identifier: 
-(13): ReSharper F# Operator Identifier: 
+(13): ReSharper F# Module Identifier: 
 (14): ReSharper F# Operator Identifier: 
-(15): ReSharper F# Module Identifier: 
+(15): ReSharper F# Operator Identifier: 
 (16): ReSharper F# Operator Identifier: 
-(17): ReSharper F# Value Identifier: 
-(18): ReSharper F# Value Identifier: 
-(19): ReSharper F# Operator Identifier: 
+(17): ReSharper F# Operator Identifier: 
+(18): ReSharper F# Module Identifier: 
+(19): ReSharper F# Module Identifier: 
 (20): ReSharper F# Operator Identifier: 
-(21): ReSharper F# Operator Identifier: 
-(22): ReSharper F# Module Identifier: 
+(21): ReSharper F# Module Identifier: 
+(22): ReSharper F# Operator Identifier: 
 (23): ReSharper F# Module Identifier: 
 (24): ReSharper F# Operator Identifier: 
-(25): ReSharper F# Module Identifier: 
-(26): ReSharper F# Operator Identifier: 
-(27): ReSharper F# Module Identifier: 
-(28): ReSharper F# Operator Identifier: 

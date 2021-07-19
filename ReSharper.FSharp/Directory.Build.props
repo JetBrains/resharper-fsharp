@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FSharpCompilerServiceVersion>2021.2.3</FSharpCompilerServiceVersion>
-    <FSharpCoreVersion>5.0.1</FSharpCoreVersion>
+    <FSharpCompilerServiceVersion>2021.2.4</FSharpCompilerServiceVersion>
+    <FSharpCoreVersion>5.0.2</FSharpCoreVersion>
   </PropertyGroup>
 
   <PropertyGroup>
