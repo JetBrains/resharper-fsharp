@@ -13,7 +13,7 @@ import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
-import withTypeProviders
+import withOutOfProcessTypeProviders
 
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
@@ -26,7 +26,7 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
     fun enableTypeProvidersSetting() {
         val sourceFile = "TypeProviderLibrary/Library.fs"
 
-        withTypeProviders {
+        withOutOfProcessTypeProviders {
             withOpenedEditor(project, sourceFile) {
                 waitForDaemon()
                 rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()
@@ -46,7 +46,7 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
         unloadAllProjects()
         reloadAllProjects(project)
 
-        withTypeProviders {
+        withOutOfProcessTypeProviders {
             withOpenedEditor(project, sourceFile) {
                 waitForDaemon()
                 rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()

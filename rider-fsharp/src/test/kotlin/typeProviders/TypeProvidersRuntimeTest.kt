@@ -14,7 +14,7 @@ import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.scriptingApi.markupAdapter
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
-import withTypeProviders
+import withOutOfProcessTypeProviders
 
 @Test
 class TypeProvidersRuntimeTest : BaseTestWithSolution() {
@@ -55,7 +55,7 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
     fun fsc() = doTest(".NET Framework 4.8")
 
     private fun doTest(expectedRuntime: String) {
-        withTypeProviders {
+        withOutOfProcessTypeProviders {
             withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
                 waitForDaemon()
                 rdFcsHost.typeProvidersRuntimeVersion.sync(Unit)

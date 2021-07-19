@@ -9,7 +9,7 @@ import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.scriptingApi.dumpSevereHighlighters
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
-import withTypeProviders
+import withOutOfProcessTypeProviders
 
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
@@ -34,7 +34,7 @@ class TypeProvidersTest : BaseTestWithSolution() {
     fun legacyTypeProviders() = doTest("LegacyTypeProviders")
 
     private fun doTest(fileName: String) {
-        withTypeProviders {
+        withOutOfProcessTypeProviders {
             withOpenedEditor(project, "TypeProviderLibrary/$fileName.fs") {
                 waitForDaemon()
                 executeWithGold(testGoldFile) {

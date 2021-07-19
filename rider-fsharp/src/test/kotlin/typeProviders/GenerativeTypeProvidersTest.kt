@@ -14,7 +14,7 @@ import com.jetbrains.rider.test.scriptingApi.markupAdapter
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
-import withTypeProviders
+import withOutOfProcessTypeProviders
 
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
@@ -23,7 +23,7 @@ class GenerativeTypeProvidersTest: BaseTestWithSolution() {
 
     @Test
     fun `generative type providers cross-project analysis`() {
-        withTypeProviders {
+        withOutOfProcessTypeProviders {
             withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
                 waitForDaemon()
                 markupAdapter.hasErrors.shouldBeTrue()
