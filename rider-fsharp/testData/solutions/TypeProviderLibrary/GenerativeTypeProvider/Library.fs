@@ -1,0 +1,5 @@
+﻿namespace GenerativeTypeProvider
+
+open SimpleGenerativeProviderNamespace
+
+type SimpleGenerativeTypeAbbr = SimpleGenerativeType

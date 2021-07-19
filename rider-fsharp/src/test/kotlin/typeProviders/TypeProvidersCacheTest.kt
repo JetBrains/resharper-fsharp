@@ -13,7 +13,7 @@ import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import dumpTypeProviders
 import org.testng.annotations.Test
-import withTypeProviders
+import withOutOfProcessTypeProviders
 import java.io.File
 
 @Test
@@ -34,7 +34,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
 
     @Test
     fun checkCachesBeforeAndAfterReloading() {
-        withTypeProviders {
+        withOutOfProcessTypeProviders {
             checkTypeProviders()
 
             unloadAllProjects()
@@ -44,11 +44,11 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     fun invalidation() {
         val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
 
-        withTypeProviders {
+        withOutOfProcessTypeProviders {
             withOpenedEditor(project, sourceFile) {
                 waitForDaemon()
 
@@ -73,7 +73,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
 
     @Test
     fun typing() {
-        withTypeProviders {
+        withOutOfProcessTypeProviders {
             withOpenedEditor(project, sourceFile) {
                 waitForDaemon()
                 typeWithLatency("//")

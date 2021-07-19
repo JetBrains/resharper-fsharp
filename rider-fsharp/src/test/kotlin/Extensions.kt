@@ -26,7 +26,7 @@ fun withSetting(project: Project, setting: String, function: () -> Unit) {
     }
 }
 
-fun BaseTestWithSolution.withTypeProviders(function: () -> Unit) {
+fun BaseTestWithSolution.withOutOfProcessTypeProviders(function: () -> Unit) {
     withSetting(project, "FSharp/FSharpOptions/FSharpExperimentalFeatures/OutOfProcessTypeProviders/@EntryValue") {
         try {
             function()
