@@ -44,7 +44,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     fun invalidation() {
         val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
 

@@ -23,7 +23,7 @@
 
     <ItemGroup>
       <Reference Include="TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae">
-        <HintPath>libs\TestTypeProviders.dll</HintPath>
+        <HintPath>..\libs\TestTypeProviders.dll</HintPath>
       </Reference>
     </ItemGroup>
 
