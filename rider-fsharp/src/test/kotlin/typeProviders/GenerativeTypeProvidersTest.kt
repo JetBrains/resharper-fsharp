@@ -11,7 +11,6 @@ import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.scriptingApi.buildSelectedProjectsWithReSharperBuild
 import com.jetbrains.rider.test.scriptingApi.markupAdapter
-import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 import withOutOfProcessTypeProviders
@@ -30,8 +29,6 @@ class GenerativeTypeProvidersTest: BaseTestWithSolution() {
 
                 buildSelectedProjectsWithReSharperBuild(listOf("${project!!.solutionDirectoryPath}/GenerativeTypeProvider/GenerativeTypeProvider.fsproj"))
 
-                waitForDaemon()
-                typeWithLatency("//")
                 waitForDaemon()
                 markupAdapter.hasErrors.shouldBeFalse()
             }
