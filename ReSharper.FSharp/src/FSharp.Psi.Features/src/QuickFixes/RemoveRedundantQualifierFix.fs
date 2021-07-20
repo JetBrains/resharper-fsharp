@@ -46,8 +46,11 @@ type RemoveRedundantQualifierFix(warning: RedundantQualifierWarning) =
                 match highlightingInfo.Highlighting.As<RedundantQualifierWarning>() with
                 | null -> ()
                 | warning ->
-                    let clause = warning.TreeNode
-                    use writeLock = WriteLockCookie.Create(clause.IsPhysical())
-                    removeQualifiers clause
+
+                let qualifier = warning.TreeNode
+                if not (isValid qualifier) then () else
+
+                use writeLock = WriteLockCookie.Create(qualifier.IsPhysical())
+                removeQualifiers qualifier
 
             null
