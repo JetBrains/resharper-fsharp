@@ -311,6 +311,11 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
 
         checkPrecedence context expr
 
+    | :? IIndexerExpr as indexerExpr ->
+        isNotNull (AppExprNavigator.GetByArgument(context)) && getFirstQualifier indexerExpr :? IAppExpr ||
+
+        checkPrecedence context expr
+    
     | :? ITypedLikeExpr ->
         expr :? ITypedExpr && isNotNull (BinaryAppExprNavigator.GetByLeftArgument(context)) ||
 

@@ -1,0 +1,19 @@
+﻿let f () = ""
+
+type System.String with
+    member this.Id = this
+
+|(|(0)"".[0]|)|(1)
+ignore |(|(2)"".[0]|)|(3)
+ignore (f().[0])
+ignore (f().Id.[0])
+ignore (f().Id.Id.[0])
+ignore |(|(4)(f()).[0]|)|(5)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
