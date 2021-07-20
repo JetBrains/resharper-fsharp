@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Diagnostic
 open System
 open System.Collections.Generic
 open JetBrains.Application
+open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Diagnostic
 open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic
@@ -13,16 +14,14 @@ open JetBrains.Util
 [<ShellComponent>]
 type FSharpProjectLoadTargetsAnalyzer() =
      interface IMsBuildProjectLoadDiagnosticProvider with
-         member x.CollectDiagnostic(_, _, result) =
+         member x.CollectDiagnostic(projectMark, _, result) =
              match result.FatalError with
              | error when isNotNull error && error.PresentableText.Contains("Microsoft.FSharp.Targets") ->
-                 FSharpTargetsDiagnosticMessage.InstanceCollection
+                 [| FSharpTargetsDiagnosticMessage(projectMark) :> ProjectLoadDiagnostic |] :> _
              | _ -> EmptyArray.Instance :> _
 
-and FSharpTargetsDiagnosticMessage private (title, message) =
-    inherit LoadDiagnosticMessage(title, message)
-
-    static let [<Literal>] messageTitle = "Could not open F# project"
+and FSharpTargetsDiagnosticMessage(projectMark, message) =
+    inherit ProjectLoadError(projectMark, message)
 
     static let platformName platform =
         match platform with
@@ -30,16 +29,13 @@ and FSharpTargetsDiagnosticMessage private (title, message) =
         | PlatformUtil.Platform.Linux -> "linux"
         | _ -> "windows"
 
-    private new() =
+    new (projectMark: IProjectMark) =
         let osName = platformName PlatformUtil.RuntimePlatform
-        let url = sprintf "https://fsharp.org/use/%s/" osName
+        let url = $"https://fsharp.org/use/%s{osName}/"
         let link = RiderContextNotificationHelper.MakeLink(url, "install F# SDK")
         let message = "F# SDK or project dependencies are missing. " +
-                      sprintf "Try restoring NuGet packages; if the problem persists, please %s." link
-        FSharpTargetsDiagnosticMessage(messageTitle, message)
-
-    static member val InstanceCollection =
-        [| FSharpTargetsDiagnosticMessage() :> ILoadDiagnostic |] :> ICollection<_>
+                      $"Try restoring NuGet packages; if the problem persists, please %s{link}."
+        FSharpTargetsDiagnosticMessage(projectMark, message)
 
 
 [<ShellComponent>]
@@ -52,15 +48,13 @@ type FSharpProjectTypeGuidAnalyzer() =
             if projectMark.Location.ExtensionNoDot <> FsprojExtension then EmptyArray.Instance :> _ else
             if isFSharpGuid projectMark.TypeGuid || projectMark.Guid = Guid.Empty then EmptyArray.Instance :> _ else
 
-            FSharpWrongProjectTypeGuid.InstanceCollection
+            [| FSharpWrongProjectTypeGuid(projectMark) :> ProjectLoadDiagnostic |] :> ICollection<_>
 
-and FSharpWrongProjectTypeGuid private (title, message) =
-    inherit LoadDiagnosticMessage(title, message)
+and FSharpWrongProjectTypeGuid(projectMark, message) =
+    inherit ProjectLoadWarning(projectMark, message) // todo: allow passing custom title?
 
     static let [<Literal>] messageTitle = "F# project has incorrect guid"
     static let [<Literal>] message = "Solution file specifies wrong project type guid."
 
-    private new() = FSharpWrongProjectTypeGuid(messageTitle, message)
-
-    static member val InstanceCollection =
-        [| FSharpWrongProjectTypeGuid() :> ILoadDiagnostic |] :> ICollection<_>
+    new (projectMark: IProjectMark) =
+        FSharpWrongProjectTypeGuid(projectMark, message)
