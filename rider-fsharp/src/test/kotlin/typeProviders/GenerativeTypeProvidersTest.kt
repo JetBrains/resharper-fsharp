@@ -20,7 +20,7 @@ import withOutOfProcessTypeProviders
 class GenerativeTypeProvidersTest: BaseTestWithSolution() {
     override fun getSolutionDirectoryName() = "TypeProviderLibrary"
 
-    @Test
+    @Test(enabled = false)
     fun `generative type providers cross-project analysis`() {
         withOutOfProcessTypeProviders {
             withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
