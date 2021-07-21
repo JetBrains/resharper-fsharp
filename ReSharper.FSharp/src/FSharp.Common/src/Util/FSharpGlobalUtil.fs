@@ -37,11 +37,11 @@ module FSharpGlobalAbbreviations =
 module FSharpFileSystemPathExtensions =
     type JetBrains.Util.FileSystemPath with
         [<Extension>]
-        member this.ToVirtualFileSystemPath() = JetBrains.Util.FileSystemPathExtension.ToVirtualFileSystemPath(this)
+        member this.ToVirtualFileSystemPath() = JetBrains.Util.FileSystemPathExtensions.ToVirtualFileSystemPath(this)
         
     type JetBrains.Util.VirtualFileSystemPath with
         [<Extension>]
-        member this.ToNativeFileSystemPath() = JetBrains.Util.VirtualFileSystemPathObsoleteExtension.ToNativeFileSystemPath(this)
+        member this.ToNativeFileSystemPath() = JetBrains.Util.VirtualFileSystemPathExtensions.ToNativeFileSystemPath(this)
 
 
 [<AutoOpen>]
