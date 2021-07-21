@@ -23,7 +23,7 @@ module rec CommonUtil =
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
 
-    let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
+    let ensureAbsolute (path: VirtualFileSystemPath) (projectDirectory: VirtualFileSystemPath) =
         match path.AsRelative() with
         | null -> path
         | relativePath -> projectDirectory.Combine(relativePath)
@@ -62,13 +62,13 @@ module rec CommonUtil =
     let (|SigExtension|_|) extension =
         if isSigFileExtension extension then someUnit else None
 
-    let isImplFile (path: FileSystemPath) =
+    let isImplFile (path: VirtualFileSystemPath) =
         isImplFileExtension path.ExtensionNoDot
 
-    let isSigFile (path: FileSystemPath) =
+    let isSigFile (path: VirtualFileSystemPath) =
         isSigFileExtension path.ExtensionNoDot
 
-    let getFullPath (path: FileSystemPath) =
+    let getFullPath (path: VirtualFileSystemPath) =
         path.FullPath
 
     type Line = Int32<DocLine>
@@ -130,13 +130,13 @@ module rec CommonUtil =
         string.EndsWith(other, StringComparison.Ordinal)
 
     let getCommonParent path1 path2 =
-        FileSystemPath.GetDeepestCommonParent(path1, path2)
+        FileSystemPathEx.GetDeepestCommonParent(path1, path2)
 
     /// Used in tests. Should not be invoked on BackSlashSeparatedRelativePath.
     let (|UnixSeparators|) (path: IPath) =
         let separatorStyle = FileSystemPathEx.SeparatorStyle.Unix
         match path with
-        | :? FileSystemPath as path -> path.NormalizeSeparators(separatorStyle)
+        | :? VirtualFileSystemPath as path -> path.NormalizeSeparators(separatorStyle)
         | :? RelativePath as path -> path.NormalizeSeparators(separatorStyle)
         | _ -> failwith "Should not be invoked on BackSlashSeparatedRelativePath."
 

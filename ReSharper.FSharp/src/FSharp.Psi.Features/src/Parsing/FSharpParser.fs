@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 
-type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sourceFile: IPsiSourceFile,
+type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPath, sourceFile: IPsiSourceFile,
         checkerService: FcsCheckerService, symbolsCache: IFcsResolvedSymbolsCache) =
 
     let tryCreateTreeBuilder lexer lifetime =
@@ -62,7 +62,7 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
     new (lexer, document, checkerService, symbolsCache) =
         FSharpParser(lexer, document, FSharpParser.SandBoxPath, null, checkerService, symbolsCache)
 
-    static member val SandBoxPath = FileSystemPath.Parse("Sandbox.fs")
+    static member val SandBoxPath = VirtualFileSystemPath.Parse("Sandbox.fs", InteractionContext.SolutionContext)
 
     interface IFSharpParser with
         member this.ParseFSharpFile(noCache) = parseFile noCache

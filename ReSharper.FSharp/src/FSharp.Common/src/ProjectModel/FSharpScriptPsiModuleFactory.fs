@@ -43,13 +43,13 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         projectFileTypeCoordinator) as this =
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.
-    let scriptsFromProjectFiles = OneToListMap<FileSystemPath, FSharpScriptPsiModule>()
+    let scriptsFromProjectFiles = OneToListMap<VirtualFileSystemPath, FSharpScriptPsiModule>()
 
     /// Psi modules for files coming from #load directives and do not present in the project model.
-    let scriptsFromPaths = Dictionary<FileSystemPath, FSharpScriptPsiModule>()
+    let scriptsFromPaths = Dictionary<VirtualFileSystemPath, FSharpScriptPsiModule>()
 
     /// References to assemblies and other source files for each known script path.
-    let scriptsReferences = Dictionary<FileSystemPath, ScriptReferences>()
+    let scriptsReferences = Dictionary<VirtualFileSystemPath, ScriptReferences>()
 
     let psiModules = List<IPsiModule>()
     let mutable psiModulesCollection = HybridCollection.Empty
@@ -67,21 +67,21 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         let platformInfo = platformInfos |> Seq.maxBy (fun info -> info.TargetFrameworkId.Version)
         platformInfo.TargetFrameworkId
 
-    let getScriptOptions (path: FileSystemPath) (document: IDocument) =
+    let getScriptOptions (path: VirtualFileSystemPath) (document: IDocument) =
         scriptOptionsProvider.GetScriptOptions(path, document.GetText())
         |> Option.orElseWith (fun _ -> failwithf "Could not get script options for: %O" path)
         |> Option.get
 
-    let getScriptReferences scriptPath scriptOptions =
-        let assembliesPaths = HashSet<FileSystemPath>()
+    let getScriptReferences (scriptPath: VirtualFileSystemPath) scriptOptions =
+        let assembliesPaths = HashSet<VirtualFileSystemPath>()
         for o in scriptOptions.OtherOptions do
             if o.StartsWith("-r:", StringComparison.Ordinal) then
-                let path = FileSystemPath.TryParse(o.Substring(3))
+                let path = VirtualFileSystemPath.TryParse(o.Substring(3), InteractionContext.SolutionContext)
                 if not path.IsEmpty then assembliesPaths.Add(path) |> ignore
 
-        let filesPaths = HashSet<FileSystemPath>()
+        let filesPaths = HashSet<VirtualFileSystemPath>()
         for file in scriptOptions.SourceFiles do
-            let path = FileSystemPath.TryParse(file)
+            let path = VirtualFileSystemPath.TryParse(file, InteractionContext.SolutionContext)
             if not path.IsEmpty && not (path.Equals(scriptPath)) then
                 filesPaths.Add(path) |> ignore
 
@@ -136,7 +136,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
         psiModule
 
-    and createPsiModuleForPath (path: FileSystemPath) changeBuilder =
+    and createPsiModuleForPath (path: VirtualFileSystemPath) changeBuilder =
         let modulesForPath = getPsiModulesForPath path
         if modulesForPath.IsEmpty() then
             let fileDocument = documentManager.GetOrCreateDocument(path)
@@ -147,7 +147,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             scriptsFromPaths.[path] <- psiModule
             addPsiModule psiModule
 
-    let rec updateReferences (path: FileSystemPath) (document: IDocument) =
+    let rec updateReferences (path: VirtualFileSystemPath) (document: IDocument) =
         locks.QueueReadLock(lifetime, "Request new F# script references", fun _ ->
             let mutable oldReferences = Unchecked.defaultof<ScriptReferences>
             match scriptsReferences.TryGetValue(path, &oldReferences) with
@@ -238,7 +238,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         resultModule <- psiModule
         true
 
-    member x.CreatePsiModuleForPath(path: FileSystemPath, changeBuilder: PsiModuleChangeBuilder) =
+    member x.CreatePsiModuleForPath(path: VirtualFileSystemPath, changeBuilder: PsiModuleChangeBuilder) =
         locks.AssertWriteAccessAllowed()
         createPsiModuleForPath path changeBuilder
 
@@ -314,7 +314,7 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, 
     inherit DelegatingProjectPsiModuleHandler(handler)
 
     let locks = solution.Locks
-    let sourceFiles = Dictionary<FileSystemPath, IPsiSourceFile>()
+    let sourceFiles = Dictionary<VirtualFileSystemPath, IPsiSourceFile>()
 
     do
         lifetime.OnTermination(fun _ ->
@@ -378,7 +378,7 @@ type FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, moduleId, a
     // We create at most one psi module for each project file and update list of handlers pointing to it.
     let projectHandlers = List<IProjectPsiModuleHandler>()
 
-    let assemblyCookies = DictionaryEvents<FileSystemPath, IAssemblyCookie>(lifetime, moduleId)
+    let assemblyCookies = DictionaryEvents<VirtualFileSystemPath, IAssemblyCookie>(lifetime, moduleId)
 
     do
         assemblyCookies.AddRemove.Advise_Remove(lifetime, fun (AddRemoveArgs (KeyValue (_, assemblyCookie))) ->
@@ -400,12 +400,12 @@ type FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, moduleId, a
 
     member x.IsValid = psiServices.Modules.HasModule(this)
 
-    member x.AddReference(path: FileSystemPath) =
+    member x.AddReference(path: VirtualFileSystemPath) =
         solution.Locks.AssertWriteAccessAllowed()
         if not (assemblyCookies.ContainsKey(path)) then
             assemblyCookies.Add(path, assemblyFactory.AddRef(AssemblyLocation(path), moduleId, this.ResolveContext))
 
-    member x.RemoveReference(path: FileSystemPath) =
+    member x.RemoveReference(path: VirtualFileSystemPath) =
         solution.Locks.AssertWriteAccessAllowed()
         if assemblyCookies.ContainsKey(path) then
             assemblyCookies.Remove(path) |> ignore
@@ -459,11 +459,11 @@ type IFSharpFileService =
     abstract member IsScriptLike: IPsiSourceFile -> bool
 
     /// True when file is an IntelliJ scratch file.
-    abstract member IsScratchFile: FileSystemPath -> bool
+    abstract member IsScratchFile: VirtualFileSystemPath -> bool
 
 
 /// Holder for psi module resolve context.
-type FSharpScriptModule(path: FileSystemPath, solution: ISolution) =
+type FSharpScriptModule(path: VirtualFileSystemPath, solution: ISolution) =
     inherit UserDataHolder()
 
     static let scratchesPath = RelativePath.TryParse("Scratches")
@@ -507,8 +507,8 @@ type ScriptFileProperties() =
 
 
 type ScriptReferences =
-    { Assemblies: ISet<FileSystemPath>
-      Files: ISet<FileSystemPath> }
+    { Assemblies: ISet<VirtualFileSystemPath>
+      Files: ISet<VirtualFileSystemPath> }
 
 
 [<SolutionFeaturePart>]

@@ -53,7 +53,7 @@ type FSharpPathReference(owner, sourceFile) =
             options.OriginalLoadReferences
             |> List.tryFind (fun (range, _, _) -> getTreeStartOffset document range = tokenStartOffset)
             |> Option.bind (fun (_, _, path) ->
-                let path = FileSystemPath.TryParse(path)
+                let path = VirtualFileSystemPath.TryParse(path, InteractionContext.SolutionContext)
                 let ext = path.ExtensionNoDot.ToLowerInvariant()
                 if not path.IsEmpty && Set.contains ext fsExtensions && path.ExistsFile then
                     let pathElement = PathDeclaredElement(fsFile.GetPsiServices(), path)

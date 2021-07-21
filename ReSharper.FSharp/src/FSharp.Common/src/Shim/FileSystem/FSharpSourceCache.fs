@@ -29,12 +29,12 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         logger: ILogger) =
     inherit FileSystemShimChangeProvider(Lifetime.Define(lifetime).Lifetime, changeManager)
 
-    let files = ConcurrentDictionary<FileSystemPath, FSharpSource>()
+    let files = ConcurrentDictionary<VirtualFileSystemPath, FSharpSource>()
 
     let getText (document: IDocument) =
         Encoding.UTF8.GetBytes(document.GetText())
 
-    let tryAddSource (path: FileSystemPath) =
+    let tryAddSource (path: VirtualFileSystemPath) =
         let mutable source = None
         ReadLockCookie.TryExecute(fun _ ->
             match files.TryGetValue(path) with
@@ -52,11 +52,11 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
 
         source
 
-    let isApplicable (path: FileSystemPath) =
+    let isApplicable (path: VirtualFileSystemPath) =
         // todo: support FCS fake paths like `startup`, prevent going to FS to check existence, etc.
         not path.IsEmpty && path.IsAbsolute && fileExtensions.GetFileType(path).Is<FSharpProjectFileType>()
 
-    member x.TryGetSource(path: FileSystemPath, [<Out>] source: byref<FSharpSource>) =
+    member x.TryGetSource(path: VirtualFileSystemPath, [<Out>] source: byref<FSharpSource>) =
         match files.TryGetValue(path) with
         | true, value -> source <- value; true
         | _ ->
@@ -150,6 +150,6 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         x.ProcessProjectModelChange(changeMap.GetChange<ProjectModelChange>(solution))
 
     member x.GetRdFSharpSource(fileName: string): RdFSharpSource =
-        let path = FileSystemPath.TryParse(fileName)
+        let path = VirtualFileSystemPath.TryParse(fileName, InteractionContext.SolutionContext)
         let mutable fsSource = Unchecked.defaultof<FSharpSource>
         if x.TryGetSource(path, &fsSource) then fsSource.ToRdFSharpSource() else null

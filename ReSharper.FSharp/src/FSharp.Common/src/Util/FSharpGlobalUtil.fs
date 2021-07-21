@@ -29,7 +29,19 @@ module FSharpGlobalAbbreviations =
 
     type ILogger = JetBrains.Util.ILogger
     type FileSystemPath = JetBrains.Util.FileSystemPath
+    type VirtualFileSystemPath = JetBrains.Util.VirtualFileSystemPath
+    type InteractionContext = JetBrains.Util.InteractionContext    
     type FormatterHelper = JetBrains.ReSharper.Psi.Impl.CodeStyle.FormatterImplHelper
+
+[<Extension;AutoOpen>]
+module FSharpFileSystemPathExtensions =
+    type JetBrains.Util.FileSystemPath with
+        [<Extension>]
+        member this.ToVirtualFileSystemPath() = JetBrains.Util.FileSystemPathExtension.ToVirtualFileSystemPath(this)
+        
+    type JetBrains.Util.VirtualFileSystemPath with
+        [<Extension>]
+        member this.ToNativeFileSystemPath() = JetBrains.Util.VirtualFileSystemPathObsoleteExtension.ToNativeFileSystemPath(this)
 
 
 [<AutoOpen>]

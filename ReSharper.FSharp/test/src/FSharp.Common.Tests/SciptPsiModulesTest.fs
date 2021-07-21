@@ -52,7 +52,7 @@ type ScriptPsiModulesTest() =
         x.SolutionManager.CloseSolution()
 
     member x.OpenSolution(lifetime: Lifetime): ISolution =
-        let tempSolutionPath = x.CopyTestDataDirectoryToTemp2(lifetime, x.TestMethodName)
+        let tempSolutionPath = x.CopyTestDataDirectoryToTemp2(lifetime, x.TestMethodName).ToVirtualFileSystemPath()
         x.SolutionManager.OpenSolution(tempSolutionPath / x.SolutionFileName)
 
     member x.DumpSourceFilePersistentIds(solution: ISolution, writer: TextWriter) =

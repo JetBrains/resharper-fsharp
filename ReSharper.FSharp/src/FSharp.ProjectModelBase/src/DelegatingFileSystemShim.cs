@@ -32,22 +32,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       lifetime.OnTermination(() => FileSystem = myFileSystem);
     }
 
-    public virtual bool ExistsFile(FileSystemPath path) =>
+    public virtual bool ExistsFile(VirtualFileSystemPath path) =>
       myFileSystem is DelegatingFileSystemShim shim
         ? shim.ExistsFile(path)
         : myFileSystem.FileExistsShim(path.FullPath);
 
-    public virtual DateTime GetLastWriteTime(FileSystemPath path) =>
+    public virtual DateTime GetLastWriteTime(VirtualFileSystemPath path) =>
       myFileSystem is DelegatingFileSystemShim shim
         ? shim.GetLastWriteTime(path)
         : myFileSystem.GetLastWriteTimeShim(path.FullPath);
 
-    public virtual bool IsStableFile(FileSystemPath path) =>
+    public virtual bool IsStableFile(VirtualFileSystemPath path) =>
       myFileSystem is DelegatingFileSystemShim shim
         ? shim.IsStableFile(path)
         : myFileSystem.IsStableFileHeuristic(path.FullPath);
 
-    public virtual Stream ReadFile(FileSystemPath path, bool useMemoryMappedFile, bool shouldShadowCopy) =>
+    public virtual Stream ReadFile(VirtualFileSystemPath path, bool useMemoryMappedFile, bool shouldShadowCopy) =>
       myFileSystem is DelegatingFileSystemShim shim
         ? shim.ReadFile(path, useMemoryMappedFile, shouldShadowCopy)
         : myFileSystem.OpenFileForReadShim(path.FullPath, useMemoryMappedFile, shouldShadowCopy);
@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       var memoryMappedFile = useMemoryMappedFile?.Value ?? false;
       var shadowCopy = shouldShadowCopy?.Value ?? false;
 
-      var path = FileSystemPath.TryParse(filePath);
+      var path = VirtualFileSystemPath.TryParse(filePath, InteractionContext.SolutionContext);
       var stream = path.IsEmpty
         ? myFileSystem.OpenFileForReadShim(filePath, useMemoryMappedFile, shouldShadowCopy)
         : ReadFile(path, memoryMappedFile, shadowCopy);
@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
     public override DateTime GetLastWriteTimeShim(string fileName)
     {
-      var path = FileSystemPath.TryParse(fileName);
+      var path = VirtualFileSystemPath.TryParse(fileName, InteractionContext.SolutionContext);
       var lastWriteTime = path.IsEmpty
         ? myFileSystem.GetLastWriteTimeShim(fileName)
         : GetLastWriteTime(path);
@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
     public override bool FileExistsShim(string fileName)
     {
-      var path = FileSystemPath.TryParse(fileName);
+      var path = VirtualFileSystemPath.TryParse(fileName, InteractionContext.SolutionContext);
       var exists = path.IsEmpty
         ? myFileSystem.FileExistsShim(fileName)
         : ExistsFile(path);
@@ -92,7 +92,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
     public override bool IsStableFileHeuristic(string fileName)
     {
-      var path = FileSystemPath.TryParse(fileName);
+      var path = VirtualFileSystemPath.TryParse(fileName, InteractionContext.SolutionContext);
       var isStablePath = path.IsEmpty
         ? myFileSystem.IsStableFileHeuristic(fileName)
         : IsStableFile(path);

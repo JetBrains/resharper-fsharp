@@ -20,7 +20,7 @@ open JetBrains.ReSharper.Psi.TreeBuilder
 open JetBrains.ReSharper.Resources.Shell
 
 [<AbstractClass>]
-type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: FileSystemPath, projectedOffset, lineShift) =
+type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFileSystemPath, projectedOffset, lineShift) =
     inherit TreeBuilderBase(lifetime, lexer)
 
     // FCS ranges are 1-based.

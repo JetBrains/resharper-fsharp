@@ -68,6 +68,6 @@ type LoggingShim(name, lifetime: Lifetime, writer: TextWriter) =
         base.GetLastWriteTime(path)
 
     override x.GetLastWriteTimeShim(fileName) =
-        let path = FileSystemPath.Parse(fileName)
+        let path = VirtualFileSystemPath.Parse(fileName, InteractionContext.SolutionContext)
         writer.WriteLine$"{name}: Get last write time (string): {path.Name}"
         base.GetLastWriteTimeShim(fileName)

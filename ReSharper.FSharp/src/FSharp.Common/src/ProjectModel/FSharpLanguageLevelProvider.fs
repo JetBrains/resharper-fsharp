@@ -46,7 +46,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         projectPropertiesListener, projectSettings, persistentProjectItemProperties,
         settingsSchema.GetKey<FSharpLanguageProjectSettings>().TryFindEntryByMemberName("LanguageLevel"))
 
-    let compilerPathToLanguageLevels = ConcurrentDictionary<FileSystemPath, VersionMapping>()
+    let compilerPathToLanguageLevels = ConcurrentDictionary<VirtualFileSystemPath, VersionMapping>()
 
     let getFSharpProjectConfiguration (project: IProject) targetFrameworkId =
         project.ProjectProperties.TryGetConfiguration<IFSharpProjectConfiguration>(targetFrameworkId)
@@ -76,11 +76,11 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | Version (11, 0) -> VersionMapping(FSharpLanguageLevel.FSharp50, FSharpLanguageLevel.Preview)
         | _ -> null
 
-    let getCompilerVersion (fscPath: FileSystemPath) =
+    let getCompilerVersion (fscPath: VirtualFileSystemPath) =
         let assemblyNameInfo = AssemblyNameReader.GetAssemblyNameRaw(fscPath)
         assemblyNameInfo.Version
 
-    let getLanguageLevelByCompilerNoCache (fscPath: FileSystemPath): VersionMapping =
+    let getLanguageLevelByCompilerNoCache (fscPath: VirtualFileSystemPath): VersionMapping =
         if fscPath.IsEmpty then getVersionMappingByToolset () else
 
         let version = getCompilerVersion fscPath
@@ -88,14 +88,14 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | null -> getVersionMappingByToolset ()
         | mapping -> mapping
 
-    let getLanguageLevelByCompiler (fscPath: FileSystemPath): VersionMapping =
+    let getLanguageLevelByCompiler (fscPath: VirtualFileSystemPath): VersionMapping =
         compilerPathToLanguageLevels.GetOrAdd(fscPath, getLanguageLevelByCompilerNoCache)
 
-    let getFscPath (configuration: IFSharpProjectConfiguration): FileSystemPath =
-        if isNull configuration then FileSystemPath.Empty else
+    let getFscPath (configuration: IFSharpProjectConfiguration): VirtualFileSystemPath =
+        if isNull configuration then (VirtualFileSystemPath.GetEmptyPathFor InteractionContext.SolutionContext) else
 
         let path = configuration.PropertiesCollection.GetPropertyValueSafe(FSharpProperties.DotnetFscCompilerPath)
-        FileSystemPath.TryParse(path)
+        VirtualFileSystemPath.TryParse(path, InteractionContext.SolutionContext)
 
     let convertToLanguageLevel (configuration: IFSharpProjectConfiguration) version =
         match version with

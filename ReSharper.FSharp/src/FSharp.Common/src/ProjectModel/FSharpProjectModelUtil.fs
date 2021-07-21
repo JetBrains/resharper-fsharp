@@ -29,11 +29,11 @@ let getReferencedModules (psiModule: IPsiModule) =
     |> Seq.map (fun reference -> reference.Module)
 
 module ModulePathProvider =
-    let outputPathKey = Key<FileSystemPath>("AssemblyReaderTest.outputPath")
+    let outputPathKey = Key<VirtualFileSystemPath>("AssemblyReaderTest.outputPath")
 
 [<SolutionComponent>]
 type ModulePathProvider() =
-    abstract GetModulePath: psiModule: IPsiModule -> FileSystemPath
+    abstract GetModulePath: psiModule: IPsiModule -> VirtualFileSystemPath
     default this.GetModulePath(psiModule) =
         match psiModule with
         | :? IAssemblyPsiModule as assemblyPsiModule ->
@@ -42,4 +42,4 @@ type ModulePathProvider() =
         | :? IProjectPsiModule as projectPsiModule ->
             projectPsiModule.Project.GetOutputFilePath(projectPsiModule.TargetFrameworkId)
 
-        | _ -> FileSystemPath.Empty
+        | _ -> (VirtualFileSystemPath.GetEmptyPathFor InteractionContext.SolutionContext)

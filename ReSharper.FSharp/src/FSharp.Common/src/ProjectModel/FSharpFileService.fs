@@ -16,7 +16,7 @@ type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation, fileEx
             .Parent / "scratches"
 
     interface IFSharpFileService with
-        member x.IsScratchFile(path: FileSystemPath) =
+        member x.IsScratchFile(path: VirtualFileSystemPath) =
             path.Parent.Equals(scratchesDir)
 
         member x.IsScriptLike(file) =

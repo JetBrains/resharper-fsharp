@@ -27,7 +27,7 @@ type TestAssemblyReaderShim(lifetime: Lifetime, solution: ISolution, changeManag
         checkerService: FcsCheckerService) =
     inherit AssemblyReaderShim(lifetime, solution, changeManager, psiModules, cache, assemblyInfoShim, checkerService)
 
-    let mutable projectPath = FileSystemPath.Empty
+    let mutable projectPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
     let mutable projectPsiModule = null
     let mutable reader = Unchecked.defaultof<_>
 
@@ -36,14 +36,14 @@ type TestAssemblyReaderShim(lifetime: Lifetime, solution: ISolution, changeManag
 
     override this.DebugReadRealAssemblies = false
 
-    member this.CreateProjectCookie(path: FileSystemPath, psiModule: IPsiModule) =
+    member this.CreateProjectCookie(path: VirtualFileSystemPath, psiModule: IPsiModule) =
         projectPath <- path
         projectPsiModule <- psiModule
         reader <- new ProjectFcsModuleReader(projectPsiModule, cache)
 
         { new IDisposable with
             member x.Dispose() =
-                projectPath <- FileSystemPath.Empty
+                projectPath <- VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
                 projectPsiModule <- null
                 reader <- Unchecked.defaultof<_> }
 

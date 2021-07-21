@@ -87,7 +87,7 @@ type FSharpPathCompletionContextProvider() =
         let replaceRange = DocumentRange(document, TextRange(rangesStart, replaceRangeEnd))
         let ranges = TextLookupRanges(insertRange, replaceRange)
 
-        let completedPath = FileSystemPath.TryParse(argValue.Substring(0, prevSeparatorValueOffset + 1))
+        let completedPath = VirtualFileSystemPath.TryParse(argValue.Substring(0, prevSeparatorValueOffset + 1), InteractionContext.SolutionContext)
         FSharpPathCompletionContext(context, token, completedPath, ranges) :> _
 
 
@@ -124,7 +124,7 @@ type FSharpPathCompletionProvider() =
         let hashDirective = token.Parent :?> _
         match getCompletionTarget hashDirective with
         | Some (allowedExtensions, iconId) ->
-            let isAllowed (path: FileSystemPath) =
+            let isAllowed (path: VirtualFileSystemPath) =
                 Set.contains (path.ExtensionNoDot.ToLower()) allowedExtensions && not (path.Equals(filePath)) ||
                 path.ExistsDirectory
 
@@ -158,7 +158,7 @@ type FSharpPathCompletionProvider() =
         true
 
 
-type FSharpPathLookupItem(path: FileSystemPath, basePath, iconId) =
+type FSharpPathLookupItem(path: VirtualFileSystemPath, basePath, iconId) =
     inherit TextLookupItemBase()
 
     override x.Image = iconId
@@ -173,7 +173,7 @@ type FSharpPathLookupItem(path: FileSystemPath, basePath, iconId) =
         name
 
 
-type FSharpFolderCompletionItem(path: FileSystemPath) =
+type FSharpFolderCompletionItem(path: VirtualFileSystemPath) =
     inherit TextLookupItemBase()
 
     override x.Image = ProjectModelThemedIcons.Directory.Id

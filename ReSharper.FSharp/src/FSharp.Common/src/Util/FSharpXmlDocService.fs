@@ -38,7 +38,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
         indexCache.TryGetValue(dllFile)
         |> Option.ofObj
         |> Option.orElseWith (fun _ ->
-            match FileSystemPath.TryParse(dllFile) with
+            match VirtualFileSystemPath.TryParse(dllFile, InteractionContext.SolutionContext) with
             | dllPath when not (dllPath.IsNullOrEmpty()) ->
                 let assemblyName = assemblyInfoDatabase.GetAssemblyName(dllPath)
                 let index =

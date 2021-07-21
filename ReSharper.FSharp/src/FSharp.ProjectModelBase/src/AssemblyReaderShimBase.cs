@@ -18,12 +18,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       lifetime.OnTermination(() => AssemblyReader = DefaultReader);
     }
 
-    protected virtual ILModuleReader GetModuleReader(FileSystemPath path, ILReaderOptions readerOptions) =>
+    protected virtual ILModuleReader GetModuleReader(VirtualFileSystemPath path, ILReaderOptions readerOptions) =>
       DefaultReader.GetILModuleReader(path.FullPath, readerOptions);
 
     public ILModuleReader GetILModuleReader(string filename, ILReaderOptions readerOptions)
     {
-      var path = FileSystemPath.TryParse(filename);
+      var path = VirtualFileSystemPath.TryParse(filename, InteractionContext.SolutionContext);
       return !path.IsEmpty
         ? GetModuleReader(path, readerOptions)
         : DefaultReader.GetILModuleReader(filename, readerOptions);

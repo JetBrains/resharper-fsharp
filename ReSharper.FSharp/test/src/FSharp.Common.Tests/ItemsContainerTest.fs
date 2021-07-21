@@ -28,17 +28,17 @@ type TestAttribute = NUnit.Framework.TestAttribute
 type ExplicitAttribute = NUnit.Framework.ExplicitAttribute
 type TestFixtureAttribute = NUnit.Framework.TestFixtureAttribute
 
-let projectDirectory = FileSystemPath.Parse(@"C:\Solution\Project")
+let projectDirectory = VirtualFileSystemPath.Parse(@"C:\Solution\Project", InteractionContext.SolutionContext)
 let solutionMark = SolutionMarkFactory.Create(projectDirectory.Combine("Solution.sln"))
 let projectMark = DummyProjectMark(solutionMark, "Project", Guid.Empty, projectDirectory.Combine("Project.fsproj"))
 
 let projectPath (relativePath: string) = projectDirectory / relativePath
 
 
-let (|NormalizedPath|) (path: FileSystemPath) =
+let (|NormalizedPath|) (path: VirtualFileSystemPath) =
     path.MakeRelativeTo(projectDirectory).NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
 
-let (|AbsolutePath|) (path: FileSystemPath) =
+let (|AbsolutePath|) (path: VirtualFileSystemPath) =
     path.MakeAbsoluteBasedOn(projectDirectory)
 
 let removeIdentities path =
@@ -87,7 +87,7 @@ let createRefresher (writer: TextWriter) =
         member x.SelectItem(_, _) = () }
 
 
-let createViewFile path (solutionItems: IDictionary<FileSystemPath, IProjectItem>) =
+let createViewFile path (solutionItems: IDictionary<VirtualFileSystemPath, IProjectItem>) =
     FSharpViewFile(getOrCreateFile path solutionItems)
 
 let createViewFolder path id solutionItems =
@@ -819,7 +819,7 @@ type FSharpItemsContainerTest() =
         x.DoContainerModificationTest(
             [ createItem "Compile" "..\\ExternalFolder\\File1" |> link "File1" ],
             fun container _ ->
-                let (UnixSeparators path) = FileSystemPath.Parse("..\\ExternalFolder\\File1")
+                let (UnixSeparators path) = VirtualFileSystemPath.Parse("..\\ExternalFolder\\File1", InteractionContext.SolutionContext)
                 container.OnUpdateFile("Compile", path, "Resource", path))
 
 
@@ -834,7 +834,7 @@ type FSharpItemsContainerTest() =
             let itemTypes =
                 items |> List.map (fun item ->
                     // todo: linked
-                    let path = FileSystemPath.Parse(removeIdentities item.EvaluatedInclude)
+                    let path = VirtualFileSystemPath.Parse(removeIdentities item.EvaluatedInclude, InteractionContext.SolutionContext)
                     path.MakeAbsoluteBasedOn(projectDirectory), item.ItemType)
                 |> dict
 
@@ -974,12 +974,12 @@ type FSharpItemsContainerTest() =
                 let emptyFolders =
                     items |> List.choose (fun item ->
                         match item.ItemType with
-                        | Folder -> Some (FileSystemPath.Parse(removeIdentities item.EvaluatedInclude))
+                        | Folder -> Some (VirtualFileSystemPath.Parse(removeIdentities item.EvaluatedInclude, InteractionContext.SolutionContext))
                         | _ -> None)
 
                 let folders =
                     items |> Seq.collect (fun item ->
-                        FileSystemPath.Parse(removeIdentities item.EvaluatedInclude).GetParentDirectories())
+                        VirtualFileSystemPath.Parse(removeIdentities item.EvaluatedInclude, InteractionContext.SolutionContext).GetParentDirectories())
                     |> Seq.append emptyFolders
                     |> HashSet
 

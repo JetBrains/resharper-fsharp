@@ -51,7 +51,7 @@ type ArgumentsOwnerTest() =
 
                         match matchingParam.Element with
                         | :? FSharpMethodParameter as param when
-                                 FileSystemPath.TryParse(param.FSharpSymbol.DeclarationLocation.FileName) = filePath ->
+                                 VirtualFileSystemPath.TryParse(param.FSharpSymbol.DeclarationLocation.FileName, InteractionContext.SolutionContext) = filePath ->
                             Some (FSharpRangeUtil.getTextRange document param.FSharpSymbol.DeclarationLocation)
                         | _ ->
                             None
