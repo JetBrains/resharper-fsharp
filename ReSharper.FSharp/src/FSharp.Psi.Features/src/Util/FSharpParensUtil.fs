@@ -227,7 +227,7 @@ let escapesTupleAppArg (context: IFSharpExpression) (expr: IFSharpExpression) =
     match expr with
     | :? IParenExpr as parenExpr ->
         match parenExpr.InnerExpression with
-        | :? ITupleExpr -> isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(context))
+        | :? ITupleExpr -> isNotNull (AppLikeExprNavigator.GetByArgumentExpression(context))
         | _ -> false
     | _ -> false
 
