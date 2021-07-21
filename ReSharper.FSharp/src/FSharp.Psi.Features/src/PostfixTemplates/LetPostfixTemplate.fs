@@ -14,7 +14,8 @@ type LetPostfixTemplate() =
 
     let isApplicableParent (tokenParent: ITreeNode) =
         match tokenParent with
-        | :? IFSharpExpression as fsExpr -> FSharpIntroduceVariable.CanIntroduceVar(fsExpr, true)
+        | :? IFSharpExpression as fsExpr ->
+            fsExpr :? IFromErrorExpr || FSharpIntroduceVariable.CanIntroduceVar(fsExpr, true)
         | :? ITypeUsage as typeUsage -> FSharpPostfixTemplates.isApplicableTypeUsage typeUsage
         | _ -> false
 
