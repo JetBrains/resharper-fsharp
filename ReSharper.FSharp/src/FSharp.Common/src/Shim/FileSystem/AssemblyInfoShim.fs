@@ -14,7 +14,7 @@ type AssemblyInfoShim(lifetime: Lifetime, fsSourceCache: FSharpSourceCache,
     // The shim is injected to get the expected shim shadowing chain, it's expected to be unused.
     do fsSourceCache |> ignore
 
-    let isSupported (path: FileSystemPath) =
+    let isSupported (path: VirtualFileSystemPath) =
         if not path.IsAbsolute then false else
 
         let extension = path.ExtensionNoDot

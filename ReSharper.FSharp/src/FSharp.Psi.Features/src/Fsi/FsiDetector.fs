@@ -36,7 +36,7 @@ module RequiredVersion =
 
 type FsiTool =
     { Title: string
-      Directory: FileSystemPath
+      Directory: VirtualFileSystemPath
       Runtime: RdFsiRuntime
       ShadowCopyAllowed: bool }
 
@@ -72,7 +72,7 @@ type FsiTool =
 
 let customTool: FsiTool =
     { Title = customToolText
-      Directory = FileSystemPath.Empty
+      Directory = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
       Runtime = RdFsiRuntime.NetFramework
       ShadowCopyAllowed = true }
 
@@ -123,7 +123,7 @@ type VsFsiProvider() =
 
             DevenvHostDiscovery.EnumInstalledVs(DevenvHostDiscovery.EnumInstalledVsFlags.IncludeAllInstancesSinceVs15)
             |> Seq.choose (fun vs ->
-                let fsiDir = vs.ProductRootDir / "Common7"/ "IDE" / "CommonExtensions" / "Microsoft" / "FSharp"
+                let fsiDir = vs.ProductRootDir.ToVirtualFileSystemPath() / "Common7"/ "IDE" / "CommonExtensions" / "Microsoft" / "FSharp"
                 let fsiPath = fsiDir / defaultFsiName
 
                 if fsiPath.ExistsFile then
@@ -137,7 +137,7 @@ type LegacyVsFsiProvider() =
         member x.GetFsiTools _ =
             if not PlatformUtil.IsRunningUnderWindows then [] :> _ else
 
-            let legacySdkPath = PlatformUtils.GetProgramFiles86() / "Microsoft SDKs" / "F#"
+            let legacySdkPath = PlatformUtils.GetProgramFiles86(InteractionContext.SolutionContext) / "Microsoft SDKs" / "F#"
             if not legacySdkPath.ExistsDirectory then [] :> _ else
 
             legacySdkPath.GetChildDirectories()
@@ -224,7 +224,7 @@ type MsBuildPropertiesFsiProvider() =
                     | false, _ | true, null -> None
                     | _, path ->
 
-                    let toolDirPath = FileSystemPath.TryParse(path)
+                    let toolDirPath = VirtualFileSystemPath.TryParse(path, InteractionContext.SolutionContext)
                     if toolDirPath.IsEmpty then None else
 
                     let fsiPath = toolDirPath / defaultFsiName
@@ -257,7 +257,7 @@ type CustomFsiProvider() =
 
 
 type CoreFsiProvider() =
-    static member val FsiPath = FileSystemPath.Parse("fsi")
+    static member val FsiPath = VirtualFileSystemPath.Parse("fsi", InteractionContext.SolutionContext)
 
     interface IFsiDirectoryProvider with
         member x.GetFsiTools(solution) =
@@ -270,6 +270,6 @@ type CoreFsiProvider() =
             | toolset ->
 
             [| { Title = ".NET Core SDK " + toolset.Sdk.Version.ToString()
-                 Directory = FileSystemPath.Empty
+                 Directory = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
                  Runtime = RdFsiRuntime.Core
                  ShadowCopyAllowed = true } |] :> _

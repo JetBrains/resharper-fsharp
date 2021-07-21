@@ -65,7 +65,7 @@ module AssemblyReaderShim =
 
         psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
 
-    let isAssembly (path: FileSystemPath) =
+    let isAssembly (path: VirtualFileSystemPath) =
         let extension = path.ExtensionNoDot
         equalsIgnoreCase "dll" extension || equalsIgnoreCase "exe" extension
 
@@ -96,7 +96,7 @@ type AssemblyReaderShim(lifetime: Lifetime, solution: ISolution, changeManager: 
 
     let locker = JetFastSemiReenterableRWLock()
 
-    let assemblyReadersByPath = ConcurrentDictionary<FileSystemPath, ReferencedAssembly>()
+    let assemblyReadersByPath = ConcurrentDictionary<VirtualFileSystemPath, ReferencedAssembly>()
     let assemblyReadersByModule = ConcurrentDictionary<IPsiModule, ReferencedAssembly>()
 
     // todo: record empty set in nonLazyModuleDependencies somehow, remove this set

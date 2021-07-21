@@ -117,4 +117,4 @@ type FsiOptionsProvider(lifetime, settings, settingsSchema) =
         base.GetValueProperty<bool>("UseLanguageVersionFromScriptOptions")
 
     member x.FsiPathAsPath =
-        FileSystemPath.TryParse(x.FsiPath.Value)
+        VirtualFileSystemPath.TryParse(x.FsiPath.Value, InteractionContext.SolutionContext)

@@ -37,7 +37,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             IPropertyEx.FlowInto(languageVersion, lifetime, flags, fun version -> getOtherFlags version)
             flags
 
-    let getOptions (path: FileSystemPath) source =
+    let getOptions (path: VirtualFileSystemPath) source =
         let path = path.FullPath
         let source = SourceText.ofString source
         lock getScriptOptionsLock (fun _ ->
@@ -58,7 +58,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                 None)
 
     interface IScriptFcsProjectProvider with
-        member x.GetScriptOptions(path: FileSystemPath, source) =
+        member x.GetScriptOptions(path: VirtualFileSystemPath, source) =
             getOptions path source
 
         member x.GetScriptOptions(file: IPsiSourceFile) =

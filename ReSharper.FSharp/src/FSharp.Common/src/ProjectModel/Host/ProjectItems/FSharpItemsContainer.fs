@@ -52,7 +52,7 @@ type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutio
             |> dict
 
         let dummyProjectMark =
-            DummyProjectMark(solution.GetSolutionMark(), String.Empty, Guid.Empty, FileSystemPath.Empty)
+            DummyProjectMark(solution.GetSolutionMark(), String.Empty, Guid.Empty, (VirtualFileSystemPath.GetEmptyPathFor InteractionContext.SolutionContext))
 
         let projectMarkMarshaller =
             { new IUnsafeMarshaller<IProjectMark> with
@@ -336,12 +336,12 @@ type IFSharpItemsContainer =
     abstract member TryGetSortKey: FSharpViewItem -> int option
     abstract member TryGetParentFolderIdentity: FSharpViewItem -> FSharpViewFolderIdentity option
     abstract member CreateFoldersWithParents: IProjectFolder -> (FSharpViewItem * FSharpViewItem option) seq
-    abstract member GetProjectItemsPaths: IProjectMark * TargetFrameworkId -> (FileSystemPath * BuildAction)[]
+    abstract member GetProjectItemsPaths: IProjectMark * TargetFrameworkId -> (VirtualFileSystemPath * BuildAction)[]
     abstract member Dump: TextWriter -> unit
 
     abstract member TryGetRelativeChildPath:
             IProjectMark * modifiedItem: FSharpViewItem option * relativeItem: FSharpViewItem option * RelativeToType ->
-            (FileSystemPath * RelativeToType) option
+            (VirtualFileSystemPath * RelativeToType) option
 
 [<DebuggerDisplay("{projectUniqueName}")>]
 type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISet<_>, logger: ILogger) =
@@ -349,8 +349,8 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
     // Files and folders by physical path.
     // For now we assume that a file is only included to a single item type group.
-    let files = Dictionary<FileSystemPath, FSharpProjectItem>()
-    let folders = CompactOneToListMap<FileSystemPath, FSharpProjectItem>()
+    let files = Dictionary<VirtualFileSystemPath, FSharpProjectItem>()
+    let folders = CompactOneToListMap<VirtualFileSystemPath, FSharpProjectItem>()
 
     let children = CompactOneToListMap<FSharpProjectModelElement, FSharpProjectItem>()
 
@@ -481,7 +481,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         match relativeItem.Parent with
         | Project projectPath -> Project projectPath, relativeItem, false
         | ProjectItem relativeItemParent ->
-            let commonParentPath = FileSystemPath.GetDeepestCommonParent(relativeItemParent.LogicalPath, itemPath)
+            let commonParentPath = FileSystemPathEx.GetDeepestCommonParent(relativeItemParent.LogicalPath, itemPath)
             let initialState = relativeItem.Parent, relativeItem, false
 
             traverseParentFolders (ProjectItem relativeItemParent)
@@ -650,7 +650,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                 // todo: check item type
                 tryGetAdjacentRelativeItem relativeToItem.Parent modifiedItemBuildAction relativeToType)
 
-    let createNewItemInfo (path: FileSystemPath) logicalPath relativeToPath relativeToType refreshFolder update =
+    let createNewItemInfo (path: VirtualFileSystemPath) logicalPath relativeToPath relativeToType refreshFolder update =
         let tryGetPossiblyRelativeNodeItem path =
             if isNull path then None else
             tryGetFile path
@@ -718,7 +718,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         folders.Push(State.Create(projectDirectory, project))
 
         let parsePaths (item: RdProjectItem) =
-            let path = FileSystemPath.TryParse(item.EvaluatedInclude)
+            let path = VirtualFileSystemPath.TryParse(item.EvaluatedInclude, InteractionContext.SolutionContext)
             if path.IsEmpty then None else
 
             let physicalPath = path.MakeAbsoluteBasedOn(projectDirectory)
@@ -737,7 +737,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                     logger.Warn("Invalid logical path {0} for project dir: {1}", logicalPath, projectDirectory) else
 
                 if logicalPath.Directory <> folders.Peek().Path then
-                    let commonParent = FileSystemPath.GetDeepestCommonParent(logicalPath.Parent, folders.Peek().Path)
+                    let commonParent = FileSystemPathEx.GetDeepestCommonParent(logicalPath.Parent, folders.Peek().Path)
                     while (folders.Peek().Path <> commonParent) do
                         folders.Pop() |> ignore
 
@@ -811,7 +811,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         addChild item
 
     static member Read(reader: UnsafeReader) =
-        let projectDirectory = reader.ReadFileSystemPath()
+        let projectDirectory = reader.ReadCurrentSolutionVirtualFileSystemPath()
         let projectUniqueName = reader.ReadString()
         let targetFrameworkIdIntern = DataIntern(setComparer)
         let readTargetFrameworkIds () =
@@ -826,8 +826,8 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         let itemsCount = reader.ReadInt()
         for _ in 1 .. itemsCount do
             let itemInfo =
-                { PhysicalPath = reader.ReadFileSystemPath()
-                  LogicalPath = reader.ReadFileSystemPath()
+                { PhysicalPath = reader.ReadCurrentSolutionVirtualFileSystemPath()
+                  LogicalPath = reader.ReadCurrentSolutionVirtualFileSystemPath()
                   Parent = foldersById.[reader.ReadInt()]
                   SortKey = reader.ReadInt() }
 
@@ -887,7 +887,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     member x.TryGetProjectItem(viewItem: FSharpViewItem): FSharpProjectItem option =
         tryGetProjectItem viewItem
 
-    member x.TryGetFolderItems(path: FileSystemPath): IList<FSharpProjectItem> =
+    member x.TryGetFolderItems(path: VirtualFileSystemPath): IList<FSharpProjectItem> =
         folders.[path]
 
     member x.AddFile(BuildAction action, path, logicalPath, relativeToPath, relativeToType, refreshFolder, update) =
@@ -964,12 +964,12 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         writer.ToString()
 
     static member val DummyMapping =
-        ProjectMapping(FileSystemPath.Empty, String.Empty, EmptySet.Instance, DummyLogger.Instance)
+        ProjectMapping(VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext), String.Empty, EmptySet.Instance, DummyLogger.Instance)
 
 
 [<Struct>]
 type FSharpProjectModelElement =
-    | Project of path: FileSystemPath
+    | Project of path: VirtualFileSystemPath
     | ProjectItem of item: FSharpProjectItem
 
     member x.GetProjectDirectory() =
@@ -990,8 +990,8 @@ type FSharpProjectItem =
 
     member x.SortKey = x.ItemInfo.SortKey
     member x.Parent  = x.ItemInfo.Parent
-    member x.PhysicalPath: FileSystemPath = x.ItemInfo.PhysicalPath
-    member x.LogicalPath: FileSystemPath = x.ItemInfo.LogicalPath
+    member x.PhysicalPath: VirtualFileSystemPath = x.ItemInfo.PhysicalPath
+    member x.LogicalPath: VirtualFileSystemPath = x.ItemInfo.LogicalPath
 
     member x.ProjectDirectory = x.Parent.GetProjectDirectory()
     member x.RelativePhysicalPath = x.PhysicalPath.MakeRelativeTo(x.ProjectDirectory)
@@ -1024,8 +1024,8 @@ type FSharpProjectItemType =
 
 
 type ItemInfo =
-    { mutable PhysicalPath: FileSystemPath
-      mutable LogicalPath: FileSystemPath
+    { mutable PhysicalPath: VirtualFileSystemPath
+      mutable LogicalPath: VirtualFileSystemPath
       mutable Parent: FSharpProjectModelElement
       mutable SortKey: int }
 
@@ -1042,7 +1042,7 @@ type MoveDirection =
 
 
 type State =
-    { Path: FileSystemPath
+    { Path: VirtualFileSystemPath
       Folder: FSharpProjectModelElement
       mutable NextSortKey: int }
 
@@ -1060,19 +1060,19 @@ type IFSharpItemsContainerRefresher =
     abstract member RefreshProject: IProjectMark * isOnProjectLoad: bool -> unit
 
     /// Refresh the project tree structure for a folder in a project.
-    abstract member RefreshFolder: IProjectMark * folder: FileSystemPath * identity: FSharpViewFolderIdentity -> unit
+    abstract member RefreshFolder: IProjectMark * folder: VirtualFileSystemPath * identity: FSharpViewFolderIdentity -> unit
 
     /// Update view item presentation (e.g. change sort key).
-    abstract member UpdateFile: IProjectMark * file: FileSystemPath -> unit
+    abstract member UpdateFile: IProjectMark * file: VirtualFileSystemPath -> unit
 
     /// Update view item presentation (e.g. change sort key).
-    abstract member UpdateFolder: IProjectMark * folder: FileSystemPath * identity: FSharpViewFolderIdentity -> unit
+    abstract member UpdateFolder: IProjectMark * folder: VirtualFileSystemPath * identity: FSharpViewFolderIdentity -> unit
 
     /// Used on changes we currently cannot process, e.g. Compile -> CompileBefore build action change.
     abstract member ReloadProject: IProjectMark -> unit
 
     /// Select view item after a project structure change that could collapse the item parent folder.
-    abstract member SelectItem: IProjectMark * FileSystemPath -> unit
+    abstract member SelectItem: IProjectMark * VirtualFileSystemPath -> unit
 
 
 [<SolutionInstanceComponent>]

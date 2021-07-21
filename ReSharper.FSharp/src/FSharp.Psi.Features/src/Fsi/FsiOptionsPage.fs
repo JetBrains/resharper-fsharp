@@ -70,7 +70,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
                 if fsi.IsCustom then fsiOptions.FsiPathAsPath else
                 fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value))
 
-        fsiPath.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue (path: FileSystemPath)) ->
+        fsiPath.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue (path: VirtualFileSystemPath)) ->
             if not autoDetect.Value then
                 fsiOptions.FsiPath.Value <- path.FullPath)
 
@@ -116,8 +116,9 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
             autoDetect.FlowIntoRd(lifetime, gridItem.Content.Enabled, Not)
 
         let fileChooser =
-            let path = fsiPath.Value
-            x.AddFileChooserOption(fsiPath, null, path, iconHost, dialogs, canBeEmpty = true, predefinedValues = [])
+            let path = fsiPath.Value.ToNativeFileSystemPath()
+            x.AddFileChooserOption(fsiPath.SelectTwoWay(lifetime, (fun p -> p.ToNativeFileSystemPath()), (fun p -> p.ToVirtualFileSystemPath())),
+                                   null, path, iconHost, dialogs, canBeEmpty = true, predefinedValues = [])
         fsiOptions.IsCustomTool.FlowIntoRd(lifetime, fileChooser.Enabled)
 
     member x.AddUseAnyCpu() =

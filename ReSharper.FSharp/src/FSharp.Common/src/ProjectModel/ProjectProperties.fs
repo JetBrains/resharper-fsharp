@@ -167,13 +167,13 @@ module Util =
     let fsProjectTypeGuid = Guid("{F2A71F9B-5D33-465A-A702-920D77279786}")
     let fsCpsProjectTypeGuid = Guid("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}")
 
-    let isFSharpProjectFile (path: FileSystemPath) =
+    let isFSharpProjectFile (path: VirtualFileSystemPath) =
         path.ExtensionNoDot.Equals(FsprojExtension, StringComparison.OrdinalIgnoreCase)
 
     let isFSharpGuid (guid: Guid) =
         guid = fsProjectTypeGuid || guid = fsCpsProjectTypeGuid
 
-    let isFSharpProject (path: FileSystemPath) (guid: Guid) =
+    let isFSharpProject (path: VirtualFileSystemPath) (guid: Guid) =
         isFSharpProjectFile path || isFSharpGuid guid
 
     let (|FSharpProject|_|) (projectModelElement: IProjectModelElement) =

@@ -240,7 +240,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       var fcsRange = mfv.DeclarationLocation;
-      var path = FileSystemPath.TryParse(fcsRange.FileName);
+      var path = VirtualFileSystemPath.TryParse(fcsRange.FileName, InteractionContext.SolutionContext);
       if (path.IsEmpty)
         return GetTypeMember(mfv, fsTypeElement);
 

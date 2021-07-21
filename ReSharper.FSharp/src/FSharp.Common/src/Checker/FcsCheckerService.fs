@@ -31,11 +31,11 @@ module FcsCheckerService =
 
 
 type FcsProject =
-    { OutputPath: FileSystemPath
-      FileIndices: Dictionary<FileSystemPath, int>
+    { OutputPath: VirtualFileSystemPath
+      FileIndices: Dictionary<VirtualFileSystemPath, int>
       ProjectOptions: FSharpProjectOptions
       ParsingOptions: FSharpParsingOptions
-      ImplementationFilesWithSignatures: ISet<FileSystemPath> }
+      ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath> }
 
     member x.IsKnownFile(sourceFile: IPsiSourceFile) =
         x.FileIndices.ContainsKey(sourceFile.GetLocation())
@@ -200,7 +200,7 @@ type IFcsProjectProvider =
 
 type IScriptFcsProjectProvider =
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
-    abstract GetScriptOptions: FileSystemPath * string -> FSharpProjectOptions option
+    abstract GetScriptOptions: VirtualFileSystemPath * string -> FSharpProjectOptions option
 
 
 type IFcsAssemblyReaderShim =

@@ -17,7 +17,7 @@ open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
 type ReferencedModule =
-    { ReferencedPath: FileSystemPath
+    { ReferencedPath: VirtualFileSystemPath
       ReferencingModules: HashSet<IPsiModule> }
 
 module ReferencedModule =
@@ -96,7 +96,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         | _ -> "library"
 
     abstract GetProjectItemsPaths:
-        project: IProject * targetFrameworkId: TargetFrameworkId -> (FileSystemPath * BuildAction)[]
+        project: IProject * targetFrameworkId: TargetFrameworkId -> (VirtualFileSystemPath * BuildAction)[]
 
     default x.GetProjectItemsPaths(project, targetFrameworkId) =
         let projectMark = project.GetProjectMark().NotNull()
@@ -183,14 +183,14 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
         let filePaths, implsWithSig, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)
 
-        otherOptions.AddRange(resources |> Seq.map (fun (r: FileSystemPath) -> "--resource:" + r.FullPath))
-        let fileIndices = Dictionary<FileSystemPath, int>()
+        otherOptions.AddRange(resources |> Seq.map (fun (r: VirtualFileSystemPath) -> "--resource:" + r.FullPath))
+        let fileIndices = Dictionary<VirtualFileSystemPath, int>()
         Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
 
         let projectOptions =
             { ProjectFileName = $"{project.ProjectFileLocation}.{targetFrameworkId}.fsproj"
               ProjectId = None
-              SourceFiles = Array.map (fun (p: FileSystemPath ) -> p.FullPath) filePaths
+              SourceFiles = Array.map (fun (p: VirtualFileSystemPath ) -> p.FullPath) filePaths
               OtherOptions = otherOptions.ToArray()
               ReferencedProjects = Array.empty
               IsIncompleteTypeCheckEnvironment = false
