@@ -517,6 +517,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                     let declaredElement = refExpr.Reference.Resolve().DeclaredElement
                     not (declaredElement :? ITypeElement || declaredElement :? INamespace)
                 else
+                    if refExpr.Qualifier :? INewExpr then true else
+
                     let element = refExpr.Reference.Resolve().DeclaredElement
                     if isNull element || element :? ITypeElement || element :? INamespace then false else
 

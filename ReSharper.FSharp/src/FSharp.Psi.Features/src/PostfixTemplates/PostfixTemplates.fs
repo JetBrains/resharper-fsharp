@@ -101,7 +101,7 @@ type FSharpPostfixTemplateBehaviorBase(info) =
         null
 
 
-    let getParentExpression (token: IFSharpTreeNode): IFSharpExpression =
+    let rec getParentExpression (token: IFSharpTreeNode): IFSharpExpression =
         match token with
         | TokenType FSharpTokenType.RESERVED_LITERAL_FORMATS _ ->
             match token.Parent.As<IConstExpr>() with
@@ -112,6 +112,9 @@ type FSharpPostfixTemplateBehaviorBase(info) =
             let constExpr = token.CreateElementFactory().CreateConstExpr(literalText)
             let newChild = ModificationUtil.ReplaceChild(parent.FirstChild, constExpr.FirstChild)
             getContainingArgExpr (newChild.Parent.As())
+
+        | TokenType FSharpTokenType.DOT _ when (token.NextSibling :? IFSharpIdentifier) ->
+            getParentExpression (token.NextSibling.As())
 
         | :? IFSharpIdentifier as identifier ->
             let refExpr = ReferenceExprNavigator.GetByIdentifier(identifier)
