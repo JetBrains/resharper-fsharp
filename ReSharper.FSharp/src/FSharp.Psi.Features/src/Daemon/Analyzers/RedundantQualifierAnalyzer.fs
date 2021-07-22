@@ -53,7 +53,7 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
     | _ ->
 
     // todo: try to check next qualified names in case we got into multiple-result resolve, i.e. for module?
-    FSharpResolveUtil.resolvesToFcsSymbolUnqualified fcsSymbol reference OpName &&
+    FSharpResolveUtil.resolvesToFcsSymbol fcsSymbol reference false OpName &&
     not (FSharpResolveUtil.mayShadowPartially referenceOwner data fcsSymbol)
 
 [<ElementProblemAnalyzer([| typeof<IReferenceExpr>; typeof<IReferenceName>; typeof<ITypeExtensionDeclaration> |],

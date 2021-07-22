@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
@@ -45,10 +46,13 @@ type DeconstructionFromUnionCaseFields(name: string, pattern: IParametersOwnerPa
         member this.Components = this.Components :> _
         member this.Type = TypeFactory.CreateUnknownType(this.Pattern.GetPsiModule()) :> _
 
-type DeconstructionFromUnionCase(name: string, pattern: IFSharpPattern, components: IDeconstructionComponent list) =
-    member val Name = name
+type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase, pattern: IFSharpPattern,
+        components: IDeconstructionComponent list, fcsEntity: FSharpEntity) =
+    member val Name = fcsUnionCase.Name
     member val Pattern = pattern
     member val Components = components
+    member val Entity = fcsEntity
+    member val UnionCase = fcsUnionCase
 
     interface IDeconstruction with
         member this.Components = this.Components :> _
@@ -175,12 +179,26 @@ type DeconstructAction(deconstruction: IDeconstruction) =
             | :? DeconstructionFromUnionCase as unionCaseDeconstruction ->
                 let pat = unionCaseDeconstruction.Pattern
                 let pattern, names = createPattern pat unionCaseDeconstruction.Components
+
                 let name = unionCaseDeconstruction.Name
+                let typeElement = unionCaseDeconstruction.Entity.GetTypeElement(pat.GetPsiModule())
+                let requiresQualifiedName = isNotNull typeElement && typeElement.RequiresQualifiedAccess()
+                let name = if requiresQualifiedName then $"{typeElement.GetSourceName()}.{name}" else name
+
                 let parametersOwnerPat =
                     let pattern = factory.CreatePattern($"({name} _)", false) :?> IParenPat
                     pattern.Pattern :?> IParametersOwnerPat
 
                 let parametersOwnerPat = ModificationUtil.ReplaceChild(pat, parametersOwnerPat)
+
+                let reference = parametersOwnerPat.ReferenceName.Reference
+                let unionCase = unionCaseDeconstruction.UnionCase
+                if not (FSharpResolveUtil.resolvesToFcsSymbol unionCase reference true "Deconstruct union case") then
+                    let containingModules = getContainingModules parametersOwnerPat
+                    let moduleToOpen = getModuleToOpen typeElement
+                    if not (containingModules.Contains(moduleToOpen)) then
+                        addOpens reference typeElement |> ignore
+
                 let parametersOwnerPat = RedundantParenPatAnalyzer.addParensIfNeeded parametersOwnerPat
                 let parametersOwnerPat = parametersOwnerPat :?> IParametersOwnerPat
                 ModificationUtil.ReplaceChild(parametersOwnerPat.Parameters.[0], pattern), names
@@ -293,7 +311,9 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
                 let components = createUnionCaseFieldDeconstructions pattern fcsUnionCase fcsEntityInstance
                 if components.IsEmpty then Seq.empty else
 
-                let deconstruction = DeconstructionFromUnionCase(fcsUnionCase.Name, pattern, components)
+                let deconstruction =
+                    DeconstructionFromUnionCase(fcsUnionCase, pattern, components, fcsEntityInstance.Entity)
+
                 DeconstructAction(deconstruction).ToContextActionIntentions() :> _
             else
                 let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(pattern.As<IWildPat>())

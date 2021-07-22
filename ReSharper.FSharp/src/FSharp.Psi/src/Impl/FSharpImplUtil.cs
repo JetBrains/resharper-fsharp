@@ -698,17 +698,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static ModuleMembersAccessKind GetAccessType([NotNull] this ITypeElement typeElement)
     {
-      Assertion.Assert(typeElement.IsModule(), "typeElement.IsModule()");
-      return typeElement switch
-      {
-        IFSharpModule module => module.AccessKind,
-        ICompiledElement _ =>
-          typeElement.HasRequireQualifiedAccessAttribute()
-            ? ModuleMembersAccessKind.RequiresQualifiedAccess
-            : typeElement.HasAutoOpenAttribute() ? ModuleMembersAccessKind.AutoOpen : ModuleMembersAccessKind.Normal,
-        _ => throw new InvalidOperationException()
-      };
+      if (typeElement is IFSharpModule fsModule)
+        return fsModule.AccessKind;
+
+      return MayHaveRequireQualifiedAccessAttribute(typeElement) && typeElement.HasRequireQualifiedAccessAttribute()
+        ? ModuleMembersAccessKind.RequiresQualifiedAccess
+        : ModuleMembersAccessKind.Normal;
     }
+
+    private static bool MayHaveRequireQualifiedAccessAttribute(ITypeElement typeElement) =>
+      typeElement.IsModule() || typeElement.IsUnion();
 
     public static bool RequiresQualifiedAccess([NotNull] this ITypeElement typeElement) =>
       typeElement.GetAccessType() == ModuleMembersAccessKind.RequiresQualifiedAccess;

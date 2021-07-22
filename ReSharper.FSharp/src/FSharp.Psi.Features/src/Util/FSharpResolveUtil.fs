@@ -40,8 +40,8 @@ let resolvesToUnqualified (declaredElement: IDeclaredElement) (reference: FSharp
 let resolvesToQualified (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) opName =
     resolvesTo declaredElement reference true opName
 
-let resolvesToFcsSymbolUnqualified (fcsSymbol: FSharpSymbol) (reference: FSharpSymbolReference) opName =
-    match reference.ResolveWithFcs(opName, false) with
+let resolvesToFcsSymbol (fcsSymbol: FSharpSymbol) (reference: FSharpSymbolReference) qualified opName =
+    match reference.ResolveWithFcs(opName, qualified) with
     | None -> false
     | Some symbolUse ->
 

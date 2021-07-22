@@ -7,6 +7,7 @@ open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
@@ -14,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
+open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -192,6 +194,33 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
         | _ -> failwithf "Unexpected module: %O" moduleDecl
 
     insertAfterAnchor anchor indent
+
+let addOpens (reference: FSharpSymbolReference) (typeElement: ITypeElement) =
+    let referenceOwner = reference.GetElement()
+    use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
+
+    let moduleToOpen = getModuleToOpen typeElement
+    let fsFile = referenceOwner.FSharpFile
+    let namingService = NamingManager.GetNamingLanguageService(fsFile.Language)
+
+    let nameToOpen =
+        toQualifiedList fsFile moduleToOpen
+        |> List.map (fun el ->
+            let sourceName = el.GetSourceName()
+            namingService.MangleNameIfNecessary(sourceName))
+        |> String.concat "."
+
+    if nameToOpen.IsNullOrEmpty() then reference else
+
+    let settings = fsFile.GetSettingsStoreWithEditorConfig()
+    addOpen (referenceOwner.GetDocumentStartOffset()) fsFile settings nameToOpen
+    reference
+
+let getContainingModules (treeNode: ITreeNode) =
+    treeNode.ContainingNodes<IModuleLikeDeclaration>().ToEnumerable()
+    |> Seq.map (fun decl -> decl.DeclaredElement)
+    |> Seq.filter isNotNull
+    |> HashSet
 
 let isInOpen (referenceName: IReferenceName) =
     match skipIntermediateParentsOfSameType referenceName with
