@@ -17,19 +17,20 @@ IFSharpSigFile
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         IConstructorSignature
           FSharpTokenType+NewTokenElement(type:NEW, text:new)
-          FSharpTokenType+ColonTokenElement(type:COLON, text::)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IFunctionTypeUsage
-            IParameterSignatureTypeUsage
-              INamedTypeUsage
-                ITypeReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+          IReturnTypeInfo
+            FSharpTokenType+ColonTokenElement(type:COLON, text::)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParameterSignatureTypeUsage
-              INamedTypeUsage
-                ITypeReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:T)
+            IFunctionTypeUsage
+              IParameterSignatureTypeUsage
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IParameterSignatureTypeUsage
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:T)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

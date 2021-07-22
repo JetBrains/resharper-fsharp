@@ -434,7 +434,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<FormattingRule>()
         .Name("SpaceBeforeColon")
         .Group(SpaceRuleGroup)
-        .Where(Right().In(FSharpTokenType.COLON))
+        .Where(Right().In(ElementType.RETURN_TYPE_INFO, FSharpTokenType.COLON))
         .Switch(it => it.SpaceBeforeColon, SpaceOptionsBuilders)
         .Build();
 

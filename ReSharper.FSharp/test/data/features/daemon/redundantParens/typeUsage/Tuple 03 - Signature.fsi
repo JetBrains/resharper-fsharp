@@ -14,3 +14,6 @@ type T =
     member M4: p: (int * int) -> [<A>] (int * int)
 
     new: (int * int) -> T
+
+val f: p: (int * int) -> int
+val v: p: (int * int)

@@ -1,4 +1,4 @@
 module Module
 
 type T =
-    member M: (int * int) -> unit
+    member M: p: (int * int) -> unit

@@ -20,12 +20,13 @@ IFSharpSigFile
         ITopReferencePat
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:cancellable)
-        FSharpTokenType+ColonTokenElement(type:COLON, text::)
-        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IReturnTypeInfo
-          INamedTypeUsage
-            ITypeReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:CancellableBuilder)
+          FSharpTokenType+ColonTokenElement(type:COLON, text::)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IParameterSignatureTypeUsage
+            INamedTypeUsage
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:CancellableBuilder)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     ITypeDeclarationGroup

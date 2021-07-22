@@ -17,11 +17,12 @@ IFSharpSigFile
       FSharpIdentifierToken(type:IDENTIFIER, text:T)
       FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      FSharpTokenType+ColonTokenElement(type:COLON, text::)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       IReturnTypeInfo
-        INamedTypeUsage
-          ITypeReferenceName
-            FSharpIdentifierToken(type:IDENTIFIER, text:int)
+        FSharpTokenType+ColonTokenElement(type:COLON, text::)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IParameterSignatureTypeUsage
+          INamedTypeUsage
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:int)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

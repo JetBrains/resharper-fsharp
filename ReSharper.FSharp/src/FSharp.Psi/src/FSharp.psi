@@ -206,11 +206,8 @@ private bindingHeader:
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>;
 
-returnTypeInfo extras {
-  get { methodName="Attributes" path=<returnTypeInfo:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-}:
+returnTypeInfo:
   COLON<FSHARP_COLON, Colon>
-  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   typeUsage<TYPE, ReturnType>;
 
 externDeclaration:
@@ -1281,8 +1278,7 @@ constructorSignature options { stubBase="ConstructorDeclarationBase"; }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   NEW<NEW, NewKeyword>
-  COLON
-  typeUsage<TYPE, TypeUsage>;
+  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>;
 
 secondaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
   get { methodName="Expression" path=<secondaryConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };

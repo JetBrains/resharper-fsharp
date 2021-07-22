@@ -12,18 +12,19 @@ IFSharpSigFile
       ITopReferencePat
         IExpressionReferenceName
           FSharpIdentifierToken(type:IDENTIFIER, text:x)
-      FSharpTokenType+ColonTokenElement(type:COLON, text::)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       IReturnTypeInfo
-        IAttributeList
-          FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
-          IAttribute
-            ITypeReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-          FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+        FSharpTokenType+ColonTokenElement(type:COLON, text::)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        INamedTypeUsage
-          ITypeReferenceName
-            FSharpIdentifierToken(type:IDENTIFIER, text:int)
+        IParameterSignatureTypeUsage
+          IAttributeList
+            FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+            IAttribute
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+            FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          INamedTypeUsage
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:int)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

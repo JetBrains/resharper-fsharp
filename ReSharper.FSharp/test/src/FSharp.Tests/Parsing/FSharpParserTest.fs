@@ -597,6 +597,7 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Val - Function 02 - Named param``() = x.DoNamedTest()
     [<Test>] member x.``Val - Function 03 - Multiple named params``() = x.DoNamedTest()
     [<Test>] member x.``Val - Function 04 - Named tuple param``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Function 05 - Named tuple param``() = x.DoNamedTest()
 
     [<Test>] member x.``Val - Active pattern 01``() = x.DoNamedTest()
 

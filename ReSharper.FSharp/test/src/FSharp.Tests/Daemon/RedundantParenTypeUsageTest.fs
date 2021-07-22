@@ -34,4 +34,7 @@ type RedundantParenTypeUsageTest() =
     [<FSharpSignatureTest>]
     [<Test>] member x.``Tuple 03 - Signature``() = x.DoNamedTest() // todo: return attribute
 
-    [<Test>] member x.``Tuple 04 - Patterns``() = x.DoNamedTest() // todo: return attribute
+    [<Test>] member x.``Tuple 04 - Patterns``() = x.DoNamedTest()
+
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``Tuple 05 - Named parameter sig``() = x.DoNamedTest()

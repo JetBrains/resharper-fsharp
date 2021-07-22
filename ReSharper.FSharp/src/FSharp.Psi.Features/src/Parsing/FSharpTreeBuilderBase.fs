@@ -530,6 +530,18 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: FileSyste
         x.Done(range, parenPatMark, ElementType.PAREN_PAT)
         x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
 
+    member x.ProcessReturnTypeInfo(valInfo: SynValInfo, synType: SynType) =
+        let (SynValInfo(_, SynArgInfo(returnAttrs, _, _))) = valInfo
+
+        let returnInfoStart =
+            match returnAttrs with
+            | { Range = attrsRange } :: _ -> attrsRange
+            | _ -> synType.Range
+
+        let returnInfoStart = x.MarkTokenOrRange(FSharpTokenType.COLON, returnInfoStart)
+        x.ProcessSignatureType(valInfo, synType)
+        x.Done(returnInfoStart, ElementType.RETURN_TYPE_INFO)
+
     member x.ProcessImplicitCtorParam(pat: SynSimplePat) =
         match pat with
         | SynSimplePat.Id(ident = IdentRange range) ->

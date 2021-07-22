@@ -274,7 +274,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 | SynValTyparDecls(Some(typeParams), _) ->
                     x.ProcessTypeParameters(typeParams, false)
                 | _ -> ()
-                x.ProcessSignatureType(arity, synType)
+                x.ProcessReturnTypeInfo(arity, synType)
                 ElementType.ABSTRACT_MEMBER_DECLARATION
 
             | SynMemberDefn.ValField(SynField(fieldType = synType), _) ->
