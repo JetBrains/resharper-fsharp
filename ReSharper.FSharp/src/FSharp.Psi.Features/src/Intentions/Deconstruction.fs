@@ -76,41 +76,9 @@ type DeconstructAction(deconstruction: IDeconstruction) =
 
         | _ -> false
 
-    let createPattern (pat: IFSharpPattern) (components: IDeconstructionComponent list) =
+    let createInnerDeconstructionPattern (pat: IFSharpPattern) (components: IDeconstructionComponent list) usedNames =
         let binding = pat.GetBinding()
         let factory = pat.CreateElementFactory()
-
-        let inExprs =
-            let letExpr = LetBindingsNavigator.GetByBinding(binding.As()).As<ILetOrUseExpr>()
-            if isNotNull letExpr then [letExpr.InExpression] else
-
-            let pat = skipIntermediatePatParents pat
-
-            let matchClause = MatchClauseNavigator.GetByPattern(pat)
-            if isNotNull matchClause then [matchClause.WhenExpression; matchClause.Expression] else
-
-            let lambdaExpr = LambdaExprNavigator.GetByPattern(pat)
-            if isNotNull lambdaExpr then [lambdaExpr.Expression] else
-
-            let memberDeclaration = MemberDeclarationNavigator.GetByParameterPattern(pat)
-            if isNotNull memberDeclaration then [memberDeclaration.Expression] else
-
-            []
-
-        let containingType = FSharpNamingService.getPatternContainingType pat
-        let usedNames = FSharpNamingService.getUsedNames inExprs EmptyList.InstanceList containingType false
-
-        let hasUsages = 
-            match pat, hasUsages pat with
-            | :? IReferencePat as refPat, true ->
-                usedNames.Add(refPat.SourceName) |> ignore
-                true
-
-            | :? IReferencePat as refPat, false ->
-                usedNames.Remove(refPat.SourceName) |> ignore
-                false
-
-            | _ -> false
 
         let isSingle = components.Length = 1
 
@@ -144,13 +112,7 @@ type DeconstructAction(deconstruction: IDeconstruction) =
         let patternText = names |> List.map List.head |> String.concat ", "
         let pattern = factory.CreatePattern(patternText, isTopLevel)
 
-        if hasUsages then
-            let refPat = pat :?> IReferencePat
-            let asPat = factory.CreatePattern($"_ as {refPat.SourceName}", isTopLevel) :?> IAsPat
-            asPat.SetPattern(pattern) |> ignore
-            asPat :> IFSharpPattern, names
-        else
-            pattern, names
+        pattern, names
 
     override this.ExecutePsiTransaction(_, _) =
         let pat: IFSharpPattern =
@@ -164,24 +126,67 @@ type DeconstructAction(deconstruction: IDeconstruction) =
         let factory = pat.CreateElementFactory()
         let hotspotsRegistry = HotspotsRegistry(pat.GetPsiServices())
 
-        let pattern, names =
-            match deconstruction with
-            | :? DeconstructionFromTuple as tupleDeconstruction ->
-                let pat = tupleDeconstruction.Pattern
-                let pattern, names = createPattern pat tupleDeconstruction.Components
-                ModificationUtil.ReplaceChild(pat, pattern), names
+        let binding = pat.GetBinding()
+        let isTopLevel = binding :? ITopBinding
+        let inExprs =
+            let letExpr = LetBindingsNavigator.GetByBinding(binding.As()).As<ILetOrUseExpr>()
+            if isNotNull letExpr then [letExpr.InExpression] else
 
-            | :? DeconstructionFromUnionCaseFields as unionCaseDeconstruction ->
-                let pat = unionCaseDeconstruction.Pattern
-                let pattern, names = createPattern pat unionCaseDeconstruction.Components
+            let pat = skipIntermediatePatParents pat
+
+            let matchClause = MatchClauseNavigator.GetByPattern(pat)
+            if isNotNull matchClause then [matchClause.WhenExpression; matchClause.Expression] else
+
+            let lambdaExpr = LambdaExprNavigator.GetByPattern(pat)
+            if isNotNull lambdaExpr then [lambdaExpr.Expression] else
+
+            let memberDeclaration = MemberDeclarationNavigator.GetByParameterPattern(pat)
+            if isNotNull memberDeclaration then [memberDeclaration.Expression] else
+
+            []
+
+        let containingType = FSharpNamingService.getPatternContainingType pat
+        let usedNames = FSharpNamingService.getUsedNames inExprs EmptyList.InstanceList containingType false
+
+        let hasUsages = 
+            match pat, hasUsages pat with
+            | :? IReferencePat as refPat, true ->
+                usedNames.Add(refPat.SourceName) |> ignore
+                true
+
+            | :? IReferencePat as refPat, false ->
+                usedNames.Remove(refPat.SourceName) |> ignore
+                false
+
+            | _ -> false
+
+        let pat =
+            if hasUsages then
+                let refPat = pat :?> IReferencePat
+                let asPat = factory.CreatePattern($"_ as {refPat.SourceName}", isTopLevel) :?> IAsPat
+                let replacedAsPat = ModificationUtil.ReplaceChild(pat, asPat)
+                let replacedAsPat = RedundantParenPatAnalyzer.addParensIfNeeded replacedAsPat
+                replacedAsPat.IgnoreInnerParens().As<IAsPat>().Pattern
+            else
+                pat
+
+        let tuplePattern, names =
+            match deconstruction with
+            | :? DeconstructionFromTuple as deconstruction ->
+                let pattern, names = createInnerDeconstructionPattern pat deconstruction.Components usedNames
+                let pattern = ModificationUtil.ReplaceChild(pat, pattern)
+                pattern, names
+
+            | :? DeconstructionFromUnionCaseFields as deconstruction ->
+                let pat = pat :?> IParametersOwnerPat
+                let pattern, names = createInnerDeconstructionPattern pat deconstruction.Components usedNames
                 ModificationUtil.ReplaceChild(pat.Parameters.[0], pattern), names
 
-            | :? DeconstructionFromUnionCase as unionCaseDeconstruction ->
-                let pat = unionCaseDeconstruction.Pattern
-                let pattern, names = createPattern pat unionCaseDeconstruction.Components
+            | :? DeconstructionFromUnionCase as deconstruction ->
+                let pattern, names = createInnerDeconstructionPattern pat deconstruction.Components usedNames
 
-                let name = unionCaseDeconstruction.Name
-                let typeElement = unionCaseDeconstruction.Entity.GetTypeElement(pat.GetPsiModule())
+                let name = deconstruction.Name
+                let typeElement = deconstruction.Entity.GetTypeElement(pat.GetPsiModule())
                 let requiresQualifiedName = isNotNull typeElement && typeElement.RequiresQualifiedAccess()
                 let name = if requiresQualifiedName then $"{typeElement.GetSourceName()}.{name}" else name
 
@@ -192,7 +197,7 @@ type DeconstructAction(deconstruction: IDeconstruction) =
                 let parametersOwnerPat = ModificationUtil.ReplaceChild(pat, parametersOwnerPat)
 
                 let reference = parametersOwnerPat.ReferenceName.Reference
-                let unionCase = unionCaseDeconstruction.UnionCase
+                let unionCase = deconstruction.UnionCase
                 if not (FSharpResolveUtil.resolvesToFcsSymbol unionCase reference true "Deconstruct union case") then
                     if requiresQualifiedName then
                         let qualifierReference = reference.QualifierReference
@@ -209,7 +214,7 @@ type DeconstructAction(deconstruction: IDeconstruction) =
 
             | _ -> null, Unchecked.defaultof<_>
 
-        let pattern = RedundantParenPatAnalyzer.addParensIfNeeded pattern
+        let pattern = RedundantParenPatAnalyzer.addParensIfNeeded tuplePattern
 
         let itemPatterns: seq<IFSharpPattern> =
             match pattern with

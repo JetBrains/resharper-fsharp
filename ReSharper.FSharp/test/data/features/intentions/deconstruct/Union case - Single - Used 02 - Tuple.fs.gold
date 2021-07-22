@@ -1,0 +1,5 @@
+﻿type U =
+    | A of int * int
+
+let A (i, i1{caret}) as a = A (1, 2)
+let b = a

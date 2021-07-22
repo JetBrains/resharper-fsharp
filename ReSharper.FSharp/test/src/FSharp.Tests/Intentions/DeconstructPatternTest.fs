@@ -31,6 +31,9 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Union case - Single - Rqa 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Rqa 02 - Import``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Rqa 03 - Rqa module``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Used 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Used 02 - Tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Used 03``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case fields - Generic 01``() = x.DoNamedTest()
