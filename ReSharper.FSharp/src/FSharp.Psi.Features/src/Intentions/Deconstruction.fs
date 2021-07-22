@@ -194,6 +194,10 @@ type DeconstructAction(deconstruction: IDeconstruction) =
                 let reference = parametersOwnerPat.ReferenceName.Reference
                 let unionCase = unionCaseDeconstruction.UnionCase
                 if not (FSharpResolveUtil.resolvesToFcsSymbol unionCase reference true "Deconstruct union case") then
+                    if requiresQualifiedName then
+                        let qualifierReference = reference.QualifierReference
+                        FSharpReferenceBindingUtil.SetRequiredQualifiers(qualifierReference, typeElement)
+
                     let containingModules = getContainingModules parametersOwnerPat
                     let moduleToOpen = getModuleToOpen typeElement
                     if not (containingModules.Contains(moduleToOpen)) then
