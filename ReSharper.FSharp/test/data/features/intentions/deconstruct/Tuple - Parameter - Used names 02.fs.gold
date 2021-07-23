@@ -1,0 +1,2 @@
+﻿let f (s, a{caret} as s1) s2 : string * string =
+    fst s1, snd s2

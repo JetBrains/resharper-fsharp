@@ -1,0 +1,2 @@
+﻿let f (a, b{caret} as s1) s2 =
+    fst s1, snd s2

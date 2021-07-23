@@ -31,8 +31,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    public static IBindingLikeDeclaration GetBinding([CanBeNull] this IFSharpPattern pat)
+    public static IBindingLikeDeclaration GetBinding([CanBeNull] this IFSharpPattern pat, bool allowFromParameters, 
+      out bool isFromParameter)
     {
+      isFromParameter = false;
+
       if (pat == null)
         return null;
 
@@ -44,6 +47,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           case IFSharpPattern _:
             node = node.Parent;
             break;
+          case IParametersPatternDeclaration _ when allowFromParameters:
+            node = node.Parent;
+            isFromParameter = true;
+            break;
           case IBindingLikeDeclaration binding:
             return binding;
           default:
@@ -53,5 +60,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       return null;
     }
+
+    [CanBeNull]
+    public static IBindingLikeDeclaration GetBindingFromHeadPattern([CanBeNull] this IFSharpPattern pat) =>
+      GetBinding(pat, false, out _);
   }
 }

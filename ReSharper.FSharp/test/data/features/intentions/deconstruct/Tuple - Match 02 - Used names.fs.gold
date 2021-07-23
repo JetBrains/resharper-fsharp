@@ -1,6 +1,6 @@
 ﻿let i = 0
 
 match 1, "" with
-| i1, s1{caret} when s <> "" ->
+| i1, s{caret} when s <> "" ->
     let _ = i
     ()

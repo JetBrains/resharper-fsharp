@@ -9,6 +9,7 @@ type DeconstructPatternTest() =
 
     override this.ExtraPath = "deconstruct"
 
+    [<Test>] member x.``Tuple - Accessor 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Lambda 02 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Lambda 03 - Used names``() = x.DoNamedTest()
@@ -24,6 +25,11 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Tuple - Parameter owner 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Wild - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Wild - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Parameter - Used names 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Parameter - Used names 02``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Parameter - Used names 03``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Parameter - Used names 04``() = x.DoNamedTest()
+    [<Test; Explicit("Fix getting _ type")>] member x.``Tuple - Parameter - Used names 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case - Single - Import 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Let 01``() = x.DoNamedTest()

@@ -77,7 +77,7 @@ type DeconstructAction(deconstruction: IDeconstruction) =
         | _ -> false
 
     let createInnerDeconstructionPattern (pat: IFSharpPattern) (components: IDeconstructionComponent list) usedNames =
-        let binding = pat.GetBinding()
+        let binding, _ = pat.GetBinding(true)
         let factory = pat.CreateElementFactory()
 
         let isSingle = components.Length = 1
@@ -126,11 +126,13 @@ type DeconstructAction(deconstruction: IDeconstruction) =
         let factory = pat.CreateElementFactory()
         let hotspotsRegistry = HotspotsRegistry(pat.GetPsiServices())
 
-        let binding = pat.GetBinding()
+        let binding, isFromParameter = pat.GetBinding(true)
         let isTopLevel = binding :? ITopBinding
         let inExprs =
             let letExpr = LetBindingsNavigator.GetByBinding(binding.As()).As<ILetOrUseExpr>()
-            if isNotNull letExpr then [letExpr.InExpression] else
+            if not isFromParameter && isNotNull letExpr then [letExpr.InExpression] else
+
+            if isFromParameter && isNotNull binding then [binding.Expression] else
 
             let pat = skipIntermediatePatParents pat
 
@@ -143,10 +145,13 @@ type DeconstructAction(deconstruction: IDeconstruction) =
             let memberDeclaration = MemberDeclarationNavigator.GetByParameterPattern(pat)
             if isNotNull memberDeclaration then [memberDeclaration.Expression] else
 
+            let accessorDeclaration = AccessorDeclarationNavigator.GetByParameterPattern(pat)
+            if isNotNull accessorDeclaration then [accessorDeclaration.Expression] else
+
             []
 
         let containingType = FSharpNamingService.getPatternContainingType pat
-        let usedNames = FSharpNamingService.getUsedNames inExprs EmptyList.InstanceList containingType false
+        let usedNames = FSharpNamingService.getUsedNames inExprs EmptyList.InstanceList containingType true
 
         let hasUsages = 
             match pat, hasUsages pat with
