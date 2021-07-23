@@ -38,7 +38,11 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) 
              settings.MultilineBlockBracketsOnSameColumn, settings.NewlineBetweenTypeDefinitionAndMembers,
              settings.KeepIfThenInSameLine, settings.MaxElmishWidth, settings.SingleArgumentWebMode,
              settings.AlignFunctionSignatureToIndentation, settings.AlternativeLongMemberDefinitions,
-             settings.SemicolonAtEndOfLine)
+             settings.SemicolonAtEndOfLine, settings.MultiLineLambdaClosingNewline, settings.MaxRecordNumberOfItems,
+             settings.MaxArrayOrListNumberOfItems, settings.MaxDotGetExpressionWidth, settings.DisableElmishSyntax,
+             settings.KeepIndentInBranch, settings.BlankLinesAroundNestedMultilineExpressions,
+             settings.BarBeforeDiscriminatedUnionDeclaration, settings.StrictMode, settings.RecordMultilineFormatter,
+             settings.ArrayOrListMultilineFormatter)
 
     let convertParsingOptions (options: FSharpParsingOptions) =
         let lightSyntax = Option.toNullable options.LightSyntax

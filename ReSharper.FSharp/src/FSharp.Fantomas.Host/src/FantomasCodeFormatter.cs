@@ -1,9 +1,10 @@
+using System;
 using Fantomas;
 using FSharp.Compiler.SourceCodeServices;
-using FSharp.Compiler.Text;
 using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
+using Range = FSharp.Compiler.Text.Range;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
@@ -42,16 +43,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         config.SpaceBeforeClassConstructor, config.SpaceBeforeMember, config.SpaceBeforeColon, config.SpaceAfterComma,
         config.SpaceBeforeSemicolon, config.SpaceAfterSemicolon, config.IndentOnTryWith, config.SpaceAroundDelimiter,
         config.MaxIfThenElseShortWidth, config.MaxInfixOperatorExpression, config.MaxRecordWidth,
-        DefaultFormatConfig.MaxRecordNumberOfItems, DefaultFormatConfig.RecordMultilineFormatter,
-        config.MaxArrayOrListWidth, DefaultFormatConfig.MaxArrayOrListNumberOfItems,
-        DefaultFormatConfig.ArrayOrListMultilineFormatter, config.MaxValueBindingWidth,
-        config.MaxFunctionBindingWidth, DefaultFormatConfig.MaxDotGetExpressionWidth,
+        config.MaxRecordNumberOfItems, Convert(config.RecordMultilineFormatter), config.MaxArrayOrListWidth,
+        config.MaxArrayOrListNumberOfItems, Convert(config.ArrayOrListMultilineFormatter),
+        config.MaxValueBindingWidth, config.MaxFunctionBindingWidth, config.MaxDotGetExpressionWidth,
         config.MultilineBlockBracketsOnSameColumn, config.NewlineBetweenTypeDefinitionAndMembers,
         config.KeepIfThenInSameLine, config.MaxElmishWidth, config.SingleArgumentWebMode,
         config.AlignFunctionSignatureToIndentation, config.AlternativeLongMemberDefinitions,
-        DefaultFormatConfig.MultiLineLambdaClosingNewline, DefaultFormatConfig.DisableElmishSyntax,
-        DefaultFormatConfig.EndOfLine, DefaultFormatConfig.KeepIndentInBranch,
-        DefaultFormatConfig.BlankLinesAroundNestedMultilineExpressions,
-        DefaultFormatConfig.BarBeforeDiscriminatedUnionDeclaration, DefaultFormatConfig.StrictMode);
+        config.MultiLineLambdaClosingNewline, config.DisableElmishSyntax, DefaultFormatConfig.EndOfLine,
+        config.KeepIndentInBranch, config.BlankLinesAroundNestedMultilineExpressions,
+        config.BarBeforeDiscriminatedUnionDeclaration, config.StrictMode);
+
+    private static FormatConfig.MultilineFormatterType Convert(string setting) => setting switch
+    {
+      "character_width" => FormatConfig.MultilineFormatterType.CharacterWidth,
+      "number_of_items" => FormatConfig.MultilineFormatterType.NumberOfItems,
+      _ => throw new ArgumentOutOfRangeException(nameof(setting), setting, null)
+    };
   }
 }

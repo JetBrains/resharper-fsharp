@@ -157,5 +157,49 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
     [SettingsEntry(true, "Never outdent pipe operators")]
     public bool NeverOutdentPipeOperators;
+
+    [SettingsEntry(false, nameof(MultiLineLambdaClosingNewline))]
+    [EditorConfigEntryAlias("multi_line_lambda_closing_newline", EditorConfigAliasType.LanguageSpecific)]
+    public bool MultiLineLambdaClosingNewline;
+
+    [SettingsEntry(1, nameof(MaxRecordNumberOfItems))]
+    [EditorConfigEntryAlias("max_record_number_of_items", EditorConfigAliasType.LanguageSpecific)]
+    public int MaxRecordNumberOfItems;
+
+    [SettingsEntry(1, nameof(MaxArrayOrListNumberOfItems))]
+    [EditorConfigEntryAlias("max_array_or_list_number_of_items", EditorConfigAliasType.LanguageSpecific)]
+    public int MaxArrayOrListNumberOfItems;
+
+    [SettingsEntry(50, nameof(MaxDotGetExpressionWidth))]
+    [EditorConfigEntryAlias("max_dot_get_expression_width", EditorConfigAliasType.LanguageSpecific)]
+    public int MaxDotGetExpressionWidth;
+
+    [SettingsEntry(false, nameof(DisableElmishSyntax))]
+    [EditorConfigEntryAlias("disable_elmish_syntax", EditorConfigAliasType.LanguageSpecific)]
+    public bool DisableElmishSyntax;
+
+    [SettingsEntry(false, nameof(KeepIndentInBranch))]
+    [EditorConfigEntryAlias("keep_indent_in_branch", EditorConfigAliasType.LanguageSpecific)]
+    public bool KeepIndentInBranch;
+
+    [SettingsEntry(true, nameof(BlankLinesAroundNestedMultilineExpressions))]
+    [EditorConfigEntryAlias("blank_lines_around_nested_multiline_expressions", EditorConfigAliasType.LanguageSpecific)]
+    public bool BlankLinesAroundNestedMultilineExpressions;
+
+    [SettingsEntry(false, nameof(BarBeforeDiscriminatedUnionDeclaration))]
+    [EditorConfigEntryAlias("bar_before_discriminated_union_declaration", EditorConfigAliasType.LanguageSpecific)]
+    public bool BarBeforeDiscriminatedUnionDeclaration;
+
+    [SettingsEntry(false, nameof(StrictMode))]
+    [EditorConfigEntryAlias("strict_mode", EditorConfigAliasType.LanguageSpecific)]
+    public bool StrictMode;
+
+    [SettingsEntry("character_width", nameof(RecordMultilineFormatter))]
+    [EditorConfigEntryAlias("record_multiline_formatter", EditorConfigAliasType.LanguageSpecific)]
+    public string RecordMultilineFormatter;
+
+    [SettingsEntry("character_width", nameof(ArrayOrListMultilineFormatter))]
+    [EditorConfigEntryAlias("array_or_list_multiline_formatter", EditorConfigAliasType.LanguageSpecific)]
+    public string ArrayOrListMultilineFormatter;
   }
 }
