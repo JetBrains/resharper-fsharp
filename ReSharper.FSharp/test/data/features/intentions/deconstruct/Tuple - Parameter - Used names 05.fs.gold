@@ -1,0 +1,4 @@
+﻿let i = 1
+
+let f ((i1, s{caret}): int * string) =
+    ignore i
