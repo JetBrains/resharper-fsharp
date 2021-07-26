@@ -1,0 +1,2 @@
+﻿let f (((i1, i2{caret}), i): (int * int) * int) =
+    ()

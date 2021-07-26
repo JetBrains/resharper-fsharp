@@ -203,6 +203,41 @@ module FSharpNamingService =
         let letDecl = LetBindingsDeclarationNavigator.GetByBinding(binding)
         getContainingType letDecl
 
+    // todo: use in Rename
+    let getPatternUsedNames (contextPattern: IFSharpPattern) =
+        let names = HashSet()
+
+        let rec loop (pat: IFSharpPattern) =
+            if isNull pat then () else
+
+            let addNames (pats: IEnumerable<IFSharpPattern>) =
+                pats
+                |> Seq.filter ((!=) pat)
+                |> Seq.collect (fun pat -> pat.NestedPatterns)
+                |> Seq.choose (fun pat ->
+                    match pat with
+                    | :? INamedPat as namedPat -> Some(namedPat.SourceName)
+                    | _ -> None)
+                |> names.AddRange
+            
+            match pat.Parent with
+            | :? ITuplePat as tuplePat -> addNames tuplePat.PatternsEnumerable
+            | :? IAndsPat as andsPat -> addNames andsPat.PatternsEnumerable
+            | :? IArrayOrListPat as asPat -> addNames asPat.PatternsEnumerable
+            | :? IRecordPat as recordPat -> addNames (Seq.cast recordPat.FieldPatternsEnumerable)
+            | :? IListConsPat as listConsPat -> addNames [listConsPat.HeadPattern; listConsPat.TailPattern]
+            | :? IParametersOwnerPat as parametersOwnerPat -> addNames parametersOwnerPat.ParametersEnumerable
+
+            | :? INamedPat as namedPat ->
+                names.Add(namedPat.SourceName) |> ignore
+                loop namedPat
+
+            | :? IFSharpPattern as fsPat -> loop fsPat
+            | _ -> ()
+
+        loop contextPattern
+        names
+
     let getUsedNames (contextExprs: IFSharpExpression list) usages containingTypeElement checkFcsSymbols: ISet<string> =
         let usedNames = getUsedNamesUsages contextExprs usages containingTypeElement checkFcsSymbols
         HashSet(usedNames.Keys) :> _

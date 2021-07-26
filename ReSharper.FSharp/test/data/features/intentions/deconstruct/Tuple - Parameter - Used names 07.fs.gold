@@ -1,0 +1,6 @@
+﻿let s = ""
+
+let f ((i1, i2, s1{caret}): int * int * string) i =
+    let i1 = ()
+    ignore i1, s
+    ()

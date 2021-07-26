@@ -1,0 +1,2 @@
+﻿match 1, 2 with
+| i, i1{caret} as t | (_, _ as t) -> ()

@@ -30,6 +30,10 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Tuple - Parameter - Used names 03``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Parameter - Used names 04``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Parameter - Used names 05``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Parameter - Used names 06``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Parameter - Used names 07``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Tuple - Parameter - Used names 08``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple - Used names 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case - Single - Import 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Let 01``() = x.DoNamedTest()

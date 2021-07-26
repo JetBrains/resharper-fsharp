@@ -65,6 +65,8 @@ type DeconstructAction(deconstruction: IDeconstruction) =
     let hasUsages (pat: IFSharpPattern) =
         match pat with
         | :? IReferencePat as refPat ->
+            if pat.GetPartialDeclarations() |> Seq.length > 1 then true else
+
             let element = refPat.DeclaredElement
             let references = List()
             let searchPattern = SearchPattern.FIND_USAGES ||| SearchPattern.FIND_RELATED_ELEMENTS
@@ -127,7 +129,9 @@ type DeconstructAction(deconstruction: IDeconstruction) =
         let hotspotsRegistry = HotspotsRegistry(pat.GetPsiServices())
 
         let binding, isFromParameter = pat.GetBinding(true)
+        let binding = binding.As<IBinding>()
         let isTopLevel = binding :? ITopBinding
+
         let inExprs =
             let letExpr = LetBindingsNavigator.GetByBinding(binding.As()).As<ILetOrUseExpr>()
             if not isFromParameter && isNotNull letExpr then [letExpr.InExpression] else
@@ -152,6 +156,18 @@ type DeconstructAction(deconstruction: IDeconstruction) =
 
         let containingType = FSharpNamingService.getPatternContainingType pat
         let usedNames = FSharpNamingService.getUsedNames inExprs EmptyList.InstanceList containingType true
+
+        let patternUsedNames = FSharpNamingService.getPatternUsedNames pat
+        usedNames.AddRange(patternUsedNames)
+
+        if isFromParameter && isNotNull binding then
+            for parameterPattern in binding.ParameterPatterns do
+                if parameterPattern.Contains(pat) then () else
+
+                parameterPattern.NestedPatterns
+                |> Seq.iter (function
+                    | :? INamedPat as namedPat -> usedNames.Add(namedPat.SourceName) |> ignore
+                    | _ -> ())
 
         let hasUsages = 
             match pat, hasUsages pat with
@@ -262,11 +278,7 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
         let binding = BindingNavigator.GetByHeadPattern(pat)
         if isNotNull binding && binding.ParametersDeclarationsEnumerable.Any() then false else
 
-        if isNotNull (ConstructorDeclarationNavigator.GetByParameterPatterns(skipIntermediatePatParents pat)) then false else
-
-        if isNull (pat.GetPartialDeclarations().SingleItem()) then false else
-
-        true
+        isNull (ConstructorDeclarationNavigator.GetByParameterPatterns(skipIntermediatePatParents pat))
 
     let getPatternFcsType (pat: IFSharpPattern) =
         match pat with
