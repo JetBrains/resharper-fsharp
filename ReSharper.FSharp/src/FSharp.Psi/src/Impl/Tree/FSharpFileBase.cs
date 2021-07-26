@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public FSharpOption<FSharpParseFileResults> ParseResults
     {
-      get => myParseResults.GetValue(this, fsFile => FcsCheckerService.ParseFile(SourceFile));
+      get => myParseResults.GetValue(this, fsFile => fsFile.FcsCheckerService.ParseFile(fsFile.SourceFile));
       set => myParseResults.SetValue(this, value);
     }
 
