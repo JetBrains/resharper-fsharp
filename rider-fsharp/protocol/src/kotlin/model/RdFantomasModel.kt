@@ -52,6 +52,17 @@ object RdFantomasModel : Root() {
         field("alignFunctionSignatureToIndentation", bool)
         field("alternativeLongMemberDefinitions", bool)
         field("semicolonAtEndOfLine", bool)
+        field("multiLineLambdaClosingNewline", bool)
+        field("maxRecordNumberOfItems", int)
+        field("maxArrayOrListNumberOfItems", int)
+        field("maxDotGetExpressionWidth", int)
+        field("disableElmishSyntax", bool)
+        field("keepIndentInBranch", bool)
+        field("blankLinesAroundNestedMultilineExpressions", bool)
+        field("barBeforeDiscriminatedUnionDeclaration", bool)
+        field("strictMode", bool)
+        field("recordMultilineFormatter", string)
+        field("arrayOrListMultilineFormatter", string)
     }
 
     private val rdFormatArgs = basestruct {
