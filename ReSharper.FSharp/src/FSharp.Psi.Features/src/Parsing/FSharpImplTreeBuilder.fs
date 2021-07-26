@@ -918,11 +918,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
 
         // todo: isOptional
         | SynExpr.LongIdent(_, lid, _, _) ->
-            x.ProcessLongIdentifierExpression(lid.Lid, range)
+            x.ProcessLongIdentifierExpression(lid, range)
 
         | SynExpr.LongIdentSet(lid, expr, _) ->
             x.PushRange(range, ElementType.SET_EXPR)
-            x.ProcessLongIdentifierExpression(lid.Lid, lid.Range)
+            x.ProcessLongIdentifierExpression(lid, lid.Range)
             x.ProcessExpression(expr)
 
         | SynExpr.DotGet(expr, _, lid, _) ->
@@ -942,7 +942,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushRange(range, ElementType.SET_EXPR)
             x.PushExpression(expr2)
             x.PushRange(Range.unionRanges lid.Range expr1.Range, ElementType.NAMED_INDEXER_EXPR)
-            x.ProcessLongIdentifierExpression(lid.Lid, lid.Range)
+            x.ProcessLongIdentifierExpression(lid, lid.Range)
             x.PushRange(expr1.Range, ElementType.INDEXER_ARG)
             x.ProcessExpression(expr1)
 
@@ -1029,10 +1029,10 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         | SynExpr.LibraryOnlyILAssembly _ ->
             x.MarkAndDone(range, ElementType.LIBRARY_ONLY_EXPR)
 
-        | SynExpr.ArbitraryAfterError _
-        | SynExpr.DiscardAfterMissingQualificationAfterDot _ ->
+        | SynExpr.ArbitraryAfterError _ ->
             x.MarkAndDone(range, ElementType.FROM_ERROR_EXPR)
 
+        | SynExpr.DiscardAfterMissingQualificationAfterDot(expr, _)
         | SynExpr.FromParseError(expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.FROM_ERROR_EXPR)
 
@@ -1091,7 +1091,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
 
         x.ProcessExpression(fromExpr)
 
-    member x.ProcessLongIdentifierExpression(lid, range) =
+    member x.ProcessLongIdentifierExpression(lidWithDots: LongIdentWithDots, range) =
+        // There may be dot at the end, consider unfinished expr like `System.`
+        // todo: optimize checking extra dot in FCS, wrap in error node
+
+        let lid = lidWithDots.Lid
         let marks = Stack()
 
         x.AdvanceToStart(range)
