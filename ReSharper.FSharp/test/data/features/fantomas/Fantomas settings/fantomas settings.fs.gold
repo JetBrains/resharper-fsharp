@@ -1,0 +1,12 @@
+﻿=== fsharp ===
+ArrayOrListMultilineFormatter, default=character_width settings=character_width editorConfig=number_of_items
+BarBeforeDiscriminatedUnionDeclaration, default=False settings=False editorConfig=True
+BlankLinesAroundNestedMultilineExpressions, default=True settings=True editorConfig=False
+DisableElmishSyntax, default=False settings=False editorConfig=True
+KeepIndentInBranch, default=False settings=False editorConfig=True
+MaxArrayOrListNumberOfItems, default=1 settings=1 editorConfig=2
+MaxDotGetExpressionWidth, default=50 settings=50 editorConfig=51
+MaxRecordNumberOfItems, default=1 settings=1 editorConfig=2
+MultiLineLambdaClosingNewline, default=False settings=False editorConfig=True
+RecordMultilineFormatter, default=character_width settings=character_width editorConfig=number_of_items
+StrictMode, default=False settings=False editorConfig=True
