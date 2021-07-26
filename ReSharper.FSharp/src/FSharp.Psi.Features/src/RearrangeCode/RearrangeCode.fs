@@ -170,15 +170,30 @@ type RearrangeableEnumCaseLikeDeclaration(decl: IEnumCaseLikeDeclaration) =
                 Whitespace()
             ] |> ignore
 
+            let typeRepr = EnumLikeTypeRepresentationNavigator.GetByEnumLikeCase(caseDeclaration)
+            if isNull typeRepr then () else
+
+            let cases = typeRepr.Cases
+            if cases.Count <= 1 || cases.[0] != caseDeclaration then () else 
+
+            let firstCaseIndent = cases.[0].Indent
+            let secondCaseIndent = cases.[1].Indent
+
+            if firstCaseIndent > secondCaseIndent then
+                let indentDiff = firstCaseIndent - secondCaseIndent
+
+                let reduceIndent (node: ITreeNode) =
+                    if isInlineSpace node && node.GetTextLength() > indentDiff then
+                        let newSpace = Whitespace(node.GetTextLength() - indentDiff)
+                        replace node newSpace
+                        true
+                    else
+                        false
+
+                (reduceIndent caseDeclaration.PrevSibling || reduceIndent typeRepr.PrevSibling) |> ignore
+
     override this.GetSiblings() =
-        match decl with
-        | :? IUnionCaseDeclaration as caseDeclaration ->
-            UnionRepresentationNavigator.GetByUnionCase(caseDeclaration).NotNull().UnionCases |> Seq.cast
-
-        | :? IEnumCaseDeclaration as caseDeclaration ->
-            EnumRepresentationNavigator.GetByEnumCase(caseDeclaration).NotNull().EnumCases |> Seq.cast
-
-        | _ -> failwithf $"Unexpected declaration: {decl}"
+        EnumLikeTypeRepresentationNavigator.GetByEnumLikeCase(decl).NotNull().Cases :> _
 
     override this.BeforeSwap(child, target) =
         addBarIfNeeded child

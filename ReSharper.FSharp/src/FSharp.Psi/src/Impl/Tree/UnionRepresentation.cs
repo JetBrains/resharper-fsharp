@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -39,5 +40,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override PartKind TypePartKind => TypeDeclaration.GetSimpleTypeKindFromAttributes();
+    public IReadOnlyList<IEnumCaseLikeDeclaration> Cases => UnionCases;
   }
 }

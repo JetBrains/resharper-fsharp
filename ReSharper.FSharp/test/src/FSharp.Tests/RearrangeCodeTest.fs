@@ -30,6 +30,8 @@ type RearrangeCodeTest() =
 
     [<Test>] member x.``Enum case 01``() = x.DoNamedTest()
     [<Test>] member x.``Enum case 02 - Xml doc``() = x.DoNamedTest()
+    [<Test>] member x.``Enum case 03 - Xml doc``() = x.DoNamedTest()
+    [<Test>] member x.``Enum case 04 - Xml doc``() = x.DoNamedTest()
 
     [<Test>] member x.``Field - Exception 01``() = x.DoNamedTest()
 

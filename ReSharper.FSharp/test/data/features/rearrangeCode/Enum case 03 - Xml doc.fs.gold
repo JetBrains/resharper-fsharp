@@ -1,0 +1,7 @@
+﻿// ${DIRECTION:Up}
+
+type U =
+    /// B
+    | B = 2
+
+    | A = 1

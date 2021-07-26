@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -8,5 +9,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public IReadOnlyList<ITypeMemberDeclaration> GetMemberDeclarations() => EnumCases;
     public override PartKind TypePartKind => PartKind.Enum;
+    public IReadOnlyList<IEnumCaseLikeDeclaration> Cases => EnumCases;
   }
 }
