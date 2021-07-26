@@ -76,6 +76,9 @@ intellij {
     instrumentCode = false
     downloadSources = false
 
+    // Uncomment when need to install plugin into a different IDE build.
+    // updateSinceUntilBuild = false
+
     // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
     setPlugins("rider-plugins-appender")
 }
