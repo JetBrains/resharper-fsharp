@@ -701,6 +701,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (typeElement is IFSharpModule fsModule)
         return fsModule.AccessKind;
 
+      if (typeElement is IEnum)
+        return ModuleMembersAccessKind.RequiresQualifiedAccess;
+
       return MayHaveRequireQualifiedAccessAttribute(typeElement) && typeElement.HasRequireQualifiedAccessAttribute()
         ? ModuleMembersAccessKind.RequiresQualifiedAccess
         : ModuleMembersAccessKind.Normal;

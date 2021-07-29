@@ -36,6 +36,13 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Tuple - Used names 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case - Single - Import 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Import 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Import 03``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Import 04``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Import 05``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Import 06``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Import 07``() = x.DoNamedTest()
+    [<Test>] member x.``Union case - Single - Import 08``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Let 02``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Rqa 01``() = x.DoNamedTest()

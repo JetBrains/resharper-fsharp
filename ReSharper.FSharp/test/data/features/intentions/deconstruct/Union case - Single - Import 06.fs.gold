@@ -1,0 +1,13 @@
+﻿namespace Ns
+
+module Module =
+    [<RequireQualifiedAccess>]
+    module Module1 =
+        module Nested =
+            type U =
+                | A of int
+
+    open Module1.Nested
+    
+    module Module2 =
+        let (A i{caret}) = Module1.Nested.A 1

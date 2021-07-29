@@ -207,9 +207,16 @@ type DeconstructAction(deconstruction: IDeconstruction) =
                 let pattern, names = createInnerDeconstructionPattern pat deconstruction.Components usedNames
 
                 let name = deconstruction.Name
-                let typeElement = deconstruction.Entity.GetTypeElement(pat.GetPsiModule())
-                let requiresQualifiedName = isNotNull typeElement && typeElement.RequiresQualifiedAccess()
-                let name = if requiresQualifiedName then $"{typeElement.GetSourceName()}.{name}" else name
+                let name, qualifierTypeElement =
+                    let typeElement = deconstruction.Entity.GetTypeElement(pat.GetPsiModule())
+                    let requiresQualifiedName = isNotNull typeElement && typeElement.RequiresQualifiedAccess()
+                    if requiresQualifiedName then $"{typeElement.GetSourceName()}.{name}", typeElement else
+
+                    let containingType = typeElement.GetContainingType()
+                    if isNotNull containingType && containingType.RequiresQualifiedAccess() then
+                        $"{containingType.GetSourceName()}.{name}", containingType else
+
+                    name, typeElement
 
                 let parametersOwnerPat =
                     let pattern = factory.CreatePattern($"({name} _)", false) :?> IParenPat
@@ -220,14 +227,14 @@ type DeconstructAction(deconstruction: IDeconstruction) =
                 let reference = parametersOwnerPat.ReferenceName.Reference
                 let unionCase = deconstruction.UnionCase
                 if not (FSharpResolveUtil.resolvesToFcsSymbol unionCase reference true "Deconstruct union case") then
-                    if requiresQualifiedName then
-                        let qualifierReference = reference.QualifierReference
-                        FSharpReferenceBindingUtil.SetRequiredQualifiers(qualifierReference, typeElement)
+                    let qualifierReference = reference.QualifierReference
+                    if isNotNull qualifierReference then
+                        FSharpReferenceBindingUtil.SetRequiredQualifiers(qualifierReference, qualifierTypeElement)
 
                     let containingModules = getContainingModules parametersOwnerPat
-                    let moduleToOpen = getModuleToOpen typeElement
+                    let moduleToOpen = getModuleToOpen qualifierTypeElement
                     if not (containingModules.Contains(moduleToOpen)) then
-                        addOpens reference typeElement |> ignore
+                        addOpens reference qualifierTypeElement |> ignore
 
                 let parametersOwnerPat = RedundantParenPatAnalyzer.addParensIfNeeded parametersOwnerPat
                 let parametersOwnerPat = parametersOwnerPat :?> IParametersOwnerPat

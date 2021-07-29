@@ -19,6 +19,9 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Basic 03 - Replace before``() = x.DoNamedTest()
     [<Test>] member x.``Basic 04 - Insert before``() = x.DoNamedTest()
 
+    [<Test>] member x.``Bind - Qualifier - Enum case 01``() = x.DoNamedTest()
+    [<Test>] member x.``Bind - Qualifier - Enum case 02 - Escape``() = x.DoNamedTest()
+
     [<Test>] member x.``Wild 01 - Replace``() = x.DoNamedTest()
     [<Test>] member x.``Wild 02 - Insert``() = x.DoNamedTest()
     [<Test>] member x.``Wild 03 - Replace before``() = x.DoNamedTest()

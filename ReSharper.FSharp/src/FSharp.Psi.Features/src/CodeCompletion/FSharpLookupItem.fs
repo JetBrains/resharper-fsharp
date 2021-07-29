@@ -11,6 +11,8 @@ open JetBrains.RdBackend.Common.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
@@ -58,17 +60,6 @@ type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionCo
 
     let mutable candidates = Unchecked.defaultof<_>
 
-    let addOpen ns =
-        let offset = context.Ranges.InsertRange.StartOffset
-        let fsFile = context.BasicContext.SourceFile.FSharpFile
-        let psiServices = fsFile.GetPsiServices()
-
-        use writeCookie = WriteLockCookie.Create(fsFile.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-        use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, "Add open")
-
-        addOpen offset fsFile context.BasicContext.ContextBoundSettingsStore ns
-
     member x.Candidates =
         match candidates with
         | null ->
@@ -106,14 +97,50 @@ type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionCo
     override x.OnAfterComplete(textControl, nameRange, decorationRange, tailType, suffix, caretPositionRangeMarker) =
         base.OnAfterComplete(textControl, &nameRange, &decorationRange, tailType, &suffix, &caretPositionRangeMarker)
 
+        // todo: 213: exit early if there's no need in additional binding
+        context.BasicContext.Solution.GetPsiServices().Files.CommitAllDocuments()
+
+        let fsFile = context.BasicContext.SourceFile.FSharpFile
+        let psiServices = fsFile.GetPsiServices()
+
+        use writeCookie = WriteLockCookie.Create(fsFile.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
+        use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, "Add open")
+
+        let declaredElement = item.FSharpSymbol.GetDeclaredElement(context.PsiModule)
+
+        let typeElement =
+            // todo: other declared elements
+            match declaredElement with
+            | :? ITypeElement as typeElement -> typeElement
+            | :? IField as field when (field.ContainingType :? IEnum) -> field.ContainingType
+            | _ -> null
+
         let ns = item.NamespaceToOpen
+        let moduleToImport =
+            if isNotNull typeElement then
+                let moduleToOpen = getModuleToOpen typeElement
+                ModuleToImport.DeclaredElement(moduleToOpen) else
+
+            let ns = ns |> Array.map FSharpKeywords.QuoteIdentifierIfNeeded |> String.concat "."
+            ModuleToImport.FullName(ns)
+
+        let offset = context.Ranges.InsertRange.StartOffset
+        // todo: getting reference owner in parse errors, e.g. unfinished `if`
+        let referenceOwner = fsFile.GetNode<IFSharpReferenceOwner>(offset)
+        if isNotNull referenceOwner && isNotNull typeElement then
+            let clrDeclaredElement: IClrDeclaredElement =
+                // todo: other elements: union cases
+                match declaredElement with
+                | :? ITypeElement as typeElement -> typeElement :> _
+                | :? IField as field when (field.ContainingType :? IEnum) -> field :> _
+                | _ -> null
+
+            if isNotNull clrDeclaredElement then
+                FSharpReferenceBindingUtil.SetRequiredQualifiers(referenceOwner.Reference, clrDeclaredElement)
+
         if ns.IsEmpty() then () else
-
-        let ns = ns |> Array.map FSharpKeywords.QuoteIdentifierIfNeeded |> String.concat "."
-
-        let solution = context.BasicContext.Solution
-        solution.GetPsiServices().Files.CommitAllDocuments()
-        addOpen ns
+        addOpen offset fsFile context.BasicContext.ContextBoundSettingsStore moduleToImport
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)
