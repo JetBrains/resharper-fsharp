@@ -16,7 +16,7 @@ using static FSharp.Compiler.ExtensionTyping;
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
   [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-  public class ProxyProvidedConstructorInfo : ProvidedConstructorInfo, IRdProvidedEntity, IProxyProvidedWithContext<ProxyProvidedConstructorInfoWithContext>
+  public class ProxyProvidedConstructorInfo : ProvidedConstructorInfo, IRdProvidedEntity
   {
     private readonly RdProvidedConstructorInfo myConstructorInfo;
     private readonly int myTypeProviderId;

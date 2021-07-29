@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       myTypeProvidersContext.Connection.ProtocolModel.RdProvidedTypeProcessModel;
 
     private ProxyProvidedType(RdOutOfProcessProvidedType rdProvidedType, int typeProviderId,
-      TypeProvidersContext typeProvidersContext) : base(null, ProvidedTypeContext.Empty)
+      TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myRdProvidedType = rdProvidedType;
       myTypeProviderId = typeProviderId;

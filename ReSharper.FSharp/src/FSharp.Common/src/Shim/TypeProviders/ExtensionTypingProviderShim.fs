@@ -117,6 +117,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
             $"{inProcessDump}\n\n{outOfProcessDump}"
 
         member this.TypeProvidersManager with get() = typeProvidersManager
+
         member this.IsConnectionAlive with get() = isConnectionAlive ()
 
     interface IDisposable with
