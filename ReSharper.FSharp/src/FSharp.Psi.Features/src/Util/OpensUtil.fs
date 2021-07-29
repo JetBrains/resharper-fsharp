@@ -215,6 +215,10 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) settings (moduleToImp
                 NewLine(lineEnding)
         ] |> ignore
 
+    let duplicates (ns: string) (openStatement: IOpenStatement) =
+        let referenceName = openStatement.ReferenceName
+        isNotNull referenceName && referenceName.QualifiedName = ns
+
     let rec addOpenToOpensGroup (opens: IOpenStatement list) (ns: string) =
         match opens with
         | [] -> failwith "Expecting non-empty list"
@@ -248,7 +252,10 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) settings (moduleToImp
         if Seq.isEmpty skippedMembers then moduleMembers else skippedMembers
 
     match tryGetFirstOpensGroup moduleMembers with
-    | Some opens -> addOpenToOpensGroup opens ns
+    | Some opens ->
+        // note: partial name modules may be added without being a duplicate (we don't add them now, though)
+        if Seq.exists (duplicates ns) opens |> not then
+            addOpenToOpensGroup opens ns
     | _ ->
 
     match moduleDecl with
