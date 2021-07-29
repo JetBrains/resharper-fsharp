@@ -126,8 +126,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
             typeProviderProxies
 
         member this.HasGenerativeTypeProviders(assembly) =
-            let typeProviders = typeProviders.Get(assembly)
-            typeProviders |> Seq.exists (fun x -> x.IsGenerative)
+            typeProviders.Get(assembly) |> Seq.exists (fun x -> x.IsGenerative)
 
         member this.Dump() =
             $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"
