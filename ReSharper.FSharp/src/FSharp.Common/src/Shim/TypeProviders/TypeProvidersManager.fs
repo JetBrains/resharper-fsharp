@@ -52,6 +52,15 @@ type internal TypeProvidersCache() =
         if not hasValue then failwith $"Cannot get type provider {id} from TypeProvidersCache"
         else proxyTypeProvidersPerId.[id]
 
+    member x.Get(assembly) =
+        let providersData =
+            typeProvidersPerAssembly
+            |> Seq.tryFind (fun (KeyValue((_, outputAssembly), _)) -> outputAssembly = assembly)
+
+        match providersData with
+        | Some x -> x.Value.Values
+        | None -> [||] :> _
+
     member x.Dump() =
         let typeProviders =
             proxyTypeProvidersPerId
@@ -74,13 +83,14 @@ type IProxyTypeProvidersManager =
         systemRuntimeAssemblyVersion: Version *
         compilerToolsPath: string list -> ITypeProvider list
 
+    abstract member HasGenerativeTypeProviders: assembly: string -> bool
     abstract member Dump: unit -> string
 
 type TypeProvidersManager(connection: TypeProvidersConnection) =
     let protocol = connection.ProtocolModel.RdTypeProviderProcessModel
     let lifetime = connection.Lifetime
-    let tpContext = TypeProvidersContext(connection)
     let typeProviders = TypeProvidersCache()
+    let tpContext = TypeProvidersContext(connection)
 
     do connection.Execute(fun () ->
         protocol.Invalidate.Advise(lifetime, fun id -> typeProviders.Get(id).OnInvalidate()))
@@ -90,7 +100,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
                 resolutionEnvironment: ResolutionEnvironment, isInvalidationSupported: bool, isInteractive: bool,
                 systemRuntimeContainsType: string -> bool, systemRuntimeAssemblyVersion: Version,
                 compilerToolsPath: string list) =
-            let envKey = $"{designTimeAssemblyNameString}+{resolutionEnvironment.resolutionFolder}"
+            let envKey = designTimeAssemblyNameString, resolutionEnvironment.outputFile.Value
 
             let result =
                 let fakeTcImports = getFakeTcImports systemRuntimeContainsType
@@ -114,6 +124,10 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
                      tp :> ITypeProvider ]
 
             typeProviderProxies
+
+        member this.HasGenerativeTypeProviders(assembly) =
+            let typeProviders = typeProviders.Get(assembly)
+            typeProviders |> Seq.exists (fun x -> x.IsGenerative)
 
         member this.Dump() =
             $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"

@@ -15,24 +15,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private readonly RdProvidedParameterInfo myParameterInfo;
     private readonly int myTypeProviderId;
     private readonly TypeProvidersContext myTypeProvidersContext;
-    private readonly ProvidedTypeContextHolder myContext;
 
     private ProxyProvidedParameterInfo(RdProvidedParameterInfo parameterInfo, int typeProviderId,
-      TypeProvidersContext typeProvidersContext, ProvidedTypeContextHolder context) : base(null, context.Context)
+      TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myParameterInfo = parameterInfo;
       myTypeProviderId = typeProviderId;
       myTypeProvidersContext = typeProvidersContext;
-      myContext = context;
       RawDefaultValue = myParameterInfo.RawDefaultValue.Unbox();
     }
 
     [ContractAnnotation("parameter:null => null")]
     public static ProxyProvidedParameterInfo Create(RdProvidedParameterInfo parameter, int typeProviderId,
-      TypeProvidersContext typeProvidersContext, ProvidedTypeContextHolder context) =>
+      TypeProvidersContext typeProvidersContext) =>
       parameter == null
         ? null
-        : new ProxyProvidedParameterInfo(parameter, typeProviderId, typeProvidersContext, context);
+        : new ProxyProvidedParameterInfo(parameter, typeProviderId, typeProvidersContext);
 
     public override string Name => myParameterInfo.Name;
     public override bool IsIn => myParameterInfo.IsIn;
@@ -62,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
           .CustomAttributes);
 
     public override ProvidedType ParameterType =>
-      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myParameterInfo.ParameterType, myTypeProviderId, myContext);
+      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myParameterInfo.ParameterType, myTypeProviderId);
 
     private string[] myXmlDocs;
   }

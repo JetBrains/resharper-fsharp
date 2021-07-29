@@ -17,6 +17,8 @@ type IProxyExtensionTypingProvider =
     inherit IExtensionTypingProvider
 
     abstract RuntimeVersion: unit -> string
+    abstract IsConnectionAlive: bool
+    abstract TypeProvidersManager: IProxyTypeProvidersManager
     abstract DumpTypeProvidersProcess: unit -> string
 
 [<SolutionComponent>]
@@ -113,6 +115,9 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                     connection.ProtocolModel.RdTestHost.Dump.Sync(Unit.Instance))}"
 
             $"{inProcessDump}\n\n{outOfProcessDump}"
+
+        member this.TypeProvidersManager with get() = typeProvidersManager
+        member this.IsConnectionAlive with get() = isConnectionAlive ()
 
     interface IDisposable with
         member this.Dispose() = terminateConnection ()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Rd.Tasks;
@@ -14,12 +15,12 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
-  public class ProxyProvidedConstructorInfo : ProvidedConstructorInfo, IRdProvidedEntity
+  [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
+  public class ProxyProvidedConstructorInfo : ProvidedConstructorInfo, IRdProvidedEntity, IProxyProvidedWithContext<ProxyProvidedConstructorInfoWithContext>
   {
     private readonly RdProvidedConstructorInfo myConstructorInfo;
     private readonly int myTypeProviderId;
     private readonly TypeProvidersContext myTypeProvidersContext;
-    private readonly ProvidedTypeContextHolder myContext;
     public int EntityId => myConstructorInfo.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.ConstructorInfo;
 
@@ -27,30 +28,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       myTypeProvidersContext.Connection.ProtocolModel.RdProvidedConstructorInfoProcessModel;
 
     private ProxyProvidedConstructorInfo(RdProvidedConstructorInfo constructorInfo, int typeProviderId,
-      TypeProvidersContext typeProvidersContext, ProvidedTypeContextHolder context) : base(null, context.Context)
+      TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myConstructorInfo = constructorInfo;
       myTypeProviderId = typeProviderId;
       myTypeProvidersContext = typeProvidersContext;
-      myContext = context;
 
       myParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() =>
-        // ReSharper disable once CoVariantArrayConversion
         myTypeProvidersContext.Connection
           .ExecuteWithCatch(() => RdProvidedConstructorInfoProcessModel.GetParameters.Sync(EntityId))
-          .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, typeProvidersContext, myContext))
+          .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, typeProvidersContext))
           .ToArray());
 
       myGenericArguments = new InterruptibleLazy<ProvidedType[]>(() =>
-        myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(constructorInfo.GenericArguments, myTypeProviderId,
-          myContext));
+        myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(constructorInfo.GenericArguments, myTypeProviderId));
 
-      myStaticParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() =>
-        // ReSharper disable once CoVariantArrayConversion
-        myTypeProvidersContext.Connection
-          .ExecuteWithCatch(() => RdProvidedConstructorInfoProcessModel.GetStaticParametersForMethod.Sync(EntityId))
-          .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, typeProvidersContext, myContext))
-          .ToArray());
+      myStaticParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() => myTypeProvidersContext.Connection
+        .ExecuteWithCatch(() => RdProvidedConstructorInfoProcessModel.GetStaticParametersForMethod.Sync(EntityId))
+        .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, typeProvidersContext))
+        .ToArray());
 
       myCustomAttributes = new InterruptibleLazy<RdCustomAttributeData[]>(() =>
         myTypeProvidersContext.ProvidedCustomAttributeProvider.GetCustomAttributes(this));
@@ -58,10 +54,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     [ContractAnnotation("constructorInfo:null => null")]
     public static ProxyProvidedConstructorInfo Create(RdProvidedConstructorInfo constructorInfo, int typeProviderId,
-      TypeProvidersContext typeProvidersContext, ProvidedTypeContextHolder context) =>
+      TypeProvidersContext typeProvidersContext) =>
       constructorInfo == null
         ? null
-        : new ProxyProvidedConstructorInfo(constructorInfo, typeProviderId, typeProvidersContext, context);
+        : new ProxyProvidedConstructorInfo(constructorInfo, typeProviderId, typeProvidersContext);
 
     public override string Name => myConstructorInfo.Name;
     public override bool IsConstructor => HasFlag(RdProvidedMethodFlags.IsConstructor);
@@ -87,14 +83,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       var method = Create(myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
         RdProvidedConstructorInfoProcessModel.ApplyStaticArgumentsForMethod.Sync(
           new ApplyStaticArgumentsForMethodArgs(EntityId, fullNameAfterArguments, staticArgDescriptions),
-          RpcTimeouts.Maximal)), myTypeProviderId, myTypeProvidersContext, myContext);
+          RpcTimeouts.Maximal)), myTypeProviderId, myTypeProvidersContext);
 
       return method;
     }
 
     public override ProvidedType DeclaringType =>
-      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myConstructorInfo.DeclaringType, myTypeProviderId,
-        myContext);
+      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myConstructorInfo.DeclaringType, myTypeProviderId);
 
     public override ProvidedParameterInfo[] GetParameters() => myParameters.Value;
     public override ProvidedType[] GetGenericArguments() => myGenericArguments.Value;
@@ -123,5 +118,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private readonly InterruptibleLazy<ProvidedType[]> myGenericArguments;
     private readonly InterruptibleLazy<ProvidedParameterInfo[]> myStaticParameters;
     private readonly InterruptibleLazy<RdCustomAttributeData[]> myCustomAttributes;
+
+    public ProxyProvidedConstructorInfoWithContext ApplyContext(ProvidedTypeContext context) =>
+      new ProxyProvidedConstructorInfoWithContext(this, context);
   }
 }

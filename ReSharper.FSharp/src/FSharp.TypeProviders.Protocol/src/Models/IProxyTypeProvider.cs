@@ -20,6 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     /// </summary>
     void IncrementVersion();
     bool IsInvalidated { get; }
+    bool IsGenerative { get; set; }
     event EventHandler Disposed;
   }
 }
