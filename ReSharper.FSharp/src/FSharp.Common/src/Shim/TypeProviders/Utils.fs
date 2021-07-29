@@ -15,5 +15,5 @@ type IProject with
 
         // We can determine which projects contain generative provided types
         // only from type providers hosted out-of-process
-        if not typeProvidersShim.IsConnectionAlive then true else
+        not typeProvidersShim.IsConnectionAlive ||
         paths |> Array.filter typeProvidersManager.HasGenerativeTypeProviders |> Array.isEmpty
