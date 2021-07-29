@@ -5,9 +5,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 type IProject with
-    member x.IsFSharpWithoutGenerativeTypeProviders(solution: ISolution) =
+    member x.IsFSharpWithoutGenerativeTypeProviders with get() =
         x.IsFSharp &&
 
+        let solution = x.GetSolution()
         let paths = solution.GetComponent<IFcsProjectProvider>().GetProjectOutputPaths(x)
         let typeProvidersShim = solution.GetComponent<IProxyExtensionTypingProvider>()
         let typeProvidersManager = typeProvidersShim.TypeProvidersManager

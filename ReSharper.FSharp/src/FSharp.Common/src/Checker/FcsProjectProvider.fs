@@ -329,13 +329,13 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
 /// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
 [<SolutionComponent>]
-type OutputAssemblyChangeInvalidator(solution: ISolution, lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,
+type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,
         psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler) =
     do
         scheduler.EnqueueTask(SolutionLoadTask("FSharpProjectOptionsProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
             // todo: track file system changes instead? This currently may be triggered on a project model change too.
             outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
-                if not fcsProjectProvider.HasFcsProjects || project.IsFSharpWithoutGenerativeTypeProviders(solution) then () else
+                if not fcsProjectProvider.HasFcsProjects || project.IsFSharpWithoutGenerativeTypeProviders then () else
 
                 if fcsProjectProvider.InvalidateReferencesToProject(project) then
                     psiFiles.IncrementModificationTimestamp(null) // Drop cached values.
