@@ -54,6 +54,11 @@ type FSharpKeywordsProvider() =
         |> List.filter (fun (keyword, _) -> not (PrettyNaming.IsOperatorName keyword))
         |> Array.ofList
 
+    let scriptKeywords =
+        [| "__SOURCE_DIRECTORY__"
+           "__SOURCE_FILE__"
+           "__LINE__" |]
+    
     override x.IsAvailable _ = true
 
     override x.AddLookupItems(context, collector) =
@@ -80,6 +85,12 @@ type FSharpKeywordsProvider() =
             let item = FSharpKeywordLookupItem(keyword, description)
             item.InitializeRanges(context.Ranges, context.BasicContext)
             collector.Add(item)
+
+        if context.BasicContext.File.Language.Is<FSharpScriptLanguage>() then
+            for keyword in scriptKeywords do
+                let item = FSharpKeywordLookupItem(keyword, "")
+                item.InitializeRanges(context.Ranges, context.BasicContext)
+                collector.Add(item)
 
         for keyword, suffix in hashDirectives do
             let item = FSharpHashDirectiveLookupItem(keyword, suffix)

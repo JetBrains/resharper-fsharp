@@ -345,7 +345,10 @@ public interface FSharpTokenType {
             WHILE,
             WITH,
             YIELD,
-            YIELD_BANG
+            YIELD_BANG,
+            KEYWORD_STRING_LINE,
+            KEYWORD_STRING_SOURCE_DIRECTORY,
+            KEYWORD_STRING_SOURCE_FILE
     );
 
     TokenSet RESERVED_IDENT_KEYWORDS = TokenSet.create(

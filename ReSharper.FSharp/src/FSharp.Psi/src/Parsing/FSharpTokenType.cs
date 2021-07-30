@@ -241,7 +241,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         WITH,
         YIELD,
         HASH,
-        RARROW);
+        RARROW,
+        KEYWORD_STRING_LINE,
+        KEYWORD_STRING_SOURCE_DIRECTORY,
+        KEYWORD_STRING_SOURCE_FILE);
 
       Identifiers = new NodeTypeSet(
         IDENTIFIER,
