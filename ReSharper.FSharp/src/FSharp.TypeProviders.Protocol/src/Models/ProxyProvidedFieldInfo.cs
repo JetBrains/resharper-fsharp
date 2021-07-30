@@ -32,9 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     [ContractAnnotation("fieldInfo:null => null")]
     public static ProxyProvidedFieldInfo Create(RdProvidedFieldInfo fieldInfo, int typeProviderId,
       TypeProvidersContext typeProvidersContext) =>
-      fieldInfo == null
-        ? null
-        : new ProxyProvidedFieldInfo(fieldInfo, typeProviderId, typeProvidersContext);
+      fieldInfo == null ? null : new ProxyProvidedFieldInfo(fieldInfo, typeProviderId, typeProvidersContext);
 
     public override string Name => myFieldInfo.Name;
     public override bool IsFamily => HasFlag(RdProvidedFieldFlags.IsFamily);

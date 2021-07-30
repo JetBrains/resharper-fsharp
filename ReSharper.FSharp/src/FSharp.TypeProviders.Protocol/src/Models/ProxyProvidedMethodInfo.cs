@@ -60,9 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     [ContractAnnotation("methodInfo:null => null")]
     public static ProxyProvidedMethodInfo Create(RdProvidedMethodInfo methodInfo, int typeProviderId,
       TypeProvidersContext typeProvidersContext) =>
-      methodInfo == null
-        ? null
-        : new ProxyProvidedMethodInfo(methodInfo, typeProviderId, typeProvidersContext);
+      methodInfo == null ? null : new ProxyProvidedMethodInfo(methodInfo, typeProviderId, typeProvidersContext);
 
     public override string Name => myMethodInfo.Name;
     public override bool IsAbstract => HasFlag(RdProvidedMethodFlags.IsAbstract);

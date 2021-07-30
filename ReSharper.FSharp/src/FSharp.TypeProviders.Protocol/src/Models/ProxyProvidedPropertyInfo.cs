@@ -45,9 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     [ContractAnnotation("propertyInfo:null => null")]
     public static ProxyProvidedPropertyInfo Create(RdProvidedPropertyInfo propertyInfo, int typeProviderId,
       TypeProvidersContext typeProvidersContext) =>
-      propertyInfo == null
-        ? null
-        : new ProxyProvidedPropertyInfo(propertyInfo, typeProviderId, typeProvidersContext);
+      propertyInfo == null ? null : new ProxyProvidedPropertyInfo(propertyInfo, typeProviderId, typeProvidersContext);
 
     public override string Name => myPropertyInfo.Name;
     public override bool CanRead => myPropertyInfo.CanRead;

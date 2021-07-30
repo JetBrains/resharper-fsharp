@@ -41,9 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     [ContractAnnotation("eventInfo:null => null")]
     public static ProxyProvidedEventInfo Create(RdProvidedEventInfo eventInfo, int typeProviderId,
       TypeProvidersContext typeProvidersContext) =>
-      eventInfo == null
-        ? null
-        : new ProxyProvidedEventInfo(eventInfo, typeProviderId, typeProvidersContext);
+      eventInfo == null ? null : new ProxyProvidedEventInfo(eventInfo, typeProviderId, typeProvidersContext);
 
     public override string Name => myEventInfo.Name;
 

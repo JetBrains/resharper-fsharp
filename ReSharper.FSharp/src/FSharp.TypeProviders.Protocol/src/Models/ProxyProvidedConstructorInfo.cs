@@ -118,8 +118,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private readonly InterruptibleLazy<ProvidedType[]> myGenericArguments;
     private readonly InterruptibleLazy<ProvidedParameterInfo[]> myStaticParameters;
     private readonly InterruptibleLazy<RdCustomAttributeData[]> myCustomAttributes;
-
-    public ProxyProvidedConstructorInfoWithContext ApplyContext(ProvidedTypeContext context) =>
-      new ProxyProvidedConstructorInfoWithContext(this, context);
   }
 }

@@ -28,9 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     [ContractAnnotation("parameter:null => null")]
     public static ProxyProvidedParameterInfo Create(RdProvidedParameterInfo parameter, int typeProviderId,
       TypeProvidersContext typeProvidersContext) =>
-      parameter == null
-        ? null
-        : new ProxyProvidedParameterInfo(parameter, typeProviderId, typeProvidersContext);
+      parameter == null ? null : new ProxyProvidedParameterInfo(parameter, typeProviderId, typeProvidersContext);
 
     public override string Name => myParameterInfo.Name;
     public override bool IsIn => myParameterInfo.IsIn;
