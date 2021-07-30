@@ -239,7 +239,11 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) settings (moduleToImp
     let firstModule = qualifiedElementList |> List.tryHead |> Option.toObj
 
     let moduleMembers: IModuleMember list =
-        let moduleMembers = List.ofSeq moduleDecl.MembersEnumerable
+        let moduleMembers =
+            moduleDecl.MembersEnumerable
+            |> List.ofSeq
+            |> List.skipWhile (fun moduleMember -> moduleMember :? IHashDirective)
+
         if isNull firstModule || not checkMembers then moduleMembers else
 
         let skippedMembers = 
