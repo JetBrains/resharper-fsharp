@@ -49,23 +49,10 @@ let toTextStyle (tag: TextTag) =
 let emptyPresentation = RichTextBlock()
 
 [<Extension; CompiledName("ToRichText")>]
-let richTextR (taggedText: TaggedText[]) =
+let richText (taggedText: TaggedText[]) =
     let result = RichText()
-
-    let mutable isAfterNewLine = false
     for text in taggedText do
-        match text.Tag with
-        | TextTag.LineBreak -> isAfterNewLine <- true
-
-        | TextTag.Space when isAfterNewLine ->
-            // RIDER-51304: Replace spaces at the start of a line with \xA0 (non-breaking space)
-            result.Append("\n" + String('\xA0', text.Text.Length), TextStyle.Default) |> ignore
-            isAfterNewLine <- false
-
-        | tag ->
-            result.Append(text.Text, toTextStyle tag) |> ignore
-            isAfterNewLine <- false
-
+        result.Append(text.Text, toTextStyle text.Tag) |> ignore
     result
 
 let isEmpty (taggedText: TaggedText[]) =

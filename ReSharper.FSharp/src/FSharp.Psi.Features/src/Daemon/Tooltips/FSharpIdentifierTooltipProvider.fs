@@ -84,10 +84,10 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                     overloads |> List.map (fun overload ->
                         let header =
                             [ if not (isEmpty overload.MainDescription) then
-                                yield overload.MainDescription |> richTextR
+                                yield overload.MainDescription |> richText
 
                               if not overload.TypeMapping.IsEmpty then
-                                yield overload.TypeMapping |> List.map richTextR |> richTextJoin "\n" ]
+                                yield overload.TypeMapping |> List.map richText |> richTextJoin "\n" ]
                             |> richTextJoin "\n\n"
 
                         let body =
@@ -97,7 +97,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
 
                               match overload.Remarks with
                               | Some remarks when not (isEmpty remarks) ->
-                                yield remarks |> richTextR |> asContent
+                                yield remarks |> richText |> asContent
                               | _ -> () ]
                             |> richTextJoin "\n\n"
 

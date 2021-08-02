@@ -69,7 +69,7 @@ type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionCo
                 match tooltip with
                 | ToolTipElement.Group(overloads) ->
                     for overload in overloads do
-                        result.Add(FSharpLookupCandidate(richTextR overload.MainDescription, overload.XmlDoc, context.XmlDocService))
+                        result.Add(FSharpLookupCandidate(richText overload.MainDescription, overload.XmlDoc, context.XmlDocService))
                 | ToolTipElement.CompositionError error ->
                     result.Add(FSharpLookupCandidate(RichText(error), FSharpXmlDoc.None, context.XmlDocService))
                 | _ -> ()
