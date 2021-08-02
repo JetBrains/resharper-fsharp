@@ -3,5 +3,5 @@ Editor #1
 Name: Text
 Model id: file=Program.fs projectModelId!=0
 Virtual file: Program.fs
-Current caret: (0, 9)
-Current selection:  startPosition = (0, 9) endPosition = (0, 9)
+Current caret: (5, 8)
+Current selection:  startPosition = (5, 8) endPosition = (5, 8)

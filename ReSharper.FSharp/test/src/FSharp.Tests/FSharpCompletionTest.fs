@@ -22,6 +22,18 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Bind - Qualifier - Enum case 01``() = x.DoNamedTest()
     [<Test>] member x.``Bind - Qualifier - Enum case 02 - Escape``() = x.DoNamedTest()
 
+    [<Test>] member x.``Local val - Binary op 01``() = x.DoNamedTest()
+    [<Test>] member x.``Local val - Binary op 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Local val - New line 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Local val - New line 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Qualified 01``() = x.DoNamedTest()
+    [<Test>] member x.``Qualified 02``() = x.DoNamedTest()
+    [<Test>] member x.``Qualified 03 - Eof``() = x.DoNamedTest()
+    [<Test>] member x.``Qualified 04 - Space``() = x.DoNamedTest()
+    [<Test>] member x.``Qualified 05``() = x.DoNamedTest()
+    [<Test>] member x.``Qualified 06``() = x.DoNamedTest()
+
     [<Test>] member x.``Wild 01 - Replace``() = x.DoNamedTest()
     [<Test>] member x.``Wild 02 - Insert``() = x.DoNamedTest()
     [<Test>] member x.``Wild 03 - Replace before``() = x.DoNamedTest()
