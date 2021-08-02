@@ -1,4 +1,4 @@
-﻿## GotoUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Immediate result:
     TO: [O] let r = |{ Field = 1 }| RANGE: (57,70) @ Record Ctor 01 - Source.fs
     Navigation result:

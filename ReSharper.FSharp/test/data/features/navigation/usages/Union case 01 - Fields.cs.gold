@@ -1,4 +1,4 @@
-﻿## GotoUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'A'`:
     TO: [I] U u = U.|NewA|(123); RANGE: (60,64) @ Union case 01 - Fields.cs
     Menu item (enabled) :

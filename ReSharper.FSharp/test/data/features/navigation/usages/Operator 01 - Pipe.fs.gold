@@ -1,4 +1,4 @@
-﻿## GotoUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'op_PipeRight(…)'`:
     TO: [O] ||>| ignore RANGE: (21,23) @ Operator 01 - Pipe.fs
     Menu item (enabled) :

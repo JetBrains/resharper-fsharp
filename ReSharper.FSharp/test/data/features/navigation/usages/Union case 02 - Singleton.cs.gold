@@ -1,4 +1,4 @@
-﻿## GotoUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'B'`:
     TO: [R] U u = U.|B|; RANGE: (60,61) @ Union case 02 - Singleton.cs
     Menu item (enabled) :

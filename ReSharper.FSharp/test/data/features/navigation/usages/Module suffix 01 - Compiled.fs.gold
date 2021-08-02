@@ -1,4 +1,4 @@
-﻿## GotoUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'ListModule'`:
     TO: [O] |List|.append |> ignore RANGE: (17,21) @ Module suffix 01 - Compiled.fs
     Menu item (enabled) :

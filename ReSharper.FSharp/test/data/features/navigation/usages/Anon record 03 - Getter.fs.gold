@@ -1,4 +1,4 @@
-﻿## GotoUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'F'`:
     TO: [R] ar.|F| RANGE: (42,43) @ Anon record 03 - Getter.fs
     Menu item (enabled) :

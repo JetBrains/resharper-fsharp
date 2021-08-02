@@ -1,4 +1,4 @@
-﻿## GotoUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'F'`:
     TO: [W] {| |F| = 1 |} RANGE: (20,21) @ Anon record 01 - Ctor.fs
     Menu item (enabled) :

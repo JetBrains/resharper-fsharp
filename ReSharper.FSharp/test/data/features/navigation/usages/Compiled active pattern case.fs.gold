@@ -1,4 +1,4 @@
-﻿## GotoUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'KeyValue'`:
     TO: [O] for |KeyValue| _ in m do () RANGE: (45,53) @ Compiled active pattern case.fs
     Menu item (enabled) :

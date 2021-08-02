@@ -1,4 +1,4 @@
-﻿## GotoUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'Record'`:
     TO: [O] let r1: Record = |{ Field = 1 }| RANGE: (34,47) @ Record Ctor 02 - Compiled.fs
     Menu item (enabled) :

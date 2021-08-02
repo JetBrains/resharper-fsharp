@@ -29,7 +29,7 @@ type FSharpGoToUsagesTest() =
 
     override x.CreateContextAction(solution, textControl) =
         base.CreateContextAction(solution, textControl)
-        |> Seq.filter (fun p -> p :? IGotoUsagesProvider)
+        |> Seq.filter (fun p -> p :? IShowUsagesProvider)
 
     [<Test>] member x.``Compiled active pattern case``() = x.DoNamedTest()
     [<Test>] member x.``Compiled union case``() = x.DoNamedTest()

@@ -1,4 +1,4 @@
-﻿## GotoUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'A'`:
     TO: [I] T.|set_A|(0, 0); RANGE: (141,146) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
