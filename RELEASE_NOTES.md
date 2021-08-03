@@ -1,5 +1,45 @@
 # Release notes
 
+## 2021.2
+
+### Code completion
+* Postfix templates: now available for 'let' template, and more templates coming in future
+
+### Actions
+
+* Deconstruct pattern (tuples, union cases)
+* Rearrange code: move elements up/down or left/right: enum/union cases, record/union case fields, match clauses, tuples, function parameters
+* Optimize Imports action is implemented for F#
+
+### Refactorings
+
+* Inline variable: now also works for top level let bindings
+* Introduce variable: better filtering for expression suggestions
+
+### Quick fixes
+
+* **New**: replace operator with built-in operator
+* **New**: add missing member self identifier
+* **New**: replace object instance with type name for static member access
+* **New**: replace `if` expression with its condition for simple expressions
+* Introduce variable: enabled for protected members access inside lambda, moves binding outside
+* Import type: fixes for importing module attributes
+* Add parens: now works in more cases (type check expressions, union constructors, etc)
+* Convert module to namespace: enabled for more error cases
+* Specify type: annotate inferred property types, values accessed via accessors
+
+### Editor
+
+* Significantly better XML documentation rendering
+* Better highlighting of various compiler errors
+
+### Misc
+
+* Language version can be specified in project properties (and is written to fsproj)
+* Enable FCS optimizations for skipping implementation files when signature files are available
+* Hide VCS lenses for simple fields
+* Better extend selection for identifiers
+
 ## 2021.1
 
 ### Refactorings
