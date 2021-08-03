@@ -10,6 +10,11 @@ type FSharpExtendSelectionTest() =
 
     override x.RelativeTestDataPath = "features/service/extendSelection"
 
+    [<Test>] member x.``Brack - Array - Right 01``() = x.DoNamedTest()
+    [<Test>] member x.``Brack - Array - Right 02``() = x.DoNamedTest()
+    [<Test>] member x.``Brack - List - Right 01``() = x.DoNamedTest()
+    [<Test>] member x.``Brack - List - Right 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Module qualifier 01 - Name``() = x.DoNamedTest()
     [<Test>] member x.``Module qualifier 02 - Qualifier``() = x.DoNamedTest()
     [<Test>] member x.``Module qualifier 03 - Multiple qualifiers``() = x.DoNamedTest()
@@ -41,6 +46,12 @@ type FSharpExtendSelectionTest() =
     [<Test>] member x.``Infix expr - Nested - Argument 02``() = x.DoNamedTest()
     [<Test>] member x.``Infix expr - Nested - Operator 01``() = x.DoNamedTest()
     [<Test>] member x.``Infix expr - Nested - Operator 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Separator - Comma 01 - Literal``() = x.DoNamedTest()
+    [<Test>] member x.``Separator - Comma 02 - Ident``() = x.DoNamedTest()
+    [<Test>] member x.``Separator - Comma 03 - Underscore``() = x.DoNamedTest()
+    [<Test>] member x.``Separator - Semi 01``() = x.DoNamedTest()
+    [<Test>] member x.``Separator - Semi 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Unit expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Unit expr 02 - Parens``() = x.DoNamedTest()

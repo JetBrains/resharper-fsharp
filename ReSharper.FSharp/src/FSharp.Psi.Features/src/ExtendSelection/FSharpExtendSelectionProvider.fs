@@ -109,7 +109,7 @@ and FSharpDotSelection(fsFile, offset, selectBetterToken, useCamelHumps) =
 
     override x.IsWordToken(token) =
         let tokenType = token.GetTokenType()
-        tokenType.IsIdentifier || tokenType.IsKeyword
+        tokenType.IsIdentifier || tokenType.IsKeyword || tokenType == FSharpTokenType.UNDERSCORE
 
     override x.IsLiteralToken(token) =
         let tokenType = token.GetTokenType()
