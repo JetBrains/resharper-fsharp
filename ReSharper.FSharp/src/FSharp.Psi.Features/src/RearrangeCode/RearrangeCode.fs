@@ -7,9 +7,9 @@ open JetBrains.ReSharper.Feature.Services.RearrangeCode
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -162,42 +162,12 @@ type RearrangeableEnumCaseLikeDeclaration(decl: IEnumCaseLikeDeclaration) =
     inherit FSharpRearrangeableElementSwap<IEnumCaseLikeDeclaration>(decl, "enum case like declaration", Direction.All,
         false)
 
-    let addBarIfNeeded (caseDeclaration: IEnumCaseLikeDeclaration) =
-        if isNull caseDeclaration.Bar && isNotNull caseDeclaration.FirstChild then
-            use cookie = WriteLockCookie.Create(caseDeclaration.IsPhysical())
-            addNodesBefore caseDeclaration.FirstChild [
-                FSharpTokenType.BAR.CreateLeafElement()
-                Whitespace()
-            ] |> ignore
-
-            let typeRepr = EnumLikeTypeRepresentationNavigator.GetByEnumLikeCase(caseDeclaration)
-            if isNull typeRepr then () else
-
-            let cases = typeRepr.Cases
-            if cases.Count <= 1 || cases.[0] != caseDeclaration then () else 
-
-            let firstCaseIndent = cases.[0].Indent
-            let secondCaseIndent = cases.[1].Indent
-
-            if firstCaseIndent > secondCaseIndent then
-                let indentDiff = firstCaseIndent - secondCaseIndent
-
-                let reduceIndent (node: ITreeNode) =
-                    if isInlineSpace node && node.GetTextLength() > indentDiff then
-                        let newSpace = Whitespace(node.GetTextLength() - indentDiff)
-                        replace node newSpace
-                        true
-                    else
-                        false
-
-                (reduceIndent caseDeclaration.PrevSibling || reduceIndent typeRepr.PrevSibling) |> ignore
-
     override this.GetSiblings() =
         EnumLikeTypeRepresentationNavigator.GetByEnumLikeCase(decl).NotNull().Cases :> _
 
     override this.BeforeSwap(child, target) =
-        addBarIfNeeded child
-        addBarIfNeeded target
+        EnumCaseLikeDeclarationUtil.addBarIfNeeded child
+        EnumCaseLikeDeclarationUtil.addBarIfNeeded target
 
 [<RearrangeableElementType>]
 type RearrangeableEnumCaseLikeDeclarationProvider() =

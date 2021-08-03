@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 
+open System.Linq
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Progress
@@ -7,6 +8,7 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -202,6 +204,13 @@ type FSharpOverridingMembersBuilder() =
         use disableFormatter = new DisableCodeFormatter()
 
         let typeDecl = context.Root :?> IFSharpTypeDeclaration
+
+        match typeDecl.TypeRepresentation with
+        | :? IUnionRepresentation as unionRepr ->
+            let caseDecl = unionRepr.Cases.FirstOrDefault()
+            if isNotNull caseDecl then
+                EnumCaseLikeDeclarationUtil.addBarIfNeeded caseDecl
+        | _ -> ()
 
         let anchor: ITreeNode =
             let typeMembers = typeDecl.TypeMembers

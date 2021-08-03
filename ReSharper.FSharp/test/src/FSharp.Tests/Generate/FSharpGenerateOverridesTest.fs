@@ -35,6 +35,9 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Repr - Empty - Class 03 - Comment``() = x.DoNamedTest()
     [<Test>] member x.``Repr - Empty - Struct 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Repr - Union - No bar - Multiple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Repr - Union - No bar - Multiple 02``() = x.DoNamedTest()
+    [<Test>] member x.``Repr - Union - No bar - Single 01``() = x.DoNamedTest()
     [<Test>] member x.``Repr - Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Repr - Union 02``() = x.DoNamedTest()
 
