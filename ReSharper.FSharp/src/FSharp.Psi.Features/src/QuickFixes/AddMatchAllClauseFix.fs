@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open System
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
@@ -7,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.TextControl
 
 [<RequireQualifiedAccess>]
 type GeneratedClauseExpr =
@@ -28,7 +31,8 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
     override x.IsAvailable _ =
         isValid expr && not expr.Clauses.IsEmpty
 
-    override x.ExecutePsiTransaction _ =
+    override x.ExecutePsiTransaction(_, _) =
+        use formatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         let factory = expr.CreateElementFactory()
         use disableFormatter = new DisableCodeFormatter()
@@ -55,3 +59,7 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
 
         if generatedExpr = GeneratedClauseExpr.ArgumentOutOfRange then
             clause.SetExpression(factory.CreateExpr("ArgumentOutOfRangeException() |> raise")) |> ignore
+
+        Action<_>(fun textControl ->
+            let offset = clause.GetNavigationRange().EndOffset
+            textControl.Caret.MoveTo(offset, CaretVisualPlacement.DontScrollIfVisible))

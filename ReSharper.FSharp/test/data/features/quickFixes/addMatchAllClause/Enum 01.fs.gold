@@ -3,6 +3,6 @@
 type Enum =
     | A = 1
 
-match Enum.A{caret} with
+match Enum.A with
 | Enum.A -> ()
-| _ -> ArgumentOutOfRangeException() |> raise
+| _ -> ArgumentOutOfRangeException() |> raise{caret}

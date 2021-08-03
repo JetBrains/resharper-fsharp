@@ -1,6 +1,6 @@
 ﻿module Say
 
-match 1{caret} with
+match 1 with
 | 1 ->
     ()
-| _ -> failwith "todo"
+| _ -> failwith "todo"{caret}
