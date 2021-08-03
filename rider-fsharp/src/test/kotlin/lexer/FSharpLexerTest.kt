@@ -274,6 +274,19 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
     }
 
     @Test
+    fun testUnfinishedIdent() {
+        doTest("``value\n",
+            """
+            |RESERVED_SYMBOLIC_SEQUENCE ('`')
+            |RESERVED_SYMBOLIC_SEQUENCE ('`')
+            |IDENT ('value')
+            |NEW_LINE ('\n')
+            """.trimMargin()
+        )
+    }
+
+
+    @Test
     fun testEndOfLineComment() {
         doTest("//hello world!\n//hello second world!",
                 """
