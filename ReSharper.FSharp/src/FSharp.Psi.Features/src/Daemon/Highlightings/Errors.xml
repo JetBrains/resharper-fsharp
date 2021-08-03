@@ -81,6 +81,10 @@
         <Title>'if' expression can be replaced with its condition</Title>
         <Description>'if' expression can be replaced with its condition.</Description>
       </Tag>
+      <Tag name="FSharpRedundantAsPattern" default="WARNING">
+        <Title>Redundant 'as' pattern</Title>
+        <Description>'as' pattern can be replaced with its name.</Description>
+      </Tag>
     </Group>
   </SeverityConfiguration>
 
@@ -295,6 +299,14 @@
     </Message>
     <Range>expr.GetDocumentRange()</Range>
     <QuickFix>ReplaceWithConditionFix</QuickFix>
+  </Warning>
+
+  <Warning name="RedundantAsPattern" configurableSeverity="FSharpRedundantAsPattern">
+    <Parameter type="IAsPat" name="asPat"/>
+    <Message value="Redundant 'as' pattern"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Range>getAsPatternRange asPat</Range>
+    <QuickFix>RemoveRedundantAsPatFix</QuickFix>
   </Warning>
 
 </Errors>

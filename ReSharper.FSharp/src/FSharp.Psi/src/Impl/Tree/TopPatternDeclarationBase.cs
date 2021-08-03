@@ -130,5 +130,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public virtual IEnumerable<IFSharpDeclaration> Declarations =>
       NestedPatterns.OfType<IFSharpDeclaration>();
+
+    public bool IsLocal => false;
   }
 }

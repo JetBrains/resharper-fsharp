@@ -35,6 +35,12 @@ let getIndexerArgListRange (indexerExpr: IItemIndexerExpr) =
     | null -> indexerExpr.GetHighlightingRange()
     | argList -> argList.GetHighlightingRange()
 
+let getAsPatternRange (asPat: IAsPat) =
+    if isValid asPat && isValid asPat.Pattern && isValid asPat.AsKeyword then
+        getTreeNodesDocumentRange asPat.Pattern asPat.AsKeyword
+    else
+        DocumentRange.InvalidRange
+
 let getLetTokenText (token: ITokenNode) =
     let tokenType = getTokenType token
     let tokenType = if isNull tokenType then FSharpTokenType.LET else tokenType

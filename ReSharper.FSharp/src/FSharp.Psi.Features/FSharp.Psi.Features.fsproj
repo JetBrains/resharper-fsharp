@@ -92,6 +92,7 @@
     <Compile Include="src\Daemon\Analyzers\SelfIdAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\InterpolatedStringCandidateAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\IfExpressionAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\AsPatAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
@@ -217,6 +218,7 @@
     <Compile Include="src\QuickFixes\AddInstanceMemberSelfIdFix.fs" />
     <Compile Include="src\QuickFixes\ToStaticMemberFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithTypeRefExprFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAsPatFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

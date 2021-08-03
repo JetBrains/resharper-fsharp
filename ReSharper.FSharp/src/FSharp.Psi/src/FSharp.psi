@@ -280,12 +280,12 @@ parametersOwnerPat options { stubBase="FSharpPatternBase"; } extras {
 
 localAsPat options { stubBase="LocalPatternDeclarationBase"; }:
   fSharpPattern<PATTERN, Pattern>
-  AS
+  AS<AS, AsKeyword>
   fSharpIdentifier<IDENTIFIER, Identifier>;
 
 topAsPat options { stubBase="TopPatternDeclarationBase"; }:
   fSharpPattern<PATTERN, Pattern>
-  AS
+  AS<AS, AsKeyword>
   fSharpIdentifier<IDENTIFIER, Identifier>;
 
 
