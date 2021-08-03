@@ -18,33 +18,33 @@ type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = ConcurrentDictionary<_, ConcurrentDictionary<_, IProxyTypeProvider>>()
     let proxyTypeProvidersPerId = ConcurrentDictionary<_, _>()
 
-    let rec addTypeProvider envKey (tp: IProxyTypeProvider) =
-        let fullName = tp.GetDisplayName(fullName = true)
+    let rec addTypeProvider projectAssembly tpAssembly (tp: IProxyTypeProvider) =
+        let tpKey = struct(tpAssembly, tp.GetDisplayName(fullName = true))
 
-        match typeProvidersPerAssembly.TryGetValue(envKey) with
+        match typeProvidersPerAssembly.TryGetValue(projectAssembly) with
         | true, assemblyCache ->
-            match assemblyCache.TryGetValue(fullName) with
+            match assemblyCache.TryGetValue(tpKey) with
             | true, oldTp ->
                 oldTp.Dispose()
-                addTypeProvider envKey tp
+                addTypeProvider projectAssembly tpAssembly tp
             | false, _ ->
-                assemblyCache.TryAdd(fullName, tp) |> ignore
+                assemblyCache.TryAdd(tpKey, tp) |> ignore
                 proxyTypeProvidersPerId.TryAdd(tp.EntityId, tp) |> ignore
-                tp.Disposed.Add(fun _ -> removeTypeProvider envKey tp)
+                tp.Disposed.Add(fun _ -> removeTypeProvider projectAssembly tpKey tp.EntityId)
         | false, _ ->
-            typeProvidersPerAssembly.TryAdd(envKey, ConcurrentDictionary()) |> ignore
-            addTypeProvider envKey tp
+            typeProvidersPerAssembly.TryAdd(projectAssembly, ConcurrentDictionary()) |> ignore
+            addTypeProvider projectAssembly tpAssembly tp
 
-    and removeTypeProvider envKey (tp: IProxyTypeProvider) =
+    and removeTypeProvider projectAssembly tpKey tpId =
         // Removes types in a unified manner, may also be disposed by FCS.
-        typeProvidersPerAssembly.[envKey].TryRemove(tp.GetDisplayName(true)) |> ignore
-        proxyTypeProvidersPerId.TryRemove(tp.EntityId) |> ignore
+        typeProvidersPerAssembly.[projectAssembly].TryRemove(tpKey) |> ignore
+        proxyTypeProvidersPerId.TryRemove(tpId) |> ignore
 
-        if typeProvidersPerAssembly.[envKey].Count = 0 then
-            typeProvidersPerAssembly.TryRemove(envKey) |> ignore
+        if typeProvidersPerAssembly.[projectAssembly].Count = 0 then
+            typeProvidersPerAssembly.TryRemove(projectAssembly) |> ignore
 
-    member x.Add(envKey, tp) =
-        addTypeProvider envKey tp
+    member x.Add(projectAssembly, tpAssembly, tp) =
+        addTypeProvider projectAssembly tpAssembly tp
 
     member x.Get(id) =
         let hasValue = SpinWait.SpinUntil((fun () -> proxyTypeProvidersPerId.ContainsKey id), 15_000)
@@ -53,13 +53,9 @@ type internal TypeProvidersCache() =
         else proxyTypeProvidersPerId.[id]
 
     member x.Get(assembly) =
-        let providersData =
-            typeProvidersPerAssembly
-            |> Seq.tryFind (fun (KeyValue((_, outputAssembly), _)) -> outputAssembly = assembly)
-
-        match providersData with
-        | Some x -> x.Value.Values
-        | None -> [||] :> _
+        match typeProvidersPerAssembly.TryGetValue assembly with
+        | true, x -> x.Values
+        | false, _ -> [||] :> _
 
     member x.Dump() =
         let typeProviders =
@@ -100,7 +96,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
                 resolutionEnvironment: ResolutionEnvironment, isInvalidationSupported: bool, isInteractive: bool,
                 systemRuntimeContainsType: string -> bool, systemRuntimeAssemblyVersion: Version,
                 compilerToolsPath: string list) =
-            let envKey = designTimeAssemblyNameString, resolutionEnvironment.outputFile.Value
+            let projectAssembly = resolutionEnvironment.outputFile.Value
 
             let result =
                 let fakeTcImports = getFakeTcImports systemRuntimeContainsType
@@ -115,7 +111,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
             let typeProviderProxies =
                 [ for tp in result.TypeProviders ->
                      let tp = new ProxyTypeProvider(tp, tpContext)
-                     typeProviders.Add(envKey, tp)
+                     typeProviders.Add(projectAssembly, designTimeAssemblyNameString, tp)
                      tp :> ITypeProvider
 
                   for id in result.CachedIds ->

@@ -17,8 +17,8 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.Utils
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
@@ -321,21 +321,25 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             getOrCreateFcsProject psiModule
 
         member this.GetProjectOutputPaths(project) =
-            [| for psiModule in projectsPsiModules.[project] do
-                match outputPaths.TryGetValue(psiModule) with
-                | null -> ()
-                | path -> yield path |]
+            seq { for psiModule in projectsPsiModules.[project] do
+                  match outputPaths.TryGetValue(psiModule) with
+                  | null -> ()
+                  | path -> yield path }
 
 
 /// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
 [<SolutionComponent>]
 type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,
-        psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler) =
+        psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
+        typeProvidersShim: IProxyExtensionTypingProvider) =
     do
         scheduler.EnqueueTask(SolutionLoadTask("FSharpProjectOptionsProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
             // todo: track file system changes instead? This currently may be triggered on a project model change too.
             outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
-                if not fcsProjectProvider.HasFcsProjects || project.IsFSharpWithoutGenerativeTypeProviders then () else
+                if not fcsProjectProvider.HasFcsProjects ||
+                   project.IsFSharp &&
+                   fcsProjectProvider.GetProjectOutputPaths(project)
+                   |> typeProvidersShim.HasGenerativeTypeProviders |> not then () else
 
                 if fcsProjectProvider.InvalidateReferencesToProject(project) then
                     psiFiles.IncrementModificationTimestamp(null) // Drop cached values.

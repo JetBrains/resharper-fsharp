@@ -8,6 +8,7 @@ open FSharp.Core.CompilerServices
 open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions
@@ -17,8 +18,7 @@ type IProxyExtensionTypingProvider =
     inherit IExtensionTypingProvider
 
     abstract RuntimeVersion: unit -> string
-    abstract IsConnectionAlive: bool
-    abstract TypeProvidersManager: IProxyTypeProvidersManager
+    abstract HasGenerativeTypeProviders: assemblies: string seq -> bool
     abstract DumpTypeProvidersProcess: unit -> string
 
 [<SolutionComponent>]
@@ -116,9 +116,11 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
 
             $"{inProcessDump}\n\n{outOfProcessDump}"
 
-        member this.TypeProvidersManager with get() = typeProvidersManager
-
-        member this.IsConnectionAlive with get() = isConnectionAlive ()
+        member this.HasGenerativeTypeProviders(assemblies) =
+            // We can determine which projects contain generative provided types
+            // only from type providers hosted out-of-process
+            not (isConnectionAlive()) ||
+            assemblies |> Seq.exists typeProvidersManager.HasGenerativeTypeProviders
 
     interface IDisposable with
         member this.Dispose() = terminateConnection ()
