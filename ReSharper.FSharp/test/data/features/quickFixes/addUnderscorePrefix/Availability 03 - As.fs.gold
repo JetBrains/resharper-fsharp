@@ -1,11 +1,14 @@
 ﻿module Module
 
 do
-    let _ as |b|(0) = ()
+    let |_ as|(0) |b|(1) = ()
     ()
 
 ------------------------------------------------
-0: The value 'b' is unused
+0: Redundant 'as' pattern
+QUICKFIXES:
+Remove redundant 'as' pattern
+1: The value 'b' is unused
 QUICKFIXES:
 Remove unused 'as' pattern
 Rename to '_b'
