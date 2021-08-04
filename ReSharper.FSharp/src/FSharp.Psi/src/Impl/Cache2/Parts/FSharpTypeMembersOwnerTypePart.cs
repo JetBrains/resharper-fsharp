@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class FSharpTypeMembersOwnerTypePart : FSharpClassLikePart<IFSharpTypeOldDeclaration>
   {
     protected FSharpTypeMembersOwnerTypePart([NotNull] IFSharpTypeOldDeclaration declaration,
-      [NotNull] ICacheBuilder cacheBuilder)
+      [NotNull] ICacheBuilder cacheBuilder, string[] implicitExtendShortNames = null)
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.Attributes),
         declaration.TypeParameterDeclarations, cacheBuilder)
     {
@@ -20,6 +20,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       if (declaration is IFSharpTypeDeclaration { TypeRepresentation: IObjectModelTypeRepresentation repr })
         extendListShortNames = ProcessMembers(repr.TypeMembersEnumerable, extendListShortNames);
+
+      if (implicitExtendShortNames != null)
+        extendListShortNames.AddRange(implicitExtendShortNames);
 
       ExtendsListShortNames = extendListShortNames.ToArray();
     }

@@ -1,0 +1,14 @@
+﻿## GotoInheritorsProvider activity:
+  Immediate result:
+    [*] DEO: Envoy: Class:Module+TType, PsiLanguageType:F# as Envoy: Class:Module+TType, PsiLanguageType:F# RANGE: (0,0) @ Interface 09 - Record.fs
+    Navigation result:
+      opened file: Interface 09 - Record.fs
+      ------------------
+          abstract P: int
+
+      type |CARET|TType =
+          { F: int }
+          interface IInterface with
+      ------------------
+
+

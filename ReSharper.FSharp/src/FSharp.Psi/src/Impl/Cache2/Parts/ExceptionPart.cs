@@ -14,12 +14,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal class ExceptionPart : FSharpTypeMembersOwnerTypePart, IExceptionPart, IGeneratedConstructorOwner
   {
-    private static readonly string[] ourExtendsListShortNames = {"Exception", "IStructuralEquatable"};
+    public static readonly string[] ExceptionExtendsListShortNames = {"Exception", "IStructuralEquatable"};
 
     public bool HasFields { get; }
 
     public ExceptionPart([NotNull] IExceptionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder) =>
+      : base(declaration, cacheBuilder, ExceptionExtendsListShortNames) =>
       HasFields = !declaration.Fields.IsEmpty;
 
     public ExceptionPart(IReader reader) : base(reader) =>
@@ -36,9 +36,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     protected override byte SerializationTag =>
       (byte) FSharpPartKind.Exception;
-
-    public override string[] ExtendsListShortNames =>
-      ourExtendsListShortNames;
 
     public override IDeclaredType GetBaseClassType() =>
       GetPsiModule().GetPredefinedType().Exception;

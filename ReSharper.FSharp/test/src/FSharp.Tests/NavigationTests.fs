@@ -77,6 +77,8 @@ type FSharpGoToInheritorsTest() =
     [<Test>] member x.``Interface 05 - Inherit``() = x.DoNamedTest()
     [<Test>] member x.``Interface 06 - Implement multiple``() = x.DoNamedTest()
     [<Test>] member x.``Interface 07 - Implement multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 08 - Union``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 09 - Record``() = x.DoNamedTest()
 
     [<Test>] member x.``Member - Override - Auto property 01``() = x.DoNamedTest()
     [<Test>] member x.``Member - Override - Auto property 02 - Default``() = x.DoNamedTest()

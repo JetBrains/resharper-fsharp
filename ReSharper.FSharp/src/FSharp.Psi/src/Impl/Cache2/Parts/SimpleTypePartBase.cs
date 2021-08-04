@@ -11,16 +11,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class SimpleTypePartBase : FSharpTypeMembersOwnerTypePart, ISimpleTypePart
   {
     protected SimpleTypePartBase([NotNull] IFSharpTypeOrExtensionDeclaration declaration,
-      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
+      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder, 
+      FSharpGeneratedMembers.SimpleTypeExtendsListShortNames)
     {
     }
 
     protected SimpleTypePartBase(IReader reader) : base(reader)
     {
     }
-
-    public override string[] ExtendsListShortNames =>
-      FSharpGeneratedMembers.SimpleTypeExtendsListShortNames;
 
     public override MemberPresenceFlag GetMemberPresenceFlag() =>
       base.GetMemberPresenceFlag() |
