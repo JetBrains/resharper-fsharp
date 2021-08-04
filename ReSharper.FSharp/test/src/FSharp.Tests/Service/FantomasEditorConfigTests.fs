@@ -25,4 +25,4 @@ type FantomasEditorConfigTest() =
         let ecContext = testData.BoundStore.SettingsStore.BindToContextTransientWithEditorConfig(sourceFile);
         let noEcContext = testData.BoundStore.SettingsStore.BindToContextTransient(SettingLayerTypeDataContextUtils.ClassicApplicationWideContextRange);
 
-        this.ProcessOneKey<FSharpFormatSettingsKey>(defaultContext, noEcContext, ecContext, optimization, writer, "fsharp")
+        this.ProcessIndexedEntry((fun (x: FSharpFormatSettingsKey) -> x.FantomasSettings), defaultContext, noEcContext, ecContext, optimization, writer, "fsharp")
