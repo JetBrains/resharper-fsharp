@@ -60,6 +60,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) 
             RdFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
                 convertParsingOptions options, newLineText)
 
+        connect()
         connection.Execute(fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
 
     member x.FormatDocument(filePath, source, settings, options, newLineText) =
@@ -67,4 +68,5 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) 
             RdFormatDocumentArgs(filePath, source, convertFormatSettings settings, convertParsingOptions options,
                 newLineText)
 
+        connect()
         connection.Execute(fun () -> connection.ProtocolModel.FormatDocument.Sync(args, RpcTimeouts.Maximal))
