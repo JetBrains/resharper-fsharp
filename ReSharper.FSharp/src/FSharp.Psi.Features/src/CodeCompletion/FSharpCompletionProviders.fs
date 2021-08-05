@@ -95,15 +95,16 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
 
                 if completionInfo.IsError then
                     let item = Seq.head completionInfo.Items
-                    let lookupItem = FSharpErrorLookupItem(item)
+                    let lookupItem = FcsErrorLookupItem(item)
                     lookupItem.InitializeRanges(context.Ranges, basicContext)
                     collector.Add(lookupItem)
                 else
                     for item in completionInfo.Items do
+                        if item.Name = ".. .." then () else
                         if not addImportItems && not (item.NamespaceToOpen.IsEmpty()) then () else
                         if skipFsiModules && isFsiModuleToSkip item then () else
 
-                        let lookupItem = FSharpLookupItem(item, context)
+                        let lookupItem = FcsLookupItem(item, context)
                         lookupItem.InitializeRanges(context.Ranges, basicContext)
                         collector.Add(lookupItem)
                 true

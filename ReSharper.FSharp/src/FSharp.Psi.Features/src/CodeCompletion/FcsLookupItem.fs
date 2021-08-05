@@ -23,7 +23,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-type FSharpLookupCandidate(description: RichText, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
+type FcsLookupCandidate(description: RichText, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
     member x.Description = description
     member x.XmlDoc = xmlDoc
 
@@ -39,7 +39,7 @@ type FSharpLookupCandidate(description: RichText, xmlDoc: FSharpXmlDoc, xmlDocSe
         member val IsFilteredOut = false with get, set
 
 
-type FSharpErrorLookupItem(item: DeclarationListItem) =
+type FcsErrorLookupItem(item: DeclarationListItem) =
     inherit TextLookupItemBase()
 
     override x.Image = null
@@ -55,10 +55,14 @@ type FSharpErrorLookupItem(item: DeclarationListItem) =
             |> Option.toObj
 
 
-type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionContext) =
+type FcsLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
 
     let mutable candidates = Unchecked.defaultof<_>
+
+    member this.FcsItem = item
+    member this.FcsSymbol = item.FSharpSymbol
+    member this.NamespaceToOpen = item.NamespaceToOpen
 
     member x.Candidates =
         match candidates with
@@ -69,9 +73,9 @@ type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionCo
                 match tooltip with
                 | ToolTipElement.Group(overloads) ->
                     for overload in overloads do
-                        result.Add(FSharpLookupCandidate(richText overload.MainDescription, overload.XmlDoc, context.XmlDocService))
+                        result.Add(FcsLookupCandidate(richText overload.MainDescription, overload.XmlDoc, context.XmlDocService))
                 | ToolTipElement.CompositionError error ->
-                    result.Add(FSharpLookupCandidate(RichText(error), FSharpXmlDoc.None, context.XmlDocService))
+                    result.Add(FcsLookupCandidate(RichText(error), FSharpXmlDoc.None, context.XmlDocService))
                 | _ -> ()
             candidates <- result.ResultingList()
             candidates
@@ -148,7 +152,7 @@ type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionCo
         let ns = item.NamespaceToOpen
         if not (ns.IsEmpty()) then
             let ns = String.concat "." ns
-            LookupUtil.AddInformationText(name, "(in " + ns + ")", itemInfoTextStyle)
+            LookupUtil.AddInformationText(name, "(in " + ns + ")", FSharpCompletionUtil.itemInfoTextStyle)
 
         name
 
@@ -167,7 +171,7 @@ type FSharpLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionCo
             let candidates = x.Candidates
             if candidates.Count = 0 then null else
 
-            let candidate = candidates.[0] :?> FSharpLookupCandidate
+            let candidate = candidates.[0] :?> FcsLookupCandidate
             let isNullOrWhiteSpace = RichTextBlock.IsNullOrWhiteSpace
 
             let mainDescription = RichTextBlock(candidate.Description)

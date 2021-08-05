@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.RdBackend.Common.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resources
@@ -84,6 +85,7 @@ type FSharpKeywordsProvider() =
         for keyword, description in keywords do
             let item = FSharpKeywordLookupItem(keyword, description)
             item.InitializeRanges(context.Ranges, context.BasicContext)
+            markRelevance item CLRLookupItemRelevance.Keywords
             collector.Add(item)
 
         if context.BasicContext.File.Language.Is<FSharpScriptLanguage>() then

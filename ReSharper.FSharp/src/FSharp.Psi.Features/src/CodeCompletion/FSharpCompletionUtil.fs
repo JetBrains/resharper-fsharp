@@ -1,10 +1,10 @@
-[<AutoOpen>]
-module rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.CompletionUtil
+module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 
 open System.Drawing
 open JetBrains.Application.Threading
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.TextControl
@@ -29,3 +29,15 @@ type ITextControl with
         solution.Locks.QueueReadLock("Next code completion", fun _ ->
             solution.CompletionSessionManager
                 .ExecuteAutomaticCompletionAsync(x, FSharpLanguage.Instance, AutopopupType.HardAutopopup))
+
+
+let inline markRelevance (lookupItem: ILookupItem) (relevance: 'T) =
+    lookupItem.Placement.Relevance <- lookupItem.Placement.Relevance ||| uint64 relevance
+
+type ILookupItem with
+    member this.WithRelevance(relevance: uint64) =
+        this.Placement.Relevance <- this.Placement.Relevance ||| relevance
+        this
+
+    member this.WithRelevance(relevance: CLRLookupItemRelevance) =
+        this.WithRelevance(uint64 relevance)
