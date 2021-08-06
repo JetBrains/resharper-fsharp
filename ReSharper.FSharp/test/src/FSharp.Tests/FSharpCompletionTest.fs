@@ -27,6 +27,12 @@ type FSharpCompletionTest() =
     [<Test; Explicit>] member x.``Local val - New line 01``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Local val - New line 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``To recursive - Escape 01``() = x.DoNamedTest()
+    [<Test>] member x.``To recursive - Local 01``() = x.DoNamedTest()
+    [<Test>] member x.``To recursive - Local 02``() = x.DoNamedTest()
+    [<Test>] member x.``To recursive - Top level 01``() = x.DoNamedTest()
+    [<Test>] member x.``To recursive - Top level 02``() = x.DoNamedTest()
+    
     [<Test>] member x.``Qualified 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualified 02``() = x.DoNamedTest()
     [<Test>] member x.``Qualified 03 - Eof``() = x.DoNamedTest()

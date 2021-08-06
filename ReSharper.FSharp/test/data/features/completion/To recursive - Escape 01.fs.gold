@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:foo bar (make recursive)}
+module Module
+
+let rec ``foo bar`` _ =
+    ``foo bar``{caret}

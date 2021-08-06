@@ -170,7 +170,7 @@ type FSharpPathLookupItem(path: VirtualFileSystemPath, basePath, iconId) =
         if path.Parent <> basePath then
             let directoryPath = path.Parent.MakeRelativeTo(basePath)
             let directoryString = directoryPath.NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
-            LookupUtil.AddInformationText(name, "(in " + directoryString + ")", itemInfoTextStyle)
+            LookupUtil.AddInformationText(name, $"(in {directoryString})")
         name
 
 

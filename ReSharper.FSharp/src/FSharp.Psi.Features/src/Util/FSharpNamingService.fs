@@ -203,22 +203,29 @@ module FSharpNamingService =
         let letDecl = LetBindingsDeclarationNavigator.GetByBinding(binding)
         getContainingType letDecl
 
+    let getPatternsNames (skipPattern: IFSharpPattern) (pats: IEnumerable<IFSharpPattern>) =
+        let pats =
+            if isNotNull skipPattern then
+                pats |> Seq.filter ((!=) skipPattern)
+            else
+                pats 
+
+        pats
+        |> Seq.collect (fun pat -> pat.NestedPatterns)
+        |> Seq.choose (fun pat ->
+            match pat with
+            | :? INamedPat as namedPat -> Some(namedPat.SourceName)
+            | _ -> None)
+
     // todo: use in Rename
-    let getPatternUsedNames (contextPattern: IFSharpPattern) =
+    let getPatternContextUsedNames (contextPattern: IFSharpPattern) =
         let names = HashSet()
 
         let rec loop (pat: IFSharpPattern) =
             if isNull pat then () else
 
             let addNames (pats: IEnumerable<IFSharpPattern>) =
-                pats
-                |> Seq.filter ((!=) pat)
-                |> Seq.collect (fun pat -> pat.NestedPatterns)
-                |> Seq.choose (fun pat ->
-                    match pat with
-                    | :? INamedPat as namedPat -> Some(namedPat.SourceName)
-                    | _ -> None)
-                |> names.AddRange
+                getPatternsNames pat pats |> names.AddRange
             
             match pat.Parent with
             | :? ITuplePat as tuplePat -> addNames tuplePat.PatternsEnumerable
@@ -281,6 +288,9 @@ module FSharpNamingService =
         let usedNamesFilter = Func<_,_>(usedNames.Contains >> not)
         let suggestionOptions = SuggestionOptions(null, DefaultName = "foo", UsedNamesFilter = usedNamesFilter)
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
+
+    let mangleNameIfNecessary name =
+        FSharpKeywords.QuoteIdentifierIfNeeded name
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =
@@ -346,7 +356,7 @@ type FSharpNamingService(language: FSharpLanguage) =
         |> dict
 
     override x.MangleNameIfNecessary(name, _) =
-        FSharpKeywords.QuoteIdentifierIfNeeded name
+        FSharpNamingService.mangleNameIfNecessary name
 
     override x.SuggestRoots(typ: IType, policyProvider: INamingPolicyProvider) =
         let roots = base.SuggestRoots(typ, policyProvider)

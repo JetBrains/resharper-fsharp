@@ -152,7 +152,7 @@ type FcsLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionConte
         let ns = item.NamespaceToOpen
         if not (ns.IsEmpty()) then
             let ns = String.concat "." ns
-            LookupUtil.AddInformationText(name, "(in " + ns + ")", FSharpCompletionUtil.itemInfoTextStyle)
+            LookupUtil.AddInformationText(name, $"(in {ns})")
 
         name
 

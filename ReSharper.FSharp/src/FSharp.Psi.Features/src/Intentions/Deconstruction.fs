@@ -157,7 +157,7 @@ type DeconstructAction(deconstruction: IDeconstruction) =
         let containingType = FSharpNamingService.getPatternContainingType pat
         let usedNames = FSharpNamingService.getUsedNames inExprs EmptyList.InstanceList containingType true
 
-        let patternUsedNames = FSharpNamingService.getPatternUsedNames pat
+        let patternUsedNames = FSharpNamingService.getPatternContextUsedNames pat
         usedNames.AddRange(patternUsedNames)
 
         if isFromParameter && isNotNull binding then

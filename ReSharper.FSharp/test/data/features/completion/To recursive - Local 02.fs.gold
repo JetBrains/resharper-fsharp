@@ -1,0 +1,10 @@
+﻿// ${COMPLETE_ITEM:x (make recursive)}
+module Module
+
+do
+    let rec x _ =
+        let loop x =
+            let loop = 1
+            ()
+        x{caret}
+    ()

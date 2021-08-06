@@ -3,15 +3,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
-
+open JetBrains.ReSharper.Resources.Shell
 
 type FcsCodeCompletionContext =
     { PartialName: PartialLongName
@@ -21,9 +25,41 @@ type FcsCodeCompletionContext =
       mutable DisplayContext: FSharpDisplayContext }
 
 
+type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
+    let [<Literal>] moniker = "F# reparse context"
+
+    interface IReparseContext with
+        member this.GetReparseResult(newText) =
+            // todo: remove standalone document, try to make it incremental
+            let source = fsFile.GetText().Insert(treeTextRange.StartOffset.Offset, newText)
+            let documentFactory = Shell.Instance.GetComponent<IInMemoryDocumentFactory>()
+            let document = documentFactory.CreateSimpleDocumentFromText(source, moniker)
+
+            let parser = fsFile.GetFSharpLanguageService().CreateParser(document)
+            let newFile =
+                parser.ParseFSharpFile(true, StandaloneDocument = document,
+                    ResolvedSymbolsCache = fsFile.ResolvedSymbolsCache)
+
+            ReparseResult(newFile, fsFile, 0)
+
+
+type FSharpReparsedCodeCompletionContext(file: IFSharpFile, treeTextRange, newText) =
+    inherit ReparsedCodeCompletionContext(file, treeTextRange, newText)
+
+    override this.GetReparseContext(file, range) =
+        FSharpReparseContext(file :?> IFSharpFile, range) :>  _
+
+    override this.FindReference(referenceRange, treeNode) =
+        treeNode.FindReferencesAt(referenceRange) |> Seq.tryHead |> Option.toObj
+
+    override this.GetRangeOfReference _ =
+        treeTextRange
+
+
 type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionContext: FcsCodeCompletionContext,
-        tokenBeforeCaret: ITreeNode, tokenAtCaret: ITreeNode, lookupRanges: TextLookupRanges,
-        psiModule: IPsiModule, nodeInFile: ITreeNode, xmlDocService) =
+        reparsedContext: FSharpReparsedCodeCompletionContext, isQualified: bool, tokenBeforeCaret: ITreeNode,
+        tokenAtCaret: ITreeNode, lookupRanges: TextLookupRanges, psiModule: IPsiModule, nodeInFile: ITreeNode,
+        xmlDocService) =
     inherit ClrSpecificCodeCompletionContext(context, psiModule, nodeInFile)
 
     override this.ContextId = "FSharpCodeCompletionContext"
@@ -33,9 +69,15 @@ type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionCo
     member this.TokenAtCaret = tokenAtCaret
     member this.Ranges = lookupRanges
     member this.XmlDocService = xmlDocService
+    member this.ReparsedContext = reparsedContext
+    member this.IsQualified = isQualified
 
     member this.InsideToken =
         isNotNull tokenBeforeCaret && tokenBeforeCaret == tokenAtCaret
+
+    member this.IsBasicOrSmartCompletion =
+        let completionType = context.CodeCompletionType
+        completionType = CodeCompletionType.SmartCompletion || completionType = CodeCompletionType.BasicCompletion
 
 
 [<IntellisensePart>]
@@ -72,6 +114,13 @@ type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
         let isIdentifierStart = canBeIdentifierStart tokenBeforeCaret
         let completedRangeStart = if isIdentifierStart then tokenBeforeCaret.GetDocumentStartOffset() else caretOffset
 
+        let reparsedContext =
+            FSharpReparsedCodeCompletionContext(fsFile, selectedTreeRange, FSharpCompletionUtil.DummyIdentifier)
+        reparsedContext.Init()
+
+        let reference = reparsedContext.Reference.As<FSharpSymbolReference>()
+        let isQualified = isNotNull reference && reference.IsQualified
+
         let lookupRanges =
             let completedRange = DocumentRange(&completedRangeStart, &caretOffset)
             let lookupRanges = CodeCompletionContextProviderBase.GetTextLookupRanges(context, completedRange)
@@ -95,6 +144,5 @@ type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
               LineText = lineText
               DisplayContext = Unchecked.defaultof<_> }
 
-        FSharpCodeCompletionContext(
-            context, fcsContext, tokenBeforeCaret, tokenAtCaret, lookupRanges, psiModule, treeNode,
-            fsXmlDocService) :> _
+        FSharpCodeCompletionContext(context, fcsContext, reparsedContext, isQualified, tokenBeforeCaret,
+            tokenAtCaret, lookupRanges, psiModule, treeNode, fsXmlDocService) :> _
