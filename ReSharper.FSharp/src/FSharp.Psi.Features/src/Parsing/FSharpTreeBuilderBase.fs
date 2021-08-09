@@ -714,7 +714,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         let processParameterGroup paramGroup synType =
             match paramGroup, synType with
-            | _, SynType.Tuple(_, types, range) ->
+            | _, SynType.Tuple(false, types, range) ->
                 let mark = x.Mark(range)
                 List.map snd types |> List.iter2 processParameterSig paramGroup
                 x.Done(mark, ElementType.TUPLE_TYPE_USAGE)
