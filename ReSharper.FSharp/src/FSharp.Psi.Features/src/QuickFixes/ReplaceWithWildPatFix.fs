@@ -76,8 +76,8 @@ type ReplaceWithWildPatScopedFix(pat: IFSharpPattern, highlightingType) =
     override x.Text = "Replace with '_'"
     override x.TryGetContextTreeNode() = pat :> _
 
-    override x.GetScopedFixingStrategy(solution) =
-        SameQuickFixSameHighlightingTypeStrategy(highlightingType, x, solution) :> _
+    override this.GetScopedFixingStrategy(_, _) =
+        SameQuickFixSameHighlightingTypeStrategy(highlightingType, this) :> _
 
     override x.IsAvailable _ =
         ReplaceWithWildPat.isAvailable pat

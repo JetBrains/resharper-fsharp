@@ -24,13 +24,23 @@ type IFSharpRemoveRedundantParensFix =
 type FSharpRemoveRedundantParensScopedFixingStrategy() =
     inherit ScopedFixingStrategyBase()
 
-    static member val Instance: IScopedFixingStrategy = FSharpRemoveRedundantParensScopedFixingStrategy() :> _
+    static let highlightingTypes =
+        [| typeof<RedundantParenExprWarning>
+           typeof<RedundantParenPatWarning>
+           typeof<RedundantParenTypeUsageWarning> |]
 
-    override this.IsEnabled(analyzer: IElementProblemAnalyzer): bool =
-        analyzer :? IFSharpRedundantParenAnalyzer
+    static member val Instance: IScopedFixingStrategy =
+        FSharpRemoveRedundantParensScopedFixingStrategy() :> _
 
-    override this.IsEnabled(quickFix: IQuickFix): bool =
+    override this.IsEnabled(highlighting: IHighlighting) =
+        let highlightingType = highlighting.GetType()
+        Array.contains highlightingType highlightingTypes
+
+    override this.IsEnabled(quickFix: IQuickFix) =
         quickFix :? IFSharpRemoveRedundantParensFix
+
+    override this.GetHighlightingTypes() =
+        highlightingTypes :> _
 
 
 [<AbstractClass>]
@@ -44,7 +54,7 @@ type FSharpRemoveRedundantParensFixBase(parensNode: IFSharpTreeNode, innerNode: 
 
     override this.TryGetContextTreeNode() = parensNode :> _
 
-    override this.GetScopedFixingStrategy _ =
+    override this.GetScopedFixingStrategy(_, _) =
         FSharpRemoveRedundantParensScopedFixingStrategy.Instance
 
     abstract AddSpaceAfter: prevToken: ITokenNode -> bool
