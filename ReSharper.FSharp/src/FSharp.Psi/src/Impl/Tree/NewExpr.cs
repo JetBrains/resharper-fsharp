@@ -26,8 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override ReferenceCollection GetFirstClassReferences() =>
       new ReferenceCollection(Reference);
 
-    public IList<IArgument> ParameterArguments => myParameterArguments.GetValue(this,
-      () => this.CalculateParameterArguments(new[] { ArgumentExpression }));
+    public IList<IArgument> ParameterArguments => 
+      myParameterArguments.GetValue(this, expr => expr.CalculateParameterArguments(new[] { expr.ArgumentExpression }));
 
     public IList<IArgument> Arguments => ParameterArguments.WhereNotNull().ToList();
   }

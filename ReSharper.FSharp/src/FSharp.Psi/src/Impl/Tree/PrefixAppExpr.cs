@@ -74,8 +74,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IList<IArgument> Arguments => ParameterArguments.Where(arg => arg != null).ToList();
 
     public IList<IArgument> ParameterArguments => myParameterArguments.GetValue(this,
-      () => InvokedReferenceExpression is { } invokedReferenceExpression
-        ? invokedReferenceExpression.CalculateParameterArguments(AppliedExpressions)
+      expr => expr.InvokedReferenceExpression is { } invokedReferenceExpression
+        ? invokedReferenceExpression.CalculateParameterArguments(expr.AppliedExpressions)
         : EmptyList<IArgument>.InstanceList);
   }
 }
