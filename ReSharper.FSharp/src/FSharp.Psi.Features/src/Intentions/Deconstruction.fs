@@ -29,9 +29,10 @@ type SingleValueDeconstructionComponent(name: string, additionalNames: string li
     interface IDeconstructionComponent with
         member this.Type = valueType
 
-type DeconstructionFromTuple(pattern: IFSharpPattern, components: IDeconstructionComponent list) =
+type DeconstructionFromTuple(pattern: IFSharpPattern, components: IDeconstructionComponent list, isStruct: bool) =
     member val Pattern = pattern
     member val Components = components
+    member val IsStruct = isStruct
 
     interface IDeconstruction with
         member this.Components = this.Components :> _
@@ -78,7 +79,9 @@ type DeconstructAction(deconstruction: IDeconstruction) =
 
         | _ -> false
 
-    let createInnerDeconstructionPattern (pat: IFSharpPattern) (components: IDeconstructionComponent list) usedNames =
+    let createInnerDeconstructionPattern (pat: IFSharpPattern) (components: IDeconstructionComponent list) isStruct
+            usedNames =
+
         let binding, _ = pat.GetBinding(true)
         let factory = pat.CreateElementFactory()
 
@@ -112,6 +115,7 @@ type DeconstructAction(deconstruction: IDeconstruction) =
 
         let isTopLevel = binding :? ITopBinding
         let patternText = names |> List.map List.head |> String.concat ", "
+        let patternText = if isStruct then $"struct ({patternText})" else patternText
         let pattern = factory.CreatePattern(patternText, isTopLevel)
 
         pattern, names
@@ -194,17 +198,18 @@ type DeconstructAction(deconstruction: IDeconstruction) =
         let tuplePattern, names =
             match deconstruction with
             | :? DeconstructionFromTuple as deconstruction ->
-                let pattern, names = createInnerDeconstructionPattern pat deconstruction.Components usedNames
+                let pattern, names =
+                    createInnerDeconstructionPattern pat deconstruction.Components deconstruction.IsStruct usedNames
                 let pattern = ModificationUtil.ReplaceChild(pat, pattern)
                 pattern, names
 
             | :? DeconstructionFromUnionCaseFields as deconstruction ->
                 let pat = pat :?> IParametersOwnerPat
-                let pattern, names = createInnerDeconstructionPattern pat deconstruction.Components usedNames
+                let pattern, names = createInnerDeconstructionPattern pat deconstruction.Components false usedNames
                 ModificationUtil.ReplaceChild(pat.Parameters.[0], pattern), names
 
             | :? DeconstructionFromUnionCase as deconstruction ->
-                let pattern, names = createInnerDeconstructionPattern pat deconstruction.Components usedNames
+                let pattern, names = createInnerDeconstructionPattern pat deconstruction.Components false usedNames
 
                 let name = deconstruction.Name
                 let name, qualifierTypeElement =
@@ -317,7 +322,7 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
         if isNull fcsType then Seq.empty else
 
         if fcsType.IsTupleType then
-            if fcsType.IsStructTupleType || fcsType.GenericArguments.Count > 7 then Seq.empty else
+            if fcsType.GenericArguments.Count > 7 then Seq.empty else
 
             let typeOwner = pattern.As<IDeclaration>().DeclaredElement.As<ITypeOwner>()
             if isNull typeOwner then Seq.empty else
@@ -332,7 +337,7 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
                 |> List.map (fun typeParameter ->
                     SingleValueDeconstructionComponent(null, [], substitution.[typeParameter]) :> IDeconstructionComponent)
 
-            let deconstruction = DeconstructionFromTuple(pattern, components)
+            let deconstruction = DeconstructionFromTuple(pattern, components, fcsType.IsStructTupleType)
             DeconstructAction(deconstruction).ToContextActionIntentions() :> _
         else
             let fcsEntityInstance = FcsEntityInstance.create fcsType
