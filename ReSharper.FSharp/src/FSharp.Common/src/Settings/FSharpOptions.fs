@@ -34,7 +34,7 @@ module FSharpOptions =
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]
 type FSharpOptions =
-    { [<SettingsEntry(false, skipImplementationAnalysis); DefaultValue>]
+    { [<SettingsEntry(true, skipImplementationAnalysis); DefaultValue>]
       mutable SkipImplementationAnalysis: bool
 
       [<SettingsEntry(false, nonFSharpProjectInMemoryAnalysis); DefaultValue>]
