@@ -66,7 +66,7 @@ module FSharpLanguageLevel =
 
         levelProvider.GetLanguageLevel(psiModule)
 
-    [<Extension; CompiledName("GetLanguageLevel")>]
+    [<Extension; CompiledName("GetFSharpLanguageLevel")>]
     let ofTreeNode (treeNode: ITreeNode) =
         PsiFileCachedDataUtil.GetPsiModuleData<FSharpLanguageLevel>(treeNode, key, ofPsiModuleNoCache)
 
