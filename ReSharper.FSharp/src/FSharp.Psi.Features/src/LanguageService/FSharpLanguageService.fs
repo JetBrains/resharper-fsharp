@@ -125,6 +125,7 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
         | null -> null
         | generatedElement -> generatedElement.CreatePointer() :?> _
 
+    override x.AnalyzeFormatStrings = false
     override x.AnalyzePossibleInfiniteInheritance = false
 
     override x.GetTypeConversionRule(_, _) = ClrPredefinedTypeConversionRule.INSTANCE
