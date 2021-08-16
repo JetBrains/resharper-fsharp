@@ -83,7 +83,7 @@ let ofFileDocumentRange (documentRange: DocumentRange) (path: VirtualFileSystemP
 
 [<Extension; CompiledName("ToDocumentRange")>]
 let ofDocumentRange (documentRange: DocumentRange) =
-    ofFileDocumentRange documentRange (VirtualFileSystemPath.GetEmptyPathFor InteractionContext.SolutionContext)
+    ofFileDocumentRange documentRange (VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext))
 
 [<Extension; CompiledName("GetTextRange")>]
 let getTextRange (document: IDocument) (range: range) =

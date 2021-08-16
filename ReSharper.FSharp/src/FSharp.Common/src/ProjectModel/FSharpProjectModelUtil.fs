@@ -42,4 +42,4 @@ type ModulePathProvider() =
         | :? IProjectPsiModule as projectPsiModule ->
             projectPsiModule.Project.GetOutputFilePath(projectPsiModule.TargetFrameworkId)
 
-        | _ -> (VirtualFileSystemPath.GetEmptyPathFor InteractionContext.SolutionContext)
+        | _ -> VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)

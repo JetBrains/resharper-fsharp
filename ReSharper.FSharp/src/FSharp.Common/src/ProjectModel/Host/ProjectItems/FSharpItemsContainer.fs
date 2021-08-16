@@ -52,7 +52,7 @@ type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutio
             |> dict
 
         let dummyProjectMark =
-            DummyProjectMark(solution.GetSolutionMark(), String.Empty, Guid.Empty, (VirtualFileSystemPath.GetEmptyPathFor InteractionContext.SolutionContext))
+            DummyProjectMark(solution.GetSolutionMark(), String.Empty, Guid.Empty, VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext))
 
         let projectMarkMarshaller =
             { new IUnsafeMarshaller<IProjectMark> with

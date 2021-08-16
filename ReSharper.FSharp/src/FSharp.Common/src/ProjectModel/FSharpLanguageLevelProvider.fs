@@ -92,7 +92,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         compilerPathToLanguageLevels.GetOrAdd(fscPath, getLanguageLevelByCompilerNoCache)
 
     let getFscPath (configuration: IFSharpProjectConfiguration): VirtualFileSystemPath =
-        if isNull configuration then (VirtualFileSystemPath.GetEmptyPathFor InteractionContext.SolutionContext) else
+        if isNull configuration then VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext) else
 
         let path = configuration.PropertiesCollection.GetPropertyValueSafe(FSharpProperties.DotnetFscCompilerPath)
         VirtualFileSystemPath.TryParse(path, InteractionContext.SolutionContext)
