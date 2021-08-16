@@ -23,6 +23,7 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Tuple - Match 02 - Used names``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Member 01 - Used names``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Parameter owner 01``() = x.DoNamedTest()
+    [<Test; Explicit("Enable .NET 5 in tests")>] member x.``Tuple - Struct 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Wild - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Wild - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Parameter - Used names 01``() = x.DoNamedTest()
