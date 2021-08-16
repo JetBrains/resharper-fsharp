@@ -27,12 +27,22 @@ type FSharpCompletionTest() =
     [<Test; Explicit>] member x.``Local val - New line 01``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Local val - New line 02``() = x.DoNamedTest()
 
+    [<Test; Explicit>] member x.``Lambda - Arg - Curried - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Arg - Curried - Tuple 01 - First``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Arg - Curried - Tuple 02 - Last``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Arg - Curried 01``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Arg - Curried 02``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Arg - Curried 03``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Pipe - Double 01``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Pipe 01``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Pipe 02``() = x.DoNamedTest()
+
     [<Test>] member x.``To recursive - Escape 01``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Local 01``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Local 02``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Top level 01``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Top level 02``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Qualified 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualified 02``() = x.DoNamedTest()
     [<Test>] member x.``Qualified 03 - Eof``() = x.DoNamedTest()

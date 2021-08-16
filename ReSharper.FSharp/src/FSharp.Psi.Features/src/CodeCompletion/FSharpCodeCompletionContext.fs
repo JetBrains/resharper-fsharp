@@ -13,9 +13,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Util
+open JetBrains.Util.Logging
 
 type FcsCodeCompletionContext =
     { PartialName: PartialLongName
@@ -37,8 +41,17 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
 
             let parser = fsFile.GetFSharpLanguageService().CreateParser(document)
             let newFile =
-                parser.ParseFSharpFile(true, StandaloneDocument = document,
-                    ResolvedSymbolsCache = fsFile.ResolvedSymbolsCache)
+                try
+                    let newFile =
+                        parser.ParseFSharpFile(true,
+                            StandaloneDocument = document,
+                            ResolvedSymbolsCache = fsFile.ResolvedSymbolsCache,
+                            DocumentRangeTranslator = IdenticalDocumentRangeTranslator(document))
+                    SandBox.CreateSandBoxFor(newFile, fsFile.GetPsiModule())
+                    newFile
+                with exn ->
+                    Logger.GetLogger<FSharpReparseContext>().LogException(exn)
+                    fsFile
 
             ReparseResult(newFile, fsFile, 0)
 

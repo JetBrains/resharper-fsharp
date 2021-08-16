@@ -22,9 +22,11 @@
     <Compile Include="src\Util\FSharpNamingService.fs" />
     <Compile Include="src\Util\FSharpLambdaUtil.fs" />
     <Compile Include="src\Util\EnumCaseLikeDeclarationUtil.fs" />
+    <Compile Include="src\Util\FSharpExpectedTypesUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FcsLookupItem.fs" />
+    <Compile Include="src\CodeCompletion\Rules\GenerateLambdaRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\ToRecursiveFunctionRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\FSharpRelevanceRule.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />

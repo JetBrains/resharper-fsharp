@@ -1,6 +1,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
 
 open FSharp.Compiler.Symbols
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -90,6 +91,22 @@ let getMatchingParameter (expr: IFSharpExpression) =
     match param with
     | Some param when param.ShortName <> SharedImplUtil.MISSING_DECLARATION_NAME -> param
     | _ -> null
+
+let getFunExprAndPosition (expr: IFSharpExpression) =
+    let expr = expr.NotNull().IgnoreParentParens()
+    let tupleExpr = TupleExprNavigator.GetByExpression(expr)
+    let arg, positionInGroup =
+        if isNull tupleExpr then expr, 0 else tupleExpr.IgnoreParentParens(), tupleExpr.Expressions.IndexOf(expr)
+
+    let prefixAppExpr = PrefixAppExprNavigator.GetByArgumentExpression(arg)
+    if isNull prefixAppExpr then None else
+
+    let rec loop curriedGroupPosition (appExpr: IPrefixAppExpr) =
+        match appExpr.FunctionExpression.IgnoreInnerParens() with
+        | :? IPrefixAppExpr as nestedPrefixAppExpr -> loop (curriedGroupPosition + 1) nestedPrefixAppExpr
+        | funExpr -> Some(funExpr.IgnoreParentParens(), (curriedGroupPosition, positionInGroup), prefixAppExpr)
+
+    loop 0 prefixAppExpr
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpMethodInvocationUtil() =
