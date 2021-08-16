@@ -75,13 +75,13 @@ let getStartOffset ([<NotNull>] document) (range: range) =
 let getEndOffset ([<NotNull>] document) (range: range) =
     getPosOffset document range.End
 
-[<Extension; CompiledName("ToDocumentRange")>]
+[<Extension; CompiledName("ToFcsRange")>]
 let ofFileDocumentRange (documentRange: DocumentRange) (path: VirtualFileSystemPath) =
     let startPos = getPosFromDocumentOffset documentRange.StartOffset
     let endPos = getPosFromDocumentOffset documentRange.EndOffset
     Range.mkRange path.FullPath startPos endPos
 
-[<Extension; CompiledName("ToDocumentRange")>]
+[<Extension; CompiledName("ToFcsRange")>]
 let ofDocumentRange (documentRange: DocumentRange) =
     ofFileDocumentRange documentRange (VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext))
 
