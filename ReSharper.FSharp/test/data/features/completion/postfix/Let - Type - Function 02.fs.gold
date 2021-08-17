@@ -1,0 +1,4 @@
+﻿// ${COMPLETE_ITEM:let}
+module Module
+
+let b = "" :? int -> obj * obj{caret}

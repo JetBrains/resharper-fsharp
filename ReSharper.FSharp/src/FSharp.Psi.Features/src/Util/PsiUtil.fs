@@ -371,6 +371,8 @@ let getNextNodeOfType nodeType (node: ITreeNode) =
 
 
 let rec skipIntermediateParentsOfSameType<'T when 'T :> ITreeNode> (node: 'T) =
+    if isNull node then node else
+
     match node.Parent with
     | :? 'T as pat -> skipIntermediateParentsOfSameType pat
     | _ -> node

@@ -88,3 +88,26 @@ type FSharpCompletionTest() =
 
     [<TestSetting(typeof<FSharpOptions>, "EnableOutOfScopeCompletion", "false")>]
     [<Test>] member x.``Import - Same project 02 - Disabled import``() = x.DoNamedTest()
+
+[<FSharpTest>]
+type FSharpPostfixCompletionTest() =
+    inherit CodeCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion/postfix"
+
+    override x.TestType = CodeCompletionTestType.Action
+
+    [<Test>] member x.``Let - Decl 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Decl 02``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Decl 03``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Literal - Float 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Literal - Float 02``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Literal - Int 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Literal - Int 02``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type - Function 02``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type - Named 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type - Tuple 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Not available - Let - Open 01``() = x.DoNamedTest()

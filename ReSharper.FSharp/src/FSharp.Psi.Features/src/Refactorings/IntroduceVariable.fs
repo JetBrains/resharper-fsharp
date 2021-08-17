@@ -517,13 +517,16 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                     let declaredElement = refExpr.Reference.Resolve().DeclaredElement
                     not (declaredElement :? ITypeElement || declaredElement :? INamespace)
                 else
-                    if refExpr.Qualifier :? INewExpr then true else
+                    let qualifier = refExpr.Qualifier
+                    if qualifier :? INewExpr then true else
+
+                    let qualifierReference = refExpr.QualifierReference
+                    if isNotNull qualifier && isNull qualifierReference then true else
 
                     let element = refExpr.Reference.Resolve().DeclaredElement
                     if isNull element || element :? ITypeElement || element :? INamespace then false else
 
-                    let qualifierReference = refExpr.QualifierReference
-                    isNull qualifierReference || isNotNull (qualifierReference.Resolve().DeclaredElement)
+                    isNotNull (qualifierReference.Resolve().DeclaredElement)
 
             | :? IParenExpr as parenExpr ->
                 isNull (NewExprNavigator.GetByArgumentExpression(expr)) &&

@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
-open System
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.PostfixTemplates
@@ -9,14 +8,12 @@ open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
-open JetBrains.Util.Extension
 
 module FSharpPostfixTemplates =
     let isApplicableTypeUsage (typeUsage: ITypeUsage) =
@@ -28,6 +25,8 @@ module FSharpPostfixTemplates =
 [<AllowNullLiteral>]
 type FSharpPostfixTemplateContext(node: ITreeNode, executionContext: PostfixTemplateExecutionContext) =
     inherit PostfixTemplateContext(node, executionContext)
+
+    // todo: override IsSemanticallyMakeSense to disable on namespaces/modules?
 
     override this.Language = FSharpLanguage.Instance :> _
 
@@ -45,8 +44,15 @@ type FSharpPostfixTemplateContextFactory() =
         member this.GetReparseStrings() = EmptyArray.Instance
 
         member this.TryCreate(node, executionContext) =
-            if isNull node then null else
-            FSharpPostfixTemplateContext(node, executionContext) :> _
+            let node = FSharpReparsedCodeCompletionContext.FixReferenceOwner(node).As<IFSharpIdentifier>()
+
+            let referenceExpr = ReferenceExprNavigator.GetByIdentifier(node)
+            if isNotNull referenceExpr then FSharpPostfixTemplateContext(referenceExpr, executionContext) :> _ else
+
+            let referenceName = TypeReferenceNameNavigator.GetByIdentifier(node)
+            if isNotNull referenceName then FSharpPostfixTemplateContext(referenceName, executionContext) :> _ else
+
+            null
 
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -54,30 +60,18 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
     inherit PostfixTemplatesItemProviderBase<FSharpCodeCompletionContext, FSharpPostfixTemplateContext>(
         templatesManager, sessionExecutor, usageStatistics)
 
-    let isApplicableToken (token: ITreeNode) =
-        let tokenType = getTokenType token
-        tokenType == FSharpTokenType.DOT ||
-        tokenType == FSharpTokenType.IEEE64 ||
-        tokenType == FSharpTokenType.DECIMAL ||
-        tokenType == FSharpTokenType.RESERVED_LITERAL_FORMATS ||
-        tokenType == FSharpTokenType.IDENTIFIER && getTokenType token.PrevSibling == FSharpTokenType.DOT
-
-    let isApplicableParent (parent: ITreeNode): bool =
-        match parent with
-        | :? IFSharpExpression -> true
-        | :? ITypeUsage as typeUsage -> FSharpPostfixTemplates.isApplicableTypeUsage typeUsage
-        | _ -> false
-
     override this.TryCreatePostfixContext(fsCompletionContext) =
         if fsCompletionContext.NodeInFile.IsFSharpSigFile() then null else
 
-        let token = fsCompletionContext.TokenBeforeCaret
-        if isNull token || not (isApplicableParent token.Parent && isApplicableToken token) then null else
+        let reparsedContext = fsCompletionContext.ReparsedContext
+        let reference = reparsedContext.Reference.As<FSharpSymbolReference>()
+        if isNull reference || not reference.IsQualified then null else
 
+        let node = reference.GetTreeNode().NotNull()
         let context = fsCompletionContext.BasicContext
         let settings = context.ContextBoundSettingsStore
         let executionContext = PostfixTemplateExecutionContext(context.Solution, context.TextControl, settings, "__")
-        FSharpPostfixTemplateContext(token, executionContext)
+        FSharpPostfixTemplateContext(node, executionContext)
 
 
 [<AbstractClass>]
@@ -92,49 +86,41 @@ type FSharpPostfixTemplateBehaviorBase(info) =
             | binaryAppExpr -> binaryAppExpr :> _
         | appExpr -> getContainingArgExpr appExpr
 
-    let getContainingTypeExpression (typeName: IReferenceName) =
-        let namedTypeUsage = NamedTypeUsageNavigator.GetByReferenceName(typeName.As())
-        let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(namedTypeUsage)
+    let getContainingTypeExpression (typeName: ITypeReferenceName) =
+        let namedTypeUsage = NamedTypeUsageNavigator.GetByReferenceName(typeName)
+        let tupleTypeUsage = TupleTypeUsageNavigator.GetByItem(namedTypeUsage)
+
+        let typeUsage: ITypeUsage =
+            if isNotNull tupleTypeUsage && tupleTypeUsage.Items.Last() == namedTypeUsage then
+                tupleTypeUsage :> _
+            else
+                namedTypeUsage :> _
+
+        let functionTypeUsage = FunctionTypeUsageNavigator.GetByReturnTypeUsage(typeUsage)
+        let typeUsage: ITypeUsage = if isNotNull functionTypeUsage then functionTypeUsage :> _ else typeUsage
+
+        let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
         if isNotNull typedExpr then
             getContainingArgExpr typedExpr else
 
         null
 
-
     let rec getParentExpression (token: IFSharpTreeNode): IFSharpExpression =
         match token with
-        | TokenType FSharpTokenType.RESERVED_LITERAL_FORMATS _ ->
-            match token.Parent.As<IConstExpr>() with
-            | null -> null
-            | parent ->
+        | :? IReferenceExpr as refExpr ->
+            let qualifier = refExpr.Qualifier.NotNull()
+            ModificationUtil.ReplaceChild(refExpr, qualifier.Copy())
 
-            let literalText = token.GetText().SubstringBeforeLast(".", StringComparison.Ordinal)
-            let constExpr = token.CreateElementFactory().CreateConstExpr(literalText)
-            let newChild = ModificationUtil.ReplaceChild(parent.FirstChild, constExpr.FirstChild)
-            getContainingArgExpr (newChild.Parent.As())
-
-        | TokenType FSharpTokenType.DOT _ when (token.NextSibling :? IFSharpIdentifier) ->
-            getParentExpression (token.NextSibling.As())
-
-        | :? IFSharpIdentifier as identifier ->
-            let refExpr = ReferenceExprNavigator.GetByIdentifier(identifier)
-            if isNotNull refExpr && isNull (ReferenceExprNavigator.GetByQualifier(refExpr)) then
-                let qualifier = refExpr.Qualifier.NotNull()
-                ModificationUtil.ReplaceChild(refExpr, qualifier.Copy()) else
-
-            let referenceName = ReferenceNameNavigator.GetByIdentifier(identifier)
-            if isNotNull referenceName && isNull (ReferenceNameNavigator.GetByQualifier(referenceName)) then
-                let qualifier = referenceName.Qualifier.NotNull()
-                let newReferenceName = ModificationUtil.ReplaceChild(referenceName, qualifier.Copy())
-                getContainingTypeExpression newReferenceName else
-
-            null
+        | :? ITypeReferenceName as referenceName ->
+            let qualifier = referenceName.Qualifier.As<ITypeReferenceName>().NotNull()
+            let newReferenceName = ModificationUtil.ReplaceChild(referenceName, qualifier.Copy())
+            getContainingTypeExpression newReferenceName
 
         | _ -> null
 
     member this.GetExpression(context: PostfixExpressionContext) =
-        let token = context.Expression :?> IFSharpTreeNode
-        let parent = getParentExpression token
+        let node = context.Expression :?> IFSharpTreeNode
+        let parent = getParentExpression node
         getContainingArgExpr parent
 
 

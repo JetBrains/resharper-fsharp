@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open System
+open System.Linq
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
@@ -8,17 +10,21 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
+open JetBrains.Util.Extension
 open JetBrains.Util.Logging
 
 type FcsCodeCompletionContext =
@@ -59,10 +65,45 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
 type FSharpReparsedCodeCompletionContext(file: IFSharpFile, treeTextRange, newText) =
     inherit ReparsedCodeCompletionContext(file, treeTextRange, newText)
 
+    static member FixReferenceOwner(node: ITreeNode) =
+        match node with
+        | TokenType FSharpTokenType.RESERVED_LITERAL_FORMATS token ->
+            match token.Parent.As<IConstExpr>() with
+            | null -> node
+            | parent ->
+
+            // todo: prevent the transaction in sandbox?
+            use writeCookie = WriteLockCookie.Create(node.IsPhysical())
+            use disableFormatter = new DisableCodeFormatter()
+            use transactionCookie =
+                PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(node.GetPsiServices(), "FixReferenceOwner")
+
+            let text = token.GetText()
+            let literalText = text.SubstringBeforeLast(".", StringComparison.Ordinal)
+
+            let factory = token.CreateElementFactory()
+            let constExpr = factory.CreateConstExpr(literalText)
+
+            let refExpr = factory.CreateReferenceExpr($"_{text}")
+            refExpr.SetQualifier(constExpr) |> ignore
+
+            let refExpr = ModificationUtil.ReplaceChild(parent, refExpr)
+            refExpr.Identifier :> _
+
+        | _ -> node
+
+    static member FixReferenceOwner(treeNode: ITreeNode, referenceRange: TreeTextRange) =
+        let root = treeNode.Root().As<TreeElement>()
+        if isNull root then () else
+
+        let node = root.FindContainingNodesAt(referenceRange).FirstOrDefault()
+        FSharpReparsedCodeCompletionContext.FixReferenceOwner(node) |> ignore
+
     override this.GetReparseContext(file, range) =
         FSharpReparseContext(file :?> IFSharpFile, range) :>  _
 
     override this.FindReference(referenceRange, treeNode) =
+        FSharpReparsedCodeCompletionContext.FixReferenceOwner(treeNode, referenceRange)
         treeNode.FindReferencesAt(referenceRange) |> Seq.tryHead |> Option.toObj
 
     override this.GetRangeOfReference _ =

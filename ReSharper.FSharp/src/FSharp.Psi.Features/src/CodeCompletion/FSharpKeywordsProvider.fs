@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
@@ -59,10 +60,13 @@ type FSharpKeywordsProvider() =
         [| "__SOURCE_DIRECTORY__"
            "__SOURCE_FILE__"
            "__LINE__" |]
-    
+
     override x.IsAvailable _ = true
 
     override x.AddLookupItems(context, collector) =
+        let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
+        if isNotNull reference && reference.IsQualified then false else
+
         let tokenBeforeCaret = context.TokenBeforeCaret
         if isNull tokenBeforeCaret then false else
 

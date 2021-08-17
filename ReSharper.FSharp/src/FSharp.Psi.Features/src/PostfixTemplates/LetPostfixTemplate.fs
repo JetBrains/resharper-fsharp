@@ -12,11 +12,13 @@ open JetBrains.ReSharper.Resources.Shell
 type LetPostfixTemplate() =
     inherit FSharpPostfixTemplateBase()
 
-    let isApplicableParent (tokenParent: ITreeNode) =
-        match tokenParent with
+    let isApplicable (node: ITreeNode) =
+        match node with
         | :? IFSharpExpression as fsExpr ->
             fsExpr :? IFromErrorExpr || FSharpIntroduceVariable.CanIntroduceVar(fsExpr, true)
-        | :? ITypeUsage as typeUsage -> FSharpPostfixTemplates.isApplicableTypeUsage typeUsage
+        | :? ITypeReferenceName as typeReferenceName ->
+            let typeUsage = NamedTypeUsageNavigator.GetByReferenceName(typeReferenceName)
+            FSharpPostfixTemplates.isApplicableTypeUsage typeUsage
         | _ -> false
 
     override this.IsEnabled _ = true
@@ -26,8 +28,7 @@ type LetPostfixTemplate() =
 
     override this.TryCreateInfo(context) =
         let context = context.AllExpressions.[0]
-        let node = context.Expression
-        if isNull node || not (isApplicableParent node.Parent) then null else
+        if not (isApplicable context.Expression) then null else
 
         LetPostfixTemplateInfo(context) :> _
 
