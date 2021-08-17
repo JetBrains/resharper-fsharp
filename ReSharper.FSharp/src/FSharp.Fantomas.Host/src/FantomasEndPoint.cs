@@ -40,10 +40,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     }
 
     private static string[] GetFormatConfigFields(Unit _) =>
-      FantomasCodeFormatter.EditorConfigFields.Select(t => t.Name).ToArray();
+      FantomasCodeFormatter.FormatConfigFields.Select(t => t.Name).ToArray();
 
-    private string FormatSelection(RdFormatSelectionArgs args) => myCodeFormatter.FormatSelection(args);
-    private string FormatDocument(RdFormatDocumentArgs args) => myCodeFormatter.FormatDocument(args);
+    private string FormatSelection(RdFantomasFormatSelectionArgs args) => myCodeFormatter.FormatSelection(args);
+    private string FormatDocument(RdFantomasFormatDocumentArgs args) => myCodeFormatter.FormatDocument(args);
 
     protected override void Run(Lifetime lifetime, RdSimpleDispatcher dispatcher) => dispatcher.Run();
   }

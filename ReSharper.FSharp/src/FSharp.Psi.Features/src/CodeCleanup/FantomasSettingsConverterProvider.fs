@@ -14,9 +14,7 @@ type FantomasSettingsConverter(fantomasSettingsEntry: SettingsIndexedEntry) =
     let fSharpPrefix = "fsharp_"
 
     let run (context: SettingsConvertContext<'a>) _ =
-        let context = context.As<SettingsConvertContext<string>>()
-        Assertion.AssertNotNull(context, "Context expected to be SettingsConvertContext<string>")
-
+        let context = context.As<SettingsConvertContext<string>>().NotNull()
         for entry in context.SourceData.FindEntriesByPrefix(fSharpPrefix) do
             let setting = SettingIndex(fantomasSettingsEntry, entry.Key)
             context.Target.SetValue(setting, entry.Value)
@@ -36,8 +34,9 @@ type FantomasSettingsConverterProvider(lifetime: Lifetime, schema: SettingsSchem
     let items = CollectionEvents<IEditorConfigConverter>(lifetime, $"{nameof FantomasSettingsConverterProvider}.Items")
 
     do
-        let fantomasSettingsEntry = schema.GetIndexedEntry<_, _>(fun (key: FSharpFormatSettingsKey) -> key.FantomasSettings)
-        items.Add(FantomasSettingsConverter(fantomasSettingsEntry))
+        let fantomasSettingsEntry =
+            schema.GetEntry(typeof<FSharpFormatSettingsKey>, "FantomasSettings") :?> SettingsIndexedEntry
+        items.Add(FantomasSettingsConverter(fantomasSettingsEntry.NotNull()))
 
     interface IProvider<IEditorConfigConverter> with
         member this.Items = items :> _

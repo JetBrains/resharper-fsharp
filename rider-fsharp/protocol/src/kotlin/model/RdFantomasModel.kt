@@ -24,7 +24,7 @@ object RdFantomasModel : Root() {
         field("endCol", int)
     }
 
-    private val rdFormatArgs = basestruct {
+    private val rdFantomasFormatArgs = basestruct {
         field("fileName", string)
         field("source", string)
         field("formatConfig", array(string))
@@ -34,8 +34,8 @@ object RdFantomasModel : Root() {
 
     init {
         call("getFormatConfigFields", void, array(string))
-        call("formatDocument", structdef("rdFormatDocumentArgs") extends rdFormatArgs {}, string)
-        call("formatSelection", structdef("rdFormatSelectionArgs") extends rdFormatArgs {
+        call("formatDocument", structdef("rdFantomasFormatDocumentArgs") extends rdFantomasFormatArgs {}, string)
+        call("formatSelection", structdef("rdFantomasFormatSelectionArgs") extends rdFantomasFormatArgs {
             field("range", rdFcsRange)
         }, string)
 

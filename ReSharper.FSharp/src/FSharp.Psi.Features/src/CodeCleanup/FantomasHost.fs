@@ -57,7 +57,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) 
 
     member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
         let args =
-            RdFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
+            RdFantomasFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
                 convertParsingOptions options, newLineText)
 
         connect()
@@ -65,7 +65,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) 
 
     member x.FormatDocument(filePath, source, settings, options, newLineText) =
         let args =
-            RdFormatDocumentArgs(filePath, source, convertFormatSettings settings, convertParsingOptions options,
+            RdFantomasFormatDocumentArgs(filePath, source, convertFormatSettings settings, convertParsingOptions options,
                 newLineText)
 
         connect()

@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Fantomas;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Diagnostics;
 using JetBrains.Extension;
 using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
+using JetBrains.Util;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
@@ -36,11 +39,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         ? "FSharp.Compiler.ErrorLogger+FSharpErrorSeverityOptions"
         : "FSharp.Compiler.SourceCodeServices.FSharpDiagnosticOptions";
 
-      var options = assemblyToSearch.GetType(searchedType);
-      Assertion.AssertNotNull(options, $"{searchedType} must exist");
-
-      var defaultValue = options.GetProperty("Default")?.GetValue(null);
-      Assertion.AssertNotNull(defaultValue, "Default != null");
+      var options = assemblyToSearch.GetType(searchedType).NotNull($"{searchedType} must exist");
+      var defaultValue = options.GetProperty("Default")?.GetValue(null).NotNull();
 
       return defaultValue;
     }
@@ -50,21 +50,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private static readonly FormatConfig DefaultFormatConfig = FormatConfig.Default;
     private static readonly Type FormatConfigType = typeof(FormatConfig);
 
-    private static readonly Type MultilineFormatterType =
-      FormatConfigType.Assembly.GetType("Fantomas.FormatConfig+MultilineFormatterType");
-
-    private static bool IsMultilineFormatterType(object obj) => obj.GetType().Name == "MultilineFormatterType";
-
-    private static readonly (string Name, object Value)[] FormatConfigFields =
+    public static readonly (string Name, object Value)[] FormatConfigFields =
       FSharpType.GetRecordFields(FormatConfigType, null)
         .Select(x => x.Name)
         .Zip(FSharpValue.GetRecordFields(DefaultFormatConfig, null), (name, value) => (name, value))
         .ToArray();
 
-    public static readonly (string Name, object Value)[] EditorConfigFields =
-      FormatConfigFields.Where(t => t.Value is int || t.Value is bool || IsMultilineFormatterType(t.Value)).ToArray();
+    private static readonly Dictionary<string, UnionCaseInfo> FormatConfigDUs =
+      FormatConfigFields
+        .Select(t => t.Value is int || t.Value is bool ? null : t.Value.GetType())
+        .Where(t => t is { FullName: { } } && t.FullName.StartsWith("Fantomas.FormatConfig"))
+        .Distinct(t => t.FullName)
+        .SelectMany(t => FSharpType.GetUnionCases(t, null))
+        .ToDictionary(t => t.Name);
 
-    public string FormatSelection(RdFormatSelectionArgs args)
+    public string FormatSelection(RdFantomasFormatSelectionArgs args)
     {
       var rdRange = args.Range;
 
@@ -77,7 +77,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         .Result.Replace("\r\n", args.NewLineText);
     }
 
-    public string FormatDocument(RdFormatDocumentArgs args) =>
+    public string FormatDocument(RdFantomasFormatDocumentArgs args) =>
       FSharpAsync.StartAsTask(
           CodeFormatter.FormatDocumentAsync(args.FileName, SourceOrigin.SourceOrigin.NewSourceString(args.Source),
             Convert(args.FormatConfig), Convert(args.ParsingOptions), myChecker), null, null)
@@ -91,7 +91,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private static FormatConfig Convert(string[] riderFormatConfigValues)
     {
       var riderFormatConfigDict =
-        EditorConfigFields
+        FormatConfigFields
           .Zip(riderFormatConfigValues,
             (field, valueData) =>
               (field.Name, Value: valueData == ""
@@ -100,8 +100,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
                 {
                   int _ => int.Parse(valueData),
                   bool _ => bool.Parse(valueData),
-                  { } x when IsMultilineFormatterType(x) => Convert(valueData),
-                  { } x => throw new InvalidOperationException($"Unexpected FormatConfig field {field.Name} = '{x}'")
+                  { } => ConvertEnumValue(valueData)
                 }))
           .ToDictionary(x => x.Name, x => x.Value);
 
@@ -112,11 +111,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       return FSharpValue.MakeRecord(FormatConfigType, formatConfigValues, null) as FormatConfig;
     }
 
-    private static object Convert(string setting) => setting switch
+    // TODO: alternatively, we can reuse the logic from
+    // https://github.com/fsprojects/fantomas/blob/master/src/Fantomas.Extras/EditorConfig.fs
+    // such as `parseOptionsFromEditorConfig`,
+    // or take the OfConfigString methods of discriminated unions as a contract
+    // https://github.com/fsprojects/fantomas/blob/master/src/Fantomas/FormatConfig.fs
+    private static object ConvertEnumValue(string setting)
     {
-      "character_width" => Enum.Parse(MultilineFormatterType, "CharacterWidth"),
-      "number_of_items" => Enum.Parse(MultilineFormatterType, "NumberOfItems"),
-      _ => throw new ArgumentOutOfRangeException(nameof(setting), setting, null)
-    };
+      var camelCaseSetting = StringUtil.MakeUpperCamelCaseName(setting);
+
+      return FormatConfigDUs.TryGetValue(camelCaseSetting, out var unionCase)
+        ? FSharpValue.MakeUnion(unionCase, null, FSharpOption<BindingFlags>.None)
+        : throw new ArgumentOutOfRangeException($"Unknown Fantomas FormatSetting {setting}");
+    }
   }
 }
