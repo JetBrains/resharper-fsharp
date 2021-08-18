@@ -58,8 +58,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static readonly Dictionary<string, UnionCaseInfo> FormatConfigDUs =
       FormatConfigFields
-        .Select(t => t.Value is int || t.Value is bool ? null : t.Value.GetType())
-        .Where(t => t is { FullName: { } } && t.FullName.StartsWith("Fantomas.FormatConfig"))
+        .Select(t => t.Value.GetType())
+        .Where(t => FSharpType.IsUnion(t, null))
         .Distinct(t => t.FullName)
         .SelectMany(t => FSharpType.GetUnionCases(t, null))
         .ToDictionary(t => t.Name);
