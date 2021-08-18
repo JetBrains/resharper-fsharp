@@ -10,12 +10,12 @@ open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.EditorConfig
 
-type FantomasSettingsConverter(fantomasSettingsEntry: SettingsIndexedEntry) =
-    let fSharpPrefix = "fsharp_"
+let fSharpEditorConfigPrefix = "fsharp_"
 
+type FantomasSettingsConverter(fantomasSettingsEntry: SettingsIndexedEntry) =
     let run (context: SettingsConvertContext<'a>) _ =
         let context = context.As<SettingsConvertContext<string>>().NotNull()
-        for entry in context.SourceData.FindEntriesByPrefix(fSharpPrefix) do
+        for entry in context.SourceData.FindEntriesByPrefix(fSharpEditorConfigPrefix) do
             let setting = SettingIndex(fantomasSettingsEntry, entry.Key)
             context.Target.SetValue(setting, entry.Value)
 
@@ -23,7 +23,7 @@ type FantomasSettingsConverter(fantomasSettingsEntry: SettingsIndexedEntry) =
 
     interface IEditorConfigConverter with
         member val Category = EditorConfigConverter.ReSharperCategory with get, set
-        member x.IsPropertySupported(property) = property.StartsWith(fSharpPrefix, StringComparison.Ordinal)
+        member x.IsPropertySupported(property) = property.StartsWith(fSharpEditorConfigPrefix, StringComparison.Ordinal)
         member x.Convert(context) = run context null
         member x.ConvertAndCheck(context) = run context context
         member x.ReverseConvert _ = true

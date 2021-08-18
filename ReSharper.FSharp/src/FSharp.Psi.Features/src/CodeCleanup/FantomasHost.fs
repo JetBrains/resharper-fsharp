@@ -8,6 +8,7 @@ open JetBrains.ProjectModel
 open JetBrains.Rd.Tasks
 open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client
 open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCleanup.FSharpEditorConfig
 open JetBrains.Util
 
 module internal Reflection =
@@ -23,7 +24,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) 
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
 
-    let toEditorConfigName name = $"fsharp_{StringUtil.MakeUnderscoreCaseName(name)}"
+    let toEditorConfigName name = $"{fSharpEditorConfigPrefix}{StringUtil.MakeUnderscoreCaseName(name)}"
 
     let isConnectionAlive () =
         isNotNull connection && connection.IsActive
