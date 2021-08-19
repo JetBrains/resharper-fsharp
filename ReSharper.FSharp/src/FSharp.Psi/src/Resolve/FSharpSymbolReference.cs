@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
@@ -113,16 +114,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         referenceOwner.SetQualifier(declaredElement);
     }
 
+    public IList<string> GetNames(bool qualified) =>
+      qualified && GetElement() is IFSharpQualifiableReferenceOwner qualifiableReferenceOwner
+        ? qualifiableReferenceOwner.Names
+        : new[] { GetName() };
+
     /// Does not reuse existing file resolve results, does complete lookup by name.
     public FSharpOption<FSharpSymbolUse> ResolveWithFcs([NotNull] string opName, bool qualified = true)
     {
       var referenceOwner = GetElement();
       var checkerService = referenceOwner.CheckerService;
 
-      var names = qualified && referenceOwner is IFSharpQualifiableReferenceOwner qualifiableReferenceOwner
-        ? qualifiableReferenceOwner.Names
-        : new[] {GetName()};
-
+      var names = GetNames(qualified);
       return checkerService.ResolveNameAtLocation(referenceOwner.FSharpIdentifier, names, opName);
     }
   }

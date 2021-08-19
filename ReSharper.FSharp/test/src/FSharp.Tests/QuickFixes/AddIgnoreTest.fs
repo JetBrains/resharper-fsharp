@@ -27,6 +27,7 @@ type AddIgnoreTest() =
 
     [<Test>] member x.``New line - Match - Deindent 01``() = x.DoNamedTest()
     [<Test>] member x.``New line - Match - Deindent 02``() = x.DoNamedTest()
+    [<Test>] member x.``New line - Match - Deindent 03 - Single clause``() = x.DoNamedTest()
 
     [<Test>] member x.``New line - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``New line - Match 02``() = x.DoNamedTest()

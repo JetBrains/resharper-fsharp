@@ -38,11 +38,13 @@ module FSharpTestAttribute =
 
     let targetFrameworkId =
         TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, Version(4, 5, 1), ProfileIdentifier.Default)
+//        TargetFrameworkId.Create(FrameworkIdentifier.NetCoreApp, new Version(5, 0))
 
 
 [<AutoOpen>]
 module PackageReferences =
     let [<Literal>] FSharpCorePackage = "FSharp.Core/4.7.2"
+//    let [<Literal>] FSharpCorePackage = "FSharp.Core/5.0.2"
 
 
 type FSharpTestAttribute(extension) =
@@ -59,6 +61,15 @@ type FSharpTestAttribute(extension) =
 
     interface ITestMsCorLibFlagProvider with
         member this.GetMsCorLibFlag() = ReferenceDlls.MsCorLib
+//        member this.GetMsCorLibFlag() = ReferenceDlls.None
+
+//    interface ITestDataPackagesProvider with
+//        member this.GetPackages _ =
+//            [|
+//               TestPackagesAttribute.ParsePackageName("Microsoft.NETCore.App.Ref/5.0.0")
+//               if this.ReferenceFSharpCore then
+//                   TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
+//        member this.Inherits = false
 
     interface ITestFileExtensionProvider with
         member x.Extension = extension
@@ -78,7 +89,9 @@ type FSharpTestAttribute(extension) =
                     properties.SetBuildAction(BuildAction.COMPILE, targetFrameworkId)
 
     override this.GetPackages _ =
-        [| if this.ReferenceFSharpCore then
+        [|
+//           TestPackagesAttribute.ParsePackageName("Microsoft.NETCore.App.Ref/5.0.0")
+           if this.ReferenceFSharpCore then
                TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
 
 type FSharpSignatureTestAttribute() =

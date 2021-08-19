@@ -1,5 +1,6 @@
-namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open System.Collections.Generic
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Tokenization
@@ -16,6 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
@@ -30,19 +32,125 @@ type KeywordSuffix =
     | None
 
 
-type FSharpItemsProviderBase() =
-    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
+module FSharpKeywordsProvider =
+    let computationExpressionKeywords = 
+        [| "and!"
+           "do!"
+           "let!"
+           "match!"
+           "return!"
+           "use!"
+           "yield!" |]
+        |> HashSet
 
-    // todo: override IsAvailable when it's possible to disable smart completion on the second invocation
-    // override x.IsAvailable = context.BasicContext.CodeCompletionType = CodeCompletionType.BasicCompletion
+    let reparseContextAwareKeywords =
+        HashSet(computationExpressionKeywords)
 
-    override x.GetDefaultRanges(context) = context.Ranges
-    override x.GetLookupFocusBehaviour _ = LookupFocusBehaviour.Soft
+    let alwaysSuggestedKeywords =
+        FSharpKeywords.KeywordsWithDescription
+        |> List.filter (fun (keyword, _) ->
+            not (reparseContextAwareKeywords.Contains(keyword)) &&
+            not (PrettyNaming.IsOperatorName keyword))
+
+    let keywordDescriptions =
+        dict FSharpKeywords.KeywordsWithDescription
+
+    let isInComputationExpression (context: FSharpCodeCompletionContext) =
+        let reference = context.ReparsedContext.Reference
+        if isNull reference then false else
+
+        let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
+        if isNull refExpr then false else
+
+        let rec loop (expr: IFSharpExpression) =
+            if expr :? IComputationExpr then true else
+
+            let letOrUseExpr = LetOrUseExprNavigator.GetByInExpression(refExpr)
+            if isNotNull letOrUseExpr then loop letOrUseExpr else
+
+            let seqExpr = SequentialExprNavigator.GetByExpression(refExpr)
+            if isNotNull seqExpr then loop seqExpr else
+
+            let matchExpr = MatchExprNavigator.GetByClauseExpression(expr)
+            if isNotNull matchExpr then loop matchExpr else
+
+            let ifExpr = IfExprNavigator.GetByBranchExpression(expr)
+            if isNotNull ifExpr then loop ifExpr else
+
+            let whileExpr = WhileExprNavigator.GetByDoExpression(expr)
+            if isNotNull whileExpr then loop whileExpr else
+
+            let forExpr = ForExprNavigator.GetByDoExpression(expr)
+            if isNotNull forExpr then loop forExpr else
+
+            let tryExpr = TryLikeExprNavigator.GetByTryExpression(expr)
+            if isNotNull tryExpr then loop tryExpr else
+
+            false
+
+        loop refExpr
+
+    let isModuleMemberStart (context: FSharpCodeCompletionContext) =
+        let reference = context.ReparsedContext.Reference
+        if isNull reference then false else
+
+        let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
+        if isNull refExpr then false else
+
+        let rec loop (expr: IFSharpExpression) =
+            match PrefixAppExprNavigator.GetByFunctionExpression(expr) with
+            | null -> expr
+            | prefixAppExpr -> loop prefixAppExpr
+
+        let expr = loop refExpr
+        let doStmt = DoStatementNavigator.GetByExpression(expr)
+        let moduleDecl = ModuleLikeDeclarationNavigator.GetByMember(doStmt)
+        isNotNull moduleDecl
+
+    let suggestKeywords (context: FSharpCodeCompletionContext) =
+        ()
+
+type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
+    inherit TextLookupItemBase()
+
+    override x.Image = PsiSymbolsThemedIcons.Keyword.Id
+
+    override x.Text =
+        match keywordSuffix with
+        | KeywordSuffix.Space -> $"{keyword} "
+        | KeywordSuffix.Quotes -> $"{keyword} \"\""
+        | _ -> keyword
+
+    override x.GetDisplayName() =
+        LookupUtil.FormatLookupString(keyword, x.TextColor)
+
+    override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
+        base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
+
+        match keywordSuffix with
+        | KeywordSuffix.Quotes ->
+            // Move caret back inside inserted quotes.
+            textControl.Caret.MoveTo(textControl.Caret.Offset() - 1, CaretVisualPlacement.DontScrollIfVisible)
+            textControl.RescheduleCompletion(solution)
+        | _ -> ()
+
+    interface IRiderAsyncCompletionLookupItem
+
+
+type FSharpKeywordLookupItem(keyword, description: string) =
+    inherit FSharpKeywordLookupItemBase(keyword, KeywordSuffix.None)
+
+    interface IDescriptionProvidingLookupItem with
+        member x.GetDescription() = RichTextBlock(description)
+
+
+type FSharpHashDirectiveLookupItem(directive, suffix) =
+    inherit FSharpKeywordLookupItemBase(directive, suffix)
 
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpKeywordsProvider() =
-    inherit FSharpItemsProviderBase()
+    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     let hashDirectives =
         [| KeywordSuffix.Quotes, [| "#load"; "#r"; "#I"; "#nowarn"; "#time" |]
@@ -62,6 +170,8 @@ type FSharpKeywordsProvider() =
            "__LINE__" |]
 
     override x.IsAvailable _ = true
+    override x.GetDefaultRanges(context) = context.Ranges
+    override x.GetLookupFocusBehaviour _ = LookupFocusBehaviour.Soft
 
     override x.AddLookupItems(context, collector) =
         let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
@@ -104,43 +214,6 @@ type FSharpKeywordsProvider() =
             collector.Add(item)
 
         true
-
-
-type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
-    inherit TextLookupItemBase()
-
-    override x.Image = PsiSymbolsThemedIcons.Keyword.Id
-
-    override x.Text =
-        match keywordSuffix with
-        | KeywordSuffix.Space -> keyword + " "
-        | KeywordSuffix.Quotes -> keyword + " \"\""
-        | _ -> keyword
-
-    override x.GetDisplayName() = LookupUtil.FormatLookupString(keyword, x.TextColor)
-
-    override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
-        base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
-
-        match keywordSuffix with
-        | KeywordSuffix.Quotes ->
-            // Move caret back inside inserted quotes.
-            textControl.Caret.MoveTo(textControl.Caret.Offset() - 1, CaretVisualPlacement.DontScrollIfVisible)
-            textControl.RescheduleCompletion(solution)
-        | _ -> ()
-
-    interface IRiderAsyncCompletionLookupItem
-
-
-type FSharpKeywordLookupItem(keyword, description: string) =
-    inherit FSharpKeywordLookupItemBase(keyword, KeywordSuffix.None)
-
-    interface IDescriptionProvidingLookupItem with
-        member x.GetDescription() = RichTextBlock(description)
-
-
-type FSharpHashDirectiveLookupItem(directive, suffix) =
-    inherit FSharpKeywordLookupItemBase(directive, suffix)
 
 
 [<SolutionComponent>]

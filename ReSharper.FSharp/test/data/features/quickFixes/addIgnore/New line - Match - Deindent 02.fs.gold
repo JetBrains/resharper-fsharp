@@ -1,5 +1,6 @@
 ﻿while true do
     match () with
+    | _ -> []
     | _ -> [
     ]
     |> ignore{caret}

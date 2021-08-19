@@ -33,6 +33,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let parser = languageService.CreateParser(document)
 
         let fsFile = parser.ParseFSharpFile(noCache = true, StandaloneDocument = document)
+        // why this sandbox is created? do we need to dispose it somehow?
         SandBox.CreateSandBoxFor(fsFile, psiModule)
         fsFile
 

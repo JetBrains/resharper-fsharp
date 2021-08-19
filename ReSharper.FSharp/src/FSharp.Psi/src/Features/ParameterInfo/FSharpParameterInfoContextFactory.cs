@@ -5,11 +5,14 @@ using JetBrains.Annotations;
 using JetBrains.Application.Settings;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.ParameterInfo;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.TextControl;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
@@ -29,6 +32,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
     public IParameterInfoContext CreateContext(ISolution solution, DocumentOffset caretOffset,
       DocumentOffset expectedLParenOffset, char invocationChar, IContextBoundSettingsStore settingsStore)
     {
+      var codeCompletionParameters = CodeCompletionParameters.CreateSingle(CodeCompletionType.BasicCompletion, true);
+
+      var textControl = Shell.Instance.GetComponent<ITextControlManager>().FocusedTextControl.Value;
+      var intellisenseManager = solution.GetComponent<IntellisenseManager>();
+      var completionContexts = intellisenseManager.SpecificCodeCompletionContexts(codeCompletionParameters, textControl);
+
       var fsFile = solution.GetPsiServices().GetPsiFile<FSharpLanguage>(caretOffset) as IFSharpFile;
       var parseResults = fsFile?.ParseResults?.Value;
       if (parseResults == null)

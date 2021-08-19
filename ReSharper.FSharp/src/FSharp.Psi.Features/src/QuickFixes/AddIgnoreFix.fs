@@ -25,16 +25,16 @@ type AddIgnoreFix(expr: IFSharpExpression) =
     let suggestInnerExpression (expr: IFSharpExpression) =
         match expr with
         | :? IIfThenElseExpr as ifExpr ->
-            Some(ifExpr.ThenExpr, "Then branch")
+            Some(ifExpr.ThenExpr, "Then branch", true)
 
         | :? ITryLikeExpr as tryExpr ->
-            Some(tryExpr.TryExpression, "Try branch")
+            Some(tryExpr.TryExpression, "Try branch", true)
 
         | :? IMatchLikeExpr as matchExpr ->
             let clauses = matchExpr.Clauses
-            if clauses.Count <= 1 then None else
+            if clauses.Count < 1 then None else
 
-            Some(clauses.[0].Expression, "First clause")
+            Some(clauses.[0].Expression, "First clause", clauses.Count > 1)
 
         | _ -> None
 
@@ -53,7 +53,9 @@ type AddIgnoreFix(expr: IFSharpExpression) =
     override x.Execute(solution, textControl) =
         expr <-
             match suggestInnerExpression expr with
-            | Some(innerExpression, text) when isNotNull innerExpression ->
+            | Some(innerExpression, text, suggestWholeExpression) when isNotNull innerExpression ->
+                if not suggestWholeExpression then innerExpression else
+
                 let occurrences =
                     [| innerExpression, text
                        expr, "Whole expression" |]

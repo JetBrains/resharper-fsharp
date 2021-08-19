@@ -323,7 +323,7 @@ listPat options { stubBase="FSharpPatternBase"; }:
   RBRACK<RBRACE, RightBracket>;
 
 tuplePat options { stubBase="FSharpPatternBase"; }:
-  STRUCT<STRUCT, StructKeyword>?
+  STRUCT<STRUCT, StructKeyword>? // todo: parens
   LIST fSharpPattern<PATTERN, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
 
 parenPat options { stubBase="FSharpPatternBase"; }:
@@ -587,7 +587,7 @@ tupleExpr options { stubBase="FSharpExpressionBase"; }:
     STRUCT<STRUCT, StructKeyword>
     LPAREN<LPAREN, LeftParen>
   )?
-  LIST fSharpExpression<EXPR, Expressions> SEP COMMA<FSHARP_COMMA, Commas>
+  LIST fSharpExpression<EXPR, Expressions> SEP COMMA<FSHARP_COMMA, Commas> // todo: rename: items
   RPAREN<RPAREN, RightParen>;
 
 interface recordLikeExpr:
@@ -700,7 +700,7 @@ lambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
   FUN
   lambdaParametersList<LAMBDA_PARAMETERS, Parameters>
   RARROW<RARROW, RArrow>
-  fSharpExpression<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>; // todo: rename: bodyExpr
   
 lambdaParametersList:
   fSharpPattern<PAT, Patterns>*;

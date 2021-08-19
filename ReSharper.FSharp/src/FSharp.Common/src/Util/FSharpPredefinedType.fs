@@ -81,14 +81,20 @@ let entryPointAttrTypeName = clrTypeName "Microsoft.FSharp.Core.EntryPointAttrib
 
 
 let predefinedFunctionTypes =
-    [| operatorsModuleTypeName, [| "not"; "id"; "ignore"; "|>"; "<|"; "<>"; "="; "fst"; "snd" |]
+    [| operatorsModuleTypeName, [| "not"; "id"; "ignore"; "|>"; "||>"; "<|"; "<>"; "="; "fst"; "snd" |]
        intrinsicOperatorsTypeName, [| "||"; "&&" |]
        extraTopLevelOperatorsTypeName, [| "sprintf" |] |]
     |> Array.collect (fun (typeName, names) -> [| for name in names -> name, typeName |])
     |> dict
 
+[<CompiledName("PipeRightOperatorNames")>]
+let pipeRightOperatorNames = [| "|>"; "||>"; "|||>" |]
+
+[<CompiledName("PipeLeftOperatorNames")>]
+let pipeLeftOperatorNames = [| "|>"; "||>"; "|||>" |]
+
 [<CompiledName("PipeOperatorNames")>]
-let pipeOperatorNames = [| "|>"; "||>"; "|||>"; "<|"; "<||"; "<|||" |] |> HashSet
+let pipeOperatorNames = Array.concat [| pipeRightOperatorNames; pipeLeftOperatorNames |] |> HashSet
 
 /// This map is used in Find Usages to get source name of element without having FSharpSymbol element.
 /// It should be removed when it's possible to get abbreviation definitions from assemblies.

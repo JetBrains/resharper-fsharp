@@ -53,6 +53,10 @@ let isPredefinedFunctionApp name (expr: #IFSharpExpression) (arg: outref<IFSharp
 
     | _ -> false
 
+type IFSharpExpression with
+    member this.IsPredefined(name, arg: outref<IFSharpExpression>) =
+        isPredefinedFunctionApp name this &arg
+
 let isFunctionInApp (expr: #IFSharpExpression) (funExpr: outref<IAppExpr>) (arg: outref<IFSharpExpression>) =
     let prefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(expr)
     if isNotNull prefixAppExpr then

@@ -671,6 +671,9 @@ type FSharpErrorsParserTest() =
 
     [<Test>] member x.``Pat - Char range 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Open 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record - Ctor 02 - As``() = x.DoNamedTest()

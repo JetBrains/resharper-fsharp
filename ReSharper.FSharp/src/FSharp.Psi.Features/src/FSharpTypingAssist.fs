@@ -1549,7 +1549,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         | null -> None
         | fsFile -> fsFile.ParseTree
 
-    member x.GetCachingLexer(textControl: ITextControl, lexer: byref<CachingLexer>) =
+    member x.GetCachingLexer(textControl: ITextControl, lexer: outref<CachingLexer>) =
         match x.GetCachingLexer(textControl) with
         | null -> false
         | cachingLexer ->
