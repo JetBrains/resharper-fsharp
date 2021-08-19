@@ -4,14 +4,14 @@
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Method,ModifiersVirtual,ModifiersPublic)
       text: Object <font color="GrayText"> (in System.Object)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      tail: <font color="GrayText">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: Object.cs
       ------------------
+          public Object();
 
-          [__DynamicallyInvokable]
-          public virtual string |CARET|ToString() => this.GetType().ToString();
+          public virtual string |CARET|ToString();
 
           [TargetedPatchingOptOut("Performance critical to inline across NGen image boundaries")]
       ------------------

@@ -9,11 +9,11 @@
     Navigation result:
       opened file: Enum.cs
       ------------------
-        [__DynamicallyInvokable]
+        [ComVisible(true)]
         [Serializable]
         public abstract class |CARET|Enum : ValueType, IComparable, IFormattable, IConvertible
         {
-          private static readonly char[] enumSeperatorCharArray = new char[1]
+          internal static ulong ToUInt64(object value);
       ------------------
 
     DEO: Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -25,11 +25,11 @@
     Navigation result:
       opened file: IComparable.cs
       ------------------
+      {
         [ComVisible(true)]
-        [__DynamicallyInvokable]
         public interface |CARET|IComparable
         {
-          [__DynamicallyInvokable]
+          int CompareTo(object obj);
       ------------------
 
     DEO: Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -42,10 +42,10 @@
       opened file: IConvertible.cs
       ------------------
         [CLSCompliant(false)]
-        [__DynamicallyInvokable]
+        [ComVisible(true)]
         public interface |CARET|IConvertible
         {
-          [__DynamicallyInvokable]
+          TypeCode GetTypeCode();
       ------------------
 
     DEO: Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -57,11 +57,11 @@
     Navigation result:
       opened file: IFormattable.cs
       ------------------
+      {
         [ComVisible(true)]
-        [__DynamicallyInvokable]
         public interface |CARET|IFormattable
         {
-          [__DynamicallyInvokable]
+          string ToString(string format, IFormatProvider formatProvider);
       ------------------
 
     DEO: Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN as Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -73,7 +73,7 @@
     Navigation result:
       opened file: ValueType.cs
       ------------------
-        [__DynamicallyInvokable]
+        [ComVisible(true)]
         [Serializable]
         public abstract class |CARET|ValueType
         {
