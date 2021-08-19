@@ -181,7 +181,7 @@ configure<RdGenExtension> {
     logger.info("Configuring rdgen params")
     classpath({
         logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${intellij.ideaDependency}")
-        val sdkPath = intellij.ideaDependency.get().classes
+        val sdkPath = intellij.getIdeaDependency(project).classes
         val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
 
         "$rdLibDirectory/rider-model.jar"
@@ -251,7 +251,7 @@ tasks {
 
         fun moveToPlugin(files: List<String>, destFolder: String) {
             files.forEach {
-                from(it) { into("${intellij.pluginName}/$destFolder") }
+                from(it) { into("${intellij.pluginName.get()}/$destFolder") }
             }
         }
 
@@ -265,7 +265,7 @@ tasks {
                 files.forEach {
                     val file = file(it)
                     if (!file.exists()) throw RuntimeException("File $file does not exist")
-                    logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/$destFolder")
+                    logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName.get()}/$destFolder")
                 }
             }
             validateFiles(files, "dotnet")
