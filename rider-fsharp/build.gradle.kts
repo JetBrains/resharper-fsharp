@@ -1,7 +1,7 @@
 import com.jetbrains.rd.generator.gradle.RdGenExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexer
-import org.jetbrains.intellij.IntelliJPlugin
+import org.jetbrains.intellij.IntelliJPluginConstants
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
@@ -27,7 +27,7 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.intellij") version "0.7.2" // https://github.com/JetBrains/gradle-intellij-plugin/releases
+    id("org.jetbrains.intellij") version "1.1.4" // https://github.com/JetBrains/gradle-intellij-plugin/releases
     id("org.jetbrains.grammarkit") version "2018.1.7"
     id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
     kotlin("jvm") version "1.4.10"
@@ -50,13 +50,13 @@ val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
 intellij {
-    type = "RD"
+    type.set("RD")
 
     // Download a version of Rider to compile and run with. Either set `version` to
     // 'LATEST-TRUNK-SNAPSHOT' or 'LATEST-EAP-SNAPSHOT' or a known version.
     // This will download from www.jetbrains.com/intellij-repository/snapshots or
     // www.jetbrains.com/intellij-repository/releases, respectively.
-    // Note that there's no guarantee that these are kept up to date
+    // Note that there's no guarantee that these are kept up-to-date
     // version = 'LATEST-TRUNK-SNAPSHOT'
     // If the build isn't available in intellij-repository, use an installed version via `localPath`
     // localPath = '/Users/matt/Library/Application Support/JetBrains/Toolbox/apps/Rider/ch-1/171.4089.265/Rider EAP.app/Contents'
@@ -67,20 +67,20 @@ intellij {
     val dir = file("build/rider")
     if (dir.exists()) {
         logger.lifecycle("*** Using Rider SDK from local path " + dir.absolutePath)
-        localPath = dir.absolutePath
+        localPath.set(dir.absolutePath)
     } else {
         logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-        version = "$baseVersion-SNAPSHOT"
+        version.set("$baseVersion-SNAPSHOT")
     }
 
-    instrumentCode = false
-    downloadSources = false
+    instrumentCode.set(false)
+    downloadSources.set(false)
 
     // Uncomment when need to install plugin into a different IDE build.
     // updateSinceUntilBuild = false
 
     // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
-    setPlugins("rider-plugins-appender")
+    plugins.set(listOf("rider-plugins-appender"))
 }
 
 repositories.forEach {
@@ -144,7 +144,7 @@ val fantomasFiles = listOf(
         "FSharp.Fantomas.Host/$outputRelativePath/Fantomas.dll")
 
 val dotNetSdkPath by lazy {
-    val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
+    val sdkPath = intellij.getIdeaDependency(project).classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
     if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
 
     println("SDK path: $sdkPath")
@@ -181,7 +181,7 @@ configure<RdGenExtension> {
     logger.info("Configuring rdgen params")
     classpath({
         logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${intellij.ideaDependency}")
-        val sdkPath = intellij.ideaDependency.classes
+        val sdkPath = intellij.ideaDependency.get().classes
         val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
 
         "$rdLibDirectory/rider-model.jar"
@@ -243,7 +243,7 @@ tasks {
         val fantomasFiles = fantomasFiles.map { "$resharperPluginPath/src/$it" }
         val typeProvidersFiles = typeProvidersFiles.map { "$resharperPluginPath/src/$it" }
 
-        if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {
+        if (name == IntelliJPluginConstants.PREPARE_TESTING_SANDBOX_TASK_NAME) {
             val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/$outputRelativePath"
             val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
             files = files + listOf("$testHostName.dll", "$testHostName.pdb")
