@@ -6,7 +6,6 @@ using JetBrains.Lifetimes;
 using JetBrains.Platform.MsBuildHost;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.Packaging;
-using JetBrains.RdBackend.Common.Features.Toolset;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
@@ -18,14 +17,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     [NotNull] private readonly ILogger myLogger;
     [NotNull] private readonly IShellLocks myShellLocks;
     [NotNull] private readonly ISolution mySolution;
-    [NotNull] private readonly IRiderSolutionToolset myToolset;
+    [NotNull] private readonly ISolutionToolset myToolset;
 
     public TypeProvidersExternalProcessFactory(
       [NotNull] ISolutionProcessStartInfoPatcher solutionProcessStartInfoPatcher,
       [NotNull] ILogger logger,
       [NotNull] IShellLocks shellLocks,
       [NotNull] ISolution solution,
-      [NotNull] IRiderSolutionToolset toolset)
+      [NotNull] ISolutionToolset toolset)
     {
       mySolutionProcessStartInfoPatcher = solutionProcessStartInfoPatcher;
       myLogger = logger;
