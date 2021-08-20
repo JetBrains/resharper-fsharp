@@ -4,11 +4,11 @@ open System
 open System.Collections.Generic
 open System.Globalization
 open JetBrains.Application
+open JetBrains.Application.Platform
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.NuGet.Packaging
 open JetBrains.ProjectModel.Platforms
 open JetBrains.ProjectModel.Properties
-open JetBrains.RdBackend.Common.Features.Runtime
 open JetBrains.RdBackend.Common.Features.Toolset
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
