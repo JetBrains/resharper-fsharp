@@ -90,6 +90,12 @@ type FSharpKeywordsProvider() =
             let item = FSharpKeywordLookupItem(keyword, description)
             item.InitializeRanges(context.Ranges, context.BasicContext)
             markRelevance item CLRLookupItemRelevance.Keywords
+            match keyword with
+            | "true" | "false" | "null" ->
+                // use the same relevance as module members
+                // todo: add F#-specific relevance
+                markRelevance item CLRLookupItemRelevance.Methods
+            | _ -> ()
             collector.Add(item)
 
         if context.BasicContext.File.Language.Is<FSharpScriptLanguage>() then
