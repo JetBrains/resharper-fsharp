@@ -65,6 +65,11 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
 type FSharpReparsedCodeCompletionContext(file: IFSharpFile, treeTextRange, newText) =
     inherit ReparsedCodeCompletionContext(file, treeTextRange, newText)
 
+    static member FixReferenceOwnerUnderTransaction(node: ITreeNode) =
+        let psiServices = node.GetPsiServices()
+        use cookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, "FixReferenceOwner")
+        FSharpReparsedCodeCompletionContext.FixReferenceOwner(node)
+
     static member FixReferenceOwner(node: ITreeNode) =
         match node with
         | TokenType FSharpTokenType.RESERVED_LITERAL_FORMATS token ->
@@ -72,11 +77,8 @@ type FSharpReparsedCodeCompletionContext(file: IFSharpFile, treeTextRange, newTe
             | null -> node
             | parent ->
 
-            // todo: prevent the transaction in sandbox?
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
             use disableFormatter = new DisableCodeFormatter()
-            use transactionCookie =
-                PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(node.GetPsiServices(), "FixReferenceOwner")
 
             let text = token.GetText()
             let literalText = text.SubstringBeforeLast(".", StringComparison.Ordinal)

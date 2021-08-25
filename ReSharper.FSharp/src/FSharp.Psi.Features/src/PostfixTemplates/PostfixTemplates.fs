@@ -44,12 +44,13 @@ type FSharpPostfixTemplateContextFactory() =
         member this.GetReparseStrings() = EmptyArray.Instance
 
         member this.TryCreate(node, executionContext) =
-            let node = FSharpReparsedCodeCompletionContext.FixReferenceOwner(node).As<IFSharpIdentifier>()
+            let node = FSharpReparsedCodeCompletionContext.FixReferenceOwnerUnderTransaction(node)
+            let fsIdentifier = node.As<IFSharpIdentifier>()
 
-            let referenceExpr = ReferenceExprNavigator.GetByIdentifier(node)
+            let referenceExpr = ReferenceExprNavigator.GetByIdentifier(fsIdentifier)
             if isNotNull referenceExpr then FSharpPostfixTemplateContext(referenceExpr, executionContext) :> _ else
 
-            let referenceName = TypeReferenceNameNavigator.GetByIdentifier(node)
+            let referenceName = TypeReferenceNameNavigator.GetByIdentifier(fsIdentifier)
             if isNotNull referenceName then FSharpPostfixTemplateContext(referenceName, executionContext) :> _ else
 
             null
