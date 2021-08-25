@@ -4,13 +4,13 @@
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: _Exception <font color="GrayText"> (in System.Runtime.InteropServices)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0</font>
+      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
       tail icon: Assembly
     Navigation result:
       opened file: _Exception.cs
       ------------------
-        [ComVisible(true)]
-        [Guid("b36b5c63-42ef-38bc-a07e-0b34c98f164a")]
+        [InterfaceType(ComInterfaceType.InterfaceIsDual)]
+        [CLSCompliant(false)]
         public interface |CARET|_Exception
         {
           string ToString();
@@ -20,23 +20,23 @@
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersPublic)
       text: **Exception **<font color="GrayText"> (in System)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0</font>
+      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
       tail icon: Assembly
     Navigation result:
       opened file: Exception.cs
       ------------------
-        [ComDefaultInterface(typeof (_Exception))]
+        [__DynamicallyInvokable]
         [Serializable]
         public class |CARET|Exception : ISerializable, _Exception
         {
-          internal string _message;
+          [OptionalField]
       ------------------
 
     DEO: Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: ISerializable <font color="GrayText"> (in System.Runtime.Serialization)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0</font>
+      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
       tail icon: Assembly
     Navigation result:
       opened file: ISerializable.cs
@@ -52,16 +52,16 @@
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: **IStructuralEquatable **<font color="GrayText"> (in System.Collections)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0</font>
+      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
       tail icon: Assembly
     Navigation result:
       opened file: IStructuralEquatable.cs
       ------------------
-      namespace System.Collections
       {
+        [__DynamicallyInvokable]
         public interface |CARET|IStructuralEquatable
         {
-          bool Equals(object other, IEqualityComparer comparer);
+          [__DynamicallyInvokable]
       ------------------
 
 

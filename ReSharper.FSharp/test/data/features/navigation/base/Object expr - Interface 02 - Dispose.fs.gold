@@ -4,8 +4,8 @@
     Navigation result:
       opened file: IDisposable.cs
       ------------------
-        public interface IDisposable
         {
+          [__DynamicallyInvokable]
           void |CARET|Dispose();
         }
       }

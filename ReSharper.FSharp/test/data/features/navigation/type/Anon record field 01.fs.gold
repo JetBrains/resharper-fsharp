@@ -4,11 +4,11 @@
     Navigation result:
       opened file: Int32.cs
       ------------------
-        [ComVisible(true)]
+        [__DynamicallyInvokable]
         [Serializable]
         public struct |CARET|Int32 : IComparable, IFormattable, IConvertible, IComparable<int>, IEquatable<int>
         {
-          public const int MaxValue = 2147483647;
+          [__DynamicallyInvokable]
       ------------------
 
 
