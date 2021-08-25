@@ -24,7 +24,7 @@ type FSharpRenameTest() =
         let testName = x.TestMethodName
         let csExtension = CSharpProjectFileType.CS_EXTENSION
         let fsExtension = FSharpProjectFileType.FsExtension
-        x.DoTestSolution([| testName + csExtension; testName + fsExtension |])
+        x.DoTestSolution(testName + csExtension, testName + fsExtension)
 
     [<Test>] member x.``Inline - Declaration``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Use``() = x.DoNamedTest()

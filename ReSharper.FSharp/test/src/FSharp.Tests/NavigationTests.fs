@@ -25,7 +25,7 @@ type FSharpGoToUsagesTest() =
         let testName = x.TestMethodName
         let csExtension = CSharpProjectFileType.CS_EXTENSION
         let fsExtension = FSharpProjectFileType.FsExtension
-        x.DoTestSolution([| testName + csExtension; testName + fsExtension |])
+        x.DoTestSolution(testName + csExtension, testName + fsExtension)
 
     override x.CreateContextAction(solution, textControl) =
         base.CreateContextAction(solution, textControl)
