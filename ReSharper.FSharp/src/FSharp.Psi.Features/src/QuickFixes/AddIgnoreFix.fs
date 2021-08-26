@@ -32,7 +32,7 @@ type AddIgnoreFix(expr: IFSharpExpression) =
 
         | :? IMatchLikeExpr as matchExpr ->
             let clauses = matchExpr.Clauses
-            if clauses.Count <= 1 then None else
+            if clauses.Count < 1 then None else
 
             Some(clauses.[0].Expression, "First clause")
 

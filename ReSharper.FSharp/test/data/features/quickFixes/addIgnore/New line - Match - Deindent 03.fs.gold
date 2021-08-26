@@ -1,0 +1,7 @@
+﻿//${OCCURRENCE:First clause}
+while true do
+    match () with
+    | _ -> 1 |> ignore
+    | _ ->
+
+    1{caret}
