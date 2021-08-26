@@ -1,4 +1,6 @@
-﻿using JetBrains.Collections.Viewable;
+﻿using System.Linq;
+using JetBrains.Collections.Viewable;
+using JetBrains.Core;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
@@ -16,10 +18,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private readonly FantomasCodeFormatter myCodeFormatter;
     protected override string ProtocolName => "Fantomas Host";
 
-    public FantomasEndPoint() : base(FantomasProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE)
-    {
+    public FantomasEndPoint() : base(FantomasProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE) =>
       myCodeFormatter = new FantomasCodeFormatter();
-    }
 
     protected override RdSimpleDispatcher InitDispatcher(Lifetime lifetime, ILogger logger) =>
       new RdSimpleDispatcher(lifetime, logger);
@@ -31,6 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     {
       var model = new RdFantomasModel(lifetime, protocol);
 
+      model.GetFormatConfigFields.Set(GetFormatConfigFields);
       model.FormatSelection.Set(FormatSelection);
       model.FormatDocument.Set(FormatDocument);
       model.Exit.Advise(lifetime, Terminate);
@@ -38,8 +39,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       return model;
     }
 
-    private string FormatSelection(RdFormatSelectionArgs args) => myCodeFormatter.FormatSelection(args);
-    private string FormatDocument(RdFormatDocumentArgs args) => myCodeFormatter.FormatDocument(args);
+    private static string[] GetFormatConfigFields(Unit _) =>
+      FantomasCodeFormatter.FormatConfigFields.Select(t => t.Name).ToArray();
+
+    private string FormatSelection(RdFantomasFormatSelectionArgs args) => myCodeFormatter.FormatSelection(args);
+    private string FormatDocument(RdFantomasFormatDocumentArgs args) => myCodeFormatter.FormatDocument(args);
 
     protected override void Run(Lifetime lifetime, RdSimpleDispatcher dispatcher) => dispatcher.Run();
   }
