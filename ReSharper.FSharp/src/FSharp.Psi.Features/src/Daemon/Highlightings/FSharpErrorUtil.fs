@@ -143,3 +143,12 @@ let getSecondBindingKeyword (bindings: ILetBindings) =
     |> Option.bind (fun b -> Option.ofObj b.BindingKeyword)
     |> Option.map getDocumentRange
     |> Option.defaultValue DocumentRange.InvalidRange
+
+let getParameterOwnerPatParametersRange (pat : IParametersOwnerPat) =
+    let parameters = pat.Parameters
+    if parameters.IsEmpty then pat.GetHighlightingRange() else
+
+    let first = parameters.First()
+    let last = parameters.Last()
+
+    getTreeNodesDocumentRange first last

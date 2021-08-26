@@ -1,0 +1,12 @@
+﻿module Module
+
+type U =
+    | A
+    | B of int * int
+
+match A with
+| A -> ()
+| B |a|(0) -> ()
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This union case expects 2 arguments in tupled form

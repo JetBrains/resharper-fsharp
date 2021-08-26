@@ -422,4 +422,15 @@
     <QuickFix>IntroduceVarFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="UnionCaseExpectsTupledArguments">
+    <Parameter type="IParametersOwnerPat" name="pat"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>getParameterOwnerPatParametersRange pat</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>DeconstructPatternFix</QuickFix>
+  </Error>
+
 </Errors>

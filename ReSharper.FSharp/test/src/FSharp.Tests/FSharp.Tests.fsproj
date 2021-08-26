@@ -107,6 +107,7 @@
     <Compile Include="QuickFixes\ToStaticMemberTest.fs" />
     <Compile Include="QuickFixes\ReplaceWithTypeRefExprTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantAsPatTest.fs" />
+    <Compile Include="QuickFixes\DeconstructPatternFixTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
