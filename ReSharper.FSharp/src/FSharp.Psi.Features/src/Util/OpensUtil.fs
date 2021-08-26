@@ -36,7 +36,7 @@ let toQualifiedList (fsFile: IFSharpFile) (declaredElement: IClrDeclaredElement)
             | :? IFSharpModule as fsModule when
                     fsModule.IsAnonymous &&
                     let decls = fsFile.ModuleDeclarations
-                    decls.Count = 1 && decls.[0].DeclaredElement == fsModule ->
+                    decls.Count = 1 && decls.[0].DeclaredElement.Equals(fsModule) ->
                 acc
 
             | containingType -> loop acc containingType
@@ -62,7 +62,7 @@ type ModuleToImport =
         let elements = toQualifiedList moduleDeclaration.FSharpFile declaredElement
         if not (moduleDeclaration :? IModuleDeclaration) then elements else
 
-        match List.skipWhile ((!=) moduleDeclaration.DeclaredElement) elements with
+        match List.skipWhile (moduleDeclaration.DeclaredElement.Equals >> not) elements with
         | [] -> elements
         | _ :: elements -> elements
 
