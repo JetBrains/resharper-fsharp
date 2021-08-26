@@ -676,7 +676,7 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Pat - Char range 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Module member - Attributes - Expr 01``() = x.DoNamedTest()
-    [<Test>] member x.``Module member - Attributes 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Module member - Attributes 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Attributes 02``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 02``() = x.DoNamedTest()
@@ -685,9 +685,9 @@ type FSharpErrorsParserTest() =
     // todo: parse as anon module/namespace?
     [<Test>] member x.``Module member - Expr - Before namespace 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type - Attribute target 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Attribute target 02``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Attribute target 03``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type - Attribute target 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type - Attribute target 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type - Attribute target 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record - Ctor 01``() = x.DoNamedTest()
@@ -696,8 +696,8 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Type decl - Union - No bar - Attribute 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Identifier 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type member - Identifier 02``() = x.DoNamedTest()
-    [<Test>] member x.``Type member - Identifier 03``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type member - Identifier 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type member - Identifier 03``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Identifier 04``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Interface 02``() = x.DoNamedTest()
