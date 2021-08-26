@@ -1,6 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open System
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
@@ -111,3 +113,72 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``Let - Type - Tuple 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available - Let - Open 01``() = x.DoNamedTest()
+
+[<FSharpTest>]
+type FSharpKeywordCompletionTest() =
+    inherit CodeCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion/keywords"
+
+    override x.TestType = CodeCompletionTestType.Action
+
+    override this.ItemSelector =
+        Func<_, _>(function :? FSharpKeywordLookupItem as keyword -> keyword.IsReparseContextAware | _ -> false)
+
+    [<Test>] member x.``AndBang - Not available 01``() = x.DoNamedTest()
+    [<Test>] member x.``AndBang - Not available 02``() = x.DoNamedTest()
+    [<Test>] member x.``AndBang - Not available 03``() = x.DoNamedTest()
+    [<Test>] member x.``AndBang 01``() = x.DoNamedTest()
+    [<Test>] member x.``AndBang 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Extern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Extern 02 - Attributes``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module - Top level 01 - Before module``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Top level 02 - Before nested module``() = x.DoNamedTest()
+
+    [<Explicit("Get non-parsed identifier from reparse context")>]
+    [<Test>] member x.``Module - Top level 03 - Before namespace``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module 01 - Module``() = x.DoNamedTest()
+    [<Test>] member x.``Module 02 - Anon module``() = x.DoNamedTest()
+    [<Test>] member x.``Module 03 - Namespace``() = x.DoNamedTest()
+
+    [<Test>] member x.``Namespace - Top level 01 - Before module``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace - Top level 02 - Before nested module``() = x.DoNamedTest()
+
+    [<Explicit("Get non-parsed identifier from reparse context")>]
+    [<Test>] member x.``Namespace - Top level 03 - Before namespace``() = x.DoNamedTest()
+
+    [<Test>] member x.``Namespace 01 - Module``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 02 - Anon module``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 03 - Namespace``() = x.DoNamedTest()
+
+    [<Test>] member x.``Open - Not available - Expression 01``() = x.DoNamedTest()
+    [<Test>] member x.``Open - Not available - Type member 01``() = x.DoNamedTest()
+    [<Test>] member x.``Open 01 - Module``() = x.DoNamedTest()
+    [<Test>] member x.``Open 02 - Anon module``() = x.DoNamedTest()
+    [<Test>] member x.``Open 03 - Before type``() = x.DoNamedTest()
+    [<Test>] member x.``Open 04 - At type``() = x.DoNamedTest()
+    [<Test>] member x.``Open 05 - Module abbreviation``() = x.DoNamedTest()
+
+    [<Test; Explicit>] member x.``Type - Attribute target 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type - Attribute target 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type - Attribute target 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Module member 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Module member 02 - Module abbreviation``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Module member 03 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Open 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Open 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Open 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Open 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``YieldBang - Not available - Binary app 01``() = x.DoNamedTest()
+    [<Test>] member x.``YieldBang - Not available - Binary app 02``() = x.DoNamedTest()
+    [<Test>] member x.``YieldBang - Not available - Binary app 03``() = x.DoNamedTest()
+    [<Test>] member x.``YieldBang - Not available - Prefix app 01``() = x.DoNamedTest()
+    [<Test>] member x.``YieldBang - Not available 01``() = x.DoNamedTest()
+    [<Test>] member x.``YieldBang 01``() = x.DoNamedTest()
+    [<Test>] member x.``YieldBang 02``() = x.DoNamedTest()
+    [<Test>] member x.``YieldBang 03``() = x.DoNamedTest()
+    [<Test>] member x.``YieldBang 04``() = x.DoNamedTest()

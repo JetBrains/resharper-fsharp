@@ -123,7 +123,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         | SynModuleDecl.Attributes(attributeLists, range) ->
             let mark = x.Mark(range)
             x.ProcessAttributeLists(attributeLists)
-            unfinishedDeclaration <- Some(mark, range, ElementType.DO_STATEMENT)
+            unfinishedDeclaration <- Some(mark, range, ElementType.EXPRESSION_STATEMENT)
 
         | SynModuleDecl.ModuleAbbrev(_, lid, range) ->
             let mark = x.Mark(range)

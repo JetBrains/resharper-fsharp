@@ -1,5 +1,6 @@
-namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open System.Collections.Generic
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Tokenization
@@ -16,6 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
@@ -30,19 +32,181 @@ type KeywordSuffix =
     | None
 
 
-type FSharpItemsProviderBase() =
-    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
+module FSharpKeywordsProvider =
+    let reparseContextAwareKeywords =
+        [| "and!"
+           "do!"
+           "exception"
+           "extern"
+           "let!"
+           "match!"
+           "module"
+           "namespace"
+           "open"
+           "return!"
+           "type"
+           "use!"
+           "yield!" |]
+        |> HashSet
 
-    // todo: override IsAvailable when it's possible to disable smart completion on the second invocation
-    // override x.IsAvailable = context.BasicContext.CodeCompletionType = CodeCompletionType.BasicCompletion
+    let alwaysSuggestedKeywords =
+        FSharpKeywords.KeywordsWithDescription
+        |> List.filter (fun (keyword, _) ->
+            not (reparseContextAwareKeywords.Contains(keyword)) &&
+            not (PrettyNaming.IsOperatorName keyword))
 
-    override x.GetDefaultRanges(context) = context.Ranges
-    override x.GetLookupFocusBehaviour _ = LookupFocusBehaviour.Soft
+    let keywordDescriptions =
+        dict FSharpKeywords.KeywordsWithDescription
+
+    let isInComputationExpression (context: FSharpCodeCompletionContext) =
+        let reference = context.ReparsedContext.Reference
+        if isNull reference then false, false else
+
+        let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
+        if isNull refExpr then false, false else
+
+        let rec loop isLetInExpr (expr: IFSharpExpression) =
+            if isNotNull (ComputationExprNavigator.GetByExpression(expr)) then true, isLetInExpr else
+
+            let letOrUseExpr = LetOrUseExprNavigator.GetByInExpression(expr)
+            if isNotNull letOrUseExpr then loop true letOrUseExpr else
+
+            let seqExpr = SequentialExprNavigator.GetByExpression(expr)
+            if isNotNull seqExpr then loop isLetInExpr seqExpr else
+
+            let matchExpr = MatchExprNavigator.GetByClauseExpression(expr)
+            if isNotNull matchExpr then loop isLetInExpr matchExpr else
+
+            let ifExpr = IfExprNavigator.GetByBranchExpression(expr)
+            if isNotNull ifExpr then loop isLetInExpr ifExpr else
+
+            let whileExpr = WhileExprNavigator.GetByDoExpression(expr)
+            if isNotNull whileExpr then loop isLetInExpr whileExpr else
+
+            let forExpr = ForExprNavigator.GetByDoExpression(expr)
+            if isNotNull forExpr then loop isLetInExpr forExpr else
+
+            let tryExpr = TryLikeExprNavigator.GetByTryExpression(expr)
+            if isNotNull tryExpr then loop isLetInExpr tryExpr else
+
+            let prefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(expr)
+            if isNotNull prefixAppExpr then loop isLetInExpr prefixAppExpr else
+
+            let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(expr)
+            if isNotNull binaryAppExpr then loop isLetInExpr binaryAppExpr else
+
+            false, false
+
+        loop false refExpr
+
+    let isModuleMemberStart (context: FSharpCodeCompletionContext) =
+        let reference = context.ReparsedContext.Reference
+        if isNull reference then false, null else
+
+        let treeNode = reference.GetTreeNode()
+        match treeNode with
+        | :? ITypeReferenceName as referenceName ->
+            let moduleAbbreviationDecl = ModuleAbbreviationDeclarationNavigator.GetByTypeName(referenceName)
+            isNotNull moduleAbbreviationDecl, moduleAbbreviationDecl :> ITreeNode
+
+        | :? IReferenceExpr as refExpr ->
+            let rec loop (expr: IFSharpExpression) =
+                match PrefixAppExprNavigator.GetByFunctionExpression(expr) with
+                | null -> expr
+                | prefixAppExpr -> loop prefixAppExpr
+
+            let expr = loop refExpr
+            let doStmt = ExpressionStatementNavigator.GetByExpression(expr)
+            let moduleDecl = ModuleLikeDeclarationNavigator.GetByMember(doStmt)
+            isNotNull moduleDecl, moduleDecl :> _
+
+        | _ -> false, null
+
+    let isAtTypeInOpen (context: FSharpCodeCompletionContext) =
+        let reference = context.ReparsedContext.Reference
+        if isNull reference then false else
+
+        let referenceName = reference.GetTreeNode().As<ITypeReferenceName>()
+        if isNull referenceName || isNotNull referenceName.Qualifier then false else
+
+        let rec loop (referenceName: ITypeReferenceName) =
+            let qualifiedReferenceName = TypeReferenceNameNavigator.GetByQualifier(referenceName)
+            if isNotNull qualifiedReferenceName then loop qualifiedReferenceName else
+            isNotNull (OpenStatementNavigator.GetByReferenceName(referenceName))
+
+        loop referenceName
+
+    let suggestKeywords (context: FSharpCodeCompletionContext) = seq {
+        let isModuleMemberStart, moduleDecl = isModuleMemberStart context
+        if isModuleMemberStart then
+            "exception"
+            "extern"
+            "open"
+            "module"
+            "type" // todo: visibility before type recovery
+
+        if moduleDecl :? INamespaceDeclaration || moduleDecl :? IAnonModuleDeclaration then
+            "namespace"
+
+        if isAtTypeInOpen context then
+            "type"
+
+        let inComputationExpression, isLetInExpr = isInComputationExpression context
+        if inComputationExpression then
+            "do!"
+            "let!"
+            "match!"
+            "return!"
+            "use!"
+            "yield!"
+            
+            if isLetInExpr then
+                "and!"
+    }
+
+type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
+    inherit TextLookupItemBase()
+
+    override x.Image = PsiSymbolsThemedIcons.Keyword.Id
+
+    override x.Text =
+        match keywordSuffix with
+        | KeywordSuffix.Space -> $"{keyword} "
+        | KeywordSuffix.Quotes -> $"{keyword} \"\""
+        | _ -> keyword
+
+    override x.GetDisplayName() =
+        LookupUtil.FormatLookupString(keyword, x.TextColor)
+
+    override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
+        base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
+
+        match keywordSuffix with
+        | KeywordSuffix.Quotes ->
+            // Move caret back inside inserted quotes.
+            textControl.Caret.MoveTo(textControl.Caret.Offset() - 1, CaretVisualPlacement.DontScrollIfVisible)
+            textControl.RescheduleCompletion(solution)
+        | _ -> ()
+
+    interface IRiderAsyncCompletionLookupItem
+
+
+type FSharpKeywordLookupItem(keyword, description: string, isReparseContextAware) =
+    inherit FSharpKeywordLookupItemBase(keyword, KeywordSuffix.None)
+
+    member val IsReparseContextAware = isReparseContextAware
+    
+    interface IDescriptionProvidingLookupItem with
+        member x.GetDescription() = RichTextBlock(description)
+
+
+type FSharpHashDirectiveLookupItem(directive, suffix) =
+    inherit FSharpKeywordLookupItemBase(directive, suffix)
 
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpKeywordsProvider() =
-    inherit FSharpItemsProviderBase()
+    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     let hashDirectives =
         [| KeywordSuffix.Quotes, [| "#load"; "#r"; "#I"; "#nowarn"; "#time" |]
@@ -50,18 +214,14 @@ type FSharpKeywordsProvider() =
         |> Array.map (fun (suffix, directives) -> directives |> Array.map (fun d -> d, suffix))
         |> Array.concat
 
-    let keywords =
-        FSharpKeywords.KeywordsWithDescription
-        // todo: implement auto-popup completion strategy that will cover operators
-        |> List.filter (fun (keyword, _) -> not (PrettyNaming.IsOperatorName keyword))
-        |> Array.ofList
-
     let scriptKeywords =
         [| "__SOURCE_DIRECTORY__"
            "__SOURCE_FILE__"
            "__LINE__" |]
 
     override x.IsAvailable _ = true
+    override x.GetDefaultRanges(context) = context.Ranges
+    override x.GetLookupFocusBehaviour _ = LookupFocusBehaviour.Soft
 
     override x.AddLookupItems(context, collector) =
         let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
@@ -86,21 +246,28 @@ type FSharpKeywordsProvider() =
 
         if not fcsCompletionContext.PartialName.QualifyingIdents.IsEmpty then false else
 
-        for keyword, description in keywords do
-            let item = FSharpKeywordLookupItem(keyword, description)
-            item.InitializeRanges(context.Ranges, context.BasicContext)
-            markRelevance item CLRLookupItemRelevance.Keywords
-            match keyword with
-            | "true" | "false" | "null" ->
-                // use the same relevance as module members
-                // todo: add F#-specific relevance
-                markRelevance item CLRLookupItemRelevance.Methods
-            | _ -> ()
-            collector.Add(item)
+        let add isReparseContext keywords =
+            for keyword, description in keywords do
+                let item = FSharpKeywordLookupItem(keyword, description, isReparseContext)
+                item.InitializeRanges(context.Ranges, context.BasicContext)
+                markRelevance item CLRLookupItemRelevance.Keywords
+
+                match keyword with
+                | "true" | "false" | "null" ->
+                    // use the same relevance as module members
+                    // todo: add F#-specific relevance
+                    markRelevance item CLRLookupItemRelevance.Methods
+                | _ -> ()
+
+                collector.Add(item)
+            ()
+
+        add false FSharpKeywordsProvider.alwaysSuggestedKeywords
+        add true (FSharpKeywordsProvider.suggestKeywords context |> Seq.map (fun k -> k, ""))
 
         if context.BasicContext.File.Language.Is<FSharpScriptLanguage>() then
             for keyword in scriptKeywords do
-                let item = FSharpKeywordLookupItem(keyword, "")
+                let item = FSharpKeywordLookupItem(keyword, "", false)
                 item.InitializeRanges(context.Ranges, context.BasicContext)
                 collector.Add(item)
 
@@ -110,43 +277,6 @@ type FSharpKeywordsProvider() =
             collector.Add(item)
 
         true
-
-
-type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
-    inherit TextLookupItemBase()
-
-    override x.Image = PsiSymbolsThemedIcons.Keyword.Id
-
-    override x.Text =
-        match keywordSuffix with
-        | KeywordSuffix.Space -> keyword + " "
-        | KeywordSuffix.Quotes -> keyword + " \"\""
-        | _ -> keyword
-
-    override x.GetDisplayName() = LookupUtil.FormatLookupString(keyword, x.TextColor)
-
-    override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
-        base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
-
-        match keywordSuffix with
-        | KeywordSuffix.Quotes ->
-            // Move caret back inside inserted quotes.
-            textControl.Caret.MoveTo(textControl.Caret.Offset() - 1, CaretVisualPlacement.DontScrollIfVisible)
-            textControl.RescheduleCompletion(solution)
-        | _ -> ()
-
-    interface IRiderAsyncCompletionLookupItem
-
-
-type FSharpKeywordLookupItem(keyword, description: string) =
-    inherit FSharpKeywordLookupItemBase(keyword, KeywordSuffix.None)
-
-    interface IDescriptionProvidingLookupItem with
-        member x.GetDescription() = RichTextBlock(description)
-
-
-type FSharpHashDirectiveLookupItem(directive, suffix) =
-    inherit FSharpKeywordLookupItemBase(directive, suffix)
 
 
 [<SolutionComponent>]

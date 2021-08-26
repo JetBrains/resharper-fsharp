@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:yield!}
+
+seq {
+    yield!{caret}
+}

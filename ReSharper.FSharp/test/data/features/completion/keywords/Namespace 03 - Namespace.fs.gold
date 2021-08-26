@@ -1,0 +1,4 @@
+﻿// ${COMPLETE_ITEM:namespace}
+namespace Ns
+
+namespace{caret}

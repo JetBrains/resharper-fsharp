@@ -1,0 +1,4 @@
+﻿// ${COMPLETE_ITEM:open}
+
+module M =
+    open{caret}
