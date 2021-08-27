@@ -13,8 +13,9 @@ open JetBrains.ReSharper.Psi.RegExp.ClrRegex.Tree
 type FSharpInjectionProvider
         (lifetime: Lifetime, solution: ISolution, persistentIndexManager: IPersistentIndexManager,
          providersViewer: InjectionNodeProvidersViewer, injectionTargetLanguage: FSharpLiteralInjectionTarget) =
-    inherit LanguageInjectorProviderInLiteralsWithRangeMarkersBase<IClrRegularExpressionFile, FSharpToken, FSharpLiteralInjectionTarget>(lifetime, solution, persistentIndexManager, providersViewer, injectionTargetLanguage)
+    inherit LanguageInjectorProviderInLiteralsWithRangeMarkersBase<IClrRegularExpressionFile, FSharpToken, FSharpLiteralInjectionTarget>
+            (lifetime, solution, persistentIndexManager, providersViewer, injectionTargetLanguage)
 
-    override __.ProvidedInjectionID = "FsRegex"
-    override __.SupportedOriginalLanguage = FSharpLanguage.Instance :> _
-    override __.ProvidedLanguage = ClrRegexLanguage.Instance :> _
+    override _.ProvidedInjectionID = "FsRegex"
+    override _.SupportedOriginalLanguage = FSharpLanguage.Instance :> _
+    override _.ProvidedLanguage = ClrRegexLanguage.Instance :> _

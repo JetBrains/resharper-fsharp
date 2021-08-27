@@ -10,4 +10,4 @@ open JetBrains.ReSharper.Psi.RegExp.ClrRegex
 type RegExprPsiProvider(injectorProvider: FSharpInjectionProvider) =
     inherit LiteralsInjectionPsiProvider<FSharpLanguage, ClrRegexLanguage>(injectorProvider, ClrRegexLanguage.Instance)
 
-    override __.ProvidedLanguageCanHaveNestedInjects = false
+    override _.ProvidedLanguageCanHaveNestedInjects = false

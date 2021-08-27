@@ -16,25 +16,25 @@ open JetBrains.Text
 [<SolutionComponent>]
 type FSharpLiteralInjectionTarget() =
     interface IInjectionTargetLanguage with
-        override __.ShouldInjectByAnnotation(originalNode, prefix, postfix) =
+        override _.ShouldInjectByAnnotation(_, prefix, postfix) =
             prefix <- null
             postfix <- null
             false
 
-        override __.GetStartOffsetForString(originalNode) =
+        override _.GetStartOffsetForString(originalNode) =
             match originalNode.GetTokenType().GetLiteralType() with
             | FSharpLiteralType.VerbatimString -> 2
             | _ -> 1
 
-        override __.GetEndOffsetForString(originalNode) = 1
+        override _.GetEndOffsetForString _ = 1
 
-        override __.UpdateNode(generatedFile, generatedNode, originalNode, length, prefix, postfix, startOffset, endOffset) =
+        override _.UpdateNode(_, _, _, length, _, _, _, _) =
             length <- -1
             null
 
-        override __.SupportsRegeneration = false
+        override _.SupportsRegeneration = false
 
-        override __.IsInjectionAllowed(literalNode) =
+        override _.IsInjectionAllowed(literalNode) =
             let tokenType = literalNode.GetTokenType()
             if isNull tokenType || not tokenType.IsStringLiteral then false else
 
@@ -43,9 +43,9 @@ type FSharpLiteralInjectionTarget() =
             | FSharpLiteralType.RegularString -> true
             | _ -> false
 
-        override __.GetCorrespondingCommentTextForLiteral(originalNode) = null
+        override _.GetCorrespondingCommentTextForLiteral _ = null
 
-        override __.CreateBuffer(originalNode, text, options) =
+        override _.CreateBuffer(_, text, options) =
             let literalType =
                 if text.StartsWith("@", StringComparison.Ordinal) then CSharpLiteralType.VerbatimString
                 else CSharpLiteralType.RegularString
@@ -59,26 +59,26 @@ type FSharpLiteralInjectionTarget() =
 
             CSharpRegExpBuffer(StringBuffer(text), literalType, lexerOptions) :> _
 
-        override __.DoNotProcessNodeInterior(element) = false
+        override _.DoNotProcessNodeInterior _ = false
 
-        override __.IsPrimaryLanguageApplicable(sourceFile) =
+        override _.IsPrimaryLanguageApplicable(sourceFile) =
             match sourceFile.LanguageType with
             | :? FSharpProjectFileType -> true
             | _ -> false
 
-        override __.CreateLexerFactory(languageService) =
+        override _.CreateLexerFactory(languageService) =
             languageService.GetPrimaryLexerFactory()
 
-        override __.AllowsLineBreaks(literalNode) =
+        override _.AllowsLineBreaks(literalNode) =
             match literalNode.GetTokenType().GetLiteralType() with
             | FSharpLiteralType.VerbatimString -> true
             | _ -> false
 
-        override __.IsWhitespaceToken(token) =
+        override _.IsWhitespaceToken(token) =
             token.GetTokenType().IsWhitespace
 
         override x.FixValueRangeForLiteral(element) =
             let startOffset = (x :> IInjectionTargetLanguage).GetStartOffsetForString(element)
             element.GetTreeTextRange().TrimLeft(startOffset).TrimRight(1)
 
-        override __.Language = FSharpLanguage.Instance :> _
+        override _.Language = FSharpLanguage.Instance :> _
