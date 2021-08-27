@@ -51,6 +51,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Qualified 04 - Space``() = x.DoNamedTest()
     [<Test>] member x.``Qualified 05``() = x.DoNamedTest()
     [<Test>] member x.``Qualified 06``() = x.DoNamedTest()
+    [<Test>] member x.``Qualified 07 - Enum``() = x.DoNamedTest()
 
     [<Test>] member x.``Wild 01 - Replace``() = x.DoNamedTest()
     [<Test>] member x.``Wild 02 - Insert``() = x.DoNamedTest()
