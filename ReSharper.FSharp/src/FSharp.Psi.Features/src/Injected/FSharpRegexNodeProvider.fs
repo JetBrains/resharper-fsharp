@@ -14,8 +14,10 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 
 [<SolutionComponent>]
-type FSharpRegexNodeProvider(solution: ISolution) =
-    let invocationUtil = solution.GetComponent<LanguageManager>().GetService<IFSharpMethodInvocationUtil>(FSharpLanguage.Instance)
+type FSharpRegexNodeProvider(languageManager: ILanguageManager) =
+    let invocationUtil = languageManager.GetService<IFSharpMethodInvocationUtil>(FSharpLanguage.Instance)
+
+    let attributes = [| RegexPatternAnnotationProvider.RegexPatternAttributeShortName |]
 
     let rec evalOptionsArg (expr: IFSharpExpression) =
         match expr.IgnoreInnerParens() with
@@ -34,15 +36,15 @@ type FSharpRegexNodeProvider(solution: ISolution) =
             let left = evalOptionsArg binaryAppExpr.LeftArgument
             let right = evalOptionsArg binaryAppExpr.RightArgument
 
-            if FSharpExpressionUtil.isPredefinedInfixOpApp "|||" binaryAppExpr then left ||| right
-            elif FSharpExpressionUtil.isPredefinedInfixOpApp "&&&" binaryAppExpr then left &&& right
-            elif FSharpExpressionUtil.isPredefinedInfixOpApp "^^^" binaryAppExpr then left ^^^ right
+            if isPredefinedInfixOpApp "|||" binaryAppExpr then left ||| right
+            elif isPredefinedInfixOpApp "&&&" binaryAppExpr then left &&& right
+            elif isPredefinedInfixOpApp "^^^" binaryAppExpr then left ^^^ right
             else RegexOptions.None
 
         | _ -> RegexOptions.None
 
     interface IInjectionNodeProvider with
-        override __.Check(node, injectedContext, data) =
+        override _.Check(node, _, data) =
             data <- null
 
             let expr = node.Parent.As<ILiteralExpr>()
@@ -81,14 +83,12 @@ type FSharpRegexNodeProvider(solution: ISolution) =
 
             true
 
-        override __.GetPrefix(node, data) = null
-        override __.GetPostfix(node, data) = null
-        override __.SupportedOriginalLanguage = FSharpLanguage.Instance :> _
-        override __.ProvidedLanguageID = "FsRegex"
-        override __.Summary = ".NET Regular Expressions in F#"
-        override __.Description = "Injects .NET Regular Expression in calls from F# code to Regex members"
-        override __.Guid = "7e4d8d57-335f-4692-9ff8-6b2fa003fb51"
-        override __.Words = null
-        override __.Attributes = [|
-            RegexPatternAnnotationProvider.RegexPatternAttributeShortName
-        |]
+        override _.GetPrefix(_, _) = null
+        override _.GetSuffix(_, _) = null
+        override _.SupportedOriginalLanguage = FSharpLanguage.Instance :> _
+        override _.ProvidedLanguageID = "FsRegex"
+        override _.Summary = ".NET Regular Expressions in F#"
+        override _.Description = "Injects .NET Regular Expression in calls from F# code to Regex members"
+        override _.Guid = "7e4d8d57-335f-4692-9ff8-6b2fa003fb51"
+        override _.Words = null
+        override _.Attributes = attributes
