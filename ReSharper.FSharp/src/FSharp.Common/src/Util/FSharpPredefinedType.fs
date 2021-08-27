@@ -85,12 +85,6 @@ let unitTypeName = clrTypeName "Microsoft.FSharp.Core.Unit"
 let entryPointAttrTypeName = clrTypeName "Microsoft.FSharp.Core.EntryPointAttribute"
 
 
-[<CompiledName("RegexTypeName")>]
-let regexTypeName = clrTypeName "System.Text.RegularExpressions.Regex"
-
-[<CompiledName("RegexOptionsTypeName")>]
-let regexOptionsTypeName = clrTypeName "System.Text.RegularExpressions.RegexOptions"
-
 let predefinedFunctionTypes =
     [| operatorsModuleTypeName, [| "not"; "id"; "ignore"; "|>"; "<|"; "<>"; "="; "fst"; "snd"; "&&&"; "|||"; "^^^" |]
        intrinsicOperatorsTypeName, [| "||"; "&&" |]
