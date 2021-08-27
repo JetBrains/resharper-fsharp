@@ -49,6 +49,7 @@
     <Compile Include="Daemon\LambdaAnalyzerTest.fs" />
     <Compile Include="Daemon\InterpolatedStringCandidateTest.fs" />
     <Compile Include="Daemon\IfExpressionAnalyzerTest.fs" />
+    <Compile Include="Daemon\RegexpHighlightingTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\FSharpQuickFixTestBase.fs" />

@@ -2,11 +2,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected
 
 open System.Text.RegularExpressions
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Features.RegExp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeAnnotations
 open JetBrains.ReSharper.Psi.Impl.Shared.InjectedPsi
@@ -23,9 +23,9 @@ type FSharpRegexNodeProvider(languageManager: ILanguageManager) =
         match expr.IgnoreInnerParens() with
         | :? IReferenceExpr as refExpr ->
             match refExpr.Reference.Resolve().DeclaredElement with
-            | :? IField as field when field.IsEnumMember ->
+            | :? IField as field when field.IsEnumMember || field.IsConstant ->
                 let typeElement = field.Type.GetTypeElement()
-                if isNotNull typeElement && typeElement.GetClrName() = regexOptionsTypeName then
+                if isNotNull typeElement && typeElement.GetClrName() = RegExpPredefinedType.REGEX_OPTIONS_FQN then
                     let value = field.ConstantValue.Value :?> RegexOptions
                     value
                 else
@@ -62,8 +62,11 @@ type FSharpRegexNodeProvider(languageManager: ILanguageManager) =
             let param = matchingParam.Element
             if isNull param || param.ShortName <> "pattern" then false else
 
-            let fullTypeName = param.ContainingParametersOwner.GetContainingType().GetClrName()
-            if fullTypeName <> regexTypeName then false else
+            let containingType = param.ContainingParametersOwner.GetContainingType()
+            if isNull containingType then false else
+
+            let fullTypeName = containingType.GetClrName()
+            if fullTypeName <> RegExpPredefinedType.REGEX_FQN then false else
 
             let optionsArg =
                 argumentsOwner.Arguments
