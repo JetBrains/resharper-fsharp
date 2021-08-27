@@ -64,6 +64,7 @@ module FSharpErrors =
     let [<Literal>] SuccessiveArgsShouldBeSpacedOrTupled = 597
     let [<Literal>] StaticFieldUsedWhenInstanceFieldExpected = 627
     let [<Literal>] InstanceMemberRequiresTarget = 673
+    let [<Literal>] UnionCaseExpectsTupledArguments = 727
     let [<Literal>] ConstructRequiresListArrayOrSequence = 747
     let [<Literal>] ConstructRequiresComputationExpression = 748
     let [<Literal>] ObjectOfIndeterminateTypeUsedRequireTypeConstraint = 752
@@ -350,6 +351,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             match fsFile.GetNode<IMemberDeclaration>(range) with
             | null -> null
             | memberDecl -> InstanceMemberRequiresTargetError(memberDecl) :> _
+
+        | UnionCaseExpectsTupledArguments ->
+            createHighlightingFromNodeWithMessage UnionCaseExpectsTupledArgumentsError range error
 
         | ConstructRequiresListArrayOrSequence ->
             createHighlightingFromNode YieldRequiresSeqExpressionError range
