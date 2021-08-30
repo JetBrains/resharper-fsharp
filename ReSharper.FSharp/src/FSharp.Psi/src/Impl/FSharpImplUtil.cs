@@ -893,10 +893,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static IDeclaredElement CreateProperty([NotNull] this IMemberSignatureOrDeclaration decl,
       FSharpMemberOrFunctionOrValue mfv)
     {
-      if (decl.AccessorDeclarationsEnumerable.Any())
-        return decl.IsIndexer
-          ? new FSharpIndexerProperty(decl)
-          : new FSharpPropertyWithExplicitAccessors(decl);
+      foreach (var accessor in decl.AccessorDeclarationsEnumerable)
+        if (accessor.IsExplicit)
+          return decl.IsIndexer
+            ? new FSharpIndexerProperty(decl)
+            : new FSharpPropertyWithExplicitAccessors(decl);
 
       return new FSharpProperty<IMemberSignatureOrDeclaration>(decl, mfv);
     }
