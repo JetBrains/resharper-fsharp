@@ -38,10 +38,13 @@ module SpecifyTypes =
         let typeUsage = factory.CreateTypeUsage(typeString)
 
         let parameters = binding.ParametersDeclarations
-        let pat = if parameters.IsEmpty then binding.HeadPattern else parameters.Last().Pattern
-        let returnTypeInfo = ModificationUtil.AddChildAfter(pat, factory.CreateReturnTypeInfo(typeUsage))
+        let anchor =
+            if parameters.IsEmpty then binding.HeadPattern :> ITreeNode
+            else parameters.Last() :> _
 
-        let settingsStore = pat.GetSettingsStoreWithEditorConfig()
+        let returnTypeInfo = ModificationUtil.AddChildAfter(anchor, factory.CreateReturnTypeInfo(typeUsage))
+
+        let settingsStore = anchor.GetSettingsStoreWithEditorConfig()
         if settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon) then
             ModificationUtil.AddChildBefore(returnTypeInfo, Whitespace()) |> ignore
 
@@ -93,7 +96,9 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
     let isAnnotated (binding: IBinding) =
         isNotNull binding.ReturnTypeInfo &&
-        binding.ParametersDeclarations |> Seq.forall (fun p -> p.Pattern.IgnoreInnerParens() :? ITypedPat)
+        binding.ParametersDeclarations |> Seq.forall (fun p ->
+            let pattern = p.Pattern.IgnoreInnerParens()
+            pattern :? ITypedPat || pattern :? IUnitPat)
 
     override x.Text = "Add type annotations"
 
