@@ -2,6 +2,7 @@ import com.jetbrains.rd.generator.gradle.RdGenExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.intellij.IntelliJPluginConstants
+import org.jetbrains.intellij.tasks.IntelliJInstrumentCodeTask
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
@@ -237,6 +238,20 @@ configure<RdGenExtension> {
 }
 
 tasks {
+    withType<IntelliJInstrumentCodeTask> {
+        val bundledMavenArtifacts = file("build/maven-artifacts")
+        if (bundledMavenArtifacts.exists()) {
+            logger.lifecycle("Use ant compiler artifacts from local folder: $bundledMavenArtifacts")
+            compilerClassPathFromMaven.set(
+                bundledMavenArtifacts.walkTopDown()
+                    .filter { it.extension == "jar" && !it.name.endsWith("-sources.jar") }
+                    .toList() + File("${ideaDependency.get().classes}/lib/util.jar")
+            )
+        } else {
+            logger.lifecycle("Use ant compiler artifacts from maven")
+        }
+    }
+
     withType<PrepareSandboxTask> {
         var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
         files = files.map { "$resharperPluginPath/src/$it" }
