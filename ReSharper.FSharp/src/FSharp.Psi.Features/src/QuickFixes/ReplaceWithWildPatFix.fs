@@ -58,7 +58,7 @@ module ReplaceWithWildPat =
         if isNull node then false else
 
         match node.Parent with
-        | :? IBinding | :? IMatchClause | :? ILambdaParametersList -> true
+        | :? IBinding | :? IMatchClause | :? ILambdaParametersList | :? IForEachExpr -> true
 
         | :? IParametersPatternDeclaration as parent ->
             let parent = parent.Parent
@@ -135,6 +135,7 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
 
                 | :? ILambdaParametersList as parametersList -> parametersList :> _, "parameter list"
                 | :? IBinding -> pat :> _, "binding patterns"
+                | :? IForEachExpr -> pat :> _, "'for' pattern"
                 | _ -> invalidArg "patOwner.Parent" "unexpected type"
 
             FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode, LocalScope(scopeNode, scopeText, scopeText))

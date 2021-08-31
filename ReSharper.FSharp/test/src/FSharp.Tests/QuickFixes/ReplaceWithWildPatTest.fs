@@ -11,6 +11,11 @@ type ReplaceWithWildPatTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceWithWildPat"
 
+    [<Test>] member x.``For - Scoped 01``() = x.DoNamedTest()
+    [<Test>] member x.``For 01``() = x.DoNamedTest()
+    [<Test>] member x.``For 02 - Tuple``() = x.DoNamedTest()
+    [<Test>] member x.``For 03 - Param``() = x.DoNamedTest()
+
     [<Test>] member x.``Let - Bang 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Value 01``() = x.DoNamedTest()
 

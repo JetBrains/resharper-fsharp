@@ -1,0 +1,4 @@
+﻿//${RUN:1}
+for _{caret}, _ in [] do
+    let x = 1
+    ()

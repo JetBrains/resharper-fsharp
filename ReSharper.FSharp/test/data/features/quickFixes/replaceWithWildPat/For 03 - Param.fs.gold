@@ -1,0 +1,4 @@
+﻿type U =
+    | C of int
+
+for C _{caret} in [] do ()
