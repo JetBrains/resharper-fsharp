@@ -1,0 +1,27 @@
+﻿Other
+---
+UsageOther TO: [O] let |f| (a: int) (b: int) = () RANGE: (21,22) @ Invocation 01.fs
+UsageOther TO: [O] let f (|a|: int) (b: int) = () RANGE: (24,25) @ Invocation 01.fs
+UsageOther TO: [O] let f (a: int) (|b|: int) = () RANGE: (33,34) @ Invocation 01.fs
+UsageOther TO: [O] |f| 1 2 RANGE: (49,50) @ Invocation 01.fs
+UsageOther TO: [O] |f| "" null RANGE: (56,57) @ Invocation 01.fs
+UsageOther TO: [O] |f| 1 RANGE: (67,68) @ Invocation 01.fs
+
+
+Type specification
+---
+UsageOther TO: [O] let f (a: |int|) (b: int) = () RANGE: (27,30) @ Invocation 01.fs
+UsageOther TO: [O] let f (a: int) (b: |int|) = () RANGE: (36,39) @ Invocation 01.fs
+
+
+Invocation
+---
+UsageInvocation TO: [O] |f| 1 2 RANGE: (49,50) @ Invocation 01.fs
+UsageInvocation TO: [O] |f| "" null RANGE: (56,57) @ Invocation 01.fs
+
+
+Partial application
+---
+UsageOther TO: [O] |f| 1 RANGE: (67,68) @ Invocation 01.fs
+
+

@@ -22,7 +22,7 @@ module SpecifyTypes =
             if fullType.IsFunctionType then
                 let specifiedTypesCount = binding.ParametersDeclarations.Count
 
-                let types = FcsTypesUtil.getFunctionTypeArgs fullType
+                let types = FcsTypeUtil.getFunctionTypeArgs true fullType
                 if types.Length <= specifiedTypesCount then mfv.ReturnParameter.Type.Format(displayContext) else
 
                 let remainingTypes = types |> List.skip specifiedTypesCount
@@ -86,7 +86,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
     let specifyParameterTypes displayContext (binding: IBinding) (mfv: FSharpMemberOrFunctionOrValue) =
-        let types = FcsTypesUtil.getFunctionTypeArgs mfv.FullType
+        let types = FcsTypeUtil.getFunctionTypeArgs true mfv.FullType
         let parameters = binding.ParametersDeclarations
 
         for fcsType, parameter in (types, parameters) ||> Seq.zip do

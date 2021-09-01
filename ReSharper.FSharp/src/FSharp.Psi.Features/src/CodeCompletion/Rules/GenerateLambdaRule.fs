@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
-open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
@@ -94,15 +93,7 @@ type GenerateLambdaRule() =
 
         if not expectedType.IsFunctionType then false else
 
-        let fcsArgTypes =
-            let rec getFunTypeArgs acc (fcsType: FSharpType) =
-                if not fcsType.IsFunctionType || fcsType.GenericArguments.Count <> 2 then List.rev acc else
-
-                let acc = fcsType.GenericArguments.[0] :: acc
-                getFunTypeArgs acc fcsType.GenericArguments.[1]
-
-            getFunTypeArgs [] expectedType
-
+        let fcsArgTypes = FcsTypeUtil.getFunctionTypeArgs false expectedType
         let lambdaParamTypes = fcsArgTypes |> List.map (fun f -> f.MapType(referenceOwner))
 
         let paramNames = 

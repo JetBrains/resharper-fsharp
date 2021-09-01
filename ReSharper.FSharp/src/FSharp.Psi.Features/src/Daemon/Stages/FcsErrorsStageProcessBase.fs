@@ -181,7 +181,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | NotAFunction ->
             let notAFunctionNode = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            match tryFindRootPrefixAppWhereExpressionIsFunc notAFunctionNode with
+            match getOutermostPrefixAppExpr notAFunctionNode with
             | :? IPrefixAppExpr as prefixAppExpr ->
                 NotAFunctionError(notAFunctionNode.IgnoreParentParens(), prefixAppExpr) :> _
             | _ -> createGenericHighlighting error range

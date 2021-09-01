@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypesUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -45,8 +45,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
     let getParentPrefixApp expr nestingLevel =
         let rec getParentPrefixAppRec expr i =
             let parentPrefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr)
-            if i + 1 <= nestingLevel
-            then getParentPrefixAppRec parentPrefixApp (i + 1)
+            if i + 1 <= nestingLevel then getParentPrefixAppRec parentPrefixApp (i + 1)
             else parentPrefixApp
 
         getParentPrefixAppRec expr 1
@@ -60,7 +59,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         let fcsType = expr.TryGetFcsType()
 
         if isNotNull fcsType && fcsType.IsFunctionType then
-            List.length (getFunctionTypeArgs fcsType) - 1
+            List.length (getFunctionTypeArgs true fcsType) - 1
 
         else
             match expr.IgnoreInnerParens() with
@@ -73,13 +72,13 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
                     let parameters = mfv.CurriedParameterGroups
                     parameters.Count > 0 && parameters.[0].Count > 0 ->
                         match mfv.FullTypeSafe with
-                        | Some t -> List.length (getFunctionTypeArgs t) - 1
+                        | Some t -> List.length (getFunctionTypeArgs true t) - 1
                         | None -> 0
                 | _ -> 0
             | _ -> 0
 
     let findAppsWithoutParens prefixAppExpr =
-        let rec collectAppliedExprsRec (prefixAppExpr: IPrefixAppExpr) prefixAppDataAcc appliedExprsAcc =
+        let rec getAppliedExpressions (prefixAppExpr: IPrefixAppExpr) prefixAppDataAcc appliedExprsAcc =
             let maxArgsCount = getMaxArgsCount prefixAppExpr.ArgumentExpression
 
             let isApplicableApp =
@@ -94,10 +93,10 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
             match prefixAppExpr.FunctionExpression.IgnoreInnerParens() with
             | :? IPrefixAppExpr as appExpr ->
-                collectAppliedExprsRec appExpr appDataAcc (prefixAppExpr.ArgumentExpression :: appliedExprsAcc)
+                getAppliedExpressions appExpr appDataAcc (prefixAppExpr.ArgumentExpression :: appliedExprsAcc)
             | _ -> appDataAcc
 
-        collectAppliedExprsRec prefixAppExpr [] []
+        getAppliedExpressions prefixAppExpr [] []
 
     let appCandidates = findAppsWithoutParens errorPrefixApp
 
@@ -134,7 +133,6 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
             |> Array.ofSeq
 
         let appOccurrence = showPopup appOccurrences AddParensToApplicationFix.AppPopupName
-
         if isNull appOccurrence then () else
 
         let appData = Seq.head appOccurrence.Entities

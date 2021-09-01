@@ -6,11 +6,11 @@ UsageFieldTypeDeclaration TO: [O] exception Exn of |int| RANGE: (34,37) @ Except
 Other
 ---
 UsageOther TO: [O] let |e| = Exn(123) RANGE: (45,46) @ Exception - Fields 01.fs
+UsageOther TO: [O] let e = |Exn|(123) RANGE: (49,52) @ Exception - Fields 01.fs
 
 
 New instance creation
 ---
-UsageInstanceCreation TO: [O] let e = |Exn|(123) RANGE: (49,52) @ Exception - Fields 01.fs
 UsageInstanceCreation TO: [O] let e = |Exn|(123) RANGE: (49,52) @ Exception - Fields 01.fs
 
 

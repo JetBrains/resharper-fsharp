@@ -17,7 +17,7 @@
     <Compile Include="src\Util\FSharpMethodInvocationUtil.fs" />
     <Compile Include="src\Util\FSharpVisualElementFactory.fs" />
     <Compile Include="src\Util\FSharpResolveUtil.fs" />
-    <Compile Include="src\Util\FcsTypesUtil.fs" />
+    <Compile Include="src\Util\FcsTypeUtil.fs" />
     <Compile Include="src\Util\FSharpModulesUtil.fs" />
     <Compile Include="src\Util\FSharpNamingService.fs" />
     <Compile Include="src\Util\FSharpLambdaUtil.fs" />

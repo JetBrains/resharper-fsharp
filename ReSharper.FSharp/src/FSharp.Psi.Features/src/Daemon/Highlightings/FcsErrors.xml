@@ -236,7 +236,7 @@
       <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
     </Message>
     <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression.GetHighlightingRange()</Range>
-    <SecondaryRanges>getAllExpressionArgs expr |> Seq.tail |> getNodeRanges</SecondaryRanges>
+    <SecondaryRanges>getPrefixAppExprArgs expr |> Seq.tail |> getNodeRanges</SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddParensToApplicationFix</QuickFix>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
