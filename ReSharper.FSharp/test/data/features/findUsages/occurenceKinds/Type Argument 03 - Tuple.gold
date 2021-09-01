@@ -1,10 +1,6 @@
-﻿Pattern
+﻿Other
 ---
 UsageOther TO: [O] let |l| = List<string * string>() RANGE: (21,22) @ Type Argument 03 - Tuple.fs
-
-
-Other
----
 UsageOther TO: [O] let l = |List|<string * string>() RANGE: (25,29) @ Type Argument 03 - Tuple.fs
 
 

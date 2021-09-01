@@ -1,4 +1,4 @@
-﻿Pattern
+﻿Other
 ---
 UsageOther TO: [O] let |a|: int[] = [||] RANGE: (21,22) @ Write - Expr 03 - Indexer.fs
 UsageOther TO: [O] let |b|: int[][] = [||] RANGE: (56,57) @ Write - Expr 03 - Indexer.fs

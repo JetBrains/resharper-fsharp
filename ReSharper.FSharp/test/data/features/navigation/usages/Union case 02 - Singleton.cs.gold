@@ -24,9 +24,9 @@
       }
       ------------------
 
-    TO: [R] let b = |B| RANGE: (86,87) @ Union case 02 - Singleton.fs
+    TO: [O] let b = |B| RANGE: (86,87) @ Union case 02 - Singleton.fs
     Menu item (enabled) :
-      icon: UsageRead
+      icon: UsageInstanceCreation
       text: Module.b      <font color="DarkRed">let b = **B</font>**<font color="HotTrack"> (8)</font>
       tail: <font color="GrayText">in <Root Namespace></font>
       tooltip: let b = **B**

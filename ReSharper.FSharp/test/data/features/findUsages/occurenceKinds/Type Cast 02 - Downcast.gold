@@ -1,7 +1,8 @@
-﻿Pattern
+﻿Other
 ---
 UsageOther TO: [O] let |s1| = obj() :?> string RANGE: (21,23) @ Type Cast 02 - Downcast.fs
 UsageOther TO: [O] let |s2| = obj() :?> System.String RANGE: (48,50) @ Type Cast 02 - Downcast.fs
+UsageOther TO: [O] let s2 = obj() :?> |System|.String RANGE: (63,69) @ Type Cast 02 - Downcast.fs
 
 
 New instance creation
@@ -16,10 +17,5 @@ Type conversions
 ---
 UsageTypeConversions TO: [O] let s1 = obj() :?> |string| RANGE: (36,42) @ Type Cast 02 - Downcast.fs
 UsageTypeConversions TO: [O] let s2 = obj() :?> System.|String| RANGE: (70,76) @ Type Cast 02 - Downcast.fs
-
-
-Other
----
-UsageOther TO: [O] let s2 = obj() :?> |System|.String RANGE: (63,69) @ Type Cast 02 - Downcast.fs
 
 

@@ -1,10 +1,6 @@
 ﻿Other
 ---
 UsageOther TO: [O] abstract M: |int| RANGE: (46,49) @ Base Type - Object expressions 01 - Class.fs
-
-
-Pattern
----
 UsageOther TO: [O] let |t| = { RANGE: (80,81) @ Base Type - Object expressions 01 - Class.fs
 
 

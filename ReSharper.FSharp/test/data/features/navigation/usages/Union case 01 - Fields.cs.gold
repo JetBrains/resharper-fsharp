@@ -24,9 +24,9 @@
       }
       ------------------
 
-    TO: [R] let a = |A|(123) RANGE: (86,87) @ Union case 01 - Fields.fs
+    TO: [O] let a = |A|(123) RANGE: (86,87) @ Union case 01 - Fields.fs
     Menu item (enabled) :
-      icon: UsageRead
+      icon: UsageInstanceCreation
       text: Module.a      <font color="DarkRed">let a = **A**(123)</font><font color="HotTrack"> (8)</font>
       tail: <font color="GrayText">in <Root Namespace></font>
       tooltip: let a = **A**(123)

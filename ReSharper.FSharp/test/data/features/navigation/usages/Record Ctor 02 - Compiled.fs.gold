@@ -26,7 +26,7 @@
       caret did not move
     TO: [O] let r2 = |{ r1 with Field = 2 }| RANGE: (58,79) @ Record Ctor 02 - Compiled.fs
     Menu item (enabled) :
-      icon: UsageOther
+      icon: UsageInstanceCreation
       text: Module.r2      <font color="DarkRed">let r2 = **{ r1 with Field = 2 }</font>**<font color="HotTrack"> (4)</font>
       tail: <font color="GrayText">in <Root Namespace></font>
       tooltip: let r2 = **{ r1 with Field = 2 }**

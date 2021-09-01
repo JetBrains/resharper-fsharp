@@ -1,15 +1,15 @@
-Type abbreviation
+﻿Type abbreviation
 ---
 UsageOther TO: [O] type U = |A| RANGE: (26,27) @ Unions 02 - Single empty case.fs
 
 
-New instance creation, Read access
+New instance creation
 ---
-UsageRead TO: [R] match |A| with RANGE: (37,38) @ Unions 02 - Single empty case.fs
+UsageInstanceCreation TO: [O] match |A| with RANGE: (37,38) @ Unions 02 - Single empty case.fs
 
 
-Pattern, Read access
+Pattern
 ---
-UsageRead TO: [R] | |A| -> () RANGE: (47,48) @ Unions 02 - Single empty case.fs
+UsagePatternChecking TO: [O] | |A| -> () RANGE: (47,48) @ Unions 02 - Single empty case.fs
 
 

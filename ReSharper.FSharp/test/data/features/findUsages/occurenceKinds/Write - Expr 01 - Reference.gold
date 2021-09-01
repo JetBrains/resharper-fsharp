@@ -1,6 +1,7 @@
-﻿Pattern
+﻿Other
 ---
 UsageOther TO: [O] let mutable |aaa| = 123 RANGE: (29,32) @ Write - Expr 01 - Reference.fs
+UsageOther TO: [O] aaa <- aaa |+| 1 RANGE: (51,52) @ Write - Expr 01 - Reference.fs
 
 
 Write access
@@ -11,10 +12,5 @@ UsageWrite TO: [W] |aaa| <- aaa + 1 RANGE: (40,43) @ Write - Expr 01 - Reference
 Read access
 ---
 UsageRead TO: [R] aaa <- |aaa| + 1 RANGE: (47,50) @ Write - Expr 01 - Reference.fs
-
-
-Other
----
-UsageOther TO: [O] aaa <- aaa |+| 1 RANGE: (51,52) @ Write - Expr 01 - Reference.fs
 
 

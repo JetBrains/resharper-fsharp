@@ -1,4 +1,4 @@
-﻿Pattern
+﻿Other
 ---
 UsageOther TO: [O] let |l|: List<string> = () RANGE: (21,22) @ Type Argument 05 - Return type.fs
 

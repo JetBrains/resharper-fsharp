@@ -1,12 +1,8 @@
 ﻿Other
 ---
 UsageOther TO: [O] abstract M: |int| RANGE: (46,49) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-UsageOther TO: [O] interface |System|.IDisposable with RANGE: (150,156) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-
-
-Pattern
----
 UsageOther TO: [O] let |t| = { RANGE: (80,81) @ Base Type - Object expressions 03 - Secondary interfaces.fs
+UsageOther TO: [O] interface |System|.IDisposable with RANGE: (150,156) @ Base Type - Object expressions 03 - Secondary interfaces.fs
 
 
 Base type

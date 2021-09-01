@@ -3,10 +3,11 @@
 UsageFieldTypeDeclaration TO: [O] type R = { mutable F: |int| } RANGE: (39,42) @ Write - Record 03 - Copy and update.fs
 
 
-Pattern
+Other
 ---
 UsageOther TO: [O] let |r1| = { F = 1 } RANGE: (50,52) @ Write - Record 03 - Copy and update.fs
 UsageOther TO: [O] let |r2| = { r1 with F = r1.F + 1 } RANGE: (70,72) @ Write - Record 03 - Copy and update.fs
+UsageOther TO: [O] let r2 = { r1 with F = r1.F |+| 1 } RANGE: (94,95) @ Write - Record 03 - Copy and update.fs
 
 
 New instance creation
@@ -22,7 +23,7 @@ UsageWrite TO: [W] let r2 = { r1 with |F| = r1.F + 1 } RANGE: (85,86) @ Write - 
 
 Copy and update
 ---
-UsageOther TO: [O] let r2 = |{ r1 with F = r1.F + 1 }| RANGE: (75,99) @ Write - Record 03 - Copy and update.fs
+UsageInstanceCreation TO: [O] let r2 = |{ r1 with F = r1.F + 1 }| RANGE: (75,99) @ Write - Record 03 - Copy and update.fs
 
 
 Read access
@@ -30,10 +31,5 @@ Read access
 UsageRead TO: [R] let r2 = { |r1| with F = r1.F + 1 } RANGE: (77,79) @ Write - Record 03 - Copy and update.fs
 UsageRead TO: [R] let r2 = { r1 with F = r1.|F| + 1 } RANGE: (92,93) @ Write - Record 03 - Copy and update.fs
 UsageRead TO: [R] let r2 = { r1 with F = |r1|.F + 1 } RANGE: (89,91) @ Write - Record 03 - Copy and update.fs
-
-
-Other
----
-UsageOther TO: [O] let r2 = { r1 with F = r1.F |+| 1 } RANGE: (94,95) @ Write - Record 03 - Copy and update.fs
 
 

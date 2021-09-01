@@ -3,9 +3,10 @@
 UsageFieldTypeDeclaration TO: [O] type R = { mutable F: |int| } RANGE: (39,42) @ Write - Record 02 - Qualified name.fs
 
 
-Pattern
+Other
 ---
 UsageOther TO: [O] let |r1| = { R.F = 123 } RANGE: (50,52) @ Write - Record 02 - Qualified name.fs
+UsageOther TO: [O] let r1 = { |R|.F = 123 } RANGE: (57,58) @ Write - Record 02 - Qualified name.fs
 
 
 New instance creation
@@ -16,10 +17,5 @@ UsageInstanceCreation TO: [O] let r1 = |{ R.F = 123 }| RANGE: (55,68) @ Write - 
 Write access
 ---
 UsageWrite TO: [W] let r1 = { R.|F| = 123 } RANGE: (59,60) @ Write - Record 02 - Qualified name.fs
-
-
-Other
----
-UsageOther TO: [O] let r1 = { |R|.F = 123 } RANGE: (57,58) @ Write - Record 02 - Qualified name.fs
 
 

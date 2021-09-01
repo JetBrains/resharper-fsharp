@@ -1,8 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 
 open FSharp.Compiler.Symbols
+open JetBrains.Application
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Occurrences
+open JetBrains.ReSharper.Feature.Services.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -12,12 +14,30 @@ open JetBrains.Util
 
 [<RequireQualifiedAccess>]
 module FSharpOccurrenceKinds =
-    let import = OccurrenceKind("Module or namespace import", OccurrenceKind.SemanticAxis)
-    let pattern = OccurrenceKind("Pattern", OccurrenceKind.SemanticAxis)
-    let copyAndUpdate = OccurrenceKind("Copy and update", OccurrenceKind.SemanticAxis)
-    let typeExtension = OccurrenceKind("Type extension", OccurrenceKind.SemanticAxis)
-    let typeAbbreviation = OccurrenceKind("Type abbreviation", OccurrenceKind.SemanticAxis)
-    let typeSpecification = OccurrenceKind("Type specification", OccurrenceKind.SemanticAxis)
+    let import = OccurrenceKind.CreateSemantic("Module or namespace import")
+    let pattern = OccurrenceKind.CreateSemantic("Pattern")
+    let copyAndUpdate = OccurrenceKind.CreateSemantic("Copy and update")
+    let typeExtension = OccurrenceKind.CreateSemantic("Type extension")
+    let typeAbbreviation = OccurrenceKind.CreateSemantic("Type abbreviation")
+    let typeSpecification = OccurrenceKind.CreateSemantic("Type specification")
+
+    let icons =
+        [| import, ServicesNavigationThemedIcons.UsageInUsings.Id
+           pattern, ServicesNavigationThemedIcons.UsagePatternChecking.Id
+           copyAndUpdate, ServicesNavigationThemedIcons.UsageInstanceCreation.Id
+           typeExtension, ServicesNavigationThemedIcons.UsageExtensionMethod.Id |]
+        |> dict
+
+
+[<ShellComponent>]
+type FsharpSpecificOccurrenceKindIconsProvider() =
+    interface IOccurrenceKindIconProvider with
+        member this.GetImageId(occurrenceKind) =
+            FSharpOccurrenceKinds.icons.TryGetValue(occurrenceKind)
+
+        member this.GetPriority _ =
+            0
+
 
 // todo: parens everywhere :)
 // todo: parens in `let i: (int) = 1`
@@ -97,6 +117,9 @@ type FSharpItemOccurenceKindProvider() =
                 EmptyList.Instance :> _
 
             | :? IExpressionReferenceName as referenceName ->
+                let referencePat = ReferencePatNavigator.GetByReferenceName(referenceName)
+                if isNotNull referencePat && referencePat.IsDeclaration then EmptyList.Instance :> _ else
+
                 if isNotNull (ReferencePatNavigator.GetByReferenceName(referenceName)) ||
                    isNotNull (ParametersOwnerPatNavigator.GetByReferenceName(referenceName)) ||
                    isNotNull (FieldPatNavigator.GetByReferenceName(referenceName)) then
@@ -130,6 +153,10 @@ type FSharpItemOccurenceKindProvider() =
                     EmptyList.Instance :> _
 
                 | _ -> EmptyList.Instance :> _
+
+//            | :? IAttribute when (element :? IConstructor) ->
+//                [| OccurrenceKind.NewInstanceCreation |] :> _
+
             | _ -> EmptyList.Instance :> _
 
         member x.GetAllPossibleOccurrenceKinds() =

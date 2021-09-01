@@ -2,7 +2,7 @@
   Async context menu shown `Usages of 'KeyValue'`:
     TO: [O] for |KeyValue| _ in m do () RANGE: (45,53) @ Compiled active pattern case.fs
     Menu item (enabled) :
-      icon: UsageOther
+      icon: UsagePatternChecking
       text: Module      <font color="DarkRed">for **KeyValue** _ in m do ()</font><font color="HotTrack"> (4)</font>
       tail: <font color="GrayText">in <Root Namespace></font>
       tooltip: for **KeyValue** _ in m do ()
@@ -10,7 +10,7 @@
       caret did not move
     TO: [O] for |KeyValue| _ in m do () RANGE: (72,80) @ Compiled active pattern case.fs
     Menu item (enabled) :
-      icon: UsageOther
+      icon: UsagePatternChecking
       text: Module      <font color="DarkRed">for **KeyValue** _ in m do ()</font><font color="HotTrack"> (5)</font>
       tail: <font color="GrayText">in <Root Namespace></font>
       tooltip: for **KeyValue** _ in m do ()

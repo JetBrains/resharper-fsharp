@@ -1,8 +1,7 @@
-﻿Pattern
+﻿Other
 ---
 UsageOther TO: [O] let |s| = Some 123 RANGE: (21,22) @ Unions 01.fs
 UsageOther TO: [O] let |n| = None RANGE: (39,40) @ Unions 01.fs
-UsageOther TO: [O] | |Some| x -> () RANGE: (67,71) @ Unions 01.fs
 UsageOther TO: [O] | Some |x| -> () RANGE: (72,73) @ Unions 01.fs
 
 
@@ -20,6 +19,11 @@ UsageRead TO: [R] let n = |None| RANGE: (43,47) @ Unions 01.fs
 Read access
 ---
 UsageRead TO: [R] match |s| with RANGE: (57,58) @ Unions 01.fs
+
+
+Pattern
+---
+UsagePatternChecking TO: [O] | |Some| x -> () RANGE: (67,71) @ Unions 01.fs
 
 
 Pattern, Read access

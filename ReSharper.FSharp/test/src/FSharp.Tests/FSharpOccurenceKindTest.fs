@@ -21,8 +21,7 @@ type FSharpOccurenceKindTest() =
     [<Test>] member x.``Unions 02 - Single empty case``() = x.DoNamedTest()
 
     [<Test>] member x.``Exception - Singleton 01``() = x.DoNamedTest()
-    [<Test>] member x.``Exception - Singleton 02 - Type specification``() = x.DoNamedTest()
-    [<Test>] member x.``Exception - Singleton 03 - Members``() = x.DoNamedTest()
+    [<Test>] member x.``Exception - Singleton 02 - Members``() = x.DoNamedTest()
     [<Test>] member x.``Exception - Fields 01``() = x.DoNamedTest()
     [<Test>] member x.``Exception - Fields 02 - Type specification``() = x.DoNamedTest()
     [<Test>] member x.``Exception - Fields 03 - Members``() = x.DoNamedTest()

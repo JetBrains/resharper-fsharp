@@ -1,4 +1,4 @@
-﻿Pattern
+﻿Other
 ---
 UsageOther TO: [O] let |l|: string[] = [||] RANGE: (21,22) @ Type Argument 04 - Array.fs
 
