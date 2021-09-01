@@ -252,7 +252,7 @@ type DeconstructionFromUnionCaseFields(name: string, pattern: IParametersOwnerPa
 
     static member TryCreate(pattern: IFSharpPattern, acceptRefPatWildPatOnly): IFSharpDeconstruction =
         let pattern = if not acceptRefPatWildPatOnly then pattern else pattern.As<IWildPat>() :> _
-        let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(pattern)
+        let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(pattern.IgnoreParentParens())
         if isNull parametersOwnerPat then null else
 
         let fcsUnionCase = parametersOwnerPat.ReferenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
