@@ -24,10 +24,6 @@ UsageRead TO: [R] match |s| with RANGE: (57,58) @ Unions 01.fs
 Pattern
 ---
 UsagePatternChecking TO: [O] | |Some| x -> () RANGE: (67,71) @ Unions 01.fs
-
-
-Pattern, Read access
----
-UsageRead TO: [R] | |None| -> () RANGE: (83,87) @ Unions 01.fs
+UsagePatternChecking TO: [O] | |None| -> () RANGE: (83,87) @ Unions 01.fs
 
 

@@ -118,6 +118,11 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
             if isNotNull (RecordFieldBindingNavigator.GetByReferenceName(referenceName)) then
                 ReferenceAccessType.WRITE else
 
+            if isNotNull (ReferencePatNavigator.GetByReferenceName(referenceName)) ||
+                   isNotNull (ParametersOwnerPatNavigator.GetByReferenceName(referenceName)) ||
+                   isNotNull (FieldPatNavigator.GetByReferenceName(referenceName)) then
+                ReferenceAccessType.OTHER else
+
             x.GetDefaultAccessType(declaredElement)
 
         | _ ->

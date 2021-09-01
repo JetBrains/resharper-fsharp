@@ -127,7 +127,7 @@ type FSharpItemOccurenceKindProvider() =
                 let referencePat = ReferencePatNavigator.GetByReferenceName(referenceName)
                 if isNotNull referencePat && referencePat.IsDeclaration then EmptyList.Instance :> _ else
 
-                if isNotNull (ReferencePatNavigator.GetByReferenceName(referenceName)) ||
+                if isNotNull referencePat ||
                    isNotNull (ParametersOwnerPatNavigator.GetByReferenceName(referenceName)) ||
                    isNotNull (FieldPatNavigator.GetByReferenceName(referenceName)) then
                     [| FSharpOccurrenceKinds.pattern |] :> _ else
