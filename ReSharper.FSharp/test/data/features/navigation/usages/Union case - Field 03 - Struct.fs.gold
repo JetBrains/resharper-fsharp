@@ -32,9 +32,9 @@
       }
       ------------------
 
-    TO: [R] | A (|a| = 123) -> () RANGE: (135,136) @ Union case - Field 03 - Struct.fs
+    TO: [O] | A (|a| = 123) -> () RANGE: (135,136) @ Union case - Field 03 - Struct.fs
     Menu item (enabled) :
-      icon: UsageRead
+      icon: UsagePatternChecking
       text: Module      <font color="DarkRed">| A (**a** = 123) -> ()</font><font color="HotTrack"> (10)</font>
       tail: <font color="GrayText">in <Root Namespace></font>
       tooltip: | A (**a** = 123) -> ()
