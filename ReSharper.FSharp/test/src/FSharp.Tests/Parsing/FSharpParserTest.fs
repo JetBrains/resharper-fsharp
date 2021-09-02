@@ -423,6 +423,12 @@ type FSharpParserTest() =
     [<Test>] member x.``Types - Constraints - Comparison 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Constraints - Equality 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Types - Static const - Const 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Static const - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Static const - Named 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Static const - Named 02``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Static const - Named 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member - Ctor - Primary - Parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary - Parameters 02 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary - Parameters 03``() = x.DoNamedTest()

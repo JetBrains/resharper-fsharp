@@ -728,11 +728,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushRangeAndProcessExpression(expr, range, ElementType.QUOTE_EXPR)
 
         | SynExpr.Const(synConst, _) ->
-            let elementType =
-                match synConst with
-                | SynConst.Unit -> ElementType.UNIT_EXPR
-                | _ -> ElementType.LITERAL_EXPR
-            x.MarkAndDone(range, elementType)
+            x.MarkAndDone(range, x.GetConstElementType(synConst))
 
         | SynExpr.Typed(expr, synType, _) ->
             let typeRange = synType.Range

@@ -5,6 +5,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -118,6 +119,9 @@ type FSharpRenameTest() =
     [<Test>] member x.``Types - Inheritance - Type params - Nested qualified``() = x.DoNamedTest()
 
     [<Test>] member x.``Types - New expr 01``() = x.DoNamedTest()
+
+    [<TestPackages(SqlProviderPackage, Inherits = true)>]
+    [<Test>] member x.``Types - Arg - Expr 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Interface 01 - Impl``() = x.DoNamedTest()
     [<Test>] member x.``Interface 02 - Internal type impl``() = x.DoNamedTest()

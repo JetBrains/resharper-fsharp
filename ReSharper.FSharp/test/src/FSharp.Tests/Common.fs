@@ -43,6 +43,7 @@ module FSharpTestAttribute =
 [<AutoOpen>]
 module PackageReferences =
     let [<Literal>] FSharpCorePackage = "FSharp.Core/4.7.2"
+    let [<Literal>] SqlProviderPackage = "SQLProvider/1.1.101"
 
 
 type FSharpTestAttribute(extension) =

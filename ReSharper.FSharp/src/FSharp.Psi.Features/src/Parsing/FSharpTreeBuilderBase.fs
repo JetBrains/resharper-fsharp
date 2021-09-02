@@ -766,18 +766,14 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                 x.Done(range, mark, ElementType.ANON_RECORD_FIELD)
             x.Done(range, mark, ElementType.ANON_RECORD_TYPE_USAGE)
 
-        | SynType.StaticConstantNamed(synType1, synType2, _)
+        | SynType.StaticConstantNamed(synType1, synType2, _) ->
+            x.MarkTypes(synType1, synType2, range, ElementType.NAMED_STATIC_CONSTANT_TYPE_USAGE)
+
         | SynType.MeasureDivide(synType1, synType2, _) ->
-            let mark = x.Mark(range)
-            x.ProcessType(synType1)
-            x.ProcessType(synType2)
-            x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
+            x.MarkTypes(synType1, synType2, range, ElementType.UNSUPPORTED_TYPE_USAGE)
 
         | SynType.Fun(synType1, synType2, _) ->
-            let mark = x.Mark(range)
-            x.ProcessType(synType1)
-            x.ProcessType(synType2)
-            x.Done(range, mark, ElementType.FUNCTION_TYPE_USAGE)
+            x.MarkTypes(synType1, synType2, range, ElementType.FUNCTION_TYPE_USAGE)
 
         | SynType.WithGlobalConstraints(synType, constraints, _) ->
             let mark = x.Mark(range)
@@ -802,10 +798,13 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessTypeAsTypeReferenceName(synType)
             x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
-        // todo: mark expressions
-        | SynType.StaticConstantExpr _
-        | SynType.StaticConstant _ ->
-            x.MarkAndDone(range, ElementType.UNSUPPORTED_TYPE_USAGE)
+        | SynType.StaticConstantExpr(expr, _) ->
+            let mark = x.Mark(range)
+            x.MarkChameleonExpression(expr)
+            x.Done(range, mark, ElementType.EXPR_STATIC_CONSTANT_TYPE_USAGE)
+
+        | SynType.StaticConstant(synConst, _) ->
+            x.MarkAndDone(range, ElementType.EXPR_STATIC_CONSTANT_TYPE_USAGE, x.GetConstElementType(synConst))
 
         | SynType.Anon _ ->
             x.MarkAndDone(range, ElementType.ANON_TYPE_USAGE)
@@ -814,6 +813,12 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             let mark = x.Mark(range)
             x.ProcessType(innerType)
             x.Done(range, mark, ElementType.PAREN_TYPE_USAGE)
+
+    member x.MarkTypes(synType1, synType2, range: range, elementType) =
+        let mark = x.Mark(range)
+        x.ProcessType(synType1)
+        x.ProcessType(synType2)
+        x.Done(range, mark, elementType)
 
     member x.ProcessTypeConstraint(typeConstraint: SynTypeConstraint) =
         let range = typeConstraint.Range
@@ -868,6 +873,11 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | SynExpr.Do(expr, _) -> expr
         | _ -> expr
 
+    member x.GetConstElementType(synConst) =
+        match synConst with
+        | SynConst.Unit -> ElementType.UNIT_EXPR
+        | _ -> ElementType.LITERAL_EXPR
+    
     member x.MarkChameleonExpression(expr: SynExpr) =
         let ExprRange range as expr = x.FixExpression(expr)
 

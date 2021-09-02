@@ -1,0 +1,6 @@
+﻿module Module
+
+open FSharp.Data.Sql
+
+let [<Literal>] zzz = "hello"
+let _ = new SqlDataProvider<zzz>()

@@ -1672,6 +1672,8 @@ interface typeUsage:
   anonTypeUsage |
   parenTypeUsage |
   parameterSignatureTypeUsage |
+  exprStaticConstantTypeUsage |
+  namedStaticConstantTypeUsage |
   unsupportedTypeUsage;
 
 
@@ -1729,6 +1731,17 @@ parameterSignatureTypeUsage:
     COLON
   )?
   typeUsage<TYPE, TypeUsage>;
+
+exprStaticConstantTypeUsage extras {
+  get { methodName="Expression" path=<exprStaticConstantTypeUsage:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
+  CONST?
+  chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
+
+namedStaticConstantTypeUsage:
+  typeUsage
+  EQUALS
+  typeUsage;
 
 unsupportedTypeUsage:
   fakeSeparator;

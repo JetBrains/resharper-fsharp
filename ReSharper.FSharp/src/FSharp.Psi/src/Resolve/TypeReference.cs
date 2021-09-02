@@ -16,8 +16,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (symbol is FSharpEntity || symbol is FSharpGenericParameter)
         return symbol;
 
-      if (base.GetFcsSymbol() is FSharpMemberOrFunctionOrValue { IsConstructor: true } mfv)
-        return mfv.DeclaringEntity?.Value;
+      if (symbol is FSharpMemberOrFunctionOrValue mfv)
+      {
+        if (mfv.IsConstructor) return mfv.DeclaringEntity?.Value;
+        if (mfv.LiteralValue != null) return mfv;
+      }
 
       return null;
     }
