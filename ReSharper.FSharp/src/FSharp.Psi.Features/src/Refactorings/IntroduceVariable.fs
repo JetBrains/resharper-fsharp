@@ -120,7 +120,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         match parent with
         | :? IConditionOwnerExpr as conditionOwnerExpr when conditionOwnerExpr.ConditionExpr != expr -> expr
         | :? IForLikeExpr as forLikeExpr when forLikeExpr.DoExpression == expr -> expr
-        | :? ISequentialExpr | :? ILambdaExpr | :? ITryLikeExpr -> expr
+        | :? ISequentialExpr | :? ILambdaExpr | :? ITryLikeExpr | :? IComputationExpr -> expr
 
         | :? IBinding as binding when
                 binding.Expression == expr && isNotNull (LetOrUseExprNavigator.GetByBinding(binding)) &&

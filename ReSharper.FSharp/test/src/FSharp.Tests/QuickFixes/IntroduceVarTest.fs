@@ -11,6 +11,8 @@ type IntroduceVarTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/introduceVar"
 
+    [<Test>] member x.``Local - Comp expr 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Local - Seq - App 01``() = x.DoNamedTest()
     [<Test>] member x.``Local - Seq - Record 01``() = x.DoNamedTest()
 

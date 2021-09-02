@@ -1,0 +1,5 @@
+﻿module Module
+
+async {
+    let {selstart}unitAsync{selend} = id
+}
