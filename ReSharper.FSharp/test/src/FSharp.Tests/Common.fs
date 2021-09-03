@@ -65,7 +65,7 @@ type FSharpTestAttribute(extension) =
         member x.Extension = extension
 
     interface ITestProjectPropertiesProvider with
-        member x.GetProjectProperties(targetFrameworkIds, _) =
+        member x.GetProjectProperties(_, targetFrameworkIds, _) =
             FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     interface ITestProjectOutputTypeProvider with
