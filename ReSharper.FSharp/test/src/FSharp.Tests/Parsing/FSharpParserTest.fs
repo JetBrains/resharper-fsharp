@@ -559,6 +559,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Pattern - Named args 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Named args 02 - Multiple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - Reference - Active pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Reference - Active pattern 02``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Reference - Active pattern 03 - Qualified``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Reference 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Reference 02 - Upper``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Reference 03 - Qualified``() = x.DoNamedTest()
@@ -610,6 +613,7 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Val - Function 02 - Named param``() = x.DoNamedTest()
     [<Test>] member x.``Val - Function 03 - Multiple named params``() = x.DoNamedTest()
     [<Test>] member x.``Val - Function 04 - Named tuple param``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Function 05 - Active pattern``() = x.DoNamedTest()
 
     [<Test>] member x.``Val - Active pattern 01``() = x.DoNamedTest()
 

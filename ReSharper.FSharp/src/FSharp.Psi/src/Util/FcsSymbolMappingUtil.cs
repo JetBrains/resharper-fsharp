@@ -324,13 +324,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         : null;
     }
 
-    private static IDeclaredElement GetActivePatternCaseElement(IPsiModule psiModule,
-      IFSharpReferenceOwner referenceExpression, FSharpActivePatternCase patternCase)
+    public static IDeclaredElement GetActivePatternCaseElement(IPsiModule psiModule,
+      IFSharpReferenceOwner referenceOwner, FSharpActivePatternCase patternCase)
     {
       var pattern = patternCase.Group;
       var entity = pattern.DeclaringEntity?.Value;
       if (entity == null)
-        return GetActivePatternCaseElement(patternCase, psiModule, referenceExpression);
+        return GetSourceActivePatternCaseElement(patternCase, psiModule, referenceOwner);
 
       var typeElement = GetTypeElement(entity, psiModule);
       var patternName = pattern.Name?.Value;
@@ -338,7 +338,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return null;
 
       if (typeElement.Module.ContainingProjectModule is IProject)
-        return GetActivePatternCaseElement(patternCase, psiModule, referenceExpression);
+        return GetSourceActivePatternCaseElement(patternCase, psiModule, referenceOwner);
 
       var patternMfv = entity.MembersFunctionsAndValues.FirstOrDefault(mfv => mfv.LogicalName == patternName);
       var patternCompiledName = patternMfv?.CompiledName ?? patternCase.Name;
@@ -361,17 +361,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return typeParameter;
     }
 
-    public static IDeclaredElement GetActivePatternCaseElement([NotNull] FSharpActivePatternCase activePatternCase,
+    public static IDeclaredElement GetSourceActivePatternCaseElement([NotNull] FSharpActivePatternCase fcsActivePatternCase,
       [NotNull] IPsiModule psiModule, [CanBeNull] IFSharpReferenceOwner referenceOwnerToken)
     {
-      var declaration = GetActivePatternDeclaration(activePatternCase, psiModule, referenceOwnerToken);
-      return declaration?.GetActivePatternByIndex(activePatternCase.Index);
+      var declaration = GetActivePatternDeclaration(fcsActivePatternCase, psiModule, referenceOwnerToken);
+      return declaration?.GetActivePatternCaseByIndex(fcsActivePatternCase.Index);
     }
 
-    private static IFSharpDeclaration GetActivePatternDeclaration([NotNull] FSharpActivePatternCase activePatternCase,
+    private static IFSharpDeclaration GetActivePatternDeclaration([NotNull] FSharpActivePatternCase fcsActivePatternCase,
       [NotNull] IPsiModule psiModule, IFSharpReferenceOwner referenceOwnerToken)
     {
-      var activePattern = activePatternCase.Group;
+      var activePattern = fcsActivePatternCase.Group;
       var declaringEntity = activePattern.DeclaringEntity?.Value;
       if (declaringEntity != null)
       {
@@ -381,7 +381,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return patternElement?.GetDeclarations().FirstOrDefault() as IFSharpDeclaration;
       }
 
-      var patternId = FindNode<IActivePatternId>(activePatternCase.DeclarationLocation, referenceOwnerToken);
+      var patternId = FindNode<IActivePatternId>(fcsActivePatternCase.DeclarationLocation, referenceOwnerToken);
       return patternId?.GetContainingNode<IFSharpDeclaration>();
     }
 

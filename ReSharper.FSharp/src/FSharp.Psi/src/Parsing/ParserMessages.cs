@@ -41,7 +41,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_BINDING = "";
     public const string IDS_BINDING_LIKE_DECLARATION = "";
     public const string IDS_IDENT_OR_OP_NAME = "";
-    public const string IDS_ACTIVE_PATTERN_CASE_DECLARATION = "";
+    public const string IDS_ACTIVE_PATTERN_ID_CASE = "";
+    public const string IDS_ACTIVE_PATTERN_CASE_NAME = "";
     public const string IDS_ACTIVE_PATTERN_NAMED_CASE_DECLARATION = "";
     public const string IDS_F_SHARP_EXPRESSION = "";
     public const string IDS_CONST_EXPR = "";
@@ -55,7 +56,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_ARRAY_OR_LIST_EXPR = "";
     public const string IDS_QUALIFIED_EXPR = "";
     public const string IDS_INDEXER_EXPR = "";
-    public const string IDS_INDEXER_ARG = "";
     public const string IDS_APP_EXPR = "";
     public const string IDS_QUOTE_EXPR = "";
     public const string IDS_MATCH_CLAUSE_LIST_OWNER_EXPR = "";

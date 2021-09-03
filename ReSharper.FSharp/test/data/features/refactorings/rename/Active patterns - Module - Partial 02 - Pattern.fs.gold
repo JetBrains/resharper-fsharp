@@ -7,3 +7,10 @@ let (    |  Zzz  |    _ | ) x =
 match true with
 | Zzz
 | _ -> ()
+
+let _ = (|Zzz|_|)
+
+let (|Id|) f x = x
+
+match () with
+| Id (|Zzz|_|) 1 -> ()

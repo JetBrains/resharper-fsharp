@@ -11,22 +11,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class NewExpr : IFSharpReferenceOwner
   {
     private readonly CachedPsiValue<IList<IArgument>> myParameterArguments = new FileCachedPsiValue<IList<IArgument>>();
-    public FSharpSymbolReference Reference { get; private set; }
 
-    protected override void PreInit()
-    {
-      base.PreInit();
-      Reference = new CtorReference(this);
-    }
+    public override IFSharpIdentifier FSharpIdentifier => TypeName?.Identifier;
 
-    public IFSharpIdentifier FSharpIdentifier => TypeName?.Identifier;
+    protected override FSharpSymbolReference CreateReference() =>
+      new CtorReference(this);
 
-    public IFSharpReferenceOwner SetName(string name) => this;
+    public override IFSharpReferenceOwner SetName(string name) => this;
 
-    public override ReferenceCollection GetFirstClassReferences() =>
-      new ReferenceCollection(Reference);
-
-    public IList<IArgument> ParameterArguments => 
+    public IList<IArgument> ParameterArguments =>
       myParameterArguments.GetValue(this, expr => expr.CalculateParameterArguments(new[] { expr.ArgumentExpression }));
 
     public IList<IArgument> Arguments => ParameterArguments.WhereNotNull().ToList();

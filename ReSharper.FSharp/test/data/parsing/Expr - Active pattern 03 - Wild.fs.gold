@@ -5,12 +5,14 @@ IFSharpImplFile
       IChameleonExpression
         IActivePatternExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          FSharpTokenType+BarTokenElement(type:BAR, text:|)
-          IReferenceExpr
-            FSharpIdentifierToken(type:IDENTIFIER, text:A)
-          FSharpTokenType+BarTokenElement(type:BAR, text:|)
-          FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-          FSharpTokenType+BarTokenElement(type:BAR, text:|)
+          IActivePatternId
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            IActivePatternNamedCaseReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:A)
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            IWildActivePatternWildCase
+              FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

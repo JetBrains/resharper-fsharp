@@ -23,9 +23,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return SharedImplUtil.MISSING_DECLARATION_NAME;
 
         var sb = new StringBuilder("|");
-        foreach (var @case in cases)
+        foreach (var activePatternIdCase in cases)
         {
-          sb.Append(@case is IActivePatternNamedCaseDeclaration caseDeclaration1 ? caseDeclaration1.SourceName : "_");
+          sb.Append(activePatternIdCase is IActivePatternCaseName caseName ? caseName.Identifier?.Name : "_");
           sb.Append("|");
         }
         return sb.ToString();
@@ -36,8 +36,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       var cases = Cases;
       return index >= 0 && index < cases.Count
-        ? null
-        : cases[index] as IActivePatternNamedCaseDeclaration;
+        ? cases[index] as IActivePatternNamedCaseDeclaration
+        : null;
     }
 
     public IList<IActivePatternNamedCaseDeclaration> NamedCases =>

@@ -7,3 +7,10 @@ let (    |  B  |    _ | ) x =
 match true with
 | B{caret}
 | _ -> ()
+
+let _ = (|B|_|)
+
+let (|Id|) f x = x
+
+match () with
+| Id (|B|_|) 1 -> ()

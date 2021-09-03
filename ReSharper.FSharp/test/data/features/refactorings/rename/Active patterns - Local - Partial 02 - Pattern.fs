@@ -8,3 +8,10 @@ let x =
     | B{caret}
     | B
     | _ -> ()
+
+    let _ = (|B|_|)
+
+    let (|Id|) f x = x
+
+    match () with
+    | Id (|B|_|) 1 -> ()

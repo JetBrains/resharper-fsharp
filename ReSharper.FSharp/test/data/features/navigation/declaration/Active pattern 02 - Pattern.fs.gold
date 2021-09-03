@@ -1,0 +1,14 @@
+﻿## GotoDeclarationProvider activity:
+  Immediate result:
+    TO: [O] let (||A||_|) x = Some () RANGE: (23,24) @ Active pattern 02 - Pattern.fs
+    Navigation result:
+      opened file: Active pattern 02 - Pattern.fs
+      ------------------
+      module Module
+
+      let (||CARET|A|_|) x = Some ()
+
+      let (|Id|) f x = x
+      ------------------
+
+

@@ -298,8 +298,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       // trim foo.bar to bar
       for (var i = endOffset - 1; i > startOffset; i--)
-        if (buffer[i].Equals('.'))
+      {
+        var c = buffer[i];
+        if (c.Equals('.') || c.Equals('('))
           return new TextRange(i + 1, endOffset);
+      }
+
       return new TextRange(startOffset, endOffset);
     }
 

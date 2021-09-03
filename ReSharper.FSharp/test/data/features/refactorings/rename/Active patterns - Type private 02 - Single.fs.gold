@@ -9,10 +9,19 @@ type T() =
         let (Zzz x) = x
         x
 
+    let _ = (|Zzz|)
+
     do
         match true with
         | Zzz x -> ()
 
+        let _ = (|Zzz|)
+
     member x.Foo =
         match true with
         | Zzz x -> ()
+
+        let (|Id|) f x = x
+
+        match () with
+        | Id (|Zzz|) 1 -> ()

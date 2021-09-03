@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open NUnit.Framework
@@ -66,3 +67,6 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Method - Application 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Parameters - Optional 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Parameters - Optional 02 - Private``() = x.DoNamedTest()
+
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``Val - Function 05 - Active pattern``() = x.DoNamedTest()

@@ -270,17 +270,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [CanBeNull]
-    internal static IDeclaredElement GetActivePatternByIndex(this IFSharpDeclaration declaration, int index)
+    public static IDeclaredElement GetActivePatternCaseByIndex(this IFSharpDeclaration declaration, int index)
     {
-      if (!(declaration.NameIdentifier is ActivePatternId patternId))
-        return null;
+      if (declaration.NameIdentifier is ActivePatternId activePatternId)
+        return activePatternId.GetCase(index)?.DeclaredElement;
 
-      var cases = patternId.Cases;
-      if (index < 0 || index >= cases.Count)
-        return null;
-
-      var caseDeclaration = cases[index] as IActivePatternNamedCaseDeclaration;
-      return caseDeclaration?.DeclaredElement;
+      return null;
     }
 
     public static TreeNodeCollection<IAttribute> GetAttributes([NotNull] this IDeclaration declaration)

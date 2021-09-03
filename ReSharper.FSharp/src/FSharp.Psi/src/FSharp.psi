@@ -477,19 +477,12 @@ setExpr options { stubBase="UnitExpressionBase"; }:
   LARROW<LARROW, LArrow>
   fSharpExpression<RIGHT_EXPR, RightExpression>;
 
-activePatternExpr options { stubBase="FSharpExpressionBase"; }:
+// todo: fix parens
+activePatternExpr options { stubBase="ReferenceOwnerExprBase"; }:
   fSharpExpression<QUALIFIER_EXPR, Qualifier>
   DOT<FSHARP_DELIMITER, Delimiter>
   LPAREN
-  BAR
-  (
-    referenceExpr<CASE, CaseExpression>
-    BAR
-  )*
-  (
-    UNDERSCORE<UNDERSCORE, Underscore>
-    BAR
-  )?
+  activePatternId<ID, ActivePatternId>
   RPAREN;
 
 interface indexerExpr:
@@ -616,7 +609,7 @@ listExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>
   RBRACK;
 
-recordExpr options { stubBase="FSharpExpressionBase"; } extras {
+recordExpr options { stubBase="ReferenceOwnerExprBase"; } extras {
   get { methodName="FieldBindings" path=<recordExpr:BINDING_LIST/recordFieldBindingList:BINDING> };
 }:
   LBRACE<LBRACE, LeftBrace>
@@ -644,7 +637,7 @@ recordFieldBinding:
   fSharpExpression<EXPR, Expression>
   SEMICOLON<FSHARP_SEMI, Semicolon>?;
 
-newExpr options { stubBase="FSharpExpressionBase"; }:
+newExpr options { stubBase="ReferenceOwnerExprBase"; }:
   NEW<NEW, NewKeyword>
   typeReferenceName<TYPE_REFERENCE, TypeName>
   fSharpExpression<EXPR, ArgumentExpression>;
@@ -1163,22 +1156,29 @@ moduleAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBa
   typeReferenceName<TYPE_REFERENCE, TypeName>
   typeBodyMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
-interface activePatternCaseDeclaration:
-  activePatternNamedCaseDeclaration |
-  activePatternWildCase;
+interface activePatternIdCase:
+  activePatternCaseName |
+  wildActivePatternWildCase;
+
+interface activePatternCaseName:
+  activePatternNamedCaseReferenceName |
+  activePatternNamedCaseDeclaration;
 
 interface activePatternNamedCaseDeclaration:
   topActivePatternCaseDeclaration |
   localActivePatternCaseDeclaration;
 
+activePatternNamedCaseReferenceName options { stubBase="ReferenceOwnerBase"; }:
+  fSharpIdentifier<IDENTIFIER, Identifier>;
+
 topActivePatternCaseDeclaration options { stubBase="FSharpDeclarationBase"; }:
-   IDENTIFIER<IDENTIFIER, Identifier>;
+  fSharpIdentifier<IDENTIFIER, Identifier>;
 
 localActivePatternCaseDeclaration options { stubBase="LocalDeclarationBase"; }:
-  IDENTIFIER<IDENTIFIER, Identifier>;
+  fSharpIdentifier<IDENTIFIER, Identifier>;
 
-activePatternWildCase:
-  wildPat;
+wildActivePatternWildCase:
+  UNDERSCORE<UNDERSCORE, Underscore>;
 
 
 delegateRepresentation options { stubBase="TypeRepresentationBase"; }:
@@ -1486,7 +1486,7 @@ activePatternId:
   LPAREN<LPAREN, LParen>
   BAR
   (
-    activePatternCaseDeclaration<ACTIVE_PATTERN_CASE, Cases>
+    activePatternIdCase<ACTIVE_PATTERN_CASE, Cases>
     BAR
   )+
   RPAREN<RPAREN, RParen>;

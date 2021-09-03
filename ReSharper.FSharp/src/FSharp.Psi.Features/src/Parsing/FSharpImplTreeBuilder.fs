@@ -448,7 +448,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             | SynPat.Named(id, _, _, _) ->
                 let mark = x.Mark(id.idRange)
                 if IsActivePatternName id.idText then
-                    x.ProcessActivePatternDecl(id, isLocal)
+                    x.ProcessActivePatternExpr(id)
                 x.Done(id.idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
                 if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
 
@@ -462,7 +462,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 | [ IdentRange idRange as id ] ->
                     let mark = x.Mark(idRange)
                     if IsActivePatternName id.idText then
-                        x.ProcessActivePatternDecl(id, isLocal)
+                        x.ProcessActivePatternExpr(id)
                     x.Done(idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
                 | lid ->
                     x.ProcessReferenceName(lid)
@@ -630,6 +630,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         for binding in rest do
             x.AdvanceToTokenOrPos(FSharpTokenType.AND, binding.StartPos)
             x.ProcessTopLevelBinding(binding)
+
+    member x.ProcessActivePatternExpr(id: Ident) =
+        x.ProcessActivePatternId(id, ElementType.ACTIVE_PATTERN_NAMED_CASE_REFERENCE_NAME)
 
 [<Struct>]
 type BuilderStep =
@@ -1043,9 +1046,6 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         | SynExpr.InterpolatedString(stringParts, _, _) ->
             x.PushRange(range, ElementType.INTERPOLATED_STRING_EXPR)
             x.PushStepList(stringParts, interpolatedStringProcessor)
-
-    member x.ProcessActivePatternExpr(id) =
-        x.ProcessActivePatternId(id, null, ElementType.REFERENCE_EXPR, null)
 
     member x.ProcessAndLocalBinding(_, _, _, pat: SynPat, expr: SynExpr, _) =
         x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)

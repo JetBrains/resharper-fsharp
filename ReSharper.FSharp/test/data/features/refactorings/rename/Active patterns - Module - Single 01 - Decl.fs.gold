@@ -8,3 +8,10 @@ let f (Zzz x) = x
 
 match true with
 | Zzz x -> ()
+
+let _ = (|Zzz|)
+
+let (|Id|) f x = x
+
+match () with
+| Id (|Zzz|) 1 -> ()

@@ -154,6 +154,10 @@ type FSharpRenameTest() =
     [<Test>] member x.``Active patterns - Type private 02 - Single``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Type private 03 - Total``() = x.DoNamedTest()
 
+    [<Test>] member x.``Active patterns - Qualified 01 - Decl``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Qualified 02 - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Qualified 03 - Pattern``() = x.DoNamedTest()
+
     [<Test>] member x.``Active patterns - Unavailable``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Should start with upper case``() = x.DoNamedTest()
 

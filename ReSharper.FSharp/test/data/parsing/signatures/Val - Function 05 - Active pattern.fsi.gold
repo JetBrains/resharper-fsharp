@@ -1,0 +1,41 @@
+﻿Language: PsiLanguageType:F#
+IFSharpSigFile
+  INamedModuleDeclaration
+    FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpIdentifierToken(type:IDENTIFIER, text:Module)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    IBindingSignature
+      FSharpTokenType+ValTokenElement(type:VAL, text:val)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+      ITopReferencePat
+        IExpressionReferenceName
+          IActivePatternId
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            ITopActivePatternCaseDeclaration
+              FSharpIdentifierToken(type:IDENTIFIER, text:A)
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            IWildActivePatternWildCase
+              FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+      FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+      IReturnTypeInfo
+        FSharpTokenType+ColonTokenElement(type:COLON, text::)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IFunctionTypeUsage
+          IParameterSignatureTypeUsage
+            INamedTypeUsage
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:a)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IParameterSignatureTypeUsage
+            INamedTypeUsage
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:b)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

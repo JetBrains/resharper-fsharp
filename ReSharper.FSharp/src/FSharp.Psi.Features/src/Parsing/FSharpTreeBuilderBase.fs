@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System.Collections.Generic
 open FSharp.Compiler.Syntax
+open FSharp.Compiler.Syntax.PrettyNaming
 open FSharp.Compiler.Text
 open FSharp.Compiler.Xml
 open JetBrains.Application.Environment
@@ -151,8 +152,11 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         for _ in lid do
             marks.Push(x.Mark())
 
-        for IdentRange id in lid do
-            x.Done(id, marks.Pop(), ElementType.EXPRESSION_REFERENCE_NAME)
+        for id in lid do
+            let isLastId = marks.Count = 1
+            if isLastId && IsActivePatternName id.idText then 
+                x.ProcessActivePatternId(id, ElementType.ACTIVE_PATTERN_NAMED_CASE_REFERENCE_NAME)
+            x.Done(id.idRange, marks.Pop(), ElementType.EXPRESSION_REFERENCE_NAME)
 
     member x.ProcessReferenceNameSkipLast(lid: Ident list) =
         match lid with
@@ -559,12 +563,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessImplicitCtorParam(pat)
             x.Done(range, mark, ElementType.ATTRIB_PAT)
 
-    member x.ProcessActivePatternId(IdentRange range, activePatternElementType, caseElementType, wildElementType) =
-        let idMark =
-            if isNotNull activePatternElementType then
-                x.Mark(range)
-            else
-                -1
+    member x.ProcessActivePatternId(IdentRange range, caseElementType) =
+        let idMark = x.Mark(range)
 
         let endOffset = x.GetEndOffset(range)
 
@@ -572,7 +572,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             let caseElementType =
                 let tokenType = x.Builder.GetTokenType()
                 if tokenType == FSharpTokenType.IDENTIFIER then caseElementType else
-                if tokenType == FSharpTokenType.UNDERSCORE then wildElementType else
+                if tokenType == FSharpTokenType.UNDERSCORE then ElementType.WILD_ACTIVE_PATTERN_WILD_CASE else
                 null
 
             if isNotNull caseElementType then
@@ -580,8 +580,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
             x.AdvanceLexer()
 
-        if isNotNull activePatternElementType then
-            x.Done(idMark, activePatternElementType)
+        x.Done(idMark, ElementType.ACTIVE_PATTERN_ID)
 
     member x.ProcessActivePatternDecl(id, isLocal) =
         let caseElementType =
@@ -590,8 +589,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             else
                 ElementType.TOP_ACTIVE_PATTERN_CASE_DECLARATION
 
-        x.ProcessActivePatternId(id, ElementType.ACTIVE_PATTERN_ID, caseElementType,
-            ElementType.ACTIVE_PATTERN_WILD_CASE)
+        x.ProcessActivePatternId(id, caseElementType)
 
     member x.ProcessTypeArgs(typeArgs, ltRange: range option, gtRange: range option, elementType) =
         match ltRange, typeArgs with

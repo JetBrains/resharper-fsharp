@@ -136,6 +136,9 @@ type FSharpGoToDeclarationTest() =
         base.CreateContextAction(solution, textControl)
         |> Seq.filter (fun p -> p :? IGotoDeclarationProvider)
 
+    [<Test>] member x.``Active pattern 01 - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Active pattern 02 - Pattern``() = x.DoNamedTest()
+
     [<Test>] member x.``Own member vs interface``() = x.DoNamedTest()
     [<Test>] member x.``Ctor 01 - Modifier``() = x.DoNamedTest()
 
