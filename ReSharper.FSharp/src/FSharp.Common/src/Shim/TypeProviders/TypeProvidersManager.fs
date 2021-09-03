@@ -2,9 +2,12 @@
 
 open System
 open System.Collections.Concurrent
+open System.Collections.Generic
 open System.Threading
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Core.CompilerServices
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.TcImportsHack
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
@@ -52,8 +55,8 @@ type internal TypeProvidersCache() =
         if not hasValue then failwith $"Cannot get type provider {id} from TypeProvidersCache"
         else proxyTypeProvidersPerId.[id]
 
-    member x.Get(assembly) =
-        match typeProvidersPerAssembly.TryGetValue assembly with
+    member x.Get(outputPath) =
+        match typeProvidersPerAssembly.TryGetValue(outputPath) with
         | true, x -> x.Values
         | false, _ -> [||] :> _
 
@@ -79,17 +82,24 @@ type IProxyTypeProvidersManager =
         systemRuntimeAssemblyVersion: Version *
         compilerToolsPath: string list -> ITypeProvider list
 
-    abstract member HasGenerativeTypeProviders: assembly: string -> bool
+    abstract member HasGenerativeTypeProviders: project: IProject -> bool
     abstract member Dump: unit -> string
 
-type TypeProvidersManager(connection: TypeProvidersConnection) =
+type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvider: IFcsProjectProvider) =
     let protocol = connection.ProtocolModel.RdTypeProviderProcessModel
     let lifetime = connection.Lifetime
-    let typeProviders = TypeProvidersCache()
     let tpContext = TypeProvidersContext(connection)
+    let typeProviders = TypeProvidersCache()
+    let projectHasGenerativeTypeProvider = Dictionary<IProject, bool>()
 
-    do connection.Execute(fun () ->
-        protocol.Invalidate.Advise(lifetime, fun id -> typeProviders.Get(id).OnInvalidate()))
+    do
+        connection.Execute(fun () ->
+            protocol.Invalidate.Advise(lifetime, fun id -> typeProviders.Get(id).OnInvalidate()))
+
+        fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun psiModule ->
+            let project = getModuleProject psiModule
+            if isNull project then () else
+            projectHasGenerativeTypeProvider.Remove(project) |> ignore)
 
     interface IProxyTypeProvidersManager with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
@@ -121,8 +131,16 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
 
             typeProviderProxies
 
-        member this.HasGenerativeTypeProviders(assembly) =
-            typeProviders.Get(assembly) |> Seq.exists (fun x -> x.IsGenerative)
+        member this.HasGenerativeTypeProviders(project) =
+            match projectHasGenerativeTypeProvider.TryGetValue(project) with
+            | true, has -> has
+            | _ ->
+                let has =
+                    fcsProjectProvider.GetProjectOutputPaths(project)
+                    |> Seq.collect typeProviders.Get
+                    |> Seq.exists (fun x -> x.IsGenerative)
+                projectHasGenerativeTypeProvider.[project] <- has
+                has
 
         member this.Dump() =
             $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"

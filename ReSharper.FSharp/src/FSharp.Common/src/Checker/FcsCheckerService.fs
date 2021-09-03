@@ -25,6 +25,34 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.VB
 open JetBrains.Util
 
+[<AutoOpen>]
+module FcsProjectProviderUtils =
+    let isProjectModule (psiModule: IPsiModule) =
+        psiModule :? IProjectPsiModule
+
+    let isMiscModule (psiModule: IPsiModule) =
+        psiModule.IsMiscFilesProjectModule()
+
+    let isFSharpProject (projectModelModule: IModule) =
+        match projectModelModule with
+        | :? IProject as project -> project.IsFSharp // todo: check `isOpened`?
+        | _ -> false
+
+    let getModuleProject (psiModule: IPsiModule) =
+        psiModule.ContainingProjectModule.As<IProject>()
+
+    let isFSharpProjectModule (psiModule: IPsiModule) =
+        psiModule.IsValid() && isFSharpProject psiModule.ContainingProjectModule // todo: remove isValid check?
+
+    let [<Literal>] invalidateProjectChangeType =
+        ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.TARGET_FRAMEWORK |||
+        ProjectModelChangeType.REFERENCE_TARGET ||| ProjectModelChangeType.REMOVED
+
+    let [<Literal>] invalidateChildChangeType =
+        ProjectModelChangeType.ADDED ||| ProjectModelChangeType.REMOVED |||
+        ProjectModelChangeType.MOVED_IN ||| ProjectModelChangeType.MOVED_OUT |||
+        ProjectModelChangeType.REFERENCE_TARGET
+
 module FcsCheckerService =
     let getSourceText (document: IDocument) =
         SourceText.ofString(document.GetText())

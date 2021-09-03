@@ -26,35 +26,6 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Threading
 open JetBrains.Util
 
-
-[<AutoOpen>]
-module FcsProjectProvider =
-    let isProjectModule (psiModule: IPsiModule) =
-        psiModule :? IProjectPsiModule
-
-    let isMiscModule (psiModule: IPsiModule) =
-        psiModule.IsMiscFilesProjectModule()
-
-    let isFSharpProject (projectModelModule: IModule) =
-        match projectModelModule with
-        | :? IProject as project -> project.IsFSharp // todo: check `isOpened`?
-        | _ -> false
-
-    let getModuleProject (psiModule: IPsiModule) =
-        psiModule.ContainingProjectModule.As<IProject>()
-
-    let isFSharpProjectModule (psiModule: IPsiModule) =
-        psiModule.IsValid() && isFSharpProject psiModule.ContainingProjectModule // todo: remove isValid check?
-
-    let [<Literal>] invalidateProjectChangeType =
-        ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.TARGET_FRAMEWORK |||
-        ProjectModelChangeType.REFERENCE_TARGET ||| ProjectModelChangeType.REMOVED
-
-    let [<Literal>] invalidateChildChangeType =
-        ProjectModelChangeType.ADDED ||| ProjectModelChangeType.REMOVED |||
-        ProjectModelChangeType.MOVED_IN ||| ProjectModelChangeType.MOVED_OUT |||
-        ProjectModelChangeType.REFERENCE_TARGET
-
 [<SolutionComponent>]
 type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
@@ -66,7 +37,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let locker = JetFastSemiReenterableRWLock()
 
     let fcsProjects = Dictionary<IPsiModule, FcsProject>()
-    let outputPaths = Dictionary<IPsiModule, string>()
     let referencedModules = Dictionary<IPsiModule, ReferencedModule>()
     let projectsPsiModules = OneToSetMap<IModule, IPsiModule>()
 
@@ -93,8 +63,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         referencedModules.Remove(psiModule) |> ignore
         fcsProjects.Remove(psiModule) |> ignore
-
-        outputPaths.Remove(psiModule) |> ignore
 
         projectsPsiModules.Remove(psiModule.ContainingProjectModule, psiModule) |> ignore
 
@@ -155,7 +123,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         let fcsProject = { fcsProject with ProjectOptions = fcsProjectOptions }
 
         fcsProjects.[psiModule] <- fcsProject
-        outputPaths.[psiModule] <- fcsProject.OutputPath.FullPath
         projectsPsiModules.Add(project, psiModule) |> ignore
 
         for referencedPsiModule in referencedProjectPsiModules do
@@ -322,9 +289,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         member this.GetProjectOutputPaths(project) =
             seq { for psiModule in projectsPsiModules.[project] do
-                  match outputPaths.TryGetValue(psiModule) with
-                  | null -> ()
-                  | path -> yield path }
+                  match tryGetValue psiModule fcsProjects with
+                  | None -> ()
+                  | Some fcsProject -> fcsProject.OutputPath.FullPath }
 
 
 /// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
@@ -337,9 +304,7 @@ type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: Outpu
             // todo: track file system changes instead? This currently may be triggered on a project model change too.
             outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
                 if not fcsProjectProvider.HasFcsProjects ||
-                   project.IsFSharp &&
-                   fcsProjectProvider.GetProjectOutputPaths(project)
-                   |> typeProvidersShim.HasGenerativeTypeProviders |> not then () else
+                   project.IsFSharp && not (typeProvidersShim.HasGenerativeTypeProviders(project)) then () else
 
                 if fcsProjectProvider.InvalidateReferencesToProject(project) then
                     psiFiles.IncrementModificationTimestamp(null) // Drop cached values.

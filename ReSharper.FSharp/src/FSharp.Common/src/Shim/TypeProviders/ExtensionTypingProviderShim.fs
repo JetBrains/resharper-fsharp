@@ -18,12 +18,12 @@ type IProxyExtensionTypingProvider =
     inherit IExtensionTypingProvider
 
     abstract RuntimeVersion: unit -> string
-    abstract HasGenerativeTypeProviders: assemblies: string seq -> bool
+    abstract HasGenerativeTypeProviders: project: IProject -> bool
     abstract DumpTypeProvidersProcess: unit -> string
 
 [<SolutionComponent>]
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
-        experimentalFeatures: FSharpExperimentalFeaturesProvider,
+        experimentalFeatures: FSharpExperimentalFeaturesProvider, fcsProjectProvider: IFcsProjectProvider,
         typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory) as this =
     let lifetime = solution.GetLifetime()
     let defaultShim = ExtensionTypingProvider
@@ -48,7 +48,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
 
             typeProvidersHostLifetime <- Lifetime.Define(lifetime)
             let newConnection = typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime).Run()
-            typeProvidersManager <- TypeProvidersManager(newConnection) :?> _
+            typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider) :?> _
             connection <- newConnection)
 
     do
@@ -116,11 +116,10 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
 
             $"{inProcessDump}\n\n{outOfProcessDump}"
 
-        member this.HasGenerativeTypeProviders(assemblies) =
+        member this.HasGenerativeTypeProviders(project) =
             // We can determine which projects contain generative provided types
             // only from type providers hosted out-of-process
-            not (isConnectionAlive()) ||
-            assemblies |> Seq.exists typeProvidersManager.HasGenerativeTypeProviders
+            isConnectionAlive() && typeProvidersManager.HasGenerativeTypeProviders(project)
 
     interface IDisposable with
         member this.Dispose() = terminateConnection ()
