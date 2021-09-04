@@ -6,6 +6,7 @@ open System.Collections.Generic
 open System.Threading
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Core.CompilerServices
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.TcImportsHack
@@ -98,8 +99,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
 
         fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun psiModule ->
             let project = getModuleProject psiModule
-            if isNull project then () else
-            projectHasGenerativeTypeProvider.Remove(project) |> ignore)
+            projectHasGenerativeTypeProvider.Remove(project.NotNull()) |> ignore)
 
     interface IProxyTypeProvidersManager with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
