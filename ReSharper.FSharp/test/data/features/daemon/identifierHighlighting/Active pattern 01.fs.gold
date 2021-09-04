@@ -1,0 +1,49 @@
+﻿module |Module|(0)
+
+let (||A|(1)|_|) |x|(2) = |Some|(3) ()
+let (||B|(4)||C|(5)|) |x|(6) = if |x|(7) then |B|(8) else |C|(9)
+let (||D|(10)|) |x|(11) = |x|(12)
+let (|  |``E``|(13)  | |F|(14) |) |x|(15) = if |x|(16) then |E|(17) else |F|(18)
+
+module |Nested|(19) =
+    let (||G|(20)|_|) |x|(21) = |x|(22)
+
+let _ = (||A|_||(23))
+let _ = |Nested|(24).(||G|_||(25))
+
+match () with
+| |D|(26) (||A|_||(27)) () -> ()
+| |D|(28) |Nested|(29).(||G|_||(30)) () -> ()
+
+---------------------------------------------------------
+(0): ReSharper F# Module Identifier: 
+(1): ReSharper F# Active Pattern Case Identifier: 
+(2): ReSharper F# Value Identifier: 
+(3): ReSharper F# Union Case Identifier: 
+(4): ReSharper F# Active Pattern Case Identifier: 
+(5): ReSharper F# Active Pattern Case Identifier: 
+(6): ReSharper F# Value Identifier: 
+(7): ReSharper F# Value Identifier: 
+(8): ReSharper F# Active Pattern Case Identifier: 
+(9): ReSharper F# Active Pattern Case Identifier: 
+(10): ReSharper F# Active Pattern Case Identifier: 
+(11): ReSharper F# Value Identifier: 
+(12): ReSharper F# Value Identifier: 
+(13): ReSharper F# Active Pattern Case Identifier: 
+(14): ReSharper F# Active Pattern Case Identifier: 
+(15): ReSharper F# Value Identifier: 
+(16): ReSharper F# Value Identifier: 
+(17): ReSharper F# Active Pattern Case Identifier: 
+(18): ReSharper F# Active Pattern Case Identifier: 
+(19): ReSharper F# Module Identifier: 
+(20): ReSharper F# Active Pattern Case Identifier: 
+(21): ReSharper F# Value Identifier: 
+(22): ReSharper F# Value Identifier: 
+(23): ReSharper F# Active Pattern Case Identifier: 
+(24): ReSharper F# Module Identifier: 
+(25): ReSharper F# Active Pattern Case Identifier: 
+(26): ReSharper F# Active Pattern Case Identifier: 
+(27): ReSharper F# Active Pattern Case Identifier: 
+(28): ReSharper F# Active Pattern Case Identifier: 
+(29): ReSharper F# Module Identifier: 
+(30): ReSharper F# Active Pattern Case Identifier: 

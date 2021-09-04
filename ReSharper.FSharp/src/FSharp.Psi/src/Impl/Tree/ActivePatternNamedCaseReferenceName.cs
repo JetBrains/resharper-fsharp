@@ -12,6 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override FSharpSymbolReference CreateReference() =>
       new ActivePatternNamedCaseReferenceNameReference(this);
+
+    public int Index => this.GetIndex();
   }
 
   internal class ActivePatternNamedCaseReferenceNameReference : FSharpSymbolReference

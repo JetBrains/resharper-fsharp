@@ -22,7 +22,10 @@ type IdentifierHighlightingTest() =
 
     [<Test>] member x.``Slice 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Active pattern decl``() = x.DoNamedTest()
+    [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()
+
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``Active pattern - Signature 01``() = x.DoNamedTest()
 
     [<TestReferences("System")>]
     [<Test>] member x.``Delegates 01``() = x.DoNamedTest()
@@ -67,6 +70,3 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Method - Application 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Parameters - Optional 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Parameters - Optional 02 - Private``() = x.DoNamedTest()
-
-    [<FSharpSignatureTest>]
-    [<Test>] member x.``Val - Function 05 - Active pattern``() = x.DoNamedTest()

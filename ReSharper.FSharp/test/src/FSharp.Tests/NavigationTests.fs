@@ -14,18 +14,22 @@ open NUnit.Framework
 type FSharpContextSearchTestBase(extraPath) =
     inherit AllNavigationProvidersTestBase()
 
+    member x.DoNamedTestWithExtensions(ext1, ext2) =
+        let testName = x.TestMethodName
+        x.DoTestSolution(testName + ext1, testName + ext2)
+    
+    member x.DoNamedTestWithCSharp() =
+        x.DoNamedTestWithExtensions(CSharpProjectFileType.CS_EXTENSION, FSharpProjectFileType.FsExtension)
+
+    member x.DoNamedTestWithSignature() =
+        x.DoNamedTestWithExtensions(FSharpSignatureProjectFileType.FsiExtension, FSharpProjectFileType.FsExtension)
+
     override x.RelativeTestDataPath = "features/navigation/" + extraPath
     override x.ExtraPath = null
 
 
 type FSharpGoToUsagesTest() =
     inherit FSharpContextSearchTestBase("usages")
-
-    member x.DoNamedTestFiles() =
-        let testName = x.TestMethodName
-        let csExtension = CSharpProjectFileType.CS_EXTENSION
-        let fsExtension = FSharpProjectFileType.FsExtension
-        x.DoTestSolution(testName + csExtension, testName + fsExtension)
 
     override x.CreateContextAction(solution, textControl) =
         base.CreateContextAction(solution, textControl)
@@ -50,14 +54,14 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Operator 01 - Pipe``() = x.DoNamedTest()
     [<Test; Explicit("Not implemented")>] member x.``Operator 02 - =``() = x.DoNamedTest()
 
-    [<Test>] member x.``Union case 01 - Fields``() = x.DoNamedTestFiles()
-    [<Test>] member x.``Union case 02 - Singleton``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Union case 01 - Fields``() = x.DoNamedTestWithCSharp()
+    [<Test>] member x.``Union case 02 - Singleton``() = x.DoNamedTestWithCSharp()
 
-    [<Test>] member x.``Union case - Field 01``() = x.DoNamedTestFiles()
-    [<Test>] member x.``Union case - Field 02 - Single case``() = x.DoNamedTestFiles()
-    [<Test>] member x.``Union case - Field 03 - Struct``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Union case - Field 01``() = x.DoNamedTestWithCSharp()
+    [<Test>] member x.``Union case - Field 02 - Single case``() = x.DoNamedTestWithCSharp()
+    [<Test>] member x.``Union case - Field 03 - Struct``() = x.DoNamedTestWithCSharp()
 
-    [<Test>] member x.``Property 01 - Explicit accessors``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Property 01 - Explicit accessors``() = x.DoNamedTestWithCSharp()
 
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")
@@ -138,6 +142,7 @@ type FSharpGoToDeclarationTest() =
 
     [<Test>] member x.``Active pattern 01 - Expr``() = x.DoNamedTest()
     [<Test>] member x.``Active pattern 02 - Pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Active pattern 03 - Signature``() = x.DoNamedTestWithSignature()
 
     [<Test>] member x.``Own member vs interface``() = x.DoNamedTest()
     [<Test>] member x.``Ctor 01 - Modifier``() = x.DoNamedTest()

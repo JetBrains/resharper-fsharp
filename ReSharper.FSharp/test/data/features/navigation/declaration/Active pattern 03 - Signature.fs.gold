@@ -1,0 +1,34 @@
+﻿## GotoDeclarationProvider activity:
+  Show context popup menu `Declarations of A 'A'`:
+    TO: [O] let (||A||) x = x + 1 RANGE: (23,24) @ Active pattern 03 - Signature.fs
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Active pattern 03 - Signature.fs<font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <TestProject></font>
+      tooltip: let (|**A**|) x = x + 1
+    Navigation result:
+      opened file: Active pattern 03 - Signature.fs
+      ------------------
+      module Module
+
+      let (||CARET|A|) x = x + 1
+
+      match 1 with
+      ------------------
+
+    TO: [O] val (||A||): int -> int RANGE: (23,24) @ Active pattern 03 - Signature.fsi
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Active pattern 03 - Signature.fsi<font color="HotTrack"> (3)</font>
+      tail: <font color="GrayText">in <TestProject></font>
+      tooltip: val (|**A**|): int -> int
+    Navigation result:
+      opened file: Active pattern 03 - Signature.fsi
+      ------------------
+      module Module
+
+      val (||CARET|A|): int -> int
+
+      ------------------
+
+
