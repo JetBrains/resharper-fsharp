@@ -499,8 +499,16 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let workflow = FSharpIntroduceVariableWorkflow(solution, escapeLambdas, addMutable)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
-    static member CanIntroduceVar(expr: IFSharpExpression, checkRefExprElementResolved: bool) =
+    static member CanIntroduceVar(expr: IFSharpExpression, checkQualifier: bool) =
         if not (isValid expr) || expr.IsFSharpSigFile() then false else
+
+        let isAllowedRefExpr allowNull (refExpr: IReferenceExpr) =
+            let declaredElement = refExpr.Reference.Resolve().DeclaredElement
+
+            // the null case is checked separately,
+            // since FCS doesn't return a symbol for entities in expr until they qualify a valid expression symbol
+            allowNull && isNull declaredElement ||
+            isNotNull declaredElement && not (declaredElement :? ITypeElement || declaredElement :? INamespace)
 
         let rec isAllowedExpr (expr: IFSharpExpression) =
             if FSharpMethodInvocationUtil.isNamedArgReference expr then false else
@@ -512,21 +520,13 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
                 if PrettyNaming.IsOperatorName shortName then false else
 
-                // todo: always check
-                if not checkRefExprElementResolved then
-                    let declaredElement = refExpr.Reference.Resolve().DeclaredElement
-                    not (declaredElement :? ITypeElement || declaredElement :? INamespace)
+                if not checkQualifier then
+                    isAllowedRefExpr true refExpr
                 else
-                    let qualifier = refExpr.Qualifier
-                    if qualifier :? INewExpr then true else
-
-                    let qualifierReference = refExpr.QualifierReference
-                    if isNotNull qualifier && isNull qualifierReference then true else
-
-                    let element = refExpr.Reference.Resolve().DeclaredElement
-                    if isNull element || element :? ITypeElement || element :? INamespace then false else
-
-                    isNotNull (qualifierReference.Resolve().DeclaredElement)
+                    match refExpr.Qualifier with
+                    | null -> false
+                    | :? IReferenceExpr as refExpr -> isAllowedRefExpr false refExpr
+                    | _ -> true
 
             | :? IParenExpr as parenExpr ->
                 isNull (NewExprNavigator.GetByArgumentExpression(expr)) &&

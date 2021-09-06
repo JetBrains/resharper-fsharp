@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:let}
+module Module
+
+let int32Func = id{caret}
+1 |> int32Func
