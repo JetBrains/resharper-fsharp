@@ -45,6 +45,12 @@ jobs:
         working-directory: ./ReSharper.FSharp
         run: dotnet test --no-build
 
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: tests-log.${{ runner.os }}
+
       - name: Build Plugin Frontend
         working-directory: ./rider-fsharp
         if: ${{ success() }} || ${{ failure() }}
