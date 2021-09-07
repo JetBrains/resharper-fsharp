@@ -17,6 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.Rd.Tasks
 open JetBrains.Rider.FSharp.TypeProviders.Protocol.Client
+open JetBrains.Threading
 
 type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = ConcurrentDictionary<_, ConcurrentDictionary<_, IProxyTypeProvider>>()
@@ -91,7 +92,8 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
     let lifetime = connection.Lifetime
     let tpContext = TypeProvidersContext(connection)
     let typeProviders = TypeProvidersCache()
-    let projectHasGenerativeTypeProvider = Dictionary<IProject, bool>()
+    let lock = SpinWaitLock()
+    let doesProjectContainGenerativeProviders = Dictionary<IProject, bool>()
 
     do
         connection.Execute(fun () ->
@@ -99,7 +101,9 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
 
         fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun psiModule ->
             let project = getModuleProject psiModule
-            projectHasGenerativeTypeProvider.Remove(project.NotNull()) |> ignore)
+            try lock.Enter()
+                doesProjectContainGenerativeProviders.Remove(project.NotNull()) |> ignore
+            finally lock.Exit())
 
     interface IProxyTypeProvidersManager with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
@@ -132,15 +136,17 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
             typeProviderProxies
 
         member this.HasGenerativeTypeProviders(project) =
-            match projectHasGenerativeTypeProvider.TryGetValue(project) with
+            match doesProjectContainGenerativeProviders.TryGetValue(project) with
             | true, has -> has
             | _ ->
-                let has =
-                    fcsProjectProvider.GetProjectOutputPaths(project)
-                    |> Seq.collect typeProviders.Get
-                    |> Seq.exists (fun x -> x.IsGenerative)
-                projectHasGenerativeTypeProvider.[project] <- has
-                has
+                try lock.Enter()
+                    let has =
+                        fcsProjectProvider.GetProjectOutputPaths(project)
+                        |> Seq.collect typeProviders.Get
+                        |> Seq.exists (fun x -> x.IsGenerative)
+                    doesProjectContainGenerativeProviders.[project] <- has
+                    has
+                finally lock.Exit()
 
         member this.Dump() =
             $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"
