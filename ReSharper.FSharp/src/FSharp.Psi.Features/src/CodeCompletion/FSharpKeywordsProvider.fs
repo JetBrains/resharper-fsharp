@@ -41,10 +41,12 @@ module FSharpKeywordsProvider =
            "do!"
            "exception"
            "extern"
+           "inline" // never suggested due to invalid Fcs context
            "let!"
            "match!"
            "member"
            "module"
+           "mutable" // never suggested due to invalid Fcs context
            "namespace"
            "open"
            "override"
@@ -53,6 +55,7 @@ module FSharpKeywordsProvider =
            "static"
            "use!"
            "val"
+           "void"
            "yield!" |]
         |> HashSet
 
@@ -108,13 +111,14 @@ module FSharpKeywordsProvider =
 
     let isModuleMemberStart (context: FSharpCodeCompletionContext) =
         let reference = context.ReparsedContext.Reference
-        if isNull reference then false, null else
+        if isNull reference then false, null, null else
 
         let treeNode = reference.GetTreeNode()
         match treeNode with
         | :? ITypeReferenceName as referenceName ->
             let moduleAbbreviationDecl = ModuleAbbreviationDeclarationNavigator.GetByTypeName(referenceName)
-            isNotNull moduleAbbreviationDecl, moduleAbbreviationDecl :> ITreeNode
+            let moduleDecl = ModuleLikeDeclarationNavigator.GetByMember(moduleAbbreviationDecl)
+            isNotNull moduleAbbreviationDecl, moduleAbbreviationDecl :> IModuleMember, moduleDecl
 
         | :? IReferenceExpr as refExpr ->
             let rec loop (expr: IFSharpExpression) =
@@ -125,9 +129,9 @@ module FSharpKeywordsProvider =
             let expr = loop refExpr
             let doStmt = ExpressionStatementNavigator.GetByExpression(expr)
             let moduleDecl = ModuleLikeDeclarationNavigator.GetByMember(doStmt)
-            isNotNull moduleDecl, moduleDecl :> _
+            isNotNull moduleDecl, doStmt :> _, moduleDecl
 
-        | _ -> false, null
+        | _ -> false, null, null
 
     let isAtTypeInOpen (context: FSharpCodeCompletionContext) =
         let reference = context.ReparsedContext.Reference
@@ -142,6 +146,12 @@ module FSharpKeywordsProvider =
             isNotNull (OpenStatementNavigator.GetByReferenceName(referenceName))
 
         loop referenceName
+
+    let allowsNamespace (moduleMember: IModuleMember) (moduleDecl: IModuleLikeDeclaration) =
+        match moduleDecl with
+        | :? INamespaceDeclaration | :? IAnonModuleDeclaration ->
+            not (moduleMember :? IModuleAbbreviationDeclaration)
+        | _ -> false
 
     let mayStartTypeMember (context: FSharpCodeCompletionContext) =
         let reference = context.ReparsedContext.Reference
@@ -159,20 +169,38 @@ module FSharpKeywordsProvider =
 
         | _ -> true
     
+    let mayBeInTypeUsage (context: FSharpCodeCompletionContext) =
+        let reference = context.ReparsedContext.Reference
+        if isNull reference then true else
+
+        match reference.GetTreeNode() with
+        | :? IReferenceExpr -> false
+        | :? ITypeReferenceName as referenceName ->
+            isNotNull (NamedTypeUsageNavigator.GetByReferenceName(referenceName))
+        | _ -> true
+
     let suggestKeywords (context: FSharpCodeCompletionContext) = seq {
-        let isModuleMemberStart, moduleDecl = isModuleMemberStart context
-        if isModuleMemberStart then
+        let isSignatureFile = context.NodeInFile.IsFSharpSigFile()
+
+        let isModuleMemberStart, moduleMember, moduleDecl = isModuleMemberStart context
+        if isModuleMemberStart || isSignatureFile then
             "exception"
             "extern"
-            "open"
             "module"
             "type" // todo: visibility before type recovery
 
-        if moduleDecl :? INamespaceDeclaration || moduleDecl :? IAnonModuleDeclaration then
-            "namespace"
+            let exprStmt = moduleMember.As<IExpressionStatement>()
+            if isNull exprStmt || Seq.isEmpty exprStmt.AttributeListsEnumerable then
+                "open"
+
+                if allowsNamespace moduleMember moduleDecl then
+                    "namespace"
 
         if isAtTypeInOpen context then
             "type"
+
+        if isSignatureFile then
+            "val"
 
         let inComputationExpression, isLetInExpr = isInComputationExpression context
         if inComputationExpression then
@@ -186,13 +214,16 @@ module FSharpKeywordsProvider =
             if isLetInExpr then
                 "and!"
 
-        if mayStartTypeMember context then
+        if mayStartTypeMember context (*&& not isTypeUsage*) then
             "abstract"
             "default"
             "member"
             "override"
             "static"
             "val"
+
+        if mayBeInTypeUsage context then
+            "void"
     }
 
 type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =

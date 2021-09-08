@@ -1,8 +1,6 @@
-﻿# 6 ITEMS #
+﻿# 4 ITEMS #
 
 + exception
 + extern
 + module
-+ namespace
-+ open
 + type

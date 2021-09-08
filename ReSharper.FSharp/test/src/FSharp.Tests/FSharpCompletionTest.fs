@@ -122,22 +122,29 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``Not available - Let - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Let - Namespace 01``() = x.DoNamedTest()
 
-[<FSharpTest>]
-type FSharpKeywordCompletionTest() =
-    inherit CodeCompletionTestBase()
 
-    override x.RelativeTestDataPath = "features/completion/keywords"
+[<FSharpTest>]
+type FSharpKeywordCompletionTestBase() =
+    inherit CodeCompletionTestBase()
 
     override x.TestType = CodeCompletionTestType.List
 
     override this.ItemSelector =
         Func<_, _>(function :? FSharpKeywordLookupItem as keyword -> keyword.IsReparseContextAware | _ -> false)
 
+type FSharpKeywordCompletionTest() =
+    inherit FSharpKeywordCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion/keywords"
+
     [<Test>] member x.``Anon module - Expr - Before module 01``() = x.DoNamedTest()
     [<Test>] member x.``Anon module - Expr - Before module 02 - Nested``() = x.DoNamedTest()
+
+    // todo: check node parent is file
     [<Test>] member x.``Anon module - Expr - Before namespace 01``() = x.DoNamedTest()
+
     [<Test; Explicit("Can't get tree node")>] member x.``Anon module - Expr 01``() = x.DoNamedTest()
-    [<Test>] member x.``Anon module - Expr 02 - Attributes``() = x.DoNamedTest() // todo: remove open
+    [<Test>] member x.``Anon module - Expr 02 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Anon module - Expr 03 - After another``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Comp - App - List ctor 01``() = x.DoNamedTest()
@@ -168,7 +175,13 @@ type FSharpKeywordCompletionTest() =
     // todo: add recovery in parser, filter member start keywords
     [<Test>] member x.``Open 05``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Abstract 01``() = x.DoNamedTest()
+
+    // todo: suggest void in extern declarations only, provide info in fcs
+    [<Test>] member x.``Type member - Property 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member 01``() = x.DoNamedTest()
+
     // todo: add recovery in parser, filter member start keywords
     [<Test>] member x.``Type member 02 - Member``() = x.DoNamedTest()
 
@@ -177,3 +190,14 @@ type FSharpKeywordCompletionTest() =
 
     [<Explicit("Get non-parsed identifier from reparse context")>]
     [<Test>] member x.``Namespace - Top level 03 - Before namespace``() = x.DoNamedTest()
+
+[<FSharpSignatureTest>]
+type FSharpSignatureKeywordCompletionTest() =
+    inherit FSharpKeywordCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion/keywords/signatures"
+
+    [<Test>] member x.``Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Module abbreviation 01``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member 01``() = x.DoNamedTest()
