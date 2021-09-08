@@ -136,17 +136,17 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
             typeProviderProxies
 
         member this.HasGenerativeTypeProviders(project) =
-            match doesProjectContainGenerativeProviders.TryGetValue(project) with
-            | true, has -> has
-            | _ ->
-                try lock.Enter()
+            try lock.Enter()
+                match doesProjectContainGenerativeProviders.TryGetValue(project) with
+                | true, has -> has
+                | _ ->
                     let has =
                         fcsProjectProvider.GetProjectOutputPaths(project)
                         |> Seq.collect typeProviders.Get
                         |> Seq.exists (fun x -> x.IsGenerative)
                     doesProjectContainGenerativeProviders.[project] <- has
                     has
-                finally lock.Exit()
+            finally lock.Exit()
 
         member this.Dump() =
             $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"
