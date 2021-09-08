@@ -18,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpComple
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
@@ -34,18 +35,24 @@ type KeywordSuffix =
 
 module FSharpKeywordsProvider =
     let reparseContextAwareKeywords =
-        [| "and!"
+        [| "abstract"
+           "and!"
+           "default"
            "do!"
            "exception"
            "extern"
            "let!"
            "match!"
+           "member"
            "module"
            "namespace"
            "open"
+           "override"
            "return!"
            "type"
+           "static"
            "use!"
+           "val"
            "yield!" |]
         |> HashSet
 
@@ -136,6 +143,22 @@ module FSharpKeywordsProvider =
 
         loop referenceName
 
+    let mayStartTypeMember (context: FSharpCodeCompletionContext) =
+        let reference = context.ReparsedContext.Reference
+        if isNull reference then true else
+
+        // todo: get element from the context
+        match reference.GetTreeNode() with
+        | :? IReferenceExpr ->
+            false
+
+        | :? ITypeReferenceName as referenceName ->
+            let typeUsage = NamedTypeUsageNavigator.GetByReferenceName(referenceName)
+            let declaration = TypeUsageOrUnionCaseDeclarationNavigator.GetByTypeUsage(typeUsage)
+            isNotNull declaration
+
+        | _ -> true
+    
     let suggestKeywords (context: FSharpCodeCompletionContext) = seq {
         let isModuleMemberStart, moduleDecl = isModuleMemberStart context
         if isModuleMemberStart then
@@ -162,6 +185,14 @@ module FSharpKeywordsProvider =
             
             if isLetInExpr then
                 "and!"
+
+        if mayStartTypeMember context then
+            "abstract"
+            "default"
+            "member"
+            "override"
+            "static"
+            "val"
     }
 
 type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
@@ -224,14 +255,14 @@ type FSharpKeywordsProvider() =
     override x.GetLookupFocusBehaviour _ = LookupFocusBehaviour.Soft
 
     override x.AddLookupItems(context, collector) =
-        let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
+        let reparsedContext = context.ReparsedContext
+        let reference = reparsedContext.Reference.As<FSharpSymbolReference>()
         if isNotNull reference && reference.IsQualified then false else
 
         let tokenBeforeCaret = context.TokenBeforeCaret
-        if isNull tokenBeforeCaret then false else
+        let fcsCompletionContext = reparsedContext.GetFcsContext()
 
-        let fcsCompletionContext = context.FcsCompletionContext
-        match fcsCompletionContext.CompletionContext, tokenBeforeCaret.GetTokenType() with
+        match fcsCompletionContext.CompletionContext, getTokenType tokenBeforeCaret with
         | Some(CompletionContext.Invalid), tokenBeforeType when tokenBeforeType != FSharpTokenType.HASH -> false
         | _, tokenBeforeType ->
 

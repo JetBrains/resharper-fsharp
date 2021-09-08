@@ -128,65 +128,52 @@ type FSharpKeywordCompletionTest() =
 
     override x.RelativeTestDataPath = "features/completion/keywords"
 
-    override x.TestType = CodeCompletionTestType.Action
+    override x.TestType = CodeCompletionTestType.List
 
     override this.ItemSelector =
         Func<_, _>(function :? FSharpKeywordLookupItem as keyword -> keyword.IsReparseContextAware | _ -> false)
 
-    [<Test>] member x.``AndBang - Not available 01``() = x.DoNamedTest()
-    [<Test>] member x.``AndBang - Not available 02``() = x.DoNamedTest()
-    [<Test>] member x.``AndBang - Not available 03``() = x.DoNamedTest()
-    [<Test>] member x.``AndBang 01``() = x.DoNamedTest()
-    [<Test>] member x.``AndBang 02``() = x.DoNamedTest()
+    [<Test>] member x.``Anon module - Expr - Before module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Anon module - Expr - Before module 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Anon module - Expr - Before namespace 01``() = x.DoNamedTest()
+    [<Test; Explicit("Can't get tree node")>] member x.``Anon module - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Anon module - Expr 02 - Attributes``() = x.DoNamedTest() // todo: remove open
+    [<Test>] member x.``Anon module - Expr 03 - After another``() = x.DoNamedTest()
 
-    [<Test>] member x.``Extern 01``() = x.DoNamedTest()
-    [<Test>] member x.``Extern 02 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - App - List ctor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - App - List ctor 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - App 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - App 02 - List``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - App 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - App 04``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - Let - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - Let - In expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - Let - In expr 02 - App``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - List ctor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - Ref 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - Seq 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Do - Ref 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Seq 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Module - Top level 01 - Before module``() = x.DoNamedTest()
-    [<Test>] member x.``Module - Top level 02 - Before nested module``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Before type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Before type 02``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Module abbreviation 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Namespace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module member 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Open 01``() = x.DoNamedTest()
+    [<Test>] member x.``Open 02``() = x.DoNamedTest()
+    [<Test>] member x.``Open 03``() = x.DoNamedTest()
+    [<Test>] member x.``Open 04``() = x.DoNamedTest()
+    // todo: add recovery in parser, filter member start keywords
+    [<Test>] member x.``Open 05``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member 01``() = x.DoNamedTest()
+    // todo: add recovery in parser, filter member start keywords
+    [<Test>] member x.``Type member 02 - Member``() = x.DoNamedTest()
 
     [<Explicit("Get non-parsed identifier from reparse context")>]
     [<Test>] member x.``Module - Top level 03 - Before namespace``() = x.DoNamedTest()
 
-    [<Test>] member x.``Module 01 - Module``() = x.DoNamedTest()
-    [<Test>] member x.``Module 02 - Anon module``() = x.DoNamedTest()
-    [<Test>] member x.``Module 03 - Namespace``() = x.DoNamedTest()
-
-    [<Test>] member x.``Namespace - Top level 01 - Before module``() = x.DoNamedTest()
-    [<Test>] member x.``Namespace - Top level 02 - Before nested module``() = x.DoNamedTest()
-
     [<Explicit("Get non-parsed identifier from reparse context")>]
     [<Test>] member x.``Namespace - Top level 03 - Before namespace``() = x.DoNamedTest()
-
-    [<Test>] member x.``Namespace 01 - Module``() = x.DoNamedTest()
-    [<Test>] member x.``Namespace 02 - Anon module``() = x.DoNamedTest()
-    [<Test>] member x.``Namespace 03 - Namespace``() = x.DoNamedTest()
-
-    [<Test>] member x.``Open - Not available - Expression 01``() = x.DoNamedTest()
-    [<Test>] member x.``Open - Not available - Type member 01``() = x.DoNamedTest()
-    [<Test>] member x.``Open 01 - Module``() = x.DoNamedTest()
-    [<Test>] member x.``Open 02 - Anon module``() = x.DoNamedTest()
-    [<Test>] member x.``Open 03 - Before type``() = x.DoNamedTest()
-    [<Test>] member x.``Open 04 - At type``() = x.DoNamedTest()
-    [<Test>] member x.``Open 05 - Module abbreviation``() = x.DoNamedTest()
-
-    [<Test; Explicit>] member x.``Type - Attribute target 01``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Type - Attribute target 02``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Type - Attribute target 03``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Module member 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Module member 02 - Module abbreviation``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Module member 03 - Attributes``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Open 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Open 02``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Open 03``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Open 04``() = x.DoNamedTest()
-
-    [<Test>] member x.``YieldBang - Not available - Binary app 01``() = x.DoNamedTest()
-    [<Test>] member x.``YieldBang - Not available - Binary app 02``() = x.DoNamedTest()
-    [<Test>] member x.``YieldBang - Not available - Binary app 03``() = x.DoNamedTest()
-    [<Test>] member x.``YieldBang - Not available - Prefix app 01``() = x.DoNamedTest()
-    [<Test>] member x.``YieldBang - Not available 01``() = x.DoNamedTest()
-    [<Test>] member x.``YieldBang 01``() = x.DoNamedTest()
-    [<Test>] member x.``YieldBang 02``() = x.DoNamedTest()
-    [<Test>] member x.``YieldBang 03``() = x.DoNamedTest()
-    [<Test>] member x.``YieldBang 04``() = x.DoNamedTest()

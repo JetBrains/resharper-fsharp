@@ -1,6 +1,0 @@
-﻿// ${COMPLETE_ITEM:namespace}
-
-namespace{caret}
-
-module Module =
-    ()

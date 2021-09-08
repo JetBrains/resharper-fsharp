@@ -1,4 +1,0 @@
-﻿// ${COMPLETE_ITEM:type}
-
-module M =
-    type{caret}

@@ -62,8 +62,46 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
             ReparseResult(newFile, fsFile, 0)
 
 
+module FSharpCodeCompletionContext =
+    let canBeIdentifierStart (token: ITreeNode) =
+        let nodeType = getTokenType token
+        if isNull nodeType then false else
+
+        nodeType == FSharpTokenType.IDENTIFIER || nodeType == FSharpTokenType.UNDERSCORE || nodeType.IsKeyword
+
+    let getFcsCompletionContext (fsFile: IFSharpFile) (document: IDocument) (offset: DocumentOffset) =
+        let fcsContext =
+            let coords = document.GetCoordsByOffset(offset.Offset)
+            let lineText = document.GetLineText(coords.Line)
+            let fcsPos = getPosFromCoords coords
+
+            let fcsCompletionContext =
+                fsFile.ParseTree |> Option.bind (fun parseTree ->
+                    ParsedInput.TryGetCompletionContext(fcsPos, parseTree, lineText))
+
+            { PartialName = QuickParse.GetPartialLongNameEx(lineText, int coords.Column - 1)
+              CompletionContext = fcsCompletionContext
+              Coords = coords
+              LineText = lineText
+              DisplayContext = Unchecked.defaultof<_> }
+
+        fcsContext
+
+
 type FSharpReparsedCodeCompletionContext(file: IFSharpFile, treeTextRange, newText) =
     inherit ReparsedCodeCompletionContext(file, treeTextRange, newText)
+
+    member this.GetFcsContext() =
+        let node = this.TreeNode
+        let documentOffset = node.GetDocumentEndOffset()
+        let file = node.GetContainingFile() :?> IFSharpFile
+
+        let document =
+            match file.StandaloneDocument with
+            | null -> file.GetSourceFile().Document
+            | document -> document
+
+        FSharpCodeCompletionContext.getFcsCompletionContext file document documentOffset
 
     static member FixReferenceOwnerUnderTransaction(node: ITreeNode) =
         let psiServices = node.GetPsiServices()
@@ -140,13 +178,6 @@ type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionCo
 type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
     inherit CodeCompletionContextProviderBase()
 
-    let canBeIdentifierStart (token: ITreeNode) =
-        let nodeType = getTokenType token
-        if isNull nodeType then false else
-
-        nodeType == FSharpTokenType.IDENTIFIER || nodeType == FSharpTokenType.UNDERSCORE || nodeType.IsKeyword
-
-
     override this.IsApplicable(context) = context.File :? IFSharpFile
 
     override this.GetCompletionContext(context) =
@@ -157,6 +188,7 @@ type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
         let selectedTreeRange = context.SelectedTreeRange
         if selectedTreeRange.Length > 0 then null else
 
+        // todo: fix for empty file via reparsed context
         let treeNode = fsFile.FindNodeAt(selectedTreeRange)
         if isNull treeNode then null else
 
@@ -167,7 +199,7 @@ type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
         let tokenAtCaret = fsFile.FindTokenAt(caretOffset)
         let tokenBeforeCaret = fsFile.FindTokenAt(caretOffset - 1)
 
-        let isIdentifierStart = canBeIdentifierStart tokenBeforeCaret
+        let isIdentifierStart = FSharpCodeCompletionContext.canBeIdentifierStart tokenBeforeCaret
         let completedRangeStart = if isIdentifierStart then tokenBeforeCaret.GetDocumentStartOffset() else caretOffset
 
         let reparsedContext =
@@ -180,25 +212,12 @@ type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
         let lookupRanges =
             let completedRange = DocumentRange(&completedRangeStart, &caretOffset)
             let lookupRanges = CodeCompletionContextProviderBase.GetTextLookupRanges(context, completedRange)
-            if not (canBeIdentifierStart tokenAtCaret) then lookupRanges else
+            if not (FSharpCodeCompletionContext.canBeIdentifierStart tokenAtCaret) then lookupRanges else
 
             let tokenAtEndOffset = tokenAtCaret.GetDocumentEndOffset()
             lookupRanges.WithReplaceRange(DocumentRange(&completedRangeStart, &tokenAtEndOffset))
 
-        let fcsContext =
-            let coords = document.GetCoordsByOffset(caretOffset.Offset)
-            let lineText = document.GetLineText(coords.Line)
-            let fcsPos = getPosFromCoords coords
-
-            let fcsCompletionContext =
-                fsFile.ParseTree |> Option.bind (fun parseTree ->
-                    ParsedInput.TryGetCompletionContext(fcsPos, parseTree, lineText))
-
-            { PartialName = QuickParse.GetPartialLongNameEx(lineText, int coords.Column - 1)
-              CompletionContext = fcsCompletionContext
-              Coords = coords
-              LineText = lineText
-              DisplayContext = Unchecked.defaultof<_> }
+        let fcsContext = FSharpCodeCompletionContext.getFcsCompletionContext fsFile document caretOffset
 
         FSharpCodeCompletionContext(context, fcsContext, reparsedContext, isQualified, tokenBeforeCaret,
             tokenAtCaret, lookupRanges, psiModule, treeNode, fsXmlDocService) :> _

@@ -1,6 +1,0 @@
-﻿// ${COMPLETE_ITEM:and!}
-
-seq {
-    let x = 1
-    and!{caret}
-}
