@@ -171,8 +171,8 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
     override this.GetPresentation(version, _, _, _) =
         FSharpLanguageVersion.toString version
 
+    override this.GetLatestAvailableLanguageLevel _ = failwith "todo"
     override this.GetLatestAvailableLanguageLevelImpl(_, _) = failwith "todo"
-    override this.GetLatestAvailableLanguageLevelImpl _ = failwith "todo"
 
 
 [<SolutionFeaturePart>]
