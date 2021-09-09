@@ -538,3 +538,4 @@ type FSharpScriptLanguageLevelProvider(scriptSettingsProvider: FSharpScriptSetti
         member this.IsAvailable(_: FSharpLanguageVersion, _: IPsiModule): bool = failwith "todo"
         member this.LanguageLevelOverrider = failwith "todo"
         member this.LanguageVersionModifier = failwith "todo"
+        member this.GetLatestAvailableLanguageLevel _ = failwith "todo"

@@ -171,7 +171,9 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
     override this.GetPresentation(version, _, _, _) =
         FSharpLanguageVersion.toString version
 
-    override this.GetLatestAvailableLanguageLevel _ = failwith "todo"
+    override this.GetLatestAvailableLanguageLevelImpl(_, _) = failwith "todo"
+    override this.GetLatestAvailableLanguageLevelImpl _ = failwith "todo"
+
 
 [<SolutionFeaturePart>]
 type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProperty) =
@@ -199,6 +201,7 @@ type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProp
             Nullable(projectProperty.GetLanguageVersion(project, targetFramework))
 
         member this.IsAvailable(_: FSharpLanguageVersion, _: IPsiModule): bool = failwith "todo"
+        member this.GetLatestAvailableLanguageLevel _ = failwith "todo"
         member this.LanguageLevelOverrider = failwith "todo"
         member this.LanguageVersionModifier = failwith "todo"
 

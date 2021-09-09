@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
@@ -56,7 +55,8 @@ module FSharpLanguageLevel =
 
     let key = Key<Boxed<FSharpLanguageLevel>>("LanguageLevel")
 
-    let private ofPsiModuleNoCache (psiModule: IPsiModule) =
+    let private ofPsiModuleNoCache (treeNode: ITreeNode) =
+        let psiModule = treeNode.GetPsiModule()
         let levelProvider =
             psiModule.GetPsiServices()
                 .GetComponent<SolutionFeaturePartsContainer>()
