@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -29,6 +30,9 @@ open JetBrains.Util
 module GenerateLambdaInfo =
     let [<Literal>] CreateLambda = "Create lambda"
 
+    let needsParens (refExpr: IReferenceExpr) =
+        // todo: escape tuple expressions, check expected types and position
+        isNull (ParenExprNavigator.GetByInnerExpression(refExpr))
 
 type GenerateLambdaInfo(text, paramNames: string list list) =
     inherit TextualInfo(text, GenerateLambdaInfo.CreateLambda)
@@ -54,20 +58,21 @@ type GenerateLambdaBehavior(info: GenerateLambdaInfo) =
         use transactionCookie =
             PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, GenerateLambdaInfo.CreateLambda)
 
-        let parenExpr = refExpr.CreateElementFactory().CreateExpr(info.Text).As<IParenExpr>()
-        let insertedParenExpr = ModificationUtil.ReplaceChild(refExpr, parenExpr)
-        let insertedLambdaExpr = insertedParenExpr.InnerExpression.As<ILambdaExpr>()
+        let text = if GenerateLambdaInfo.needsParens refExpr then $"({info.Text})" else info.Text
+        let expr = refExpr.CreateElementFactory().CreateExpr(text)
+        let insertedExpr = ModificationUtil.ReplaceChild(refExpr, expr)
+        let lambdaExpr = insertedExpr.IgnoreInnerParens().As<ILambdaExpr>()
 
-        let hotspotsRegistry = HotspotsRegistry(insertedLambdaExpr.GetPsiServices())
+        let hotspotsRegistry = HotspotsRegistry(lambdaExpr.GetPsiServices())
 
-        (info.Names, insertedLambdaExpr.Parameters.Patterns) ||> Seq.iter2 (fun names itemPattern ->
+        (info.Names, lambdaExpr.Parameters.Patterns) ||> Seq.iter2 (fun names itemPattern ->
             let nameSuggestionsExpression = NameSuggestionsExpression(names)
             let rangeMarker = itemPattern.GetDocumentRange().CreateRangeMarker()
             hotspotsRegistry.Register(rangeMarker, nameSuggestionsExpression))
 
         let hotspotSession =
             LiveTemplatesManager.Instance.CreateHotspotSessionAtopExistingText(
-                solution, insertedLambdaExpr.Expression.GetDocumentEndOffset(), textControl,
+                solution, lambdaExpr.Expression.GetDocumentEndOffset(), textControl,
                 LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotsRegistry.CreateHotspots())
 
         hotspotSession.ExecuteAndForget()
@@ -118,7 +123,7 @@ type GenerateLambdaRule() =
             |> String.concat " -> "
 
         let presentationText = $"fun {text} ->"
-        let info = GenerateLambdaInfo($"(fun {paramNamesText} -> ())", paramNames, Ranges = context.Ranges)
+        let info = GenerateLambdaInfo($"fun {paramNamesText} -> ()", paramNames, Ranges = context.Ranges)
 
         let item =
             LookupItemFactory.CreateLookupItem(info)

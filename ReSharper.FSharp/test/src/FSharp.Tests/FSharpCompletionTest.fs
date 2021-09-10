@@ -38,6 +38,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Lambda - Pipe - Double 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Pipe 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Pipe 02``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Pipe 03 - Parens``() = x.DoNamedTest()
 
     [<Test>] member x.``To recursive - Escape 01``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Local 01``() = x.DoNamedTest()
