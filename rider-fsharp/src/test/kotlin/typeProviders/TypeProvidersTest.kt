@@ -13,9 +13,8 @@ import withOutOfProcessTypeProviders
 
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
-class TypeProvidersTest : BaseTestWithSolution() {
+class TypeProvidersTest : BaseTypeProvidersTest() {
     override fun getSolutionDirectoryName() = "TypeProviderLibrary"
-    override val restoreNuGetPackages = true
 
     @Test
     fun swaggerProvider() = doTest("SwaggerProvider")

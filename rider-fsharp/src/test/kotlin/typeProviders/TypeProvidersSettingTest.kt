@@ -17,10 +17,8 @@ import withOutOfProcessTypeProviders
 
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
-class TypeProvidersSettingTest : BaseTestWithSolution() {
+class TypeProvidersSettingTest : BaseTypeProvidersTest() {
     override fun getSolutionDirectoryName() = "TypeProviderLibrary"
-    override val restoreNuGetPackages = true
-    private val rdFcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
 
     @Test
     fun enableTypeProvidersSetting() {

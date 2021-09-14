@@ -2,6 +2,7 @@ package typeProviders
 
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
+import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
@@ -17,7 +18,7 @@ import withOutOfProcessTypeProviders
 
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
-class GenerativeTypeProvidersTest: BaseTestWithSolution() {
+class GenerativeTypeProvidersTest: BaseTypeProvidersTest() {
     override fun getSolutionDirectoryName() = "TypeProviderLibrary"
 
     @Test(enabled = false)

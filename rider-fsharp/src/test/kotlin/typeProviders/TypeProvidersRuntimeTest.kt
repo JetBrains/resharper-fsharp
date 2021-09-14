@@ -17,11 +17,8 @@ import org.testng.annotations.Test
 import withOutOfProcessTypeProviders
 
 @Test
-class TypeProvidersRuntimeTest : BaseTestWithSolution() {
+class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
     override fun getSolutionDirectoryName() = "CoreTypeProviderLibrary"
-    override val restoreNuGetPackages = true
-
-    private val rdFcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
 
     @Test
     @TestEnvironment(

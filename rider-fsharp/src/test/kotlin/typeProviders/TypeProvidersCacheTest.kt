@@ -18,9 +18,8 @@ import java.io.File
 
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
-class TypeProvidersCacheTest : BaseTestWithSolution() {
+class TypeProvidersCacheTest : BaseTypeProvidersTest() {
     override fun getSolutionDirectoryName() = "TypeProviderLibrary"
-    override val restoreNuGetPackages = true
     private val sourceFile = "TypeProviderLibrary/Caches.fs"
 
     private fun checkTypeProviders() {
