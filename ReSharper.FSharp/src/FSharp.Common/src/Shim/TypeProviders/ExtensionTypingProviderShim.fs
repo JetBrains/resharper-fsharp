@@ -28,6 +28,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
     let lifetime = solution.GetLifetime()
     let defaultShim = ExtensionTypingProvider
     let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
+    let traceCategories = loggerModel.TraceCategories
     let createProcessLockObj = obj()
 
     let [<VolatileField>] mutable connection: TypeProvidersConnection = null
@@ -55,9 +56,10 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
             typeProvidersManager <- TypeProvidersManager(newConnection) :?> _
 
             connection <- newConnection
+
             connection.ExecuteWithCatch(fun _ ->
-                loggerModel.TraceCategories.Change.Advise(lifetime, fun categories -> configureTracing categories))
-            configureTracing loggerModel.TraceCategories.Value)
+                traceCategories.Change.Advise(lifetime, fun categories -> configureTracing categories))
+            configureTracing traceCategories.Value)
 
     do
         lifetime.Bracket((fun () -> ExtensionTypingProvider <- this),

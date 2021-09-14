@@ -24,6 +24,7 @@ module internal Reflection =
 type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, loggerModel: LoggerModel) =
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
+    let traceCategories = loggerModel.TraceCategories
 
     let toEditorConfigName name = $"{fSharpEditorConfigPrefix}{StringUtil.MakeUnderscoreCaseName(name)}"
 
@@ -39,9 +40,11 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
         let formatterHostLifetime = Lifetime.Define(solution.GetLifetime())
         let lifetime = formatterHostLifetime.Lifetime
         connection <- fantomasFactory.Create(lifetime).Run()
+
         connection.Execute(fun _ ->
-            loggerModel.TraceCategories.Change.Advise(lifetime, fun categories -> configureTracing categories))
+            traceCategories.Change.Advise(lifetime, fun categories -> configureTracing categories))
         configureTracing loggerModel.TraceCategories.Value
+
         formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance))
 
     let convertRange (range: range) =
