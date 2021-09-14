@@ -363,5 +363,7 @@ object RdFSharpTypeProvidersModel : Root() {
         field("RdProvidedConstructorInfoProcessModel", RdProvidedConstructorInfoProcessModel)
         field("RdProvidedAssemblyProcessModel", RdProvidedAssemblyProcessModel)
         field("RdTestHost", RdTestHost)
+
+        property("EnableTracing", bool)
     }
 }

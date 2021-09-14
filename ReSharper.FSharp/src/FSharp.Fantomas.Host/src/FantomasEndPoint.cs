@@ -15,7 +15,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
   internal class FantomasEndPoint : ProtocolEndPoint<RdFantomasModel, RdSimpleDispatcher>
   {
+    private LifetimeDefinition myLoggerLifetime = Lifetime.Define(Lifetime.Terminated);
     private readonly FantomasCodeFormatter myCodeFormatter;
+    private string myLoggingPath;
     protected override string ProtocolName => "Fantomas Host";
 
     public FantomasEndPoint() : base(FantomasProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE) =>
@@ -24,12 +26,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     protected override RdSimpleDispatcher InitDispatcher(Lifetime lifetime, ILogger logger) =>
       new RdSimpleDispatcher(lifetime, logger);
 
-    protected override void InitLogger(Lifetime lifetime, string path) =>
-      ProtocolEndPointUtil.InitLogger(path, lifetime, LoggingLevel.TRACE);
+    protected override void InitLogger(Lifetime lifetime, string path) => myLoggingPath = path;
 
     protected override RdFantomasModel InitModel(Lifetime lifetime, JetBrains.Rd.Impl.Protocol protocol)
     {
       var model = new RdFantomasModel(lifetime, protocol);
+      model.EnableTracing.Advise(lifetime, enabled => ConfigureTracing(lifetime, enabled));
 
       model.GetFormatConfigFields.Set(GetFormatConfigFields);
       model.FormatSelection.Set(FormatSelection);
@@ -46,5 +48,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private string FormatDocument(RdFantomasFormatDocumentArgs args) => myCodeFormatter.FormatDocument(args);
 
     protected override void Run(Lifetime lifetime, RdSimpleDispatcher dispatcher) => dispatcher.Run();
+
+    private void ConfigureTracing(Lifetime lifetime, bool enable)
+    {
+      if (enable && myLoggerLifetime.Lifetime.IsNotAlive)
+      {
+        myLoggerLifetime = Lifetime.Define(lifetime);
+        ProtocolEndPointUtil.InitLogger(myLoggingPath, myLoggerLifetime.Lifetime, LoggingLevel.TRACE);
+      }
+
+      else myLoggerLifetime.Terminate();
+    }
   }
 }

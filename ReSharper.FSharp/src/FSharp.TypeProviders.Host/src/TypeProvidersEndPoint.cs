@@ -14,7 +14,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
   public class
     TypeProvidersEndPoint : ProtocolEndPoint<RdFSharpTypeProvidersModel, RdSimpleDispatcher>
   {
+    private LifetimeDefinition myLoggerLifetime = Lifetime.Define(Lifetime.Terminated);
     private RdSimpleDispatcher myDispatcher;
+    private string myLoggingPath;
 
     protected override string ProtocolName => "Out-of-Process Type Providers Host";
 
@@ -28,15 +30,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
       return myDispatcher;
     }
 
-    protected override void InitLogger(Lifetime lifetime, string path)
-    {
-      ProtocolEndPointUtil.InitLogger(path, lifetime, LoggingLevel.TRACE);
-      Logger.Log(LoggingLevel.INFO, $"Process Runtime: {RuntimeInformation.FrameworkDescription}");
-    }
+    protected override void InitLogger(Lifetime lifetime, string path) => myLoggingPath = path;
 
     protected override RdFSharpTypeProvidersModel InitModel(Lifetime lifetime, Rd.Impl.Protocol protocol)
     {
       var model = new RdFSharpTypeProvidersModel(lifetime, protocol);
+      model.EnableTracing.Advise(lifetime, enabled => ConfigureTracing(lifetime, enabled));
+
       var typeProvidersContext = new TypeProvidersContext(Logger);
 
       new TypeProvidersHost(typeProvidersContext).Initialize(model.RdTypeProviderProcessModel);
@@ -50,5 +50,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     }
 
     protected override void Run(Lifetime lifetime, RdSimpleDispatcher dispatcher) => dispatcher.Run();
+
+    private void ConfigureTracing(Lifetime lifetime, bool enable)
+    {
+      if (enable && myLoggerLifetime.Lifetime.IsNotAlive)
+      {
+        myLoggerLifetime = Lifetime.Define(lifetime);
+        ProtocolEndPointUtil.InitLogger(myLoggingPath, myLoggerLifetime.Lifetime, LoggingLevel.TRACE);
+        Logger.Log(LoggingLevel.INFO, $"Process Runtime: {RuntimeInformation.FrameworkDescription}");
+      }
+
+      else myLoggerLifetime.Terminate();
+    }
   }
 }

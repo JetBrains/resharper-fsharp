@@ -39,6 +39,7 @@ object RdFantomasModel : Root() {
             field("range", rdFcsRange)
         }, string)
 
+        property("EnableTracing", bool)
         signal("exit", void)
     }
 }

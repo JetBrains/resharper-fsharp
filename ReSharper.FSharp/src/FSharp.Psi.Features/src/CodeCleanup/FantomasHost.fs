@@ -9,6 +9,7 @@ open JetBrains.Rd.Tasks
 open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client
 open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCleanup.FSharpEditorConfig
+open JetBrains.Rider.Model.Loggers
 open JetBrains.Util
 
 module internal Reflection =
@@ -20,7 +21,7 @@ module internal Reflection =
 
 
 [<SolutionComponent>]
-type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) =
+type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, loggerModel: LoggerModel) =
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
 
@@ -29,10 +30,18 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) 
     let isConnectionAlive () =
         isNotNull connection && connection.IsActive
 
+    let configureTracing (categories: System.Collections.Generic.List<string>) =
+        connection.Execute(fun _ ->
+            connection.ProtocolModel.EnableTracing.Value <- categories.Contains("JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host"))
+
     let connect () =
         if isConnectionAlive () then () else
         let formatterHostLifetime = Lifetime.Define(solution.GetLifetime())
-        connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime).Run()
+        let lifetime = formatterHostLifetime.Lifetime
+        connection <- fantomasFactory.Create(lifetime).Run()
+        connection.Execute(fun _ ->
+            loggerModel.TraceCategories.Change.Advise(lifetime, fun categories -> configureTracing categories))
+        configureTracing loggerModel.TraceCategories.Value
         formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance))
 
     let convertRange (range: range) =
