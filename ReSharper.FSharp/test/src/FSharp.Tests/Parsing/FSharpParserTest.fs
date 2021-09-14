@@ -331,6 +331,11 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - ObjExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - ObjExpr 02 - Interface``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - ObjExpr - Member - Property - Accessors 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - ObjExpr - Member - Property - Accessors 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - ObjExpr - Member - Property - Accessors 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - ObjExpr - Member - Property - Accessors 04 - Interface``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - ObjExpr - Member - Property - Accessors 05 - Interface``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - ImplicitZero 01``() = x.DoNamedTest()
 

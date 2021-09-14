@@ -227,11 +227,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         | _ ->
 
         let mark =
-            match unfinishedDeclaration with
-            | Some(mark, unfinishedRange, _) when unfinishedRange = typeMember.Range ->
-                isFinishingDeclaration <- true
-                unfinishedDeclaration <- None
-                mark
+            match x.ContinueMemberDecl(typeMember.Range) with
+            | ValueSome(mark) -> mark
             | _ ->
                 let mark = x.MarkXmlDocOwner(typeMember.XmlDoc, null, typeMember.Range)
                 x.ProcessAttributeLists(typeMember.Attributes)
@@ -293,9 +290,32 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
             | _ -> failwithf "Unexpected type member: %A" typeMember
 
+        x.FinishMemberDecl(typeMember.Range, mark, memberType)
+
+    member x.ProcessObjExprMember(binding) =
+        let (SynBinding(range = range)) = binding
+        let mark =
+            match x.ContinueMemberDecl(range) with
+            | ValueSome(mark) -> mark
+            | _ ->
+                x.EnsureMembersAreFinished()
+                x.Mark(range)
+
+        let elementType = x.ProcessMemberBinding(mark, binding, range)
+        x.FinishMemberDecl(range, mark, elementType)
+
+    member x.ContinueMemberDecl(range: range) =
+        match unfinishedDeclaration with
+        | Some(mark, unfinishedRange, _) when unfinishedRange.Start = range.Start ->
+            isFinishingDeclaration <- true
+            unfinishedDeclaration <- None
+            ValueSome(mark)
+        | _ -> ValueNone
+
+    member x.FinishMemberDecl(range, mark, elementType) =
         isFinishingDeclaration <- false
         if unfinishedDeclaration.IsNone then
-            x.Done(typeMember.Range, mark, memberType)
+            x.Done(range, mark, elementType)
 
     member x.ProcessMemberBinding(mark, SynBinding(_, _, _, _, _, _, valData, headPat, returnInfo, expr, _, _), range) =
         let elType =
@@ -790,6 +810,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushRange(range, ElementType.OBJ_EXPR)
             x.ProcessTypeAsTypeReferenceName(synType)
             x.PushStepList(interfaceImpls, interfaceImplementationListProcessor)
+            x.PushStep((), finishObjectExpressionMemberListProcessor)
             x.PushStepList(bindings, objectExpressionMemberListProcessor)
 
             match args with
@@ -1163,6 +1184,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
 
     member x.ProcessInterfaceImplementation(SynInterfaceImpl(interfaceType, bindings, range)) =
         x.PushRange(range, ElementType.INTERFACE_IMPLEMENTATION)
+        x.PushStep((), finishObjectExpressionMemberListProcessor)
         x.ProcessTypeAsTypeReferenceName(interfaceType)
         x.PushStepList(bindings, objectExpressionMemberListProcessor)
 
@@ -1427,14 +1449,20 @@ type MatchClauseListProcessor() =
     override x.Process(matchClause, builder) =
         builder.ProcessMatchClause(matchClause)
 
+
 type ObjectExpressionMemberListProcessor() =
     inherit StepListProcessorBase<SynBinding>()
 
     override x.Process(binding, builder) =
-        let (SynBinding(range = range)) = binding
-        let mark = builder.Mark(range)
-        let elementType = builder.ProcessMemberBinding(mark, binding, range)
-        builder.Done(range, mark, elementType)
+        builder.ProcessObjExprMember(binding)
+
+
+type FinishObjectExpressionMemberProcessor() =
+    inherit StepProcessorBase<unit>()
+
+    override x.Process(_, builder) =
+        builder.EnsureMembersAreFinished()
+
 
 type InterfaceImplementationListProcessor() =
     inherit StepListProcessorBase<SynInterfaceImpl>()
@@ -1488,6 +1516,7 @@ module BuilderStepProcessors =
     let indexerArgsProcessor = IndexerArgsProcessor()
     let recordBindingListRepresentationProcessor = RecordBindingListRepresentationProcessor()
     let anonRecordBindingListRepresentationProcessor = AnonRecordBindingListRepresentationProcessor()
+    let finishObjectExpressionMemberListProcessor = FinishObjectExpressionMemberProcessor()
 
     let expressionListProcessor = ExpressionListProcessor()
     let secondaryBindingListProcessor = SecondaryBindingListProcessor()
