@@ -3,12 +3,12 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpParensUtil
 
 open System
 open FSharp.Compiler.Syntax
-open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -234,7 +234,7 @@ let escapesTupleAppArg (context: IFSharpExpression) (expr: IFSharpExpression) =
 let literalsRequiringParens =
     NodeTypeSet(FSharpTokenType.INT32, FSharpTokenType.IEEE32, FSharpTokenType.IEEE64)
 
-let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
+let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: IFSharpExpression) (expr: IFSharpExpression) =
     if escapesTupleAppArg context expr then true else
     if expr :? IParenExpr then false else
 
@@ -244,11 +244,6 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     let parentPrefixAppExpr = PrefixAppExprNavigator.GetByArgumentExpression(context)
     if isNotNull parentPrefixAppExpr && parentPrefixAppExpr.IsHighPrecedence &&
             isNotNull (QualifiedExprNavigator.GetByQualifier(parentPrefixAppExpr)) then true else
-
-    // todo: calc once?
-    let allowHighPrecedenceAppParens () =
-        let settingsStore = context.GetSettingsStoreWithEditorConfig()
-        settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.AllowHighPrecedenceAppParens)
 
     if isHighPrecedenceAppArg context && allowHighPrecedenceAppParens () then true else
 
@@ -276,7 +271,7 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
         let lastClauseExpr = if isNull lastClause then null else lastClause.Expression
         if isNull lastClauseExpr then false else // todo: or true?
 
-        needsParens context lastClauseExpr ||
+        needsParensImpl allowHighPrecedenceAppParens context lastClauseExpr ||
         lastClauseExpr.Indent = matchExpr.Indent ||
 
         let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(context)
@@ -391,6 +386,13 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
 
     precedence binaryApp.LeftArgument < precedence binaryApp
 
+let allowHighPrecedenceAppParens (node: ITreeNode) =
+    let settingsStore = node.GetSettingsStoreWithEditorConfig()
+    SettingsUtil.getBoundValue<FSharpFormatSettingsKey, bool> settingsStore "AllowHighPrecedenceAppParens"
+
+let needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
+    let allowHighPrecedenceAppParens () = allowHighPrecedenceAppParens context
+    needsParensImpl allowHighPrecedenceAppParens context expr
 
 let addParens (expr: IFSharpExpression) =
     let exprCopy = expr.Copy()

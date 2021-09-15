@@ -5,8 +5,12 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.Util
 open JetBrains.Util.dataStructures
+
+let allowHighPrecedenceAppParensKey = Key<Boxed<bool>>("AllowHighPrecedenceAppParens")
 
 type ElementProblemAnalyzerData with
     member this.LanguageLevel =
@@ -33,3 +37,12 @@ type ElementProblemAnalyzerData with
         this.PutData(parseAndCheckResultsKey, results)
 
         results
+
+    member this.AllowHighPrecedenceAppParens =
+        let value = this.GetData(allowHighPrecedenceAppParensKey)
+        if isNotNull value then value.Value else
+
+        let value = allowHighPrecedenceAppParens this.File
+        this.PutData(allowHighPrecedenceAppParensKey, Boxed(value))
+
+        value

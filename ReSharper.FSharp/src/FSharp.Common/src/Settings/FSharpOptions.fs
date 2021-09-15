@@ -207,3 +207,10 @@ module SettingsUtil =
         let entry = getEntry<'TKey> settingsStore name
         let settingsStoreLive = settingsStore.BindToContextTransient(ContextRange.ApplicationWide)
         settingsStoreLive.GetValue(entry, null) :?> 'TValue
+
+    let getBoundEntry<'TKey> (settingsStore: IContextBoundSettingsStore) name =
+        settingsStore.Schema.GetKey<'TKey>().TryFindEntryByMemberName(name) :?> SettingsScalarEntry
+
+    let getBoundValue<'TKey, 'TValue> (settingsStore: IContextBoundSettingsStore) name =
+        let entry = getBoundEntry<'TKey> settingsStore name
+        settingsStore.GetValue(entry, null) :?> 'TValue

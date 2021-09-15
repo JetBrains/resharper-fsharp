@@ -25,7 +25,8 @@ type RedundantParenExprAnalyzer() =
         let context = parenExpr.IgnoreParentParens()
         if escapesTupleAppArg context innerExpr then () else
 
-        if innerExpr :? IParenExpr || not (needsParens context innerExpr) then
+        let allowHighPrecedenceAppParens () = data.AllowHighPrecedenceAppParens
+        if innerExpr :? IParenExpr || not (needsParensImpl allowHighPrecedenceAppParens context innerExpr) then
             consumer.AddHighlighting(RedundantParenExprWarning(parenExpr))
 
     interface IFSharpRedundantParenAnalyzer
