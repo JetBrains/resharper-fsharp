@@ -37,6 +37,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let locker = JetFastSemiReenterableRWLock()
 
     let fcsProjects = Dictionary<IPsiModule, FcsProject>()
+    let outputPathsPsiModules = Dictionary<string, IPsiModule>()
     let referencedModules = Dictionary<IPsiModule, ReferencedModule>()
     let projectsPsiModules = OneToSetMap<IModule, IPsiModule>()
 
@@ -63,6 +64,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         referencedModules.Remove(psiModule) |> ignore
         fcsProjects.Remove(psiModule) |> ignore
+        outputPathsPsiModules.Remove(fcsProject.OutputPath.FullPath) |> ignore
 
         projectsPsiModules.Remove(psiModule.ContainingProjectModule, psiModule) |> ignore
 
@@ -123,6 +125,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         let fcsProject = { fcsProject with ProjectOptions = fcsProjectOptions }
 
         fcsProjects.[psiModule] <- fcsProject
+        outputPathsPsiModules.[fcsProject.OutputPath.FullPath] <- psiModule
         projectsPsiModules.Add(project, psiModule) |> ignore
 
         for referencedPsiModule in referencedProjectPsiModules do
@@ -287,11 +290,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         member this.GetFcsProject(psiModule) =
             getOrCreateFcsProject psiModule
 
-        member this.GetProjectOutputPaths(project) =
-            seq { for psiModule in projectsPsiModules.[project] do
-                  match tryGetValue psiModule fcsProjects with
-                  | None -> ()
-                  | Some fcsProject -> fcsProject.OutputPath.FullPath }
+        member this.GetPsiModule(outputPath) =
+            match outputPathsPsiModules.TryGetValue(outputPath) with
+            | null -> None
+            | psiModule -> Some(psiModule)
 
 
 /// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
