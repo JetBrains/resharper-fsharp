@@ -6,7 +6,6 @@ using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
 using JetBrains.ReSharper.Psi.Tree;
@@ -20,11 +19,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     where T : class, IFSharpTypeElementDeclaration
   {
     public override ExtensionMethodInfo[] ExtensionMethodInfos { get; } = EmptyArray<ExtensionMethodInfo>.Instance;
+    public string SourceName { get; }
 
     protected FSharpTypePart([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
       int typeParameters, [NotNull] ICacheBuilder cacheBuilder) : base(declaration, shortName, typeParameters)
     {
       Modifiers = memberDecoration;
+      SourceName = cacheBuilder.Intern(declaration.SourceName);
 
       var attrNames = new FrugalLocalHashSet<string>();
       foreach (var attr in declaration.GetAttributes())
@@ -76,6 +77,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     protected FSharpTypePart(IReader reader) : base(reader)
     {
+      SourceName = reader.ReadString();
       Modifiers = MemberDecoration.FromInt(reader.ReadInt());
       AttributeClassNames = reader.ReadStringArray();
       var extensionMethodCount = reader.ReadInt();
@@ -91,6 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected override void Write(IWriter writer)
     {
       base.Write(writer);
+      writer.WriteString(SourceName);
       writer.WriteInt(Modifiers.ToInt());
       writer.WriteStringArray(AttributeClassNames);
 
@@ -160,8 +163,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     protected virtual string PrintTypeParameters() => "";
-
-    public string SourceName =>
-      GetDeclaration()?.SourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
   }
 }
