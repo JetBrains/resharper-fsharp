@@ -80,12 +80,14 @@ module AssemblyReaderShim =
         |> HashSet
 
 [<SolutionComponent>]
-type AssemblyReaderShim(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, psiModules: IPsiModules,
-        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService) as this =
+type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
+        cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService,
+        fsOptionsProvider: FSharpOptionsProvider) as this =
     inherit AssemblyReaderShimBase(lifetime, changeManager)
 
     let isEnabled () =
-        FSharpExperimentalFeatures.IsFSharpExperimentalFeatureEnabled(solution, ExperimentalFeature.AssemblyReaderShim)
+        FSharpExperimentalFeatureCookie.IsEnabled(ExperimentalFeature.AssemblyReaderShim) ||
+        fsOptionsProvider.NonFSharpProjectInMemoryAnalysis.Value
 
     do
         checkerService.AssemblyReaderShim <- this

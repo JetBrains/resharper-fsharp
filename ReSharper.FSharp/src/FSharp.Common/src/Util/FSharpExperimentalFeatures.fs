@@ -32,14 +32,19 @@ type FSharpExperimentalFeatureCookie(feature: ExperimentalFeature) =
 [<AbstractClass; Sealed; Extension>]
 type FSharpExperimentalFeatures() =
     static let isEnabledInSettings (solution: ISolution) feature =
-        let experimentalFeatures = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
-        let fsOptions = solution.GetComponent<FSharpOptionsProvider>()
+        match feature with
+        | ExperimentalFeature.AssemblyReaderShim ->
+            let fsOptions = solution.GetComponent<FSharpOptionsProvider>()
+            fsOptions.NonFSharpProjectInMemoryAnalysis.Value
 
+        | _ ->
+
+        let experimentalFeatures = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
         match feature with
         | ExperimentalFeature.Formatter -> experimentalFeatures.RedundantParensAnalysis.Value
         | ExperimentalFeature.PostfixTemplates -> experimentalFeatures.EnablePostfixTemplates.Value
         | ExperimentalFeature.RedundantParenAnalysis -> experimentalFeatures.RedundantParensAnalysis.Value
-        | ExperimentalFeature.AssemblyReaderShim -> fsOptions.NonFSharpProjectInMemoryAnalysis.Value
+        | _ -> failwith $"Unexpected feature: {feature}"
 
     [<Extension>]
     static member IsFSharpExperimentalFeatureEnabled(solution: ISolution, feature: ExperimentalFeature) =
