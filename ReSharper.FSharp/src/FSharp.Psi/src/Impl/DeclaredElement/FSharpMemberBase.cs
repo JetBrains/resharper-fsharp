@@ -87,6 +87,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
       get
       {
+        if (!IsExplicitImplementation)
+          return EmptyList<IExplicitImplementation>.Instance;
+
         var mfv = Mfv;
         if (mfv == null)
           return EmptyList<IExplicitImplementation>.Instance;
