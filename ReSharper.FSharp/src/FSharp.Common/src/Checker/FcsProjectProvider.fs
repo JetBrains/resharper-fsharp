@@ -26,8 +26,9 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Threading
 open JetBrains.Util
 
+
 [<AutoOpen>]
-module FcsProjectProviderUtils =
+module FcsProjectProvider =
     let isProjectModule (psiModule: IPsiModule) =
         psiModule :? IProjectPsiModule
 
@@ -311,7 +312,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         member this.GetFcsProject(psiModule) =
             getOrCreateFcsProject psiModule
-
 
 /// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
 [<SolutionComponent>]

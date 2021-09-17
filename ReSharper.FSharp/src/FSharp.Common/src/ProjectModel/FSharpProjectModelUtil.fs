@@ -30,7 +30,6 @@ let getReferencedModules (psiModule: IPsiModule) =
         | _ -> true)
     |> Seq.map (fun reference -> reference.Module)
 
-
 module ModulePathProvider =
     let outputPathKey = Key<VirtualFileSystemPath>("AssemblyReaderTest.outputPath")
 
