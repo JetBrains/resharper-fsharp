@@ -197,4 +197,3 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member this.GetProjectOptions(_: IPsiModule): FSharpProjectOptions option = failwith "todo"
 
         member this.GetFcsProject(psiModule) = Some (getFcsProject psiModule)
-        member this.GetPsiModule _ = failwith "todo"

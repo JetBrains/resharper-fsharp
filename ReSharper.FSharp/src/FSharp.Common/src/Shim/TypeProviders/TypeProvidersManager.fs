@@ -8,7 +8,9 @@ open FSharp.Compiler.ExtensionTyping
 open FSharp.Core.CompilerServices
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Build
 open JetBrains.ReSharper.Plugins.FSharp.Checker
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.FSharpProjectModelUtil
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.TcImportsHack
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
@@ -16,10 +18,8 @@ open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.Rd.Tasks
-open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Rider.FSharp.TypeProviders.Protocol.Client
 open JetBrains.Util.Concurrency
-open JetBrains.Util.dataStructures
 
 type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = ConcurrentDictionary<_, ConcurrentDictionary<_, IProxyTypeProvider>>()
@@ -84,27 +84,23 @@ type IProxyTypeProvidersManager =
     abstract member HasGenerativeTypeProviders: project: IProject -> bool
     abstract member Dump: unit -> string
 
-type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvider: IFcsProjectProvider) =
+type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvider: IFcsProjectProvider,
+                          outputAssemblies: OutputAssemblies) =
     let protocol = connection.ProtocolModel.RdTypeProviderProcessModel
     let lifetime = connection.Lifetime
     let tpContext = TypeProvidersContext(connection)
     let typeProviders = TypeProvidersCache()
     let lock = SpinWaitLockRef()
-    let projectPsiModulesWithGenerativeProviders = Dictionary<IProject, FrugalLocalList<IPsiModule>>()
+    let projectsWithGenerativeProviders = HashSet<IProject>()
 
-    let cachePsiModuleWithGenerativeProvider outputPath =
-        match fcsProjectProvider.GetPsiModule(outputPath) with
-        | Some psiModule ->
+    let addProjectWithGenerativeProvider outputPath =
+        let outputAssemblyPath = VirtualFileSystemPath.Parse(outputPath, InteractionContext.SolutionContext)
+        Assertion.Assert(not outputAssemblyPath.IsEmpty, "OutputAssemblyPath expected to be not empty")
+        match outputAssemblies.TryGetProjectByOutputAssemblyLocation(outputAssemblyPath) with
+        | null -> ()
+        | project ->
             use lock = lock.Push()
-            let project = (getModuleProject psiModule).NotNull()
-            match projectPsiModulesWithGenerativeProviders.TryGetValue(project) with
-            | true, psiModules when psiModules.Contains(psiModule) -> ()
-            | true, psiModules -> psiModules.Add(psiModule)
-            | _ ->
-                let psiModules = FrugalLocalList()
-                psiModules.Add(psiModule)
-                projectPsiModulesWithGenerativeProviders.Add(project, psiModules)
-        | None -> ()
+            projectsWithGenerativeProviders.Add(project) |> ignore
 
     do
         connection.Execute(fun () ->
@@ -113,12 +109,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
         fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun psiModule ->
             use lock = lock.Push()
             let project = (getModuleProject psiModule).NotNull()
-            match projectPsiModulesWithGenerativeProviders.TryGetValue(project) with
-            | true, psiModules when psiModules.Contains(psiModule) ->
-                psiModules.Remove(psiModule) |> ignore
-                if psiModules.Count = 0 then
-                    projectPsiModulesWithGenerativeProviders.Remove(project) |> ignore
-            | _ -> ())
+            projectsWithGenerativeProviders.Remove(project) |> ignore)
 
     interface IProxyTypeProvidersManager with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
@@ -140,7 +131,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
             let typeProviderProxies =
                 [ for tp in result.TypeProviders ->
                      let tp = new ProxyTypeProvider(tp, tpContext)
-                     tp.ContainsGenerativeTypes.Add(fun _ -> cachePsiModuleWithGenerativeProvider outputPath)
+                     tp.ContainsGenerativeTypes.Add(fun _ -> addProjectWithGenerativeProvider outputPath)
                      typeProviders.Add(outputPath, designTimeAssemblyNameString, tp)
                      tp :> ITypeProvider
 
@@ -153,7 +144,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
 
         member this.HasGenerativeTypeProviders(project) =
             use lock = lock.Push()
-            projectPsiModulesWithGenerativeProviders.ContainsKey(project)
+            projectsWithGenerativeProviders.Contains(project)
 
         member this.Dump() =
             $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"

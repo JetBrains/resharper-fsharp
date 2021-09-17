@@ -12,6 +12,8 @@ let getModuleResolveContext (resolveContextManager: PsiModuleResolveContextManag
     let project = psiModule.ContainingProjectModule :?> IProject
     getResolveContext resolveContextManager project psiModule
 
+let getModuleProject (psiModule: IPsiModule) =
+    psiModule.ContainingProjectModule.As<IProject>()
 
 let getReferencedModules (psiModule: IPsiModule) =
     let project = psiModule.ContainingProjectModule :?> _
@@ -27,6 +29,7 @@ let getReferencedModules (psiModule: IPsiModule) =
         | :? IProjectPsiModule as projectPsiModule -> projectPsiModule != project
         | _ -> true)
     |> Seq.map (fun reference -> reference.Module)
+
 
 module ModulePathProvider =
     let outputPathKey = Key<VirtualFileSystemPath>("AssemblyReaderTest.outputPath")

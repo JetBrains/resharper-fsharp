@@ -8,6 +8,7 @@ open FSharp.Core.CompilerServices
 open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Build
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
@@ -24,7 +25,7 @@ type IProxyExtensionTypingProvider =
 [<SolutionComponent>]
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         experimentalFeatures: FSharpExperimentalFeaturesProvider, fcsProjectProvider: IFcsProjectProvider,
-        typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory) as this =
+        outputAssemblies: OutputAssemblies, typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory) as this =
     let lifetime = solution.GetLifetime()
     let defaultShim = ExtensionTypingProvider
     let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
@@ -48,7 +49,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
 
             typeProvidersHostLifetime <- Lifetime.Define(lifetime)
             let newConnection = typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime).Run()
-            typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider) :?> _
+            typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, outputAssemblies) :?> _
             connection <- newConnection)
 
     do

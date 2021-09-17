@@ -26,6 +26,31 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Threading
 open JetBrains.Util
 
+[<AutoOpen>]
+module FcsProjectProviderUtils =
+    let isProjectModule (psiModule: IPsiModule) =
+        psiModule :? IProjectPsiModule
+
+    let isMiscModule (psiModule: IPsiModule) =
+        psiModule.IsMiscFilesProjectModule()
+
+    let isFSharpProject (projectModelModule: IModule) =
+        match projectModelModule with
+        | :? IProject as project -> project.IsFSharp // todo: check `isOpened`?
+        | _ -> false
+
+    let isFSharpProjectModule (psiModule: IPsiModule) =
+        psiModule.IsValid() && isFSharpProject psiModule.ContainingProjectModule // todo: remove isValid check?
+
+    let [<Literal>] invalidateProjectChangeType =
+        ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.TARGET_FRAMEWORK |||
+        ProjectModelChangeType.REFERENCE_TARGET ||| ProjectModelChangeType.REMOVED
+
+    let [<Literal>] invalidateChildChangeType =
+        ProjectModelChangeType.ADDED ||| ProjectModelChangeType.REMOVED |||
+        ProjectModelChangeType.MOVED_IN ||| ProjectModelChangeType.MOVED_OUT |||
+        ProjectModelChangeType.REFERENCE_TARGET
+
 [<SolutionComponent>]
 type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
@@ -37,7 +62,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let locker = JetFastSemiReenterableRWLock()
 
     let fcsProjects = Dictionary<IPsiModule, FcsProject>()
-    let outputPathsPsiModules = Dictionary<string, IPsiModule>()
     let referencedModules = Dictionary<IPsiModule, ReferencedModule>()
     let projectsPsiModules = OneToSetMap<IModule, IPsiModule>()
 
@@ -64,7 +88,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         referencedModules.Remove(psiModule) |> ignore
         fcsProjects.Remove(psiModule) |> ignore
-        outputPathsPsiModules.Remove(fcsProject.OutputPath.FullPath) |> ignore
 
         projectsPsiModules.Remove(psiModule.ContainingProjectModule, psiModule) |> ignore
 
@@ -125,7 +148,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         let fcsProject = { fcsProject with ProjectOptions = fcsProjectOptions }
 
         fcsProjects.[psiModule] <- fcsProject
-        outputPathsPsiModules.[fcsProject.OutputPath.FullPath] <- psiModule
         projectsPsiModules.Add(project, psiModule) |> ignore
 
         for referencedPsiModule in referencedProjectPsiModules do
@@ -289,11 +311,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         member this.GetFcsProject(psiModule) =
             getOrCreateFcsProject psiModule
-
-        member this.GetPsiModule(outputPath) =
-            match outputPathsPsiModules.TryGetValue(outputPath) with
-            | null -> None
-            | psiModule -> Some(psiModule)
 
 
 /// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
