@@ -508,7 +508,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (GetTypeKind(declaration.Attributes, out var typeKind))
         return typeKind;
 
-      foreach (var member in declaration.TypeMembersEnumerable)
+      var typeMembers = declaration.TypeMembersEnumerable;
+      if (typeMembers.IsEmpty())
+        return PartKind.Class;
+
+      foreach (var member in typeMembers)
         if (!(member is IInterfaceInherit) && !(member is IAbstractMemberDeclaration))
           return PartKind.Class;
 

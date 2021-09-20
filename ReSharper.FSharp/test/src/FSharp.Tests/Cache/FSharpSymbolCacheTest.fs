@@ -37,6 +37,7 @@ type FSharpSymbolCacheTest() =
     [<Test>] member x.``Namespace 05 - Multiple qualifiers``() = x.DoNamedTest()
 
     [<Test>] member x.``Class 01``() = x.DoNamedTest()
+    [<Test>] member x.``Class 02 - Hidden impl``() = x.DoNamedTest()
 
     [<Test>] member x.``Interface 01 - Explicit``() = x.DoNamedTest()
     [<Test>] member x.``Interface 02 - Attribute``() = x.DoNamedTest()
