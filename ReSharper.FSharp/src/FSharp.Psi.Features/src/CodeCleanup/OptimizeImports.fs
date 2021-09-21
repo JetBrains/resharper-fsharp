@@ -20,7 +20,7 @@ type FSharpOptimizeImports() =
             sourceFile.PrimaryPsiLanguage :? FSharpLanguage
 
         member this.IsAvailable(profile: CodeCleanupProfile): bool =
-            profile.GetSetting(OptimizeUsings.OPTIMIZE_USINGS_DESCRIPTOR).OptimizeUsings
+            profile.GetSetting(OptimizeUsings.OptimizeUsingsDescriptor)
 
         member this.Process(sourceFile, _, _, _, _) =
             sourceFile.GetPsiServices().Transactions.Execute("Code cleanup", fun _ ->
