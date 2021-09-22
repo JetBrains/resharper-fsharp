@@ -1,0 +1,14 @@
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+    var _ = t.A;
+    t.A = 1;
+  }
+}
+
+---------------------------------------------------------
+M:T.#ctor
+P:T.A
+P:T.A
