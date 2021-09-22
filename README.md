@@ -2,7 +2,6 @@
 
 [![JetBrains official project](https://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 [![Join the chat at https://gitter.im/JetBrains/resharper-fsharp](https://badges.gitter.im/JetBrains/resharper-fsharp.svg)](https://gitter.im/JetBrains/resharper-fsharp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-![build-test](https://github.com/JetBrains/resharper-fsharp/workflows/build-test/badge.svg)
 
 F# support in Rider is implemented as a plugin made of two major components: 
 * ReSharper.Host plugin (referred to as the *backend*) that adds F# support to ReSharper and is implemented in ReSharper.FSharp solution. ReSharper.Host is a modification of ReSharper used as a language service that the IntelliJ Platform interacts with. The backend is written in F# and C#.
