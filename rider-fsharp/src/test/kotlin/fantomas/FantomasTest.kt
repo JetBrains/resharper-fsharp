@@ -2,6 +2,7 @@ package fantomas
 
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.enums.CoreVersion
@@ -15,6 +16,8 @@ import withEditorConfig
 @TestEnvironment(coreVersion = CoreVersion.DEFAULT)
 class FantomasTest : EditorTestBase() {
     override fun getSolutionDirectoryName() = "FormatCodeApp"
+    override val traceCategories: List<String>
+        get() = super.traceCategories + listOf(FSharpLogTraceScenarios.FantomasTraceScenarioName)
 
     @Test
     fun withEditorConfig() = doTest("EditorConfig.fs")

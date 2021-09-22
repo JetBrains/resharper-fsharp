@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
+open JetBrains.Rider.Model.Loggers
 
 type IProxyExtensionTypingProvider =
     inherit IExtensionTypingProvider
@@ -22,10 +23,12 @@ type IProxyExtensionTypingProvider =
 [<SolutionComponent>]
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         experimentalFeatures: FSharpExperimentalFeaturesProvider,
-        typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory) as this =
+        typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory,
+        loggerModel: LoggerModel) as this =
     let lifetime = solution.GetLifetime()
     let defaultShim = ExtensionTypingProvider
     let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
+    let traceCategories = loggerModel.TraceCategories
     let createProcessLockObj = obj()
 
     let [<VolatileField>] mutable connection: TypeProvidersConnection = null
@@ -38,6 +41,10 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
     let terminateConnection () =
         if isConnectionAlive() then typeProvidersHostLifetime.Terminate()
 
+    let configureTracing (categories: System.Collections.Generic.List<string>) =
+        connection.ExecuteWithCatch(fun _ ->
+            connection.ProtocolModel.EnableTracing.Value <- categories.Contains("JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host"))
+
     let connect () =
         if isConnectionAlive () then () else
 
@@ -47,7 +54,12 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
             typeProvidersHostLifetime <- Lifetime.Define(lifetime)
             let newConnection = typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime).Run()
             typeProvidersManager <- TypeProvidersManager(newConnection) :?> _
-            connection <- newConnection)
+
+            connection <- newConnection
+
+            connection.ExecuteWithCatch(fun _ ->
+                traceCategories.Change.Advise(lifetime, fun categories -> configureTracing categories))
+            configureTracing traceCategories.Value)
 
     do
         lifetime.Bracket((fun () -> ExtensionTypingProvider <- this),
