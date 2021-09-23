@@ -43,7 +43,7 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
     fun net5() = doTest(".NET 5")
 
     @Test
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_6)
+    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_6)
     fun net6() = doTest(".NET 6")
 
     @Test(enabled = false)
