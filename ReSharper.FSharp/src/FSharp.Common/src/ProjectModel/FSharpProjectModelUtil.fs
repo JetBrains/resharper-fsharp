@@ -12,6 +12,8 @@ let getModuleResolveContext (resolveContextManager: PsiModuleResolveContextManag
     let project = psiModule.ContainingProjectModule :?> IProject
     getResolveContext resolveContextManager project psiModule
 
+let getModuleProject (psiModule: IPsiModule) =
+    psiModule.ContainingProjectModule.As<IProject>()
 
 let getReferencedModules (psiModule: IPsiModule) =
     let project = psiModule.ContainingProjectModule :?> _

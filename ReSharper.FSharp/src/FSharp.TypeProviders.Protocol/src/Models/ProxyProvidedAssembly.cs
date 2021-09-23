@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       {
         // Version can be null for generated runtime assemblies
         Version = version == null ? null : Version.Parse(version),
-        Flags = (AssemblyNameFlags) flags
+        Flags = (AssemblyNameFlags)flags
       };
 
       if (rdPublicKey == null) return assemblyName;

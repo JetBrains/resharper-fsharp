@@ -1,8 +1,10 @@
 ﻿namespace  JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 
 open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.Rider.Backend.Product
+open JetBrains.ProjectModel
+open JetBrains.ProjectModel.NuGet
 
 [<ZoneMarker>]
 type ZoneMarker() =
-    interface IRequire<IRiderProductEnvironmentZone>
+    interface IRequire<IProjectModelZone>
+    interface IRequire<INuGetZone>

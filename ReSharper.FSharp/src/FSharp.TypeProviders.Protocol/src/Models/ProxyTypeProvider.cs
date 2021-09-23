@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       myProvidedNamespaces = new InterruptibleLazy<IProvidedNamespace[]>(
         myTypeProvidersContext.Connection
           .ExecuteWithCatch(() => RdTypeProviderProcessModel.GetProvidedNamespaces.Sync(EntityId, RpcTimeouts.Maximal))
-          .Select(t => new ProxyProvidedNamespace(t, myRdTypeProvider.EntityId, myTypeProvidersContext))
+          .Select(t => new ProxyProvidedNamespace(t, this, myTypeProvidersContext))
           .ToArray());
     }
 
@@ -43,7 +43,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     }
 
     public void IncrementVersion() => ++myVersion;
-    public bool IsInvalidated { get; private set; }
+    private bool IsInvalidated { get; set; }
+
+    public bool IsGenerative
+    {
+      get => myIsGenerative;
+      set
+      {
+        ContainsGenerativeTypes?.Invoke(this, EventArgs.Empty);
+        myIsGenerative = value;
+      }
+    }
+
 
     public IProvidedNamespace[] GetNamespaces() => myProvidedNamespaces.Value;
 
@@ -95,8 +106,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       Disposed?.Invoke(this, EventArgs.Empty);
     }
 
+    public event EventHandler ContainsGenerativeTypes;
     public event EventHandler Invalidate;
     public event EventHandler Disposed;
+    private bool myIsGenerative;
     private bool myIsDisposed;
     private int myVersion;
     private readonly InterruptibleLazy<IProvidedNamespace[]> myProvidedNamespaces;

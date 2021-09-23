@@ -5,16 +5,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
   public class ProxyProvidedVar : ProvidedVar
   {
-    private ProxyProvidedVar(string name, bool isMutable, ProvidedType type, ProvidedTypeContextHolder context) :
-      base(null, context.Context)
+    private ProxyProvidedVar(string name, bool isMutable, ProvidedType type) :
+      base(null, type.Context)
     {
       Name = name;
       IsMutable = isMutable;
       Type = type;
     }
 
-    public static ProxyProvidedVar Create(string name, bool isMutable, ProvidedType type,
-      ProvidedTypeContextHolder context) => new ProxyProvidedVar(name, isMutable, type, context);
+    public static ProxyProvidedVar Create(string name, bool isMutable, ProvidedType type) =>
+      new ProxyProvidedVar(name, isMutable, type);
 
     public override string Name { get; }
 

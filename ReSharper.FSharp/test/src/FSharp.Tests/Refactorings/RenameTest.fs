@@ -121,6 +121,7 @@ type FSharpRenameTest() =
     [<Test>] member x.``Types - New expr 01``() = x.DoNamedTest()
 
     [<TestPackages(SqlProviderPackage, Inherits = true)>]
+    [<TestSetting(typeof<JetBrains.ReSharper.Plugins.FSharp.Settings.FSharpExperimentalFeatures>, "OutOfProcessTypeProviders", "false")>]
     [<Test>] member x.``Types - Arg - Expr 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Interface 01 - Impl``() = x.DoNamedTest()

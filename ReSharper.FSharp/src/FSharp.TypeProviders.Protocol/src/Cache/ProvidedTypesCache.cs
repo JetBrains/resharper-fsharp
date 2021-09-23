@@ -4,10 +4,11 @@ using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
+using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 {
-  public class ProvidedTypesCache : ProvidedEntitiesCacheBase<ProxyProvidedType, int, ProvidedTypeContextHolder>
+  public class ProvidedTypesCache : ProvidedEntitiesCacheBase<ProxyProvidedType, int, ProvidedTypeContext>
   {
     private RdProvidedTypeProcessModel ProvidedTypeProcessModel =>
       TypeProvidersContext.Connection.ProtocolModel.RdProvidedTypeProcessModel;
@@ -18,19 +19,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     protected override bool KeyHasValue(int key) => key != ProvidedConst.DefaultId;
 
-    protected override ProxyProvidedType Create(int key, int typeProviderId,
-      ProvidedTypeContextHolder context) =>
+    protected override ProxyProvidedType Create(int key, int typeProviderId, ProvidedTypeContext context) =>
       ProxyProvidedType.Create(
         TypeProvidersContext.Connection.ExecuteWithCatch(() =>
           ProvidedTypeProcessModel.GetProvidedType.Sync(key, RpcTimeouts.Maximal)),
-        typeProviderId, TypeProvidersContext, context ?? ProvidedTypeContextHolder.Create());
+        typeProviderId, TypeProvidersContext);
 
-    protected override ProxyProvidedType[] CreateBatch(int[] keys, int typeProviderId,
-      ProvidedTypeContextHolder context) =>
+    protected override ProxyProvidedType[] CreateBatch(int[] keys, int typeProviderId, ProvidedTypeContext context) =>
       TypeProvidersContext.Connection.ExecuteWithCatch(() =>
           ProvidedTypeProcessModel.GetProvidedTypes.Sync(keys, RpcTimeouts.Maximal))
-        .Select(t => ProxyProvidedType.Create(t, typeProviderId, TypeProvidersContext,
-          context ?? ProvidedTypeContextHolder.Create()))
+        .Select(t => ProxyProvidedType.Create(t, typeProviderId, TypeProvidersContext))
         .ToArray();
 
     public override string Dump() =>

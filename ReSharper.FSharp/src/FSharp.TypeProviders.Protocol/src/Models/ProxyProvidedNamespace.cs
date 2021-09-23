@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
@@ -8,30 +9,35 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
+  [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
   public class ProxyProvidedNamespace : IProxyProvidedNamespace
   {
     private readonly RdProvidedNamespace myProvidedNamespace;
 
-    public ProxyProvidedNamespace(RdProvidedNamespace providedNamespace, int typeProviderId,
+    public ProxyProvidedNamespace(RdProvidedNamespace providedNamespace, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext)
     {
       myProvidedNamespace = providedNamespace;
-      var context = ProvidedTypeContextHolder.Create();
 
       myNestedNamespaces = new InterruptibleLazy<ProxyProvidedNamespace[]>(() =>
         providedNamespace.NestedNamespaces
-          .Select(t => new ProxyProvidedNamespace(t, typeProviderId, typeProvidersContext))
+          .Select(t => new ProxyProvidedNamespace(t, typeProvider, typeProvidersContext))
           .ToArray());
 
       myProvidedTypes =
         new InterruptibleLazy<ProvidedType[]>(() =>
-          typeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(providedNamespace.Types, typeProviderId,
-            context));
+        {
+          var types =
+            typeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(providedNamespace.Types, typeProvider.EntityId);
+
+          typeProvider.IsGenerative = types.Any(t => !t.IsErased);
+
+          return types;
+        });
     }
 
     public string NamespaceName => myProvidedNamespace.Name;
 
-    // ReSharper disable once CoVariantArrayConversion
     public IProvidedNamespace[] GetNestedNamespaces() => myNestedNamespaces.Value;
 
     public Type[] GetTypes() =>
@@ -42,8 +48,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public ProvidedType[] GetProvidedTypes() => myProvidedTypes.Value;
 
-    public ProvidedType ResolveProvidedTypeName(string typeName) =>
-      myProvidedTypes.Value.FirstOrDefault(t => t.Name == typeName);
+    public ProvidedType ResolveProvidedTypeName(string typeName)
+    {
+      foreach (var type in myProvidedTypes.Value)
+        if (type.Name == typeName)
+          return type;
+
+      return null;
+    }
 
     private readonly InterruptibleLazy<ProxyProvidedNamespace[]> myNestedNamespaces;
     private readonly InterruptibleLazy<ProvidedType[]> myProvidedTypes;

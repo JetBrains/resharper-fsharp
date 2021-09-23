@@ -2,9 +2,15 @@
 
 open System
 open System.Collections.Concurrent
+open System.Collections.Generic
 open System.Threading
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Core.CompilerServices
+open JetBrains.Diagnostics
+open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Build
+open JetBrains.ReSharper.Plugins.FSharp.Checker
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.FSharpProjectModelUtil
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.TcImportsHack
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
@@ -13,38 +19,39 @@ open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.Rd.Tasks
 open JetBrains.Rider.FSharp.TypeProviders.Protocol.Client
+open JetBrains.Util.Concurrency
 
 type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = ConcurrentDictionary<_, ConcurrentDictionary<_, IProxyTypeProvider>>()
     let proxyTypeProvidersPerId = ConcurrentDictionary<_, _>()
 
-    let rec addTypeProvider envKey (tp: IProxyTypeProvider) =
-        let fullName = tp.GetDisplayName(fullName = true)
+    let rec addTypeProvider projectAssembly tpAssembly (tp: IProxyTypeProvider) =
+        let tpKey = struct(tpAssembly, tp.GetDisplayName(fullName = true))
 
-        match typeProvidersPerAssembly.TryGetValue(envKey) with
+        match typeProvidersPerAssembly.TryGetValue(projectAssembly) with
         | true, assemblyCache ->
-            match assemblyCache.TryGetValue(fullName) with
+            match assemblyCache.TryGetValue(tpKey) with
             | true, oldTp ->
                 oldTp.Dispose()
-                addTypeProvider envKey tp
+                addTypeProvider projectAssembly tpAssembly tp
             | false, _ ->
-                assemblyCache.TryAdd(fullName, tp) |> ignore
+                assemblyCache.TryAdd(tpKey, tp) |> ignore
                 proxyTypeProvidersPerId.TryAdd(tp.EntityId, tp) |> ignore
-                tp.Disposed.Add(fun _ -> removeTypeProvider envKey tp)
+                tp.Disposed.Add(fun _ -> removeTypeProvider projectAssembly tpKey tp.EntityId)
         | false, _ ->
-            typeProvidersPerAssembly.TryAdd(envKey, ConcurrentDictionary()) |> ignore
-            addTypeProvider envKey tp
+            typeProvidersPerAssembly.TryAdd(projectAssembly, ConcurrentDictionary()) |> ignore
+            addTypeProvider projectAssembly tpAssembly tp
 
-    and removeTypeProvider envKey (tp: IProxyTypeProvider) =
+    and removeTypeProvider projectAssembly tpKey tpId =
         // Removes types in a unified manner, may also be disposed by FCS.
-        typeProvidersPerAssembly.[envKey].TryRemove(tp.GetDisplayName(true)) |> ignore
-        proxyTypeProvidersPerId.TryRemove(tp.EntityId) |> ignore
+        typeProvidersPerAssembly.[projectAssembly].TryRemove(tpKey) |> ignore
+        proxyTypeProvidersPerId.TryRemove(tpId) |> ignore
 
-        if typeProvidersPerAssembly.[envKey].Count = 0 then
-            typeProvidersPerAssembly.TryRemove(envKey) |> ignore
+        if typeProvidersPerAssembly.[projectAssembly].Count = 0 then
+            typeProvidersPerAssembly.TryRemove(projectAssembly) |> ignore
 
-    member x.Add(envKey, tp) =
-        addTypeProvider envKey tp
+    member x.Add(projectAssembly, tpAssembly, tp) =
+        addTypeProvider projectAssembly tpAssembly tp
 
     member x.Get(id) =
         let hasValue = SpinWait.SpinUntil((fun () -> proxyTypeProvidersPerId.ContainsKey id), 15_000)
@@ -74,23 +81,42 @@ type IProxyTypeProvidersManager =
         systemRuntimeAssemblyVersion: Version *
         compilerToolsPath: string list -> ITypeProvider list
 
+    abstract member HasGenerativeTypeProviders: project: IProject -> bool
     abstract member Dump: unit -> string
 
-type TypeProvidersManager(connection: TypeProvidersConnection) =
+type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvider: IFcsProjectProvider,
+                          outputAssemblies: OutputAssemblies) =
     let protocol = connection.ProtocolModel.RdTypeProviderProcessModel
     let lifetime = connection.Lifetime
     let tpContext = TypeProvidersContext(connection)
     let typeProviders = TypeProvidersCache()
+    let lock = SpinWaitLockRef()
+    let projectsWithGenerativeProviders = HashSet<IProject>()
 
-    do connection.Execute(fun () ->
-        protocol.Invalidate.Advise(lifetime, fun id -> typeProviders.Get(id).OnInvalidate()))
+    let addProjectWithGenerativeProvider outputPath =
+        let outputAssemblyPath = VirtualFileSystemPath.Parse(outputPath, InteractionContext.SolutionContext)
+        Assertion.Assert(not outputAssemblyPath.IsEmpty, "OutputAssemblyPath expected to be not empty")
+        match outputAssemblies.TryGetProjectByOutputAssemblyLocation(outputAssemblyPath) with
+        | null -> ()
+        | project ->
+            use lock = lock.Push()
+            projectsWithGenerativeProviders.Add(project) |> ignore
+
+    do
+        connection.Execute(fun () ->
+            protocol.Invalidate.Advise(lifetime, fun id -> typeProviders.Get(id).OnInvalidate()))
+
+        fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun psiModule ->
+            use lock = lock.Push()
+            let project = (getModuleProject psiModule).NotNull()
+            projectsWithGenerativeProviders.Remove(project) |> ignore)
 
     interface IProxyTypeProvidersManager with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
                 resolutionEnvironment: ResolutionEnvironment, isInvalidationSupported: bool, isInteractive: bool,
                 systemRuntimeContainsType: string -> bool, systemRuntimeAssemblyVersion: Version,
                 compilerToolsPath: string list) =
-            let envKey = $"{designTimeAssemblyNameString}+{resolutionEnvironment.resolutionFolder}"
+            let outputPath = resolutionEnvironment.outputFile.Value
 
             let result =
                 let fakeTcImports = getFakeTcImports systemRuntimeContainsType
@@ -105,7 +131,8 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
             let typeProviderProxies =
                 [ for tp in result.TypeProviders ->
                      let tp = new ProxyTypeProvider(tp, tpContext)
-                     typeProviders.Add(envKey, tp)
+                     tp.ContainsGenerativeTypes.Add(fun _ -> addProjectWithGenerativeProvider outputPath)
+                     typeProviders.Add(outputPath, designTimeAssemblyNameString, tp)
                      tp :> ITypeProvider
 
                   for id in result.CachedIds ->
@@ -114,6 +141,10 @@ type TypeProvidersManager(connection: TypeProvidersConnection) =
                      tp :> ITypeProvider ]
 
             typeProviderProxies
+
+        member this.HasGenerativeTypeProviders(project) =
+            use lock = lock.Push()
+            projectsWithGenerativeProviders.Contains(project)
 
         member this.Dump() =
             $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"

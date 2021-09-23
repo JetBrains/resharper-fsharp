@@ -19,7 +19,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     /// and will be removed from the caches when Dispose() is called.
     /// </summary>
     void IncrementVersion();
-    bool IsInvalidated { get; }
+    bool IsGenerative { get; set; }
+    event EventHandler ContainsGenerativeTypes;
     event EventHandler Disposed;
   }
 }

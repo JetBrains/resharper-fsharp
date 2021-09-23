@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Rd.Tasks;
@@ -14,12 +15,12 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
+  [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
   public class ProxyProvidedType : ProvidedType, IRdProvidedEntity
   {
     private readonly RdOutOfProcessProvidedType myRdProvidedType;
     private readonly int myTypeProviderId;
     private readonly TypeProvidersContext myTypeProvidersContext;
-    private readonly ProvidedTypeContextHolder myContext;
     public int EntityId => myRdProvidedType.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.TypeInfo;
 
@@ -27,82 +28,64 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       myTypeProvidersContext.Connection.ProtocolModel.RdProvidedTypeProcessModel;
 
     private ProxyProvidedType(RdOutOfProcessProvidedType rdProvidedType, int typeProviderId,
-      TypeProvidersContext typeProvidersContext, ProvidedTypeContextHolder context) : base(null, context.Context)
+      TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myRdProvidedType = rdProvidedType;
       myTypeProviderId = typeProviderId;
       myTypeProvidersContext = typeProvidersContext;
-      myContext = context;
 
       myInterfaces = new InterruptibleLazy<ProvidedType[]>(() =>
         myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(
           myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.GetInterfaces.Sync(EntityId)),
-          typeProviderId, context));
+          typeProviderId));
 
       myGenericArguments = new InterruptibleLazy<ProvidedType[]>(() =>
-        myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(myRdProvidedType.GenericArguments, typeProviderId,
-          context));
+        myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(myRdProvidedType.GenericArguments, typeProviderId));
 
-      myMethods = new InterruptibleLazy<ProvidedMethodInfo[]>(() =>
-        // ReSharper disable once CoVariantArrayConversion
-        myTypeProvidersContext.Connection
-          .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetMethods.Sync(EntityId, RpcTimeouts.Maximal))
-          .Select(t => ProxyProvidedMethodInfo.Create(t, typeProviderId, typeProvidersContext, context))
-          .ToArray());
+      myMethods = new InterruptibleLazy<ProvidedMethodInfo[]>(() => myTypeProvidersContext.Connection
+        .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetMethods.Sync(EntityId, RpcTimeouts.Maximal))
+        .Select(t => ProxyProvidedMethodInfo.Create(t, typeProviderId, typeProvidersContext))
+        .ToArray());
 
       myAllNestedTypes = new InterruptibleLazy<ProvidedType[]>(() =>
-        myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(myTypeProvidersContext.Connection.ExecuteWithCatch(
-            () =>
-              RdProvidedTypeProcessModel.GetAllNestedTypes.Sync(EntityId, RpcTimeouts.Maximal)), typeProviderId,
-          context));
+        myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(
+          myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
+            RdProvidedTypeProcessModel.GetAllNestedTypes.Sync(EntityId, RpcTimeouts.Maximal)), typeProviderId));
 
-      myProperties = new InterruptibleLazy<ProvidedPropertyInfo[]>(() =>
-        // ReSharper disable once CoVariantArrayConversion
-        myTypeProvidersContext.Connection
-          .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetProperties.Sync(EntityId, RpcTimeouts.Maximal))
-          .Select(t => ProxyProvidedPropertyInfo.Create(t, myTypeProviderId, myTypeProvidersContext, context))
-          .ToArray());
+      myProperties = new InterruptibleLazy<ProvidedPropertyInfo[]>(() => myTypeProvidersContext.Connection
+        .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetProperties.Sync(EntityId, RpcTimeouts.Maximal))
+        .Select(t => ProxyProvidedPropertyInfo.Create(t, myTypeProviderId, myTypeProvidersContext))
+        .ToArray());
 
-      myStaticParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() =>
-        // ReSharper disable once CoVariantArrayConversion
-        myTypeProvidersContext.Connection
-          .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetStaticParameters.Sync(EntityId, RpcTimeouts.Maximal))
-          .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, myTypeProvidersContext, context))
-          .ToArray());
+      myStaticParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() => myTypeProvidersContext.Connection
+        .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetStaticParameters.Sync(EntityId, RpcTimeouts.Maximal))
+        .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, myTypeProvidersContext))
+        .ToArray());
 
-      myFields = new InterruptibleLazy<ProvidedFieldInfo[]>(() =>
-        // ReSharper disable once CoVariantArrayConversion
-        myTypeProvidersContext.Connection
-          .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetFields.Sync(EntityId, RpcTimeouts.Maximal))
-          .Select(t => ProxyProvidedFieldInfo.Create(t, myTypeProviderId, typeProvidersContext, context))
-          .ToArray());
+      myFields = new InterruptibleLazy<ProvidedFieldInfo[]>(() => myTypeProvidersContext.Connection
+        .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetFields.Sync(EntityId, RpcTimeouts.Maximal))
+        .Select(t => ProxyProvidedFieldInfo.Create(t, myTypeProviderId, typeProvidersContext))
+        .ToArray());
 
-      myEvents = new InterruptibleLazy<ProvidedEventInfo[]>(() =>
-        // ReSharper disable once CoVariantArrayConversion
-        myTypeProvidersContext.Connection
-          .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetEvents.Sync(EntityId, RpcTimeouts.Maximal))
-          .Select(t => ProxyProvidedEventInfo.Create(t, myTypeProviderId, myTypeProvidersContext, context))
-          .ToArray());
+      myEvents = new InterruptibleLazy<ProvidedEventInfo[]>(() => myTypeProvidersContext.Connection
+        .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetEvents.Sync(EntityId, RpcTimeouts.Maximal))
+        .Select(t => ProxyProvidedEventInfo.Create(t, myTypeProviderId, myTypeProvidersContext))
+        .ToArray());
 
-      myConstructors = new InterruptibleLazy<ProvidedConstructorInfo[]>(() =>
-        // ReSharper disable once CoVariantArrayConversion
-        myTypeProvidersContext.Connection
-          .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetConstructors.Sync(EntityId, RpcTimeouts.Maximal))
-          .Select(t => ProxyProvidedConstructorInfo.Create(t, myTypeProviderId, myTypeProvidersContext, context))
-          .ToArray());
+      myConstructors = new InterruptibleLazy<ProvidedConstructorInfo[]>(() => myTypeProvidersContext.Connection
+        .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetConstructors.Sync(EntityId, RpcTimeouts.Maximal))
+        .Select(t => ProxyProvidedConstructorInfo.Create(t, myTypeProviderId, myTypeProvidersContext))
+        .ToArray());
 
       myCustomAttributes = new InterruptibleLazy<RdCustomAttributeData[]>(() =>
         myTypeProvidersContext.ProvidedCustomAttributeProvider.GetCustomAttributes(this));
     }
 
     [ContractAnnotation("type:null => null")]
-    public static ProxyProvidedType Create(
-      RdOutOfProcessProvidedType type,
-      int typeProviderId,
-      TypeProvidersContext typeProvidersContext,
-      ProvidedTypeContextHolder context) =>
-      type == null ? null : new ProxyProvidedType(type, typeProviderId, typeProvidersContext, context);
+    public static ProxyProvidedType Create(RdOutOfProcessProvidedType type, int typeProviderId,
+      TypeProvidersContext typeProvidersContext) =>
+      type == null ? null : new ProxyProvidedType(type, typeProviderId, typeProvidersContext);
 
     public override string Name => myRdProvidedType.Name;
     public override string FullName => myRdProvidedType.FullName;
@@ -132,14 +115,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
           RdProvidedTypeProcessModel.GenericParameterPosition.Sync(myRdProvidedType.EntityId));
 
     public override ProvidedType BaseType =>
-      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myRdProvidedType.BaseType, myTypeProviderId, myContext);
+      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myRdProvidedType.BaseType, myTypeProviderId);
 
     public override ProvidedType DeclaringType =>
-      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myRdProvidedType.DeclaringType, myTypeProviderId,
-        myContext);
+      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myRdProvidedType.DeclaringType, myTypeProviderId);
 
-    public override ProvidedType GetNestedType(string nm) =>
-      myAllNestedTypes.Value.FirstOrDefault(t => t.Name == nm);
+    public override ProvidedType GetNestedType(string nm)
+    {
+      foreach (var t in myAllNestedTypes.Value)
+        if (t.Name == nm)
+          return t;
+
+      return null;
+    }
 
     public override ProvidedType[] GetNestedTypes() =>
       myAllNestedTypes.Value.Where(t => t.IsPublic || t.IsNestedPublic).ToArray();
@@ -151,12 +139,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         myGenericTypeDefinitionId ??=
           myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.GetGenericTypeDefinition.Sync(EntityId)),
-        myTypeProviderId, myContext);
+        myTypeProviderId);
 
     public override ProvidedPropertyInfo[] GetProperties() => myProperties.Value;
 
-    public override ProvidedPropertyInfo GetProperty(string nm) =>
-      myProperties.Value.FirstOrDefault(t => t.Name == nm);
+    public override ProvidedPropertyInfo GetProperty(string nm)
+    {
+      foreach (var t in myProperties.Value)
+        if (t.Name == nm)
+          return t;
+
+      return null;
+    }
 
     public override int GetArrayRank() =>
       myArrayRank ??=
@@ -168,8 +162,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         myElementTypeId ??=
           myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.GetElementType.Sync(EntityId)),
-        myTypeProviderId,
-        myContext);
+        myTypeProviderId);
 
     public override ProvidedType[] GetGenericArguments() => myGenericArguments.Value;
 
@@ -178,7 +171,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         myEnumUnderlyingTypeId ??=
           myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.GetEnumUnderlyingType.Sync(EntityId)),
-        myTypeProviderId, myContext);
+        myTypeProviderId);
 
     public override ProvidedParameterInfo[] GetStaticParameters(ITypeProvider provider) => myStaticParameters.Value;
 
@@ -195,7 +188,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
           () => RdProvidedTypeProcessModel.ApplyStaticArguments.Sync(
             new ApplyStaticArgumentsParameters(EntityId, fullTypePathAfterArguments, staticArgDescriptions),
             RpcTimeouts.Maximal)),
-        myTypeProviderId, myContext);
+        myTypeProviderId);
     }
 
     // Since we distinguish different generative types by assembly name
@@ -207,7 +200,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       var staticArgDescriptions = staticArgs.Select(PrimitiveTypesBoxer.BoxToServerStaticArg).ToArray();
 
       return myTypeProvidersContext.AppliedProvidedTypesCache.GetOrCreate((EntityId, key), myTypeProviderId,
-        (myContext, new ApplyStaticArgumentsParameters(EntityId, fullTypePathAfterArguments, staticArgDescriptions)));
+        new ApplyStaticArgumentsParameters(EntityId, fullTypePathAfterArguments, staticArgDescriptions));
     }
 
     public override ProvidedType[] GetInterfaces() => myInterfaces.Value;
@@ -218,7 +211,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public override ProvidedType MakeArrayType(int rank) =>
       myTypeProvidersContext.ArrayProvidedTypesCache.GetOrCreate((EntityId, rank), myTypeProviderId,
-        (myContext, new MakeArrayTypeArgs(EntityId, rank)));
+        new MakeArrayTypeArgs(EntityId, rank));
 
     public override ProvidedType MakeGenericType(ProvidedType[] args)
     {
@@ -230,7 +223,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         .ToArray();
 
       return myTypeProvidersContext.GenericProvidedTypesCache.GetOrCreate((EntityId, key), myTypeProviderId,
-        (myContext, new MakeGenericTypeArgs(EntityId, argIds)));
+        new MakeGenericTypeArgs(EntityId, argIds));
     }
 
     public override ProvidedType MakePointerType() =>
@@ -238,53 +231,47 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         myMakePointerTypeId ??=
           myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.MakePointerType.Sync(EntityId)),
-        myTypeProviderId,
-        myContext);
+        myTypeProviderId);
 
     public override ProvidedType MakeByRefType() =>
       myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(
         myMakeByRefTypeId ??=
           myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.MakeByRefType.Sync(EntityId)),
-        myTypeProviderId,
-        myContext);
+        myTypeProviderId);
 
     public override ProvidedEventInfo[] GetEvents() => myEvents.Value;
 
-    public override ProvidedEventInfo GetEvent(string nm) =>
-      myEvents.Value.FirstOrDefault(t => t.Name == nm);
+    public override ProvidedEventInfo GetEvent(string nm)
+    {
+      foreach (var t in myEvents.Value)
+        if (t.Name == nm)
+          return t;
+
+      return null;
+    }
 
     public override ProvidedFieldInfo[] GetFields() => myFields.Value;
 
-    public override ProvidedFieldInfo GetField(string nm) =>
-      myFields.Value.FirstOrDefault(t => t.Name == nm);
+    public override ProvidedFieldInfo GetField(string nm)
+    {
+      foreach (var t in myFields.Value)
+        if (t.Name == nm)
+          return t;
+
+      return null;
+    }
 
     public override ProvidedConstructorInfo[] GetConstructors() => myConstructors.Value;
 
-    public override ProvidedType ApplyContext(ProvidedTypeContext context)
-    {
-      var (lookupIlTypeRef, lookupTyconRef) = myContext.Context.GetDictionaries();
-      var (newLookupIlTypeRef, newLookupTyconRef) = context.GetDictionaries();
-
-      foreach (var ilTypeRef in lookupIlTypeRef)
-        if (!newLookupIlTypeRef.ContainsKey(ilTypeRef.Key))
-          newLookupIlTypeRef.TryAdd(ilTypeRef.Key, ilTypeRef.Value);
-
-      foreach (var tyconRef in lookupTyconRef)
-        if (!newLookupTyconRef.ContainsKey(tyconRef.Key))
-          newLookupTyconRef.TryAdd(tyconRef.Key, tyconRef.Value);
-
-      myContext.Context = context;
-      return this;
-    }
+    public override ProvidedType ApplyContext(ProvidedTypeContext context) =>
+      ProxyProvidedTypeWithContext.Create(this, context);
 
     public override ProvidedAssembly Assembly => myProvidedAssembly ??=
-      myTypeProvidersContext.ProvidedAssembliesCache.GetOrCreate(myRdProvidedType.Assembly, myTypeProviderId, null);
+      myTypeProvidersContext.ProvidedAssembliesCache.GetOrCreate(myRdProvidedType.Assembly, myTypeProviderId);
 
     public override ProvidedVar AsProvidedVar(string nm) =>
-      ProxyProvidedVar.Create(nm, false, this, myContext);
-
-    public override ProvidedTypeContext Context => myContext.Context;
+      ProxyProvidedVar.Create(nm, false, this);
 
     public override
       FSharpOption<Tuple<FSharpList<FSharpOption<object>>, FSharpList<Tuple<string, FSharpOption<object>>>>>

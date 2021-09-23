@@ -10,12 +10,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
   public interface IProvidedEntitiesCache<out T, in TKey, in TParam> where T : class
   {
     [ContractAnnotation("key:null => null")]
-    T GetOrCreate(TKey key, int typeProviderId, TParam parameters);
+    T GetOrCreate(TKey key, int typeProviderId, TParam parameters = default);
 
     /// <summary>
     /// Returns a batch of provided entities with taking into account the keys order
     /// </summary>
-    T[] GetOrCreateBatch(TKey[] keys, int typeProviderId, TParam parameters);
+    T[] GetOrCreateBatch(TKey[] keys, int typeProviderId, TParam parameters = default);
 
     void Remove(int typeProviderId);
 
@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
       EntitiesPerProvider = new Dictionary<int, List<TKey>>();
     }
 
-    public T GetOrCreate(TKey key, int typeProviderId, TParam parameters)
+    public T GetOrCreate(TKey key, int typeProviderId, TParam parameters = default)
     {
       if (!KeyHasValue(key)) return null;
       if (Entities.TryGetValue(key, out var providedEntity)) return providedEntity;
@@ -57,7 +57,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
       }
     }
 
-    public T[] GetOrCreateBatch(TKey[] keys, int typeProviderId, TParam parameters)
+    public T[] GetOrCreateBatch(TKey[] keys, int typeProviderId, TParam parameters = default)
     {
       if (keys.Length == 1) return new[] { GetOrCreate(keys[0], typeProviderId, parameters) };
 

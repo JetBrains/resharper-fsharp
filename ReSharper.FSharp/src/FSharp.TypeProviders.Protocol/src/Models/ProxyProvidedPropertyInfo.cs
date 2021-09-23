@@ -18,28 +18,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private readonly RdProvidedPropertyInfo myPropertyInfo;
     private readonly int myTypeProviderId;
     private readonly TypeProvidersContext myTypeProvidersContext;
-    private readonly ProvidedTypeContextHolder myContext;
     public int EntityId => myPropertyInfo.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.PropertyInfo;
 
     private ProxyProvidedPropertyInfo(RdProvidedPropertyInfo propertyInfo, int typeProviderId,
-      TypeProvidersContext typeProvidersContext, ProvidedTypeContextHolder context) : base(null, context.Context)
+      TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myPropertyInfo = propertyInfo;
       myTypeProviderId = typeProviderId;
       myTypeProvidersContext = typeProvidersContext;
-      myContext = context;
 
-      myMethods = new InterruptibleLazy<ProvidedMethodInfo[]>(() =>
-        // ReSharper disable once CoVariantArrayConversion
-        GetMethodsInfos()
-          .Select(t => ProxyProvidedMethodInfo.Create(t, typeProviderId, typeProvidersContext, context))
-          .ToArray());
+      myMethods = new InterruptibleLazy<ProxyProvidedMethodInfo[]>(() => GetMethodsInfos()
+        .Select(t => ProxyProvidedMethodInfo.Create(t, typeProviderId, typeProvidersContext))
+        .ToArray());
 
       myIndexParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(
         () => // ReSharper disable once CoVariantArrayConversion
           propertyInfo.IndexParameters
-            .Select(t => ProxyProvidedParameterInfo.Create(t, typeProviderId, typeProvidersContext, context))
+            .Select(t => ProxyProvidedParameterInfo.Create(t, typeProviderId, typeProvidersContext))
             .ToArray());
 
       myCustomAttributes = new InterruptibleLazy<RdCustomAttributeData[]>(() =>
@@ -48,20 +44,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     [ContractAnnotation("propertyInfo:null => null")]
     public static ProxyProvidedPropertyInfo Create(RdProvidedPropertyInfo propertyInfo, int typeProviderId,
-      TypeProvidersContext typeProvidersContext, ProvidedTypeContextHolder context) =>
-      propertyInfo == null
-        ? null
-        : new ProxyProvidedPropertyInfo(propertyInfo, typeProviderId, typeProvidersContext, context);
+      TypeProvidersContext typeProvidersContext) =>
+      propertyInfo == null ? null : new ProxyProvidedPropertyInfo(propertyInfo, typeProviderId, typeProvidersContext);
 
     public override string Name => myPropertyInfo.Name;
     public override bool CanRead => myPropertyInfo.CanRead;
     public override bool CanWrite => myPropertyInfo.CanWrite;
 
     public override ProvidedType DeclaringType =>
-      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myPropertyInfo.DeclaringType, myTypeProviderId, myContext);
+      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myPropertyInfo.DeclaringType, myTypeProviderId);
 
     public override ProvidedType PropertyType =>
-      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myPropertyInfo.PropertyType, myTypeProviderId, myContext);
+      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myPropertyInfo.PropertyType, myTypeProviderId);
 
     public override ProvidedMethodInfo GetGetMethod() => myMethods.Value[0];
 
@@ -91,7 +85,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       if (myPropertyInfo.GetMethod != 0 && myPropertyInfo.SetMethod != 0)
         return myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
           myTypeProvidersContext.Connection.ProtocolModel.RdProvidedMethodInfoProcessModel.GetProvidedMethodInfos
-            .Sync(new[] {myPropertyInfo.GetMethod, myPropertyInfo.SetMethod}, RpcTimeouts.Maximal));
+            .Sync(new[] { myPropertyInfo.GetMethod, myPropertyInfo.SetMethod }, RpcTimeouts.Maximal));
 
       var infos = new RdProvidedMethodInfo[2];
 
@@ -109,7 +103,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     }
 
     private string[] myXmlDocs;
-    private readonly InterruptibleLazy<ProvidedMethodInfo[]> myMethods;
+    private readonly InterruptibleLazy<ProxyProvidedMethodInfo[]> myMethods;
     private readonly InterruptibleLazy<ProvidedParameterInfo[]> myIndexParameters;
     private readonly InterruptibleLazy<RdCustomAttributeData[]> myCustomAttributes;
   }

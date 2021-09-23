@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Rd.Tasks;
@@ -13,37 +14,34 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
+  [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
   public class ProxyProvidedEventInfo : ProvidedEventInfo
   {
     private readonly RdProvidedEventInfo myEventInfo;
     private readonly TypeProvidersContext myTypeProvidersContext;
 
     private ProxyProvidedEventInfo(RdProvidedEventInfo eventInfo, int typeProviderId,
-      TypeProvidersContext typeProvidersContext,
-      ProvidedTypeContextHolder context) : base(null, context.Context)
+      TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myEventInfo = eventInfo;
       myTypeProvidersContext = typeProvidersContext;
 
       myMethods = new InterruptibleLazy<ProvidedMethodInfo[]>(() =>
-        // ReSharper disable once CoVariantArrayConversion
         myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
           typeProvidersContext.Connection.ProtocolModel.RdProvidedMethodInfoProcessModel.GetProvidedMethodInfos
-            .Sync(new[] {eventInfo.AddMethod, eventInfo.RemoveMethod}, RpcTimeouts.Maximal)
-            .Select(t => ProxyProvidedMethodInfo.Create(t, typeProviderId, typeProvidersContext, context))
+            .Sync(new[] { eventInfo.AddMethod, eventInfo.RemoveMethod }, RpcTimeouts.Maximal)
+            .Select(t => ProxyProvidedMethodInfo.Create(t, typeProviderId, typeProvidersContext))
             .ToArray()));
 
       myTypes = new InterruptibleLazy<ProvidedType[]>(() =>
         myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(
-          new[] {eventInfo.DeclaringType, eventInfo.EventHandlerType}, typeProviderId, context));
+          new[] { eventInfo.DeclaringType, eventInfo.EventHandlerType }, typeProviderId));
     }
 
     [ContractAnnotation("eventInfo:null => null")]
     public static ProxyProvidedEventInfo Create(RdProvidedEventInfo eventInfo, int typeProviderId,
-      TypeProvidersContext typeProvidersContext, ProvidedTypeContextHolder context) =>
-      eventInfo == null
-        ? null
-        : new ProxyProvidedEventInfo(eventInfo, typeProviderId, typeProvidersContext, context);
+      TypeProvidersContext typeProvidersContext) =>
+      eventInfo == null ? null : new ProxyProvidedEventInfo(eventInfo, typeProviderId, typeProvidersContext);
 
     public override string Name => myEventInfo.Name;
 
