@@ -20,7 +20,6 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
-open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.TestFramework
@@ -129,15 +128,3 @@ type FSharpFileServiceStub() =
     interface IFSharpFileService with
         member x.IsScratchFile _ = false
         member x.IsScriptLike _ = false
-
-[<SolutionComponent>]
-type TestExtensionTypingProviderStub() =
-    interface IProxyExtensionTypingProvider with
-        member this.DisplayNameOfTypeProvider(_, _) = failwith "todo"
-        member this.DumpTypeProvidersProcess() = failwith "todo"
-        member this.GetInvokerExpression(_, _, _) = failwith "todo"
-        member this.GetProvidedTypes _ = failwith "todo"
-        member this.HasGenerativeTypeProviders _ = false
-        member this.InstantiateTypeProvidersOfAssembly(_, _, _, _, _, _, _, _, _, _) = failwith "todo"
-        member this.ResolveTypeName(_, _) = failwith "todo"
-        member this.RuntimeVersion() = failwith "todo"
