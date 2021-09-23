@@ -38,11 +38,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public void OnInvalidate()
     {
-      IsInvalidated = true;
+      DisposeManually();
+      myIsInvalidated = true;
       Invalidate?.Invoke(this, EventArgs.Empty);
     }
 
-    public void IncrementVersion() => ++myVersion;
     private bool IsInvalidated { get; set; }
 
     public bool IsGenerative
@@ -97,11 +97,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public void Dispose()
     {
-      --myVersion;
-      if (myIsDisposed || !IsInvalidated && myVersion >= 0) return;
+    }
+
+    public void DisposeManually()
+    {
+      if (myIsDisposed) return;
 
       myTypeProvidersContext.Dispose(EntityId);
-      myTypeProvidersContext.Connection.ExecuteWithCatch(() => RdTypeProviderProcessModel.Dispose.Sync(EntityId));
+
+      if (!myIsInvalidated)
+        myTypeProvidersContext.Connection.ExecuteWithCatch(() => RdTypeProviderProcessModel.Dispose.Sync(EntityId));
+
       myIsDisposed = true;
       Disposed?.Invoke(this, EventArgs.Empty);
     }
@@ -111,7 +117,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public event EventHandler Disposed;
     private bool myIsGenerative;
     private bool myIsDisposed;
-    private int myVersion;
+    private bool myIsInvalidated;
     private readonly InterruptibleLazy<IProvidedNamespace[]> myProvidedNamespaces;
   }
 }
