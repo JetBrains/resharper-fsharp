@@ -63,15 +63,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
 
     private Unit Dispose(int typeProviderId)
     {
-      if (myTypeProvidersContext.TypeProvidersCache.Contains(typeProviderId))
-      {
-        myTypeProvidersContext.ProvidedConstructorsCache.Remove(typeProviderId);
-        myTypeProvidersContext.ProvidedMethodsCache.Remove(typeProviderId);
-        myTypeProvidersContext.ProvidedPropertyCache.Remove(typeProviderId);
-        myTypeProvidersContext.ProvidedAssembliesCache.Remove(typeProviderId);
-        myTypeProvidersContext.ProvidedTypesCache.Remove(typeProviderId);
-        myTypeProvidersContext.TypeProvidersCache.Remove(typeProviderId);
-      }
+      myTypeProvidersContext.ProvidedConstructorsCache.Remove(typeProviderId);
+      myTypeProvidersContext.ProvidedMethodsCache.Remove(typeProviderId);
+      myTypeProvidersContext.ProvidedPropertyCache.Remove(typeProviderId);
+      myTypeProvidersContext.ProvidedAssembliesCache.Remove(typeProviderId);
+      myTypeProvidersContext.ProvidedTypesCache.Remove(typeProviderId);
+      myTypeProvidersContext.TypeProvidersCache.Remove(typeProviderId);
 
       return Unit.Instance;
     }
@@ -89,21 +86,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
 
       foreach (var typeProvider in typeProviders)
       {
-        if (myTypeProvidersContext.TypeProvidersCache.TryGetInfo(typeProvider, envKey, out var info))
+        if (myTypeProvidersContext.TypeProvidersCache.TryGetInfo(typeProvider, envKey, out var info) &&
+            !info.isInvalidated)
         {
-          if (info.isInvalidated) Dispose(info.key);
-          else
-          {
-            cachedIds.Add(info.key);
-            continue;
-          }
+          cachedIds.Add(info.key);
+          continue;
         }
 
         var typeProviderRdModel =
           myTypeProvidersContext.TypeProviderRdModelsCreator.CreateRdModel(typeProvider, envKey);
 
         typeProvider.Invalidate += (_, __) =>
-          processModel.Proto.Scheduler.Queue(() => processModel.Invalidate.Fire(typeProviderRdModel!.EntityId));
+        {
+          var tpId = typeProviderRdModel.EntityId;
+          processModel.Proto.Scheduler.Queue(() => processModel.Invalidate.Fire(tpId));
+          Dispose(tpId);
+        };
 
         rdTypeProviders.Add(typeProviderRdModel);
       }
