@@ -23,7 +23,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
     override val restoreNuGetPackages = true
     private val sourceFile = "TypeProviderLibrary/Caches.fs"
 
-    private fun checkTypeProviders() {
+    private fun checkTypeProviders(testGoldFile: File) {
         withOpenedEditor(project, sourceFile) {
             waitForDaemon()
             executeWithGold(testGoldFile) {
@@ -33,14 +33,14 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
     }
 
     @Test
-    fun checkCachesBeforeAndAfterReloading() {
+    fun checkCachesWhenProjectReloading() {
         withOutOfProcessTypeProviders {
-            checkTypeProviders()
+            checkTypeProviders(File(testGoldFile.path + "_before"))
 
             unloadAllProjects()
             reloadAllProjects(project)
 
-            checkTypeProviders()
+            checkTypeProviders(File(testGoldFile.path + "_after"))
         }
     }
 
@@ -77,7 +77,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
             withOpenedEditor(project, sourceFile) {
                 waitForDaemon()
                 typeWithLatency("//")
-                checkTypeProviders()
+                checkTypeProviders(testGoldFile)
             }
         }
     }

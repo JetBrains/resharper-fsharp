@@ -26,25 +26,20 @@ type internal TypeProvidersCache() =
     let proxyTypeProvidersPerId = ConcurrentDictionary<_, _>()
 
     let rec addTypeProvider projectAssembly tpAssembly (tp: IProxyTypeProvider) =
-        let tpKey = struct(tpAssembly, tp.GetDisplayName(fullName = true))
-
         match typeProvidersPerAssembly.TryGetValue(projectAssembly) with
         | true, assemblyCache ->
-            match assemblyCache.TryGetValue(tpKey) with
-            | true, oldTp ->
-                oldTp.Dispose()
-                addTypeProvider projectAssembly tpAssembly tp
+            match assemblyCache.TryGetValue(tp.EntityId) with
+            | true, _ -> ()
             | false, _ ->
-                assemblyCache.TryAdd(tpKey, tp) |> ignore
+                assemblyCache.TryAdd(tp.EntityId, tp) |> ignore
                 proxyTypeProvidersPerId.TryAdd(tp.EntityId, tp) |> ignore
-                tp.Disposed.Add(fun _ -> removeTypeProvider projectAssembly tpKey tp.EntityId)
+                tp.Disposed.Add(fun _ -> removeTypeProvider projectAssembly tp.EntityId)
         | false, _ ->
             typeProvidersPerAssembly.TryAdd(projectAssembly, ConcurrentDictionary()) |> ignore
             addTypeProvider projectAssembly tpAssembly tp
 
-    and removeTypeProvider projectAssembly tpKey tpId =
-        // Removes types in a unified manner, may also be disposed by FCS.
-        typeProvidersPerAssembly.[projectAssembly].TryRemove(tpKey) |> ignore
+    and removeTypeProvider projectAssembly tpId =
+        typeProvidersPerAssembly.[projectAssembly].TryRemove(tpId) |> ignore
         proxyTypeProvidersPerId.TryRemove(tpId) |> ignore
 
         if typeProvidersPerAssembly.[projectAssembly].Count = 0 then
@@ -58,6 +53,11 @@ type internal TypeProvidersCache() =
 
         if not hasValue then failwith $"Cannot get type provider {id} from TypeProvidersCache"
         else proxyTypeProvidersPerId.[id]
+
+    member x.Get(assembly) =
+        match typeProvidersPerAssembly.TryGetValue assembly with
+        | true, x -> x.Values
+        | false, _ -> Array.Empty<_>() :> _
 
     member x.Dump() =
         let typeProviders =
@@ -102,6 +102,10 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
             use lock = lock.Push()
             projectsWithGenerativeProviders.Add(project) |> ignore
 
+    let disposeTypeProviders (assembly: string) =
+        typeProviders.Get(assembly) |> Seq.iter (fun x -> x.DisposeManually())
+        Assertion.Assert(typeProviders.Get(assembly) |> Seq.isEmpty, "Type Providers should be disposed")
+
     do
         connection.Execute(fun () ->
             protocol.Invalidate.Advise(lifetime, fun id -> typeProviders.Get(id).OnInvalidate()))
@@ -109,7 +113,12 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
         fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun psiModule ->
             use lock = lock.Push()
             let project = getModuleProject psiModule |> notNull
-            projectsWithGenerativeProviders.Remove(project) |> ignore)
+            projectsWithGenerativeProviders.Remove(project) |> ignore
+
+            let fcsProject = fcsProjectProvider.GetFcsProject(psiModule)
+            match fcsProject with
+            | Some fcsProject -> disposeTypeProviders fcsProject.OutputPath.FullPath
+            | None -> ())
 
     interface IProxyTypeProvidersManager with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
@@ -136,9 +145,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                      tp :> ITypeProvider
 
                   for id in result.CachedIds ->
-                     let tp = typeProviders.Get(id)
-                     tp.IncrementVersion()
-                     tp :> ITypeProvider ]
+                     typeProviders.Get(id) :> ITypeProvider ]
 
             typeProviderProxies
 
