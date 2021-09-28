@@ -21,6 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override IType ReturnType => Module.GetPredefinedType().Void;
 
     public abstract bool IsImplicit { get; }
+    public bool IsValueTypeZeroInit => false;
 
     public bool IsDefault => false;
     public bool IsParameterless => Parameters.IsEmpty();
