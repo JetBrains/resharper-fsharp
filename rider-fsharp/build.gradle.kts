@@ -338,6 +338,9 @@ tasks {
 
     withType<Test> {
         useTestNG()
+        // Workaround for https://youtrack.jetbrains.com/issue/IDEA-279019
+        // TODO: remove in the next version of the Gradle IntelliJ plugin
+        jvmArgs = listOf("-Didea.force.use.core.classloader=true")
         testLogging {
             showStandardStreams = true
             exceptionFormat = TestExceptionFormat.FULL
