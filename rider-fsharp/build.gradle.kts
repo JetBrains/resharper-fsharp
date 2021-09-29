@@ -338,6 +338,7 @@ tasks {
 
     withType<Test> {
         useTestNG()
+        jvmArgs = listOf("-Didea.force.use.core.classloader=true")
         testLogging {
             showStandardStreams = true
             exceptionFormat = TestExceptionFormat.FULL
