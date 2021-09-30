@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using JetBrains.Collections.Viewable;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
@@ -37,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     protected override RdFSharpTypeProvidersModel InitModel(Lifetime lifetime, Rd.Impl.Protocol protocol)
     {
       var model = new RdFSharpTypeProvidersModel(lifetime, protocol);
-      var typeProvidersContext = new TypeProvidersContext(Logger);
+      var typeProvidersContext = new TypeProvidersContext(Logger, myDispatcher.AsTaskScheduler());
 
       new TypeProvidersHost(typeProvidersContext).Initialize(model.RdTypeProviderProcessModel);
       new ProvidedTypesHost(typeProvidersContext).Initialize(model.RdProvidedTypeProcessModel);

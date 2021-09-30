@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using JetBrains.Core;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
+using JetBrains.Threading;
 using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core.CompilerServices;
 using Microsoft.FSharp.Quotations;
@@ -38,12 +41,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public void OnInvalidate()
     {
+      IsInvalidate = true;
       DisposeManually();
-      myIsInvalidated = true;
       Invalidate?.Invoke(this, EventArgs.Empty);
     }
 
-    private bool IsInvalidated { get; set; }
+    private bool IsInvalidate { get; set; }
 
     public bool IsGenerative
     {
@@ -54,7 +57,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         myIsGenerative = value;
       }
     }
-
 
     public IProvidedNamespace[] GetNamespaces() => myProvidedNamespaces.Value;
 
@@ -103,10 +105,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     {
       if (myIsDisposed) return;
 
-      myTypeProvidersContext.Dispose(EntityId);
+      // In an invalidated type provider,
+      // the out-of-process caches are cleared before the invalidation signal reaches the proxy type provider
+      var disposeOutOfProcessTask = IsInvalidate
+        ? Task.CompletedTask
+        : myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
+          RdTypeProviderProcessModel.Dispose.Start(myTypeProvidersContext.Connection.Lifetime, EntityId)).AsTask();
 
-      if (!myIsInvalidated)
-        myTypeProvidersContext.Connection.ExecuteWithCatch(() => RdTypeProviderProcessModel.Dispose.Sync(EntityId));
+      myTypeProvidersContext.Dispose(EntityId);
+      disposeOutOfProcessTask.Wait();
 
       myIsDisposed = true;
       Disposed?.Invoke(this, EventArgs.Empty);
@@ -117,7 +124,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public event EventHandler Disposed;
     private bool myIsGenerative;
     private bool myIsDisposed;
-    private bool myIsInvalidated;
     private readonly InterruptibleLazy<IProvidedNamespace[]> myProvidedNamespaces;
   }
 }

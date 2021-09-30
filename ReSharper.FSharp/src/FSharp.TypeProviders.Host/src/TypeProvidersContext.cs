@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Threading.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
@@ -12,6 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
   public class TypeProvidersContext
   {
     public ILogger Logger { get; }
+    public TaskScheduler TaskScheduler { get; }
     public ITypeProvidersLoader TypeProvidersLoader { get; }
     public TypeProvidersCache TypeProvidersCache { get; }
     public IProvidedCache<(ProvidedConstructorInfo, int), int> ProvidedConstructorsCache { get; }
@@ -52,9 +54,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     public IProvidedRdModelsCreator<CustomAttributeData, RdCustomAttributeData>
       ProvidedCustomAttributeRdModelsCreator { get; }
 
-    public TypeProvidersContext(ILogger logger)
+    public TypeProvidersContext(ILogger logger, TaskScheduler taskScheduler)
     {
       Logger = logger;
+      TaskScheduler = taskScheduler;
       TypeProvidersLoader = new TypeProvidersLoader();
 
       TypeProvidersCache = new TypeProvidersCache();
