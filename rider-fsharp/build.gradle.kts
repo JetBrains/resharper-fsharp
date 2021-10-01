@@ -28,7 +28,7 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.intellij") version "1.1.4" // https://github.com/JetBrains/gradle-intellij-plugin/releases
+    id("org.jetbrains.intellij") version "1.2.0" // https://github.com/JetBrains/gradle-intellij-plugin/releases
     id("org.jetbrains.grammarkit") version "2021.1.3"
     id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
     kotlin("jvm") version "1.4.10"
@@ -338,9 +338,6 @@ tasks {
 
     withType<Test> {
         useTestNG()
-        // Workaround for https://youtrack.jetbrains.com/issue/IDEA-279019
-        // TODO: remove in the next version of the Gradle IntelliJ plugin
-        jvmArgs = listOf("-Didea.force.use.core.classloader=true")
         testLogging {
             showStandardStreams = true
             exceptionFormat = TestExceptionFormat.FULL
