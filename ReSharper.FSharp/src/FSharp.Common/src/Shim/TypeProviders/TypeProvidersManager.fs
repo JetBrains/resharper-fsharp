@@ -25,7 +25,7 @@ type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = ConcurrentDictionary<_, ConcurrentDictionary<_, IProxyTypeProvider>>()
     let proxyTypeProvidersPerId = ConcurrentDictionary<_, _>()
 
-    let rec addTypeProvider projectAssembly tpAssembly (tp: IProxyTypeProvider) =
+    let rec addTypeProvider projectAssembly (tp: IProxyTypeProvider) =
         match typeProvidersPerAssembly.TryGetValue(projectAssembly) with
         | true, assemblyCache ->
             match assemblyCache.TryGetValue(tp.EntityId) with
@@ -36,7 +36,7 @@ type internal TypeProvidersCache() =
                 tp.Disposed.Add(fun _ -> removeTypeProvider projectAssembly tp.EntityId)
         | false, _ ->
             typeProvidersPerAssembly.TryAdd(projectAssembly, ConcurrentDictionary()) |> ignore
-            addTypeProvider projectAssembly tpAssembly tp
+            addTypeProvider projectAssembly tp
 
     and removeTypeProvider projectAssembly tpId =
         typeProvidersPerAssembly.[projectAssembly].TryRemove(tpId) |> ignore
@@ -45,8 +45,8 @@ type internal TypeProvidersCache() =
         if typeProvidersPerAssembly.[projectAssembly].Count = 0 then
             typeProvidersPerAssembly.TryRemove(projectAssembly) |> ignore
 
-    member x.Add(projectAssembly, tpAssembly, tp) =
-        addTypeProvider projectAssembly tpAssembly tp
+    member x.Add(projectAssembly, tp) =
+        addTypeProvider projectAssembly tp
 
     member x.Get(id) =
         let hasValue = SpinWait.SpinUntil((fun () -> proxyTypeProvidersPerId.ContainsKey id), 15_000)
@@ -141,7 +141,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                 [ for tp in result.TypeProviders ->
                      let tp = new ProxyTypeProvider(tp, tpContext)
                      tp.ContainsGenerativeTypes.Add(fun _ -> addProjectWithGenerativeProvider outputPath)
-                     typeProviders.Add(outputPath, designTimeAssemblyNameString, tp)
+                     typeProviders.Add(outputPath, tp)
                      tp :> ITypeProvider
 
                   for id in result.CachedIds ->
