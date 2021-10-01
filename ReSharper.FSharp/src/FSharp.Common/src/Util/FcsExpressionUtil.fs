@@ -9,7 +9,7 @@ let rec isSimpleValueExpression (synExpr: SynExpr) =
     match synExpr with
     | SynExpr.Paren(expr = expr) -> isSimpleValueExpression expr
     | SynExpr.Const _ | SynExpr.Quote _
-    | SynExpr.ArrayOrList _ | SynExpr.ArrayOrListOfSeqExpr _
+    | SynExpr.ArrayOrList _ | SynExpr.ArrayOrListComputed _
     | SynExpr.ObjExpr _ | SynExpr.New _
     | SynExpr.Record _ | SynExpr.AnonRecd _
     | SynExpr.Do _ | SynExpr.Lazy _ | SynExpr.TypeTest _

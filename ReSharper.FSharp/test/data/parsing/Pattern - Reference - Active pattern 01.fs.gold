@@ -19,15 +19,15 @@ IFSharpImplFile
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:A)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               ILocalReferencePat
                 IExpressionReferenceName
                   IActivePatternId
+                    FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                     FSharpTokenType+BarTokenElement(type:BAR, text:|)
                     IActivePatternNamedCaseReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:B)
                     FSharpTokenType+BarTokenElement(type:BAR, text:|)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                    FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

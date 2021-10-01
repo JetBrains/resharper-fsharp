@@ -21,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public FSharpParameter FSharpSymbol { get; }
 
     public override string ShortName =>
-      FSharpSymbol.DisplayName is var name && name.IsEmpty()
+      FSharpSymbol.DisplayName is var name && name.RemoveBackticks().IsEmpty()
         ? SharedImplUtil.MISSING_DECLARATION_NAME
         : name;
 

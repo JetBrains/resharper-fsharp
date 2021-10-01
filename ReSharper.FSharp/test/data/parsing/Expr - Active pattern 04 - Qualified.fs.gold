@@ -3,16 +3,16 @@ IFSharpImplFile
   IAnonModuleDeclaration
     IExpressionStatement
       IChameleonExpression
-        IActivePatternExpr
+        IReferenceExpr
           IReferenceExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:Module)
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
-          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           IActivePatternId
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             FSharpTokenType+BarTokenElement(type:BAR, text:|)
             IActivePatternNamedCaseReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:Ident)
             FSharpTokenType+BarTokenElement(type:BAR, text:|)
-          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

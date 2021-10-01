@@ -457,7 +457,6 @@ interface typedLikeExpr:
 
 interface qualifiedExpr:
   referenceExpr |
-  activePatternExpr |
   indexerExpr;
 
 interface ifExpr:
@@ -477,43 +476,25 @@ setExpr options { stubBase="UnitExpressionBase"; }:
   LARROW<LARROW, LArrow>
   fSharpExpression<RIGHT_EXPR, RightExpression>;
 
-// todo: fix parens
-activePatternExpr options { stubBase="ReferenceOwnerExprBase"; }:
-  fSharpExpression<QUALIFIER_EXPR, Qualifier>
-  DOT<FSHARP_DELIMITER, Delimiter>
-  LPAREN
-  activePatternId<ID, ActivePatternId>
-  RPAREN;
-
 interface indexerExpr:
   itemIndexerExpr |
   namedIndexerExpr;
 
-itemIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
-  get { methodName="Args" path=<itemIndexerExpr:ARG_LIST/indexerArgList:INDEXER_ARG> };
-}:
+itemIndexerExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<QUALIFIER_EXPR, Qualifier>
   DOT<FSHARP_DELIMITER, Delimiter>
   indexerArgList<ARG_LIST, IndexerArgList>;
 
-namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
-  // todo: fix this, it's always empty now
-  get { methodName="Args" path=<namedIndexerExpr:INDEXER_ARG> };
-}:
+namedIndexerExpr options { stubBase="FSharpExpressionBase"; }:
   // todo: maybe: refExpr?
   fSharpExpression<QUALIFIER_EXPR, Qualifier>
   DOT<FSHARP_DELIMITER, Delimiter>
-  indexerArg<INDEXER_ARG, IndexerArg>;
+  fSharpExpression<INDXER_ARG, Arg>;
 
 indexerArgList:
   LBRACK
-  LIST indexerArg<INDEXER_ARG, IndexerArgs> SEP COMMA<FSHARP_COMMA, Commas>
+  fSharpExpression<INDXER_ARG, Arg>
   RBRACK;
-
-indexerArg extras {
-  get { methodName="Expressions" path=<indexerArg:EXPR> };
-}:
-  fSharpExpression<EXPR, Expression>;
 
 interface castExpr:
   upcastExpr |
@@ -1484,10 +1465,10 @@ private identOrOpName{ROLE, Getter}:
 
 activePatternId:
   LPAREN<LPAREN, LParen>
-  BAR
+  BAR<BAR, Bars>
   (
     activePatternIdCase<ACTIVE_PATTERN_CASE, Cases>
-    BAR
+    BAR<BAR, Bars>
   )+
   RPAREN<RPAREN, RParen>;
 

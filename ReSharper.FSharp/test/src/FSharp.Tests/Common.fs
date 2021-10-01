@@ -179,7 +179,8 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
                 SourceFiles = paths
                 ConditionalCompilationDefines = defines
                 IsExe = isExe
-                IsInteractive = isScript }
+                IsInteractive = isScript
+                LangVersionText = "preview" } // todo: fix language level attribute is not applied
 
         member x.GetFileIndex(sourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then 0 else

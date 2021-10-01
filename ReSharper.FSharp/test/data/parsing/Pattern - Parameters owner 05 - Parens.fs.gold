@@ -19,18 +19,11 @@ IFSharpImplFile
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:A)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              ILocalReferencePat
-                IExpressionReferenceName
-                  IActivePatternId
-                    FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                    FSharpTokenType+BarTokenElement(type:BAR, text:|)
-                    IActivePatternNamedCaseReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:B)
-                    FSharpTokenType+BarTokenElement(type:BAR, text:|)
-                    IWildActivePatternWildCase
-                      FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-                    FSharpTokenType+BarTokenElement(type:BAR, text:|)
-                    FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              IParenPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                IWildPat
+                  FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

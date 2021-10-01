@@ -18,6 +18,6 @@ type RedundantBackticksAnalyzer() =
         let withoutBackticks = text.RemoveBackticks()
         if text.Length = withoutBackticks.Length then () else
 
-        let escaped = FSharpKeywords.QuoteIdentifierIfNeeded withoutBackticks
+        let escaped = FSharpKeywords.AddBackticksToIdentifierIfNeeded withoutBackticks
         if escaped.Length = withoutBackticks.Length then
             consumer.AddHighlighting(RedundantBackticksWarning(identifier))

@@ -18,10 +18,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public const int EscapedNameAffixLength = 4;
     public const int EscapedNameStartIndex = 2;
 
+    /// Checks if an identifier is escaped, like in ``foo bar``.
+    /// Synthetic FCS symbols may have escaped empty names, like ````.
     public static bool IsEscapedWithBackticks([NotNull] this string name)
     {
       var length = name.Length;
-      return length > EscapedNameAffixLength &&
+      return length >= EscapedNameAffixLength &&
              name[0] == '`' && name[1] == '`' && name[length - 2] == '`' && name[length - 1] == '`';
     }
 

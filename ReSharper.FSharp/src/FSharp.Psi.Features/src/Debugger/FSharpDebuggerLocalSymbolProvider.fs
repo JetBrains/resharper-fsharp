@@ -60,7 +60,7 @@ type FSharpDebuggerLocalSymbolProvider() =
                         bindings |> List.tryPick (fun (SynBinding(headPat = headPat)) ->
                             visitPat headPat (fun _ -> None))
 
-                    member this.VisitMatchClause(_, defaultTraverse, (SynMatchClause(pat, _, _, _, _) as clause)) =
+                    member this.VisitMatchClause(_, defaultTraverse, (SynMatchClause(pat, _, _, _, _, _) as clause)) =
                         visitPat pat (fun _ -> None) |> Option.orElseWith (fun _ -> defaultTraverse clause) }
 
             SyntaxTraversal.Traverse(pos, parseTree, visitor) |> ignore

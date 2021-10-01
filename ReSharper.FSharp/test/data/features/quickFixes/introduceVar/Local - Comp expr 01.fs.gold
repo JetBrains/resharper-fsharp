@@ -1,5 +1,5 @@
 ﻿module Module
 
 async {
-    let {selstart}unitAsync{selend} = id
+    let {selstart}objectFunc{selend} = id
 }

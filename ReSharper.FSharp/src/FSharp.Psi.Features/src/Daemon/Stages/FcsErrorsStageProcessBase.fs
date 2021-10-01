@@ -84,7 +84,7 @@ module FSharpErrors =
     let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type "
 
     let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
-    let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values of the same type as the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
+    let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
 
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =

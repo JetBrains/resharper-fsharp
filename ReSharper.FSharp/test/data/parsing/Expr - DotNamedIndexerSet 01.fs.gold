@@ -10,12 +10,11 @@ IFSharpImplFile
                 FSharpString(type:STRING, text:"")
               FSharpTokenType+DotTokenElement(type:DOT, text:.)
               FSharpIdentifierToken(type:IDENTIFIER, text:Chars)
-            IIndexerArg
-              IParenExpr
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                ILiteralExpr
-                  FSharpToken(type:INT32, text:1)
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            IParenExpr
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              ILiteralExpr
+                FSharpToken(type:INT32, text:1)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

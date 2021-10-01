@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
@@ -347,7 +348,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Slice - Beginning 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Slice - Beginning 02 - Negative``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Slice - End 01``() = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.Preview)>]
     [<Test>] member x.``Expr - Slice - End 02 - Negative``() = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.Preview)>]
     [<Test>] member x.``Expr - Slice - Negative 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Slice - Star 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Slice - Star 02``() = x.DoNamedTest()
@@ -574,6 +578,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Pattern - Parameters owner 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Parameters owner 02 - Qualified``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Parameters owner 03 - Tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Parameters owner 04 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Parameters owner 05 - Parens``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - IsInst 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - IsInst 02 - Function``() = x.DoNamedTest()

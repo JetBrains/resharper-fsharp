@@ -9,10 +9,10 @@ IFSharpSigFile
     IBindingSignature
       FSharpTokenType+ValTokenElement(type:VAL, text:val)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
       ITopReferencePat
         IExpressionReferenceName
           IActivePatternId
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             FSharpTokenType+BarTokenElement(type:BAR, text:|)
             ITopActivePatternCaseDeclaration
               FSharpIdentifierToken(type:IDENTIFIER, text:A)
@@ -20,7 +20,7 @@ IFSharpSigFile
             IWildActivePatternWildCase
               FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
             FSharpTokenType+BarTokenElement(type:BAR, text:|)
-      FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
       IReturnTypeInfo
         FSharpTokenType+ColonTokenElement(type:COLON, text::)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

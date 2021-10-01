@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -20,6 +21,7 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Operators 03 - Unary``() = x.DoNamedTest()
     [<Test>] member x.``Operators 04 - op_Multiply decl``() = x.DoNamedTest()
 
+    [<FSharpLanguageLevel(FSharpLanguageLevel.Preview)>]
     [<Test>] member x.``Slice 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()

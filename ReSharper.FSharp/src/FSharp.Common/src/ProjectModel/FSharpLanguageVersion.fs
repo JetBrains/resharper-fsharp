@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
@@ -55,8 +56,7 @@ module FSharpLanguageLevel =
 
     let key = Key<Boxed<FSharpLanguageLevel>>("LanguageLevel")
 
-    let private ofPsiModuleNoCache (treeNode: ITreeNode) =
-        let psiModule = treeNode.GetPsiModule()
+    let ofPsiModuleNoCache (psiModule: IPsiModule) =
         let levelProvider =
             psiModule.GetPsiServices()
                 .GetComponent<SolutionFeaturePartsContainer>()
@@ -66,9 +66,13 @@ module FSharpLanguageLevel =
 
         levelProvider.GetLanguageLevel(psiModule)
 
+    let private ofTreeNodeNoCache (treeNode: ITreeNode) =
+        let psiModule = treeNode.GetPsiModule()
+        ofPsiModuleNoCache psiModule
+
     [<Extension; CompiledName("GetFSharpLanguageLevel")>]
     let ofTreeNode (treeNode: ITreeNode) =
-        PsiFileCachedDataUtil.GetPsiModuleData<FSharpLanguageLevel>(treeNode, key, ofPsiModuleNoCache)
+        PsiFileCachedDataUtil.GetPsiModuleData<FSharpLanguageLevel>(treeNode, key, ofTreeNodeNoCache)
 
     [<Extension; CompiledName("IsFSharp47Supported")>]
     let isFSharp47Supported (treeNode: ITreeNode) =

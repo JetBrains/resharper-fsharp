@@ -10,9 +10,8 @@ IFSharpImplFile
             FSharpTokenType+DotTokenElement(type:DOT, text:.)
             IIndexerArgList
               FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-              IIndexerArg
-                ILiteralExpr
-                  FSharpToken(type:INT32, text:1)
+              ILiteralExpr
+                FSharpToken(type:INT32, text:1)
               FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)

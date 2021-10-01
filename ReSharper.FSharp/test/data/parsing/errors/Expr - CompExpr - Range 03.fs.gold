@@ -16,10 +16,11 @@ IFSharpImplFile
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IFromErrorExpr
-            FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpToken(type:INT32, text:2)
+              IBeginningSliceExpr
+                FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                ILiteralExpr
+                  FSharpToken(type:INT32, text:2)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"

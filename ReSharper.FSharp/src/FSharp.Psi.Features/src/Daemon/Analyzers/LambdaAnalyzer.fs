@@ -78,7 +78,7 @@ type LambdaAnalyzer() =
 
             | :? IReferenceExpr as r when
                     let name = r.ShortName
-                    name = SharedImplUtil.MISSING_DECLARATION_NAME || PrettyNaming.IsOperatorName name ->
+                    name = SharedImplUtil.MISSING_DECLARATION_NAME || PrettyNaming.IsOperatorDisplayName name ->
                 false, false, null
 
             | x -> hasMatches, i = pats.Count, x

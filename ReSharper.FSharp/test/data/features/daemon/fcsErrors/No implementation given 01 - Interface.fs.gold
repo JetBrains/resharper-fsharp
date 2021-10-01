@@ -16,11 +16,11 @@ type T3() =
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: No implementation was given for those members: 
-	'abstract member I.P1 : int'
-	'abstract member I.P2 : int'
+	'abstract I.P1: int'
+	'abstract I.P2: int'
 Note that all interface members must be implemented and listed under an appropriate 'interface' declaration, e.g. 'interface ... with member ...'.
 (1): ReSharper Underlined Error Highlighting: No implementation was given for those members: 
-	'abstract member I.P1 : int'
-	'abstract member I.P2 : int'
+	'abstract I.P1: int'
+	'abstract I.P2: int'
 Note that all interface members must be implemented and listed under an appropriate 'interface' declaration, e.g. 'interface ... with member ...'.
-(2): ReSharper Underlined Error Highlighting: No implementation was given for 'abstract member I.P2 : int'. Note that all interface members must be implemented and listed under an appropriate 'interface' declaration, e.g. 'interface ... with member ...'.
+(2): ReSharper Underlined Error Highlighting: No implementation was given for 'abstract I.P2: int'. Note that all interface members must be implemented and listed under an appropriate 'interface' declaration, e.g. 'interface ... with member ...'.

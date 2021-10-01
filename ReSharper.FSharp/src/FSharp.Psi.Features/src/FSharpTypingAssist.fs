@@ -430,7 +430,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
     let insertNewLineAt textControl indent trimAfterCaret =
         use command = this.CommandProcessor.UsingCommand("New Line")
         let insertPos = trimTrailingSpaces textControl trimAfterCaret
-        let text = this.GetNewLineText(textControl) + System.String(' ', indent)
+        let text = this.GetNewLineText(textControl) + String(' ', indent)
         insertText textControl insertPos text "Indent on Enter"
 
     let insertIndentFromLine textControl line =
@@ -756,7 +756,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let document = textControl.Document
         let visitor =
             { new SyntaxVisitorBase<_>() with
-                member x.VisitMatchClause(_, defaultTraverse, (SynMatchClause.SynMatchClause (pat, whenExpr, _, _, _) as mc)) =
+                member x.VisitMatchClause(_, defaultTraverse, (SynMatchClause.SynMatchClause (pat, whenExpr, _, _, _, _) as mc)) =
                     match pat, whenExpr with
                     | _, Some (ExprRange range)
                     | PatRange range, None when getEndOffset document range = prevTokenEnd -> Some mc
@@ -769,7 +769,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let documentCoords = document.GetCoordsByOffset(lexer.TokenStart)
         match SyntaxTraversal.Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
         | None -> false
-        | Some (SynMatchClause.SynMatchClause (_, _, _, range, _)) ->
+        | Some (SynMatchClause.SynMatchClause (_, _, _, _, range, _)) ->
 
         use cookie = LexerStateCookie.Create(lexer)
 
@@ -823,8 +823,8 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                 let line = getContinuedIndentLine textControl leftBracketStartOffset LeadingParenContinuesLine.Yes
                 getLineWhitespaceIndent textControl line
 
-        let baseIndentString = x.GetNewLineText(textControl) + System.String(' ', baseIndentLength)
-        let indentString = baseIndentString + System.String(' ',  getIndentSize textControl)
+        let baseIndentString = x.GetNewLineText(textControl) + String(' ', baseIndentLength)
+        let indentString = baseIndentString + String(' ',  getIndentSize textControl)
 
         if lastElementEndOffset = leftBracketEndOffset then
             let newText =
@@ -1519,7 +1519,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         if additionalSpaces > 0 then
             let replaceRange = TextRange(startOffset, endOffset)
-            document.ReplaceText(replaceRange, System.String(' ', additionalSpaces))
+            document.ReplaceText(replaceRange, String(' ', additionalSpaces))
 
         elif startOffset <> endOffset then
             document.DeleteText(TextRange(startOffset, endOffset))

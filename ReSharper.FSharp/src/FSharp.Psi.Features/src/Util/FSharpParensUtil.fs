@@ -101,8 +101,9 @@ let operatorPrecedence (binaryApp: IBinaryAppExpr) =
 let precedence (expr: ITreeNode) =
     match expr with
     | :? ILibraryOnlyExpr
-    | :? IActivePatternExpr
     | :? ITraitCallExpr -> 0
+
+    | :? IReferenceExpr as refExpr when (refExpr.Identifier :? IActivePatternId) -> 0
 
     | :? ILetOrUseExpr -> 1
 
@@ -302,7 +303,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
         isNotNull (AppExprNavigator.GetByArgument(context)) && getFirstQualifier refExpr :? IAppExpr ||
 
         // todo: tests
-        isNull typeArgumentList && isNull qualifier && PrettyNaming.IsOperatorName (refExpr.GetText()) ||
+        isNull typeArgumentList && isNull qualifier && PrettyNaming.IsOperatorDisplayName (refExpr.GetText()) ||
 
         checkPrecedence context expr
 

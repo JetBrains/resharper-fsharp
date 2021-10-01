@@ -9,9 +9,8 @@ IFSharpImplFile
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           IIndexerArgList
             FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-            IIndexerArg
-              IWholeRangeExpr
-                FSharpTokenType+StarTokenElement(type:STAR, text:*)
+            IWholeRangeExpr
+              FSharpTokenType+StarTokenElement(type:STAR, text:*)
             FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

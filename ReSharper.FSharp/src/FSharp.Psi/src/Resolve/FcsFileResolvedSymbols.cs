@@ -296,11 +296,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         }
       }
 
-      // trim foo.bar to bar
+      // We need symbol use start offset to be synchronized with FCS; trim qualifiers:
+      // `foo.bar` -> `bar`
+      // `foo.(+) -> +
+      // `foo.(|A|) -> (|A|)
+      // todo: align operators and active patterns handling in the parser
       for (var i = endOffset - 1; i > startOffset; i--)
       {
         var c = buffer[i];
-        if (c.Equals('.') || c.Equals('('))
+        if (c.Equals('.') || c.Equals('(') && i < endOffset - 1 && buffer[i + 1] != '|')
           return new TextRange(i + 1, endOffset);
       }
 

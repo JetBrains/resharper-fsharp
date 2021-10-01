@@ -290,7 +290,7 @@ module FSharpNamingService =
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
     let mangleNameIfNecessary name =
-        FSharpKeywords.QuoteIdentifierIfNeeded name
+        FSharpKeywords.AddBackticksToIdentifierIfNeeded name
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =

@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
@@ -156,6 +157,15 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
             if cfg.TreatWarningsAsErrors then
                 otherOptions.Add("--warnaserror")
+
+            if Shell.Instance.IsTestShell then
+                let languageLevel = FSharpLanguageLevel.ofPsiModuleNoCache psiModule
+                let langVersionArg =
+                    languageLevel
+                    |> FSharpLanguageLevel.toLanguageVersion
+                    |> FSharpLanguageVersion.toCompilerArg
+
+                otherOptions.Add(langVersionArg)
 
             let doc = cfg.DocumentationFile
             if not (doc.IsNullOrWhitespace()) then otherOptions.Add("--doc:" + doc)

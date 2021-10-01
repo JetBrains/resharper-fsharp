@@ -24,8 +24,8 @@ IFSharpImplFile
                   IExpressionReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:M)
                   FSharpTokenType+DotTokenElement(type:DOT, text:.)
-                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                   IActivePatternId
+                    FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                     FSharpTokenType+BarTokenElement(type:BAR, text:|)
                     IActivePatternNamedCaseReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:B)
@@ -33,7 +33,7 @@ IFSharpImplFile
                     IWildActivePatternWildCase
                       FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
                     FSharpTokenType+BarTokenElement(type:BAR, text:|)
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                    FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

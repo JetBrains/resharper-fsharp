@@ -9,9 +9,9 @@ IFSharpImplFile
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           IIndexerArgList
             FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-            IIndexerArg
-              IBeginningSliceExpr
-                FSharpIdentifierToken(type:SYMBOLIC_OP, text:..^)
+            IBeginningSliceExpr
+              FSharpIdentifierToken(type:SYMBOLIC_OP, text:..^)
+              IEndSliceExpr
                 ILiteralExpr
                   FSharpToken(type:INT32, text:1)
             FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])

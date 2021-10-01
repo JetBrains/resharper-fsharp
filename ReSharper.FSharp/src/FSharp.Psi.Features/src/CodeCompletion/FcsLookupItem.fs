@@ -1,5 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Tokenization
@@ -55,20 +56,20 @@ type FcsErrorLookupItem(item: DeclarationListItem) =
             |> Option.toObj
 
 
-type FcsLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionContext) =
+type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
 
     let mutable candidates = Unchecked.defaultof<_>
 
-    member this.FcsItem = item
-    member this.FcsSymbol = item.FSharpSymbol
-    member this.NamespaceToOpen = item.NamespaceToOpen
+    member this.FcsSymbolUse = items.SymbolUses.Head 
+    member this.FcsSymbol = this.FcsSymbolUse.Symbol
+    member this.NamespaceToOpen = items.NamespaceToOpen
 
     member x.Candidates =
         match candidates with
         | null ->
             let result = LocalList<ICandidate>()
-            let (ToolTipText(tooltips)) = item.Description
+            let (ToolTipText(tooltips)) = items.Description
             for tooltip in tooltips do
                 match tooltip with
                 | ToolTipElement.Group(overloads) ->
@@ -83,16 +84,16 @@ type FcsLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionConte
         | candidates -> candidates
 
     override x.Image =
-        try getIconId item.FSharpSymbol
+        try getIconId x.FcsSymbol
         with _ -> null
 
     override x.Text =
-        FSharpKeywords.QuoteIdentifierIfNeeded item.Name
+        FSharpKeywords.AddBackticksToIdentifierIfNeeded items.Name
 
     override x.DisplayTypeName =
         try
-            match getReturnType item.FSharpSymbol with
-            | Some t -> RichText(t.Format(context.FcsCompletionContext.DisplayContext))
+            match getReturnType x.FcsSymbol with
+            | Some t -> RichText(t.Format(x.FcsSymbolUse.DisplayContext))
             | _ -> null
         with _ -> null
 
@@ -111,7 +112,7 @@ type FcsLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionConte
         use disableFormatter = new DisableCodeFormatter()
         use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, "Add open")
 
-        let declaredElement = item.FSharpSymbol.GetDeclaredElement(context.PsiModule)
+        let declaredElement = x.FcsSymbol.GetDeclaredElement(context.PsiModule)
 
         let typeElement =
             // todo: other declared elements
@@ -120,13 +121,13 @@ type FcsLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionConte
             | :? IField as field when (field.ContainingType :? IEnum) -> field.ContainingType
             | _ -> null
 
-        let ns = item.NamespaceToOpen
+        let ns = items.NamespaceToOpen
         let moduleToImport =
             if isNotNull typeElement then
                 let moduleToOpen = getModuleToOpen typeElement
                 ModuleToImport.DeclaredElement(moduleToOpen) else
 
-            let ns = ns |> Array.map FSharpKeywords.QuoteIdentifierIfNeeded |> String.concat "."
+            let ns = ns |> Array.map FSharpKeywords.AddBackticksToIdentifierIfNeeded |> String.concat "."
             ModuleToImport.FullName(ns)
 
         let offset = context.Ranges.InsertRange.StartOffset
@@ -147,9 +148,9 @@ type FcsLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionConte
         addOpen offset fsFile context.BasicContext.ContextBoundSettingsStore moduleToImport
 
     override x.GetDisplayName() =
-        let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)
+        let name = LookupUtil.FormatLookupString(items.Name, x.TextColor)
 
-        let ns = item.NamespaceToOpen
+        let ns = items.NamespaceToOpen
         if not (ns.IsEmpty()) then
             let ns = String.concat "." ns
             LookupUtil.AddInformationText(name, $"(in {ns})")
@@ -158,10 +159,7 @@ type FcsLookupItem(item: DeclarationListItem, context: FSharpCodeCompletionConte
 
     interface IParameterInfoCandidatesProvider with
         member x.HasCandidates =
-            match item.Kind with
-            | CompletionItemKind.Method _ -> true
-            | _ ->
-                x.Candidates.Count > 1
+            x.Candidates.Count > 1
 
         member x.CreateCandidates() = x.Candidates :> _
 

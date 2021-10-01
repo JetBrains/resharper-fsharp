@@ -9,12 +9,12 @@ IFSharpImplFile
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           IIndexerArgList
             FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-            IIndexerArg
+            IEndSliceExpr
               IEndSliceExpr
                 FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
                 ILiteralExpr
                   FSharpToken(type:INT32, text:1)
-                FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
+              FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
             FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

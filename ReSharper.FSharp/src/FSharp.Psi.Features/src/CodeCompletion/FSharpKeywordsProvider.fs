@@ -63,7 +63,7 @@ module FSharpKeywordsProvider =
         FSharpKeywords.KeywordsWithDescription
         |> List.filter (fun (keyword, _) ->
             not (reparseContextAwareKeywords.Contains(keyword)) &&
-            not (PrettyNaming.IsOperatorName keyword))
+            not (PrettyNaming.IsOperatorDisplayName keyword))
 
     let keywordDescriptions =
         dict FSharpKeywords.KeywordsWithDescription

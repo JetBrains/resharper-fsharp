@@ -158,8 +158,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                     getExprToInsertBefore binaryAppExpr.RightArgument
                 | _ -> getExprToInsertBefore leftArgument
 
-        | :? IIndexerArg as indexerArg ->
-            let indexerExpr = ItemIndexerExprNavigator.GetByArg(indexerArg)
+        | :? IIndexerArgList as indexerArgList ->
+            let indexerExpr = ItemIndexerExprNavigator.GetByIndexerArgList(indexerArgList)
             if isNull indexerExpr then expr else indexerExpr :> _
 
         | :? IFSharpExpression as parentExpr -> getExprToInsertBefore parentExpr
@@ -518,7 +518,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 let shortName = refExpr.ShortName
                 if shortName = SharedImplUtil.MISSING_DECLARATION_NAME then false else
 
-                if PrettyNaming.IsOperatorName shortName then false else
+                if PrettyNaming.IsOperatorDisplayName shortName then false else
 
                 if not checkQualifier then
                     isAllowedRefExpr true refExpr
@@ -541,7 +541,13 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
         let isAllowedContext (expr: IFSharpExpression) =
             let topLevelExpr = skipIntermediateParentsOfSameType<IFSharpExpression>(expr)
-            isNull (AttributeNavigator.GetByExpression(topLevelExpr))
+            isNull (AttributeNavigator.GetByExpression(topLevelExpr)) &&
+
+            match expr with
+            | :? ITupleExpr ->
+                isNull (ItemIndexerExprNavigator.GetByIndexerArgList(IndexerArgListNavigator.GetByArg(expr))) &&
+                isNull (NamedIndexerExprNavigator.GetByArg(TupleExprNavigator.GetByExpression expr))
+            | _ -> true
 
         if not (isAllowedContext expr) then false else
         isAllowedExpr expr

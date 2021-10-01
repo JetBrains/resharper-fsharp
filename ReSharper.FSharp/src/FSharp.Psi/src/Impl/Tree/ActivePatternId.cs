@@ -1,12 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -56,22 +53,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         : null;
     }
 
-    public IList<IActivePatternNamedCaseDeclaration> NamedCases =>
-      Cases.OfType<IActivePatternNamedCaseDeclaration>().AsList();
-
     public TreeTextRange GetCasesRange()
     {
-      var nameRange = this.GetTreeTextRange();
-      var cases = NamedCases;
-      if (cases.IsEmpty())
-        return nameRange;
+      // todo: remove parens from range?
 
-      var firstRange = cases[0].NameIdentifier.GetNameRange();
-      var lastRange = cases.Last().NameIdentifier.GetNameRange();
+      var lParen = LParen;
+      var rParen = RParen;
+      if (lParen == null || rParen == null) // todo: better recovery for missing rparen
+        return this.GetTreeTextRange();
+
+      var firstRange = lParen.GetTreeTextRange();
+      var lastRange = rParen.GetTreeTextRange();
 
       return firstRange.IsValid() && lastRange.IsValid()
         ? new TreeTextRange(firstRange.StartOffset, lastRange.EndOffset)
-        : nameRange;
+        : this.GetTreeTextRange();
     }
   }
 }

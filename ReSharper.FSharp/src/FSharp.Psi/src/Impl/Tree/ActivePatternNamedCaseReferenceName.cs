@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     // todo: unify interfaces
     private static IFSharpReferenceOwner GetActivePatternReferenceOwner(IActivePatternId activePatternId) =>
-      (IFSharpReferenceOwner) ActivePatternExprNavigator.GetByActivePatternId(activePatternId) ??
+      (IFSharpReferenceOwner) ReferenceExprNavigator.GetByIdentifier(activePatternId) ??
       ExpressionReferenceNameNavigator.GetByIdentifier(activePatternId);
 
     protected override IDeclaredElement GetDeclaredElement()

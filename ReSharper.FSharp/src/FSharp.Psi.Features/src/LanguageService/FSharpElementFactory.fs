@@ -80,7 +80,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             if PrettyNaming.IsMangledOpName logicalName then
                 sprintf "( %s )" name
             else
-                FSharpKeywords.QuoteIdentifierIfNeeded name
+                FSharpKeywords.AddBackticksToIdentifierIfNeeded name
 
         let memberSource = sprintf "member this.%s%s%s = failwith \"todo\"" name typeParametersSource parameters
         let typeDecl = getTypeDecl memberSource
@@ -167,7 +167,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
             let printParam (name, fcsType: FSharpType) =
-                let name = FSharpKeywords.QuoteIdentifierIfNeeded name
+                let name = FSharpKeywords.AddBackticksToIdentifierIfNeeded name
                 if not addTypes then name else
 
                 let fcsType = fcsType.Format(displayContext)

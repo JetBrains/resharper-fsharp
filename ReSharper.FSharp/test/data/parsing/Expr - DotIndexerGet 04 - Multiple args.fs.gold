@@ -9,7 +9,7 @@ IFSharpImplFile
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           IIndexerArgList
             FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-            IIndexerArg
+            ITupleExpr
               IRangeExpr
                 ILiteralExpr
                   FSharpToken(type:INT32, text:1)
@@ -18,9 +18,8 @@ IFSharpImplFile
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 ILiteralExpr
                   FSharpToken(type:INT32, text:2)
-            FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IIndexerArg
+              FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ILiteralExpr
                 FSharpToken(type:INT32, text:3)
             FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])

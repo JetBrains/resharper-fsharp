@@ -9,14 +9,13 @@ IFSharpImplFile
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           IIndexerArgList
             FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-            IIndexerArg
-              IRangeExpr
-                ILiteralExpr
-                  FSharpToken(type:INT32, text:1)
-                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
-                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                ILiteralExpr
-                  FSharpToken(type:INT32, text:2)
+            IRangeExpr
+              ILiteralExpr
+                FSharpToken(type:INT32, text:1)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              ILiteralExpr
+                FSharpToken(type:INT32, text:2)
             FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
 
