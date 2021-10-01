@@ -46,7 +46,7 @@ type FSharpExpressionEvaluationInfoProvider() =
         getTextToEvaluate expr
 
     interface IExpressionEvaluationInfoProvider with
-        member x.FindExpression(file, range, _, _) =
+        member x.FindExpression(file, range, _, _, _, _) =
             let expr = file.GetNode<IFSharpExpression>(range)
             let exprName = getTextToEvaluate expr
             if isNotNull exprName then
