@@ -55,9 +55,9 @@ type internal TypeProvidersCache() =
         else proxyTypeProvidersPerId.[id]
 
     member x.Get(assembly) =
-        match typeProvidersPerAssembly.TryGetValue assembly with
+        match typeProvidersPerAssembly.TryGetValue(assembly) with
         | true, x -> x.Values
-        | false, _ -> Array.Empty<_>() :> _
+        | _ -> JetBrains.Util.EmptyArray.Instance :> _
 
     member x.Dump() =
         let typeProviders =
