@@ -54,8 +54,8 @@ type internal TypeProvidersCache() =
         if not hasValue then failwith $"Cannot get type provider {id} from TypeProvidersCache"
         else proxyTypeProvidersPerId.[id]
 
-    member x.Get(assembly) =
-        match typeProvidersPerAssembly.TryGetValue(assembly) with
+    member x.Get(projectOutputPath) =
+        match typeProvidersPerAssembly.TryGetValue(projectOutputPath) with
         | true, x -> x.Values
         | _ -> JetBrains.Util.EmptyArray.Instance :> _
 
@@ -102,8 +102,8 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
             use lock = lock.Push()
             projectsWithGenerativeProviders.Add(project) |> ignore
 
-    let disposeTypeProviders (assembly: string) =
-        let providersToDispose = typeProviders.Get(assembly)
+    let disposeTypeProviders (projectOutputPath: string) =
+        let providersToDispose = typeProviders.Get(projectOutputPath)
         if providersToDispose.Count = 0 then () else
 
         let disposeOutOfProcessProvidersTask =
@@ -115,7 +115,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
         for typeProvider in providersToDispose do typeProvider.DisposeProxy()
         disposeOutOfProcessProvidersTask.Wait()
 
-        Assertion.Assert(typeProviders.Get(assembly) |> Seq.isEmpty, "Type Providers should be disposed")
+        Assertion.Assert(typeProviders.Get(projectOutputPath) |> Seq.isEmpty, "Type Providers should be disposed")
 
     do
         connection.Execute(fun () ->
