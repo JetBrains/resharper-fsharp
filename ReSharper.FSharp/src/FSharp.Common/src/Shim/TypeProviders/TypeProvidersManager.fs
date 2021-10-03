@@ -108,9 +108,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
 
         let disposeOutOfProcessProvidersTask =
             let providersIds = [| for tp in providersToDispose -> tp.EntityId |]
-            connection
-                .Execute(fun () -> connection.ProtocolModel.RdTypeProviderProcessModel.Dispose.Start(lifetime, providersIds))
-                .AsTask()
+            connection.Execute(fun () -> protocol.Dispose.Start(lifetime, providersIds)).AsTask()
 
         for typeProvider in providersToDispose do typeProvider.DisposeProxy()
         disposeOutOfProcessProvidersTask.Wait()
