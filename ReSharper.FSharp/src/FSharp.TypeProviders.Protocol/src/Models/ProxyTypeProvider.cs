@@ -41,12 +41,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public void OnInvalidate()
     {
-      IsInvalidate = true;
-      DisposeManually();
+      DisposeProxy();
       Invalidate?.Invoke(this, EventArgs.Empty);
     }
-
-    private bool IsInvalidate { get; set; }
 
     public bool IsGenerative
     {
@@ -101,19 +98,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     {
     }
 
-    public void DisposeManually()
+    public void DisposeProxy()
     {
       if (myIsDisposed) return;
 
-      // In an invalidated type provider,
-      // the out-of-process caches are cleared before the invalidation signal reaches the proxy type provider
-      var disposeOutOfProcessTask = IsInvalidate
-        ? Task.CompletedTask
-        : myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
-          RdTypeProviderProcessModel.Dispose.Start(myTypeProvidersContext.Connection.Lifetime, EntityId)).AsTask();
-
       myTypeProvidersContext.Dispose(EntityId);
-      disposeOutOfProcessTask.Wait();
 
       myIsDisposed = true;
       Disposed?.Invoke(this, EventArgs.Empty);

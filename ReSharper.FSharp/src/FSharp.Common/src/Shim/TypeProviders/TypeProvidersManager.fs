@@ -103,7 +103,18 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
             projectsWithGenerativeProviders.Add(project) |> ignore
 
     let disposeTypeProviders (assembly: string) =
-        typeProviders.Get(assembly) |> Seq.iter (fun x -> x.DisposeManually())
+        let providersToDispose = typeProviders.Get(assembly)
+        if providersToDispose.Count = 0 then () else
+
+        let disposeOutOfProcessProvidersTask =
+            let providersIds = [| for tp in providersToDispose -> tp.EntityId |]
+            connection
+                .Execute(fun () -> connection.ProtocolModel.RdTypeProviderProcessModel.Dispose.Start(lifetime, providersIds))
+                .AsTask()
+
+        for typeProvider in providersToDispose do typeProvider.DisposeProxy()
+        disposeOutOfProcessProvidersTask.Wait()
+
         Assertion.Assert(typeProviders.Get(assembly) |> Seq.isEmpty, "Type Providers should be disposed")
 
     do

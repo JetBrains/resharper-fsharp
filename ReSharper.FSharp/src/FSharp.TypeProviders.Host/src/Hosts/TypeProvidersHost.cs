@@ -73,8 +73,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
       myTypeProvidersContext.TypeProvidersCache.Remove(typeProviderId);
     }
 
-    private RdTask<Unit> Dispose(Lifetime lifetime, int typeProviderId) =>
-      lifetime.Start(myTypeProvidersContext.TaskScheduler, () => Dispose(typeProviderId)).ToRdTask();
+    private RdTask<Unit> Dispose(Lifetime lifetime, int[] providerIds) =>
+      lifetime.Start(myTypeProvidersContext.TaskScheduler, () =>
+      {
+        foreach (var providerId in providerIds) Dispose(providerId);
+      }).ToRdTask();
 
     private InstantiationResult InstantiateTypeProvidersOfAssembly(InstantiateTypeProvidersOfAssemblyParameters @params,
       RdTypeProviderProcessModel processModel)

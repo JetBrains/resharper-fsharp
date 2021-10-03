@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     void OnInvalidate();
     bool IsGenerative { get; set; }
     event EventHandler ContainsGenerativeTypes;
-    void DisposeManually();
+    void DisposeProxy();
     event EventHandler Disposed;
   }
 }
