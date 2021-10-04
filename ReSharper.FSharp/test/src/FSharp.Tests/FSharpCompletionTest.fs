@@ -16,6 +16,9 @@ type FSharpCompletionTest() =
 
     override x.TestType = CodeCompletionTestType.Action
 
+    [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
+    [<Test; Explicit("Needs reparse")>] member x.``Attribute 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Basic 01 - Replace``() = x.DoNamedTest()
     [<Test>] member x.``Basic 02 - Insert``() = x.DoNamedTest()
     [<Test>] member x.``Basic 03 - Replace before``() = x.DoNamedTest()
@@ -26,8 +29,8 @@ type FSharpCompletionTest() =
 
     [<Test>] member x.``Local val - Binary op 01``() = x.DoNamedTest()
     [<Test>] member x.``Local val - Binary op 02``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Local val - New line 01``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Local val - New line 02``() = x.DoNamedTest()
+    [<Test; Explicit("Needs reparse")>] member x.``Local val - New line 01``() = x.DoNamedTest()
+    [<Test; Explicit("Needs reparse")>] member x.``Local val - New line 02``() = x.DoNamedTest()
 
     [<Test; Explicit>] member x.``Lambda - Arg - Curried - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Arg - Curried - Tuple 01 - First``() = x.DoNamedTest()
