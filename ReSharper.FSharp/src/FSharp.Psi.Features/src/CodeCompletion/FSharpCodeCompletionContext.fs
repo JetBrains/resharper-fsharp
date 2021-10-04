@@ -70,22 +70,19 @@ module FSharpCodeCompletionContext =
         nodeType == FSharpTokenType.IDENTIFIER || nodeType == FSharpTokenType.UNDERSCORE || nodeType.IsKeyword
 
     let getFcsCompletionContext (fsFile: IFSharpFile) (document: IDocument) (offset: DocumentOffset) =
-        let fcsContext =
-            let coords = document.GetCoordsByOffset(offset.Offset)
-            let lineText = document.GetLineText(coords.Line)
-            let fcsPos = getPosFromCoords coords
+        let coords = document.GetCoordsByOffset(offset.Offset)
+        let lineText = document.GetLineText(coords.Line)
+        let fcsPos = getPosFromCoords coords
 
-            let fcsCompletionContext =
-                fsFile.ParseTree |> Option.bind (fun parseTree ->
-                    ParsedInput.TryGetCompletionContext(fcsPos, parseTree, lineText))
+        let fcsCompletionContext =
+            fsFile.ParseTree |> Option.bind (fun parseTree ->
+                ParsedInput.TryGetCompletionContext(fcsPos, parseTree, lineText))
 
-            { PartialName = QuickParse.GetPartialLongNameEx(lineText, int coords.Column - 1)
-              CompletionContext = fcsCompletionContext
-              Coords = coords
-              LineText = lineText
-              DisplayContext = Unchecked.defaultof<_> }
-
-        fcsContext
+        { PartialName = QuickParse.GetPartialLongNameEx(lineText, int coords.Column - 1)
+          CompletionContext = fcsCompletionContext
+          Coords = coords
+          LineText = lineText
+          DisplayContext = Unchecked.defaultof<_> }
 
 
 type FSharpReparsedCodeCompletionContext(file: IFSharpFile, treeTextRange, newText) =
@@ -94,12 +91,13 @@ type FSharpReparsedCodeCompletionContext(file: IFSharpFile, treeTextRange, newTe
     member this.GetFcsContext() =
         let node = this.TreeNode
         let documentOffset = node.GetDocumentEndOffset()
-        let file = node.GetContainingFile() :?> IFSharpFile
+        let file = node.GetContainingFile() :?> IFSharpFile |> notNull
 
         let document =
             match file.StandaloneDocument with
             | null -> file.GetSourceFile().Document
             | document -> document
+            |> notNull
 
         FSharpCodeCompletionContext.getFcsCompletionContext file document documentOffset
 
