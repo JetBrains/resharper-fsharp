@@ -166,7 +166,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         | _ -> expr
 
     let getCommonParentExpr (data: IntroduceVariableData) (sourceExpr: IFSharpExpression): IFSharpExpression =
-        let commonParent = data.Usages.FindLCA().As<IFSharpExpression>().NotNull("commonParentExpr is null")
+        let commonParent = data.Usages.FindLCA() :?> IFSharpExpression |> notNull
 
         let seqExpr = commonParent.As<ISequentialExpr>()
         if isNull seqExpr then commonParent else

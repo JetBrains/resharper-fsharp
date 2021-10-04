@@ -108,7 +108,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
 
         fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun psiModule ->
             use lock = lock.Push()
-            let project = (getModuleProject psiModule).NotNull()
+            let project = getModuleProject psiModule |> notNull
             projectsWithGenerativeProviders.Remove(project) |> ignore)
 
     interface IProxyTypeProvidersManager with

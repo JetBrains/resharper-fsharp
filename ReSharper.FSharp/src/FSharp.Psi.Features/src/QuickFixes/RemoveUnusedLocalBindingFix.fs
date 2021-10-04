@@ -21,7 +21,7 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
     // todo: we can also check that every top declaration pat is unused instead
 
     let binding = BindingNavigator.GetByHeadPattern(pat)
-    let letOrUse = LetBindingsNavigator.GetByBinding(binding)
+    let letBindings = LetBindingsNavigator.GetByBinding(binding)
 
     let getCopyRange (expr: ILetOrUseExpr) =
         let inExpr = expr.InExpression
@@ -51,7 +51,7 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
             "Remove unused value"
 
     override x.IsAvailable _ =
-        isValid pat && isValid letOrUse &&
+        isValid pat && isValid letBindings &&
 
         not (pat :? IAsPat) // todo: enable, check inner patterns
 
@@ -59,9 +59,9 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let bindings = letOrUse.Bindings
+        let bindings = letBindings.Bindings
         if bindings.Count = 1 then
-            match letOrUse with
+            match letBindings with
             | :? ILetBindingsDeclaration as letBindings ->
                 let first =
                     letBindings
@@ -79,10 +79,10 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
                 ModificationUtil.ReplaceChildRange(TreeRange(letExpr), rangeToCopy) |> ignore
 
             | _ ->
-                failwithf "Unexpected let: %O" letOrUse
+                failwithf "Unexpected let: %O" letBindings
             null
         else
-            let letBindings = letOrUse.As<ILetBindings>().NotNull()
+            let letBindings = letBindings.NotNull()
             let bindingIndex = bindings.IndexOf(binding)
 
             let rangeToDelete =

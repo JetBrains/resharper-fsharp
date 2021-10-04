@@ -17,7 +17,7 @@ module FSharpGlobalUtil =
     let inline isNull x = x == null
     let inline isNotNull x = not (isNull x)
 
-    let notNull<'T when 'T: not struct> (x: 'T) =
+    let inline notNull<'T when 'T: not struct> (x: 'T) =
         JetBrains.Diagnostics.Assertion.NotNull(x)
 
     let someUnit = Some ()
