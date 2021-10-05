@@ -8,13 +8,11 @@ import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 
-@Test
 abstract class FSharpTemplatesTestCore : RiderTemplatesTestBase() {
 
+    @Test
     fun classlibCoreTemplate() {
-        var templateId = ProjectTemplateIds.Core.fsharp_classLibrary
-        if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
-            templateId = ProjectTemplateIds.Core.fsharp_classLibrary
+        var templateId = ProjectTemplateIds.currentCore.fsharp_classLibrary
 
         val projectName = "ClassLibrary"
         doCoreTest(templateId, projectName) { project ->
@@ -23,12 +21,9 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestBase() {
         }
     }
 
-
     @Test
     fun classlibNetCoreAppTemplate() {
-        var templateId = ProjectTemplateIds.Core.fsharp_classLibrary
-        if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
-            templateId = ProjectTemplateIds.Core.fsharp_classLibrary
+        var templateId = ProjectTemplateIds.currentCore.fsharp_classLibrary
 
         val projectName = "ClassLibrary"
         doCoreTest(templateId, projectName, "netcoreapp2.1") { project ->
@@ -37,11 +32,9 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestBase() {
         }
     }
 
-
+    @Test
     fun consoleAppCoreTemplate() {
-        var templateId = ProjectTemplateIds.Core.fsharp_consoleApplication
-        if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
-            templateId = ProjectTemplateIds.Core.fsharp_consoleApplication
+        var templateId = ProjectTemplateIds.currentCore.fsharp_consoleApplication
 
         val projectName = "ConsoleApplication"
         doCoreTest(templateId, projectName) { project ->
@@ -76,12 +69,9 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestBase() {
         }
     }
 
-
     @Test
     fun xUnitCoreTemplate() {
-        var templateId = ProjectTemplateIds.Core.fsharp_xUnit
-        if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
-            templateId = ProjectTemplateIds.Core.fsharp_xUnit
+        var templateId = ProjectTemplateIds.currentCore.fsharp_xUnit
         
         val projectName = "UnitTestProject"
         doCoreTest(templateId, projectName) { project ->
@@ -91,7 +81,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestBase() {
             // No run configuration in 2.1.402
 //            checkSelectedRunConfigurationExecutionNotAllowed(project)
 
-            runAllUnitTestsFromProject(project, projectName, 4, 4, expectedSuccessful = 4)
+            runAllUnitTestsFromProject(project, projectName, 3, 3, expectedSuccessful = 3)
 
             //todo enable after move ScriptingAPI.Debug.Temp to ScriptingAPI
             /*val testsCs = activeSolutionDirectory.resolve(projectName).resolve("UnitTest1.cs").toVirtualFile(true)!!
