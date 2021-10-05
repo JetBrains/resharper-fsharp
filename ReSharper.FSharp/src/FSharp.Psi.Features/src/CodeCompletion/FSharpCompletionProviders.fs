@@ -27,6 +27,14 @@ open JetBrains.Util
 type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbols) =
     let [<Literal>] opName = "FSharpLookupItemsProviderBase"
 
+    let isAttributeReference (context: FSharpCodeCompletionContext) =
+        let reference = context.ReparsedContext.Reference
+        if isNull reference then false else
+
+        match reference.GetTreeNode() with
+        | :? ITypeReferenceName as name -> isNotNull (AttributeNavigator.GetByReferenceName(name))
+        | _ -> false
+
     member x.GetDefaultRanges(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext as context -> context.Ranges | _ -> null
 
@@ -83,11 +91,13 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
             let parseResults = fsFile.ParseResults
             let line = int fcsContext.Coords.Line + 1
 
+            let isAttributeReferenceContext = isAttributeReference context
             let getAllSymbols () = getAllSymbols checkResults
+
             try
                 let itemLists =
                     checkResults.GetDeclarationListSymbols(parseResults, line, fcsContext.LineText,
-                        fcsContext.PartialName, getAllSymbols)
+                        fcsContext.PartialName, isAttributeReferenceContext, getAllSymbols)
 
                 for list in itemLists do
                     if list.Name = ".. .." then () else

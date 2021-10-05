@@ -17,7 +17,7 @@ type FSharpCompletionTest() =
     override x.TestType = CodeCompletionTestType.Action
 
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
-    [<Test; Explicit("Needs reparse")>] member x.``Attribute 02``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Basic 01 - Replace``() = x.DoNamedTest()
     [<Test>] member x.``Basic 02 - Insert``() = x.DoNamedTest()

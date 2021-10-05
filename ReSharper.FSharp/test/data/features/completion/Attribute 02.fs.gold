@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:CompiledName}
+module Module =
+
+[<CompiledName{caret}>]
+let x = 1

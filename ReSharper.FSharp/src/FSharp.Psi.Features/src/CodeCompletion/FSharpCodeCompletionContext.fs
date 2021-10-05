@@ -134,7 +134,8 @@ type FSharpReparsedCodeCompletionContext(file: IFSharpFile, treeTextRange, newTe
         let root = treeNode.Root().As<TreeElement>()
         if isNull root then () else
 
-        let node = root.FindContainingNodesAt(referenceRange).FirstOrDefault()
+        let nodes = root.FindContainingNodesAt(referenceRange)
+        let node = nodes.FirstOrDefault()
         FSharpReparsedCodeCompletionContext.FixReferenceOwner(node) |> ignore
 
     override this.GetReparseContext(file, range) =
@@ -145,7 +146,7 @@ type FSharpReparsedCodeCompletionContext(file: IFSharpFile, treeTextRange, newTe
         treeNode.FindReferencesAt(referenceRange) |> Seq.tryHead |> Option.toObj
 
     override this.GetRangeOfReference _ =
-        treeTextRange
+        treeTextRange.ExtendRight(1)
 
 
 type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionContext: FcsCodeCompletionContext,
