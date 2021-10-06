@@ -137,8 +137,11 @@ and FSharpDotSelection(fsFile, offset, selectBetterToken, useCamelHumps) =
 
     override x.GetParentInternal(token) =
         let shouldCreateTokenPartSelection (tokenType: TokenNodeType) =
-            tokenType.IsIdentifier || tokenType.IsComment ||
-            tokenType.IsConstantLiteral || tokenType.IsStringLiteral
+            tokenType.IsIdentifier
+            || tokenType.IsComment
+            || tokenType.IsConstantLiteral
+            || tokenType.IsStringLiteral
+            || FSharpTokenType.InterpolatedStrings.[tokenType]
 
         if not (shouldCreateTokenPartSelection (token.GetTokenType())) then null else
         x.CreateTokenPartSelection(token, TreeTextRange(offset))
@@ -173,9 +176,12 @@ and FSharpTreeRangeSelection(fsFile, first: ITreeNode, last: ITreeNode) =
 and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
     inherit TokenPartSelection<IFSharpFile>(fsFile, treeTextRange, token)
 
-    override x.Parent =
-        let tokenText = token.GetText()
+    let isInterpolatedStringPart (token: ITokenNode) (tokenType: TokenNodeType) =
+        FSharpTokenType.InterpolatedStrings.[tokenType]
+        && token.Parent :? IInterpolatedStringExpr
 
+    let processRegularTokens (token: ITokenNode) (tokenType: TokenNodeType): ISelectedRange =
+        let tokenText = token.GetText()
         let trim left right =
             let range = token.GetTreeTextRange()
             if range.Length >= left + right then
@@ -183,13 +189,13 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
             else tokenText, left
 
         let text, start =
-            let tokenType = token.GetTokenType()
             if tokenType.IsStringLiteral then
                 // todo: trim end if it actually ends with proper symbols?
                 match tokenType.GetLiteralType() with
                 | FSharpLiteralType.Character
                 | FSharpLiteralType.RegularString -> trim 1 1
                 | FSharpLiteralType.VerbatimString -> trim 2 1
+                | FSharpLiteralType.InterpolatedString -> trim 2 1
                 | FSharpLiteralType.TripleQuoteString -> trim 3 3
                 | FSharpLiteralType.ByteArray -> trim 1 2
 
@@ -221,6 +227,15 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
         else
             FSharpTreeNodeSelection(fsFile, token) :> _
 
+    let processInterpolatedPart (token: ITokenNode): ISelectedRange =
+        FSharpTreeNodeSelection(fsFile, token.Parent) :> _
+
+    override x.Parent =
+        let tokenType = token.GetTokenType()
+
+        match token, tokenType with
+        | token, tokenType when isInterpolatedStringPart token tokenType -> processInterpolatedPart token
+        | token, tokenType -> processRegularTokens token tokenType
 
 and FSharpBindingSelection(fsFile: IFSharpFile, binding: IBinding, letBindings: ILetBindings) =
     inherit FSharpTreeRangeSelection(fsFile, binding, binding)
