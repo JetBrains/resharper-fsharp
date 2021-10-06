@@ -32,6 +32,13 @@ type WarningHighlighting(message, range) =
     inherit FSharpErrorHighlightingBase(message, range)
 
 
+[<StaticSeverityHighlighting(Severity.INFO, typeof<HighlightingGroupIds.IdentifierHighlightings>,
+                             AttributeId = AnalysisHighlightingAttributeIds.WARNING,
+                             OverlapResolve = OverlapResolveKind.NONE)>]
+type InfoHighlighting(message, range) =
+    inherit FSharpErrorHighlightingBase(message, range)
+
+
 [<StaticSeverityHighlighting(Severity.ERROR, typeof<HighlightingGroupIds.IdentifierHighlightings>,
                              AttributeId = AnalysisHighlightingAttributeIds.UNRESOLVED_ERROR,
                              OverlapResolve = OverlapResolveKind.NONE)>]

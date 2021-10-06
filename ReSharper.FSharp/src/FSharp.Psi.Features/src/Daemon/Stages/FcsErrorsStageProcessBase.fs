@@ -103,7 +103,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
     let createGenericHighlighting (error: FSharpDiagnostic) range: IHighlighting =
         match error.Severity with
-        | FSharpDiagnosticSeverity.Info
+        | FSharpDiagnosticSeverity.Info -> InfoHighlighting(error.Message, range) :> _
         | FSharpDiagnosticSeverity.Warning -> WarningHighlighting(error.Message, range) :> _
         | _ -> ErrorHighlighting(error.Message, range) :> _
 
