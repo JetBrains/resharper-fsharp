@@ -81,6 +81,23 @@ let private assertStringTokenType (tokenType: TokenNodeType) =
     if not FSharpTokenType.Strings.[tokenType] then
         failwithf $"Got token type: {tokenType}"
 
+let getStringBeginningQuotesLength (tokenType: TokenNodeType) =
+    assertStringTokenType tokenType
+
+    match tokenType.GetLiteralType() with
+    | Character
+    | RegularString -> 1
+    | VerbatimString
+    | InterpolatedString
+    | InterpolatedStringStart
+    | VerbatimInterpolatedString
+    | VerbatimInterpolatedStringStart
+    | ByteArray
+    | VerbatimByteArray -> 2
+    | TripleQuoteString -> 3
+    | TripleQuoteInterpolatedString
+    | TripleQuoteInterpolatedStringStart -> 4
+    | _ -> 0
 
 let getStringEndingQuote tokenType =
     assertStringTokenType tokenType
