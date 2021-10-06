@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
-open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
