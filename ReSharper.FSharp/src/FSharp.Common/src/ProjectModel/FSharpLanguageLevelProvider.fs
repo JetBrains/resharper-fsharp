@@ -174,6 +174,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
     override this.GetLatestAvailableLanguageLevel _ = failwith "todo"
     override this.GetLatestAvailableLanguageLevelImpl(_, _) = failwith "todo"
 
+    override this.LanguageLevelComparer = FSharpLanguageLevelComparer.Instance :> _
 
 [<SolutionFeaturePart>]
 type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProperty) =

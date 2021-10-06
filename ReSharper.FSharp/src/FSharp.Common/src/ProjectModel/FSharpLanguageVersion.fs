@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
+open System.Collections.Generic
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -128,3 +129,9 @@ module FSharpLanguageVersion =
 
     let toCompilerArg =
         toCompilerOptionValue >> sprintf "--langversion:%s"
+
+type FSharpLanguageLevelComparer() =
+    static member val Instance = FSharpLanguageLevelComparer()
+
+    interface IComparer<FSharpLanguageLevel> with
+        member this.Compare(x, y) = x.CompareTo(y)
