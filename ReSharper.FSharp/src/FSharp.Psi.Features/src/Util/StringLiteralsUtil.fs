@@ -90,10 +90,10 @@ let getStringBeginningQuotesLength (tokenType: TokenNodeType) =
     | VerbatimString
     | InterpolatedString
     | InterpolatedStringStart
-    | VerbatimInterpolatedString
-    | VerbatimInterpolatedStringStart
     | ByteArray
     | VerbatimByteArray -> 2
+    | VerbatimInterpolatedString
+    | VerbatimInterpolatedStringStart
     | TripleQuoteString -> 3
     | TripleQuoteInterpolatedString
     | TripleQuoteInterpolatedStringStart -> 4
