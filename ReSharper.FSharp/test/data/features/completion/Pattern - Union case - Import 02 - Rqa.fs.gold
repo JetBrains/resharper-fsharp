@@ -1,0 +1,13 @@
+﻿// ${COMPLETE_ITEM:U.B}
+module Module
+
+module Nested =
+    [<RequireQualifiedAccess>]
+    type U =
+        | A
+        | B of int
+
+open Nested
+
+match Nested.U.A with
+| U.B i{caret}
