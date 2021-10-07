@@ -12,6 +12,7 @@
     <Compile Include="src\Util\FSharpAutoOpenUtil.fs" />
     <Compile Include="src\Util\OpensUtil.fs" />
     <Compile Include="src\Util\FSharpParensUtil.fs" />
+    <Compile Include="src\Util\ParenPatUtil.fs" />
     <Compile Include="src\Util\FSharpExpressionUtil.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpMethodInvocationUtil.fs" />
@@ -23,12 +24,14 @@
     <Compile Include="src\Util\FSharpLambdaUtil.fs" />
     <Compile Include="src\Util\EnumCaseLikeDeclarationUtil.fs" />
     <Compile Include="src\Util\FSharpExpectedTypesUtil.fs" />
+    <Compile Include="src\Util\Deconstruction.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FcsLookupItem.fs" />
     <Compile Include="src\CodeCompletion\Rules\GenerateLambdaRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\ToRecursiveFunctionRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\FSharpRelevanceRule.fs" />
+    <Compile Include="src\CodeCompletion\Rules\UnionCasePatternRule.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
@@ -138,7 +141,7 @@
     <Compile Include="src\Generate\GenerateProvider.fs" />
     <Compile Include="src\Intentions\DataProviders.fs" />
     <Compile Include="src\Intentions\FSharpContextActionBase.fs" />
-    <Compile Include="src\Intentions\Deconstruction.fs" />
+    <Compile Include="src\Intentions\DeconstructAction.fs" />
     <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
     <Compile Include="src\Intentions\ToMultilineRecord.fs" />
     <Compile Include="src\Intentions\ToRecursiveModuleAction.fs" />

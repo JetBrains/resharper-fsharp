@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:Some}
+module Module
+
+match None with
+| Some value{caret}

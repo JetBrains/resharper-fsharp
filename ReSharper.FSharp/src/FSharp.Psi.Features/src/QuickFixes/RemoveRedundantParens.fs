@@ -120,4 +120,4 @@ type RemoveRedundantParenPatFix(warning: RedundantParenPatWarning) =
         let innerExpr = warning.ParenPat.Pattern
         let context = innerExpr.IgnoreParentParens()
 
-        not (RedundantParenPatAnalyzer.needsParens context innerExpr)
+        not (ParenPatUtil.needsParens context innerExpr)

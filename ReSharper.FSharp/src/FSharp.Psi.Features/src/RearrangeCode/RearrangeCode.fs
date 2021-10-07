@@ -6,7 +6,6 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.RearrangeCode
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -71,13 +70,13 @@ type RearrangeableTuplePattern(fsPattern: IFSharpPattern, tuplePat: ITuplePat) =
     let updateParens (pattern: IFSharpPattern) =
         match pattern with
         | :? IAsPat as asPat ->
-            RedundantParenPatAnalyzer.addParensIfNeeded asPat
+            ParenPatUtil.addParensIfNeeded asPat
 
         | :? IParenPat as parenPat ->
             match parenPat.Pattern.IgnoreInnerParens() with
             | :? IAsPat as asPat ->
                 let contextPattern = parenPat.IgnoreParentParens()
-                if RedundantParenPatAnalyzer.needsParens contextPattern asPat then pattern else
+                if ParenPatUtil.needsParens contextPattern asPat then pattern else
 
                 use writeLockCookie = WriteLockCookie.Create(pattern.IsPhysical())
                 ModificationUtil.ReplaceChild(contextPattern, asPat) :> _

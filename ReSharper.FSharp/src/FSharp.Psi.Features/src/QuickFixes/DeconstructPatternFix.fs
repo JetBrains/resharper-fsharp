@@ -27,4 +27,4 @@ type DeconstructPatternFix(error: UnionCaseExpectsTupledArgumentsError) =
     override this.Text = deconstruction.Text
 
     override x.ExecutePsiTransaction(_, _) =
-        FSharpDeconstruction.deconstruct deconstruction
+        FSharpDeconstruction.deconstruct false deconstruction
