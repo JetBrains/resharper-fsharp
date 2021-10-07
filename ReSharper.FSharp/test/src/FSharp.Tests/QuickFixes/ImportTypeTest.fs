@@ -24,12 +24,22 @@ type ImportTypeTest() =
 
     [<Test>] member x.``Type arguments - Count 01``() = x.DoNamedTest()
     [<Test>] member x.``Module name - Escaped 01``() = x.DoNamedTest()
+    [<Test>] member x.``Inner namespace - Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Inner namespace - Module 02``() = x.DoNamedTest()
+    [<Test>] member x.``Inner namespace - Module 03``() = x.DoNamedTest()
+    [<Test>] member x.``Inner namespace - Module 04``() = x.DoNamedTest()
+    [<Test>] member x.``Inner namespace - Module 05``() = x.DoNamedTest()
+    [<Test>] member x.``Inner namespace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Inner namespace 02 - Sibling``() = x.DoNamedTest()
 
     [<Test>] member x.``Nested Module - Attribute 01``() = x.DoNamedTest()
     [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
     [<Test>] member x.``Nested Module - Attribute 02 - Prefer nested``() = x.DoNamedTest()
     [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
     [<Test>] member x.``Nested Module - Attribute 03 - Nested modules``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nested Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Nested Module 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Qualifiers - Expr - Imported 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Expr - Imported 02 - Nested``() = x.DoNamedTest()

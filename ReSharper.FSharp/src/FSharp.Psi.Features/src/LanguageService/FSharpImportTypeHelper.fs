@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -34,6 +35,10 @@ type FSharpImportTypeHelper() =
             let sourceFile = context.GetSourceFile()
             let psiModule = context.GetPsiModule()
             let containingModules = getContainingModules context
+            let referenceStartOffset = context.GetDocumentStartOffset()
+
+            let fsFile = sourceFile.FSharpFile
+            let settings = fsFile.GetSettingsStoreWithEditorConfig()
 
             let names = reference.GetAllNames().ResultingList()
             let factory = importTypeCacheFactory.Invoke(context)
@@ -63,8 +68,10 @@ type FSharpImportTypeHelper() =
                             not (psiModule.References(typeElement.Module)) then
                         true else
 
-                    let fsFile = context.FSharpFile
-                    let names = toQualifiedList fsFile typeElement |> List.map (fun el -> el.GetSourceName())
+                    let moduleToImport = ModuleToImport.DeclaredElement(moduleToOpen)
+                    let moduleDecl, _ = findModuleToInsertTo fsFile referenceStartOffset settings moduleToImport
+                    let qualifiedElementList = moduleToImport.GetQualifiedElementList(moduleDecl, true)
+                    let names = qualifiedElementList |> List.map (fun el -> el.GetSourceName())
                     let symbolUse = fsFile.CheckerService.ResolveNameAtLocation(context, names, opName)
                     Option.isSome symbolUse)
                 |> Seq.cast
