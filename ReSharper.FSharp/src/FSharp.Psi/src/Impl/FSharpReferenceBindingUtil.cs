@@ -53,16 +53,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return null;
     }
 
-    private static bool IsNamespaceQualifierRequired([NotNull] FSharpSymbolReference reference)
+    private static bool RequiresFullyQualifiedName([NotNull] IReference reference)
     {
+      // Can't insert 'open' before top-level module declaration.
       var attribute = reference.GetTreeNode().GetContainingNode<IAttribute>(true);
       return NamedModuleDeclarationNavigator.GetByAttribute(attribute) != null;
     }
 
-    private static void SetNamespaceQualifiesIfNeeded([NotNull] FSharpSymbolReference reference,
+    private static void SetNamespaceQualifierIfNeeded([NotNull] FSharpSymbolReference reference,
       [NotNull] IClrDeclaredElement declaredElement)
     {
-      if (!IsNamespaceQualifierRequired(reference))
+      if (!RequiresFullyQualifiedName(reference))
         return;
 
       var ns = GetNamespace(declaredElement);
@@ -72,19 +73,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       reference.SetQualifier(ns);
     }
 
+    /// Doesn't take opened modules into account, only checks if qualifiers are required by containing type or syntax.
     public static void SetRequiredQualifiers([NotNull] FSharpSymbolReference reference,
       [NotNull] IClrDeclaredElement declaredElement)
     {
       var containingType = declaredElement.GetContainingType();
       if (containingType == null)
       {
-        SetNamespaceQualifiesIfNeeded(reference, declaredElement);
+        SetNamespaceQualifierIfNeeded(reference, declaredElement);
         return;
       }
 
       if (containingType.IsModule() && !containingType.RequiresQualifiedAccess())
       {
-        SetNamespaceQualifiesIfNeeded(reference, containingType);
+        SetNamespaceQualifierIfNeeded(reference, containingType);
+        return;
+      }
+
+      if ((containingType.IsUnion() || containingType.IsRecord()) && !containingType.RequiresQualifiedAccess())
+      {
+        // Containing module may require qualifier.
+        SetRequiredQualifiers(reference, containingType);
         return;
       }
 

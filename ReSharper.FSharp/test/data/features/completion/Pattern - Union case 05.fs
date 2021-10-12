@@ -1,0 +1,6 @@
+// ${COMPLETE_ITEM:Error}
+module Module
+
+match Ok 123 with
+| {caret}
+

@@ -708,8 +708,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : ModuleMembersAccessKind.Normal;
     }
 
-    private static bool MayHaveRequireQualifiedAccessAttribute(ITypeElement typeElement) =>
-      typeElement.IsModule() || typeElement.IsUnion();
+    public static bool MayHaveRequireQualifiedAccessAttribute([NotNull] this ITypeElement typeElement) =>
+      typeElement.IsModule() || typeElement.IsUnion() || typeElement.IsRecord();
 
     public static bool RequiresQualifiedAccess([NotNull] this ITypeElement typeElement) =>
       typeElement.GetAccessType() == ModuleMembersAccessKind.RequiresQualifiedAccess;

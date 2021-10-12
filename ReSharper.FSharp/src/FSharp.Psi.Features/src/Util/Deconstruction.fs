@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruct
 
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
-open FSharp.Compiler.Tokenization
 open JetBrains.Application.Progress
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Bulbs
@@ -47,12 +46,12 @@ module FSharpDeconstruction =
             | _ -> Unchecked.defaultof<_>
         | _ -> Unchecked.defaultof<_>
 
-    let createUnionCaseFields (pattern: IFSharpPattern) (fcsUnionCase: FSharpUnionCase)
+    let createUnionCaseFields (context: ITreeNode) (fcsUnionCase: FSharpUnionCase)
             (fcsEntityInstance: FcsEntityInstance) =
         fcsUnionCase.Fields
         |> List.ofSeq
         |> List.map (fun field ->
-            let fieldType = field.FieldType.Instantiate(fcsEntityInstance.Substitution).MapType(pattern)
+            let fieldType = field.FieldType.Instantiate(fcsEntityInstance.Substitution).MapType(context)
             SingleValueDeconstructionComponent(field.Name, [], fieldType) :> IDeconstructionComponent)
 
     let hasUsages (pat: IFSharpPattern) =
@@ -206,7 +205,7 @@ module FSharpDeconstruction =
 
         BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, endOffset)
 
-[<AbstractClass>]
+[<AbstractClass; AllowNullLiteral>]
 type FSharpDeconstructionBase(pattern: IFSharpPattern, components: IDeconstructionComponent list) =
     member val Components = components
 
@@ -251,6 +250,7 @@ type DeconstructionFromTuple(pattern: IFSharpPattern, components: IDeconstructio
         let pattern = ModificationUtil.ReplaceChild(pat, pattern)
         null, pattern, names
 
+[<AllowNullLiteral>]
 type DeconstructionFromUnionCaseFields(name: string, pattern: IParametersOwnerPat, components: IDeconstructionComponent list) =
     inherit FSharpDeconstructionBase(pattern, components)
 
@@ -284,6 +284,8 @@ type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase, pattern: IFSharp
         components: IDeconstructionComponent list, fcsEntity: FSharpEntity) =
     inherit FSharpDeconstructionBase(pattern, components)
 
+    let [<Literal>] opName = "DeconstructionFromUnionCase.DeconstructInnerPatterns"
+
     member val Name = fcsUnionCase.Name
     member val Entity = fcsEntity
     member val UnionCase = fcsUnionCase
@@ -316,46 +318,7 @@ type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase, pattern: IFSharp
             else
                 null, []
 
-        let name = FSharpKeywords.AddBackticksToIdentifierIfNeeded this.Name
-        let name, qualifierTypeElement =
-            let typeElement = fcsEntity.GetTypeElement(pat.GetPsiModule())
-            let requiresQualifiedName = isNotNull typeElement && typeElement.RequiresQualifiedAccess()
-            if requiresQualifiedName then $"{typeElement.GetSourceName()}.{name}", typeElement else
-
-            let containingType = typeElement.GetContainingType()
-            if isNotNull containingType && containingType.RequiresQualifiedAccess() then
-                $"{containingType.GetSourceName()}.{name}", containingType else
-
-            name, typeElement
-
-        let pat, reference =
-            let parametersOwnerPat =
-                let factory = pat.CreateElementFactory()
-                let text = if hasFields then $"({name} _)" else $"({name})"
-                let pattern = factory.CreatePattern(text, false) :?> IParenPat
-                pattern.Pattern
-
-            let pat = ModificationUtil.ReplaceChild(pat, parametersOwnerPat)
-
-            let referenceName = 
-                match pat with
-                | :? IReferencePat as refPat -> refPat.ReferenceName
-                | :? IParametersOwnerPat as pa -> pa.ReferenceName
-                | _ -> failwith "Unexpected pattern"
-
-            pat, referenceName.Reference
-
-        let unionCase = fcsUnionCase
-        if not (FSharpResolveUtil.resolvesToFcsSymbol unionCase reference true "Deconstruct union case") then
-            let qualifierReference = reference.QualifierReference
-            if isNotNull qualifierReference then
-                FSharpReferenceBindingUtil.SetRequiredQualifiers(qualifierReference, qualifierTypeElement)
-
-            let containingModules = getContainingModules pat
-            let moduleToOpen = getModuleToOpen qualifierTypeElement
-            if not (containingModules.Contains(moduleToOpen)) then
-                addOpens reference qualifierTypeElement |> ignore
-
+        let pat = FSharpPatternUtil.bindFcsSymbol pat fcsUnionCase opName
         if not hasFields then pat, null, [] else
 
         let pat = ParenPatUtil.addParensIfNeeded pat
