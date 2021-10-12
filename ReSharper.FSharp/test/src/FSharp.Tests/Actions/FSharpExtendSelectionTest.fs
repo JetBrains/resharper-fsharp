@@ -71,3 +71,12 @@ type FSharpExtendSelectionTest() =
     [<Test>] member x.``Greater 03``() = x.DoNamedTest()
     [<Test>] member x.``Less 01``() = x.DoNamedTest()
     [<Test>] member x.``Plus 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Strings - Regular - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Regular - Multiple words``() = x.DoNamedTest()
+
+    [<Test>] member x.``Strings - Interpolated - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - With inserts 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - With inserts 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Without expressions``() = x.DoNamedTest()
+
