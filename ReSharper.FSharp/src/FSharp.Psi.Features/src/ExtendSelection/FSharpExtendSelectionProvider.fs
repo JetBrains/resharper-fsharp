@@ -207,10 +207,14 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
             |> Option.defaultValue null
 
         let createInsertSelectionForPrevLiteral (): ISelectedRange =
+            let mutable previousToken: ITokenNode = null
             interpolatedStringExpr.LiteralsEnumerable
-            |> Seq.pairwise
-            |> Seq.tryFind (snd >> (==) token)
-            |> Option.map (fun (previousToken, _) ->
+            |> Seq.tryFind (fun literal ->
+                let found = literal == token
+                if found then true else
+                previousToken <- literal
+                false)
+            |> Option.map (fun _ ->
                 FSharpInterpolatedStringInsertSelectionWithTokens(fsFile, previousToken, token, interpolatedStringExpr) :> ISelectedRange)
             |> Option.defaultValue null
 
@@ -270,10 +274,6 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
             if localParentRange.IsValid() && localParentRange.Contains(&localRange) then
                 let range = localParentRange.Shift(token.GetTreeStartOffset() + start)
                 FSharpTokenPartSelection(fsFile, range, token) :> _ else
-//            if (isInterpolatedStringMiddleToken tokenType || isInterpolatedStringEndToken tokenType)
-//                 && treeTextRange.StartOffset.Offset = token.GetTreeStartOffset().Offset
-//                 && token.PrevSibling <> null then
-//                FSharpTreeNodeSelection(fsFile, token.PrevSibling) :> _ else
             let betterSelection = FSharpExtendSelectionProvider.FindBetterNode(fsFile, token)
             if isNotNull betterSelection then betterSelection else
             FSharpTreeNodeSelection(fsFile, token) :> _
