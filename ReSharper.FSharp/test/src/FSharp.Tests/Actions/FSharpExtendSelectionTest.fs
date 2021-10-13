@@ -77,6 +77,17 @@ type FSharpExtendSelectionTest() =
     [<Test>] member x.``Strings - Regular 03 - Single word 01``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Regular 04 - Single word 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Strings - Verbatim 01 - Multiple words 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Verbatim 02 - Multiple words 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Verbatim 03 - Single word 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Verbatim 04 - Single word 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Strings - Triple quoted 01 - Multiple words 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Triple quoted 02 - Multiple words 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Triple quoted 03 - Single word 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Triple quoted 04 - Single word 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Triple quoted 05 - Multiline``() = x.DoNamedTest()
+
     [<Test>] member x.``Strings - Interpolated - Regular 01 - Before start brace``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Regular 02 - After end brace``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Regular 03 - After start brace``() = x.DoNamedTest()
