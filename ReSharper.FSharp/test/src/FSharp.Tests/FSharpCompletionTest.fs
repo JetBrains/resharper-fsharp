@@ -226,3 +226,22 @@ type FSharpSignatureKeywordCompletionTest() =
     [<Test>] member x.``Module member - Module abbreviation 01``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member 01``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type FSharpFilteredCompletionTest() =
+    inherit CodeCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion"
+
+    override x.TestType = CodeCompletionTestType.Action
+
+    member val CompleteItem = null with get, set
+
+    override this.ItemSelector =
+        Func<_, _>(function :? FcsLookupItem as item -> item.Text = this.CompleteItem | _ -> false)
+
+    [<Test>] member x.``Pattern - No reparse ident 01``() = x.DoNamedTest()
+
+    override this.BeforeTestStart(_, _, documentText) =
+        this.CompleteItem <- FSharpFilteredCompletionTest.GetSetting(documentText, "COMPLETE_ITEM")

@@ -33,6 +33,7 @@
     <Compile Include="src\CodeCompletion\Rules\ToRecursiveFunctionRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\FSharpRelevanceRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\UnionCasePatternRule.fs" />
+    <Compile Include="src\CodeCompletion\Rules\RemoveReparsePatternRule.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
