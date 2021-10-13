@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
+open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application.UI.Controls.JetPopupMenu
 open JetBrains.DocumentModel
@@ -124,58 +125,95 @@ type UnionCasePatternRule() =
         | null -> pat
         | orPat -> skipParentOrPats orPat
 
-    override this.IsAvailable(context) =
-        context.IsBasicOrSmartCompletion && not context.IsQualified
-
-    override this.TransformItems(context, collector) =
-        let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
-        if isNull reference then () else
-
-        let referenceName = reference.GetElement().As<IExpressionReferenceName>()
-        if isNull referenceName then () else
-
+    let getExpectedUnionType referenceName =
         let referencePat = ReferencePatNavigator.GetByReferenceName(referenceName)
         let pat = skipParentOrPats referencePat
         let matchClause = MatchClauseNavigator.GetByPattern(pat)
         let matchExpr = MatchExprNavigator.GetByClause(matchClause)
-        if isNull matchExpr then () else
+        if isNull matchExpr then None else
 
         let expr = matchExpr.Expression
-        if isNull expr then () else
+        if isNull expr then None else
 
         let fcsType = expr.TryGetFcsType()
-        if isNull fcsType || not fcsType.HasTypeDefinition then () else
+        if isNull fcsType || not fcsType.HasTypeDefinition then None else
 
         let displayContext = expr.TryGetFcsDisplayContext()
-        if isNull displayContext then () else
+        if isNull displayContext then None else
 
         let fcsEntity = getAbbreviatedEntity fcsType.TypeDefinition
-        if not fcsEntity.IsFSharpUnion then () else
+        if not fcsEntity.IsFSharpUnion then None else
 
-        collector.RemoveWhere(fun lookupItem ->
-            let lookupItem = lookupItem.As<FcsLookupItem>()
-            if isNull lookupItem then false else
+        Some (FcsEntityInstance.create fcsType, fcsType, displayContext)
 
-            match lookupItem.FcsSymbol with
-            | :? FSharpUnionCase as fcsUnionCase ->
-                let returnType = fcsUnionCase.ReturnType
-                returnType.HasTypeDefinition && getAbbreviatedEntity returnType.TypeDefinition = fcsEntity
-            | _ -> false)
+    override this.IsAvailable(context) =
+        context.IsBasicOrSmartCompletion && not context.IsQualified &&
 
-        let typeElement = fcsEntity.GetTypeElement(expr.GetPsiModule())
-        let requiresQualifiedName = isNotNull typeElement && typeElement.RequiresQualifiedAccess()
-        let typeName = typeElement.GetSourceName()
-        let displayContext = displayContext.WithShortTypeNames(true)
+        let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
+        isNotNull reference &&
 
-        for unionCase in fcsEntity.UnionCases do
-            let text = if requiresQualifiedName then $"{typeName}.{unionCase.Name}" else unionCase.Name
-            let info = UnionCasePatternInfo(text, unionCase, FcsEntityInstance.create fcsType, Ranges = context.Ranges)
-            let item =
+        let referenceOwner = reference.GetElement()
+        isNotNull (ReferencePatNavigator.GetByReferenceName(referenceOwner.As()))
+
+    override this.TransformItems(context, collector) =
+        let reference = context.ReparsedContext.Reference :?> FSharpSymbolReference
+        let referenceName = reference.GetElement() :?> IExpressionReferenceName
+
+        let createItem fcsEntityInstance (fcsType: FSharpType) displayContext text matchesType (fcsUnionCase: FSharpUnionCase) =
+            let info = UnionCasePatternInfo(text, fcsUnionCase, fcsEntityInstance, Ranges = context.Ranges)
+            let item = 
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->
                         let typeText = fcsType.Format(displayContext)
-                        TextPresentation(info, typeText, true, PsiSymbolsThemedIcons.EnumMember.Id) :> _)
+                        TextPresentation(info, typeText, matchesType, PsiSymbolsThemedIcons.EnumMember.Id) :> _)
                     .WithBehavior(fun _ -> UnionCasePatternBehavior(info) :> _)
                     .WithMatcher(fun _ -> TextualMatcher(info) :> _)
-                    .WithRelevance(CLRLookupItemRelevance.ExpectedTypeMatch)
-            collector.Add(item)
+                    .WithRelevance(CLRLookupItemRelevance.Methods)
+
+            if matchesType then
+                markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
+
+            item
+
+        let expectedUnionType = getExpectedUnionType referenceName
+
+        // todo: move the filtering to the item provider instead of hacky modification of the collection?
+        let unionCaseItems = List()
+        collector.RemoveWhere(fun item ->
+            match item with
+            | :? FcsLookupItem as lookupItem ->
+                // Replace provided items for union cases with special ones.
+                match lookupItem.FcsSymbol with
+                | :? FSharpUnionCase as fcsUnionCase ->
+                    let matchesType =
+                        match expectedUnionType with
+                        | None -> false
+                        | Some(fcsEntityInstance, _, _) ->
+                            let returnType = fcsUnionCase.ReturnType
+                            returnType.HasTypeDefinition && getAbbreviatedEntity returnType.TypeDefinition = fcsEntityInstance.Entity
+
+                    // Expected type cases provided separately below: we don't know if they were provided by FCS.
+                    if not matchesType then
+                        let fcsType = fcsUnionCase.ReturnType.Instantiate(lookupItem.FcsSymbolUse.GenericArguments)
+                        let fcsEntityInstance = FcsEntityInstance.create fcsType
+                        let item = createItem fcsEntityInstance fcsType lookupItem.FcsSymbolUse.DisplayContext fcsUnionCase.Name false fcsUnionCase
+                        unionCaseItems.Add(item)
+
+                    true
+
+                | _ -> false
+            | _ -> false)
+
+        unionCaseItems |> Seq.iter collector.Add
+
+        match expectedUnionType with
+        | None -> ()
+        | Some(fcsEntityInstance, fcsType, displayContext) ->
+            let typeElement = fcsEntityInstance.Entity.GetTypeElement(context.NodeInFile.GetPsiModule())
+            let requiresQualifiedName = isNotNull typeElement && typeElement.RequiresQualifiedAccess()
+            let typeName = typeElement.GetSourceName()
+
+            for fcsUnionCase in fcsEntityInstance.Entity.UnionCases do
+                let text = if requiresQualifiedName then $"{typeName}.{fcsUnionCase.Name}" else fcsUnionCase.Name
+                let item = createItem fcsEntityInstance fcsType displayContext text true fcsUnionCase
+                collector.Add(item)
