@@ -4,20 +4,32 @@ using JetBrains.Diagnostics;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
 {
-  public struct ProhibitTypeCheckCookie : IDisposable
+  public class ProhibitTypeCheckCookie : IDisposable
   {
+    private readonly bool myAcquiredByThisInstance;
+
     [ThreadStatic] private static bool IsAcquired;
+
+    public ProhibitTypeCheckCookie(bool acquire) =>
+      myAcquiredByThisInstance = acquire;
 
     /// Prohibits type checking on the current thread.
     public static IDisposable Create()
     {
-      AssertTypeCheckIsAllowed();
+      if (IsAcquired)
+        return new ProhibitTypeCheckCookie(false);
 
       IsAcquired = true;
-      return new ProhibitTypeCheckCookie();
+      return new ProhibitTypeCheckCookie(true);
     }
 
-    public void Dispose() => IsAcquired = false;
+    public void Dispose()
+    {
+      if (!myAcquiredByThisInstance)
+        return;
+
+      IsAcquired = false;
+    }
 
     [Conditional("JET_MODE_ASSERT")]
     public static void AssertTypeCheckIsAllowed() =>

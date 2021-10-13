@@ -95,6 +95,10 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
     member x.ParseAndCheckFile([<NotNull>] sourceFile: IPsiSourceFile, opName,
             [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
+        match PinTypeCheckResultsCookie.PinnedResults with
+        | Some(parseResults, checkResults) -> Some({ ParseResults = parseResults; CheckResults = checkResults })
+        | _ ->
+
         ProhibitTypeCheckCookie.AssertTypeCheckIsAllowed()
 
         match x.FcsProjectProvider.GetProjectOptions(sourceFile) with
@@ -116,6 +120,12 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         | _ ->
             logger.Trace("ParseAndCheckFile: fail {0}, {1}", path, opName)
             None
+
+    member x.PinCheckResults(sourceFile, opName) =
+        match x.ParseAndCheckFile(sourceFile, opName) with
+        | Some(parseAndCheckResults) ->
+            new PinTypeCheckResultsCookie(parseAndCheckResults.ParseResults, parseAndCheckResults.CheckResults) :> IDisposable
+        | _ -> { new IDisposable with member this.Dispose() = () }
 
     member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) =
         match x.FcsProjectProvider.GetProjectOptions(file) with

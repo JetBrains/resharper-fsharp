@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using FSharp.Compiler.Syntax;
@@ -16,6 +17,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   {
     [CanBeNull]
     FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults, string opName);
+
+    IDisposable PinTypeCheckResults(string opName);
 
     [NotNull] FcsCheckerService FcsCheckerService { get; set; }
 
