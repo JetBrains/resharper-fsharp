@@ -119,6 +119,7 @@
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
     <QuickFix>AddIgnoreFix</QuickFix>
     <QuickFix>IntroduceVarFix</QuickFix>
   </Error>

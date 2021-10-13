@@ -16,6 +16,7 @@ type ReplaceWithAssignmentExpressionTest() =
     [<Test>] member x.``ReferenceExpr 3 - Mutable field``() = x.DoNamedTest()
     [<Test>] member x.``ReferenceExpr 4 - Mutable member``() = x.DoNamedTest()
     [<Test>] member x.``IndexerExpr``() = x.DoNamedTest()
+    [<Test>] member x.``Unit type expected error``() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``ReferenceExpr 1 - Not mutable field, not available``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``ReferenceExpr 2 - Not mutable member, not available``() = x.DoNamedTest()

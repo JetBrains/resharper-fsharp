@@ -10,10 +10,14 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Resources.Shell
 
-type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
+type ReplaceWithAssignmentExpressionFix(expr: IBinaryAppExpr) =
     inherit FSharpQuickFixBase()
 
-    let expr = warning.Expr.As<IBinaryAppExpr>()
+    new (error: UnitTypeExpectedError) =
+        ReplaceWithAssignmentExpressionFix(error.Expr.As<IBinaryAppExpr>())
+
+    new (warning: UnitTypeExpectedWarning) =
+        ReplaceWithAssignmentExpressionFix(warning.Expr.As<IBinaryAppExpr>())
 
     override x.IsAvailable _ =
         if not (isValid expr && isPredefinedFunctionRef "=" expr.Operator) then false else
