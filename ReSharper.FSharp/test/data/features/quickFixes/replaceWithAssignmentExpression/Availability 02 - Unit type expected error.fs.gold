@@ -1,0 +1,15 @@
+﻿module Test
+
+let f(): unit =
+    let a = [|0|]
+    |a.[0] = 5|(0)
+
+------------------------------------------------
+0: This expression was expected to have type
+    'unit'    
+but here has type
+    'bool'    
+QUICKFIXES:
+Ignore value
+Introduce 'let' binding
+Replace with '<-' assignment
