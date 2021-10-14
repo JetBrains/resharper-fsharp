@@ -121,6 +121,7 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddIgnoreFix</QuickFix>
     <QuickFix>IntroduceVarFix</QuickFix>
+    <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
   </Error>
 
   <Warning staticGroup="FSharpErrors" name="TypeTestUnnecessary">

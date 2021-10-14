@@ -1,0 +1,14 @@
+﻿module Test
+
+let f() =
+    let a = 0
+    |a = 5|(0)
+    ()
+
+------------------------------------------------
+0: The result of this equality expression has type 'bool' and is implicitly discarded. Consider using 'let' to bind the result to a name, e.g. 'let result = expression'. If you intended to mutate a value, then mark the value 'mutable' and use the '<-' operator e.g. 'a <- expression'.
+QUICKFIXES:
+Introduce 'let' binding
+Ignore value
+Remove subsequent expressions
+Replace with '<-' assignment
