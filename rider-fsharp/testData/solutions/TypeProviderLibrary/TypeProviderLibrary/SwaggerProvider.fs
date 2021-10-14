@@ -2,7 +2,7 @@
 
 open SwaggerProvider
 
-let [<Literal>] Schema = "https://petstore.swagger.io/v2/swagger.json"
-type PetStore = OpenApiClientProvider<Schema>
+let [<Literal>] Schema = "\swagger.json"
+type PetStore = OpenApiClientProvider<const (__SOURCE_DIRECTORY__ + Schema)>
 let client = PetStore.Client()
 ignore (client.DeleteOrder(2L))

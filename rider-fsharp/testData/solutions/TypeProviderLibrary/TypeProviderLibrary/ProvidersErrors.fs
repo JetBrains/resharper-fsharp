@@ -5,10 +5,10 @@ open FSharp.Configuration
 open FSharp.Text.RegexProvider
 open SimpleErasingProviderNamespace
 
-let [<Literal>] Schema = "https://petstore.swagger.io/v2/swagger.json"
+let [<Literal>] Schema = "\swagger.json"
 
-type PetStore1 = OpenApiClientProvider<Schema>
-type PetStore2 = OpenApiClientProvider<Schema>
+type PetStore1 = OpenApiClientProvider<const (__SOURCE_DIRECTORY__ + Schema)>
+type PetStore2 = OpenApiClientProvider<const (__SOURCE_DIRECTORY__ + Schema)>
 
 
 let _  = YamlConfig<"1.txt">
