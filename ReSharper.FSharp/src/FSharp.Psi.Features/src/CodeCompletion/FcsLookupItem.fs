@@ -59,6 +59,8 @@ type FcsErrorLookupItem(item: DeclarationListItem) =
 type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
 
+    let [<Literal>] Id = "FcsLookupItem.OnAfterComplete"
+    
     let mutable candidates = Unchecked.defaultof<_>
 
     member this.FcsSymbolUse = items.SymbolUses.Head 
@@ -98,6 +100,10 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
         with _ -> null
 
     override x.DisableFormatter = true
+
+    override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
+        use pinCheckResultsCookie = textControl.GetFSharpFile(solution).PinTypeCheckResults(true, Id)
+        base.Accept(textControl, nameRange, insertType, suffix, context.PsiModule.GetSolution(), keepCaretStill)
 
     override x.OnAfterComplete(textControl, nameRange, decorationRange, tailType, suffix, caretPositionRangeMarker) =
         base.OnAfterComplete(textControl, &nameRange, &decorationRange, tailType, &suffix, &caretPositionRangeMarker)

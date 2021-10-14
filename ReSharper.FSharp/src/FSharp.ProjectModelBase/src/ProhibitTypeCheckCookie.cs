@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
     [ThreadStatic] private static bool IsAcquired;
 
-    public ProhibitTypeCheckCookie(bool acquire) =>
+    private ProhibitTypeCheckCookie(bool acquire) =>
       myAcquiredByThisInstance = acquire;
 
     /// Prohibits type checking on the current thread.

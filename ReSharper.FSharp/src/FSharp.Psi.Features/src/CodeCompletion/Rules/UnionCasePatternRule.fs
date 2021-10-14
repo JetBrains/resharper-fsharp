@@ -15,7 +15,6 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.Util
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
@@ -49,8 +48,8 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
     inherit TextualBehavior<UnionCasePatternInfo>(info)
 
     override this.Accept(textControl, nameRange, _, _, solution, _) =
-        use pinCheckResultsCookie = textControl.GetFSharpFile(solution).PinTypeCheckResults(UnionCasePatternInfo.Id)
-        use cookie = ProhibitTypeCheckCookie.Create()
+        use pinCheckResultsCookie =
+            textControl.GetFSharpFile(solution).PinTypeCheckResults(true, UnionCasePatternInfo.Id)
 
         textControl.Document.ReplaceText(nameRange, "_")
         let nameRange = nameRange.StartOffset.ExtendRight("_".Length)

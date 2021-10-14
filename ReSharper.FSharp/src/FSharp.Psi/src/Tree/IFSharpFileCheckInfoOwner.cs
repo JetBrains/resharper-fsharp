@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     [CanBeNull]
     FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults, string opName);
 
-    IDisposable PinTypeCheckResults(string opName);
+    IDisposable PinTypeCheckResults(bool prohibitTypeCheck, string opName);
 
     [NotNull] FcsCheckerService FcsCheckerService { get; set; }
 

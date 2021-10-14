@@ -31,6 +31,7 @@ type RemoveReparsePatternRule() =
         let name = reparsedName.SubstringBeforeLast(FSharpCompletionUtil.DummyIdentifier)
         if reparsedName.Length = name.Length then () else
 
+        let document = context.BasicContext.Document
         let treeStartOffset = referencePat.GetTreeStartOffset()
         collector.RemoveWhere(fun item ->
             let lookupItem = item.As<FcsLookupItem>()
@@ -38,6 +39,5 @@ type RemoveReparsePatternRule() =
 
             match lookupItem.FcsSymbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
-                not mfv.IsModuleValueOrMember &&
-                getTreeStartOffset context.BasicContext.Document mfv.DeclarationLocation = treeStartOffset
+                not mfv.IsModuleValueOrMember && getTreeStartOffset document mfv.DeclarationLocation = treeStartOffset
             | _ -> false)
