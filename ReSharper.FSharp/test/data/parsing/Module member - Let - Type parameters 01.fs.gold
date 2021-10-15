@@ -8,25 +8,26 @@ IFSharpImplFile
         ITopReferencePat
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:f)
-        FSharpTokenType+LessTokenElement(type:LESS, text:<)
-        ITypeParameterOfMethodDeclaration
-          FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-          FSharpIdentifierToken(type:IDENTIFIER, text:T)
-        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
-        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        ITypeConstraint
-          ITypeReferenceName
-            ITypeParameterId
-              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-              FSharpIdentifierToken(type:IDENTIFIER, text:T)
+        IPostfixTypeParameterDeclarationList
+          FSharpTokenType+LessTokenElement(type:LESS, text:<)
+          ITypeParameterOfMethodDeclaration
+            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+            FSharpIdentifierToken(type:IDENTIFIER, text:T)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+ColonGreaterTokenElement(type:COLON_GREATER, text::>)
+          FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedTypeUsage
+          ITypeConstraint
             ITypeReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:int)
-        FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+              ITypeParameterId
+                FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                FSharpIdentifierToken(type:IDENTIFIER, text:T)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+ColonGreaterTokenElement(type:COLON_GREATER, text::>)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            INamedTypeUsage
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:int)
+          FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IParametersPatternDeclaration
           IWildPat

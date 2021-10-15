@@ -8,11 +8,12 @@ IFSharpImplFile
         ITopReferencePat
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:F)
-        FSharpTokenType+LessTokenElement(type:LESS, text:<)
-        ITypeParameterOfMethodDeclaration
-          FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-          FSharpIdentifierToken(type:IDENTIFIER, text:T)
-        FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+        IPostfixTypeParameterDeclarationList
+          FSharpTokenType+LessTokenElement(type:LESS, text:<)
+          ITypeParameterOfMethodDeclaration
+            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+            FSharpIdentifierToken(type:IDENTIFIER, text:T)
+          FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IParametersPatternDeclaration
           ILocalReferencePat

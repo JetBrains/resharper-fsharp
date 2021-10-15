@@ -454,9 +454,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
             match typars with
             | Some(SynValTyparDecls(Some(typarDecls), _)) ->
+                let mark = x.Mark(typarDecls.Range)
                 for typarDecl in typarDecls.TyparDecls do
                     x.ProcessTypeParameter(typarDecl, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
                 x.ProcessConstraints(typarDecls.Constraints)
+                x.Done(typarDecls.Range, mark, ElementType.POSTFIX_TYPE_PARAMETER_DECLARATION_LIST)
             | _ -> ()
 
             x.ProcessMemberParams(args, true, true)
