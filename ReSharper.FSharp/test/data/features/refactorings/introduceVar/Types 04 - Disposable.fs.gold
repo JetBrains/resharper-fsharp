@@ -1,0 +1,5 @@
+﻿Suggested names: {let, use}, {disposable, cookie}
+let createCookie () : System.IDisposable = null
+
+do
+    let disposable = createCookie ()

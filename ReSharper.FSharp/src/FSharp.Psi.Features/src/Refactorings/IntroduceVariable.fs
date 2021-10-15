@@ -274,6 +274,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let commonParent = getCommonParentExpr data sourceExpr
         let safeParentToInsertBefore = getSafeParentExprToInsertBefore commonParent
 
+        let isDisposable = sourceExpr.Type().IsSubtypeOf(sourceExpr.GetPredefinedType().IDisposable)
+
         // `contextDecl` is not null when expression is bound to a module/type let binding.
         let contextExpr = getExprToInsertBefore safeParentToInsertBefore
         let contextDecl = getContextDeclaration contextExpr
@@ -454,6 +456,12 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             let shift = lambdaExpr.Indent - bodyExpr.Indent + contextExpr.GetIndentSize()
             shiftWithWhitespaceBefore shift bodyExpr
         | _ -> ()
+ 
+        let hotspotsRegistry = HotspotsRegistry(solution.GetPsiServices())
+
+        if isDisposable then
+            let suggestions = NameSuggestionsExpression(["let"; "use"])
+            hotspotsRegistry.Register([| binding.BindingKeyword :> ITreeNode |], suggestions)
 
         let nodes =
             let replacedNodes =
@@ -465,7 +473,6 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             |> Array.append replacedNodes
 
         let nameExpression = NameSuggestionsExpression(names)
-        let hotspotsRegistry = HotspotsRegistry(solution.GetPsiServices())
         hotspotsRegistry.Register(nodes, nameExpression)
 
         let caretTarget =

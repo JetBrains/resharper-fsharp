@@ -1,4 +1,4 @@
-﻿Suggested names: disposable
+﻿Suggested names: {let, use}, {disposable}
 module Module
 
 open System

@@ -101,6 +101,7 @@ type IntroduceVarTest() =
     [<Test>] member x.``Types 01 - Binary app``() = x.DoNamedTest()
     [<Test>] member x.``Types 02 - Method return``() = x.DoNamedTest()
     [<Test>] member x.``Types 03 - Type check``() = x.DoNamedTest()
+    [<Test>] member x.``Types 04 - Disposable``() = x.DoNamedTest()
 
     [<Test>] member x.``Used names - For 01``() = x.DoNamedTest()
     [<Test>] member x.``Used names - Let 01``() = x.DoNamedTest()
