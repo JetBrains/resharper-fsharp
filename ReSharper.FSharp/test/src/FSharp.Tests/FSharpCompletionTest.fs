@@ -232,14 +232,17 @@ type FSharpSignatureKeywordCompletionTest() =
 type FSharpFilteredCompletionTest() =
     inherit CodeCompletionTestBase()
 
-    override x.RelativeTestDataPath = "features/completion"
+    override x.RelativeTestDataPath = "features/completion/filtered"
 
-    override x.TestType = CodeCompletionTestType.Action
+    override x.TestType = CodeCompletionTestType.List
 
     member val CompleteItem = null with get, set
 
     override this.ItemSelector =
         Func<_, _>(function :? FcsLookupItem as item -> item.Text = this.CompleteItem | _ -> false)
+
+    [<Test>] member x.``Expr - Base 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Base 02 - Local``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - No reparse ident 01``() = x.DoNamedTest()
 

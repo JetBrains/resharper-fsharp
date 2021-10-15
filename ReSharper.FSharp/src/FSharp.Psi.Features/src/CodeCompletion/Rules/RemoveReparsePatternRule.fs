@@ -41,3 +41,23 @@ type RemoveReparsePatternRule() =
             | :? FSharpMemberOrFunctionOrValue as mfv ->
                 not mfv.IsModuleValueOrMember && getTreeStartOffset document mfv.DeclarationLocation = treeStartOffset
             | _ -> false)
+
+
+[<Language(typeof<FSharpLanguage>)>]
+type FilterFcsRule() =
+    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
+
+    override this.IsAvailable(context) =
+        context.IsBasicOrSmartCompletion && not context.IsQualified
+
+    override this.TransformItems(_, collector) =
+        collector.RemoveWhere(fun item ->
+            let lookupItem = item.As<FcsLookupItem>()
+            if isNull lookupItem then false else
+
+            match lookupItem.Text with
+            | "``base``" ->
+                match lookupItem.FcsSymbol with
+                | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.IsBaseValue
+                | _ -> false
+            | _ -> false)
