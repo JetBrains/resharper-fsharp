@@ -191,6 +191,7 @@ type UnionCasePatternRule() =
 
             if matchesType then
                 markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
+                item.Placement.Location <- PlacementLocation.Top
 
             item
 
