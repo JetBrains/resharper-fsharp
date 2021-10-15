@@ -172,6 +172,11 @@ type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionCo
         let completionType = context.CodeCompletionType
         completionType = CodeCompletionType.SmartCompletion || completionType = CodeCompletionType.BasicCompletion
 
+    member this.GetCheckResults(opName) =
+        match this.BasicContext.File with
+        | :? IFSharpFile as fsFile when fsFile.ParseResults.IsSome ->
+            fsFile.GetParseAndCheckResults(true, opName) |> Option.map (fun results -> results.CheckResults)
+        | _ -> None
 
 [<IntellisensePart>]
 type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =

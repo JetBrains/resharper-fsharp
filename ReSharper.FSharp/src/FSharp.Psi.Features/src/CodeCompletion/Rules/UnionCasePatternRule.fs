@@ -36,11 +36,27 @@ open JetBrains.UI.RichText
 module UnionCasePatternInfo =
     let [<Literal>] Id = "Union case pattern"
 
-type UnionCasePatternInfo(text, fcsUnionCase: FSharpUnionCase, fcsEntityInstance: FcsEntityInstance) =
+type UnionCasePatternInfo(text, fcsUnionCase: FSharpUnionCase, fcsEntityInstance: FcsEntityInstance,
+        context: FSharpCodeCompletionContext) =
     inherit TextualInfo(text, UnionCasePatternInfo.Id)
 
     member val UnionCase = fcsUnionCase
     member val EntityInstance = fcsEntityInstance
+
+    interface IDescriptionProvidingLookupItem with
+        member this.GetDescription() =
+            match context.GetCheckResults(UnionCasePatternInfo.Id) with
+            | None -> null
+            | Some(checkResults) ->
+
+            let _, range = context.ReparsedContext.TreeNode.TryGetFcsRange()
+            let toolTipText = checkResults.GetDescription(fcsUnionCase, fcsEntityInstance.Substitution, range)
+
+            toolTipText
+            |> FcsLookupCandidate.getOverloads
+            |> List.tryHead
+            |> Option.map (FcsLookupCandidate.getDescription context.XmlDocService)
+            |> Option.defaultValue null
 
     override this.IsRiderAsync = false
 
@@ -163,7 +179,7 @@ type UnionCasePatternRule() =
         let referenceName = reference.GetElement() :?> IExpressionReferenceName
 
         let createItem fcsEntityInstance (fcsType: FSharpType) displayContext text matchesType (fcsUnionCase: FSharpUnionCase) =
-            let info = UnionCasePatternInfo(text, fcsUnionCase, fcsEntityInstance, Ranges = context.Ranges)
+            let info = UnionCasePatternInfo(text, fcsUnionCase, fcsEntityInstance, context, Ranges = context.Ranges)
             let item = 
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->

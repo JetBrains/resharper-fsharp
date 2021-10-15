@@ -2,7 +2,6 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
-open FSharp.Compiler.Symbols
 open FSharp.Compiler.Tokenization
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
@@ -24,13 +23,16 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-type FcsLookupCandidate(description: RichText, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
-    member x.Description = description
-    member x.XmlDoc = xmlDoc
+[<AllowNullLiteral>]
+type FcsLookupCandidate(fcsTooltip: ToolTipElementData, xmlDocService: FSharpXmlDocService) =
+    member x.Description = richText fcsTooltip.MainDescription
+    member x.XmlDoc = fcsTooltip.XmlDoc
+
+    member x.FcsTooltip = fcsTooltip
 
     interface ICandidate with
-        member x.GetSignature(_, _, _, _, _) = description
-        member x.GetDescription() = xmlDocService.GetXmlDoc(xmlDoc, true)
+        member x.GetSignature(_, _, _, _, _) = x.Description
+        member x.GetDescription() = xmlDocService.GetXmlDoc(x.XmlDoc, true)
         member x.Matches _ = true
 
         member x.GetParametersInfo(_, _) = ()
@@ -39,6 +41,19 @@ type FcsLookupCandidate(description: RichText, xmlDoc: FSharpXmlDoc, xmlDocServi
         member x.ObsoleteDescription = null
         member val IsFilteredOut = false with get, set
 
+module FcsLookupCandidate =
+    let getOverloads (ToolTipText(tooltips)) =
+        tooltips |> List.collect (function ToolTipElement.Group(overloads) -> overloads | _ -> [])
+
+    let getDescription (xmlDocService: FSharpXmlDocService) (fcsTooltip: ToolTipElementData) =
+        let mainDescription = RichTextBlock(richText fcsTooltip.MainDescription)
+        match xmlDocService.GetXmlDoc(fcsTooltip.XmlDoc, true) with
+        | null -> ()
+        | xmlDoc ->
+            if not (RichTextBlock.IsNullOrWhiteSpace(mainDescription) || RichTextBlock.IsNullOrWhiteSpace(xmlDoc)) then
+                mainDescription.AddLines(RichTextBlock(" "))
+            mainDescription.AddLines(xmlDoc)
+        mainDescription
 
 type FcsErrorLookupItem(item: DeclarationListItem) =
     inherit TextLookupItemBase()
@@ -61,29 +76,13 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
 
     let [<Literal>] Id = "FcsLookupItem.OnAfterComplete"
     
-    let mutable candidates = Unchecked.defaultof<_>
-
     member this.FcsSymbolUse = items.SymbolUses.Head 
     member this.FcsSymbol = this.FcsSymbolUse.Symbol
     member this.NamespaceToOpen = items.NamespaceToOpen
 
     member x.Candidates =
-        match candidates with
-        | null ->
-            let result = LocalList<ICandidate>()
-            let (ToolTipText(tooltips)) = items.Description
-            for tooltip in tooltips do
-                match tooltip with
-                | ToolTipElement.Group(overloads) ->
-                    for overload in overloads do
-                        result.Add(FcsLookupCandidate(richText overload.MainDescription, overload.XmlDoc, context.XmlDocService))
-                | ToolTipElement.CompositionError error ->
-                    result.Add(FcsLookupCandidate(RichText(error), FSharpXmlDoc.None, context.XmlDocService))
-                | _ -> ()
-            candidates <- result.ResultingList()
-            candidates
-
-        | candidates -> candidates
+        FcsLookupCandidate.getOverloads items.Description
+        |> List.map (fun overload -> FcsLookupCandidate(overload, context.XmlDocService) :> ICandidate)
 
     override x.Image =
         try getIconId x.FcsSymbol
@@ -164,27 +163,17 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
         name
 
     interface IParameterInfoCandidatesProvider with
-        member x.HasCandidates =
-            x.Candidates.Count > 1
-
+        member x.HasCandidates = x.Candidates.Length > 1
         member x.CreateCandidates() = x.Candidates :> _
 
     interface IDescriptionProvidingLookupItem with
         /// Called when x.HasCandidates is false.
         member x.GetDescription() =
-            let candidates = x.Candidates
-            if candidates.Count = 0 then null else
+            match x.Candidates with
+            | [] -> null
+            | candidate :: _ ->
 
-            let candidate = candidates.[0] :?> FcsLookupCandidate
-            let isNullOrWhiteSpace = RichTextBlock.IsNullOrWhiteSpace
-
-            let mainDescription = RichTextBlock(candidate.Description)
-            match context.XmlDocService.GetXmlDoc(candidate.XmlDoc, true) with
-            | null -> ()
-            | xmlDoc ->
-                if not (isNullOrWhiteSpace mainDescription || isNullOrWhiteSpace xmlDoc) then
-                    mainDescription.AddLines(RichTextBlock(" "))
-                mainDescription.AddLines(xmlDoc)
-            mainDescription
+            let candidate = candidate :?> FcsLookupCandidate
+            FcsLookupCandidate.getDescription context.XmlDocService candidate.FcsTooltip
 
     interface IRiderAsyncCompletionLookupItem

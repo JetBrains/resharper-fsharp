@@ -69,12 +69,8 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
         | _ ->
 
         let basicContext = context.BasicContext
-        match basicContext.File with
-        | :? IFSharpFile as fsFile when fsFile.ParseResults.IsSome ->
-            match fsFile.GetParseAndCheckResults(true, opName) with
-            | None -> false
-            | Some results ->
-
+        match context.BasicContext.File, context.GetCheckResults(opName) with
+        | :? IFSharpFile as fsFile, Some checkResults ->
             let settings = basicContext.ContextBoundSettingsStore
             let addImportItems = settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion)
 
@@ -87,7 +83,6 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
                 not (Array.isEmpty item.NamespaceToOpen) &&
                 item.Name.StartsWith(PrettyNaming.FsiDynamicModulePrefix, StringComparison.Ordinal)
 
-            let checkResults = results.CheckResults
             let parseResults = fsFile.ParseResults
             let line = int fcsContext.Coords.Line + 1
 
