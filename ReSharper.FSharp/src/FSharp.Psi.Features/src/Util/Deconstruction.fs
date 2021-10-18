@@ -230,12 +230,7 @@ type DeconstructionFromTuple(pattern: IFSharpPattern, components: IDeconstructio
     static member TryCreate(pattern: IFSharpPattern, fcsType: FSharpType): IFSharpDeconstruction =
         if not fcsType.IsTupleType || fcsType.GenericArguments.Count > 7 then null else
 
-        let typeOwner = pattern.As<IDeclaration>().DeclaredElement.As<ITypeOwner>()
-        if isNull typeOwner then null else
-
-        let declaredType = typeOwner.Type.As<IDeclaredType>()
-        if isNull declaredType then null else
-
+        let declaredType = fcsType.MapType(pattern).As<IDeclaredType>()
         let substitution = declaredType.GetSubstitution()
         let components = 
             substitution.Domain

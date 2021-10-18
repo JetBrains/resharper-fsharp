@@ -34,6 +34,8 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Tuple - Parameter - Used names 06``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Parameter - Used names 07``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Tuple - Parameter - Used names 08``() = x.DoNamedTest()
+    [<Explicit("Fix mapping for local type parameters")>]
+    [<Test>] member x.``Tuple - Parameter - Used names 09 - Local``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Used names 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case - Single - Import 01``() = x.DoNamedTest()

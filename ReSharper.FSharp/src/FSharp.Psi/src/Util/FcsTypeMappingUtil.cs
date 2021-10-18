@@ -164,9 +164,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         : TypeFactory.CreateUnknownType(psiModule);
     }
 
-    public static IType MapType([NotNull] this FSharpType fcsType, [NotNull] ITreeNode treeNode) =>
-      // todo: get external type parameters
-      MapType(fcsType, EmptyList<ITypeParameter>.Instance, treeNode.GetPsiModule());
+    // todo: get type parameters for local bindings
+    public static IType MapType([NotNull] this FSharpType fcsType, [NotNull] ITreeNode context)
+    {
+      var typeMemberDeclaration = context.GetContainingNode<ITypeMemberDeclaration>();
+      var typeParametersOwner = typeMemberDeclaration?.DeclaredElement as IFSharpTypeParametersOwner;
+      var typeParameters = typeParametersOwner?.AllTypeParameters ?? EmptyList<ITypeParameter>.Instance;
+      return MapType(fcsType, typeParameters, context.GetPsiModule());
+    }
 
     [NotNull]
     private static IType GetSingleTypeArgument([NotNull] FSharpType fcsType, IList<ITypeParameter> typeParams,
