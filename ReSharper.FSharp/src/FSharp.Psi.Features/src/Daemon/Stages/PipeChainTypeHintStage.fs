@@ -2,21 +2,16 @@
 
 open System
 open System.Collections.Generic
-open System.Text
-open FSharp.Compiler.EditorServices
-open FSharp.Compiler.Text
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Tooltips
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Psi.Tree
@@ -29,26 +24,22 @@ type SameLinePipeHints =
     | Hide
 
 type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
-    inherit TreeNodeVisitor<List<FSharpIdentifierToken * ITreeNode>>()
+    inherit TreeNodeVisitor<List<IReferenceExpr * ITreeNode>>()
 
     let showSameLineHints =
         match sameLinePipeHints with
         | SameLinePipeHints.Show -> true
         | SameLinePipeHints.Hide -> false
 
-    let visitBinaryAppExpr binaryAppExpr (context: List<FSharpIdentifierToken * ITreeNode>) =
+    let visitBinaryAppExpr binaryAppExpr (context: List<IReferenceExpr * ITreeNode>) =
         if not (isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
 
-        match binaryAppExpr.LeftArgument with
-        | null -> ()
-        | exprToAdorn ->
+        let exprToAdorn = binaryAppExpr.LeftArgument
+        if isNull exprToAdorn then () else
 
         let opExpr = binaryAppExpr.Operator
-        if not showSameLineHints && exprToAdorn.EndLine = opExpr.StartLine then () else
-
-        match opExpr.Identifier.As<FSharpIdentifierToken>() with
-        | null -> ()
-        | token -> context.Add(token, exprToAdorn :> _)
+        if showSameLineHints || exprToAdorn.EndLine <> opExpr.StartLine then
+            context.Add(opExpr, exprToAdorn :> _)
 
     override x.VisitNode(node, context) =
         for child in node.Children() do
@@ -63,41 +54,19 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
 type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
-    let [<Literal>] opName = "PipeChainHighlightingProcess"
-
-    /// Formats a type parameter layout.
-    /// Removes the "'T1 is " prefix from the layout string.
-    let formatTypeParamLayout (layout: TaggedText[]) =
-        let result = StringBuilder()
-        for text in layout do
-            result.Append(text.Text) |> ignore
-        let typeParamStr = result.ToString()
-        let prefixToRemove = "'T1 is "
-        if typeParamStr.StartsWith(prefixToRemove) then
-            typeParamStr.Substring(prefixToRemove.Length)
-        else
-            null
-
-    let adornExprs logKey checkResults (exprs : (FSharpIdentifierToken * ITreeNode)[]) =
+    let adornExprs logKey (exprs : (IReferenceExpr * ITreeNode)[]) =
         use _swc = logger.StopwatchCookie(sprintf "Adorning %s expressions" logKey, sprintf "exprCount=%d sourceFile=%s" exprs.Length daemonProcess.SourceFile.Name)
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
 
-        for token, exprToAdorn in exprs do
+        for refExpr, exprToAdorn in exprs do
             if daemonProcess.InterruptFlag then raise <| OperationCanceledException()
 
-            let (ToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(checkResults, token)
+            let symbolUse = refExpr.Reference.GetSymbolUse()
+            if isNull symbolUse then () else
 
-            // The |> operator should have one overload and two type parameters
-            match layouts with
-            | [ ToolTipElement.Group [ { TypeMapping = [ argumentType; _ ] } ] ] ->
-                let returnTypeStr = formatTypeParamLayout argumentType
-                if returnTypeStr = null then () else
-
-                // Use EndOffsetRange to ensure the adornment appears at the end of multi-line expressions
-                let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
-
-                highlightingConsumer.AddHighlighting(TypeHintHighlighting(returnTypeStr, range))
-            | _ -> ()
+            let _, fcsType = symbolUse.GenericArguments.[0]
+            let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
+            highlightingConsumer.AddHighlighting(TypeHintHighlighting(fcsType.Format(symbolUse.DisplayContext), range))
 
         highlightingConsumer.Highlightings
 
@@ -107,10 +76,6 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
                 SameLinePipeHints.Hide
             else
                 SameLinePipeHints.Show
-
-        match fsFile.GetParseAndCheckResults(true, opName) with
-        | None -> ()
-        | Some results ->
 
         let consumer = List()
         fsFile.Accept(PipeOperatorVisitor(sameLinePipeHints), consumer)
@@ -131,13 +96,13 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
                     )
 
                 // Adorn visible expressions first
-                let visibleHighlightings = adornExprs "visible" results.CheckResults visible
+                let visibleHighlightings = adornExprs "visible" visible
                 committer.Invoke(DaemonStageResult(visibleHighlightings, visibleRange))
 
                 // Finally adorn expressions that aren't visible in the viewport
-                adornExprs "not visible" results.CheckResults notVisible
+                adornExprs "not visible" notVisible
             else
-                adornExprs "all" results.CheckResults allHighlightings
+                adornExprs "all" allHighlightings
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
