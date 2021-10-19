@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open NUnit.Framework
 
 type DeconstructPatternTest() =
-    inherit FSharpContextActionExecuteTestBase<DeconstructPatternAction>()
+    inherit FSharpContextActionExecuteTestBase<DeconstructPatternContextAction>()
 
     override this.ExtraPath = "deconstruct"
 

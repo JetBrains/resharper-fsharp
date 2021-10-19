@@ -31,7 +31,6 @@ type SingleValueDeconstructionComponent(name: string, additionalNames: string li
 type IFSharpDeconstruction =
     inherit IDeconstruction
 
-    abstract Pattern: IFSharpPattern
     abstract Text: string
 
     abstract DeconstructInnerPatterns: pat: IFSharpPattern * usedNames: ISet<string> -> IFSharpPattern * IFSharpPattern * string list list
@@ -108,9 +107,7 @@ module FSharpDeconstruction =
 
         pattern, names
 
-    let deconstruct moveCaretToEnd (deconstruction: IFSharpDeconstruction) =
-        let pat = deconstruction.Pattern
-
+    let deconstructImpl moveCaretToEnd (deconstruction: IFSharpDeconstruction) (pat: IFSharpPattern) =
         use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
         let factory = pat.CreateElementFactory()
         let hotspotsRegistry = HotspotsRegistry(pat.GetPsiServices())
@@ -189,48 +186,52 @@ module FSharpDeconstruction =
             | :? IReferencePat as refPat -> Seq.singleton refPat |> Seq.cast
             | _ -> invalidOp $"Unexpected pattern: {pattern}"
 
-        if Seq.isEmpty itemPatterns then null else
+        if Seq.isEmpty itemPatterns then None else
 
         (names, itemPatterns) ||> Seq.iter2 (fun names itemPattern ->
             let nameSuggestionsExpression = NameSuggestionsExpression(names)
             let rangeMarker = itemPattern.GetDocumentRange().CreateRangeMarker()
             hotspotsRegistry.Register(rangeMarker, nameSuggestionsExpression))
 
+        let pat: IFSharpPattern = if isNotNull pat then pat else tuplePattern
         let endOffset =
             if moveCaretToEnd then
-                let pat: IFSharpPattern = if isNotNull pat then pat else tuplePattern
                 pat.GetDocumentEndOffset()
             else
                 DocumentOffset.InvalidOffset
 
-        BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, endOffset)
+        Some (hotspotsRegistry, pat, endOffset)
+
+    let deconstruct m d pat =
+        match deconstructImpl m d pat with
+        | Some(hotspotsRegistry, _, endOffset) -> BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, endOffset)
+        | _ -> null
 
 [<AbstractClass; AllowNullLiteral>]
-type FSharpDeconstructionBase(pattern: IFSharpPattern, components: IDeconstructionComponent list) =
+type FSharpDeconstructionBase(components: IDeconstructionComponent list) =
     member val Components = components
 
     abstract Text: string
     abstract DeconstructInnerPatterns: pat: IFSharpPattern * usedNames: ISet<string> -> IFSharpPattern * IFSharpPattern * string list list
 
     interface IFSharpDeconstruction with
-        member this.Pattern = pattern
         member this.Components = components :> _
         member this.Text = this.Text
-        member this.Type = TypeFactory.CreateUnknownType(pattern.GetPsiModule()) :> _
+        member this.Type = failwith "todo"
         member this.DeconstructInnerPatterns(pat, usedNames) = this.DeconstructInnerPatterns(pat, usedNames)
 
 
-type DeconstructionFromTuple(pattern: IFSharpPattern, components: IDeconstructionComponent list, isStruct: bool) =
-    inherit FSharpDeconstructionBase(pattern, components)
+type DeconstructionFromTuple(components: IDeconstructionComponent list, isStruct: bool) =
+    inherit FSharpDeconstructionBase(components)
 
     member val IsStruct = isStruct
 
     override this.Text = "Deconstruct tuple"
 
-    static member TryCreate(pattern: IFSharpPattern, fcsType: FSharpType): IFSharpDeconstruction =
+    static member TryCreate(context: ITreeNode, fcsType: FSharpType): IFSharpDeconstruction =
         if not fcsType.IsTupleType || fcsType.GenericArguments.Count > 7 then null else
 
-        let declaredType = fcsType.MapType(pattern).As<IDeclaredType>()
+        let declaredType = fcsType.MapType(context).As<IDeclaredType>()
         let substitution = declaredType.GetSubstitution()
         let components = 
             substitution.Domain
@@ -238,7 +239,7 @@ type DeconstructionFromTuple(pattern: IFSharpPattern, components: IDeconstructio
             |> List.map (fun typeParameter ->
                 SingleValueDeconstructionComponent(null, [], substitution.[typeParameter]) :> IDeconstructionComponent)
 
-        DeconstructionFromTuple(pattern, components, fcsType.IsStructTupleType) :> _
+        DeconstructionFromTuple(components, fcsType.IsStructTupleType) :> _
 
     override this.DeconstructInnerPatterns(pat, usedNames) =
         let pattern, names = FSharpDeconstruction.createInnerPattern pat this isStruct usedNames
@@ -246,8 +247,8 @@ type DeconstructionFromTuple(pattern: IFSharpPattern, components: IDeconstructio
         null, pattern, names
 
 [<AllowNullLiteral>]
-type DeconstructionFromUnionCaseFields(name: string, pattern: IParametersOwnerPat, components: IDeconstructionComponent list) =
-    inherit FSharpDeconstructionBase(pattern, components)
+type DeconstructionFromUnionCaseFields(name: string, components: IDeconstructionComponent list) =
+    inherit FSharpDeconstructionBase(components)
 
     member val Name = name
     override this.Text = $"Deconstruct '{name}' fields"
@@ -267,17 +268,20 @@ type DeconstructionFromUnionCaseFields(name: string, pattern: IParametersOwnerPa
         if isNotNull fcsEntityInstance && not fcsEntityInstance.Entity.IsFSharpUnion then null else
 
         let components = FSharpDeconstruction.createUnionCaseFields pattern fcsUnionCase fcsEntityInstance
-        DeconstructionFromUnionCaseFields(fcsUnionCase.Name, parametersOwnerPat, components) :> _
+        DeconstructionFromUnionCaseFields(fcsUnionCase.Name, components) :> _
 
     override this.DeconstructInnerPatterns(pat, usedNames) =
-        let pat = pat :?> IParametersOwnerPat
+        let pat = 
+            match pat with
+            | :? IParametersOwnerPat as p -> p
+            | _ -> ParametersOwnerPatNavigator.GetByParameter(pat.IgnoreParentParens())
         let pattern, names = FSharpDeconstruction.createInnerPattern pat this false usedNames
         pat :> _, ModificationUtil.ReplaceChild(pat.Parameters.[0], pattern), names
 
 
-type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase, pattern: IFSharpPattern,
+type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase,
         components: IDeconstructionComponent list, fcsEntity: FSharpEntity) =
-    inherit FSharpDeconstructionBase(pattern, components)
+    inherit FSharpDeconstructionBase(components)
 
     let [<Literal>] opName = "DeconstructionFromUnionCase.DeconstructInnerPatterns"
 
@@ -289,9 +293,9 @@ type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase, pattern: IFSharp
 
     static member Create(pattern, fcsUnionCase: FSharpUnionCase, fcsEntityInstance: FcsEntityInstance) =
         let components = FSharpDeconstruction.createUnionCaseFields pattern fcsUnionCase fcsEntityInstance
-        DeconstructionFromUnionCase(fcsUnionCase, pattern, components, fcsEntityInstance.Entity) :> IFSharpDeconstruction
+        DeconstructionFromUnionCase(fcsUnionCase, components, fcsEntityInstance.Entity) :> IFSharpDeconstruction
 
-    static member TryCreateFromSingleCaseUnionType(pattern, fcsType): IFSharpDeconstruction =
+    static member TryCreateFromSingleCaseUnionType(context: ITreeNode, fcsType): IFSharpDeconstruction =
         let fcsEntityInstance = FcsEntityInstance.create fcsType
         if isNull fcsEntityInstance || not fcsEntityInstance.Entity.IsFSharpUnion then null else
 
@@ -299,10 +303,10 @@ type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase, pattern: IFSharp
         if fcsUnionCases.Count <> 1 then null else
 
         let fcsUnionCase = fcsUnionCases.[0]
-        let components = FSharpDeconstruction.createUnionCaseFields pattern fcsUnionCase fcsEntityInstance
+        let components = FSharpDeconstruction.createUnionCaseFields context fcsUnionCase fcsEntityInstance
         if components.IsEmpty then null else
 
-        DeconstructionFromUnionCase(fcsUnionCase, pattern, components, fcsEntityInstance.Entity) :> _
+        DeconstructionFromUnionCase(fcsUnionCase, components, fcsEntityInstance.Entity) :> _
 
     override this.DeconstructInnerPatterns(pat, usedNames) =
         let hasFields = fcsUnionCase.HasFields
@@ -321,10 +325,10 @@ type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase, pattern: IFSharp
         parametersOwnerPat :> _, ModificationUtil.ReplaceChild(parametersOwnerPat.Parameters.[0], pattern), names
 
 
-type DeconstructAction(deconstruction: IFSharpDeconstruction) =
+type DeconstructAction(pat: IFSharpPattern, deconstruction: IFSharpDeconstruction) =
     inherit BulbActionBase()
 
     override this.Text = deconstruction.Text
 
     override this.ExecutePsiTransaction(_, _) =
-        FSharpDeconstruction.deconstruct false deconstruction
+        FSharpDeconstruction.deconstruct false deconstruction pat

@@ -85,7 +85,7 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
         if not info.UnionCase.HasFields then () else
 
         let fields = FSharpDeconstruction.createUnionCaseFields pat info.UnionCase info.EntityInstance
-        let deconstruction = DeconstructionFromUnionCaseFields(info.UnionCase.Name, pat :?> _, fields)
+        let deconstruction = DeconstructionFromUnionCaseFields(info.UnionCase.Name, fields)
 
         let deconstructFields () =
             use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
@@ -94,7 +94,7 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
             use transactionCookie =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, UnionCasePatternInfo.Id)
 
-            let action = FSharpDeconstruction.deconstruct true deconstruction
+            let action = FSharpDeconstruction.deconstruct true deconstruction pat
             if isNotNull action then
                 action.Invoke(textControl)
 

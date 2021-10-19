@@ -9,10 +9,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 type DeconstructPatternFix(error: UnionCaseExpectsTupledArgumentsError) =
     inherit FSharpQuickFixBase()
 
-    let mutable deconstruction = null
+    let mutable deconstruction = None
 
     let tryCreate pattern =
-        deconstruction <- DeconstructionFromUnionCaseFields.TryCreate(pattern, false)
+        deconstruction <-
+            match DeconstructionFromUnionCaseFields.TryCreate(pattern, false) with
+            | null -> None
+            | d -> Some(pattern, d)
         isNotNull deconstruction
 
     override this.IsAvailable _ =
@@ -24,7 +27,13 @@ type DeconstructPatternFix(error: UnionCaseExpectsTupledArgumentsError) =
         let pattern = parameters.[0]
         pattern :? IReferencePat && tryCreate pattern
 
-    override this.Text = deconstruction.Text
+    override this.Text =
+        match deconstruction with
+        | Some(_, deconstruction) -> deconstruction.Text
+        | _ -> failwithf ""
 
     override x.ExecutePsiTransaction(_, _) =
-        FSharpDeconstruction.deconstruct false deconstruction
+        match deconstruction with
+        | Some(pattern, deconstruction) ->
+            FSharpDeconstruction.deconstruct false deconstruction pattern
+        | _ -> failwithf ""

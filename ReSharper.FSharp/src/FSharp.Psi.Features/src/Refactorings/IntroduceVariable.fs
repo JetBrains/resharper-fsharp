@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
 open System.Collections.Generic
+open System.Linq
 open FSharp.Compiler.Syntax
 open JetBrains.Application.DataContext
 open JetBrains.Application.UI.Actions.ActionManager
@@ -11,7 +12,9 @@ open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
+open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruction
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpNamingService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -30,7 +33,10 @@ open JetBrains.ReSharper.Refactorings.IntroduceVariable
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
+open JetBrains.UI.RichText
 open JetBrains.Util
+
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
 type FSharpIntroduceVariableWorkflow(solution, escapeLambdas: bool, addMutable: bool) =
     inherit IntroduceVariableWorkflow(solution, null)
@@ -459,29 +465,43 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
  
         let hotspotsRegistry = HotspotsRegistry(solution.GetPsiServices())
 
-        if isDisposable then
-            let suggestions = NameSuggestionsExpression(["let"; "use"])
-            hotspotsRegistry.Register([| binding.BindingKeyword :> ITreeNode |], suggestions)
+        let deconstruction =
+            match workflow with
+            | :? IntroduceVariableWorkflow as workflow ->
+                workflow.DataModel.Deconstruction.As<IFSharpDeconstruction>()
+            | _ -> null
 
-        let nodes =
-            let replacedNodes =
-                replacedUsages
-                |> Seq.choose (fun pointer -> pointer.GetTreeNode() |> Option.ofObj)
-                |> Seq.toArray
+        if isNotNull deconstruction then
+            match FSharpDeconstruction.deconstructImpl false deconstruction binding.HeadPattern with
+            | Some(hotspotsRegistry, pattern, _) ->
+                let node = pattern :> ITreeNode
+                IntroduceVariableResult(hotspotsRegistry, node.CreateTreeElementPointer())
+            | _ -> failwith "FSharpDeconstruction.deconstructImpl"
+        else
+            if isDisposable then
+                let suggestions = NameSuggestionsExpression(["let"; "use"])
+                hotspotsRegistry.Register([| binding.BindingKeyword :> ITreeNode |], suggestions)
 
-            [| binding.HeadPattern :> ITreeNode |]
-            |> Array.append replacedNodes
+            let nodes =
+                let replacedNodes =
+                    replacedUsages
+                    |> Seq.choose (fun pointer -> pointer.GetTreeNode() |> Option.ofObj)
+                    |> Seq.toArray
 
-        let nameExpression = NameSuggestionsExpression(names)
-        hotspotsRegistry.Register(nodes, nameExpression)
+                let pattern = binding.HeadPattern
+                [| pattern :> ITreeNode |]
+                |> Array.append replacedNodes
 
-        let caretTarget =
-            if isInSingleLineContext && replaceSourceExprNode then
-                letBindings.LastChild
-            else
-                letBindings.Bindings.[0].Expression :> _
+            let nameExpression = NameSuggestionsExpression(names)
+            hotspotsRegistry.Register(nodes, nameExpression)
 
-        IntroduceVariableResult(hotspotsRegistry, caretTarget.CreateTreeElementPointer())
+            let caretTarget =
+                if isInSingleLineContext && replaceSourceExprNode then
+                    letBindings.LastChild
+                else
+                    letBindings.Bindings.[0].Expression :> _
+
+            IntroduceVariableResult(hotspotsRegistry, caretTarget.CreateTreeElementPointer())
 
     static member IntroduceVar(expr: IFSharpExpression, textControl: ITextControl, removeSourceExpr, escapeLambdas,
             addMutable) =
@@ -581,3 +601,29 @@ type FSharpIntroduceVarHelper() =
 
     override x.CheckAvailability(node) =
         FSharpIntroduceVariable.CanIntroduceVar(node.As<IFSharpExpression>(), false)
+
+    override this.AdditionalInitialization(workflow, expression, context) =
+        let fsExpr = expression.As<IFSharpExpression>()
+        if isNull fsExpr then false else 
+
+        let fcsType = fsExpr.TryGetFcsType()
+        if isNull fcsType then true else
+
+        let deconstruction = 
+            [ DeconstructionFromTuple.TryCreate(expression, fcsType)
+              DeconstructionFromUnionCase.TryCreateFromSingleCaseUnionType(expression, fcsType) ]
+            |> List.tryFind isNotNull
+
+        match deconstruction with
+        | None -> true
+        | Some(deconstruction) ->
+
+        let occurrences = 
+            [ WorkflowPopupMenuOccurrence(RichText("Bind value"), null, null)
+              WorkflowPopupMenuOccurrence(RichText(deconstruction.Text), null, deconstruction) ]
+
+        let selectedOccurrence = workflow.ShowOccurrences(occurrences.AsArray(), context)
+        if isNull selectedOccurrence then false else
+
+        workflow.DataModel.Deconstruction <- selectedOccurrence.Entities.FirstOrDefault()
+        true

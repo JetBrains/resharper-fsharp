@@ -11,7 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 
 [<ContextAction(Name = "Deconstruct variable", Group = "F#",
                 Description = "Deconstructs pattern into multiple positional components")>]
-type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
+type DeconstructPatternContextAction(provider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(provider)
 
     let getPattern () =
@@ -45,5 +45,5 @@ type DeconstructPatternAction(provider: FSharpContextActionDataProvider) =
           DeconstructionFromUnionCase.TryCreateFromSingleCaseUnionType(pattern, fcsType)
           DeconstructionFromUnionCaseFields.TryCreate(pattern, true) ]
         |> List.tryFind isNotNull // todo: allow multiple
-        |> Option.map (fun d -> DeconstructAction(d).ToContextActionIntentions() :> seq<IntentionAction>)
+        |> Option.map (fun d -> DeconstructAction(pattern, d).ToContextActionIntentions() :> seq<IntentionAction>)
         |> Option.defaultValue Seq.empty
