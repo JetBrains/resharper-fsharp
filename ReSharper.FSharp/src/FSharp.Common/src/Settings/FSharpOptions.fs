@@ -170,7 +170,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
             use indent = this.Indent()
             [ this.AddBoolOption((fun key -> key.HideSameLine), RichText(FSharpTypeHintOptions.hideSameLinePipe), null) ]
             |> Seq.iter (fun checkbox ->
-                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), id))
+                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes),  (fun t -> t.As<Object>())))
 
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.SkipImplementationAnalysis), RichText(skipImplementationAnalysis), null) |> ignore
