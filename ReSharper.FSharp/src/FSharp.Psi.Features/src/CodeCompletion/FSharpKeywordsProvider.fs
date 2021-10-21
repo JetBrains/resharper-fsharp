@@ -15,6 +15,7 @@ open JetBrains.RdBackend.Common.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -75,39 +76,8 @@ module FSharpKeywordsProvider =
         let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
         if isNull refExpr then false, false else
 
-        let rec loop isLetInExpr (expr: IFSharpExpression) =
-            if isNotNull (ComputationExprNavigator.GetByExpression(expr)) then true, isLetInExpr else
-
-            let letOrUseExpr = LetOrUseExprNavigator.GetByInExpression(expr)
-            if isNotNull letOrUseExpr then loop true letOrUseExpr else
-
-            let seqExpr = SequentialExprNavigator.GetByExpression(expr)
-            if isNotNull seqExpr then loop isLetInExpr seqExpr else
-
-            let matchExpr = MatchExprNavigator.GetByClauseExpression(expr)
-            if isNotNull matchExpr then loop isLetInExpr matchExpr else
-
-            let ifExpr = IfExprNavigator.GetByBranchExpression(expr)
-            if isNotNull ifExpr then loop isLetInExpr ifExpr else
-
-            let whileExpr = WhileExprNavigator.GetByDoExpression(expr)
-            if isNotNull whileExpr then loop isLetInExpr whileExpr else
-
-            let forExpr = ForExprNavigator.GetByDoExpression(expr)
-            if isNotNull forExpr then loop isLetInExpr forExpr else
-
-            let tryExpr = TryLikeExprNavigator.GetByTryExpression(expr)
-            if isNotNull tryExpr then loop isLetInExpr tryExpr else
-
-            let prefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(expr)
-            if isNotNull prefixAppExpr then loop isLetInExpr prefixAppExpr else
-
-            let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(expr)
-            if isNotNull binaryAppExpr then loop isLetInExpr binaryAppExpr else
-
-            false, false
-
-        loop false refExpr
+        let computationExpr, isInLet = tryGetEffectiveParentComputationExpression refExpr
+        isNotNull computationExpr, isInLet
 
     let isModuleMemberStart (context: FSharpCodeCompletionContext) =
         let reference = context.ReparsedContext.Reference

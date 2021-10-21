@@ -143,10 +143,46 @@ let rec createLogicallyNegatedExpression (expr: IFSharpExpression): IFSharpExpre
 
     factory.CreateAppExpr("not", expr) :> _
 
-let setBindingExpression (expr: IFSharpExpression) contextIndent (letBindings: #ILetBindings) =
-    let newExpr = letBindings.Bindings.[0].SetExpression(expr.Copy())
+let setBindingExpression (expr: IFSharpExpression) contextIndent (binding: IBinding) =
+    let newExpr = binding.SetExpression(expr.Copy())
     if not expr.IsSingleLine then
         let indentSize = expr.GetIndentSize()
         ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
         ModificationUtil.AddChildBefore(newExpr, Whitespace(contextIndent + indentSize)) |> ignore
         shiftNode indentSize newExpr
+
+let tryGetEffectiveParentComputationExpression (expr: IFSharpExpression) =
+    let rec loop isLetInExpr (expr: IFSharpExpression) =
+        let computationExpr = ComputationExprNavigator.GetByExpression(expr)
+        if isNotNull computationExpr then computationExpr, isLetInExpr else
+
+        let letOrUseExpr = LetOrUseExprNavigator.GetByInExpression(expr)
+        if isNotNull letOrUseExpr then loop true letOrUseExpr else
+
+        let seqExpr = SequentialExprNavigator.GetByExpression(expr)
+        if isNotNull seqExpr then loop isLetInExpr seqExpr else
+
+        let matchExpr = MatchExprNavigator.GetByClauseExpression(expr)
+        if isNotNull matchExpr then loop isLetInExpr matchExpr else
+
+        let ifExpr = IfExprNavigator.GetByBranchExpression(expr)
+        if isNotNull ifExpr then loop isLetInExpr ifExpr else
+
+        let whileExpr = WhileExprNavigator.GetByDoExpression(expr)
+        if isNotNull whileExpr then loop isLetInExpr whileExpr else
+
+        let forExpr = ForExprNavigator.GetByDoExpression(expr)
+        if isNotNull forExpr then loop isLetInExpr forExpr else
+
+        let tryExpr = TryLikeExprNavigator.GetByTryExpression(expr)
+        if isNotNull tryExpr then loop isLetInExpr tryExpr else
+
+        let prefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(expr)
+        if isNotNull prefixAppExpr then loop isLetInExpr prefixAppExpr else
+
+        let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(expr)
+        if isNotNull binaryAppExpr then loop isLetInExpr binaryAppExpr else
+
+        null, false
+
+    loop false expr

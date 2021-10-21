@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Naming.Elements
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Naming.Extentions
@@ -249,10 +250,10 @@ module FSharpNamingService =
         let usedNames = getUsedNamesUsages contextExprs usages containingTypeElement checkFcsSymbols
         HashSet(usedNames.Keys) :> _
 
-    let createEmptyNamesCollection (fsTreeNode: IFSharpTreeNode) =
-        let sourceFile = fsTreeNode.GetSourceFile()
+    let createEmptyNamesCollection (context: ITreeNode) =
+        let sourceFile = context.GetSourceFile()
         let namingManager = sourceFile.GetSolution().GetPsiServices().Naming
-        namingManager.Suggestion.CreateEmptyCollection(PluralityKinds.Unknown, fsTreeNode.Language, true, sourceFile)
+        namingManager.Suggestion.CreateEmptyCollection(PluralityKinds.Unknown, context.Language, true, sourceFile)
 
     let getEntryOptions () =
         EntryOptions(PluralityKinds.Unknown, SubrootPolicy.Decompose, PredefinedPrefixPolicy.Remove)
@@ -269,8 +270,15 @@ module FSharpNamingService =
         namesCollection.Add(t, getEntryOptions ())
         namesCollection
 
-    let addNamesForExpression (expr: IFSharpExpression) (namesCollection: INamesCollection) =
-        namesCollection.Add(expr, getEntryOptions ())
+    let addNamesForExpression (overrideType: IType option) (expr: IFSharpExpression) (namesCollection: INamesCollection) =
+        let options = getEntryOptions ()
+        match overrideType with
+        | None -> namesCollection.Add(expr, options)
+        | Some overrideType ->
+            // todo: add names from references (the override in namingService.SuggestRoots is protected)
+            let namingService = NamingManager.GetNamingLanguageService(expr.Language).As<ClrNamingLanguageServiceBase>()
+            namingService.SuggestRoots(overrideType, namesCollection.PolicyProvider)
+            |> Seq.iter (fun root -> namesCollection.Add(root, options))
         namesCollection
 
     let prepareNamesCollection

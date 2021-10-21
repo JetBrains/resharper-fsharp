@@ -17,7 +17,7 @@ type IntroduceVarFix(expr: IFSharpExpression, removeExpr, escapeLambdas, addMuta
 
     let suggestInnerExpression (expr: IFSharpExpression) =
         let binaryAppExpr = expr.As<IBinaryAppExpr>()
-        if isNotNull binaryAppExpr && FSharpIntroduceVariable.CanInsertBeforeRightOperand(binaryAppExpr) then
+        if isNotNull binaryAppExpr && FSharpIntroduceVariable.canInsertBeforeRightOperand binaryAppExpr then
             binaryAppExpr.RightArgument
         else
             null

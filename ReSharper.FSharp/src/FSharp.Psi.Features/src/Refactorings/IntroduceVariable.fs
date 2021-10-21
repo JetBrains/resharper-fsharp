@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
 open System.Collections.Generic
 open System.Linq
+open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
 open JetBrains.Application.DataContext
 open JetBrains.Application.UI.Actions.ActionManager
@@ -21,6 +22,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
@@ -36,73 +38,26 @@ open JetBrains.TextControl.DataContext
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-
 type FSharpIntroduceVariableWorkflow(solution, escapeLambdas: bool, addMutable: bool) =
     inherit IntroduceVariableWorkflow(solution, null)
 
     member val EscapeLambdas = escapeLambdas
     member val Mutable = addMutable
 
-type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, driver) =
-    inherit IntroduceVariableBase(workflow, solution, driver)
 
-    /// Applies to case where source expression is the node to replace and is the last expression in a block,
-    /// i.e. it doesn't have any expression to put as InExpression in the new `let` binding expression.
-    /// Producing incomplete expression adds error but is easier to edit code immediately afterwards.
-    let alwaysGenerateCompleteBindingExpr = false
+type FSharpIntroduceVariableData(sourceExpr, usages) =
+    inherit IntroduceVariableData(sourceExpr, usages)
 
-    static let needsSpaceAfterIdentNodeTypes =
-        NodeTypeSet(
-           ElementType.RECORD_EXPR,
-           ElementType.ANON_RECORD_EXPR,
-           ElementType.ARRAY_EXPR,
-           ElementType.LIST_EXPR,
-           ElementType.PAREN_EXPR,
-           ElementType.LAMBDA_EXPR,
-           ElementType.MATCH_LAMBDA_EXPR,
-           ElementType.COMPUTATION_EXPR,
-           ElementType.QUOTE_EXPR,
-           ElementType.OBJ_EXPR,
-           ElementType.ADDRESS_OF_EXPR)
+    member val FirstUsageExpr: IFSharpExpression = null with get, set
+    member val ContextExpr: IFSharpExpression = null with get, set
 
-    let getNames (usedNames: ISet<string>) (expr: IFSharpExpression) =
-        createEmptyNamesCollection expr
-        |> addNamesForExpression expr
-        |> prepareNamesCollection usedNames expr
+    member val Keywords = [FSharpTokenType.LET] with get, set
+    member val BindComputation = false with get, set
+    member val OverridenType = null with get, set
 
-    let getReplaceRanges (contextExpr: IFSharpExpression) removeSourceExpr =
-        let sequentialExpr = SequentialExprNavigator.GetByExpression(contextExpr)
-        if isNotNull sequentialExpr then
-            let inRangeStart = if removeSourceExpr then contextExpr.NextSibling else contextExpr :> _
-            let inRange = TreeRange(inRangeStart, sequentialExpr.LastChild)
 
-            let seqExprs = sequentialExpr.Expressions
-            let index = seqExprs.IndexOf(contextExpr)
-
-            if seqExprs.Count - index > 2 then
-                // Replace rest expressions with a sequential expr node.
-                let newSeqExpr = ElementType.SEQUENTIAL_EXPR.Create()
-                let newSeqExpr = ModificationUtil.ReplaceChildRange(inRange, TreeRange(newSeqExpr)).First
-
-                LowLevelModificationUtil.AddChild(newSeqExpr, Array.ofSeq inRange)
-
-                let replaceRange =
-                    if removeSourceExpr then TreeRange(contextExpr, newSeqExpr) else TreeRange(newSeqExpr)
-
-                {| ReplaceRange = replaceRange
-                   InRange = TreeRange(newSeqExpr)
-                   AddNewLine = not removeSourceExpr |}
-            else
-                // The last expression can be moved as is.
-                {| ReplaceRange = TreeRange(contextExpr, sequentialExpr.LastChild)
-                   InRange = inRange
-                   AddNewLine = not removeSourceExpr |}
-        else
-            let range = TreeRange(contextExpr)
-            {| ReplaceRange = range; InRange = range; AddNewLine = true |}
-
-    static let canInsertBeforeRightOperand (binaryAppExpr: IBinaryAppExpr) =
+module FSharpIntroduceVariable =
+    let canInsertBeforeRightOperand (binaryAppExpr: IBinaryAppExpr) =
         // Don't move up from "blocks" after empty non-code line separators.
         // todo: allow choosing scope?
 
@@ -182,11 +137,69 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let contextExpr = sourceExpr.PathToRoot() |> Seq.find (fun n -> n.Parent == commonParent)
         contextExpr :?> _
 
-    let getSafeParentExprToInsertBefore (parent: IFSharpExpression) =
+    let getSafeParentExprToInsertBefore (workflow: IntroduceLocalWorkflowBase) (parent: IFSharpExpression) =
         match workflow with
         | :? FSharpIntroduceVariableWorkflow as fsWorkflow when fsWorkflow.EscapeLambdas ->
             getOutermostLambda parent
         | _ -> parent
+
+type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, driver) =
+    inherit IntroduceVariableBase(workflow, solution, driver)
+
+    /// Applies to case where source expression is the node to replace and is the last expression in a block,
+    /// i.e. it doesn't have any expression to put as InExpression in the new `let` binding expression.
+    /// Producing incomplete expression adds error but is easier to edit code immediately afterwards.
+    let alwaysGenerateCompleteBindingExpr = false
+
+    static let needsSpaceAfterIdentNodeTypes =
+        NodeTypeSet(
+           ElementType.RECORD_EXPR,
+           ElementType.ANON_RECORD_EXPR,
+           ElementType.ARRAY_EXPR,
+           ElementType.LIST_EXPR,
+           ElementType.PAREN_EXPR,
+           ElementType.LAMBDA_EXPR,
+           ElementType.MATCH_LAMBDA_EXPR,
+           ElementType.COMPUTATION_EXPR,
+           ElementType.QUOTE_EXPR,
+           ElementType.OBJ_EXPR,
+           ElementType.ADDRESS_OF_EXPR)
+
+    let getNames (usedNames: ISet<string>) (data: FSharpIntroduceVariableData) (expr: IFSharpExpression) =
+        createEmptyNamesCollection expr
+        |> addNamesForExpression (Option.ofObj data.OverridenType) expr
+        |> prepareNamesCollection usedNames expr
+
+    let getReplaceRanges (contextExpr: IFSharpExpression) removeSourceExpr =
+        let sequentialExpr = SequentialExprNavigator.GetByExpression(contextExpr)
+        if isNotNull sequentialExpr then
+            let inRangeStart = if removeSourceExpr then contextExpr.NextSibling else contextExpr :> _
+            let inRange = TreeRange(inRangeStart, sequentialExpr.LastChild)
+
+            let seqExprs = sequentialExpr.Expressions
+            let index = seqExprs.IndexOf(contextExpr)
+
+            if seqExprs.Count - index > 2 then
+                // Replace rest expressions with a sequential expr node.
+                let newSeqExpr = ElementType.SEQUENTIAL_EXPR.Create()
+                let newSeqExpr = ModificationUtil.ReplaceChildRange(inRange, TreeRange(newSeqExpr)).First
+
+                LowLevelModificationUtil.AddChild(newSeqExpr, Array.ofSeq inRange)
+
+                let replaceRange =
+                    if removeSourceExpr then TreeRange(contextExpr, newSeqExpr) else TreeRange(newSeqExpr)
+
+                {| ReplaceRange = replaceRange
+                   InRange = TreeRange(newSeqExpr)
+                   AddNewLine = not removeSourceExpr |}
+            else
+                // The last expression can be moved as is.
+                {| ReplaceRange = TreeRange(contextExpr, sequentialExpr.LastChild)
+                   InRange = inRange
+                   AddNewLine = not removeSourceExpr |}
+        else
+            let range = TreeRange(contextExpr)
+            {| ReplaceRange = range; InRange = range; AddNewLine = true |}
 
     let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
         let binding = BindingNavigator.GetByExpression(contextExpr)
@@ -274,16 +287,11 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
     static member val ExpressionToRemoveKey = Key("FSharpIntroduceVariable.ExpressionToRemove")
 
     override x.Process(data) =
-        // Replace the actual source expression with the outer-most expression among usages,
-        // since it's needed for calculating a common node to replace.
-        let sourceExpr = data.Usages |> Seq.minBy (fun u -> u.GetTreeStartOffset().Offset) :?> IFSharpExpression
-        let commonParent = getCommonParentExpr data sourceExpr
-        let safeParentToInsertBefore = getSafeParentExprToInsertBefore commonParent
-
-        let isDisposable = sourceExpr.Type().IsSubtypeOf(sourceExpr.GetPredefinedType().IDisposable)
+        let data = data :?> FSharpIntroduceVariableData
+        let sourceExpr = data.FirstUsageExpr
+        let contextExpr = data.ContextExpr
 
         // `contextDecl` is not null when expression is bound to a module/type let binding.
-        let contextExpr = getExprToInsertBefore safeParentToInsertBefore
         let contextDecl = getContextDeclaration contextExpr
 
         let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
@@ -310,7 +318,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
         let containingTypeElement = getContainingType contextDecl
         let usedNames = getUsedNames [contextExpr] data.Usages containingTypeElement true
-        let names = getNames usedNames sourceExpr
+        let names = getNames usedNames data sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
 
         let removeSourceExpr =
@@ -337,11 +345,17 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         shiftNode indentShift sourceExpr
 
         let letBindings = createBinding contextExpr contextDecl name
-        setBindingExpression sourceExpr contextIndent letBindings
+        let binding = letBindings.Bindings.[0]
+
+        // Replace the keyword after the parsing to workaround bad parser recovery for `let! x = ()` without in-expr
+        // todo: fix parser recovery in Fcs
+        ModificationUtil.ReplaceChild(binding.BindingKeyword, data.Keywords.[0].CreateTreeElement()) |> ignore
+
+        setBindingExpression sourceExpr contextIndent binding
 
         match workflow with
         | :? FSharpIntroduceVariableWorkflow as fsWorkflow when fsWorkflow.Mutable ->
-            letBindings.Bindings.[0].SetIsMutable(true)
+            binding.SetIsMutable(true)
         | _ -> ()
 
         let replacedUsages, sourceExpr =
@@ -478,8 +492,9 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 IntroduceVariableResult(hotspotsRegistry, node.CreateTreeElementPointer())
             | _ -> failwith "FSharpDeconstruction.deconstructImpl"
         else
-            if isDisposable then
-                let suggestions = NameSuggestionsExpression(["let"; "use"])
+            if data.Keywords.Length > 1 then
+                let keywords = data.Keywords |> List.map (fun nodeType -> nodeType.TokenRepresentation)
+                let suggestions = NameSuggestionsExpression(keywords)
                 hotspotsRegistry.Register([| binding.BindingKeyword :> ITreeNode |], suggestions)
 
             let nodes =
@@ -591,27 +606,118 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let aprExpr = PrefixAppExprNavigator.GetByArgumentExpression(expr)
         not (isNotNull aprExpr && aprExpr.IsHighPrecedence)
 
-    static member CanInsertBeforeRightOperand(binaryAppExpr: IBinaryAppExpr) =
-        canInsertBeforeRightOperand binaryAppExpr
-
 type FSharpIntroduceVarHelper() =
     inherit IntroduceVariableHelper()
+
+    let getApplicableBindingKeywords bindComputation supportsUse =
+        match bindComputation, supportsUse with
+        | false, true -> [FSharpTokenType.LET; FSharpTokenType.USE]
+        | true, true -> [FSharpTokenType.LET_BANG; FSharpTokenType.USE_BANG]
+        | false, _ -> [FSharpTokenType.LET]
+        | true, _ -> [FSharpTokenType.LET_BANG]
+
+    let getBuilderMethodParamTypes name (mfv: FSharpMemberOrFunctionOrValue) =
+        if mfv.LogicalName <> name then None else
+
+        let mfvParamGroups = mfv.CurriedParameterGroups
+        if mfvParamGroups.Count <> 1 then None else
+
+        let mfvParamGroup = mfvParamGroups.[0]
+        if mfvParamGroup.Count <> 2 then None else
+
+        Some(mfvParamGroup.[0].Type, mfvParamGroup.[1].Type)
 
     override x.IsLanguageSupported = true
 
     override x.CheckAvailability(node) =
         FSharpIntroduceVariable.CanIntroduceVar(node.As<IFSharpExpression>(), false)
 
-    override this.AdditionalInitialization(workflow, expression, context) =
-        let fsExpr = expression.As<IFSharpExpression>()
-        if isNull fsExpr then false else 
+    override this.CreateData(sourceExpression, usages) =
+        FSharpIntroduceVariableData(sourceExpression, usages) :> _
 
-        let fcsType = fsExpr.TryGetFcsType()
+    override this.AdditionalInitialization(workflow, expression, context) =
+        let data = workflow.DataModel :?> FSharpIntroduceVariableData
+
+        // Replace the actual source expression with the outer-most expression among usages,
+        // since it's needed for calculating a common node to replace.
+        let sourceExpr = data.Usages |> Seq.minBy (fun u -> u.GetTreeStartOffset().Offset) :?> IFSharpExpression
+
+        let commonParent = FSharpIntroduceVariable.getCommonParentExpr data sourceExpr
+        let safeParentToInsertBefore = FSharpIntroduceVariable.getSafeParentExprToInsertBefore workflow commonParent
+        let contextExpr = FSharpIntroduceVariable.getExprToInsertBefore safeParentToInsertBefore
+
+        data.FirstUsageExpr <- sourceExpr
+        data.ContextExpr <- contextExpr
+
+        let fcsType = sourceExpr.TryGetFcsType()
         if isNull fcsType then true else
 
+        let compExpr, _ = tryGetEffectiveParentComputationExpression contextExpr
+        let isInComputationExpr = isNotNull compExpr
+        let computationType = 
+            if not isInComputationExpr then None else
+
+            let prefixAppExpr = PrefixAppExprNavigator.GetByArgumentExpression(compExpr)
+            let builderFcsType = prefixAppExpr.FunctionExpression.TryGetFcsType()
+            if isNull builderFcsType then None else
+
+            let prefixAppExprFcsType = prefixAppExpr.TryGetFcsType()
+            if isNull prefixAppExprFcsType then None else
+
+            let fcsEntity = getAbbreviatedEntity builderFcsType.TypeDefinition
+            let allMembers = fcsEntity.MembersFunctionsAndValues
+
+            allMembers |> Seq.tryPick (fun mfv ->
+                getBuilderMethodParamTypes "Bind" mfv |> Option.bind (fun (computationType, lambdaType) ->
+                    if not lambdaType.IsFunctionType then None else
+
+                    let substitution = FSharpExpectedTypesUtil.extractPartialSubstitution computationType fcsType
+                    let paramTypeWithSubstitution = computationType.Instantiate(substitution)
+                    if fcsType <> paramTypeWithSubstitution then None else
+
+                    Some(lambdaType.Instantiate(substitution).GenericArguments.[0], allMembers)))
+
+        let boundType = 
+            match computationType with
+            | None -> Some(fcsType, false)
+            | Some(computationType, _) ->
+                let occurrences = 
+                    [ WorkflowPopupMenuOccurrence(RichText("Bind value"), null, (fcsType, false))
+                      WorkflowPopupMenuOccurrence(RichText("Bind computation with let!"), null, (computationType, true)) ]
+
+                let selectedOccurrence = workflow.ShowOccurrences(occurrences.AsArray(), context)
+                if isNull selectedOccurrence then None else
+                    Some(selectedOccurrence.Entities.FirstOrDefault())
+
+        match boundType with
+        | None -> false
+        | Some(boundType, bindComputation) ->
+
+        let disposableType = sourceExpr.GetPredefinedType().IDisposable
+
+        let mappedBoundType = boundType.MapType(expression)
+        let isDisposable = mappedBoundType.IsSubtypeOf(disposableType)
+
+        let supportsUse =
+            match isDisposable, computationType with
+            | false, _ -> false
+            | _, None -> true
+            | _, Some(_, builderMembers) ->
+
+            builderMembers |> Seq.exists (fun mfv ->
+                match getBuilderMethodParamTypes "Using" mfv with
+                | None -> false
+                | Some(paramType, _) -> paramType.MapType(sourceExpr).IsSubtypeOf(disposableType))
+
+        data.Keywords <- getApplicableBindingKeywords data.BindComputation supportsUse
+
+        if bindComputation then
+            data.BindComputation <- bindComputation
+            data.OverridenType <- mappedBoundType
+
         let deconstruction = 
-            [ DeconstructionFromTuple.TryCreate(expression, fcsType)
-              DeconstructionFromUnionCase.TryCreateFromSingleCaseUnionType(expression, fcsType) ]
+            [ DeconstructionFromTuple.TryCreate(expression, boundType)
+              DeconstructionFromUnionCase.TryCreateFromSingleCaseUnionType(expression, boundType) ]
             |> List.tryFind isNotNull
 
         match deconstruction with
@@ -625,5 +731,5 @@ type FSharpIntroduceVarHelper() =
         let selectedOccurrence = workflow.ShowOccurrences(occurrences.AsArray(), context)
         if isNull selectedOccurrence then false else
 
-        workflow.DataModel.Deconstruction <- selectedOccurrence.Entities.FirstOrDefault()
+        data.Deconstruction <- selectedOccurrence.Entities.FirstOrDefault()
         true
