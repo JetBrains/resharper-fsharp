@@ -161,24 +161,27 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             |> Seq.iter x.InvalidateFcsProject
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
-    member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, opName) =
+    member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, resolveExpr: bool, opName) =
         // todo: different type parameters count
         x.ParseAndCheckFile(sourceFile, opName, true)
         |> Option.bind (fun results ->
             let checkResults = results.CheckResults
             let fcsPos = getPosFromCoords coords
-            let lineText = sourceFile.Document.GetLineText(coords.Line)
-            checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names))
+            if resolveExpr then
+                checkResults.ResolveNamesAtLocation(fcsPos, names)
+            else
+                let lineText = sourceFile.Document.GetLineText(coords.Line)
+                checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names))
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
-    member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, name, coords, opName) =
-        x.ResolveNameAtLocation(sourceFile, [name], coords, opName)
+    member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, name: string, coords, resolveExpr, opName) =
+        x.ResolveNameAtLocation(sourceFile, [name], coords, resolveExpr, opName)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
-    member x.ResolveNameAtLocation(context: ITreeNode, names, opName) =
+    member x.ResolveNameAtLocation(context: ITreeNode, names, resolveExpr, opName) =
         let offset = context.GetNavigationRange().EndOffset - 1
         let coords = offset.ToDocumentCoords()
-        x.ResolveNameAtLocation(context.GetSourceFile(), List.ofSeq names, coords, opName)
+        x.ResolveNameAtLocation(context.GetSourceFile(), List.ofSeq names, coords, resolveExpr, opName)
 
 
 type FSharpParseAndCheckResults =

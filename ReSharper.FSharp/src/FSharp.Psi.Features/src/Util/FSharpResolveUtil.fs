@@ -23,8 +23,8 @@ let private resolvesToAssociatedModule (declaredElement: IDeclaredElement) (unqu
     let typeElement = FSharpImplUtil.TryGetAssociatedType(unqualifiedTypeElement, shortName)
     declaredElement.Equals(typeElement)
 
-let private resolvesTo (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) qualified opName =
-    match reference.ResolveWithFcs(opName, qualified) with
+let private resolvesTo (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) qualified resolveExpr opName =
+    match reference.ResolveWithFcs(opName, resolveExpr, qualified) with
     | None -> false
     | Some symbolUse ->
 
@@ -34,14 +34,14 @@ let private resolvesTo (declaredElement: IDeclaredElement) (reference: FSharpSym
 
     resolvesToAssociatedModule declaredElement unqualifiedElement reference
 
-let resolvesToUnqualified (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) opName =
-    resolvesTo declaredElement reference false opName
+let resolvesToUnqualified (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) resolveExpr opName =
+    resolvesTo declaredElement reference false resolveExpr opName
 
-let resolvesToQualified (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) opName =
-    resolvesTo declaredElement reference true opName
+let resolvesToQualified (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) resolveExpr opName =
+    resolvesTo declaredElement reference true resolveExpr opName
 
-let resolvesToFcsSymbol (fcsSymbol: FSharpSymbol) (reference: FSharpSymbolReference) qualified opName =
-    match reference.ResolveWithFcs(opName, qualified) with
+let resolvesToFcsSymbol (fcsSymbol: FSharpSymbol) (reference: FSharpSymbolReference) qualified resolveExpr opName =
+    match reference.ResolveWithFcs(opName, resolveExpr, qualified) with
     | None -> false
     | Some symbolUse ->
 
@@ -85,7 +85,7 @@ let mayShadowPartially (newExpr: ITreeNode) (data: ElementProblemAnalyzerData) (
 
 let resolvesToPredefinedFunction (context: ITreeNode) name opName =
     let checkerService = context.GetContainingFile().As<IFSharpFile>().CheckerService
-    match checkerService.ResolveNameAtLocation(context, [name], opName) with
+    match checkerService.ResolveNameAtLocation(context, [name], false, opName) with
     | Some symbolUse ->
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as symbol ->

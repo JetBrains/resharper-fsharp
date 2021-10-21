@@ -50,7 +50,7 @@ type UnionCasePatternInfo(text, fcsUnionCase: FSharpUnionCase, fcsEntityInstance
             | Some(checkResults) ->
 
             let _, range = context.ReparsedContext.TreeNode.TryGetFcsRange()
-            let toolTipText = checkResults.GetDescription(fcsUnionCase, fcsEntityInstance.Substitution, range)
+            let toolTipText = checkResults.GetDescription(fcsUnionCase, fcsEntityInstance.Substitution, false, range)
 
             toolTipText
             |> FcsLookupCandidate.getOverloads

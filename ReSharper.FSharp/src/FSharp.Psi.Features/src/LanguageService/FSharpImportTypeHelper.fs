@@ -72,7 +72,7 @@ type FSharpImportTypeHelper() =
                     let moduleDecl, _ = findModuleToInsertTo fsFile referenceStartOffset settings moduleToImport
                     let qualifiedElementList = moduleToImport.GetQualifiedElementList(moduleDecl, true)
                     let names = qualifiedElementList |> List.map (fun el -> el.GetSourceName())
-                    let symbolUse = fsFile.CheckerService.ResolveNameAtLocation(context, names, opName)
+                    let symbolUse = fsFile.CheckerService.ResolveNameAtLocation(context, names, false, opName)
                     Option.isSome symbolUse)
                 |> Seq.cast
 
@@ -108,7 +108,7 @@ type FSharpQuickFixUtilComponent() =
         use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
 
         FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, typeElement)
-        if FSharpResolveUtil.resolvesToQualified typeElement reference FcsOpName then reference else
+        if FSharpResolveUtil.resolvesToQualified typeElement reference false FcsOpName then reference else
 
         addOpens reference typeElement
 

@@ -63,6 +63,8 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Pattern - Union case 04 - Rqa``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Union case 05``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Union case 06``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 07``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 08 - Module Rqa``() = x.DoNamedTest()
 
     [<Test>] member x.``To recursive - Escape 01``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Local 01``() = x.DoNamedTest()

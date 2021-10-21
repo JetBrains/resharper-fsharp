@@ -33,7 +33,7 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
         let reference = referenceName.Reference
         FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, declaredElement)
 
-        if not (FSharpResolveUtil.resolvesToQualified declaredElement reference opName) then
+        if not (FSharpResolveUtil.resolvesToQualified declaredElement reference true opName) then
             // todo: use declared element directly
             let typeElement = declaredElement.GetContainingType()
             addOpens reference typeElement |> ignore
