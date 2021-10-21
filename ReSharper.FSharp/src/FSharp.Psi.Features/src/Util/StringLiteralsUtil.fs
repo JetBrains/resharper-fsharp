@@ -103,7 +103,6 @@ let getStringStartingQuotesLength (tokenType: TokenNodeType) =
     | VerbatimInterpolatedStringStart -> 3
     | TripleQuoteInterpolatedString
     | TripleQuoteInterpolatedStringStart -> 4
-    | _ -> 0
 
 let getStringEndingQuote tokenType =
     assertStringTokenType tokenType
@@ -131,8 +130,6 @@ let getStringEndingQuotesLength (tokenType: TokenNodeType) =
     | TripleQuoteInterpolatedStringEnd -> 3
     | ByteArray
     | VerbatimByteArray -> 2
-    | _ -> 0
-
 
 let emptyString = "\"\""
 let emptyChar = "''"
@@ -144,16 +141,21 @@ let getCorrespondingQuotesPair char =
     | _ -> failwithf "Got char: %O" char
 
 let isInterpolatedStringStartToken (tokenType: TokenNodeType) =
-    (tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START
-    || tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START
-    || tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_START)
+    tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START ||
+    tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START ||
+    tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_START
 
 let isInterpolatedStringMiddleToken (tokenType: TokenNodeType) =
-    (tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE
-    || tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE
-    || tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE)
+    tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE ||
+    tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE ||
+    tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE
 
 let isInterpolatedStringEndToken (tokenType: TokenNodeType) =
-    (tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_END
-    || tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END
-    || tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END)
+    tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_END ||
+    tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END ||
+    tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END
+
+let isInterpolatedStringToken (tokenType: TokenNodeType) =
+    isInterpolatedStringStartToken tokenType ||
+    isInterpolatedStringMiddleToken tokenType ||
+    isInterpolatedStringEndToken tokenType
