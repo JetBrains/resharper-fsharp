@@ -155,7 +155,7 @@ let isInterpolatedStringEndToken (tokenType: TokenNodeType) =
     tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END ||
     tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END
 
-let isInterpolatedStringToken (tokenType: TokenNodeType) =
+let isInterpolatedStringPartToken (tokenType: TokenNodeType) =
     isInterpolatedStringStartToken tokenType ||
     isInterpolatedStringMiddleToken tokenType ||
     isInterpolatedStringEndToken tokenType
