@@ -1,0 +1,10 @@
+﻿Suggested names: {let!, use!}, {disposable, cookie}
+//${OCCURRENCE0:Bind computation with let!}
+
+let getCookie () : Async<System.IDisposable> = async { return null }
+
+async {
+
+    let! disposable = getCookie ()
+    return 1
+}

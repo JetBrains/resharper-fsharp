@@ -1,0 +1,8 @@
+﻿Suggested names: {let!, use!}, {disposable}
+//${OCCURRENCE0:Bind computation with let!}
+
+async {
+
+    let! disposable = async { return (null: System.IDisposable) }
+    return 1
+}

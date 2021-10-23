@@ -625,7 +625,10 @@ type FSharpIntroduceVarHelper() =
         let mfvParamGroup = mfvParamGroups.[0]
         if mfvParamGroup.Count <> 2 then None else
 
-        Some(mfvParamGroup.[0].Type, mfvParamGroup.[1].Type)
+        let binderType = mfvParamGroup.[1].Type
+        if not binderType.IsFunctionType then None else
+
+        Some(mfvParamGroup.[0].Type, binderType)
 
     override x.IsLanguageSupported = true
 
@@ -704,12 +707,14 @@ type FSharpIntroduceVarHelper() =
             | _, None -> true
             | _, Some(_, builderMembers) ->
 
-            builderMembers |> Seq.exists (fun mfv ->
-                match getBuilderMethodParamTypes "Using" mfv with
-                | None -> false
-                | Some(paramType, _) -> paramType.MapType(sourceExpr).IsSubtypeOf(disposableType))
+            // We don't check the actual parameter type here,
+            // due to can't reuse `T -> IDisposable` substitution from `Bind`: the Ts are considered different by Fcs.
+            // todo: find a way to compute common substitution
+            builderMembers
+            |> Seq.tryPick (getBuilderMethodParamTypes "Using")
+            |> Option.isSome
 
-        data.Keywords <- getApplicableBindingKeywords data.BindComputation supportsUse
+        data.Keywords <- getApplicableBindingKeywords bindComputation supportsUse
 
         if bindComputation then
             data.BindComputation <- bindComputation

@@ -1,0 +1,6 @@
+﻿Suggested names: int32Async, async
+async {
+
+    let int32Async = async { return 1 }
+    return 1
+}

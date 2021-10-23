@@ -1,0 +1,8 @@
+﻿Suggested names: i
+//${OCCURRENCE0:Bind computation with let!}
+
+async {
+
+    let! i = async { return 1 }
+    return 1
+}

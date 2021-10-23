@@ -1,0 +1,8 @@
+﻿Suggested names: {i, item1, _}, {s, item2, _}
+//${OCCURRENCE0:Bind computation with let!}
+//${OCCURRENCE1:Deconstruct tuple}
+
+async {
+    let! i, s = async { return 1, "" }
+    return 1
+}

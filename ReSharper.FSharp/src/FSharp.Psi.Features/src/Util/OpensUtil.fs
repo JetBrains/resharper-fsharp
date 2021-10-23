@@ -20,7 +20,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
-let toQualifiedList (fsFile: IFSharpFile) (declaredElement: IClrDeclaredElement) =
+let toQualifiedList (declaredElement: IClrDeclaredElement) =
     let rec loop acc (declaredElement: IClrDeclaredElement) =
         match declaredElement with
         | :? INamespace as ns ->
@@ -32,16 +32,9 @@ let toQualifiedList (fsFile: IFSharpFile) (declaredElement: IClrDeclaredElement)
 
             match typeElement.GetContainingType() with
             | null -> loop acc (typeElement.GetContainingNamespace())
-
-            | :? IFSharpModule as fsModule when
-                    fsModule.IsAnonymous &&
-                    let decls = fsFile.ModuleDeclarations
-                    decls.Count = 1 && decls.[0].DeclaredElement.Equals(fsModule) ->
-                acc
-
             | containingType -> loop acc containingType
 
-        | _ -> failwithf "Expecting namespace to type element"
+        | _ -> failwithf "Expecting a namespace or a type element"
 
     loop [] declaredElement
 
@@ -59,7 +52,7 @@ type ModuleToImport =
         | FullName _ -> []
         | DeclaredElement(declaredElement) ->
 
-        let elements = toQualifiedList moduleDeclaration.FSharpFile declaredElement
+        let elements = toQualifiedList declaredElement
         if not skipNamespaces && not (moduleDeclaration :? IModuleDeclaration) then elements else
 
         // When importing `Ns.Module.NestedModule` inside `Ns.Module`, skip the parent part.
@@ -103,7 +96,7 @@ let rec getModuleToOpen (typeElement: ITypeElement): IClrDeclaredElement =
         else
             getModuleToOpen containingType
 
-let tryGetCommonParentModuleDecl (context: ITreeNode) fsFile (moduleToImport: ModuleToImport) =
+let tryGetCommonParentModuleDecl (context: ITreeNode) (moduleToImport: ModuleToImport) =
     match moduleToImport with
     | ModuleToImport.DeclaredElement(declaredElement) ->
         let moduleDecls = 
@@ -116,7 +109,7 @@ let tryGetCommonParentModuleDecl (context: ITreeNode) fsFile (moduleToImport: Mo
             | :? IGlobalNamespaceDeclaration :: decls -> decls
             | _ -> moduleDecls
 
-        let importModuleQualifiedList = toQualifiedList fsFile declaredElement
+        let importModuleQualifiedList = toQualifiedList declaredElement
         let topLevelDecl = List.head moduleDecls
 
         let commonPrefixImportModuleList =
@@ -139,7 +132,7 @@ let findModuleToInsertTo (fsFile: IFSharpFile) (offset: DocumentOffset) (setting
         (moduleToImport: ModuleToImport): IModuleLikeDeclaration * bool =
 
     let containingModuleDecl = fsFile.GetNode<IModuleLikeDeclaration>(offset)
-    match tryGetCommonParentModuleDecl containingModuleDecl fsFile moduleToImport with
+    match tryGetCommonParentModuleDecl containingModuleDecl moduleToImport with
     | Some(decl, searchAnchor) -> decl, searchAnchor
     | _ ->
 
@@ -321,7 +314,7 @@ let addOpens (reference: FSharpSymbolReference) (typeElement: ITypeElement) =
     let moduleToOpen = getModuleToOpen typeElement
     let fsFile = referenceOwner.FSharpFile
 
-    let qualifiedModuleToOpen = toQualifiedList fsFile moduleToOpen
+    let qualifiedModuleToOpen = toQualifiedList moduleToOpen
     if qualifiedModuleToOpen.IsEmpty then reference else
 
     let moduleToImport = ModuleToImport.DeclaredElement(moduleToOpen)

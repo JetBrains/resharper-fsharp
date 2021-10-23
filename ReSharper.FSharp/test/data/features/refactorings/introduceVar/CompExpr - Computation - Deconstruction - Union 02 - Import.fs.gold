@@ -1,0 +1,14 @@
+﻿Suggested names: {i, item1, _}, {f, item2, _}
+//${OCCURRENCE0:Bind computation with let!}
+//${OCCURRENCE1:Deconstruct 'A' union case}
+
+module Module =
+    type U =
+        | A of int * float
+
+open Module
+
+async {
+    let! (A (i, f)) = async { return Module.A(1, 1.0) }
+    return 1
+}

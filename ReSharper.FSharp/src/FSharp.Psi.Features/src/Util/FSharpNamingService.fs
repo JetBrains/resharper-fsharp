@@ -275,9 +275,11 @@ module FSharpNamingService =
         match overrideType with
         | None -> namesCollection.Add(expr, options)
         | Some overrideType ->
-            // todo: add names from references (the override in namingService.SuggestRoots is protected)
             let namingService = NamingManager.GetNamingLanguageService(expr.Language).As<ClrNamingLanguageServiceBase>()
-            namingService.SuggestRoots(overrideType, namesCollection.PolicyProvider)
+            let provider = namesCollection.PolicyProvider
+
+            (namingService.SuggestRoots(expr, false, provider), namingService.SuggestRoots(overrideType, provider))
+            ||> Seq.append
             |> Seq.iter (fun root -> namesCollection.Add(root, options))
         namesCollection
 

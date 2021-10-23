@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Refactorings
 
+open System.Collections.Generic
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Refactorings.Test.Common
 open NUnit.Framework
@@ -10,6 +11,25 @@ type IntroduceVarTest() =
 
     override x.RelativeTestDataPath = "features/refactorings/introduceVar"
 
+    member val Occurrences = null with get, set
+
+    override this.CreateRefactoringWorkflow(control, context) =
+        this.Occurrences <- IntroduceVarTest.GetSettings(control.Document.Buffer, "OCCURRENCE") |> Queue
+        this.TestLifetime.OnTermination(fun _ -> this.Occurrences <- null) |> ignore
+
+        base.CreateRefactoringWorkflow(control, context)
+    
+    override this.ProvideOccurrencesData(occurrences, context, control, occurrencesSelectorName) =
+        let baseOccurrence = base.ProvideOccurrencesData(occurrences, context, control, occurrencesSelectorName)
+
+        if this.Occurrences.Count = 0 then baseOccurrence else
+
+        match occurrences |> Array.tryFind (fun occurrence -> occurrence.Name.Text = this.Occurrences.Peek()) with
+        | Some occurrence ->
+            this.Occurrences.Dequeue() |> ignore
+            occurrence
+        | _ -> baseOccurrence
+
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02``() = x.DoNamedTest()
     [<Test>] member x.``Simple 03``() = x.DoNamedTest()
@@ -19,6 +39,14 @@ type IntroduceVarTest() =
     [<Test>] member x.``Let 03 - Inside other``() = x.DoNamedTest()
     [<Test>] member x.``Let 04 - After other``() = x.DoNamedTest()
     [<Test>] member x.``Let 05 - Nested indent``() = x.DoNamedTest()
+
+    [<Test>] member x.``CompExpr - Computation 01``() = x.DoNamedTest()
+    [<Test>] member x.``CompExpr - Computation - Deconstruction - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``CompExpr - Computation - Deconstruction - Union 01``() = x.DoNamedTest()
+    [<Test>] member x.``CompExpr - Computation - Deconstruction - Union 02 - Import``() = x.DoNamedTest()
+    [<Test>] member x.``CompExpr - Computation - Disposable 01``() = x.DoNamedTest()
+    [<Test>] member x.``CompExpr - Computation - Disposable 02``() = x.DoNamedTest()
+    [<Test>] member x.``CompExpr - Value 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Match 02 - Multiline``() = x.DoNamedTest()
