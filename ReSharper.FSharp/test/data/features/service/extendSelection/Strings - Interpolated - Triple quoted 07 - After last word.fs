@@ -1,1 +1,0 @@
-$"""{quick} brown fox{caret} """

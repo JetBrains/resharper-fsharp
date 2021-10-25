@@ -1,1 +1,0 @@
-$@"{quick} brown {caret}fox "

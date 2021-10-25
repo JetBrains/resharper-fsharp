@@ -68,8 +68,8 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             if isNotNull interpolationStringExpr then
                 let prevLiteral = getPrevSibling expr
                 let nextLiteral = getNextSibling expr
-                if isNotNull prevLiteral && isNotNull nextLiteral
-                    && isInterpolatedStringPartToken (prevLiteral.GetTokenType()) && isInterpolatedStringPartToken (nextLiteral.GetTokenType()) then
+                if isNotNull prevLiteral && isNotNull nextLiteral &&
+                    isInterpolatedStringPartToken (prevLiteral.GetTokenType()) && isInterpolatedStringPartToken (nextLiteral.GetTokenType()) then
                     FSharpInterpolatedStringInsertSelectionWithTokens(fsFile, prevLiteral, nextLiteral, interpolationStringExpr) :> _
                 else null
             else
@@ -225,11 +225,11 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
                 FSharpInterpolatedStringInsertSelectionWithTokens(fsFile, prev, token, interpolatedStringExpr) :> ISelectedRange)
             |> Option.defaultValue null
 
-        if treeTextRange.ContainedIn(&tokenTextEnd)
-            && (isInterpolatedStringStartToken tokenType || isInterpolatedStringMiddleToken tokenType) then
+        if treeTextRange.ContainedIn(&tokenTextEnd) &&
+            (isInterpolatedStringStartToken tokenType || isInterpolatedStringMiddleToken tokenType) then
             createInsertSelectionForNextLiteral ()
-        elif treeTextRange.ContainedIn(&tokenTextStart)
-            && (isInterpolatedStringMiddleToken tokenType || isInterpolatedStringEndToken tokenType) then
+        elif treeTextRange.ContainedIn(&tokenTextStart) &&
+            (isInterpolatedStringMiddleToken tokenType || isInterpolatedStringEndToken tokenType) then
             createInsertSelectionForPrevLiteral ()
         else
             null
@@ -272,9 +272,9 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
             let localRange = treeTextRange.Shift(-token.GetTreeStartOffset().Offset - start)
             let localParentRange = TokenPartSelection<_>.GetLocalParent(StringSlice(text), localRange)
 
-            if isInterpolatedStringPartToken tokenType
-                && tokenText.Length <> 0 && text.Length = localParentRange.Length
-                && token.Parent :? IInterpolatedStringExpr then
+            if isInterpolatedStringPartToken tokenType &&
+                tokenText.Length <> 0 && text.Length = localParentRange.Length &&
+                token.Parent :? IInterpolatedStringExpr then
                 let parentExpr = token.Parent :?> IInterpolatedStringExpr
                 if parentExpr.Literals.Count >= 2 then
                     FSharpInterpolatedStringExpressionSelection(fsFile, parentExpr) :> _ else

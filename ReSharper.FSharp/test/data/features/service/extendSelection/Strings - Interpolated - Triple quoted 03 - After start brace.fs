@@ -1,1 +1,0 @@
-$"""Quick {{caret}brown} {fox} """
