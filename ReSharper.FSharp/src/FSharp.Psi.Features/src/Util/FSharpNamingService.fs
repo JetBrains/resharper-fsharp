@@ -234,6 +234,7 @@ module FSharpNamingService =
             | :? IArrayOrListPat as asPat -> addNames asPat.PatternsEnumerable
             | :? IRecordPat as recordPat -> addNames (Seq.cast recordPat.FieldPatternsEnumerable)
             | :? IListConsPat as listConsPat -> addNames [listConsPat.HeadPattern; listConsPat.TailPattern]
+            | :? IAsPat as asPat -> addNames [asPat.LeftPattern; asPat.RightPattern]
             | :? IParametersOwnerPat as parametersOwnerPat -> addNames parametersOwnerPat.ParametersEnumerable
 
             | :? INamedPat as namedPat ->
@@ -528,6 +529,7 @@ type FSharpNamingService(language: FSharpLanguage) =
         | _ -> ()
 
         let getParameterOwnerPat (pattern: IFSharpPattern) =
+            let pattern = FSharpPatternUtil.ignoreParentAsPatsFromRight pattern
             let parametersOwner = ParametersOwnerPatNavigator.GetByParameter(pattern.IgnoreParentParens())
             if isNotNull parametersOwner then parametersOwner else
 
@@ -535,6 +537,7 @@ type FSharpNamingService(language: FSharpLanguage) =
             ParametersOwnerPatNavigator.GetByParameter(tuplePat.IgnoreParentParens())
 
         let getUnionCaseFieldIndex (pattern: IFSharpPattern) (parametersOwnerPat: IParametersOwnerPat) =
+            let pattern = FSharpPatternUtil.ignoreParentAsPatsFromRight pattern
             let pattern = pattern.IgnoreParentParens()
 
             let singleParam = parametersOwnerPat.ParametersEnumerable.SingleItem
@@ -574,7 +577,8 @@ type FSharpNamingService(language: FSharpLanguage) =
 
         match fsPattern with
         | :? INamedPat as namedPat ->
-            let parametersOwner = ParametersOwnerPatNavigator.GetByParameter(namedPat.IgnoreParentParens())
+            let pat = FSharpPatternUtil.ignoreParentAsPatsFromRight namedPat
+            let parametersOwner = ParametersOwnerPatNavigator.GetByParameter(pat.IgnoreParentParens())
             if isNull parametersOwner || parametersOwner.Parameters.Count <> 1 then () else
 
             let typeName = addSingleParamSuggestions.TryGetValue(parametersOwner.ReferenceName.ShortName)

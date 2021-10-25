@@ -14,14 +14,14 @@ open JetBrains.ReSharper.Resources.Shell
 type RemoveUnusedNamedAsPatFix(warning: UnusedValueWarning) =
     inherit FSharpQuickFixBase()
 
-    let pat = warning.Pat.As<IAsPat>()
+    let pat = AsPatNavigator.GetByRightPattern(warning.Pat)
 
     override x.Text = "Remove unused 'as' pattern"
 
     override x.IsAvailable _ =
-        isValid pat && isNotNull pat.Pattern
+        isValid pat && isNotNull pat.LeftPattern
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        replaceWithCopy pat pat.Pattern
+        replaceWithCopy pat pat.LeftPattern

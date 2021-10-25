@@ -58,8 +58,12 @@ let rec compoundPatternNeedsParens (strictContext: ITreeNode) (fsPattern: IFShar
     if isNull strictContext then false else
 
     match fsPattern with
-    | :? IAsPat as asPat -> compoundPatternNeedsParens strictContext asPat.Pattern
-    | :? ITuplePat as tuplePat -> Seq.exists (compoundPatternNeedsParens strictContext) tuplePat.Patterns
+    | :? IAsPat as asPat ->
+        compoundPatternNeedsParens strictContext asPat.LeftPattern &&
+        compoundPatternNeedsParens strictContext asPat.RightPattern
+
+    | :? ITuplePat as tuplePat ->
+        Seq.exists (compoundPatternNeedsParens strictContext) tuplePat.Patterns
 
     | :? IAttribPat
     | :? ITypedLikePat -> true
@@ -74,8 +78,8 @@ let getBindingPattern (context: IFSharpPattern) =
         let tuplePat = TuplePatNavigator.GetByPattern(fsPattern)
         if not seenTuple && isNotNull tuplePat then loop true tuplePat else
 
-        let tuplePat = AsPatNavigator.GetByPattern(fsPattern)
-        if isNotNull tuplePat then loop seenTuple tuplePat else
+        let asPat = AsPatNavigator.GetByLeftPattern(fsPattern)
+        if isNotNull asPat then loop seenTuple asPat else
 
         fsPattern
 

@@ -36,8 +36,8 @@ let getIndexerArgListRange (indexerExpr: IItemIndexerExpr) =
     | argList -> argList.GetHighlightingRange()
 
 let getAsPatternRange (asPat: IAsPat) =
-    if isValid asPat && isValid asPat.Pattern && isValid asPat.AsKeyword then
-        getTreeNodesDocumentRange asPat.Pattern asPat.AsKeyword
+    if isValid asPat && isValid asPat.LeftPattern && isValid asPat.AsKeyword then
+        getTreeNodesDocumentRange asPat.LeftPattern asPat.AsKeyword
     else
         DocumentRange.InvalidRange
 

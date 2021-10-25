@@ -563,7 +563,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Pattern - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Record 02 - Qualified name``() = x.DoNamedTest()
 
-    [<Test>] member x.``Pattern - As - Wild 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - As - Named 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - As - Parameter owner 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - As - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - As - Tuple 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - Named args 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Named args 02 - Multiple``() = x.DoNamedTest()

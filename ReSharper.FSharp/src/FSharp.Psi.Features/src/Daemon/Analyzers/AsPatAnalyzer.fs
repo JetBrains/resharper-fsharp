@@ -11,5 +11,5 @@ type AsPatAnalyzer() =
     inherit ElementProblemAnalyzer<IAsPat>()
 
     override x.Run(asPat, _, consumer) =
-        if asPat.Pattern.IgnoreInnerParens() :? IWildPat then
+        if asPat.LeftPattern.IgnoreInnerParens() :? IWildPat then
             consumer.AddHighlighting(RedundantAsPatternWarning(asPat))

@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -227,14 +228,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | UnusedValue ->
             match fsFile.GetNode<INamedPat>(range) with
             | null -> UnusedHighlighting(error.Message, range) :> _
-            | pat ->
+            | namedPat ->
 
+            let pat = FSharpPatternUtil.ignoreParentAsPatsFromRight namedPat
             let binding = TopBindingNavigator.GetByHeadPattern(pat)
             let decl = LetBindingsDeclarationNavigator.GetByBinding(binding)
             if isNotNull decl && binding.HasParameters && not (Seq.isEmpty binding.AttributesEnumerable) then
                 IgnoredHighlighting.Instance :> _
             else
-                UnusedValueWarning(pat) :> _
+                UnusedValueWarning(namedPat) :> _
 
         | RuleNeverMatched ->
             let matchClause = fsFile.GetNode<IMatchClause>(range)

@@ -28,7 +28,7 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
             let referenceName = refPat.ReferenceName
             isNotNull referenceName && isNull referenceName.Qualifier
 
-        | :? IAsPat as asPat -> isSimplePattern asPat.Pattern
+        | :? IAsPat as asPat -> isSimplePattern asPat.LeftPattern && isSimplePattern asPat.RightPattern
         | :? IParenPat as parenPat -> isSimplePattern parenPat.Pattern
 
         | _ -> false

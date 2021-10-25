@@ -11,7 +11,7 @@ IFSharpImplFile
             ILambdaParametersList
               IParenPat
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                ILocalAsPat
+                IAsPat
                   ITuplePat
                     ILocalReferencePat
                       IExpressionReferenceName
@@ -24,12 +24,14 @@ IFSharpImplFile
                   Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                   FSharpTokenType+AsTokenElement(type:AS, text:as)
                   Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  FSharpIdentifierToken(type:IDENTIFIER, text:c)
+                  ILocalReferencePat
+                    IExpressionReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:c)
                 FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IParenPat
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                ILocalAsPat
+                IAsPat
                   ITuplePat
                     ILocalReferencePat
                       IExpressionReferenceName
@@ -47,7 +49,9 @@ IFSharpImplFile
                   Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                   FSharpTokenType+AsTokenElement(type:AS, text:as)
                   Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  FSharpIdentifierToken(type:IDENTIFIER, text:g)
+                  ILocalReferencePat
+                    IExpressionReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:g)
                 FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)

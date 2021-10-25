@@ -1,0 +1,3 @@
+﻿do
+    let f (i3, foo{caret} as s1) (i as i1 as i2) =
+        fst s1 + i

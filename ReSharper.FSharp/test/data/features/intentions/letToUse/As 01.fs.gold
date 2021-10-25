@@ -1,3 +1,0 @@
-﻿do
-    use a as b{caret} = { new System.IDisposable with member x.Dispose() = () }
-    ()

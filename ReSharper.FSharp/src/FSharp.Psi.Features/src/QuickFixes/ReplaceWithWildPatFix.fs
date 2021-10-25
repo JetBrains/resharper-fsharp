@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Scopes
 open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -46,7 +47,8 @@ module ReplaceWithWildPat =
     let isAvailable (pat: IFSharpPattern) =
         isValid pat &&
 
-        let binding = BindingNavigator.GetByHeadPattern(pat)
+        let pat = FSharpPatternUtil.ignoreParentAsPatsFromRight pat
+        let binding = BindingNavigator.GetByHeadPattern(pat.IgnoreParentParens())
         if isNotNull binding && binding.HasParameters then false else
 
         match pat with

@@ -227,6 +227,7 @@ externDeclaration:
 
 interface fSharpPattern:
   namedPat |
+  asPat |
   typedLikePat |
   attribPat |
   orPat |
@@ -247,16 +248,11 @@ interface fSharpPattern:
   fromErrorPat;
 
 interface namedPat:
-  referencePat |
-  asPat;
+  referencePat;
 
 interface referencePat:
   localReferencePat |
   topReferencePat;
-
-interface asPat:
-  localAsPat |
-  topAsPat;
 
 interface typedLikePat:
   typedPat |
@@ -278,15 +274,10 @@ parametersOwnerPat options { stubBase="FSharpPatternBase"; } extras {
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   fSharpPattern<PARAMETER, Parameters>*;
 
-localAsPat options { stubBase="LocalPatternDeclarationBase"; }:
-  fSharpPattern<PATTERN, Pattern>
+asPat options { stubBase="FSharpPatternBase"; }:
+  fSharpPattern<LEFT_PATTERN, LeftPattern>
   AS<AS, AsKeyword>
-  fSharpIdentifier<IDENTIFIER, Identifier>;
-
-topAsPat options { stubBase="TopPatternDeclarationBase"; }:
-  fSharpPattern<PATTERN, Pattern>
-  AS<AS, AsKeyword>
-  fSharpIdentifier<IDENTIFIER, Identifier>;
+  fSharpPattern<RIGHT_PATTERN, RightPattern>;
 
 
 interface arrayOrListPat:

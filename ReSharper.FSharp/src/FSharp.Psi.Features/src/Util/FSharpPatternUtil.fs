@@ -41,3 +41,13 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
         pat
 
     | _ -> failwith $"Unexpected symbol: {fcsSymbol}"
+
+let rec ignoreParentAsPatsFromRight (pat: IFSharpPattern) =
+    match AsPatNavigator.GetByRightPattern(pat.IgnoreParentParens()) with
+    | null -> pat
+    | pat -> ignoreParentAsPatsFromRight pat
+
+let rec ignoreInnerAsPatsToRight (pat: IFSharpPattern) =
+    match pat with
+    | :? IAsPat as asPat -> ignoreInnerAsPatsToRight asPat.RightPattern
+    | _ -> pat

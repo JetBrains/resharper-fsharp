@@ -5,14 +5,16 @@ IFSharpImplFile
       ITopBinding
         FSharpTokenType+LetTokenElement(type:LET, text:let)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        ITopAsPat
+        IAsPat
           ITopReferencePat
             IExpressionReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:a)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+AsTokenElement(type:AS, text:as)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpIdentifierToken(type:IDENTIFIER, text:b)
+          ITopReferencePat
+            IExpressionReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:b)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

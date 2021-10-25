@@ -67,11 +67,6 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
         let sourceFile = fsFile.GetSourceFile()
         FSharpCacheDeclarationProcessor.GetObjectExpressions(fsFile, sourceFile) |> Seq.cast
 
-    override x.CalcOffset(declaration) =
-        match declaration with
-        | :? IAsPat as asPat -> asPat.Identifier.GetTreeStartOffset()
-        | _ -> base.CalcOffset(declaration)
-
     member x.GetDefaultAccessType(declaredElement: IDeclaredElement) =
         // todo: invocations, partial applications
         match declaredElement with

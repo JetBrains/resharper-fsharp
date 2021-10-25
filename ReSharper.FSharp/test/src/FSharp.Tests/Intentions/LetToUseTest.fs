@@ -10,7 +10,6 @@ type LetToUseTest() =
     override x.ExtraPath = "letToUse"
 
     [<Test>] member x.``Ref 01``() = x.DoNamedTest()
-    [<Test>] member x.``As 01``() = x.DoNamedTest()
 
 type LetToUseAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<LetToUseAction>()

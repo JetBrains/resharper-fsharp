@@ -171,7 +171,7 @@ module FSharpDeconstruction =
                 let asPat = factory.CreatePattern($"_ as {refPat.SourceName}", isTopLevel) :?> IAsPat
                 let replacedAsPat = ModificationUtil.ReplaceChild(pat, asPat)
                 let replacedAsPat = ParenPatUtil.addParensIfNeeded replacedAsPat
-                replacedAsPat.IgnoreInnerParens().As<IAsPat>().Pattern
+                replacedAsPat.IgnoreInnerParens().As<IAsPat>().LeftPattern
             else
                 pat
 
@@ -181,7 +181,7 @@ module FSharpDeconstruction =
         let itemPatterns: seq<IFSharpPattern> =
             match pattern with
             | null -> Seq.empty
-            | :? IAsPat as asPat -> asPat.Pattern.As<ITuplePat>().PatternsEnumerable :> _
+            | :? IAsPat as asPat -> asPat.LeftPattern.As<ITuplePat>().PatternsEnumerable :> _
             | :? ITuplePat as tuplePat -> tuplePat.PatternsEnumerable :> _
             | :? IReferencePat as refPat -> Seq.singleton refPat |> Seq.cast
             | _ -> invalidOp $"Unexpected pattern: {pattern}"

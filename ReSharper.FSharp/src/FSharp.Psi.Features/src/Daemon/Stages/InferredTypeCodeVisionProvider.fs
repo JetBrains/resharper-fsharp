@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.RdBackend.Common.Features.Services
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
@@ -127,12 +128,11 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
 
     override x.VisitTopBinding(binding, consumer) =
         let headPattern = binding.HeadPattern.IgnoreInnerParens()
-        if not headPattern.IsDeclaration then () else
+        let pattern = FSharpPatternUtil.ignoreInnerAsPatsToRight headPattern
+        let namedPat = pattern.IgnoreInnerParens().As<INamedPat>()
+        if isNull namedPat || not namedPat.IsDeclaration then () else
 
-        let namedPat = headPattern.As<INamedPat>()
-        if isNull namedPat then () else
-
-        let symbolUse = (headPattern :?> IFSharpDeclaration).GetFcsSymbolUse()
+        let symbolUse = namedPat.GetFcsSymbolUse()
         if isNull symbolUse then () else
 
         match symbolUse.Symbol with

@@ -46,6 +46,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
+    // todo: unify with FSharpPatternUtil impl
+    private static IFSharpPattern IgnoreInnerAsPatsToRight(IFSharpPattern pattern) => 
+      pattern is IAsPat asPat ? IgnoreInnerAsPatsToRight(asPat.RightPattern) : pattern;
+
     public override FSharpSymbol GetFcsSymbol()
     {
       var symbolUse = GetSymbolUse();
@@ -59,7 +63,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       var exprToGetBy = sequentialExpr ?? RecordExpr.IgnoreParentParens();
 
       var binding = BindingNavigator.GetByExpression(exprToGetBy);
-      if (!(binding is { HeadPattern: INamedPat namedPat }))
+      if (binding == null) return null;
+
+      var headPattern = IgnoreInnerAsPatsToRight(binding.HeadPattern);
+      if (!(headPattern is INamedPat namedPat))
         return null;
 
       var mfv = namedPat.GetFcsSymbol() as FSharpMemberOrFunctionOrValue;

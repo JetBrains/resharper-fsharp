@@ -15,13 +15,15 @@ IFSharpImplFile
           IMatchClause
             FSharpTokenType+BarTokenElement(type:BAR, text:|)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ILocalAsPat
+            IAsPat
               IWildPat
                 FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpTokenType+AsTokenElement(type:AS, text:as)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:x)
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:x)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

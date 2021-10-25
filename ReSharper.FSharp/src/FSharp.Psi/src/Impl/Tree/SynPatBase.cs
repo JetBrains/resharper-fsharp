@@ -77,47 +77,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Parameters.SelectMany(param => param.NestedPatterns);
   }
 
-  internal partial class TopAsPat
+  internal partial class AsPat
   {
-    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
-    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
-    public bool IsDeclaration => true;
-    public override IEnumerable<IFSharpPattern> NestedPatterns => Pattern?.NestedPatterns.Prepend(this) ?? new[] {this};
-
-    public TreeNodeCollection<IAttribute> Attributes =>
-      this.GetBindingFromHeadPattern()?.Attributes ??
-      TreeNodeCollection<IAttribute>.Empty;
-
-    public bool IsMutable => Binding?.IsMutable ?? false;
-
-    public void SetIsMutable(bool value)
+    public override IEnumerable<IFSharpPattern> NestedPatterns
     {
-      var binding = Binding;
-      Assertion.Assert(binding != null, "GetBinding() != null");
-      binding.SetIsMutable(true);
+      get
+      {
+        var pattern1Decls = LeftPattern?.NestedPatterns ?? EmptyList<IFSharpPattern>.Instance;
+        var pattern2Decls = RightPattern?.NestedPatterns ?? EmptyList<IFSharpPattern>.Instance;
+        return pattern2Decls.Prepend(pattern1Decls);
+      }
     }
-
-    public override IBindingLikeDeclaration Binding => this.GetBindingFromHeadPattern();
-  }
-
-  internal partial class LocalAsPat
-  {
-    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
-    public bool IsDeclaration => true;
-    public override IEnumerable<IFSharpPattern> NestedPatterns => Pattern?.NestedPatterns.Prepend(this) ?? new[] {this};
-
-    public bool IsMutable => Binding?.IsMutable ?? false;
-
-    public void SetIsMutable(bool value)
-    {
-      var binding = Binding;
-      Assertion.Assert(binding is LocalBinding, "GetBinding() is LocalBinding");
-      binding.SetIsMutable(true);
-    }
-
-    public bool CanBeMutable => Binding is LocalBinding;
-
-    private IBindingLikeDeclaration Binding => this.GetBindingFromHeadPattern();
   }
 
   internal partial class OrPat
