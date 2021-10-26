@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
@@ -34,3 +35,11 @@ type SpecifyPropertyTypeTest() =
     override x.RelativeTestDataPath = "features/quickFixes/specifyType"
 
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
+
+[<FSharpTest>]
+type SpecifyTypeFixAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/specifyType"
+
+    [<Test>] member x.``Text 01``() = x.DoNamedTest()

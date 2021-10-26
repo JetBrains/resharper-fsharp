@@ -1,0 +1,14 @@
+﻿module Module
+
+let f (x: string) =
+    ()
+
+let g x =
+    |x.Length|(0)
+    f x
+    ()
+
+------------------------------------------------
+0: Lookup on object of indeterminate type based on information prior to this program point. A type annotation may be needed constrain the type of the object.
+QUICKFIXES:
+Add 'string' type annotation to 'x'
