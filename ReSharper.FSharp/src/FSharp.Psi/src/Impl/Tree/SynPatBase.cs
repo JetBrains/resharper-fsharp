@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class TopReferencePat
   {
-    public bool IsDeclaration => true;
+    public bool IsDeclaration => this.IsDeclaration();
 
     public override IEnumerable<IFSharpPattern> NestedPatterns => new[] {this};
 
@@ -30,26 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
 
-    public bool IsDeclaration
-    {
-      get
-      {
-        // todo: check other parents: e.g. parameters?
-        if (Parent is IBindingLikeDeclaration)
-          return true;
-
-        var referenceName = ReferenceName;
-        if (!(referenceName is { Qualifier: null }))
-          return false;
-
-        var name = referenceName.ShortName;
-        if (!name.IsEmpty() && name[0].IsLowerFast())
-          return true;
-
-        var idOffset = GetNameIdentifierRange().StartOffset.Offset;
-        return FSharpFile.GetSymbolUse(idOffset) == null;
-      }
-    }
+    public bool IsDeclaration => this.IsDeclaration();
 
     public override IEnumerable<IFSharpPattern> NestedPatterns => new[] {this};
 
@@ -168,6 +149,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         var pattern2Decls = TailPattern?.NestedPatterns ?? EmptyList<IFSharpPattern>.Instance;
         return pattern2Decls.Prepend(pattern1Decls);
       }
+    }
+  }
+
+  internal static class ReferencePatternUtil
+  {
+    internal static bool IsDeclaration(this IReferencePat refPat)
+    {
+      if (refPat.Parent is IBindingLikeDeclaration)
+        return true;
+
+      var referenceName = refPat.ReferenceName;
+      if (!(referenceName is {Qualifier: null}))
+        return false;
+
+      var name = referenceName.ShortName;
+      if (!name.IsEmpty() && name[0].IsLowerFast())
+        return true;
+
+      var idOffset = refPat.GetNameIdentifierRange().StartOffset.Offset;
+      return refPat.FSharpFile.GetSymbolUse(idOffset) == null;
     }
   }
 }
