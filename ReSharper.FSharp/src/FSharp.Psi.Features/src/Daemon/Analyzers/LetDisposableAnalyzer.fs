@@ -16,10 +16,10 @@ module LetDisposableAnalyzer =
         let bindings = letExpr.Bindings
         if bindings.Count > 1 then false else
 
-        let namedPat = bindings.[0].HeadPattern.IgnoreInnerParens().As<INamedPat>()
-        if isNull namedPat then false else
+        let refPat = bindings.[0].HeadPattern.IgnoreInnerParens().As<IReferencePat>()
+        if isNull refPat then false else
 
-        let typeOwner = namedPat.DeclaredElement.As<ITypeOwner>()
+        let typeOwner = refPat.DeclaredElement.As<ITypeOwner>()
         if isNull typeOwner then false else
 
         let typeElement = typeOwner.Type.GetTypeElement()

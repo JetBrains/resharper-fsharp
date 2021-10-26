@@ -71,7 +71,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnusedValue">
-    <Parameter type="INamedPat" name="pat"/>
+    <Parameter type="IReferencePat" name="pat"/>
     <Message value="The value '{0}' is unused">
       <Argument>pat.SourceName</Argument>
     </Message>
@@ -182,7 +182,7 @@
   </Warning>
 
   <Error staticGroup="FSharpErrors" name="VarBoundTwice">
-    <Parameter type="INamedPat" name="pat"/>
+    <Parameter type="IReferencePat" name="pat"/>
     <Message value="'{0}' is bound multiple times">
       <Argument>pat.SourceName</Argument>
     </Message>

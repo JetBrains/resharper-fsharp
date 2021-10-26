@@ -129,10 +129,10 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
     override x.VisitTopBinding(binding, consumer) =
         let headPattern = binding.HeadPattern.IgnoreInnerParens()
         let pattern = FSharpPatternUtil.ignoreInnerAsPatsToRight headPattern
-        let namedPat = pattern.IgnoreInnerParens().As<INamedPat>()
-        if isNull namedPat || not namedPat.IsDeclaration then () else
+        let refPat = pattern.IgnoreInnerParens().As<IReferencePat>()
+        if isNull refPat || not refPat.IsDeclaration then () else
 
-        let symbolUse = namedPat.GetFcsSymbolUse()
+        let symbolUse = refPat.GetFcsSymbolUse()
         if isNull symbolUse then () else
 
         match symbolUse.Symbol with

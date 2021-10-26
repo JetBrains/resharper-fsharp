@@ -66,10 +66,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (binding == null) return null;
 
       var headPattern = IgnoreInnerAsPatsToRight(binding.HeadPattern);
-      if (!(headPattern is INamedPat namedPat))
+      if (!(headPattern is IReferencePat refPat))
         return null;
 
-      var mfv = namedPat.GetFcsSymbol() as FSharpMemberOrFunctionOrValue;
+      var mfv = refPat.GetFcsSymbol() as FSharpMemberOrFunctionOrValue;
       var returnParameterType = mfv?.ReturnParameter.Type;
       if (!(returnParameterType is { HasTypeDefinition: true }))
         return null;

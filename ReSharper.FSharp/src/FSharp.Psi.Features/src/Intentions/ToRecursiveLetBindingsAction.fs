@@ -15,7 +15,7 @@ type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider)
     override x.IsAvailable _ =
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
         if isNull letBindings || letBindings.IsRecursive then false else
-        if not (isAtLetExprKeywordOrNamedPat dataProvider letBindings) then false else
+        if not (isAtLetExprKeywordOrReferencePattern dataProvider letBindings) then false else
 
         let bindings = letBindings.Bindings
         bindings.Count = 1 && bindings.[0].HasParameters

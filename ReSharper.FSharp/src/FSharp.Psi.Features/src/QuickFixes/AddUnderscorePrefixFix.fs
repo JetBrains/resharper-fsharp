@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Resources.Shell
 type AddUnderscorePrefixFix(warning: UnusedValueWarning) =
     inherit FSharpQuickFixBase()
 
-    let pat = warning.Pat.As<INamedPat>()
+    let pat = warning.Pat.As<IReferencePat>()
 
     override x.Text = sprintf "Rename to '_%s'" pat.SourceName
 
@@ -18,10 +18,10 @@ type AddUnderscorePrefixFix(warning: UnusedValueWarning) =
         if not (isValid pat) || pat.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME then false else
 
         pat.GetPartialDeclarations() |> Seq.forall (fun pat ->
-            let referencePat = pat :?> INamedPat
-            if isNull referencePat then false else
+            let refPat = pat :?> IReferencePat
+            if isNull refPat then false else
 
-            let identifier = referencePat.Identifier
+            let identifier = refPat.Identifier
             isValid identifier && not (identifier.GetText().IsEscapedWithBackticks()))
 
 
@@ -30,5 +30,5 @@ type AddUnderscorePrefixFix(warning: UnusedValueWarning) =
 
         let patterns = pat.GetPartialDeclarations() |> Seq.toList
         for pat in patterns do
-            let pat = pat :?> INamedPat
-            pat.SetName("_" + pat.SourceName, ChangeNameKind.SourceName)
+            let refPat = pat :?> IReferencePat
+            refPat.SetName("_" + refPat.SourceName, ChangeNameKind.SourceName)

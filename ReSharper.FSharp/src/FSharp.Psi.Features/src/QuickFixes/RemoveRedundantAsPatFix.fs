@@ -17,14 +17,14 @@ type RemoveRedundantAsPatFix(warning: RedundantAsPatternWarning) =
     override x.IsAvailable _ =
         isValid asPat &&
         
-        let namedPat = asPat.RightPattern.As<INamedPat>()
-        isNotNull namedPat && isNotNull namedPat.NameIdentifier
+        let refPat = asPat.RightPattern.As<IReferencePat>()
+        isNotNull refPat && isNotNull refPat.NameIdentifier
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(asPat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let namedPat = asPat.RightPattern :?> INamedPat
+        let refPat = asPat.RightPattern :?> IReferencePat
         let elementFactory = asPat.CreateElementFactory()
-        let refPat = elementFactory.CreatePattern(namedPat.SourceName, not namedPat.IsLocal)
+        let refPat = elementFactory.CreatePattern(refPat.SourceName, not refPat.IsLocal)
         replace asPat refPat

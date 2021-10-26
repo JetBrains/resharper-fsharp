@@ -17,7 +17,7 @@ type ReSpellerPsiHelper() =
 
     override x.GetDeclarationOnIdentifier(node) =
         match node with
-        | :? IFSharpIdentifier as fsIdentifier -> NamedPatNavigator.GetByIdentifier(fsIdentifier) :> _
+        | :? IFSharpIdentifier as fsIdentifier -> ReferencePatNavigator.GetByIdentifier(fsIdentifier) :> _
         | _ -> null
 
     override x.ShouldSkipInheritedMember(node, _) =

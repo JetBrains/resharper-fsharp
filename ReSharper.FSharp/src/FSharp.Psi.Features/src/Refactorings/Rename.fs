@@ -95,7 +95,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService, settingsStore: ISett
         if not (element :? IFSharpLocalDeclaration) then false else
 
         match element with
-        | :? INamedPat as namedPat -> namedPat.IsDeclaration
+        | :? IReferencePat as refPat -> refPat.IsDeclaration
         | _ -> true
 
     override x.CheckLocalRenameSameDocument(element: IDeclaredElement) =
@@ -103,10 +103,10 @@ type FSharpRenameHelper(namingService: FSharpNamingService, settingsStore: ISett
 
     override x.GetSecondaryElements(element: IDeclaredElement, newName) =
         match element with
-        | :? ILocalReferencePat as localNamedPat ->
-            localNamedPat.GetPartialDeclarations()
+        | :? ILocalReferencePat as localRefPat ->
+            localRefPat.GetPartialDeclarations()
             |> Seq.cast<IDeclaredElement>
-            |> Seq.filter (fun decl -> decl != localNamedPat)
+            |> Seq.filter (fun decl -> decl != localRefPat)
 
         | :? IUnionCase as unionCase ->
             unionCase.GetGeneratedMembers()
@@ -197,7 +197,7 @@ type FSharpAtomicRenamesFactory() =
     override x.CheckRenameAvailability(element: IDeclaredElement) =
         match element with
         | :? FSharpGeneratedMemberBase -> RenameAvailabilityCheckResult.CanNotBeRenamed
-        | :? INamedPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
+        | :? IReferencePat as refPat when not refPat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
         | :? IWildPat -> RenameAvailabilityCheckResult.CanBeRenamed
 
         | :? IFSharpDeclaredElement as fsElement when fsElement.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME ->

@@ -215,7 +215,7 @@ module FSharpNamingService =
         |> Seq.collect (fun pat -> pat.NestedPatterns)
         |> Seq.choose (fun pat ->
             match pat with
-            | :? INamedPat as namedPat -> Some(namedPat.SourceName)
+            | :? IReferencePat as refPat -> Some(refPat.SourceName)
             | _ -> None)
 
     // todo: use in Rename
@@ -237,9 +237,9 @@ module FSharpNamingService =
             | :? IAsPat as asPat -> addNames [asPat.LeftPattern; asPat.RightPattern]
             | :? IParametersOwnerPat as parametersOwnerPat -> addNames parametersOwnerPat.ParametersEnumerable
 
-            | :? INamedPat as namedPat ->
-                names.Add(namedPat.SourceName) |> ignore
-                loop namedPat
+            | :? IReferencePat as refPat ->
+                names.Add(refPat.SourceName) |> ignore
+                loop refPat
 
             | :? IFSharpPattern as fsPat -> loop fsPat
             | _ -> ()
@@ -576,8 +576,8 @@ type FSharpNamingService(language: FSharpLanguage) =
         addUnionCaseFieldName ()
 
         match fsPattern with
-        | :? INamedPat as namedPat ->
-            let pat = FSharpPatternUtil.ignoreParentAsPatsFromRight namedPat
+        | :? IReferencePat as refPat ->
+            let pat = FSharpPatternUtil.ignoreParentAsPatsFromRight refPat
             let parametersOwner = ParametersOwnerPatNavigator.GetByParameter(pat.IgnoreParentParens())
             if isNull parametersOwner || parametersOwner.Parameters.Count <> 1 then () else
 

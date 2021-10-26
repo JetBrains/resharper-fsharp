@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [ItemNotNull]
     public static IEnumerable<IFSharpPattern> GetPartialDeclarations([NotNull] this IFSharpPattern fsPattern)
     {
-      if (!(fsPattern is INamedPat namedPattern))
+      if (!(fsPattern is IReferencePat refPat))
         return new[] { fsPattern };
 
       var canBePartial = false;
@@ -24,10 +24,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (!canBePartial)
-        return new[] { namedPattern };
+        return new[] { refPat };
 
       return fsPattern.NestedPatterns.Where(pattern =>
-        pattern is INamedPat namedPat && namedPat.SourceName == namedPattern.SourceName && pattern.IsDeclaration);
+        pattern is IReferencePat nestedRefPat && nestedRefPat.SourceName == refPat.SourceName && pattern.IsDeclaration);
     }
 
     [CanBeNull]

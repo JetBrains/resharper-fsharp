@@ -226,7 +226,7 @@ externDeclaration:
 // todo: extract declaring pattern interface
 
 interface fSharpPattern:
-  namedPat |
+  referencePat |
   asPat |
   typedLikePat |
   attribPat |
@@ -246,9 +246,6 @@ interface fSharpPattern:
   quoteExprPat |
   charRangePat |
   fromErrorPat;
-
-interface namedPat:
-  referencePat;
 
 interface referencePat:
   localReferencePat |

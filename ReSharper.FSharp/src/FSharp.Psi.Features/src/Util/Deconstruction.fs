@@ -150,7 +150,7 @@ module FSharpDeconstruction =
 
                 parameterPattern.NestedPatterns
                 |> Seq.iter (function
-                    | :? INamedPat as namedPat -> usedNames.Add(namedPat.SourceName) |> ignore
+                    | :? IReferencePat as refPat -> usedNames.Add(refPat.SourceName) |> ignore
                     | _ -> ())
 
         let hasUsages =

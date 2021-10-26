@@ -226,17 +226,17 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode IndeterminateTypeError range
 
         | UnusedValue ->
-            match fsFile.GetNode<INamedPat>(range) with
+            match fsFile.GetNode<IReferencePat>(range) with
             | null -> UnusedHighlighting(error.Message, range) :> _
-            | namedPat ->
+            | refPat ->
 
-            let pat = FSharpPatternUtil.ignoreParentAsPatsFromRight namedPat
+            let pat = FSharpPatternUtil.ignoreParentAsPatsFromRight refPat
             let binding = TopBindingNavigator.GetByHeadPattern(pat)
             let decl = LetBindingsDeclarationNavigator.GetByBinding(binding)
             if isNotNull decl && binding.HasParameters && not (Seq.isEmpty binding.AttributesEnumerable) then
                 IgnoredHighlighting.Instance :> _
             else
-                UnusedValueWarning(namedPat) :> _
+                UnusedValueWarning(refPat) :> _
 
         | RuleNeverMatched ->
             let matchClause = fsFile.GetNode<IMatchClause>(range)

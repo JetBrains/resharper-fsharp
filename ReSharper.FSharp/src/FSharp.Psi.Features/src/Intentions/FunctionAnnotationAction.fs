@@ -109,7 +109,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         let bindings = letBindings.Bindings
         if bindings.Count <> 1 then false else
 
-        isAtLetExprKeywordOrNamedPat dataProvider letBindings && not (isAnnotated bindings.[0])
+        isAtLetExprKeywordOrReferencePattern dataProvider letBindings && not (isAnnotated bindings.[0])
 
     override x.ExecutePsiTransaction _ =
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
