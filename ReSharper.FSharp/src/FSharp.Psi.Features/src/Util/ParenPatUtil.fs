@@ -59,7 +59,7 @@ let rec compoundPatternNeedsParens (strictContext: ITreeNode) (fsPattern: IFShar
 
     match fsPattern with
     | :? IAsPat as asPat ->
-        compoundPatternNeedsParens strictContext asPat.LeftPattern &&
+        compoundPatternNeedsParens strictContext asPat.LeftPattern ||
         compoundPatternNeedsParens strictContext asPat.RightPattern
 
     | :? ITuplePat as tuplePat ->
