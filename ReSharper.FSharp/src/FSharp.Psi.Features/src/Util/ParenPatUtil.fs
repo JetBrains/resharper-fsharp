@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Util
 
 let precedence (treeNode: ITreeNode) =
     match treeNode with
@@ -89,6 +90,15 @@ let getStrictContext context =
     let bindingPattern = getBindingPattern context
     BindingNavigator.GetByHeadPattern(bindingPattern)
 
+let prefersReferenceResolveRules (refPat: IReferencePat) =
+    isNotNull refPat &&
+
+    let referenceName = refPat.ReferenceName
+    isNotNull referenceName &&
+    
+    let name = referenceName.ShortName
+    not (name.IsEmpty()) && name.[0].IsUpperFast()
+
 let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
     match fsPattern with
     | :? IListConsPat as listConsPat ->
@@ -143,6 +153,9 @@ let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
     | _ ->
 
     checkPrecedence context fsPattern ||
+
+    let refPat = fsPattern.As<IReferencePat>()
+    isNotNull (BindingNavigator.GetByHeadPattern(context)) && prefersReferenceResolveRules refPat ||
 
     // todo: add code style setting
     let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(context)
