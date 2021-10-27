@@ -244,6 +244,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Left 05 - Add right before attr list end``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 06 - No add after single quote``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 07 - Interpolated string``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Left 08 - Interpolated string``() = x.DoNamedTest()
+
+    [<Test>] member x.``Brackets - Right 01 - Interpolated string``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Skip right 01``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 02 - After code``() = x.DoNamedTest()

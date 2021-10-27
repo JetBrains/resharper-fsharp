@@ -1206,6 +1206,8 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         x.HandleSurroundTyping(context, lBrace, rBrace, lToken, rToken, JetFunc<_>.False)
 
     member x.HandleLeftBracket(context: ITypingContext) =
+        let hasSelection = context.TextControl.Selection.HasSelection()
+
         this.HandleLeftBracketTyped(context,
              (fun lexer -> leftBrackets.Contains(lexer.TokenType)),
              (fun _ -> FSharpBracketMatcher() :> _),
@@ -1215,7 +1217,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         // todo: insert pair brace in `$"{ {caret} }"`
 
-        if context.Char = '{' then
+        if context.Char = '{' && not hasSelection then
             let mutable lexer = Unchecked.defaultof<_>
             let textControl = context.TextControl
             let typedPos = textControl.Caret.Offset() - 1
