@@ -1,0 +1,5 @@
+$"""{caret}Quick
+
+{brown}
+
+ {fox} """

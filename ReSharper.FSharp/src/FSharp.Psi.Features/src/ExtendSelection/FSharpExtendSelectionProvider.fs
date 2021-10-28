@@ -64,6 +64,16 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             if isNotNull letExpr then
                 FSharpBindingSelection(fsFile, binding, letExpr) :> _ else
 
+            let interpolationStringExpr = InterpolatedStringExprNavigator.GetByInsert(expr)
+            if isNotNull interpolationStringExpr then
+                let prevLiteral = getPrevSibling expr
+                let nextLiteral = getNextSibling expr
+                if isNotNull prevLiteral && isNotNull nextLiteral &&
+                    isInterpolatedStringPartToken (prevLiteral.GetTokenType()) && isInterpolatedStringPartToken (nextLiteral.GetTokenType()) then
+                    FSharpInterpolatedStringInsertSelectionWithTokens(fsFile, prevLiteral, nextLiteral, interpolationStringExpr) :> _
+                else null
+            else
+
             null
 
         | :? IWhenExprClause as whenClause ->
@@ -80,11 +90,17 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
             null
 
+        | node when (FSharpTokenType.InterpolatedStrings.[node.GetTokenType()] && node.Parent :? IInterpolatedStringExpr) ->
+            let parentExpr = node.Parent :?> IInterpolatedStringExpr
+            if parentExpr.Literals.Count < 2 then null else
+            FSharpInterpolatedStringExpressionSelection(fsFile, node.Parent :?> IInterpolatedStringExpr) :> _
+
         | _ -> null
 
     static member FindBetterNode(fsFile, node: ITreeNode) =
         let shouldTryFindBetterNode (node: ITreeNode) =
-            node :? IBinding
+            node :? IBinding ||
+            FSharpTokenType.InterpolatedStrings.[node.GetTokenType()]
 
         if not (shouldTryFindBetterNode node) then null else
         FSharpExtendSelectionProvider.ExtendNodeSelection(fsFile, node)
@@ -137,8 +153,11 @@ and FSharpDotSelection(fsFile, offset, selectBetterToken, useCamelHumps) =
 
     override x.GetParentInternal(token) =
         let shouldCreateTokenPartSelection (tokenType: TokenNodeType) =
-            tokenType.IsIdentifier || tokenType.IsComment ||
-            tokenType.IsConstantLiteral || tokenType.IsStringLiteral
+            tokenType.IsIdentifier ||
+            tokenType.IsComment ||
+            tokenType.IsConstantLiteral ||
+            tokenType.IsStringLiteral ||
+            FSharpTokenType.InterpolatedStrings.[tokenType]
 
         if not (shouldCreateTokenPartSelection (token.GetTokenType())) then null else
         x.CreateTokenPartSelection(token, TreeTextRange(offset))
@@ -163,9 +182,16 @@ and FSharpTreeNodeSelection(fsFile, node: ITreeNode) =
 
 
 and FSharpTreeRangeSelection(fsFile, first: ITreeNode, last: ITreeNode) =
-    inherit TreeRangeSelection<IFSharpFile>(fsFile, first, last)
+    inherit FSharpTreeRangeOffsetSelection(fsFile, first, last,
+        Func<ITreeNode, _>(fun node -> node.GetTreeStartOffset()),
+        Func<ITreeNode, _>(fun node -> node.GetTreeEndOffset()))
 
-    override x.Parent = FSharpTreeNodeSelection(fsFile, first.Parent) :> _
+
+and FSharpTreeRangeOffsetSelection(fsFile, first: ITreeNode, last: ITreeNode, firstOffsetFunc, lastOffsetFunc) =
+    inherit TreeRangeSelection<IFSharpFile>(fsFile, first, last, firstOffsetFunc, lastOffsetFunc)
+
+    override x.Parent =
+        FSharpTreeNodeSelection(fsFile, first.Parent) :> _
 
     override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.DO_NOT_EXTEND
 
@@ -173,7 +199,43 @@ and FSharpTreeRangeSelection(fsFile, first: ITreeNode, last: ITreeNode) =
 and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
     inherit TokenPartSelection<IFSharpFile>(fsFile, treeTextRange, token)
 
+    let findInterpolationInsertRange (tokenType: TokenNodeType): ISelectedRange =
+        if not FSharpTokenType.InterpolatedStrings.[tokenType] then null else
+
+        let tokenTextEnd = TreeTextRange(token.GetTreeEndOffset()).ExtendLeft(getStringEndingQuotesLength tokenType)
+        let tokenTextStart = TreeTextRange(token.GetTreeStartOffset()).ExtendRight(getStringStartingQuotesLength tokenType)
+
+        let interpolatedStringExpr = token.GetContainingNode<IInterpolatedStringExpr>()
+        if isNull interpolatedStringExpr then null else
+
+        let createInsertSelectionForNextLiteral (): ISelectedRange =
+            interpolatedStringExpr.LiteralsEnumerable
+            |> Seq.tryFind (fun literal ->
+                let startOffset = literal.GetTreeStartOffset()
+                startOffset.Offset >= treeTextRange.EndOffset.Offset)
+            |> Option.map (fun literal ->
+                FSharpInterpolatedStringInsertSelectionWithTokens(fsFile, token, literal, interpolatedStringExpr) :> ISelectedRange)
+            |> Option.defaultValue null
+
+        let createInsertSelectionForPrevLiteral (): ISelectedRange =
+            interpolatedStringExpr.LiteralsEnumerable
+            |> Seq.pairwise
+            |> Seq.tryFind (fun (_, next) -> next == token)
+            |> Option.map (fun (prev, _) ->
+                FSharpInterpolatedStringInsertSelectionWithTokens(fsFile, prev, token, interpolatedStringExpr) :> ISelectedRange)
+            |> Option.defaultValue null
+
+        if treeTextRange.ContainedIn(&tokenTextEnd) &&
+            (isInterpolatedStringStartToken tokenType || isInterpolatedStringMiddleToken tokenType) then
+            createInsertSelectionForNextLiteral ()
+        elif treeTextRange.ContainedIn(&tokenTextStart) &&
+            (isInterpolatedStringMiddleToken tokenType || isInterpolatedStringEndToken tokenType) then
+            createInsertSelectionForPrevLiteral ()
+        else
+            null
+
     override x.Parent =
+        let tokenType = token.GetTokenType()
         let tokenText = token.GetText()
 
         let trim left right =
@@ -183,15 +245,11 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
             else tokenText, left
 
         let text, start =
-            let tokenType = token.GetTokenType()
-            if tokenType.IsStringLiteral then
+            if tokenType.IsStringLiteral || FSharpTokenType.InterpolatedStrings.[tokenType] then
                 // todo: trim end if it actually ends with proper symbols?
-                match tokenType.GetLiteralType() with
-                | FSharpLiteralType.Character
-                | FSharpLiteralType.RegularString -> trim 1 1
-                | FSharpLiteralType.VerbatimString -> trim 2 1
-                | FSharpLiteralType.TripleQuoteString -> trim 3 3
-                | FSharpLiteralType.ByteArray -> trim 1 2
+                let left = getStringStartingQuotesLength tokenType
+                let right = getStringEndingQuotesLength tokenType
+                trim left right
 
             elif tokenType == FSharpTokenType.IDENTIFIER then
                 if tokenText.Length > 4 &&
@@ -212,15 +270,82 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
 
         if treeTextRange.IsValid() then
             let localRange = treeTextRange.Shift(-token.GetTreeStartOffset().Offset - start)
-            let range = TokenPartSelection<_>.GetLocalParent(StringSlice(text), localRange)
-            if range.IsValid() && range.Contains(&localRange) then
-                let range = range.Shift(token.GetTreeStartOffset() + start)
-                FSharpTokenPartSelection(fsFile, range, token) :> _
-            else
+            let localParentRange = TokenPartSelection<_>.GetLocalParent(StringSlice(text), localRange)
+
+            if isInterpolatedStringPartToken tokenType &&
+                tokenText.Length <> 0 && text.Length = localParentRange.Length &&
+                token.Parent :? IInterpolatedStringExpr then
+                let parentExpr = token.Parent :?> IInterpolatedStringExpr
+                if parentExpr.Literals.Count >= 2 then
+                    FSharpInterpolatedStringExpressionSelection(fsFile, parentExpr) :> _ else
                 FSharpTreeNodeSelection(fsFile, token) :> _
+            else
+
+            let interpolationInsertRange = findInterpolationInsertRange tokenType
+            if isNotNull interpolationInsertRange then
+                interpolationInsertRange else
+
+            if localParentRange.IsValid() && localParentRange.Contains(&localRange) then
+                let range = localParentRange.Shift(token.GetTreeStartOffset() + start)
+                FSharpTokenPartSelection(fsFile, range, token) :> _ else
+
+            let betterSelection = FSharpExtendSelectionProvider.FindBetterNode(fsFile, token)
+            if isNotNull betterSelection then betterSelection else
+
+            FSharpTreeNodeSelection(fsFile, token) :> _
         else
             FSharpTreeNodeSelection(fsFile, token) :> _
 
+and FSharpInterpolatedStringInsertSelectionWithTokens(fsFile, first: ITreeNode, last: ITreeNode, expr: IInterpolatedStringExpr) =
+    inherit FSharpTreeRangeOffsetSelection(fsFile, first, last,
+        Func<_,_>(FSharpInterpolatedStringInsertSelectionWithTokens.FirstOffsetFunc),
+        Func<_,_>(FSharpInterpolatedStringInsertSelectionWithTokens.LastOffsetFunc))
+
+    override x.Parent =
+        FSharpInterpolatedStringExpressionSelection(fsFile, expr) :> _
+
+    static member LastOffsetFunc(node: ITreeNode) =
+        seq {
+            yield node :?> ITokenNode
+            yield! TreeNodeExtensions.NextTokens node
+        }
+        |> Seq.tryFind (isWhitespaceOrComment >> not)
+        |> Option.map (fun tokenNode ->
+            let tokenType = tokenNode.GetTokenType()
+            if isInterpolatedStringMiddleToken tokenType || isInterpolatedStringEndToken tokenType then
+                tokenNode.GetTreeStartOffset().Shift(1)
+            else
+                node.GetTreeStartOffset())
+        |> Option.defaultValue (node.GetTreeStartOffset())
+
+    static member FirstOffsetFunc(node: ITreeNode) =
+        seq {
+            yield node :?> ITokenNode
+            yield! TreeNodeExtensions.PrevTokens node
+        }
+        |> Seq.tryFind (isWhitespaceOrComment >> not)
+        |> Option.map (fun tokenNode ->
+            let tokenType = tokenNode.GetTokenType()
+            if isInterpolatedStringStartToken tokenType || isInterpolatedStringMiddleToken tokenType then
+                tokenNode.GetTreeEndOffset().Shift(-1)
+            else
+                node.GetTreeEndOffset())
+        |> Option.defaultValue (node.GetTreeEndOffset())
+
+and FSharpInterpolatedStringExpressionSelection(fsFile: IFSharpFile, expr: IInterpolatedStringExpr) =
+    inherit FSharpTreeRangeOffsetSelection(fsFile, expr.Literals.First(), expr.Literals.Last(),
+        Func<_,_>(FSharpInterpolatedStringExpressionSelection.FirstOffsetFunc),
+        Func<_,_>(FSharpInterpolatedStringExpressionSelection.LastOffsetFunc))
+
+    static member LastOffsetFunc(node: ITreeNode) =
+        let tokenType = node.GetTokenType()
+        let quotesLength = if isNotNull tokenType then getStringEndingQuotesLength tokenType else 0
+        node.GetTreeEndOffset().Shift(-quotesLength)
+
+    static member FirstOffsetFunc(node: ITreeNode) =
+        let tokenType = node.GetTokenType()
+        let quotesLength = if isNotNull tokenType then getStringStartingQuotesLength tokenType else 0
+        node.GetTreeStartOffset().Shift(quotesLength)
 
 and FSharpBindingSelection(fsFile: IFSharpFile, binding: IBinding, letBindings: ILetBindings) =
     inherit FSharpTreeRangeSelection(fsFile, binding, binding)
