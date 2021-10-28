@@ -200,7 +200,7 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
     inherit TokenPartSelection<IFSharpFile>(fsFile, treeTextRange, token)
 
     let findInterpolationInsertRange (tokenType: TokenNodeType): ISelectedRange =
-        if not tokenType.IsStringLiteral && not FSharpTokenType.InterpolatedStrings.[tokenType] then null else
+        if not FSharpTokenType.InterpolatedStrings.[tokenType] then null else
 
         let tokenTextEnd = TreeTextRange(token.GetTreeEndOffset()).ExtendLeft(getStringEndingQuotesLength tokenType)
         let tokenTextStart = TreeTextRange(token.GetTreeStartOffset()).ExtendRight(getStringStartingQuotesLength tokenType)
