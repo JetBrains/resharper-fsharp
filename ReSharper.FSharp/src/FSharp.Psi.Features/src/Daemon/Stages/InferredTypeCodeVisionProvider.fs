@@ -20,6 +20,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
+open JetBrains.TextControl.DocumentMarkup
 open JetBrains.Util
 
 module FSharpInferredTypeHighlighting =
@@ -54,9 +55,16 @@ type InferredTypeCodeVisionProvider() =
 
             let shell = Shell.Instance
             shell.GetComponent<Clipboard>().SetText(entry.Text)
+            let documentMarkupManager = shell.GetComponent<IDocumentMarkupManager>()
             shell.GetComponent<ITooltipManager>().Show(copiedText, PopupWindowContextSource(fun _ ->
-                let offset = highlighting.Range.StartOffset.Offset
-                RiderEditorOffsetPopupWindowContext(offset) :> _))
+                let documentMarkup = documentMarkupManager.TryGetMarkupModel(highlighting.Range.Document)
+                if isNull documentMarkup then null else
+                let highlighter =
+                    documentMarkup.GetFilteredHighlighters(id, fun h -> highlighting.Equals(h.UserData))
+                    |> Seq.tryHead
+                    |> Option.toObj
+
+                RiderEditorOffsetPopupWindowContext(highlighter) :> _))
 
         member x.OnExtraActionClick(_, _, _) = ()
 
