@@ -194,7 +194,6 @@ module FSharpProperties =
     let [<Literal>] TargetProfile = "TargetProfile"
     let [<Literal>] OtherFlags = "OtherFlags"
     let [<Literal>] NoWarn = "NoWarn"
-    let [<Literal>] WarnAsError = "WarnAsError"
     let [<Literal>] LangVersion = "LangVersion"
     let [<Literal>] FscToolPath = "FscToolPath"
     let [<Literal>] DotnetFscCompilerPath = "DotnetFscCompilerPath"
@@ -206,7 +205,6 @@ type FSharpProjectPropertiesRequest() =
         [| FSharpProperties.TargetProfile
            FSharpProperties.OtherFlags
            FSharpProperties.NoWarn
-           FSharpProperties.WarnAsError
            FSharpProperties.LangVersion
            FSharpProperties.FscToolPath
            FSharpProperties.DotnetFscCompilerPath |]

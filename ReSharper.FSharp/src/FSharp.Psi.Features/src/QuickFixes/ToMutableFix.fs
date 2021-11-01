@@ -3,11 +3,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-type ToMutableFix(error: FieldOrValueNotMutableError) =
+type ToMutableFix(refExpr: IReferenceExpr) =
     inherit FSharpQuickFixBase()
 
-    let refExpr = error.RefExpr
+    new (error: FieldNotMutableError) =
+        ToMutableFix(error.RefExpr)
+
+    new (error: ValueNotMutableError) =
+        ToMutableFix(error.RefExpr)
 
     override x.Text = "Make " + refExpr.Identifier.GetSourceName() + " mutable"
 

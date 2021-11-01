@@ -15,9 +15,9 @@ match None, None with
 | _ -> ()
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: The value 'a' is unused
-(1):<secondary> ReSharper Dead Code: The value 'a' is unused
-(2): ReSharper Dead Code: This rule will never be matched
-(3): ReSharper Dead Code: This rule will never be matched
-(4): ReSharper Dead Code: The value 'a' is unused
-(5):<secondary> ReSharper Dead Code: The value 'a' is unused
+(0): ReSharper Dead Code [FS1182]: The value 'a' is unused
+(1):<secondary> ReSharper Dead Code [FS1182]: The value 'a' is unused
+(2): ReSharper Dead Code [FS0026]: This rule will never be matched
+(3): ReSharper Dead Code [FS0026]: This rule will never be matched
+(4): ReSharper Dead Code [FS1182]: The value 'a' is unused
+(5):<secondary> ReSharper Dead Code [FS1182]: The value 'a' is unused

@@ -27,10 +27,8 @@ type FSharpGeneratorMfvElement(mfv, displayContext, substitution, addTypes) =
         member x.AddTypes = addTypes
         member x.IsOverride = false
 
-type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
+type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
     inherit FSharpQuickFixBase()
-
-    let impl = error.Impl
 
     let getInterfaces (fcsType: FSharpType) =
         fcsType.AllInterfaces
@@ -38,6 +36,12 @@ type GenerateInterfaceMembersFix(error: NoImplementationGivenInterfaceError) =
         |> Seq.map FcsEntityInstance.create
         |> Seq.filter isNotNull
         |> Seq.toList
+
+    new (error: NoImplementationGivenInInterfaceError) =
+        GenerateInterfaceMembersFix(error.Impl)
+
+    new (error: NoImplementationGivenInInterfaceWithSuggestionError) =
+        GenerateInterfaceMembersFix(error.Impl)
 
     override x.Text = "Generate missing members"
 

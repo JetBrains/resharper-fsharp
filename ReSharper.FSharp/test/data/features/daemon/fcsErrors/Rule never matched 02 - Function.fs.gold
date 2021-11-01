@@ -6,4 +6,4 @@ let f = function
     | _ -> ()
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: This rule will never be matched
+(0): ReSharper Dead Code [FS0026]: This rule will never be matched

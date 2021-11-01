@@ -1,4 +1,4 @@
-<Errors language="F#">
+<Errors language="F#" implementationLanguage="FSHARP">
 
   <Usings>
     JetBrains.ReSharper.Intentions.QuickFixes;
@@ -16,7 +16,7 @@
     <Group name="F# Errors" key="FSharpErrors"/>
   </StaticSeverityGroups>
 
-  <Warning staticGroup="FSharpErrors" name="UseBindingsIllegalInModules">
+  <Warning compilerGroup="FSharpErrors" name="UseBindingsIllegalInModules" ID="FS0524: 'use' bindings illegal in modules">
     <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
     <Message value="'use' bindings are treated as 'let' bindings in modules"/>
     <Range>letBindings.BindingKeyword.GetHighlightingRange()</Range>
@@ -24,7 +24,7 @@
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
   </Warning>
 
-  <Error staticGroup="FSharpErrors" name="UseKeywordIllegalInPrimaryCtor">
+  <Error staticGroup="FSharpErrors" name="UseKeywordIllegalInPrimaryCtor" ID="FS0523: 'use' bindings illegal in implicit constructors">
     <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
     <Message value="'use' bindings are not permitted in primary constructors"/>
     <Range>letBindings.BindingKeyword.GetHighlightingRange()</Range>
@@ -32,7 +32,7 @@
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
   </Error>
 
-  <Warning staticGroup="FSharpErrors" name="MatchIncomplete">
+  <Warning compilerGroup="FSharpErrors" name="MatchIncomplete" ID="FS0025: Match incomplete">
     <Parameter type="IMatchExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -43,7 +43,7 @@
     <QuickFix>AddMatchAllClauseFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="EnumMatchIncomplete">
+  <Warning compilerGroup="FSharpErrors" name="EnumMatchIncomplete" ID="FS0104: Match incomplete for enum">
     <Parameter type="IMatchExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -53,8 +53,8 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddMatchAllClauseFix</QuickFix>
   </Warning>
-  
-  <Warning staticGroup="FSharpErrors" name="RuleNeverMatched">
+
+  <Warning compilerGroup="FSharpErrors" name="RuleNeverMatched" ID="FS0026: Rule never matched">
     <Parameter type="IMatchClause" name="matchClause"/>
     <Message value="This rule will never be matched"/>
     <Range>matchClause.GetHighlightingRange()</Range>
@@ -62,7 +62,7 @@
     <QuickFix>RemoveNeverMatchingRuleFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="UnusedThisVariable">
+  <Warning compilerGroup="FSharpErrors" name="UnusedThisVariable" ID="FS1183: Unused 'this' value">
     <Parameter type="ICtorSelfId" name="selfId"/>
     <Message value="The self reference is unused and adds runtime initialization checks to members in this and derived types"/>
     <Range>selfId.Identifier.GetHighlightingRange()</Range>
@@ -70,7 +70,7 @@
     <QuickFix>RemoveUnusedSelfIdVariableFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="UnusedValue">
+  <Warning compilerGroup="FSharpErrors" name="UnusedValue" ID="FS1182: Unused value">
     <Parameter type="IReferencePat" name="pat"/>
     <Message value="The value '{0}' is unused">
       <Argument>pat.SourceName</Argument>
@@ -84,7 +84,7 @@
     <QuickFix>AddUnderscorePrefixFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
+  <Warning compilerGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0001: 'unit' type expected">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -98,7 +98,7 @@
     <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="FunctionValueUnexpected">
+  <Warning compilerGroup="FSharpErrors" name="FunctionValueUnexpected" ID="FS0193: Function type expected">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -110,8 +110,8 @@
     <QuickFix>AddIgnoreFix</QuickFix>
     <QuickFix>RemoveSubsequentFix</QuickFix>
   </Warning>
-  
-  <Error staticGroup="FSharpErrors" name="UnitTypeExpected">
+
+  <Error staticGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0001: 'unit' type expected">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -124,7 +124,7 @@
     <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
   </Error>
 
-  <Warning staticGroup="FSharpErrors" name="TypeTestUnnecessary">
+  <Warning compilerGroup="FSharpErrors" name="TypeTestUnnecessary" ID="FS0067: Type test is unnecessary">
     <Parameter type="IDowncastExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -135,7 +135,7 @@
     <QuickFix>ToUpcastFix</QuickFix>
   </Warning>
 
-  <Error staticGroup="FSharpErrors" name="FieldRequiresAssignment">
+  <Error staticGroup="FSharpErrors" name="FieldRequiresAssignment" ID="FS0764: Field requires assignment">
     <Parameter type="IRecordExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -146,7 +146,7 @@
     <QuickFix>GenerateMissingRecordFieldsFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="EmptyRecordInvalid">
+  <Error staticGroup="FSharpErrors" name="EmptyRecordInvalid" ID="FS0789: '{}' is not a valid expression">
     <Parameter type="IRecordExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -157,7 +157,7 @@
     <QuickFix>GenerateMissingRecordFieldsFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="LetAndForNonRecBindings">
+  <Error staticGroup="FSharpErrors" name="LetAndForNonRecBindings" ID="FS0576: 'and' is used in non-recursive bindings">
     <Parameter type="ILetBindings" name="letBindings"/>
     <Range>getSecondBindingKeyword letBindings</Range>
     <Behavour overlapResolvePolicy="NONE"/>
@@ -165,15 +165,15 @@
     <QuickFix>ToRecursiveLetBindingsFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="LocalClassBindingsCannotBeInline">
+  <Error staticGroup="FSharpErrors" name="LocalClassBindingsCannotBeInline" ID="FS0894: Class bindings can't be inline">
     <Parameter type="ITopBinding" name="binding"/>
     <Range>binding.InlineKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Class local bindings cannot be inline"/>
     <QuickFix>RemoveInlineFix</QuickFix>
   </Error>
-  
-  <Warning staticGroup="FSharpErrors" name="UpcastUnnecessary">
+
+  <Warning compilerGroup="FSharpErrors" name="UpcastUnnecessary" ID="FS0066: Upcast is unnecessary">
     <Parameter type="IUpcastExpr" name="upcastExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getUpcastRange upcastExpr</Range>
@@ -181,7 +181,7 @@
     <QuickFix>RemoveUnnecessaryUpcastFix</QuickFix>
   </Warning>
 
-  <Error staticGroup="FSharpErrors" name="VarBoundTwice">
+  <Error staticGroup="FSharpErrors" name="VarBoundTwice" ID="FS0038: Pattern bound twice">
     <Parameter type="IReferencePat" name="pat"/>
     <Message value="'{0}' is bound multiple times">
       <Argument>pat.SourceName</Argument>
@@ -191,7 +191,7 @@
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="UndefinedName">
+  <Error staticGroup="FSharpErrors" name="UndefinedName" ID="FS0039: Undefined name">
     <Parameter type="FSharpSymbolReference" name="reference"/> <!-- todo: change to IReference? -->
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -205,14 +205,14 @@
     <QuickFix arguments="h.Reference">ReferenceModuleAndTypeFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="UndefinedIndexer">
+  <Error staticGroup="FSharpErrors" name="UndefinedIndexer" ID="FS0039: Undefined indexer">
     <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
     <Range>getIndexerArgListRange indexerExpr</Range>
     <Message value="Cannot apply indexing to an expression"/>
     <Behavour overlapResolvePolicy="NONE"/>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="SuccessiveArgsShouldBeSpacedOrTupled">
+  <Error staticGroup="FSharpErrors" name="SuccessiveArgsShouldBeSpacedOrTupled" ID="FS0597: Successive args should be separated with spaces or have parens">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Range>expr.GetHighlightingRange()</Range>
     <Message value="Successive arguments should be separated by spaces, tupled, or parenthesized"/>
@@ -220,7 +220,7 @@
     <QuickFix>AddParensFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
+  <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet" ID="FS0588: Missing 'in' expression">
     <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.BindingKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
@@ -230,7 +230,7 @@
     <QuickFix>ReplaceLetWithExpressionFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="NotAFunction">
+  <Error staticGroup="FSharpErrors" name="NotAFunction" ID="FS0003: Value is not a function">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="IPrefixAppExpr" name="prefixApp"/>
     <Message value="{0}">
@@ -243,7 +243,7 @@
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="FieldOrValueNotMutable">
+  <Error staticGroup="FSharpErrors" name="FieldNotMutable" ID="FS0005: Field is not mutable">
     <Parameter type="IReferenceExpr" name="refExpr"/>
     <Message value="{0} is not mutable">
       <Argument>refExpr.Identifier.GetSourceName()</Argument>
@@ -253,7 +253,17 @@
     <QuickFix>ToMutableFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="NoImplementationGivenType">
+  <Error staticGroup="FSharpErrors" name="ValueNotMutable" ID="FS0027: Value is not mutable">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message value="{0} is not mutable">
+      <Argument>refExpr.Identifier.GetSourceName()</Argument>
+    </Message>
+    <Range>getRefExprNameRange refExpr</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ToMutableFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="NoImplementationGivenInType" ID="FS0365: No implementation given">
     <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -265,7 +275,19 @@
     <QuickFix>ToAbstractFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="NoImplementationGivenInterface">
+  <Error staticGroup="FSharpErrors" name="NoImplementationGivenInTypeWithSuggestion" ID="FS0366: No implementation given">
+    <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>typeDecl.GetNameDocumentRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateMissingOverridesFix</QuickFix>
+    <QuickFix>ToAbstractFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="NoImplementationGivenInInterface" ID="FS0365: No implementation given">
     <Parameter type="IInterfaceImplementation" name="impl"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -276,7 +298,18 @@
     <QuickFix>GenerateInterfaceMembersFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression">
+  <Error staticGroup="FSharpErrors" name="NoImplementationGivenInInterfaceWithSuggestion" ID="FS0366: No implementation given">
+    <Parameter type="IInterfaceImplementation" name="impl"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>getInterfaceImplHeaderRange impl</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateInterfaceMembersFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression" ID="FS0748: 'return' is not allowed">
     <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
     <Message value="`return` may only be used within computation expressions"/>
     <Range>yieldExpr.GetHighlightingRange()</Range>
@@ -284,7 +317,7 @@
     <QuickFix>RemoveYieldFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="YieldRequiresSeqExpression">
+  <Error staticGroup="FSharpErrors" name="YieldRequiresSeqExpression" ID="FS0747: 'yield' is not allowed">
     <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
     <Message value="`yield` may only be used within list, array, and sequence expressions"/>
     <Range>yieldExpr.GetHighlightingRange()</Range>
@@ -292,7 +325,7 @@
     <QuickFix>RemoveYieldFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="NamespaceCannotContainBindings">
+  <Error staticGroup="FSharpErrors" name="NamespaceCannotContainBindings" ID="FS0201: Namespaces can't contain values">
     <Parameter type="IBindingLikeDeclaration" name="binding"/>
     <Message value="Namespaces cannot contain bindings"/>
     <Range>binding.GetHighlightingRange()</Range>
@@ -300,7 +333,7 @@
     <QuickFix>NamespaceToModuleFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="NamespaceCannotContainExpressions">
+  <Error staticGroup="FSharpErrors" name="NamespaceCannotContainExpressions" ID="FS0201: Namespaces can't contain values">
     <Parameter type="IDoLikeStatement" name="expr"/>
     <Message value="Namespaces cannot contain expressions"/>
     <Range>expr.GetHighlightingRange()</Range>
@@ -308,7 +341,7 @@
     <QuickFix>NamespaceToModuleFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="TypeEquation">
+  <Error staticGroup="FSharpErrors" name="TypeEquation" ID="FS0001: Type equation error">
     <Parameter type="string" name="expectedType"/>
     <Parameter type="string" name="actualType"/>
     <Parameter type="IFSharpExpression" name="expr"/>
@@ -321,7 +354,7 @@
     <QuickFix>ConvertTupleToArrayOrListElementsFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="TypeAbbreviationsCannotHaveAugmentations">
+  <Error staticGroup="FSharpErrors" name="TypeAbbreviationsCannotHaveAugmentations" ID="FS0964: Type abbreviations cannot have augmentations">
     <Parameter type="ITypeExtensionDeclaration" name="extensionDecl"/>
     <Message value="Type abbreviations cannot have augmentations"/>
     <Range>extensionDecl.Identifier.GetHighlightingRange()</Range>
@@ -329,7 +362,7 @@
     <QuickFix>ReplaceWithAbbreviatedTypeFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="RuntimeCoercionSourceSealed">
+  <Error staticGroup="FSharpErrors" name="RuntimeCoercionSourceSealed" ID="FS0016: Can't coerce sealed type">
     <Parameter type="ITypedLikeExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -340,7 +373,7 @@
     <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="TypeConstraintMismatch">
+  <Error staticGroup="FSharpErrors" name="TypeConstraintMismatch" ID="FS0193: Type constraint mismatch">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -351,7 +384,7 @@
     <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="IndeterminateType">
+  <Error staticGroup="FSharpErrors" name="IndeterminateType" ID="FS0072: Lookup on indeterminate type object">
     <Parameter type="IReferenceExpr" name="refExpr"/>
     <Message value="Lookup on object of indeterminate type based on information prior to this program point. A type annotation may be needed constrain the type of the object."/>
     <Range>refExpr.GetHighlightingRange()</Range>
@@ -360,7 +393,7 @@
     <QuickFix>SpecifyPropertyTypeFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="IndexerIndeterminateType">
+  <Error staticGroup="FSharpErrors" name="IndexerIndeterminateType" ID="FS0752: Use of indexer on indeterminate type object">
     <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
     <Message value="The operator 'expr.[idx]' has been used on an object of indeterminate type based on information prior to this program point."/>
     <Range>indexerExpr.GetHighlightingRange()</Range>
@@ -369,7 +402,7 @@
     <QuickFix>SpecifyPropertyTypeFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="AddingConstraint">
+  <Error staticGroup="FSharpErrors" name="AddingConstraint" ID="FS0043: Error from adding type constraint">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -380,7 +413,7 @@
     <QuickFix>ReplaceWithPredefinedOperatorFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="OnlyClassCanTakeValueArguments">
+  <Error staticGroup="FSharpErrors" name="OnlyClassCanTakeValueArguments" ID="FS0552: Only class and struct types may have constructors">
     <Parameter type="IPrimaryConstructorDeclaration" name="ctorDecl"/>
     <Message value="Only class and struct types may have constructors"/>
     <Range>ctorDecl.GetHighlightingRange()</Range>
@@ -388,7 +421,7 @@
     <QuickFix>RemoveConstructorFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="InstanceMemberRequiresTarget">
+  <Error staticGroup="FSharpErrors" name="InstanceMemberRequiresTarget" ID="FS0673: Missing 'this' identifier">
     <Parameter type="IMemberDeclaration" name="memberDecl"/>
     <Message value="Instance member requires a parameter to represent the object"/>
     <Range>memberDecl.Identifier.GetHighlightingRange()</Range>
@@ -397,7 +430,7 @@
     <QuickFix>ToStaticMemberFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="MemberIsNotAccessible">
+  <Error staticGroup="FSharpErrors" name="MemberIsNotAccessible" ID="FS0491: Member is inaccessible">
     <Parameter type="IReferenceExpr" name="refExpr"/>
     <Message value="Protected members cannot be accessed from closures"/>
     <Range>refExpr.Identifier.GetHighlightingRange()</Range>
@@ -405,7 +438,7 @@
     <QuickFix>IntroduceVarFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="MemberIsStatic">
+  <Error staticGroup="FSharpErrors" name="FieldIsStatic" ID="FS0493: Static field used on instance">
     <Parameter type="IReferenceExpr" name="refExpr"/>
     <Message value="'{0}' is static">
       <Argument>refExpr.ShortName</Argument>
@@ -415,7 +448,27 @@
     <QuickFix>ReplaceWithTypeRefExprFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="CantTakeAddressOfExpression">
+  <Error staticGroup="FSharpErrors" name="MethodIsStatic" ID="FS0493: Static method used on instance">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message value="'{0}' is static">
+      <Argument>refExpr.ShortName</Argument>
+    </Message>
+    <Range>refExpr.Identifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithTypeRefExprFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="PropertyIsStatic" ID="FS0809: Static propery used on instance">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message value="'{0}' is static">
+      <Argument>refExpr.ShortName</Argument>
+    </Message>
+    <Range>refExpr.Identifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithTypeRefExprFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="CantTakeAddressOfExpression" ID="FS3236: Can't take address of expression">
     <Parameter type="IAddressOfExpr" name="expr"/>
     <Message value="Can't take address of expression"/>
     <Range>expr.GetHighlightingRange()</Range>
@@ -423,7 +476,7 @@
     <QuickFix>IntroduceVarFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="UnionCaseExpectsTupledArguments">
+  <Error staticGroup="FSharpErrors" name="UnionCaseExpectsTupledArguments" ID="FS0727: Union case expects tupled arguments">
     <Parameter type="IParametersOwnerPat" name="pat"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">

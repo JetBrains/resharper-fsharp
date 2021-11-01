@@ -6,6 +6,7 @@ open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Strategies
 open JetBrains.ProjectModel.Properties.Managed
@@ -172,16 +173,17 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
             let props = cfg.PropertiesCollection
 
-            let getOption f p =
+            let getOption f (p: string, compilerArg) =
+                let compilerArg = defaultArg compilerArg (p.ToLower())
                 match props.TryGetValue(p) with
-                | true, v when not (v.IsNullOrWhitespace()) -> Some ("--" + p.ToLower() + ":" + f v)
+                | true, v when not (v.IsNullOrWhitespace()) -> Some ("--" + compilerArg + ":" + f v)
                 | _ -> None
 
-            [ FSharpProperties.TargetProfile; FSharpProperties.LangVersion ]
+            [ FSharpProperties.TargetProfile, None; FSharpProperties.LangVersion, None ]
             |> List.choose (getOption id)
             |> otherOptions.AddRange
 
-            [ FSharpProperties.NoWarn; FSharpProperties.WarnAsError ]
+            [ FSharpProperties.NoWarn, None; MSBuildProjectUtil.WarningsAsErrorsProperty, Some("warnaserror") ]
             |> List.choose (getOption (fun v -> (splitAndTrim itemsDelimiters v).Join(",")))
             |> otherOptions.AddRange
 

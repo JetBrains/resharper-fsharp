@@ -3,14 +3,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FcsErrors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-type ReplaceWithTypeRefExprFix(error: MemberIsStaticError) =
+type ReplaceWithTypeRefExprFix(refExpr: IReferenceExpr) =
     inherit FSharpQuickFixBase()
 
-    let refExpr = error.RefExpr
+    new (error: FieldIsStaticError) =
+        ReplaceWithTypeRefExprFix(error.RefExpr)
+
+    new (error: MethodIsStaticError) =
+        ReplaceWithTypeRefExprFix(error.RefExpr)
+
+    new (error: PropertyIsStaticError) =
+        ReplaceWithTypeRefExprFix(error.RefExpr)
 
     override this.Text = "Access via type name"
 

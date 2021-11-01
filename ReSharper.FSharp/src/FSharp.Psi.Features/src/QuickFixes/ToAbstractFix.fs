@@ -4,13 +4,18 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpAttributesUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-type ToAbstractFix(error: NoImplementationGivenTypeError) =
+type ToAbstractFix(typeDecl: IFSharpTypeDeclaration) =
     inherit FSharpQuickFixBase()
 
-    let typeDecl = error.TypeDecl
+    new (error: NoImplementationGivenInTypeError) =
+        ToAbstractFix(error.TypeDecl)
+
+    new (error: NoImplementationGivenInTypeWithSuggestionError) =
+        ToAbstractFix(error.TypeDecl)
 
     override x.Text = "To abstract"
 

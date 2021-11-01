@@ -16,18 +16,18 @@ do
 
 ---------------------------------------------------------
 (0): ReSharper Warning: The '=' operator should not normally be redefined. To define equality semantics for a type, override the 'Object.Equals' member in the definition of that type.
-(1): ReSharper Dead Code: The value '=' is unused
-(2): ReSharper Dead Code: The value '-' is unused
-(3): ReSharper Dead Code: The value '+' is unused
+(1): ReSharper Dead Code [FS1182]: The value '=' is unused
+(2): ReSharper Dead Code [FS1182]: The value '-' is unused
+(3): ReSharper Dead Code [FS1182]: The value '+' is unused
 (4): ReSharper Warning: The '&&' operator should not normally be redefined. Consider using a different operator name
-(5): ReSharper Dead Code: The value '&&' is unused
+(5): ReSharper Dead Code [FS1182]: The value '&&' is unused
 (6): ReSharper Warning: The '||' operator should not normally be redefined. Consider using a different operator name
-(7): ReSharper Dead Code: The value '||' is unused
+(7): ReSharper Dead Code [FS1182]: The value '||' is unused
 (8): ReSharper Warning: The '>' operator should not normally be redefined. To define overloaded comparison semantics for a particular type, implement the 'System.IComparable' interface in the definition of that type.
-(9): ReSharper Dead Code: The value '>' is unused
+(9): ReSharper Dead Code [FS1182]: The value '>' is unused
 (10): ReSharper Warning: The '<' operator should not normally be redefined. To define overloaded comparison semantics for a particular type, implement the 'System.IComparable' interface in the definition of that type.
-(11): ReSharper Dead Code: The value '<' is unused
-(12): ReSharper Dead Code: The value '(*)' is unused
-(13): ReSharper Dead Code: The value '?' is unused
-(14): ReSharper Dead Code: The value '%' is unused
-(15): ReSharper Dead Code: The value '%%' is unused
+(11): ReSharper Dead Code [FS1182]: The value '<' is unused
+(12): ReSharper Dead Code [FS1182]: The value '(*)' is unused
+(13): ReSharper Dead Code [FS1182]: The value '?' is unused
+(14): ReSharper Dead Code [FS1182]: The value '%' is unused
+(15): ReSharper Dead Code [FS1182]: The value '%%' is unused

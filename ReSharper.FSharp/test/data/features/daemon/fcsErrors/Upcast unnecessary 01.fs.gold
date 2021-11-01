@@ -6,4 +6,4 @@ let l1 = null: IList
 let l2 = l1 |:> IList|(0)
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Upcast is unnecessary
+(0): ReSharper Dead Code [FS0066]: Upcast is unnecessary

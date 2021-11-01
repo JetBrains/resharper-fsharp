@@ -5,4 +5,4 @@ match () with
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant 'as' pattern
-(1): ReSharper Dead Code: The value 'u' is unused
+(1): ReSharper Dead Code [FS1182]: The value 'u' is unused

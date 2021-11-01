@@ -5,12 +5,11 @@ open JetBrains.ReSharper.Feature.Services.Generate.Workflows
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
 
-type GenerateMissingOverridesFix(error: NoImplementationGivenTypeError) =
+type GenerateMissingOverridesFix(typeDecl: IFSharpTypeDeclaration) =
     inherit FSharpQuickFixBase()
-
-    let typeDecl = error.TypeDecl
 
     let configureContext (context: IGeneratorContext) =
       context.InputElements.Clear()
@@ -18,6 +17,12 @@ type GenerateMissingOverridesFix(error: NoImplementationGivenTypeError) =
 
       if context.ProvidedElements.Count = 1 then
           context.ProvidedElements.Clear()
+
+    new (error: NoImplementationGivenInTypeError) =
+        GenerateMissingOverridesFix(error.TypeDecl)
+
+    new (error: NoImplementationGivenInTypeWithSuggestionError) =
+        GenerateMissingOverridesFix(error.TypeDecl)
 
     override x.Text = "Generate missing members"
 

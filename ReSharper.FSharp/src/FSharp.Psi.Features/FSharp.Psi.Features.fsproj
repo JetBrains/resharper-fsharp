@@ -65,6 +65,7 @@
     <Compile Include="src\Daemon\Tooltips\FSharpQuickDocSuppressor.fs" />
     <Compile Include="src\Daemon\Tooltips\ZoneMarker.fs" />
     <Compile Include="src\Daemon\Stages\FcsErrorsStageProcessBase.fs" />
+    <Compile Include="src\Daemon\Stages\FSharpCompilerWarningProcessor.fs" />
     <Compile Include="src\Daemon\Stages\FSharpDaemonBehaviour.fs" />
     <Compile Include="src\Daemon\Stages\ScriptLoadPathsStage.fs" />
     <Compile Include="src\Daemon\Stages\SyntaxErrorsStage.fs" />
