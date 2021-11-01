@@ -1,0 +1,1708 @@
+===================
+Init
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   -Folder
+    File1.fs
+    File2.fs
+   File3.fs
+   EmptyFolder
+   -Folder
+    File3.fs
+    File4.fs
+    -Sub
+     Class1.fs
+    File5.fs
+    -Sub
+     Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File3.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : File1.fs)[COMPILE ]
+        ProjectFileImpl(Path : File2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File1.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:Folder[1]
+  1:File1.fs
+  2:File2.fs
+3:File3.fs
+4:EmptyFolder[1]
+5:Folder[2]
+  1:File3.fs
+  2:File4.fs
+  3:Sub[1]
+    1:Class1.fs
+  4:File5.fs
+  5:Sub[2]
+    1:Class2.fs
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+8:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+Folder/File1.fs
+Folder/File2.fs
+File3.fs
+Folder/File3.fs
+Folder/File4.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Sub/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+1. Move file 'Folder(1)/File1.fs' inside other part of the same folder after 'Folder(2)/File4.fs'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   -Folder
+    File2.fs
+   File3.fs
+   EmptyFolder
+   -Folder
+    File3.fs
+    File4.fs
+    File1.fs
+    -Sub
+     Class1.fs
+    File5.fs
+    -Sub
+     Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File3.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : File1.fs)[COMPILE ]
+        ProjectFileImpl(Path : File2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File1.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:Folder[1]
+  1:File2.fs
+3:File3.fs
+4:EmptyFolder[1]
+5:Folder[2]
+  1:File3.fs
+  2:File4.fs
+  3:File1.fs
+  4:Sub[1]
+    1:Class1.fs
+  5:File5.fs
+  6:Sub[2]
+    1:Class2.fs
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+8:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+Folder/File2.fs
+File3.fs
+Folder/File3.fs
+Folder/File4.fs
+Folder/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Sub/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+2. Move file 'Folder(2)/File3.fs' inside other part of the same folder before 'Folder(1)/File2.fs'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   -Folder
+    File3.fs
+    File2.fs
+   File3.fs
+   EmptyFolder
+   -Folder
+    File4.fs
+    File1.fs
+    -Sub
+     Class1.fs
+    File5.fs
+    -Sub
+     Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File3.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : File1.fs)[COMPILE ]
+        ProjectFileImpl(Path : File2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File1.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:Folder[1]
+  1:File3.fs
+  2:File2.fs
+3:File3.fs
+4:EmptyFolder[1]
+5:Folder[2]
+  1:File4.fs
+  2:File1.fs
+  3:Sub[1]
+    1:Class1.fs
+  4:File5.fs
+  5:Sub[2]
+    1:Class2.fs
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+8:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+Folder/File3.fs
+Folder/File2.fs
+File3.fs
+Folder/File4.fs
+Folder/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Sub/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+3. Move file 'Folder(2)/File1.fs' before folder 'Folder(2)'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   -Folder
+    File3.fs
+    File2.fs
+   File3.fs
+   EmptyFolder
+   File1.fs
+   -Folder
+    File4.fs
+    -Sub
+     Class1.fs
+    File5.fs
+    -Sub
+     Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File1.fs)[COMPILE ]
+    ProjectFileImpl(Path : File3.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : File2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File1.fs
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:Folder[1]
+  1:File3.fs
+  2:File2.fs
+3:File3.fs
+4:EmptyFolder[1]
+5:File1.fs
+6:Folder[2]
+  1:File4.fs
+  2:Sub[1]
+    1:Class1.fs
+  3:File5.fs
+  4:Sub[2]
+    1:Class2.fs
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+9:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+Folder/File3.fs
+Folder/File2.fs
+File3.fs
+File1.fs
+Folder/File4.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Sub/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+4. Move file 'File3.fs' and 'File1.fs' in folder 'Folder(2)/Sub(1)' before 'Class1.fs'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   -Folder
+    File3.fs
+    File2.fs
+   EmptyFolder
+   -Folder
+    File4.fs
+    -Sub
+     File3.fs
+     File1.fs
+     Class1.fs
+    File5.fs
+    -Sub
+     Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : File2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+            ProjectFileImpl(Path : File1.fs)[COMPILE ]
+            ProjectFileImpl(Path : File3.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/Folder/Sub/File3.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:Folder[1]
+  1:File3.fs
+  2:File2.fs
+3:EmptyFolder[1]
+4:Folder[2]
+  1:File4.fs
+  2:Sub[1]
+    1:File3.fs
+    2:File1.fs
+    3:Class1.fs
+  3:File5.fs
+  4:Sub[2]
+    1:Class2.fs
+5:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+6:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+7:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+Folder/File3.fs
+Folder/File2.fs
+Folder/File4.fs
+Folder/Sub/File3.fs
+Folder/Sub/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Sub/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+5. Move 'Folder/Sub/File3.fs' to project folder before EmptyFolder
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   -Folder
+    File3.fs
+    File2.fs
+   File3.fs
+   EmptyFolder
+   -Folder
+    File4.fs
+    -Sub
+     File1.fs
+     Class1.fs
+    File5.fs
+    -Sub
+     Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File3.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : File2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+            ProjectFileImpl(Path : File1.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:Folder[1]
+  1:File3.fs
+  2:File2.fs
+3:File3.fs
+4:EmptyFolder[1]
+5:Folder[2]
+  1:File4.fs
+  2:Sub[1]
+    1:File1.fs
+    2:Class1.fs
+  3:File5.fs
+  4:Sub[2]
+    1:Class2.fs
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+8:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+Folder/File3.fs
+Folder/File2.fs
+File3.fs
+Folder/File4.fs
+Folder/Sub/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Sub/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+6. Move 'Folder/Sub/File3.fs' to project folder after EmptyFolder
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   -Folder
+    File3.fs
+    File2.fs
+   EmptyFolder
+   File3.fs
+   -Folder
+    File4.fs
+    -Sub
+     File1.fs
+     Class1.fs
+    File5.fs
+    -Sub
+     Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File3.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : File2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+            ProjectFileImpl(Path : File1.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/Class2.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:Folder[1]
+  1:File3.fs
+  2:File2.fs
+3:EmptyFolder[1]
+4:File3.fs
+5:Folder[2]
+  1:File4.fs
+  2:Sub[1]
+    1:File1.fs
+    2:Class1.fs
+  3:File5.fs
+  4:Sub[2]
+    1:Class2.fs
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+8:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+Folder/File3.fs
+Folder/File2.fs
+File3.fs
+Folder/File4.fs
+Folder/Sub/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Sub/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+7. Move file 'Class2.fs' in folder 'Folder(2)' before 'Sub(2)'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   -Folder
+    File3.fs
+    File2.fs
+   EmptyFolder
+   File3.fs
+   -Folder
+    File4.fs
+    -Sub
+     File1.fs
+     Class1.fs
+    File5.fs
+    Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File3.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : File1.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:Folder[1]
+  1:File3.fs
+  2:File2.fs
+3:EmptyFolder[1]
+4:File3.fs
+5:Folder[2]
+  1:File4.fs
+  2:Sub[1]
+    1:File1.fs
+    2:Class1.fs
+  3:File5.fs
+  4:Class2.fs
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+8:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+Folder/File3.fs
+Folder/File2.fs
+File3.fs
+Folder/File4.fs
+Folder/Sub/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+8. Move file 'Folder(1)/File2.fs' before folder 'Folder(1)/File3.fs'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   -Folder
+    File2.fs
+    File3.fs
+   EmptyFolder
+   File3.fs
+   -Folder
+    File4.fs
+    -Sub
+     File1.fs
+     Class1.fs
+    File5.fs
+    Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File3.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : File1.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:Folder[1]
+  1:File2.fs
+  2:File3.fs
+3:EmptyFolder[1]
+4:File3.fs
+5:Folder[2]
+  1:File4.fs
+  2:Sub[1]
+    1:File1.fs
+    2:Class1.fs
+  3:File5.fs
+  4:Class2.fs
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+8:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+Folder/File2.fs
+Folder/File3.fs
+File3.fs
+Folder/File4.fs
+Folder/Sub/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+9. Move file 'Folder/File2.fs' before 'Folder(1)'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   File2.fs
+   -Folder
+    File3.fs
+   EmptyFolder
+   File3.fs
+   -Folder
+    File4.fs
+    -Sub
+     File1.fs
+     Class1.fs
+    File5.fs
+    Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File2.fs)[COMPILE ]
+    ProjectFileImpl(Path : File3.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : File1.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File2.fs
+  ClassLibrary1/File3.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:File2.fs
+3:Folder[1]
+  1:File3.fs
+4:EmptyFolder[1]
+5:File3.fs
+6:Folder[2]
+  1:File4.fs
+  2:Sub[1]
+    1:File1.fs
+    2:Class1.fs
+  3:File5.fs
+  4:Class2.fs
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+9:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+File2.fs
+Folder/File3.fs
+File3.fs
+Folder/File4.fs
+Folder/Sub/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+10. Rename file 'File3.fs' to 'Foo.fs'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   File2.fs
+   -Folder
+    File3.fs
+   EmptyFolder
+   Foo.fs
+   -Folder
+    File4.fs
+    -Sub
+     File1.fs
+     Class1.fs
+    File5.fs
+    Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File2.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : File1.fs)[COMPILE ]
+    ProjectFileImpl(Path : Foo.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File2.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/Foo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:File2.fs
+3:Folder[1]
+  1:File3.fs
+4:EmptyFolder[1]
+5:Foo.fs
+6:Folder[2]
+  1:File4.fs
+  2:Sub[1]
+    1:File1.fs
+    2:Class1.fs
+  3:File5.fs
+  4:Class2.fs
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+9:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+File2.fs
+Folder/File3.fs
+Foo.fs
+Folder/File4.fs
+Folder/Sub/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+11. Move file 'Foo.fs' to 'EmptyFolder(1)'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   File2.fs
+   -Folder
+    File3.fs
+   -EmptyFolder
+    Foo.fs
+   -Folder
+    File4.fs
+    -Sub
+     File1.fs
+     Class1.fs
+    File5.fs
+    Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+      Child items:
+        ProjectFileImpl(Path : Foo.fs)[COMPILE ]
+    ProjectFileImpl(Path : File2.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : File1.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/EmptyFolder/Foo.fs
+  ClassLibrary1/File2.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:File2.fs
+3:Folder[1]
+  1:File3.fs
+4:EmptyFolder[1]
+  1:Foo.fs
+5:Folder[2]
+  1:File4.fs
+  2:Sub[1]
+    1:File1.fs
+    2:Class1.fs
+  3:File5.fs
+  4:Class2.fs
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+8:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+File2.fs
+Folder/File3.fs
+EmptyFolder/Foo.fs
+Folder/File4.fs
+Folder/Sub/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+12. Move file 'EmptyFolder/Foo.fs' before 'EmptyFolder(1)'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   File2.fs
+   -Folder
+    File3.fs
+   Foo.fs
+   EmptyFolder
+   -Folder
+    File4.fs
+    -Sub
+     File1.fs
+     Class1.fs
+    File5.fs
+    Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File2.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+            ProjectFileImpl(Path : File1.fs)[COMPILE ]
+    ProjectFileImpl(Path : Foo.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File2.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Folder/Sub/Class1.fs
+  ClassLibrary1/Folder/Sub/File1.fs
+  ClassLibrary1/Foo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:File2.fs
+3:Folder[1]
+  1:File3.fs
+4:Foo.fs
+5:EmptyFolder[1]
+6:Folder[2]
+  1:File4.fs
+  2:Sub[1]
+    1:File1.fs
+    2:Class1.fs
+  3:File5.fs
+  4:Class2.fs
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+9:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+File2.fs
+Folder/File3.fs
+Foo.fs
+Folder/File4.fs
+Folder/Sub/File1.fs
+Folder/Sub/Class1.fs
+Folder/File5.fs
+Folder/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+
+===================
+13. Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
+
+-Project
+ -FSharpProjectTree * 1 project
+  -ClassLibrary1 * has errors
+   -Dependencies
+    -.NETFramework 4.5
+     -Assemblies
+      System
+      System.Core
+      System.Data
+      System.Drawing
+      System.IO.Compression.FileSystem
+      System.Numerics
+      System.Runtime.Serialization
+      System.Xml
+      System.Xml.Linq
+     -Packages
+      FSharp.Core/4.7.2
+      System.ValueTuple/4.4.0
+   BeforeFile.fs [CompileBefore]
+   File2.fs
+   -Folder
+    File3.fs
+   Foo.fs
+   EmptyFolder
+   -Folder
+    File4.fs
+    File1.fs
+    Class1.fs
+    Sub
+    File5.fs
+    Class2.fs
+   LinkedFile1.fs
+   -LinkedFolder
+    LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProjectTree.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
+    ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:EmptyFolder]
+    ProjectFileImpl(Path : File2.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : Class1.fs)[COMPILE ]
+        ProjectFileImpl(Path : Class2.fs)[COMPILE ]
+        ProjectFileImpl(Path : File1.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        ProjectFileImpl(Path : File4.fs)[COMPILE ]
+        ProjectFileImpl(Path : File5.fs)[COMPILE ]
+        Folder [Name:Sub]
+    ProjectFileImpl(Path : Foo.fs)[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
+    Folder [Name:LinkedFolder, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/AfterFile.fs
+  ClassLibrary1/BeforeFile.fs
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File2.fs
+  ClassLibrary1/Folder/Class1.fs
+  ClassLibrary1/Folder/Class2.fs
+  ClassLibrary1/Folder/File1.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/File4.fs
+  ClassLibrary1/Folder/File5.fs
+  ClassLibrary1/Foo.fs
+  ExternalFolder/LinkedFile1.fs
+  ExternalFolder/LinkedFile2.fs
+  FSharpProjectTree.sln
+
+1:BeforeFile.fs (CompileBefore)
+2:File2.fs
+3:Folder[1]
+  1:File3.fs
+4:Foo.fs
+5:EmptyFolder[1]
+6:Folder[2]
+  1:File4.fs
+  2:File1.fs
+  3:Class1.fs
+  4:Sub[1]
+  5:File5.fs
+  6:Class2.fs
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
+9:AfterFile.fs (CompileAfter)
+
+.NETFramework,Version=v4.5
+BeforeFile.fs
+File2.fs
+Folder/File3.fs
+Foo.fs
+Folder/File4.fs
+Folder/File1.fs
+Folder/Class1.fs
+Folder/File5.fs
+Folder/Class2.fs
+../ExternalFolder/LinkedFile1.fs
+../ExternalFolder/LinkedFile2.fs
+AfterFile.fs
+

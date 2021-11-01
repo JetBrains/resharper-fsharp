@@ -1,0 +1,196 @@
+package com.jetbrains.rider.test.cases.projectModel
+
+import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
+import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
+import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.base.ProjectModelBaseTest
+import com.jetbrains.rider.test.enums.CoreVersion
+import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.framework.TestProjectModelContext
+import com.jetbrains.rider.test.framework.waitBackend
+import com.jetbrains.rider.test.scriptingApi.*
+import org.testng.annotations.Test
+
+class FSharpProjectModelTest : ProjectModelBaseTest() {
+    override fun getSolutionDirectoryName() = "EmptySolution"
+    override val restoreNuGetPackages: Boolean
+        get() = true
+
+    private val fcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
+
+    private fun moveItem(from: Array<Array<String>>, to: Array<String>, orderType: ActionOrderType? = null) {
+        // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
+        waitBackend(project) {
+            cutItem(project, from)
+            pasteItem(project, to, orderType = orderType)
+        }
+    }
+
+    private fun moveItem(from: Array<String>, to: Array<String>, orderType: ActionOrderType? = null) {
+        moveItem(arrayOf(from), to, orderType)
+    }
+
+    @Suppress("SameParameterValue")
+    private fun renameItem(path: Array<String>, newName: String) {
+        // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
+        waitBackend(project) {
+            renameItem(project, path, newName)
+        }
+    }
+
+    @Suppress("SameParameterValue")
+    private fun addNewProject(path: Array<String>, newName: String, templateId: TemplateIdWithVersion) {
+        // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
+        waitBackend(project) {
+            addProject(project, path, newName, templateId)
+        }
+    }
+
+    private fun addNewFolder(path: Array<String>, name: String) {
+        // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
+        waitBackend(project) {
+            addNewFolder(project, path, name)
+        }
+    }
+
+    private fun deleteElement(path: Array<String>) {
+        // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
+        waitBackend(project) {
+            deleteElement(project, path)
+        }
+    }
+
+    private fun TestProjectModelContext.dump2(
+        caption: String,
+        checkSlnFile: Boolean,
+        compareProjFile: Boolean,
+        action: () -> Unit,
+    ) {
+        dump(caption, checkSlnFile, compareProjFile, action)
+        treeOutput.append(fcsHost.dumpSingleProjectMapping.sync(Unit))
+    }
+
+    @Test(description = "RIDER-69561")
+    @TestEnvironment(coreVersion = CoreVersion.DEFAULT, toolset = ToolsetVersion.TOOLSET_16_CORE)
+    fun testFSharpDirectoryManipulation() {
+        doTestDumpProjectsView {
+            dump2("1. Create project", checkSlnFile = false, compareProjFile = true) {
+                addNewProject(arrayOf("Solution"), "ClassLibrary", ProjectTemplateIds.currentCore.fsharp_classLibrary)
+            }
+            dump2("2. Create folder 'NewFolder'", checkSlnFile = false, compareProjFile = true) {
+                addNewFolder(arrayOf("Solution", "ClassLibrary"), "NewFolder")
+            }
+            dump2("3. Create subfolder 'NewFolder/NewSub'", checkSlnFile = false, compareProjFile = true) {
+                addNewFolder(arrayOf("Solution", "ClassLibrary", "NewFolder"), "NewSub")
+            }
+            dump2("4. Move folder 'NewFolder/NewSub' to project root", checkSlnFile = false, compareProjFile = true) {
+                moveItem(
+                    arrayOf("Solution", "ClassLibrary", "NewFolder", "NewSub"),
+                    arrayOf("Solution", "ClassLibrary")
+                )
+            }
+            dump2("5. Delete folder 'NewSub'", checkSlnFile = false, compareProjFile = true) {
+                deleteElement(arrayOf("Solution", "ClassLibrary", "NewSub"))
+            }
+        }
+    }
+
+    @Test
+    @TestEnvironment(solution = "FSharpProjectTree", toolset = ToolsetVersion.TOOLSET_16_CORE)
+    fun testFSharpProjectStructure() {
+        doTestDumpProjectsView {
+            dump2("Init", checkSlnFile = false, compareProjFile = false) {
+            }
+            dump2("1. Move file 'Folder(1)/File1.fs' inside other part of the same folder after 'Folder(2)/File4.fs'",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                moveItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File1.fs"),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "File4.fs"))
+            }
+            dump2("2. Move file 'Folder(2)/File3.fs' inside other part of the same folder before 'Folder(1)/File2.fs'",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                moveItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "File3.fs"),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File2.fs"), ActionOrderType.Before)
+            }
+            dump2("3. Move file 'Folder(2)/File1.fs' before folder 'Folder(2)'",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                moveItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "File1.fs"),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2"), ActionOrderType.Before)
+            }
+            dump2("4. Move file 'File3.fs' and 'File1.fs' in folder 'Folder(2)/Sub(1)' before 'Class1.fs'",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                moveItem(
+                    arrayOf(
+                        arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"),
+                        arrayOf("FSharpProjectTree", "ClassLibrary1", "File1.fs")),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "Class1.fs"),
+                    ActionOrderType.Before)
+            }
+            dump2("5. Move 'Folder/Sub/File3.fs' to project folder before EmptyFolder",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                moveItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "File3.fs"),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"), ActionOrderType.Before)
+            }
+            dump2("6. Move 'Folder/Sub/File3.fs' to project folder after EmptyFolder",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                moveItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"), ActionOrderType.After)
+            }
+            dump2("7. Move file 'Class2.fs' in folder 'Folder(2)' before 'Sub(2)'",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                moveItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?2", "Class2.fs"),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?2"), ActionOrderType.Before)
+            }
+            dump2("8. Move file 'Folder(1)/File2.fs' before folder 'Folder(1)/File3.fs'",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                moveItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File2.fs"),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File3.fs"), ActionOrderType.Before)
+            }
+            dump2("9. Move file 'Folder/File2.fs' before 'Folder(1)'", checkSlnFile = false, compareProjFile = true) {
+                moveItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File2.fs"),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1"), ActionOrderType.Before)
+            }
+            dump2("10. Rename file 'File3.fs' to 'Foo.fs'", checkSlnFile = false, compareProjFile = true) {
+                renameItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"), "Foo.fs")
+            }
+            dump2("11. Move file 'Foo.fs' to 'EmptyFolder(1)'", checkSlnFile = false, compareProjFile = true) {
+                moveItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Foo.fs"),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1"))
+            }
+            dump2("12. Move file 'EmptyFolder/Foo.fs' before 'EmptyFolder(1)'",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                moveItem(
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1", "Foo.fs"),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1"), ActionOrderType.Before)
+            }
+            dump2("13. Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                moveItem(
+                    arrayOf(
+                        arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "File1.fs"),
+                        arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "Class1.fs")),
+                    arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1"), ActionOrderType.Before)
+            }
+        }
+    }
+}
