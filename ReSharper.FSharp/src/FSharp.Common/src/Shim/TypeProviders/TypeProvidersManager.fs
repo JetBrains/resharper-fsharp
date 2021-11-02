@@ -106,12 +106,10 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
         let providersToDispose = typeProviders.Get(projectOutputPath)
         if providersToDispose.Count = 0 then () else
 
-        let disposeOutOfProcessProvidersTask =
-            let providersIds = [| for tp in providersToDispose -> tp.EntityId |]
-            connection.Execute(fun () -> protocol.Dispose.Start(lifetime, providersIds)).AsTask()
+        let providersIds = [| for tp in providersToDispose -> tp.EntityId |]
+        connection.Execute(fun () -> protocol.Dispose.Start(lifetime, providersIds)) |> ignore
 
         for typeProvider in providersToDispose do typeProvider.DisposeProxy()
-        disposeOutOfProcessProvidersTask.Wait()
 
         Assertion.Assert(typeProviders.Get(projectOutputPath) |> Seq.isEmpty, "Type Providers should be disposed")
 
