@@ -1,5 +1,52 @@
 # Release notes
 
+## 2021.3
+
+### Refactorings: introduce variable
+
+* Suggest deconstruction of tuples and single-case union types
+* Suggest using computation type in computation expressions
+* Suggest using `use` and `use!` keywords when applicable
+* Improved placement of added binding
+
+### Code completion
+
+* Better completion suggestions order
+* Rewrite getting completion context (allows adding new completion rules and better suggestions filtering)
+* **New**: 'To recursive function' rule, adding `rec` to containing function
+* When completing union case pattern, deconstucting its fields is suggested
+* Improved `Attribute` suffix cutting
+* Initial context-based keyword filtering (some keywords no longer show up when aren't applicable)
+
+### Find usages
+
+* **New**: Icons in Find Usages results help to distinguish invocation, partial application, pattern, and other occurrence kinds
+
+
+### Quick fixes
+
+* **New**: Deconstruct union case fields
+* Enable 'Replace with assignment' and 'Replace with `_`' in more cases
+
+### Extend selection
+
+* **New**: Extend selection inside interpolated strings (by [@seclerp](https://github.com/seclerp) ([#316](https://github.com/JetBrains/resharper-fsharp/pull/316)))
+* Improved selection for `_` and various brackets kinds
+
+### Misc
+
+* Improved performance of redundant parens analyzer and pipe types highlighting
+* Some unused R# analyzers are not run on F# code anymore for improved performance
+* Improved `open` placement when importing type in quick fixes, refactorings and other actions
+* **New**: Deconstruct pattern: support struct tuples
+* **Fix**: `WarningsAsErrors` property doesn't change warning severity in editor
+* **Fix**: Surround with braces adds extra `}` in string interpolations
+* **Fix**: Navigation to interface implementations might not work for implementations in union and record types
+* **Fix**: Navigation to active patterns in signature doesn't work
+* **Fix**: Projects with generative type providers may not be invalidated and use stale results
+* **Fix**: C# interop: property accessors may show incorrect visibility
+
+
 ## 2021.2
 
 ### Code completion
