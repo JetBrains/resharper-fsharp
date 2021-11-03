@@ -6,7 +6,7 @@ import com.jetbrains.rider.test.enums.ToolsetVersion
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_6)
+@TestEnvironment(coreVersion = CoreVersion.DOT_NET_6, toolset = ToolsetVersion.TOOLSET_17_CORE)
 class FSharpTemplatesTestNet6 : FSharpTemplatesTestCore() {
     fun classLibCoreTemplate() = classLibCoreTemplate(
         CoreTemplateTestArgs(expectedNumOfAnalyzedFiles = 1, expectedNumOfSkippedFiles = 0)
