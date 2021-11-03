@@ -71,7 +71,28 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
         treeOutput.append(fcsHost.dumpSingleProjectMapping.sync(Unit))
     }
 
-    @Test(description = "RIDER-69561")
+    @Test(description = "RIDER-69084", enabled = false) // Disabled until ScriptingAPI.ProjectModel refactoring
+    @TestEnvironment(solution = "ProjectReferencesCSharp",
+        coreVersion = CoreVersion.DEFAULT,
+        toolset = ToolsetVersion.TOOLSET_16_CORE)
+    fun testMoveDirectoryFromFSharpProject() {
+        doTestDumpProjectsView {
+            dump2("1. Create folder 'Folder' with 'file.txt' in F# project",
+                checkSlnFile = false,
+                compareProjFile = true) {
+                addNewFolder(arrayOf("ProjectReferencesCSharp", "FSharpProject"), "Folder")
+                addNewFile(arrayOf("ProjectReferencesCSharp", "FSharpProject", "Folder"), "file.txt")
+            }
+            dump2("2. Move folder 'Folder' from F# to C# project", checkSlnFile = false, compareProjFile = true) {
+                moveItem(
+                    arrayOf("ProjectReferencesCSharp", "FSharpProject", "Folder"),
+                    arrayOf("ProjectReferencesCSharp", "CSharpProject")
+                )
+            }
+        }
+    }
+
+    @Test(description = "RIDER-69562")
     @TestEnvironment(coreVersion = CoreVersion.DEFAULT, toolset = ToolsetVersion.TOOLSET_16_CORE)
     fun testFSharpDirectoryManipulation() {
         doTestDumpProjectsView {
@@ -97,7 +118,9 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
     }
 
     @Test
-    @TestEnvironment(solution = "FSharpProjectTree", toolset = ToolsetVersion.TOOLSET_16_CORE)
+    @TestEnvironment(solution = "FSharpProjectTree",
+        coreVersion = CoreVersion.DEFAULT,
+        toolset = ToolsetVersion.TOOLSET_16_CORE)
     fun testFSharpProjectStructure() {
         doTestDumpProjectsView {
             dump2("Init", checkSlnFile = false, compareProjFile = false) {

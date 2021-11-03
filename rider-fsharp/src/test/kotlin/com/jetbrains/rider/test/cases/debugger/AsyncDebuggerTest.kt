@@ -18,7 +18,7 @@ class AsyncDebuggerTest : DebuggerTestBase() {
 
     @Test(description = "RIDER-27263")
     fun testAsyncBreakpoint() {
-        // Note that this test doesn't checks the behavior of FSharpBreakpointVariantsProvider, since it's never called
+        // Note that this test doesn't check the behavior of FSharpBreakpointVariantsProvider, since it's never called
         // in tests. But the test breakpoints are multi-method by default, and we should just check that multi-method
         // breakpoints work well in F# code.
         testDebugProgram({

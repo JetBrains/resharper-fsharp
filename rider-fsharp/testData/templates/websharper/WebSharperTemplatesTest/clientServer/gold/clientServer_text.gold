@@ -1,0 +1,147 @@
+===================
+Opened
+
+[Client.fs]
+﻿namespace ClientServer
+
+open WebSharper
+open WebSharper.UI
+open WebSharper.UI.Templating
+open WebSharper.UI.Notation
+
+[<JavaScript>]
+module Templates =
+
+    type MainTemplate = Templating.Template<"Main.html", ClientLoad.FromDocument, ServerLoad.WhenChanged>
+
+[<JavaScript>]
+module Client =
+
+    let Main () =
+        let rvReversed = Var.Create ""
+        Templates.MainTemplate.MainForm()
+            .OnSend(fun e ->
+                async {
+                    let! res = Server.DoSomething e.Vars.TextToReverse.Value
+                    rvReversed := res
+                }
+                |> Async.StartImmediate
+            )
+            .Reversed(rvReversed.View)
+            .Doc()
+
+[Remoting.fs]
+﻿namespace ClientServer
+
+open WebSharper
+
+module Server =
+
+    [<Rpc>]
+    let DoSomething input =
+        let R (s: string) = System.String(Array.rev(s.ToCharArray()))
+        async {
+            return R input
+        }
+
+[Site.fs]
+namespace ClientServer
+
+open WebSharper
+open WebSharper.Sitelets
+open WebSharper.UI
+open WebSharper.UI.Server
+
+type EndPoint =
+    | [<EndPoint "/">] Home
+    | [<EndPoint "/about">] About
+
+module Templating =
+    open WebSharper.UI.Html
+
+    // Compute a menubar where the menu item for the given endpoint is active
+    let MenuBar (ctx: Context<EndPoint>) endpoint : Doc list =
+        let ( => ) txt act =
+             li [if endpoint = act then yield attr.``class`` "active"] [
+                a [attr.href (ctx.Link act)] [text txt]
+             ]
+        [
+            "Home" => EndPoint.Home
+            "About" => EndPoint.About
+        ]
+
+    let Main ctx action (title: string) (body: Doc list) =
+        Content.Page(
+            Templates.MainTemplate()
+                .Title(title)
+                .MenuBar(MenuBar ctx action)
+                .Body(body)
+                .Doc()
+        )
+
+module Site =
+    open WebSharper.UI.Html
+
+    let HomePage ctx =
+        Templating.Main ctx EndPoint.Home "Home" [
+            h1 [] [text "Say Hi to the server!"]
+            div [] [client <@ Client.Main() @>]
+        ]
+
+    let AboutPage ctx =
+        Templating.Main ctx EndPoint.About "About" [
+            h1 [] [text "About"]
+            p [] [text "This is a template WebSharper client-server application."]
+        ]
+
+    [<Website>]
+    let Main =
+        Application.MultiPage (fun ctx endpoint ->
+            match endpoint with
+            | EndPoint.Home -> HomePage ctx
+            | EndPoint.About -> AboutPage ctx
+        )
+
+[Startup.fs]
+namespace ClientServer
+
+open System
+open Microsoft.AspNetCore
+open Microsoft.AspNetCore.Builder
+open Microsoft.AspNetCore.Hosting
+open Microsoft.AspNetCore.Http
+open Microsoft.Extensions.Configuration
+open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Hosting
+open WebSharper.AspNetCore
+
+type Startup() =
+
+    member this.ConfigureServices(services: IServiceCollection) =
+        services.AddSitelet(Site.Main)
+            .AddAuthentication("WebSharper")
+            .AddCookie("WebSharper", fun options -> ())
+        |> ignore
+
+    member this.Configure(app: IApplicationBuilder, env: IWebHostEnvironment) =
+        if env.IsDevelopment() then app.UseDeveloperExceptionPage() |> ignore
+
+        app.UseAuthentication()
+            .UseStaticFiles()
+            .UseWebSharper()
+            .Run(fun context ->
+                context.Response.StatusCode <- 404
+                context.Response.WriteAsync("Page not found"))
+
+module Program =
+    let BuildWebHost args =
+        WebHost
+            .CreateDefaultBuilder(args)
+            .UseStartup<Startup>()
+            .Build()
+
+    [<EntryPoint>]
+    let main args =
+        BuildWebHost(args).Run()
+        0
+

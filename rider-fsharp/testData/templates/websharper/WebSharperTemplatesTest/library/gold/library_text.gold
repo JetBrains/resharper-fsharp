@@ -1,0 +1,12 @@
+===================
+Opened
+
+[Library.fs]
+﻿namespace Library
+
+open WebSharper
+
+[<JavaScript>]
+type Class1() = 
+    member this.X = "F#"
+

@@ -1,0 +1,46 @@
+===================
+Opened
+
+-Project
+ -ClientServer * 1 project
+  -ClientServer
+   -Dependencies
+    -.NET 5.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/5.0.0
+      WebSharper.AspNetCore/5.0.0.120
+      WebSharper.FSharp/5.0.0.120
+      WebSharper.UI/5.0.0.120
+      WebSharper/5.0.0.120
+     -Frameworks
+      Microsoft.AspNetCore.App
+      Microsoft.NETCore.App
+   wsconfig.json
+   Remoting.fs
+   Client.fs
+   Site.fs
+   Startup.fs
+   Main.html
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClientServer.sln)[]
+
+Project [Name:ClientServer, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : Client.fs)[COMPILE ]
+    ProjectFileImpl(Path : ClientServer.fsproj)[]
+    ProjectFileImpl(Path : Main.html)[CONTENT ]
+    ProjectFileImpl(Path : Remoting.fs)[COMPILE ]
+    ProjectFileImpl(Path : Site.fs)[COMPILE ]
+    ProjectFileImpl(Path : Startup.fs)[COMPILE ]
+    ProjectFileImpl(Path : wsconfig.json)[CONTENT ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+

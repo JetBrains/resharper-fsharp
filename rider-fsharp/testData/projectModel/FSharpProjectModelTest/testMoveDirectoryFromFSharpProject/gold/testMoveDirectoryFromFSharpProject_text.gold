@@ -1,0 +1,40 @@
+===================
+1. Create folder 'Folder' with 'file.txt' in F# project
+
+[Class1.cs]
+﻿using System;
+
+namespace CSharpProject
+{
+    public class CSharpClass
+    {
+        public static readonly int Prop = 123;
+    }
+}
+
+[Library.fs]
+﻿module FSharpProject
+
+let x = CSharpProject.CSharpClass.Prop
+
+
+===================
+2. Move folder 'Folder' from F# to C# project
+
+[Class1.cs]
+﻿using System;
+
+namespace CSharpProject
+{
+    public class CSharpClass
+    {
+        public static readonly int Prop = 123;
+    }
+}
+
+[Library.fs]
+﻿module FSharpProject
+
+let x = CSharpProject.CSharpClass.Prop
+
+

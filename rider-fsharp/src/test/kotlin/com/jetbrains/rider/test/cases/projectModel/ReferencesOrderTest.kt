@@ -9,7 +9,7 @@ import org.testng.annotations.Test
 
 @Test
 @TestEnvironment(coreVersion = CoreVersion.DEFAULT)
-class ReferencesOrder : BaseTestWithSolution() {
+class ReferencesOrderTest : BaseTestWithSolution() {
     override fun getSolutionDirectoryName() = "ReferencesOrder"
 
     override val waitForCaches = true
@@ -17,7 +17,7 @@ class ReferencesOrder : BaseTestWithSolution() {
 
     private val fcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
 
-    @Test()
+    @Test
     fun testReferencesOrder() {
         val references = fcsHost.dumpSingleProjectLocalReferences.sync(Unit)
         assert(references.equals(listOf("Library1.dll", "Library2.dll")))

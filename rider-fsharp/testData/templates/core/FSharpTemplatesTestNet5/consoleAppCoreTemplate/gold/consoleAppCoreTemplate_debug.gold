@@ -1,0 +1,4 @@
+--> Program.fs:7(153,170) // sprintf "from %s"
+Program.from() in , ConsoleApplication.dll
+    whom = F#: string
+

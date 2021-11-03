@@ -1,0 +1,163 @@
+===================
+1. Create folder 'Folder' with 'file.txt' in F# project
+
+-Project
+ -ProjectReferencesCSharp * 2 projects
+  -CSharpProject
+   -Dependencies
+    -.NETStandard 2.0
+     -Assemblies
+      -Implicit
+       ...
+     -SDK
+      ...
+   Class1.cs
+  -FSharpProject
+   -Dependencies
+    -.NETStandard 2.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.7.2
+     -SDK
+      ...
+   Library.fs
+   -Folder
+    file.txt
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ProjectReferencesCSharp.sln)[]
+
+Project [Name:CSharpProject, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : CSharpProject.csproj)[]
+    ProjectFileImpl(Path : Class1.cs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netstandard2.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : CSharpProject.AssemblyInfo.cs)[Hidden COMPILE ]
+
+Project [Name:FSharpProject, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProject.fsproj)[]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : file.txt)[CONTENT ]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  CSharpProject/CSharpProject.csproj
+  CSharpProject/Class1.cs
+  CSharpProject/obj/Debug/netstandard2.0/CSharpProject.AssemblyInfo.cs
+  FSharpProject/FSharpProject.fsproj
+  FSharpProject/Folder/file.txt
+  FSharpProject/Library.fs
+  ProjectReferencesCSharp.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:netstandard2.0[1]
+      1:.NETStandard,Version=v2.0.AssemblyAttributes.fs (CompileBefore)
+      2:FSharpProject.AssemblyInfo.fs (CompileBefore)
+2:Library.fs
+3:Folder[1]
+  1:file.txt (Content)
+
+.NETStandard,Version=v2.0
+obj/Debug/netstandard2.0/.NETStandard,Version=v2.0.AssemblyAttributes.fs
+obj/Debug/netstandard2.0/FSharpProject.AssemblyInfo.fs
+Library.fs
+Folder/file.txt
+
+===================
+2. Move folder 'Folder' from F# to C# project
+
+-Project
+ -ProjectReferencesCSharp * 2 projects
+  -CSharpProject
+   -Dependencies
+    -.NETStandard 2.0
+     -Assemblies
+      -Implicit
+       ...
+     -SDK
+      ...
+   -Folder
+    file.txt
+   Class1.cs
+  -FSharpProject
+   -Dependencies
+    -.NETStandard 2.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.7.2
+     -SDK
+      ...
+   Library.fs
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ProjectReferencesCSharp.sln)[]
+
+Project [Name:CSharpProject, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : CSharpProject.csproj)[]
+    ProjectFileImpl(Path : Class1.cs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : file.txt)[CONTENT ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netstandard2.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : CSharpProject.AssemblyInfo.cs)[Hidden COMPILE ]
+
+Project [Name:FSharpProject, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : FSharpProject.fsproj)[]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  CSharpProject/CSharpProject.csproj
+  CSharpProject/Class1.cs
+  CSharpProject/Folder/file.txt
+  CSharpProject/obj/Debug/netstandard2.0/CSharpProject.AssemblyInfo.cs
+  FSharpProject/FSharpProject.fsproj
+  FSharpProject/Library.fs
+  ProjectReferencesCSharp.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:netstandard2.0[1]
+      1:.NETStandard,Version=v2.0.AssemblyAttributes.fs (CompileBefore)
+      2:FSharpProject.AssemblyInfo.fs (CompileBefore)
+2:Library.fs
+
+.NETStandard,Version=v2.0
+obj/Debug/netstandard2.0/.NETStandard,Version=v2.0.AssemblyAttributes.fs
+obj/Debug/netstandard2.0/FSharpProject.AssemblyInfo.fs
+Library.fs
+

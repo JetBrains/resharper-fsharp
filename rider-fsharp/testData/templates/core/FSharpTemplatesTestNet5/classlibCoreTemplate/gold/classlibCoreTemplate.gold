@@ -1,0 +1,31 @@
+===================
+Opened
+
+-Project
+ -ClassLibrary * 1 project
+  -ClassLibrary
+   -Dependencies
+    -.NETStandard 2.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/5.0.0
+     -Frameworks
+      NETStandard.Library
+   Library.fs
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary.sln)[]
+
+Project [Name:ClassLibrary, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary.fsproj)[]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+

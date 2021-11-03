@@ -1,16 +1,16 @@
 package com.jetbrains.rider.test.cases
 
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
-import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.test.asserts.shouldNotBeNull
-import com.jetbrains.rider.test.base.BaseTestWithSolution
-import com.jetbrains.rider.test.scriptingApi.changeFileContent
-import com.jetbrains.rider.util.idea.lifetime
+import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rdclient.util.idea.waitAndPump
 import com.jetbrains.rider.plugins.fsharp.RdFSharpTestHost
+import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
+import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.asserts.shouldNotBeNull
+import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.enums.CoreVersion
+import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import org.testng.annotations.Test
 import java.io.File
 import java.time.Duration
