@@ -45,7 +45,7 @@ class WebSharperTemplatesTest : RiderTemplatesTestBase() {
     @Test
     fun clientServer() {
         val templateId = WebSharperTemplateIds.fsharp_clientServer
-        doCoreTest(templateId, "ClientServer") { project -> 
+        doCoreTest(templateId, "ClientServer") { project ->
             checkSwea(project)
         }
     }
