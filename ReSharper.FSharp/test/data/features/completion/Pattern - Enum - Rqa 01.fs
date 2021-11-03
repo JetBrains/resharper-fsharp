@@ -1,0 +1,10 @@
+// ${COMPLETE_ITEM:A}
+module Module
+
+[<RequireQualifiedAccess>]
+module E =
+    type E =
+        | A = 1
+
+match E.E.A with
+| E.E.{caret}A -> ()

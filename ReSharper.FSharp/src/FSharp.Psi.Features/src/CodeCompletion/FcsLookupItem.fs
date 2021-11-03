@@ -137,17 +137,19 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
 
         let offset = context.Ranges.InsertRange.StartOffset
         // todo: getting reference owner in parse errors, e.g. unfinished `if`
-        let referenceOwner = fsFile.GetNode<IFSharpReferenceOwner>(offset)
-        if isNotNull referenceOwner && isNotNull typeElement then
-            let clrDeclaredElement: IClrDeclaredElement =
-                // todo: other elements: union cases
-                match declaredElement with
-                | :? ITypeElement as typeElement -> typeElement :> _
-                | :? IField as field when (field.ContainingType :? IEnum) -> field :> _
-                | _ -> null
 
-            if isNotNull clrDeclaredElement then
-                FSharpReferenceBindingUtil.SetRequiredQualifiers(referenceOwner.Reference, clrDeclaredElement)
+        let referenceOwner = fsFile.GetNode<IFSharpReferenceOwner>(offset)
+        if not referenceOwner.Reference.IsQualified then
+            if isNotNull referenceOwner && isNotNull typeElement then
+                let clrDeclaredElement: IClrDeclaredElement =
+                    // todo: other elements: union cases
+                    match declaredElement with
+                    | :? ITypeElement as typeElement -> typeElement :> _
+                    | :? IField as field when (field.ContainingType :? IEnum) -> field :> _
+                    | _ -> null
+
+                if isNotNull clrDeclaredElement then
+                    FSharpReferenceBindingUtil.SetRequiredQualifiers(referenceOwner.Reference, clrDeclaredElement)
 
         if ns.IsEmpty() then () else
         addOpen offset fsFile context.BasicContext.ContextBoundSettingsStore moduleToImport
