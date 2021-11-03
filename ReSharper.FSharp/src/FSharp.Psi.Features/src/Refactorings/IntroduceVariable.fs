@@ -486,8 +486,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             | _ -> null
 
         if isNotNull deconstruction then
-            match FSharpDeconstruction.deconstructImpl false deconstruction binding.HeadPattern with
-            | Some(hotspotsRegistry, pattern, _) ->
+            match FSharpDeconstructionImpl.deconstructImpl deconstruction binding.HeadPattern with
+            | Some(hotspotsRegistry, pattern) ->
                 let node = pattern :> ITreeNode
                 IntroduceVariableResult(hotspotsRegistry, node.CreateTreeElementPointer())
             | _ -> failwith "FSharpDeconstruction.deconstructImpl"
@@ -720,11 +720,7 @@ type FSharpIntroduceVarHelper() =
             data.BindComputation <- bindComputation
             data.OverridenType <- mappedBoundType
 
-        let deconstruction = 
-            [ DeconstructionFromTuple.TryCreate(expression, boundType)
-              DeconstructionFromUnionCase.TryCreateFromSingleCaseUnionType(expression, boundType) ]
-            |> List.tryFind isNotNull
-
+        let deconstruction = FSharpDeconstruction.tryGetDeconstruction expression boundType
         match deconstruction with
         | None -> true
         | Some(deconstruction) ->

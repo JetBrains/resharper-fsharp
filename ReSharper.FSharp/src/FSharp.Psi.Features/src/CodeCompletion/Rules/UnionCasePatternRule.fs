@@ -84,22 +84,42 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
 
         if not info.UnionCase.HasFields then () else
 
-        let fields = FSharpDeconstruction.createUnionCaseFields pat info.UnionCase info.EntityInstance
-        let deconstruction = DeconstructionFromUnionCaseFields(info.UnionCase.Name, fields)
+        let parametersOwnerPat = pat.As<IParametersOwnerPat>()
+        if isNull parametersOwnerPat then () else
 
-        let deconstructFields () =
+        let pat = parametersOwnerPat.ParametersEnumerable.FirstOrDefault()
+        if isNull pat then () else 
+
+        let fields = FSharpDeconstructionImpl.createUnionCaseFields pat info.UnionCase info.EntityInstance
+        let fieldsDeconstruction: IFSharpDeconstruction =
+            DeconstructionFromUnionCaseFields(info.UnionCase.Name, fields) :> _
+
+        let singleField = Seq.tryExactlyOne info.UnionCase.Fields
+
+        let singleFieldDeconstruction = 
+            singleField
+            |> Option.map (fun fcsField -> fcsField.FieldType.Instantiate(info.EntityInstance.Substitution))
+            |> Option.bind (FSharpDeconstruction.tryGetDeconstruction pat)
+            |> Option.map (fun deconstruction -> singleField.Value.DisplayNameCore, deconstruction)
+
+        let fieldsDeconstructionText = 
+            singleFieldDeconstruction
+            |> Option.map (fun (name, _) -> $"Use named pattern for '{name}'")
+            |> Option.defaultValue fieldsDeconstruction.Text
+
+        let deconstruct (deconstruction: IFSharpDeconstruction) =
             use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
             use cookie =
                 CompilationContextCookie.GetOrCreate(pat.GetPsiModule().GetContextFromModule())
             use transactionCookie =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, UnionCasePatternInfo.Id)
 
-            let action = FSharpDeconstruction.deconstruct true deconstruction pat
+            let action = FSharpDeconstruction.deconstruct parametersOwnerPat deconstruction pat
             if isNotNull action then
                 action.Invoke(textControl)
 
         if Shell.Instance.IsTestShell then
-            deconstructFields () else
+            deconstruct fieldsDeconstruction else
 
         solution.Locks.ExecuteOrQueueReadLockEx(solution.GetLifetime(), UnionCasePatternInfo.Id, fun _ ->
             let jetPopupMenus = solution.GetComponent<JetPopupMenus>()
@@ -109,28 +129,42 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
 
                 // Adding null item keys is not allowed, wrap them into anon records as a workaround.
                 // Inlining the list to AddRange changes anon record types due to allowed implicit casts on method args.
-                let items = [{| Deconstruction = deconstruction |}; {| Deconstruction = null |}]
+                let items =
+                    [ {| Deconstruction = fieldsDeconstruction; Text = fieldsDeconstructionText |}
+
+                      match singleFieldDeconstruction with
+                      | None _ -> ()
+                      | Some (_, deconstruction) ->
+                          {| Deconstruction = deconstruction; Text = deconstruction.Text |}
+
+                      {| Deconstruction = null; Text = null |} ]
+
                 jetPopupMenu.ItemKeys.AddRange(List.map box items)
 
                 let (|Deconstruction|) (obj: obj) =
-                    let deconstructionItem = obj :?> {| Deconstruction: DeconstructionFromUnionCaseFields |}
-                    deconstructionItem.Deconstruction 
+                    let deconstructionItem = obj :?> {| Deconstruction: IFSharpDeconstruction; Text: string |}
+                    deconstructionItem.Deconstruction, deconstructionItem.Text 
 
                 jetPopupMenu.DescribeItem.Advise(lifetime, fun args ->
-                    let (Deconstruction deconstruction) = args.Key
+                    let (Deconstruction (deconstruction, text)) = args.Key
 
-                    let text = if isNotNull deconstruction then deconstruction.Text else "Ignore fields"
+                    let text =
+                        match deconstruction, singleField with
+                        | null, None -> "Ignore fields"
+                        | null, Some _ -> "Ignore field"
+                        | _ -> text
+
                     args.Descriptor.Text <- RichText(text)
                     args.Descriptor.Style <- MenuItemStyle.Enabled)
 
-                jetPopupMenu.ItemClicked.Advise(lifetime, fun (Deconstruction deconstruction) ->
+                jetPopupMenu.ItemClicked.Advise(lifetime, fun (Deconstruction (deconstruction, _)) ->
                     use readLockCookie = ReadLockCookie.Create()
 
                     textControlLockLifetimeDefinition.Terminate()
                     psiServices.Files.AssertAllDocumentAreCommitted()
 
                     if isNotNull deconstruction then
-                        deconstructFields ())
+                        deconstruct deconstruction)
 
                 jetPopupMenu.PopupWindowContextSource <- textControl.PopupWindowContextFactory.ForCaret()))
 
