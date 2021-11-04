@@ -12,7 +12,8 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         IEnumRepresentation
           IEnumCaseDeclaration
-            DocComment(type:LINE_COMMENT, text:/// A)
+            IXmlDocBlock
+              DocComment(type:LINE_COMMENT, text:/// A)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
             FSharpTokenType+BarTokenElement(type:BAR, text:|)
@@ -26,7 +27,8 @@ IFSharpImplFile
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
           IEnumCaseDeclaration
-            DocComment(type:LINE_COMMENT, text:/// B)
+            IXmlDocBlock
+              DocComment(type:LINE_COMMENT, text:/// B)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
             FSharpTokenType+BarTokenElement(type:BAR, text:|)

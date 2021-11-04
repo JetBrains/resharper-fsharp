@@ -31,7 +31,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
             x.Done(mark, ElementType.NESTED_MODULE_DECLARATION)
 
         | SynModuleSigDecl.Types(typeSigs, range) ->
-            let mark = x.Mark(typeSigGroupStartRange typeSigs range |> fst)
+            let mark = x.Mark(typeSigGroupStartRange typeSigs range)
 
             match typeSigs with
             | [] -> ()

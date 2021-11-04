@@ -19,7 +19,8 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "
           IRecordFieldDeclarationList
             IRecordFieldDeclaration
-              DocComment(type:LINE_COMMENT, text:/// F2)
+              IXmlDocBlock
+                DocComment(type:LINE_COMMENT, text:/// F2)
               NewLine(type:NEW_LINE, text:\n) spaces:"\n"
               Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "
               FSharpIdentifierToken(type:IDENTIFIER, text:Field)

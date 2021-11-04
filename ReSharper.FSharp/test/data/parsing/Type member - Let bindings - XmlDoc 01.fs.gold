@@ -14,10 +14,12 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         ILetBindingsDeclaration
           ITopBinding
-            DocComment(type:LINE_COMMENT, text:/// A)
+            IXmlDocBlock
+              DocComment(type:LINE_COMMENT, text:/// A)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
             FSharpTokenType+LetTokenElement(type:LET, text:let)
