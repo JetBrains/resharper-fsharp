@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
 open System.Collections.Generic
+open System.Drawing
 open System.Linq
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
@@ -653,9 +654,11 @@ type FSharpIntroduceVarHelper() =
         data.ContextExpr <- contextExpr
 
         let fcsType = sourceExpr.TryGetFcsType()
-        if isNull fcsType then true else
+        let displayContext = sourceExpr.TryGetFcsDisplayContext()
+        if isNull fcsType || isNull displayContext then true else
 
         let compExpr, _ = tryGetEffectiveParentComputationExpression contextExpr
+        let displayContext = displayContext.WithShortTypeNames(true)
         let isInComputationExpr = isNotNull compExpr
         let computationType = 
             if not isInComputationExpr then None else
@@ -680,13 +683,21 @@ type FSharpIntroduceVarHelper() =
 
                     Some(lambdaType.Instantiate(substitution).GenericArguments.[0], allMembers)))
 
-        let boundType = 
+        let getOccurrenceText (fcsType: FSharpType) (text: string) =
+            let richText = RichText("Bind '")
+            richText.Append(fcsType.Format(displayContext), TextStyle(FontStyle.Bold)) |> ignore
+            richText.Append(text, TextStyle()) |> ignore
+            richText
+
+        let boundType =
             match computationType with
             | None -> Some(fcsType, false)
             | Some(computationType, _) ->
-                let occurrences = 
-                    [ WorkflowPopupMenuOccurrence(RichText("Bind value"), null, (fcsType, false))
-                      WorkflowPopupMenuOccurrence(RichText("Bind computation with let!"), null, (computationType, true)) ]
+                let occurrences =
+                    let computationText = getOccurrenceText computationType "' computation with let!"
+                    let valueText = getOccurrenceText fcsType "' value"
+                    [ WorkflowPopupMenuOccurrence(valueText, null, (fcsType, false))
+                      WorkflowPopupMenuOccurrence(computationText, null, (computationType, true)) ]
 
                 let selectedOccurrence = workflow.ShowOccurrences(occurrences.AsArray(), context)
                 if isNull selectedOccurrence then None else

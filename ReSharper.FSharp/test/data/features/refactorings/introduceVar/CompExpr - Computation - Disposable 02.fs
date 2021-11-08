@@ -1,4 +1,4 @@
-//${OCCURRENCE0:Bind computation with let!}
+//${OCCURRENCE0:Bind 'IDisposable' computation with let!}
 
 let getCookie () : Async<System.IDisposable> = async { return null }
 

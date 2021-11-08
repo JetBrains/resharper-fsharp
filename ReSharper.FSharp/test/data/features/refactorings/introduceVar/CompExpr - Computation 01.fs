@@ -1,4 +1,4 @@
-//${OCCURRENCE0:Bind computation with let!}
+//${OCCURRENCE0:Bind 'int' computation with let!}
 
 async {
 

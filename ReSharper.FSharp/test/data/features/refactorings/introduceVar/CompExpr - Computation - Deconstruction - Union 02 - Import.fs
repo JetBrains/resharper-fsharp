@@ -1,4 +1,4 @@
-//${OCCURRENCE0:Bind computation with let!}
+//${OCCURRENCE0:Bind 'U' computation with let!}
 //${OCCURRENCE1:Deconstruct 'A' union case}
 
 module Module =
