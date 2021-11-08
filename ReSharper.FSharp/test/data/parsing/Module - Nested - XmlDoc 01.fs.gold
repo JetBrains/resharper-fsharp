@@ -3,7 +3,7 @@ IFSharpImplFile
   IAnonModuleDeclaration
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     INestedModuleDeclaration
-      IXmlDocBlock
+      XmlDocBlock
         DocComment(type:LINE_COMMENT, text:/// A)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         DocComment(type:LINE_COMMENT, text:/// B)

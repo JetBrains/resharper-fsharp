@@ -80,7 +80,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             | [SynBinding(attributes = attrs; headPat = headPat; returnInfo = returnInfo; trivia = trivia)] when
                     trivia.LetKeyword.IsNone ->
 
-				let letMark = x.MarkOrMarkXmlDocOwner(xmlDoc, range)
+				let mark = x.Mark(xmlDoc, range)
                 x.ProcessAttributeLists(attrs)
                 x.AdvanceToTokenOrRangeStart(FSharpTokenType.EXTERN, headPat.Range)
                 Assertion.Assert(x.TokenType == FSharpTokenType.EXTERN, "Expecting EXTERN, got: {0}", x.TokenType)
@@ -90,15 +90,14 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                     x.ProcessAttributeLists(attrs)
                 | _ -> ()
                 // todo: mark parameters
-                x.Done(range, letMark, ElementType.EXTERN_DECLARATION)
+                x.Done(range, mark, ElementType.EXTERN_DECLARATION)
 
             | _ ->
 
             let letMark =
                 match bindings with
                 | SynBinding(xmlDoc = XmlDoc xmlDoc) :: _ ->
-                    x.AdvanceToXmlDocOwner(xmlDoc, null, range)
-                    x.Mark()
+                    x.MarkXmlDocOwner(xmlDoc, null, range, false)
                 | _ ->
                     x.Mark()
             x.ProcessTopLevelBindings(bindings)
@@ -215,7 +214,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             while (isNotNull x.TokenType && x.TokenType.IsWhitespace) && not x.Eof do
                 x.AdvanceLexer()
 
-            let mark = x.MarkOrMarkXmlDocOwner(xmlDoc, args.Range)
+            let mark = x.Mark(xmlDoc, args.Range)
 
             x.ProcessAttributeLists(attrs)
             x.ProcessImplicitCtorSimplePats(args)
@@ -237,10 +236,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 let mark =
                     match typeMember with
                     | SynMemberDefn.LetBindings _ ->
-                        x.AdvanceToXmlDocOwner(typeMember.XmlDoc, null, typeMember.Range)
-                        x.Mark()
+                        x.MarkXmlDocOwner(typeMember.XmlDoc, null, typeMember.Range, false)
                     | _ ->
-                        let mark = x.MarkXmlDocOwner(typeMember.XmlDoc, null, typeMember.Range)
+                        let mark = x.MarkXmlDocOwner(typeMember.XmlDoc, null, typeMember.Range, true)
                         x.ProcessAttributeLists(typeMember.Attributes)
                         mark
                 mark
@@ -637,12 +635,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             if Position.posGt r.End outerRange.Start then attrs else
             x.SkipOuterAttrs(rest, outerRange)
 
-    member x.ProcessTopLevelBinding(binding, isSecond) =
+    member x.ProcessTopLevelBinding(binding, isSecondary) =
         let (SynBinding(_, kind, _, _, attrs, XmlDoc xmlDoc, _ , headPat, returnInfo, expr, range, _)) = binding
 
-        if isSecond then x.AdvanceToTokenOrRangeStart(FSharpTokenType.AND, if xmlDoc.IsEmpty then range else xmlDoc.Range)
+        if isSecondary then
+            x.AdvanceToTokenOrRangeStart(FSharpTokenType.AND, xmlDocOwnerStartRange xmlDoc range)
 
-        let mark = x.MarkOrMarkXmlDocOwner(xmlDoc, range)
+        let mark = x.Mark(xmlDoc, range)
         let expr = x.FixExpression(expr)
 
         match kind with

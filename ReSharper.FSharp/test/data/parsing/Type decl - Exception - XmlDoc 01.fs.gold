@@ -2,7 +2,7 @@
 IFSharpImplFile
   IAnonModuleDeclaration
     IExceptionDeclaration
-      IXmlDocBlock
+      XmlDocBlock
         DocComment(type:LINE_COMMENT, text:/// E)
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       FSharpTokenType+ExceptionTokenElement(type:EXCEPTION, text:exception)

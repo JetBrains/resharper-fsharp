@@ -19,7 +19,7 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "
           IRecordFieldDeclarationList
             IRecordFieldDeclaration
-              IXmlDocBlock
+              XmlDocBlock
                 DocComment(type:LINE_COMMENT, text:/// F2)
               NewLine(type:NEW_LINE, text:\n) spaces:"\n"
               Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "

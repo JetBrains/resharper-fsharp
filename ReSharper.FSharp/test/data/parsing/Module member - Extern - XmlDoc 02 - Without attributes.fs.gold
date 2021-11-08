@@ -2,7 +2,7 @@
 IFSharpImplFile
   IAnonModuleDeclaration
     IExternDeclaration
-      IXmlDocBlock
+      XmlDocBlock
         DocComment(type:LINE_COMMENT, text:///F)
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       FSharpTokenType+ExternTokenElement(type:EXTERN, text:extern)

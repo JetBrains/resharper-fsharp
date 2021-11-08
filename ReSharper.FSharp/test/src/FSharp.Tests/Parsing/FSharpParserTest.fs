@@ -22,7 +22,7 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Module - Top level - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level - XmlDoc 02 - Attributes``() = x.DoNamedTest()
-    [<Test>] member x.``Module - Top level - XmlDoc 03 - Multiple blocks``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Top level - XmlDoc 03 - Separated by attributes``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level - XmlDoc 04 - Attributes before``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level - XmlDoc 05 - Attributes before``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level 01``() = x.DoNamedTest()
@@ -63,7 +63,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - XmlDoc 02 - Multiple lines``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - XmlDoc 03 - Attribute``() = x.DoNamedTest()
-    [<Test>] member x.``Type decl - XmlDoc 04 - Multiple blocks``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - XmlDoc 04 - Separated by attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Il 01``() = x.DoNamedTest()
 
@@ -564,7 +564,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Module member - Extern 02 - Access modifier``() = x.DoNamedTest()
 
     [<Test>] member x.``Module member - Let - XmlDoc 01``() = x.DoNamedTest()
-    [<Test; Explicit("Remove extra space")>] member x.``Module member - Let - XmlDoc 02 - Multiple blocks``() = x.DoNamedTest()
+    [<Test; Explicit("Remove extra space")>] member x.``Module member - Let - XmlDoc 02 - Separated by expression``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Let - Inline 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Let - Type parameters 01``() = x.DoNamedTest()
 
@@ -625,6 +625,9 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Implicit defines 01``() = x.DoNamedTest()
     [<Test; FSharpScriptTest; Explicit>] member x.``Implicit defines 02 - Script``() = x.DoNamedTest()
+
+    [<Test>] member x.``XmlDoc 01 - Simple comment separator``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 02 - Simple comment at the end``() = x.DoNamedTest()
 
 
 [<FSharpSignatureTest>]

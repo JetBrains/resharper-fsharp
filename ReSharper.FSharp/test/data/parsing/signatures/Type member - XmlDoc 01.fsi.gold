@@ -17,7 +17,7 @@ IFSharpSigFile
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         IMemberSignature
-          IXmlDocBlock
+          XmlDocBlock
             DocComment(type:LINE_COMMENT, text:///P)
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "

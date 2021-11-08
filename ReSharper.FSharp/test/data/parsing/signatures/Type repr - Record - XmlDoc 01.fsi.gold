@@ -20,7 +20,7 @@ IFSharpSigFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IRecordFieldDeclarationList
             IRecordFieldDeclaration
-              IXmlDocBlock
+              XmlDocBlock
                 DocComment(type:LINE_COMMENT, text:///A1)
                 NewLine(type:NEW_LINE, text:\n) spaces:"\n"
                 Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "
@@ -38,7 +38,7 @@ IFSharpSigFile
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "
             IRecordFieldDeclaration
-              IXmlDocBlock
+              XmlDocBlock
                 DocComment(type:LINE_COMMENT, text:///A1)
                 NewLine(type:NEW_LINE, text:\n) spaces:"\n"
                 Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "
@@ -58,7 +58,7 @@ IFSharpSigFile
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "
             IRecordFieldDeclaration
-              IXmlDocBlock
+              XmlDocBlock
                 DocComment(type:LINE_COMMENT, text:///A1)
                 NewLine(type:NEW_LINE, text:\n) spaces:"\n"
                 Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "

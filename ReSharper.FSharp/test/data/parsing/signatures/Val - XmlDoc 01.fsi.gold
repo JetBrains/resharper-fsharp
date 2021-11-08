@@ -7,7 +7,7 @@ IFSharpSigFile
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     IBindingSignature
-      IXmlDocBlock
+      XmlDocBlock
         DocComment(type:LINE_COMMENT, text:///Val)
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       FSharpTokenType+ValTokenElement(type:VAL, text:val)

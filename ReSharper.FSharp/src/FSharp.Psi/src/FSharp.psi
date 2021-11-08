@@ -1742,9 +1742,6 @@ anonRecordField:
   COLON<FSHARP_COLON, Colon>
   typeUsage<TYPE, TypeUsage>;
 
-xmlDocBlock:
-  LPAREN<LPAREN, LParen>;
-
 arrayTypeUsage:
   topLevelTypeParameterDecl
   typeUsage<TYPE, TypeUsage>

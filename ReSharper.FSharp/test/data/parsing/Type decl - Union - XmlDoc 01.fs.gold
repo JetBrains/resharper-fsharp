@@ -3,7 +3,7 @@ IFSharpImplFile
   IAnonModuleDeclaration
     ITypeDeclarationGroup
       IFSharpTypeDeclaration
-        IXmlDocBlock
+        XmlDocBlock
           DocComment(type:LINE_COMMENT, text:/// Uu)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
@@ -15,7 +15,7 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         IUnionRepresentation
           IUnionCaseDeclaration
-            IXmlDocBlock
+            XmlDocBlock
               DocComment(type:LINE_COMMENT, text:/// Aa)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "

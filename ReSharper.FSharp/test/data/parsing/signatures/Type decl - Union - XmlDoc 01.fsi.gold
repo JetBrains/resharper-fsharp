@@ -17,7 +17,7 @@ IFSharpSigFile
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         IUnionRepresentation
           IUnionCaseDeclaration
-            IXmlDocBlock
+            XmlDocBlock
               DocComment(type:LINE_COMMENT, text:///A )
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
@@ -29,7 +29,7 @@ IFSharpSigFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IUnionCaseFieldDeclarationList
               IUnionCaseFieldDeclaration
-                IXmlDocBlock
+                XmlDocBlock
                   DocComment(type:LINE_COMMENT, text:///Name)
                 NewLine(type:NEW_LINE, text:\n) spaces:"\n"
                 Whitespace(type:WHITE_SPACE, text:           ) spaces:"           "
@@ -44,7 +44,7 @@ IFSharpSigFile
               NewLine(type:NEW_LINE, text:\n) spaces:"\n"
               Whitespace(type:WHITE_SPACE, text:           ) spaces:"           "
               IUnionCaseFieldDeclaration
-                IXmlDocBlock
+                XmlDocBlock
                   DocComment(type:LINE_COMMENT, text:///String)
                 NewLine(type:NEW_LINE, text:\n) spaces:"\n"
                 Whitespace(type:WHITE_SPACE, text:           ) spaces:"           "
@@ -55,7 +55,7 @@ IFSharpSigFile
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
           IUnionCaseDeclaration
-            IXmlDocBlock
+            XmlDocBlock
               DocComment(type:LINE_COMMENT, text:///B)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
