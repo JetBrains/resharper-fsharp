@@ -2,4 +2,4 @@
     | C of 'T1 * 'T2 option
 
 match C(1, Some "") with
-| C (i, stringOption{caret}) -> ()
+| C(i, stringOption{caret}) -> ()

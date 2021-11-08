@@ -1,8 +1,10 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.ParenPatUtil
 
+open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -180,13 +182,29 @@ let escapesTuplePatParamDecl (context: IFSharpPattern) (innerPattern: IFSharpPat
 let addParensIfNeeded (pattern: IFSharpPattern) =
     if isNull pattern then pattern else
 
-    use writeLockCookie = WriteLockCookie.Create(pattern.IsPhysical())
     let contextPattern = pattern.IgnoreParentParens()
     if contextPattern == pattern && needsParens contextPattern pattern then
+        use writeLockCookie = WriteLockCookie.Create(pattern.IsPhysical())
+
         let parenPattern = pattern.CreateElementFactory().CreatePattern("(_)", false) :?> IParenPat
         let patternCopy = pattern.Copy()
         let parenPattern = ModificationUtil.ReplaceChild(pattern, parenPattern)
-        parenPattern.SetPattern(patternCopy)
+        let pattern = parenPattern.SetPattern(patternCopy)
+
+        let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(parenPattern)
+        if isNotNull parametersOwnerPat then
+            let referenceName = parametersOwnerPat.ReferenceName
+            if isNull referenceName then () else
+
+            let nextSibling = referenceName.NextSibling
+            if isInlineSpace nextSibling && nextSibling.NextSibling == parenPattern && nextSibling.GetTextLength() = 1 then
+                let settingsStore = pattern.GetSettingsStoreWithEditorConfig()
+                let spaceBeforeUppercase =
+                    settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeUppercaseInvocation)
+
+                if not spaceBeforeUppercase then
+                    ModificationUtil.DeleteChild(nextSibling)
+
+        pattern
     else
         pattern
-

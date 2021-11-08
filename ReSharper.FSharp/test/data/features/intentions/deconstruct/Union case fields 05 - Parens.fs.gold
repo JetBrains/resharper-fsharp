@@ -5,4 +5,4 @@
     | D
 
 match D with
-| A (i, i1{caret}) -> ()
+| A(i, i1{caret}) -> ()

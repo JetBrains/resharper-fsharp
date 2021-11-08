@@ -6,6 +6,6 @@ type U =
     | A of int * float
 
 async {
-    let! (A (i, f)) = async { return A(1, 1.0) }
+    let! (A(i, f)) = async { return A(1, 1.0) }
     return 1
 }

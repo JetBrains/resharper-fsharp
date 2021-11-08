@@ -1,7 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 type DeconstructPatternTest() =
@@ -58,6 +60,8 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Union case - Single - Used 03``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single 02 - Escaped``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "SpaceBeforeUppercaseInvocation", "true")>]
+    [<Test>] member x.``Union case - Single 03 - Space``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case fields - Generic 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case fields - Generic 02``() = x.DoNamedTest()

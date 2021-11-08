@@ -1,4 +1,4 @@
 ﻿type U =
     | A of field: int * string
 
-let (A (field, s{caret})) = A (1, "")
+let (A(field, s{caret})) = A (1, "")
