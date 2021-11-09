@@ -487,7 +487,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             | _ -> null
 
         if isNotNull deconstruction then
-            match FSharpDeconstructionImpl.deconstructImpl deconstruction binding.HeadPattern with
+            match FSharpDeconstructionImpl.deconstructImpl false deconstruction binding.HeadPattern with
             | Some(hotspotsRegistry, pattern) ->
                 let node = pattern :> ITreeNode
                 IntroduceVariableResult(hotspotsRegistry, node.CreateTreeElementPointer())

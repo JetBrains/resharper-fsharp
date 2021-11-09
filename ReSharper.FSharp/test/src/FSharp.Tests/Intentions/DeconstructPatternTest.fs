@@ -1,5 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open System.Linq
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
@@ -10,6 +13,11 @@ type DeconstructPatternTest() =
     inherit FSharpContextActionExecuteTestBase<DeconstructPatternContextAction>()
 
     override this.ExtraPath = "deconstruct"
+
+    override this.DoTest(lifetime, testProject) =
+        let popupMenu = this.Solution.GetComponent<TestWorkflowPopupMenu>()
+        popupMenu.SetTestData(lifetime, fun _ occurrences _ _ _ -> occurrences.FirstOrDefault())
+        base.DoTest(lifetime, testProject)
 
     [<Test>] member x.``Tuple - Accessor 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Lambda 01``() = x.DoNamedTest()

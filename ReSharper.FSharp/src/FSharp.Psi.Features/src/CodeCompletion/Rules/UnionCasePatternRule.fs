@@ -114,7 +114,7 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
             use transactionCookie =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, UnionCasePatternInfo.Id)
 
-            let action = FSharpDeconstruction.deconstruct parametersOwnerPat deconstruction pat
+            let action = FSharpDeconstruction.deconstruct false parametersOwnerPat deconstruction pat
             if isNotNull action then
                 action.Invoke(textControl)
 

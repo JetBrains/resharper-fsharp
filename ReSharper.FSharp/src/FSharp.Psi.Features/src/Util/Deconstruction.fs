@@ -1,12 +1,16 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruction
 
 open System.Collections.Generic
+open System.Drawing
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Progress
 open JetBrains.DocumentModel
 open JetBrains.Diagnostics
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
+open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
+open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -19,6 +23,7 @@ open JetBrains.ReSharper.Psi.Search
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util.Deconstruction
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.UI.RichText
 open JetBrains.Util
 
 type SingleValueDeconstructionComponent(name: string, valueType: IType) =
@@ -98,7 +103,7 @@ module FSharpDeconstructionImpl =
 
         pattern, names
 
-    let deconstructImpl (deconstruction: IFSharpDeconstruction) (pat: IFSharpPattern) =
+    let deconstructImpl ignoreUsages (deconstruction: IFSharpDeconstruction) (pat: IFSharpPattern) =
         use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
         let factory = pat.CreateElementFactory()
         let hotspotsRegistry = HotspotsRegistry(pat.GetPsiServices())
@@ -145,16 +150,15 @@ module FSharpDeconstructionImpl =
                     | _ -> ())
 
         let hasUsages =
-            match pat, hasUsages pat with
-            | :? IReferencePat as refPat, true ->
+            let refPat = pat.As<IReferencePat>()
+            if isNull refPat then false else
+
+            if not ignoreUsages && hasUsages pat then
                 usedNames.Add(refPat.SourceName) |> ignore
                 true
-
-            | :? IReferencePat as refPat, false ->
+            else
                 usedNames.Remove(refPat.SourceName) |> ignore
                 false
-
-            | _ -> false
 
         let pat =
             if hasUsages then
@@ -315,8 +319,8 @@ module FSharpDeconstruction =
             | _ -> Unchecked.defaultof<_>
         | _ -> Unchecked.defaultof<_>
 
-    let deconstruct (endOffsetNode: ITreeNode) deconstruction (pattern: IFSharpPattern) =
-        match FSharpDeconstructionImpl.deconstructImpl deconstruction pattern with
+    let deconstruct ignoreUsages (endOffsetNode: ITreeNode) deconstruction (pattern: IFSharpPattern) =
+        match FSharpDeconstructionImpl.deconstructImpl ignoreUsages deconstruction pattern with
         | Some(hotspotsRegistry, _) ->
             let offset =
                 if isNotNull endOffsetNode then endOffsetNode.GetDocumentEndOffset() else DocumentOffset.InvalidOffset
@@ -332,7 +336,39 @@ module FSharpDeconstruction =
 type DeconstructAction(pat: IFSharpPattern, deconstruction: IFSharpDeconstruction) =
     inherit BulbActionBase()
 
+    let mutable ignoreUsages = false
+
     override this.Text = deconstruction.Text
 
+    override this.Execute(solution, textControl) =
+        let refPat = pat.As<IReferencePat>()
+        if isNull refPat then base.Execute(solution, textControl) else
+
+        let hasUsages = FSharpDeconstructionImpl.hasUsages pat
+        if not hasUsages then base.Execute(solution, textControl) else
+
+        let keepPatternText =
+            let richText = RichText("Add '")
+            richText.Append($"as {refPat.SourceName}", TextStyle(FontStyle.Bold)) |> ignore
+            richText.Append("' pattern", TextStyle()) |> ignore
+            richText
+
+        let occurrences =
+            [|WorkflowPopupMenuOccurrence(keepPatternText, RichText.Empty, false)
+              WorkflowPopupMenuOccurrence(RichText("Remove pattern"), RichText.Empty, true)|]
+
+        let popupMenu = solution.GetComponent<WorkflowPopupMenu>()
+        let occurrence =
+            popupMenu.ShowPopup(textControl.Lifetime, occurrences, CustomHighlightingKind.Other, textControl, null)
+
+        if isNull occurrence then () else
+
+        occurrence
+        |> Option.ofObj
+        |> Option.bind (fun occurrence -> occurrence.Entities |> Seq.tryHead)
+        |> Option.iter (fun keepPatternOccurrence -> ignoreUsages <- keepPatternOccurrence)
+
+        base.Execute(solution, textControl)
+
     override this.ExecutePsiTransaction(_, _) =
-        FSharpDeconstruction.deconstruct null deconstruction pat
+        FSharpDeconstruction.deconstruct ignoreUsages null deconstruction pat
