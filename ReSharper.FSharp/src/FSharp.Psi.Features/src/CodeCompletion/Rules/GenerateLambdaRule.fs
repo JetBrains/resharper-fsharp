@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
+open JetBrains.Application.Environment
+open JetBrains.Application.Environment.Helpers
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
@@ -86,6 +88,9 @@ type GenerateLambdaRule() =
         context.IsBasicOrSmartCompletion && not context.IsQualified
 
     override this.AddLookupItems(context, collector) =
+        let productConfigurations = Shell.Instance.GetComponent<RunsProducts.ProductConfigurations>()
+        if not (productConfigurations.IsInternalMode()) then false else
+
         let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
         if isNull reference then false else
 
@@ -136,4 +141,4 @@ type GenerateLambdaRule() =
 
         collector.Add(item)
 
-        true
+        false
