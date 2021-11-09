@@ -156,7 +156,7 @@ module FSharpNamingService =
                     | :? IForExpr as forExpr ->
                         if isNull forExpr.DoExpression then () else
 
-                        let name = forExpr.Identifier.GetSourceName()
+                        let name = forExpr.Identifier.SourceName
                         if name <> SharedImplUtil.MISSING_DECLARATION_NAME then
                             scopes.Push({| Expr = forExpr.DoExpression; Names = [| name |] |})
 

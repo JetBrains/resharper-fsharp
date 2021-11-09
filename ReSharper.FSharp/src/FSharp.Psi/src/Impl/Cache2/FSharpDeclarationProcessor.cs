@@ -249,7 +249,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         : (TypePart) new TypeAbbreviationOrDeclarationPart(decl, Builder);
       Builder.StartPart(typePart);
 
-      var declaredName = repr.AbbreviatedTypeOrUnionCase?.GetSourceName();
+      var identifier = repr.AbbreviatedTypeOrUnionCase?.NameIdentifier;
+      var declaredName = identifier.GetSourceName();
       if (declaredName != SharedImplUtil.MISSING_DECLARATION_NAME)
         Builder.AddDeclaredMemberName(declaredName);
     }

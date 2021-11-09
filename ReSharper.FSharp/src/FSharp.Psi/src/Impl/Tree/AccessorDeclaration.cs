@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     // CompiledName is ignored for accessors.
-    protected override string DeclaredElementName => Identifier.GetSourceName() + "_" + OwnerMember.SourceName;
+    protected override string DeclaredElementName => NameIdentifier.GetSourceName() + "_" + OwnerMember.SourceName;
 
     public override string CompiledName => DeclaredElementName;
     public override string SourceName => DeclaredElementName;
