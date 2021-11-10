@@ -67,14 +67,14 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
         use pinCheckResultsCookie =
             textControl.GetFSharpFile(solution).PinTypeCheckResults(true, UnionCasePatternInfo.Id)
 
-        textControl.Document.ReplaceText(nameRange, "_")
-        let nameRange = nameRange.StartOffset.ExtendRight("_".Length)
+        textControl.Document.ReplaceText(nameRange, "__")
+        let nameRange = nameRange.StartOffset.ExtendRight("__".Length)
 
         let psiServices = solution.GetPsiServices()
         psiServices.Files.CommitAllDocuments()
 
         let pat =
-            let pat = TextControlToPsi.GetElement<IWildPat>(solution, nameRange.EndOffset)
+            let pat = TextControlToPsi.GetElement<IReferencePat>(solution, nameRange.EndOffset)
 
             use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
             use transactionCookie =
@@ -178,7 +178,9 @@ type UnionCasePatternRule() =
         | null -> pat
         | orPat -> skipParentOrPats orPat
 
-    let getExpectedUnionType referenceName =
+    let getExpectedUnionType (referenceName: IExpressionReferenceName) =
+        if referenceName.IsQualified then None else
+
         let referencePat = ReferencePatNavigator.GetByReferenceName(referenceName)
         let pat = skipParentOrPats referencePat
         let matchClause = MatchClauseNavigator.GetByPattern(pat)
@@ -200,7 +202,7 @@ type UnionCasePatternRule() =
         Some (FcsEntityInstance.create fcsType, fcsType, displayContext)
 
     override this.IsAvailable(context) =
-        context.IsBasicOrSmartCompletion && not context.IsQualified &&
+        context.IsBasicOrSmartCompletion &&
 
         let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
         isNotNull reference &&

@@ -28,7 +28,7 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
             | _ -> null
 
         let declaredElement = fcsSymbol.GetDeclaredElement(pat.GetPsiModule()).As<IClrDeclaredElement>()
-        if isNull referenceName || isNull declaredElement then pat else
+        if isNull referenceName || referenceName.IsQualified || isNull declaredElement then pat else
 
         let reference = referenceName.Reference
         FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, declaredElement)
