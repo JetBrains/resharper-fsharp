@@ -570,9 +570,21 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let caretLine = caretCoords.Line
 
         if caretLine.Next >= document.GetLineCount() then false else
-        if not (document.GetLineText(caretLine).IsWhitespace()) then false else
+        let lineStartOffset = document.GetLineStartOffset(caretLine)
 
-        match tryGetNestedIndentBelow cachingLexerService textControl caretLine (int caretCoords.Column) with
+        let mutable lexer = Unchecked.defaultof<_>
+        let mutable seenComment = false
+        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(lineStartOffset)) then false else
+
+        while lexer.TokenType == FSharpTokenType.WHITESPACE ||
+                isNotNull lexer.TokenType && lexer.TokenType.IsComment && lexer.TokenStart < caretOffset do
+            seenComment <- seenComment || lexer.TokenType.IsComment
+            lexer.Advance()
+
+        if lexer.TokenType != FSharpTokenType.NEW_LINE then false else
+
+        let currentIndent = if seenComment then 0 else int caretCoords.Column
+        match tryGetNestedIndentBelow cachingLexerService textControl caretLine seenComment currentIndent with
         | None -> false
         | Some (_, (Source indent | Comments indent)) ->
             insertNewLineAt textControl indent TrimTrailingSpaces.No
@@ -1606,9 +1618,9 @@ let tryGetNestedIndentBelowLine cachingLexerService textControl line =
     match getLineIndent cachingLexerService textControl line with
     | None | Some (Comments _) -> None
     | Some (Source currentIndent) ->
-        tryGetNestedIndentBelow cachingLexerService textControl line currentIndent
+        tryGetNestedIndentBelow cachingLexerService textControl line false currentIndent
 
-let tryGetNestedIndentBelow cachingLexerService textControl line currentIndent =
+let tryGetNestedIndentBelow cachingLexerService textControl line preferComment currentIndent =
     let linesCount = textControl.Document.GetLineCount()
 
     let rec tryFindIndent (firstFoundCommentIndent: (Line * LineIndent) option) line =
@@ -1619,6 +1631,8 @@ let tryGetNestedIndentBelow cachingLexerService textControl line currentIndent =
             |> Option.map (fun indent -> line, indent)
 
         match indent, firstFoundCommentIndent with
+        | Some (_, Comments _), _ when preferComment -> indent
+
         | Some (_, Source n), _ ->
             if n > currentIndent then indent else firstFoundCommentIndent
 

@@ -1,0 +1,8 @@
+// ${CHAR:Enter} 
+module Module
+
+do
+    ()
+// {caret}
+
+    ()

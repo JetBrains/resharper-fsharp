@@ -106,6 +106,18 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 73 - Enter in parens``() = x.DoNamedTest()
     [<Test>] member x.``Enter 74 - Enter in parens``() = x.DoNamedTest()
 
+    [<Test>] member x.``Enter - After comment - Indent 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Indent 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Indent 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Indent 04``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Line start 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Line start 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Line start 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Line start 04``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Line start 05``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Line start 06``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Line start 07``() = x.DoNamedTest()
+
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after error 01 - If``() = x.DoNamedTest()
@@ -321,7 +333,7 @@ type FSharpTypingAssistTest() =
 type LineIndentsTest() =
     inherit LineIndentsTestBase()
 
-    [<Test>] member x.``Indents``() = x.DoNamedTest()
+    [<Test>] member x.Indents() = x.DoNamedTest()
 
     override x.DoLineTest(writer, textControl, line) =
         writer.WriteLine(getLineIndent x.CachingLexerService textControl line)
@@ -346,7 +358,7 @@ type LineIndentsTestBase() =
 
     abstract DoLineTest: TextWriter * ITextControl * Line -> unit
 
-    override x.DoTest(lifetime: Lifetime, project: IProject) =
+    override x.DoTest(lifetime: Lifetime, _: IProject) =
         let textControl = x.OpenTextControl(lifetime)
         let linesCount = int (textControl.Document.GetLineCount())
         x.ExecuteWithGold(fun writer ->

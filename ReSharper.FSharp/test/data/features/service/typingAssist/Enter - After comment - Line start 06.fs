@@ -1,0 +1,9 @@
+// ${CHAR:Enter} 
+module Module
+
+let f _ =
+    let a = 1
+// A {caret}
+// B
+    let b = 2
+    ()
