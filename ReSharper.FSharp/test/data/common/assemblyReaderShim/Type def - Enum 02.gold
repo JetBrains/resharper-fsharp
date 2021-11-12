@@ -1,0 +1,69 @@
+﻿module Module
+
+let _: Enum = enum 0
+let _: Class = enum 0
+
+let _: EnumShort = |enum 0|(0)
+let _: EnumShort = |enum |0s|(1)|(2)
+
+let _: EmptyEnum = enum 0
+let _: EnumWrongBaseType = enum 0
+
+
+System.Nullable<Enum>() |> ignore
+|System.Nullable<Class>|(3)() |> ignore
+
+
+match |Enum.A|(4) with
+| Enum.A -> ()
+| Enum.B -> ()
+|| Enum.C -> ()|(5)
+| Enum.D -> ()
+
+match |EnumShort.A|(6) with
+| EnumShort.A -> ()
+| EnumShort.B -> ()
+
+match |EnumWrongBaseType.A|(7) with
+| EnumWrongBaseType.A -> ()
+| EnumWrongBaseType.B -> ()
+
+match EnumWrongValueType.A with
+| |EnumWrongValueType.A|(8) -> ()
+
+match EnumOverflowValue.A with
+| |EnumOverflowValue.A|(9) -> ()
+| EnumOverflowValue.B -> ()
+
+match |EnumSameFields.A|(10) with
+| EnumSameFields.A -> ()
+
+match |EnumSameFields.A|(11) with
+| EnumSameFields.A -> ()
+|| EnumSameFields.A -> ()|(12)
+
+
+type InheritEnum() =
+    |inherit Enum()|(13)
+
+type InheritClass() =
+    inherit Class()
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The type 'int32' does not match the type 'int16'
+(1): ReSharper Underlined Error Highlighting: The type 'int32' does not match the type 'int16'
+(2): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int32'    
+but here has type
+    'int16'    
+(3): ReSharper Underlined Error Highlighting: A generic construct requires that the type 'Class' is a CLI or F# struct type
+(4): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<Enum> (3)' may indicate a case not covered by the pattern(s).
+(5): ReSharper Dead Code: This rule will never be matched
+(6): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<EnumShort> (2s)' may indicate a case not covered by the pattern(s).
+(7): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<EnumWrongBaseType> (2)' may indicate a case not covered by the pattern(s).
+(8): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
+(9): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
+(10): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value 'EnumSameFields.A' may indicate a case not covered by the pattern(s).
+(11): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value 'EnumSameFields.A' may indicate a case not covered by the pattern(s).
+(12): ReSharper Dead Code: This rule will never be matched
+(13): ReSharper Underlined Error Highlighting: Cannot inherit a sealed type

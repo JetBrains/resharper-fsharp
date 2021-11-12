@@ -240,7 +240,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         infixOpTokens.Contains(lexer.TokenType) ||
 
         lexer.TokenType == FSharpTokenType.SYMBOLIC_OP &&
-        IsInfixOperator (lexer.GetTokenText())
+        IsOperatorDisplayName (lexer.GetTokenText())
 
 
     static let charOffsetInRightBrackets: IDictionary<char, (TokenNodeType * int)[]> =
@@ -721,7 +721,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                         Some range
 
                     // for i = ... to ... do {caret}
-                    | SynExpr.For (_, IdentRange range, _, _, ExprRange lastRange, _, _)
+                    | SynExpr.For (_, IdentRange range, _, _, _, ExprRange lastRange, _, _)
 
                     // for ... in ... do {caret}
                     | SynExpr.ForEach (_, _, _, PatRange range, ExprRange lastRange, _, _) when

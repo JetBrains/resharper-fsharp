@@ -8,4 +8,4 @@ f [|0, 1|(0)]
 (0): ReSharper Underlined Error Highlighting: This expression was expected to have type
     'int list'    
 but here has type
-    ''a * 'b'    
+    'int * int'    

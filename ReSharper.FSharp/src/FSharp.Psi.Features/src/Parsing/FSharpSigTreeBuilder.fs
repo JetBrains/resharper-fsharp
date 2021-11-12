@@ -24,7 +24,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
 
     member x.ProcessModuleMemberSignature(moduleMember) =
         match moduleMember with
-        | SynModuleSigDecl.NestedModule(SynComponentInfo(attrs, _, _, lid, XmlDoc xmlDoc, _, _, _), _, memberSigs, range) ->
+        | SynModuleSigDecl.NestedModule(SynComponentInfo(attrs, _, _, lid, XmlDoc xmlDoc, _, _, _), _, _, memberSigs, range) ->
             let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, List.tryHead lid, range)
             for memberSig in memberSigs do
                 x.ProcessModuleMemberSignature(memberSig)
@@ -78,7 +78,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
 
         | _ -> ()
 
-    member x.ProcessTypeSignature(SynTypeDefnSig(info, repr, memberSigs, range), typeKeywordType) =
+    member x.ProcessTypeSignature(SynTypeDefnSig(info, _, repr, memberSigs, range), typeKeywordType) =
         let (SynComponentInfo(attrs, typeParams, constraints, lid, XmlDoc xmlDoc, _, _, _)) = info
 
         let mark = x.StartType(attrs, xmlDoc, typeParams, constraints, lid, range, typeKeywordType)

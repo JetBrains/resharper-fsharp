@@ -99,6 +99,7 @@ type AssemblyReaderTest() =
     [<Test>] member x.``Type def - Delegate 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type def - Enum 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type def - Enum 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Type def - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type def - Interface 02 - Super``() = x.DoNamedTest() // todo: members, type parameters

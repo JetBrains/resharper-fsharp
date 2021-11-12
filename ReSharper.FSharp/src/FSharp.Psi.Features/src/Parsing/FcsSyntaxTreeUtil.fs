@@ -95,13 +95,13 @@ let attrOwnerStartRange (attrLists: SynAttributeList list) (xmlDoc: XmlDoc) (own
 
 let typeDefnGroupStartRange (bindings: SynTypeDefn list) (range: Range) =
     match bindings with
-    | SynTypeDefn(SynComponentInfo(xmlDoc = XmlDoc xmlDoc), _, _, _, _) :: _ ->
+    | SynTypeDefn(typeInfo = SynComponentInfo(xmlDoc = XmlDoc xmlDoc)) :: _ ->
         xmlDocOwnerStartRange xmlDoc range
     | _ -> range, XmlDoc.Empty
 
 let typeSigGroupStartRange (bindings: SynTypeDefnSig list) (range: Range) =
     match bindings with
-    | SynTypeDefnSig(SynComponentInfo(xmlDoc = XmlDoc xmlDoc), _, _, _) :: _ ->
+    | SynTypeDefnSig(typeInfo = SynComponentInfo(xmlDoc = XmlDoc xmlDoc)) :: _ ->
         xmlDocOwnerStartRange xmlDoc range
     | _ -> range, XmlDoc.Empty
 

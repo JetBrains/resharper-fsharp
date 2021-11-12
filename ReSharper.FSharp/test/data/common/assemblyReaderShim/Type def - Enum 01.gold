@@ -1,70 +1,8 @@
 ﻿module Module
 
 let _: Enum = enum 0
-let _: Class = |enum 0|(0)
-
-let _: EnumShort = |enum 0|(1)
-let _: EnumShort = |enum |0s|(2)|(3)
-
-let _: EmptyEnum = enum 0
-let _: EnumWrongBaseType = enum 0
-
-
-System.Nullable<Enum>() |> ignore
-|System.Nullable<Class>|(4)() |> ignore
-
-
-match |Enum.A|(5) with
-| Enum.A -> ()
-| Enum.B -> ()
-|| Enum.C -> ()|(6)
-| Enum.D -> ()
-
-match |EnumShort.A|(7) with
-| EnumShort.A -> ()
-| EnumShort.B -> ()
-
-match |EnumWrongBaseType.A|(8) with
-| EnumWrongBaseType.A -> ()
-| EnumWrongBaseType.B -> ()
-
-match EnumWrongValueType.A with
-| |EnumWrongValueType.A|(9) -> ()
-
-match EnumOverflowValue.A with
-| |EnumOverflowValue.A|(10) -> ()
-| EnumOverflowValue.B -> ()
-
-match |EnumSameFields.A|(11) with
-| EnumSameFields.A -> ()
-
-match |EnumSameFields.A|(12) with
-| EnumSameFields.A -> ()
-|| EnumSameFields.A -> ()|(13)
-
-
-type InheritEnum() =
-    |inherit Enum()|(14)
-
-type InheritClass() =
-    inherit Class()
+let _: Class = ||enum|(1) 0|(0)
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: The type 'Class' is not a CLI enum type
-(1): ReSharper Underlined Error Highlighting: The type 'int32' does not match the type 'int16'
-(2): ReSharper Underlined Error Highlighting: The type 'int32' does not match the type 'int16'
-(3): ReSharper Underlined Error Highlighting: This expression was expected to have type
-    'int32'    
-but here has type
-    'int16'    
-(4): ReSharper Underlined Error Highlighting: A generic construct requires that the type 'Class' is a CLI or F# struct type
-(5): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<Enum> (3)' may indicate a case not covered by the pattern(s).
-(6): ReSharper Dead Code: This rule will never be matched
-(7): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<EnumShort> (2s)' may indicate a case not covered by the pattern(s).
-(8): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<EnumWrongBaseType> (2)' may indicate a case not covered by the pattern(s).
-(9): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
-(10): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
-(11): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value 'EnumSameFields.A' may indicate a case not covered by the pattern(s).
-(12): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value 'EnumSameFields.A' may indicate a case not covered by the pattern(s).
-(13): ReSharper Dead Code: This rule will never be matched
-(14): ReSharper Underlined Error Highlighting: Cannot inherit a sealed type
+(0): ReSharper Underlined Error Highlighting: Type constraint mismatch when applying the default type 'Class' for a type inference variable. The type 'Class' is not a CLI enum type Consider adding further type constraints
+(1): ReSharper Underlined Error Highlighting: Could not resolve the ambiguity in the use of a generic construct with an 'enum' constraint at or near this position

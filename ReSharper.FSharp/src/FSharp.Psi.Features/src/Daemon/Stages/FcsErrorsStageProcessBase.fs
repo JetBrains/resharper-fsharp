@@ -81,7 +81,7 @@ module FSharpErrors =
     let [<Literal>] undefinedGetSliceMessageSuffix = " does not define the field, constructor or member 'GetSlice'."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
-    let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type "
+    let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type \n    '(.+)'    \nis not compatible with type\n    '(.+)'"
 
     let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
     let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
@@ -388,7 +388,17 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 let expr = getResultExpr expr
                 FunctionValueUnexpectedWarning(expr, error.Message) :> _
 
-            | x when startsWith typeConstraintMismatchMessage x ->
+            | Regex typeConstraintMismatchMessage [_; typeConstraint] ->
+                let highlighting =
+                    match typeConstraint with
+                    | "unit" ->
+                        let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                        let expr = getResultExpr expr
+                        if isNull expr then null else UnitTypeExpectedError(expr, error.Message)
+                    | _ -> null
+
+                if isNotNull highlighting then highlighting :> _ else
+
                 createHighlightingFromNodeWithMessage TypeConstraintMismatchError range error
 
             | _ -> null
