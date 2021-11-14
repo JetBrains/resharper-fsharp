@@ -191,6 +191,15 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Backspace - String - Triple quote 07``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - String - Verbatim 01 - Empty``() = x.DoNamedTest()
 
+    [<Test>] member x.``Backspace - Record - Definition 01``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Record - Definition 02``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Record - Instance 01``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Record - Anonymous 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Delete - Record - Definition 01``() = x.DoNamedTest()
+    [<Test>] member x.``Delete - Record - Definition 02``() = x.DoNamedTest()
+    [<Test>] member x.``Delete - Record - Instance 01``() = x.DoNamedTest()
+    [<Test>] member x.``Delete - Record - Anonymous 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
