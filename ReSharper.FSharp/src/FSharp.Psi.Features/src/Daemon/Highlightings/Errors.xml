@@ -286,6 +286,7 @@
     <Message value="Redundant string interpolation"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>expr.GetDollarSignRange()</Range>
+    <QuickFix>ReplaceWithRegularStringFix</QuickFix>
   </Warning>
 
   <Warning name="ExpressionCanBeReplacedWithCondition" configurableSeverity="FSharpExpressionCanBeReplacedWithCondition">
