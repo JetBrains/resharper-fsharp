@@ -32,7 +32,7 @@ type ReplaceWithRegularStringFix(warning: RedundantStringInterpolationWarning) =
             | a when a == FSharpTokenType.REGULAR_INTERPOLATED_STRING -> FSharpTokenType.STRING, text.Substring(1)
             | a when a == FSharpTokenType.VERBATIM_INTERPOLATED_STRING -> FSharpTokenType.VERBATIM_STRING, $"@{text.Substring(2)}"
             | a when a == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING -> FSharpTokenType.TRIPLE_QUOTED_STRING, text.Substring(1)
-            | _ -> FSharpTokenType.STRING, text
+            | a -> failwith $"Unexpected token type: {a}"
 
         let regularString = FSharpString(regularStringType, fixedText)
         let stringExpr = ElementType.LITERAL_EXPR.Create()
