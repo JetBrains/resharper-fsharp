@@ -231,6 +231,7 @@
     <Compile Include="src\QuickFixes\ReplaceWithTypeRefExprFix.fs" />
     <Compile Include="src\QuickFixes\RemoveRedundantAsPatFix.fs" />
     <Compile Include="src\QuickFixes\DeconstructPatternFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithRegularStringFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />
