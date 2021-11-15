@@ -56,7 +56,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       try
       {
-        return new ClrTypeName(entity.QualifiedBaseName);
+        // `Replace` workarounds fix for https://github.com/dotnet/fsharp/issues/9.
+        return new ClrTypeName(entity.QualifiedBaseName.Replace(@"\,", ",")); 
       }
       catch (Exception e)
       {
