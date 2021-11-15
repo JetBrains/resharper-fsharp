@@ -124,7 +124,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     member x.PinCheckResults(sourceFile, prohibitTypeCheck, opName) =
         match x.ParseAndCheckFile(sourceFile, opName) with
         | Some(parseAndCheckResults) ->
-            new PinTypeCheckResultsCookie(parseAndCheckResults.ParseResults, parseAndCheckResults.CheckResults, prohibitTypeCheck) :> IDisposable
+            new PinTypeCheckResultsCookie(sourceFile, parseAndCheckResults.ParseResults, parseAndCheckResults.CheckResults, prohibitTypeCheck) :> IDisposable
         | _ -> { new IDisposable with member this.Dispose() = () }
 
     member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) =
