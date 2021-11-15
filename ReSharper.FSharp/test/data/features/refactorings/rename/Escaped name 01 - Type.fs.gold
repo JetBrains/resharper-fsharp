@@ -1,0 +1,4 @@
+﻿module M =
+    type zzz() = class end
+
+M.zzz()
