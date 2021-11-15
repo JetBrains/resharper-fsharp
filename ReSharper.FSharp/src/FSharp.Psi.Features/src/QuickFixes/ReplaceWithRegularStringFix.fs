@@ -15,7 +15,6 @@ type ReplaceWithRegularStringFix(warning: RedundantStringInterpolationWarning) =
 
     override this.IsAvailable _ =
         isValid expr &&
-        isNotNull expr &&
         expr.Literals.Count = 1 &&
         expr.Literals.Single().GetTokenType() |> isFullInterpolatedStringToken
 
@@ -35,6 +34,8 @@ type ReplaceWithRegularStringFix(warning: RedundantStringInterpolationWarning) =
             | a when a == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING -> FSharpTokenType.TRIPLE_QUOTED_STRING, text.Substring(1)
             | _ -> FSharpTokenType.STRING, text
 
-        let replacement = FSharpString(regularStringType, fixedText)
+        let regularString = FSharpString(regularStringType, fixedText)
+        let stringExpr = ElementType.LITERAL_EXPR.Create()
+        stringExpr.AppendNewChild regularString
 
-        replace expr replacement
+        replace expr stringExpr
