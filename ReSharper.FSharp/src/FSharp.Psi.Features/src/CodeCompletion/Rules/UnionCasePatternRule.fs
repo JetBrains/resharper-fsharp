@@ -64,7 +64,8 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
     inherit TextualBehavior<UnionCasePatternInfo>(info)
 
     override this.Accept(textControl, nameRange, _, _, solution, _) =
-        let pinCheckResultsCookie =
+        use writeCookie = WriteLockCookie.Create(true)
+        use pinCheckResultsCookie =
             textControl.GetFSharpFile(solution).PinTypeCheckResults(true, UnionCasePatternInfo.Id)
 
         textControl.Document.ReplaceText(nameRange, "__")
@@ -120,10 +121,6 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
 
         if Shell.Instance.IsTestShell then
             deconstruct fieldsDeconstruction else
-
-        do
-            use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
-            pinCheckResultsCookie.Dispose()
 
         solution.Locks.ExecuteOrQueueReadLockEx(solution.GetLifetime(), UnionCasePatternInfo.Id, fun _ ->
             let jetPopupMenus = solution.GetComponent<JetPopupMenus>()
