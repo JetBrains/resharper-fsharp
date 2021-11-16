@@ -102,7 +102,7 @@ type ToRecursiveFunctionRule() =
                     LookupItemFactory.CreateLookupItem(info)
                         .WithPresentation(fun _ -> TextualPresentation(lookupText, info) :> _)
                         .WithBehavior(fun _ -> ToRecursiveFunctionBehavior(info, letBindings.GetTreeStartOffset()) :> _)
-                        .WithMatcher(fun _ -> TextualMatcher(lookupText.Text, info) :> _)
+                        .WithMatcher(fun _ -> TextualMatcher(name, info) :> _)
                         .WithRelevance(CLRLookupItemRelevance.GenerateItems)
 
                 collector.Add(item)
