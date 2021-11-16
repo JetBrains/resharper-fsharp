@@ -101,6 +101,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
     override x.DisableFormatter = true
 
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
+        use writeCookie = WriteLockCookie.Create(true)
         use pinCheckResultsCookie = textControl.GetFSharpFile(solution).PinTypeCheckResults(true, Id)
         base.Accept(textControl, nameRange, insertType, suffix, context.PsiModule.GetSolution(), keepCaretStill)
 
