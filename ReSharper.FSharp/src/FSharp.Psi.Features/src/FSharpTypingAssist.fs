@@ -1315,20 +1315,13 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
     member x.TryDeleteRecordFieldWhitespaces(textControl: ITextControl, prev: ITreeNode, next: ITreeNode) =
         let newlineExists =
-            this.GetSiblingsBetween(prev, next)
+            TreeNodeExtensions.NextTokens prev
+            |> Seq.takeWhile ((!=) next)
             |> Seq.exists (getTokenType >> (==) FSharpTokenType.NEW_LINE)
         if not newlineExists then false else
         let replaceRange = TextRange(prev.GetTreeEndOffset().Offset, next.GetTreeStartOffset().Offset)
         textControl.Document.ReplaceText(replaceRange, "; ")
         true
-
-    member x.GetSiblingsBetween(first: ITreeNode, second: ITreeNode) =
-        seq {
-            let mutable current = first
-            while current != second do
-                yield current
-                current <- current.NextSibling
-        }
 
     member x.HandleSurroundTyping(typingContext, lChar, rChar, lTokenType, rTokenType, shouldNotSurround) =
         base.HandleSurroundTyping(typingContext, lChar, rChar, lTokenType, rTokenType, shouldNotSurround)
