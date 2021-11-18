@@ -8,9 +8,17 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Util
 
 // todo: replace Fcs symbols with R# elements when possible
 let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
+    let getReferenceName (pattern: IFSharpPattern) =
+        // todo: unify interface
+        match pattern with
+        | :? IReferencePat as refPat -> refPat.ReferenceName
+        | :? IParametersOwnerPat as p -> p.ReferenceName
+        | _ -> null
+
     match fcsSymbol with
     | :? FSharpUnionCase as unionCase ->
         let factory = pattern.CreateElementFactory()
@@ -20,12 +28,14 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
         let newPattern = factory.CreatePattern(text, false) :?> IParenPat
         let pat = ModificationUtil.ReplaceChild(pattern, newPattern.Pattern) // todo: move to reference binding
 
-        // todo: unify interface
-        let referenceName = 
-            match pat with
-            | :? IReferencePat as refPat -> refPat.ReferenceName
-            | :? IParametersOwnerPat as p -> p.ReferenceName
-            | _ -> null
+        let referenceName = getReferenceName pat
+
+        let oldQualifierWithDot =
+            let referenceName = getReferenceName pattern
+            if isNotNull referenceName then TreeRange(referenceName.Qualifier, referenceName.Delimiter) else null
+
+        if isNotNull oldQualifierWithDot then
+            ModificationUtil.AddChildRangeAfter(referenceName, null, oldQualifierWithDot) |> ignore
 
         let declaredElement = fcsSymbol.GetDeclaredElement(pat.GetPsiModule()).As<IClrDeclaredElement>()
         if isNull referenceName || referenceName.IsQualified || isNull declaredElement then pat else
