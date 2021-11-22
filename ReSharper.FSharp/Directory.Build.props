@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <Company>JetBrains</Company>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)resharper-fsharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
