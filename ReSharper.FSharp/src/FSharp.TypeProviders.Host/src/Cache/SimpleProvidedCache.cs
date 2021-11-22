@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using NuGet;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 {

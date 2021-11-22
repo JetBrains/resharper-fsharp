@@ -14,26 +14,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
       new BidirectionalMapOnDictionary<int, (ITypeProvider, string)>(EqualityComparer<int>.Default,
         new TypeProviderComparer());
 
-    private readonly HashSet<int> myInvalidatedProviders = new HashSet<int>();
-
     public ITypeProvider Get(int typeProviderId) => myTypeProviders[typeProviderId].typeProvider;
 
-    public void Add(int id, (ITypeProvider typeProvider, string) value)
-    {
-      myTypeProviders.Add(id, value);
-      value.typeProvider.Invalidate += (s, obj) => myInvalidatedProviders.Add(id);
-    }
+    public void Add(int id, (ITypeProvider typeProvider, string) value) => myTypeProviders.Add(id, value);
 
-    public bool TryGetInfo(ITypeProvider model, string envKey, out (int key, bool isInvalidated) info)
-    {
-      info = (ProvidedConst.DefaultId, false);
-
-      if (!myTypeProviders.TryGetLeftByRight((model, envKey), out var id))
-        return false;
-
-      info = (id, myInvalidatedProviders.Contains(id));
-      return id != ProvidedConst.DefaultId;
-    }
+    public bool TryGetInfo(ITypeProvider model, string envKey, out int key) =>
+      myTypeProviders.TryGetLeftByRight((model, envKey), out key);
 
     public void Remove(int typeProviderId)
     {
@@ -42,10 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 
       typeProvider.Dispose();
       myTypeProviders.RemoveMapping(typeProviderId, typeProviderData);
-      myInvalidatedProviders.Remove(typeProviderId);
     }
-
-    public bool Contains(int typeProviderId) => myTypeProviders.ContainsLeft(typeProviderId);
 
     public string Dump() =>
       "Type Providers:\n" + string.Join("\n",
