@@ -1,0 +1,11 @@
+﻿// ${COMPLETE_ITEM:U.B}
+module Module
+
+[<RequireQualifiedAccess>]
+type U =
+    | A
+    | B of int
+
+match U.A with
+| {caret}
+| U.A -> ()

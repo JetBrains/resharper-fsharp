@@ -2,6 +2,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil
 
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Tokenization
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -61,3 +62,44 @@ let rec ignoreInnerAsPatsToRight (pat: IFSharpPattern) =
     match pat with
     | :? IAsPat as asPat -> ignoreInnerAsPatsToRight asPat.RightPattern
     | _ -> pat
+
+module ParentTraversal =
+    [<RequireQualifiedAccess>]
+    type PatternParentTraverseStep =
+        | Tuple of item: int * tuplePat: ITuplePat
+        | Or of orPat: IOrPat
+        | And of andPat: IAndsPat
+
+    let makeTuplePatPath pat =
+        let rec tryMakePatPath path (IgnoreParenPat fsPattern: IFSharpPattern) =
+            match fsPattern.Parent with
+            | :? ITuplePat as tuplePat ->
+                let item = tuplePat.Patterns.IndexOf(fsPattern)
+                Assertion.Assert(item <> -1, "item <> -1")
+                tryMakePatPath (PatternParentTraverseStep.Tuple(item, tuplePat) :: path) tuplePat
+
+            | :? IOrPat as orPat ->
+                tryMakePatPath (PatternParentTraverseStep.Or(orPat) :: path) orPat
+
+            | :? IAndsPat as andsPat ->
+                tryMakePatPath (PatternParentTraverseStep.And(andsPat) :: path) andsPat
+
+            | _ -> fsPattern, path
+
+        tryMakePatPath [] pat
+
+    let rec tryTraverseExprPath (path: PatternParentTraverseStep list) (IgnoreInnerParenExpr expr) =
+        match path with
+        | [] -> expr
+        | step :: rest ->
+
+        match expr, step with
+        | _, (PatternParentTraverseStep.Or _ | PatternParentTraverseStep.And _) ->
+            tryTraverseExprPath rest expr
+
+        | :? ITupleExpr as tupleExpr, PatternParentTraverseStep.Tuple(n, _) ->
+            let tupleItems = tupleExpr.Expressions
+            if tupleItems.Count <= n then null else
+            tryTraverseExprPath rest tupleItems.[n]
+
+        | _ -> null
