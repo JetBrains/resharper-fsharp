@@ -79,7 +79,7 @@ object RdFSharpTypeProvidersModel : Root() {
         signal("Invalidate", int)
         call("InvalidateExternalTP", int, void)
         call("GetProvidedNamespaces", int, array(RdProvidedNamespace))
-        call("Dispose", int, void)
+        call("Dispose", array(int), void)
         call("GetCustomAttributes", structdef("GetCustomAttributesArgs") {
             field("EntityId", int)
             field("ProvidedEntityType", RdProvidedEntityType)
