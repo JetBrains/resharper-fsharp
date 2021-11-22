@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Tokenization
-open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -20,33 +19,6 @@ open JetBrains.ReSharper.Psi.Naming.Interfaces
 open JetBrains.ReSharper.Psi.Naming.Settings
 open JetBrains.Util
 
-module Traverse =
-    type TraverseStep =
-        | TupleItem of item: int
-
-    let makeTuplePatPath pat =
-        let rec tryMakePatPath path (IgnoreParenPat fsPattern: IFSharpPattern) =
-            match fsPattern.Parent with
-            | :? ITuplePat as tuplePat ->
-                let item = tuplePat.Patterns.IndexOf(fsPattern)
-                Assertion.Assert(item <> -1, "item <> -1")
-                tryMakePatPath (TupleItem(item) :: path) tuplePat
-            | _ -> fsPattern, path
-
-        tryMakePatPath [] pat
-
-    let rec tryTraverseExprPath (path: TraverseStep list) (IgnoreInnerParenExpr expr: IFSharpExpression) =
-        match path with
-        | [] -> expr
-        | step :: rest ->
-
-        match expr, step with
-        | :? ITupleExpr as tupleExpr, TupleItem(n) ->
-            let tupleItems = tupleExpr.Expressions
-            if tupleItems.Count <= n then null else
-            tryTraverseExprPath rest tupleItems.[n]
-
-        | _ -> null
 
 module FSharpNamingService =
     let getUsedNamesUsages
@@ -485,14 +457,14 @@ type FSharpNamingService(language: FSharpLanguage) =
         | _ -> EmptyList.Instance :> _
 
     member x.AddExtraNames(namesCollection: INamesCollection, fsPattern: IFSharpPattern) =
-        let pat, path = Traverse.makeTuplePatPath fsPattern
+        let pat, path = FSharpPatternUtil.ParentTraversal.makeTuplePatPath fsPattern
 
         let entryOptions =
             EntryOptions(subrootPolicy = SubrootPolicy.Decompose, emphasis = Emphasis.Good,
                          prefixPolicy = PredefinedPrefixPolicy.Remove)
 
         let addNamesForExpr expr =
-            match Traverse.tryTraverseExprPath path expr with
+            match FSharpPatternUtil.ParentTraversal.tryTraverseExprPath path expr with
             | null -> ()
             | expr -> namesCollection.Add(expr, entryOptions)
 

@@ -183,7 +183,7 @@ type UnionCasePatternRule() =
         if referenceName.IsQualified then None else
 
         let referencePat = ReferencePatNavigator.GetByReferenceName(referenceName)
-        let pat = skipParentOrPats referencePat
+        let pat, path = FSharpPatternUtil.ParentTraversal.makeTuplePatPath referencePat
         let matchClause = MatchClauseNavigator.GetByPattern(pat)
         let matchExpr = MatchExprNavigator.GetByClause(matchClause)
         if isNull matchExpr then None else
@@ -191,8 +191,66 @@ type UnionCasePatternRule() =
         let expr = matchExpr.Expression
         if isNull expr then None else
 
+        let rec tryToGetInnerExpr (IgnoreInnerParenExpr expr) path =
+            match path with
+            | [] -> Some(expr, [])
+            | step :: rest ->
+
+            match step, expr with
+            | FSharpPatternUtil.ParentTraversal.PatternParentTraverseStep.Tuple(i, _), (:? ITupleExpr as tupleExpr) ->
+                let tupleItems = tupleExpr.Expressions
+                if tupleItems.Count <= i then None else
+                tryToGetInnerExpr tupleItems.[i] rest
+
+            | FSharpPatternUtil.ParentTraversal.PatternParentTraverseStep.Or _, _ ->
+                tryToGetInnerExpr expr rest
+
+            | _ -> Some(expr, path)
+
+        let rec tryGetInnerType (fcsType: FSharpType) path =
+            match path with
+            | [] -> Some(fcsType, [])
+            | step :: rest ->
+
+            match step with
+            | FSharpPatternUtil.ParentTraversal.PatternParentTraverseStep.Tuple(i, _) ->
+                if not fcsType.IsTupleType then None else
+
+                let typeArguments = fcsType.GenericArguments
+                if typeArguments.Count <= i then None else
+
+                tryGetInnerType typeArguments.[i] rest
+
+            | _ -> Some(fcsType, path)
+
+        let innerExpr = tryToGetInnerExpr expr path
+        match innerExpr with
+        | None -> None
+        | Some(expr, path) ->
+
+        let expr = 
+            match expr with
+            | :? ITupleExpr as tupleExpr ->
+                tupleExpr.ExpressionsEnumerable.FirstOrDefault()
+                |> Option.ofObj
+                |> Option.defaultValue expr
+            | _ -> expr
+
         let fcsType = expr.TryGetFcsType()
-        if isNull fcsType || not fcsType.HasTypeDefinition then None else
+        if isNull fcsType then None else
+
+        let innerType = tryGetInnerType fcsType path
+        match innerType with
+        | None | Some(_, _ :: _) -> None
+        | Some(fcsType, _) ->
+
+        let fcsType =
+            if not fcsType.IsTupleType then fcsType else
+
+            let typeArguments = fcsType.GenericArguments
+            if typeArguments.Count <> 0 then typeArguments.[0] else fcsType
+
+        if not fcsType.HasTypeDefinition then None else
 
         let displayContext = expr.TryGetFcsDisplayContext()
         if isNull displayContext then None else
@@ -217,7 +275,7 @@ type UnionCasePatternRule() =
 
         let createItem fcsEntityInstance (fcsType: FSharpType) displayContext text matchesType (fcsUnionCase: FSharpUnionCase) =
             let info = UnionCasePatternInfo(text, fcsUnionCase, fcsEntityInstance, context, Ranges = context.Ranges)
-            let item = 
+            let item =
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->
                         let typeText = fcsType.Format(displayContext)
