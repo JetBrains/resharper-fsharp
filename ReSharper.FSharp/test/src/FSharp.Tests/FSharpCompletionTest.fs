@@ -44,6 +44,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Lambda - Pipe 02``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Pipe 03 - Parens``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - Enum - Matched type 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Enum - Rqa 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Enum - Rqa 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Enum 01 - Replace qualified``() = x.DoNamedTest()
