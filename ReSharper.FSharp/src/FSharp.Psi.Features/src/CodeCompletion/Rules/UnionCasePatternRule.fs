@@ -36,11 +36,11 @@ open JetBrains.UI.RichText
 module UnionCasePatternInfo =
     let [<Literal>] Id = "Union case pattern"
 
-type UnionCasePatternInfo(text, fcsUnionCase: FSharpUnionCase, fcsEntityInstance: FcsEntityInstance,
+type EnumCaseLikePatternInfo<'T when 'T :> FSharpSymbol>(text, symbol: 'T, fcsEntityInstance: FcsEntityInstance,
         context: FSharpCodeCompletionContext) =
     inherit TextualInfo(text, UnionCasePatternInfo.Id)
 
-    member val UnionCase = fcsUnionCase
+    member val Case = symbol
     member val EntityInstance = fcsEntityInstance
 
     interface IDescriptionProvidingLookupItem with
@@ -50,7 +50,7 @@ type UnionCasePatternInfo(text, fcsUnionCase: FSharpUnionCase, fcsEntityInstance
             | Some(checkResults) ->
 
             let _, range = context.ReparsedContext.TreeNode.TryGetFcsRange()
-            let toolTipText = checkResults.GetDescription(fcsUnionCase, fcsEntityInstance.Substitution, false, range)
+            let toolTipText = checkResults.GetDescription(symbol, fcsEntityInstance.Substitution, false, range)
 
             toolTipText
             |> FcsLookupCandidate.getOverloads
@@ -60,8 +60,16 @@ type UnionCasePatternInfo(text, fcsUnionCase: FSharpUnionCase, fcsEntityInstance
 
     override this.IsRiderAsync = false
 
-type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
-    inherit TextualBehavior<UnionCasePatternInfo>(info)
+
+type UnionCasePatternInfo(text, fcsUnionCase, fcsEntityInstance, context) =
+    inherit EnumCaseLikePatternInfo<FSharpUnionCase>(text, fcsUnionCase, fcsEntityInstance, context)
+
+
+type EnumCaseLikePatternBehavior<'T when 'T :> FSharpSymbol>(info: EnumCaseLikePatternInfo<'T>) =
+    inherit TextualBehavior<EnumCaseLikePatternInfo<'T>>(info)
+
+    abstract Deconstruct: IFSharpPattern * ITextControl * ISolution * IPsiServices -> unit
+    default this.Deconstruct(_, _, _, _) = ()
 
     override this.Accept(textControl, nameRange, _, _, solution, _) =
         use writeCookie = WriteLockCookie.Create(true)
@@ -81,9 +89,17 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
             use transactionCookie =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, UnionCasePatternInfo.Id)
 
-            FSharpPatternUtil.bindFcsSymbol pat info.UnionCase UnionCasePatternInfo.Id
+            FSharpPatternUtil.bindFcsSymbol pat info.Case UnionCasePatternInfo.Id
 
-        if not info.UnionCase.HasFields then () else
+        textControl.Caret.MoveTo(pat.GetNavigationRange().EndOffset, CaretVisualPlacement.DontScrollIfVisible)
+        this.Deconstruct(pat, textControl, solution, psiServices)
+
+
+type UnionCasePatternBehavior(info) =
+    inherit EnumCaseLikePatternBehavior<FSharpUnionCase>(info)
+
+    override this.Deconstruct(pat, textControl, solution, psiServices) =
+        if not info.Case.HasFields then () else
 
         let parametersOwnerPat = pat.As<IParametersOwnerPat>()
         if isNull parametersOwnerPat then () else
@@ -91,19 +107,19 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
         let pat = parametersOwnerPat.ParametersEnumerable.FirstOrDefault()
         if isNull pat then () else 
 
-        let fields = FSharpDeconstructionImpl.createUnionCaseFields pat info.UnionCase info.EntityInstance
+        let fields = FSharpDeconstructionImpl.createUnionCaseFields pat info.Case info.EntityInstance
         let fieldsDeconstruction: IFSharpDeconstruction =
-            DeconstructionFromUnionCaseFields(info.UnionCase.Name, fields) :> _
+            DeconstructionFromUnionCaseFields(info.Case.Name, fields) :> _
 
-        let singleField = Seq.tryExactlyOne info.UnionCase.Fields
+        let singleField = Seq.tryExactlyOne info.Case.Fields
 
-        let singleFieldDeconstruction = 
+        let singleFieldDeconstruction =
             singleField
             |> Option.map (fun fcsField -> fcsField.FieldType.Instantiate(info.EntityInstance.Substitution))
             |> Option.bind (FSharpDeconstruction.tryGetDeconstruction pat)
             |> Option.map (fun deconstruction -> singleField.Value.DisplayNameCore, deconstruction)
 
-        let fieldsDeconstructionText = 
+        let fieldsDeconstructionText =
             singleFieldDeconstruction
             |> Option.map (fun (name, _) -> $"Use named pattern for '{name}'")
             |> Option.defaultValue fieldsDeconstruction.Text
@@ -169,6 +185,7 @@ type UnionCasePatternBehavior(info: UnionCasePatternInfo) =
 
                 jetPopupMenu.PopupWindowContextSource <- textControl.PopupWindowContextFactory.ForCaret()))
 
+
 [<Language(typeof<FSharpLanguage>)>]
 type UnionCasePatternRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
@@ -179,7 +196,7 @@ type UnionCasePatternRule() =
         | null -> pat
         | orPat -> skipParentOrPats orPat
 
-    let getExpectedUnionType (referenceName: IExpressionReferenceName) =
+    let getExpectedUnionOrEnumType (referenceName: IExpressionReferenceName) =
         if referenceName.IsQualified then None else
 
         let referencePat = ReferencePatNavigator.GetByReferenceName(referenceName)
@@ -228,7 +245,7 @@ type UnionCasePatternRule() =
         | None -> None
         | Some(expr, path) ->
 
-        let expr = 
+        let expr =
             match expr with
             | :? ITupleExpr as tupleExpr ->
                 tupleExpr.ExpressionsEnumerable.FirstOrDefault()
@@ -256,7 +273,7 @@ type UnionCasePatternRule() =
         if isNull displayContext then None else
 
         let fcsEntity = getAbbreviatedEntity fcsType.TypeDefinition
-        if not fcsEntity.IsFSharpUnion then None else
+        if not (fcsEntity.IsFSharpUnion || fcsEntity.IsEnum) then None else
 
         Some (FcsEntityInstance.create fcsType, fcsType, displayContext)
 
@@ -273,14 +290,13 @@ type UnionCasePatternRule() =
         let reference = context.ReparsedContext.Reference :?> FSharpSymbolReference
         let referenceName = reference.GetElement() :?> IExpressionReferenceName
 
-        let createItem fcsEntityInstance (fcsType: FSharpType) displayContext text matchesType (fcsUnionCase: FSharpUnionCase) =
-            let info = UnionCasePatternInfo(text, fcsUnionCase, fcsEntityInstance, context, Ranges = context.Ranges)
+        let createItem info behavior (fcsType: FSharpType) displayContext matchesType =
             let item =
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->
                         let typeText = fcsType.Format(displayContext)
                         TextPresentation(info, typeText, matchesType, PsiSymbolsThemedIcons.EnumMember.Id) :> _)
-                    .WithBehavior(fun _ -> UnionCasePatternBehavior(info) :> _)
+                    .WithBehavior(fun _ -> behavior)
                     .WithMatcher(fun _ -> TextualMatcher(info) :> _)
                     .WithRelevance(CLRLookupItemRelevance.Methods)
 
@@ -290,45 +306,83 @@ type UnionCasePatternRule() =
 
             item
 
-        let expectedUnionType = getExpectedUnionType referenceName
+        let createUnionCaseItem (fcsEntityInstance: FcsEntityInstance) (returnType: FSharpType) displayContext name
+                symbol matchesType =
+            let fcsType = returnType.Instantiate(fcsEntityInstance.Substitution)
+            let info = UnionCasePatternInfo(name, symbol, fcsEntityInstance, context, Ranges = context.Ranges)
+            let behavior = UnionCasePatternBehavior(info)
+            createItem info behavior fcsType displayContext matchesType
+
+        let createEnumCaseItem (fcsEntityInstance: FcsEntityInstance) (returnType: FSharpType) displayContext name
+                symbol matchesType =
+            let fcsType = returnType.Instantiate(fcsEntityInstance.Substitution)
+            let info = EnumCaseLikePatternInfo(name, symbol, fcsEntityInstance, context, Ranges = context.Ranges)
+            let behavior = EnumCaseLikePatternBehavior(info)
+            createItem info behavior fcsType displayContext matchesType
+
+        let expectedType = getExpectedUnionOrEnumType referenceName
+
+        let matchesType (returnType: FSharpType) =
+            match expectedType with
+            | None -> false
+            | Some(fcsEntityInstance, _, _) ->
+
+            returnType.HasTypeDefinition &&
+            getAbbreviatedEntity returnType.TypeDefinition = fcsEntityInstance.Entity
 
         // todo: move the filtering to the item provider instead of hacky modification of the collection?
         let unionCaseItems = List()
         collector.RemoveWhere(fun item ->
-            match item with
-            | :? FcsLookupItem as lookupItem ->
-                // Replace provided items for union cases with special ones.
-                match lookupItem.FcsSymbol with
-                | :? FSharpUnionCase as fcsUnionCase ->
-                    let matchesType =
-                        match expectedUnionType with
-                        | None -> false
-                        | Some(fcsEntityInstance, _, _) ->
-                            let returnType = fcsUnionCase.ReturnType
-                            returnType.HasTypeDefinition && getAbbreviatedEntity returnType.TypeDefinition = fcsEntityInstance.Entity
+            let lookupItem = item.As<FcsLookupItem>()
+            if isNull lookupItem then false else
 
-                    // Expected type cases provided separately below: we don't know if they were provided by FCS.
-                    if not matchesType then
-                        let fcsType = fcsUnionCase.ReturnType.Instantiate(lookupItem.FcsSymbolUse.GenericArguments)
-                        let fcsEntityInstance = FcsEntityInstance.create fcsType
-                        let item = createItem fcsEntityInstance fcsType lookupItem.FcsSymbolUse.DisplayContext fcsUnionCase.Name false fcsUnionCase
-                        unionCaseItems.Add(item)
+            // Replace provided items for union cases with special ones.
+            // Expected type items provided separately below: we don't know if they were provided by FCS.
+            match lookupItem.FcsSymbol with
+            | :? FSharpUnionCase as fcsUnionCase ->
+                let returnType = fcsUnionCase.ReturnType
+                if not (matchesType returnType) then
+                    let text = fcsUnionCase.Name
+                    let fcsEntityInstance = FcsEntityInstance.create returnType
+                    let displayContext = lookupItem.FcsSymbolUse.DisplayContext
+                    let item = createUnionCaseItem fcsEntityInstance returnType displayContext text fcsUnionCase false
+                    unionCaseItems.Add(item)
 
-                    true
+                true
 
-                | _ -> false
+            | :? FSharpField as fcsField when FSharpSymbolUtil.isEnumMember fcsField ->
+                let fieldType = fcsField.FieldType
+                if not (matchesType fieldType) then
+                    let text = fcsField.Name
+                    let fcsEntityInstance = FcsEntityInstance.create fieldType
+                    let displayContext = lookupItem.FcsSymbolUse.DisplayContext
+                    let item = createEnumCaseItem fcsEntityInstance fieldType displayContext text fcsField false 
+                    unionCaseItems.Add(item)
+
+                true
+
             | _ -> false)
 
         unionCaseItems |> Seq.iter collector.Add
 
-        match expectedUnionType with
+        match expectedType with
         | None -> ()
         | Some(fcsEntityInstance, fcsType, displayContext) ->
-            let typeElement = fcsEntityInstance.Entity.GetTypeElement(context.NodeInFile.GetPsiModule())
+            let fcsEntity = fcsEntityInstance.Entity
+            let typeElement = fcsEntity.GetTypeElement(context.NodeInFile.GetPsiModule())
             let requiresQualifiedName = isNotNull typeElement && typeElement.RequiresQualifiedAccess()
             let typeName = typeElement.GetSourceName()
 
-            for fcsUnionCase in fcsEntityInstance.Entity.UnionCases do
-                let text = if requiresQualifiedName then $"{typeName}.{fcsUnionCase.Name}" else fcsUnionCase.Name
-                let item = createItem fcsEntityInstance fcsType displayContext text true fcsUnionCase
-                collector.Add(item)
+            if fcsEntity.IsFSharpUnion then
+                for fcsUnionCase in fcsEntity.UnionCases do
+                    let text = if requiresQualifiedName then $"{typeName}.{fcsUnionCase.Name}" else fcsUnionCase.Name
+                    let item = createUnionCaseItem fcsEntityInstance fcsType displayContext text fcsUnionCase true
+                    collector.Add(item)
+
+            elif fcsEntity.IsEnum then
+                for field in fcsEntity.FSharpFields do
+                    if not field.IsLiteral then () else
+
+                    let text = $"{typeName}.{field.Name}"
+                    let item = createEnumCaseItem fcsEntityInstance fcsType displayContext text field true
+                    collector.Add(item)
