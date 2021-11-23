@@ -25,6 +25,10 @@ let isValCompiledAsMethod (mfv: FSharpMemberOrFunctionOrValue) =
         Logger.LogExceptionSilently(e)
         false
 
+let isEnumMember (field: FSharpField) =
+    match field.DeclaringEntity with
+    | Some entity -> entity.IsEnum
+    | _ -> false
 
 [<CompiledName("GetReturnType")>]
 let getReturnType (symbol: FSharpSymbol) =

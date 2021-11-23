@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -20,13 +21,10 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
         | :? IParametersOwnerPat as p -> p.ReferenceName
         | _ -> null
 
-    match fcsSymbol with
-    | :? FSharpUnionCase as unionCase ->
+    let bind patternText =
         let factory = pattern.CreateElementFactory()
 
-        let name = FSharpKeywords.AddBackticksToIdentifierIfNeeded unionCase.Name
-        let text = if unionCase.HasFields then $"({name} _)" else $"({name})" // todo: remove parens, escape in factory
-        let newPattern = factory.CreatePattern(text, false) :?> IParenPat
+        let newPattern = factory.CreatePattern(patternText, false) :?> IParenPat
         let pat = ModificationUtil.ReplaceChild(pattern, newPattern.Pattern) // todo: move to reference binding
 
         let referenceName = getReferenceName pat
@@ -50,6 +48,17 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
             addOpens reference typeElement |> ignore
 
         pat
+    
+    match fcsSymbol with
+    | :? FSharpUnionCase as unionCase ->
+        let name = FSharpKeywords.AddBackticksToIdentifierIfNeeded unionCase.Name
+        let text = if unionCase.HasFields then $"({name} _)" else $"({name})" // todo: remove parens, escape in factory
+        bind text
+
+    | :? FSharpField as field when FSharpSymbolUtil.isEnumMember field ->
+        let name = FSharpKeywords.AddBackticksToIdentifierIfNeeded field.Name
+        let text = $"({name})"
+        bind text
 
     | _ -> failwith $"Unexpected symbol: {fcsSymbol}"
 
