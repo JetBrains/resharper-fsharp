@@ -9,23 +9,45 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Util
+open JetBrains.ReSharper.Resources.Shell
+
+let getReferenceName (pattern: IFSharpPattern) =
+    // todo: unify interface
+    match pattern with
+    | :? IReferencePat as refPat -> refPat.ReferenceName
+    | :? IParametersOwnerPat as p -> p.ReferenceName
+    | _ -> null
+
+let toParameterOwnerPat (pat: IFSharpPattern) opName =
+    use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
+    use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(pat.GetPsiServices(), opName)
+
+    match pat with
+    | :? IReferencePat as refPat ->
+        use writeLock = WriteLockCookie.Create(pat.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
+
+        let referenceName = refPat.ReferenceName.NotNull()
+        let factory = pat.CreateElementFactory()
+        let newPattern = factory.CreatePattern("(__ _)", false) :?> IParenPat
+        let newPat = ModificationUtil.ReplaceChild(refPat, newPattern.Pattern) :?> IParametersOwnerPat
+        ModificationUtil.ReplaceChild(newPat.ReferenceName, referenceName) |> ignore
+        newPat
+    | _ -> failwith $"Unexpected pattern: {pat}"
 
 // todo: replace Fcs symbols with R# elements when possible
 let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
-    let getReferenceName (pattern: IFSharpPattern) =
-        // todo: unify interface
-        match pattern with
-        | :? IReferencePat as refPat -> refPat.ReferenceName
-        | :? IParametersOwnerPat as p -> p.ReferenceName
-        | _ -> null
-
-    let bind patternText =
+    // todo: move to reference binding
+    let bind name =
         let factory = pattern.CreateElementFactory()
 
-        let newPattern = factory.CreatePattern(patternText, false) :?> IParenPat
-        let pat = ModificationUtil.ReplaceChild(pattern, newPattern.Pattern) // todo: move to reference binding
+        let name = FSharpKeywords.AddBackticksToIdentifierIfNeeded name
+        let newPattern = factory.CreatePattern(name, false)
+        let pat = ModificationUtil.ReplaceChild(pattern, newPattern)
 
         let referenceName = getReferenceName pat
 
@@ -50,16 +72,8 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
         pat
     
     match fcsSymbol with
-    | :? FSharpUnionCase as unionCase ->
-        let name = FSharpKeywords.AddBackticksToIdentifierIfNeeded unionCase.Name
-        let text = if unionCase.HasFields then $"({name} _)" else $"({name})" // todo: remove parens, escape in factory
-        bind text
-
-    | :? FSharpField as field when FSharpSymbolUtil.isEnumMember field ->
-        let name = FSharpKeywords.AddBackticksToIdentifierIfNeeded field.Name
-        let text = $"({name})"
-        bind text
-
+    | :? FSharpUnionCase as unionCase -> bind unionCase.Name
+    | :? FSharpField as field when FSharpSymbolUtil.isEnumMember field -> bind field.Name
     | _ -> failwith $"Unexpected symbol: {fcsSymbol}"
 
 let rec ignoreParentAsPatsFromRight (pat: IFSharpPattern) =

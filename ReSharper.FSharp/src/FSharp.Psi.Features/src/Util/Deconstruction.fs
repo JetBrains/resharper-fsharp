@@ -304,8 +304,9 @@ type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase,
         let pat = FSharpPatternUtil.bindFcsSymbol pat fcsUnionCase opName
         if not hasFields then pat, null, [] else
 
-        let pat = ParenPatUtil.addParensIfNeeded pat
-        let parametersOwnerPat = pat :?> IParametersOwnerPat
+        let parametersOwnerPat = FSharpPatternUtil.toParameterOwnerPat pat opName
+        let pat = ParenPatUtil.addParensIfNeeded parametersOwnerPat
+        let parametersOwnerPat = pat.IgnoreInnerParens() :?> IParametersOwnerPat
         parametersOwnerPat :> _, ModificationUtil.ReplaceChild(parametersOwnerPat.Parameters.[0], pattern), names
 
 
