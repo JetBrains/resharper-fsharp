@@ -23,6 +23,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> myGluingCache =
       new ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool>();
 
+    private static readonly NodeTypeSet InterpolatedStringStartOrMiddleParts =
+      new NodeTypeSet(FSharpTokenType.REGULAR_INTERPOLATED_STRING_START,
+        FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE,
+        FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START,
+        FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE,
+        FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_START,
+        FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE);
+
+    private static readonly NodeTypeSet InterpolatedStringMiddleOrEndParts =
+      new NodeTypeSet(FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE,
+        FSharpTokenType.REGULAR_INTERPOLATED_STRING_END,
+        FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE,
+        FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END,
+        FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE,
+        FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END);
+
     public FSharpCodeFormatter(FSharpLanguage language, CodeFormatterRequirements requirements,
       FSharpFormatterInfoProvider formatterInfoProvider) : base(language, requirements)
     {
@@ -105,6 +121,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     private static bool AreTokensGlued(FormatterImplHelper.TokenTypePair key)
     {
+      if (InterpolatedStringStartOrMiddleParts[key.Type1] || InterpolatedStringMiddleOrEndParts[key.Type2])
+        return false;
+
       var lexer = new FSharpLexer(new StringBuffer(key.Type1.GetSampleText() + key.Type2.GetSampleText()));
       return lexer.LookaheadToken(1) == null;
     }
