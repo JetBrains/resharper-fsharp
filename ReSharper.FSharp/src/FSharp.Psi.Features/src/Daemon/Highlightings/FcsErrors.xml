@@ -119,9 +119,9 @@
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
     <QuickFix>AddIgnoreFix</QuickFix>
     <QuickFix>IntroduceVarFix</QuickFix>
-    <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
   </Error>
 
   <Warning compilerGroup="FSharpErrors" name="TypeTestUnnecessary" ID="FS0067: Type test is unnecessary">
