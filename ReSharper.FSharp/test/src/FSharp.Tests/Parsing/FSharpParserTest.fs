@@ -15,6 +15,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Module - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Anon 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module - Multiple 01 - XmlDoc``() = x.DoNamedTest()
+
     [<Test>] member x.``Module - Nested - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Nested - XmlDoc 02``() = x.DoNamedTest()
     [<Test>] member x.``Module - Nested - XmlDoc 03``() = x.DoNamedTest()
@@ -136,11 +138,12 @@ type FSharpParserTest() =
     [<Test>] member x.``Let - Local - Parameters 02``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local - Upper case 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local - Upper case 02 - Parameters``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Local - XmlDoc 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Local - XmlDoc 02 - In method``() = x.DoNamedTest()
 
     [<Test>] member x.``Let - Local 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local 02 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local 03 - Typed expr``() = x.DoNamedTest()
-    [<Test>] member x.``Let - Local 04 - XmlDoc``() = x.DoNamedTest()
 
     [<Test>] member x.``Let - Top 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Top 02 - Upper case``() = x.DoNamedTest()

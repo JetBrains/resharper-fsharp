@@ -75,41 +75,6 @@ let rangeStartPosMin (range1: range) (range2: range) =
 let rangeStartMin (range1: range) (range2: range) =
     if Position.posLt range1.Start range2.Start then range1 else range2
 
-
-let xmlDocOwnerStartRange (xmlDoc: XmlDoc) (ownerRange: range) =
-    if xmlDoc.IsEmpty then ownerRange
-    else rangeStartMin ownerRange xmlDoc.Range
-
-let attrOwnerStartRange (attrLists: SynAttributeList list) (xmlDoc: XmlDoc) (ownerRange: range) =
-    match attrLists with
-    | { Range = attrsRange } :: _ ->
-        if xmlDoc.IsEmpty then
-            rangeStartMin attrsRange ownerRange
-        else
-            rangeStartMin xmlDoc.Range (rangeStartMin attrsRange ownerRange)
-
-    | _ ->
-        xmlDocOwnerStartRange xmlDoc ownerRange
-
-let typeDefnGroupStartRange (bindings: SynTypeDefn list) (range: Range) =
-    match bindings with
-    | SynTypeDefn(typeInfo = SynComponentInfo(xmlDoc = XmlDoc xmlDoc)) :: _ ->
-        xmlDocOwnerStartRange xmlDoc range
-    | _ -> range
-
-let typeSigGroupStartRange (bindings: SynTypeDefnSig list) (range: Range) =
-    match bindings with
-    | SynTypeDefnSig(typeInfo = SynComponentInfo(xmlDoc = XmlDoc xmlDoc)) :: _ ->
-        xmlDocOwnerStartRange xmlDoc range
-    | _ -> range
-
-let letBindingGroupStartRange (bindings: SynBinding list) (range: Range) =
-    match bindings with
-    | SynBinding(attributes = attrs; xmlDoc = XmlDoc xmlDoc) :: _ ->
-        attrOwnerStartRange attrs xmlDoc range
-    | _ -> range
-
-
 let rec skipGeneratedLambdas expr =
     match expr with
     | SynExpr.Lambda(_, true, _, bodyExpr, _, _, _) ->

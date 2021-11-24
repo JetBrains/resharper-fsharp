@@ -122,17 +122,16 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         while x.CurrentOffset < maxOffset && x.TokenType != tokenType && not x.Eof do
             x.AdvanceLexer()
 
-    member x.MarkXmlDocOwner(xmlDoc: XmlDoc, expectedType: TokenNodeType, declarationRange: range, markXmlDoc: bool) =
-        let range = xmlDocOwnerStartRange xmlDoc declarationRange
-        x.AdvanceToTokenOrRangeStart(expectedType, range)
+    member x.MarkXmlDocOwner(xmlDoc: XmlDoc, expectedType: TokenNodeType, declarationRange: range) =
+        x.AdvanceToTokenOrRangeStart(expectedType, declarationRange)
         let mark = x.Mark()
-        if not xmlDoc.IsEmpty && markXmlDoc then
+        if not xmlDoc.IsEmpty then
             x.MarkAndDone(xmlDoc.Range, FSharpTokenType.XML_DOC_BLOCK)
         mark
 
     member x.Mark(xmlDoc: XmlDoc, declarationRange: range) =
         if xmlDoc.IsEmpty then x.Mark()
-        else x.MarkXmlDocOwner(xmlDoc, null, declarationRange, true)
+        else x.MarkXmlDocOwner(xmlDoc, null, declarationRange)
 
     member x.ProcessReferenceName(lid: Ident list) =
         if lid.IsEmpty then () else
@@ -217,7 +216,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
     member x.StartTopLevelDeclaration(lid: LongIdent, attrs: SynAttributes, moduleKind, xmlDoc: XmlDoc, range) =
         match lid with
-        | IdentRange idRange as id :: _ ->
+        | IdentRange idRange :: _ ->
             let mark =
                 match moduleKind with
                 | SynModuleOrNamespaceKind.AnonModule ->
@@ -226,15 +225,16 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                 | _ when attrs.IsEmpty ->
                     // Ast namespace range starts after its identifier,
                     // we try to locate the keyword followed by access modifiers.
-                    let keywordTokenType =
-                        match moduleKind with
-                        | SynModuleOrNamespaceKind.NamedModule -> FSharpTokenType.MODULE
-                        | SynModuleOrNamespaceKind.DeclaredNamespace -> FSharpTokenType.NAMESPACE
-                        | _ -> null
-                    x.MarkXmlDocOwner(xmlDoc, keywordTokenType, idRange, true)
+                    match moduleKind with
+                    | SynModuleOrNamespaceKind.NamedModule ->
+                        x.MarkXmlDocOwner(xmlDoc, null, range)
+                    | SynModuleOrNamespaceKind.DeclaredNamespace ->
+                        x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.NAMESPACE, idRange)
+                    | _ ->
+                        x.MarkXmlDocOwner(xmlDoc, null, idRange)
 
                 | _ ->
-                    x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, Some id, range)
+                    x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
 
             if moduleKind <> SynModuleOrNamespaceKind.AnonModule then
                 x.ProcessReferenceNameSkipLast(lid)
@@ -261,25 +261,13 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         if mark.IsSome then
             x.Done(mark.Value, elementType)
 
-    member x.MarkAndProcessAttributesOrIdOrRange(attrs: SynAttributes, xmlDoc: XmlDoc, id: Ident option, range: range) =
+    /// Process xmlDoc and attrbiutes
+    member x.MarkAndProcessIntro(attrs: SynAttributes, xmlDoc: XmlDoc, tokenType: TokenNodeType, range: range) =
+        let mark = x.MarkXmlDocOwner(xmlDoc, tokenType, range)
         match attrs with
-             | attrList :: _ ->
-                 let mark = x.MarkXmlDocOwner(xmlDoc, null, attrList.Range, true)
-                 x.ProcessAttributeLists(attrs)
-                 mark
-
-             | _ ->
-                 let minDeclOrIdRange =
-                     match id with
-                     | Some(IdentRange idRange) ->
-                         rangeStartMin idRange range
-                     | None ->
-                         range
-
-                 if xmlDoc.IsEmpty then
-                     x.Mark(minDeclOrIdRange)
-                 else
-                    x.MarkXmlDocOwner(xmlDoc, null, minDeclOrIdRange, true)
+        | [] -> ()
+        | _ -> x.ProcessAttributeLists(attrs)
+        mark
 
     member x.ProcessOpenDeclTarget(openDeclTarget, range) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
@@ -290,20 +278,14 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessType(typeName)
         x.Done(range, mark, ElementType.OPEN_STATEMENT)
 
-    member x.StartException(SynExceptionDefnRepr(_, unionCase, _, XmlDoc xmlDoc, _, range)) =
+    member x.StartException(SynExceptionDefnRepr(_, unionCase, _, XmlDoc xmlDoc, _, _), exnRange) =
         let (SynUnionCase(caseType = unionCaseType)) = unionCase
-        let mark = x.MarkXmlDocOwner(xmlDoc, null, range, true)
+        let mark = x.MarkXmlDocOwner(xmlDoc, null, exnRange)
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION)
         mark
 
     member x.StartType(attrs: SynAttributes, xmlDoc, typeParams: SynTyparDecls option, constraints, lid: LongIdent, range, typeTokenType) =
-        let startRange =
-            match attrs with
-            | attrList :: _ -> attrList.Range
-            | _ -> range
-
-        let mark = x.MarkXmlDocOwner(xmlDoc, typeTokenType, startRange, true)
-        x.ProcessAttributeLists(attrs)
+        let mark = x.MarkAndProcessIntro(attrs, xmlDoc, typeTokenType, range)
 
         if not lid.IsEmpty then
             let id = lid.Head
@@ -388,10 +370,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             let representationMark = x.Mark(range)
 
             if not fields.IsEmpty then
-                let SynField(range = firstFieldRange) as firstField = fields.Head
+                let SynField(range = firstFieldRange) = fields.Head
                 let (SynField(range = lastFieldRange)) = List.last fields
 
-                let fieldListMark = x.MarkXmlDocOwner(firstField.XmlDoc, null, firstFieldRange, false)
+                let fieldListMark = x.Mark(firstFieldRange)
 
                 for field in fields do
                     x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
@@ -400,22 +382,14 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.Done(range, representationMark, ElementType.RECORD_REPRESENTATION)
 
         | SynTypeDefnSimpleRepr.Enum(cases, range) ->
-            let representationMark =
-                match cases with
-                | [] -> x.Mark(range)
-                | SynEnumCase(_, _, _, _, XmlDoc xmlDoc, _) :: _ ->
-                    x.MarkXmlDocOwner(xmlDoc, null, range, false)
+            let representationMark = x.Mark(range)
 
             for case in cases do
                 x.ProcessEnumCase case
             x.Done(representationMark, ElementType.ENUM_REPRESENTATION)
 
         | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
-            let representationMark =
-                match cases with
-                | [] -> x.Mark(range)
-                | SynUnionCase(_, _, _, XmlDoc xmlDoc, _, _) :: _ ->
-                    x.MarkXmlDocOwner(xmlDoc, null, range, false)
+            let representationMark = x.Mark(range)
 
             for case in cases do
                 x.ProcessUnionCase(case)
@@ -437,7 +411,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | _ -> failwithf "Unexpected simple type representation: %A" repr
 
     member x.ProcessUnionCase(SynUnionCase(attrs, _, caseType, XmlDoc xmlDoc, _, range)) =
-        let mark = x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.BAR, range, true)
+        let mark = x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.BAR, range)
         x.ProcessAttributeLists(attrs)
         x.ProcessUnionCaseType(caseType, ElementType.UNION_CASE_FIELD_DECLARATION)
         x.Done(range, mark, ElementType.UNION_CASE_DECLARATION)
@@ -485,13 +459,13 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
-    member x.ProcessEnumCase(SynEnumCase(attrs, _, _, _, XmlDoc xmlDoc, range)) =
-        let mark = x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.BAR, range, true)
+    member x.ProcessEnumCase(SynEnumCase(attrs, _, _, _, _, XmlDoc xmlDoc, range)) =
+        let mark = x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.BAR, range)
         x.ProcessAttributeLists(attrs)
         x.Done(range, mark, ElementType.ENUM_CASE_DECLARATION)
 
-    member x.ProcessField(SynField(attrs, _, id, synType, _, XmlDoc xmlDoc, _, range)) elementType =
-        let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, id, range)
+    member x.ProcessField(SynField(attrs, _, _, synType, _, XmlDoc xmlDoc, _, range)) elementType =
+        let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
         x.ProcessType(synType)
         x.Done(range, mark, elementType)
 
