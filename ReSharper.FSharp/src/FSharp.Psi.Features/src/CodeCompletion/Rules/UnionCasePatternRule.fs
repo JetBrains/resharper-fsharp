@@ -99,13 +99,7 @@ type UnionCasePatternBehavior(info) =
     inherit EnumCaseLikePatternBehavior<FSharpUnionCase>(info)
 
     override this.Deconstruct(pat, textControl, solution, psiServices) =
-        if not info.Case.HasFields then () else
-
-        let parametersOwnerPat = pat.As<IParametersOwnerPat>()
-        if isNull parametersOwnerPat then () else
-
-        let pat = parametersOwnerPat.ParametersEnumerable.FirstOrDefault()
-        if isNull pat then () else 
+        if not info.Case.HasFields || not (pat :? IReferencePat) then () else
 
         let fields = FSharpDeconstructionImpl.createUnionCaseFields pat info.Case info.EntityInstance
         let fieldsDeconstruction: IFSharpDeconstruction =
@@ -124,19 +118,21 @@ type UnionCasePatternBehavior(info) =
             |> Option.map (fun (name, _) -> $"Use named pattern for '{name}'")
             |> Option.defaultValue fieldsDeconstruction.Text
 
-        let deconstruct (deconstruction: IFSharpDeconstruction) =
-            use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
+        let deconstruct (deconstruction: IFSharpDeconstruction) (parametersOwnerPat: IParametersOwnerPat) =
+            use writeCookie = WriteLockCookie.Create(parametersOwnerPat.IsPhysical())
             use cookie =
-                CompilationContextCookie.GetOrCreate(pat.GetPsiModule().GetContextFromModule())
+                CompilationContextCookie.GetOrCreate(parametersOwnerPat.GetPsiModule().GetContextFromModule())
             use transactionCookie =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, UnionCasePatternInfo.Id)
 
+            let pat = parametersOwnerPat.ParametersEnumerable.FirstOrDefault()
             let action = FSharpDeconstruction.deconstruct false parametersOwnerPat deconstruction pat
             if isNotNull action then
                 action.Invoke(textControl)
 
         if Shell.Instance.IsTestShell then
-            deconstruct fieldsDeconstruction else
+            let pat = FSharpPatternUtil.toParameterOwnerPat pat UnionCasePatternInfo.Id
+            deconstruct fieldsDeconstruction pat else
 
         solution.Locks.ExecuteOrQueueReadLockEx(solution.GetLifetime(), UnionCasePatternInfo.Id, fun _ ->
             let jetPopupMenus = solution.GetComponent<JetPopupMenus>()
@@ -180,8 +176,12 @@ type UnionCasePatternBehavior(info) =
                     textControlLockLifetimeDefinition.Terminate()
                     psiServices.Files.AssertAllDocumentAreCommitted()
 
+                    let pat = FSharpPatternUtil.toParameterOwnerPat pat UnionCasePatternInfo.Id
                     if isNotNull deconstruction then
-                        deconstruct deconstruction)
+                        deconstruct deconstruction pat
+                    else
+                        let endOffset = pat.GetNavigationRange().EndOffset
+                        textControl.Caret.MoveTo(endOffset, CaretVisualPlacement.DontScrollIfVisible))
 
                 jetPopupMenu.PopupWindowContextSource <- textControl.PopupWindowContextFactory.ForCaret()))
 
