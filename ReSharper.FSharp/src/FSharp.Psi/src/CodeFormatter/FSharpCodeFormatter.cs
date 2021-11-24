@@ -39,6 +39,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE,
         FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END);
 
+    private static readonly NodeTypeSet LeftBraceStartNodes =
+      new NodeTypeSet(FSharpTokenType.LBRACE, FSharpTokenType.LBRACE_BAR);
+
+    private static readonly NodeTypeSet RightBraceEndNodes =
+      new NodeTypeSet(FSharpTokenType.RBRACE, FSharpTokenType.BAR_RBRACE);
+
     public FSharpCodeFormatter(FSharpLanguage language, CodeFormatterRequirements requirements,
       FSharpFormatterInfoProvider formatterInfoProvider) : base(language, requirements)
     {
@@ -121,8 +127,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     private static bool AreTokensGlued(FormatterImplHelper.TokenTypePair key)
     {
-      if (InterpolatedStringStartOrMiddleParts[key.Type1] || InterpolatedStringMiddleOrEndParts[key.Type2])
-        return false;
+      if (InterpolatedStringStartOrMiddleParts[key.Type1])
+        return LeftBraceStartNodes[key.Type2];
+
+      if (InterpolatedStringMiddleOrEndParts[key.Type2])
+        return RightBraceEndNodes[key.Type1];
 
       var lexer = new FSharpLexer(new StringBuffer(key.Type1.GetSampleText() + key.Type2.GetSampleText()));
       return lexer.LookaheadToken(1) == null;

@@ -26,6 +26,7 @@ type InlineVarTest() =
     [<Test>] member x.``Expr - Lambda - Type cast 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match - If 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match - If 02``() = x.DoNamedTest()
+    [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Expr - Record - Interpolation 01``() = x.DoNamedTest()
     [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Expr - Ref - Interpolation 01``() = x.DoNamedTest()
     [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Expr - Ref - Interpolation 02 - Qualifier``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Ref - Operator 01``() = x.DoNamedTest()
