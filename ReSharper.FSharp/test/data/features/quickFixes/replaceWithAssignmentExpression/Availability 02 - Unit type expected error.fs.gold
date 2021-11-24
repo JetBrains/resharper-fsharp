@@ -10,6 +10,6 @@ let f(): unit =
 but here has type
     'bool'    
 QUICKFIXES:
+Replace with '<-' assignment
 Ignore value
 Introduce 'let' binding
-Replace with '<-' assignment
