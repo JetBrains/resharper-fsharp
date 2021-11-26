@@ -193,12 +193,22 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``Backspace - Record - Definition 01``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Record - Definition 02``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Record - Definition 03 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Record - Definition 04 - Empty line 01``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Record - Definition 05 - Empty line 02``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Record - Instance 01``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Record - Instance 02 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Record - Instance 03 - Empty line``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Record - Anonymous 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Delete - Record - Definition 01``() = x.DoNamedTest()
     [<Test>] member x.``Delete - Record - Definition 02``() = x.DoNamedTest()
+    [<Test>] member x.``Delete - Record - Definition 03 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Delete - Record - Definition 04 - Empty line 01``() = x.DoNamedTest()
+    [<Test>] member x.``Delete - Record - Definition 05 - Empty line 02``() = x.DoNamedTest()
     [<Test>] member x.``Delete - Record - Instance 01``() = x.DoNamedTest()
+    [<Test>] member x.``Delete - Record - Instance 02 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Delete - Record - Instance 03 - Empty line``() = x.DoNamedTest()
     [<Test>] member x.``Delete - Record - Anonymous 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
