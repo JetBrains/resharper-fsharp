@@ -1229,8 +1229,12 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             |> Seq.pairwise
             |> Seq.tryFind (fun (_, second) -> second.GetTreeStartOffset().Offset = offset)
             |> Option.map (fun (prev, next) ->
-                this.DeleteRecordAttributesWhitespaces(textControl, next)
-                this.TryDeleteRecordFieldWhitespaces(textControl, prev, next))
+                let newlinesCount = this.GetNewlinesCountBetweenNodes(prev, next)
+                if newlinesCount = 0 then false else
+                if newlinesCount = 1 then
+                    this.DeleteRecordAttributesWhitespaces(textControl, next)
+                    this.TryMoveNextRecordFieldToPrevFieldLine(textControl, prev, next)
+                else this.TryMoveNextRecordFieldToPrevEmptyLine(textControl, next))
             |> Option.defaultValue false
 
         let processRecordBinding (bindings: IRecordFieldBindingList) =
@@ -1238,7 +1242,10 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             |> Seq.pairwise
             |> Seq.tryFind (fun (_, second) -> second.GetTreeStartOffset().Offset = offset)
             |> Option.map (fun (prev, next) ->
-                this.TryDeleteRecordFieldWhitespaces(textControl, prev, next))
+                let newlinesCount = this.GetNewlinesCountBetweenNodes(prev, next)
+                if newlinesCount = 0 then false else
+                if newlinesCount = 1 then this.TryMoveNextRecordFieldToPrevFieldLine(textControl, prev, next)
+                else this.TryMoveNextRecordFieldToPrevEmptyLine(textControl, next))
             |> Option.defaultValue false
 
         let declarations = token.GetContainingNode<IRecordFieldDeclarationList>()
@@ -1279,8 +1286,10 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             |> Seq.tryFind (fun (first, second) ->
                 offset >= first.GetTreeEndOffset().Offset && offset < second.GetTreeStartOffset().Offset)
             |> Option.map (fun (prev, next) ->
+                let newlinesCount = this.GetNewlinesCountBetweenNodes(prev, next)
+                if newlinesCount <> 1 then false else
                 this.DeleteRecordAttributesWhitespaces(textControl, next)
-                this.TryDeleteRecordFieldWhitespaces(textControl, prev, next))
+                this.TryMoveNextRecordFieldToPrevFieldLine(textControl, prev, next))
             |> Option.defaultValue false
 
         let processRecordBinding (bindings: IRecordFieldBindingList) =
@@ -1289,7 +1298,9 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             |> Seq.tryFind (fun (first, second) ->
                 offset >= first.GetTreeEndOffset().Offset && offset < second.GetTreeStartOffset().Offset)
             |> Option.map (fun (prev, next) ->
-                this.TryDeleteRecordFieldWhitespaces(textControl, prev, next))
+                let newlinesCount = this.GetNewlinesCountBetweenNodes(prev, next)
+                if newlinesCount <> 1 then false else
+                this.TryMoveNextRecordFieldToPrevFieldLine(textControl, prev, next))
             |> Option.defaultValue false
 
         let declarations = token.GetContainingNode<IRecordFieldDeclarationList>()
@@ -1313,12 +1324,38 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             textControl.Document.ReplaceText(replaceRange, replacement)
             removalOffset <- removalOffset - (replaceRange.Length - replacement.Length))
 
-    member x.TryDeleteRecordFieldWhitespaces(textControl: ITextControl, prev: ITreeNode, next: ITreeNode) =
-        let newlineExists =
-            TreeNodeExtensions.NextTokens prev
-            |> Seq.takeWhile ((!=) next)
-            |> Seq.exists (getTokenType >> (==) FSharpTokenType.NEW_LINE)
-        if not newlineExists then false else
+    member x.GetTokensBetweenNodes(fromNode: ITreeNode, toNode: ITreeNode) =
+        TreeNodeExtensions.NextTokens fromNode.LastChild
+        |> Seq.takeWhile (fun token -> token.GetTreeStartOffset().Offset <> toNode.GetTreeStartOffset().Offset)
+
+    member x.GetNewlinesCountBetweenNodes(fromNode: ITreeNode, toNode: ITreeNode): int =
+        this.GetTokensBetweenNodes(fromNode, toNode)
+        |> Seq.filter (getTokenType >> (==) FSharpTokenType.NEW_LINE)
+        |> Seq.length
+
+    member x.TryMoveNextRecordFieldToPrevEmptyLine(textControl: ITextControl, next: ITreeNode) =
+        let currentIndentToken = next.PrevSibling
+        if (currentIndentToken.GetTokenType() != FSharpTokenType.WHITESPACE) then false else
+
+        let prevNewline = currentIndentToken.PrevSibling
+        let afterPrevPrevNewline =
+            prevNewline
+            |> TreeNodeExtensions.PrevTokens
+            |> Seq.takeWhile (getTokenType >> (!=) FSharpTokenType.NEW_LINE)
+
+        if (afterPrevPrevNewline |> Seq.exists (TokenNodeExtensions.IsWhitespaceToken >> not)) then false else
+        let prevPrevNewline =
+            afterPrevPrevNewline
+            |> Seq.rev
+            |> Seq.tryHead
+            |> Option.map (fun token -> token.PrevSibling)
+            |> Option.defaultValue prevNewline.PrevSibling
+
+        let replaceRange = TextRange(prevPrevNewline.GetTreeStartOffset().Offset, prevNewline.GetTreeStartOffset().Offset)
+        textControl.Document.ReplaceText(replaceRange, "")
+        true
+
+    member x.TryMoveNextRecordFieldToPrevFieldLine(textControl: ITextControl, prev: ITreeNode, next: ITreeNode) =
         let replaceRange = TextRange(prev.GetTreeEndOffset().Offset, next.GetTreeStartOffset().Offset)
         textControl.Document.ReplaceText(replaceRange, "; ")
         true
