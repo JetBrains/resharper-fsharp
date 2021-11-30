@@ -218,7 +218,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       var key = string.Join(",", args.Select(t => $"{t.Assembly.FullName} {t.FullName}"));
 
       var argIds = args
-        .Cast<ProxyProvidedType>()
+        .Cast<IRdProvidedEntity>()
         .Select(t => t.EntityId)
         .ToArray();
 

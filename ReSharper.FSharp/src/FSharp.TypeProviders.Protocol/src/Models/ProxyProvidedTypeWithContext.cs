@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
+using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -9,12 +11,13 @@ using static FSharp.Compiler.ExtensionTyping;
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
   [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-  public class ProxyProvidedTypeWithContext : ProvidedType
+  public class ProxyProvidedTypeWithContext : ProvidedType, IRdProvidedEntity
   {
     private readonly ProvidedType myProvidedType;
 
     private ProxyProvidedTypeWithContext(ProvidedType providedType, ProvidedTypeContext context) : base(null, context)
     {
+      Assertion.Assert(providedType is IRdProvidedEntity, "providedType is IRdProvidedEntity");
       myProvidedType = providedType;
     }
 
@@ -154,5 +157,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public override bool GetHasTypeProviderEditorHideMethodsAttribute(ITypeProvider tp) =>
       myProvidedType.GetHasTypeProviderEditorHideMethodsAttribute(tp);
+
+    public int EntityId => myProvidedType is IRdProvidedEntity entity ? entity.EntityId : ProvidedConst.DefaultId;
+    public RdProvidedEntityType EntityType => RdProvidedEntityType.TypeInfo;
   }
 }
