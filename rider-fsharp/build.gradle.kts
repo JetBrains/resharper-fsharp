@@ -11,12 +11,10 @@ import java.net.URI
 
 buildscript {
     repositories {
-        maven { setUrl("https://cache-redirector.jetbrains.com/www.myget.org/F/rd-snapshots/maven") }
         maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
     }
     dependencies {
-        // https://www.myget.org/feed/rd-snapshots/package/maven/com.jetbrains.rd/rd-gen
-        classpath("com.jetbrains.rd:rd-gen:0.212.307")
+        classpath("com.jetbrains.rd:rd-gen:2021.3.4")
     }
 }
 
