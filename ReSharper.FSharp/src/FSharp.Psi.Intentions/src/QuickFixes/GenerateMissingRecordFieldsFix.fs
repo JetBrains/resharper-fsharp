@@ -23,7 +23,7 @@ open JetBrains.ReSharper.Resources.Shell
 type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
     inherit FSharpQuickFixBase()
 
-    let maxItemsCountOnSingleLine = 4
+    let maxBindingsAmountOnSingleLine = 4
 
     let addSemicolon (binding: IRecordFieldBinding) =
         if isNull binding.Semicolon then
@@ -70,15 +70,12 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let isSingleLine = recordExpr.IsSingleLine
 
         let generateSingleLine =
-            existingBindings.Count > 1 && fieldNames.Count <= maxItemsCountOnSingleLine && isSingleLine
+            existingBindings.Count > 1 && fieldNames.Count <= maxBindingsAmountOnSingleLine && isSingleLine
 
         if isSingleLine && not generateSingleLine && existingBindings.Count > 0 then
             ToMultilineRecord.Execute(recordExpr)
 
         let areBindingsOrdered = x.AreBindingsOrdered existingBindings (fieldNames |> Array.ofSeq)
-
-        if generateSingleLine && not existingBindings.IsEmpty then
-            addSemicolon (existingBindings.Last())
 
         let generatedBindings =
             if areBindingsOrdered && not existingBindings.IsEmpty then
@@ -150,6 +147,9 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         (fieldsToAdd: HashSet<string>) (elementFactory: IFSharpElementFactory) : seq<IRecordFieldBinding> =
 
         let generatedBindings = LinkedList<IRecordFieldBinding>()
+
+        if generateSingleLine && not existingBindings.IsEmpty then
+            addSemicolon (existingBindings.Last())
 
         let anchorBindingList =
             match existingBindings.LastOrDefault() with

@@ -1,0 +1,3 @@
+﻿type R = { A: int; B: int; C: int }
+
+let r = { C = 3; A = 1; B = {selstart}failwith "todo"{selend} }
