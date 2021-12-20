@@ -1,0 +1,11 @@
+// ${COMPLETE_ITEM:Aa}
+module Module
+
+type U1 =
+    | Aa
+
+type U2 =
+    | Aa
+
+match U1.Aa with
+| U2.A{caret}

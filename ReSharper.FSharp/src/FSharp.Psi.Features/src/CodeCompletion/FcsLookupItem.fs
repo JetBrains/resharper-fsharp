@@ -101,6 +101,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
     override x.DisableFormatter = true
 
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
+        use writeCookie = WriteLockCookie.Create(true)
         use pinCheckResultsCookie = textControl.GetFSharpFile(solution).PinTypeCheckResults(true, Id)
         base.Accept(textControl, nameRange, insertType, suffix, context.PsiModule.GetSolution(), keepCaretStill)
 
@@ -139,7 +140,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
         // todo: getting reference owner in parse errors, e.g. unfinished `if`
 
         let referenceOwner = fsFile.GetNode<IFSharpReferenceOwner>(offset)
-        if not referenceOwner.Reference.IsQualified then
+        if isNotNull referenceOwner && not referenceOwner.Reference.IsQualified then
             if isNotNull referenceOwner && isNotNull typeElement then
                 let clrDeclaredElement: IClrDeclaredElement =
                     // todo: other elements: union cases

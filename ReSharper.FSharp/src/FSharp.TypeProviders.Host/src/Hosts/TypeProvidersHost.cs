@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
@@ -61,20 +63,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
         .CreateRdModels(myTypeProvidersContext.ProvidedNamespaceRdModelsCreator, entityId);
     }
 
-    private Unit Dispose(int typeProviderId)
+    private void Dispose(int typeProviderId)
     {
-      if (myTypeProvidersContext.TypeProvidersCache.Contains(typeProviderId))
-      {
-        myTypeProvidersContext.ProvidedConstructorsCache.Remove(typeProviderId);
-        myTypeProvidersContext.ProvidedMethodsCache.Remove(typeProviderId);
-        myTypeProvidersContext.ProvidedPropertyCache.Remove(typeProviderId);
-        myTypeProvidersContext.ProvidedAssembliesCache.Remove(typeProviderId);
-        myTypeProvidersContext.ProvidedTypesCache.Remove(typeProviderId);
-        myTypeProvidersContext.TypeProvidersCache.Remove(typeProviderId);
-      }
-
-      return Unit.Instance;
+      myTypeProvidersContext.ProvidedConstructorsCache.Remove(typeProviderId);
+      myTypeProvidersContext.ProvidedMethodsCache.Remove(typeProviderId);
+      myTypeProvidersContext.ProvidedPropertyCache.Remove(typeProviderId);
+      myTypeProvidersContext.ProvidedAssembliesCache.Remove(typeProviderId);
+      myTypeProvidersContext.ProvidedTypesCache.Remove(typeProviderId);
+      myTypeProvidersContext.TypeProvidersCache.Remove(typeProviderId);
     }
+
+    private RdTask<Unit> Dispose(Lifetime lifetime, int[] providerIds) =>
+      lifetime.Start(myTypeProvidersContext.TaskScheduler, () =>
+      {
+        foreach (var providerId in providerIds) Dispose(providerId);
+      }).ToRdTask();
 
     private InstantiationResult InstantiateTypeProvidersOfAssembly(InstantiateTypeProvidersOfAssemblyParameters @params,
       RdTypeProviderProcessModel processModel)
@@ -89,21 +92,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
 
       foreach (var typeProvider in typeProviders)
       {
-        if (myTypeProvidersContext.TypeProvidersCache.TryGetInfo(typeProvider, envKey, out var info))
+        if (myTypeProvidersContext.TypeProvidersCache.TryGetInfo(typeProvider, envKey, out var key))
         {
-          if (info.isInvalidated) Dispose(info.key);
-          else
-          {
-            cachedIds.Add(info.key);
-            continue;
-          }
+          cachedIds.Add(key);
+          continue;
         }
 
         var typeProviderRdModel =
           myTypeProvidersContext.TypeProviderRdModelsCreator.CreateRdModel(typeProvider, envKey);
 
         typeProvider.Invalidate += (_, __) =>
-          processModel.Proto.Scheduler.Queue(() => processModel.Invalidate.Fire(typeProviderRdModel!.EntityId));
+        {
+          var tpId = typeProviderRdModel.EntityId;
+          Dispose(tpId);
+          processModel.Proto.Scheduler.Queue(() => processModel.Invalidate.Fire(tpId));
+        };
 
         rdTypeProviders.Add(typeProviderRdModel);
       }

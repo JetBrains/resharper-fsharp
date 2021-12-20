@@ -1,0 +1,8 @@
+// ${COMPLETE_ITEM:E.A}
+module Module
+
+type E =
+    | A = 1
+
+match E.A with
+| {caret}

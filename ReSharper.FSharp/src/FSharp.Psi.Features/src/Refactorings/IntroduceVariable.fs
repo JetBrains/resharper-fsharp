@@ -696,10 +696,10 @@ type FSharpIntroduceVarHelper() =
                 let occurrences =
                     let computationText = getOccurrenceText computationType "' computation with let!"
                     let valueText = getOccurrenceText fcsType "' value"
-                    [ WorkflowPopupMenuOccurrence(valueText, null, (fcsType, false))
-                      WorkflowPopupMenuOccurrence(computationText, null, (computationType, true)) ]
+                    [| WorkflowPopupMenuOccurrence(valueText, null, (fcsType, false))
+                       WorkflowPopupMenuOccurrence(computationText, null, (computationType, true)) |]
 
-                let selectedOccurrence = workflow.ShowOccurrences(occurrences.AsArray(), context)
+                let selectedOccurrence = workflow.ShowOccurrences(occurrences, context)
                 if isNull selectedOccurrence then None else
                     Some(selectedOccurrence.Entities.FirstOrDefault())
 
@@ -736,11 +736,12 @@ type FSharpIntroduceVarHelper() =
         | None -> true
         | Some(deconstruction) ->
 
-        let occurrences = 
-            [ WorkflowPopupMenuOccurrence(RichText("Bind value"), null, null)
-              WorkflowPopupMenuOccurrence(RichText(deconstruction.Text), null, deconstruction) ]
+        let occurrences =
+            let valueText = getOccurrenceText boundType "' value"
+            [| WorkflowPopupMenuOccurrence(valueText, null, null)
+               WorkflowPopupMenuOccurrence(RichText(deconstruction.Text), null, deconstruction) |]
 
-        let selectedOccurrence = workflow.ShowOccurrences(occurrences.AsArray(), context)
+        let selectedOccurrence = workflow.ShowOccurrences(occurrences, context)
         if isNull selectedOccurrence then false else
 
         data.Deconstruction <- selectedOccurrence.Entities.FirstOrDefault()
