@@ -118,7 +118,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         (declaredFields: string[]) (elementFactory: IFSharpElementFactory): seq<IRecordFieldBinding> =
 
         let generatedBindings = LinkedList<IRecordFieldBinding>()
-        let indexedBindings = x.CreatedIndexedBindings existingBindings declaredFields
+        let indexedBindings = x.CreateIndexedBindings existingBindings declaredFields
 
         for fieldIndex in [0..(declaredFields.Length - 1)] do
             let declaredField = declaredFields[fieldIndex]
@@ -189,7 +189,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
         ordered
 
-    member private x.CreatedIndexedBindings (bindings: IRecordFieldBinding[])
+    member private x.CreateIndexedBindings (bindings: IRecordFieldBinding[])
         (declaredFields: string[]): IRecordFieldBinding[] =
 
         let bindingsIndexed = Array.init declaredFields.Length (fun _ -> null)
