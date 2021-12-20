@@ -14,6 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
   public class ProxyProvidedTypeWithContext : ProvidedType, IRdProvidedEntity
   {
     private readonly ProvidedType myProvidedType;
+    private IRdProvidedEntity RdProvidedEntity => (IRdProvidedEntity)myProvidedType;
 
     private ProxyProvidedTypeWithContext(ProvidedType providedType, ProvidedTypeContext context) : base(null, context)
     {
@@ -158,7 +159,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public override bool GetHasTypeProviderEditorHideMethodsAttribute(ITypeProvider tp) =>
       myProvidedType.GetHasTypeProviderEditorHideMethodsAttribute(tp);
 
-    public int EntityId => myProvidedType is IRdProvidedEntity entity ? entity.EntityId : ProvidedConst.DefaultId;
-    public RdProvidedEntityType EntityType => RdProvidedEntityType.TypeInfo;
+    public int EntityId => RdProvidedEntity.EntityId;
+    public RdProvidedEntityType EntityType => RdProvidedEntity.EntityType;
   }
 }
