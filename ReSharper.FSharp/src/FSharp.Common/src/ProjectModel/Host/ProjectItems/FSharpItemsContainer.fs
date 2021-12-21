@@ -212,8 +212,16 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
             | FSharpProjectMark ->
                 let itemsByName = CompactOneToListMap()
                 for rdProject in msBuildProject.RdProjects do
+                    let itemFilter = filterProvider.CreateItemFilter(rdProject, projectDescriptor)
+
+                    let isAllowedItem (item: RdProjectItem) =
+                        match item.ItemType with
+                        | CompileBefore | CompileAfter -> true
+                        | itemType -> not (itemFilter.FilterByItemType(itemType, item.IsImported()))
+
                     for rdItem in rdProject.Items do
-                        itemsByName.AddValue(rdItem.EvaluatedInclude, rdItem.ItemType)
+                        if isAllowedItem rdItem then
+                            itemsByName.AddValue(rdItem.EvaluatedInclude, rdItem.ItemType)
 
                 let compileBeforeItems = getItems msBuildProject projectDescriptor isCompileBefore itemsByName true
                 let compileAfterItems = getItems msBuildProject projectDescriptor isCompileAfter itemsByName true
