@@ -43,11 +43,23 @@ type FSharpCompilerWarningProcessor() =
             let configuration = getConfiguration file
             if isNull configuration then info else
 
+            let props = configuration.PropertiesCollection
+
             let mutable warningIsError = false
             if configuration.TreatWarningsAsErrors then
-                warningIsError <- true
+                match Seq.tryExactlyOne compilerIds with
+                | Some("FS1182") ->
+                    let otherFlags = props.GetReadOnlyValueSafe(FSharpProperties.OtherFlags)
+                    if isNotNull otherFlags && otherFlags.Contains("--warnon:1182") then
+                        warningIsError <- true
+                    else
+                        let warnOn = props.GetReadOnlyValueSafe(FSharpProperties.WarnOn)
+                        let warnOn = parseCompilerIds warnOn
+                        if not (warnOn.IsEmpty()) && Seq.exists warnOn.Contains compilerIds then
+                            warningIsError <- true
 
-            let props = configuration.PropertiesCollection
+                | _ -> warningIsError <- true
+
             let warningsAsErrors = props.GetReadOnlyValueSafe(MSBuildProjectUtil.WarningsAsErrorsProperty)
             let warningsAsErrors = parseCompilerIds warningsAsErrors
 
