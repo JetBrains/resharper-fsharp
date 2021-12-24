@@ -197,6 +197,7 @@ module FSharpProperties =
     let [<Literal>] LangVersion = "LangVersion"
     let [<Literal>] FscToolPath = "FscToolPath"
     let [<Literal>] DotnetFscCompilerPath = "DotnetFscCompilerPath"
+    let [<Literal>] WarnOn = "WarnOn"
 
 
 [<ShellComponent>]
@@ -207,7 +208,8 @@ type FSharpProjectPropertiesRequest() =
            FSharpProperties.NoWarn
            FSharpProperties.LangVersion
            FSharpProperties.FscToolPath
-           FSharpProperties.DotnetFscCompilerPath |]
+           FSharpProperties.DotnetFscCompilerPath
+           FSharpProperties.WarnOn |]
 
     interface IProjectPropertiesRequest with
         member x.RequestedProperties = properties :> _
