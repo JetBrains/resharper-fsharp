@@ -1,36 +1,32 @@
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Threading;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
-  public class FSharpModuleResolvedSymbols : IFSharpModuleResolvedSymbols
+  public class FcsModuleResolvedSymbols
   {
     private readonly FcsFileResolvedSymbols[] myFileResolvedSymbols;
-
-    public IPsiModule PsiModule { get; }
-    public FcsCheckerService CheckerService { get; }
-    public IFcsProjectProvider FcsProjectProvider { get; }
-
     private readonly JetFastSemiReenterableRWLock myLock = new JetFastSemiReenterableRWLock();
 
-    public FSharpModuleResolvedSymbols(IPsiModule psiModule, int filesCount, FcsCheckerService checkerService,
-      IFcsProjectProvider fcsProjectProvider)
+    [CanBeNull] public FcsProject FcsProject { get; }
+
+    public static readonly FcsModuleResolvedSymbols Empty = new FcsModuleResolvedSymbols(null);
+
+    public FcsModuleResolvedSymbols([CanBeNull] FcsProject fcsProject)
     {
+      var filesCount = fcsProject?.ParsingOptions.SourceFiles.Length ?? 0;
       myFileResolvedSymbols = new FcsFileResolvedSymbols[filesCount];
 
-      PsiModule = psiModule;
-      CheckerService = checkerService;
-      FcsProjectProvider = fcsProjectProvider;
+      FcsProject = fcsProject;
     }
 
     public void Invalidate(IPsiSourceFile sourceFile)
     {
       using (myLock.UsingWriteLock())
       {
-        var fileIndex = FcsProjectProvider.GetFileIndex(sourceFile);
-        if (fileIndex == -1)
+        if (FcsProject == null || !FcsProject.FileIndices.TryGetValue(sourceFile.GetLocation(), out var fileIndex))
           return;
 
         var filesCount = myFileResolvedSymbols.Length;
@@ -47,7 +43,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public IFcsFileResolvedSymbols GetResolvedSymbols(IPsiSourceFile sourceFile)
     {
-      var fileIndex = FcsProjectProvider.GetFileIndex(sourceFile);
+      if (FcsProject == null || !FcsProject.FileIndices.TryGetValue(sourceFile.GetLocation(), out var fileIndex))
+        return EmptyFcsFileResolvedSymbols.Instance;
+
       var fileResolvedSymbols = TryGetResolvedSymbols(fileIndex);
       if (fileResolvedSymbols != null)
         return fileResolvedSymbols;
@@ -58,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         if (fileResolvedSymbols != null)
           return fileResolvedSymbols;
 
-        fileResolvedSymbols = new FcsFileResolvedSymbols(sourceFile, CheckerService);
+        fileResolvedSymbols = new FcsFileResolvedSymbols(sourceFile);
         myFileResolvedSymbols[fileIndex] = fileResolvedSymbols;
       }
 
@@ -67,6 +65,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void Invalidate()
     {
+      if (FcsProject == null)
+        return;
+
       using (myLock.UsingWriteLock())
         for (var i = 0; i < myFileResolvedSymbols.Length; i++)
           myFileResolvedSymbols[i] = null;

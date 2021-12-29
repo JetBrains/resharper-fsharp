@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
-using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -31,12 +30,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly object myLock = new object();
 
     [NotNull] public IPsiSourceFile SourceFile { get; }
-    [NotNull] public FcsCheckerService CheckerService { get; }
 
-    public FcsFileResolvedSymbols([NotNull] IPsiSourceFile sourceFile, [NotNull] FcsCheckerService checkerService)
+    public FcsFileResolvedSymbols([NotNull] IPsiSourceFile sourceFile)
     {
       SourceFile = sourceFile;
-      CheckerService = checkerService;
     }
 
     private ResolvedSymbols GetResolvedSymbols()

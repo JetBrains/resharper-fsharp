@@ -87,11 +87,15 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         checkerService.InvalidateFcsProject(fcsProject.ProjectOptions)
         getReferencingModules psiModule |> Seq.iter invalidateFcsProject
 
+        for referencedPsiModule in fcsProject.ReferencedModules do
+            match tryGetValue referencedPsiModule referencedModules with
+            | None -> ()
+            | Some referencedModule ->
+                referencedModule.ReferencingModules.Remove(referencedPsiModule) |> ignore
+
         referencedModules.Remove(psiModule) |> ignore
         fcsProjects.Remove(psiModule) |> ignore
-
         projectsPsiModules.Remove(psiModule.ContainingProjectModule, psiModule) |> ignore
-
         dirtyModules.Remove(psiModule) |> ignore
 
         // todo: remove removed psiModules? (don't we remove them anyway?) (standalone projects only?)
