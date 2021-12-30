@@ -45,6 +45,7 @@ type FcsErrorsHighlightingTest() =
     [<Test>] member x.``Rule never matched 01``() = x.DoNamedTest()
     [<Test>] member x.``Rule never matched 02 - Function``() = x.DoNamedTest()
 
+    // todo: add test with different F# levels
     [<Test>] member x.``Undefined indexer 01``() = x.DoNamedTest()
     [<Test>] member x.``Undefined indexer 02 - Undefined id``() = x.DoNamedTest()
     [<Test>] member x.``Undefined indexer 03 - Item Id``() = x.DoNamedTest()

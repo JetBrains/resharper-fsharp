@@ -30,11 +30,6 @@ let getUpcastRange (upcastExpr: IUpcastExpr) =
     else
         DocumentRange.InvalidRange
 
-let getIndexerArgListRange (indexerExpr: IItemIndexerExpr) =
-    match indexerExpr.IndexerArgList with
-    | null -> indexerExpr.GetHighlightingRange()
-    | argList -> argList.GetHighlightingRange()
-
 let getAsPatternRange (asPat: IAsPat) =
     if isValid asPat && isValid asPat.LeftPattern && isValid asPat.AsKeyword then
         getTreeNodesDocumentRange asPat.LeftPattern asPat.AsKeyword

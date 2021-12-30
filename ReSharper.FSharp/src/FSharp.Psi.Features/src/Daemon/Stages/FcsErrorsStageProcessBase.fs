@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 type IIgnoredHighlighting =
@@ -203,8 +204,20 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let isUndefinedIndexerText =
                 endsWith undefinedIndexerMessageSuffix message || endsWith undefinedGetSliceMessageSuffix message
 
-            if isUndefinedIndexerText && isNotNull (fsFile.GetNode<IItemIndexerExpr>(range)) then
-                UndefinedIndexerError(fsFile.GetNode(range)) :> _ else
+            let tryGetIndexerExpr (range: DocumentRange): ITreeNode option =
+                let indexerExpr = fsFile.GetNode<IItemIndexerExpr>(range)
+                if isNotNull indexerExpr && isNotNull indexerExpr.IndexerArgList then
+                    Some(indexerExpr.IndexerArgList) else
+
+                let appExpr = (fsFile.GetNode<IPrefixAppExpr>(range))
+                if isNotNull appExpr && appExpr.ArgumentExpression :? IListExpr then
+                    Some(appExpr.ArgumentExpression) else
+
+                None
+
+            match isUndefinedIndexerText, tryGetIndexerExpr range with
+            | true, Some(treeNode) -> UndefinedIndexerError(treeNode) :> _
+            | _ ->
 
             let identifier = fsFile.GetNode(range)
             let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)

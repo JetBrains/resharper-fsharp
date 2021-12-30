@@ -206,8 +206,8 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UndefinedIndexer" ID="FS0039: Undefined indexer">
-    <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
-    <Range>getIndexerArgListRange indexerExpr</Range>
+    <Parameter type="ITreeNode" name="indexerNode"/>
+    <Range>indexerNode.GetHighlightingRange()</Range>
     <Message value="Cannot apply indexing to an expression"/>
     <Behavour overlapResolvePolicy="NONE"/>
   </Error>
