@@ -10,6 +10,7 @@
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Cannot access explicit implementation of 'IDisposable.Dispose'
+M:Module.T.System#IDisposable#Dispose
 M:Module.T.#ctor
 M:Module.T.System#IDisposable#Dispose
 M:Module.T.System#IDisposable#Dispose
