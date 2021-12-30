@@ -262,7 +262,7 @@ let isAfterEmptyLine (node: ITreeNode) =
     let prevNonWhitespace = skipMatchingNodesBefore isInlineSpace node
     let prevPrevNonWhiteSpace = skipMatchingNodesBefore isInlineSpace prevNonWhitespace
 
-    prevNonWhitespace != prevPrevNonWhiteSpace &&
+    (prevNonWhitespace != prevPrevNonWhiteSpace || isNotNull prevNonWhitespace && isNull prevNonWhitespace.PrevSibling) &&
     prevNonWhitespace :? NewLine && (isNull prevPrevNonWhiteSpace || prevPrevNonWhiteSpace :? NewLine)
 
 let isFirstChildOrAfterEmptyLine (node: ITreeNode) =

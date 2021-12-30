@@ -13,6 +13,7 @@ type ImportTypeTest() =
     override x.RelativeTestDataPath = "features/quickFixes/importType"
 
     [<Test>] member x.``Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type 02 - Empty line``() = x.DoNamedTest()
     [<Test>] member x.``Type extension 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Generic List 01``() = x.DoNamedTest()
