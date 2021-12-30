@@ -71,7 +71,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
 
             | FSharpXmlDoc.FromXmlFile (dllFile, memberName) ->
                 getIndex dllFile
-                |> Option.map (fun index -> index.GetXml(memberName))
+                |> Option.map (fun index -> index.GetXml(memberName) |> fst)
                 |> Option.defaultValue null
 
             | FSharpXmlDoc.None -> null
