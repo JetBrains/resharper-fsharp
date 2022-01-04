@@ -1,0 +1,119 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Intentions.Tests</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Intentions.Tests</AssemblyName>
+    <JetTestProject>true</JetTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src\ZoneMarker.fs" />
+    <Compile Include="src\ErrorAttributes.fs" />
+    <Compile Include="src\Daemon\AssemblyReaderTest.fs" />
+    <Compile Include="src\Daemon\FSharpHighlightingTestBase.fs" />
+    <Compile Include="src\Daemon\IdentifierHighlightingTest.fs" />
+    <Compile Include="src\Daemon\FcsErrorsHighlightingTest.fs" />
+    <Compile Include="src\Daemon\ErrorsHighlightingTest.fs" />
+    <Compile Include="src\Daemon\FormatSpecifiersHighlightingTest.fs" />
+    <Compile Include="src\Daemon\InferredTypeCodeVisionProviderTest.fs" />
+    <Compile Include="src\Daemon\PipeChainTypeHintStageTest.fs" />
+    <Compile Include="src\Daemon\InheritanceGutterMarksTest.fs" />
+    <Compile Include="src\Daemon\SyntaxHighlightingTest.fs" />
+    <Compile Include="src\Daemon\RedundantParenExprTest.fs" />
+    <Compile Include="src\Daemon\RedundantParenPatTest.fs" />
+    <Compile Include="src\Daemon\RedundantParenTypeUsageTest.fs" />
+    <Compile Include="src\Daemon\StringAnalyzerTest.fs" />
+    <Compile Include="src\Daemon\RedundantAttributeParensTest.fs" />
+    <Compile Include="src\Daemon\RedundantAttributeSuffixAnalyzerTest.fs" />
+    <Compile Include="src\Daemon\FSharpColorHighlightingTest.fs" />
+    <Compile Include="src\Daemon\RedundantQualifiersTest.fs" />
+    <Compile Include="src\Daemon\AppExprAnalyzerTest.fs" />
+    <Compile Include="src\Daemon\LambdaAnalyzerTest.fs" />
+    <Compile Include="src\Daemon\InterpolatedStringCandidateTest.fs" />
+    <Compile Include="src\Daemon\IfExpressionAnalyzerTest.fs" />
+    <Compile Include="src\Intentions\IntentionsTestBase.fs" />
+    <Compile Include="src\Intentions\ToRecursiveLetBindings.fs" />
+    <Compile Include="src\Intentions\ToMultilineRecordTest.fs" />
+    <Compile Include="src\Intentions\ToRecursiveModuleActionTest.fs" />
+    <Compile Include="src\Intentions\ToModuleNamespaceActionTest.fs" />
+    <Compile Include="src\Intentions\InvertIfTest.fs" />
+    <Compile Include="src\Intentions\ElifToIfTest.fs" />
+    <Compile Include="src\Intentions\IfToElifTest.fs" />
+    <Compile Include="src\Intentions\NegateConditionTest.fs" />
+    <Compile Include="src\Intentions\ToMutableTest.fs" />
+    <Compile Include="src\Intentions\SpecifyTypesTest.fs" />
+    <Compile Include="src\Intentions\ToLiteralTest.fs" />
+    <Compile Include="src\Intentions\LetToUseTest.fs" />
+    <Compile Include="src\Intentions\RenameFileToMatchTypeNameTest.fs" />
+    <Compile Include="src\Intentions\DeconstructPatternTest.fs" />
+    <Compile Include="src\QuickFixes\FSharpQuickFixTestBase.fs" />
+    <Compile Include="src\QuickFixes\ReplaceUseWithLetTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithWildPatTest.fs" />
+    <Compile Include="src\QuickFixes\AddIgnoreTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedNamedAsPatTest.fs" />
+    <Compile Include="src\QuickFixes\GenerateMissingRecordFieldsTest.fs" />
+    <Compile Include="src\QuickFixes\ToRecursiveLetBindingsTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveInlineTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantBackticksTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnnecessaryUpcastTest.fs" />
+    <Compile Include="src\QuickFixes\ToRecursiveFunctionTest.fs" />
+    <Compile Include="src\QuickFixes\AddParensTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveSubsequentTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantNewTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedLocalBindingTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLetWithExpressionTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedOpensTest.fs" />
+    <Compile Include="src\QuickFixes\ToUpcastTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveNeverMatchingRuleTest.fs" />
+    <Compile Include="src\QuickFixes\IntroduceVarTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnexpectedArgumentsTest.fs" />
+    <Compile Include="src\QuickFixes\ImportTypeTest.fs" />
+    <Compile Include="src\QuickFixes\ToMutableTest.fs" />
+    <Compile Include="src\QuickFixes\AddUnderscorePrefixFixTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAttributeParensTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAttributeSuffixTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithAssignmentExpressionTest.fs" />
+    <Compile Include="src\QuickFixes\AddMatchAllClauseFixTest.fs" />
+    <Compile Include="src\QuickFixes\ToAbstractFixTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveYieldTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantQualifierTest.fs" />
+    <Compile Include="src\QuickFixes\AddExtensionAttributeTest.fs" />
+    <Compile Include="src\QuickFixes\AddParensToApplicationTest.fs" />
+    <Compile Include="src\QuickFixes\NamespaceToModuleTest.fs" />
+    <Compile Include="src\QuickFixes\SimplifyListConsPatTest.fs" />
+    <Compile Include="src\QuickFixes\SimplifyLambdaTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLambdaWithInnerExpressionTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLambdaWithBuiltinFunctionTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLambdaBodyWithIdTest.fs" />
+    <Compile Include="src\QuickFixes\GenerateInterfaceMembersFixTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAttributeTest.fs" />
+    <Compile Include="src\QuickFixes\ConvertTupleToArrayOrListElementsFixTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithAbbreviatedTypeTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantParens.fs" />
+    <Compile Include="src\QuickFixes\AddParensToTypedLikeExprTest.fs" />
+    <Compile Include="src\QuickFixes\SpecifyParameterTypeTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithInterpolatedStringTest.fs" />
+    <Compile Include="src\QuickFixes\UseWildSelfIdTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithPredefinedOperatorTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveCtorTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceIfWithConditionOperandTest.fs" />
+    <Compile Include="src\QuickFixes\AddInstanceMemberSelfIdTest.fs" />
+    <Compile Include="src\QuickFixes\ToStaticMemberTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithTypeRefExprTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAsPatTest.fs" />
+    <Compile Include="src\QuickFixes\DeconstructPatternFixTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithRegularStringFixTest.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\FSharp.Psi.Daemon\FSharp.Psi.Daemon.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj" />
+    <ProjectReference Include="..\FSharp.Tests.Common\FSharp.Tests.Common.fsproj" />
+  </ItemGroup>
+
+  <Import Project="$(PlatformSdkSubplatform)" Condition="Exists('$(PlatformSdkSubplatform)')" />
+  <Import Project="$(PsiFeaturesTestSubplatform)" Condition="Exists('$(PsiFeaturesTestSubplatform)')" />
+  <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
+</Project>

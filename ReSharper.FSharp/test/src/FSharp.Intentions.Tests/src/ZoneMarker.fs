@@ -1,6 +1,7 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions
 
 open System.Threading
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.TestFramework
 open NUnit.Framework
@@ -11,3 +12,6 @@ do()
 [<SetUpFixture>]
 type PsiFeaturesTestEnvironmentAssembly() =
     inherit ExtensionTestEnvironmentAssembly<IFSharpTestsZone>()
+
+module ForceAssemblyReference =
+    let _ = FSharpErrorsStage.redundantParensEnabledKey

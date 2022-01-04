@@ -35,6 +35,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Psi.Daemon", "src\FS
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Psi.Intentions", "src\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj", "{12E28B8B-CB6E-4620-B438-013C93ACC734}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Intentions.Tests", "test\src\FSharp.Intentions.Tests\FSharp.Intentions.Tests.fsproj", "{24E8C927-A6E4-48DB-B548-DEEEE808EC4E}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests.Common", "test\src\FSharp.Tests.Common\FSharp.Tests.Common.fsproj", "{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +101,14 @@ Global
 		{12E28B8B-CB6E-4620-B438-013C93ACC734}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12E28B8B-CB6E-4620-B438-013C93ACC734}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12E28B8B-CB6E-4620-B438-013C93ACC734}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24E8C927-A6E4-48DB-B548-DEEEE808EC4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24E8C927-A6E4-48DB-B548-DEEEE808EC4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24E8C927-A6E4-48DB-B548-DEEEE808EC4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24E8C927-A6E4-48DB-B548-DEEEE808EC4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -116,5 +128,7 @@ Global
 		{B41F2443-4F46-4571-8C49-CFB0EADD5F65} = {2E19336B-3133-4C1A-8E65-E2F7C465663B}
 		{92CA923A-5889-4B0F-8A89-5310042F9FEF} = {2E19336B-3133-4C1A-8E65-E2F7C465663B}
 		{12E28B8B-CB6E-4620-B438-013C93ACC734} = {2E19336B-3133-4C1A-8E65-E2F7C465663B}
+		{24E8C927-A6E4-48DB-B548-DEEEE808EC4E} = {7B41BA27-ACA5-43D2-9EBA-2E604D63A4E2}
+		{B5A9B84B-B69B-4DCD-863A-989023EAEF8C} = {7B41BA27-ACA5-43D2-9EBA-2E604D63A4E2}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Tests.Common</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Tests.Common</AssemblyName>
+    <JetTestProject>true</JetTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src\Common.fs" />
+    <Compile Include="src\Stubs.fs" />
+    <Compile Include="src\ZoneMarker.fs" />
+    <Compile Include="src\TestWithTwoProjectsBase.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
+    <PackageReference Include="Moq" Version="4.8.2" />
+    <PackageReference Include="NUnit.Console" Version="3.10.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\FSharp.Common\FSharp.Common.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
+    <ProjectReference Include="..\..\..\src\FSharp.Psi\FSharp.Psi.csproj" />
+    <ProjectReference Include="..\..\..\src\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <Import Project="$(PlatformSdkSubplatform)" Condition="Exists('$(PlatformSdkSubplatform)')" />
+  <Import Project="$(PsiFeaturesTestSubplatform)" Condition="Exists('$(PsiFeaturesTestSubplatform)')" />
+  <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
+</Project>
