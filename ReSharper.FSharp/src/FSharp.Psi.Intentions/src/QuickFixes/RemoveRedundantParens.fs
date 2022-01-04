@@ -4,13 +4,13 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI

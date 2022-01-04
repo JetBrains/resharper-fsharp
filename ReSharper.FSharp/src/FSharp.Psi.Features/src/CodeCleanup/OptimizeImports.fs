@@ -3,7 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCleanup.OptimizeImpor
 open JetBrains.ReSharper.Daemon.CSharp.CodeCleanup
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.Util
@@ -24,7 +24,7 @@ type FSharpOptimizeImports() =
 
         member this.Process(sourceFile, _, _, _, _) =
             sourceFile.GetPsiServices().Transactions.Execute("Code cleanup", fun _ ->
-                let unusedOpens = UnusedOpensStageProcess.getUnusedOpens sourceFile.FSharpFile EmptyAction.Instance
+                let unusedOpens = UnusedOpensUtil.getUnusedOpens sourceFile.FSharpFile EmptyAction.Instance
                 Array.iter OpensUtil.removeOpen unusedOpens) |> ignore
 
         member this.SetDefaultSetting(_, _) = ()

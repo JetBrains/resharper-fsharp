@@ -153,6 +153,8 @@
     <ProjectReference Include="..\..\..\src\FSharp.Common\FSharp.Common.fsproj" />
     <ProjectReference Include="..\..\..\src\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\..\..\src\FSharp.Psi\FSharp.Psi.csproj" />
+    <ProjectReference Include="..\..\..\src\FSharp.Psi.Daemon\FSharp.Psi.Daemon.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj" />
     <ProjectReference Include="..\..\..\src\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
   </ItemGroup>
 

@@ -6,10 +6,15 @@ open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.UI.RichText
 
@@ -60,3 +65,25 @@ type IFSharpQuickFixUtilComponent =
     inherit IQuickFixUtilComponent
 
     abstract BindTo: FSharpSymbolReference * ITypeElement -> FSharpSymbolReference
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpQuickFixUtilComponent() =
+    let [<Literal>] FcsOpName = "FSharpQuickFixUtilComponent.BindTo"
+
+    member x.BindTo(reference: FSharpSymbolReference, typeElement: ITypeElement) =
+        let referenceOwner = reference.GetElement()
+        use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
+
+        FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, typeElement)
+        if FSharpResolveUtil.resolvesToQualified typeElement reference false FcsOpName then reference else
+
+        addOpens reference typeElement
+
+    interface IFSharpQuickFixUtilComponent with
+        member x.BindTo(reference, typeElement, _, _) =
+            x.BindTo(reference :?> _, typeElement) :> _
+
+        member x.AddImportsForExtensionMethod(reference, _) = reference
+
+        member this.BindTo(reference, typeElement) =
+            this.BindTo(reference :?> _, typeElement)
