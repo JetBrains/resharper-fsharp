@@ -100,6 +100,7 @@ let operatorPrecedence (binaryApp: IBinaryAppExpr) =
 
 let precedence (expr: ITreeNode) =
     match expr with
+    | :? IInterpolatedStringExpr
     | :? ILibraryOnlyExpr
     | :? ITraitCallExpr -> 0
 
