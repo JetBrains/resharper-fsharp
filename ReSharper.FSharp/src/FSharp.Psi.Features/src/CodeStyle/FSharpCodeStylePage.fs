@@ -1,13 +1,17 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
 open System
+open System.Drawing
 open System.Linq.Expressions
 open JetBrains.Application.Components
 open JetBrains.Application.UI.Options
+open JetBrains.Application.UI.Options.OptionsDialog
 open JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Resources.Resources.Icons
+open JetBrains.UI.RichText
 
 [<CodePreviewPreparatorComponent>]
 type FSharpCodePreviewPreparator() =
@@ -20,7 +24,7 @@ type FSharpCodePreviewPreparator() =
 
 [<FormattingSettingsPresentationComponent>]
 type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, container, settingsToHide) =
-    inherit CodeStylePageSchema<FSharpFormatSettingsKey, FSharpCodePreviewPreparator>(lifetime, smartContext,
+    inherit IndentStylePageSchema<FSharpFormatSettingsKey, FSharpCodePreviewPreparator>(lifetime, smartContext,
         itemViewModelFactory, container, settingsToHide)
 
     override x.Language = FSharpLanguage.Instance :> _
@@ -69,3 +73,28 @@ type FSharpCodeStylePage(lifetime, smartContext: OptionsSettingsSmartContext, en
     let _ = PsiFeaturesUnsortedOptionsThemedIcons.Indent // workaround to create assembly reference (dotnet/fsharp#3522)
 
     override x.Id = "FSharpIndentStylePage"
+
+
+[<OptionsPage("FantomasPage", "Fantomas", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
+type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPageContext: OptionsPageContext) as this =
+    inherit FSharpOptionsPageBase(lifetime, optionsPageContext, smartContext)
+    let _ = PsiFeaturesUnsortedOptionsThemedIcons.Indent // workaround to create assembly reference (dotnet/fsharp#3522)
+
+    do
+        let localTool = true, true
+        let globalTool = false, false
+
+        use indent = this.Indent()
+        this.AddComboOptionFromEnum((fun (key: FSharpFormatSettingsKey) -> key.FantomasVersion),
+                                    (fun key ->
+                                         match key with
+                                         | FantomasVersion.Bundled -> "Bundled (v 1.0.0.0)"
+                                         | FantomasVersion.DotnetTools -> "From dotnet-tools.json (v 2.0.0)"
+                                         | FantomasVersion.Global -> "From .NET global tools (v 3.0.0)"),
+                                    exclude =
+                                        seq {
+                                            if not (fst localTool) then FantomasVersion.DotnetTools
+                                            if not (fst globalTool) then FantomasVersion.Global
+                                        },
+                                    prefix = "Version") |> ignore
+

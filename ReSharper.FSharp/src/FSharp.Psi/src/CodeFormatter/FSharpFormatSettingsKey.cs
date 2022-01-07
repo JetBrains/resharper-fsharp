@@ -5,6 +5,14 @@ using JetBrains.ReSharper.Psi.Format;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 {
+  public enum FantomasVersion
+  {
+    Bundled,
+    DotnetTools,
+    Global
+  }
+
+
   [SettingsKey(typeof(CodeFormattingSettingsKey), "Code formatting in F#")]
   [EditorConfigKey("fsharp")]
   public class FSharpFormatSettingsKey : FormatSettingsKeyBase
@@ -16,26 +24,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [SettingsEntry(BraceFormatStyleEx.PICO, "Type and namespace declaration")]
     public BraceFormatStyleEx TypeDeclarationBraces;
 
-    [SettingsEntry(2, "todo")]
-    public int BlankLineAroundTopLevelModules;
+    [SettingsEntry(2, "todo")] public int BlankLineAroundTopLevelModules;
 
-    [SettingsEntry(0, "todo")]
-    public int BlankLinesAroundSingleLineModuleMember;
+    [SettingsEntry(0, "todo")] public int BlankLinesAroundSingleLineModuleMember;
 
-    [SettingsEntry(1, "todo")]
-    public int BlankLinesAroundMultilineModuleMembers;
+    [SettingsEntry(1, "todo")] public int BlankLinesAroundMultilineModuleMembers;
 
-    [SettingsEntry(1, "todo")]
-    public int BlankLinesAroundDifferentModuleMemberKinds;
+    [SettingsEntry(1, "todo")] public int BlankLinesAroundDifferentModuleMemberKinds;
 
-    [SettingsEntry(2, "todo")]
-    public int KeepMaxBlankLineAroundModuleMembers;
+    [SettingsEntry(2, "todo")] public int KeepMaxBlankLineAroundModuleMembers;
 
-    [SettingsEntry(1, "todo")]
-    public int BlankLinesBeforeFirstModuleMemberInTopLevelModule;
+    [SettingsEntry(1, "todo")] public int BlankLinesBeforeFirstModuleMemberInTopLevelModule;
 
-    [SettingsEntry(0, "todo")]
-    public int BlankLinesBeforeFirstModuleMemberInNestedModule;
+    [SettingsEntry(0, "todo")] public int BlankLinesBeforeFirstModuleMemberInNestedModule;
 
     [SettingsEntry(true, "Line break after type representation access modifier")]
     public bool LineBreakAfterTypeReprAccessModifier;
@@ -160,5 +161,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
     [SettingsIndexedEntry("Fantomas settings")]
     public readonly IIndexedEntry<string, string> FantomasSettings;
+
+    [SettingsEntry(FantomasVersion.Bundled, "Fantomas version")]
+    public FantomasVersion FantomasVersion;
   }
 }
