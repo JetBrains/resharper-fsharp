@@ -83,9 +83,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -228,9 +225,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -373,9 +367,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -518,9 +509,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -663,9 +651,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -808,9 +793,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -953,9 +935,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -1097,9 +1076,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -1240,9 +1216,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -1383,9 +1356,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -1526,9 +1496,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -1670,9 +1637,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -1813,9 +1777,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
@@ -1955,9 +1916,6 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 ===================
 Workspace Model
-Modules:
-  ClassLibrary1#Project#GUID
-  FSharpProjectTree#SolutionItems
 Content roots:
   ClassLibrary1/AfterFile.fs
   ClassLibrary1/BeforeFile.fs
