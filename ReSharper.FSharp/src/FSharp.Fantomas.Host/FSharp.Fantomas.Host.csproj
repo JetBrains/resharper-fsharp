@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Fantomas" Version="4.5.0" />
+      <PackageReference Include="Fantomas" Version="4.5.11" />
       <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
     </ItemGroup>
 
