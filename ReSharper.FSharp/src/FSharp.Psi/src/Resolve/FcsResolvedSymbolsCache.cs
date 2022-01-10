@@ -9,6 +9,7 @@ using JetBrains.DocumentManagers.impl;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts;
 using JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
@@ -194,6 +195,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
         if (PsiModulesCaches.TryGetValue(psiModule, out var symbols))
           return symbols;
+
+        if (psiModule is FSharpScriptPsiModule)
+        {
+          var scriptResolvedSymbols = new FcsModuleResolvedSymbols(null, true);
+          PsiModulesCaches[psiModule] = scriptResolvedSymbols;
+          return scriptResolvedSymbols;
+        }
 
         var fcsProject = FcsProjectProvider.GetFcsProject(psiModule)?.Value;
         if (fcsProject == null)

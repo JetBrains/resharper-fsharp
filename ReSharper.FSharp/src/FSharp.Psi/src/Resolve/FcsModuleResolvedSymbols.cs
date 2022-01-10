@@ -10,23 +10,40 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly FcsFileResolvedSymbols[] myFileResolvedSymbols;
     private readonly JetFastSemiReenterableRWLock myLock = new JetFastSemiReenterableRWLock();
 
+    public bool IsScript { get; }
     [CanBeNull] public FcsProject FcsProject { get; }
 
     public static readonly FcsModuleResolvedSymbols Empty = new FcsModuleResolvedSymbols(null);
 
-    public FcsModuleResolvedSymbols([CanBeNull] FcsProject fcsProject)
+    public FcsModuleResolvedSymbols([CanBeNull] FcsProject fcsProject, bool isScript = false)
     {
-      var filesCount = fcsProject?.ParsingOptions.SourceFiles.Length ?? 0;
+      var filesCount = fcsProject?.ParsingOptions.SourceFiles.Length ?? (isScript ? 1 : 0);
       myFileResolvedSymbols = new FcsFileResolvedSymbols[filesCount];
 
       FcsProject = fcsProject;
+      IsScript = isScript;
+    }
+
+    private bool TryGetFileIndex(IPsiSourceFile sourceFile, out int index)
+    {
+      if (FcsProject != null)
+        return FcsProject.FileIndices.TryGetValue(sourceFile.GetLocation(), out index);
+
+      if (IsScript)
+      {
+        index = 0;
+        return true;
+      }
+
+      index = 0;
+      return false;
     }
 
     public void Invalidate(IPsiSourceFile sourceFile)
     {
       using (myLock.UsingWriteLock())
       {
-        if (FcsProject == null || !FcsProject.FileIndices.TryGetValue(sourceFile.GetLocation(), out var fileIndex))
+        if (!TryGetFileIndex(sourceFile, out var fileIndex))
           return;
 
         var filesCount = myFileResolvedSymbols.Length;
@@ -43,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public IFcsFileResolvedSymbols GetResolvedSymbols(IPsiSourceFile sourceFile)
     {
-      if (FcsProject == null || !FcsProject.FileIndices.TryGetValue(sourceFile.GetLocation(), out var fileIndex))
+      if (!TryGetFileIndex(sourceFile, out var fileIndex))
         return EmptyFcsFileResolvedSymbols.Instance;
 
       var fileResolvedSymbols = TryGetResolvedSymbols(fileIndex);
