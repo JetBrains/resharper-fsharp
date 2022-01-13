@@ -84,7 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
       myTrulyProvidedTypes = new BidirectionalMapOnDictionary<int, (ProvidedType type, int typeProviderId)>(
         EqualityComparer<int>.Default,
         EqualityComparer.Create<(ProvidedType type, int typeProviderId)>(
-          (x, y) => equalityComparer.Equals(x.type, y.type),
+          (x, y) => equalityComparer.Equals(x.type, y.type) && x.typeProviderId == y.typeProviderId,
           x => equalityComparer.GetHashCode(x.type)));
     }
 
