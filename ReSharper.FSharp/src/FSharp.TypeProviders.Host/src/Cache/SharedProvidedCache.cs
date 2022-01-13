@@ -1,21 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 #if NETFRAMEWORK
 using JetBrains.Collections;
 #endif
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
+using JetBrains.Util;
+using JetBrains.Util.Collections;
+using JetBrains.Util.dataStructures;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 {
-  public abstract class SharedProvidedCache<T> : IBiDirectionalProvidedCache<T, int>
+  public class SharedProvidedCache<T> :
+    IEnumerable<KeyValuePair<T, (int id, HashSet<int> referencingProviders)>>,
+    IBiDirectionalProvidedCache<T, int> where T : class
   {
     // typeProviderId defines the main holder of the entity
-    private readonly Dictionary<int, (T model, int typeProviderId)> myEntities = new Dictionary<int, (T, int)>();
+    private readonly Dictionary<int, (T type, int typeProviderId)> myEntities =
+      new Dictionary<int, (T type, int typeProviderId)>();
+
     protected readonly Dictionary<T, (int id, HashSet<int> referencingProviders)> IdsCache;
 
-    protected SharedProvidedCache(IEqualityComparer<T> equalityComparer) =>
+    internal SharedProvidedCache(IEqualityComparer<T> equalityComparer) =>
       IdsCache = new Dictionary<T, (int, HashSet<int>)>(equalityComparer);
 
     public (T model, int typeProviderId) Get(int key) => myEntities[key];
@@ -23,7 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
     public void Add(int id, (T model, int typeProviderId) value)
     {
       myEntities.Add(id, value);
-      IdsCache.Add(value.model, (id, new HashSet<int> {value.typeProviderId}));
+      IdsCache.Add(value.model, (id, new HashSet<int> { value.typeProviderId }));
     }
 
     // [Not pure] Remembers providers requesting a model
@@ -57,22 +65,65 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
         return true;
       });
 
-    public abstract string Dump();
+    public virtual string Dump() => "";
+
+    public IEnumerator<KeyValuePair<T, (int id, HashSet<int> referencingProviders)>> GetEnumerator() =>
+      IdsCache.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
   }
 
-  public class ProvidedTypesCache : SharedProvidedCache<ProvidedType>
+  public class ProvidedTypesCache : IBiDirectionalProvidedCache<ProvidedType, int>
   {
-    public ProvidedTypesCache(IEqualityComparer<ProvidedType> equalityComparer) : base(equalityComparer)
+    private readonly BidirectionalMapOnDictionary<int, (ProvidedType type, int typeProviderId)> myTrulyProvidedTypes;
+    private readonly SharedProvidedCache<ProvidedType> mySharedProvidedCache;
+
+    public ProvidedTypesCache(IEqualityComparer<ProvidedType> equalityComparer)
     {
+      mySharedProvidedCache = new SharedProvidedCache<ProvidedType>(equalityComparer);
+      myTrulyProvidedTypes = new BidirectionalMapOnDictionary<int, (ProvidedType type, int typeProviderId)>(
+        EqualityComparer<int>.Default,
+        EqualityComparer.Create<(ProvidedType type, int typeProviderId)>(
+          (x, y) => equalityComparer.Equals(x.type, y.type),
+          x => equalityComparer.GetHashCode(x.type)));
     }
 
-    public override string Dump() =>
-      "Provided Types:\n" + string.Join("\n",
-        IdsCache
-          .OrderBy(t => t.Key.FullName)
-          .Select(t =>
-            $"{t.Key.FullName} tps: {string.Join("|", t.Value.referencingProviders.OrderBy().ToArray())} " +
-            $"(from {t.Key.Assembly.GetLogName()})"));
+    public (ProvidedType model, int typeProviderId) Get(int key) =>
+      myTrulyProvidedTypes.TryGetRightByLeft(key, out var result) ? result : mySharedProvidedCache.Get(key);
+
+    public void Add(int id, (ProvidedType model, int typeProviderId) value)
+    {
+      if (value.model.IsTrulyProvided())
+        myTrulyProvidedTypes.Add(id, value);
+
+      else mySharedProvidedCache.Add(id, value);
+    }
+
+    public void Remove(int typeProviderId)
+    {
+      mySharedProvidedCache.Remove(typeProviderId);
+      myTrulyProvidedTypes.RemoveAll(t => t.Value.typeProviderId == typeProviderId);
+    }
+
+    public bool TryGetKey(ProvidedType model, int requestingTypeProviderId, out int key) =>
+      model.IsTrulyProvided()
+        ? myTrulyProvidedTypes.TryGetLeftByRight((model, requestingTypeProviderId), out key)
+        : mySharedProvidedCache.TryGetKey(model, requestingTypeProviderId, out key);
+
+    public string Dump() =>
+      string.Join("\n\n",
+        "Truly provided Types:\n" + string.Join("\n",
+          myTrulyProvidedTypes
+            .OrderBy(t => t.Value.type.FullName)
+            .Select(t =>
+              $"{t.Value.type.FullName} tp: {t.Value.typeProviderId} " +
+              $"(from {t.Value.type.Assembly.GetLogName()})")),
+        "Provided Types:\n" + string.Join("\n",
+          mySharedProvidedCache
+            .OrderBy(t => t.Key.FullName)
+            .Select(t =>
+              $"{t.Key.FullName} tps: {string.Join("|", t.Value.referencingProviders.OrderBy().ToArray())} " +
+              $"(from {t.Key.Assembly.GetLogName()})")));
   }
 
   public class ProvidedAssembliesCache : SharedProvidedCache<ProvidedAssembly>
