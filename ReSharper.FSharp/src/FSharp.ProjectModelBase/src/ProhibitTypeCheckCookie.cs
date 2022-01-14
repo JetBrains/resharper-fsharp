@@ -32,7 +32,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     }
 
     [Conditional("JET_MODE_ASSERT")]
-    public static void AssertTypeCheckIsAllowed() =>
-      Assertion.Assert(!IsAcquired, "!IsAcquired");
+    public static void AssertTypeCheckIsAllowed() => Assertion.Assert(!IsAcquired);
   }
 }

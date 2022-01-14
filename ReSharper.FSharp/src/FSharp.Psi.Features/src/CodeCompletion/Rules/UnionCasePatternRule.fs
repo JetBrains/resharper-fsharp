@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.Util
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
@@ -119,6 +120,7 @@ type UnionCasePatternBehavior(info) =
             |> Option.defaultValue fieldsDeconstruction.Text
 
         let deconstruct (deconstruction: IFSharpDeconstruction) (parametersOwnerPat: IParametersOwnerPat) =
+            use prohibitTypeCheckCookie = ProhibitTypeCheckCookie.Create()
             use writeCookie = WriteLockCookie.Create(parametersOwnerPat.IsPhysical())
             use cookie =
                 CompilationContextCookie.GetOrCreate(parametersOwnerPat.GetPsiModule().GetContextFromModule())

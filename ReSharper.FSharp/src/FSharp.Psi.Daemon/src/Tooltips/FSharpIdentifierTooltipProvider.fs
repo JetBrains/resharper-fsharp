@@ -53,8 +53,8 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
     override x.GetRichTooltip(highlighter) =
         if not highlighter.IsValid then emptyPresentation else
 
-//        let psiServices = solution.GetPsiServices()
-//        if not psiServices.Files.AllDocumentsAreCommitted || psiServices.Caches.HasDirtyFiles then emptyPresentation else
+        let psiServices = solution.GetPsiServices()
+        if not psiServices.Files.AllDocumentsAreCommitted || psiServices.Caches.HasDirtyFiles then emptyPresentation else
 
         let document = highlighter.Document
         match document.GetPsiSourceFile(solution) with

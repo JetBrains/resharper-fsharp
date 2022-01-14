@@ -1,9 +1,8 @@
 using System;
 using FSharp.Compiler.CodeAnalysis;
 using JetBrains.Diagnostics;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Resources.Shell;
 using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
@@ -37,9 +36,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       PinnedResults = null;
       myProhibitTypeCheckCookie?.Dispose();
 
-      var file = mySourceFile.GetPrimaryPsiFile();
-      if (file != null)
-        mySourceFile.GetSolution().GetComponent<IPsiFiles>().PsiChanged(file, PsiChangedElementType.InvalidateCached);
+      using var cookie = WriteLockCookie.Create(true);
+      mySourceFile.GetPsiServices().Files.IncrementModificationTimestamp(null);
     }
   }
 }
