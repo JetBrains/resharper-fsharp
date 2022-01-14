@@ -75,26 +75,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 
   public class ProvidedTypesCache : IBiDirectionalProvidedCache<ProvidedType, int>
   {
-    private readonly BidirectionalMapOnDictionary<int, (ProvidedType type, int typeProviderId)> myTrulyProvidedTypes;
+    private readonly BidirectionalMapOnDictionary<int, (ProvidedType type, int typeProviderId)>
+      myCreatedByProviderTypes;
+
     private readonly SharedProvidedCache<ProvidedType> mySharedProvidedCache;
 
     public ProvidedTypesCache(IEqualityComparer<ProvidedType> equalityComparer)
     {
       mySharedProvidedCache = new SharedProvidedCache<ProvidedType>(equalityComparer);
-      myTrulyProvidedTypes = new BidirectionalMapOnDictionary<int, (ProvidedType type, int typeProviderId)>(
+      myCreatedByProviderTypes = new BidirectionalMapOnDictionary<int, (ProvidedType type, int typeProviderId)>(
         EqualityComparer<int>.Default,
         EqualityComparer.Create<(ProvidedType type, int typeProviderId)>(
-          (x, y) => equalityComparer.Equals(x.type, y.type) && x.typeProviderId == y.typeProviderId,
+          (x, y) => x.typeProviderId == y.typeProviderId && equalityComparer.Equals(x.type, y.type),
           x => equalityComparer.GetHashCode(x.type)));
     }
 
     public (ProvidedType model, int typeProviderId) Get(int key) =>
-      myTrulyProvidedTypes.TryGetRightByLeft(key, out var result) ? result : mySharedProvidedCache.Get(key);
+      myCreatedByProviderTypes.TryGetRightByLeft(key, out var result) ? result : mySharedProvidedCache.Get(key);
 
     public void Add(int id, (ProvidedType model, int typeProviderId) value)
     {
-      if (value.model.IsTrulyProvided())
-        myTrulyProvidedTypes.Add(id, value);
+      if (value.model.IsCreatedByProvider())
+        myCreatedByProviderTypes.Add(id, value);
 
       else mySharedProvidedCache.Add(id, value);
     }
@@ -102,18 +104,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
     public void Remove(int typeProviderId)
     {
       mySharedProvidedCache.Remove(typeProviderId);
-      myTrulyProvidedTypes.RemoveAll(t => t.Value.typeProviderId == typeProviderId);
+      myCreatedByProviderTypes.RemoveAll(t => t.Value.typeProviderId == typeProviderId);
     }
 
     public bool TryGetKey(ProvidedType model, int requestingTypeProviderId, out int key) =>
-      model.IsTrulyProvided()
-        ? myTrulyProvidedTypes.TryGetLeftByRight((model, requestingTypeProviderId), out key)
+      model.IsCreatedByProvider()
+        ? myCreatedByProviderTypes.TryGetLeftByRight((model, requestingTypeProviderId), out key)
         : mySharedProvidedCache.TryGetKey(model, requestingTypeProviderId, out key);
 
     public string Dump() =>
       string.Join("\n\n",
-        "Truly provided Types:\n" + string.Join("\n",
-          myTrulyProvidedTypes
+        "Created by provider Types:\n" + string.Join("\n",
+          myCreatedByProviderTypes
             .OrderBy(t => t.Value.type.FullName)
             .Select(t =>
               $"{t.Value.type.FullName} tp: {t.Value.typeProviderId} " +

@@ -136,7 +136,7 @@ Type Providers:
 17 SwaggerProvider.OpenApiClientTypeProvider, SwaggerProvider.DesignTime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary)
 18 SwaggerProvider.SwaggerTypeProvider, SwaggerProvider.DesignTime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary)
 
-Truly provided Types:
+Created by provider Types:
 FSharp.Configuration.AppSettings tp: 3 (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
 FSharp.Configuration.IniFile tp: 3 (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
 FSharp.Configuration.YamlConfig tp: 3 (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)

@@ -48,7 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
       if (logger.Catch(() => providedModel.IsNestedPublic)) flags |= RdProvidedTypeFlags.IsNestedPublic;
       if (logger.Catch(() => providedModel.IsSuppressRelocate)) flags |= RdProvidedTypeFlags.IsSuppressRelocate;
       if (logger.Catch(() => providedModel.IsGenericParameter)) flags |= RdProvidedTypeFlags.IsGenericParameter;
-      if (providedModel.IsTrulyProvided()) flags |= RdProvidedTypeFlags.IsTrulyProvided;
+      if (providedModel.IsCreatedByProvider()) flags |= RdProvidedTypeFlags.IsCreatedByProvider;
 
       var genericParameters = providedModel.IsGenericType
         ? providedModel

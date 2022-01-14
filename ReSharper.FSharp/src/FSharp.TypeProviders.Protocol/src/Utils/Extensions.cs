@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
       assembly.GetName().Version == null ? "generated assembly" : assembly.FullName;
 
 
-    public static bool IsTrulyProvided(this ProvidedType providedType) =>
+    public static bool IsCreatedByProvider(this ProvidedType providedType) =>
       //FSharp.TypeProviders.SDK/ProvidedTypes.fsi
       providedType.RawSystemType.GetType().Name == "ProvidedTypeDefinition";
 
