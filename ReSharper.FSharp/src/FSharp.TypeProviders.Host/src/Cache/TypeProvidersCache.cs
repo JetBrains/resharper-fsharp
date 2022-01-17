@@ -33,6 +33,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
     public string Dump() =>
       "Type Providers:\n" + string.Join("\n",
         myTypeProviders.Select(t =>
-          $"{t.Key} {t.Value.typeProvider.GetType().FullName} (from {Path.GetFileName(t.Value.envKey)})"));
+          $"{t.Key} {t.Value.typeProvider.GetType().AssemblyQualifiedName} (from {Path.GetFileName(t.Value.envKey)})"));
   }
 }
