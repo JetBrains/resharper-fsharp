@@ -147,15 +147,13 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                 else
                     ScriptReferences.Empty
 
-            let ira =
-                InterruptableReadActivityThe
-                    (lifetime, locks, fun _ -> not lifetime.IsAlive || locks.ContentModelLocks.IsWriteLockRequested)
+            let ira = InterruptableReadActivityThe(lifetime, locks)
 
             ira.FuncRun <-
                 fun _ ->
                     let newOptions = getScriptOptions path document
                     let newReferences = getScriptReferences path newOptions
-                    InterruptableActivityCookie.CheckAndThrow()
+                    Interruption.Current.CheckAndThrow()
 
                     let getDiff oldPaths newPaths =
                         let notChanged = Enumerable.Intersect(newPaths, oldPaths) |> HashSet
@@ -166,7 +164,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                     | [], [] when newReferences.Files.SetEquals(oldReferences.Files) -> ()
                     | added, removed ->
 
-                    InterruptableActivityCookie.CheckAndThrow()
+                    Interruption.Current.CheckAndThrow()
                     locks.ExecuteOrQueue(lifetime, "Update F# script references", fun _ ->
                         use cookie = WriteLockCookie.Create()
                         let changeBuilder = PsiModuleChangeBuilder()

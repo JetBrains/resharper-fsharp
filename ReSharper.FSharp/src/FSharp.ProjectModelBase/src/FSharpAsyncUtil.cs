@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       new CancellationTokenSource().Token;
 
     private static readonly Action ourDefaultInterruptCheck =
-      () => InterruptableActivityCookie.CheckAndThrow();
+      () => Interruption.Current.CheckAndThrow();
 
     [CanBeNull]
     public static T RunAsTask<T>([NotNull] this FSharpAsync<T> async, [CanBeNull] Action interruptChecker = null) =>
