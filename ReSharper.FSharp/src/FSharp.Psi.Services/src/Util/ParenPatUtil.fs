@@ -124,6 +124,7 @@ let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
         checkPrecedence context fsPattern ||
 
         isNotNull (TuplePatNavigator.GetByPattern(context)) ||
+        isNotNull (AndsPatNavigator.GetByPattern(context)) ||
 
         // todo: suggest moving parens to a single inner pattern?
         let strictContext = getStrictContext context
