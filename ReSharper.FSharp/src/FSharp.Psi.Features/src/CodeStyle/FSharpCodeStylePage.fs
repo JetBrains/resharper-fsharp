@@ -6,12 +6,16 @@ open System.Linq.Expressions
 open JetBrains.Application.Components
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog
+open JetBrains.IDE.UI
 open JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Resources.Resources.Icons
+open JetBrains.IDE.UI.Extensions
+open JetBrains.Rider.Model.UIAutomation
 open JetBrains.UI.RichText
+open JetBrains.ReSharper.Feature.Services.UI.Validation
 
 [<CodePreviewPreparatorComponent>]
 type FSharpCodePreviewPreparator() =
@@ -76,9 +80,16 @@ type FSharpCodeStylePage(lifetime, smartContext: OptionsSettingsSmartContext, en
 
 
 [<OptionsPage("FantomasPage", "Fantomas", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
-type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPageContext: OptionsPageContext) as this =
+type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPageContext: OptionsPageContext, iconHostBase: IconHostBase) as this =
     inherit FSharpOptionsPageBase(lifetime, optionsPageContext, smartContext)
     let _ = PsiFeaturesUnsortedOptionsThemedIcons.Indent // workaround to create assembly reference (dotnet/fsharp#3522)
+    let warningIcon =  ValidationStates.validationWarning.GetIcon(iconHostBase);
+    let decorate (text: string) withWarning =
+        if withWarning then text.GetBeLabel(warningIcon, true)
+        else
+            let label = BeLabel(true)
+            label.Text.Value <- text
+            label
 
     do
         let localTool = true, true
@@ -98,3 +109,4 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
                                         },
                                     prefix = "Version") |> ignore
 
+        this.AddComboOption()
