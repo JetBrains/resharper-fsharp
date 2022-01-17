@@ -60,6 +60,10 @@
         <Title>Lambda expression can be simplified</Title>
         <Description>Lambda expression can be simplified.</Description>
       </Tag>
+      <Tag name="FSharpLambdaCanBeReplacedWithInnerExpression" default="HINT">
+        <Title>Lambda expression can be replaced with inner expression</Title>
+        <Description>Lambda expression can be replaced with inner expression.</Description>
+      </Tag>
       <Tag name="FSharpBuiltinFunctionReimplementation" default="HINT">
         <Title>Lambda expression can be replaced with built-in function</Title>
         <Description>Lambda expression can be replaced with built-in function.</Description>
@@ -236,14 +240,7 @@
     <QuickFix>SimplifyLambdaFix</QuickFix>
   </Warning>
 
-  <Warning name="LambdaBodyCanBeReplacedWithId" configurableSeverity="FSharpLambdaCanBeSimplified">
-    <Parameter type="ILambdaExpr" name="lambda"/>
-    <Range>lambda.GetHighlightingRange()</Range>
-    <Message value="Lambda body can be replaced with 'id'"/>
-    <QuickFix>ReplaceLambdaBodyWithIdFix</QuickFix>
-  </Warning>
-
-  <Warning name="LambdaCanBeReplacedWithInnerExpression" configurableSeverity="FSharpLambdaCanBeSimplified">
+  <Warning name="LambdaCanBeReplacedWithInnerExpression" configurableSeverity="FSharpLambdaCanBeReplacedWithInnerExpression">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>

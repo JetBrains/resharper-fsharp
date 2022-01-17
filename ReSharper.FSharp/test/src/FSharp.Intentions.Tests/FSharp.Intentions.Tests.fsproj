@@ -86,7 +86,6 @@
     <Compile Include="src\QuickFixes\SimplifyLambdaTest.fs" />
     <Compile Include="src\QuickFixes\ReplaceLambdaWithInnerExpressionTest.fs" />
     <Compile Include="src\QuickFixes\ReplaceLambdaWithBuiltinFunctionTest.fs" />
-    <Compile Include="src\QuickFixes\ReplaceLambdaBodyWithIdTest.fs" />
     <Compile Include="src\QuickFixes\GenerateInterfaceMembersFixTest.fs" />
     <Compile Include="src\QuickFixes\RemoveRedundantAttributeTest.fs" />
     <Compile Include="src\QuickFixes\ConvertTupleToArrayOrListElementsFixTest.fs" />
