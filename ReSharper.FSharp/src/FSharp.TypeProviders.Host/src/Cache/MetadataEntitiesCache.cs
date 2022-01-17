@@ -15,8 +15,8 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 {
-  /// Holds entities (provided types/assemblies) that can be shared between type provider instances.
-  public class SharedProvidedCache<T> :
+  /// Holds metadata entities (types/assemblies) that can be shared between type provider instances.
+  public class MetadataEntitiesCache<T> :
     IEnumerable<KeyValuePair<T, (int id, HashSet<int> referencingProviders)>>,
     IBiDirectionalProvidedCache<T, int> where T : class
   {
@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 
     protected readonly Dictionary<T, (int id, HashSet<int> referencingProviders)> IdsCache;
 
-    internal SharedProvidedCache(IEqualityComparer<T> equalityComparer) =>
+    internal MetadataEntitiesCache(IEqualityComparer<T> equalityComparer) =>
       IdsCache = new Dictionary<T, (int, HashSet<int>)>(equalityComparer);
 
     public (T model, int typeProviderId) Get(int key) => myEntities[key];
@@ -87,11 +87,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
     private readonly BidirectionalMapOnDictionary<int, (ProvidedType type, int typeProviderId)>
       myCreatedByProviderTypes;
 
-    private readonly SharedProvidedCache<ProvidedType> mySharedProvidedCache;
+    private readonly MetadataEntitiesCache<ProvidedType> myMetadataEntitiesCache;
 
     public ProvidedTypesCache(IEqualityComparer<ProvidedType> equalityComparer)
     {
-      mySharedProvidedCache = new SharedProvidedCache<ProvidedType>(equalityComparer);
+      myMetadataEntitiesCache = new MetadataEntitiesCache<ProvidedType>(equalityComparer);
       myCreatedByProviderTypes = new BidirectionalMapOnDictionary<int, (ProvidedType type, int typeProviderId)>(
         EqualityComparer<int>.Default,
         EqualityComparer.Create<(ProvidedType type, int typeProviderId)>(
@@ -117,25 +117,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
     }
 
     public (ProvidedType model, int typeProviderId) Get(int key) =>
-      myCreatedByProviderTypes.TryGetRightByLeft(key, out var result) ? result : mySharedProvidedCache.Get(key);
+      myCreatedByProviderTypes.TryGetRightByLeft(key, out var result) ? result : myMetadataEntitiesCache.Get(key);
 
     public void Add(int id, (ProvidedType model, int typeProviderId) value)
     {
       if (CanBeSharedBetweenProviders(value.model.RawSystemType))
-        mySharedProvidedCache.Add(id, value);
+        myMetadataEntitiesCache.Add(id, value);
 
       else myCreatedByProviderTypes.Add(id, value);
     }
 
     public void Remove(int typeProviderId)
     {
-      mySharedProvidedCache.Remove(typeProviderId);
+      myMetadataEntitiesCache.Remove(typeProviderId);
       myCreatedByProviderTypes.RemoveAll(t => t.Value.typeProviderId == typeProviderId);
     }
 
     public bool TryGetKey(ProvidedType model, int requestingTypeProviderId, out int key) =>
       CanBeSharedBetweenProviders(model.RawSystemType)
-        ? mySharedProvidedCache.TryGetKey(model, requestingTypeProviderId, out key)
+        ? myMetadataEntitiesCache.TryGetKey(model, requestingTypeProviderId, out key)
         : myCreatedByProviderTypes.TryGetLeftByRight((model, requestingTypeProviderId), out key);
 
     public string Dump() =>
@@ -147,14 +147,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
               $"{t.Value.type.FullName} tp: {t.Value.typeProviderId} " +
               $"(from {t.Value.type.Assembly.GetLogName()})")),
         "Provided Types:\n" + string.Join("\n",
-          mySharedProvidedCache
+          myMetadataEntitiesCache
             .OrderBy(t => t.Key.FullName)
             .Select(t =>
               $"{t.Key.FullName} tps: {string.Join("|", t.Value.referencingProviders.OrderBy().ToArray())} " +
               $"(from {t.Key.Assembly.GetLogName()})")));
   }
 
-  public class ProvidedAssembliesCache : SharedProvidedCache<ProvidedAssembly>
+  public class ProvidedAssembliesCache : MetadataEntitiesCache<ProvidedAssembly>
   {
     public ProvidedAssembliesCache(IEqualityComparer<ProvidedAssembly> equalityComparer) : base(equalityComparer)
     {
