@@ -80,7 +80,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
   /// 1. Created by particular type provider instances.
   /// 2. Coming from referenced assemblies metadata and not depending on particular type provider instances.
   ///
-  /// Sharing created by provider types is not allowed, since type provider instantiations
+  /// Sharing types created by type providers is not allowed, since type provider instantiations
   /// depend on project configuration and may produce different types with the same name.
   public class ProvidedTypesCache : IBiDirectionalProvidedCache<ProvidedType, int>
   {
@@ -101,7 +101,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 
     private static bool CanBeSharedBetweenProviders(Type providedType)
     {
-      // FSharp.TypeProviders.SDK/ProvidedTypes.fsi
       if (providedType.IsCreatedByProvider()) return false;
 
       if (providedType.IsArray || providedType.IsByRef || providedType.IsPointer)
