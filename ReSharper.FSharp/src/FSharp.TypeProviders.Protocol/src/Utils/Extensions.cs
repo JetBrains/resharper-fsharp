@@ -10,11 +10,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
     public static string GetLogName(this ProvidedAssembly assembly) =>
       assembly.GetName().Version == null ? "generated assembly" : assembly.FullName;
 
-
-    public static bool IsCreatedByProvider(this ProvidedType providedType) =>
-      //FSharp.TypeProviders.SDK/ProvidedTypes.fsi
-      providedType.RawSystemType.GetType().Name == "ProvidedTypeDefinition";
-
     public static void RemoveAll<T, TU>(this IDictionary<T, TU> dict, Func<KeyValuePair<T, TU>, bool> match)
     {
       var itemsToRemove = new FrugalLocalList<KeyValuePair<T, TU>>();

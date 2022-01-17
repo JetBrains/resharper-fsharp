@@ -81,4 +81,17 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
             }
         }
     }
+
+    @Test
+    fun projectsWithEqualProviders() {
+        withOutOfProcessTypeProviders {
+            withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
+                waitForDaemon()
+            }
+            withOpenedEditor(project, "TypeProviderLibrary2/Library.fs") {
+                waitForDaemon()
+                checkTypeProviders(testGoldFile)
+            }
+        }
+    }
 }

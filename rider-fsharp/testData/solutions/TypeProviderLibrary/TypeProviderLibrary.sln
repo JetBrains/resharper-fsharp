@@ -6,6 +6,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GenerativeTypeProvider", "G
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GenerativeTypeLibrary", "GenerativeTypeLibrary\GenerativeTypeLibrary.fsproj", "{D571D103-2A9A-4F28-9A65-EBD97DD44410}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TypeProviderLibrary2", "TypeProviderLibrary2\TypeProviderLibrary2.fsproj", "{2D42CCB0-057D-43EE-B20E-4BA94A0192FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,5 +30,9 @@ Global
 		{D571D103-2A9A-4F28-9A65-EBD97DD44410}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D571D103-2A9A-4F28-9A65-EBD97DD44410}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D571D103-2A9A-4F28-9A65-EBD97DD44410}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D42CCB0-057D-43EE-B20E-4BA94A0192FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D42CCB0-057D-43EE-B20E-4BA94A0192FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D42CCB0-057D-43EE-B20E-4BA94A0192FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D42CCB0-057D-43EE-B20E-4BA94A0192FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

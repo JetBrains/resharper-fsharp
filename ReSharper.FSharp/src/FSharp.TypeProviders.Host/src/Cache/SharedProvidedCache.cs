@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Utils;
 #if NETFRAMEWORK
 using JetBrains.Collections;
 #endif
@@ -13,6 +15,7 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 {
+  /// Holds entities (provided types/assemblies) that can be shared between type provider instances.
   public class SharedProvidedCache<T> :
     IEnumerable<KeyValuePair<T, (int id, HashSet<int> referencingProviders)>>,
     IBiDirectionalProvidedCache<T, int> where T : class
@@ -73,6 +76,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
   }
 
+  /// Cache holding types:
+  /// 1. Created by particular type provider instances.
+  /// 2. Coming from referenced assemblies metadata and not depending on particular type provider instances.
+  ///
+  /// Sharing created by provider types is not allowed, since type provider instantiations
+  /// depend on project configuration and may produce different types with the same name.
   public class ProvidedTypesCache : IBiDirectionalProvidedCache<ProvidedType, int>
   {
     private readonly BidirectionalMapOnDictionary<int, (ProvidedType type, int typeProviderId)>
@@ -90,15 +99,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
           x => equalityComparer.GetHashCode(x.type)));
     }
 
+    private static bool CanBeSharedBetweenProviders(Type providedType)
+    {
+      // FSharp.TypeProviders.SDK/ProvidedTypes.fsi
+      if (providedType.IsCreatedByProvider()) return false;
+
+      if (providedType.IsArray || providedType.IsByRef || providedType.IsPointer)
+        return CanBeSharedBetweenProviders(providedType.GetElementType());
+
+      // F# Spec: "Provided type and method definitions may not be generic"
+      // so there is no need to check providedType.GetGenericTypeDefinition()
+      if (providedType.IsGenericType)
+        foreach (var type in providedType.GetGenericArguments())
+          if (!CanBeSharedBetweenProviders(type))
+            return false;
+
+      return true;
+    }
+
     public (ProvidedType model, int typeProviderId) Get(int key) =>
       myCreatedByProviderTypes.TryGetRightByLeft(key, out var result) ? result : mySharedProvidedCache.Get(key);
 
     public void Add(int id, (ProvidedType model, int typeProviderId) value)
     {
-      if (value.model.IsCreatedByProvider())
-        myCreatedByProviderTypes.Add(id, value);
+      if (CanBeSharedBetweenProviders(value.model.RawSystemType))
+        mySharedProvidedCache.Add(id, value);
 
-      else mySharedProvidedCache.Add(id, value);
+      else myCreatedByProviderTypes.Add(id, value);
     }
 
     public void Remove(int typeProviderId)
@@ -108,9 +135,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
     }
 
     public bool TryGetKey(ProvidedType model, int requestingTypeProviderId, out int key) =>
-      model.IsCreatedByProvider()
-        ? myCreatedByProviderTypes.TryGetLeftByRight((model, requestingTypeProviderId), out key)
-        : mySharedProvidedCache.TryGetKey(model, requestingTypeProviderId, out key);
+      CanBeSharedBetweenProviders(model.RawSystemType)
+        ? mySharedProvidedCache.TryGetKey(model, requestingTypeProviderId, out key)
+        : myCreatedByProviderTypes.TryGetLeftByRight((model, requestingTypeProviderId), out key);
 
     public string Dump() =>
       string.Join("\n\n",

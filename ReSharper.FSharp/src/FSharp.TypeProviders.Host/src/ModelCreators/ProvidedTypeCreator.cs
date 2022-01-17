@@ -1,5 +1,5 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
+﻿using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Utils;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
 using JetBrains.Util;
 using static FSharp.Compiler.ExtensionTyping;
