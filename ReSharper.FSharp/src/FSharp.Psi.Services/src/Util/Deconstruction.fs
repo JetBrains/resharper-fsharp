@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruction
 
 open System.Collections.Generic
-open System.Drawing
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Progress
 open JetBrains.DocumentModel
@@ -350,7 +349,7 @@ type DeconstructAction(pat: IFSharpPattern, deconstruction: IFSharpDeconstructio
 
         let keepPatternText =
             let richText = RichText("Add '")
-            richText.Append($"as {refPat.SourceName}", TextStyle(FontStyle.Bold)) |> ignore
+            richText.Append($"as {refPat.SourceName}", TextStyle(JetFontStyles.Bold)) |> ignore
             richText.Append("' pattern", TextStyle()) |> ignore
             richText
 

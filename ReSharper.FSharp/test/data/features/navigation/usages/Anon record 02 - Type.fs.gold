@@ -3,16 +3,16 @@
     TO: [W] {| |F| = 1 |} RANGE: (43,44) @ Anon record 02 - Type.fs
     Menu item (enabled) :
       icon: UsageWrite
-      text: Module      <font color="DarkRed">{| **F** = 1 |}</font><font color="HotTrack"> (4)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: Module      <font color="FF8B0000">{| **F** = 1 |}</font><font color="06C"> (4)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: {| **F** = 1 |}
     Navigation result:
       caret did not move
     TO: [R] type R = {| |F|: int |} RANGE: (29,30) @ Anon record 02 - Type.fs
     Menu item (enabled) :
       icon: UsageRead
-      text: Module.R      <font color="DarkRed">type R = {| **F**: int |}</font><font color="HotTrack"> (3)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: Module.R      <font color="FF8B0000">type R = {| **F**: int |}</font><font color="06C"> (3)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: type R = {| **F**: int |}
     Navigation result:
       opened file: Anon record 02 - Type.fs

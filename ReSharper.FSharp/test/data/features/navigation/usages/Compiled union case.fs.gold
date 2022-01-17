@@ -3,16 +3,16 @@
     TO: [O] |Ok| 123 RANGE: (17,19) @ Compiled union case.fs
     Menu item (enabled) :
       icon: UsageInstanceCreation
-      text: Module      **<font color="DarkRed">Ok** 123</font><font color="HotTrack"> (3)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: Module      **<font color="FF8B0000">Ok** 123</font><font color="06C"> (3)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: **Ok** 123
     Navigation result:
       caret did not move
     TO: [O] |Ok| 123 RANGE: (25,27) @ Compiled union case.fs
     Menu item (enabled) :
       icon: UsageInstanceCreation
-      text: Module      **<font color="DarkRed">Ok** 123</font><font color="HotTrack"> (4)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: Module      **<font color="FF8B0000">Ok** 123</font><font color="06C"> (4)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: **Ok** 123
     Navigation result:
       opened file: Compiled union case.fs

@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
 open System.Collections.Generic
-open System.Drawing
 open System.Linq
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
@@ -685,7 +684,7 @@ type FSharpIntroduceVarHelper() =
 
         let getOccurrenceText (fcsType: FSharpType) (text: string) =
             let richText = RichText("Bind '")
-            richText.Append(fcsType.Format(displayContext), TextStyle(FontStyle.Bold)) |> ignore
+            richText.Append(fcsType.Format(displayContext), TextStyle(JetFontStyles.Bold)) |> ignore
             richText.Append(text, TextStyle()) |> ignore
             richText
 

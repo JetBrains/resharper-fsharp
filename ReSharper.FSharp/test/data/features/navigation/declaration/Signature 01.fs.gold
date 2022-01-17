@@ -3,8 +3,8 @@
     TO: [O] let |x| = 123 RANGE: (19,20) @ Signature 01.fs
     Menu item (enabled) :
       icon: Fsharp
-      text: Signature 01.fs<font color="HotTrack"> (2)</font>
-      tail: <font color="GrayText">in <TestProject></font>
+      text: Signature 01.fs<font color="06C"> (2)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
       tooltip: let **x** = 123
     Navigation result:
       opened file: Signature 01.fs
@@ -18,8 +18,8 @@
     TO: [O] val |x|: int RANGE: (21,22) @ Signature 01.fsi
     Menu item (enabled) :
       icon: Fsharp
-      text: Signature 01.fsi<font color="HotTrack"> (3)</font>
-      tail: <font color="GrayText">in <TestProject></font>
+      text: Signature 01.fsi<font color="06C"> (3)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
       tooltip: val **x**: int
     Navigation result:
       opened file: Signature 01.fsi

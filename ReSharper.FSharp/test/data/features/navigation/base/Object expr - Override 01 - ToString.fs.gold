@@ -3,8 +3,8 @@
     DEO: Envoy: Method:System.Object.ToString(), PsiLanguageType:UNKNOWN as Envoy: Method:System.Object.ToString(), PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Method,ModifiersVirtual,ModifiersPublic)
-      text: Object <font color="GrayText"> (in System.Object)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      text: Object <font color="FF6D6D6D"> (in System.Object)</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: Object.cs
@@ -19,8 +19,8 @@
     DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 01 - ToString.fs
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Method,ModifiersPublic)
-      text: Object expr - Override 01 - ToString.T <font color="GrayText"> (in Object expr - Override 01 - ToString.T)</font>
-      tail: <font color="GrayText">TestProject</font>
+      text: Object expr - Override 01 - ToString.T <font color="FF6D6D6D"> (in Object expr - Override 01 - ToString.T)</font>
+      tail: <font color="FF6D6D6D">TestProject</font>
       tail icon: FsharpProject
     Navigation result:
       opened file: Object expr - Override 01 - ToString.fs

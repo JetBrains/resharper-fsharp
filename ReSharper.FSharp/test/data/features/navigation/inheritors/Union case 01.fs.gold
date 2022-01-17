@@ -3,8 +3,8 @@
     [*] DEO: Envoy: Class:Module+U+A, PsiLanguageType:F# as Envoy: Class:Module+U+A, PsiLanguageType:F# RANGE: (0,0) @ Union case 01.fs
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,EnumMember)
-      text: **Module.U.A **<font color="GrayText"> (in Module.U)</font>
-      tail: <font color="GrayText">TestProject</font>
+      text: **Module.U.A **<font color="FF6D6D6D"> (in Module.U)</font>
+      tail: <font color="FF6D6D6D">TestProject</font>
       tail icon: FsharpProject
     Navigation result:
       opened file: Union case 01.fs
@@ -19,8 +19,8 @@
     [*] DEO: Envoy: Class:Module+U+B, PsiLanguageType:F# as Envoy: Class:Module+U+B, PsiLanguageType:F# RANGE: (0,0) @ Union case 01.fs
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,EnumMember)
-      text: **Module.U.B **<font color="GrayText"> (in Module.U)</font>
-      tail: <font color="GrayText">TestProject</font>
+      text: **Module.U.B **<font color="FF6D6D6D"> (in Module.U)</font>
+      tail: <font color="FF6D6D6D">TestProject</font>
       tail icon: FsharpProject
     Navigation result:
       opened file: Union case 01.fs
