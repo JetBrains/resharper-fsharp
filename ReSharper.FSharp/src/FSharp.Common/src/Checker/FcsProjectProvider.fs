@@ -10,6 +10,7 @@ open JetBrains.DataFlow
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
+open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.Tasks
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
@@ -114,7 +115,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     do
         // Start listening for the changes after project model is updated.
         scheduler.EnqueueTask(SolutionLoadTask("FSharpProjectOptionsProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
-            changeManager.Changed2.Advise(lifetime, this.ProcessChange)))
+            changeManager.Changed2.Advise(lifetime, this.ProcessChange)
+            fsItemsContainer.FSharpProjectLoaded.Advise(lifetime, this.ProcessFSharpProjectLoaded)))
 
         checkerService.FcsProjectProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
@@ -192,6 +194,11 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             dirtyModules.Add(psiModule) |> ignore
 
     member x.FcsProjectInvalidated = fcsProjectInvalidated
+
+    member private this.ProcessFSharpProjectLoaded(projectMark: IProjectMark) =
+        use lock = locker.UsingWriteLock()
+        for project in solution.GetProjectsByMark(projectMark) do
+            invalidateProject project
 
     member x.ProcessChange(obj: ChangeEventArgs) =
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
