@@ -7,4 +7,5 @@
 }
 
 ---------------------------------------------------------
+M:Module.R.System#IDisposable#Dispose
 M:Module.R.#ctor(System.Int32)

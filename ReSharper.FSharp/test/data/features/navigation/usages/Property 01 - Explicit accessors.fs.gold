@@ -3,8 +3,8 @@
     TO: [I] T.|set_A|(0, 0); RANGE: (141,146) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
-      text: Class1.Class1      <font color="DarkRed">T.**set_A**(0, 0);</font><font color="HotTrack"> (8)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: Class1.Class1      <font color="FF8B0000">T.**set_A**(0, 0);</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: T.**set_A**(0, 0);
     Navigation result:
       opened file: Property 01 - Explicit accessors.cs
@@ -19,8 +19,8 @@
     TO: [I] T.|set_A|(0, 0, 0); RANGE: (161,166) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
-      text: Class1.Class1      <font color="DarkRed">T.**set_A**(0, 0, 0);</font><font color="HotTrack"> (9)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: Class1.Class1      <font color="FF8B0000">T.**set_A**(0, 0, 0);</font><font color="06C"> (9)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: T.**set_A**(0, 0, 0);
     Navigation result:
       opened file: Property 01 - Explicit accessors.cs
@@ -35,8 +35,8 @@
     TO: [I] T.|set_A|(0, 0, 0, 0, 0); RANGE: (184,189) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
-      text: Class1.Class1      <font color="DarkRed">T.**set_A**(0, 0, 0, 0, 0);</font><font color="HotTrack"> (10)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: Class1.Class1      <font color="FF8B0000">T.**set_A**(0, 0, 0, 0, 0);</font><font color="06C"> (10)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: T.**set_A**(0, 0, 0, 0, 0);
     Navigation result:
       opened file: Property 01 - Explicit accessors.cs
@@ -51,8 +51,8 @@
     TO: [I] var _ = T.|get_A|(0); RANGE: (62,67) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
-      text: Class1.Class1      <font color="DarkRed">var _ = T.**get_A**(0);</font><font color="HotTrack"> (5)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: Class1.Class1      <font color="FF8B0000">var _ = T.**get_A**(0);</font><font color="06C"> (5)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: var _ = T.**get_A**(0);
     Navigation result:
       opened file: Property 01 - Explicit accessors.cs
@@ -67,8 +67,8 @@
     TO: [I] var __ = T.|get_A|(0, 0); RANGE: (88,93) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
-      text: Class1.Class1      <font color="DarkRed">var __ = T.**get_A**(0, 0);</font><font color="HotTrack"> (6)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: Class1.Class1      <font color="FF8B0000">var __ = T.**get_A**(0, 0);</font><font color="06C"> (6)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: var __ = T.**get_A**(0, 0);
     Navigation result:
       opened file: Property 01 - Explicit accessors.cs
@@ -83,8 +83,8 @@
     TO: [I] var ___ = T.|get_A|(0, 0, 0); RANGE: (118,123) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
-      text: Class1.Class1      <font color="DarkRed">var ___ = T.**get_A**(0, 0, 0);</font><font color="HotTrack"> (7)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: Class1.Class1      <font color="FF8B0000">var ___ = T.**get_A**(0, 0, 0);</font><font color="06C"> (7)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: var ___ = T.**get_A**(0, 0, 0);
     Navigation result:
       opened file: Property 01 - Explicit accessors.cs
@@ -99,8 +99,8 @@
     TO: [W] static member A with set (_: int, _: int) (_: int) = T.|A|(0) <- 0 RANGE: (224,225) @ Property 01 - Explicit accessors.fs
     Menu item (enabled) :
       icon: UsageWrite
-      text: T.set_A      <font color="DarkRed">... int, _: int) (_: int) = T.**A**(0) <- 0</font><font color="HotTrack"> (9)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: T.set_A      <font color="FF8B0000">... int, _: int) (_: int) = T.**A**(0) <- 0</font><font color="06C"> (9)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: ... int, _: int) (_: int) = T.**A**(0) <- 0
     Navigation result:
       opened file: Property 01 - Explicit accessors.fs
@@ -115,8 +115,8 @@
     TO: [W] static member A with set (_: int, _: int, _: int, _: int) (_: int) = T.|A|(0, 0) <- 0 RANGE: (369,370) @ Property 01 - Explicit accessors.fs
     Menu item (enabled) :
       icon: UsageWrite
-      text: T.set_A      <font color="DarkRed">... int, _: int) (_: int) = T.**A**(0, 0) <- 0</font><font color="HotTrack"> (13)</font>
-      tail: <font color="GrayText">in <Root Namespace></font>
+      text: T.set_A      <font color="FF8B0000">... int, _: int) (_: int) = T.**A**(0, 0) <- 0</font><font color="06C"> (13)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: ... int, _: int) (_: int) = T.**A**(0, 0) <- 0
     Navigation result:
       opened file: Property 01 - Explicit accessors.fs

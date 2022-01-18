@@ -24,10 +24,10 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.intellij") version "1.2.0" // https://github.com/JetBrains/gradle-intellij-plugin/releases
+    id("org.jetbrains.intellij") version "1.3.1" // https://github.com/JetBrains/gradle-intellij-plugin/releases
     id("org.jetbrains.grammarkit") version "2021.1.3"
     id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
-    kotlin("jvm") version "1.4.10"
+    kotlin("jvm") version "1.6.10"
 }
 
 apply {
@@ -42,7 +42,7 @@ java {
 }
 
 
-val baseVersion = "2021.3"
+val baseVersion = "2022.1"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
@@ -116,6 +116,9 @@ val pluginFiles = listOf(
         "FSharp.ProjectModelBase/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
         "FSharp.Common/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Common",
         "FSharp.Psi/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi",
+        "FSharp.Psi.Services/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi.Services",
+        "FSharp.Psi.Daemon/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon",
+        "FSharp.Psi.Intentions/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions",
         "FSharp.Psi.Features/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
         "FSharp.Fantomas.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol",
         "FSharp.TypeProviders.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol")
@@ -140,13 +143,6 @@ val fantomasFiles = listOf(
         "FSharp.Fantomas.Host/$outputRelativePath/FSharp.Compiler.Service.dll",
         "FSharp.Fantomas.Host/$outputRelativePath/Fantomas.dll")
 
-val dotNetSdkPath by lazy {
-    val sdkPath = intellij.getIdeaDependency(project).classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
-    if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
-
-    println("SDK path: $sdkPath")
-    return@lazy sdkPath
-}
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
 val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
@@ -163,77 +159,85 @@ fun File.writeTextIfChanged(content: String) {
     }
 }
 
-configure<RdGenExtension> {
-    val csOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.ProjectModelBase/src/Protocol")
-    val ktOutput = File(repoRoot, "rider-fsharp/src/main/java/com/jetbrains/rider/plugins/fsharp/protocol")
-
-    val typeProviderClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Client")
-    val typeProviderServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Server")
-
-    val fantomasServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.Fantomas.Protocol/src/Server")
-    val fantomasClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.Fantomas.Protocol/src/Client")
-
-    verbose = true
-    hashFolder = "build/rdgen"
-    logger.info("Configuring rdgen params")
-    classpath({
-        logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${intellij.ideaDependency}")
-        val sdkPath = intellij.getIdeaDependency(project).classes
-        val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
-
-        "$rdLibDirectory/rider-model.jar"
-    })
-    sources(File(repoRoot, "rider-fsharp/protocol/src/kotlin/model"))
-    packages = "model"
-
-    generator {
-        language = "kotlin"
-        transform = "asis"
-        root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-        namespace = "com.jetbrains.rider.model"
-        directory = "$ktOutput"
-    }
-
-    generator {
-        language = "csharp"
-        transform = "reversed"
-        root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-        namespace = "JetBrains.Rider.Model"
-        directory = "$csOutput"
-    }
-
-    generator {
-        language = "csharp"
-        transform = "asis"
-        root = "model.RdFSharpTypeProvidersModel"
-        namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Client"
-        directory = "$typeProviderClientOutput"
-    }
-    generator {
-        language = "csharp"
-        transform = "reversed"
-        root = "model.RdFSharpTypeProvidersModel"
-        namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Server"
-        directory = "$typeProviderServerOutput"
-    }
-
-    generator {
-        language = "csharp"
-        transform = "asis"
-        root = "model.RdFantomasModel"
-        namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client"
-        directory = "$fantomasClientOutput"
-    }
-    generator {
-        language = "csharp"
-        transform = "reversed"
-        root = "model.RdFantomasModel"
-        namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server"
-        directory = "$fantomasServerOutput"
-    }
-}
-
 tasks {
+    val dotNetSdkPath by lazy {
+        val sdkPath = setupDependencies.get().idea.get().classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
+        if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
+
+        println("SDK path: $sdkPath")
+        return@lazy sdkPath
+    }
+
+    configure<RdGenExtension> {
+        val csOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.ProjectModelBase/src/Protocol")
+        val ktOutput = File(repoRoot, "rider-fsharp/src/main/java/com/jetbrains/rider/plugins/fsharp/protocol")
+
+        val typeProviderClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Client")
+        val typeProviderServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Server")
+
+        val fantomasServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.Fantomas.Protocol/src/Server")
+        val fantomasClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.Fantomas.Protocol/src/Client")
+
+        verbose = true
+        hashFolder = "build/rdgen"
+        logger.info("Configuring rdgen params")
+        classpath({
+        logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${setupDependencies.get().idea.get()}")
+            val sdkPath = setupDependencies.get().idea.get().classes
+            val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
+
+            "$rdLibDirectory/rider-model.jar"
+        })
+        sources(File(repoRoot, "rider-fsharp/protocol/src/kotlin/model"))
+        packages = "model"
+
+        generator {
+            language = "kotlin"
+            transform = "asis"
+            root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+            namespace = "com.jetbrains.rider.model"
+            directory = "$ktOutput"
+        }
+
+        generator {
+            language = "csharp"
+            transform = "reversed"
+            root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+            namespace = "JetBrains.Rider.Model"
+            directory = "$csOutput"
+        }
+
+        generator {
+            language = "csharp"
+            transform = "asis"
+            root = "model.RdFSharpTypeProvidersModel"
+            namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Client"
+            directory = "$typeProviderClientOutput"
+        }
+        generator {
+            language = "csharp"
+            transform = "reversed"
+            root = "model.RdFSharpTypeProvidersModel"
+            namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Server"
+            directory = "$typeProviderServerOutput"
+        }
+
+        generator {
+            language = "csharp"
+            transform = "asis"
+            root = "model.RdFantomasModel"
+            namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client"
+            directory = "$fantomasClientOutput"
+        }
+        generator {
+            language = "csharp"
+            transform = "reversed"
+            root = "model.RdFantomasModel"
+            namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server"
+            directory = "$fantomasServerOutput"
+        }
+    }
+
     withType<IntelliJInstrumentCodeTask> {
         val bundledMavenArtifacts = file("build/maven-artifacts")
         if (bundledMavenArtifacts.exists()) {
@@ -328,7 +332,7 @@ tasks {
     }
 
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
         dependsOn(generateFSharpLexer, "rdgen")
     }
 

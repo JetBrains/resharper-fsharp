@@ -1,0 +1,108 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src\Intentions\DataProviders.fs" />
+    <Compile Include="src\Intentions\FSharpContextActionBase.fs" />
+    <Compile Include="src\Intentions\DeconstructAction.fs" />
+    <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
+    <Compile Include="src\Intentions\ToMultilineRecord.fs" />
+    <Compile Include="src\Intentions\ToRecursiveModuleAction.fs" />
+    <Compile Include="src\Intentions\ToModuleNamespaceDeclarationAction.fs" />
+    <Compile Include="src\Intentions\InvertIfAction.fs" />
+    <Compile Include="src\Intentions\ElifToIfAction.fs" />
+    <Compile Include="src\Intentions\IfToElifAction.fs" />
+    <Compile Include="src\Intentions\NegateConditionActions.fs" />
+    <Compile Include="src\Intentions\ToMutableAction.fs" />
+    <Compile Include="src\Intentions\FunctionAnnotationAction.fs" />
+    <Compile Include="src\Intentions\ToLiteralAction.fs" />
+    <Compile Include="src\Intentions\SetNameAction.fs" />
+    <Compile Include="src\Intentions\LetToUseAction.fs" />
+    <Compile Include="src\Intentions\RenameFileToMatchTypeNameAction.fs" />
+    <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedOpensFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceUseWithLetFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedNamedAsPatFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithWildPatFix.fs" />
+    <Compile Include="src\QuickFixes\AddIgnoreFix.fs" />
+    <Compile Include="src\QuickFixes\GenerateMissingRecordFieldsFix.fs" />
+    <Compile Include="src\QuickFixes\ToRecursiveLetBindingsFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantBackticksFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveInlineFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnnecessaryUpcastFix.fs" />
+    <Compile Include="src\QuickFixes\ToRecursiveFunctionFix.fs" />
+    <Compile Include="src\QuickFixes\AddParensFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveSubsequentFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantNewFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedLocalBindingFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLetWithExpressionFix.fs" />
+    <Compile Include="src\QuickFixes\ConvertToUseFix.fs" />
+    <Compile Include="src\QuickFixes\ToUpcastFix.fs" />
+    <Compile Include="src\QuickFixes\IntroduceVarFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveNeverMatchingRuleFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnexpectedArgumentsFix.fs" />
+    <Compile Include="src\QuickFixes\ToMutableFix.fs" />
+    <Compile Include="src\QuickFixes\AddUnderscorePrefixFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAttributeParensFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAttributeSuffixFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithAssignmentExpressionFix.fs" />
+    <Compile Include="src\QuickFixes\AddMatchAllClauseFix.fs" />
+    <Compile Include="src\QuickFixes\ToAbstractFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveYieldFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantQualifierFix.fs" />
+    <Compile Include="src\QuickFixes\AddParensToApplicationFix.fs" />
+    <Compile Include="src\QuickFixes\AddExtensionAttributeFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithInnerTreeNodeFixBase.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantParens.fs" />
+    <Compile Include="src\QuickFixes\NamespaceToModuleFix.fs" />
+    <Compile Include="src\QuickFixes\SimplifyListConsPatFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceAppExprWithArgFix.fs" />
+    <Compile Include="src\QuickFixes\SimplifyLambdaFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLambdaWithInnerExpressionFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLambdaWithBuiltinFunctionFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLambdaBodyWithId.fs" />
+    <Compile Include="src\QuickFixes\GenerateInterfaceMembersFix.fs" />
+    <Compile Include="src\QuickFixes\GenerateMissingOverridesFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAttributeFix.fs" />
+    <Compile Include="src\QuickFixes\ConvertTupleToArrayOrListElementsFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithAbbreviatedTypeFix.fs" />
+    <Compile Include="src\QuickFixes\UseWildSelfIdFix.fs" />
+    <Compile Include="src\QuickFixes\AddParensToTypedLikeExprFix.fs" />
+    <Compile Include="src\QuickFixes\SpecifyParameterTypeFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithInterpolatedStringFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithPredefinedOperatorFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveConstructorFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithConditionFix.fs" />
+    <Compile Include="src\QuickFixes\AddInstanceMemberSelfIdFix.fs" />
+    <Compile Include="src\QuickFixes\ToStaticMemberFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithTypeRefExprFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAsPatFix.fs" />
+    <Compile Include="src\QuickFixes\DeconstructPatternFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithRegularStringFix.fs" />
+    <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\Errors.xml">
+      <Mode>QUICKFIX</Mode>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
+      <OutputFile>src\QuickFixes\CommonQuickFixes.Generated.fs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
+    <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\FcsErrors.xml">
+      <Mode>QUICKFIX</Mode>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
+      <OutputFile>src\QuickFixes\FcsErrorsQuickFixes.Generated.fs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.Psi.Services\FSharp.Psi.Services.fsproj" />
+  </ItemGroup>
+
+  <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
+</Project>

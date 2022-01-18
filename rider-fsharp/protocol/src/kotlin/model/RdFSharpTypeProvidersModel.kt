@@ -267,6 +267,7 @@ object RdFSharpTypeProvidersModel : Root() {
         +"IsErased"
         +"IsGenericType"
         +"IsMeasure"
+        +"IsCreatedByProvider"
     }
 
     private val RdProvidedFieldFlags = flags {

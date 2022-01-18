@@ -3,8 +3,8 @@
     TO: [O] let |x| = 123 RANGE: (21,22) @ Signature 02 - Same range.fs
     Menu item (enabled) :
       icon: Fsharp
-      text: Signature 02 - Same range.fs<font color="HotTrack"> (3)</font>
-      tail: <font color="GrayText">in <TestProject></font>
+      text: Signature 02 - Same range.fs<font color="06C"> (3)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
       tooltip: let **x** = 123
     Navigation result:
       opened file: Signature 02 - Same range.fs
@@ -19,8 +19,8 @@
     TO: [O] val |x|: int RANGE: (21,22) @ Signature 02 - Same range.fsi
     Menu item (enabled) :
       icon: Fsharp
-      text: Signature 02 - Same range.fsi<font color="HotTrack"> (3)</font>
-      tail: <font color="GrayText">in <TestProject></font>
+      text: Signature 02 - Same range.fsi<font color="06C"> (3)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
       tooltip: val **x**: int
     Navigation result:
       opened file: Signature 02 - Same range.fsi

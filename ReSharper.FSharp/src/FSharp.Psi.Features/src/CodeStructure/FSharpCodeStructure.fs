@@ -25,7 +25,7 @@ type FSharpCodeStructureProvider() =
     let typeExtensionIconId = compose PsiSymbolsThemedIcons.Class.Id FSharpIcons.ExtensionOverlay.Id
 
     let rec processNode (parent: CodeStructureElement) (parentBlock: ICodeStructureBlockStart) (node: ITreeNode) =
-        InterruptableActivityCookie.CheckAndThrow()
+        Interruption.Current.CheckAndThrow()
 
         match node with
         | :? IFSharpFile as fsFile ->

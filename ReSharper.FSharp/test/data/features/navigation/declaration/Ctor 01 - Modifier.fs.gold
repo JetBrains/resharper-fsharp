@@ -3,8 +3,8 @@
     Candidate:
       Menu item (enabled) :
         icon: u(PsiSymbolTypicalSizePlaceholder,Constructor,ModifiersInternal)
-        text: T(int) <font color="GrayText"> (in Module.T)</font>
-        tail: <font color="GrayText">TestProject</font>
+        text: T(int) <font color="FF6D6D6D"> (in Module.T)</font>
+        tail: <font color="FF6D6D6D">TestProject</font>
         tail icon: FsharpProject
     Candidate execution:
       Immediate result:
@@ -22,8 +22,8 @@
     Candidate:
       Menu item (enabled) :
         icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersPublic)
-        text: T <font color="GrayText"> (in Module)</font>
-        tail: <font color="GrayText">TestProject</font>
+        text: T <font color="FF6D6D6D"> (in Module)</font>
+        tail: <font color="FF6D6D6D">TestProject</font>
         tail icon: FsharpProject
     Candidate execution:
       Immediate result:

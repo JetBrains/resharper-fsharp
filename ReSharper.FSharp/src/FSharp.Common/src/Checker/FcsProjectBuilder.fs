@@ -85,11 +85,6 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         if isNull s then EmptyArray.Instance else
         s.Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
 
-    let getReferences psiModule =
-        getReferencedModules psiModule
-        |> Seq.map modulePathProvider.GetModulePath
-        |> Seq.map (fun r -> "-r:" + r.FullPath)
-
     let getOutputType (outputType: ProjectOutputType) =
         match outputType with
         | ProjectOutputType.CONSOLE_EXE -> "exe"
@@ -145,7 +140,15 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
         otherOptions.AddRange(defaultOptions)
         otherOptions.AddRange(unusedValuesWarns)
-        otherOptions.AddRange(getReferences psiModule)
+
+        let referencedModules = getReferencedModules psiModule
+
+        let moduleReferences = 
+            referencedModules
+            |> Seq.map modulePathProvider.GetModulePath
+            |> Seq.map (fun r -> "-r:" + r.FullPath)
+
+        otherOptions.AddRange(moduleReferences)
 
         match projectProperties.ActiveConfigurations.TryGetConfiguration(targetFrameworkId) with
         | :? IManagedProjectConfiguration as cfg ->
@@ -228,4 +231,5 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
           ProjectOptions = projectOptions
           ParsingOptions = parsingOptions
           FileIndices = fileIndices
-          ImplementationFilesWithSignatures = implsWithSig }
+          ImplementationFilesWithSignatures = implsWithSig
+          ReferencedModules = HashSet(referencedModules) }

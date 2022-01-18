@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
+﻿using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Utils;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
 using JetBrains.Util;
 using static FSharp.Compiler.ExtensionTyping;
@@ -47,6 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
       if (logger.Catch(() => providedModel.IsNestedPublic)) flags |= RdProvidedTypeFlags.IsNestedPublic;
       if (logger.Catch(() => providedModel.IsSuppressRelocate)) flags |= RdProvidedTypeFlags.IsSuppressRelocate;
       if (logger.Catch(() => providedModel.IsGenericParameter)) flags |= RdProvidedTypeFlags.IsGenericParameter;
+      if (providedModel.IsCreatedByProvider()) flags |= RdProvidedTypeFlags.IsCreatedByProvider;
 
       var genericParameters = providedModel.IsGenericType
         ? providedModel

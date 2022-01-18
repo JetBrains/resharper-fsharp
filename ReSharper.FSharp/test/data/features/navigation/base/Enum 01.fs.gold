@@ -3,8 +3,8 @@
     [*] DEO: Envoy: Class:System.Enum, PsiLanguageType:UNKNOWN as Envoy: Class:System.Enum, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersAbstract,ModifiersPublic)
-      text: **Enum **<font color="GrayText"> (in System)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0</font>
+      text: **Enum **<font color="FF6D6D6D"> (in System)</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: Enum.cs
@@ -19,8 +19,8 @@
     DEO: Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
-      text: IComparable <font color="GrayText"> (in System)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0</font>
+      text: IComparable <font color="FF6D6D6D"> (in System)</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: IComparable.cs
@@ -35,8 +35,8 @@
     DEO: Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
-      text: IConvertible <font color="GrayText"> (in System)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0</font>
+      text: IConvertible <font color="FF6D6D6D"> (in System)</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: IConvertible.cs
@@ -51,8 +51,8 @@
     DEO: Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
-      text: IFormattable <font color="GrayText"> (in System)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0</font>
+      text: IFormattable <font color="FF6D6D6D"> (in System)</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: IFormattable.cs
@@ -67,8 +67,8 @@
     DEO: Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN as Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersAbstract,ModifiersPublic)
-      text: ValueType <font color="GrayText"> (in System)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0</font>
+      text: ValueType <font color="FF6D6D6D"> (in System)</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: ValueType.cs

@@ -3,8 +3,8 @@
     TO: [O] let (||A||) x = x + 1 RANGE: (23,24) @ Active pattern 03 - Signature.fs
     Menu item (enabled) :
       icon: Fsharp
-      text: Active pattern 03 - Signature.fs<font color="HotTrack"> (3)</font>
-      tail: <font color="GrayText">in <TestProject></font>
+      text: Active pattern 03 - Signature.fs<font color="06C"> (3)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
       tooltip: let (|**A**|) x = x + 1
     Navigation result:
       opened file: Active pattern 03 - Signature.fs
@@ -19,8 +19,8 @@
     TO: [O] val (||A||): int -> int RANGE: (23,24) @ Active pattern 03 - Signature.fsi
     Menu item (enabled) :
       icon: Fsharp
-      text: Active pattern 03 - Signature.fsi<font color="HotTrack"> (3)</font>
-      tail: <font color="GrayText">in <TestProject></font>
+      text: Active pattern 03 - Signature.fsi<font color="06C"> (3)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
       tooltip: val (|**A**|): int -> int
     Navigation result:
       opened file: Active pattern 03 - Signature.fsi

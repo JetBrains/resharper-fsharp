@@ -1,0 +1,65 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Services</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Services</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src\Util\StringLiteralsUtil.fs" />
+    <Compile Include="src\Util\PsiUtil.fs" />
+    <Compile Include="src\Util\ParenPatUtil.fs" />
+    <Compile Include="src\Util\FSharpAttributesUtil.fs" />
+    <Compile Include="src\Util\FSharpAutoOpenUtil.fs" />
+    <Compile Include="src\Util\OpensUtil.fs" />
+    <Compile Include="src\Util\FSharpParensUtil.fs" />
+    <Compile Include="src\Util\TypeUsageParensUtil.fs" />
+    <Compile Include="src\Util\FSharpExpressionUtil.fs" />
+    <Compile Include="src\Util\FSharpResolveUtil.fs" />
+    <Compile Include="src\Util\FSharpPatternUtil.fs" />
+    <Compile Include="src\Util\FSharpMethodInvocationUtil.fs" />
+    <Compile Include="src\Util\FSharpNamingService.fs" />
+    <Compile Include="src\Util\LetDisposableAnalyzer.fs" />
+    <Compile Include="src\Util\UnusedOpensUtil.fs" />
+    <Compile Include="src\Util\FSharpModulesUtil.fs" />
+    <Compile Include="src\Util\FcsTypeUtil.fs" />
+    <Compile Include="src\Util\Deconstruction.fs" />
+    <Compile Include="src\Util\FSharpLambdaUtil.fs" />
+    <Compile Include="src\Util\FSharpExpectedTypesUtil.fs" />
+    <Compile Include="src\Util\EnumCaseLikeDeclarationUtil.fs" />
+    <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
+    <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
+    <ErrorsGen Include="src\Daemon\Highlightings\Errors.xml">
+      <Mode>ERRORS</Mode>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors</Namespace>
+      <OutputFile>src\Daemon\Highlightings\Errors.Generated.fs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
+    <Compile Include="src\Daemon\Highlightings\Errors.Generated.fs">
+      <DependentUpon>Errors.xml</DependentUpon>
+    </Compile>
+    <ErrorsGen Include="src\Daemon\Highlightings\FcsErrors.xml">
+      <Mode>ERRORS</Mode>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FcsErrors</Namespace>
+      <OutputFile>src\Daemon\Highlightings\FcsErrors.Generated.fs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
+    <Compile Include="src\Daemon\Highlightings\FcsErrors.Generated.fs">
+      <DependentUpon>FcsErrors.xml</DependentUpon>
+    </Compile>
+    <Compile Include="src\Generate\IFSharpGeneratorElement.fs" />
+    <Compile Include="src\Generate\GenerateOverrides.fs" />
+    <Compile Include="src\Generate\GenerateProvider.fs" />
+    <Compile Include="src\Refactorings\Rename.fs" />
+    <Compile Include="src\Refactorings\IntroduceVariable.fs" />
+    <Compile Include="src\Refactorings\FSharpInlineVariable.fs" />
+    <Compile Include="src\Refactorings\FSharpRefactoringLanguageService.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
+  </ItemGroup>
+  
+  <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
+</Project>

@@ -3,7 +3,6 @@ package com.jetbrains.rider.plugins.fsharp.logs
 import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 
 object FSharpLogTraceScenarios {
-    object FSharpFcsReactorMonitor : LogTraceScenario("JetBrains.ReSharper.Plugins.FSharp.FcsReactorMonitor")
     object FSharpFcsProjectProvider : LogTraceScenario("JetBrains.ReSharper.Plugins.FSharp.Checker.FcsProjectProvider")
 
     object FSharpFileSystemShim : LogTraceScenario(

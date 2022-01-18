@@ -35,7 +35,8 @@ type FcsProject =
       FileIndices: Dictionary<VirtualFileSystemPath, int>
       ProjectOptions: FSharpProjectOptions
       ParsingOptions: FSharpParsingOptions
-      ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath> }
+      ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
+      ReferencedModules: HashSet<IPsiModule> }
 
     member x.IsKnownFile(sourceFile: IPsiSourceFile) =
         x.FileIndices.ContainsKey(sourceFile.GetLocation())

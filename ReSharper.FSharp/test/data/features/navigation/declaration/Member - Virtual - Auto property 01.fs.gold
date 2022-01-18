@@ -3,8 +3,8 @@
     TO: [O] abstract |P|: int RANGE: (61,62) @ Member - Virtual - Auto property 01.fs
     Menu item (enabled) :
       icon: Fsharp
-      text: Member - Virtual - Auto property 01.fs<font color="HotTrack"> (5)</font>
-      tail: <font color="GrayText">in <TestProject></font>
+      text: Member - Virtual - Auto property 01.fs<font color="06C"> (5)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
       tooltip: abstract **P**: int
     Navigation result:
       opened file: Member - Virtual - Auto property 01.fs
@@ -19,8 +19,8 @@
     TO: [O] default val |P| = 1 RANGE: (85,86) @ Member - Virtual - Auto property 01.fs
     Menu item (enabled) :
       icon: Fsharp
-      text: Member - Virtual - Auto property 01.fs<font color="HotTrack"> (6)</font>
-      tail: <font color="GrayText">in <TestProject></font>
+      text: Member - Virtual - Auto property 01.fs<font color="06C"> (6)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
       tooltip: default val **P** = 1
     Navigation result:
       opened file: Member - Virtual - Auto property 01.fs

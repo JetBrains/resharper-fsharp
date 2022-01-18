@@ -2,6 +2,8 @@
 
 let n = 1
 n.|[1]|(0)
+n|[1]|(1)
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression
+(1): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression

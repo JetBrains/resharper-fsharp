@@ -10,6 +10,7 @@ open JetBrains.Application.Components
 open JetBrains.Application.DataContext
 open JetBrains.Application.PersistentMap
 open JetBrains.Application.Threading
+open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.Platform.MsBuildHost.Models
@@ -87,13 +88,15 @@ type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
 
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
 [<SolutionInstanceComponent>]
-type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainerLoader,
+type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: FSharpItemsContainerLoader,
         projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider) =
 
     let locker = JetFastSemiReenterableRWLock()
     let projectMappings = lazy (containerLoader.GetMap())
     let targetFrameworkIdsIntern = DataIntern(setComparer)
 
+    let fsProjectLoaded = new Signal<IProjectMark>(lifetime, "fsProjectLoaded")
+ 
     let tryGetProjectMark (projectItem: IProjectItem) =
         match projectItem.GetProject() with
         | null -> None
@@ -191,6 +194,8 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
 
     member x.ProjectMappings = projectMappings.Value
 
+    member x.FSharpProjectLoaded = fsProjectLoaded
+
     member x.IsValid(viewItem: FSharpViewItem) =
         use lock = locker.UsingReadLock()
         tryGetProjectItem viewItem |> Option.isSome
@@ -233,6 +238,7 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
                     |> List.ofSeq
                 let targetFrameworkIds = HashSet(msBuildProject.TargetFrameworkIds)
 
+                fsProjectLoaded.Fire(projectMark)                
                 addProjectMapping targetFrameworkIds items projectMark
                 projectRefresher.RefreshProject(projectMark, true)
             | _ -> ()

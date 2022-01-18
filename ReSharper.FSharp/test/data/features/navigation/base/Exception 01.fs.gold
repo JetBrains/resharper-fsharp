@@ -3,8 +3,8 @@
     DEO: Envoy: Interface:System.Runtime.InteropServices._Exception, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.InteropServices._Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
-      text: _Exception <font color="GrayText"> (in System.Runtime.InteropServices)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      text: _Exception <font color="FF6D6D6D"> (in System.Runtime.InteropServices)</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: _Exception.cs
@@ -19,8 +19,8 @@
     [*] DEO: Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN as Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersPublic)
-      text: **Exception **<font color="GrayText"> (in System)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      text: **Exception **<font color="FF6D6D6D"> (in System)</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: Exception.cs
@@ -35,8 +35,8 @@
     DEO: Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
-      text: ISerializable <font color="GrayText"> (in System.Runtime.Serialization)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      text: ISerializable <font color="FF6D6D6D"> (in System.Runtime.Serialization)</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: ISerializable.cs
@@ -51,8 +51,8 @@
     [*] DEO: Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
-      text: **IStructuralEquatable **<font color="GrayText"> (in System.Collections)</font>
-      tail: <font color="GrayText">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
+      text: **IStructuralEquatable **<font color="FF6D6D6D"> (in System.Collections)</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: IStructuralEquatable.cs

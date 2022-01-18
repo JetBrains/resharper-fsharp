@@ -9,6 +9,7 @@ using JetBrains.DocumentManagers.impl;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts;
 using JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
@@ -25,6 +26,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public IPsiModules PsiModules { get; }
     public FcsCheckerService CheckerService { get; }
     public IFcsProjectProvider FcsProjectProvider { get; }
+
+    protected readonly IDictionary<IPsiModule, FcsModuleResolvedSymbols> PsiModulesCaches =
+      new Dictionary<IPsiModule, FcsModuleResolvedSymbols>();
+
+    private readonly OneToSetMap<IPsiModule, IPsiModule> myReferencingModules =
+      new OneToSetMap<IPsiModule, IPsiModule>();
 
     private readonly object myLock = new object();
     private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
@@ -47,9 +54,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       lock (myLock)
       {
+        InvalidateReferencingModules(psiModule);
+        if (PsiModulesCaches.TryGetValue(psiModule, out var symbols) && symbols.FcsProject is { } fcsProject)
+        {
+          foreach (var referencedModule in fcsProject.ReferencedModules)
+            myReferencingModules.Remove(referencedModule, psiModule);
+        }
+
         PsiModulesCaches.Remove(psiModule);
-        if (psiModule.IsValid())
-          InvalidateReferencingModules(psiModule);
       }
     }
 
@@ -58,13 +70,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (PsiModulesCaches.IsEmpty())
         return;
 
-      // todo: reuse FcsProjectProvider/AssemblyReaderShim references
-      using (CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule()))
+      foreach (var referencingModule in myReferencingModules.GetReadOnlyValues(psiModule))
       {
-        var resolveContext = CompilationContextCookie.GetContext();
-        foreach (var psiModuleReference in PsiModules.GetReverseModuleReferences(psiModule, resolveContext))
-          if (PsiModulesCaches.TryGetValue(psiModuleReference.Module, out var moduleSymbols))
-            moduleSymbols.Invalidate();
+        if (PsiModulesCaches.TryGetValue(referencingModule, out var moduleSymbols))
+          moduleSymbols.Invalidate();
       }
     }
 
@@ -134,7 +143,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return;
 
       var sourceFile = elementContainingChanges.GetSourceFile();
-      Assertion.Assert(sourceFile != null, "sourceFile != null");
+      Assertion.Assert(sourceFile != null);
 
       MarkAsDirty(sourceFile);
     }
@@ -167,18 +176,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       }
     }
 
-    protected readonly IDictionary<IPsiModule, FSharpModuleResolvedSymbols> PsiModulesCaches =
-      new Dictionary<IPsiModule, FSharpModuleResolvedSymbols>();
-
     private IFcsFileResolvedSymbols GetOrCreateResolvedSymbols(IPsiSourceFile sourceFile) =>
       GetModuleResolvedSymbols(sourceFile).GetResolvedSymbols(sourceFile);
 
     [NotNull]
-    private IFSharpModuleResolvedSymbols GetModuleResolvedSymbols(IPsiSourceFile sourceFile)
+    private FcsModuleResolvedSymbols GetModuleResolvedSymbols(IPsiSourceFile sourceFile)
     {
       var psiModule = sourceFile.PsiModule;
       if (psiModule.IsMiscFilesProjectModule() && !(psiModule is SandboxPsiModule))
-        return FSharpMiscModuleResolvedSymbols.Instance;
+        return FcsModuleResolvedSymbols.Empty;
 
       FcsProjectProvider.InvalidateDirty();
 
@@ -190,12 +196,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         if (PsiModulesCaches.TryGetValue(psiModule, out var symbols))
           return symbols;
 
-        var parsingOptions = FcsProjectProvider.GetParsingOptions(sourceFile);
-        var filesCount = parsingOptions.SourceFiles.Length;
+        if (psiModule is FSharpScriptPsiModule)
+        {
+          var scriptResolvedSymbols = new FcsModuleResolvedSymbols(null, true);
+          PsiModulesCaches[psiModule] = scriptResolvedSymbols;
+          return scriptResolvedSymbols;
+        }
 
-        var moduleResolvedSymbols =
-          new FSharpModuleResolvedSymbols(psiModule, filesCount, CheckerService, FcsProjectProvider);
+        var fcsProject = FcsProjectProvider.GetFcsProject(psiModule)?.Value;
+        if (fcsProject == null)
+          return FcsModuleResolvedSymbols.Empty;
+
+        var moduleResolvedSymbols = new FcsModuleResolvedSymbols(fcsProject);
         PsiModulesCaches[psiModule] = moduleResolvedSymbols;
+
+        foreach (var referencedModule in fcsProject.ReferencedModules)
+          myReferencingModules.Add(referencedModule, psiModule);
+
         return moduleResolvedSymbols;
       }
     }

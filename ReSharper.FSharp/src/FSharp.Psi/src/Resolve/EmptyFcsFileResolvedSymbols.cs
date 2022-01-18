@@ -7,6 +7,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   public class EmptyFcsFileResolvedSymbols : IFcsFileResolvedSymbols
   {
+    private EmptyFcsFileResolvedSymbols()
+    {
+    }
+
     public static IFcsFileResolvedSymbols Instance = new EmptyFcsFileResolvedSymbols();
 
     public FSharpSymbolUse GetSymbolUse(int offset) => null;

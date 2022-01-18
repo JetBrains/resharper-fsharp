@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src\Highlightings\TypeHintHighlighting.fs" />
+    <Compile Include="src\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
+    <Compile Include="src\Tooltips\FSharpIdentifierTooltipProvider.fs" />
+    <Compile Include="src\Tooltips\FSharpSyntaxHighlightingQuickDocTooltipRequest.fs" />
+    <Compile Include="src\Tooltips\FSharpQuickDocSuppressor.fs" />
+    <Compile Include="src\Tooltips\ZoneMarker.fs" />
+    <Compile Include="src\Stages\FcsErrorsStageProcessBase.fs" />
+    <Compile Include="src\Stages\FSharpCompilerWarningProcessor.fs" />
+    <Compile Include="src\Stages\FSharpDaemonBehaviour.fs" />
+    <Compile Include="src\Stages\ScriptLoadPathsStage.fs" />
+    <Compile Include="src\Stages\SyntaxErrorsStage.fs" />
+    <Compile Include="src\Stages\TypeCheckErrorsStage.fs" />
+    <Compile Include="src\Stages\UnusedOpensStage.fs" />
+    <Compile Include="src\Stages\FormatSpecifiersStage.fs" />
+    <Compile Include="src\Stages\FSharpInheritedMembersHighlighterStage.fs" />
+    <Compile Include="src\Stages\FSharpVcsCodeVisionRangesProviderStage.fs" />
+    <Compile Include="src\Stages\FSharpErrorsStage.fs" />
+    <Compile Include="src\Stages\PipeChainTypeHintStage.fs" />
+    <Compile Include="src\Stages\InferredTypeCodeVisionProvider.fs" />
+    <Compile Include="src\Stages\FSharpSyntaxHighlightingStage.fs" />
+    <Compile Include="src\UsageChecking\FSharpUsageCheckingService.fs" />
+    <Compile Include="src\Analyzers\ElementProblemAnalyzerUtil.fs" />
+    <Compile Include="src\Analyzers\ReSpellerHelper.fs" />
+    <Compile Include="src\Analyzers\StringProblemsAnalyzer.fs" />
+    <Compile Include="src\Analyzers\AttributeTargetAnalyzer.fs" />
+    <Compile Include="src\Analyzers\ExtensionAttributeAnalyzer.fs" />
+    <Compile Include="src\Analyzers\RequireQualifiedAccessAttributeAnalyzer.fs" />
+    <Compile Include="src\Analyzers\RedundantBackticksAnalyzer.fs" />
+    <Compile Include="src\Analyzers\RedundantNew.fs" />
+    <Compile Include="src\Analyzers\RedundantParenExprAnalyzer.fs" />
+    <Compile Include="src\Analyzers\RedundantParenPatAnalyzer.fs" />
+    <Compile Include="src\Analyzers\RedundantParenTypeUsageAnalyzer.fs" />
+    <Compile Include="src\Analyzers\InactivePreprocessorBranchAnalyzer.fs" />
+    <Compile Include="src\Analyzers\AttributeRedundanciesAnalyzer.fs" />
+    <Compile Include="src\Analyzers\ColorReferenceAnalyzer.fs" />
+    <Compile Include="src\Analyzers\RedundantQualifierAnalyzer.fs" />
+    <Compile Include="src\Analyzers\RedundantUnionCaseFieldPatsAnalyzer.fs" />
+    <Compile Include="src\Analyzers\ListConsPatAnalyzer.fs" />
+    <Compile Include="src\Analyzers\AppExpressionAnalyzer.fs" />
+    <Compile Include="src\Analyzers\LambdaAnalyzer.fs" />
+    <Compile Include="src\Analyzers\SelfIdAnalyzer.fs" />
+    <Compile Include="src\Analyzers\InterpolatedStringCandidateAnalyzer.fs" />
+    <Compile Include="src\Analyzers\IfExpressionAnalyzer.fs" />
+    <Compile Include="src\Analyzers\AsPatAnalyzer.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.Psi.Services\FSharp.Psi.Services.fsproj" />
+  </ItemGroup>
+  
+  <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
+</Project>

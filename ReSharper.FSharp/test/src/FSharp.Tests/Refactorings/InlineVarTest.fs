@@ -26,9 +26,6 @@ type InlineVarTest() =
     [<Test>] member x.``Expr - Lambda - Type cast 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match - If 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match - If 02``() = x.DoNamedTest()
-    [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Expr - Record - Interpolation 01``() = x.DoNamedTest()
-    [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Expr - Ref - Interpolation 01``() = x.DoNamedTest()
-    [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Expr - Ref - Interpolation 02 - Qualifier``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Ref - Operator 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Ref - Operator 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Ref - Operator 03 - Compiled name``() = x.DoNamedTest()
@@ -46,6 +43,12 @@ type InlineVarTest() =
     [<Test>] member x.``Expr - Qualifier - Literal 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Qualifier - Method 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Qualifier - Method 02``() = x.DoNamedTest()
+
+    [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Interpolation - App 01``() = x.DoNamedTest()
+    [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Interpolation - Record 01``() = x.DoNamedTest()
+    [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Interpolation - Record 02 - Anon``() = x.DoNamedTest()
+    [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Interpolation - Ref 01``() = x.DoNamedTest()
+    [<Test; Explicit("Use FSharp.Core 5 in tests")>] member x.``Interpolation - Ref 02 - Qualifier``() = x.DoNamedTest()
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02``() = x.DoNamedTest()

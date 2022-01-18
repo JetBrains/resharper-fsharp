@@ -29,7 +29,6 @@ module FSharpOptions =
     let [<Literal>] nonFSharpProjectInMemoryAnalysis = "Analyze C#/VB projects without build (requires restart)"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
-    let [<Literal>] enableFcsReactorMonitor = "Enable FCS monitor"
 
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]

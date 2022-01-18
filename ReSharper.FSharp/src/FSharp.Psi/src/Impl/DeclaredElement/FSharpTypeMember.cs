@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
@@ -41,20 +42,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (declaration == null)
         return EmptyList<IDeclaration>.InstanceList;
 
+      using var _ = CompilationContextCookie.GetOrCreate(containingType.Module.GetContextFromModule());
+
       var list = new FrugalLocalList<IDeclaration>();
-      var declarations =
+      var typeDeclarations =
         sourceFile != null
           ? containingType.GetDeclarationsIn(sourceFile)
           : containingType.GetDeclarations();
 
-      foreach (var partDeclaration in declarations)
+      foreach (var partDeclaration in typeDeclarations)
       {
         if (!(partDeclaration is IFSharpTypeElementDeclaration typeDeclaration))
           continue;
 
-        foreach (var member in typeDeclaration.MemberDeclarations)
-          if (member.DeclaredName == declaration.DeclaredName && Equals(this, member.DeclaredElement))
-            list.Add(member);
+        foreach (var memberDecl in typeDeclaration.MemberDeclarations)
+          if (memberDecl.DeclaredName == declaration.DeclaredName && Equals(this, memberDecl.DeclaredElement))
+            list.Add(memberDecl);
       }
 
       return list.ResultingList();
