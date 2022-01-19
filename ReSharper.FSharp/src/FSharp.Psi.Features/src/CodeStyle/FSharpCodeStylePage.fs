@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Drawing
 open System.Linq.Expressions
 open JetBrains.Application.Components
+open JetBrains.Application.Notifications
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog
 open JetBrains.Collections.Viewable
@@ -93,7 +94,7 @@ type FantomasRunValidationResult =
 //From settings and ?
 
 [<SolutionComponent>]
-type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsProvider) =
+type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsProvider, notifications: UserNotifications) =
     let minimalSupportedVersion = Version("1.1.1")
     let dataCache =
         let dict = Dictionary(3)
@@ -113,18 +114,22 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
             if not x.HasNew then () else
             selectedVersion.Value <- dataCache[x.New])
 
+        //subscrive on dotnet-tools
+
     member x.SelectedVersion = selectedVersion
 
     //TODO: notifications?
     member x.TryRun(runAction: unit -> unit) =
         try runAction()
         with _ ->
+
             let key = selectedVersion.Value |> fst |> (fun x -> x.Version |> fst)
+            notifications.CreateNotification(lifetime, title = "Fantomas failed to run!", body = $"%A{key}") |> ignore
             let data, _ = dataCache[key]
             dataCache[key] <- data, FailedToRun
             selectedVersion.Value <- dataCache[FantomasVersion.Bundled]
 
-    member x.GetSettings() = dataCache
+    member x.GetSettings() = Dictionary(dataCache)
 
 
 [<OptionsPage("FantomasPage", "Fantomas", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]

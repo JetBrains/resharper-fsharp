@@ -33,6 +33,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory,
     let isConnectionAlive () =
         isNotNull connection && connection.IsActive
 
+    //cringe
     let terminateConnection () =
         if isConnectionAlive () then
             formatterHostLifetime.Terminate()
@@ -45,8 +46,8 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory,
         //check invariants
         runSettings.TryRun(fun _ ->
             formatterHostLifetime <- Lifetime.Define(solution.GetLifetime())
-            let settings = runSettings.SelectedVersion.Value
-            connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, (fst settings).Path).Run()
+            let settings = runSettings.SelectedVersion.Value |> fst
+            connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, settings.Path).Run()
             formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance))
             notifications.CreateNotification(formatterHostLifetime.Lifetime, title = "Fantomas", body = $"%A{settings.Version}") |> ignore
         )
