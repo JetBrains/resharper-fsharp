@@ -5,14 +5,6 @@ using JetBrains.ReSharper.Psi.Format;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 {
-  public enum FantomasVersion
-  {
-    Bundled,
-    DotnetTools,
-    Global
-  }
-
-
   [SettingsKey(typeof(CodeFormattingSettingsKey), "Code formatting in F#")]
   [EditorConfigKey("fsharp")]
   public class FSharpFormatSettingsKey : FormatSettingsKeyBase
@@ -161,8 +153,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
     [SettingsIndexedEntry("Fantomas settings")]
     public readonly IIndexedEntry<string, string> FantomasSettings;
-
-    [SettingsEntry(FantomasVersion.Bundled, "Fantomas version")]
-    public FantomasVersion FantomasVersion;
   }
 }

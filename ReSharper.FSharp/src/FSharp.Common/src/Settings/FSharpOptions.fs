@@ -45,6 +45,18 @@ type FSharpOptions =
       mutable TopLevelOpenCompletion: bool }
 
 
+type FantomasVersion =
+    | NotSelected = 0
+    | Bundled = 1
+    | LocalDotnetTool = 2
+    | GlobalDotnetTool = 3
+
+[<SettingsKey(typeof<FSharpSettings>, "FSharpFantomasOptions")>]
+type FSharpFantomasOptions =
+    { [<SettingsEntry(true, "Fantomas version"); DefaultValue>]
+      mutable Version: FantomasVersion }
+
+
 module FSharpScriptOptions =
     let [<Literal>] languageVersion = "Language version"
     let [<Literal>] targetNetFramework = "Target .NET Framework"
@@ -89,6 +101,8 @@ type FSharpExperimentalFeatures =
       mutable OutOfProcessTypeProviders: bool }
 
 
+
+
 [<AllowNullLiteral>]
 type FSharpSettingsProviderBase<'T>(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive,
         settingsSchema: SettingsSchema) =
@@ -129,6 +143,12 @@ type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
 
     member val NonFSharpProjectInMemoryAnalysis = base.GetValueProperty<bool>("NonFSharpProjectInMemoryAnalysis")
 
+
+[<SolutionInstanceComponent>]
+type FSharpFantomasSettingsProvider(lifetime, solution, settings, settingsSchema) =
+    inherit FSharpSettingsProviderBase<FSharpFantomasOptions>(lifetime, solution, settings, settingsSchema)
+
+    member val Version = base.GetValueProperty<FantomasVersion>("Version")
 
 module FSharpTypeHintOptions =
     let [<Literal>] pipeReturnTypes = "Show return type hints in |> chains"

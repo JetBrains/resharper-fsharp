@@ -1,12 +1,15 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
 open System
+open System.Collections.Generic
 open System.Drawing
 open System.Linq.Expressions
 open JetBrains.Application.Components
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog
+open JetBrains.Collections.Viewable
 open JetBrains.IDE.UI
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -16,6 +19,8 @@ open JetBrains.IDE.UI.Extensions
 open JetBrains.Rider.Model.UIAutomation
 open JetBrains.UI.RichText
 open JetBrains.ReSharper.Feature.Services.UI.Validation
+open JetBrains.IDE.UI.Extensions
+open JetBrains.IDE.UI.Extensions.Validation
 
 [<CodePreviewPreparatorComponent>]
 type FSharpCodePreviewPreparator() =
@@ -79,34 +84,98 @@ type FSharpCodeStylePage(lifetime, smartContext: OptionsSettingsSmartContext, en
     override x.Id = "FSharpIndentStylePage"
 
 
-[<OptionsPage("FantomasPage", "Fantomas", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
-type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPageContext: OptionsPageContext, iconHostBase: IconHostBase) as this =
-    inherit FSharpOptionsPageBase(lifetime, optionsPageContext, smartContext)
-    let _ = PsiFeaturesUnsortedOptionsThemedIcons.Indent // workaround to create assembly reference (dotnet/fsharp#3522)
-    let warningIcon =  ValidationStates.validationWarning.GetIcon(iconHostBase);
-    let decorate (text: string) withWarning =
-        if withWarning then text.GetBeLabel(warningIcon, true)
-        else
-            let label = BeLabel(true)
-            label.Text.Value <- text
-            label
+type FantomasRunSettings = { Version: FantomasVersion * string; Path: string }
+type FantomasRunValidationResult =
+    | Ok
+    | FailedToRun
+    | UnsupportedVersion
+    | NotFound
+//From settings and ?
+
+[<SolutionComponent>]
+type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsProvider) =
+    let minimalSupportedVersion = Version("1.1.1")
+    let dataCache =
+        let dict = Dictionary(3)
+        dict[FantomasVersion.Bundled] <- { Version = FantomasVersion.Bundled, "1.1.1"; Path = null }, Ok
+        dict[FantomasVersion.LocalDotnetTool] <- { Version = FantomasVersion.LocalDotnetTool, "1.1.1"; Path = "" }, Ok
+        dict[FantomasVersion.GlobalDotnetTool] <- { Version = FantomasVersion.GlobalDotnetTool, "1.1.1"; Path = null }, Ok
+        dict
+
+    let mutable selectedVersion = ViewableProperty(dataCache[FantomasVersion.Bundled])
+
+    let validate version =
+        if Version.Parse(version) < minimalSupportedVersion then UnsupportedVersion
+        else Ok
 
     do
-        let localTool = true, true
-        let globalTool = false, false
+        settingsProvider.Version.Change.Advise(lifetime, fun x ->
+            if not x.HasNew then () else
+            selectedVersion.Value <- dataCache[x.New])
 
+    member x.SelectedVersion = selectedVersion
+
+    //TODO: notifications?
+    member x.TryRun(runAction: unit -> unit) =
+        try runAction()
+        with _ ->
+            let key = selectedVersion.Value |> fst |> (fun x -> x.Version |> fst)
+            let data, _ = dataCache[key]
+            dataCache[key] <- data, FailedToRun
+            selectedVersion.Value <- dataCache[FantomasVersion.Bundled]
+
+    member x.GetSettings() = dataCache
+
+
+[<OptionsPage("FantomasPage", "Fantomas", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
+type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPageContext: OptionsPageContext,
+                  iconHostBase: IconHostBase, settings: FantomasProcessSettings) as this =
+    inherit FSharpOptionsPageBase(lifetime, optionsPageContext, smartContext)
+    let _ = PsiFeaturesUnsortedOptionsThemedIcons.Indent // workaround to create assembly reference (dotnet/fsharp#3522)
+    let warningIcon =  ValidationStates.validationWarning.GetIcon(iconHostBase)
+
+    let formatVersion (version: string) =
+        RichText(version, TextStyle.FromForeColor(Color.Gray))
+
+    let formatSetting (description: RichText) ({ Version = fantomasVersion, version; Path = _ }, status) =
+        let version =
+            match status with
+            | Ok -> $" (v.{version})"
+            | FailedToRun -> $" (v.{version} failed to run)"
+            | UnsupportedVersion -> $" (v.{version} not supported)"
+            | NotFound -> " (not found)"
+
+        let description = description + (formatVersion version)
+
+        match status with
+        | Ok -> description.GetBeRichText() :> BeControl
+        | _ -> description.GetBeRichText(warningIcon, true) :> _
+
+    do
         use indent = this.Indent()
-        this.AddComboOptionFromEnum((fun (key: FSharpFormatSettingsKey) -> key.FantomasVersion),
-                                    (fun key ->
-                                         match key with
-                                         | FantomasVersion.Bundled -> "Bundled (v 1.0.0.0)"
-                                         | FantomasVersion.DotnetTools -> "From dotnet-tools.json (v 2.0.0)"
-                                         | FantomasVersion.Global -> "From .NET global tools (v 3.0.0)"),
-                                    exclude =
-                                        seq {
-                                            if not (fst localTool) then FantomasVersion.DotnetTools
-                                            if not (fst globalTool) then FantomasVersion.Global
-                                        },
-                                    prefix = "Version") |> ignore
 
-        this.AddComboOption()
+        this.AddComboOption((fun (key: FSharpFantomasOptions) -> key.Version),
+                            (fun key ->
+                                let fantomasVersionsData = settings.GetSettings()
+                                let withValidationRule =
+                                    key.GetBeComboBoxFromEnum(lifetime,
+                                        //CHECK DICT IS VALID
+                                        presentation = PresentComboItem (fun x y z ->
+                                            match y with
+                                            | FantomasVersion.LocalDotnetTool ->
+                                                formatSetting "From dotnet-tools.json" fantomasVersionsData[FantomasVersion.LocalDotnetTool]
+                                            | FantomasVersion.GlobalDotnetTool ->
+                                                formatSetting  "From .NET global tools" fantomasVersionsData[FantomasVersion.GlobalDotnetTool]
+                                            | _ -> formatSetting "Bundled" fantomasVersionsData[FantomasVersion.Bundled]),
+                                        except = seq {
+                                            FantomasVersion.NotSelected
+                                            if not (fantomasVersionsData.ContainsKey(FantomasVersion.LocalDotnetTool)) then
+                                                FantomasVersion.LocalDotnetTool
+                                            if not (fantomasVersionsData.ContainsKey(FantomasVersion.GlobalDotnetTool)) then
+                                                FantomasVersion.GlobalDotnetTool
+                                        }).WithValidationRule(lifetime, (fun () -> false), "Supported formatter versions: 1.1.0 through 1.2.1. Falling back to the bundled formatter.")
+
+                                withValidationRule),
+
+                            prefix = "Version") |> ignore
+        ()

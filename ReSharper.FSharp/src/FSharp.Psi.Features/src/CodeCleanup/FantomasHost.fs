@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
+open JetBrains.Application.Notifications
 open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -20,20 +21,35 @@ module internal Reflection =
 
 
 [<SolutionComponent>]
-type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) =
+type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory,
+                  notifications: UserNotifications, runSettings: FantomasProcessSettings) =
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
+    //TODO: add lock
+    let mutable formatterHostLifetime: LifetimeDefinition = null
 
     let toEditorConfigName name = $"{fSharpEditorConfigPrefix}{StringUtil.MakeUnderscoreCaseName(name)}"
 
     let isConnectionAlive () =
         isNotNull connection && connection.IsActive
 
+    let terminateConnection () =
+        if isConnectionAlive () then
+            formatterHostLifetime.Terminate()
+            true
+        else false
+
     let connect () =
         if isConnectionAlive () then () else
-        let formatterHostLifetime = Lifetime.Define(solution.GetLifetime())
-        connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime).Run()
-        formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance))
+
+        //check invariants
+        runSettings.TryRun(fun _ ->
+            formatterHostLifetime <- Lifetime.Define(solution.GetLifetime())
+            let settings = runSettings.SelectedVersion.Value
+            connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, (fst settings).Path).Run()
+            formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance))
+            notifications.CreateNotification(formatterHostLifetime.Lifetime, title = "Fantomas", body = $"%A{settings.Version}") |> ignore
+        )
 
     let convertRange (range: range) =
         RdFcsRange(range.FileName, range.StartLine, range.StartColumn, range.EndLine, range.EndColumn)
@@ -55,6 +71,10 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) 
         let lightSyntax = Option.toNullable options.LightSyntax
         RdFcsParsingOptions(Array.last options.SourceFiles, lightSyntax,
             List.toArray options.ConditionalCompilationDefines, options.IsExe, options.LangVersionText)
+
+    do
+        runSettings.SelectedVersion.Advise(solution.GetLifetime(), fun version ->
+            if terminateConnection () then connect ())
 
     member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
         let args =
