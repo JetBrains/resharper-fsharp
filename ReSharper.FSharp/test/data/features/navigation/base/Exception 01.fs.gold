@@ -4,7 +4,7 @@
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: _Exception <font color="FF6D6D6D"> (in System.Runtime.InteropServices)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
       tail icon: Assembly
     Navigation result:
       opened file: _Exception.cs
@@ -20,7 +20,7 @@
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersPublic)
       text: **Exception **<font color="FF6D6D6D"> (in System)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
       tail icon: Assembly
     Navigation result:
       opened file: Exception.cs
@@ -36,7 +36,7 @@
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: ISerializable <font color="FF6D6D6D"> (in System.Runtime.Serialization)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
       tail icon: Assembly
     Navigation result:
       opened file: ISerializable.cs
@@ -52,7 +52,7 @@
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: **IStructuralEquatable **<font color="FF6D6D6D"> (in System.Collections)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
       tail icon: Assembly
     Navigation result:
       opened file: IStructuralEquatable.cs

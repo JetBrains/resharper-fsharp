@@ -4,7 +4,7 @@
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Method,ModifiersVirtual,ModifiersPublic)
       text: Object <font color="FF6D6D6D"> (in System.Object)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1</font>
       tail icon: Assembly
     Navigation result:
       opened file: Object.cs
