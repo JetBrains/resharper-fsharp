@@ -1,0 +1,18 @@
+===================
+Init
+
+[File1.fs]
+module File1
+
+[File2.fs]
+module File2
+
+===================
+Move File1 and File2
+
+[File1.fs]
+module File1
+
+[File2.fs]
+module File2
+

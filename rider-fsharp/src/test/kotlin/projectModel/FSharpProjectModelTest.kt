@@ -9,6 +9,7 @@ import com.jetbrains.rider.test.framework.TestProjectModelContext
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
+import java.io.File
 
 @Test
 class FSharpProjectModelTest : ProjectModelBaseTest() {
@@ -30,6 +31,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
         moveItem(arrayOf(from), to, orderType)
     }
 
+    @Suppress("SameParameterValue")
     private fun renameItem(path: Array<String>, newName: String) {
         // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
         waitBackend(project) {
@@ -115,6 +117,24 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
                                 arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "File1.fs"),
                                 arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "Class1.fs")),
                         arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1"), ActionOrderType.Before)
+            }
+        }
+    }
+
+    @Test
+    @TestEnvironment(solution = "FsprojWithTwoFiles", toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_5)
+    fun testManualFsprojChange() {
+        doTestDumpProjectsView {
+            dump2("Init", false, false) { }
+
+            dump2("Move File1 and File2 lines", false, true) {
+                val fsprojFile = File(activeSolutionDirectory, "ClassLibrary1/ClassLibrary1.fsproj")
+                changeFileContent(project, fsprojFile) { content ->
+                    content
+                        .replace("<Compile Include=\"File2.fs\" />", "<Compile Include=\"File2.fs.tmp\" />")
+                        .replace("<Compile Include=\"File1.fs\" />", "<Compile Include=\"File2.fs\" />")
+                        .replace("<Compile Include=\"File2.fs.tmp\" />", "<Compile Include=\"File1.fs\" />")
+                }
             }
         }
     }
