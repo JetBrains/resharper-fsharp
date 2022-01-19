@@ -100,7 +100,7 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
         let dict = Dictionary(3)
         dict[FantomasVersion.Bundled] <- { Version = FantomasVersion.Bundled, "1.1.1"; Path = null }, Ok
         dict[FantomasVersion.LocalDotnetTool] <- { Version = FantomasVersion.LocalDotnetTool, "1.1.1"; Path = "" }, Ok
-        dict[FantomasVersion.GlobalDotnetTool] <- { Version = FantomasVersion.GlobalDotnetTool, "1.1.1"; Path = null }, Ok
+        dict[FantomasVersion.GlobalDotnetTool] <- { Version = FantomasVersion.GlobalDotnetTool, "1.1.1"; Path = null }, NotFound
         dict
 
     let mutable selectedVersion = ViewableProperty(dataCache[FantomasVersion.Bundled])
@@ -114,7 +114,8 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
             if not x.HasNew then () else
             selectedVersion.Value <- dataCache[x.New])
 
-        //subscrive on dotnet-tools
+        //subscribe on dotnet-tools
+        //change version to dotnet-tools/global if not selected
 
     member x.SelectedVersion = selectedVersion
 
@@ -142,19 +143,29 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
     let formatVersion (version: string) =
         RichText(version, TextStyle.FromForeColor(Color.Gray))
 
-    let formatSetting (description: RichText) ({ Version = fantomasVersion, version; Path = _ }, status) =
-        let version =
+    let formatSetting ({ Version = fantomasVersion, version; Path = _ }, status) =
+        let description =
+            match fantomasVersion with
+            | FantomasVersion.LocalDotnetTool -> "From dotnet-tools.json"
+            | FantomasVersion.GlobalDotnetTool -> "From .NET global tools"
+            | _ -> "Bundled"
+            |> RichText
+
+        let version, tooltip =
             match status with
-            | Ok -> $" (v.{version})"
-            | FailedToRun -> $" (v.{version} failed to run)"
-            | UnsupportedVersion -> $" (v.{version} not supported)"
-            | NotFound -> " (not found)"
+            | Ok -> $" (v.{version})", ""
+            | FailedToRun -> $" (v.{version} failed to run)", "The specified Fantomas version failed to run. Falling back to the bundled version."
+            | UnsupportedVersion -> $" (v.{version} not supported)", "Supported Fantomas versions: 1.2.1 and later. Falling back to the bundled version."
+            | NotFound -> " (not found)", ""
 
         let description = description + (formatVersion version)
 
         match status with
         | Ok -> description.GetBeRichText() :> BeControl
-        | _ -> description.GetBeRichText(warningIcon, true) :> _
+        | _ ->
+            let control = description.GetBeRichText(warningIcon, true)
+            control.Tooltip.Value <- tooltip
+            control :> _
 
     do
         use indent = this.Indent()
@@ -164,22 +175,14 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
                                 let fantomasVersionsData = settings.GetSettings()
                                 let withValidationRule =
                                     key.GetBeComboBoxFromEnum(lifetime,
-                                        //CHECK DICT IS VALID
-                                        presentation = PresentComboItem (fun x y z ->
-                                            match y with
-                                            | FantomasVersion.LocalDotnetTool ->
-                                                formatSetting "From dotnet-tools.json" fantomasVersionsData[FantomasVersion.LocalDotnetTool]
-                                            | FantomasVersion.GlobalDotnetTool ->
-                                                formatSetting  "From .NET global tools" fantomasVersionsData[FantomasVersion.GlobalDotnetTool]
-                                            | _ -> formatSetting "Bundled" fantomasVersionsData[FantomasVersion.Bundled]),
-                                        except = seq {
+                                        PresentComboItem (fun x y z -> formatSetting fantomasVersionsData[y]),
+                                        seq {
                                             FantomasVersion.NotSelected
                                             if not (fantomasVersionsData.ContainsKey(FantomasVersion.LocalDotnetTool)) then
                                                 FantomasVersion.LocalDotnetTool
                                             if not (fantomasVersionsData.ContainsKey(FantomasVersion.GlobalDotnetTool)) then
                                                 FantomasVersion.GlobalDotnetTool
                                         }).WithValidationRule(lifetime, (fun () -> false), "Supported formatter versions: 1.1.0 through 1.2.1. Falling back to the bundled formatter.")
-
                                 withValidationRule),
 
                             prefix = "Version") |> ignore
