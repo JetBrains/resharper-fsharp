@@ -1,6 +1,6 @@
 ﻿## GotoTypeDeclarationProvider activity:
   Immediate result:
-    CEO: Envoy: Struct:System.Int32, PsiLanguageType:UNKNOWN Target:  Module: mscorlib Platform: .NETFramework,Version=v4.5.1 TargetPosition: #0 in Unknown
+    DEO: Envoy: Struct:System.Int32, PsiLanguageType:UNKNOWN as Envoy: Struct:System.Int32, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Navigation result:
       opened file: Int32.cs
       ------------------

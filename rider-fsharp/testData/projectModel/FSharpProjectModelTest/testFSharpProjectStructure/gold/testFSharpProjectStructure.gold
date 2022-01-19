@@ -5,24 +5,14 @@ Init
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    -Folder
     File1.fs
@@ -73,7 +63,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -95,7 +85,7 @@ Content roots:
   ClassLibrary1/Folder/File5.fs
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/Class2.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -103,8 +93,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:Folder[1]
   1:File1.fs
@@ -124,10 +114,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 Folder/File1.fs
 Folder/File2.fs
 File3.fs
@@ -147,24 +137,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    -Folder
     File2.fs
@@ -215,7 +195,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -237,7 +217,7 @@ Content roots:
   ClassLibrary1/Folder/File5.fs
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/Class2.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -245,8 +225,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:Folder[1]
   1:File2.fs
@@ -266,10 +246,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 Folder/File2.fs
 File3.fs
 Folder/File3.fs
@@ -289,24 +269,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -357,7 +327,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -379,7 +349,7 @@ Content roots:
   ClassLibrary1/Folder/File5.fs
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/Class2.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -387,8 +357,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:Folder[1]
   1:File3.fs
@@ -408,10 +378,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 File3.fs
@@ -431,24 +401,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -499,7 +459,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -521,7 +481,7 @@ Content roots:
   ClassLibrary1/Folder/File5.fs
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/Class2.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -529,8 +489,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:Folder[1]
   1:File3.fs
@@ -550,10 +510,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 10:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 File3.fs
@@ -573,24 +533,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -641,7 +591,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -663,7 +613,7 @@ Content roots:
   ClassLibrary1/Folder/Sub/Class2.fs
   ClassLibrary1/Folder/Sub/File1.fs
   ClassLibrary1/Folder/Sub/File3.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -671,8 +621,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:Folder[1]
   1:File3.fs
@@ -692,10 +642,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 8:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 Folder/File4.fs
@@ -715,24 +665,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -783,7 +723,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -805,7 +745,7 @@ Content roots:
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/Class2.fs
   ClassLibrary1/Folder/Sub/File1.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -813,8 +753,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:Folder[1]
   1:File3.fs
@@ -834,10 +774,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 File3.fs
@@ -857,24 +797,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -925,7 +855,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -947,7 +877,7 @@ Content roots:
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/Class2.fs
   ClassLibrary1/Folder/Sub/File1.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -955,8 +885,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:Folder[1]
   1:File3.fs
@@ -976,10 +906,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 File3.fs
@@ -999,24 +929,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
@@ -1066,7 +986,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -1088,7 +1008,7 @@ Content roots:
   ClassLibrary1/Folder/File5.fs
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/File1.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -1096,8 +1016,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:Folder[1]
   1:File3.fs
@@ -1116,10 +1036,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 File3.fs
@@ -1139,24 +1059,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    -Folder
     File2.fs
@@ -1206,7 +1116,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -1228,7 +1138,7 @@ Content roots:
   ClassLibrary1/Folder/File5.fs
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/File1.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -1236,8 +1146,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:Folder[1]
   1:File2.fs
@@ -1256,10 +1166,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 Folder/File2.fs
 Folder/File3.fs
 File3.fs
@@ -1279,24 +1189,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
@@ -1346,7 +1246,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -1368,7 +1268,7 @@ Content roots:
   ClassLibrary1/Folder/File5.fs
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/File1.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -1376,8 +1276,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:File2.fs
 4:Folder[1]
@@ -1396,10 +1296,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 10:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
 File3.fs
@@ -1419,24 +1319,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
@@ -1486,7 +1376,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -1508,7 +1398,7 @@ Content roots:
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/File1.fs
   ClassLibrary1/Foo.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -1516,8 +1406,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:File2.fs
 4:Folder[1]
@@ -1536,10 +1426,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 10:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
 Foo.fs
@@ -1559,24 +1449,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
@@ -1627,7 +1507,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -1649,7 +1529,7 @@ Content roots:
   ClassLibrary1/Folder/File5.fs
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/File1.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -1657,8 +1537,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:File2.fs
 4:Folder[1]
@@ -1677,10 +1557,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
 EmptyFolder/Foo.fs
@@ -1700,24 +1580,14 @@ AfterFile.fs
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
@@ -1767,7 +1637,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -1789,7 +1659,7 @@ Content roots:
   ClassLibrary1/Folder/Sub/Class1.fs
   ClassLibrary1/Folder/Sub/File1.fs
   ClassLibrary1/Foo.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -1797,8 +1667,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:File2.fs
 4:Folder[1]
@@ -1817,10 +1687,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 10:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
 Foo.fs
@@ -1840,24 +1710,14 @@ Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
  -FSharpProjectTree * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NETFramework 4.5
+    -.NET 5.0
      -Assemblies
       -Implicit
-       FSharp.Core
-       mscorlib
-       System.ValueTuple
-      System
-      System.Core
-      System.Data
-      System.Drawing
-      System.IO.Compression.FileSystem
-      System.Numerics
-      System.Runtime.Serialization
-      System.Xml
-      System.Xml.Linq
+       ...
      -Packages
-      FSharp.Core/4.7.2
-      System.ValueTuple/4.4.0
+      FSharp.Core/6.0.1
+     -Frameworks
+      Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
@@ -1906,7 +1766,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net45, IsHidden:true]
+            Folder [Name:net5.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
@@ -1928,7 +1788,7 @@ Content roots:
   ClassLibrary1/Folder/File4.fs
   ClassLibrary1/Folder/File5.fs
   ClassLibrary1/Foo.fs
-  ClassLibrary1/obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   ExternalFolder/LinkedFile1.fs
   ExternalFolder/LinkedFile2.fs
   FSharpProjectTree.sln
@@ -1936,8 +1796,8 @@ Content roots:
 1:BeforeFile.fs (CompileBefore)
 2:obj[1]
   1:Debug[1]
-    1:net45[1]
-      1:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore)
+    1:net5.0[1]
+      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
 3:File2.fs
 4:Folder[1]
@@ -1956,10 +1816,10 @@ Content roots:
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 10:AfterFile.fs (CompileAfter)
 
-.NETFramework,Version=v4.5
+net5.0
 BeforeFile.fs
-obj/Debug/net45/.NETFramework,Version=v4.5.AssemblyAttributes.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
 Foo.fs

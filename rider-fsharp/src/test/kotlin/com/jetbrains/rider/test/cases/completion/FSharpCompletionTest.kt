@@ -25,7 +25,7 @@ class FSharpCompletionTest : CompletionTestBase() {
     @Test
     fun listModuleValue() = doTestTyping("filt")
 
-    @Test
+    @Test(enabled = false)
     fun localVal01() = doTestChooseItem("x")
 
     @Test
