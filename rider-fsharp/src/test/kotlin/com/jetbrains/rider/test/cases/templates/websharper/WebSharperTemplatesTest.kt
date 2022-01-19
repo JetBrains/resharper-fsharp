@@ -28,6 +28,7 @@ class WebSharperTemplatesTest : RiderTemplatesTestBase() {
         val fsharp_extensions = TemplateIdWithVersion("WebSharper.Extension.FSharp.Template")
         val fsharp_library = TemplateIdWithVersion("WebSharper.Library.FSharp.Template")
         val fsharp_min = TemplateIdWithVersion("WebSharper.Min.FSharp.Template")
+        
         val fsharp_offline = TemplateIdWithVersion("WebSharper.Offline.FSharp.Template")
         val fsharp_proxy = TemplateIdWithVersion("WebSharper.Proxy.FSharp.Template")
         val fsharp_spa = TemplateIdWithVersion("WebSharper.SPA.FSharp.Template")
@@ -41,16 +42,8 @@ class WebSharperTemplatesTest : RiderTemplatesTestBase() {
                 "websharper.templates.$webSharperTemplatesVersion.nupkg"
         ReSharperProjectTemplateProvider.addUserTemplateSource(webSharperTemplatesNupkg)
     }
-
-    @Test
-    fun clientServer() {
-        val templateId = WebSharperTemplateIds.fsharp_clientServer
-        doCoreTest(templateId, "ClientServer") { project ->
-            checkSwea(project)
-        }
-    }
-
-    @Test
+    
+    @Test(enabled = false) // wsfscservice.exe hangs and holds sdk directory
     fun library() {
         val templateId = WebSharperTemplateIds.fsharp_library
         doCoreTest(templateId, "Library") { project ->
