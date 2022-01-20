@@ -106,15 +106,18 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
     let mutable selectedVersionProp: ViewableProperty<_> = null
 
     let validate version =
-        if Version.Parse(version) < minimalSupportedVersion then UnsupportedVersion
-        else Ok
+        //if Version.Parse(version) < minimalSupportedVersion then UnsupportedVersion
+        //else Ok
+        Ok
 
     do
         settingsProvider.Version.Change.Advise(lifetime, fun x ->
             if not x.HasNew then () else
             selectedVersionProp.Value <- dataCache[x.New])
 
-        let dotnetToolVersions = HashSet<FantomasVersion>() //just like from dotnet tools restore
+        let dotnetToolVersions = HashSet<FantomasVersion>()          //just like from dotnet tools restore
+        dotnetToolVersions.Add(FantomasVersion.LocalDotnetTool)
+
         let selectedVersionString = "1.2.3"
         let selectedVersionByUser = settingsProvider.Version.Value
 
@@ -129,8 +132,7 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
         let selectedVersion =
             match selectedVersionByUser with
             //TODO: move to common code
-            | FantomasVersion.Bundled -> FantomasVersion.Bundled
-            | FantomasVersion.NotSelected ->
+            | FantomasVersion.Bundled ->
                 if dotnetToolVersions.Contains FantomasVersion.LocalDotnetTool then
                     settingsProvider.Version.Value <- FantomasVersion.LocalDotnetTool
                     notifications.CreateNotification(lifetime,
@@ -193,9 +195,16 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
     inherit FSharpOptionsPageBase(lifetime, optionsPageContext, smartContext)
     let _ = PsiFeaturesUnsortedOptionsThemedIcons.Indent // workaround to create assembly reference (dotnet/fsharp#3522)
     let warningIcon =  ValidationStates.validationWarning.GetIcon(iconHostBase)
+    let okIcon =  iconHostBase.Transform(JetBrains.Application.UI.Icons.CommonThemedIcons.CommonThemedIcons.TransparentNothing.Id)
 
     let formatVersion (version: string) =
         RichText(version, TextStyle.FromForeColor(Color.Gray))
+
+    let getTooltip = function
+        | Ok -> ""
+        | FailedToRun -> "The specified Fantomas version failed to run. Falling back to the bundled version."
+        | UnsupportedVersion -> "Supported Fantomas versions: 1.2.1 and later. Falling back to the bundled version."
+        | NotFound -> "The specified Fantomas version not found. Falling back to the bundled version."
 
     let formatSetting ({ Version = fantomasVersion, version; Path = _ }, status) =
         let description =
@@ -205,17 +214,19 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
             | _ -> "Bundled"
             |> RichText
 
-        let version, tooltip =
+        let version =
             match status with
-            | Ok -> $" (v.{version})", ""
-            | FailedToRun -> $" (v.{version} failed to run)", "The specified Fantomas version failed to run. Falling back to the bundled version."
-            | UnsupportedVersion -> $" (v.{version} not supported)", "Supported Fantomas versions: 1.2.1 and later. Falling back to the bundled version."
-            | NotFound -> " (not found)", "The specified Fantomas version not found. Falling back to the bundled version."
+            | Ok -> $" (v.{version})"
+            | FailedToRun -> $" (v.{version} failed to run)"
+            | UnsupportedVersion -> $" (v.{version} not supported)"
+            | NotFound -> " (not found)"
+
+        let tooltip = getTooltip status
 
         let description = description + (formatVersion version)
 
         match status with
-        | Ok -> description.GetBeRichText() :> BeControl
+        | Ok -> description.GetBeRichText(okIcon, true) :> BeControl
         | _ ->
             let control = description.GetBeRichText(warningIcon, true)
             control.Tooltip.Value <- tooltip
@@ -227,27 +238,17 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
         this.AddComboOption((fun (key: FSharpFantomasOptions) -> key.Version),
                             (fun key ->
                                 let fantomasVersionsData = settings.GetSettings()
-                                key.GetBeComboBoxFromEnum(lifetime,
-                                    PresentComboItem (fun x y z -> formatSetting fantomasVersionsData[y]),
-                                    seq {
-                                        FantomasVersion.NotSelected
-                                        if not (fantomasVersionsData.ContainsKey(FantomasVersion.LocalDotnetTool)) then
-                                            FantomasVersion.LocalDotnetTool
-                                        if not (fantomasVersionsData.ContainsKey(FantomasVersion.GlobalDotnetTool)) then
-                                            FantomasVersion.GlobalDotnetTool
-                                    }
-                                )),//.WithValidationRule(lifetime, (fun () -> false), "Supported formatter versions: 1.1.0 through 1.2.1. Falling back to the bundled formatter.")),
+                                let beComboBoxFromEnum =
+                                    key.GetBeComboBoxFromEnum(lifetime,
+                                        PresentComboItem (fun x y z -> formatSetting fantomasVersionsData[y]),
+                                        seq {
+                                            if not (fantomasVersionsData.ContainsKey(FantomasVersion.LocalDotnetTool)) then
+                                                FantomasVersion.LocalDotnetTool
+                                            if not (fantomasVersionsData.ContainsKey(FantomasVersion.GlobalDotnetTool)) then
+                                                FantomasVersion.GlobalDotnetTool
+                                        }
+                                    )
+                                let _, status = fantomasVersionsData[key.Value]
+                                beComboBoxFromEnum.Tooltip.Value <- getTooltip status
+                                beComboBoxFromEnum),//.WithValidationRule(lifetime, (fun () -> false), "Supported formatter versions: 1.1.0 through 1.2.1. Falling back to the bundled formatter.")),
                             prefix = "Version") |> ignore
-
-        match settings.SelectedVersion.Value with
-        | _, Ok -> ()
-        | _, status ->
-            let text =
-                match status with
-                | FailedToRun -> "The specified Fantomas version failed to run. Falling back to the bundled version."
-                | UnsupportedVersion -> "Supported Fantomas versions: 1.2.1 and later. Falling back to the bundled version."
-                | NotFound -> "The specified Fantomas version not found. Falling back to the bundled version."
-            use indent = this.Indent()
-            this.AddRichText(RichText(text, TextStyle.FromForeColor(Color.Red))) |> ignore
-
-        ()
