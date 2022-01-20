@@ -13,7 +13,6 @@ type LambdaAnalyzerTest() =
         match highlighting with
         | :? LambdaCanBeReplacedWithInnerExpressionWarning
         | :? LambdaCanBeSimplifiedWarning
-        | :? LambdaBodyCanBeReplacedWithIdWarning
         | :? LambdaCanBeReplacedWithBuiltinFunctionWarning
         | :? RedundantApplicationWarning -> true
         | _ -> false

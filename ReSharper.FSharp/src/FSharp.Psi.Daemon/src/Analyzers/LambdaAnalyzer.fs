@@ -15,8 +15,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
-                         HighlightingTypes = [| typeof<LambdaBodyCanBeReplacedWithIdWarning>
-                                                typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>
+                         HighlightingTypes = [| typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>
                                                 typeof<LambdaCanBeReplacedWithInnerExpressionWarning>
                                                 typeof<LambdaCanBeSimplifiedWarning>
                                                 typeof<RedundantApplicationWarning> |])>]
@@ -168,7 +167,6 @@ type LambdaAnalyzer() =
                         else null
                     | _ -> null
 
-            elif compareArg (pats.LastOrDefault()) expr then LambdaBodyCanBeReplacedWithIdWarning(lambda) :>_
             else null
 
         if isNotNull warning && not (isImplicitlyConvertedToDelegate lambda) then
