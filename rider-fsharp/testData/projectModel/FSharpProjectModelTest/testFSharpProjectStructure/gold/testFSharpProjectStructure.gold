@@ -10,7 +10,7 @@ Init
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -142,7 +142,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -274,7 +274,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -406,7 +406,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -538,7 +538,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -670,7 +670,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -802,7 +802,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -934,7 +934,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -1064,7 +1064,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -1194,7 +1194,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -1324,7 +1324,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -1454,7 +1454,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -1585,7 +1585,7 @@ AfterFile.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
@@ -1715,7 +1715,7 @@ Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
