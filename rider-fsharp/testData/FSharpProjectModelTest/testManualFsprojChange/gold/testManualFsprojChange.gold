@@ -10,7 +10,7 @@ Init
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    File1.fs
@@ -65,7 +65,7 @@ Move File1 and File2 lines
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.1
+      FSharp.Core/5.0.0
      -Frameworks
       Microsoft.NETCore.App
    File2.fs
