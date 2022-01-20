@@ -35,10 +35,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory,
 
     //cringe
     let terminateConnection () =
-        if isConnectionAlive () then
-            formatterHostLifetime.Terminate()
-            true
-        else false
+        if isConnectionAlive () then formatterHostLifetime.Terminate()
 
     let connect () =
         if isConnectionAlive () then () else
@@ -75,7 +72,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory,
 
     do
         runSettings.SelectedVersion.Advise(solution.GetLifetime(), fun version ->
-            if terminateConnection () then connect ())
+            terminateConnection ())
 
     member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
         let args =

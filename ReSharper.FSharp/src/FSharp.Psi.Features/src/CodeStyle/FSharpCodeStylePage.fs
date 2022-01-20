@@ -103,7 +103,7 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
         dict[FantomasVersion.GlobalDotnetTool] <- { Version = FantomasVersion.GlobalDotnetTool, "1.1.1"; Path = null }, NotFound
         dict
 
-    let mutable selectedVersion = ViewableProperty(dataCache[FantomasVersion.Bundled])
+    let mutable selectedVersionProp: ViewableProperty<_> = null
 
     let validate version =
         if Version.Parse(version) < minimalSupportedVersion then UnsupportedVersion
@@ -112,23 +112,44 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
     do
         settingsProvider.Version.Change.Advise(lifetime, fun x ->
             if not x.HasNew then () else
-            selectedVersion.Value <- dataCache[x.New])
+            selectedVersionProp.Value <- dataCache[x.New])
 
+        let dotnetToolVersions = HashSet<FantomasVersion>() //just like from dotnet tools restore
+        let selectedVersionString = "1.2.3"
+        let selectedVersionByUser = settingsProvider.Version.Value
+
+        //TODO: replace with real one
+        //TODO: move to separate function
+        for version in dotnetToolVersions do
+            let versionString = ""
+            let path = ""
+            dataCache[version] <-
+                { Version = version, versionString; Path = path }, validate versionString
+
+        let selectedVersion =
+            match selectedVersionByUser with
+            | FantomasVersion.Bundled -> FantomasVersion.Bundled
+            | version ->
+                if not (dotnetToolVersions.Contains selectedVersionByUser) then FantomasVersion.Bundled else
+                match validate selectedVersionString with
+                | Ok -> version
+                | _ -> FantomasVersion.Bundled
+
+        selectedVersionProp <- ViewableProperty(dataCache[selectedVersion])
         //subscribe on dotnet-tools
         //change version to dotnet-tools/global if not selected
 
-    member x.SelectedVersion = selectedVersion
+    member x.SelectedVersion = selectedVersionProp
 
     //TODO: notifications?
     member x.TryRun(runAction: unit -> unit) =
         try runAction()
         with _ ->
-
-            let key = selectedVersion.Value |> fst |> (fun x -> x.Version |> fst)
+            let key = selectedVersionProp.Value |> fst |> (fun x -> x.Version |> fst)
             notifications.CreateNotification(lifetime, title = "Fantomas failed to run!", body = $"%A{key}") |> ignore
             let data, _ = dataCache[key]
             dataCache[key] <- data, FailedToRun
-            selectedVersion.Value <- dataCache[FantomasVersion.Bundled]
+            selectedVersionProp.Value <- dataCache[FantomasVersion.Bundled]
 
     member x.GetSettings() = Dictionary(dataCache)
 
