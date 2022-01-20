@@ -151,6 +151,10 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
 
             | version ->
                 if not (dotnetToolVersions.Contains selectedVersionByUser) then
+                    notifications.CreateNotification(lifetime,
+                        title = "Unable to use custom Fantomas version",
+                        body = """Fantomas version specified in "HMHMHMHMHM" is not installed. *Falling back to the bundled version*. Install it using *command to install*.""",
+                        additionalCommands = seq { UserNotificationCommand("Settings", id) }) |> ignore
                     //createNotFoundNotification,
                     FantomasVersion.Bundled
                 else
