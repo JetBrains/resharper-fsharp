@@ -13,13 +13,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
   public class FSharpReferenceSearcher : IDomainSpecificSearcher
   {
     private readonly IDeclaredElementsSet myElements;
-    private readonly bool myFindCandidates;
+    private readonly ReferenceSearcherParameters myReferenceSearcherParameters;
     private readonly ICollection<string> myElementNames;
 
-    public FSharpReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates)
+    public FSharpReferenceSearcher(IDeclaredElementsSet elements,
+      ReferenceSearcherParameters referenceSearcherParameters)
     {
       myElements = elements;
-      myFindCandidates = findCandidates;
+      myReferenceSearcherParameters = referenceSearcherParameters;
       myElementNames = new HashSet<string>();
 
       foreach (var element in elements)
@@ -33,7 +34,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public bool ProcessElement<TResult>(ITreeNode element, IFindResultConsumer<TResult> consumer)
     {
-      var result = new FSharpReferenceSearchProcessor<TResult>(element, myFindCandidates, consumer, myElements, myElementNames).Run();
+      var result = new FSharpReferenceSearchProcessor<TResult>(element, myReferenceSearcherParameters, consumer,
+        myElements, myElementNames).Run();
       return result == FindExecution.Stop;
     }
   }

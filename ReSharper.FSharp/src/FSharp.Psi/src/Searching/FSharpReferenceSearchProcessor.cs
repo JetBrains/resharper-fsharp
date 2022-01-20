@@ -8,9 +8,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 {
   internal class FSharpReferenceSearchProcessor<TResult> : ReferenceSearchSourceFileProcessor<TResult>
   {
-    public FSharpReferenceSearchProcessor(ITreeNode treeNode, bool findCandidates,
+    public FSharpReferenceSearchProcessor(ITreeNode treeNode, ReferenceSearcherParameters referenceSearcherParameters,
       IFindResultConsumer<TResult> resultConsumer, IDeclaredElementsSet elements, ICollection<string> referenceNames)
-      : base(treeNode, findCandidates, resultConsumer, elements, referenceNames, referenceNames)
+      : base(treeNode, referenceSearcherParameters, resultConsumer, elements, referenceNames, referenceNames)
     {
     }
   }
