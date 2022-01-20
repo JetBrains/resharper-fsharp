@@ -85,7 +85,9 @@ type FSharpCodeStylePage(lifetime, smartContext: OptionsSettingsSmartContext, en
     override x.Id = "FSharpIndentStylePage"
 
 
+//struct
 type FantomasRunSettings = { Version: FantomasVersion * string; Path: string }
+type FantomasNotificationEvent = { Version: FantomasVersion * string }
 type FantomasRunValidationResult =
     | Ok
     | FailedToRun
@@ -94,8 +96,11 @@ type FantomasRunValidationResult =
 //From settings and ?
 
 [<SolutionComponent>]
-type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsProvider, notifications: UserNotifications) =
+type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsProvider,
+                             notifications: UserNotifications, optionsManager: OptionsManager) =
     let minimalSupportedVersion = Version("1.1.1")
+    let notificationEvent = Signal<FantomasNotificationEvent>()
+
     let dataCache =
         let dict = Dictionary(3)
         dict[FantomasVersion.Bundled] <- { Version = FantomasVersion.Bundled, "1.1.1"; Path = null }, Ok
@@ -154,7 +159,7 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
                     notifications.CreateNotification(lifetime,
                         title = "Unable to use custom Fantomas version",
                         body = """Fantomas version specified in "HMHMHMHMHM" is not installed. *Falling back to the bundled version*. Install it using *command to install*.""",
-                        additionalCommands = seq { UserNotificationCommand("Settings", id) }) |> ignore
+                        additionalCommands = seq { UserNotificationCommand("Settings", fun _ -> optionsManager.BeginShowOptions("FantomasPage")) }) |> ignore
                     //createNotFoundNotification,
                     FantomasVersion.Bundled
                 else
@@ -191,6 +196,15 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
             selectedVersionProp.Value <- dataCache[FantomasVersion.Bundled]
 
     member x.GetSettings() = Dictionary(dataCache)
+    member x.NotificationProducer = notificationEvent
+
+
+[<SolutionComponent>]
+type FantomasNotificationsManager(lifetime, settings: FantomasProcessSettings) =
+
+    let createNotification (event: FantomasNotificationEvent) = ()
+
+    do settings.NotificationProducer.Advise(lifetime, createNotification)
 
 
 [<OptionsPage("FantomasPage", "Fantomas", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
