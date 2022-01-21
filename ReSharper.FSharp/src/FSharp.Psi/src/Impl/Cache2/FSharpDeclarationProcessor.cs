@@ -19,6 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   {
     protected readonly ICacheBuilder Builder;
     private readonly FcsCheckerService myCheckerService;
+    private bool myHasInternalsVisibleTo;
 
     public FSharpCacheDeclarationProcessor(ICacheBuilder builder, FcsCheckerService checkerService)
     {
@@ -43,13 +44,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       var fileKind = GetFSharpFileKind(fsFile);
       var hasPairFile = myCheckerService.FcsProjectProvider.HasPairFile(sourceFile);
 
-      Builder.CreateProjectFilePart(new FSharpProjectFilePart(sourceFile, fileKind, hasPairFile));
+      var filePart = new FSharpProjectFilePart(sourceFile, fileKind, hasPairFile);
+      Builder.CreateProjectFilePart(filePart);
 
       foreach (var declaration in fsFile.ModuleDeclarations)
         declaration.Accept(this);
 
       foreach (var objExpr in GetObjectExpressions(fsFile, sourceFile))
         objExpr.Accept(this);
+
+      filePart.HasInternalsVisibleTo = myHasInternalsVisibleTo;
     }
 
     public static IEnumerable<IObjExpr> GetObjectExpressions(IFSharpFile fsFile, IPsiSourceFile sourceFile)
@@ -302,6 +306,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
+    public override void VisitDoStatement(IDoStatement doStmt) => ProcessDoLikeStatement(doStmt);
+    public override void VisitExpressionStatement(IExpressionStatement exprStmt) => ProcessDoLikeStatement(exprStmt);
+
+    private void ProcessDoLikeStatement(IDoLikeStatement doStmt)
+    {
+      foreach (var attribute in doStmt.Attributes)
+        // Workaround for providing IVT attributes until attributes can be resolved in a better/faster way.
+        if (attribute.ReferenceName.ShortName.DropAttributeSuffix() == "InternalsVisibleTo")
+          myHasInternalsVisibleTo = true;
+    }
+    
     private void ProcessTypeMembers(IEnumerable<ITreeNode> declarations)
     {
       foreach (var declaration in declarations)
