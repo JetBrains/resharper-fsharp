@@ -26,6 +26,13 @@ Project [Name:ClassLibrary1, GUID:GUID]
     ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
     ProjectFileImpl(Path : File1.fs)[COMPILE ]
     ProjectFileImpl(Path : File2.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net5.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -37,6 +44,7 @@ Content roots:
   ClassLibrary1/ClassLibrary1.fsproj
   ClassLibrary1/File1.fs
   ClassLibrary1/File2.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   FsprojWithTwoFiles.sln
 
 1:obj[1]
@@ -81,6 +89,13 @@ Project [Name:ClassLibrary1, GUID:GUID]
     ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
     ProjectFileImpl(Path : File1.fs)[COMPILE ]
     ProjectFileImpl(Path : File2.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net5.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -92,6 +107,7 @@ Content roots:
   ClassLibrary1/ClassLibrary1.fsproj
   ClassLibrary1/File1.fs
   ClassLibrary1/File2.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
   FsprojWithTwoFiles.sln
 
 1:obj[1]
