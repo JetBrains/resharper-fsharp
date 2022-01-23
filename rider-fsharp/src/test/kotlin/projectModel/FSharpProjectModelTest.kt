@@ -1,23 +1,22 @@
-import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
+import com.jetbrains.rider.plugins.fsharp.test.fcsHost
 import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
-import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.framework.TestProjectModelContext
 import com.jetbrains.rider.test.framework.waitBackend
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.changeFileContent
+import com.jetbrains.rider.test.scriptingApi.cutItem
+import com.jetbrains.rider.test.scriptingApi.pasteItem
+import com.jetbrains.rider.test.scriptingApi.renameItem
 import org.testng.annotations.Test
 import java.io.File
 
 @Test
 class FSharpProjectModelTest : ProjectModelBaseTest() {
     override fun getSolutionDirectoryName() = "EmptySolution"
-    override val restoreNuGetPackages: Boolean
-        get() = true
-
-    private val fcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
+    override val restoreNuGetPackages = true
 
     private fun moveItem(from: Array<Array<String>>, to: Array<String>, orderType: ActionOrderType? = null) {
         // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
@@ -41,7 +40,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
 
     private fun TestProjectModelContext.dump2(caption: String, checkSlnFile: Boolean, compareProjFile: Boolean, action: () -> Unit) {
         dump(caption, checkSlnFile, compareProjFile, action)
-        treeOutput.append(fcsHost.dumpSingleProjectMapping.sync(Unit))
+        treeOutput.append(project.fcsHost.dumpSingleProjectMapping.sync(Unit))
     }
 
     @Test

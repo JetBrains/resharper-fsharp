@@ -2,6 +2,7 @@ package fantomas
 
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.plugins.fsharp.test.withEditorConfig
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.enums.CoreVersion
@@ -9,7 +10,6 @@ import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.reformatCode
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
-import withEditorConfig
 
 @Test
 @TestEnvironment(coreVersion = CoreVersion.DEFAULT)
