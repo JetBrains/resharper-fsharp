@@ -44,16 +44,15 @@ type FSharpOptions =
       [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
       mutable TopLevelOpenCompletion: bool }
 
-
-type FantomasVersion =
-    | Bundled = 0
-    | LocalDotnetTool = 1
-    | GlobalDotnetTool = 2
+type FantomasVersionOption =
+    | AutoDetected = 0
+    | SolutionDotnetTool = 2
+    | GlobalDotnetTool = 3
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpFantomasOptions")>]
 type FSharpFantomasOptions =
     { [<SettingsEntry(true, "Fantomas version"); DefaultValue>]
-      mutable Version: FantomasVersion }
+      mutable Version: FantomasVersionOption }
 
 
 module FSharpScriptOptions =
@@ -147,7 +146,7 @@ type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
 type FSharpFantomasSettingsProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpFantomasOptions>(lifetime, solution, settings, settingsSchema)
 
-    member val Version = base.GetValueProperty<FantomasVersion>("Version")
+    member val Version = base.GetValueProperty<FantomasVersionOption>("Version")
 
 module FSharpTypeHintOptions =
     let [<Literal>] pipeReturnTypes = "Show return type hints in |> chains"

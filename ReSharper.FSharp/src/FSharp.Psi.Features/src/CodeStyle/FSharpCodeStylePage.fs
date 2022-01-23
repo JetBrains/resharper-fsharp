@@ -86,29 +86,55 @@ type FSharpCodeStylePage(lifetime, smartContext: OptionsSettingsSmartContext, en
 
 
 //struct
-type FantomasRunSettings = { Version: FantomasVersion * string; Path: string }
-type FantomasNotificationEvent = { Version: FantomasVersion * string }
+
 type FantomasRunValidationResult =
     | Ok
     | FailedToRun
     | UnsupportedVersion
     | NotFound
+
+type FantomasVersion =
+    | Bundled = 1
+    | SolutionDotnetTool = 2
+    | GlobalDotnetTool = 3
+
+type FantomasRunSettings = { Version: FantomasVersion * string; Path: string }
+type FantomasNotificationEvent = { Event: FantomasRunValidationResult; Version: FantomasVersion * string }
 //From settings and ?
 
 [<SolutionComponent>]
-type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsProvider,
-                             notifications: UserNotifications, optionsManager: OptionsManager) =
+type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsProvider, optionsManager: OptionsManager) =
     let minimalSupportedVersion = Version("1.1.1")
     let notificationEvent = Signal<FantomasNotificationEvent>()
 
     let dataCache =
         let dict = Dictionary(3)
         dict[FantomasVersion.Bundled] <- { Version = FantomasVersion.Bundled, "1.1.1"; Path = null }, Ok
-        dict[FantomasVersion.LocalDotnetTool] <- { Version = FantomasVersion.LocalDotnetTool, "1.1.1"; Path = "" }, Ok
+        dict[FantomasVersion.SolutionDotnetTool] <- { Version = FantomasVersion.SolutionDotnetTool, "1.1.1"; Path = "" }, Ok
         dict[FantomasVersion.GlobalDotnetTool] <- { Version = FantomasVersion.GlobalDotnetTool, "1.1.1"; Path = null }, NotFound
         dict
 
     let mutable selectedVersionProp: ViewableProperty<_> = null
+    let mutable settingsVersion: FantomasVersionOption = FantomasVersionOption.AutoDetected
+
+    //notifications
+    //check is Valid
+    let rec chooseNextVersion setting badVersion =
+        match setting with
+        | FantomasVersionOption.AutoDetected ->
+            match badVersion with
+            | FantomasVersion.SolutionDotnetTool ->
+                if dataCache.ContainsKey FantomasVersion.GlobalDotnetTool then FantomasVersion.GlobalDotnetTool
+                else FantomasVersion.Bundled
+
+            | FantomasVersion.GlobalDotnetTool -> FantomasVersion.Bundled
+            | _ -> FantomasVersion.Bundled //raise
+
+        | FantomasVersionOption.SolutionDotnetTool
+        | FantomasVersionOption.GlobalDotnetTool -> chooseNextVersion FantomasVersionOption.AutoDetected badVersion
+        | _ -> FantomasVersion.Bundled
+
+
 
     let validate version =
         //if Version.Parse(version) < minimalSupportedVersion then UnsupportedVersion
@@ -121,7 +147,7 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
             selectedVersionProp.Value <- dataCache[x.New])
 
         let dotnetToolVersions = HashSet<FantomasVersion>()          //just like from dotnet tools restore
-        dotnetToolVersions.Add(FantomasVersion.LocalDotnetTool)
+        dotnetToolVersions.Add(FantomasVersionOption.SolutionDotnetTool)
 
         let selectedVersionString = "1.2.3"
         let selectedVersionByUser = settingsProvider.Version.Value
@@ -137,22 +163,10 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
         let selectedVersion =
             match selectedVersionByUser with
             //TODO: move to common code
-            | FantomasVersion.Bundled ->
-                if dotnetToolVersions.Contains FantomasVersion.LocalDotnetTool then
-                    settingsProvider.Version.Value <- FantomasVersion.LocalDotnetTool
-                    notifications.CreateNotification(lifetime,
-                        title = "Fantomas from solution settings is used",
-                        body = """Fantomas v.1.1.1 specified in "dotnet-tool.json" is used in your solution.""") |> ignore
-                    FantomasVersion.LocalDotnetTool
-
-                elif dotnetToolVersions.Contains FantomasVersion.GlobalDotnetTool then
-                    settingsProvider.Version.Value <- FantomasVersion.GlobalDotnetTool
-                    notifications.CreateNotification(lifetime,
-                        title = "Fantomas ver 1.1.1 is used",
-                        body = "Global Fantomas v.1.1.1 is used. To switch to bundled version go to settings.") |> ignore
-                    FantomasVersion.GlobalDotnetTool
-
-                else FantomasVersion.Bundled
+            | FantomasVersionOption.AutoDetected ->
+                //check is valid
+                if dataCache.ContainsKey FantomasVersion.SolutionDotnetTool then FantomasVersion.SolutionDotnetTool
+                else chooseNextVersion settingsVersion FantomasVersion.SolutionDotnetTool
 
             | version ->
                 if not (dotnetToolVersions.Contains selectedVersionByUser) then
@@ -161,21 +175,21 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
                         body = """Fantomas version specified in "HMHMHMHMHM" is not installed. *Falling back to the bundled version*. Install it using *command to install*.""",
                         additionalCommands = seq { UserNotificationCommand("Settings", fun _ -> optionsManager.BeginShowOptions("FantomasPage")) }) |> ignore
                     //createNotFoundNotification,
-                    FantomasVersion.Bundled
+                else chooseNextVersion settingsVersion FantomasVersion.SolutionDotnetTool
                 else
                 match version, validate selectedVersionString with
                 | _, Ok -> version
-                | FantomasVersion.LocalDotnetTool, _ ->
+                | FantomasVersionOption.PreferSolutionDotnetTool, _ ->
                     notifications.CreateNotification(lifetime,
                         title = "Unable to use custom Fantomas",
                         body = """Fantomas specified in "dotnet-tool.json" is not compatible with the current Rider version. Falling back to the bundled version. Supported formatter versions: X""") |> ignore
-                    FantomasVersion.Bundled
-                | FantomasVersion.GlobalDotnetTool, _ ->
+                        else chooseNextVersion settingsVersion FantomasVersion.SolutionDotnetTool
+                | FantomasVersionOption.PreferGlobalDotnetTool, _ ->
                     notifications.CreateNotification(lifetime,
                         title = "Unable to use custom Fantomas",
                         body = """F# formatter installed globally via 'dotnet tool install fantomas-tool' is not compatible with the current Rider version. Falling back to the bundled formatter. Supported versions: 1.2.1 and later.""") |> ignore
-                    FantomasVersion.Bundled
-                | _ -> FantomasVersion.Bundled
+                else chooseNextVersion settingsVersion FantomasVersion.SolutionDotnetTool
+                | _ -> FantomasVersionOption.PreferBundled
 
         selectedVersionProp <- ViewableProperty(dataCache[selectedVersion])
         //subscribe on dotnet-tools
@@ -185,24 +199,34 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
 
     //TODO: notifications?
     member x.TryRun(runAction: unit -> unit) =
-        let key = selectedVersionProp.Value |> fst |> (fun x -> x.Version |> fst)
-        try
-            runAction()
-            notifications.CreateNotification(lifetime, title = "Fantomas succssesfully run!", body = $"%A{key}") |> ignore
+        let selectedVersion, version = selectedVersionProp.Value |> fst |> (fun x -> x.Version)
+        try runAction()
         with _ ->
-            notifications.CreateNotification(lifetime, title = "Fantomas failed to run!", body = $"%A{key}") |> ignore
-            let data, _ = dataCache[key]
-            dataCache[key] <- data, FailedToRun
-            selectedVersionProp.Value <- dataCache[FantomasVersion.Bundled]
+            notificationEvent.Fire({ Event = FailedToRun; Version = selectedVersion, version })
+            let data, _ = dataCache[selectedVersion]
+            dataCache[selectedVersion] <- data, FailedToRun
+            selectedVersionProp.Value <- (chooseNextVersion settingsVersion selectedVersion) |> dataCache.get_Item
 
     member x.GetSettings() = Dictionary(dataCache)
     member x.NotificationProducer = notificationEvent
 
 
 [<SolutionComponent>]
-type FantomasNotificationsManager(lifetime, settings: FantomasProcessSettings) =
+type FantomasNotificationsManager(lifetime, settings: FantomasProcessSettings, notifications: UserNotifications) =
 
-    let createNotification (event: FantomasNotificationEvent) = ()
+    let createNotification { Event = event; Version = fantomasVersion, versionString } =
+        let title, body, commands =
+            match event with
+            | FailedToRun -> ()
+            | UnsupportedVersion ->
+                "Unable to use custom Fantomas version",
+                match fantomasVersion with
+                | FantomasVersion.PreferSolutionDotnetTool ->
+                    """Fantomas version specified in "dotnet-tool.json" is not compatible with the current Rider version. Falling back to the bundled formatter. Supported formatter versions: 1.2.1 and later."""
+                | FantomasVersion.PreferGlobalDotnetTool ->
+
+
+        notifications.CreateNotification(lifetime, title, body, additionalCommands = commands)
 
     do settings.NotificationProducer.Advise(lifetime, createNotification)
 
@@ -227,8 +251,8 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
     let formatSetting ({ Version = fantomasVersion, version; Path = _ }, status) =
         let description =
             match fantomasVersion with
-            | FantomasVersion.LocalDotnetTool -> "From dotnet-tools.json"
-            | FantomasVersion.GlobalDotnetTool -> "From .NET global tools"
+            | FantomasVersionOption.SolutionDotnetTool -> "From dotnet-tools.json"
+            | FantomasVersionOption.GlobalDotnetTool -> "From .NET global tools"
             | _ -> "Bundled"
             |> RichText
 
@@ -260,10 +284,10 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
                                     key.GetBeComboBoxFromEnum(lifetime,
                                         PresentComboItem (fun x y z -> formatSetting fantomasVersionsData[y]),
                                         seq {
-                                            if not (fantomasVersionsData.ContainsKey(FantomasVersion.LocalDotnetTool)) then
-                                                FantomasVersion.LocalDotnetTool
-                                            if not (fantomasVersionsData.ContainsKey(FantomasVersion.GlobalDotnetTool)) then
-                                                FantomasVersion.GlobalDotnetTool
+                                            if not (fantomasVersionsData.ContainsKey(FantomasVersionOption.SolutionDotnetTool)) then
+                                                FantomasVersionOption.SolutionDotnetTool
+                                            if not (fantomasVersionsData.ContainsKey(FantomasVersionOption.GlobalDotnetTool)) then
+                                                FantomasVersionOption.GlobalDotnetTool
                                         }
                                     )
                                 let _, status = fantomasVersionsData[key.Value]
