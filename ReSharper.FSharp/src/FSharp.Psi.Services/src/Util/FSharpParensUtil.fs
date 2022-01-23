@@ -107,32 +107,34 @@ let precedence (expr: ITreeNode) =
     | :? IReferenceExpr as refExpr when (refExpr.Identifier :? IActivePatternId) -> 0
 
     | :? ILetOrUseExpr -> 1
+    | :? IYieldOrReturnExpr -> 2
 
     | :? IForLikeExpr
     | :? IIfExpr
     | :? IMatchClauseListOwnerExpr
     | :? ITryLikeExpr
-    | :? IWhileExpr -> 3
+    | :? IWhileExpr -> 4
 
     // todo: type test, cast, typed
-    | :? ITypedLikeExpr -> 4
-    | :? ILambdaExpr -> 5
-    | :? ISequentialExpr -> 6
-    | :? ITupleExpr -> 7
+    | :? ITypedLikeExpr -> 5
+    | :? ILambdaExpr -> 6
+    | :? ISequentialExpr -> 7
+    
+    | :? ITupleExpr -> 8
 
     | :? IBinaryAppExpr as binaryAppExpr ->
         // todo: remove this hack and align common precedence
         match operatorName binaryAppExpr with
-        | "|>" -> 2
-        | _ -> 8
+        | "|>" -> 3
+        | _ -> 9
 
-    | :? IDoLikeExpr -> 9
-    | :? INewExpr -> 10
+    | :? IDoLikeExpr -> 10
+    | :? INewExpr -> 11
 
     | :? IPrefixAppExpr as prefixApp ->
-        if prefixApp.IsHighPrecedence then 12 else 11
+        if prefixApp.IsHighPrecedence then 13 else 12
 
-    | :? IFSharpExpression -> 13
+    | :? IFSharpExpression -> 14
 
     | _ -> 0
 
@@ -141,7 +143,7 @@ let startsBlock (context: IFSharpExpression) =
     isNotNull (SetExprNavigator.GetByRightExpression(context))
 
 let getContextPrecedence (context: IFSharpExpression) =
-    if isNotNull (QualifiedExprNavigator.GetByQualifier(context)) then 12 else
+    if isNotNull (QualifiedExprNavigator.GetByQualifier(context)) then 13 else
 
     if startsBlock context then 0 else precedence context.Parent
 
@@ -161,8 +163,7 @@ let rec getPossibleStrictContextExpr (context: IFSharpExpression): IFSharpExpres
     context
 
 let strictContextRequiresDeclExpr (context: IFSharpExpression) =
-    isNotNull (WhenExprClauseNavigator.GetByExpression(context)) ||
-    isNotNull (YieldOrReturnExprNavigator.GetByExpression(context))
+    isNotNull (WhenExprClauseNavigator.GetByExpression(context))
 
 let contextRequiresDeclExpr (context: IFSharpExpression) =
     let strictContextExpr = getPossibleStrictContextExpr context
@@ -315,6 +316,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
     
     | :? ITypedLikeExpr ->
         expr :? ITypedExpr && isNotNull (BinaryAppExprNavigator.GetByLeftArgument(context)) ||
+        expr :? ITypedExpr && isNotNull (YieldOrReturnExprNavigator.GetByExpression(context)) ||
 
         contextRequiresDeclExpr context ||
         checkPrecedence context expr
@@ -350,6 +352,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
 
         let strictContextExpr = getPossibleStrictContextExpr context
         isNotNull (ConditionOwnerExprNavigator.GetByConditionExpr(strictContextExpr)) ||
+        isNotNull (YieldOrReturnExprNavigator.GetByExpression(strictContextExpr)) ||
         strictContextRequiresDeclExpr strictContextExpr ||
 
         checkPrecedence context expr
