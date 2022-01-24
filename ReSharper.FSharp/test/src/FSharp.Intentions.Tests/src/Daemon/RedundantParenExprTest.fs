@@ -122,3 +122,4 @@ type RedundantParenExprTest() =
     [<Test>] member x.``While - Condition - Type cast 01``() = x.DoNamedTest()
     [<Test>] member x.``While - Condition - Type check 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``YieldOrReturn 01``() = x.DoNamedTest()

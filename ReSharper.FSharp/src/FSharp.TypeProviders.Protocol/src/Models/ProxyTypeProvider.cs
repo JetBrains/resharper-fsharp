@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       myTypeProvidersContext = typeProvidersContext;
 
       // ReSharper disable once CoVariantArrayConversion
-      myProvidedNamespaces = new InterruptibleLazy<IProvidedNamespace[]>(
+      myProvidedNamespaces = new InterruptibleLazy<IProvidedNamespace[]>(() =>
         myTypeProvidersContext.Connection
           .ExecuteWithCatch(() => RdTypeProviderProcessModel.GetProvidedNamespaces.Sync(EntityId, RpcTimeouts.Maximal))
           .Select(t => new ProxyProvidedNamespace(t, this, myTypeProvidersContext))

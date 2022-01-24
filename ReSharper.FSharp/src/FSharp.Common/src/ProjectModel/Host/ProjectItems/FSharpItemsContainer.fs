@@ -1247,7 +1247,7 @@ type FSharpModificationSettingsProvider() =
         member x.SmartModificationsFilter = ["fsproj"] :> _
 
 
-//[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent>]
 type FSharpBuildActionsProvider() =
     inherit MsBuildDefaultBuildActionsProvider()
 

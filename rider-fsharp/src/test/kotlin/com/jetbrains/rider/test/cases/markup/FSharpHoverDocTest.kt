@@ -1,10 +1,10 @@
-package com.jetbrains.rider.test.cases.markup
+package markup
 
+import com.jetbrains.rider.plugins.fsharp.test.withCultureInfo
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.HoverDocTestBase
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import org.testng.annotations.Test
-import com.jetbrains.rider.test.framework.withCultureInfo
 
 @TestEnvironment(solution = "CoreConsoleApp", toolset = ToolsetVersion.TOOLSET_16_CORE)
 class FSharpHoverDocTest : HoverDocTestBase() {

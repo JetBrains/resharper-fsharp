@@ -1,9 +1,9 @@
-package com.jetbrains.rider.test.cases.typeProviders
+package typeProviders
 
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
-import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
-import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.plugins.fsharp.test.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.withOutOfProcessTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
@@ -14,14 +14,11 @@ import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.scriptingApi.markupAdapter
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
-import com.jetbrains.rider.test.framework.withOutOfProcessTypeProviders
 
 @Test
 class TypeProvidersRuntimeTest : BaseTestWithSolution() {
     override fun getSolutionDirectoryName() = "CoreTypeProviderLibrary"
     override val restoreNuGetPackages = true
-
-    private val rdFcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
 
     @Test
     @TestEnvironment(
@@ -58,7 +55,8 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
         withOutOfProcessTypeProviders {
             withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
                 waitForDaemon()
-                rdFcsHost.typeProvidersRuntimeVersion.sync(Unit)
+                this.project!!.fcsHost
+                    .typeProvidersRuntimeVersion.sync(Unit)
                     .shouldNotBeNull()
                     .startsWith(expectedRuntime)
                     .shouldBeTrue()

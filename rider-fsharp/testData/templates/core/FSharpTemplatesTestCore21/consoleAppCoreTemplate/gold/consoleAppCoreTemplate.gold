@@ -24,6 +24,13 @@ Project [Name:ConsoleApplication, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : ConsoleApplication.fsproj)[]
     ProjectFileImpl(Path : Program.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netcoreapp2.1, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ConsoleApplication.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 

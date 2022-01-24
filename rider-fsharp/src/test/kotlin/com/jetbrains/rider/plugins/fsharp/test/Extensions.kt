@@ -1,4 +1,4 @@
-package com.jetbrains.rider.test.framework
+package com.jetbrains.rider.plugins.fsharp.test
 
 import com.intellij.execution.process.impl.ProcessListUtil
 import com.intellij.openapi.project.Project
@@ -7,6 +7,7 @@ import com.jetbrains.rider.inTests.TestHost
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.base.BaseTestWithSolution
+import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.dumpSevereHighlighters
 import java.io.PrintStream
 
@@ -45,7 +46,7 @@ fun withEditorConfig(project: Project, function: () -> Unit) {
 }
 
 fun withCultureInfo(project: Project, culture: String, function: () -> Unit) {
-    val getCultureInfoAndSetNew = project.solution.rdFSharpModel.fsharpTestHost.getCultureInfoAndSetNew
+    val getCultureInfoAndSetNew = project.fcsHost.getCultureInfoAndSetNew
     val oldCulture = getCultureInfoAndSetNew.sync(culture)
     try {
         function()
@@ -53,3 +54,5 @@ fun withCultureInfo(project: Project, culture: String, function: () -> Unit) {
         getCultureInfoAndSetNew.sync(oldCulture)
     }
 }
+
+val Project.fcsHost get() = this.solution.rdFSharpModel.fsharpTestHost

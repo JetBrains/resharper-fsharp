@@ -1,8 +1,9 @@
-package com.jetbrains.rider.test.cases.typeProviders
+package typeProviders
 
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rdclient.testFramework.waitForNextDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
+import com.jetbrains.rider.plugins.fsharp.test.withOutOfProcessTypeProviders
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
@@ -12,7 +13,6 @@ import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
-import com.jetbrains.rider.test.framework.withOutOfProcessTypeProviders
 import java.time.Duration
 
 @Test
