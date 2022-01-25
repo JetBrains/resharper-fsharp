@@ -1,0 +1,5 @@
+﻿type R = { A: int; B: int; C: int }
+
+let r = { A = 1 // Comment
+          B = {selstart}failwith "todo"{selend}
+          C = 3 }

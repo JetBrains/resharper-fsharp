@@ -129,10 +129,29 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
                 let actualBinding =
                     if fieldIndex = 0 then
-                        ModificationUtil.AddChildBefore(recordExpr.FieldBindingList.FieldBindings.First(), binding)
+                        let anchor =
+                            recordExpr.FieldBindingList.FieldBindings.First()
+
+                        ModificationUtil.AddChildBefore(anchor, binding)
                     else
-                        let anchor = indexedBindings[fieldIndex - 1]
-                        ModificationUtil.AddChildAfter(anchor, binding)
+                        let anchor: ITreeNode =
+                            let indexedBinding = indexedBindings[fieldIndex - 1]
+                            if generateSingleLine then
+                                indexedBinding
+                            else
+                                indexedBinding
+                                |> x.SkipComments
+
+                        let resultingNode =
+                            // Nodes after block comments are not automatically moved to the new line, fixing it
+                            if (not generateSingleLine) && anchor.GetTokenType() == FSharpTokenType.BLOCK_COMMENT then
+                                let newLineNode = NewLine(binding.GetLineEnding())
+                                let insertedNewLine = ModificationUtil.AddChildAfter(anchor, newLineNode)
+                                ModificationUtil.AddChildAfter(insertedNewLine, binding)
+                            else
+                                ModificationUtil.AddChildAfter(anchor, binding)
+
+                        resultingNode
 
                 indexedBindings[fieldIndex] <- actualBinding
                 generatedBindings.AddLast(actualBinding) |> ignore
@@ -141,6 +160,28 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
                     addSemicolon createdBinding
 
         generatedBindings
+
+    member private x.SkipComments (node: ITreeNode): ITreeNode =
+        let mutable current = node
+        let mutable found = false
+
+        while not found do
+            let next = current.NextSibling
+            if next == null then found <- true
+
+            else if next.GetTokenType() == FSharpTokenType.WHITESPACE then
+                let nextNext = next.NextSibling
+                if nextNext == null then found <- true
+
+                // Whitespace + Comment: set comment as current
+                else if nextNext.IsCommentToken() then
+                    current <- nextNext
+
+                else found <- true
+
+            else found <- true
+
+        current
 
     member private x.HandleUnordered
         (generateSingleLine: bool) (existingBindings: TreeNodeCollection<IRecordFieldBinding>)
@@ -178,7 +219,8 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let mutable ordered = true
 
         while bindingIndex < bindings.Count && ordered do
-            while declaredFieldIndex < declaredFields.Length && declaredFields[declaredFieldIndex] != bindings[bindingIndex].ReferenceName.ShortName do
+            while declaredFieldIndex < declaredFields.Length &&
+                  declaredFields[declaredFieldIndex] != bindings[bindingIndex].ReferenceName.ShortName do
                 declaredFieldIndex <- declaredFieldIndex + 1
 
             if declaredFieldIndex >= declaredFields.Length then
@@ -198,7 +240,8 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let mutable bindingIndex = 0
 
         while bindingIndex < bindings.Length do
-            while declaredFieldIndex < declaredFields.Length && declaredFields[declaredFieldIndex] <> bindings[bindingIndex].ReferenceName.ShortName do
+            while declaredFieldIndex < declaredFields.Length &&
+                  declaredFields[declaredFieldIndex] <> bindings[bindingIndex].ReferenceName.ShortName do
                 declaredFieldIndex <- declaredFieldIndex + 1
 
             bindingsIndexed[declaredFieldIndex] <- bindings[bindingIndex]
