@@ -46,7 +46,6 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory,
             let settings = runSettings.SelectedVersion.Value |> fst
             connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, settings.Path).Run()
             formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance))
-            notifications.CreateNotification(formatterHostLifetime.Lifetime, title = "Fantomas", body = $"%A{settings.Version}") |> ignore
         )
 
     let convertRange (range: range) =

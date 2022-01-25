@@ -46,8 +46,9 @@ type FSharpOptions =
 
 type FantomasVersionOption =
     | AutoDetected = 0
-    | SolutionDotnetTool = 2
-    | GlobalDotnetTool = 3
+    | SolutionDotnetTool = 1
+    | GlobalDotnetTool = 2
+    | Bundled = 3
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpFantomasOptions")>]
 type FSharpFantomasOptions =
