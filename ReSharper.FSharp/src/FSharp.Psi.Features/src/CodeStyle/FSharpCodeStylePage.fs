@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open System
 open System.Collections.Generic
 open System.Linq.Expressions
+open System.Threading
 open JetBrains.Application.Components
 open JetBrains.Application.Notifications
 open JetBrains.Application.UI.Options
@@ -20,6 +21,7 @@ open JetBrains.Rider.Model.UIAutomation
 open JetBrains.UI.RichText
 open JetBrains.ReSharper.Feature.Services.UI.Validation
 open JetBrains.Util.Media
+open JetBrains.IDE.UI.Extensions.Validation
 
 [<CodePreviewPreparatorComponent>]
 type FSharpCodePreviewPreparator() =
@@ -100,12 +102,15 @@ type FantomasVersion =
 type FantomasRunSettings = { Version: FantomasVersion * string; Path: string }
 type FantomasNotificationEvent = { Event: FantomasRunValidationResult; Version: FantomasVersion * string }
 
+//Read-write lock
 [<SolutionComponent>]
 type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsProvider) =
     let minimalSupportedVersion = Version("1.1.1")
     let notificationEvent = Signal<FantomasNotificationEvent>()
+    let coockie = ReaderWriterLockSlim()
 
     let dataCache =
+        coockie
         let dict = Dictionary(3)
         dict[FantomasVersion.Bundled] <- { Version = FantomasVersion.Bundled, "1.1.1"; Path = null }, Ok
         dict[FantomasVersion.SolutionDotnetTool] <- { Version = FantomasVersion.SolutionDotnetTool, "1.1.1"; Path = "" }, Ok
@@ -122,8 +127,8 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
 
     let rec chooseNextVersion badVersion =
         match badVersion with
-        | FantomasVersion.SolutionDotnetTool when isValid FantomasVersion.GlobalDotnetTool ->
-            FantomasVersion.GlobalDotnetTool
+        | FantomasVersion.SolutionDotnetTool
+            when isValid FantomasVersion.GlobalDotnetTool -> FantomasVersion.GlobalDotnetTool
 
         | _ -> FantomasVersion.Bundled
 
@@ -180,9 +185,9 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
     member x.SelectedVersion = selectedVersionProp
     member x.AutoDetectedVersion = autoDetectedVersion
 
-    member x.TryRun(runAction: unit -> unit) =
-        let selectedVersion, version = selectedVersionProp.Value |> fst |> (fun x -> x.Version)
-        try runAction()
+    member x.TryRun(runAction: FantomasRunSettings -> unit) =
+        let { Version = selectedVersion, version; Path = _ } as settings, _ = selectedVersionProp.Value
+        try runAction settings
         with _ ->
             notificationEvent.Fire({ Event = FailedToRun; Version = selectedVersion, version })
             let data, _ = dataCache[selectedVersion]
@@ -191,7 +196,9 @@ type FantomasProcessSettings(lifetime, settingsProvider: FSharpFantomasSettingsP
             selectedVersionProp.Value <- (chooseNextVersion selectedVersion) |> dataCache.get_Item
             x.TryRun(runAction)
 
-    member x.GetSettings() = Dictionary(dataCache)
+    member x.GetSettings() =
+        coockie
+        Dictionary(dataCache)
     member x.NotificationProducer = notificationEvent
 
 
@@ -204,7 +211,7 @@ type FantomasNotificationsManager(lifetime, settings: FantomasProcessSettings,
     let solutionToolActions = [|openDotnetToolsAction; goToSettingsAction|]
     let globalToolActions = [|goToSettingsAction|]
     
-    let createNotification { Event = event; Version = fantomasVersion, versionString } =
+    let createNotification { Event = event; Version = fantomasVersion, _ } =
         let body, commands =
             match event with
             | NotFound ->
@@ -258,10 +265,10 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
         RichText(version, TextStyle.FromForeColor(JetRgbaColors.Gray))
 
     let getTooltip = function
-        | Ok -> ""
         | FailedToRun -> "The specified Fantomas version failed to run."
         | UnsupportedVersion -> "Supported Fantomas versions: 1.2.1 and later."
-        | NotFound -> "The specified Fantomas version not found. Falling back to the bundled version."
+        | SelectedButNotFound -> "The specified Fantomas version not found. Falling back to the bundled version."
+        | _ -> ""
 
     let formatSetting setting ({ Version = fantomasVersion, version; Path = _ }, status) =
         let description =
@@ -320,8 +327,10 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
                                             if not (fantomasVersionsData.ContainsKey(FantomasVersion.GlobalDotnetTool)) then
                                                 FantomasVersionOption.GlobalDotnetTool
                                         }
-                                    )
+                                    ).WithValidationRule(lifetime, (fun () -> false), "Supported formatter versions: 1.1.0 through 1.2.1. Falling back to the bundled formatter.", ValidationStates.validationWarning)
                                 let _, status = fantomasVersionsData[settings.AutoDetectedVersion]
-                                beComboBoxFromEnum.Tooltip.Value <- getTooltip status
+                                //beComboBoxFromEnum.ValidationStyle.Value <- ValidationStyle.Border
+                                //beComboBoxFromEnum.Tooltip.Value <- getTooltip status
+                                beComboBoxFromEnum.SelectedIndex.Change.Advise(lifetime, fun x -> beComboBoxFromEnum.Revalidate.Fire(ValidationTrigger.ValueChanged);)
                                 beComboBoxFromEnum),//.WithValidationRule(lifetime, (fun () -> false), "Supported formatter versions: 1.1.0 through 1.2.1. Falling back to the bundled formatter.")),
                             prefix = "Fantomas version") |> ignore

@@ -22,10 +22,9 @@ module internal Reflection =
 
 [<SolutionComponent>]
 type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory,
-                  notifications: UserNotifications, runSettings: FantomasProcessSettings) =
+                  notifications: UserNotifications, fantomasRunSettings: FantomasProcessSettings) =
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
-    //TODO: add lock
     let mutable formatterHostLifetime: LifetimeDefinition = null
 
     let toEditorConfigName name = $"{fSharpEditorConfigPrefix}{StringUtil.MakeUnderscoreCaseName(name)}"
@@ -33,18 +32,16 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory,
     let isConnectionAlive () =
         isNotNull connection && connection.IsActive
 
-    //cringe
     let terminateConnection () =
         if isConnectionAlive () then formatterHostLifetime.Terminate()
 
+    // Formatting called on UI thread, so we don't need to synchronize it
     let connect () =
         if isConnectionAlive () then () else
 
-        //check invariants
-        runSettings.TryRun(fun _ ->
+        fantomasRunSettings.TryRun(fun { Path = path } ->
             formatterHostLifetime <- Lifetime.Define(solution.GetLifetime())
-            let settings = runSettings.SelectedVersion.Value |> fst
-            connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, settings.Path).Run()
+            connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, path).Run()
             formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance))
         )
 
@@ -69,9 +66,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory,
         RdFcsParsingOptions(Array.last options.SourceFiles, lightSyntax,
             List.toArray options.ConditionalCompilationDefines, options.IsExe, options.LangVersionText)
 
-    do
-        runSettings.SelectedVersion.Advise(solution.GetLifetime(), fun version ->
-            terminateConnection ())
+    do fantomasRunSettings.SelectedVersion.Advise(solution.GetLifetime(), fun _ -> terminateConnection ())
 
     member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
         let args =
