@@ -77,11 +77,11 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
         let areBindingsOrdered = x.AreBindingsOrdered existingBindings (fieldNames |> Array.ofSeq)
 
-        let generatedBindings =
+        let generatedBindings: seq<IRecordFieldBinding> =
             if areBindingsOrdered && not existingBindings.IsEmpty then
-                x.HandleOrdered generateSingleLine (existingBindings.ToArray()) (fieldNames.ToArray()) elementFactory
+                x.HandleOrdered (existingBindings.ToArray()) (fieldNames.ToArray()) generateSingleLine elementFactory
             else
-                x.HandleUnordered generateSingleLine existingBindings fieldsToAdd elementFactory
+                x.HandleUnordered (existingBindings.ToArray()) fieldsToAdd generateSingleLine elementFactory
 
         let existingBindings = recordExpr.FieldBindings
 
@@ -114,11 +114,31 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
             hotspotSession.Execute())
 
     member private x.HandleOrdered
-        (generateSingleLine: bool) (existingBindings: IRecordFieldBinding[])
-        (declaredFields: string[]) (elementFactory: IFSharpElementFactory): seq<IRecordFieldBinding> =
+        (existingBindings: IRecordFieldBinding[]) (declaredFields: string[]) =
+
+        let indexedBindings = x.CreateOrderedIndexedBindings existingBindings declaredFields
+
+        x.Handle indexedBindings declaredFields
+
+    member private x.HandleUnordered
+        (existingBindings: IRecordFieldBinding[]) (fieldsToAdd: HashSet<string>) =
+
+        let declaredFieldsCount = existingBindings.Length + fieldsToAdd.Count
+        let indexedBindings = x.CreateUnorderedIndexedBindings existingBindings declaredFieldsCount
+        let declaredFields =
+            seq {
+                yield! existingBindings |> Seq.map (fun binding -> binding.ReferenceName.ShortName )
+                yield! fieldsToAdd
+            }
+            |> Array.ofSeq
+
+        x.Handle indexedBindings declaredFields
+
+    member private x.Handle
+        (indexedBindings: IRecordFieldBinding[]) (declaredFields: string[])
+        (generateSingleLine: bool) (elementFactory: IFSharpElementFactory): seq<IRecordFieldBinding> =
 
         let generatedBindings = LinkedList<IRecordFieldBinding>()
-        let indexedBindings = x.CreateIndexedBindings existingBindings declaredFields
 
         for fieldIndex in [0..(declaredFields.Length - 1)] do
             let declaredField = declaredFields[fieldIndex]
@@ -129,18 +149,20 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
                 let actualBinding =
                     if fieldIndex = 0 then
-                        let anchor =
-                            recordExpr.FieldBindingList.FieldBindings.First()
-
-                        ModificationUtil.AddChildBefore(anchor, binding)
+                        if isNull recordExpr.FieldBindingList then
+                            let bindingList = RecordFieldBindingListNavigator.GetByFieldBinding(binding)
+                            let actualList = ModificationUtil.AddChildAfter(recordExpr.LeftBrace, bindingList)
+                            actualList.FieldBindings.First()
+                        else
+                            let anchor = recordExpr.FieldBindingList.FieldBindings.First()
+                            ModificationUtil.AddChildBefore(anchor, binding)
                     else
                         let anchor: ITreeNode =
                             let indexedBinding = indexedBindings[fieldIndex - 1]
                             if generateSingleLine then
                                 indexedBinding
                             else
-                                indexedBinding
-                                |> x.SkipComments
+                                x.SkipComments indexedBinding
 
                         let resultingNode =
                             // Nodes after block comments are not automatically moved to the new line, fixing it
@@ -183,33 +205,6 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
         current
 
-    member private x.HandleUnordered
-        (generateSingleLine: bool) (existingBindings: TreeNodeCollection<IRecordFieldBinding>)
-        (fieldsToAdd: HashSet<string>) (elementFactory: IFSharpElementFactory) : seq<IRecordFieldBinding> =
-
-        let generatedBindings = LinkedList<IRecordFieldBinding>()
-
-        if generateSingleLine && not existingBindings.IsEmpty then
-            addSemicolon (existingBindings.Last())
-
-        let anchorBindingList =
-            match existingBindings.LastOrDefault() with
-            | null ->
-                let firstField = fieldsToAdd.First()
-                fieldsToAdd.Remove(firstField) |> ignore
-                let binding = elementFactory.CreateRecordFieldBinding(firstField, generateSingleLine)
-                let bindingList = RecordFieldBindingListNavigator.GetByFieldBinding(binding)
-                let actualList = ModificationUtil.AddChildAfter(recordExpr.LeftBrace, bindingList)
-                generatedBindings.AddLast(actualList.FieldBindings.First()) |> ignore
-                actualList
-            | binding -> RecordFieldBindingListNavigator.GetByFieldBinding(binding)
-
-        for name in fieldsToAdd do
-            let binding = elementFactory.CreateRecordFieldBinding(name, generateSingleLine)
-            generatedBindings.AddLast(ModificationUtil.AddChild(anchorBindingList, binding)) |> ignore
-
-        generatedBindings
-
     member private x.AreBindingsOrdered (bindings: TreeNodeCollection<IRecordFieldBinding>)
         (declaredFields: string array) =
         if declaredFields.Length <= 1 then true else
@@ -231,7 +226,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
         ordered
 
-    member private x.CreateIndexedBindings (bindings: IRecordFieldBinding[])
+    member private x.CreateOrderedIndexedBindings (bindings: IRecordFieldBinding[])
         (declaredFields: string[]): IRecordFieldBinding[] =
 
         let bindingsIndexed = Array.init declaredFields.Length (fun _ -> null)
@@ -248,5 +243,13 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
             bindingIndex <- bindingIndex + 1
             declaredFieldIndex <- declaredFieldIndex + 1
+
+        bindingsIndexed
+
+    member private x.CreateUnorderedIndexedBindings (bindings: IRecordFieldBinding[])
+        (declaredFieldsCount: int): IRecordFieldBinding[] =
+
+        let bindingsIndexed = Array.init declaredFieldsCount (fun i ->
+            if i < bindings.Length then bindings[i] else null)
 
         bindingsIndexed
