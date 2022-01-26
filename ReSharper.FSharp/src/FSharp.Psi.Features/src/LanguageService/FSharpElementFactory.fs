@@ -145,14 +145,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             | null -> failwith "Could not get record expr"
             | recordExpr -> recordExpr.FieldBindings.First()
 
-        member x.CreateRecordFieldBindingList() =
-            let source = """{ }"""
-            let newExpr = getExpression source
-
-            match newExpr.As<IRecordExpr>() with
-            | null -> failwith "Could not get record expr"
-            | recordExpr -> recordExpr.FieldBindingList
-
         member x.CreateAppExpr(funcName, argExpr) =
             let source = sprintf "%s ()" funcName
             let newExpr = getExpression source :?> IPrefixAppExpr

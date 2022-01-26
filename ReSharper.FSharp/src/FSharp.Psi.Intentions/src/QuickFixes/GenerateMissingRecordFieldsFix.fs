@@ -113,16 +113,12 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
             hotspotSession.Execute())
 
-    member private x.HandleOrdered
-        (existingBindings: IRecordFieldBinding[]) (declaredFields: string[]) =
-
+    member private x.HandleOrdered (existingBindings: IRecordFieldBinding[]) (declaredFields: string[]) =
         let indexedBindings = x.CreateOrderedIndexedBindings existingBindings declaredFields
 
         x.Handle indexedBindings declaredFields
 
-    member private x.HandleUnordered
-        (existingBindings: IRecordFieldBinding[]) (fieldsToAdd: HashSet<string>) =
-
+    member private x.HandleUnordered (existingBindings: IRecordFieldBinding[]) (fieldsToAdd: HashSet<string>) =
         let declaredFieldsCount = existingBindings.Length + fieldsToAdd.Count
         let indexedBindings = x.CreateUnorderedIndexedBindings existingBindings declaredFieldsCount
         let declaredFields =
@@ -134,8 +130,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
         x.Handle indexedBindings declaredFields
 
-    member private x.Handle
-        (indexedBindings: IRecordFieldBinding[]) (declaredFields: string[])
+    member private x.Handle (indexedBindings: IRecordFieldBinding[]) (declaredFields: string[])
         (generateSingleLine: bool) (elementFactory: IFSharpElementFactory): seq<IRecordFieldBinding> =
 
         let generatedBindings = LinkedList<IRecordFieldBinding>()

@@ -28,7 +28,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     IBinaryAppExpr CreateIgnoreApp(IFSharpExpression expr, bool newLine);
     IRecordFieldBinding CreateRecordFieldBinding(string fieldName, bool addSemicolon);
-    IRecordFieldBindingList CreateRecordFieldBindingList();
 
     IFSharpPattern CreatePattern(string text, bool topLevel);
     IParenPat CreateParenPat();
