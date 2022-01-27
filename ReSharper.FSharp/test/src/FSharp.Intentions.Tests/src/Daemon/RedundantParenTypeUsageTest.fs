@@ -39,4 +39,5 @@ type RedundantParenTypeUsageTest() =
     [<FSharpSignatureTest>]
     [<Test>] member x.``Tuple 05 - Named parameter sig``() = x.DoNamedTest()
 
+    [<Test>] member x.``As pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Trait call 01``() = x.DoNamedTest()
