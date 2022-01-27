@@ -26,6 +26,7 @@ let rec ignoreParentCompoundTypes (typeUsage: ITypeUsage) =
 let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
     let parentTypeUsage = context.Parent.As<ITypeUsage>()
     if isNotNull parentTypeUsage && not (applicable parentTypeUsage) then true else
+    if context.Parent :? ITraitCallExpr then true else
 
     match typeUsage with
     | :? ITupleTypeUsage as tupleTypeUsage ->

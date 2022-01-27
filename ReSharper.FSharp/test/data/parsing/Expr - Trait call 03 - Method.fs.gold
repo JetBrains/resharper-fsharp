@@ -1,0 +1,54 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExpressionStatement
+      IChameleonExpression
+        ITraitCallExpr
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
+          FSharpIdentifierToken(type:IDENTIFIER, text:x)
+          FSharpTokenType+ColonTokenElement(type:COLON, text::)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:Map)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+ColonTokenElement(type:COLON, text::)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IParenTypeUsage
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IFunctionTypeUsage
+              IParenTypeUsage
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                IFunctionTypeUsage
+                  INamedTypeUsage
+                    ITypeReferenceName
+                      ITypeParameterId
+                        FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                        FSharpIdentifierToken(type:IDENTIFIER, text:a)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  INamedTypeUsage
+                    ITypeReferenceName
+                      ITypeParameterId
+                        FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                        FSharpIdentifierToken(type:IDENTIFIER, text:b)
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedTypeUsage
+                ITypeReferenceName
+                  ITypeParameterId
+                    FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
+                    FSharpIdentifierToken(type:IDENTIFIER, text:z)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:x)
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
