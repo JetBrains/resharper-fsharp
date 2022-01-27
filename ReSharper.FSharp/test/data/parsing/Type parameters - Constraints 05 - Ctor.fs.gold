@@ -14,15 +14,40 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IValueTypeConstraint
+          IMemberConstraint
             ITypeReferenceName
               ITypeParameterId
                 FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
                 FSharpIdentifierToken(type:IDENTIFIER, text:T)
             FSharpTokenType+ColonTokenElement(type:COLON, text::)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+StructTokenElement(type:STRUCT, text:struct)
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IConstructorSignature
+              FSharpTokenType+NewTokenElement(type:NEW, text:new)
+              IReturnTypeInfo
+                FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                IFunctionTypeUsage
+                  IParameterSignatureTypeUsage
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:unit)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  IParameterSignatureTypeUsage
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        ITypeParameterId
+                          FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                          FSharpIdentifierToken(type:IDENTIFIER, text:T)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+        IPrimaryConstructorDeclaration
+          IParametersPatternDeclaration
+            IUnitPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"

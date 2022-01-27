@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
-      GetFcsSymbol() is { } fcsSymbol
+      !(Parent is IMemberConstraint) && GetFcsSymbol() is { } fcsSymbol
         ? CreateDeclaredElement(fcsSymbol)
         : null;
 

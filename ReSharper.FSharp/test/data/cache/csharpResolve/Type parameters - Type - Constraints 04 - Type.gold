@@ -1,0 +1,91 @@
+﻿using System;
+
+public enum Enum1 {}
+public class Exception1 : Exception {}
+
+public class Disposable : IDisposable
+{
+    public void Dispose() => throw new NotImplementedException();
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        new BaseClassConstraint1<string>();
+        new BaseClassConstraint1<String>();
+        new BaseClassConstraint1<int>();
+        new BaseClassConstraint1<Nullable<int>>();
+        new BaseClassConstraint1<int?>();
+        new BaseClassConstraint1<Enum>();
+        new BaseClassConstraint1<Enum1>();
+
+        new BaseClassConstraint2<Exception>();
+        new BaseClassConstraint2<Exception1>();
+        new BaseClassConstraint2<|string|(0)>();
+        new BaseClassConstraint2<|String|(1)>();
+        new BaseClassConstraint2<|int|(2)>();
+        new BaseClassConstraint2<|Nullable<int>|(3)>();
+        new BaseClassConstraint2<|int?|(4)>();
+        new BaseClassConstraint2<|IDisposable|(5)>();
+
+        new InterfaceConstraint<IDisposable>();
+        new InterfaceConstraint<|string|(6)>();
+        new InterfaceConstraint<|String|(7)>();
+        new InterfaceConstraint<|int|(8)>();
+        new InterfaceConstraint<|Nullable<int>|(9)>();
+        new InterfaceConstraint<|int?|(10)>();
+        new InterfaceConstraint<|Exception|(11)>();
+
+        new UnresolvedTypeConstraint<string>();
+        new UnresolvedTypeConstraint<String>();
+        new UnresolvedTypeConstraint<int>();
+        new UnresolvedTypeConstraint<Nullable<int>>();
+        new UnresolvedTypeConstraint<int?>();
+        new UnresolvedTypeConstraint<Enum>();
+        new UnresolvedTypeConstraint<Enum1>();
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The type 'string' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
+(1): ReSharper Underlined Error Highlighting: The type 'string' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
+(2): ReSharper Underlined Error Highlighting: The type 'int' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
+(3): ReSharper Underlined Error Highlighting: The type 'System.Nullable<int>' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
+(4): ReSharper Underlined Error Highlighting: The type 'System.Nullable<int>' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
+(5): ReSharper Underlined Error Highlighting: The type 'System.IDisposable' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
+(6): ReSharper Underlined Error Highlighting: The type 'string' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
+(7): ReSharper Underlined Error Highlighting: The type 'string' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
+(8): ReSharper Underlined Error Highlighting: The type 'int' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
+(9): ReSharper Underlined Error Highlighting: The type 'System.Nullable<int>' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
+(10): ReSharper Underlined Error Highlighting: The type 'System.Nullable<int>' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
+(11): ReSharper Underlined Error Highlighting: The type 'System.Exception' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
+M:BaseClassConstraint1`1.#ctor
+M:BaseClassConstraint1`1.#ctor
+M:BaseClassConstraint1`1.#ctor
+M:BaseClassConstraint1`1.#ctor
+M:BaseClassConstraint1`1.#ctor
+M:BaseClassConstraint1`1.#ctor
+M:BaseClassConstraint1`1.#ctor
+M:BaseClassConstraint2`1.#ctor
+M:BaseClassConstraint2`1.#ctor
+M:BaseClassConstraint2`1.#ctor
+M:BaseClassConstraint2`1.#ctor
+M:BaseClassConstraint2`1.#ctor
+M:BaseClassConstraint2`1.#ctor
+M:BaseClassConstraint2`1.#ctor
+M:BaseClassConstraint2`1.#ctor
+M:InterfaceConstraint`1.#ctor
+M:InterfaceConstraint`1.#ctor
+M:InterfaceConstraint`1.#ctor
+M:InterfaceConstraint`1.#ctor
+M:InterfaceConstraint`1.#ctor
+M:InterfaceConstraint`1.#ctor
+M:InterfaceConstraint`1.#ctor
+M:UnresolvedTypeConstraint`1.#ctor
+M:UnresolvedTypeConstraint`1.#ctor
+M:UnresolvedTypeConstraint`1.#ctor
+M:UnresolvedTypeConstraint`1.#ctor
+M:UnresolvedTypeConstraint`1.#ctor
+M:UnresolvedTypeConstraint`1.#ctor
+M:UnresolvedTypeConstraint`1.#ctor

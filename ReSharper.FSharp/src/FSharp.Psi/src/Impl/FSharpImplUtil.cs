@@ -759,6 +759,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return fsPattern;
     }
 
+    [CanBeNull]
+    public static ITypeUsage IgnoreInnerParens([CanBeNull] this ITypeUsage typeUsage, bool ignoreParameterSignature = true)
+    {
+      if (typeUsage == null)
+        return null;
+
+      // Ignore top-level parameter signature wrapper type usage.
+      if (ignoreParameterSignature)
+        typeUsage = IgnoreParameterSignature(typeUsage);
+
+      while (typeUsage is IParenTypeUsage { InnerTypeUsage: { } } parenTypeUsage)
+        typeUsage = parenTypeUsage.InnerTypeUsage;
+      return typeUsage;
+    }
+
+    [CanBeNull]
+    public static ITypeUsage IgnoreParameterSignature([CanBeNull] this ITypeUsage typeUsage) =>
+      typeUsage is IParameterSignatureTypeUsage parameterSignatureTypeUsage
+        ? parameterSignatureTypeUsage.TypeUsage
+        : typeUsage;
+
     [NotNull]
     public static IFSharpReferenceOwner SetName([NotNull] this IFSharpReferenceOwner referenceOwner,
       [NotNull] string name)

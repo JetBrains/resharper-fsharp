@@ -1,0 +1,21 @@
+﻿using System;
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        new StructConstraint<int>();
+        new StructConstraint<|string|(0)>();
+        new StructConstraint<|String|(1)>();
+        new StructConstraint<|Nullable<int>|(2)>();
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The type 'string' must be a non-nullable value type in order to use it as parameter 'T'
+(1): ReSharper Underlined Error Highlighting: The type 'string' must be a non-nullable value type in order to use it as parameter 'T'
+(2): ReSharper Underlined Error Highlighting: The type 'System.Nullable<int>' must be a non-nullable value type in order to use it as parameter 'T'
+M:StructConstraint`1.#ctor
+M:StructConstraint`1.#ctor
+M:StructConstraint`1.#ctor
+M:StructConstraint`1.#ctor

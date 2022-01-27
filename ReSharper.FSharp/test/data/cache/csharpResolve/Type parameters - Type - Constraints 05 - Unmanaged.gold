@@ -1,0 +1,23 @@
+﻿using System;
+
+public enum Enum1 {}
+public class Exception1 : Exception {}
+
+public class Disposable : IDisposable
+{
+    public void Dispose() => throw new NotImplementedException();
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        new UnmanagedConstraint<int>();
+        new UnmanagedConstraint<|string|(0)>();
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The type 'string' must be valid unmanaged type (simple numeric, 'bool', 'char', 'void', enumeration type or struct type with all fields of unmanaged types at any level of nesting) in order to use it as a type argument for 'T' parameter
+M:UnmanagedConstraint`1.#ctor
+M:UnmanagedConstraint`1.#ctor

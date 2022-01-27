@@ -15,23 +15,25 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          ITypeConstraint
-            INamedTypeUsage
-              ITypeReferenceName
-                ITypeParameterId
-                  FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
-                  FSharpIdentifierToken(type:IDENTIFIER, text:T)
+          IMemberConstraint
+            ITypeReferenceName
+              ITypeParameterId
+                FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
+                FSharpIdentifierToken(type:IDENTIFIER, text:T)
             FSharpTokenType+ColonTokenElement(type:COLON, text::)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpIdentifierToken(type:IDENTIFIER, text:P)
-            FSharpTokenType+ColonTokenElement(type:COLON, text::)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedTypeUsage
-              ITypeReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            IMemberSignature
+              FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpIdentifierToken(type:IDENTIFIER, text:P)
+              IReturnTypeInfo
+                FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                IParameterSignatureTypeUsage
+                  INamedTypeUsage
+                    ITypeReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

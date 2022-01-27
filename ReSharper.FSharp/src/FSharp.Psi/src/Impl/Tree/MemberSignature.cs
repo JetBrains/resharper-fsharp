@@ -12,6 +12,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
+      if (Parent is IMemberConstraint)
+        return null;
+
       if (TypeUsage is IFunctionTypeUsage)
         return this.CreateMethod();
 
