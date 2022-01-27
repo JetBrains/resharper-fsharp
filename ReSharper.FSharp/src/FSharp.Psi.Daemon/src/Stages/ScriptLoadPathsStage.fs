@@ -1,6 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
 open System.Collections.Generic
+open JetBrains.Application
 open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -26,8 +27,6 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     override x.Execute(committer) =
-        let interruptChecker = x.SeldomInterruptChecker
-
         let allDirectives = Dictionary<TreeOffset, IHashDirective>()
         let visitor =
             { new TreeNodeVisitor() with
@@ -47,7 +46,7 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
                             | _ -> ()
                         | _ -> ()
 
-                        interruptChecker.CheckForInterrupt() }
+                        Interruption.Current.CheckAndThrow() }
 
         fsFile.Accept(visitor)
         if allDirectives.IsEmpty() then () else

@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
+open JetBrains.Application
 open JetBrains.ReSharper.Daemon.UsageChecking
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
@@ -23,10 +24,9 @@ and UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess) 
         let interruptChecker = daemonProcess.CreateInterruptChecker()
         let unusedOpens = UnusedOpensUtil.getUnusedOpens fsFile interruptChecker
 
-        let seldomInterruptChecker = x.SeldomInterruptChecker
         unusedOpens
         |> Array.map (fun openDirective ->
-            seldomInterruptChecker.CheckForInterrupt()
+            Interruption.Current.CheckAndThrow()
             let range = openDirective.GetHighlightingRange()
             HighlightingInfo(range, UnusedOpenWarning(openDirective)))
         |> DaemonStageResult

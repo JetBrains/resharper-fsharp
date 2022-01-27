@@ -4,7 +4,7 @@ using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using FSharp.Compiler.Text;
 using JetBrains.Annotations;
-using JetBrains.Application.Threading;
+using JetBrains.Application;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -85,7 +85,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     [NotNull]
     private ResolvedSymbols CreateFileResolvedSymbols()
     {
-      var interruptChecker = new SeldomInterruptCheckerWithCheckTime(100);
       // todo: cancellation
       if (!(SourceFile.GetPrimaryPsiFile() is IFSharpFile fsFile))
         return ResolvedSymbols.Empty;
@@ -251,7 +250,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             resolvedSymbols.Declarations.Remove(startOffset);
         }
 
-        interruptChecker.CheckForInterrupt();
+        Interruption.Current.CheckAndThrow();
       }
 
       return resolvedSymbols;

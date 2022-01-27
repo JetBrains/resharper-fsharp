@@ -61,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
         var highlighting = new FSharpIdentifierHighlighting(highlightingId, documentRange);
         highlightings.Add(new HighlightingInfo(documentRange, highlighting));
 
-        SeldomInterruptChecker.CheckForInterrupt();
+        Interruption.Current.CheckAndThrow();
       }
     }
 
