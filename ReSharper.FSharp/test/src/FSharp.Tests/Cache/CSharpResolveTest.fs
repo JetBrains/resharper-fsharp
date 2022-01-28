@@ -160,6 +160,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Type repr - Class 01 - Impl``() = x.DoNamedTest()
     [<Test>] member x.``Type repr - Class 02 - Member``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type parameters - Method - Constraints 01``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Type - Constraints 01 - ValueType``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Type - Constraints 02 - Reference``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Type - Constraints 03 - Ctor``() = x.DoNamedTest()
