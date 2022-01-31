@@ -518,7 +518,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     [NotNull]
     public static TypeAugmentation GetTypeAugmentationInfo([NotNull] ITypeExtensionDeclaration declaration)
     {
-      var extensionNameInfo = 
+      var extensionNameInfo =
         new NameAndParametersCount(declaration.SourceName, declaration.TypeParameterDeclarations.Count);
 
       var declaredTypeNames = new Dictionary<NameAndParametersCount, TypeAugmentation>();
@@ -671,16 +671,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         _ => false
       };
 
-    public static ICollection<string> GetRecordFieldNames([NotNull] this ITypeElement typeElement)
+    public static IList<string> GetRecordFieldNames([NotNull] this ITypeElement typeElement)
     {
       switch (typeElement)
       {
         case IFSharpTypeElement fsTypeElement:
-          return fsTypeElement.GetPart<IRecordPart>()?.Fields.Select(f => f.ShortName).AsCollection() ??
+          return fsTypeElement.GetPart<IRecordPart>()?.Fields.Select(f => f.ShortName).AsIList() ??
                  EmptyList<string>.InstanceList;
 
         case ICompiledElement _:
-          return typeElement.Properties.Where(p => p.IsCompiledFSharpField()).Select(p => p.ShortName).AsCollection();
+          return typeElement.Properties.Where(p => p.IsCompiledFSharpField()).Select(p => p.ShortName).AsIList();
 
         default:
           return EmptyArray<string>.Instance;

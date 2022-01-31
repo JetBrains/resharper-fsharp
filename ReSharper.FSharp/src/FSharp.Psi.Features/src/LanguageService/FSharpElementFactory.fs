@@ -263,7 +263,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
                 match topLevel with
                 | true -> createLetDecl text :> _
                 | _ -> createLetExpr text :> _
-    
+
             letBindings.Bindings.[0].HeadPattern
 
         member x.CreateParenPat() =
