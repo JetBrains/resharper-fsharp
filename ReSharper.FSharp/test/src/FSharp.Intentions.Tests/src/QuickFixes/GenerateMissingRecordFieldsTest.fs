@@ -33,6 +33,7 @@ type GenerateMissingRecordFieldsTest() =
     [<Test>] member x.``Multiline 06 - Ordered comment 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 07 - Ordered comment 02``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 08 - Ordered comment 03``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 09 - Only middle``() = x.DoNamedTest()
 
     [<Test>] member x.``Empty function``() = x.DoNamedTest()
 
