@@ -31,12 +31,12 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
             | null -> failwith "Could not get expr"
             | expr -> ModificationUtil.AddChildAfter(expr, FSharpTokenType.SEMICOLON.CreateLeafElement()) |> ignore
 
-    let generateBindings (indexedBindings: IRecordFieldBinding[]) (declaredFields: string[])
+    let generateBindings (indexedBindings: IRecordFieldBinding[]) (declaredFields: IList<string>)
         (generateSingleLine: bool) (elementFactory: IFSharpElementFactory): seq<IRecordFieldBinding> =
 
         let generatedBindings = LinkedList<IRecordFieldBinding>()
 
-        for fieldIndex in [0..(declaredFields.Length - 1)] do
+        for fieldIndex in [0..(declaredFields.Count - 1)] do
             let declaredField = declaredFields[fieldIndex]
             let createdBinding = indexedBindings[fieldIndex]
 
@@ -101,15 +101,15 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         ordered
 
     let createOrderedIndexedBindings (bindings: TreeNodeCollection<IRecordFieldBinding>)
-        (declaredFields: string[]): IRecordFieldBinding[] =
+        (declaredFields: IList<string>): IRecordFieldBinding[] =
 
-        let bindingsIndexed = Array.init declaredFields.Length (fun _ -> null)
+        let bindingsIndexed = Array.init declaredFields.Count (fun _ -> null)
 
         let mutable declaredFieldIndex = 0
         let mutable bindingIndex = 0
 
         while bindingIndex < bindings.Count do
-            while declaredFieldIndex < declaredFields.Length &&
+            while declaredFieldIndex < declaredFields.Count &&
                   declaredFields[declaredFieldIndex] <> bindings[bindingIndex].ReferenceName.ShortName do
                 declaredFieldIndex <- declaredFieldIndex + 1
 
@@ -128,7 +128,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
         bindingsIndexed
 
-    let generateOrderedBindings (existingBindings: TreeNodeCollection<IRecordFieldBinding>) (declaredFields: string[]) =
+    let generateOrderedBindings (existingBindings: TreeNodeCollection<IRecordFieldBinding>) (declaredFields: IList<string>) =
         let indexedBindings = createOrderedIndexedBindings existingBindings declaredFields
 
         generateBindings indexedBindings declaredFields
@@ -190,7 +190,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
         let generatedBindings: seq<IRecordFieldBinding> =
             if areBindingsOrdered && not existingBindings.IsEmpty then
-                generateOrderedBindings existingBindings (fieldNames.ToArray()) generateSingleLine elementFactory
+                generateOrderedBindings existingBindings fieldNames generateSingleLine elementFactory
             else
                 generateUnorderedBindings existingBindings fieldsToAdd generateSingleLine elementFactory
 
