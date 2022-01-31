@@ -676,11 +676,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       switch (typeElement)
       {
         case IFSharpTypeElement fsTypeElement:
-          return fsTypeElement.GetPart<IRecordPart>()?.Fields.Select(f => f.ShortName).AsList() ??
+          return fsTypeElement.GetPart<IRecordPart>()?.Fields.Select(f => f.ShortName).AsIList() ??
                  EmptyList<string>.InstanceList;
 
         case ICompiledElement _:
-          return typeElement.Properties.Where(p => p.IsCompiledFSharpField()).Select(p => p.ShortName).AsList();
+          return typeElement.Properties.Where(p => p.IsCompiledFSharpField()).Select(p => p.ShortName).AsIList();
 
         default:
           return EmptyArray<string>.Instance;

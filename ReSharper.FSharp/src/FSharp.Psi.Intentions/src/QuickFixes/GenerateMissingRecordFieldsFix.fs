@@ -186,7 +186,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         if isSingleLine && not generateSingleLine && existingBindings.Count > 0 then
             ToMultilineRecord.Execute(recordExpr)
 
-        let areBindingsOrdered = areBindingsOrdered existingBindings (fieldNames |> Array.ofSeq)
+        let areBindingsOrdered = areBindingsOrdered existingBindings fieldNames
 
         let generatedBindings: seq<IRecordFieldBinding> =
             if areBindingsOrdered && not existingBindings.IsEmpty then
