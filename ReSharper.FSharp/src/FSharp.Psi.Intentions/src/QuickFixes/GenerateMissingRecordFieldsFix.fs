@@ -80,7 +80,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         generatedBindings
 
     let areBindingsOrdered (bindings: TreeNodeCollection<IRecordFieldBinding>)
-        (declaredFields: string array) =
+        (declaredFields: IList<string>): bool =
         if bindings.Count <= 1 then true else
 
         let mutable declaredFieldIndex = 0
@@ -88,11 +88,11 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let mutable ordered = true
 
         while bindingIndex < bindings.Count && ordered do
-            while declaredFieldIndex < declaredFields.Length &&
+            while declaredFieldIndex < declaredFields.Count &&
                   declaredFields[declaredFieldIndex] != bindings[bindingIndex].ReferenceName.ShortName do
                 declaredFieldIndex <- declaredFieldIndex + 1
 
-            if declaredFieldIndex >= declaredFields.Length then
+            if declaredFieldIndex >= declaredFields.Count then
                 ordered <- false
 
             bindingIndex <- bindingIndex + 1
