@@ -65,6 +65,13 @@ module ProjectOptions =
 type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer, logger: ILogger,
         modulePathProvider: ModulePathProvider) =
 
+    let mutable stamp = 0L
+
+    let getNextStamp () =
+        let result = stamp
+        stamp <- stamp + 1L
+        result
+
     let itemsDelimiters = [| ';'; ','; ' ' |]
 
     let defaultOptions =
@@ -213,7 +220,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
               LoadTime = DateTime.Now
               OriginalLoadReferences = List.empty
               UnresolvedReferences = None
-              Stamp = None }
+              Stamp = Some(getNextStamp ()) }
 
         let parsingOptions, errors =
             checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)

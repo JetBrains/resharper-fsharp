@@ -23,11 +23,124 @@ open JetBrains.ReSharper.Resources.Shell
 type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
     inherit FSharpQuickFixBase()
 
+    let maxBindingsAmountOnSingleLine = 4
+
     let addSemicolon (binding: IRecordFieldBinding) =
         if isNull binding.Semicolon then
             match binding.Expression with
             | null -> failwith "Could not get expr"
             | expr -> ModificationUtil.AddChildAfter(expr, FSharpTokenType.SEMICOLON.CreateLeafElement()) |> ignore
+
+    let generateBindings (indexedBindings: IRecordFieldBinding[]) (declaredFields: IList<string>)
+        (generateSingleLine: bool) (elementFactory: IFSharpElementFactory): seq<IRecordFieldBinding> =
+
+        let generatedBindings = LinkedList<IRecordFieldBinding>()
+
+        for fieldIndex in [0..(declaredFields.Count - 1)] do
+            let declaredField = declaredFields[fieldIndex]
+            let createdBinding = indexedBindings[fieldIndex]
+
+            if isNull createdBinding then
+                let binding = elementFactory.CreateRecordFieldBinding(declaredField, generateSingleLine)
+
+                let actualBinding =
+                    if fieldIndex = 0 then
+                        if isNull recordExpr.FieldBindingList then
+                            let bindingList = RecordFieldBindingListNavigator.GetByFieldBinding(binding)
+                            let actualList = ModificationUtil.AddChildAfter(recordExpr.LeftBrace, bindingList)
+                            actualList.FieldBindings.First()
+                        else
+                            let anchor = recordExpr.FieldBindingList.FieldBindings.First()
+                            ModificationUtil.AddChildBefore(anchor, binding)
+                    else
+                        let anchor: ITreeNode =
+                            let indexedBinding = indexedBindings[fieldIndex - 1]
+                            if generateSingleLine then
+                                indexedBinding
+                            else
+                                getLastMatchingNodeAfter isInlineSpaceOrComment indexedBinding
+
+                        let resultingNode =
+                            // Nodes after block comments are not automatically moved to the new line, fixing it
+                            if (not generateSingleLine) && anchor.GetTokenType() == FSharpTokenType.BLOCK_COMMENT then
+                                let newLineNode = NewLine(binding.GetLineEnding())
+                                let insertedNewLine = ModificationUtil.AddChildAfter(anchor, newLineNode)
+                                ModificationUtil.AddChildAfter(insertedNewLine, binding)
+                            else
+                                ModificationUtil.AddChildAfter(anchor, binding)
+
+                        resultingNode
+
+                indexedBindings[fieldIndex] <- actualBinding
+                generatedBindings.AddLast(actualBinding) |> ignore
+            else
+                if generateSingleLine && isNull createdBinding.Semicolon then
+                    addSemicolon createdBinding
+
+        generatedBindings
+
+    let areBindingsOrdered (bindings: TreeNodeCollection<IRecordFieldBinding>)
+        (declaredFields: IList<string>): bool =
+        if bindings.Count <= 1 then true else
+
+        let mutable declaredFieldIndex = 0
+        let mutable bindingIndex = 0
+        let mutable ordered = true
+
+        while bindingIndex < bindings.Count && ordered do
+            while declaredFieldIndex < declaredFields.Count &&
+                  declaredFields[declaredFieldIndex] != bindings[bindingIndex].ReferenceName.ShortName do
+                declaredFieldIndex <- declaredFieldIndex + 1
+
+            if declaredFieldIndex >= declaredFields.Count then
+                ordered <- false
+
+            bindingIndex <- bindingIndex + 1
+            declaredFieldIndex <- declaredFieldIndex + 1
+
+        ordered
+
+    let createOrderedIndexedBindings (bindings: TreeNodeCollection<IRecordFieldBinding>)
+        (declaredFields: IList<string>): IRecordFieldBinding[] =
+
+        let bindingsIndexed = Array.init declaredFields.Count (fun _ -> null)
+
+        let mutable declaredFieldIndex = 0
+        let mutable bindingIndex = 0
+
+        while bindingIndex < bindings.Count do
+            while declaredFieldIndex < declaredFields.Count &&
+                  declaredFields[declaredFieldIndex] <> bindings[bindingIndex].ReferenceName.ShortName do
+                declaredFieldIndex <- declaredFieldIndex + 1
+
+            bindingsIndexed[declaredFieldIndex] <- bindings[bindingIndex]
+
+            bindingIndex <- bindingIndex + 1
+            declaredFieldIndex <- declaredFieldIndex + 1
+
+        bindingsIndexed
+
+    let createUnorderedIndexedBindings (bindings: TreeNodeCollection<IRecordFieldBinding>)
+        (declaredFieldsCount: int): IRecordFieldBinding[] =
+
+        let bindingsIndexed = Array.init declaredFieldsCount (fun i ->
+            if i < bindings.Count then bindings[i] else null)
+
+        bindingsIndexed
+
+    let generateOrderedBindings (existingBindings: TreeNodeCollection<IRecordFieldBinding>) (declaredFields: IList<string>) =
+        let indexedBindings = createOrderedIndexedBindings existingBindings declaredFields
+
+        generateBindings indexedBindings declaredFields
+
+    let generateUnorderedBindings (existingBindings: TreeNodeCollection<IRecordFieldBinding>) (fieldsToAdd: HashSet<string>) =
+        let declaredFieldsCount = existingBindings.Count + fieldsToAdd.Count
+        let indexedBindings = createUnorderedIndexedBindings existingBindings declaredFieldsCount
+        let declaredFields =
+            [| yield! existingBindings |> Seq.map (fun binding -> binding.ReferenceName.ShortName )
+               yield! fieldsToAdd |]
+
+        generateBindings indexedBindings declaredFields
 
     new (error: FieldRequiresAssignmentError) =
         GenerateMissingRecordFieldsFix(error.Expr)
@@ -68,34 +181,23 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let isSingleLine = recordExpr.IsSingleLine
 
         let generateSingleLine =
-            existingBindings.Count > 1 && fieldNames.Count <= 4 && isSingleLine
+            existingBindings.Count > 1 && fieldNames.Count <= maxBindingsAmountOnSingleLine && isSingleLine
 
         if isSingleLine && not generateSingleLine && existingBindings.Count > 0 then
             ToMultilineRecord.Execute(recordExpr)
 
-        if generateSingleLine && not existingBindings.IsEmpty then
-            addSemicolon (existingBindings.Last())
+        let areBindingsOrdered = areBindingsOrdered existingBindings fieldNames
 
-        let generatedBindings = List<IRecordFieldBinding>()
+        let generatedBindings: seq<IRecordFieldBinding> =
+            if areBindingsOrdered && not existingBindings.IsEmpty then
+                generateOrderedBindings existingBindings fieldNames generateSingleLine elementFactory
+            else
+                generateUnorderedBindings existingBindings fieldsToAdd generateSingleLine elementFactory
 
-        let anchorBindingList =
-            match existingBindings.LastOrDefault() with
-            | null ->
-                let firstField = fieldsToAdd.First()
-                fieldsToAdd.Remove(firstField) |> ignore
-                let binding = elementFactory.CreateRecordFieldBinding(firstField, generateSingleLine)
-                let bindingList = RecordFieldBindingListNavigator.GetByFieldBinding(binding)
-                let actualList = ModificationUtil.AddChildAfter(recordExpr.LeftBrace, bindingList)
-                generatedBindings.Add(actualList.FieldBindings.First())
-                actualList
-            | binding -> RecordFieldBindingListNavigator.GetByFieldBinding(binding)
-
-        for name in fieldsToAdd do
-            let binding = elementFactory.CreateRecordFieldBinding(name, generateSingleLine)
-            generatedBindings.Add(ModificationUtil.AddChild(anchorBindingList, binding))
+        let existingBindings = recordExpr.FieldBindings
 
         if generateSingleLine then
-            let lastBinding = generatedBindings.Last()
+            let lastBinding = existingBindings.Last()
             ModificationUtil.DeleteChild(lastBinding.Semicolon)
 
             for binding in existingBindings do

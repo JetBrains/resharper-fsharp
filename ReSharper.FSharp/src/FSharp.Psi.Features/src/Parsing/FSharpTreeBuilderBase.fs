@@ -823,39 +823,99 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         let mark = x.Mark(range)
 
         match typeConstraint with
-        | SynTypeConstraint.WhereTyparIsValueType(typeParameter, _)
-        | SynTypeConstraint.WhereTyparIsReferenceType(typeParameter, _)
-        | SynTypeConstraint.WhereTyparIsUnmanaged(typeParameter, _)
-        | SynTypeConstraint.WhereTyparSupportsNull(typeParameter, _)
-        | SynTypeConstraint.WhereTyparIsComparable(typeParameter, _)
+        | SynTypeConstraint.WhereTyparIsValueType(typeParameter, _) ->
+            x.ProcessTypeParameter(typeParameter)
+            x.Done(range, mark, ElementType.VALUE_TYPE_CONSTRAINT)
+
+        | SynTypeConstraint.WhereTyparIsReferenceType(typeParameter, _) ->
+            x.ProcessTypeParameter(typeParameter)
+            x.Done(range, mark, ElementType.REFERENCE_TYPE_CONSTRAINT)
+
+        | SynTypeConstraint.WhereTyparIsUnmanaged(typeParameter, _) ->
+            x.ProcessTypeParameter(typeParameter)
+            x.Done(range, mark, ElementType.UNMANAGED_TYPE_CONSTRAINT)
+
+        | SynTypeConstraint.WhereTyparSupportsNull(typeParameter, _) ->
+            x.ProcessTypeParameter(typeParameter)
+            x.Done(range, mark, ElementType.NULL_CONSTRAINT)
+
+        | SynTypeConstraint.WhereTyparIsComparable(typeParameter, _) ->
+            x.ProcessTypeParameter(typeParameter)
+            x.Done(range, mark, ElementType.COMPARABLE_CONSTRAINT)
+
         | SynTypeConstraint.WhereTyparIsEquatable(typeParameter, _) ->
             x.ProcessTypeParameter(typeParameter)
+            x.Done(range, mark, ElementType.EQUATABLE_CONSTRAINT)
 
-        | SynTypeConstraint.WhereTyparDefaultsToType(typeParameter, synType, _)
+        | SynTypeConstraint.WhereTyparDefaultsToType(typeParameter, synType, _) ->
+            x.ProcessTypeParameter(typeParameter)
+            x.ProcessType(synType)
+            x.Done(range, mark, ElementType.DEFAULTS_TO_CONSTRAINT)
+
         | SynTypeConstraint.WhereTyparSubtypeOfType(typeParameter, synType, _) ->
             x.ProcessTypeParameter(typeParameter)
             x.ProcessType(synType)
+            x.Done(range, mark, ElementType.SUBTYPE_CONSTRAINT)
 
         | SynTypeConstraint.WhereTyparSupportsMember(typeParameterTypes, memberSig, _) ->
             for synType in typeParameterTypes do
-                x.ProcessType(synType)
+                x.ProcessTypeAsTypeReferenceName(synType)
+
             match memberSig with
-            | SynMemberSig.Member(SynValSig(synType = synType), _, _) ->
-                x.ProcessType(synType)
+            | SynMemberSig.Member _ ->
+                x.ProcessTypeMemberSignature(memberSig)
             | _ -> ()
 
-        | SynTypeConstraint.WhereTyparIsEnum(typeParameter, synTypes, _)
+            x.Done(range, mark, ElementType.MEMBER_CONSTRAINT)
+
+        | SynTypeConstraint.WhereTyparIsEnum(typeParameter, synTypes, _) ->
+            x.ProcessTypeParameter(typeParameter)
+            for synType in synTypes do
+                x.ProcessType(synType)
+            x.Done(range, mark, ElementType.ENUM_CONSTRAINT)
+
         | SynTypeConstraint.WhereTyparIsDelegate(typeParameter, synTypes, _) ->
             x.ProcessTypeParameter(typeParameter)
             for synType in synTypes do
                 x.ProcessType(synType)
-
-        x.Done(range, mark, ElementType.TYPE_CONSTRAINT)
+            x.Done(range, mark, ElementType.DELEGATE_CONSTRAINT)
 
     member x.ProcessTypeParameter(SynTypar(IdentRange range, _, _)) =
         let mark = x.Mark(range)
         x.MarkAndDone(range, ElementType.TYPE_PARAMETER_ID)
         x.Done(range, mark, ElementType.TYPE_REFERENCE_NAME)
+
+    member x.ProcessTypeMemberSignature(memberSig) =
+        match memberSig with
+        | SynMemberSig.Member(SynValSig(attrs, id, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _), flags, range) ->
+            let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, Some id, range)
+            x.ProcessReturnTypeInfo(arity, synType)
+            let elementType =
+                if flags.IsDispatchSlot then
+                    ElementType.ABSTRACT_MEMBER_DECLARATION
+                else
+                    match flags.MemberKind with
+                    | SynMemberKind.Constructor -> ElementType.CONSTRUCTOR_SIGNATURE
+                    | _ -> ElementType.MEMBER_SIGNATURE
+            x.Done(range, mark, elementType)
+
+        | SynMemberSig.ValField(SynField(attrs, _, id, synType, _, XmlDoc xmlDoc, _, _), range) ->
+            if id.IsSome then
+                let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, id, range)
+                x.ProcessType(synType)
+                x.Done(mark,ElementType.VAL_FIELD_DECLARATION)
+
+        | SynMemberSig.Inherit(synType, range) ->
+            let mark = x.Mark(range)
+            x.ProcessTypeAsTypeReferenceName(synType)
+            x.Done(mark, ElementType.INTERFACE_INHERIT)
+
+        | SynMemberSig.Interface(synType, range) ->
+            let mark = x.Mark(range)
+            x.ProcessTypeAsTypeReferenceName(synType)
+            x.Done(mark, ElementType.INTERFACE_IMPLEMENTATION)
+
+        | _ -> ()
 
     member x.FixExpression(expr: SynExpr) =
         // A fake SynExpr.Typed node is added for binding with return type specification like in the following

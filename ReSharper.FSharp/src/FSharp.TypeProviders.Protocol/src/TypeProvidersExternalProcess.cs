@@ -102,7 +102,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     public TypeProvidersExternalProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
       IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, NuGetVersion nuGetVersion)
-      : base(lifetime, logger, locks, processInfoPatcher, request)
+      : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
       myRequest = request;
       myNuGetVersion = nuGetVersion;

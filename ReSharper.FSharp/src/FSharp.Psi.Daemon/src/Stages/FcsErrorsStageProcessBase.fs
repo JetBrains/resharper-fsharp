@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
 open System
 open FSharp.Compiler.Diagnostics
+open JetBrains.Application
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -449,6 +450,6 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 if highlighting != IgnoredHighlighting.Instance then
                     consumer.ConsumeHighlighting(HighlightingInfo(highlighting.CalculateRange(), highlighting))
 
-            x.SeldomInterruptChecker.CheckForInterrupt()
+            Interruption.Current.CheckAndThrow()
 
         committer.Invoke(DaemonStageResult(consumer.Highlightings))

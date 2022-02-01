@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
+open JetBrains.ReSharper.Daemon.Syntax
 open JetBrains.ReSharper.Daemon.SyntaxHighlighting
-open JetBrains.RdBackend.Common.Features.SyntaxHighlighting
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -35,6 +35,6 @@ type FSharpSyntaxHighlightingProcessor() =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpSyntaxHighlightingManager() =
-    inherit RiderSyntaxHighlightingManager()
+    inherit SyntaxHighlightingManager()
 
     override x.CreateProcessor() = FSharpSyntaxHighlightingProcessor() :> _

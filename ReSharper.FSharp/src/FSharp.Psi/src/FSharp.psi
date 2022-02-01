@@ -129,7 +129,7 @@ anonModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
 
 // Module members
 
-interface moduleMember  options { customParseFunction; noInternalParseFunction; }:
+interface moduleMember options { customParseFunction; noInternalParseFunction; }:
   nestedModuleDeclaration |
   typeDeclarationGroup |
   exceptionDeclaration |
@@ -926,11 +926,8 @@ fSharpTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } e
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   prefixTypeParameterDeclarationList<PREFIX_TYPE_PARAMETER_LIST, PrefixTypeParameterList>?
   identifier<IDENTIFIER, Identifier>
+  typeConstraintsClause?
   postfixTypeParameterDeclarationList<POSTFIX_TYPE_PARAMETER_LIST, PostfixTypeParameterList>?
-  (
-    WHEN
-    typeConstraint+
-  )?
   primaryConstructorDeclaration<PRIMARY_CTOR_DECL, PrimaryConstructorDeclaration>?
   EQUALS<FSHARP_EQUALS, EqualsToken>
   typeRepresentation<TYPE_REPR, TypeRepresentation>?
@@ -1005,6 +1002,7 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
   prefixTypeParameterDeclarationList<PREFIX_TYPE_PARAMETER_LIST, PrefixTypeParameterList>?
   fSharpIdentifier<IDENTIFIER, Identifier>
   postfixTypeParameterDeclarationList<POSTFIX_TYPE_PARAMETER_LIST, PostfixTypeParameterList>?
+  typeConstraintsClause?
   WITH<WITH, WithKeyword>
   typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*;
 
@@ -1514,6 +1512,7 @@ interface typeParameterDeclarationList:
 postfixTypeParameterDeclarationList:
   LESS<LESS, LAngle>
   LIST typeParameterDeclaration<TYPE_PARAMETER, TypeParameters> SEP COMMA<FSHARP_COMMA, Separators>
+  typeConstraintsClause?
   GREATER<GREATER, RAngle>;
 
 prefixTypeParameterDeclarationList:
@@ -1539,8 +1538,80 @@ typeParameterOfMethodDeclaration options { stubBase="FSharpDeclarationBase"; } e
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>;
 
-typeConstraint:
-  fakeSeparator;
+
+private typeConstraintsClause:
+  WHEN<WHEN, WhenKeyword>
+  LIST typeConstraint<TYPE_CONSTRAINT, Constraints> SEP AND<FSHARP_AND, Separators>;
+
+interface typeConstraint:
+  valueTypeConstraint |
+  referenceTypeConstraint |
+  unmanagedTypeConstraint |
+  nullConstraint |
+  comparableConstraint |
+  equatableConstraint |
+  defaultsToConstraint |
+  subtypeConstraint |
+  memberConstraint |
+  enumConstraint |
+  delegateConstraint;
+
+valueTypeConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON
+  STRUCT;
+
+referenceTypeConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON;
+
+unmanagedTypeConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON;
+
+nullConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON
+  NULL;
+
+comparableConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON;
+
+equatableConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON;
+
+defaultsToConstraint:
+  DEFAULT
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON
+  typeUsage;
+
+subtypeConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON;
+
+memberConstraint:
+  (
+    typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  |
+    LPAREN
+    LIST typeReferenceName<TYPE_REFERENCE, ReferenceNames> SEP OR<FSHARP_OR, Separators>
+    RPAREN
+  )
+  COLON
+  memberSignatureLikeDeclaration<MEMBER_SIGNATURE, MemberSignature>;
+
+enumConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON;
+
+delegateConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON;
+
+
 
 // Access modifiers
 

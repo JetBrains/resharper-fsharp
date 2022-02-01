@@ -16,7 +16,7 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          ITypeConstraint
+          ISubtypeConstraint
             ITypeReferenceName
               ITypeParameterId
                 FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')

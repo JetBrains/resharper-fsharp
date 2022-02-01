@@ -518,7 +518,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     [NotNull]
     public static TypeAugmentation GetTypeAugmentationInfo([NotNull] ITypeExtensionDeclaration declaration)
     {
-      var extensionNameInfo = 
+      var extensionNameInfo =
         new NameAndParametersCount(declaration.SourceName, declaration.TypeParameterDeclarations.Count);
 
       var declaredTypeNames = new Dictionary<NameAndParametersCount, TypeAugmentation>();
@@ -671,16 +671,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         _ => false
       };
 
-    public static ICollection<string> GetRecordFieldNames([NotNull] this ITypeElement typeElement)
+    public static IList<string> GetRecordFieldNames([NotNull] this ITypeElement typeElement)
     {
       switch (typeElement)
       {
         case IFSharpTypeElement fsTypeElement:
-          return fsTypeElement.GetPart<IRecordPart>()?.Fields.Select(f => f.ShortName).AsCollection() ??
+          return fsTypeElement.GetPart<IRecordPart>()?.Fields.Select(f => f.ShortName).AsIList() ??
                  EmptyList<string>.InstanceList;
 
         case ICompiledElement _:
-          return typeElement.Properties.Where(p => p.IsCompiledFSharpField()).Select(p => p.ShortName).AsCollection();
+          return typeElement.Properties.Where(p => p.IsCompiledFSharpField()).Select(p => p.ShortName).AsIList();
 
         default:
           return EmptyArray<string>.Instance;
@@ -758,6 +758,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         fsPattern = parenPat.Pattern;
       return fsPattern;
     }
+
+    [CanBeNull]
+    public static ITypeUsage IgnoreInnerParens([CanBeNull] this ITypeUsage typeUsage, bool ignoreParameterSignature = true)
+    {
+      if (typeUsage == null)
+        return null;
+
+      // Ignore top-level parameter signature wrapper type usage.
+      if (ignoreParameterSignature)
+        typeUsage = IgnoreParameterSignature(typeUsage);
+
+      while (typeUsage is IParenTypeUsage { InnerTypeUsage: { } } parenTypeUsage)
+        typeUsage = parenTypeUsage.InnerTypeUsage;
+      return typeUsage;
+    }
+
+    [CanBeNull]
+    public static ITypeUsage IgnoreParameterSignature([CanBeNull] this ITypeUsage typeUsage) =>
+      typeUsage is IParameterSignatureTypeUsage parameterSignatureTypeUsage
+        ? parameterSignatureTypeUsage.TypeUsage
+        : typeUsage;
 
     [NotNull]
     public static IFSharpReferenceOwner SetName([NotNull] this IFSharpReferenceOwner referenceOwner,

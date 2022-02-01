@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 
     public FantomasProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
       IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request)
-      : base(lifetime, logger, locks, processInfoPatcher, request)
+      : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
     }
   }

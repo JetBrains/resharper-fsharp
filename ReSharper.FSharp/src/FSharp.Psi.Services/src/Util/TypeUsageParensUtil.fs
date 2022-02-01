@@ -20,12 +20,13 @@ let rec ignoreParentCompoundTypes (typeUsage: ITypeUsage) =
     let parent = typeUsage.Parent
     match parent with
     | :? ITupleTypeUsage
-    | :? IFunctionTypeUsage -> ignoreParentCompoundTypes (parent :?> ITypeUsage)
+    | :? IFunctionTypeUsage -> ignoreParentCompoundTypes (parent :?> _)
     | _ -> typeUsage
 
 let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
     let parentTypeUsage = context.Parent.As<ITypeUsage>()
     if isNotNull parentTypeUsage && not (applicable parentTypeUsage) then true else
+    if context.Parent :? ITraitCallExpr then true else
 
     match typeUsage with
     | :? ITupleTypeUsage as tupleTypeUsage ->
@@ -61,5 +62,11 @@ let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
 
     | :? IArrayTypeUsage ->
         isNotNull (IsInstPatNavigator.GetByTypeUsage(ignoreParentCompoundTypes context))
+
+    | :? INamedTypeUsage as namedTypeUsage ->
+        isNotNull (IsInstPatNavigator.GetByTypeUsage(context)) &&
+
+        let referenceName = namedTypeUsage.ReferenceName
+        isNotNull referenceName && referenceName.TypeArgumentList :? IPostfixAppTypeArgumentList
 
     | _ -> false

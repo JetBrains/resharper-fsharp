@@ -22,9 +22,6 @@ module TcImportsHack =
             let v = fld.GetValue(x)
             v
 
-        member x.GetElements() =
-            [ for t in (x :?> IEnumerable) -> t ]
-
     type FakeDllInfo(fileName: string) =
         member this.FileName = fileName
 
@@ -49,7 +46,7 @@ module TcImportsHack =
     // This hack allows you to pull this data for transfer between processes.
     let getFakeTcImports (runtimeContainsType: 'a -> 'b) =
         let getDllInfos tcImports =
-            [| for dllInfo in tcImports.GetField("dllInfos").GetElements() ->
+            [| for dllInfo in (tcImports.GetField("dllInfos")  :?> _) ->
                    Client.RdFakeDllInfo(dllInfo.GetProperty("FileName") :?> _) |]
 
         let tcImports =

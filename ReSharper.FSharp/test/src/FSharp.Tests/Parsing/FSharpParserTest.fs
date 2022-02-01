@@ -64,11 +64,15 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl - Il 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type Parameters - Constraints - Outside list 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type Parameters - Constraints - Outside list 02 - Ctor``() = x.DoNamedTest()
+    [<Test>] member x.``Type Parameters - Constraints - Outside list 03 - Internal Ctor``() = x.DoNamedTest()
+    [<Test>] member x.``Type Parameters - Constraints - Outside list 04 - Ctor with XmlDoc``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 01 - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 02 - Member``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 03 - Or``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 04 - Or and member``() = x.DoNamedTest()
-    [<Test>] member x.``Type Parameters - Constraints 05 - Outside list``() = x.DoNamedTest()
+    [<Test>] member x.``Type parameters - Constraints 05 - Ctor``() = x.DoNamedTest()
     [<Test>] member x.``Type Parameters 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Attributes 01``() = x.DoNamedTest()
@@ -246,6 +250,7 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - Trait call 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Trait call 02 - Nested parens``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Trait call 03 - Method``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - TryWith 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - TryWith 02 - Parameters``() = x.DoNamedTest()
