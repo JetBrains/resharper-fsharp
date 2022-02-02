@@ -1,4 +1,4 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.templates.websharper
+package com.jetbrains.rider.test.cases.templates.websharper
 
 import com.jetbrains.rider.projectView.actions.projectTemplating.backend.ReSharperProjectTemplateProvider
 import com.jetbrains.rider.test.annotations.TestEnvironment

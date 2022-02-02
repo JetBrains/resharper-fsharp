@@ -1,4 +1,4 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases
+package com.jetbrains.rider.test.cases
 
 import com.intellij.openapi.diagnostic.Logger
 import com.jetbrains.rdclient.util.BackendException

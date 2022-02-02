@@ -1,4 +1,4 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.typingAssist
+package com.jetbrains.rider.test.cases.typingAssist
 
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.TypingAssistTestBase

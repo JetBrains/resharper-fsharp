@@ -1,4 +1,4 @@
-package com.jetbrains.rider.plugins.fsharp.test.framework
+package com.jetbrains.rider.test.framework
 
 import com.intellij.execution.process.impl.ProcessListUtil
 import com.intellij.openapi.project.Project
@@ -7,7 +7,6 @@ import com.jetbrains.rider.inTests.TestHost
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.base.BaseTestWithSolution
-import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.dumpSevereHighlighters
 import java.io.PrintStream
 

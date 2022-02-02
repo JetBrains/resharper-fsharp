@@ -1,8 +1,8 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
+package com.jetbrains.rider.test.cases.fantomas
 
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
-import com.jetbrains.rider.plugins.fsharp.test.framework.withEditorConfig
+import com.jetbrains.rider.test.framework.withEditorConfig
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.enums.CoreVersion

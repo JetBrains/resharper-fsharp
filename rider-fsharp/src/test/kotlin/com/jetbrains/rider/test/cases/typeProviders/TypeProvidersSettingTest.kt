@@ -1,9 +1,9 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
+package com.jetbrains.rider.test.cases.typeProviders
 
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
-import com.jetbrains.rider.plugins.fsharp.test.framework.withOutOfProcessTypeProviders
+import com.jetbrains.rider.test.framework.withOutOfProcessTypeProviders
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse

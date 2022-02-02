@@ -1,9 +1,9 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
+package com.jetbrains.rider.test.cases.typeProviders
 
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
-import com.jetbrains.rider.plugins.fsharp.test.framework.dumpTypeProviders
-import com.jetbrains.rider.plugins.fsharp.test.framework.withOutOfProcessTypeProviders
+import com.jetbrains.rider.test.framework.dumpTypeProviders
+import com.jetbrains.rider.test.framework.withOutOfProcessTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.base.BaseTestWithSolution

@@ -1,4 +1,4 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
+package com.jetbrains.rider.test.cases.projectModel
 
 import com.intellij.testFramework.ProjectViewTestUtil
 import com.jetbrains.rdclient.testFramework.waitForDaemon

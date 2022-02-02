@@ -1,6 +1,5 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.templates.core
+package com.jetbrains.rider.test.cases.templates.core
 
-import com.jetbrains.rider.plugins.fsharp.test.cases.templates.core.FSharpTemplatesTestCore
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion

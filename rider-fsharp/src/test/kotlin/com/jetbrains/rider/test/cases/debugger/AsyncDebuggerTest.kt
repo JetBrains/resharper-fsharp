@@ -1,4 +1,4 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.debugger
+package com.jetbrains.rider.test.cases.debugger
 
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.DebuggerTestBase

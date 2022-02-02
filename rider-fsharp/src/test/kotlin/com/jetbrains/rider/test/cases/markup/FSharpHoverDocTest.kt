@@ -1,6 +1,6 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.markup
+package com.jetbrains.rider.test.cases.markup
 
-import com.jetbrains.rider.plugins.fsharp.test.framework.withCultureInfo
+import com.jetbrains.rider.test.framework.withCultureInfo
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.HoverDocTestBase
 import com.jetbrains.rider.test.enums.ToolsetVersion

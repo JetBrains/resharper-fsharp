@@ -1,4 +1,4 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.lexer
+package com.jetbrains.rider.test.cases.lexer
 
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
 import com.jetbrains.rider.test.RiderFrontendLexerTest

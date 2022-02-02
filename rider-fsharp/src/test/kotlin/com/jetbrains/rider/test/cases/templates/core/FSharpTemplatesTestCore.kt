@@ -1,4 +1,4 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.templates.core
+package com.jetbrains.rider.test.cases.templates.core
 
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.jetbrains.rider.run.configurations.project.DotNetProjectConfiguration

@@ -1,4 +1,4 @@
-package com.jetbrains.rider.plugins.fsharp.test.cases.completion
+package com.jetbrains.rider.test.cases.completion
 
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.test.annotations.TestEnvironment
