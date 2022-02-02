@@ -38,7 +38,7 @@ type ReplaceWithWildPatTest() =
     [<Test>] member x.``Partial pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Partial pattern 02``() = x.DoNamedTest()
 
-    [<Test; ExecuteScopedQuickFixInFile>] member x.``Whole file``() = x.DoNamedTest()
+    [<Test; ExecuteScopedActionInFile>] member x.``Whole file``() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``Not available - As 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Ctor 01``() = x.DoNamedTest()

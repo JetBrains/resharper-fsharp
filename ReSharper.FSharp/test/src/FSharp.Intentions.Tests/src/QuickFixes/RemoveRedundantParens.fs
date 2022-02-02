@@ -22,8 +22,8 @@ type RemoveRedundantParenExprTest() =
     [<Test>] member x.``App 01``() = x.DoNamedTest()
     [<Test>] member x.``App 02 - Spaces``() = x.DoNamedTest()
 
-    [<Test; ExecuteScopedQuickFixInFile>] member x.``Scoped 01``() = x.DoNamedTest()
-    [<Test; ExecuteScopedQuickFixInFile>] member x.``Scoped 02 - Nested``() = x.DoNamedTest()
+    [<Test; ExecuteScopedActionInFile>] member x.``Scoped 01``() = x.DoNamedTest()
+    [<Test; ExecuteScopedActionInFile>] member x.``Scoped 02 - Nested``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type RemoveRedundantPatParenTest() =
