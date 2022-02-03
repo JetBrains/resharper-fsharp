@@ -15,4 +15,4 @@ type RemoveRedundantQualifierTest() =
     [<Test>] member x.``Reference name 01``() = x.DoNamedTest()
     [<Test>] member x.``Type extension 01``() = x.DoNamedTest()
 
-    [<Test; ExecuteScopedQuickFixInFile>] member x.``Multiple 01``() = x.DoNamedTest()
+    [<Test; ExecuteScopedActionInFile>] member x.``Multiple 01``() = x.DoNamedTest()

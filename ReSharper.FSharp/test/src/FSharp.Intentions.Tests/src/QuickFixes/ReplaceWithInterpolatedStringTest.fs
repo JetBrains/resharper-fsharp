@@ -9,8 +9,8 @@ type ReplaceWithInterpolatedStringTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceWithInterpolatedString"
 
-    [<Test; ExecuteScopedQuickFixInFile>] member x.``String 01 - Single specifier``() = x.DoNamedTest()
-    [<Test; ExecuteScopedQuickFixInFile>] member x.``String 02 - Many specifiers``() = x.DoNamedTest()
+    [<Test; ExecuteScopedActionInFile>] member x.``String 01 - Single specifier``() = x.DoNamedTest()
+    [<Test; ExecuteScopedActionInFile>] member x.``String 02 - Many specifiers``() = x.DoNamedTest()
     [<Test>] member x.``String 03 - Many specifiers with text``() = x.DoNamedTest()
     [<Test>] member x.``String 04 - Escape braces``() = x.DoNamedTest()
     [<Test>] member x.``String 05 - failwithf``() = x.DoNamedTest()
