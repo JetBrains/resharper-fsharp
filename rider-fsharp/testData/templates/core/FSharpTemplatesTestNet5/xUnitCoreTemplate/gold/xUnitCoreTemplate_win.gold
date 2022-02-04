@@ -32,6 +32,13 @@ Project [Name:UnitTestProject, GUID:GUID]
     ProjectFileImpl(Path : Program.fs)[COMPILE ]
     ProjectFileImpl(Path : Tests.fs)[COMPILE ]
     ProjectFileImpl(Path : UnitTestProject.fsproj)[]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net5.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : UnitTestProject.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
     ProjectFileImpl(Path : testhost.dll (.nuget/packages/testhost.dll))[Hidden CONTENT ]
     ProjectFileImpl(Path : testhost.exe (.nuget/packages/testhost.exe))[Hidden CONTENT ]
     ProjectFileImpl(Path : xunit.runner.reporters.netcoreapp10.dll (.nuget/packages))[Hidden NONE ]

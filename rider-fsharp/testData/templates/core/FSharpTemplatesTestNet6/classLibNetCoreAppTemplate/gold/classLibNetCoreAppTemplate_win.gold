@@ -10,7 +10,7 @@ Opened
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.0
+      FSharp.Core/6.0.1
      -Frameworks
       Microsoft.NETCore.App
    Library.fs
@@ -24,6 +24,13 @@ Project [Name:ClassLibrary, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : ClassLibrary.fsproj)[]
     ProjectFileImpl(Path : Library.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net6.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
