@@ -470,6 +470,7 @@ type FSharpScriptModule(path: VirtualFileSystemPath, solution: ISolution) =
         member x.Name = path.FullPath
 
         member x.IsValid() = solution.IsValid()
+        member x.IsValidAndAlive() = solution.IsValidAndAlive()
         member x.GetSolution() = solution
         member x.Accept(visitor) = visitor.VisitProjectModelElement(x)
         member x.MarshallerType = null
