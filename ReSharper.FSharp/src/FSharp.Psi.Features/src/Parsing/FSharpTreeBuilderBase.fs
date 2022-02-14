@@ -948,7 +948,9 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         let startOffset = x.GetStartOffset(range)
         let mark = x.Mark(startOffset)
-        Assertion.Assert(x.CurrentOffset = startOffset, $"Can't convert FCS tree expression in {path} at {range}.{dumpFileContent ()}")
+
+        if x.CurrentOffset <> startOffset then
+            Assertion.Fail($"Can't convert FCS tree expression in {path} at {range}.{dumpFileContent ()}")
 
         // Replace all tokens with single chameleon token.
         let tokenMark = x.Mark(range)
