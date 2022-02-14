@@ -404,7 +404,7 @@ type FSharpNamingService(language: FSharpLanguage) =
         if isUnionCaseLike element && not (isValidCaseStart name.[0]) then false else
         if isTypeLike element && name.IndexOfAny(notAllowedInTypes) <> -1 then false else
 
-        not (name.ContainsNewLine() || name.Contains("``"))
+        not (name.ContainsNewLine() || name.Contains("``") || endsWith "`" name)
 
     override x.SuggestRoots(treeNode: ITreeNode, useExpectedTypes, policyProvider) =
         match treeNode with
