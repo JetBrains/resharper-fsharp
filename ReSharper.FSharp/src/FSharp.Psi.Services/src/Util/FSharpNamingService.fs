@@ -7,6 +7,7 @@ open FSharp.Compiler.Tokenization
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -397,11 +398,13 @@ type FSharpNamingService(language: FSharpLanguage) =
             | :? ITypeElement as typeElement -> typeElement.IsException()
             | _ -> false
 
+        let name = name.RemoveBackticks()
+
         if name.IsEmpty() then false else
         if isUnionCaseLike element && not (isValidCaseStart name.[0]) then false else
         if isTypeLike element && name.IndexOfAny(notAllowedInTypes) <> -1 then false else
 
-        not (startsWith "`" name || endsWith "`" name || name.ContainsNewLine() || name.Contains("``"))
+        not (name.ContainsNewLine() || name.Contains("``"))
 
     override x.SuggestRoots(treeNode: ITreeNode, useExpectedTypes, policyProvider) =
         match treeNode with
