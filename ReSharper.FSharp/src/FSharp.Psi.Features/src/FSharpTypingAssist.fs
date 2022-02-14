@@ -1315,7 +1315,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
     member x.SkipBacktickInId(textControl: ITextControl, lexer: CachingLexer, offset) =
         if not (lexer.FindTokenAt(offset)) then false else
         if lexer.TokenType != FSharpTokenType.IDENTIFIER then false else
-        if offset - 2 > lexer.TokenStart && offset + 2 < lexer.TokenEnd then false else
+        if offset + 2 < lexer.TokenEnd then false else
         if not (lexer.GetTokenText().IsEscapedWithBackticks()) then false else
 
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
