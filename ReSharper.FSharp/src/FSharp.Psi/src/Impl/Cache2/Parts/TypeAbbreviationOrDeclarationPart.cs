@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool IsByRefLike => false;
   }
 
-  internal abstract class TypeAbbreviationOrDeclarationPartBase : UnionPartBase
+  internal abstract class TypeAbbreviationOrDeclarationPartBase : UnionPartBase, ITypeAbbreviationOrDeclarationPart
   {
     protected TypeAbbreviationOrDeclarationPartBase([NotNull] IFSharpTypeDeclaration declaration,
       [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder, false, true)
