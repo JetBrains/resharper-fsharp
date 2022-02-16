@@ -98,7 +98,7 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
 
         match x.TryGetSource(path) with
         | true, Exists(_, timestamp) -> timestamp
-        | true, NotExists -> failwithf $"GetLastWriteTime: NotExists: {path}"
+        | true, NotExists -> FileNotFoundException($"GetLastWriteTime: NotExists: {path}") |> raise
         | _ ->
 
         logger.Trace("GetLastWriteTime: miss: {0}", path)
@@ -113,7 +113,8 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         | _ ->
 
         match tryAddSource path with
-        | Some _ -> true
+        | Some (Exists _) -> true
+        | Some NotExists -> false
         | _ ->
 
         logger.Trace("Miss: Exists: {0}", path)
