@@ -1,4 +1,4 @@
-namespace rec JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
+namespace JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 
 open System
 open System.IO
@@ -13,15 +13,16 @@ open JetBrains.DocumentModel
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Resources.Shell
 
 type FSharpSource =
-    { Source: byte[]
-      Timestamp: DateTime }
+    | Exists of Source: byte[] * Timestamp: DateTime
+    | NotExists
 
     member x.ToRdFSharpSource() =
-        RdFSharpSource(Encoding.UTF8.GetString(x.Source), x.Timestamp)
+        match x with
+        | Exists(source, timestamp) -> RdFSharpSource(Encoding.UTF8.GetString(source), timestamp)
+        | _ -> RdFSharpSource("NotExists", DateTime.MinValue)
 
 [<SolutionComponent>]
 type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
@@ -41,16 +42,32 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
             | true, value -> source <- Some value
             | _ ->
 
-            match documentManager.GetOrCreateDocument(path) with
-            | null -> ()
-            | document ->
+            let document = documentManager.GetOrCreateDocument(path)
+            if isNull document then () else
 
-            let timestamp = File.GetLastWriteTimeUtc(path.FullPath)
-            source <- Some { Source = getText document; Timestamp = timestamp }
             logger.Trace("Add: tryAddSource: {0}", path)
-            files.[path] <- source.Value) |> ignore
+            source <-
+                if path.ExistsFile then
+                    Some(Exists(getText document, File.GetLastWriteTimeUtc(path.FullPath)))
+                else
+                    Some(NotExists)
+
+            files.[path] <- source.Value
+        ) |> ignore
 
         source
+
+    let applyChange (projectFile: IProjectFile) (document: IDocument) changeSource =
+        let path = projectFile.Location
+        let text = getText document
+
+        let mutable fsSource = Unchecked.defaultof<_>
+        match files.TryGetValue(path, &fsSource), fsSource with
+        | true, Exists(source, _) when source = text -> ()
+        | _ ->
+
+        logger.Trace("Add: {0} change: {1}", changeSource, path)
+        files.[path] <- Exists(text, DateTime.UtcNow)
 
     let isApplicable (path: VirtualFileSystemPath) =
         // todo: support FCS fake paths like `startup`, prevent going to FS to check existence, etc.
@@ -69,7 +86,8 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         if not (isApplicable path) then base.ReadFile(path, useMemoryMappedFile, shouldShadowCopy) else
 
         match this.TryGetSource(path) with
-        | true, source -> new MemoryStream(source.Source) :> _
+        | true, Exists(source, _) -> new MemoryStream(source) :> _
+        | true, NotExists -> failwithf $"Reading not existing file: {path}"
         | _ ->
 
         logger.Trace("Miss: FileStreamReadShim miss: {0}", path)
@@ -79,16 +97,19 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         if not (isApplicable path) then base.GetLastWriteTime(path) else
 
         match x.TryGetSource(path) with
-        | true, source -> source.Timestamp
+        | true, Exists(_, timestamp) -> timestamp
+        | true, NotExists -> failwithf $"GetLastWriteTime: NotExists: {path}"
         | _ ->
 
-        logger.Trace("Miss: GetLastWriteTime: {0}", path)
+        logger.Trace("GetLastWriteTime: miss: {0}", path)
         base.GetLastWriteTime(path)
 
     override x.ExistsFile(path) =
         if not (isApplicable path) then base.ExistsFile(path) else
+
         match files.TryGetValue(path) with
-        | true, _ -> true
+        | true, Exists _ -> true
+        | true, NotExists -> false
         | _ ->
 
         match tryAddSource path with
@@ -105,12 +126,8 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
             | :? ProjectFileDocumentCopyChange as change -> change.ProjectFile
             | _ -> null
 
-        match projectFile with
-        | null -> ()
-        | file ->
-
-        if file.LanguageType.Is<FSharpProjectFileType>() then
-             files.[file.Location] <- { Source = getText change.Document; Timestamp = DateTime.UtcNow }
+        if isNotNull projectFile && projectFile.LanguageType.Is<FSharpProjectFileType>() then
+             applyChange projectFile change.Document "Document"
 
     member x.ProcessProjectModelChange(change: ProjectModelChange) =
         if isNull change then () else
@@ -121,26 +138,15 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
                     base.VisitItemDelta(change)
 
                     if change.ContainsChangeType(ProjectModelChangeType.REMOVED) then
-                        files.remove(change.OldLocation)
+                        files.[change.OldLocation] <- NotExists
 
                     elif change.ContainsChangeType(ProjectModelChangeType.EXTERNAL_CHANGE) then
-                        match change.ProjectItem.As<IProjectFile>() with
-                        | null -> ()
-                        | projectFile when not (projectFile.LanguageType.Is<FSharpProjectFileType>()) -> ()
-                        | projectFile ->
+                        let projectFile = change.ProjectItem.As<IProjectFile>()
+                        if isNotNull projectFile && projectFile.LanguageType.Is<FSharpProjectFileType>() then () else
 
-                        match projectFile.GetDocument() with
-                        | null -> ()
-                        | document ->
-
-                        let path = projectFile.Location
-                        let text = getText document
-
-                        let mutable fsSource = Unchecked.defaultof<_>
-                        if files.TryGetValue(path, &fsSource) && text = fsSource.Source then () else
-
-                        logger.Trace("Add: Project Model change: {0}", path)
-                        files.[path] <- { Source = text; Timestamp = DateTime.UtcNow } }
+                        let document = projectFile.GetDocument()
+                        if isNotNull document then
+                            applyChange projectFile document "Project model" }
 
         visitor.VisitDelta(change)
 
