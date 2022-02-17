@@ -24,9 +24,8 @@ type FSharpSettings() = class end
 
 [<AutoOpen>]
 module FSharpOptions =
-    let [<Literal>] backgroundTypeCheck = "Enable background analysis (requires restart)"
-    let [<Literal>] skipImplementationAnalysis = "Skip implementation files analysis when possible (requires restart)"
-    let [<Literal>] nonFSharpProjectInMemoryAnalysis = "Analyze C#/VB projects without build (requires restart)"
+    let [<Literal>] skipImplementationAnalysis = "Skip implementation files analysis when possible"
+    let [<Literal>] nonFSharpProjectInMemoryAnalysis = "Analyze C#/VB projects without build"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
 
@@ -68,8 +67,8 @@ module FSharpExperimentalFeatures =
     let [<Literal>] postfixTemplates = "Enable postfix templates"
     let [<Literal>] redundantParenAnalysis = "Enable redundant paren analysis"
     let [<Literal>] formatter = "Enable F# code formatter"
-    let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor (experimental)"
-    let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process (solution reload required)"
+    let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor"
+    let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
@@ -160,7 +159,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
         if PlatformUtil.IsRunningUnderWindows then
             this.AddBoolOption((fun key -> key.TargetNetFramework), RichText(FSharpScriptOptions.targetNetFramework)) |> ignore
-        this.AddBoolOption((fun key -> key.FsiInteractiveEditor), RichText(FSharpExperimentalFeatures.fsiInteractiveEditor)) |> ignore
+        this.AddBoolOption((fun key -> key.FsiInteractiveEditor), FSharpExperimentalFeatures.fsiInteractiveEditor, "Experimental") |> ignore
 
         this.AddHeader("Type hints")
         this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null) |> ignore
@@ -172,15 +171,15 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), fun t -> t :> obj))
 
         this.AddHeader("FSharp.Compiler.Service options")
-        this.AddBoolOption((fun key -> key.SkipImplementationAnalysis), RichText(skipImplementationAnalysis), null) |> ignore
-        this.AddBoolOption((fun key -> key.OutOfProcessTypeProviders), RichText(FSharpExperimentalFeatures.outOfProcessTypeProviders), null) |> ignore
+        this.AddBoolOption((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
+        this.AddBoolOption((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Solution reload required") |> ignore
 
         if configurations.IsInternalMode() then
             this.AddHeader("Experimental features options")
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
             this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
-            this.AddBool(nonFSharpProjectInMemoryAnalysis, fun key -> key.NonFSharpProjectInMemoryAnalysis)
+            this.AddBoolOption((fun key -> key.NonFSharpProjectInMemoryAnalysis), nonFSharpProjectInMemoryAnalysis, "Requires restart") |> ignore
 
 
 [<ShellComponent>]
