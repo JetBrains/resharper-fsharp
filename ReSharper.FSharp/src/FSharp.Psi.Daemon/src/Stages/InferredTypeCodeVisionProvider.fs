@@ -135,7 +135,10 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
     override x.Execute(committer) =
         let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
 
-        let isDisabled = 
+        let isDisabled =
+            // todo: fix zoning?
+            not Shell.Instance.IsTestShell &&
+
             x.DaemonProcess.ContextBoundSettingsStore.GetIndexedValue(
                 (fun (key: CodeInsightsSettings) -> key.DisabledProviders), FSharpInferredTypeHighlighting.ProviderId)
 
