@@ -209,11 +209,12 @@ type FSharpAtomicRenamesFactory() =
         | name when IsActivePatternName name -> RenameAvailabilityCheckResult.CanNotBeRenamed
         | _ -> RenameAvailabilityCheckResult.CanBeRenamed
 
-    override x.CreateAtomicRenames(declaredElement, newName, _) =
+    override x.CreateAtomicRenames(declaredElement, newName, doNotAddBindingConflicts) =
         match declaredElement with
         | :? IFSharpAnonRecordFieldProperty ->
             [| FSharpAnonRecordFieldAtomicRename(declaredElement, newName) :> AtomicRenameBase |] :> _
-        | _ -> Seq.empty
+        | _ ->
+            [| AtomicRename(declaredElement, newName, doNotAddBindingConflicts) |]
 
 
 [<RenamePart>]
