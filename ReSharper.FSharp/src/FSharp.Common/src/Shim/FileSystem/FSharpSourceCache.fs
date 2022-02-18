@@ -57,21 +57,24 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
 
         source
 
-    let applyChange (projectFile: IProjectFile) (document: IDocument) changeSource =
-        let path = projectFile.Location
-        let text = getText document
-
-        let mutable fsSource = Unchecked.defaultof<_>
-        match files.TryGetValue(path, &fsSource), fsSource with
-        | true, Exists(source, _) when source = text -> ()
-        | _ ->
-
-        logger.Trace("Add: {0} change: {1}", changeSource, path)
-        files.[path] <- Exists(text, DateTime.UtcNow)
-
     let isApplicable (path: VirtualFileSystemPath) =
         // todo: support FCS fake paths like `startup`, prevent going to FS to check existence, etc.
         not path.IsEmpty && path.IsAbsolute && fileExtensions.GetFileType(path).Is<FSharpProjectFileType>()
+
+    let applyChange (projectFile: IProjectFile) (document: IDocument) changeSource =
+        let path = projectFile.Location
+        if not (isApplicable path) then () else
+
+        let text = getText document
+        let fileExists = path.ExistsFile
+
+        let mutable fsSource = Unchecked.defaultof<_>
+        match files.TryGetValue(path, &fsSource), fsSource with
+        | true, Exists(source, _) when fileExists && source = text -> ()
+        | _ ->
+
+        logger.Trace("Add: {0} change: {1}", changeSource, path)
+        files.[path] <- if fileExists then Exists(text, DateTime.UtcNow) else NotExists
 
     member x.TryGetSource(path: VirtualFileSystemPath, [<Out>] source: byref<FSharpSource>) =
         match files.TryGetValue(path) with
@@ -139,9 +142,9 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
                     base.VisitItemDelta(change)
 
                     if change.ContainsChangeType(ProjectModelChangeType.REMOVED) then
-                        files.[change.OldLocation] <- NotExists
+                         files.TryRemove(change.OldLocation) |> ignore
 
-                    elif change.ContainsChangeType(ProjectModelChangeType.EXTERNAL_CHANGE) then
+                    if change.ContainsChangeType(ProjectModelChangeType.EXTERNAL_CHANGE) then
                         let projectFile = change.ProjectItem.As<IProjectFile>()
                         if isNotNull projectFile && projectFile.LanguageType.Is<FSharpProjectFileType>() then () else
 
