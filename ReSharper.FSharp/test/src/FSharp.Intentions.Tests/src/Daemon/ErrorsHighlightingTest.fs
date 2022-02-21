@@ -18,7 +18,11 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Extension analyzer``() = x.DoNamedTest()
 
     [<HighlightOnly(typeof<RedundantIndexerDotWarning>)>]
-    [<Test>] member x.``Indexer dot analyzer``() = x.DoNamedTest()
+    [<Test>] member x.``Indexer dot analyzer 01``() = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp50)>]
+    [<HighlightOnly(typeof<RedundantIndexerDotWarning>)>]
+    [<Test>] member x.``Indexer dot analyzer 02``() = x.DoNamedTest()
 
     [<HighlightOnly(typeof<RedundantStringInterpolationWarning>, typeof<ReSharperSyntaxHighlighting>)>]
     [<Test>] member x.``Interpolated string 01``() = x.DoNamedTest()
