@@ -36,6 +36,14 @@ let getAsPatternRange (asPat: IAsPat) =
     else
         DocumentRange.InvalidRange
 
+let getIndexerDotRange (indexerExpr: IItemIndexerExpr) =
+    if not (isValid indexerExpr) then DocumentRange.InvalidRange else 
+
+    let delimiter = indexerExpr.Delimiter
+    if not (isValid delimiter) then DocumentRange.InvalidRange else
+
+    delimiter.GetDocumentRange()
+
 let getLetTokenText (token: ITokenNode) =
     let tokenType = getTokenType token
     let tokenType = if isNull tokenType then FSharpTokenType.LET else tokenType

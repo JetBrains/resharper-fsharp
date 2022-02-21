@@ -45,14 +45,12 @@ type FSharpRemoveRedundantParensScopedFixingStrategy() =
 
 [<AbstractClass>]
 type FSharpRemoveRedundantParensFixBase(parensNode: IFSharpTreeNode, innerNode: IFSharpTreeNode) =
-    inherit FSharpScopedQuickFixBase()
+    inherit FSharpScopedQuickFixBase(parensNode)
 
     override x.Text = "Remove redundant parens"
 
     override x.IsAvailable _ =
         isValid parensNode && isValid innerNode
-
-    override this.TryGetContextTreeNode() = parensNode :> _
 
     override this.GetScopedFixingStrategy(_, _) =
         FSharpRemoveRedundantParensScopedFixingStrategy.Instance

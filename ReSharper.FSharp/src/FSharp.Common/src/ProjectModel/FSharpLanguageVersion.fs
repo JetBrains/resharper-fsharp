@@ -22,6 +22,7 @@ type FSharpLanguageLevel =
     /// String interpolation, nameof, open types
     | FSharp50 = 50
 
+    /// Indexing without dot
     | FSharp60 = 60
 
     | Latest = 60
@@ -88,6 +89,9 @@ module FSharpLanguageLevel =
     let isFSharp50Supported (treeNode: ITreeNode) =
         ofTreeNode treeNode >= FSharpLanguageLevel.FSharp50
 
+    [<Extension; CompiledName("IsFSharp60Supported")>]
+    let isFSharp60Supported (treeNode: ITreeNode) =
+        ofTreeNode treeNode >= FSharpLanguageLevel.FSharp60
 
 [<RequireQualifiedAccess>]
 module FSharpLanguageVersion =

@@ -1,0 +1,39 @@
+﻿module Module
+
+let l = []
+l{caret}[1]
+---------------------------------------------------------
+
+IFSharpImplFile
+  INamedModuleDeclaration
+    FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpIdentifierToken(type:IDENTIFIER, text:Module)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    ILetBindingsDeclaration
+      ITopBinding
+        FSharpTokenType+LetTokenElement(type:LET, text:let)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        ITopReferencePat
+          IExpressionReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:l)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IChameleonExpression
+          IListExpr
+            FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
+            FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    IExpressionStatement
+      IChameleonExpression
+        IPrefixAppExpr
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:l)
+          IListExpr
+            FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
+            ILiteralExpr
+              FSharpToken(type:INT32, text:1)
+            FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"

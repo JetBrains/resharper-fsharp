@@ -1,0 +1,34 @@
+﻿let l = []
+l{caret}[..1]
+---------------------------------------------------------
+
+IFSharpImplFile
+  IAnonModuleDeclaration
+    ILetBindingsDeclaration
+      ITopBinding
+        FSharpTokenType+LetTokenElement(type:LET, text:let)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        ITopReferencePat
+          IExpressionReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:l)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IChameleonExpression
+          IListExpr
+            FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
+            FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    IExpressionStatement
+      IChameleonExpression
+        IPrefixAppExpr
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:l)
+          IListExpr
+            FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
+            IBeginningSliceExpr
+              FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
+              ILiteralExpr
+                FSharpToken(type:INT32, text:1)
+            FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"

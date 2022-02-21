@@ -104,6 +104,7 @@
     <Compile Include="src\QuickFixes\RemoveRedundantAsPatTest.fs" />
     <Compile Include="src\QuickFixes\DeconstructPatternFixTest.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithRegularStringFixTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveIndexerDotFixTest.fs" />
   </ItemGroup>
 
   <ItemGroup>

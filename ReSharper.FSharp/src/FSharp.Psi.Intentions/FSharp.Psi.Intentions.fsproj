@@ -85,6 +85,7 @@
     <Compile Include="src\QuickFixes\RemoveRedundantAsPatFix.fs" />
     <Compile Include="src\QuickFixes\DeconstructPatternFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithRegularStringFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveIndexerDotFix.fs" />
     <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\Errors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
