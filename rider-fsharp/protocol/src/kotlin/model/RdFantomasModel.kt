@@ -14,6 +14,7 @@ object RdFantomasModel : Root() {
         field("lightSyntax", bool.nullable)
         field("conditionalCompilationDefines", array(string))
         field("isExe", bool)
+        field("langVersion", string)
     }
 
     private val rdFcsRange = structdef {
