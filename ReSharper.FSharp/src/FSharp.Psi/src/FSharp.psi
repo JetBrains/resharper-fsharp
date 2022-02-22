@@ -1714,6 +1714,7 @@ interface typeUsage:
   parameterSignatureTypeUsage |
   exprStaticConstantTypeUsage |
   namedStaticConstantTypeUsage |
+  constrainedTypeUsage |
   unsupportedTypeUsage;
 
 
@@ -1782,6 +1783,10 @@ namedStaticConstantTypeUsage:
   typeUsage
   EQUALS
   typeUsage;
+
+constrainedTypeUsage:
+  typeUsage<TYPE, TypeUsage>
+  typeConstraintsClause<TYPE_CONSTRAINTS_CLAUSE, TypeConstraintsClause>;
 
 unsupportedTypeUsage:
   fakeSeparator;

@@ -436,6 +436,7 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Types - Constraints - Null 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Constraints - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Constraints - Type 02 - No when``() = x.DoNamedTest()
     [<Test>] member x.``Types - Constraints - Reference 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Constraints - Struct 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Constraints - Comparison 01``() = x.DoNamedTest()

@@ -782,9 +782,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | SynType.WithGlobalConstraints(synType, constraints, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType)
-            for typeConstraint in constraints do
-                x.ProcessTypeConstraint(typeConstraint)
-            x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
+            x.ProcessConstraintsClause(constraints)
+            x.Done(range, mark, ElementType.CONSTRAINED_TYPE_USAGE)
 
         | SynType.HashConstraint(synType, _)
         | SynType.MeasurePower(synType, _, _) ->
