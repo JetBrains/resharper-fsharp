@@ -926,7 +926,7 @@ fSharpTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } e
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   prefixTypeParameterDeclarationList<PREFIX_TYPE_PARAMETER_LIST, PrefixTypeParameterList>?
   identifier<IDENTIFIER, Identifier>
-  typeConstraintsClause?
+  typeConstraintsClause<TYPE_CONSTRAINTS_CLAUSE, TypeConstraintsClause>?
   postfixTypeParameterDeclarationList<POSTFIX_TYPE_PARAMETER_LIST, PostfixTypeParameterList>?
   primaryConstructorDeclaration<PRIMARY_CTOR_DECL, PrimaryConstructorDeclaration>?
   EQUALS<FSHARP_EQUALS, EqualsToken>
@@ -1002,7 +1002,7 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
   prefixTypeParameterDeclarationList<PREFIX_TYPE_PARAMETER_LIST, PrefixTypeParameterList>?
   fSharpIdentifier<IDENTIFIER, Identifier>
   postfixTypeParameterDeclarationList<POSTFIX_TYPE_PARAMETER_LIST, PostfixTypeParameterList>?
-  typeConstraintsClause?
+  typeConstraintsClause<TYPE_CONSTRAINTS_CLAUSE, TypeConstraintsClause>?
   WITH<WITH, WithKeyword>
   typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*;
 
@@ -1512,7 +1512,7 @@ interface typeParameterDeclarationList:
 postfixTypeParameterDeclarationList:
   LESS<LESS, LAngle>
   LIST typeParameterDeclaration<TYPE_PARAMETER, TypeParameters> SEP COMMA<FSHARP_COMMA, Separators>
-  typeConstraintsClause?
+  typeConstraintsClause<TYPE_CONSTRAINTS_CLAUSE, TypeConstraintsClause>?
   GREATER<GREATER, RAngle>;
 
 prefixTypeParameterDeclarationList:
@@ -1539,7 +1539,7 @@ typeParameterOfMethodDeclaration options { stubBase="FSharpDeclarationBase"; } e
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 
-private typeConstraintsClause:
+typeConstraintsClause:
   WHEN<WHEN, WhenKeyword>
   LIST typeConstraint<TYPE_CONSTRAINT, Constraints> SEP AND<FSHARP_AND, Separators>;
 

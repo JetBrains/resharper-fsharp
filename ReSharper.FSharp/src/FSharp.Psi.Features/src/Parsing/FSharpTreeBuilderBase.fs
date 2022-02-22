@@ -326,7 +326,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             | Some(typeParams) -> x.ProcessTypeParameters(typeParams, true)
             | _ -> ()
 
-            x.ProcessConstraints(constraints)
+            x.ProcessConstraintsClause(constraints)
 
             // Needs to advance past id range due to implicit ctor range in class includes id.
             x.AdvanceToEnd(id.idRange)
@@ -344,7 +344,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         for p in typeParams.TyparDecls do
             x.ProcessTypeParameter(p, typeParameterElementType)
-        x.ProcessConstraints(typeParams.Constraints)
+        x.ProcessConstraintsClause(typeParams.Constraints)
 
         let typeParameterListElementType =
             match typeParams with
@@ -353,9 +353,15 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         x.Done(range, mark, typeParameterListElementType)
 
-    member x.ProcessConstraints(constraints) =
+    member x.ProcessConstraintsClause(constraints: SynTypeConstraint list) =
+        match constraints with
+        | [] -> ()
+        | typeConstraint :: _ ->
+
+        let mark = x.MarkTokenOrRange(FSharpTokenType.WHEN, typeConstraint.Range)
         for typeConstraint in constraints do
             x.ProcessTypeConstraint(typeConstraint)
+        x.Done(mark, ElementType.TYPE_CONSTRAINTS_CLAUSE)
 
     member x.ProcessTypeParameter(SynTyparDecl(_, SynTypar(IdentRange range, _, _)), elementType) =
         x.MarkAndDone(range, elementType)

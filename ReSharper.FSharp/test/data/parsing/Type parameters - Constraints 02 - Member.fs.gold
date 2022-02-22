@@ -13,28 +13,29 @@ IFSharpImplFile
             FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
             FSharpIdentifierToken(type:IDENTIFIER, text:T)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IMemberConstraint
-            ITypeReferenceName
-              ITypeParameterId
-                FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
-                FSharpIdentifierToken(type:IDENTIFIER, text:T)
-            FSharpTokenType+ColonTokenElement(type:COLON, text::)
+          ITypeConstraintsClause
+            FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            IMemberSignature
-              FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+            IMemberConstraint
+              ITypeReferenceName
+                ITypeParameterId
+                  FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
+                  FSharpIdentifierToken(type:IDENTIFIER, text:T)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:P)
-              IReturnTypeInfo
-                FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IMemberSignature
+                FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                IParameterSignatureTypeUsage
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
-            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                FSharpIdentifierToken(type:IDENTIFIER, text:P)
+                IReturnTypeInfo
+                  FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  IParameterSignatureTypeUsage
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
