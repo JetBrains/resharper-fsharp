@@ -8,6 +8,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   public class FSharpCacheVersion
   {
     [UsedImplicitly] public static UnsafeReader.ReadDelegate<object> ReadDelegate = _ => new FSharpCacheVersion();
-    [UsedImplicitly] public static UnsafeWriter.WriteDelegate<object> WriteDelegate = (_, __) => { };
+    [UsedImplicitly] public static UnsafeWriter.WriteDelegate<object> WriteDelegate = (_, _) => { };
   }
 }
