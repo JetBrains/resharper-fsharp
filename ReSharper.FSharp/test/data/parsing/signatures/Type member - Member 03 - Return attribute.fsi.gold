@@ -51,5 +51,5 @@ IFSharpSigFile
                       ITypeReferenceName
                         FSharpIdentifierToken(type:IDENTIFIER, text:int)
                   FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

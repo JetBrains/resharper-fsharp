@@ -48,7 +48,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 x.Done(range, mark, elementType)
 
         match moduleMember with
-        | SynModuleDecl.NestedModule(SynComponentInfo(attrs, _, _, lid, XmlDoc xmlDoc, _, _, _), _, _, decls, _, range) ->
+        | SynModuleDecl.NestedModule(SynComponentInfo(attrs, _, _, lid, XmlDoc xmlDoc, _, _, _), _, decls, _, range, _) ->
             let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, List.tryHead lid, range)
             for decl in decls do
                 x.ProcessModuleMemberDeclaration(decl)
@@ -65,7 +65,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                     x.ProcessTypeDefn(typeDefn, FSharpTokenType.AND)
             x.Done(range, mark, ElementType.TYPE_DECLARATION_GROUP)
 
-        | SynModuleDecl.Exception(SynExceptionDefn(exn, members, range), _) ->
+        | SynModuleDecl.Exception(SynExceptionDefn(exn, _, members, range), _) ->
             let mark = x.StartException(exn)
             x.ProcessTypeMembers(members)
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
@@ -80,14 +80,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             // `extern` declarations are represented as normal `let` bindings with fake rhs expressions in FCS AST.
             // This is a workaround to mark such declarations and not to mark the non-existent expressions inside it.
             match bindings with
-            | [SynBinding(attributes = attrs; returnInfo = returnInfo; expr = expr)] when
-                    Range.equals range expr.Range ->
+            | [SynBinding(attributes = attrs; headPat = headPat; returnInfo = returnInfo; trivia = trivia)] when
+                    trivia.LetKeyword.IsNone ->
 
-                x.ProcessOuterAttrs(attrs, range)
-                x.AdvanceToStart(range)
-                Assertion.Assert(x.TokenType == FSharpTokenType.EXTERN, "Expecting EXTERN, got: {0}", x.TokenType)
-                let attrs = x.SkipOuterAttrs(attrs, range)
                 x.ProcessAttributeLists(attrs)
+                x.AdvanceToTokenOrRangeStart(FSharpTokenType.EXTERN, headPat.Range)
+                Assertion.Assert(x.TokenType == FSharpTokenType.EXTERN, "Expecting EXTERN, got: {0}", x.TokenType)
 
                 match returnInfo with
                 | Some(SynBindingReturnInfo(attributes = attrs)) ->
@@ -133,11 +131,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         | decl ->
             failwithf "unexpected decl: %A" decl
 
-    member x.ProcessTypeDefn(SynTypeDefn(info, _, repr, members, implicitCtor, range) as typeDefn, typeKeywordType) =
+    member x.ProcessTypeDefn(SynTypeDefn(info, repr, members, implicitCtor, range, _) as typeDefn, typeKeywordType) =
         let (SynComponentInfo(attrs, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
 
         match repr with
-        | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.Augmentation, _, _) ->
+        | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.Augmentation _, _, _) ->
             x.ProcessTypeExtensionDeclaration(typeDefn, attrs)
         | _ ->
 
@@ -184,7 +182,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             x.ProcessTypeMember(m)
         x.EnsureMembersAreFinished()
 
-    member x.ProcessTypeExtensionDeclaration(SynTypeDefn(info, _, _, members, _, range), attrs) =
+    member x.ProcessTypeExtensionDeclaration(SynTypeDefn(info, _, members, _, range, _), attrs) =
         let (SynComponentInfo(_, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
         let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, List.tryHead lid, range)
 
@@ -241,7 +239,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 x.MarkChameleonExpression(args)
                 ElementType.TYPE_INHERIT
 
-            | SynMemberDefn.Interface(interfaceType, interfaceMembersOpt , _) ->
+            | SynMemberDefn.Interface(interfaceType, _, interfaceMembersOpt, _) ->
                 x.ProcessTypeAsTypeReferenceName(interfaceType)
                 match interfaceMembersOpt with
                 | Some(members) -> x.ProcessTypeMembers(members)
@@ -278,7 +276,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 x.ProcessType(synType)
                 ElementType.VAL_FIELD_DECLARATION
 
-            | SynMemberDefn.AutoProperty(_, _, _, synTypeOpt, _, _, _, _, _, expr, accessorClause, _) ->
+            | SynMemberDefn.AutoProperty(_, _, _, synTypeOpt, _, _, _, _, _, expr, _, accessorClause, _) ->
                 match synTypeOpt with
                 | Some synType -> x.ProcessType(synType)
                 | _ -> ()
@@ -317,10 +315,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         if unfinishedDeclaration.IsNone then
             x.Done(range, mark, elementType)
 
-    member x.ProcessMemberBinding(mark, SynBinding(_, _, _, _, _, _, valData, headPat, returnInfo, _, expr, _, _), range) =
+    member x.ProcessMemberBinding(mark, SynBinding(_, _, _, _, _, _, valData, headPat, returnInfo, expr, _, _, _), range) =
         let elType =
             match headPat with
-            | SynPat.LongIdent(LongIdentWithDots(lid, _), accessorId, typeParamsOpt, memberParams, _, range) ->
+            | SynPat.LongIdent(LongIdentWithDots(lid, _), _, accessorId, typeParamsOpt, memberParams, _, range) ->
                 match lid with
                 | [_] ->
                     match valData with
@@ -432,14 +430,15 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         let patMark = x.Mark(range)
 
         match pat with
-        | SynPat.LongIdent(LongIdentLid [ IdentText "op_ColonColon" ], _, _, SynArgPats.Pats([SynPat.Tuple(_, pats, _)]), _, _) ->
+        | SynPat.LongIdent(LongIdentLid [ IdentText "op_ColonColon" ], _, _, _,
+                SynArgPats.Pats([SynPat.Tuple(_, pats, _)]), _, _) ->
             for pat in pats do
                 x.ProcessPat(pat, isLocal, false)
             x.Done(range, patMark, ElementType.LIST_CONS_PAT)
         | _ ->
 
         match isBindingHeadPattern, pat with
-        | true, SynPat.LongIdent(lid, _, typars, args, _, _) ->
+        | true, SynPat.LongIdent(lid, _, _, typars, args, _, _) ->
             match lid.Lid with
             | [ IdentRange idRange as id ] ->
                 let mark = x.Mark(idRange)
@@ -479,7 +478,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 x.ProcessPat(rhsPat, isLocal, false)
                 ElementType.AS_PAT
 
-            | SynPat.LongIdent(lid, _, _, args, _, _) ->
+            | SynPat.LongIdent(lid, _, _, _, args, _, _) ->
                 match lid.Lid with
                 | [ IdentRange idRange as id ] ->
                     let mark = x.Mark(idRange)
@@ -500,7 +499,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 x.ProcessType(synType)
                 ElementType.TYPED_PAT
 
-            | SynPat.Or(pat1, pat2, _) ->
+            | SynPat.Or(pat1, pat2, _, _) ->
                 x.ProcessPat(pat1, isLocal, false)
                 x.ProcessPat(pat2, isLocal, false)
                 ElementType.OR_PAT
@@ -626,7 +625,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             x.SkipOuterAttrs(rest, outerRange)
 
     member x.ProcessTopLevelBinding(binding) =
-        let (SynBinding(_, kind, _, _, attrs, _, _ , headPat, returnInfo, _, expr, _, _)) = binding
+        let (SynBinding(_, kind, _, _, attrs, _, _ , headPat, returnInfo, expr, _, _, _)) = binding
 
         let mark = x.Mark()
         let expr = x.FixExpression(expr)
@@ -672,7 +671,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
     let nextSteps = Stack<BuilderStep>()
 
     member x.ProcessLocalBinding(binding, isSecondary) =
-        let (SynBinding(_, kind, _, _, attrs, _, _, headPat, returnInfo, _, expr, _, _)) = binding
+        let (SynBinding(_, kind, _, _, attrs, _, _, headPat, returnInfo, expr, _, _, _)) = binding
 
         if isSecondary then
             x.AdvanceToTokenOrPos(FSharpTokenType.AND, binding.StartPos)
@@ -808,12 +807,12 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.ProcessTypeAsTypeReferenceName(synType)
             x.ProcessExpression(expr)
 
-        | SynExpr.ObjExpr(synType, args, bindings, interfaceImpls, _, _) ->
+        | SynExpr.ObjExpr(synType, args, _, _, memberDefns, interfaceImpls, _, _) ->
             x.PushRange(range, ElementType.OBJ_EXPR)
             x.ProcessTypeAsTypeReferenceName(synType)
             x.PushStepList(interfaceImpls, interfaceImplementationListProcessor)
             x.PushStep((), finishObjectExpressionMemberListProcessor)
-            x.PushStepList(bindings, objectExpressionMemberListProcessor)
+            x.PushStepList(memberDefns, objectExpressionMemberListProcessor)
 
             match args with
             | Some(expr, _) -> x.ProcessExpression(expr)
@@ -824,14 +823,14 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushExpression(doExpr)
             x.ProcessExpression(whileExpr)
 
-        | SynExpr.For(_, id, _, idBody, _, toBody, doBody, _) ->
+        | SynExpr.For(_, _, id, _, idBody, _, toBody, doBody, _) ->
             x.PushRange(range, ElementType.FOR_EXPR)
             x.PushExpression(doBody)
             x.PushExpression(toBody)
             x.ProcessLocalId(id)
             x.ProcessExpression(idBody)
 
-        | SynExpr.ForEach(_, _, _, pat, enumExpr, bodyExpr, _) ->
+        | SynExpr.ForEach(_, _, _, _, pat, enumExpr, bodyExpr, _) ->
             x.PushRange(range, ElementType.FOR_EACH_EXPR)
             x.ProcessPat(pat, true, false)
             x.PushExpression(bodyExpr)
@@ -844,7 +843,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         | SynExpr.ComputationExpr(_, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.COMPUTATION_EXPR)
 
-        | SynExpr.Lambda(_, inLambdaSeq, _, _, bodyExpr, parsedData, _) ->
+        | SynExpr.Lambda(_, inLambdaSeq, _, bodyExpr, parsedData, _, _) ->
             Assertion.Assert(not inLambdaSeq, "Expecting non-generated lambda expression, got:\n{0}", expr)
             x.PushRange(range, ElementType.LAMBDA_EXPR)
             x.PushExpression(getLambdaBodyExpr bodyExpr)
@@ -861,7 +860,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushRange(range, ElementType.MATCH_LAMBDA_EXPR)
             x.ProcessMatchClauses(clauses)
 
-        | SynExpr.Match(_, expr, clauses, _) ->
+        | SynExpr.Match(_, _, expr, _, clauses, _) ->
             x.MarkMatchExpr(range, expr, clauses)
 
         | SynExpr.Do(expr, _) ->
@@ -899,17 +898,17 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushStep(typeApp, typeArgsInReferenceExprProcessor)
             x.ProcessExpression(expr)
 
-        | SynExpr.LetOrUse(_, _, bindings, bodyExpr, _) ->
+        | SynExpr.LetOrUse(_, _, bindings, bodyExpr, _, _) ->
             x.PushRange(range, ElementType.LET_OR_USE_EXPR)
             x.PushExpression(bodyExpr)
             x.ProcessBindings(bindings)
 
-        | SynExpr.TryWith(tryExpr, _, withCases, _, _, _, _) ->
+        | SynExpr.TryWith(tryExpr, withCases, _, _, _, _) ->
             x.PushRange(range, ElementType.TRY_WITH_EXPR)
             x.PushStepList(withCases, matchClauseListProcessor)
             x.ProcessExpression(tryExpr)
 
-        | SynExpr.TryFinally(tryExpr, finallyExpr, _, _, _) ->
+        | SynExpr.TryFinally(tryExpr, finallyExpr, _, _, _, _) ->
             x.PushRange(range, ElementType.TRY_FINALLY_EXPR)
             x.PushExpression(finallyExpr)
             x.ProcessExpression(tryExpr)
@@ -917,7 +916,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         | SynExpr.Lazy(expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.LAZY_EXPR)
 
-        | SynExpr.IfThenElse(_, isElif, ifExpr, _, thenExpr, _, elseExprOpt, _, _, _, _) ->
+        | SynExpr.IfThenElse(ifExpr, thenExpr, elseExprOpt, _, _, _, { IsElif = isElif }) ->
             // Nested ifExpr may have wrong range, e.g. `else` goes inside the nested expr range here:
             // `if true then "a" else if true then "b" else "c"`
             // However, elif expressions actually start this way.
@@ -1035,7 +1034,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.ProcessPat(pat, true, false)
             x.ProcessExpression(expr)
 
-        | SynExpr.MatchBang(_, expr, clauses, _) ->
+        | SynExpr.MatchBang(_, _, expr, _, clauses, _) ->
             x.MarkMatchExpr(range, expr, clauses)
 
         | SynExpr.DoBang(expr, _) ->
@@ -1094,6 +1093,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
 
             | _ ->
                 x.MarkAndDone(range, ElementType.WHOLE_RANGE_EXPR)
+
+        | SynExpr.DebugPoint _ -> failwithf $"Synthetic expression: {expr}"
 
     member x.ProcessAndLocalBinding(pat: SynPat, expr: SynExpr) =
         x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
@@ -1168,7 +1169,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
 
         x.ProcessExpression(expr)
 
-    member x.MarkMatchExpr(range: range, expr, clauses) =
+    member x.MarkMatchExpr(range: range, expr: SynExpr, clauses) =
         x.PushRange(range, ElementType.MATCH_EXPR)
         x.PushStepList(clauses, matchClauseListProcessor)
         x.ProcessExpression(expr)
@@ -1207,11 +1208,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushExpressionList(rest)
             x.ProcessExpression(expr)
 
-    member x.ProcessInterfaceImplementation(SynInterfaceImpl(interfaceType, bindings, range)) =
+    member x.ProcessInterfaceImplementation(SynInterfaceImpl(interfaceType, _, _, memberDefns, range)) =
         x.PushRange(range, ElementType.INTERFACE_IMPLEMENTATION)
         x.PushStep((), finishObjectExpressionMemberListProcessor)
         x.ProcessTypeAsTypeReferenceName(interfaceType)
-        x.PushStepList(bindings, objectExpressionMemberListProcessor)
+        x.PushStepList(memberDefns, objectExpressionMemberListProcessor)
 
     member x.ProcessRecordFieldBindingList(fields: SynExprRecordField list) =
         let fieldsRange =
@@ -1263,7 +1264,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         x.PushType(synType)
         x.ProcessExpression(expr)
 
-    member x.ProcessMatchClause(SynMatchClause(pat, whenExprOpt, _, expr, _, _) as clause) =
+    member x.ProcessMatchClause(SynMatchClause(pat, whenExprOpt, expr, _, _, _) as clause) =
         let range = clause.Range
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
         x.PushRangeForMark(range, mark, ElementType.MATCH_CLAUSE)
@@ -1419,7 +1420,7 @@ type SecondaryBindingListProcessor() =
 type AndLocalBindingListProcessor() =
     inherit StepListProcessorBase<SynExprAndBang>()
 
-    override x.Process(SynExprAndBang(_, _, _, pat, _, expr, _), builder) =
+    override x.Process(SynExprAndBang(_, _, _, pat, expr, _, _), builder) =
         builder.ProcessAndLocalBinding(pat, expr)
 
 
@@ -1445,10 +1446,10 @@ type MatchClauseListProcessor() =
 
 
 type ObjectExpressionMemberListProcessor() =
-    inherit StepListProcessorBase<SynBinding>()
+    inherit StepListProcessorBase<SynMemberDefn>()
 
     override x.Process(binding, builder) =
-        builder.ProcessObjExprMember(binding)
+        builder.ProcessTypeMember(binding)
 
 
 type FinishObjectExpressionMemberProcessor() =

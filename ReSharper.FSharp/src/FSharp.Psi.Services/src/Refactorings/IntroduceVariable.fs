@@ -666,6 +666,9 @@ type FSharpIntroduceVarHelper() =
             let builderFcsType = prefixAppExpr.FunctionExpression.TryGetFcsType()
             if isNull builderFcsType then None else
 
+            let builderFcsType =
+                if builderFcsType.IsFunctionType then builderFcsType.GenericArguments.[0] else builderFcsType
+
             let prefixAppExprFcsType = prefixAppExpr.TryGetFcsType()
             if isNull prefixAppExprFcsType then None else
 

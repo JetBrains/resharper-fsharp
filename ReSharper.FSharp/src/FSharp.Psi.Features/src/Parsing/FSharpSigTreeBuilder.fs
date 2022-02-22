@@ -24,7 +24,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
 
     member x.ProcessModuleMemberSignature(moduleMember) =
         match moduleMember with
-        | SynModuleSigDecl.NestedModule(SynComponentInfo(attrs, _, _, lid, XmlDoc xmlDoc, _, _, _), _, _, memberSigs, range) ->
+        | SynModuleSigDecl.NestedModule(SynComponentInfo(attrs, _, _, lid, XmlDoc xmlDoc, _, _, _), _, memberSigs, range, _) ->
             let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, List.tryHead lid, range)
             for memberSig in memberSigs do
                 x.ProcessModuleMemberSignature(memberSig)
@@ -41,7 +41,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
                     x.ProcessTypeSignature(typeDefn, FSharpTokenType.AND)
             x.Done(range, mark, ElementType.TYPE_DECLARATION_GROUP)
 
-        | SynModuleSigDecl.Exception(SynExceptionSig(exn, members, range), _) ->
+        | SynModuleSigDecl.Exception(SynExceptionSig(exn, _, members, range), _) ->
             let mark = x.StartException(exn)
             x.ProcessTypeMembers(members)
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
@@ -50,7 +50,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
             x.ProcessNamedTypeReference(lid)
             x.MarkAndDone(range, ElementType.MODULE_ABBREVIATION_DECLARATION)
 
-        | SynModuleSigDecl.Val(SynValSig(attrs, id, _, synType, arity, _, _, XmlDoc xmlDoc, _, exprOption, _), range) ->
+        | SynModuleSigDecl.Val(SynValSig(attrs, id, _, synType, arity, _, _, XmlDoc xmlDoc, _, exprOption, _, _), range) ->
             let valMark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, Some id, range)
 
             let patMark = x.Mark(id.idRange)
@@ -78,7 +78,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
 
         | _ -> ()
 
-    member x.ProcessTypeSignature(SynTypeDefnSig(info, _, repr, memberSigs, range), typeKeywordType) =
+    member x.ProcessTypeSignature(SynTypeDefnSig(info, _, repr, _, memberSigs, range), typeKeywordType) =
         let (SynComponentInfo(attrs, typeParams, constraints, lid, XmlDoc xmlDoc, _, _, _)) = info
 
         let mark = x.StartType(attrs, xmlDoc, typeParams, constraints, lid, range, typeKeywordType)

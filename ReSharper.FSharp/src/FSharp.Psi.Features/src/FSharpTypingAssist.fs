@@ -721,10 +721,10 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                         Some range
 
                     // for i = ... to ... do {caret}
-                    | SynExpr.For (_, IdentRange range, _, _, _, ExprRange lastRange, _, _)
+                    | SynExpr.For (_, _, IdentRange range, _, _, _, _, ExprRange lastRange, _)
 
                     // for ... in ... do {caret}
-                    | SynExpr.ForEach (_, _, _, PatRange range, ExprRange lastRange, _, _) when
+                    | SynExpr.ForEach (_, _, _, _, PatRange range, ExprRange lastRange, _, _) when
                             getEndOffset document lastRange = prevTokenEnd ->
                         Some range
 
@@ -781,7 +781,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let documentCoords = document.GetCoordsByOffset(lexer.TokenStart)
         match SyntaxTraversal.Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
         | None -> false
-        | Some (SynMatchClause.SynMatchClause (_, _, _, _, range, _)) ->
+        | Some (SynMatchClause.SynMatchClause (_, _, _, range, _, _)) ->
 
         use cookie = LexerStateCookie.Create(lexer)
 

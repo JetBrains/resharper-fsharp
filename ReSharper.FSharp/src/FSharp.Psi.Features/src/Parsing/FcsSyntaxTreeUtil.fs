@@ -114,13 +114,13 @@ let letBindingGroupStartRange (bindings: SynBinding list) (range: Range) =
 
 let rec skipGeneratedLambdas expr =
     match expr with
-    | SynExpr.Lambda(_, true, _, _, bodyExpr, _, _) ->
+    | SynExpr.Lambda(_, true, _, bodyExpr, _, _, _) ->
         skipGeneratedLambdas bodyExpr
     | _ -> expr
 
 and skipGeneratedMatch expr =
     match expr with
-    | SynExpr.Match(_, _, [ SynMatchClause(_, _, _, innerExpr, _, _) as clause ], matchRange) when
+    | SynExpr.Match(_, _, _, _, [ SynMatchClause(_, _, innerExpr, _, _, _) as clause ], matchRange) when
             matchRange.Start = clause.Range.Start ->
         skipGeneratedMatch innerExpr
     | _ -> expr
