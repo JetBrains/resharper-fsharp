@@ -35,10 +35,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private static dynamic GetDiagnosticOptions()
     {
       var assemblyToSearch = typeof(FSharpParsingOptions).Assembly;
+      var fantomasVersion = typeof(CodeFormatter).Assembly.GetName().Version;
 
-      var version = typeof(CodeFormatter).Assembly.GetName().Version;
-
-      var searchedType = version switch
+      var searchedType = fantomasVersion switch
       {
         { } v when v < Version.Parse("4.5") => "FSharp.Compiler.ErrorLogger+FSharpErrorSeverityOptions",
         { } v when v < Version.Parse("4.6") => "FSharp.Compiler.SourceCodeServices.FSharpDiagnosticOptions",
