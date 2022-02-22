@@ -37,16 +37,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       var assemblyToSearch = typeof(FSharpParsingOptions).Assembly;
       var fantomasVersion = typeof(CodeFormatter).Assembly.GetName().Version;
 
-      var searchedType = fantomasVersion switch
+      var optionsTypeName = fantomasVersion switch
       {
         { } v when v < Version.Parse("4.5") => "FSharp.Compiler.ErrorLogger+FSharpErrorSeverityOptions",
         { } v when v < Version.Parse("4.6") => "FSharp.Compiler.SourceCodeServices.FSharpDiagnosticOptions",
         _ => "FSharp.Compiler.Diagnostics.FSharpDiagnosticOptions",
       };
-      
 
-      var options = assemblyToSearch.GetType(searchedType).NotNull($"{searchedType} must exist");
-      var defaultValue = options.GetProperty("Default")?.GetValue(null).NotNull();
+      var optionsType = assemblyToSearch.GetType(optionsTypeName).NotNull($"{optionsTypeName} must exist");
+      var defaultValue = optionsType.GetProperty("Default")?.GetValue(null).NotNull();
 
       return defaultValue;
     }
