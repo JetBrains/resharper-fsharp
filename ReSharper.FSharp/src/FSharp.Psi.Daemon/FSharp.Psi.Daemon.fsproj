@@ -51,6 +51,7 @@
     <Compile Include="src\Analyzers\InterpolatedStringCandidateAnalyzer.fs" />
     <Compile Include="src\Analyzers\IfExpressionAnalyzer.fs" />
     <Compile Include="src\Analyzers\AsPatAnalyzer.fs" />
+    <Compile Include="src\Analyzers\IndexerExprAnalyzer.fs" />
   </ItemGroup>
 
   <ItemGroup>
