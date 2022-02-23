@@ -78,12 +78,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     [CanBeNull]
     private FSharpGenericParameter GetFcsParameter()
     {
-      if (!(Method is IFSharpTypeMember {Symbol: FSharpMemberOrFunctionOrValue mfv})) 
+      if (!(Method is IFSharpTypeMember {ContainingType: { } typeElement, Symbol: FSharpMemberOrFunctionOrValue mfv})) 
         return null;
 
+      var index = Index + typeElement.TypeParameters.Count;
       var mfvTypeParameters = mfv.GenericParameters;
-      return mfvTypeParameters.Count > Index
-        ? mfvTypeParameters[Index]
+      return mfvTypeParameters.Count > index
+        ? mfvTypeParameters[index]
         : null;
     }
 
