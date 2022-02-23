@@ -103,35 +103,3 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
     member x.ProcessTypeMembers(members: SynMemberSig list) =
         for m in members do
             x.ProcessTypeMemberSignature(m)
-
-    member x.ProcessTypeMemberSignature(memberSig) =
-        match memberSig with
-        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, _), flags, range) ->
-            let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
-            x.ProcessReturnTypeInfo(arity, synType)
-            let elementType =
-                if flags.IsDispatchSlot then
-                    ElementType.ABSTRACT_MEMBER_DECLARATION
-                else
-                    match flags.MemberKind with
-                    | SynMemberKind.Constructor -> ElementType.CONSTRUCTOR_SIGNATURE
-                    | _ -> ElementType.MEMBER_SIGNATURE
-            x.Done(range, mark, elementType)
-
-        | SynMemberSig.ValField(SynField(attrs, _, id, synType, _, XmlDoc xmlDoc, _, _), range) ->
-            if id.IsSome then
-                let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
-                x.ProcessType(synType)
-                x.Done(mark,ElementType.VAL_FIELD_DECLARATION)
-
-        | SynMemberSig.Inherit(synType, range) ->
-            let mark = x.Mark(range)
-            x.ProcessTypeAsTypeReferenceName(synType)
-            x.Done(mark, ElementType.INTERFACE_INHERIT)
-
-        | SynMemberSig.Interface(synType, range) ->
-            let mark = x.Mark(range)
-            x.ProcessTypeAsTypeReferenceName(synType)
-            x.Done(mark, ElementType.INTERFACE_IMPLEMENTATION)
-
-        | _ -> ()
