@@ -48,7 +48,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 x.Done(range, mark, elementType)
 
         match moduleMember with
-        | SynModuleDecl.NestedModule(SynComponentInfo(attrs, _, _, _, XmlDoc xmlDoc, _, _, _), _, _, decls, _, range) ->
+        | SynModuleDecl.NestedModule(SynComponentInfo(attrs, _, _, _, XmlDoc xmlDoc, _, _, _), _, decls, _, range, _) ->
             let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             for decl in decls do
                 x.ProcessModuleMemberDeclaration(decl)
@@ -64,7 +64,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                     x.ProcessTypeDefn(typeDefn, FSharpTokenType.AND)
             x.Done(range, mark, ElementType.TYPE_DECLARATION_GROUP)
 
-        | SynModuleDecl.Exception(SynExceptionDefn(exn, members, range), _) ->
+        | SynModuleDecl.Exception(SynExceptionDefn(exn, _, members, range), _) ->
             let mark = x.StartException(exn, range)
             x.ProcessTypeMembers(members)
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
@@ -76,10 +76,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             // `extern` declarations are represented as normal `let` bindings with fake rhs expressions in FCS AST.
             // This is a workaround to mark such declarations and not to mark the non-existent expressions inside it.
             match bindings with
-            | [SynBinding(attributes = attrs; headPat = headPat; returnInfo = returnInfo; trivia = trivia)] when
-                    trivia.LetKeyword.IsNone ->
+            | [SynBinding(attributes = attrs; headPat = headPat; returnInfo = returnInfo; trivia = trivia; xmlDoc = XmlDoc xmlDoc)] when
+                trivia.LetKeyword.IsNone ->
 
-				let mark = x.MarkXmlDocOwner(xmlDoc, null, range)
+                let mark = x.MarkXmlDocOwner(xmlDoc, null, range)
                 x.ProcessAttributeLists(attrs)
                 x.AdvanceToTokenOrRangeStart(FSharpTokenType.EXTERN, headPat.Range)
                 Assertion.Assert(x.TokenType == FSharpTokenType.EXTERN, "Expecting EXTERN, got: {0}", x.TokenType)
@@ -631,7 +631,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             x.SkipOuterAttrs(rest, outerRange)
 
     member x.ProcessTopLevelBinding(binding, isSecondary) =
-        let (SynBinding(_, kind, _, _, attrs, XmlDoc xmlDoc, _ , headPat, returnInfo, _, expr, range, _)) = binding
+        let (SynBinding(_, kind, _, _, attrs, XmlDoc xmlDoc, _ , headPat, returnInfo, expr, range, _, _)) = binding
 
         if isSecondary then x.AdvanceToTokenOrRangeStart(FSharpTokenType.AND, range)
 
@@ -678,7 +678,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
     let nextSteps = Stack<BuilderStep>()
 
     member x.ProcessLocalBinding(binding, isSecondary) =
-        let (SynBinding(_, kind, _, _, attrs, XmlDoc xmlDoc, _, headPat, returnInfo, _, expr, range, _)) = binding
+        let (SynBinding(_, kind, _, _, attrs, XmlDoc xmlDoc, _, headPat, returnInfo, expr, range, _, _)) = binding
 
         if isSecondary then
             x.AdvanceToTokenOrRangeStart(FSharpTokenType.AND, range)

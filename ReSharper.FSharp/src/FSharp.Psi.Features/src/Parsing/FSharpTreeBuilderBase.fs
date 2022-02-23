@@ -410,7 +410,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         | _ -> failwithf "Unexpected simple type representation: %A" repr
 
-    member x.ProcessUnionCase(SynUnionCase(attrs, _, caseType, XmlDoc xmlDoc, _, range)) =
+    member x.ProcessUnionCase(SynUnionCase(attrs, _, caseType, XmlDoc xmlDoc, _, range, _)) =
         let mark = x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.BAR, range)
         x.ProcessAttributeLists(attrs)
         x.ProcessUnionCaseType(caseType, ElementType.UNION_CASE_FIELD_DECLARATION)
@@ -459,7 +459,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
-    member x.ProcessEnumCase(SynEnumCase(attrs, _, _, _, _, XmlDoc xmlDoc, range)) =
+    member x.ProcessEnumCase(SynEnumCase(attrs, _, _, _, XmlDoc xmlDoc, range, _)) =
         let mark = x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.BAR, range)
         x.ProcessAttributeLists(attrs)
         x.Done(range, mark, ElementType.ENUM_CASE_DECLARATION)
@@ -856,7 +856,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
         | SynMemberSig.Member(SynValSig(attrs, id, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, _), flags, range) ->
-            let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, Some id, range)
+            let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             x.ProcessReturnTypeInfo(arity, synType)
             let elementType =
                 if flags.IsDispatchSlot then
@@ -869,7 +869,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         | SynMemberSig.ValField(SynField(attrs, _, id, synType, _, XmlDoc xmlDoc, _, _), range) ->
             if id.IsSome then
-                let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, id, range)
+                let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
                 x.ProcessType(synType)
                 x.Done(mark,ElementType.VAL_FIELD_DECLARATION)
 
