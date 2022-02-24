@@ -30,10 +30,11 @@ IFSharpImplFile
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
         IPrimaryConstructorDeclaration
-          DocComment(type:LINE_COMMENT, text:/// Default)
-          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-          Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
-          DocComment(type:LINE_COMMENT, text:/// .ctor)
+          XmlDocBlock
+            DocComment(type:LINE_COMMENT, text:/// Default)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
+            DocComment(type:LINE_COMMENT, text:/// .ctor)
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
           IParametersPatternDeclaration

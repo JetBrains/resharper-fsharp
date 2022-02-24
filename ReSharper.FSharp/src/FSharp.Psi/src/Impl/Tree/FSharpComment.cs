@@ -92,4 +92,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
   }
+
+  public class XmlDocBlock : FSharpCompositeElement
+  {
+    public override bool IsFiltered() => true;
+    public override NodeType NodeType => FSharpTokenType.XML_DOC_BLOCK;
+  }
 }

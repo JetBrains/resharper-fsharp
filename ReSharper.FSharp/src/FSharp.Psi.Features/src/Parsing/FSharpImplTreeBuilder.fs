@@ -48,15 +48,14 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 x.Done(range, mark, elementType)
 
         match moduleMember with
-        | SynModuleDecl.NestedModule(SynComponentInfo(attrs, _, _, lid, XmlDoc xmlDoc, _, _, _), _, decls, _, range, _) ->
-            let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, List.tryHead lid, range)
+        | SynModuleDecl.NestedModule(SynComponentInfo(attrs, _, _, _, XmlDoc xmlDoc, _, _, _), _, decls, _, range, _) ->
+            let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             for decl in decls do
                 x.ProcessModuleMemberDeclaration(decl)
             x.Done(range, mark, ElementType.NESTED_MODULE_DECLARATION)
 
         | SynModuleDecl.Types(typeDefns, range) ->
-            let startRange, xmlDoc = typeDefnGroupStartRange typeDefns range
-            let mark = x.MarkXmlDocOwner(xmlDoc, null, startRange)
+            let mark = x.Mark(range)
             match typeDefns with
             | [] -> ()
             | primary :: secondary ->
@@ -66,7 +65,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             x.Done(range, mark, ElementType.TYPE_DECLARATION_GROUP)
 
         | SynModuleDecl.Exception(SynExceptionDefn(exn, _, members, range), _) ->
-            let mark = x.StartException(exn)
+            let mark = x.StartException(exn, range)
             x.ProcessTypeMembers(members)
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
 
@@ -74,15 +73,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             x.ProcessOpenDeclTarget(openDeclTarget, range)
 
         | SynModuleDecl.Let(_, bindings, range) ->
-            let startRange, xmlDoc = letBindingGroupStartRange bindings range
-            let letMark = x.MarkXmlDocOwner(xmlDoc, null, startRange)
-
             // `extern` declarations are represented as normal `let` bindings with fake rhs expressions in FCS AST.
             // This is a workaround to mark such declarations and not to mark the non-existent expressions inside it.
             match bindings with
-            | [SynBinding(attributes = attrs; headPat = headPat; returnInfo = returnInfo; trivia = trivia)] when
-                    trivia.LetKeyword.IsNone ->
+            | [SynBinding(attributes = attrs; headPat = headPat; returnInfo = returnInfo; trivia = trivia; xmlDoc = XmlDoc xmlDoc)] when
+                trivia.LetKeyword.IsNone ->
 
+                let mark = x.MarkXmlDocOwner(xmlDoc, null, range)
                 x.ProcessAttributeLists(attrs)
                 x.AdvanceToTokenOrRangeStart(FSharpTokenType.EXTERN, headPat.Range)
                 Assertion.Assert(x.TokenType == FSharpTokenType.EXTERN, "Expecting EXTERN, got: {0}", x.TokenType)
@@ -92,10 +89,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                     x.ProcessAttributeLists(attrs)
                 | _ -> ()
                 // todo: mark parameters
-                x.Done(range, letMark, ElementType.EXTERN_DECLARATION)
+                x.Done(range, mark, ElementType.EXTERN_DECLARATION)
 
             | _ ->
 
+            let letMark = x.Mark(range)
             x.ProcessTopLevelBindings(bindings)
             x.Done(range, letMark, ElementType.LET_BINDINGS_DECLARATION)
 
@@ -184,7 +182,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
     member x.ProcessTypeExtensionDeclaration(SynTypeDefn(info, _, members, _, range, _), attrs) =
         let (SynComponentInfo(_, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
-        let mark = x.MarkAndProcessAttributesOrIdOrRange(attrs, xmlDoc, List.tryHead lid, range)
+        let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
 
         match typeParams with
         | Some(SynTyparDecls.PrefixList _ | SynTyparDecls.SinglePrefix _ as typeParams) ->
@@ -210,7 +208,14 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             while (isNotNull x.TokenType && x.TokenType.IsWhitespace) && not x.Eof do
                 x.AdvanceLexer()
 
-            let mark = x.MarkAndProcessAttributesOrIdOrRange(typeMember.Attributes, xmlDoc, None, typeMember.Range)
+            // TODO: add range for primary constructor in FCS
+            let mark =
+                if not xmlDoc.IsEmpty then
+                    let mark = x.Mark(xmlDoc.Range)
+                    x.MarkAndDone(xmlDoc.Range, FSharpTokenType.XML_DOC_BLOCK)
+                    mark
+                else x.Mark()
+
             x.ProcessAttributeLists(attrs)
             x.ProcessImplicitCtorSimplePats(args)
             x.ProcessCtorSelfId(selfId)
@@ -228,9 +233,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             match x.ContinueMemberDecl(typeMember.Range) with
             | ValueSome(mark) -> mark
             | _ ->
-                let mark = x.MarkXmlDocOwner(typeMember.XmlDoc, null, typeMember.Range)
-                x.ProcessAttributeLists(typeMember.Attributes)
-                mark
+
+            match typeMember with
+            | SynMemberDefn.LetBindings _ -> x.Mark(typeMember.Range)
+            | _ -> x.MarkAndProcessIntro(typeMember.Attributes, typeMember.XmlDoc, null, typeMember.Range)
 
         let memberType =
             match typeMember with
@@ -624,11 +630,15 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             if Position.posGt r.End outerRange.Start then attrs else
             x.SkipOuterAttrs(rest, outerRange)
 
-    member x.ProcessTopLevelBinding(binding) =
-        let (SynBinding(_, kind, _, _, attrs, _, _ , headPat, returnInfo, expr, _, _, _)) = binding
+    member x.ProcessTopLevelBinding(binding, isSecondary) =
+        let (SynBinding(_, kind, _, _, attrs, XmlDoc xmlDoc, _ , headPat, returnInfo, expr, range, _, _)) = binding
 
-        let mark = x.Mark()
+        if isSecondary then x.AdvanceToTokenOrRangeStart(FSharpTokenType.AND, range)
+
         let expr = x.FixExpression(expr)
+        let mark =
+            if xmlDoc.IsEmpty then x.Mark()
+            else x.MarkXmlDocOwner(xmlDoc, null, range)
 
         match kind with
         | SynBindingKind.StandaloneExpression
@@ -647,10 +657,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         | [] -> ()
         | binding :: rest ->
 
-        x.ProcessTopLevelBinding(binding)
+        x.ProcessTopLevelBinding(binding, false)
         for binding in rest do
-            x.AdvanceToTokenOrPos(FSharpTokenType.AND, binding.StartPos)
-            x.ProcessTopLevelBinding(binding)
+            x.ProcessTopLevelBinding(binding, true)
 
     member x.ProcessActivePatternExpr(id: Ident) =
         x.ProcessActivePatternId(id, ElementType.ACTIVE_PATTERN_NAMED_CASE_REFERENCE_NAME)
@@ -671,13 +680,14 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
     let nextSteps = Stack<BuilderStep>()
 
     member x.ProcessLocalBinding(binding, isSecondary) =
-        let (SynBinding(_, kind, _, _, attrs, _, _, headPat, returnInfo, expr, _, _, _)) = binding
+        let (SynBinding(_, kind, _, _, attrs, XmlDoc xmlDoc, _, headPat, returnInfo, expr, range, _, _)) = binding
 
-        if isSecondary then
-            x.AdvanceToTokenOrPos(FSharpTokenType.AND, binding.StartPos)
+        if isSecondary then x.AdvanceToTokenOrRangeStart(FSharpTokenType.AND, range)
 
         let expr = x.FixExpression(expr)
-        let mark = x.Mark()
+        let mark =
+            if xmlDoc.IsEmpty then x.Mark()
+            else x.MarkXmlDocOwner(xmlDoc, null, range)
 
         match kind with
         | SynBindingKind.StandaloneExpression

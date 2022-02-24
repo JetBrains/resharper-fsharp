@@ -1,0 +1,2 @@
+///F
+extern int F()

@@ -1,0 +1,26 @@
+﻿Language: PsiLanguageType:F#
+IFSharpSigFile
+  INamedModuleDeclaration
+    FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpIdentifierToken(type:IDENTIFIER, text:Module)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    IBindingSignature
+      XmlDocBlock
+        DocComment(type:LINE_COMMENT, text:///Val)
+      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+      FSharpTokenType+ValTokenElement(type:VAL, text:val)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      ITopReferencePat
+        IExpressionReferenceName
+          FSharpIdentifierToken(type:IDENTIFIER, text:x)
+      IReturnTypeInfo
+        FSharpTokenType+ColonTokenElement(type:COLON, text::)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IParameterSignatureTypeUsage
+          INamedTypeUsage
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:int)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
