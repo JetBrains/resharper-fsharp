@@ -320,8 +320,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         match caseType with
         | SynUnionCaseKind.Fields(fields) ->
             match fields with
-            | field :: _ ->
-                let fieldListMark = x.Mark(field.StartPos)
+            | SynField(range = range) :: _ ->
+                let fieldListMark = x.Mark(range)
                 for f in fields do
                     x.ProcessField f fieldElementType
                 x.Done(fieldListMark, ElementType.UNION_CASE_FIELD_DECLARATION_LIST)

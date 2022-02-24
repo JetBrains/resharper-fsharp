@@ -11,11 +11,6 @@ type SynBinding with
         let (SynBinding(headPat = headPat)) = x
         headPat.Range.Start
 
-type SynField with
-    member x.StartPos =
-        let (SynField(range = range)) = x
-        range.Start
-
 type SynMemberDefn with
     member x.Attributes =
         match x with
