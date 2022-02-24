@@ -12,19 +12,9 @@ type SynBinding with
         headPat.Range.Start
 
 type SynField with
-    // todo: xmlDoc
     member x.StartPos =
-        let (SynField(attrs, _, id, _, _, _, _, range)) = x
-        let range =
-            match attrs, id with
-            | attrList :: _, _ -> attrList.Range
-            | _, Some id -> id.idRange
-            | _ -> range
+        let (SynField(range = range)) = x
         range.Start
-
-    member x.XmlDoc =
-        let (SynField(_, _, _, _, _, XmlDoc xmlDoc, _, _)) = x
-        xmlDoc
 
 type SynMemberDefn with
     member x.Attributes =

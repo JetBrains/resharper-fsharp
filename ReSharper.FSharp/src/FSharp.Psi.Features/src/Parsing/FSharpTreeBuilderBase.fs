@@ -321,9 +321,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | SynUnionCaseKind.Fields(fields) ->
             match fields with
             | field :: _ ->
-                let xmlDoc = field.XmlDoc
-                let startPos = if xmlDoc.IsEmpty then field.StartPos else xmlDoc.Range.Start
-                let fieldListMark = x.Mark(startPos)
+                let fieldListMark = x.Mark(field.StartPos)
                 for f in fields do
                     x.ProcessField f fieldElementType
                 x.Done(fieldListMark, ElementType.UNION_CASE_FIELD_DECLARATION_LIST)
