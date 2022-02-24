@@ -245,7 +245,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         if mark.IsSome then
             x.Done(mark.Value, elementType)
 
-    /// Process xmlDoc and attrbiutes
+    /// Process xmlDoc and attributes
     member x.MarkAndProcessIntro(attrs: SynAttributes, xmlDoc: XmlDoc, tokenType: TokenNodeType, range: range) =
         let mark = x.MarkXmlDocOwner(xmlDoc, tokenType, range)
         x.ProcessAttributeLists(attrs)
