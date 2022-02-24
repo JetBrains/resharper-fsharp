@@ -39,7 +39,7 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
         use enableFormatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
 
         let bindings = recordExpr.FieldBindings
-        let firstBinding = bindings.[0]
+        let firstBinding = bindings[0]
 
         for binding in bindings do
             if binding != firstBinding then

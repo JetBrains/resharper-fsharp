@@ -62,7 +62,7 @@ type ArgumentsOwnerTest() =
                     | Some declRange -> [| argRange; sprintf "|(param #%d)" i, declRange |])
                 |> Array.unzip
 
-            let endText rangeIdx = endTexts.[rangeIdx]
+            let endText rangeIdx = endTexts[rangeIdx]
 
             DocumentRangeUtil.DumpRanges(textControl.Document, ranges, (fun _ -> "|"), Func<_,_>(endText)).ToString()
             |> writer.WriteLine

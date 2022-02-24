@@ -41,7 +41,7 @@ type AddParensToApplicationTest() =
                 match id with
                 | AppPopupName when isNotNull appOccurrenceName -> appOccurrenceName
                 | ArgsPopupName when isNotNull argsOccurrenceName -> argsOccurrenceName
-                | _ -> occurrences.[0].Name.Text
+                | _ -> occurrences[0].Name.Text
 
             occurrences
             |> Array.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)

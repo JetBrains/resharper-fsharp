@@ -39,10 +39,10 @@ type internal TypeProvidersCache() =
             addTypeProvider projectAssembly tp
 
     and removeTypeProvider projectAssembly tpId =
-        typeProvidersPerAssembly.[projectAssembly].TryRemove(tpId) |> ignore
+        typeProvidersPerAssembly[projectAssembly].TryRemove(tpId) |> ignore
         proxyTypeProvidersPerId.TryRemove(tpId) |> ignore
 
-        if typeProvidersPerAssembly.[projectAssembly].Count = 0 then
+        if typeProvidersPerAssembly[projectAssembly].Count = 0 then
             typeProvidersPerAssembly.TryRemove(projectAssembly) |> ignore
 
     member x.Add(projectAssembly, tp) =
@@ -52,7 +52,7 @@ type internal TypeProvidersCache() =
         let hasValue = SpinWait.SpinUntil((fun () -> proxyTypeProvidersPerId.ContainsKey id), 15_000)
 
         if not hasValue then failwith $"Cannot get type provider {id} from TypeProvidersCache"
-        else proxyTypeProvidersPerId.[id]
+        else proxyTypeProvidersPerId[id]
 
     member x.Get(projectOutputPath) =
         match typeProvidersPerAssembly.TryGetValue(projectOutputPath) with

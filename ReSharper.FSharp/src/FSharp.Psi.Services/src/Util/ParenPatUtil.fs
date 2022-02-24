@@ -99,7 +99,7 @@ let prefersReferenceResolveRules (refPat: IReferencePat) =
     isNotNull referenceName &&
     
     let name = referenceName.ShortName
-    not (name.IsEmpty()) && name.[0].IsUpperFast()
+    not (name.IsEmpty()) && name[0].IsUpperFast()
 
 let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
     match fsPattern with

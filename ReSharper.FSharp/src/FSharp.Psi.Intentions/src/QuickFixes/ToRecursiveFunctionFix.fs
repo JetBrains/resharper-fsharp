@@ -36,7 +36,7 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
         |> Option.defaultValue false
 
     let getNameRange (letBindings: ILetBindings) =
-        [| letBindings.Bindings.[0].HeadPattern.GetNavigationRange() |]
+        [| letBindings.Bindings[0].HeadPattern.GetNavigationRange() |]
 
     override x.Text = "Make " + referenceExpr.ShortName + " recursive"
 

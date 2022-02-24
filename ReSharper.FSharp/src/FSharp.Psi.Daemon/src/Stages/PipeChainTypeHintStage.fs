@@ -64,7 +64,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
             let symbolUse = refExpr.Reference.GetSymbolUse()
             if isNull symbolUse then () else
 
-            let _, fcsType = symbolUse.GenericArguments.[0]
+            let _, fcsType = symbolUse.GenericArguments[0]
             let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
             highlightingConsumer.AddHighlighting(TypeHintHighlighting(fcsType.Format(symbolUse.DisplayContext), range))
 

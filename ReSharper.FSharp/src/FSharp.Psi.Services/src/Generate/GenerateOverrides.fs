@@ -66,7 +66,7 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
     if element.Mfv.IsCliEvent() then
         let attribute = context.CreateElementFactory().CreateAttribute("CLIEvent")
         FSharpAttributesUtil.addOuterAttributeListWithIndent true indent memberDeclaration
-        FSharpAttributesUtil.addAttribute memberDeclaration.AttributeLists.[0] attribute |> ignore
+        FSharpAttributesUtil.addAttribute memberDeclaration.AttributeLists[0] attribute |> ignore
 
     if element.AddTypes then
         let lastParam = memberDeclaration.ParametersDeclarations.LastOrDefault()
@@ -87,7 +87,7 @@ let noEmptyLineAnchors =
 
 let addEmptyLineIfNeeded (anchor: ITreeNode) =
     let addEmptyLine =
-        not noEmptyLineAnchors.[getTokenType anchor] &&
+        not noEmptyLineAnchors[getTokenType anchor] &&
         not ((anchor :? IMemberDeclaration) && anchor.IsSingleLine)
 
     if addEmptyLine then

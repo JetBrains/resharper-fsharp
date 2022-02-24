@@ -58,7 +58,7 @@ type FSharpBreakpointVariantsProvider() =
                     // Multi-method breakpoints allow us to set up multiple breakpoints across multiple methods if they
                     // all point to the same place in the source code. This is the case e.g. for async CE (since there
                     // may be more than one function generated for a particular CE call).
-                    result.[range] <-
+                    result[range] <-
                         TextRangeBreakpoint(TextRange(startOffset, endOffset), text, containingFunctionName = null,
                             isMultiMethodBreakpoint = true)
                 | _ -> ()

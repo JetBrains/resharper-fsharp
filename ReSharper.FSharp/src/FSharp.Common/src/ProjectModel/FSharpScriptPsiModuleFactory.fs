@@ -135,7 +135,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             let sourceFileCtor = createSourceFileForPath path
             let psiModule = createPsiModule path fileDocument moduleId sourceFileCtor changeBuilder
 
-            scriptsFromPaths.[path] <- psiModule
+            scriptsFromPaths[path] <- psiModule
             addPsiModule psiModule
 
     and queueUpdateReferences (path: VirtualFileSystemPath) (document: IDocument) =
@@ -168,7 +168,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                     locks.ExecuteOrQueue(lifetime, "Update F# script references", fun _ ->
                         use cookie = WriteLockCookie.Create()
                         let changeBuilder = PsiModuleChangeBuilder()
-                        scriptsReferences.[path] <- newReferences
+                        scriptsReferences[path] <- newReferences
 
                         for filePath in newReferences.Files do
                             createPsiModuleForPath filePath changeBuilder
@@ -319,10 +319,10 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, 
             let mutable psiModule = Unchecked.defaultof<FSharpScriptPsiModule>
             if modulesProvider.CreatePsiModuleForProjectFile(projectFile, changeBuilder, &psiModule) then
                 psiModule.AddProjectHandler(this)
-                sourceFiles.[projectFile.Location] <- psiModule.SourceFile
+                sourceFiles[projectFile.Location] <- psiModule.SourceFile
 
         | PsiModuleChange.ChangeType.Removed when sourceFiles.ContainsKey(oldLocation) ->
-            let sourceFile = sourceFiles.[oldLocation]
+            let sourceFile = sourceFiles[oldLocation]
             let psiModule = sourceFile.PsiModule :?> FSharpScriptPsiModule
             psiModule.RemoveProjectHandler(this)
             sourceFiles.Remove(oldLocation) |> ignore

@@ -223,7 +223,7 @@ type DeconstructionFromTuple(components: IDeconstructionComponent list, isStruct
             substitution.Domain
             |> List.ofSeq
             |> List.map (fun typeParameter ->
-                SingleValueDeconstructionComponent(null, substitution.[typeParameter]) :> IDeconstructionComponent)
+                SingleValueDeconstructionComponent(null, substitution[typeParameter]) :> IDeconstructionComponent)
 
         DeconstructionFromTuple(components, fcsType.IsStructTupleType) :> _
 
@@ -259,7 +259,7 @@ type DeconstructionFromUnionCaseFields(name: string, components: IDeconstruction
     override this.DeconstructInnerPatterns(pat, usedNames) =
         let pat = ParametersOwnerPatNavigator.GetByParameter(pat.IgnoreParentParens()).NotNull()
         let pattern, names = FSharpDeconstructionImpl.createInnerPattern pat this false usedNames
-        pat :> _, ModificationUtil.ReplaceChild(pat.Parameters.[0], pattern), names
+        pat :> _, ModificationUtil.ReplaceChild(pat.Parameters[0], pattern), names
 
 
 type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase,
@@ -285,7 +285,7 @@ type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase,
         let fcsUnionCases = fcsEntityInstance.Entity.UnionCases
         if fcsUnionCases.Count <> 1 then null else
 
-        let fcsUnionCase = fcsUnionCases.[0]
+        let fcsUnionCase = fcsUnionCases[0]
         let components = FSharpDeconstructionImpl.createUnionCaseFields context fcsUnionCase fcsEntityInstance
         if components.IsEmpty then null else
 
@@ -306,7 +306,7 @@ type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase,
         let parametersOwnerPat = FSharpPatternUtil.toParameterOwnerPat pat opName
         let pat = ParenPatUtil.addParensIfNeeded parametersOwnerPat
         let parametersOwnerPat = pat.IgnoreInnerParens() :?> IParametersOwnerPat
-        parametersOwnerPat :> _, ModificationUtil.ReplaceChild(parametersOwnerPat.Parameters.[0], pattern), names
+        parametersOwnerPat :> _, ModificationUtil.ReplaceChild(parametersOwnerPat.Parameters[0], pattern), names
 
 
 module FSharpDeconstruction =

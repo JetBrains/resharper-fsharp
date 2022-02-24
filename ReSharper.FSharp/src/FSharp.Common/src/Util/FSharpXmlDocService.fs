@@ -52,7 +52,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
                         assemblyFile.XmlDocIndex)
                     |> Option.defaultWith (fun _ ->
                         XmlDocIndex(dllPath.ChangeExtension(ExtensionConstants.Xml), true, psiConfig, xmlDocThread))
-                indexCache.[dllFile] <- index
+                indexCache[dllFile] <- index
                 Some index
             | _ -> None)
 

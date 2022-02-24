@@ -166,7 +166,7 @@ let rec getAbbreviatedType (fcsType: FSharpType) =
 
 [<Extension; CompiledName("HasMeasureParameter")>]
 let hasMeasureParameter(entity: FSharpEntity) =
-    entity.GenericParameters.Count > 0 && entity.GenericParameters.[0].IsMeasure;
+    entity.GenericParameters.Count > 0 && entity.GenericParameters[0].IsMeasure;
 
 type FSharpActivePatternGroup with
     member x.PatternName = patternName x

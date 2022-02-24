@@ -78,7 +78,7 @@ type FSharpLiteralType =
 
 
 let private assertStringTokenType (tokenType: TokenNodeType) =
-    if not FSharpTokenType.Strings.[tokenType] then
+    if not FSharpTokenType.Strings[tokenType] then
         failwithf $"Got token type: {tokenType}"
 
 let getStringStartingQuotesLength (tokenType: TokenNodeType) =

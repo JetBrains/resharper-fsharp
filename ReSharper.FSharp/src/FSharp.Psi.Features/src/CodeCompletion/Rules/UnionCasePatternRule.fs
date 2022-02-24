@@ -219,7 +219,7 @@ type UnionCasePatternRule() =
             | FSharpPatternUtil.ParentTraversal.PatternParentTraverseStep.Tuple(i, _), (:? ITupleExpr as tupleExpr) ->
                 let tupleItems = tupleExpr.Expressions
                 if tupleItems.Count <= i then None else
-                tryToGetInnerExpr tupleItems.[i] rest
+                tryToGetInnerExpr tupleItems[i] rest
 
             | FSharpPatternUtil.ParentTraversal.PatternParentTraverseStep.Or _, _ ->
                 tryToGetInnerExpr expr rest
@@ -238,7 +238,7 @@ type UnionCasePatternRule() =
                 let typeArguments = fcsType.GenericArguments
                 if typeArguments.Count <= i then None else
 
-                tryGetInnerType typeArguments.[i] rest
+                tryGetInnerType typeArguments[i] rest
 
             | _ -> Some(fcsType, path)
 
@@ -267,7 +267,7 @@ type UnionCasePatternRule() =
             if not fcsType.IsTupleType then fcsType else
 
             let typeArguments = fcsType.GenericArguments
-            if typeArguments.Count <> 0 then typeArguments.[0] else fcsType
+            if typeArguments.Count <> 0 then typeArguments[0] else fcsType
 
         if not fcsType.HasTypeDefinition then None else
 

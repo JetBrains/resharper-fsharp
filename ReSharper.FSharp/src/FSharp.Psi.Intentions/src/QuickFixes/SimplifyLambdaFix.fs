@@ -35,7 +35,7 @@ type SimplifyLambdaFix(warning: LambdaCanBeSimplifiedWarning) =
 
         let patterns = lambda.Patterns
         let redundantArgsCount = countRedundantArgs replaceCandidate
-        let firstNodeToDelete = patterns.[patterns.Count - redundantArgsCount - 1].NextSibling
+        let firstNodeToDelete = patterns[patterns.Count - redundantArgsCount - 1].NextSibling
 
         let arrow = lambda.RArrow
         let indentDiff = arrow.Indent - firstNodeToDelete.Indent - 1

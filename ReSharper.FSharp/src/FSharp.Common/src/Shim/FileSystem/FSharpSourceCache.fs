@@ -52,7 +52,7 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
                 else
                     Some(NotExists)
 
-            files.[path] <- source.Value
+            files[path] <- source.Value
         ) |> ignore
 
         source
@@ -74,7 +74,7 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         | _ ->
 
         logger.Trace("Add: {0} change: {1}", changeSource, path)
-        files.[path] <- if fileExists then Exists(text, DateTime.UtcNow) else NotExists
+        files[path] <- if fileExists then Exists(text, DateTime.UtcNow) else NotExists
 
     member x.TryGetSource(path: VirtualFileSystemPath, [<Out>] source: byref<FSharpSource>) =
         match files.TryGetValue(path) with

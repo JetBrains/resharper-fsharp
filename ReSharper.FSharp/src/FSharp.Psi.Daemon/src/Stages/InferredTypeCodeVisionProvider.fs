@@ -98,7 +98,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
 
         let paramGroups = mfv.CurriedParameterGroups
         if paramGroups.IsEmpty() then returnTypeStr else
-        if paramGroups.Count = 1 && paramGroups.[0].IsEmpty() && mfv.IsMember then "unit -> " + returnTypeStr else
+        if paramGroups.Count = 1 && paramGroups[0].IsEmpty() && mfv.IsMember then "unit -> " + returnTypeStr else
 
         let builder = StringBuilder()
         let isSingleGroup = paramGroups.Count = 1

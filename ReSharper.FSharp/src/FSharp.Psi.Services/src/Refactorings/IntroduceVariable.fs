@@ -231,7 +231,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             let index = clauses.IndexOf(matchClause)
             if index = clauses.Count - 1 then false else
 
-            clauses.[index + 1].StartLine = matchClause.StartLine
+            clauses[index + 1].StartLine = matchClause.StartLine
 
         | :? IIfThenElseExpr | :? ILambdaExpr | :? ITryLikeExpr | :? IWhenExprClause -> true
         | _ -> false
@@ -314,12 +314,12 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             | Some indent -> indent
             | _ -> contextExpr.Indent
 
-        let addSpaceNearIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
+        let addSpaceNearIdents = needsSpaceAfterIdentNodeTypes[sourceExpr.NodeType]
 
         let containingTypeElement = getContainingType contextDecl
         let usedNames = getUsedNames [contextExpr] data.Usages containingTypeElement true
         let names = getNames usedNames data sourceExpr
-        let name = if names.Count > 0 then names.[0] else "x"
+        let name = if names.Count > 0 then names[0] else "x"
 
         let removeSourceExpr =
             if data.SourceExpression.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey) then true else
@@ -345,11 +345,11 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         shiftNode indentShift sourceExpr
 
         let letBindings = createBinding contextExpr contextDecl name
-        let binding = letBindings.Bindings.[0]
+        let binding = letBindings.Bindings[0]
 
         // Replace the keyword after the parsing to workaround bad parser recovery for `let! x = ()` without in-expr
         // todo: fix parser recovery in Fcs
-        ModificationUtil.ReplaceChild(binding.BindingKeyword, data.Keywords.[0].CreateTreeElement()) |> ignore
+        ModificationUtil.ReplaceChild(binding.BindingKeyword, data.Keywords[0].CreateTreeElement()) |> ignore
 
         setBindingExpression sourceExpr contextIndent binding
 
@@ -437,7 +437,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 let ranges = getReplaceRanges contextExpr removeSourceExpr
                 let letBindings = ModificationUtil.AddChildBefore(ranges.ReplaceRange.First, letBindings)
 
-                let binding = letBindings.Bindings.[0]
+                let binding = letBindings.Bindings[0]
                 let replaceRange = TreeRange(binding.NextSibling, letBindings.LastChild)
                 let replaced = ModificationUtil.ReplaceChildRange(replaceRange, ranges.InRange)
 
@@ -467,7 +467,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
             | _ -> failwithf "Unexpected let node type"
 
-        let binding = letBindings.As<ILetBindings>().Bindings.[0]
+        let binding = letBindings.As<ILetBindings>().Bindings[0]
 
         match binding.Expression.IgnoreInnerParens() with
         | :? ILambdaExpr as lambdaExpr when not lambdaExpr.IsSingleLine ->
@@ -514,7 +514,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 if isInSingleLineContext && replaceSourceExprNode then
                     letBindings.LastChild
                 else
-                    letBindings.Bindings.[0].Expression :> _
+                    letBindings.Bindings[0].Expression :> _
 
             IntroduceVariableResult(hotspotsRegistry, caretTarget.CreateTreeElementPointer())
 
@@ -622,13 +622,13 @@ type FSharpIntroduceVarHelper() =
         let mfvParamGroups = mfv.CurriedParameterGroups
         if mfvParamGroups.Count <> 1 then None else
 
-        let mfvParamGroup = mfvParamGroups.[0]
+        let mfvParamGroup = mfvParamGroups[0]
         if mfvParamGroup.Count <> 2 then None else
 
-        let binderType = mfvParamGroup.[1].Type
+        let binderType = mfvParamGroup[1].Type
         if not binderType.IsFunctionType then None else
 
-        Some(mfvParamGroup.[0].Type, binderType)
+        Some(mfvParamGroup[0].Type, binderType)
 
     override x.IsLanguageSupported = true
 
@@ -667,7 +667,7 @@ type FSharpIntroduceVarHelper() =
             if isNull builderFcsType then None else
 
             let builderFcsType =
-                if builderFcsType.IsFunctionType then builderFcsType.GenericArguments.[0] else builderFcsType
+                if builderFcsType.IsFunctionType then builderFcsType.GenericArguments[0] else builderFcsType
 
             let prefixAppExprFcsType = prefixAppExpr.TryGetFcsType()
             if isNull prefixAppExprFcsType then None else
@@ -683,7 +683,7 @@ type FSharpIntroduceVarHelper() =
                     let paramTypeWithSubstitution = computationType.Instantiate(substitution)
                     if fcsType <> paramTypeWithSubstitution then None else
 
-                    Some(lambdaType.Instantiate(substitution).GenericArguments.[0], allMembers)))
+                    Some(lambdaType.Instantiate(substitution).GenericArguments[0], allMembers)))
 
         let getOccurrenceText (fcsType: FSharpType) (text: string) =
             let richText = RichText("Bind '")

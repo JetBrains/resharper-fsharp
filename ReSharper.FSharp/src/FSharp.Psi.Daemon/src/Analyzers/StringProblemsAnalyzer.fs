@@ -93,7 +93,7 @@ type RegularStringLexer(buffer) =
     override x.EndOffset = 1
 
     override x.AdvanceInternal() =
-        match x.Buffer.[x.Position] with
+        match x.Buffer[x.Position] with
         | '\\' ->
             x.Position <- x.Position + 1
             if x.CanAdvance then x.ProcessEscapeSequence()
@@ -102,7 +102,7 @@ type RegularStringLexer(buffer) =
 
     abstract ProcessEscapeSequence: unit -> TokenNodeType
     default x.ProcessEscapeSequence() =
-        match x.Buffer.[x.Position] with
+        match x.Buffer[x.Position] with
         | 'u' -> x.ProcessHexEscapeSequence(4)
         | 'U' -> x.ProcessLongHexEscapeSequence()
         | 'x' -> x.ProcessHexEscapeSequence(2)
@@ -153,10 +153,10 @@ type VerbatimStringLexer(buffer) =
         override x.EndOffset = 1
 
         override x.AdvanceInternal() =
-            if x.Buffer.[x.Position] = '\"' then
+            if x.Buffer[x.Position] = '\"' then
                 x.Position <- x.Position + 1
 
-                if x.CanAdvance && x.Buffer.[x.Position] = '\"' then StringTokenTypes.ESCAPE_CHARACTER else
+                if x.CanAdvance && x.Buffer[x.Position] = '\"' then StringTokenTypes.ESCAPE_CHARACTER else
                 StringTokenTypes.CHARACTER
 
             else StringTokenTypes.CHARACTER
@@ -227,7 +227,7 @@ type ByteArrayLexer(buffer) =
     override x.EndOffset = 2
 
     override x.ProcessEscapeSequence() =
-        match x.Buffer.[x.Position] with
+        match x.Buffer[x.Position] with
         | '\\' -> StringTokenTypes.ESCAPE_CHARACTER
         | _ -> StringTokenTypes.CHARACTER
 
@@ -237,14 +237,14 @@ type ByteArrayLexer(buffer) =
 module InterpolatedStringLexer =
     let private checkChar (lexer: FSharpStringLexerBase) c =
         lexer.Position <- lexer.Position + 1
-        if lexer.CanAdvance && lexer.Buffer.[lexer.Position] = c then
+        if lexer.CanAdvance && lexer.Buffer[lexer.Position] = c then
             StringTokenTypes.ESCAPE_CHARACTER
         else
             lexer.Position <- lexer.Position - 1
             StringTokenTypes.INVALID_CHARACTER
 
     let advance (lexer: FSharpStringLexerBase) =
-        match lexer.Buffer.[lexer.Position] with
+        match lexer.Buffer[lexer.Position] with
         | '{' -> checkChar lexer '{'
         | '}' -> checkChar lexer '}'
         | _ -> null

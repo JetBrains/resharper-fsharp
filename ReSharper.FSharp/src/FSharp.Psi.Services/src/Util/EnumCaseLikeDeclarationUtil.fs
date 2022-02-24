@@ -21,10 +21,10 @@ let addBarIfNeeded (caseDeclaration: IEnumCaseLikeDeclaration) =
     if isNull typeRepr then () else
 
     let cases = typeRepr.Cases
-    if cases.Count <= 1 || cases.[0] != caseDeclaration then () else 
+    if cases.Count <= 1 || cases[0] != caseDeclaration then () else 
 
-    let firstCaseIndent = cases.[0].Indent
-    let secondCaseIndent = cases.[1].Indent
+    let firstCaseIndent = cases[0].Indent
+    let secondCaseIndent = cases[1].Indent
 
     if firstCaseIndent > secondCaseIndent then
         let indentDiff = firstCaseIndent - secondCaseIndent

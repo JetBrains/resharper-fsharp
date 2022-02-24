@@ -18,7 +18,7 @@ type FSharpLineCommentActionProvider() =
 
     override x.IsEndOfLineComment(tokenType, tokenText) =
         tokenType == FSharpTokenType.LINE_COMMENT &&
-        (tokenText.Length = 2 || tokenText.[2] <> '/' || tokenText.Length > 3 && tokenText.[3] = '/')
+        (tokenText.Length = 2 || tokenText[2] <> '/' || tokenText.Length > 3 && tokenText[3] = '/')
 
     override x.ShouldInsertAtLineStart(settingsStore) =
         settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.StickComment)

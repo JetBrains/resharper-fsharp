@@ -34,8 +34,8 @@ let getFunTypeArgs (fcsType: FSharpType) =
     let rec loop acc (fcsType: FSharpType) =
         if not fcsType.IsFunctionType then List.rev acc else
 
-        let acc = fcsType.GenericArguments.[0] :: acc
-        loop acc fcsType.GenericArguments.[1]
+        let acc = fcsType.GenericArguments[0] :: acc
+        loop acc fcsType.GenericArguments[1]
     loop [] fcsType
 
 let tryGetExpectedFcsType (expr: IFSharpExpression): (FSharpType * FSharpDisplayContext) option =
@@ -78,10 +78,10 @@ let tryGetExpectedFcsType (expr: IFSharpExpression): (FSharpType * FSharpDisplay
             let parameterGroups = mfvParameterGroups
             if parameterGroups.Count < 2 then [] else
 
-            let lastParamGroup = parameterGroups.[parameterGroups.Count - 1]
+            let lastParamGroup = parameterGroups[parameterGroups.Count - 1]
             if lastParamGroup.Count <> 1 then [] else // todo: tuples?
 
-            let fcsParamType = lastParamGroup.[0].Type
+            let fcsParamType = lastParamGroup[0].Type
 
             let leftArgType = arg.TryGetFcsType()
             if isNull leftArgType then [] else
@@ -107,13 +107,13 @@ let tryGetExpectedFcsType (expr: IFSharpExpression): (FSharpType * FSharpDisplay
             if parameterGroupCount < 3 then [] else
 
             let fcsParamGroups = 
-                [ parameterGroups.[parameterGroupCount - 2]
-                  parameterGroups.[parameterGroupCount - 1] ]
+                [ parameterGroups[parameterGroupCount - 2]
+                  parameterGroups[parameterGroupCount - 1] ]
 
             (fcsParamGroups, tupleTypeArgs)
             ||> List.zip
             |> List.filter (fun (paramGroup, _) -> paramGroup.Count = 1) // todo: tuples
-            |> List.map (fun (paramGroup, argType) -> paramGroup.[0].Type, argType)
+            |> List.map (fun (paramGroup, argType) -> paramGroup[0].Type, argType)
             |> List.unzip
             ||> List.map2 extractPartialSubstitution
             |> List.concat

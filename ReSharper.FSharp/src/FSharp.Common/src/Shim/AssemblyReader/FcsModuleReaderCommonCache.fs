@@ -24,7 +24,7 @@ type FcsModuleReaderCommonCache(lifetime: Lifetime, changeManager: ChangeManager
         | _ ->
 
         let cache = ConcurrentDictionary()
-        assemblyTypeRefs.[targetModule] <- cache
+        assemblyTypeRefs[targetModule] <- cache
         cache
 
     member this.TryGetAssemblyTypeRef(psiModule: IPsiModule, clrTypeName: IClrTypeName, typeRef: byref<_>) =

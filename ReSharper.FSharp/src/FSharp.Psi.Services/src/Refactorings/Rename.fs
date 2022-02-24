@@ -244,7 +244,7 @@ type SingleUnionCaseRenameEvaluator() =
                 sourceName <> SharedImplUtil.MISSING_DECLARATION_NAME &&
 
                 let unionCases = typeElement.GetSourceUnionCases()
-                unionCases.Count = 1 && unionCases.[0].SourceName = sourceName
+                unionCases.Count = 1 && unionCases[0].SourceName = sourceName
 
             match initialElement.FirstOrDefault() with
             | :? ITypeElement as typeElement when isApplicable typeElement ->

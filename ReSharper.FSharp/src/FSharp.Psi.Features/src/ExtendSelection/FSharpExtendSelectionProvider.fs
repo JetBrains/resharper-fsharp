@@ -90,7 +90,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
             null
 
-        | node when (FSharpTokenType.InterpolatedStrings.[node.GetTokenType()] && node.Parent :? IInterpolatedStringExpr) ->
+        | node when (FSharpTokenType.InterpolatedStrings[node.GetTokenType()] && node.Parent :? IInterpolatedStringExpr) ->
             let parentExpr = node.Parent :?> IInterpolatedStringExpr
             if parentExpr.Literals.Count < 2 then null else
             FSharpInterpolatedStringExpressionSelection(fsFile, node.Parent :?> IInterpolatedStringExpr) :> _
@@ -100,7 +100,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
     static member FindBetterNode(fsFile, node: ITreeNode) =
         let shouldTryFindBetterNode (node: ITreeNode) =
             node :? IBinding ||
-            FSharpTokenType.InterpolatedStrings.[node.GetTokenType()]
+            FSharpTokenType.InterpolatedStrings[node.GetTokenType()]
 
         if not (shouldTryFindBetterNode node) then null else
         FSharpExtendSelectionProvider.ExtendNodeSelection(fsFile, node)
@@ -133,7 +133,7 @@ and FSharpDotSelection(fsFile, offset, selectBetterToken, useCamelHumps) =
 
     override this.IsPrevTokenBetter(prevToken, tokenNode) =
         let tokenType = tokenNode.GetTokenType()
-        let isIdentifierLikeToken = FSharpTokenType.Identifiers.[tokenType]
+        let isIdentifierLikeToken = FSharpTokenType.Identifiers[tokenType]
         isIdentifierLikeToken && tokenType != FSharpTokenType.IDENTIFIER && not (this.IsSpaceToken(prevToken)) ||
 
         base.IsPrevTokenBetter(prevToken, tokenNode)
@@ -157,7 +157,7 @@ and FSharpDotSelection(fsFile, offset, selectBetterToken, useCamelHumps) =
             tokenType.IsComment ||
             tokenType.IsConstantLiteral ||
             tokenType.IsStringLiteral ||
-            FSharpTokenType.InterpolatedStrings.[tokenType]
+            FSharpTokenType.InterpolatedStrings[tokenType]
 
         if not (shouldCreateTokenPartSelection (token.GetTokenType())) then null else
         x.CreateTokenPartSelection(token, TreeTextRange(offset))
@@ -200,7 +200,7 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
     inherit TokenPartSelection<IFSharpFile>(fsFile, treeTextRange, token)
 
     let findInterpolationInsertRange (tokenType: TokenNodeType): ISelectedRange =
-        if not FSharpTokenType.InterpolatedStrings.[tokenType] then null else
+        if not FSharpTokenType.InterpolatedStrings[tokenType] then null else
 
         let tokenTextEnd = TreeTextRange(token.GetTreeEndOffset()).ExtendLeft(getStringEndingQuotesLength tokenType)
         let tokenTextStart = TreeTextRange(token.GetTreeStartOffset()).ExtendRight(getStringStartingQuotesLength tokenType)
@@ -245,7 +245,7 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
             else tokenText, left
 
         let text, start =
-            if tokenType.IsStringLiteral || FSharpTokenType.InterpolatedStrings.[tokenType] then
+            if tokenType.IsStringLiteral || FSharpTokenType.InterpolatedStrings[tokenType] then
                 // todo: trim end if it actually ends with proper symbols?
                 let left = getStringStartingQuotesLength tokenType
                 let right = getStringEndingQuotesLength tokenType

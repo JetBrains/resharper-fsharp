@@ -135,8 +135,8 @@ let createViewItems solutionItems (item: AnItem) : seq<FSharpViewItem> = seq {
         let matched = Regex.Match(itemComponent, @"(?<name>\w+)\[(?<identity>\d+)\]")
         Assert.IsTrue(matched.Success)
 
-        let name = matched.Groups.["name"].Value
-        let id = Int32.Parse(matched.Groups.["identity"].Value)
+        let name = matched.Groups["name"].Value
+        let id = Int32.Parse(matched.Groups["identity"].Value)
         path <- path.Combine(name)
 
         yield createViewFolder path id solutionItems

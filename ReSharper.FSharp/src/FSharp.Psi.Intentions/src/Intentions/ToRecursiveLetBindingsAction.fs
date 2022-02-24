@@ -18,7 +18,7 @@ type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider)
         if not (isAtLetExprKeywordOrReferencePattern dataProvider letBindings) then false else
 
         let bindings = letBindings.Bindings
-        bindings.Count = 1 && bindings.[0].HasParameters
+        bindings.Count = 1 && bindings[0].HasParameters
 
     static member Execute(letBindings: ILetBindings) =
         use writeCookie = WriteLockCookie.Create(letBindings.IsPhysical())

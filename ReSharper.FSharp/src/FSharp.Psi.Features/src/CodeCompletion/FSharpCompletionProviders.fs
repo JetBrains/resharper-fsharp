@@ -56,7 +56,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
         // todo: check unfinished strings/comments instead of `isNull tokenType`
         if isNotNull tokenBeforeType && (fsContext.InsideToken || isNull tokenType) &&
                 (tokenBeforeType.IsComment ||
-                 FSharpTokenType.Strings.[tokenBeforeType] ||
+                 FSharpTokenType.Strings[tokenBeforeType] ||
                  tokenBeforeType.IsConstantLiteral) then null else
 
         obj()

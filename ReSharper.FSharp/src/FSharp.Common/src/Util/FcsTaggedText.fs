@@ -57,7 +57,7 @@ let richText (taggedText: TaggedText[]) =
 
 let isEmpty (taggedText: TaggedText[]) =
     Array.isEmpty taggedText ||
-    Array.length taggedText = 1 && taggedText.[0].Text = ""
+    Array.length taggedText = 1 && taggedText[0].Text = ""
 
 let richTextJoin (sep : string) (parts : RichText seq) =
     let sep = RichText(sep, TextStyle.Default)

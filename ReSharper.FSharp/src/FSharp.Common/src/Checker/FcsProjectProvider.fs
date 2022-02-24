@@ -178,12 +178,12 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 let fcsProjectOptions = { fcsProject.ProjectOptions with ReferencedProjects = referencedFcsProjects }
                 let fcsProject = { fcsProject with ProjectOptions = fcsProjectOptions }
 
-                fcsProjects.[psiModule] <- fcsProject
+                fcsProjects[psiModule] <- fcsProject
                 projectsPsiModules.Add(project, psiModule) |> ignore
 
                 let projectMark = project.GetProjectMark()
-                projectsProjectMarks.[projectMark] <- project
-                projectMarkModules.[psiModule] <- projectMark
+                projectsProjectMarks[projectMark] <- project
+                projectMarkModules[psiModule] <- projectMark
 
                 for referencedPsiModule in referencedProjectPsiModules do
                     let referencedModule = referencedModules.GetOrCreateValue(referencedPsiModule, createReferencedModule)

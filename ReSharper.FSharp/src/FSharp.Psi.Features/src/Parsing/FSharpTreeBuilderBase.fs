@@ -32,7 +32,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         Array.init (int lineCount) (fun line -> document.GetLineStartOffset(docLine line))
 
     let getLineOffset line =
-        lineOffsets.[line + lineShift]
+        lineOffsets[line + lineShift]
 
     new (sourceFile, lexer, lifetime, path) =
         FSharpTreeBuilderBase(sourceFile, lexer, lifetime, path, 0, 0)
@@ -620,19 +620,19 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
             // The last one is an already processed reference expr from this type app (see ProcessExpression).
             let exprEndIndex = productions.Count - 1
-            let mutable exprEndMarker = productions.[exprEndIndex]
+            let mutable exprEndMarker = productions[exprEndIndex]
 
             let expectedType = ElementType.REFERENCE_EXPR :> NodeType
             Assertion.Assert(exprEndMarker.ElementType == expectedType, "exprEnd.ElementType <> refExpr; {0}", expr)
 
             // Get reference expr start marker.
             let exprStart = exprEndIndex + exprEndMarker.OppositeMarker
-            let mutable exprStartMarker = productions.[exprStart]
+            let mutable exprStartMarker = productions[exprStart]
 
             // Remove the Done marker, reset start marker so it's considered unfinished.
             productions.RemoveAt(exprEndIndex)
             exprStartMarker.OppositeMarker <- Marker.InvalidPointer
-            productions.[exprStart] <- exprStartMarker
+            productions[exprStart] <- exprStartMarker
 
             // Process type args as part of reference expr.
             match ltRange, typeArgs with
@@ -962,7 +962,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         x.AdvanceToEnd(range)
         x.Builder.AlterToken(tokenMark, FSharpTokenType.CHAMELEON)
 
-        let lineStart = lineOffsets.[range.StartLine - 1]
+        let lineStart = lineOffsets[range.StartLine - 1]
         let data = expr, startOffset, lineStart
         x.Done(range, mark, ChameleonExpressionNodeType.Instance, data)
 

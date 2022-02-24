@@ -35,7 +35,7 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
             | :? IDeclaredModuleDeclaration as moduleDecl ->
                 if moduleDecl.AttributeLists.IsEmpty then
                     addOuterAttributeList true moduleDecl
-                moduleDecl.AttributeLists.[0]
+                moduleDecl.AttributeLists[0]
 
             | :? IFSharpTypeOrExtensionDeclaration as t ->
                 getTypeDeclarationAttributeList t

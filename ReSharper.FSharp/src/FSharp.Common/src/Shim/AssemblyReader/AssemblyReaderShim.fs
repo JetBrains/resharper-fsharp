@@ -161,11 +161,11 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         moduleDependenciesRecorded.Add(psiModule) |> ignore
 
     let recordReader path reader =
-        assemblyReadersByPath.[path] <- reader
+        assemblyReadersByPath[path] <- reader
 
         match reader with
         | ReferencedAssembly.ProjectOutput moduleReader ->
-            assemblyReadersByModule.[moduleReader.PsiModule] <- reader
+            assemblyReadersByModule[moduleReader.PsiModule] <- reader
         | _ -> ()
 
     let getOrCreateReaderFromModule (psiModule: IPsiModule) =

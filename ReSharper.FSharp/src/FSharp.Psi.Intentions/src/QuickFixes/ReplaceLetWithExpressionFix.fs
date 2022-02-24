@@ -31,11 +31,11 @@ type ReplaceLetWithExpressionFix(error: ExpectedExpressionAfterLetError) =
         let bindings = letExpr.Bindings
         bindings.Count = 1 &&
 
-        let binding = bindings.[0]
+        let binding = bindings[0]
         isValid binding.Expression && binding.ParametersDeclarationsEnumerable.IsEmpty()
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(letExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        let expr = ModificationUtil.ReplaceChild(letExpr, letExpr.Bindings.[0].Expression.Copy())
+        let expr = ModificationUtil.ReplaceChild(letExpr, letExpr.Bindings[0].Expression.Copy())
         removeDanglingIn expr
