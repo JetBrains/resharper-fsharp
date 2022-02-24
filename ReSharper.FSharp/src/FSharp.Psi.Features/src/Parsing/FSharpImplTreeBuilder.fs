@@ -635,8 +635,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
         if isSecondary then x.AdvanceToTokenOrRangeStart(FSharpTokenType.AND, range)
 
-        let mark = x.Mark(xmlDoc, range)
         let expr = x.FixExpression(expr)
+        let mark =
+            if xmlDoc.IsEmpty then x.Mark()
+            else x.MarkXmlDocOwner(xmlDoc, null, range)
 
         match kind with
         | SynBindingKind.StandaloneExpression
@@ -680,11 +682,12 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
     member x.ProcessLocalBinding(binding, isSecondary) =
         let (SynBinding(_, kind, _, _, attrs, XmlDoc xmlDoc, _, headPat, returnInfo, expr, range, _, _)) = binding
 
-        if isSecondary then
-            x.AdvanceToTokenOrRangeStart(FSharpTokenType.AND, range)
+        if isSecondary then x.AdvanceToTokenOrRangeStart(FSharpTokenType.AND, range)
 
         let expr = x.FixExpression(expr)
-        let mark = x.Mark(xmlDoc, range)
+        let mark =
+            if xmlDoc.IsEmpty then x.Mark()
+            else x.MarkXmlDocOwner(xmlDoc, null, range)
 
         match kind with
         | SynBindingKind.StandaloneExpression

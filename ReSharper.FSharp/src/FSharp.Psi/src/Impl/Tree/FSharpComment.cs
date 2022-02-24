@@ -95,14 +95,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   public class XmlDocBlock : FSharpCompositeElement
   {
-    [NotNull] private readonly CompositeNodeType myNodeType;
-
-    public XmlDocBlock([NotNull] CompositeNodeType nodeType)
-    {
-      myNodeType = nodeType;
-    }
-
     public override bool IsFiltered() => true;
-    public override NodeType NodeType => myNodeType;
+    public override NodeType NodeType => FSharpTokenType.XML_DOC_BLOCK;
   }
 }

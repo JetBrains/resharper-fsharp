@@ -74,7 +74,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         x.Mark()
 
     member x.Mark() =
-        // The base member is protected and cannot be used in closures.
+        /// The base member is protected and cannot be used in closures.
         base.Mark()
 
     member x.Done(mark, elementType) =
@@ -123,15 +123,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.AdvanceLexer()
 
     member x.MarkXmlDocOwner(xmlDoc: XmlDoc, expectedType: TokenNodeType, declarationRange: range) =
-        x.AdvanceToTokenOrRangeStart(expectedType, declarationRange)
-        let mark = x.Mark()
+        let mark = x.MarkTokenOrRange(expectedType, declarationRange)
         if not xmlDoc.IsEmpty then
             x.MarkAndDone(xmlDoc.Range, FSharpTokenType.XML_DOC_BLOCK)
         mark
-
-    member x.Mark(xmlDoc: XmlDoc, declarationRange: range) =
-        if xmlDoc.IsEmpty then x.Mark()
-        else x.MarkXmlDocOwner(xmlDoc, null, declarationRange)
 
     member x.ProcessReferenceName(lid: Ident list) =
         if lid.IsEmpty then () else
@@ -216,45 +211,34 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
     member x.StartTopLevelDeclaration(lid: LongIdent, attrs: SynAttributes, moduleKind, xmlDoc: XmlDoc, range) =
         match lid with
-        | IdentRange idRange :: _ ->
-            let mark =
-                match moduleKind with
-                | SynModuleOrNamespaceKind.AnonModule ->
-                    x.Mark()
-
-                | _ when attrs.IsEmpty ->
-                    // Ast namespace range starts after its identifier,
-                    // we try to locate the keyword followed by access modifiers.
-                    match moduleKind with
-                    | SynModuleOrNamespaceKind.NamedModule ->
-                        x.MarkXmlDocOwner(xmlDoc, null, range)
-                    | SynModuleOrNamespaceKind.DeclaredNamespace ->
-                        x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.NAMESPACE, idRange)
-                    | _ ->
-                        x.MarkXmlDocOwner(xmlDoc, null, idRange)
-
-                | _ ->
-                    x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
-
-            if moduleKind <> SynModuleOrNamespaceKind.AnonModule then
-                x.ProcessReferenceNameSkipLast(lid)
-
-            let elementType =
-                match moduleKind with
-                | SynModuleOrNamespaceKind.NamedModule -> ElementType.NAMED_MODULE_DECLARATION
-                | SynModuleOrNamespaceKind.AnonModule -> ElementType.ANON_MODULE_DECLARATION
-                | _ -> ElementType.NAMED_NAMESPACE_DECLARATION
-
-            Some mark, elementType
+        | [] ->
+            match moduleKind with
+            | SynModuleOrNamespaceKind.GlobalNamespace ->
+                x.AdvanceToTokenOrRangeStart(FSharpTokenType.NAMESPACE, range)
+                let mark = x.Mark()
+                Some mark, ElementType.GLOBAL_NAMESPACE_DECLARATION
+            | _ -> None, null
 
         | _ ->
 
-        match moduleKind with
-        | SynModuleOrNamespaceKind.GlobalNamespace ->
-            x.AdvanceToTokenOrRangeStart(FSharpTokenType.NAMESPACE, range)
-            let mark = x.Mark()
-            Some mark, ElementType.GLOBAL_NAMESPACE_DECLARATION
-        | _ -> None, null
+        let mark =
+            match moduleKind with
+            | SynModuleOrNamespaceKind.AnonModule ->
+                x.Mark()
+
+            | _ ->
+                x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
+
+        if moduleKind <> SynModuleOrNamespaceKind.AnonModule then
+            x.ProcessReferenceNameSkipLast(lid)
+
+        let elementType =
+            match moduleKind with
+            | SynModuleOrNamespaceKind.NamedModule -> ElementType.NAMED_MODULE_DECLARATION
+            | SynModuleOrNamespaceKind.AnonModule -> ElementType.ANON_MODULE_DECLARATION
+            | _ -> ElementType.NAMED_NAMESPACE_DECLARATION
+
+        Some mark, elementType
 
     member x.FinishTopLevelDeclaration(mark: int option, range, elementType) =
         x.AdvanceToEnd(range)
@@ -264,9 +248,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
     /// Process xmlDoc and attrbiutes
     member x.MarkAndProcessIntro(attrs: SynAttributes, xmlDoc: XmlDoc, tokenType: TokenNodeType, range: range) =
         let mark = x.MarkXmlDocOwner(xmlDoc, tokenType, range)
-        match attrs with
-        | [] -> ()
-        | _ -> x.ProcessAttributeLists(attrs)
+        x.ProcessAttributeLists(attrs)
         mark
 
     member x.ProcessOpenDeclTarget(openDeclTarget, range) =
@@ -370,7 +352,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             let representationMark = x.Mark(range)
 
             if not fields.IsEmpty then
-                let SynField(range = firstFieldRange) = fields.Head
+                let (SynField(range = firstFieldRange)) as firstField = fields.Head
                 let (SynField(range = lastFieldRange)) = List.last fields
 
                 let fieldListMark = x.Mark(firstFieldRange)

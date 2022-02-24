@@ -129,7 +129,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       {
       }
 
-      public override CompositeElement Create() => new XmlDocBlock(this);
+      public override CompositeElement Create() => new XmlDocBlock();
     }
 
     public const int WHITESPACE_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 1;
