@@ -538,4 +538,13 @@
     <Behavour overlapResolvePolicy="NONE"/>
   </Error>
 
+  <Warning compilerGroup="FSharpErrors" name="InvalidXmlDocPosition" ID="FS3520: XML comment is not placed on a valid language element">
+    <Parameter type="DocComment" name="comment"/>
+    <Message value="XML comment is not placed on a valid language element."/>
+    <Range>comment.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceXmlDocWithLineCommentFix</QuickFix>
+    <QuickFix>RemoveXmlDocFix</QuickFix>
+  </Warning>
+
 </Errors>
