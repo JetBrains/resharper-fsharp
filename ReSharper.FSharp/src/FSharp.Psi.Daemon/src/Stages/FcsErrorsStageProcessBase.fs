@@ -79,6 +79,7 @@ module FSharpErrors =
     let [<Literal>] UnusedThisVariable = 1183
     let [<Literal>] CantTakeAddressOfExpression = 3236
     let [<Literal>] SingleQuoteInSingleQuote = 3373
+    let [<Literal>] InvalidXmlDocPosition = 3520
 
     let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
     let [<Literal>] undefinedGetSliceMessageSuffix = " does not define the field, constructor or member 'GetSlice'."
@@ -454,7 +455,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
     abstract ShouldAddDiagnostic: error: FSharpDiagnostic * range: DocumentRange -> bool
     default x.ShouldAddDiagnostic(error: FSharpDiagnostic, _) =
-        error.ErrorNumber <> UnrecognizedOption
+        error.ErrorNumber <> UnrecognizedOption &&
+        error.ErrorNumber <> InvalidXmlDocPosition
 
     member x.Execute(errors: FSharpDiagnostic[], committer: Action<DaemonStageResult>) =
         let daemonProcess = x.DaemonProcess

@@ -92,6 +92,10 @@
         <Title>Redundant '.' in indexer</Title>
         <Description>'.' can be removed in indexers.</Description>
       </Tag>
+      <Tag name="InvalidXmlDocPosition" default="WARNING">
+        <Title>Invalid XML comment position</Title>
+        <Description>XML comment is not placed on a valid language element.</Description>
+      </Tag>
 
     </Group>
   </SeverityConfiguration>
@@ -319,4 +323,12 @@
     <QuickFix>RemoveIndexerDotFix</QuickFix>
   </Warning>
 
+  <Warning name="InvalidXmlDocPosition" configurableSeverity="InvalidXmlDocPosition">
+    <Parameter type="DocComment" name="comment"/>
+    <Message value="XML comment is not placed on a valid language element."/>
+    <Range>comment.GetHighlightingRange()</Range>
+    <QuickFix>ReplaceXmlDocWithLineCommentFix</QuickFix>
+    <QuickFix>RemoveXmlDocFix</QuickFix>
+  </Warning>
+  
 </Errors>

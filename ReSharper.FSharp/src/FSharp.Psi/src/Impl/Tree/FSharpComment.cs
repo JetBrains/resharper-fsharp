@@ -84,9 +84,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return string.Empty;
       }
     }
+
+    public static FSharpComment CreateLineComment(string text) =>
+      new FSharpComment(FSharpTokenType.LINE_COMMENT, "//" + text);
   }
 
-  internal class DocComment : FSharpComment
+  public class DocComment : FSharpComment
   {
     public DocComment([NotNull] TokenNodeType nodeType, [NotNull] string text) : base(nodeType, text)
     {

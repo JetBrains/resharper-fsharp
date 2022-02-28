@@ -32,6 +32,7 @@
     <Compile Include="src\Daemon\LambdaAnalyzerTest.fs" />
     <Compile Include="src\Daemon\InterpolatedStringCandidateTest.fs" />
     <Compile Include="src\Daemon\IfExpressionAnalyzerTest.fs" />
+    <Compile Include="src\Daemon\XmlDocAnalyzerTest.fs" />
     <Compile Include="src\Intentions\IntentionsTestBase.fs" />
     <Compile Include="src\Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="src\Intentions\ToMultilineRecordTest.fs" />
@@ -107,6 +108,7 @@
     <Compile Include="src\QuickFixes\RemoveIndexerDotFixTest.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithTripleQuotedInterpolatedStringFixTest.fs" />
     <Compile Include="src\QuickFixes\ReplaceReturnTypeTest.fs" />
+    <Compile Include="src\QuickFixes\XmlDocFixesTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
