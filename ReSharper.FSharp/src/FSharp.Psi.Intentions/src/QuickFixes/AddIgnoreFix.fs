@@ -34,7 +34,7 @@ type AddIgnoreFix(expr: IFSharpExpression) =
             let clauses = matchExpr.Clauses
             if clauses.Count < 1 then None else
 
-            Some(clauses.[0].Expression, "First clause")
+            Some(clauses[0].Expression, "First clause")
 
         | _ -> None
 

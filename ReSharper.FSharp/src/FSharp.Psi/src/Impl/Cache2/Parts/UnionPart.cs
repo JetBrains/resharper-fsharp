@@ -129,4 +129,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     IList<IUnionCase> Cases { get; }
     TreeNodeCollection<IUnionCaseDeclaration> CaseDeclarations { get; }
   }
+
+  public interface ITypeAbbreviationOrDeclarationPart : IUnionPart
+  {
+    bool IsUnionCase { get; }
+  }
 }

@@ -18,7 +18,7 @@ type MatchPostfixTemplate() =
     inherit FSharpPostfixTemplateBase()
 
     override x.CreateBehavior(info) = MatchPostfixTemplateBehavior(info) :> _
-    override x.TryCreateInfo(context) = MatchPostfixTemplateInfo(context.AllExpressions.[0]) :> _
+    override x.TryCreateInfo(context) = MatchPostfixTemplateInfo(context.AllExpressions[0]) :> _
 
 
 and MatchPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
@@ -44,7 +44,7 @@ and MatchPostfixTemplateBehavior(info) =
         let matchExpr = node.As<IMatchExpr>()
         if isNull matchExpr then () else
 
-        let matchClause = matchExpr.Clauses.[0]
+        let matchClause = matchExpr.Clauses[0]
         let hotspotInfos =
             let templateField = TemplateField("Foo", SimpleHotspotExpression(null), 0)
             HotspotInfo(templateField, matchClause.Pattern.GetDocumentRange(), KeepExistingText = true)

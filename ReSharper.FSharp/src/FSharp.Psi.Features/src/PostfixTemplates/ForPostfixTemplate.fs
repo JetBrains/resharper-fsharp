@@ -19,7 +19,7 @@ type ForPostfixTemplate() =
     inherit FSharpPostfixTemplateBase()
 
     override x.CreateBehavior(info) = ForPostfixTemplateBehavior(info) :> _
-    override x.TryCreateInfo(context) = ForPostfixTemplateInfo(context.AllExpressions.[0]) :> _
+    override x.TryCreateInfo(context) = ForPostfixTemplateInfo(context.AllExpressions[0]) :> _
 
 
 and ForPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =

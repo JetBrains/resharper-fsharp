@@ -1,5 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open System
 open System.IO
 open FSharp.Compiler.IO
 open JetBrains.Lifetimes
@@ -65,9 +66,15 @@ type LoggingShim(name, lifetime: Lifetime, writer: TextWriter) =
 
     override x.GetLastWriteTime(path) =
         writer.WriteLine$"{name}: Get last write time (path): {path.Name}"
-        base.GetLastWriteTime(path)
+        try
+            base.GetLastWriteTime(path)
+        with :? FileNotFoundException ->
+            DateTime.MinValue
 
     override x.GetLastWriteTimeShim(fileName) =
         let path = VirtualFileSystemPath.Parse(fileName, InteractionContext.SolutionContext)
         writer.WriteLine$"{name}: Get last write time (string): {path.Name}"
-        base.GetLastWriteTimeShim(fileName)
+        try
+            base.GetLastWriteTimeShim(fileName)
+        with :? FileNotFoundException ->
+            DateTime.MinValue

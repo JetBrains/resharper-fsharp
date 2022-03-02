@@ -88,6 +88,11 @@
         <Title>Redundant 'as' pattern</Title>
         <Description>'as' pattern can be replaced with its name.</Description>
       </Tag>
+      <Tag name="FSharpRedundantDotInIndexer" default="WARNING">
+        <Title>Redundant '.' in indexer</Title>
+        <Description>'.' can be removed in indexers.</Description>
+      </Tag>
+
     </Group>
   </SeverityConfiguration>
 
@@ -304,6 +309,14 @@
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getAsPatternRange asPat</Range>
     <QuickFix>RemoveRedundantAsPatFix</QuickFix>
+  </Warning>
+
+  <Warning name="RedundantIndexerDot" configurableSeverity="FSharpRedundantDotInIndexer">
+    <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
+    <Message value="Redundant '.'"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Range>getIndexerDotRange indexerExpr</Range>
+    <QuickFix>RemoveIndexerDotFix</QuickFix>
   </Warning>
 
 </Errors>

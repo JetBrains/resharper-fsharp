@@ -26,7 +26,7 @@ let isPredefinedFunctionRef name (expr: IFSharpExpression) =
     if isNull declaredElement then false else
 
     let containingType = declaredElement.GetContainingType()
-    isNotNull containingType && containingType.GetClrName() = predefinedFunctionTypes.[name]
+    isNotNull containingType && containingType.GetClrName() = predefinedFunctionTypes[name]
 
 let isPredefinedInfixOpApp name (binaryAppExpr: IBinaryAppExpr) =
     if isNull binaryAppExpr then false else

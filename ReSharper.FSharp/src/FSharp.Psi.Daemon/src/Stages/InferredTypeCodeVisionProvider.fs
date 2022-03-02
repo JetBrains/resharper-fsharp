@@ -4,10 +4,12 @@ open System.Text
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
 open JetBrains.Application
+open JetBrains.Application.Settings
 open JetBrains.Application.UI.Components
 open JetBrains.Application.UI.PopupLayout
 open JetBrains.Application.UI.Tooltips
 open JetBrains.ProjectModel
+open JetBrains.RdBackend.Common.Platform.CodeInsights
 open JetBrains.ReSharper.Daemon.CodeInsights
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.RdBackend.Common.Features.Services
@@ -25,6 +27,7 @@ open JetBrains.Util
 
 module FSharpInferredTypeHighlighting =
     let [<Literal>] Id = "CodeInsights"
+    let [<Literal>] ProviderId = "F# Inferred types"
 
 [<StaticSeverityHighlighting(
     Severity.INFO, typeof<HighlightingGroupIds.CodeInsights>,
@@ -38,12 +41,11 @@ type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider
 
 [<ShellComponent>]
 type InferredTypeCodeVisionProvider() =
-    let [<Literal>] id = "F# Inferred types"
-    let [<Literal>] copiedText = "Inferred type copied to clipboard"
+    let [<Literal>] TypeCopiedTooltipText = "Inferred type copied to clipboard"
 
     interface ICodeInsightsProvider with
-        member x.ProviderId = id
-        member x.DisplayName = id
+        member x.ProviderId = FSharpInferredTypeHighlighting.ProviderId
+        member x.DisplayName = FSharpInferredTypeHighlighting.ProviderId
         member x.DefaultAnchor = CodeLensAnchorKind.Default
         member x.RelativeOrderings = [| CodeLensRelativeOrderingFirst() :> CodeLensRelativeOrdering |] :> _
 
@@ -56,11 +58,12 @@ type InferredTypeCodeVisionProvider() =
             let shell = Shell.Instance
             shell.GetComponent<Clipboard>().SetText(entry.Text)
             let documentMarkupManager = shell.GetComponent<IDocumentMarkupManager>()
-            shell.GetComponent<ITooltipManager>().Show(copiedText, PopupWindowContextSource(fun _ ->
+            shell.GetComponent<ITooltipManager>().Show(TypeCopiedTooltipText, PopupWindowContextSource(fun _ ->
                 let documentMarkup = documentMarkupManager.TryGetMarkupModel(highlighting.Range.Document)
                 if isNull documentMarkup then null else
                 let highlighter =
-                    documentMarkup.GetFilteredHighlighters(id, fun h -> highlighting.Equals(h.UserData))
+                    documentMarkup.GetFilteredHighlighters(FSharpInferredTypeHighlighting.ProviderId,
+                        fun h -> highlighting.Equals(h.UserData))
                     |> Seq.tryHead
                     |> Option.toObj
 
@@ -95,7 +98,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
 
         let paramGroups = mfv.CurriedParameterGroups
         if paramGroups.IsEmpty() then returnTypeStr else
-        if paramGroups.Count = 1 && paramGroups.[0].IsEmpty() && mfv.IsMember then "unit -> " + returnTypeStr else
+        if paramGroups.Count = 1 && paramGroups[0].IsEmpty() && mfv.IsMember then "unit -> " + returnTypeStr else
 
         let builder = StringBuilder()
         let isSingleGroup = paramGroups.Count = 1
@@ -131,7 +134,17 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
 
     override x.Execute(committer) =
         let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
-        fsFile.ProcessThisAndDescendants(Processor(x, consumer))
+
+        let isDisabled =
+            // todo: fix zoning?
+            not Shell.Instance.IsTestShell &&
+
+            x.DaemonProcess.ContextBoundSettingsStore.GetIndexedValue(
+                (fun (key: CodeInsightsSettings) -> key.DisabledProviders), FSharpInferredTypeHighlighting.ProviderId)
+
+        if not isDisabled then
+            fsFile.ProcessThisAndDescendants(Processor(x, consumer))
+
         committer.Invoke(DaemonStageResult(consumer.Highlightings))
 
     override x.VisitTopBinding(binding, consumer) =

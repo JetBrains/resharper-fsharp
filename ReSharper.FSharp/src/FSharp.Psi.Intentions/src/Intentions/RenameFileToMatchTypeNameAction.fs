@@ -21,8 +21,8 @@ type RenameFileToMatchTypeNameAction(dataProvider: FSharpContextActionDataProvid
         let modules = HashSet<IFSharpModule>()
 
         let decls = dataProvider.PsiFile.ModuleDeclarations
-        if decls.Count = 1 && decls.[0] :? INamedModuleDeclaration then
-            decls.[0].DeclaredElement.Equals(typeElement) else
+        if decls.Count = 1 && decls[0] :? INamedModuleDeclaration then
+            decls[0].DeclaredElement.Equals(typeElement) else
 
         for moduleDecl in decls do
             for md in moduleDecl.MembersEnumerable do

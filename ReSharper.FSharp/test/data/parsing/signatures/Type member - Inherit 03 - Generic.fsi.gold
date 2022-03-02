@@ -26,5 +26,5 @@ IFSharpSigFile
                 ITypeReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:int)
               FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
-        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

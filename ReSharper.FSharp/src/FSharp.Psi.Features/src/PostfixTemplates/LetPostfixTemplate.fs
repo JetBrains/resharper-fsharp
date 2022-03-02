@@ -27,7 +27,7 @@ type LetPostfixTemplate() =
         LetPostfixTemplateBehavior(info) :> _
 
     override this.TryCreateInfo(context) =
-        let context = context.AllExpressions.[0]
+        let context = context.AllExpressions[0]
         if not (isApplicable context.Expression) then null else
 
         LetPostfixTemplateInfo(context) :> _

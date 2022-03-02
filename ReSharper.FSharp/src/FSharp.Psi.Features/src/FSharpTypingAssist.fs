@@ -221,7 +221,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         nodeTypeSet tokenTypes
 
     let isStringLiteralStopper (tokenType: TokenNodeType) =
-        stringLiteralStoppers.[tokenType] || isNotNull tokenType && tokenType.IsStringLiteral
+        stringLiteralStoppers[tokenType] || isNotNull tokenType && tokenType.IsStringLiteral
 
 
     let strings =
@@ -386,7 +386,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let endOffset = document.GetLineEndOffsetNoLineBreak(line)
 
         let mutable pos = startOffset
-        while pos < endOffset && Char.IsWhiteSpace(buffer.[pos]) do
+        while pos < endOffset && Char.IsWhiteSpace(buffer[pos]) do
             pos <- pos + 1
 
         pos - startOffset
@@ -449,7 +449,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let startOffset = document.GetLineStartOffset(caretLine)
         let mutable pos = startOffset
 
-        while pos < caretOffset && Char.IsWhiteSpace(buffer.[pos]) do
+        while pos < caretOffset && Char.IsWhiteSpace(buffer[pos]) do
             pos <- pos + 1
 
         let indent = pos - startOffset
@@ -721,10 +721,10 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                         Some range
 
                     // for i = ... to ... do {caret}
-                    | SynExpr.For (_, IdentRange range, _, _, _, ExprRange lastRange, _, _)
+                    | SynExpr.For (_, _, IdentRange range, _, _, _, _, ExprRange lastRange, _)
 
                     // for ... in ... do {caret}
-                    | SynExpr.ForEach (_, _, _, PatRange range, ExprRange lastRange, _, _) when
+                    | SynExpr.ForEach (_, _, _, _, PatRange range, ExprRange lastRange, _, _) when
                             getEndOffset document lastRange = prevTokenEnd ->
                         Some range
 
@@ -781,7 +781,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let documentCoords = document.GetCoordsByOffset(lexer.TokenStart)
         match SyntaxTraversal.Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
         | None -> false
-        | Some (SynMatchClause.SynMatchClause (_, _, _, _, range, _)) ->
+        | Some (SynMatchClause.SynMatchClause (_, _, _, range, _, _)) ->
 
         use cookie = LexerStateCookie.Create(lexer)
 
@@ -1214,7 +1214,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         if not (matchingBrackets.TryGetValue(typedBracket, &secondBracket)) then false else
 
         let lBrace, rBrace = if typedBracketIsLeft then typedBracket, secondBracket else secondBracket, typedBracket
-        let lToken, rToken = bracketToTokenType.[lBrace], bracketToTokenType.[rBrace]
+        let lToken, rToken = bracketToTokenType[lBrace], bracketToTokenType[rBrace]
         x.HandleSurroundTyping(context, lBrace, rBrace, lToken, rToken, JetFunc<_>.False)
 
     member x.HandleLeftBracket(context: ITypingContext) =
@@ -1225,7 +1225,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
              (fun _ -> FSharpBracketMatcher() :> _),
              (fun _ -> x.TrySurroundWithBraces(context, context.Char, true, leftToRightBracket)),
              (fun tokenType _ -> tokensSuitableForRightBracket.Contains(tokenType)),
-             (fun _ -> rightBracketsText.[context.Char])) |> ignore
+             (fun _ -> rightBracketsText[context.Char])) |> ignore
 
         // todo: insert pair brace in `$"{ {caret} }"`
 
@@ -1315,7 +1315,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
     member x.SkipBacktickInId(textControl: ITextControl, lexer: CachingLexer, offset) =
         if not (lexer.FindTokenAt(offset)) then false else
         if lexer.TokenType != FSharpTokenType.IDENTIFIER then false else
-        if offset - 2 > lexer.TokenStart && offset + 2 < lexer.TokenEnd then false else
+        if offset + 2 < lexer.TokenEnd then false else
         if not (lexer.GetTokenText().IsEscapedWithBackticks()) then false else
 
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
@@ -1324,7 +1324,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
     member x.SkipQuote(textControl: ITextControl, typedChar: char) =
         let buffer = textControl.Document.Buffer
         let offset = textControl.Caret.Offset()
-        if offset >= buffer.Length || typedChar <> buffer.[offset] then false else
+        if offset >= buffer.Length || typedChar <> buffer[offset] then false else
 
         let skipEndQuote (lexer: CachingLexer) =
             typedChar = getStringEndingQuote lexer.TokenType &&
@@ -1337,7 +1337,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
-        if not strings.[lexer.TokenType] || offset = lexer.TokenEnd then false else
+        if not strings[lexer.TokenType] || offset = lexer.TokenEnd then false else
         if not (skipEndQuote lexer || skipEscapedQuoteInVerbatim lexer) then false else
 
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
@@ -1502,13 +1502,13 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let buffer = document.Buffer
 
         let rec skipWhitespaceBefore offset =
-            if offset > 0 && isWhitespace buffer.[offset - 1] then
+            if offset > 0 && isWhitespace buffer[offset - 1] then
                 skipWhitespaceBefore (offset - 1)
             else offset
 
         startOffset <- skipWhitespaceBefore startOffset
 
-        if startOffset > 0 && buffer.[startOffset - 1] = ';' then
+        if startOffset > 0 && buffer[startOffset - 1] = ';' then
             let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
             if not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)) then
                 let fsFile = textControl.GetFSharpFile(solution)
@@ -1524,7 +1524,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         let lineEndOffset = document.GetLineEndOffsetNoLineBreak(line)
         if trimAfterCaret = TrimTrailingSpaces.Yes then
-            while endOffset < lineEndOffset && isWhitespace buffer.[endOffset] do
+            while endOffset < lineEndOffset && isWhitespace buffer[endOffset] do
                 endOffset <- endOffset + 1
 
         let additionalSpaces =
@@ -1649,13 +1649,13 @@ let findUnmatchedBracketToLeft (lexer: CachingLexer) offset minOffset =
     let mutable foundToken = false
 
     while not foundToken && lexer.TokenStart >= minOffset do
-        if FSharpTokenType.RightBraces.[lexer.TokenType] then
+        if FSharpTokenType.RightBraces[lexer.TokenType] then
             if matcher.FindMatchingBracket(lexer) then
                 lexer.Advance(-1)
 
-        if FSharpTokenType.LeftBraces.[lexer.TokenType] then
+        if FSharpTokenType.LeftBraces[lexer.TokenType] then
             foundToken <- true
-        elif not FSharpTokenType.RightBraces.[lexer.TokenType] then
+        elif not FSharpTokenType.RightBraces[lexer.TokenType] then
             lexer.Advance(-1)
 
     foundToken
@@ -1693,7 +1693,7 @@ let lineEndsWithString (lexer: CachingLexer) (document: IDocument) line =
 
 
 let shouldTrimSpacesBeforeToken (tokenType: TokenNodeType) =
-    if isNull tokenType || FSharpTokenType.RightBraces.[tokenType] || tokenType.IsComment then TrimTrailingSpaces.No
+    if isNull tokenType || FSharpTokenType.RightBraces[tokenType] || tokenType.IsComment then TrimTrailingSpaces.No
     else TrimTrailingSpaces.Yes
 
 

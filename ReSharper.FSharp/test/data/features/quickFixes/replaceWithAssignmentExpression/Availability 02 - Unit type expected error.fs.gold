@@ -2,7 +2,7 @@
 
 let f(): unit =
     let a = [|0|]
-    |a.[0] = 5|(0)
+    |a|.|(1)[0] = 5|(0)
 
 ------------------------------------------------
 0: This expression was expected to have type
@@ -13,3 +13,9 @@ QUICKFIXES:
 Replace with '<-' assignment
 Ignore value
 Introduce 'let' binding
+1: Redundant '.'
+QUICKFIXES:
+Remove redundant '.'
+--Remove redundant '.' in file
+--Remove redundant '.' in project
+--Remove redundant '.' in solution

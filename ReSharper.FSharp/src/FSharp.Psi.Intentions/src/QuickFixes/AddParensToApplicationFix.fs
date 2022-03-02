@@ -70,7 +70,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
                 match ref.Reference.GetFcsSymbol() with
                 | :? FSharpMemberOrFunctionOrValue as mfv when
                     let parameters = mfv.CurriedParameterGroups
-                    parameters.Count > 0 && parameters.[0].Count > 0 ->
+                    parameters.Count > 0 && parameters[0].Count > 0 ->
                         match mfv.FullTypeSafe with
                         | Some t -> List.length (getFunctionTypeArgs true t) - 1
                         | None -> 0

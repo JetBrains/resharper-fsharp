@@ -7,6 +7,7 @@ open FSharp.Compiler.Tokenization
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -69,7 +70,7 @@ module FSharpNamingService =
                         let fsExpr = treeNode.As<IFSharpExpression>()
                         if scope.Expr == fsExpr then
                             for name in scope.Names do
-                                scopedNames.[name] <-
+                                scopedNames[name] <-
                                     let mutable count = Unchecked.defaultof<_>
                                     if scopedNames.TryGetValue(name, &count) then count + 1 else 1
 
@@ -145,7 +146,7 @@ module FSharpNamingService =
                             if scopedNames.TryGetValue(name, &count) then
                                 match count with
                                 | 1 -> scopedNames.Remove(name) |> ignore
-                                | count -> scopedNames.[name] <- count - 1
+                                | count -> scopedNames[name] <- count - 1
 
                         scopes.Pop() |> ignore
             }
@@ -358,7 +359,7 @@ type FSharpNamingService(language: FSharpLanguage) =
         let psiServices = typeElement.GetPsiServices()
         match psiServices.Naming.Parsing.GetName(typeElement, "unknown", policyProvider).GetRoot() with
         | FSharpNameRoot root ->
-            let typeArg = declaredType.GetSubstitution().[typeParameters.[0]]
+            let typeArg = declaredType.GetSubstitution().[typeParameters[0]]
             let typeArgRoots = x.SuggestRoots(typeArg, policyProvider) |> List.ofSeq
             let newRoots = typeArgRoots |> List.map (withSuffix root.Words)
             seq {
@@ -397,11 +398,13 @@ type FSharpNamingService(language: FSharpLanguage) =
             | :? ITypeElement as typeElement -> typeElement.IsException()
             | _ -> false
 
+        let name = name.RemoveBackticks()
+
         if name.IsEmpty() then false else
-        if isUnionCaseLike element && not (isValidCaseStart name.[0]) then false else
+        if isUnionCaseLike element && not (isValidCaseStart name[0]) then false else
         if isTypeLike element && name.IndexOfAny(notAllowedInTypes) <> -1 then false else
 
-        not (startsWith "`" name || endsWith "`" name || name.ContainsNewLine() || name.Contains("``"))
+        not (name.ContainsNewLine() || name.Contains("``") || endsWith "`" name)
 
     override x.SuggestRoots(treeNode: ITreeNode, useExpectedTypes, policyProvider) =
         match treeNode with
@@ -539,7 +542,7 @@ type FSharpNamingService(language: FSharpLanguage) =
                 let defaultItemName = if isSingle then "Item" else $"Item{indexOf + 1}"
 
                 if indexOf >= 0 && indexOf < fcsFields.Count then
-                    let fcsField = fcsFields.[indexOf]
+                    let fcsField = fcsFields[indexOf]
                     let name = fcsField.Name
                     if name <> defaultItemName then
                         FSharpNamingService.addNames name fsPattern namesCollection |> ignore

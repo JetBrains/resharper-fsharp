@@ -351,7 +351,7 @@ module OpenScope =
 
         let offset = treeNode.GetTreeStartOffset()
         if scopes.Count = 1 then
-            includesOffset offset scopes.[0]
+            includesOffset offset scopes[0]
         else
             scopes |> Seq.exists (includesOffset offset)
 

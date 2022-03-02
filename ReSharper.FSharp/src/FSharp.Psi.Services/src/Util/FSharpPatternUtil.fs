@@ -123,6 +123,6 @@ module ParentTraversal =
         | :? ITupleExpr as tupleExpr, PatternParentTraverseStep.Tuple(n, _) ->
             let tupleItems = tupleExpr.Expressions
             if tupleItems.Count <= n then null else
-            tryTraverseExprPath rest tupleItems.[n]
+            tryTraverseExprPath rest tupleItems[n]
 
         | _ -> null

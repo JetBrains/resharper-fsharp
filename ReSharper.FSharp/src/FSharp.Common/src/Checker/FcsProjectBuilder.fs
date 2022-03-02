@@ -207,7 +207,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
         otherOptions.AddRange(resources |> Seq.map (fun (r: VirtualFileSystemPath) -> "--resource:" + r.FullPath))
         let fileIndices = Dictionary<VirtualFileSystemPath, int>()
-        Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
+        Array.iteri (fun i p -> fileIndices[p] <- i) filePaths
 
         let projectOptions =
             { ProjectFileName = $"{project.ProjectFileLocation}.{targetFrameworkId}.fsproj"

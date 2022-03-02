@@ -81,10 +81,10 @@ let removeAttributeFromList (attr: IAttribute) =
         deleteChildRange attrList.LBrack.NextSibling rBrack.PrevSibling else
 
     if attrs.Count > 1 && attrs.First() == attr then
-        deleteChildRange attrList.LBrack.NextSibling attrs.[1].PrevSibling else
+        deleteChildRange attrList.LBrack.NextSibling attrs[1].PrevSibling else
 
     if isNotNull rBrack && attrs.Last() == attr then
-        deleteChildRange attrs.[attrs.Count - 2].NextSibling rBrack.PrevSibling else
+        deleteChildRange attrs[attrs.Count - 2].NextSibling rBrack.PrevSibling else
 
     let isFirstOnLine = isFirstMeaningfulNodeOnLine attr
 
@@ -171,16 +171,16 @@ let isOuterAttributeList (typeDecl: IFSharpTypeOrExtensionDeclaration) (attrList
 let getTypeDeclarationAttributeList (typeDecl: #IFSharpTypeOrExtensionDeclaration) =
     if typeDecl.IsPrimary then
         let attributeLists = typeDecl.AttributeLists
-        if attributeLists.Count > 0 && isOuterAttributeList typeDecl attributeLists.[0] then
-            attributeLists.[0]
+        if attributeLists.Count > 0 && isOuterAttributeList typeDecl attributeLists[0] then
+            attributeLists[0]
         else
             addOuterAttributeList true typeDecl
-            typeDecl.AttributeLists.[0]
+            typeDecl.AttributeLists[0]
     else
         let attributeLists = typeDecl.AttributeLists
         if attributeLists.IsEmpty then
             addAttributeListToTypeDeclaration typeDecl
-        typeDecl.AttributeLists.[0]
+        typeDecl.AttributeLists[0]
 
 let resolvesToType (clrTypeName: IClrTypeName) (attr: IAttribute) =
     let reference = attr.ReferenceName.Reference

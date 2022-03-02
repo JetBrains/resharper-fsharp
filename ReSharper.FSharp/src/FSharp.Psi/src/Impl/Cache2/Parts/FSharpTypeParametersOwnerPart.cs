@@ -89,11 +89,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     private IEnumerable<ITypeConstraint> GetAllTypeParameterConstraints()
     {
       if (!(GetDeclaration() is IFSharpTypeDeclaration typeDecl))
-        return EmptyList<ITypeConstraint>.Instance;
+        yield break;
 
-      return typeDecl.PostfixTypeParameterList is { } typeParamDeclList
-        ? typeParamDeclList.ConstraintsEnumerable.Concat(typeDecl.ConstraintsEnumerable)
-        : typeDecl.ConstraintsEnumerable;
+      if (typeDecl.PostfixTypeParameterList is {TypeConstraintsClause: { } typeParamListClause})
+        foreach (var constraint in typeParamListClause.Constraints)
+          yield return constraint;
+
+      if (typeDecl.TypeConstraintsClause is { } typeDeclClause)
+        foreach (var constraint in typeDeclClause.Constraints)
+          yield return constraint;
     }
 
     private IEnumerable<ITypeConstraint> GetTypeParameterConstraints(string name)

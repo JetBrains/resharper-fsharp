@@ -41,7 +41,7 @@ type SpecifyTypeFixBase(refExpr: IQualifiedExpr) =
         isNotNull declaredElement && this.IsApplicable(declaredElement) &&
 
         let declarations = declaredElement.GetDeclarations()
-        declarations.Count = 1 && this.IsApplicable(declarations.[0])
+        declarations.Count = 1 && this.IsApplicable(declarations[0])
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(this.QualifierRefExpr.IsPhysical())

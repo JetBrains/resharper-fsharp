@@ -41,7 +41,7 @@ type SetNameAction(dataProvider: FSharpContextActionDataProvider) =
             |> addNamesForType (wildPat.GetPatternType())
             |> prepareNamesCollection EmptySet.Instance wildPat
 
-        let name = if names.Count > 0 then names.[0] else "x"
+        let name = if names.Count > 0 then names[0] else "x"
 
         let elementType =
             match skipIntermediatePatParents wildPat with

@@ -15,12 +15,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeStyle
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.TextControl
+open JetBrains.Util
 open JetBrains.Util.Text
 
 type IFile with
@@ -317,6 +319,14 @@ module PsiModificationUtil =
     /// A shorthand helper for PsiModificationUtil.replace.
     let replaceWithToken oldChild (newChildTokenType: TokenNodeType) =
         replace oldChild (newChildTokenType.CreateLeafElement())
+
+    let replaceWithNodeKeepChildren (oldChild: ITreeNode) (newChildNodeType: CompositeNodeType) =
+        use disableFormatter = new DisableCodeFormatter()
+
+        let newNode = ModificationUtil.ReplaceChild(oldChild, newChildNodeType.Create())
+        LowLevelModificationUtil.AddChild(newNode, oldChild.Children().AsArray())
+
+        newNode
 
     let deleteChildRange first last =
         ModificationUtil.DeleteChildRange(first, last)

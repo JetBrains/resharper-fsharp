@@ -58,16 +58,6 @@ type FSharpCustomRenameModel(declaredElement, reference, lifetime, changeNameKin
     member x.ChangeNameKind = changeNameKind
 
 
-type FSharpAtomicRename(declaredElement, newName, doNotShowBindingConflicts) =
-    inherit AtomicRename(declaredElement, newName, doNotShowBindingConflicts)
-
-    override x.SetName(declaration, renameRefactoring) =
-        match declaration with
-        | :? IFSharpDeclaration as fsDeclaration ->
-            fsDeclaration.SetName(x.NewName, renameRefactoring.Workflow.FSharpChangeNameKind)
-        | declaration -> failwithf "Got declaration: %O" declaration
-
-
 type FSharpAnonRecordFieldAtomicRename(declaredElement, newName) =
     inherit AnonymousTypePropertyAtomicRenameBase(declaredElement, newName)
 
@@ -178,6 +168,12 @@ type FSharpRenameHelper(namingService: FSharpNamingService, settingsStore: ISett
         | :? IWildPat as wil -> wil.GetDocumentRange()
         | _ -> base.GetNameDocumentRangeForRename(declaration, initialName)
 
+    override this.SetName(declaration, newName, refactoring) =
+        match declaration with
+        | :? IFSharpDeclaration as fsDeclaration ->
+            fsDeclaration.SetName(newName, refactoring.Workflow.FSharpChangeNameKind)
+        | declaration -> failwithf "Got declaration: %O" declaration
+
 
 type FSharpNameValidationRule(property, element: IDeclaredElement, namingService: FSharpNamingService) as this =
     inherit SimpleValidationRuleOnProperty<string>(property, element.GetSolution().Locks)
@@ -217,9 +213,8 @@ type FSharpAtomicRenamesFactory() =
         match declaredElement with
         | :? IFSharpAnonRecordFieldProperty ->
             [| FSharpAnonRecordFieldAtomicRename(declaredElement, newName) :> AtomicRenameBase |] :> _
-
         | _ ->
-            [| FSharpAtomicRename(declaredElement, newName, doNotAddBindingConflicts) :> AtomicRenameBase |] :> _
+            [| AtomicRename(declaredElement, newName, doNotAddBindingConflicts) |]
 
 
 [<RenamePart>]
@@ -249,7 +244,7 @@ type SingleUnionCaseRenameEvaluator() =
                 sourceName <> SharedImplUtil.MISSING_DECLARATION_NAME &&
 
                 let unionCases = typeElement.GetSourceUnionCases()
-                unionCases.Count = 1 && unionCases.[0].SourceName = sourceName
+                unionCases.Count = 1 && unionCases[0].SourceName = sourceName
 
             match initialElement.FirstOrDefault() with
             | :? ITypeElement as typeElement when isApplicable typeElement ->

@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type UseWildSelfIdFix(warning: UseWildSelfIdWarning) =
-    inherit FSharpScopedQuickFixBase()
+    inherit FSharpScopedQuickFixBase(warning.SelfId)
 
     let selfId = warning.SelfId
 
@@ -15,8 +15,6 @@ type UseWildSelfIdFix(warning: UseWildSelfIdWarning) =
 
     override this.IsAvailable _ =
         isValid selfId
-
-    override this.TryGetContextTreeNode() = selfId :> _
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(selfId.IsPhysical())

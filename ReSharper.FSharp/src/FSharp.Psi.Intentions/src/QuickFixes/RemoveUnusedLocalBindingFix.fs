@@ -103,10 +103,10 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
 
                         TreeRange(startNode, endNode)
 
-                    let secondBindingKeyword = bindings.[1].BindingKeyword.NotNull()
+                    let secondBindingKeyword = bindings[1].BindingKeyword.NotNull()
                     ModificationUtil.ReplaceChildRange(TreeRange(secondBindingKeyword), copyRange) |> ignore
 
-                    TreeRange(getFirstMatchingNodeBefore isInlineSpaceOrComment binding, bindings.[1].PrevSibling)
+                    TreeRange(getFirstMatchingNodeBefore isInlineSpaceOrComment binding, bindings[1].PrevSibling)
                 else
                     let rangeStart = getFirstMatchingNodeBefore isInlineSpaceOrComment binding
 
@@ -121,5 +121,5 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
 
             Action<_>(fun textControl ->
                 let anchorIndex = if bindingIndex > 0 then bindingIndex - 1 else 0
-                let offset = letBindings.Bindings.[anchorIndex].GetNavigationRange().EndOffset
+                let offset = letBindings.Bindings[anchorIndex].GetNavigationRange().EndOffset
                 textControl.Caret.MoveTo(offset, CaretVisualPlacement.DontScrollIfVisible))

@@ -45,7 +45,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
         fsiDetector.GetActiveTool(solution, fsiOptions)
 
     let parsedPath = fsiOptions.FsiPathAsPath
-    let fsiTool = if autoDetect.Value then tools.[0] else getActiveTool ()
+    let fsiTool = if autoDetect.Value then tools[0] else getActiveTool ()
 
     let initialPath = if fsiTool.IsCustom then parsedPath else fsiTool.GetFsiPath(fsiOptions.UseAnyCpu.Value)
     let fsiPath = new Property<_>(lifetime, "FsiExePath", initialPath)
@@ -57,10 +57,10 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
         autoDetect.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue autoDetect) ->
             fsiOptions.AutoDetect.Value <- autoDetect
             fsiTool.Value <-
-                if autoDetect then tools.[0] else
+                if autoDetect then tools[0] else
 
                 let path = fsiOptions.FsiPathAsPath
-                if path.IsEmpty && autoDetectAllowed then tools.[0] else
+                if path.IsEmpty && autoDetectAllowed then tools[0] else
                 getActiveTool ())
 
         fsiTool.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue (FsiTool fsi)) ->

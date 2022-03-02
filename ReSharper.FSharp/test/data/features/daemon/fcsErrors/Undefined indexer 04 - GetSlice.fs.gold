@@ -1,6 +1,7 @@
 ﻿module Module
 
-"".|[1..2, 1]|(0)
+""|.|(0)|[1..2, 1]|(1)
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression
+(0): ReSharper Dead Code: Redundant '.'
+(1): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression

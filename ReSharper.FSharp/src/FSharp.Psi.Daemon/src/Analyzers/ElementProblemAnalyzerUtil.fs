@@ -28,6 +28,9 @@ type ElementProblemAnalyzerData with
     member this.IsFSharp50Supported =
         this.LanguageLevel >= FSharpLanguageLevel.FSharp50
 
+    member this.IsFSharp60Supported =
+        this.LanguageLevel >= FSharpLanguageLevel.FSharp60
+
     member this.ParseAndCheckResults =
         let results = this.GetData(parseAndCheckResultsKey)
         if Option.isSome results then results else

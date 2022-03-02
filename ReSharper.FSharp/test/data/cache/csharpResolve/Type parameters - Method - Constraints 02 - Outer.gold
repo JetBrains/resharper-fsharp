@@ -1,0 +1,13 @@
+﻿using System.Collections.Generic;
+
+class C
+{
+    public C()
+    {
+        T<string>.M<List<int>, int>();
+    }
+}
+
+---------------------------------------------------------
+M:T`1.M``2
+M:T`1.M``2

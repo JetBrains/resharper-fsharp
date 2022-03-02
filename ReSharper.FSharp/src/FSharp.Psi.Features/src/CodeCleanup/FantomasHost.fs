@@ -54,7 +54,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) 
     let convertParsingOptions (options: FSharpParsingOptions) =
         let lightSyntax = Option.toNullable options.LightSyntax
         RdFcsParsingOptions(Array.last options.SourceFiles, lightSyntax,
-            List.toArray options.ConditionalCompilationDefines, options.IsExe)
+            List.toArray options.ConditionalCompilationDefines, options.IsExe, options.LangVersionText)
 
     member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
         let args =

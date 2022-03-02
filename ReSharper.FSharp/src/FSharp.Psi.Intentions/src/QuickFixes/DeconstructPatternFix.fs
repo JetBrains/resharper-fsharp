@@ -24,7 +24,7 @@ type DeconstructPatternFix(error: UnionCaseExpectsTupledArgumentsError) =
         let parameters = error.Pat.Parameters
         parameters.Count = 1 &&
 
-        let pattern = parameters.[0]
+        let pattern = parameters[0]
         pattern :? IReferencePat && tryCreate pattern
 
     override this.Text =

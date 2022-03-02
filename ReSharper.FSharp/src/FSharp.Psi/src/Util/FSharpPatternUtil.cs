@@ -44,10 +44,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       {
         switch (node)
         {
-          case IFSharpPattern _:
+          case IFSharpPattern:
             node = node.Parent;
             break;
-          case IParametersPatternDeclaration _ when allowFromParameters:
+          case IParametersPatternDeclaration when allowFromParameters:
             node = node.Parent;
             isFromParameter = true;
             break;

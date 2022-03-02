@@ -5,9 +5,9 @@ open FSharp.Compiler.Symbols
 let getFunctionTypeArgs includeReturnType fcsType =
     let rec loop (fcsType: FSharpType) acc =
         let args = fcsType.GenericArguments
-        let acc = args.[0] :: acc
+        let acc = args[0] :: acc
 
-        let argType = args.[1]
+        let argType = args[1]
         if argType.IsFunctionType then
             loop argType acc
         else

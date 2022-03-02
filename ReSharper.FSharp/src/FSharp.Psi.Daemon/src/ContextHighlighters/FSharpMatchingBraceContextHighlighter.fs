@@ -26,8 +26,8 @@ type FSharpMatchingBraceContextHighlighter() =
         highlighter.ProcessDataContextImpl(lifetime, prolongedLifetime, documentRangeView, invisibleBraceHintManager,
                                            matchingBraceSuggester, matchingBraceConsumerFactory)
 
-    override x.IsLeftBracket(tokenType: TokenNodeType) = FSharpTokenType.LeftBraces.[tokenType]
-    override x.IsRightBracket(tokenType: TokenNodeType) = FSharpTokenType.RightBraces.[tokenType]
+    override x.IsLeftBracket(tokenType: TokenNodeType) = FSharpTokenType.LeftBraces[tokenType]
+    override x.IsRightBracket(tokenType: TokenNodeType) = FSharpTokenType.RightBraces[tokenType]
 
     override x.TryHighlightToLeft(consumer, selectedToken, _) =
         if x.IsRightBracket(selectedToken.GetTokenType()) then

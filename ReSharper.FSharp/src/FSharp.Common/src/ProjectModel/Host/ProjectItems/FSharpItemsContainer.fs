@@ -128,22 +128,22 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
                 (allowNonDefaultItemType || not (filter.FilterByItemType(item.ItemType, item.IsImported()))) &&
 
                 (let (BuildAction buildAction) = item.ItemType
-                 not (buildAction.IsNone() && itemsByName.[item.EvaluatedInclude].Count > 1)))
+                 not (buildAction.IsNone() && itemsByName[item.EvaluatedInclude].Count > 1)))
 
             |> Seq.fold (fun index item ->
-                if index < items.Count && items.[index].Item.EvaluatedInclude = item.EvaluatedInclude then
-                    items.[index].TargetFrameworkIds.Add(targetFrameworkId) |> ignore
+                if index < items.Count && items[index].Item.EvaluatedInclude = item.EvaluatedInclude then
+                    items[index].TargetFrameworkIds.Add(targetFrameworkId) |> ignore
                     index + 1
                 else
                     let mutable tmpIndex = index + 1
-                    while tmpIndex < items.Count && items.[tmpIndex].Item.EvaluatedInclude <> item.EvaluatedInclude do
+                    while tmpIndex < items.Count && items[tmpIndex].Item.EvaluatedInclude <> item.EvaluatedInclude do
                         tmpIndex <- tmpIndex + 1
 
                     if tmpIndex >= items.Count then
                         items.Insert(index, { Item = item; TargetFrameworkIds = HashSet([targetFrameworkId]) })
                         index + 1
                     else
-                        items.[tmpIndex].TargetFrameworkIds.Add(targetFrameworkId) |> ignore
+                        items[tmpIndex].TargetFrameworkIds.Add(targetFrameworkId) |> ignore
                         tmpIndex + 1) 0 |> ignore
         items
 
@@ -180,12 +180,12 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
         |> Option.iter (fun mapping ->
             let refreshFolder, update, refresh = createRefreshers projectMark
             updateFunction mapping refreshFolder update
-            projectMappings.Value.[projectMark] <- mapping
+            projectMappings.Value[projectMark] <- mapping
             refresh ())
 
     let addProjectMapping targetFrameworkIds items projectMark =
         use lock = locker.UsingWriteLock()
-        projectMappings.Value.[projectMark] <-
+        projectMappings.Value[projectMark] <-
             let projectDirectory = projectMark.Location.Directory
             let projectUniqueName = projectMark.UniqueProjectName
             let mapping = ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds, logger)
@@ -382,19 +382,19 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         match viewItem with
         | FSharpViewFile _ -> tryGetFile path
         | FSharpViewFolder (_, identity) ->
-            folders.[path]
+            folders[path]
             |> Seq.tryFind (function | FolderItem (_, id) -> id = identity | _ -> false)
 
     let getNewFolderIdentity path =
-        let folders = folders.[path]
+        let folders = folders[path]
         { Identity = folders.Count + 1 }
 
     let getChildrenSorted (parent: FSharpProjectModelElement) =
-        children.[parent]
+        children[parent]
         |> Seq.sortBy (fun x -> x.SortKey)
 
     let getNewSortKey parent =
-        children.[parent].Count + 1
+        children[parent].Count + 1
 
     let moveFollowingItems parent sortKeyFrom direction updateItem =
         for item in getChildrenSorted parent do
@@ -415,7 +415,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         ProjectItem item
 
     let getOrCreateFolder folderRefresher parent path =
-        folders.[path]
+        folders[path]
         |> Seq.sortBy (fun item -> item.SortKey)
         |> Seq.tryLast
         |> Option.defaultWith (fun _ ->
@@ -432,7 +432,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
     let (|EmptyFolder|_|) projectItem =
         match projectItem with
-        | FolderItem _ when children.[ProjectItem projectItem].IsEmpty() -> Some projectItem
+        | FolderItem _ when children[ProjectItem projectItem].IsEmpty() -> Some projectItem
         | _ -> None
 
     let getNewRelativeSortKey (item: FSharpProjectItem) relativeToType =
@@ -564,7 +564,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             tryGetRelativeChildItem relativeElement modifiedItemBuildAction relativeToType
 
     let rec renameFolder oldLocation newLocation itemUpdater =
-        folders.[oldLocation]
+        folders[oldLocation]
         |> Seq.iter (fun folderItem ->
             folderItem.ItemInfo.LogicalPath <- newLocation
             folderItem.ItemInfo.PhysicalPath <- newLocation
@@ -588,11 +588,11 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         folders.RemoveKey(oldLocation)
 
     let rec removeSplittedFolderIfEmpty folder folderPath folderRefresher itemUpdater =
-        let isFolderSplitted path = folders.[path].Count > 1
+        let isFolderSplitted path = folders[path].Count > 1
 
         match folder with
         | ProjectItem (EmptyFolder (FolderItem (_, folderId)) as folderItem) when isFolderSplitted folderPath ->
-            folders.[folderPath]
+            folders[folderPath]
             |> Seq.iter (fun folderItem ->
                 match folderItem with
                 | FolderItem (_, id) ->
@@ -669,9 +669,9 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             if isNull path then None else
             tryGetFile path
             |> Option.orElseWith (fun _ ->
-                let folders = folders.[path]
+                let folders = folders[path]
                 if folders.Count <> 1 then None else
-                match folders.[0] with
+                match folders[0] with
                 | EmptyFolder _ as item -> Some item
                 | _ -> None)
 
@@ -795,7 +795,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         let foldersIds = Dictionary<FSharpProjectModelElement, int>()
         let getFolderId el =
             foldersIds.GetOrCreateValue(el, fun () -> foldersIds.Count)
-        foldersIds.[project] <- 0
+        foldersIds[project] <- 0
 
         iter (fun projectItem ->
             let info = projectItem.ItemInfo
@@ -819,7 +819,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     member private x.AddItem(item: FSharpProjectItem) =
         let path = item.PhysicalPath
         match item with
-        | FileItem _ -> files.[path] <- item
+        | FileItem _ -> files[path] <- item
         | FolderItem _ -> folders.AddValue(path, item)
 
         addChild item
@@ -835,14 +835,14 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         let logger = Logger.GetLogger<FSharpItemsContainer>()
         let mapping = ProjectMapping(projectDirectory, projectUniqueName, readTargetFrameworkIds (), logger)
         let foldersById = Dictionary<int, FSharpProjectModelElement>()
-        foldersById.[0] <- Project projectDirectory
+        foldersById[0] <- Project projectDirectory
 
         let itemsCount = reader.ReadInt()
         for _ in 1 .. itemsCount do
             let itemInfo =
                 { PhysicalPath = reader.ReadCurrentSolutionVirtualFileSystemPath()
                   LogicalPath = reader.ReadCurrentSolutionVirtualFileSystemPath()
-                  Parent = foldersById.[reader.ReadInt()]
+                  Parent = foldersById[reader.ReadInt()]
                   SortKey = reader.ReadInt() }
 
             let item =
@@ -854,7 +854,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                 | FSharpProjectItemType.Folder ->
                     let id = reader.ReadInt()
                     let item = FolderItem(itemInfo, { Identity = reader.ReadInt() })
-                    foldersById.[id] <- ProjectItem item
+                    foldersById[id] <- ProjectItem item
                     item
 
                 | itemType -> failwithf "got item %O" itemType
@@ -891,7 +891,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         | _ -> failwithf "No item found for %O" path
 
     member x.RemoveFolder(path, refreshFolder, update) =
-        for folder in folders.[path] do
+        for folder in folders[path] do
             removeItem refreshFolder update folder
 
     member x.UpdateFolder(oldLocation, newLocation, update) =
@@ -902,7 +902,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         tryGetProjectItem viewItem
 
     member x.TryGetFolderItems(path: VirtualFileSystemPath): IList<FSharpProjectItem> =
-        folders.[path]
+        folders[path]
 
     member x.AddFile(BuildAction action, path, logicalPath, relativeToPath, relativeToType, refreshFolder, update) =
         let info = createNewItemInfo path logicalPath relativeToPath relativeToType refreshFolder update

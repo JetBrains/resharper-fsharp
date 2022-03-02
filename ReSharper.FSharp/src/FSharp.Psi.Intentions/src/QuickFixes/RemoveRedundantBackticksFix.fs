@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveRedundantBackticksFix(warning: RedundantBackticksWarning) =
-    inherit FSharpScopedQuickFixBase()
+    inherit FSharpScopedQuickFixBase(warning.Identifier)
 
     let identifier = warning.Identifier
 
@@ -23,7 +23,6 @@ type RemoveRedundantBackticksFix(warning: RedundantBackticksWarning) =
         let newId = FSharpIdentifierToken(name)
         replace identifier newId
 
-    override x.TryGetContextTreeNode() = identifier :> _
     override x.ExecutePsiTransaction _ = x.ExecutePsiTransaction()
 
     interface IHighlightingsCleanupItem with

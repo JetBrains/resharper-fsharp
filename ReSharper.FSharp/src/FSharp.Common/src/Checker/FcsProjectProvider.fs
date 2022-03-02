@@ -66,6 +66,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let fcsProjects = Dictionary<IPsiModule, FcsProject>()
     let referencedModules = Dictionary<IPsiModule, ReferencedModule>()
     let projectsPsiModules = OneToSetMap<IModule, IPsiModule>()
+    let projectsProjectMarks = Dictionary<IProjectMark, IProject>()
+    let projectMarkModules = Dictionary<IPsiModule, IProjectMark>()
 
     let dirtyModules = HashSet<IPsiModule>()
     let fcsProjectInvalidated = new Signal<IPsiModule>(lifetime, "FcsProjectInvalidated")
@@ -97,6 +99,11 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         referencedModules.Remove(psiModule) |> ignore
         fcsProjects.Remove(psiModule) |> ignore
         projectsPsiModules.Remove(psiModule.ContainingProjectModule, psiModule) |> ignore
+
+        let projectMark = projectMarkModules[psiModule]
+        projectsProjectMarks.Remove(projectMark) |> ignore
+        projectMarkModules.Remove(psiModule) |> ignore
+
         dirtyModules.Remove(psiModule) |> ignore
 
         // todo: remove removed psiModules? (don't we remove them anyway?) (standalone projects only?)
@@ -171,8 +178,12 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 let fcsProjectOptions = { fcsProject.ProjectOptions with ReferencedProjects = referencedFcsProjects }
                 let fcsProject = { fcsProject with ProjectOptions = fcsProjectOptions }
 
-                fcsProjects.[psiModule] <- fcsProject
+                fcsProjects[psiModule] <- fcsProject
                 projectsPsiModules.Add(project, psiModule) |> ignore
+
+                let projectMark = project.GetProjectMark()
+                projectsProjectMarks[projectMark] <- project
+                projectMarkModules[psiModule] <- projectMark
 
                 for referencedPsiModule in referencedProjectPsiModules do
                     let referencedModule = referencedModules.GetOrCreateValue(referencedPsiModule, createReferencedModule)
@@ -214,8 +225,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
     member private this.ProcessFSharpProjectLoaded(projectMark: IProjectMark) =
         use lock = locker.UsingWriteLock()
-        for project in solution.GetProjectsByMark(projectMark) do
-            invalidateProject project
+
+        tryGetValue projectMark projectsProjectMarks
+        |> Option.iter invalidateProject
 
     member x.ProcessChange(obj: ChangeEventArgs) =
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)

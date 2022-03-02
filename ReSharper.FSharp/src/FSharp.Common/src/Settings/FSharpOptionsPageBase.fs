@@ -27,8 +27,5 @@ type FSharpOptionsPageBase(lifetime, optionsPageContext, settings) =
     member x.AddBool(text, property: IProperty<_>) =
         x.AddBoolOption(property, RichText(text), text) |> ignore
 
-    member x.AddBool(text, expression: Expression<Func<_, _>>) =
-        x.AddBoolOption(expression, RichText(text), text) |> ignore
-
     member x.AddHeader(text: string) =
         base.AddHeader(text) |> ignore

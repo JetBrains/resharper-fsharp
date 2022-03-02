@@ -374,7 +374,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
     | :? ILiteralExpr as literalExpr ->
         // todo: check digits after dot: `1.0.Prop` is allowed, and `1.Prop` is not.
         let tokenType = getTokenType literalExpr.Literal
-        literalsRequiringParens.[tokenType] && isNotNull (QualifiedExprNavigator.GetByQualifier(context))
+        literalsRequiringParens[tokenType] && isNotNull (QualifiedExprNavigator.GetByQualifier(context))
 
     | _ ->
 

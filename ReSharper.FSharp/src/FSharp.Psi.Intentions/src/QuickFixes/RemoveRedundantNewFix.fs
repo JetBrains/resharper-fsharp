@@ -8,14 +8,12 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveRedundantNewFix(warning: RedundantNewWarning) =
-    inherit FSharpScopedQuickFixBase()
+    inherit FSharpScopedQuickFixBase(warning.NewExpr)
 
     let newExpr = warning.NewExpr
 
     override x.Text = "Remove redundant 'new'"
     override x.IsAvailable _ = isValid newExpr
-
-    override x.TryGetContextTreeNode() = newExpr :> _
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(newExpr.IsPhysical())

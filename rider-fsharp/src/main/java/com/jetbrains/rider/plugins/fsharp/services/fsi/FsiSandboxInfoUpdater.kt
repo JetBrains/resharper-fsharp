@@ -71,7 +71,7 @@ class FsiSandboxInfoUpdater(project: Project, private val consoleEditor: EditorE
                     val sandboxInfo = createFSharpSandbox(sandboxText, false, emptyList())
 
                     sandboxManager.markAsSandbox(consoleEditor, sandboxInfo)
-                    FrontendTextControlHost.getInstance(project).rebindEditor(consoleEditor)
+                    RiderTextControlHost.getInstance(project).rebindEditor(consoleEditor)
                 }
             }
         }

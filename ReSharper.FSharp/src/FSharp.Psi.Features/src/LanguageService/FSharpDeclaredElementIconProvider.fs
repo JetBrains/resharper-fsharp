@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -54,6 +55,17 @@ type FSharpDeclaredElementIconProvider() =
                     | AccessRights.PRIVATE -> privateField
                     | AccessRights.INTERNAL -> internalField
                     | _ -> PsiSymbolsThemedIcons.Field.Id
+
+            | :? TypeElement as typeElement when
+                    typeElement.PresentationLanguage.Is<FSharpLanguage>() &&
+                    isNotNull (typeElement.GetPart<ITypeAbbreviationOrDeclarationPart>()) ->
+                // Prevent trigger getting Fcs symbol to check if type is a union or is an abbreviation
+                canApplyExtensions <- false
+
+                if box typeElement :? IStruct then
+                    PsiSymbolsThemedIcons.Struct.Id
+                else
+                    PsiSymbolsThemedIcons.Class.Id
 
             | :? TypeElement as typeElement when
                     typeElement.PresentationLanguage.Is<FSharpLanguage>() && typeElement.IsUnion() ->

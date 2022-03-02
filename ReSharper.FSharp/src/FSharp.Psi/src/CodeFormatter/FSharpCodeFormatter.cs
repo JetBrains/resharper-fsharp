@@ -20,11 +20,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
   {
     private readonly FSharpFormatterInfoProvider myFormatterInfoProvider;
 
-    private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> myGluingCache =
-      new ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool>();
+    private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> myGluingCache = new();
 
     private static readonly NodeTypeSet InterpolatedStringStartOrMiddleParts =
-      new NodeTypeSet(FSharpTokenType.REGULAR_INTERPOLATED_STRING_START,
+      new(FSharpTokenType.REGULAR_INTERPOLATED_STRING_START,
         FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE,
         FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START,
         FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE,
@@ -32,18 +31,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE);
 
     private static readonly NodeTypeSet InterpolatedStringMiddleOrEndParts =
-      new NodeTypeSet(FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE,
+      new(FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE,
         FSharpTokenType.REGULAR_INTERPOLATED_STRING_END,
         FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE,
         FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END,
         FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE,
         FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END);
 
-    private static readonly NodeTypeSet LeftBraceStartNodes =
-      new NodeTypeSet(FSharpTokenType.LBRACE, FSharpTokenType.LBRACE_BAR);
+    private static readonly NodeTypeSet LeftBraceStartNodes = new(FSharpTokenType.LBRACE, FSharpTokenType.LBRACE_BAR);
 
-    private static readonly NodeTypeSet RightBraceEndNodes =
-      new NodeTypeSet(FSharpTokenType.RBRACE, FSharpTokenType.BAR_RBRACE);
+    private static readonly NodeTypeSet RightBraceEndNodes = new(FSharpTokenType.RBRACE, FSharpTokenType.BAR_RBRACE);
 
     public FSharpCodeFormatter(FSharpLanguage language, CodeFormatterRequirements requirements,
       FSharpFormatterInfoProvider formatterInfoProvider) : base(language, requirements)
@@ -53,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     protected override CodeFormattingContext CreateFormatterContext(CodeFormatProfile profile, ITreeNode firstNode,
       ITreeNode lastNode, AdditionalFormatterParameters parameters, ICustomFormatterInfoProvider provider) =>
-      new CodeFormattingContext(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger,
+      new(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger,
         parameters);
 
     public override MinimalSeparatorType GetMinimalSeparatorByNodeTypes(TokenNodeType leftTokenType,

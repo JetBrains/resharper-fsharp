@@ -39,7 +39,7 @@ module ProjectFcsModuleReader =
 
         let paramsCountString =
             if paramsCount >= typeParameterCountStringsCount then paramsCount.ToString() else
-            typeParameterCountStrings.[paramsCount]
+            typeParameterCountStrings[paramsCount]
 
         name + paramsCountString
 
@@ -177,7 +177,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | _ ->
 
         let assemblyRef = ILScopeRef.Assembly(createAssemblyScopeRef assemblyName)
-        cache.AssemblyRefs.[assemblyName] <- assemblyRef
+        cache.AssemblyRefs[assemblyName] <- assemblyRef
         assemblyRef
 
     let mkILScopeRef (targetModule: IPsiModule): ILScopeRef =
@@ -194,7 +194,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     
     let internTypeRef (typeRefCache: IDictionary<_, _>) scopeRef (clrTypeName: IClrTypeName) enclosing name =
         let typeRef = ILTypeRef.Create(scopeRef, enclosing, name)
-        typeRefCache.[clrTypeName.GetPersistent()] <- typeRef
+        typeRefCache[clrTypeName.GetPersistent()] <- typeRef
         typeRef
 
     let internTypeRefAtScope typeRefCache scopeRef clrTypeName (typeRef: ILTypeRef) =
@@ -298,7 +298,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                     domain
                     |> List.ofSeq
                     |> List.sortBy getGlobalIndex
-                    |> List.map (fun typeParameter -> mkType substitution.[typeParameter])
+                    |> List.map (fun typeParameter -> mkType substitution[typeParameter])
 
                 let typeRef = mkTypeRef typeElement
                 let typeSpec = ILTypeSpec.Create(typeRef, typeArgs)
@@ -760,7 +760,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             currentTypeUnresolvedUsedNames <- null
 
             clrNamesByShortNames.Add(typeElement.ShortName, clrTypeName)
-            typeDefs.[clrTypeName] <- typeDef
+            typeDefs[clrTypeName] <- typeDef
             typeDef
 
     member this.GetClrTypeNamesByShortName(shortName: string) =

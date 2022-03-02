@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Fantomas;
-using FSharp.Compiler.SourceCodeServices;
+using FSharp.Compiler.CodeAnalysis;
 using JetBrains.Diagnostics;
 using JetBrains.Extension;
 using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
@@ -35,12 +35,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private static dynamic GetDiagnosticOptions()
     {
       var assemblyToSearch = typeof(FSharpParsingOptions).Assembly;
-      var searchedType = Version.Parse(CodeFormatter.GetVersion()) < Version.Parse("4.5")
-        ? "FSharp.Compiler.ErrorLogger+FSharpErrorSeverityOptions"
-        : "FSharp.Compiler.SourceCodeServices.FSharpDiagnosticOptions";
+      var fantomasVersion = typeof(CodeFormatter).Assembly.GetName().Version;
 
-      var options = assemblyToSearch.GetType(searchedType).NotNull($"{searchedType} must exist");
-      var defaultValue = options.GetProperty("Default")?.GetValue(null).NotNull();
+      var optionsTypeName = fantomasVersion switch
+      {
+        { } v when v < Version.Parse("4.5") => "FSharp.Compiler.ErrorLogger+FSharpErrorSeverityOptions",
+        { } v when v < Version.Parse("4.6") => "FSharp.Compiler.SourceCodeServices.FSharpDiagnosticOptions",
+        _ => "FSharp.Compiler.Diagnostics.FSharpDiagnosticOptions",
+      };
+
+      var optionsType = assemblyToSearch.GetType(optionsTypeName).NotNull($"{optionsTypeName} must exist");
+      var defaultValue = optionsType.GetProperty("Default")?.GetValue(null).NotNull();
 
       return defaultValue;
     }
@@ -86,7 +91,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private static FSharpParsingOptions Convert(RdFcsParsingOptions options) =>
       new FSharpParsingOptions(new[] { options.LastSourceFile },
         ListModule.OfArray(options.ConditionalCompilationDefines), DefaultDiagnosticOptions,
-        false, options.LightSyntax ?? FSharpOption<bool>.None, false, options.IsExe);
+        options.LangVersion, false, options.LightSyntax ?? FSharpOption<bool>.None, false, options.IsExe);
 
     private static FormatConfig Convert(string[] riderFormatConfigValues)
     {

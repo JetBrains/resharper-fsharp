@@ -62,8 +62,7 @@ type FSharpRunMarkerProvider() =
                 consumer.AddHighlighting(highlighting, range)
 
             for binding in CachedDeclarationsCollector.Run<ITopBinding>(fsFile) do
-                let parametersOwner = binding.HeadPattern.As<IParametersOwnerPat>()
-                if isNull parametersOwner then () else
+                if binding.ParametersDeclarationsEnumerable.IsEmpty() then () else
 
                 let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
                 if binding.IsInline || isNull (ModuleDeclarationNavigator.GetByMember(letBindings)) then () else

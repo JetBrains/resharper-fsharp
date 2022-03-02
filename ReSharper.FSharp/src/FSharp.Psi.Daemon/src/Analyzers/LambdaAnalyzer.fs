@@ -41,7 +41,7 @@ type LambdaAnalyzer() =
             if patReferenceName.IsQualified || expr.IsQualified then false else
 
             let patName = patReferenceName.ShortName
-            if patName.IsEmpty() || not (Char.IsLower(patName.[0])) then false else
+            if patName.IsEmpty() || not (Char.IsLower(patName[0])) then false else
 
             patName = expr.ShortName
 
@@ -59,7 +59,7 @@ type LambdaAnalyzer() =
             let hasMatches = i > 0
             match expr.IgnoreInnerParens() with
             | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && i <> pats.Count ->
-                let pat = pats.[pats.Count - 1 - i]
+                let pat = pats[pats.Count - 1 - i]
                 let argExpr = app.ArgumentExpression
 
                 if not (compareArg pat argExpr) then
@@ -102,10 +102,10 @@ type LambdaAnalyzer() =
             let parameterGroups = m.CurriedParameterGroups
             if parameterGroups.Count = 0 then false else
 
-            let args = parameterGroups.[0]
+            let args = parameterGroups[0]
             if args.Count <= lambdaPos then false else
 
-            let argDecl = args.[lambdaPos]
+            let argDecl = args[lambdaPos]
             let argDeclType = argDecl.Type
 
             let argIsDelegate =
@@ -119,7 +119,7 @@ type LambdaAnalyzer() =
                     |> Seq.exists (fun x ->
                         not (x.Equals m) &&
                         x.DisplayName = mName &&
-                        x.CurriedParameterGroups.[0].Count >= args.Count)
+                        x.CurriedParameterGroups[0].Count >= args.Count)
                 not mHasOverload
             else false
         | _ -> false
@@ -147,7 +147,7 @@ type LambdaAnalyzer() =
             | _ ->
 
             if pats.Count = 1 then
-                let pat = pats.[0].IgnoreInnerParens()
+                let pat = pats[0].IgnoreInnerParens()
                 if compareArg pat expr then
                     let expr = lambda.IgnoreParentParens()
                     let mutable funExpr = Unchecked.defaultof<_>
@@ -160,9 +160,9 @@ type LambdaAnalyzer() =
                     match pat with
                     | :? ITuplePat as pat when not pat.IsStruct && pat.PatternsEnumerable.CountIs(2) ->
                         let tuplePats = pat.Patterns
-                        if compareArg tuplePats.[0] expr then
+                        if compareArg tuplePats[0] expr then
                             LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "fst") :> _
-                        elif compareArg tuplePats.[1] expr then
+                        elif compareArg tuplePats[1] expr then
                             LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "snd") :> _
                         else null
                     | _ -> null

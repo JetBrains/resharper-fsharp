@@ -45,7 +45,7 @@ module ReplaceWithInterpolatedStringFix =
          | _ -> false
 
 type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarning) =
-    inherit FSharpScopedQuickFixBase()
+    inherit FSharpScopedQuickFixBase(warning.FormatStringExpr)
 
     let outerPrefixAppExpr = warning.OuterPrefixAppExpr
     let prefixAppExpr = warning.PrefixAppExpr
@@ -55,8 +55,6 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
 
     override this.IsAvailable _ =
         isValid formatStringExpr
-
-    override this.TryGetContextTreeNode() = formatStringExpr :> _
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(formatStringExpr.IsPhysical())
