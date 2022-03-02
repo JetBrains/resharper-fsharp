@@ -50,7 +50,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         // todo: provide tooltip for #r strings in fsx, should pass String tag
         checkResults.GetToolTip(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier)
 
-    override x.GetRichTooltip(highlighter) =
+    override x.GetRichTooltip(highlighter, _) =
         if not highlighter.IsValid then emptyPresentation else
 
         let psiServices = solution.GetPsiServices()
