@@ -1704,7 +1704,7 @@ Folder/Class2.fs
 AfterFile.fs
 
 ===================
-Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
+13. Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
 
 -Project
  -FSharpProjectTree * 1 project

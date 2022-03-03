@@ -2,7 +2,7 @@ ConsoleApplication/obj/Debug/net5.0/ConsoleApplication.fsproj.FileListAbsolute.t
 	ConsoleApplication/bin/Debug/net5.0/ConsoleApplication.deps.json
 	ConsoleApplication/bin/Debug/net5.0/ConsoleApplication.dll
 	ConsoleApplication/bin/Debug/net5.0/ConsoleApplication.exe
-    ConsoleApplication/bin/Debug/net5.0/ConsoleApplication.pdb
+	ConsoleApplication/bin/Debug/net5.0/ConsoleApplication.pdb
 	ConsoleApplication/bin/Debug/net5.0/ConsoleApplication.runtimeconfig.dev.json
 	ConsoleApplication/bin/Debug/net5.0/ConsoleApplication.runtimeconfig.json
 	ConsoleApplication/bin/Debug/net5.0/FSharp.Core.dll
