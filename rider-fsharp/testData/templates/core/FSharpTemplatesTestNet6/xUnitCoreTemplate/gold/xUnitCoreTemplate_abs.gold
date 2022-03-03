@@ -75,6 +75,7 @@ UnitTestProject/obj/Debug/net6.0/UnitTestProject.fsproj.FileListAbsolute.txt:
 	UnitTestProject/bin/Debug/net6.0/ru/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
 	UnitTestProject/bin/Debug/net6.0/ru/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
 	UnitTestProject/bin/Debug/net6.0/testhost.dll
+	UnitTestProject/bin/Debug/net6.0/testhost.exe
 	UnitTestProject/bin/Debug/net6.0/tr/FSharp.Core.resources.dll
 	UnitTestProject/bin/Debug/net6.0/tr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
 	UnitTestProject/bin/Debug/net6.0/tr/Microsoft.TestPlatform.CoreUtilities.resources.dll

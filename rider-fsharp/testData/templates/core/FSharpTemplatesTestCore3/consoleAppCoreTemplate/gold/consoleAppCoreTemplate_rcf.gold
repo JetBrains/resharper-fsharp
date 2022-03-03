@@ -10,7 +10,7 @@ Start browser url:
 Start browser is start JavaScript debugger: false
 Start browser browser name: null
 Project kind: DotNetCore
-Exe path: $PROJECT_DIR$/ConsoleApplication/bin/Debug/netcoreapp3.1/ConsoleApplication.dll
+Exe path: $PROJECT_DIR$/ConsoleApplication/bin/Debug/netcoreapp3.1/ConsoleApplication.exe
 Arguments: 
 Working directory: $PROJECT_DIR$/ConsoleApplication/bin/Debug/netcoreapp3.1
 Environment variables: {}
