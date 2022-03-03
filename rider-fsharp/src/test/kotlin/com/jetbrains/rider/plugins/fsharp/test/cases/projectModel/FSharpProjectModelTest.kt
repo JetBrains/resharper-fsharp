@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
-import com.intellij.openapi.project.Project
 import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
 import com.jetbrains.rider.test.annotations.TestEnvironment
@@ -132,7 +131,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
                         arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1", "Foo.fs"),
                         arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1"), ActionOrderType.Before)
             }
-            dump2("Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'", false, true) {
+            dump2("13. Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'", false, true) {
                 moveItem(
                         arrayOf(
                                 arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "File1.fs"),
