@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -95,20 +94,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public DocComment([NotNull] TokenNodeType nodeType, [NotNull] string text) : base(nodeType, text)
     {
     }
-  }
-
-  public partial class XmlDocBlock : FSharpCompositeElement, ICommentNode
-  {
-    public override bool IsFiltered() => true;
-    public override NodeType NodeType => FSharpTokenType.XML_DOC_BLOCK;
-    public TokenNodeType GetTokenType() => (TokenNodeType)NodeType;
-
-    public TreeTextRange GetCommentRange()
-    {
-      var startOffset = GetTreeStartOffset();
-      return new TreeTextRange(startOffset + 3, startOffset + GetTextLength());
-    }
-
-    public string CommentText => GetText();
   }
 }

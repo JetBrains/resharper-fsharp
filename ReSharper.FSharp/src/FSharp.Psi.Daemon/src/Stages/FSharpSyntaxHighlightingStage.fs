@@ -1,9 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
+open JetBrains.ReSharper.Daemon.CSharp.Syntax
 open JetBrains.ReSharper.Daemon.Syntax
 open JetBrains.ReSharper.Daemon.SyntaxHighlighting
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi
 
@@ -31,6 +33,12 @@ type FSharpSyntaxHighlightingProcessor() =
     let highlighting = FSharpSyntaxHighlighting()
 
     override x.GetAttributeId(tokenType) = highlighting.GetAttributeId(tokenType)
+    override x.ProcessBeforeInterior(element, context) =
+        match element with
+        | :? IFSharpDocCommentBlock as block ->
+            let xmlFile = block.GetXmlPsi().XmlFile
+            xmlFile.ProcessDescendants(XmlDocSyntaxHighlightingVisitor(), context); //TODO: F# implementation
+        | _ -> ()
 
 
 [<Language(typeof<FSharpLanguage>)>]
