@@ -19,7 +19,7 @@ class FSharpTemplatesTestNet6 : FSharpTemplatesTestCore() {
 
     fun consoleAppCoreTemplate() = consoleAppCoreTemplate(
         CoreTemplateTestArgs(expectedNumOfAnalyzedFiles = 1, expectedNumOfSkippedFiles = 0,
-            expectedOutput = "Hello from F#", breakpointFile = "Program.fs", breakpointLine = 4)
+            expectedOutput = "Hello from F#", breakpointFile = "Program.fs", breakpointLine = 2)
     )
 
     fun xUnitCoreTemplate() = xUnitCoreTemplate(
