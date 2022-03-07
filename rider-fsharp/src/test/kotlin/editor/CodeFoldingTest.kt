@@ -1,4 +1,4 @@
-package editor
+package com.jetbrains.rider.plugins.fsharp.test.cases.editor
 
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.test.annotations.TestEnvironment
