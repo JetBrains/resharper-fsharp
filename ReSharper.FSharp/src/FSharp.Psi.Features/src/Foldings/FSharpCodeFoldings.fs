@@ -46,7 +46,7 @@ type FSharpCodeFoldingProcess(logger: ILogger) =
                         yield document.GetLineText(docLine line) |]
 
         getOutliningRanges lines parseTree
-        |> Seq.distinctBy (fun x -> x.Range.StartLine)
+        |> Seq.distinctBy (fun x -> x.CollapseRange.StartLine)
         |> Seq.iter (fun x ->
             let textRange = getTextRange document x.CollapseRange
             if textRange.IsEmpty then logger.Warn(sprintf "Empty folding: %O %A" textRange x) else
