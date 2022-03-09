@@ -88,6 +88,9 @@ module FSharpErrors =
     let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
     let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
 
+    let isDirectiveSyntaxError number =
+        number >= 232 && number <= 235
+
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
