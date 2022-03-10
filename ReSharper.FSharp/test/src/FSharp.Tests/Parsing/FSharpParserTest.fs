@@ -542,6 +542,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Member - Type parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Type parameters 02``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - XmlDoc 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - XmlDoc 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Auto Property - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Auto Property - XmlDoc 02 - Attribute``() = x.DoNamedTest()
@@ -665,6 +666,7 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Type decl group - XmlDoc 02``() = x.DoNamedTest()
     [<Test>] member x.``Type decl group - XmlDoc 03 - With attributes 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl group - XmlDoc 03 - With attributes 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl group - XmlDoc 04``() = x.DoNamedTest()
 
     [<Test>] member x.``Val - Value 01``() = x.DoNamedTest()
     [<Test>] member x.``Val - Value 02 - Return attrs``() = x.DoNamedTest()
@@ -713,6 +715,7 @@ type FSharpSignatureParserTest() =
 
     [<Test>] member x.``Type member - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - XmlDoc 02 - With attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - XmlDoc 03 - Constructor``() = x.DoNamedTest()
 
     [<Test>] member x.``Hash directive 01``() = x.DoNamedTest()
 
