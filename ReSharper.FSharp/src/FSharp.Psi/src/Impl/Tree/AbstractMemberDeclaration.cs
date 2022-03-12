@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
@@ -34,16 +35,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private static bool CalcHasDefaultImplementation([CanBeNull] FSharpMemberOrFunctionOrValue mfv)
     {
-      if (!(mfv is { IsDispatchSlot: true }))
+      if (mfv is not {IsDispatchSlot: true})
+        return false;
+
+      var mfvEntity = mfv.DeclaringEntity;
+      if (mfvEntity == null)
         return false;
 
       var logicalName = mfv.LogicalName;
       var mfvType = mfv.FullType.GenericArguments[1];
 
-      return
-        mfv.DeclaringEntity?.Value.MembersFunctionsAndValues.Any(m =>
-          m.IsOverrideOrExplicitInterfaceImplementation &&
-          logicalName == m.LogicalName && mfvType.Equals(m.FullType)) ?? false;
+      return mfvEntity.Value.MembersFunctionsAndValues.Any(m =>
+        m.IsOverrideOrExplicitInterfaceImplementation &&
+        logicalName == m.LogicalName &&
+        mfvType.Equals(m.FullType) &&
+        mfv.ImplementedAbstractSignatures.Count == 1 &&
+        mfv.ImplementedAbstractSignatures[0].DeclaringType.Equals(mfvEntity.Value.AsType()));
     }
 
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
