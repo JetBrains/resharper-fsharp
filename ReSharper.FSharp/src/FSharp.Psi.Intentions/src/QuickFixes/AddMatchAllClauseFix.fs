@@ -61,5 +61,6 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
             clause.SetExpression(factory.CreateExpr("ArgumentOutOfRangeException() |> raise")) |> ignore
 
         Action<_>(fun textControl ->
-            let offset = clause.GetNavigationRange().EndOffset
-            textControl.Caret.MoveTo(offset, CaretVisualPlacement.DontScrollIfVisible))
+            let range = clause.Expression.GetNavigationRange()
+            textControl.Caret.MoveTo(range.EndOffset, CaretVisualPlacement.DontScrollIfVisible)
+            textControl.Selection.SetRange(range))

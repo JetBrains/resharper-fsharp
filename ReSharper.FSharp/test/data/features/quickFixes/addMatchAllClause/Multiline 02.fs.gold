@@ -5,4 +5,4 @@ match 1 with
     ()
 | 2 ->
     ()
-| _ -> failwith "todo"{caret}
+| _ -> {selstart}failwith "todo"{selend}
