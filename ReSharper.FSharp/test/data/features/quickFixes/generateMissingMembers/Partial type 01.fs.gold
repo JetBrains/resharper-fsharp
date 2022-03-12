@@ -1,0 +1,14 @@
+﻿[<AbstractClass>]
+type A() =
+    abstract P1: int
+    abstract P2: int
+    abstract P3: int
+
+type B() =
+    inherit A()
+
+    override this.P1 = 1
+    override this.P3 = {selstart}failwith "todo"{selend}
+
+type B with
+    override this.P2 = 1

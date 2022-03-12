@@ -5,6 +5,6 @@ type I =
   abstract P2: int
 
 type T() =
-  interface I{caret} with
+  interface I with
     member x.P1 = 1
-    member this.P2 = failwith "todo"
+    member this.P2 = {selstart}failwith "todo"{selend}

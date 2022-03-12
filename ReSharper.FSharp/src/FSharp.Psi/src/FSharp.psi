@@ -954,19 +954,19 @@ interface objectModelTypeRepresentation:
   interfaceRepresentation;
 
 classRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
-  CLASS<CLASS, ClassKeyword>
+  CLASS<FSHARP_BEGIN, BeginKeyword>
   typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*
-  END;
+  END<FSHARP_END, EndKeyword>;
 
 structRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
-  STRUCT<STRUCT, StructKeyword>
+  STRUCT<FSHARP_BEGIN, BeginKeyword>
   typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*
-  END;
+  END<FSHARP_END, EndKeyword>;
 
 interfaceRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
-  INTERFACE<INTERFACE, InterfaceKeyword>
+  INTERFACE<FSHARP_BEGIN, BeginKeyword>
   typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*
-  END;
+  END<FSHARP_END, EndKeyword>;
 
 interface fSharpTypeOldDeclaration:
   exceptionDeclaration |

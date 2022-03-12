@@ -12,4 +12,4 @@ type T() =
         member x.P1 = 1
     end
     member x.P2 = 1
-    override this.ToString() = failwith "todo"{caret}
+    override this.ToString() = {selstart}failwith "todo"{selend}

@@ -25,28 +25,33 @@ open JetBrains.Util
 type FSharpGeneratorContext(kind, typeDecl: IFSharpTypeDeclaration) =
     inherit GeneratorContextBase(kind)
 
+    let mutable selectedRange = TreeTextRange.InvalidRange
+
     member x.TypeDeclaration = typeDecl
 
     override x.Language = FSharpLanguage.Instance :> _
 
     override x.Root = typeDecl :> _
-    override val Anchor = null with get, set // todo
+    override val Anchor = null with get, set
 
     override x.PsiModule = typeDecl.GetPsiModule()
     override this.Solution = typeDecl.GetSolution()
 
-    override x.GetSelectionTreeRange() = TreeTextRange.InvalidRange // todo
+    override x.GetSelectionTreeRange() = selectedRange
 
     override x.CreatePointer() =
         FSharpGeneratorWorkflowPointer(x) :> _
 
-    static member Create(kind, treeNode: ITreeNode) =
+    member x.AddGeneratedMembers(nodes, lastNode) =
+        selectedRange <- GenerateOverrides.getGeneratedSelectionTreeRange lastNode nodes
+
+    static member Create(kind, treeNode: ITreeNode, anchor) =
         if isNull treeNode || treeNode.IsFSharpSigFile() then null else
 
         let typeDeclaration = treeNode.As<IFSharpTypeDeclaration>()
         if isNull typeDeclaration || isNull typeDeclaration.DeclaredElement then null else
 
-        FSharpGeneratorContext(kind, typeDeclaration)
+        FSharpGeneratorContext(kind, typeDeclaration, Anchor = anchor)
 
 
 and FSharpGeneratorWorkflowPointer(context: FSharpGeneratorContext) =
@@ -68,10 +73,11 @@ type FSharpGeneratorContextFactory() =
                     | group -> group.TypeDeclarations.FirstOrDefault().As<IFSharpTypeDeclaration>()
                 | typeDeclaration -> typeDeclaration
 
-            FSharpGeneratorContext.Create(kind, typeDeclaration) :> _
+            let anchor = GenerateOverrides.getAnchorNode psiView
+            FSharpGeneratorContext.Create(kind, typeDeclaration, anchor) :> _
 
-        member x.TryCreate(kind, treeNode, _) =
-            FSharpGeneratorContext.Create(kind, treeNode) :> _
+        member x.TryCreate(kind, treeNode, anchor) =
+            FSharpGeneratorContext.Create(kind, treeNode, anchor) :> _
 
         member x.TryCreate(_: string, _: IDeclaredElement): IGeneratorContext = null
 
@@ -213,6 +219,9 @@ type FSharpOverridingMembersBuilder() =
         | _ -> ()
 
         let anchor: ITreeNode =
+            let anchor = context.Anchor
+            if isNotNull anchor then anchor else
+
             let typeMembers = typeDecl.TypeMembers
             if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
 
@@ -239,17 +248,54 @@ type FSharpOverridingMembersBuilder() =
         let (anchor: ITreeNode), indent =
             match anchor with
             | :? IStructRepresentation as structRepr ->
-                structRepr.StructKeyword :> _, structRepr.StructKeyword.Indent + typeDecl.GetIndentSize()
-            | :? ITokenNode ->
-                let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl).NotNull()
-                anchor, typeDeclarationGroup.Indent + typeDecl.GetIndentSize()
+                structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
+
+            | :? ITokenNode as token ->
+                let parent = token.Parent
+                match parent with
+                | :? IObjectModelTypeRepresentation as repr when token != repr.EndKeyword ->
+                    let indent =
+                        match repr.TypeMembersEnumerable |> Seq.tryHead with
+                        | Some memberDecl -> memberDecl.Indent
+                        | _ -> repr.BeginKeyword.Indent + typeDecl.GetIndentSize()
+                    token, indent
+                | _ ->
+
+                let indent = 
+                    match typeDecl.TypeMembersEnumerable |> Seq.tryHead with
+                    | Some memberDecl -> memberDecl.Indent
+                    | _ ->
+
+                    let typeRepr = typeDecl.TypeRepresentation
+                    if isNotNull typeRepr then typeRepr.Indent else
+
+                    let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl).NotNull()
+                    typeDeclarationGroup.Indent + typeDecl.GetIndentSize()
+
+                anchor, indent
+
             | _ -> anchor, anchor.Indent
 
-        let anchor = GenerateOverrides.addEmptyLineIfNeeded anchor
+        let anchor =
+            if isAtEmptyLine anchor then
+                let first = getFirstMatchingNodeBefore isInlineSpace anchor |> getThisOrPrevNewLIne
+                let last = getLastMatchingNodeAfter isInlineSpace anchor
 
-        context.InputElements
-        |> Seq.cast
-        |> Seq.map (GenerateOverrides.generateMember typeDecl indent)
-        |> Seq.collect (withNewLineAndIndentBefore indent)
-        |> addNodesAfter anchor
-        |> ignore
+                let anchor = first.PrevSibling
+                deleteChildRange first last
+                anchor
+            else
+                anchor
+
+        let anchor = GenerateOverrides.addEmptyLineBeforeIfNeeded anchor
+
+        let lastNode = 
+            context.InputElements
+            |> Seq.cast
+            |> Seq.map (GenerateOverrides.generateMember typeDecl indent)
+            |> Seq.collect (withNewLineAndIndentBefore indent)
+            |> addNodesAfter anchor
+
+        GenerateOverrides.addEmptyLineAfterIfNeeded lastNode
+
+        context.AddGeneratedMembers(anchor.RightSiblings(), lastNode)

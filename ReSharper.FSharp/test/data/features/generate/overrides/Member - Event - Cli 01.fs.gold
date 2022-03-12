@@ -13,8 +13,8 @@ type A() =
     [<CLIEvent>]
     abstract E: IEvent<int>
 
-type T() ={caret}
+type T() =
     inherit A()
 
     [<CLIEvent>]
-    override this.E = failwith "todo"
+    override this.E = {selstart}failwith "todo"{selend}

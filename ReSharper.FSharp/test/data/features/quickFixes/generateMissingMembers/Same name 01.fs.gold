@@ -3,7 +3,7 @@ type A() =
     abstract M: unit -> unit
     member this.M(x: int) = ()
 
-type {caret}B() =
+type B() =
     inherit A()
 
-    override this.M() = failwith "todo"
+    override this.M() = {selstart}failwith "todo"{selend}

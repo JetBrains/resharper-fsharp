@@ -5,4 +5,4 @@
 type T() =
     interface I with
       [<CLIEvent>]
-      member this.E = failwith "todo"{caret}
+      member this.E = {selstart}failwith "todo"{selend}

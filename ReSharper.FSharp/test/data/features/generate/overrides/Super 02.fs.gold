@@ -23,8 +23,8 @@ type B() =
     inherit A()
     override x.M(_: int) = ()
 
-type T() ={caret}
+type T() =
     inherit B()
 
     override this.M(var0: int): unit = failwith "todo"
-    override this.M(var0: double): unit = failwith "todo"
+    override this.M(var0: double): unit = {selstart}failwith "todo"{selend}

@@ -8,7 +8,7 @@ type A<'T>() =
     interface I with
         member this.M() = failwith "todo"
 
-type {caret}B() =
+type B() =
     inherit A<int>()
 
-    override this.M(var0) = failwith "todo"
+    override this.M(var0) = {selstart}failwith "todo"{selend}

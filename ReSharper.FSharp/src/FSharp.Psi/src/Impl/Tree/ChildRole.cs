@@ -11,6 +11,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public const short FSHARP_DELIMITER = 5;
     public const short FSHARP_COLON = 6;
     public const short FSHARP_OR = 7;
+    public const short FSHARP_BEGIN = 8;
+    public const short FSHARP_END = 9;
 
     public const short LAST = 100;
   }

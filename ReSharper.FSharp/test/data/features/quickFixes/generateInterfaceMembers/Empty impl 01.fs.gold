@@ -3,4 +3,4 @@
 
 type T() =
   interface I with
-    member this.P = failwith "todo"{caret}
+    member this.P = {selstart}failwith "todo"{selend}

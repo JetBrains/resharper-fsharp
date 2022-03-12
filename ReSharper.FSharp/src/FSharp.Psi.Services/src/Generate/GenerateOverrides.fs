@@ -10,6 +10,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
@@ -85,13 +87,79 @@ let noEmptyLineAnchors =
         FSharpTokenType.WITH,
         FSharpTokenType.EQUALS)
 
-let addEmptyLineIfNeeded (anchor: ITreeNode) =
+let getThisOrPreviousMeaningfulSibling (node: ITreeNode) =
+    if isNotNull node && node.IsFiltered() then node.GetPreviousMeaningfulSibling() else node
+
+let addEmptyLineBeforeIfNeeded (anchor: ITreeNode) =
     let addEmptyLine =
         not noEmptyLineAnchors[getTokenType anchor] &&
-        not ((anchor :? IMemberDeclaration) && anchor.IsSingleLine)
+        
+        let anchor = getThisOrPreviousMeaningfulSibling anchor
+        not ((anchor :? IOverridableMemberDeclaration) && anchor.IsSingleLine)
 
     if addEmptyLine then
+        let anchor = getLastMatchingNodeAfter isInlineSpaceOrComment anchor
         ModificationUtil.AddChildAfter(anchor, NewLine(anchor.GetLineEnding())) :> ITreeNode
     else
         anchor
     |> getLastMatchingNodeAfter isInlineSpaceOrComment
+
+let addEmptyLineAfterIfNeeded (lastGeneratedNode: ITreeNode) =
+    if isBeforeEmptyLine lastGeneratedNode then () else
+
+    let nextNode = lastGeneratedNode.GetNextMeaningfulSibling()
+    if nextNode :? ITypeBodyMemberDeclaration && not nextNode.IsSingleLine then
+        addNodeAfter lastGeneratedNode (NewLine(lastGeneratedNode.GetLineEnding()))
+
+let getGeneratedSelectionTreeRange (lastNode: ITreeNode) (generatedNodes: seq<ITreeNode>) =
+    generatedNodes
+    |> Seq.takeWhile (fun node -> node.GetTreeEndOffset().Offset <= lastNode.GetTreeEndOffset().Offset)
+    |> Seq.choose (fun node ->
+           match node with
+           | :? IMemberDeclaration as memberDecl -> Some(memberDecl)
+           | _ -> None)
+    |> Seq.tryLast
+    |> Option.map (fun memberDecl ->
+        match memberDecl.AccessorDeclarationsEnumerable |> Seq.tryHead with
+        | Some accessorDecl -> accessorDecl.GetTreeTextRange()
+        | _ -> memberDecl.Expression.GetTreeTextRange())
+    |> Option.defaultValue TreeTextRange.InvalidRange
+
+let private getObjectTypeReprAnchor (objectTypeRepr: IObjectModelTypeRepresentation) (psiView: IPsiView) =
+    let node = psiView.GetSelectedTreeNode()
+    if node.GetTreeStartOffset().Offset < objectTypeRepr.GetTreeStartOffset().Offset then null else
+
+    let prevSibling = getThisOrPreviousMeaningfulSibling node
+    if isNotNull prevSibling && prevSibling != objectTypeRepr.EndKeyword then prevSibling else null
+
+let canInsertBefore (node: ITreeNode) =
+    match node with
+    | null -> true
+    | :? ILetBindingsDeclaration
+    | :? IDoStatement
+    | :? IValFieldDeclaration
+    | :? ITypeInherit -> false
+    | _ -> true
+
+let canInsertAtNode (node: ITreeNode) =
+    isNotNull node && isAtEmptyLine node &&
+    canInsertBefore (node.GetNextMeaningfulSibling())
+
+let getAnchorNode (psiView: IPsiView): ITreeNode =
+    let memberDecl = psiView.GetSelectedTreeNode<ITypeBodyMemberDeclaration>()
+    if isNotNull memberDecl && canInsertBefore (memberDecl.GetNextMeaningfulSibling()) then memberDecl else
+
+    let selectedTreeNode = psiView.GetSelectedTreeNode()
+    if canInsertAtNode selectedTreeNode then selectedTreeNode else
+
+    let objectTypeRepr = psiView.GetSelectedTreeNode<IObjectModelTypeRepresentation>()
+    if isNotNull objectTypeRepr then
+        getObjectTypeReprAnchor objectTypeRepr psiView else
+
+    let typeRepresentation = psiView.GetSelectedTreeNode<ITypeRepresentation>()
+    if isNotNull typeRepresentation then typeRepresentation else
+
+    let selectedTreeNode = psiView.GetSelectedTreeNode()
+    selectedTreeNode.LeftSiblings()
+    |> Seq.tryFind (fun node -> node :? ITypeBodyMemberDeclaration || node :? ITypeRepresentation)
+    |> Option.defaultValue null

@@ -12,7 +12,7 @@ type A() =
     abstract P: int
     default x.P = 1
 
-type T() ={caret}
+type T() =
     inherit A()
 
-    override this.P = failwith "todo"
+    override this.P = {selstart}failwith "todo"{selend}
