@@ -49,6 +49,7 @@ type GenerateInterfaceMembersFixTest() =
 
     [<Test>] member x.``Nested interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Nested interface 02 - Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Nested interface 03 - Partially base implemented``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

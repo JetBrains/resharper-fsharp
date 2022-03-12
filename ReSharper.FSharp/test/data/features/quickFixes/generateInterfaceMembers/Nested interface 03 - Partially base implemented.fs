@@ -1,0 +1,18 @@
+module Module
+
+type I1 =
+    abstract P1: int
+
+type I2 =
+    inherit I1
+
+    abstract P2: int
+
+type T1() =
+    interface I1 with
+        member this.P1 = 1
+
+type T2() =
+    inherit T1()
+
+    interface I2{caret}

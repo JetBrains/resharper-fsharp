@@ -15,7 +15,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 
@@ -56,15 +58,17 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
         use writeCookie = WriteLockCookie.Create(impl.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let interfaceType =
-            let typeDeclaration =
-                match FSharpTypeDeclarationNavigator.GetByTypeMember(impl) with
-                | null ->
-                    let repr = ObjectModelTypeRepresentationNavigator.GetByTypeMember(impl)
-                    FSharpTypeDeclarationNavigator.GetByTypeRepresentation(repr)
-                | decl -> decl
+        let typeDeclaration =
+            match FSharpTypeDeclarationNavigator.GetByTypeMember(impl) with
+            | null ->
+                let repr = ObjectModelTypeRepresentationNavigator.GetByTypeMember(impl)
+                FSharpTypeDeclarationNavigator.GetByTypeRepresentation(repr)
+            | decl -> decl
 
-            let fcsEntity = typeDeclaration.GetFcsSymbol() :?> FSharpEntity
+        let typeElement = typeDeclaration.DeclaredElement
+        let fcsEntity = typeDeclaration.GetFcsSymbol() :?> FSharpEntity
+
+        let interfaceType = 
             fcsEntity.DeclaredInterfaces |> Seq.find (fun e ->
                 e.HasTypeDefinition && e.TypeDefinition.IsEffectivelySameAs(impl.FcsEntity))
 
@@ -74,11 +78,18 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
 
         let implementedMembers =
             existingMemberDecls
-            |> Seq.map (fun m ->
-                m.DeclaredElement.As<IOverridableMember>().ExplicitImplementations
+            |> Seq.collect (fun memberDecl ->
+                memberDecl.DeclaredElement.As<IOverridableMember>().ExplicitImplementations
                 |> Seq.choose (fun i -> i.Resolve() |> Option.ofObj |> Option.map (fun i -> i.Element.XMLDocId)))
-            |> Seq.concat
             |> HashSet
+
+        TypeElementUtil.GetAllMembers(typeElement)
+        |> Seq.collect (fun m ->
+            let overridableMember = m.Member.As<IOverridableMember>()
+            if isNull overridableMember then Seq.empty else
+            OverridableMemberImpl.GetImmediateImplement(OverridableMemberInstance(overridableMember), false))
+        |> Seq.map (fun memberInstance -> memberInstance.Element.XMLDocId)
+        |> Seq.iter (implementedMembers.Add >> ignore)
 
         let allInterfaceMembers =
             getInterfaces interfaceType |> List.collect (fun fcsEntityInstance ->
