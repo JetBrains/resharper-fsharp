@@ -257,7 +257,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             let changeBuilder = PsiModuleChangeBuilder()
             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Removed)
             changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed)
-            changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance))
+            changeManager.ExecuteAfterChange(fun _ -> changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance)))
 
     member x.GetPsiModulesForPath(path) =
         getPsiModulesForPath path
