@@ -65,6 +65,7 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
                 FSharpTypeDeclarationNavigator.GetByTypeRepresentation(repr)
             | decl -> decl
 
+        let psiModule = typeDeclaration.GetPsiModule()
         let typeElement = typeDeclaration.DeclaredElement
         let fcsEntity = typeDeclaration.GetFcsSymbol() :?> FSharpEntity
 
@@ -72,26 +73,69 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
             fcsEntity.DeclaredInterfaces |> Seq.find (fun e ->
                 e.HasTypeDefinition && e.TypeDefinition.IsEffectivelySameAs(impl.FcsEntity))
 
-        let displayContext = impl.TypeName.Reference.GetSymbolUse().DisplayContext
-
         let existingMemberDecls = impl.TypeMembers
+
+        let getXmlDocId (typeMember: ITypeMember) =
+            XMLDocUtil.GetTypeMemberXmlDocId(typeMember, typeMember.ShortName)
+
+        let getAccessorOrPropertyXmlDocId (mfv: FSharpMemberOrFunctionOrValue) (prop: IProperty) =
+            if mfv.IsPropertyGetterMethod then
+                getXmlDocId prop.Getter else
+
+            if mfv.IsPropertySetterMethod then
+                getXmlDocId prop.Setter else
+
+            getXmlDocId prop
+
+        let getPropertyAccessorXmlDocIds (implementedProp: IProperty) (prop: IProperty) =
+            prop.GetAllAccessors()
+            |> Seq.choose (fun accessor ->
+                match accessor.Kind with
+                | AccessorKind.GETTER -> Some(getXmlDocId implementedProp.Getter)
+                | AccessorKind.SETTER -> Some(getXmlDocId implementedProp.Setter)
+                | _ -> None)
 
         let implementedMembers =
             existingMemberDecls
             |> Seq.collect (fun memberDecl ->
-                memberDecl.DeclaredElement.As<IOverridableMember>().ExplicitImplementations
-                |> Seq.choose (fun i -> i.Resolve() |> Option.ofObj |> Option.map (fun i -> i.Element.XMLDocId)))
+                let declaredElement = memberDecl.DeclaredElement :?> IOverridableMember
+                declaredElement.ExplicitImplementations
+                |> Seq.collect (fun explicitImpl ->
+                    match explicitImpl.Resolve() with
+                    | null -> Seq.empty
+                    | memberInstance ->
+
+                    let fcsSymbol = memberDecl.GetFcsSymbol()
+                    match memberInstance.Member, declaredElement with
+                    | :? IProperty as implementedProp, (:? IProperty as prop) when fcsSymbol.IsNonCliEventPropertyOrAccessor() ->
+                        getPropertyAccessorXmlDocIds implementedProp prop
+                    | implementedMember, _ -> [implementedMember.XMLDocId]))
             |> HashSet
 
-        TypeElementUtil.GetAllMembers(typeElement)
-        |> Seq.collect (fun m ->
-            let overridableMember = m.Member.As<IOverridableMember>()
+        let baseTypeElement =
+            match typeElement with
+            | :? IClass as classTypeElement ->
+                let baseClassType = classTypeElement.GetBaseClassType()
+                baseClassType.Resolve().DeclaredElement.As<ITypeElement>()
+            | _ -> null
+
+        let baseTypeMembers =
+            if isNull baseTypeElement then Seq.empty else
+            TypeElementUtil.GetAllMembers(baseTypeElement)
+
+        baseTypeMembers
+        |> Seq.collect (fun memberInstance ->
+            let overridableMember = memberInstance.Member.As<IOverridableMember>()
             if isNull overridableMember then Seq.empty else
             OverridableMemberImpl.GetImmediateImplement(OverridableMemberInstance(overridableMember), false))
-        |> Seq.map (fun memberInstance -> memberInstance.Element.XMLDocId)
+        |> Seq.collect (fun memberInstance ->
+            match memberInstance.Element with
+            | :? IProperty as prop -> getPropertyAccessorXmlDocIds prop prop
+            | element -> [element.XMLDocId])
         |> Seq.iter (implementedMembers.Add >> ignore)
 
         let allInterfaceMembers =
+            let displayContext = impl.TypeName.Reference.GetSymbolUse().DisplayContext
             getInterfaces interfaceType |> List.collect (fun fcsEntityInstance ->
                 fcsEntityInstance.Entity.MembersFunctionsAndValues
                 |> Seq.map (fun mfv -> FcsMfvInstance.create mfv displayContext fcsEntityInstance.Substitution)
@@ -100,16 +144,25 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
         let needsTypesAnnotations =
             GenerateOverrides.getMembersNeedingTypeAnnotations allInterfaceMembers
 
+        let needsTypesAnnotations mfvInstance =
+            needsTypesAnnotations.Contains(mfvInstance.Mfv)
+
         let membersToGenerate =
             allInterfaceMembers
             |> List.filter (fun mfvInstance ->
-                not (mfvInstance.Mfv.IsAccessor()) &&
+                let mfv = mfvInstance.Mfv
+                (not mfv.IsProperty || mfv.IsCliEvent()) && not (mfv.IsCliEventAccessor()) &&
 
-                let xmlDocId = mfvInstance.Mfv.GetXmlDocId()
+                let declaredElement = mfv.GetDeclaredElement(psiModule)
+                let xmlDocId =
+                    match declaredElement with
+                    | :? IProperty as prop -> getAccessorOrPropertyXmlDocId mfv prop
+                    | :? ITypeMember as typeMember -> getXmlDocId typeMember
+                    | _ -> mfv.GetXmlDocId()
+
                 not (implementedMembers.Contains(xmlDocId)))
-            |> List.sortBy (fun mfvInstance -> mfvInstance.Mfv.LogicalName) // todo: better sorting?
-            |> List.map (fun mfvInstance -> mfvInstance, needsTypesAnnotations.Contains(mfvInstance.Mfv))
-            |> List.map FSharpGeneratorMfvElement
+            |> List.sortBy (fun mfvInstance -> mfvInstance.Mfv.DisplayNameCore) // todo: try to preserve declaration sorting?
+            |> List.map (fun mfvInstance -> FSharpGeneratorMfvElement(mfvInstance, needsTypesAnnotations mfvInstance))
 
         let indent =
             if existingMemberDecls.IsEmpty then

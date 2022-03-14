@@ -1,6 +1,7 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate.GenerateOverrides
 
 open System.Collections.Generic
+open FSharp.Compiler.Symbols
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -39,8 +40,23 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
         nextUnnamedVariableNumber <- nextUnnamedVariableNumber + 1
         name
 
+    let isPropertyGetterMethod = mfv.IsPropertyGetterMethod
+    let isPropertySetterMethod = mfv.IsPropertySetterMethod
+
+    let paramGroups = mfv.CurriedParameterGroups
+
+    let tryGetSingleParam (paramGroups: IList<IList<FSharpParameter>>) =
+        if paramGroups.Count = 1 && paramGroups[0].Count = 1 then
+            Some(paramGroups[0][0])
+        else
+            None
+
     let argNames =
-        mfv.CurriedParameterGroups
+        match isPropertySetterMethod, tryGetSingleParam paramGroups with
+        | true, Some param when param.Name.IsNone -> [["value", param.Type.Instantiate(element.Substitution)]]
+        | _ ->
+
+        paramGroups
         |> Seq.map (Seq.map (fun x ->
             let name = x.Name |> Option.defaultWith (fun _ -> getUnnamedVariableName ())
             name, x.Type.Instantiate(element.Substitution)) >> Seq.toList)
@@ -50,17 +66,26 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
         if not element.AddTypes then [] else
         mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
 
-    let memberName = mfv.LogicalName
+    let memberName =
+        if isPropertyGetterMethod || isPropertySetterMethod then
+            mfv.LogicalName.Substring(4)
+        else
+            mfv.LogicalName
 
     let factory = context.CreateElementFactory()
     let settingsStore = context.GetSettingsStoreWithEditorConfig()
     let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
 
     let paramGroups =
-        if mfv.IsProperty then [] else
-        factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, element.AddTypes, element.DisplayContext)
+        if mfv.IsProperty || isPropertyGetterMethod then [] else // todo: properties with params
+        let preferNoParens = isPropertySetterMethod
+        factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, element.AddTypes, preferNoParens, element.DisplayContext)
 
-    let memberDeclaration = factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups)
+    let memberDeclaration =
+        if isPropertySetterMethod then
+            factory.CreatePropertyWithAccessor(memberName, "set", paramGroups)
+        else
+            factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups)
 
     if element.IsOverride then
         memberDeclaration.SetOverride(true)
@@ -121,7 +146,7 @@ let getGeneratedSelectionTreeRange (lastNode: ITreeNode) (generatedNodes: seq<IT
     |> Seq.tryLast
     |> Option.map (fun memberDecl ->
         match memberDecl.AccessorDeclarationsEnumerable |> Seq.tryHead with
-        | Some accessorDecl -> accessorDecl.GetTreeTextRange()
+        | Some accessorDecl -> accessorDecl.Expression.GetTreeTextRange()
         | _ -> memberDecl.Expression.GetTreeTextRange())
     |> Option.defaultValue TreeTextRange.InvalidRange
 

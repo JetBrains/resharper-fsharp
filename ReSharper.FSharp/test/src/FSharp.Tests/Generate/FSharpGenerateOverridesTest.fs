@@ -51,6 +51,8 @@ type FSharpGenerateOverridesTest() =
 
     [<Test>] member x.``Member - Event - Cli 01``() = x.DoNamedTest()
     [<Test>] member x.``Member - Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Property 02 - Setter``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Property 03 - Setter only``() = x.DoNamedTest()
 
     [<Test>] member x.``Input elements - Overriden 01``() = x.DoNamedTest()
 

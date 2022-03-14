@@ -234,7 +234,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         var compiledName = compiledNameAttr != null && !compiledNameAttr.Value.ConstructorArguments.IsEmpty()
           ? compiledNameAttr.Value.ConstructorArguments[0].Item2 as string
           : null;
-        return compiledName ?? (IsImplicitAccessor(mfv) ? mfv.DisplayName : mfv.LogicalName);
+        return compiledName ?? (IsImplicitAccessor(mfv) ? mfv.DisplayName : mfv.LogicalName); // todo: map to accessor
       }
       catch (Exception e)
       {
@@ -872,9 +872,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       using (CompilationContextCookie.GetOrCreate(decl.GetPsiModule().GetContextFromModule()))
         return cache.GetOrCreateDeclaredElement(decl, factory);
     }
-
-    public static bool IsIndexer(this IMemberSignatureOrDeclaration decl) =>
-      decl.SourceName == StandardMemberNames.DefaultIndexerName && decl.SourceName == decl.CompiledName;
 
     public static IDeclaredElement CreateMethod([NotNull] this IMemberSignatureOrDeclaration decl)
     {

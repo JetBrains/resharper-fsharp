@@ -18,6 +18,7 @@ open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
@@ -82,19 +83,19 @@ type FSharpGeneratorContextFactory() =
         member x.TryCreate(_: string, _: IDeclaredElement): IGeneratorContext = null
 
 
-type FSharpGeneratorElement(element, mfv, displayContext, substitution, addTypes) =
+type FSharpGeneratorElement(element, mfvInstance: FcsMfvInstance, addTypes) =
     inherit GeneratorDeclaredElement(element)
 
-    new (element, mfvInstance: FcsMfvInstance, addTypes) =
-        FSharpGeneratorElement(element, mfvInstance.Mfv, mfvInstance.DisplayContext, mfvInstance.Substitution, addTypes)
-
+    member x.AddTypes = addTypes
+    member x.Mfv = mfvInstance.Mfv
+    member x.MfvInstance = mfvInstance
     member x.Member = element
 
     interface IFSharpGeneratorElement with
-        member x.Mfv = mfv
-        member x.DisplayContext = displayContext
-        member x.Substitution = substitution
-        member x.AddTypes = addTypes
+        member x.Mfv = x.Mfv
+        member x.DisplayContext = mfvInstance.DisplayContext
+        member x.Substitution = mfvInstance.Substitution
+        member x.AddTypes = x.AddTypes
         member x.IsOverride = true
 
     override x.ToString() = element.ToString()
@@ -120,6 +121,9 @@ type FSharpOverridableMembersProvider() =
         let typeElement = typeDeclaration.DeclaredElement
         if not (canHaveOverrides typeElement) then () else
 
+        let psiModule = typeElement.Module
+        let missingMembersOnly = context.Kind = GeneratorStandardKinds.MissingMembers
+
         let fcsEntity = typeDeclaration.GetFcsSymbol().As<FSharpEntity>()
         if isNull fcsEntity then () else
 
@@ -140,7 +144,13 @@ type FSharpOverridableMembersProvider() =
 
         let ownMembersIds =
             typeElement.GetMembers()
-            |> Seq.filter (fun e -> not (e :? IFSharpGeneratedElement))
+            |> Seq.collect (fun typeMember ->
+                if typeMember :? IFSharpGeneratedElement then Seq.empty else
+                if not missingMembersOnly then Seq.singleton typeMember else
+
+                match typeMember with
+                | :? IProperty as prop -> prop.GetAllAccessors() |> Seq.cast
+                | _ -> [typeMember])
             |> Seq.map getTestDescriptor
             |> HashSet
 
@@ -167,8 +177,11 @@ type FSharpOverridableMembersProvider() =
                     let mfv = mfvInstance.Mfv
                     if mfv.IsAccessor() then None else // todo: allow generating accessors
 
-                    // FCS provides wrong XmlDocId for accessors, e.g. T.P for T.get_P()
-                    let xmlDocId = mfv.GetXmlDocId()
+                    let xmlDocId =
+                        match mfv.GetDeclaredElement(psiModule).As<ITypeMember>() with
+                        | null -> mfv.GetXmlDocId() 
+                        | typeMember -> XMLDocUtil.GetTypeMemberXmlDocId(typeMember, typeMember.ShortName)
+
                     if ownMembersIds.Contains(xmlDocId) then None else
 
                     let mutable memberInstance = Unchecked.defaultof<_>
@@ -185,13 +198,17 @@ type FSharpOverridableMembersProvider() =
             |> List.map snd
             |> GenerateOverrides.getMembersNeedingTypeAnnotations
 
-        let missingMembersOnly = context.Kind = GeneratorStandardKinds.MissingMembers
-
         overridableMemberInstances
-        |> Seq.filter (fun (m, _) ->
-            // todo: events, anything else?
-            // todo: separate getters/setters (including existing ones)
-            (m :? IMethod || m :? IProperty || m :? IEvent) && m.CanBeOverridden())
+        |> Seq.filter (fun (m, _) -> (m :? IMethod || m :? IProperty || m :? IEvent) && m.CanBeOverridden())
+        |> Seq.collect (fun (m, mfvInstance as i) ->
+            let mfv = mfvInstance.Mfv
+            let prop = m.As<IProperty>()
+            if not missingMembersOnly || isNull prop || not (mfv.IsNonCliEventProperty()) then [i] else
+
+            [ if isNotNull prop.Getter && mfv.HasGetterMethod then
+                  prop.Getter :> IOverridableMember, { mfvInstance with Mfv = mfv.GetterMethod }
+              if isNotNull prop.Setter && mfv.HasSetterMethod then
+                  prop.Setter :> IOverridableMember, { mfvInstance with Mfv = mfv.SetterMethod } ])
         |> Seq.map (fun (m, mfvInstance) ->
             FSharpGeneratorElement(m, mfvInstance, needsTypesAnnotations.Contains(mfvInstance.Mfv)))
         |> Seq.filter (fun i -> not (ownMembersIds.Contains(i.TestDescriptor)))
@@ -289,8 +306,26 @@ type FSharpOverridingMembersBuilder() =
 
         let anchor = GenerateOverrides.addEmptyLineBeforeIfNeeded anchor
 
-        let lastNode = 
+        let missingMembersOnly = context.Kind = GeneratorStandardKinds.MissingMembers
+
+        let inputElements =
+            if missingMembersOnly then context.InputElements |> Seq.cast<FSharpGeneratorElement> else
+
             context.InputElements
+            |> Seq.collect (fun generatorElement ->
+                let e = generatorElement :?> FSharpGeneratorElement
+                let mfv = e.Mfv
+                let prop = e.Member.As<IProperty>()
+
+                if isNull prop || not (mfv.IsNonCliEventProperty()) then [e] else
+
+                [ if isNotNull prop.Getter && mfv.HasGetterMethod then
+                      FSharpGeneratorElement(prop.Getter, { e.MfvInstance with Mfv = mfv.GetterMethod }, e.AddTypes)
+                  if isNotNull prop.Setter && mfv.HasSetterMethod then
+                      FSharpGeneratorElement(prop.Setter, { e.MfvInstance with Mfv = mfv.SetterMethod }, e.AddTypes) ])
+
+        let lastNode = 
+            inputElements
             |> Seq.cast
             |> Seq.map (GenerateOverrides.generateMember typeDecl indent)
             |> Seq.collect (withNewLineAndIndentBefore indent)

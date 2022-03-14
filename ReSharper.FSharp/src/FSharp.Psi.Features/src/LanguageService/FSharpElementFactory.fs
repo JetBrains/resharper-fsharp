@@ -22,7 +22,8 @@ open JetBrains.ReSharper.Resources.Shell
 type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IPsiModule) =
     let [<Literal>] moniker = "F# element factory"
 
-    let namingService = NamingManager.GetNamingLanguageService(FSharpLanguage.Instance)
+    let getNamingService () =
+        NamingManager.GetNamingLanguageService(FSharpLanguage.Instance)
 
     let createDocument source =
         let documentFactory = Shell.Instance.GetComponent<IInMemoryDocumentFactory>()
@@ -69,20 +70,22 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
     let createLetDecl patternText =
         getModuleMember $"let {patternText} = ()" :?> ILetBindingsDeclaration
 
-    let createMemberDecl logicalName typeParameters parameters =
+    let toSourceName logicalName =
+        let name = PrettyNaming.DecompileOpName logicalName
+        if PrettyNaming.IsMangledOpName logicalName then
+            sprintf "( %s )" name
+        else
+            FSharpKeywords.AddBackticksToIdentifierIfNeeded name
+
+    let createMemberDecl logicalName typeParameters parameters addSpaceBeforeParams =
         let typeParametersSource =
             match typeParameters with
             | [] -> ""
             | parameters -> parameters |> List.map ((+) "'") |> String.concat ", " |> sprintf "<%s>"
 
-        let name =
-            let name = PrettyNaming.DecompileOpName logicalName
-            if PrettyNaming.IsMangledOpName logicalName then
-                sprintf "( %s )" name
-            else
-                FSharpKeywords.AddBackticksToIdentifierIfNeeded name
-
-        let memberSource = sprintf "member this.%s%s%s = failwith \"todo\"" name typeParametersSource parameters
+        let name = toSourceName logicalName
+        let space = if addSpaceBeforeParams then " " else ""
+        let memberSource = sprintf "member this.%s%s%s%s = failwith \"todo\"" name typeParametersSource space parameters
         let typeDecl = getTypeDecl memberSource
         typeDecl.TypeMembers[0] :?> IMemberDeclaration
 
@@ -135,6 +138,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             binaryAppExpr
 
         member x.CreateRecordFieldBinding(field, addSemicolon) =
+            let namingService = getNamingService ()
             let field = namingService.MangleNameIfNecessary(field)
             let semicolon = if addSemicolon then ";" else ""
 
@@ -165,7 +169,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = $"let {patternText} = ()"
             getModuleMember source :?> ILetBindingsDeclaration
 
-        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
+        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, preferNoParens, displayContext) =
             let printParam (name, fcsType: FSharpType) =
                 let name = FSharpKeywords.AddBackticksToIdentifierIfNeeded name
                 if not addTypes then name else
@@ -175,21 +179,39 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             let parametersSource =
                 curriedParameterNames
-                |> List.map (List.map printParam >> String.concat (if isSpaceAfterComma then ", " else ","))
-                |> List.map (sprintf "(%s)")
+                |> List.map (fun paramNames ->
+                    let concatenatedNames =
+                        paramNames
+                        |> List.map printParam
+                        |> String.concat (if isSpaceAfterComma then ", " else ",") 
+
+                    match preferNoParens, paramNames with
+                    | true, [_] -> concatenatedNames
+                    | _ -> $"({concatenatedNames})")
                 |> String.concat " "
 
-            let memberBinding = createMemberDecl "P" List.empty parametersSource
+            let memberBinding = createMemberDecl "P" List.empty parametersSource true
             memberBinding.ParametersDeclarations |> Seq.toList
 
         member x.CreateMemberBindingExpr(name, typeParameters, parameters) =
             let parsedParams = "()" |> List.replicate parameters.Length |> String.concat " "
-            let memberDecl = createMemberDecl name typeParameters parsedParams
+            let memberDecl = createMemberDecl name typeParameters parsedParams false
 
             for realArg, fakeArg in Seq.zip parameters memberDecl.ParametersDeclarations do
                 ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
             memberDecl
 
+        member x.CreatePropertyWithAccessor(name, accessorName, parameters) =
+            let name = toSourceName name
+            let memberSource = $"member this.{name} with {accessorName} {parameters} = failwith \"todo\""
+            let typeDecl = getTypeDecl memberSource
+            let memberDecl = typeDecl.TypeMembers[0] :?> IMemberDeclaration
+
+            for realArg, fakeArg in Seq.zip parameters memberDecl.AccessorDeclarations[0].ParametersDeclarations do
+                ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
+
+            memberDecl
+        
         member x.CreateConstExpr(text) =
             getExpression text :?> _
 

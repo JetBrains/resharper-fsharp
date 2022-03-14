@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using FSharp.Compiler.Symbols;
+using FSharp.Compiler.Text;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -15,25 +16,65 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     protected FSharpPropertyMemberBase([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
     {
-      var prop = GetProperty(mfv);
-
-      IsReadable = prop.HasGetterMethod || prop.IsPropertyGetterMethod ||
-                   prop.IsModuleValueOrMember && !prop.IsMember;
-
-      IsWritable = prop.IsMutable || prop.HasSetterMethod || prop.IsPropertySetterMethod;
+      var (isReadable, isWriteable) = GetReadWriteRights(mfv);
+      IsReadable = isReadable;
+      IsWritable = isWriteable;
     }
 
     public override bool IsReadable { get; }
     public override bool IsWritable { get; }
 
-    [NotNull]
-    private static FSharpMemberOrFunctionOrValue GetProperty([NotNull] FSharpMemberOrFunctionOrValue prop)
+    private static (bool isReadable, bool isWriteable) GetReadWriteRights([NotNull] FSharpMemberOrFunctionOrValue prop)
     {
+      bool IsWriteable(FSharpMemberOrFunctionOrValue mfv) =>
+        mfv.IsMutable || mfv.HasSetterMethod || mfv.IsPropertySetterMethod;
+
+      bool IsReadable(FSharpMemberOrFunctionOrValue mfv) =>
+        mfv.HasGetterMethod || mfv.IsPropertyGetterMethod ||
+        mfv.IsModuleValueOrMember && !mfv.IsMember;
+
+      var entity = prop.DeclaringEntity?.Value;
+      if (entity == null)
+        return (IsReadable(prop), IsWriteable(prop));
+
       // Property returned in AccessorProperty currently returns HasSetterMethod = false.
       // Workaround it by getting mfv property from declaring entity.
-      var entity = prop.DeclaringEntity?.Value;
-      var propertyName = prop.LogicalName;
-      return entity?.MembersFunctionsAndValues.FirstOrDefault(m => m.LogicalName == propertyName) ?? prop;
+      var name = prop.LogicalName;
+      var range = prop.DeclarationLocation;
+
+      var mfvs = entity.MembersFunctionsAndValues;
+      var propMfv = mfvs.FirstOrDefault(m => RangeModule.equals(m.DeclarationLocation, range) && m.LogicalName == name);
+      if (propMfv != null)
+        // Matching property is returned by Fcs
+        return (IsReadable(propMfv), IsWriteable(propMfv));
+
+      // Property isn't returned by Fcs for some reason, e.g. in explicit implementation.
+      // Trying to calculate info from accessors.
+
+      var isReadable = false;
+      var isWriteable = false;
+
+      foreach (var mfv in mfvs)
+      {
+        if (RangeModule.equals(mfv.DeclarationLocation, range) && mfv.DisplayNameCore == name)
+        {
+          if ($"get_{name}" == mfv.LogicalName)
+          {
+            var getterType = mfv.FullType;
+            if (getterType.IsFunctionType && getterType.GenericArguments[1].Equals(prop.FullType))
+              isReadable = true;
+            continue;
+          }
+
+          if ($"set_{name}" == mfv.LogicalName)
+          {
+            var getterType = mfv.FullType;
+            if (getterType.IsFunctionType && getterType.GenericArguments[0].Equals(prop.FullType))
+              isWriteable = true;
+          }
+        }
+      }
+      return (isReadable, isWriteable);
     }
   }
 
