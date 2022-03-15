@@ -203,7 +203,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreatePropertyWithAccessor(name, accessorName, parameters) =
             let name = toSourceName name
-            let memberSource = $"member this.{name} with {accessorName} {parameters} = failwith \"todo\""
+            let parametersString = parameters |> Seq.map (fun _ -> "()") |> String.concat " "
+            let memberSource = $"member this.{name} with {accessorName} {parametersString} = failwith \"todo\""
             let typeDecl = getTypeDecl memberSource
             let memberDecl = typeDecl.TypeMembers[0] :?> IMemberDeclaration
 

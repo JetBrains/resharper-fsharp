@@ -1,0 +1,9 @@
+﻿[<AbstractClass>]
+type A() =
+    abstract Item: int -> string with get, set
+
+type T() =
+    inherit A()
+
+    override this.Item with get var0 = failwith "todo"
+    override this.Item with set var0 value = {selstart}failwith "todo"{selend}

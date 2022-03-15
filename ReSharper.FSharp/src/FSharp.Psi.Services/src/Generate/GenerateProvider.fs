@@ -175,7 +175,7 @@ type FSharpOverridableMembersProvider() =
             baseFcsMembers |> List.collect (fun (_, mfvInstances) ->
                 mfvInstances |> List.choose (fun mfvInstance ->
                     let mfv = mfvInstance.Mfv
-                    if mfv.IsAccessor() then None else // todo: allow generating accessors
+                    if mfv.IsAccessor() then None else
 
                     let xmlDocId =
                         match mfv.GetDeclaredElement(psiModule).As<ITypeMember>() with

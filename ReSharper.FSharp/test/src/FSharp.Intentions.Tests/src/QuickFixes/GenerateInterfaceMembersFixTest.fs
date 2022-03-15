@@ -38,6 +38,9 @@ type GenerateInterfaceMembersFixTest() =
     [<Test>] member x.``Method - Substitution 04 - Inherited interface``() = x.DoNamedTest()
     [<Test>] member x.``Method - Substitution 05 - Inherited interface``() = x.DoNamedTest()
 
+    [<Test>] member x.``Property - Indexer 01``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Indexer 02 - Named param``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Indexer 03``() = x.DoNamedTest()
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 02 - Setter``() = x.DoNamedTest()
     [<Test>] member x.``Property 03 - Setter only``() = x.DoNamedTest()
@@ -72,6 +75,7 @@ type GenerateMissingMembersFixTest() =
     [<Test>] member x.``Property - Accessor - Setter 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Accessor - Setter 02``() = x.DoNamedTest()
     [<Test>] member x.``Property - Accessor - Setter 03``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Indexer 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Same name 01``() = x.DoNamedTest()
     [<Test>] member x.``Same name 02``() = x.DoNamedTest()

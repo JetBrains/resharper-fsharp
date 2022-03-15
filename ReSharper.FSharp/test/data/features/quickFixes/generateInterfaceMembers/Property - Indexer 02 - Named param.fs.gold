@@ -1,0 +1,9 @@
+﻿module Module
+
+type I =
+    abstract Item: index: int -> string with get, set
+
+type T() =
+  interface I with
+    member this.Item with get index = failwith "todo"
+    member this.Item with set index value = {selstart}failwith "todo"{selend}

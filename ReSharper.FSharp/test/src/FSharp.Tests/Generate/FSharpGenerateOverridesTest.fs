@@ -50,6 +50,7 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Anchor - Union Case 02 - Modifier``() = x.DoNamedTest()
 
     [<Test>] member x.``Member - Event - Cli 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Property - Indexer 01``() = x.DoNamedTest()
     [<Test>] member x.``Member - Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Member - Property 02 - Setter``() = x.DoNamedTest()
     [<Test>] member x.``Member - Property 03 - Setter only``() = x.DoNamedTest()

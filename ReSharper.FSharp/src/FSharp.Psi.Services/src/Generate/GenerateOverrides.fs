@@ -3,6 +3,7 @@
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Settings
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -33,6 +34,10 @@ let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
 
 let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGeneratorElement) =
     let mfv = element.Mfv
+    let displayContext = element.DisplayContext
+    let addTypes = element.AddTypes
+
+    Assertion.Assert(not (mfv.IsNonCliEventProperty()))
 
     let mutable nextUnnamedVariableNumber = 0
     let getUnnamedVariableName () =
@@ -42,32 +47,43 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
 
     let isPropertyGetterMethod = mfv.IsPropertyGetterMethod
     let isPropertySetterMethod = mfv.IsPropertySetterMethod
+    let isPropertyAccessor = isPropertyGetterMethod || isPropertySetterMethod
 
     let paramGroups = mfv.CurriedParameterGroups
 
-    let tryGetSingleParam (paramGroups: IList<IList<FSharpParameter>>) =
-        if paramGroups.Count = 1 && paramGroups[0].Count = 1 then
-            Some(paramGroups[0][0])
-        else
-            None
-
     let argNames =
-        match isPropertySetterMethod, tryGetSingleParam paramGroups with
-        | true, Some param when param.Name.IsNone -> [["value", param.Type.Instantiate(element.Substitution)]]
-        | _ ->
+        let getParamType (param: FSharpParameter) =
+            param.Type.Instantiate(element.Substitution)
 
-        paramGroups
-        |> Seq.map (Seq.map (fun x ->
-            let name = x.Name |> Option.defaultWith (fun _ -> getUnnamedVariableName ())
-            name, x.Type.Instantiate(element.Substitution)) >> Seq.toList)
-        |> Seq.toList
+        let getParamNameAndType defaultName (param: FSharpParameter) =
+            param.Name |> Option.defaultWith defaultName, getParamType param
+
+        let getValueParamNameAndType (param: FSharpParameter) =
+            getParamNameAndType (fun _ -> "value") param
+
+        if isPropertySetterMethod && paramGroups.Count = 1 && paramGroups[0].Count > 0 then
+            let paramGroup = paramGroups[0]
+            if paramGroup.Count = 1 then
+                [ [ getValueParamNameAndType paramGroup[0] ] ]
+            else
+                let accessorParams, valueParam = 
+                    paramGroup
+                    |> List.ofSeq
+                    |> List.splitAt (paramGroup.Count - 1)
+
+                [ accessorParams |> List.map (getParamNameAndType getUnnamedVariableName)
+                  valueParam |> List.map getValueParamNameAndType ]
+        else
+            paramGroups
+            |> Seq.map (Seq.map (getParamNameAndType getUnnamedVariableName) >> Seq.toList)
+            |> Seq.toList
 
     let typeParams =
-        if not element.AddTypes then [] else
+        if not addTypes then [] else
         mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
 
     let memberName =
-        if isPropertyGetterMethod || isPropertySetterMethod then
+        if isPropertyAccessor then
             mfv.LogicalName.Substring(4)
         else
             mfv.LogicalName
@@ -76,14 +92,20 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
     let settingsStore = context.GetSettingsStoreWithEditorConfig()
     let spaceAfterComma = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
 
+    let generateParameters =
+        if isPropertySetterMethod then true else
+        if isPropertyGetterMethod && paramGroups.Count = 1 && paramGroups[0].Count = 0 then false else
+
+        not (mfv.IsCliEvent()) 
+
     let paramGroups =
-        if mfv.IsProperty || isPropertyGetterMethod then [] else // todo: properties with params
-        let preferNoParens = isPropertySetterMethod
-        factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, element.AddTypes, preferNoParens, element.DisplayContext)
+        if not generateParameters then [] else
+        factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, addTypes, isPropertyAccessor, displayContext)
 
     let memberDeclaration =
-        if isPropertySetterMethod then
-            factory.CreatePropertyWithAccessor(memberName, "set", paramGroups)
+        if isPropertyAccessor && generateParameters then
+            let accessorName = if isPropertyGetterMethod then "get" else "set"
+            factory.CreatePropertyWithAccessor(memberName, accessorName, paramGroups)
         else
             factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups)
 
@@ -95,12 +117,12 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
         FSharpAttributesUtil.addOuterAttributeListWithIndent true indent memberDeclaration
         FSharpAttributesUtil.addAttribute memberDeclaration.AttributeLists[0] attribute |> ignore
 
-    if element.AddTypes then
+    if addTypes then
         let lastParam = memberDeclaration.ParametersDeclarations.LastOrDefault()
         if isNull lastParam then () else
 
         let typeString = mfv.ReturnParameter.Type.Instantiate(element.Substitution)
-        let typeUsage = factory.CreateTypeUsage(typeString.Format(element.DisplayContext))
+        let typeUsage = factory.CreateTypeUsage(typeString.Format(displayContext))
         ModificationUtil.AddChildAfter(lastParam, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
 
     memberDeclaration

@@ -1,0 +1,21 @@
+﻿Provided elements:
+ 0: Item():System.String
+ 1: ToString():System.String
+ 2: Equals(System.Object):System.Boolean
+ 3: GetHashCode():System.Int32
+ 4: Finalize():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:Item():System.String}
+
+[<AbstractClass>]
+type A() =
+    abstract Item: int -> string with get, set
+    default this.Item with get _ = 1
+    default this.Item with set _ _ = ()
+
+type B() =
+  inherit A()
+
+  override this.Item with get var0 = failwith "todo"
+  override this.Item with set var0 value = {selstart}failwith "todo"{selend}
