@@ -21,9 +21,9 @@ import java.io.File
 class TypeProvidersCacheTest : BaseTestWithSolution() {
     override fun getSolutionDirectoryName() = "TypeProviderLibrary"
     override val restoreNuGetPackages = true
-    private val sourceFile = "TypeProviderLibrary/Caches.fs"
+    private val defaultSourceFile = "TypeProviderLibrary/Caches.fs"
 
-    private fun checkTypeProviders(testGoldFile: File) {
+    private fun checkTypeProviders(testGoldFile: File, sourceFile: String) {
         withOpenedEditor(project, sourceFile) {
             waitForDaemon()
             executeWithGold(testGoldFile) {
@@ -35,12 +35,12 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
     @Test
     fun checkCachesWhenProjectReloading() {
         withOutOfProcessTypeProviders {
-            checkTypeProviders(File(testGoldFile.path + "_before"))
+            checkTypeProviders(File(testGoldFile.path + "_before"), defaultSourceFile)
 
             unloadAllProjects()
             reloadAllProjects(project)
 
-            checkTypeProviders(File(testGoldFile.path + "_after"))
+            checkTypeProviders(File(testGoldFile.path + "_after"), defaultSourceFile)
         }
     }
 
@@ -49,7 +49,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
         val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
 
         withOutOfProcessTypeProviders {
-            withOpenedEditor(project, sourceFile) {
+            withOpenedEditor(project, defaultSourceFile) {
                 waitForDaemon()
 
                 testDirectory.deleteRecursively().shouldBeTrue()
@@ -74,10 +74,10 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
     @Test
     fun typing() {
         withOutOfProcessTypeProviders {
-            withOpenedEditor(project, sourceFile) {
+            withOpenedEditor(project, defaultSourceFile) {
                 waitForDaemon()
                 typeWithLatency("//")
-                checkTypeProviders(testGoldFile)
+                checkTypeProviders(testGoldFile, defaultSourceFile)
             }
         }
     }
@@ -90,8 +90,20 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
             }
             withOpenedEditor(project, "TypeProviderLibrary2/Library.fs") {
                 waitForDaemon()
-                checkTypeProviders(testGoldFile)
+                checkTypeProviders(testGoldFile, defaultSourceFile)
             }
+        }
+    }
+
+    @Test(description = "RIDER-73091")
+    fun script() {
+        withOutOfProcessTypeProviders {
+            checkTypeProviders(File(testGoldFile.path + "_before"), "TypeProviderLibrary/Script.fsx")
+
+            unloadAllProjects()
+            reloadAllProjects(project)
+
+            checkTypeProviders(File(testGoldFile.path + "_after"), "TypeProviderLibrary/Script.fsx")
         }
     }
 }

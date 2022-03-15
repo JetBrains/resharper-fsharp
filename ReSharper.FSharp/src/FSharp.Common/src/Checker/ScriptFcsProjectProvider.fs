@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
+open System
 open FSharp.Compiler.Text
 open JetBrains.DataFlow
 open JetBrains.Lifetimes
@@ -44,7 +45,9 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             let getScriptOptionsAsync =
                 let targetNetFramework = not PlatformUtil.IsRunningOnCore && scriptSettings.TargetNetFramework.Value
                 checkerService.Checker.GetProjectOptionsFromScript(path, source,
-                    otherFlags = otherFlags.Value.Value, assumeDotNetFramework = targetNetFramework)
+                    otherFlags = otherFlags.Value.Value,
+                    assumeDotNetFramework = targetNetFramework,
+                    loadedTimeStamp = DateTime.Now)
             try
                 let options, errors = getScriptOptionsAsync.RunAsTask()
                 if not errors.IsEmpty then
