@@ -4,10 +4,10 @@
 
 [<AbstractClass>]
 type A() =
-    abstract M: int
+    abstract M: int -> unit
     default x.M(_: int) = ()
 
-    abstract M: double
+    abstract M: double -> unit
     default x.M(_: double) = ()
 
 type B() =

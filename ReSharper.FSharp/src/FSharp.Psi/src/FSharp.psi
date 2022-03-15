@@ -647,7 +647,7 @@ objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   typeReferenceName<TYPE_REFERENCE, TypeName>
   fSharpExpression<ARG_EXPR, ArgExpression>
   WITH<WITH, WithKeyword>
-  memberDeclaration<MEMBER_DECL, MemberDeclarations>*
+  overridableMemberDeclaration<MEMBER_DECL, MemberDeclarations>*
   interfaceImplementation<INTERFACE_IMPL, InterfaceImplementations>*
   RBRACE;
 
@@ -954,19 +954,19 @@ interface objectModelTypeRepresentation:
   interfaceRepresentation;
 
 classRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
-  CLASS<CLASS, ClassKeyword>
+  CLASS<FSHARP_BEGIN, BeginKeyword>
   typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*
-  END;
+  END<FSHARP_END, EndKeyword>;
 
 structRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
-  STRUCT<STRUCT, StructKeyword>
+  STRUCT<FSHARP_BEGIN, BeginKeyword>
   typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*
-  END;
+  END<FSHARP_END, EndKeyword>;
 
 interfaceRepresentation options { stubBase="ObjectModelTypeRepresentationBase"; }:
-  INTERFACE<INTERFACE, InterfaceKeyword>
+  INTERFACE<FSHARP_BEGIN, BeginKeyword>
   typeBodyMemberDeclaration<MEMBER_DECL, TypeMembers>*
-  END;
+  END<FSHARP_END, EndKeyword>;
 
 interface fSharpTypeOldDeclaration:
   exceptionDeclaration |
@@ -1209,7 +1209,7 @@ interfaceImplementation:
   typeReferenceName<TYPE_REFERENCE, TypeName>
   (
     WITH<WITH, WithKeyword>
-    memberDeclaration<MEMBER_DECL, TypeMembers>*
+    overridableMemberDeclaration<MEMBER_DECL, TypeMembers>*
   )?;
 
 
@@ -1355,11 +1355,11 @@ autoPropertyDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBas
 accessorsNamesClause:
   WITH
   (
-    IDENTIFIER<ACESSOR, AccessorsNames>
+    fSharpIdentifier<ACESSOR, AccessorsNames>
   |
-    IDENTIFIER<ACESSOR, AccessorsNames>
+    fSharpIdentifier<ACESSOR, AccessorsNames>
     COMMA<FSHARP_COMMA, Comma>
-    IDENTIFIER<ACESSOR, AccessorsNames>
+    fSharpIdentifier<ACESSOR, AccessorsNames>
   );
 
 accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {

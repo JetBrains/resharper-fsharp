@@ -7,4 +7,4 @@ type I =
 type T() =
   interface I with
     member this.``My prop`` = failwith "todo"
-    member this.``type`` = failwith "todo"{caret}
+    member this.``type`` = {selstart}failwith "todo"{selend}

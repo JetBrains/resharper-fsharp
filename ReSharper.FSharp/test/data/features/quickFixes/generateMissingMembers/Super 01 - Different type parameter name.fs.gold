@@ -9,7 +9,7 @@ type B<'T2>() =
 
     override x.M _ = ()
 
-type C{caret}() =
+type C() =
     inherit B<int>()
 
-    override this.P = failwith "todo"
+    override this.P = {selstart}failwith "todo"{selend}

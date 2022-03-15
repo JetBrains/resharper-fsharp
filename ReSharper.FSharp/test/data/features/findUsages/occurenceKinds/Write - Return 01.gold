@@ -1,0 +1,23 @@
+﻿New instance creation
+---
+UsageInstanceCreation TO: [O] static member M() = |T|() RANGE: (89,90) @ Write - Return 01.fs
+UsageInstanceCreation TO: [O] static member M() = |T|() RANGE: (89,90) @ Write - Return 01.fs
+
+
+Invocation
+---
+UsageInvocation TO: [O] T.|M|(P = 1) RANGE: (98,99) @ Write - Return 01.fs
+
+
+Other
+---
+UsageOther TO: [O] T.|M|(P = 1) RANGE: (98,99) @ Write - Return 01.fs
+UsageOther TO: [O] |T|.M(P = 1) RANGE: (96,97) @ Write - Return 01.fs
+UsageOther TO: [O] T.M(P |=| 1) RANGE: (102,103) @ Write - Return 01.fs
+
+
+Write access
+---
+UsageWrite TO: [W] T.M(|P| = 1) RANGE: (100,101) @ Write - Return 01.fs
+
+

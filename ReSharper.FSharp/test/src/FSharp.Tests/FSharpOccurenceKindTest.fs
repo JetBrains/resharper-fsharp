@@ -62,6 +62,7 @@ type FSharpOccurenceKindTest() =
     [<Test>] member x.``Write - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Write - Record 02 - Qualified name``() = x.DoNamedTest()
     [<Test>] member x.``Write - Record 03 - Copy and update``() = x.DoNamedTest()
+    [<Test>] member x.``Write - Return 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type Extension 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 02 - Qualified``() = x.DoNamedTest()

@@ -28,5 +28,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override bool IsOverride => this.IsOverride();
+    public override bool IsExplicitImplementation => this.IsExplicitImplementation();
   }
 }

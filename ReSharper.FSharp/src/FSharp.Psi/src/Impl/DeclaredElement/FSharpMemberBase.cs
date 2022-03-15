@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool CanBeImplicitImplementation => false;
 
     public bool IsExplicitImplementation =>
-      GetDeclaration() is IMemberDeclaration { IsExplicitImplementation: true };
+      GetDeclaration() is IOverridableMemberDeclaration { IsExplicitImplementation: true };
 
     public IList<IExplicitImplementation> ExplicitImplementations
     {

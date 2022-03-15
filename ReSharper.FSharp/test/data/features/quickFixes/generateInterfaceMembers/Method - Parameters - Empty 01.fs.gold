@@ -5,4 +5,4 @@ type I =
 
 type T() =
   interface I with
-    member this.M() = failwith "todo"{caret}
+    member this.M() = {selstart}failwith "todo"{selend}

@@ -103,9 +103,19 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
             if isNotNull (SetExprNavigator.GetByLeftExpression(indexerExpr)) then
                 ReferenceAccessType.WRITE else
 
+            let isInstanceFieldOrProperty (element: IDeclaredElement) =
+                match element with
+                | :? IField as field -> not field.IsStatic
+                | :? IProperty as property -> not property.IsStatic
+                | _ -> false
+
             let indexerExpr = IndexerExprNavigator.GetByQualifier(referenceExpr.IgnoreParentParens())
             if isNotNull indexerExpr && isNotNull (SetExprNavigator.GetByLeftExpression(indexerExpr)) then
                 ReferenceAccessType.READ else
+
+            let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr)
+            if isInstanceFieldOrProperty declaredElement && not referenceExpr.IsQualified && isNotNull binaryAppExpr then
+                ReferenceAccessType.WRITE else
 
             x.GetDefaultAccessType(declaredElement)
 

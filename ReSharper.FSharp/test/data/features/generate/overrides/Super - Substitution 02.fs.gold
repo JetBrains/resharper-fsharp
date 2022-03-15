@@ -19,8 +19,8 @@ type B<'T2>() =
     inherit A<int>()
     abstract M: 'T2 -> unit
 
-type T() ={caret}
+type T() =
     inherit B<double>()
 
     override this.M(var0: int): unit = failwith "todo"
-    override this.M(var0: double): unit = failwith "todo"
+    override this.M(var0: double): unit = {selstart}failwith "todo"{selend}

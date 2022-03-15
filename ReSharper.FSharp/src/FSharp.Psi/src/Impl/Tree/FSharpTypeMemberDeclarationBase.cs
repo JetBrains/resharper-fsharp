@@ -99,6 +99,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsUnsafe => false;
     public bool IsVolatile => false;
     public bool HasAccessRights => false;
+    public virtual bool IsExplicitImplementation => false;
 
     public void SetAccessRights(AccessRights rights)
     {

@@ -1,0 +1,9 @@
+﻿[<AbstractClass>]
+type A() =
+    abstract P: int with get, set
+
+type T() =
+    inherit A()
+
+    override x.P with set _ = ()
+    override this.P = {selstart}failwith "todo"{selend}

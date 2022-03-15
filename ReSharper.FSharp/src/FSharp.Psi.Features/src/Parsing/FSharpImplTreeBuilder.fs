@@ -1036,7 +1036,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         | SynExpr.YieldOrReturnFrom(_, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
-        | SynExpr.LetOrUseBang(_, _, _, pat, _, expr, ands, inExpr, range) ->
+        | SynExpr.LetOrUseBang(_, _, _, pat, expr, ands, inExpr, range, _) ->
             x.PushRange(range, ElementType.LET_OR_USE_EXPR)
             x.PushExpression(inExpr)
             x.PushStepList(ands, andLocalBindingListProcessor)

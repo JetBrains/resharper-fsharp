@@ -38,6 +38,14 @@ type GenerateInterfaceMembersFixTest() =
     [<Test>] member x.``Method - Substitution 04 - Inherited interface``() = x.DoNamedTest()
     [<Test>] member x.``Method - Substitution 05 - Inherited interface``() = x.DoNamedTest()
 
+    [<Test>] member x.``Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Property 02 - Setter``() = x.DoNamedTest()
+    [<Test>] member x.``Property 03 - Setter only``() = x.DoNamedTest()
+    [<Test>] member x.``Property 04``() = x.DoNamedTest()
+    [<Test>] member x.``Property 05``() = x.DoNamedTest()
+    [<Test>] member x.``Property 06``() = x.DoNamedTest()
+    [<Test>] member x.``Property 07``() = x.DoNamedTest()
+
     [<Test>] member x.``Overloads 01``() = x.DoNamedTest()
     [<Test>] member x.``Overloads 02``() = x.DoNamedTest()
     [<Test>] member x.``Overloads 03``() = x.DoNamedTest()
@@ -49,6 +57,7 @@ type GenerateInterfaceMembersFixTest() =
 
     [<Test>] member x.``Nested interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Nested interface 02 - Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Nested interface 03 - Partially base implemented``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
@@ -58,6 +67,11 @@ type GenerateMissingMembersFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/generateMissingMembers"
 
     [<Test>] member x.``Context - Common namespace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Explicit impl 01``() = x.DoNamedTest()
+    [<Test>] member x.``Partial type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Accessor - Setter 01``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Accessor - Setter 02``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Accessor - Setter 03``() = x.DoNamedTest()
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Same name 01``() = x.DoNamedTest()
     [<Test>] member x.``Same name 02``() = x.DoNamedTest()

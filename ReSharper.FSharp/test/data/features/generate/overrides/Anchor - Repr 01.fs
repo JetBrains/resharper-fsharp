@@ -2,7 +2,7 @@
 // ${SELECT0:ToString():System.String}
 
 type T() =
-    class
-        member x.P1 = 1 {caret}
+    class{caret}
+        member x.P1 = 1
     end
     member x.P2 = 1

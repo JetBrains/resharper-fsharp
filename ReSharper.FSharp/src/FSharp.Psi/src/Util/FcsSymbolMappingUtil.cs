@@ -408,7 +408,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       mfv.IsProperty && mfv.Attributes.HasAttributeInstance(FSharpPredefinedType.CLIEventAttribute);
 
     public static bool IsAccessor([NotNull] this FSharpMemberOrFunctionOrValue mfv) =>
-      mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod || mfv.IsEventAddMethod || mfv.IsEventRemoveMethod;
+      mfv.IsPropertyAccessor() || mfv.IsCliEventAccessor();
+
+    public static bool IsCliEventAccessor([NotNull] this FSharpMemberOrFunctionOrValue mfv) =>
+      mfv.IsEventAddMethod || mfv.IsEventRemoveMethod || mfv.IsPropertyGetterMethod &&
+      (mfv.AccessorProperty?.Value.IsCliEvent() ?? false);
+
+    public static bool IsPropertyAccessor([CanBeNull] this FSharpSymbol fcsSymbol) =>
+      fcsSymbol is FSharpMemberOrFunctionOrValue mfv && (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod);
+
+    public static bool IsNonCliEventProperty([CanBeNull] this FSharpSymbol fcsSymbol) =>
+      fcsSymbol is FSharpMemberOrFunctionOrValue { IsProperty: true } mfv && !mfv.IsCliEvent();
+
+    public static bool IsNonCliEventPropertyOrAccessor([CanBeNull] this FSharpSymbol fcsSymbol) =>
+      fcsSymbol.IsNonCliEventProperty() || fcsSymbol.IsPropertyAccessor();
 
     private static T FindNode<T>(Range range, [CanBeNull] ITreeNode node) where T : class, ITreeNode
     {

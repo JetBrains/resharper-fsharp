@@ -34,11 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol) =>
       this.CreateMemberDeclaredElement(fcsSymbol);
 
-    public bool IsExplicitImplementation =>
-      InterfaceImplementationNavigator.GetByTypeMember(this) != null ||
-      ObjExprNavigator.GetByMemberDeclaration(this) is { ArgExpression: null } ||
-      ObjExprNavigator.GetByInterfaceMember(this) != null;
-
+    public override bool IsExplicitImplementation => this.IsExplicitImplementation();
     public bool IsIndexer => this.IsIndexer();
 
     public override bool IsStatic =>

@@ -15,7 +15,7 @@ type A<'T1>() =
     abstract M: double -> unit
 
 [<AbstractClass>]
-type T<'T2>() ={caret}
+type T<'T2>() =
     inherit A<'T2>()
 
-    override this.M(var0: 'T2): unit = failwith "todo"
+    override this.M(var0: 'T2): unit = {selstart}failwith "todo"{selend}

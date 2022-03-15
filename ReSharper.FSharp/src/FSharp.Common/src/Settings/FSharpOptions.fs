@@ -159,7 +159,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
         if PlatformUtil.IsRunningUnderWindows then
             this.AddBoolOption((fun key -> key.TargetNetFramework), RichText(FSharpScriptOptions.targetNetFramework)) |> ignore
-        this.AddBoolOption((fun key -> key.FsiInteractiveEditor), FSharpExperimentalFeatures.fsiInteractiveEditor, "Experimental") |> ignore
+        this.AddBoolOptionWithComment((fun key -> key.FsiInteractiveEditor), FSharpExperimentalFeatures.fsiInteractiveEditor, "Experimental") |> ignore
 
         this.AddHeader("Type hints")
         this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null) |> ignore
@@ -171,15 +171,15 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), fun t -> t :> obj))
 
         this.AddHeader("FSharp.Compiler.Service options")
-        this.AddBoolOption((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
-        this.AddBoolOption((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Solution reload required") |> ignore
+        this.AddBoolOptionWithComment((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
+        this.AddBoolOptionWithComment((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Solution reload required") |> ignore
 
         if configurations.IsInternalMode() then
             this.AddHeader("Experimental features options")
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
             this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
-            this.AddBoolOption((fun key -> key.NonFSharpProjectInMemoryAnalysis), nonFSharpProjectInMemoryAnalysis, "Requires restart") |> ignore
+            this.AddBoolOptionWithComment((fun key -> key.NonFSharpProjectInMemoryAnalysis), nonFSharpProjectInMemoryAnalysis, "Requires restart") |> ignore
 
 
 [<ShellComponent>]

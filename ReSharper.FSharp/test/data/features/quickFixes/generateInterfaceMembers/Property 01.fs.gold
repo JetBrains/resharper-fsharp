@@ -1,0 +1,8 @@
+﻿module Module
+
+type I =
+  abstract P: int
+
+type T() =
+  interface I with
+    member this.P = {selstart}failwith "todo"{selend}

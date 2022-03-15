@@ -10,4 +10,4 @@
 type U =
     | C of int
 
-    override this.ToString() = failwith "todo"{caret}
+    override this.ToString() = {selstart}failwith "todo"{selend}

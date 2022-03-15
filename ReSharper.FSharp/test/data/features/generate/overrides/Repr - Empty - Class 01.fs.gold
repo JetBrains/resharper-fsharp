@@ -7,5 +7,5 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String}
 
-type T() ={caret}
-  override this.ToString() = failwith "todo"
+type T() =
+  override this.ToString() = {selstart}failwith "todo"{selend}

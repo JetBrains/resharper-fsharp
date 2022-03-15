@@ -47,9 +47,9 @@
 
       ------------------
 
-    TO: [R] match A(|a| = 123) with RANGE: (89,90) @ Union case - Field 01.fs
+    TO: [W] match A(|a| = 123) with RANGE: (89,90) @ Union case - Field 01.fs
     Menu item (enabled) :
-      icon: UsageRead
+      icon: UsageWrite
       text: Module      <font color="FF8B0000">match A(**a** = 123) with</font><font color="06C"> (8)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: match A(**a** = 123) with

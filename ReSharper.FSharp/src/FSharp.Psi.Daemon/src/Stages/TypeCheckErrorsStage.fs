@@ -20,7 +20,13 @@ and TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger: ILogger) =
     let [<Literal>] opName = "TypeCheckErrorsStageProcess"
 
     override x.ShouldAddDiagnostic(error, range) =
-        base.ShouldAddDiagnostic(error, range) && error.Subcategory <> "parse"
+        base.ShouldAddDiagnostic(error, range) &&
+
+        match error.Subcategory with
+        | "parse" ->
+            // Directive syntax errors are only reported in type check results, so we allow these syntax errors
+            isDirectiveSyntaxError error.ErrorNumber
+        | _ -> true
 
     override x.Execute(committer) =
         match fsFile.GetParseAndCheckResults(false, opName) with
