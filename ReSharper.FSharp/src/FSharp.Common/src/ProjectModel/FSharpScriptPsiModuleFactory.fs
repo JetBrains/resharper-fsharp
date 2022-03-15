@@ -245,7 +245,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         | true -> paths.Files |> Seq.map (getPsiModulesForPath >> Seq.maxBy sameProjectSorter)
         | _ -> EmptyList.Instance :> _
 
-    member x.RemoveProjectFilePsiModule(moduleToRemove: FSharpScriptPsiModule) = //, changeBuilder: PsiModuleChangeBuilder) =
+    member x.RemoveProjectFilePsiModule(moduleToRemove: FSharpScriptPsiModule, changeBuilder: PsiModuleChangeBuilder) =
         let path = moduleToRemove.Path
         scriptsFromProjectFiles.GetValuesSafe(path)
         |> Seq.tryFind (fun psiModule -> psiModule.Path = moduleToRemove.Path)
@@ -254,10 +254,8 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             removePsiModule psiModule
 
             psiModule.LifetimeDefinition.Terminate()
-            let changeBuilder = PsiModuleChangeBuilder()
             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Removed)
-            changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed)
-            changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance))
+            changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed))
 
     member x.GetPsiModulesForPath(path) =
         getPsiModulesForPath path
@@ -306,9 +304,11 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, 
     do
         lifetime.OnTermination(fun _ ->
             changeManager.ExecuteAfterChange(fun _ ->
+                let changeBuilder = PsiModuleChangeBuilder()
                 for sourceFile in sourceFiles.Values do
                     let psiModule = sourceFile.PsiModule :?> FSharpScriptPsiModule
-                    psiModule.RemoveProjectHandler(this))) |> ignore
+                    psiModule.RemoveProjectHandler(this, changeBuilder)
+                changeManager.OnProviderChanged(modulesProvider, changeBuilder.Result, SimpleTaskExecutor.Instance))) |> ignore
 
     /// Prevents creating default psi source files for scripts and adds new psi modules with source files instead.
     override x.OnProjectFileChanged(projectFile, oldLocation, changeType, changeBuilder) =
@@ -324,7 +324,7 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, 
         | PsiModuleChange.ChangeType.Removed when sourceFiles.ContainsKey(oldLocation) ->
             let sourceFile = sourceFiles[oldLocation]
             let psiModule = sourceFile.PsiModule :?> FSharpScriptPsiModule
-            psiModule.RemoveProjectHandler(this)
+            psiModule.RemoveProjectHandler(this, changeBuilder)
             sourceFiles.Remove(oldLocation) |> ignore
 
         | _ -> handler.OnProjectFileChanged(projectFile, oldLocation, changeType, changeBuilder)
@@ -400,10 +400,10 @@ type FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, moduleId, a
     member x.AddProjectHandler(handler: FSharpScriptPsiModuleHandler) =
         projectHandlers.Add(handler)
 
-    member x.RemoveProjectHandler(handler: FSharpScriptPsiModuleHandler) =
+    member x.RemoveProjectHandler(handler: FSharpScriptPsiModuleHandler, changeBuilder: PsiModuleChangeBuilder) =
         projectHandlers.Remove(handler) |> ignore
         if projectHandlers.IsEmpty() then
-            modulesProvider.RemoveProjectFilePsiModule(this)
+            modulesProvider.RemoveProjectFilePsiModule(this, changeBuilder)
 
     override x.ToString() =
         let typeName = this.GetType().Name
