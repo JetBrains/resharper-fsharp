@@ -5,9 +5,7 @@ import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.plugins.fsharp.test.framework.withOutOfProcessTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.asserts.shouldBeFalse
-import com.jetbrains.rider.test.asserts.shouldBeTrue
-import com.jetbrains.rider.test.asserts.shouldNotBeNull
+import com.jetbrains.rider.test.asserts.*
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
@@ -26,9 +24,13 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
         coreVersion = CoreVersion.DOT_NET_CORE_3_1,
         solution = "TypeProviderLibrary")
     fun framework461() = doTest(".NET Framework 4.8")
-
+    
     @Test(enabled = false)
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_2_1)
+    @TestEnvironment(
+        toolset = ToolsetVersion.TOOLSET_16_CORE, 
+        coreVersion = CoreVersion.DOT_NET_CORE_2_1,
+        additionalCoreVersions = [CoreVersion.DOT_NET_CORE_3_1]
+    )
     fun core21() = doTest(".NET Core 3.1")
 
     @Test
@@ -55,11 +57,12 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
         withOutOfProcessTypeProviders {
             withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
                 waitForDaemon()
-                this.project!!.fcsHost
+                val typeProvidersRuntimeVersion = this.project!!.fcsHost
                     .typeProvidersRuntimeVersion.sync(Unit)
                     .shouldNotBeNull()
+                typeProvidersRuntimeVersion
                     .startsWith(expectedRuntime)
-                    .shouldBeTrue()
+                    .shouldBeTrue("Expected runtime starts with: $expectedRuntime, actual: $typeProvidersRuntimeVersion")
                 markupAdapter.hasErrors.shouldBeFalse()
             }
         }
