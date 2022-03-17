@@ -63,6 +63,8 @@ type FSharpGoToUsagesTest() =
 
     [<Test>] member x.``Property 01 - Explicit accessors``() = x.DoNamedTestWithCSharp()
 
+    [<Test>] member x.``Type private function - Generic 01``() = x.DoNamedTest()
+
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")
 

@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     private IList<ITypeParameter> GetTypeParameters()
     {
-      var mfvTypeParams = MfvParameters;
+      var mfvTypeParams = MfvTypeParameters;
       if (mfvTypeParams.Count == 0)
         return EmptyList<ITypeParameter>.Instance;
 
@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
       get
       {
-        var mfvTypeParams = MfvParameters;
+        var mfvTypeParams = MfvTypeParameters;
         var mfvParametersCount = mfvTypeParams.Count;
         if (mfvParametersCount == 0)
           return EmptyList<ITypeParameter>.Instance;
@@ -57,7 +57,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override IList<ITypeParameter> TypeParameters => GetTypeParameters();
 
-    private IList<FSharpGenericParameter> MfvParameters =>
+    protected virtual IList<FSharpGenericParameter> MfvTypeParameters =>
       Mfv?.GenericParameters ?? EmptyList<FSharpGenericParameter>.Instance;
   }
 }

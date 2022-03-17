@@ -1,4 +1,7 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using System.Linq;
+using FSharp.Compiler.Symbols;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -27,5 +30,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool IsStatic =>
       GetDeclaration() is { IsStatic: true };
+
+    protected override IList<FSharpGenericParameter> MfvTypeParameters =>
+      GetDeclaration() is { } decl && decl.GetContainingTypeDeclaration()?.GetFcsSymbol() is FSharpEntity fcsEntity
+        ? fcsEntity.GenericParameters.Concat(base.MfvTypeParameters).ToList()
+        : base.MfvTypeParameters;
   }
 }
