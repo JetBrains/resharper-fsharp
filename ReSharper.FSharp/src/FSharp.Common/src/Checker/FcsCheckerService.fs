@@ -145,6 +145,11 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
             None
 
+    member x.GetCachedProjectOptions(path, isScript) =
+        if checker.IsValueCreated then
+            checker.Value.GetCachedProjectOptions(path, isScript)
+        else []
+    
     member x.InvalidateFcsProject(fcsProjectOptions: FSharpProjectOptions) =
         if checker.IsValueCreated then
             checker.Value.InvalidateConfiguration(fcsProjectOptions)

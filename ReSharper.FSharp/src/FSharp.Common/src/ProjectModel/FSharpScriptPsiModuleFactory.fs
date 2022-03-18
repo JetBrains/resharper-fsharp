@@ -40,7 +40,7 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         documentManager: DocumentManager, scriptOptionsProvider: IScriptFcsProjectProvider,
         platformManager: IPlatformManager, assemblyFactory: AssemblyFactory, projectFileExtensions,
-        projectFileTypeCoordinator) as this =
+        projectFileTypeCoordinator, scriptProvider: IScriptFcsProjectProvider, checkerService: FcsCheckerService) as this =
 
     let scriptPsiModuleInvalidated = new Signal<FSharpScriptPsiModule>(lifetime, "ScriptPsiModuleInvalidated")
 
@@ -253,10 +253,15 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         scriptsFromProjectFiles.GetValuesSafe(path)
         |> Seq.tryFind (fun psiModule -> psiModule.Path = moduleToRemove.Path)
         |> Option.iter (fun psiModule ->
+            match checkerService.GetCachedProjectOptions(path.FullPath, true) with
+            | [options] -> checkerService.InvalidateFcsProject(options)
+            | _ -> ()
+
             scriptsFromProjectFiles.RemoveValue(path, psiModule) |> ignore
             removePsiModule psiModule
 
             psiModule.LifetimeDefinition.Terminate()
+            
             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Removed)
             changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed)
             scriptPsiModuleInvalidated.Fire(psiModule))
