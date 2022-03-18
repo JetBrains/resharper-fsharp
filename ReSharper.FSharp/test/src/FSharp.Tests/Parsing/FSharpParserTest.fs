@@ -39,6 +39,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Namespace 05 - Global``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 06 - Global, type``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 07 - Global, Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 08 - XmlDoc``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl group 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl group 02 - Attributes``() = x.DoNamedTest()
@@ -495,6 +496,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Ctor - Secondary 04 - Self id``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Secondary 05``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Secondary 06``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Secondary 07 - XmlDoc``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Inherit - Type 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit - Type 02 - Qualified``() = x.DoNamedTest()

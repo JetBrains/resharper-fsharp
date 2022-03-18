@@ -318,5 +318,4 @@
     <Range>getIndexerDotRange indexerExpr</Range>
     <QuickFix>RemoveIndexerDotFix</QuickFix>
   </Warning>
-  
 </Errors>
