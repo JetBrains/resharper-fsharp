@@ -97,10 +97,6 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
     @Test(description = "RIDER-73091")
     fun script() {
         withOutOfProcessTypeProviders {
-            withOpenedEditor(project, defaultSourceFile) {
-                waitForDaemon()
-                markupAdapter.hasErrors.shouldBeFalse()
-            }
             checkTypeProviders(File(testGoldFile.path + "_before"), "TypeProviderLibrary/Script.fsx")
 
             unloadAllProjects()
