@@ -40,7 +40,7 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         documentManager: DocumentManager, scriptOptionsProvider: IScriptFcsProjectProvider,
         platformManager: IPlatformManager, assemblyFactory: AssemblyFactory, projectFileExtensions,
-        projectFileTypeCoordinator, scriptProvider: IScriptFcsProjectProvider, checkerService: FcsCheckerService) as this =
+        projectFileTypeCoordinator, checkerService: FcsCheckerService) as this =
 
     let scriptPsiModuleInvalidated = new Signal<FSharpScriptPsiModule>(lifetime, "ScriptPsiModuleInvalidated")
 

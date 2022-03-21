@@ -45,9 +45,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             let getScriptOptionsAsync =
                 let targetNetFramework = not PlatformUtil.IsRunningOnCore && scriptSettings.TargetNetFramework.Value
                 checkerService.Checker.GetProjectOptionsFromScript(path, source,
-                    otherFlags = otherFlags.Value.Value,
-                    assumeDotNetFramework = targetNetFramework)
-                    //loadedTimeStamp = DateTime.Now)
+                    otherFlags = otherFlags.Value.Value, assumeDotNetFramework = targetNetFramework)
             try
                 let options, errors = getScriptOptionsAsync.RunAsTask()
                 if not errors.IsEmpty then

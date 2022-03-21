@@ -109,7 +109,6 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
                 checker.Value.InvalidateAll())
 
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
-    
     member val AssemblyReaderShim = Unchecked.defaultof<IFcsAssemblyReaderShim> with get, set
 
     member x.Checker = checker.Value
