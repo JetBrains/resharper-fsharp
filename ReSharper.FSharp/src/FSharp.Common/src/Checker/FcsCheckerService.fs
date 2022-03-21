@@ -96,9 +96,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             fun () ->
                 match method.Invoke(cache, args) with
                 | :? seq<ITuple> as data ->
-                    data
-                    |> Seq.map (fun x -> x[0].As<FSharpProjectOptions>())
-                    |> Seq.filter isNotNull
+                    data |> Seq.map (fun x -> x[0] :?> FSharpProjectOptions)
                 | _ ->
                     Assertion.Assert(false, "cached project options data should be seq<FSharpProjectOptions * _>")
                     JetBrains.Util.EmptyArray.Instance
