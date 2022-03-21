@@ -2,6 +2,8 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
 open System.Collections.Generic
+open System.Reflection
+open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
@@ -10,6 +12,7 @@ open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.DataFlow
+open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -66,12 +69,47 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
             checker
 
+    let getCachedProjectOptionsData =
+        lazy
+            let backgroundCompiler =
+                ReflectionUtil
+                    .TryGetNonStaticField(checker.Value, "backgroundCompiler")
+                    .NotNull("backgroundCompiler must exist in FSharpChecker")
+
+            let incrementalBuildersCache =
+                ReflectionUtil
+                    .TryGetNonStaticField(backgroundCompiler, "incrementalBuildersCache")
+                    .NotNull("incrementalBuildersCache must exist in backgroundCompiler")
+
+            let cache =
+                ReflectionUtil
+                    .TryGetNonStaticField(incrementalBuildersCache, "cache")
+                    .NotNull("cache must exist in incrementalBuildersCache")
+
+            let method =
+                cache.GetType()
+                    .GetMethod("FilterAndHold", BindingFlags.Instance ||| BindingFlags.NonPublic)
+                    .NotNull("FilterAndHold must exist in AgedLookup")
+
+            let args = [|null|]
+
+            fun () ->
+                match method.Invoke(cache, args) with
+                | :? seq<ITuple> as data ->
+                    data
+                    |> Seq.map (fun x -> x[0].As<FSharpProjectOptions>())
+                    |> Seq.filter isNotNull
+                | _ ->
+                    Assertion.Assert(false, "cached project options data should be seq<FSharpProjectOptions * _>")
+                    JetBrains.Util.EmptyArray.Instance
+
     do
         onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ ->
             if checker.IsValueCreated then
                 checker.Value.InvalidateAll())
 
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
+    
     member val AssemblyReaderShim = Unchecked.defaultof<IFcsAssemblyReaderShim> with get, set
 
     member x.Checker = checker.Value
@@ -145,10 +183,12 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
             None
 
-    member x.GetCachedProjectOptions(path, isScript) =
+    member x.GetScriptCachedProjectOptions(path) =
         if checker.IsValueCreated then
-            checker.Value.GetCachedProjectOptions(path, isScript)
-        else []
+            let path = path + ".fsproj"
+            let cachedOptionsData = getCachedProjectOptionsData.Value()
+            cachedOptionsData |> Seq.tryFind (fun x -> x.ProjectFileName = path)
+        else None
     
     member x.InvalidateFcsProject(fcsProjectOptions: FSharpProjectOptions) =
         if checker.IsValueCreated then

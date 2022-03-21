@@ -253,9 +253,9 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         scriptsFromProjectFiles.GetValuesSafe(path)
         |> Seq.tryFind (fun psiModule -> psiModule.Path = moduleToRemove.Path)
         |> Option.iter (fun psiModule ->
-            match checkerService.GetCachedProjectOptions(path.FullPath, true) with
-            | [options] -> checkerService.InvalidateFcsProject(options)
-            | _ -> ()
+            match checkerService.GetScriptCachedProjectOptions(path.FullPath) with
+            | Some options -> checkerService.InvalidateFcsProject(options)
+            | None -> ()
 
             scriptsFromProjectFiles.RemoveValue(path, psiModule) |> ignore
             removePsiModule psiModule
