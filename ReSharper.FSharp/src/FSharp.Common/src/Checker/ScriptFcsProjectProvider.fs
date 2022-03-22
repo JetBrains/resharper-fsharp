@@ -1,6 +1,5 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
-open System
 open FSharp.Compiler.Text
 open JetBrains.DataFlow
 open JetBrains.Lifetimes

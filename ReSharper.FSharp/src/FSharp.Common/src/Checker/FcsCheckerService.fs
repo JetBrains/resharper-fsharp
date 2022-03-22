@@ -2,8 +2,6 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
 open System.Collections.Generic
-open System.Reflection
-open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
@@ -12,7 +10,6 @@ open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.DataFlow
-open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
