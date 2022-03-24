@@ -44,26 +44,26 @@ type FSharpCompilerWarningProcessor() =
             if isNull configuration then info else
 
             let props = configuration.PropertiesCollection
-
-            let mutable warningIsError = false
-            if configuration.TreatWarningsAsErrors then
+ 
+            let isEnabled =
                 match Seq.tryExactlyOne compilerIds with
                 | Some("FS1182") ->
                     let otherFlags = props.GetReadOnlyValueSafe(FSharpProperties.OtherFlags)
-                    if isNotNull otherFlags && otherFlags.Contains("--warnon:1182") then
-                        warningIsError <- true
-                    else
-                        let warnOn = props.GetReadOnlyValueSafe(FSharpProperties.WarnOn)
-                        let warnOn = parseCompilerIds warnOn
-                        if not (warnOn.IsEmpty()) && Seq.exists warnOn.Contains compilerIds then
-                            warningIsError <- true
+                    isNotNull otherFlags && otherFlags.Contains("--warnon:1182") ||
 
-                | _ -> warningIsError <- true
+                    let warnOn = props.GetReadOnlyValueSafe(FSharpProperties.WarnOn)
+                    let warnOn = parseCompilerIds warnOn
+                    not (warnOn.IsEmpty()) && Seq.exists warnOn.Contains compilerIds
+                | _ -> true
+
+            let mutable warningIsError = false
+            if configuration.TreatWarningsAsErrors then
+                warningIsError <- isEnabled
 
             let warningsAsErrors = props.GetReadOnlyValueSafe(MSBuildProjectUtil.WarningsAsErrorsProperty)
             let warningsAsErrors = parseCompilerIds warningsAsErrors
 
-            if not (warningsAsErrors.IsEmpty()) && Seq.exists warningsAsErrors.Contains compilerIds then
+            if isEnabled && not (warningsAsErrors.IsEmpty()) && Seq.exists warningsAsErrors.Contains compilerIds then
                 warningIsError <- true
 
             if warningIsError then
