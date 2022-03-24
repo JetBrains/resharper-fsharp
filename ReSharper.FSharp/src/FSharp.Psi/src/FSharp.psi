@@ -1439,7 +1439,8 @@ private letOrUse{ROLE, Getter}:
   LET<@ROLE, @Getter> |
   USE<@ROLE, @Getter> |
   LET_BANG<@ROLE, @Getter> |
-  USE_BANG<@ROLE, @Getter>;
+  USE_BANG<@ROLE, @Getter> |
+  AND_BANG<@ROLE, @Getter>;
 
 private identOrOpName{ROLE, Getter}:
   IDENTIFIER<@ROLE, @Getter> |

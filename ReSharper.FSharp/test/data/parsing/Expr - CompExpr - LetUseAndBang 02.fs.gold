@@ -1,0 +1,94 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExpressionStatement
+      IChameleonExpression
+        IPrefixAppExpr
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:async)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IComputationExpr
+            FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:     ) spaces:"     "
+            ILetOrUseExpr
+              ILocalBinding
+                FSharpTokenType+LetBangTokenElement(type:LET_BANG, text:let!)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                ILocalReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:x)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                IUnitExpr
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+              Whitespace(type:WHITE_SPACE, text:     ) spaces:"     "
+              ILocalBinding
+                FSharpTokenType+AndBangTokenElement(type:AND_BANG, text:and!)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                ILocalReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:y)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                IUnitExpr
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+              Whitespace(type:WHITE_SPACE, text:     ) spaces:"     "
+              ILetOrUseExpr
+                ILocalBinding
+                  FSharpTokenType+UseBangTokenElement(type:USE_BANG, text:use!)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  ILocalReferencePat
+                    IExpressionReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:z)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  IUnitExpr
+                    FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                    FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+                Whitespace(type:WHITE_SPACE, text:     ) spaces:"     "
+                ILetOrUseExpr
+                  ILocalBinding
+                    FSharpTokenType+LetTokenElement(type:LET, text:let)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    ILocalReferencePat
+                      IExpressionReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:v)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    IUnitExpr
+                      FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                      FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+                  Whitespace(type:WHITE_SPACE, text:     ) spaces:"     "
+                  ILetOrUseExpr
+                    ILocalBinding
+                      FSharpTokenType+UseTokenElement(type:USE, text:use)
+                      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                      ILocalReferencePat
+                        IExpressionReferenceName
+                          FSharpIdentifierToken(type:IDENTIFIER, text:c)
+                      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                      FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                      IUnitExpr
+                        FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                        FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+                    Whitespace(type:WHITE_SPACE, text:     ) spaces:"     "
+                    IUnitExpr
+                      FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                      FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
