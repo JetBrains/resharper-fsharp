@@ -1036,13 +1036,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         | SynExpr.YieldOrReturnFrom(_, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
-        | SynExpr.LetOrUseBang(_, isUse, _, pat, expr, ands, inExpr, range, _) ->
+        | SynExpr.LetOrUseBang(_, _, _, pat, expr, ands, inExpr, range, _) ->
             x.PushRange(range, ElementType.LET_OR_USE_EXPR)
             x.PushExpression(inExpr)
             x.PushStepList(ands, andLocalBindingListProcessor)
-            let letOrUseBangToken = if isUse then FSharpTokenType.USE_BANG else FSharpTokenType.LET_BANG
-            x.AdvanceToTokenOrRangeStart(letOrUseBangToken, range)
-            let exprWithPatRange = Range.mkRange expr.Range.FileName pat.Range.Start expr.Range.End
+            let exprWithPatRange = Range.unionRanges expr.Range pat.Range
             x.PushRangeForMark(exprWithPatRange, x.Mark(), ElementType.LOCAL_BINDING)
             x.ProcessPat(pat, true, false)
             x.ProcessExpression(expr)
@@ -1111,7 +1109,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
 
     member x.ProcessAndBangLocalBinding(pat: SynPat, expr: SynExpr, range) =
         x.AdvanceToTokenOrRangeStart(FSharpTokenType.AND_BANG, range)
-        let exprWithPatRange = Range.mkRange expr.Range.FileName pat.Range.Start expr.Range.End
+        let exprWithPatRange = Range.unionRanges expr.Range pat.Range
         x.PushRangeForMark(exprWithPatRange, x.Mark(), ElementType.LOCAL_BINDING)
         x.ProcessPat(pat, true, false)
         x.ProcessExpression(expr)
