@@ -12,9 +12,9 @@ IFSharpImplFile
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
             ILetOrUseExpr
-              FSharpTokenType+LetBangTokenElement(type:LET_BANG, text:let!)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ILocalBinding
+                FSharpTokenType+LetBangTokenElement(type:LET_BANG, text:let!)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 ILocalReferencePat
                   IExpressionReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:x)
@@ -26,9 +26,9 @@ IFSharpImplFile
                   FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
               NewLine(type:NEW_LINE, text:\n) spaces:"\n"
               Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-              FSharpTokenType+AndBangTokenElement(type:AND_BANG, text:and!)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ILocalBinding
+                FSharpTokenType+AndBangTokenElement(type:AND_BANG, text:and!)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 ILocalReferencePat
                   IExpressionReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:y)
