@@ -1,6 +1,7 @@
-﻿# 6 ITEMS #
+﻿# 7 ITEMS #
 
 + do!
++ inherit
 + let!
 + match!
 + return!

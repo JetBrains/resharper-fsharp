@@ -42,6 +42,7 @@ module FSharpKeywordsProvider =
            "do!"
            "exception"
            "extern"
+           "inherit"
            "inline" // never suggested due to invalid Fcs context
            "let!"
            "match!"
@@ -73,8 +74,15 @@ module FSharpKeywordsProvider =
     let getReferenceOwner (context: FSharpCodeCompletionContext) =
         let reference = context.ReparsedContext.Reference
         if isNull reference then null else
-    
+
         reference.GetTreeNode()
+
+    let getOuterPrefixAppFromFunctionExpr expr =
+        let rec loop (expr: IFSharpExpression) =
+            match PrefixAppExprNavigator.GetByFunctionExpression(expr) with
+            | null -> expr
+            | prefixAppExpr -> loop prefixAppExpr
+        loop expr
 
     let isInComputationExpression (context: FSharpCodeCompletionContext) =
         let reference = context.ReparsedContext.Reference
@@ -94,12 +102,7 @@ module FSharpKeywordsProvider =
             isNotNull moduleAbbreviationDecl, moduleAbbreviationDecl :> IModuleMember, moduleDecl
 
         | :? IReferenceExpr as refExpr ->
-            let rec loop (expr: IFSharpExpression) =
-                match PrefixAppExprNavigator.GetByFunctionExpression(expr) with
-                | null -> expr
-                | prefixAppExpr -> loop prefixAppExpr
-
-            let expr = loop refExpr
+            let expr = getOuterPrefixAppFromFunctionExpr refExpr
             let doStmt = ExpressionStatementNavigator.GetByExpression(expr)
             let moduleDecl = ModuleLikeDeclarationNavigator.GetByMember(doStmt)
             isNotNull moduleDecl, doStmt :> _, moduleDecl
@@ -136,6 +139,13 @@ module FSharpKeywordsProvider =
             isNotNull declaration
 
         | _ -> true
+
+    let mayStartInheritExpr (context: FSharpCodeCompletionContext) =
+        match getReferenceOwner context with
+        | :? IReferenceExpr as refExpr ->
+            let appExpr = getOuterPrefixAppFromFunctionExpr refExpr
+            isNotNull (ComputationExprNavigator.GetByExpression(appExpr))
+        | _ -> false
 
     let mayBeUnionCaseDecl (context: FSharpCodeCompletionContext) =
         match getReferenceOwner context with
@@ -204,6 +214,7 @@ module FSharpKeywordsProvider =
         if mayStartTypeMember context && not (mayBeUnionCaseDecl context) then
             "abstract"
             "default"
+            "inherit"
             "member"
             "override"
             "static"
@@ -214,6 +225,9 @@ module FSharpKeywordsProvider =
 
         if not (inReferenceExpression context) || mayBeUnionCaseDecl context then
             "of"
+
+        if mayStartInheritExpr context then
+            "inherit"
     }
 
 type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
