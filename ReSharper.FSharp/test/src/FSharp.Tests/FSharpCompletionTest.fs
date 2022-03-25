@@ -139,22 +139,6 @@ type FSharpCompletionTest() =
     [<TestSetting(typeof<FSharpOptions>, "EnableOutOfScopeCompletion", "false")>]
     [<Test>] member x.``Import - Same project 02 - Disabled import``() = x.DoNamedTest()
 
-    [<Test>] member x.``Record - Field 01``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Field 02``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Field 03 - Another``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Field 04 - Another``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Field 05``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Field 06``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Update - Base 01``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Update - Base 02``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Update - Field 01``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Update - Field 02``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Update - Field 03``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Update - Field 04``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Update - Field 05``() = x.DoNamedTest()
-    [<Test>] member x.``Record - Update - Field 06``() = x.DoNamedTest()
-
-    // todo: RQA fields
 
 [<FSharpTest>]
 type FSharpPostfixCompletionTest() =
