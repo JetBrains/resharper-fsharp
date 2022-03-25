@@ -154,7 +154,8 @@ let setBindingExpression (expr: IFSharpExpression) contextIndent (binding: IBind
 let tryGetEffectiveParentComputationExpression (expr: IFSharpExpression) =
     let rec loop isLetInExpr (expr: IFSharpExpression) =
         let computationExpr = ComputationExprNavigator.GetByExpression(expr)
-        if isNotNull computationExpr then computationExpr, isLetInExpr else
+        let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(computationExpr)
+        if isNotNull appExpr then computationExpr, isLetInExpr else
 
         let letOrUseExpr = LetOrUseExprNavigator.GetByInExpression(expr)
         if isNotNull letOrUseExpr then loop true letOrUseExpr else

@@ -139,6 +139,23 @@ type FSharpCompletionTest() =
     [<TestSetting(typeof<FSharpOptions>, "EnableOutOfScopeCompletion", "false")>]
     [<Test>] member x.``Import - Same project 02 - Disabled import``() = x.DoNamedTest()
 
+    [<Test>] member x.``Record - Field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Field 02``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Field 03 - Another``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Field 04 - Another``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Field 05``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Field 06``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Update - Base 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Update - Base 02``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Update - Field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Update - Field 02``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Update - Field 03``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Update - Field 04``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Update - Field 05``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Update - Field 06``() = x.DoNamedTest()
+
+    // todo: RQA fields
+
 [<FSharpTest>]
 type FSharpPostfixCompletionTest() =
     inherit CodeCompletionTestBase()
@@ -206,7 +223,9 @@ type FSharpKeywordCompletionTest() =
     [<Test>] member x.``Expr - Comp - List ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Comp - Ref 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Comp - Seq 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Comp - 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Do - Ref 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Seq 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Module member - Before type 01``() = x.DoNamedTest()
@@ -222,10 +241,23 @@ type FSharpKeywordCompletionTest() =
     // todo: add recovery in parser, filter member start keywords
     [<Test>] member x.``Open 05``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type - Attribute target 01``() = x.DoNamedTest()
+    [<Test; Explicit("Can't reparse")>] member x.``Type - Attribute target 02``() = x.DoNamedTest()
+    [<Test; Explicit("Can't reparse")>] member x.``Type - Attribute target 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Delegate 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Delegate 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Exception 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Exception 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Exception 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Union 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Union 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Union 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member - Abstract 01``() = x.DoNamedTest()
 
     // todo: suggest void in extern declarations only, provide info in fcs
     [<Test>] member x.``Type member - Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Property 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member 01``() = x.DoNamedTest()
 

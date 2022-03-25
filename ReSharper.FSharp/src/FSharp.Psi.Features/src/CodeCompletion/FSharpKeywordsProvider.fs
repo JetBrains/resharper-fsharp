@@ -49,6 +49,7 @@ module FSharpKeywordsProvider =
            "module"
            "mutable" // never suggested due to invalid Fcs context
            "namespace"
+           "of"
            "open"
            "override"
            "return!"
@@ -69,6 +70,12 @@ module FSharpKeywordsProvider =
     let keywordDescriptions =
         dict FSharpKeywords.KeywordsWithDescription
 
+    let getReferenceOwner (context: FSharpCodeCompletionContext) =
+        let reference = context.ReparsedContext.Reference
+        if isNull reference then null else
+    
+        reference.GetTreeNode()
+
     let isInComputationExpression (context: FSharpCodeCompletionContext) =
         let reference = context.ReparsedContext.Reference
         if isNull reference then false, false else
@@ -80,11 +87,7 @@ module FSharpKeywordsProvider =
         isNotNull computationExpr, isInLet
 
     let isModuleMemberStart (context: FSharpCodeCompletionContext) =
-        let reference = context.ReparsedContext.Reference
-        if isNull reference then false, null, null else
-
-        let treeNode = reference.GetTreeNode()
-        match treeNode with
+        match getReferenceOwner context with
         | :? ITypeReferenceName as referenceName ->
             let moduleAbbreviationDecl = ModuleAbbreviationDeclarationNavigator.GetByTypeName(referenceName)
             let moduleDecl = ModuleLikeDeclarationNavigator.GetByMember(moduleAbbreviationDecl)
@@ -104,10 +107,8 @@ module FSharpKeywordsProvider =
         | _ -> false, null, null
 
     let isAtTypeInOpen (context: FSharpCodeCompletionContext) =
-        let reference = context.ReparsedContext.Reference
-        if isNull reference then false else
-
-        let referenceName = reference.GetTreeNode().As<ITypeReferenceName>()
+        let referenceOwner = getReferenceOwner context
+        let referenceName = referenceOwner.As<ITypeReferenceName>()
         if isNull referenceName || isNotNull referenceName.Qualifier then false else
 
         let rec loop (referenceName: ITypeReferenceName) =
@@ -124,11 +125,8 @@ module FSharpKeywordsProvider =
         | _ -> false
 
     let mayStartTypeMember (context: FSharpCodeCompletionContext) =
-        let reference = context.ReparsedContext.Reference
-        if isNull reference then true else
-
         // todo: get element from the context
-        match reference.GetTreeNode() with
+        match getReferenceOwner context with
         | :? IReferenceExpr ->
             false
 
@@ -138,16 +136,35 @@ module FSharpKeywordsProvider =
             isNotNull declaration
 
         | _ -> true
-    
-    let mayBeInTypeUsage (context: FSharpCodeCompletionContext) =
-        let reference = context.ReparsedContext.Reference
-        if isNull reference then true else
 
-        match reference.GetTreeNode() with
+    let mayBeUnionCaseDecl (context: FSharpCodeCompletionContext) =
+        match getReferenceOwner context with
+        | :? ITypeReferenceName as referenceName ->
+            let typeUsage = NamedTypeUsageNavigator.GetByReferenceName(referenceName)
+            isNotNull (TypeUsageOrUnionCaseDeclarationNavigator.GetByTypeUsage(typeUsage)) &&
+
+            match referenceName.TypeArgumentList with
+            | :? IPostfixAppTypeArgumentList as list ->
+                let typeArgs = list.TypeUsages
+                typeArgs.Count = 1 &&
+
+                match typeArgs[0] with
+                | :? INamedTypeUsage as argTypeUsage ->
+                    let argReferenceName = argTypeUsage.ReferenceName
+                    not argReferenceName.IsQualified && isNull argReferenceName.TypeArgumentList
+                | _ -> false
+            | _ -> false
+        | _ -> false
+
+    let mayBeInTypeUsage (context: FSharpCodeCompletionContext) =
+        match getReferenceOwner context with
         | :? IReferenceExpr -> false
         | :? ITypeReferenceName as referenceName ->
             isNotNull (NamedTypeUsageNavigator.GetByReferenceName(referenceName))
         | _ -> true
+
+    let inReferenceExpression (context: FSharpCodeCompletionContext) =
+        getReferenceOwner context :? IFSharpQualifiableReferenceOwner
 
     let suggestKeywords (context: FSharpCodeCompletionContext) = seq {
         let isSignatureFile = context.NodeInFile.IsFSharpSigFile()
@@ -184,7 +201,7 @@ module FSharpKeywordsProvider =
             if isLetInExpr then
                 "and!"
 
-        if mayStartTypeMember context (*&& not isTypeUsage*) then
+        if mayStartTypeMember context && not (mayBeUnionCaseDecl context) then
             "abstract"
             "default"
             "member"
@@ -194,6 +211,9 @@ module FSharpKeywordsProvider =
 
         if mayBeInTypeUsage context then
             "void"
+
+        if not (inReferenceExpression context) || mayBeUnionCaseDecl context then
+            "of"
     }
 
 type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =

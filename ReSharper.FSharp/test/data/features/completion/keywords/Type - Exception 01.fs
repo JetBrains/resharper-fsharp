@@ -1,0 +1,3 @@
+namespace Ns
+
+exception {caret}
