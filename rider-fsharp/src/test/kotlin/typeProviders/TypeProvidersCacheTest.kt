@@ -94,7 +94,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
         }
     }
 
-    @Test(description = "RIDER-73091")
+    @Test(description = "RIDER-73091", enabled = false)
     fun script() {
         withOutOfProcessTypeProviders {
             checkTypeProviders(File(testGoldFile.path + "_before"), "TypeProviderLibrary/Script.fsx")
