@@ -16,10 +16,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
     public abstract RichText GetSignature(string[] namedArguments, AnnotationsDisplayKind showAnnotations,
       out TextRange[] parameterRanges, out int[] mapToOriginalOrder, out ExtensionMethodInfo extensionMethodInfo);
 
-    public void GetParametersInfo(out ParamPresentationInfo[] paramInfos, out bool isParamsArray)
+    public void GetParametersInfo(out ParamPresentationInfo[] paramInfos, out int paramArrayIndex)
     {
       paramInfos = EmptyArray<ParamPresentationInfo>.Instance;
-      isParamsArray = false;
+      paramArrayIndex = -1;
     }
 
     public RichTextBlock GetDescription() => null;
