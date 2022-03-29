@@ -18,7 +18,8 @@ open JetBrains.Util
 
 [<SolutionComponent>]
 type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread, psiConfig: IPsiConfiguration,
-        psiModules: IPsiModules, assemblyInfoDatabase: AssemblyInfoDatabase, theming: ITheming, factory: XmlDocSectionFactory) =
+        psiModules: IPsiModules, assemblyInfoDatabase: AssemblyInfoDatabase, theming: ITheming,
+        factory: XmlDocSectionFactory, renderer: IXmlDocHtmlRenderer) =
 
     static let сrefManager =
         { new CrefManager() with
@@ -29,9 +30,10 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
 
     let formatXmlDoc (node: XmlNode) =
         let result = RichText()
+        let builder = XmlDocHtmlUtil.HTMLBuilder(renderer)
         XmlDocHtmlPresenter
             .ConvertProcessor(node, null, null :> DeclaredElementInstance, false, FSharpLanguage.Instance, сrefManager, factory, theming)
-            .AppendTextBody(result, true)
+            .AppendTextBody(builder, result, true)
         result
 
     let getIndex dllFile =
