@@ -83,7 +83,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
       RdTypeProviderProcessModel processModel)
     {
       var runtimeAssembly = @params.RunTimeAssemblyFileName;
-      var environment = @params.RdResolutionEnvironment.ResolutionFolder;
+      var environment = @params.EnvironmentPath;
       var envKey = $"{runtimeAssembly}+{environment}";
 
       var typeProviders = myTypeProvidersContext.TypeProvidersLoader.InstantiateTypeProvidersOfAssembly(@params);

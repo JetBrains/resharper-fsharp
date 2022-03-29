@@ -10,6 +10,7 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
 open JetBrains.ReSharper.Plugins.FSharp.Checker
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions
@@ -25,7 +26,8 @@ type IProxyExtensionTypingProvider =
 [<SolutionComponent>]
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         experimentalFeatures: FSharpExperimentalFeaturesProvider, fcsProjectProvider: IFcsProjectProvider,
-        outputAssemblies: OutputAssemblies, typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory) as this =
+        scriptPsiModulesProvider: FSharpScriptPsiModulesProvider, outputAssemblies: OutputAssemblies,
+        typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory) as this =
     let lifetime = solution.GetLifetime()
     let defaultShim = ExtensionTypingProvider
     let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
@@ -49,7 +51,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
 
             typeProvidersHostLifetime <- Lifetime.Define(lifetime)
             let newConnection = typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime).Run()
-            typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, outputAssemblies) :?> _
+            typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, scriptPsiModulesProvider, outputAssemblies) :?> _
             connection <- newConnection)
 
     do
@@ -75,7 +77,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                 try
                     typeProvidersManager.GetOrCreate(runTimeAssemblyFileName, designTimeAssemblyNameString,
                         resolutionEnvironment, isInvalidationSupported, isInteractive, systemRuntimeContainsType,
-                        systemRuntimeAssemblyVersion, compilerToolsPath)
+                        systemRuntimeAssemblyVersion, compilerToolsPath, m)
                 with :? TypeProvidersInstantiationException as e  ->
                     logError (TypeProviderError(e.FcsNumber, "", m, [e.Message]))
                     []
