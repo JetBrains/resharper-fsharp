@@ -11,12 +11,18 @@ open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
+open JetBrains.Util.dataStructures
 
 [<CompiledName("InterfaceDataVersionAttrTypeName")>]
 let interfaceDataVersionAttrTypeName = clrTypeName "Microsoft.FSharp.Core.FSharpInterfaceDataVersionAttribute"
 
+[<CompiledName("InterfaceDataVersionAttrConcatTypeName")>]
+let interfaceDataVersionAttrConcatTypeName =
+    StringDotConcat("Microsoft.FSharp.Core", "FSharpInterfaceDataVersionAttribute");
+
 let isFSharpAssemblyKey = Key("IsFSharpAssembly")
 
+/// Shouldn't be used during an assembly load, as the assembly attributes aren't populated yet.
 [<Extension; CompiledName("IsFSharpAssembly")>]
 let isFSharpAssembly (psiModule: IPsiModule) =
     match psiModule.ContainingProjectModule with
@@ -70,8 +76,6 @@ let getFSharpMetadataResources (psiModule: IPsiModule) =
 
     let path = assemblyPsiModule.Assembly.Location
     if isNull path then null else
-
-    Assertion.Assert(isFSharpAssembly psiModule, "isFSharpAssembly psiModule")
 
     use metadataLoader = new MetadataLoader()
     let metadataAssembly = metadataLoader.TryLoadFrom(path, JetFunc<_>.False)
