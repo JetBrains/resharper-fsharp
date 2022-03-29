@@ -49,6 +49,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                 let options, errors = getScriptOptionsAsync.RunAsTask()
                 if not errors.IsEmpty then
                     logErrors logger (sprintf "Script options for %s" path) errors
+                else logger.Info($"SCRIPT ({path}) OPTIONS: %A{options}")
                 Some options
             with
             | OperationCanceled -> reraise()
