@@ -209,7 +209,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     private static IDeclaredElement GetTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
       [NotNull] IPsiModule psiModule)
     {
-      Assertion.Assert(mfv.IsModuleValueOrMember, "mfv.IsModuleValueOrMember");
+      Assertion.Assert(mfv.IsModuleValueOrMember);
       var entity = mfv.DeclaringEntity.NotNull().Value;
 
       var typeElement = GetTypeElement(entity, psiModule);

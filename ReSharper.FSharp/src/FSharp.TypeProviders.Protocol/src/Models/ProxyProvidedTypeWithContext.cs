@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     private ProxyProvidedTypeWithContext(ProvidedType providedType, ProvidedTypeContext context) : base(null, context)
     {
-      Assertion.Assert(providedType is IRdProvidedEntity, "providedType is IRdProvidedEntity");
+      Assertion.Assert(providedType is IRdProvidedEntity);
       myProvidedType = providedType;
     }
 

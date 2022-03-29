@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       using var cookie = ProhibitTypeCheckCookie.Create();
 
       var sourceFile = file.GetSourceFile();
-      Assertion.AssertNotNull(sourceFile, "sourceFile != null");
+      Assertion.AssertNotNull(sourceFile);
 
       var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, myCheckerService);
       (file as IFSharpFile)?.Accept(declarationProcessor);

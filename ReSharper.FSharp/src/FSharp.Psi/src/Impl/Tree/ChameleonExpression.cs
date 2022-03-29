@@ -76,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private void OpenChameleon()
     {
-      Assertion.Assert(!myOpened, "!myOpened");
+      Assertion.Assert(!myOpened);
       Assertion.Assert(firstChild == lastChild && firstChild is IClosedChameleonBody,
         "One ChameleonElement child but found also {0}", lastChild.NodeType);
 

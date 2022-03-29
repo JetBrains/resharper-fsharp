@@ -126,7 +126,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         return (b10 << 8) | b11;
       }
 
-      Assertion.Assert(b0 == 0xFF, "b0 == 0xFF");
+      Assertion.Assert(b0 == 0xFF);
       return ReadInt32();
     }
 

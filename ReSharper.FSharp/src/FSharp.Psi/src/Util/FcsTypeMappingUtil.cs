@@ -179,7 +179,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       IPsiModule psiModule, bool isFromMethod)
     {
       var genericArgs = fcsType.GenericArguments;
-      Assertion.Assert(genericArgs.Count == 1, "genericArgs.Count == 1");
+      Assertion.Assert(genericArgs.Count == 1);
       return GetTypeArgumentType(genericArgs[0], typeParams, psiModule, isFromMethod);
     }
 

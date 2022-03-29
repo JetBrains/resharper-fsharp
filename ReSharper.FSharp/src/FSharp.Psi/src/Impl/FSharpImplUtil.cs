@@ -629,7 +629,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       var typeSourceName = fsTypeElement.SourceName;
       foreach (var part in typeElement.EnumerateParts())
       {
-        foreach (var child in part.Parent.NotNull("part.Parent != null").Children())
+        foreach (var child in part.Parent.NotNull().Children())
         {
           if (!(child is IModulePart && child is TypePart typePart))
             continue;

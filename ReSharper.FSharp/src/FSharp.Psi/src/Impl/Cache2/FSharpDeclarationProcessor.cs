@@ -69,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       {
         var token = tokens[i];
         var tokenType = token.Type;
-        Assertion.Assert(tokenType != null, "tokenType != null");
+        Assertion.Assert(tokenType != null);
         if (tokenType.IsFiltered)
           continue;
 
