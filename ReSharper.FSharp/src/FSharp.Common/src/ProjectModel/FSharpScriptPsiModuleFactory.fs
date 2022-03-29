@@ -40,7 +40,9 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         documentManager: DocumentManager, scriptOptionsProvider: IScriptFcsProjectProvider,
         platformManager: IPlatformManager, assemblyFactory: AssemblyFactory, projectFileExtensions,
-        projectFileTypeCoordinator) as this =
+        projectFileTypeCoordinator, checkerService: FcsCheckerService) as this =
+
+    let scriptPsiModuleInvalidated = new Signal<FSharpScriptPsiModule>(lifetime, "ScriptPsiModuleInvalidated")
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.
     let scriptsFromProjectFiles = OneToListMap<VirtualFileSystemPath, FSharpScriptPsiModule>()
@@ -177,6 +179,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                             for path in added do psiModule.AddReference(path)
                             for path in removed do psiModule.RemoveReference(path)
                             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
+                            scriptPsiModuleInvalidated.Fire(psiModule)
 
                         changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance)
 
@@ -250,12 +253,18 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         scriptsFromProjectFiles.GetValuesSafe(path)
         |> Seq.tryFind (fun psiModule -> psiModule.Path = moduleToRemove.Path)
         |> Option.iter (fun psiModule ->
+            match checkerService.GetCachedScriptOptions(path.FullPath) with
+            | Some options -> checkerService.InvalidateFcsProject(options)
+            | None -> ()
+
             scriptsFromProjectFiles.RemoveValue(path, psiModule) |> ignore
             removePsiModule psiModule
 
             psiModule.LifetimeDefinition.Terminate()
+            
             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Removed)
-            changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed))
+            changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed)
+            scriptPsiModuleInvalidated.Fire(psiModule))
 
     member x.GetPsiModulesForPath(path) =
         getPsiModulesForPath path
@@ -280,6 +289,8 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         writer.WriteLine(sprintf "Scripts from project files:")
         for fsPsiModule in scriptsFromProjectFiles.Values do
             writer.WriteLine("  " + fsPsiModule.SourceFile.ToProjectFile().GetPersistentID())
+
+    member x.ModuleInvalidated = scriptPsiModuleInvalidated
 
     interface IProjectPsiModuleProviderFilter with
         member x.OverrideHandler(lifetime, _, handler) =

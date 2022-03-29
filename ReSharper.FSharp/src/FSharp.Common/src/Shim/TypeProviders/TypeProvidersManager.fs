@@ -5,12 +5,14 @@ open System.Collections.Concurrent
 open System.Collections.Generic
 open System.Threading
 open FSharp.Compiler.ExtensionTyping
+open FSharp.Compiler.Text
 open FSharp.Core.CompilerServices
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.FSharpProjectModelUtil
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.TcImportsHack
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
@@ -79,12 +81,14 @@ type IProxyTypeProvidersManager =
         isInteractive: bool *
         systemRuntimeContainsType: (string -> bool) *
         systemRuntimeAssemblyVersion: Version *
-        compilerToolsPath: string list -> ITypeProvider list
+        compilerToolsPath: string list *
+        m: range -> ITypeProvider list
 
     abstract member HasGenerativeTypeProviders: project: IProject -> bool
     abstract member Dump: unit -> string
 
 type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvider: IFcsProjectProvider,
+                          scriptPsiModulesProvider: FSharpScriptPsiModulesProvider,
                           outputAssemblies: OutputAssemblies) =
     let protocol = connection.ProtocolModel.RdTypeProviderProcessModel
     let lifetime = connection.Lifetime
@@ -102,8 +106,8 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
             use lock = lock.Push()
             projectsWithGenerativeProviders.Add(project) |> ignore
 
-    let disposeTypeProviders (projectOutputPath: string) =
-        let providersToDispose = typeProviders.Get(projectOutputPath)
+    let disposeTypeProviders (path: string) =
+        let providersToDispose = typeProviders.Get(path)
         if providersToDispose.Count = 0 then () else
 
         let providersIds = [| for tp in providersToDispose -> tp.EntityId |]
@@ -111,7 +115,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
 
         for typeProvider in providersToDispose do typeProvider.DisposeProxy()
 
-        Assertion.Assert(typeProviders.Get(projectOutputPath) |> Seq.isEmpty, "Type Providers should be disposed")
+        Assertion.Assert(typeProviders.Get(path) |> Seq.isEmpty, "Type Providers should be disposed")
 
     do
         connection.Execute(fun () ->
@@ -127,12 +131,19 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
             | Some fcsProject -> disposeTypeProviders fcsProject.OutputPath.FullPath
             | None -> ())
 
+        scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime,
+            fun psiModule -> disposeTypeProviders psiModule.Path.FullPath)
+
     interface IProxyTypeProvidersManager with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
                 resolutionEnvironment: ResolutionEnvironment, isInvalidationSupported: bool, isInteractive: bool,
                 systemRuntimeContainsType: string -> bool, systemRuntimeAssemblyVersion: Version,
-                compilerToolsPath: string list) =
-            let outputPath = resolutionEnvironment.outputFile.Value
+                compilerToolsPath: string list, m: range) =
+
+            let envPath =
+                match resolutionEnvironment.outputFile with
+                | Some file -> file
+                | None -> m.FileName
 
             let result =
                 let fakeTcImports = getFakeTcImports systemRuntimeContainsType
@@ -142,13 +153,16 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                         InstantiateTypeProvidersOfAssemblyParameters(runTimeAssemblyFileName,
                             designTimeAssemblyNameString, resolutionEnvironment.toRdResolutionEnvironment(),
                             isInvalidationSupported, isInteractive, systemRuntimeAssemblyVersion.ToString(),
-                            compilerToolsPath |> Array.ofList, fakeTcImports), RpcTimeouts.Maximal))
+                            compilerToolsPath |> Array.ofList, fakeTcImports, envPath), RpcTimeouts.Maximal))
 
             let typeProviderProxies =
                 [ for tp in result.TypeProviders ->
                      let tp = new ProxyTypeProvider(tp, tpContext)
-                     tp.ContainsGenerativeTypes.Add(fun _ -> addProjectWithGenerativeProvider outputPath)
-                     typeProviders.Add(outputPath, tp)
+
+                     if not isInteractive then
+                         tp.ContainsGenerativeTypes.Add(fun _ -> addProjectWithGenerativeProvider envPath)
+
+                     typeProviders.Add(envPath, tp)
                      tp :> ITypeProvider
 
                   for id in result.CachedIds ->

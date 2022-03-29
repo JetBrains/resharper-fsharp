@@ -1,6 +1,5 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 
-open System.Collections
 open System.Reflection
 open JetBrains.Rider.FSharp.TypeProviders.Protocol
 
