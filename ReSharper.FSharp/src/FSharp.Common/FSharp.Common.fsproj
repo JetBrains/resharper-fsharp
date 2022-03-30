@@ -14,6 +14,9 @@
     <Compile Include="src\Util\FSharpCompilerAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpAssemblyUtil.fs" />
     <Compile Include="src\Util\RdTypeProvidersUtil.fs" />
+    <Compile Include="src\Metadata\FSharpMetadataFlags.fs" />
+    <Compile Include="src\Metadata\FSharpDeclaredName.fs" />
+    <Compile Include="src\Metadata\FSharpMetadataUtil.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\FSharpLanguageVersion.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties.fs" />

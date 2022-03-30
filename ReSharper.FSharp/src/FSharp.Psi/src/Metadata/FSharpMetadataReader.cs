@@ -2,44 +2,86 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using FSharp.Compiler.Text;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Metadata;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
 using Microsoft.FSharp.Core;
 using Range = FSharp.Compiler.Text.Range;
 
+// ReSharper disable UnusedVariable
+// ReSharper disable VariableHidesOuterVariable
+// ReSharper disable UnusedMethodReturnValue.Local
+
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 {
-  public class FSharpMetadataReader : BinaryReader
+  public class FSharpMetadataReader
   {
-    private class MetadataType
+    public static FSharpMetadata ReadMetadata(IPsiModule psiModule, IMetadataAssembly assembly)
     {
-      public int Index;
-      public string Name;
+      var metadata = new FSharpMetadata();
+
+      var manifestResources = assembly.GetManifestResources();
+      var metadataResources = 
+        manifestResources
+          .Where(resource => resource.IsFSharpMetadataResource(out _))
+          .SelectNotNull(resource => resource.GetDisposition())
+          .AsIList();
+
+      if (metadataResources.IsEmpty() && FSharpAssemblyUtil.IsFSharpCore(assembly.AssemblyName))
+      {
+        using var stream = FSharpAssemblyUtil.GetFSharpCoreSigdataPath(assembly).OpenFileForReading();
+        ReadMetadata(stream, metadata);
+      }
+      else
+      {
+        foreach (var metadataResource in metadataResources)
+        {
+          using var stream = metadataResource.CreateResourceReader();
+          ReadMetadata(stream, metadata);
+        }
+      }
+
+      return metadata;
     }
 
-    public FSharpMetadataReader([NotNull] Stream input, [NotNull] Encoding encoding) : base(input, encoding)
+    private static void ReadMetadata(Stream stream, FSharpMetadata metadata)
+    {
+      using var reader = new FSharpMetadataStreamReader(stream, Encoding.UTF8) { Metadata = metadata };
+      reader.ReadMetadata();
+    }
+  }
+
+  internal delegate T Reader<out T>(FSharpMetadataStreamReader reader);
+
+  internal class FSharpMetadataStreamReader : BinaryReader
+  {
+    public FSharpMetadataStreamReader([NotNull] Stream input, [NotNull] Encoding encoding) : base(input, encoding)
     {
     }
 
-    private readonly Stack<MetadataType> myState = new Stack<MetadataType>();
+    internal FSharpMetadata Metadata { get; set; }
 
-    private static readonly Func<FSharpMetadataReader, int> ReadIntFunc = reader => reader.ReadPackedInt();
-    private static readonly Func<FSharpMetadataReader, bool> ReadBoolFunc = reader => reader.ReadBoolean();
-    private static readonly Func<FSharpMetadataReader, string> ReadStringFunc = reader => reader.ReadString();
-    private static readonly Func<FSharpMetadataReader, object> ReadTypeFunc = reader => reader.ReadType();
-    private static readonly Func<FSharpMetadataReader, object> ReadIlTypeFunc = reader => reader.ReadIlType();
-    private static readonly Func<FSharpMetadataReader, object> ReadExpressionFunc = reader => reader.ReadExpression();
-    private static readonly Func<FSharpMetadataReader, object> ReadValueRefFunc = reader => reader.ReadValueRef();
-    private static readonly Func<FSharpMetadataReader, Range> ReadRangeFunc = reader => reader.ReadRange();
+    private readonly Stack<MetadataEntity> myState = new();
 
-    private static readonly Func<FSharpMetadataReader, string> ReadUniqueStringFunc =
-      reader => reader.ReadUniqueString();
+    private MetadataEntity CurrentEntity => myState.Peek();
+
+    private static readonly Reader<int> ReadIntFunc = reader => reader.ReadPackedInt();
+    private static readonly Reader<bool> ReadBoolFunc = reader => reader.ReadBoolean();
+    private static readonly Reader<string> ReadStringFunc = reader => reader.ReadString();
+    private static readonly Reader<object> ReadTypeFunc = reader => reader.ReadType();
+    private static readonly Reader<object> ReadIlTypeFunc = reader => reader.ReadIlType();
+    private static readonly Reader<object> ReadExpressionFunc = reader => reader.ReadExpression();
+    private static readonly Reader<object> ReadValueRefFunc = reader => reader.ReadValueRef();
+    private static readonly Reader<Range> ReadRangeFunc = reader => reader.ReadRange();
+    private static readonly Reader<string> ReadUniqueStringFunc = reader => reader.ReadUniqueString();
 
     private static readonly Func<bool, object> IgnoreBoolFunc = _ => null;
 
@@ -61,16 +103,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         Assertion.Fail($"{methodName}: {tagName} <= {maxValue}, actual: {value}");
     }
 
-    private Tuple<T1, T2> ReadTuple2<T1, T2>(Func<FSharpMetadataReader, T1> reader1,
-      Func<FSharpMetadataReader, T2> reader2)
+    public T ReadByteAsEnum<T>(string tagName = "tag") where T : struct, Enum
+    {
+      var value = ReadByte();
+      // Assertion.Assert(value < Enum.GetValues(typeof(T)).Length, $"{tagName}: {value}");
+      return Unsafe.As<byte, T>(ref value);
+    }
+
+    private Tuple<T1, T2> ReadTuple2<T1, T2>(Reader<T1> reader1, Reader<T2> reader2)
     {
       var v1 = reader1(this);
       var v2 = reader2(this);
       return Tuple.Create(v1, v2);
     }
 
-    private Tuple<T1, T2, T3> ReadTuple3<T1, T2, T3>(Func<FSharpMetadataReader, T1> reader1,
-      Func<FSharpMetadataReader, T2> reader2, Func<FSharpMetadataReader, T3> reader3)
+    private Tuple<T1, T2, T3> ReadTuple3<T1, T2, T3>(Reader<T1> reader1, Reader<T2> reader2, Reader<T3> reader3)
     {
       var v1 = reader1(this);
       var v2 = reader2(this);
@@ -78,7 +125,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return Tuple.Create(v1, v2, v3);
     }
 
-    private T[] ReadArray<T>(Func<FSharpMetadataReader, T> reader)
+    private T[] ReadArray<T>(Reader<T> reader)
     {
       var arrayLength = ReadPackedInt();
       if (arrayLength == 0)
@@ -87,7 +134,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return ReadArray(reader, arrayLength);
     }
 
-    private T[] ReadArray<T>(Func<FSharpMetadataReader, T> reader, int arrayLength)
+    private T[] ReadArray<T>(Reader<T> reader, int arrayLength)
     {
       var array = new T[arrayLength];
       for (var i = 0; i < arrayLength; i++)
@@ -95,7 +142,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return array;
     }
 
-    private FSharpOption<T> ReadOption<T>(Func<FSharpMetadataReader, T> reader)
+    private FSharpOption<T> ReadOption<T>(Reader<T> reader)
     {
       var tag = ReadByte();
       CheckTagValue(tag, 1);
@@ -137,21 +184,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return i1 | ((long) i2 << 32);
     }
 
-    public static void ReadMetadata(FSharpAssemblyUtil.FSharpSignatureDataResource resource)
-    {
-      using var resourceReader = resource.MetadataResource.CreateResourceReader();
-      using var reader = new FSharpMetadataReader(resourceReader, Encoding.UTF8);
-      reader.ReadMetadata();
-    }
-
-    public static void ReadMetadata(IPsiModule psiModule)
-    {
-      var metadataResources = FSharpAssemblyUtil.GetFSharpMetadataResources(psiModule);
-      foreach (var metadataResource in metadataResources)
-        ReadMetadata(metadataResource);
-    }
-
-    private void ReadMetadata()
+    internal void ReadMetadata()
     {
       // Initial reading inside unpickleObjWithDanglingCcus.
 
@@ -167,8 +200,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       myPublicPaths = ReadArray(reader => reader.ReadArray(ReadIntFunc));
 
       // u_encoded_nleref
-      ReadArray(reader =>
-        reader.ReadTuple2(ReadIntFunc, reader => reader.ReadArray(ReadIntFunc)));
+      ReadArray(reader => reader.ReadTuple2(ReadIntFunc, reader => reader.ReadArray(ReadIntFunc)));
 
       // u_encoded_simpletyp
       ReadArray(ReadIntFunc);
@@ -193,11 +225,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadEntitySpec()
     {
       var index = ReadPackedInt();
-      myState.Push(new MetadataType {Index = index});
-
       var typeParameters = ReadArray(reader => reader.ReadTypeParameterSpec());
       var logicalName = ReadUniqueString();
-      myState.Peek().Name = logicalName;
+
+      myState.Push(new MetadataEntity {Index = index, LogicalName = logicalName});
 
       var compiledName = ReadOption(ReadUniqueStringFunc);
       var range = ReadRange();

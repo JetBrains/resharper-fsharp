@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -15,21 +16,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     public int Priority => 20;
 
     private static bool IsFSharpMetadataResource(IMetadataManifestResource resource) =>
-      resource.Name.StartsWith("FSharpSignatureInfo.", StringComparison.Ordinal) ||
-      resource.Name.StartsWith("FSharpSignatureData.", StringComparison.Ordinal);
+      resource.Name.StartsWith(FSharpAssemblyUtil.SignatureInfoResourceName, StringComparison.Ordinal) ||
+      resource.Name.StartsWith(FSharpAssemblyUtil.SignatureInfoResourceNameOld, StringComparison.Ordinal);
 
     private static bool IsFSharpSignatureAttribute(MetadataTypeReference typeReference) =>
       typeReference.FullName.Equals(FSharpAssemblyUtil.InterfaceDataVersionAttrConcatTypeName);
 
+    private static bool HasFSharpSignatureAttribute([NotNull] IMetadataAssembly metadataAssembly)
+    {
+      foreach (var typeReference in metadataAssembly.CustomAttributesTypeNames)
+        if (IsFSharpSignatureAttribute(typeReference))
+          return true;
+
+      return false;
+    }
+
     public bool IsApplicable(IPsiAssembly assembly, IMetadataAssembly metadataAssembly)
     {
       foreach (var resource in metadataAssembly.GetManifestResources())
-      {
-        if (!IsFSharpMetadataResource(resource)) continue;
+        if (IsFSharpMetadataResource(resource) && HasFSharpSignatureAttribute(metadataAssembly))
+          return true;
 
-        foreach (var typeReference in metadataAssembly.CustomAttributesTypeNames)
-          if (IsFSharpSignatureAttribute(typeReference))
-            return true;
+      if (metadataAssembly.AssemblyName?.Name == "FSharp.Core")
+      {
+        var sigdataPath = FSharpAssemblyUtil.GetFSharpCoreSigdataPath(metadataAssembly);
+        return sigdataPath.ExistsFile && HasFSharpSignatureAttribute(metadataAssembly);
       }
 
       return false;

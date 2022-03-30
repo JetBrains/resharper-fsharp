@@ -10,6 +10,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 {
   public class FSharpAssemblyPsiFile : AssemblyPsiFile
   {
+    public FSharpMetadata FSharpMetadata { get; set; }
+
     public FSharpAssemblyPsiFile([NotNull] Func<IAssemblyLocation, IPsiModule, MetadataLoader> metadataLoaderFactory,
       [NotNull] IPsiConfiguration psiConfiguration,
       [NotNull] IExternalProviderCache<ICompiledEntity, IType> decodedTypeCache,
@@ -20,8 +22,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
     public override void LoadAssembly(IMetadataAssembly assembly, IAssemblyPsiModule containingModule)
     {
-      FSharpMetadataReader.ReadMetadata(containingModule);
+      FSharpMetadata = FSharpMetadataReader.ReadMetadata(containingModule, assembly);
       base.LoadAssembly(assembly, containingModule);
+      FSharpMetadata = null;
     }
   }
 }
