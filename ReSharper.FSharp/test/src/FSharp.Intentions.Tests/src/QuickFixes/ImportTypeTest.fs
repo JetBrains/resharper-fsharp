@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
-open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -42,7 +41,6 @@ type ImportTypeTest() =
 
     [<Test>] member x.``Nested Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Nested Module 02``() = x.DoNamedTest()
-    [<Test>] member x.``Nested Module 03 - Module suffix``() = x.DoNamedTest()
 
     [<Test>] member x.``Qualifiers - Expr - Imported 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Expr - Imported 02 - Nested``() = x.DoNamedTest()
