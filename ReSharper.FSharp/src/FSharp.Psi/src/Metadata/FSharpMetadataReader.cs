@@ -241,11 +241,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var typeAugmentation = ReadTypeAugmentation();
       var xmlDocId = ReadUniqueString(); // Should be empty string.
       var typeKind = ReadTypeKind();
-      var typeRepresentationFlag = ReadInt64();
+
+      var entityFlags = (EntityFlags) ReadInt64() & ~EntityFlags.ReservedBit;
+      var isModuleOrNamespace = (entityFlags & EntityFlags.IsModuleOrNamespace) != 0;
+
       var compilationPath = ReadOption(reader => reader.ReadCompilationPath());
+      CurrentEntity.CompilationPath = compilationPath?.Value;
+
       var moduleType = ReadModuleType();
       var exceptionRepresentation = ReadExceptionRepresentation();
       var possibleXmlDoc = ReadPossibleXmlDoc();
+
+      if (isModuleOrNamespace && CurrentEntity.EntityKind != EntityKind.Namespace)
+        Metadata.CreateModule(CurrentEntity);
 
       myState.Pop();
 
@@ -309,22 +317,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return name;
     }
 
-    private object ReadCompilationPath()
+    private Tuple<string, EntityKind>[] ReadCompilationPath()
     {
       ReadIlScopeRef();
-      ReadArray(reader =>
+      return ReadArray(reader =>
         reader.ReadTuple2(
           ReadUniqueStringFunc,
-          reader => reader.ReadModuleOrNamespaceKind()));
-      return null;
+          reader => reader.ReadEntityKind()));
     }
 
-    private object ReadModuleOrNamespaceKind()
-    {
-      var tag = ReadByte();
-      CheckTagValue(tag, 2);
-      return null;
-    }
+    private EntityKind ReadEntityKind() =>
+      ReadByteAsEnum<EntityKind>();
 
     private object ReadIlScopeRef()
     {
@@ -488,7 +491,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var ovalsIdx1 = ReadInt32();
       var ovalsIdx2 = ReadInt32();
 
-      ReadModuleOrNamespaceKind();
+      CurrentEntity.EntityKind = ReadEntityKind();
+
       ReadArray(reader => reader.ReadValue());
       ReadArray(reader => reader.ReadEntitySpec());
 

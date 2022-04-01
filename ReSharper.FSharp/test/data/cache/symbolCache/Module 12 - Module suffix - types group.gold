@@ -7,5 +7,5 @@ FSharpProjectFilePart:ImplFile
 []: Namespace:
  [Ns]: Namespace:Ns
   [Foo]: Class:Ns.Foo[TestProject]
-  [T]: Class:Ns.T[TestProject]
+  [T]: Class:Ns.T[TestProject], Class:Ns.TModule[TestProject]
   [TModule]: Class:Ns.TModule[TestProject]

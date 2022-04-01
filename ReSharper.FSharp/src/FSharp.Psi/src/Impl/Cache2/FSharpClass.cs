@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
 
     protected override bool AcceptsPart(TypePart part) =>
-      base.AcceptsPart(part) && !(part is IModulePart);
+      base.AcceptsPart(part) && part.ShortName == ShortName && part is not IModulePart;
 
     protected override MemberDecoration Modifiers => myParts.GetModifiers();
     public string SourceName => this.GetSourceName();

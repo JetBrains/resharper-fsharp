@@ -18,6 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     ModuleMembersAccessKind AccessKind { get; }
 
+    /// Same-source-named type element defined in the same namespace group, forcing the module to have `Module` suffix.
     [CanBeNull] ITypeElement AssociatedTypeElement { get; }
   }
 }

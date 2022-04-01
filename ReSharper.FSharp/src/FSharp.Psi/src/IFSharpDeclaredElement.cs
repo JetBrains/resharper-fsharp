@@ -1,4 +1,6 @@
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Caches.SymbolCache;
+using JetBrains.ReSharper.Psi.Impl.Reflection2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
@@ -8,6 +10,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   }
 
   public interface IFSharpTypeElement : IFSharpDeclaredElement, ITypeElement
+  {
+  }
+
+  public interface IFSharpCompiledTypeElement : ICompiledTypeElement, IFSharpDeclaredElement,
+    IAlternativeNameCacheTrieNodeOwner
   {
   }
 }

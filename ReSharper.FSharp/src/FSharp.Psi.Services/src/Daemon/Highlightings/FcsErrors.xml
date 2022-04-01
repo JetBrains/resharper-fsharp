@@ -200,8 +200,8 @@
     <Range>reference.GetElement().FSharpIdentifier.GetHighlightingRange()</Range>
     <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
     <QuickFix>ToRecursiveFunctionFix</QuickFix>
-    <QuickFix arguments="h.Reference">ImportTypeFix</QuickFix>
-    <QuickFix arguments="h.Reference">ReferenceModuleAndTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UndefinedIndexer" ID="FS0039: Undefined indexer">

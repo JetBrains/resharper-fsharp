@@ -2,6 +2,7 @@
 
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -18,7 +19,7 @@ let private resolvesToAssociatedModule (declaredElement: IDeclaredElement) (unqu
 
     let shortName = reference.GetName()
     if not (unqualifiedTypeElement.ShortName.HasModuleSuffix() && not (shortName.HasModuleSuffix())) then false else
-    if not (isCompiledModule unqualifiedTypeElement) then false else
+    if not (unqualifiedTypeElement :? FSharpCompiledModule) then false else
 
     let typeElement = FSharpImplUtil.TryGetAssociatedType(unqualifiedTypeElement, shortName)
     declaredElement.Equals(typeElement)
@@ -79,7 +80,7 @@ let mayShadowPartially (newExpr: ITreeNode) (data: ElementProblemAnalyzerData) (
     typeElements
     |> Seq.cast<ITypeElement>
     |> Seq.map getContainingEntity
-    |> Seq.collect (fun element -> opens.GetValuesSafe(element.ShortName))
+    |> Seq.collect (fun element -> opens.GetValuesSafe(element.GetSourceName()))
     |> Seq.toArray
     |> OpenScope.inAnyScope newExpr
 

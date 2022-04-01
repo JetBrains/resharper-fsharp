@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
@@ -70,7 +69,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var typeShortName = type.ShortName;
       names.Add(typeShortName.SubstringBeforeLast(AttributeInstanceExtensions.ATTRIBUTE_SUFFIX));
-      names.Add(typeShortName.SubstringBeforeLast(FSharpImplUtil.ModuleSuffix));
 
       if (type.GetClrName().TryGetPredefinedAbbreviations(out var abbreviations))
         names.AddRange(abbreviations);

@@ -26,5 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       base.LoadAssembly(assembly, containingModule);
       FSharpMetadata = null;
     }
+
+    protected override ReflectionElementPropertiesProvider CreateReflectionElementPropertiesProvider() =>
+      new FSharpReflectionElementPropertiesProvider(FSharpMetadata);
   }
 }
