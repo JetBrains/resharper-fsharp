@@ -1,10 +1,11 @@
 using FSharp.Compiler.Symbols;
+using JetBrains.Annotations;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public partial interface IDelegateRepresentation
   {
-    FSharpEntity Delegate { get; }
-    FSharpDelegateSignature DelegateSignature { get; }
+    [CanBeNull] FSharpEntity Delegate { get; }
+    [CanBeNull] FSharpDelegateSignature DelegateSignature { get; }
   }
 }

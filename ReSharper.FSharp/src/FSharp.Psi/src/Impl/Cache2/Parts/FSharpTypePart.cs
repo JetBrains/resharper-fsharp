@@ -163,5 +163,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     protected virtual string PrintTypeParameters() => "";
+
+    public virtual int MeasureTypeParametersCount => 0;
   }
 }

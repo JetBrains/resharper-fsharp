@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  public interface IFSharpClassLikePart : ClassLikeTypeElement.IClassLikePart
+  public interface IFSharpClassLikePart : IFSharpTypePart, ClassLikeTypeElement.IClassLikePart
   {
     [NotNull] IEnumerable<ITypeElement> GetSuperTypeElements();
   }

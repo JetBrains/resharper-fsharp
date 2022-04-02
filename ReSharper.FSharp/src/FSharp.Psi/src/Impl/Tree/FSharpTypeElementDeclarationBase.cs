@@ -153,7 +153,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public virtual TreeNodeCollection<ITypeParameterDeclaration> TypeParameterDeclarations =>
-      TreeNodeCollection<ITypeParameterDeclaration>.Empty;
+    public virtual IList<ITypeParameterDeclaration> TypeParameterDeclarations =>
+      EmptyList<ITypeParameterDeclaration>.Instance;
   }
 }

@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       (byte) FSharpPartKind.Union;
   }
 
-  internal class StructUnionPart : UnionPartBase, Struct.IStructPart
+  internal class StructUnionPart : UnionPartBase, IFSharpStructPart
   {
     public StructUnionPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
       bool isSingleCase) : base(declaration, cacheBuilder, false, isSingleCase)

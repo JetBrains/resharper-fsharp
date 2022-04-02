@@ -826,6 +826,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : ModuleMembersAccessKind.Normal;
     }
 
+    public static IList<ITypeParameterDeclaration> GetTypeParameterDeclarations(
+      [NotNull] this IFSharpTypeOrExtensionDeclaration decl)
+    {
+      var decls = decl.TypeParameterDeclarationList?.TypeParameters;
+      if (decls == null)
+        return EmptyList<ITypeParameterDeclaration>.Instance;
+
+      return decls.Value.ToListWhere(typeParamDecl => !typeParamDecl.Attributes.HasAttribute("Measure"));
+    }
+
     public static IList<ITypeParameter> GetAllTypeParametersReversed(this ITypeElement typeElement) =>
       typeElement.GetAllTypeParameters().ResultingList().Reverse();
 

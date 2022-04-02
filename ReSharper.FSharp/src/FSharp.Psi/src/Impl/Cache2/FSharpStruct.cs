@@ -9,9 +9,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   public class FSharpStruct : Struct, IFSharpTypeElement, IFSharpTypeParametersOwner
   {
-    public FSharpStruct([NotNull] IStructPart part) : base(part)
-    {
-    }
+    public int MeasureTypeParametersCount { get; }
+
+    public FSharpStruct([NotNull] IFSharpStructPart part) : base(part) =>
+      MeasureTypeParametersCount = part.MeasureTypeParametersCount;
+
+    protected override bool AcceptsPart(TypePart part) =>
+      part.ShortName == ShortName &&
+      part is IFSharpStructPart structPart && structPart.MeasureTypeParametersCount == MeasureTypeParametersCount;
 
     protected override MemberDecoration Modifiers => Parts.GetModifiers();
     public string SourceName => this.GetSourceName();

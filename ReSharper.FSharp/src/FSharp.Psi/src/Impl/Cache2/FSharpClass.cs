@@ -9,12 +9,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   public class FSharpClass : Class, IFSharpTypeElement, IFSharpTypeParametersOwner
   {
+    public int MeasureTypeParametersCount { get; }
+
     public FSharpClass([NotNull] IClassPart part) : base(part)
     {
+      if (part is IFSharpClassPart fsClassPart)
+        MeasureTypeParametersCount = fsClassPart.MeasureTypeParametersCount;
     }
 
     protected override bool AcceptsPart(TypePart part) =>
-      base.AcceptsPart(part) && part.ShortName == ShortName && part is not IModulePart;
+      part.ShortName == ShortName &&
+      part is IFSharpClassPart classPart && classPart.MeasureTypeParametersCount == MeasureTypeParametersCount;
 
     protected override MemberDecoration Modifiers => myParts.GetModifiers();
     public string SourceName => this.GetSourceName();

@@ -4,7 +4,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   public interface IFSharpTypePart
   {
-    [NotNull]
-    string SourceName { get; }
+    [NotNull] string SourceName { get; }
+    int MeasureTypeParametersCount { get; }
   }
 }

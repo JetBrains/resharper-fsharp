@@ -85,7 +85,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public ITypeParameterDeclarationList TypeParameterDeclarationList =>
       (ITypeParameterDeclarationList) PrefixTypeParameterList ?? PostfixTypeParameterList;
 
-    public override TreeNodeCollection<ITypeParameterDeclaration> TypeParameterDeclarations =>
-      TypeParameterDeclarationList?.TypeParameters ??
-      TreeNodeCollection<ITypeParameterDeclaration>.Empty;  }
+    public override IList<ITypeParameterDeclaration> TypeParameterDeclarations => this.GetTypeParameterDeclarations();
+  }
 }

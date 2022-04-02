@@ -11,11 +11,10 @@ using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
 using Microsoft.FSharp.Core;
-using Delegate = JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.Delegate;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class DelegatePart : FSharpTypeParametersOwnerPart<IFSharpTypeDeclaration>, Delegate.IDelegatePart
+  internal class DelegatePart : FSharpTypeParametersOwnerPart<IFSharpTypeDeclaration>, IFSharpDelegatePart
   {
     public DelegatePart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.Attributes),
@@ -33,16 +32,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected override byte SerializationTag =>
       (byte) FSharpPartKind.Delegate;
 
+    public FSharpDelegateSignature FcsDelegateSignature =>
+      GetDeclaration() is {TypeRepresentation: IDelegateRepresentation { DelegateSignature: { } signature }}
+        ? signature
+        : null;
+
     public IParameter[] Parameters =>
-      GetDeclaration() is { TypeRepresentation: IDelegateRepresentation repr }
-        ? GetParameters(repr.DelegateSignature.DelegateArguments)
+      FcsDelegateSignature is { } signature
+        ? GetParameters(signature.DelegateArguments)
         : EmptyArray<IParameter>.Instance;
 
     internal IPsiModule Module => GetPsiModule();
 
     public IType ReturnType =>
-      GetDeclaration() is { TypeRepresentation: IDelegateRepresentation repr }
-        ? GetType(repr.DelegateSignature.DelegateReturnType, true)
+      FcsDelegateSignature is { } signature
+        ? GetType(signature.DelegateReturnType, true)
         : TypeFactory.CreateUnknownType(Module);
 
     protected IParameter[] GetParameters(IList<Tuple<FSharpOption<string>, FSharpType>> types)

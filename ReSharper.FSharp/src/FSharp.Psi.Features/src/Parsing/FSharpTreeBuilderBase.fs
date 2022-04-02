@@ -313,8 +313,14 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessTypeConstraint(typeConstraint)
         x.Done(mark, ElementType.TYPE_CONSTRAINTS_CLAUSE)
 
-    member x.ProcessTypeParameter(SynTyparDecl(_, SynTypar(IdentRange range, _, _)), elementType) =
-        x.MarkAndDone(range, elementType)
+    member x.ProcessTypeParameter(SynTyparDecl(attrs, SynTypar(IdentRange range, _, _)), elementType) =
+        let range = 
+            match attrs with
+            | [] -> range
+            | attrList :: _ -> Range.unionRanges attrList.Range range
+
+        let mark = x.MarkAndProcessIntro(attrs, XmlDoc.Empty, null, range)
+        x.Done(range, mark, elementType)
 
     member x.ProcessUnionCaseType(caseType, fieldElementType) =
         match caseType with

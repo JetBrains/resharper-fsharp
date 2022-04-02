@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       (byte) FSharpPartKind.Record;
   }
 
-  internal class StructRecordPart : RecordPartBase, Struct.IStructPart
+  internal class StructRecordPart : RecordPartBase, IFSharpStructPart
   {
     public StructRecordPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
