@@ -22,6 +22,7 @@ type RemoveXmlDocFixTest() =
     [<Test>] member x.``XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 02``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 03 - Remove line``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 04 - Remove extra spaces``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type ReplaceXmlDocWithLineCommentAvailabilityTest() =
