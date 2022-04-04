@@ -26,14 +26,6 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Threading
 open JetBrains.Util
 
-[<RequireQualifiedAccess>]
-type ReferencedAssembly =
-    /// An output of a psi source project except for F# projects.
-    | ProjectOutput of ProjectFcsModuleReader
-
-    /// Not supported file or output assembly for F# project.
-    | Ignored
-
 module AssemblyReaderShim =
     let isSupportedProjectLanguage (language: ProjectLanguage) =
         language = ProjectLanguage.CSHARP || language = ProjectLanguage.VBASIC
@@ -138,27 +130,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         loop psiModule
         projectModules, hasFSharpReferences
-
-    let rec recordDependencies (psiModule: IPsiModule): unit =
-        if moduleDependenciesRecorded.Contains(psiModule) then () else
-
-        if not (psiModule :? IProjectPsiModule) then () else
-
-        // todo: filter by primary module? test on web projects containing multiple modules 
-        for referencedModule in getReferencedModules psiModule do
-            if not (referencedModule :? IProjectPsiModule) then () else
-
-            let referencedProjectModules, hasFSharpReferences = transitiveReferencedProjectModules referencedModule
-
-            if hasFSharpReferences then
-                nonLazyDependenciesForModule.Add(psiModule, referencedModule) |> ignore
-
-            dependenciesToReferencingModules.Add(referencedModule, psiModule) |> ignore
-
-            for referencedProjectModule in referencedProjectModules do
-                recordDependencies referencedProjectModule
-
-        moduleDependenciesRecorded.Add(psiModule) |> ignore
 
     let recordReader path reader =
         assemblyReadersByPath[path] <- reader
@@ -302,14 +273,15 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             allTypesCreated.Remove(psiModule) |> ignore
 
     interface IFcsAssemblyReaderShim with
-        member this.PrepareDependencies(psiModule) =
-            if not (isEnabled ()) then () else
+        member this.IsEnabled = isEnabled ()
 
-            use lock = locker.UsingWriteLock()
+        member this.GetTimestamp(psiModule) =
+            match assemblyReadersByModule.TryGetValue(psiModule).NotNull() with
+            | ReferencedAssembly.Ignored -> failwith $"Expecting project output for {psiModule}"
+            | ReferencedAssembly.ProjectOutput reader -> reader.Timestamp
 
-            recordDependencies psiModule
-            invalidateDirtyDependencies ()
-            createAllTypeDefsInDependencies psiModule
+        member this.GetModuleReader(psiModule) =
+            getOrCreateReaderFromModule psiModule
 
 
 [<SolutionComponent>]

@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System.Collections.Generic
+open FSharp.Compiler.AbstractIL.ILBinaryReader
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Annotations
 open JetBrains.Application.Settings
@@ -18,6 +19,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -58,7 +60,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
         scriptFcsProjectProvider: IScriptFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
         fsFileService: IFSharpFileService, fsItemsContainer: FSharpItemsContainer,
-        modulePathProvider: ModulePathProvider, locks: IShellLocks, logger: ILogger) as this =
+        modulePathProvider: ModulePathProvider, locks: IShellLocks, logger: ILogger,
+        fcsAssemblyReaderShim: IFcsAssemblyReaderShim) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let locker = JetFastSemiReenterableRWLock()
@@ -166,13 +169,33 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             | Some referencedProjectPsiModules ->
                 let fcsProject = fcsProjectBuilder.BuildFcsProject(psiModule, project)
 
+                for referencedPsiModule in referencedProjectPsiModules do
+                    let referencedModule = referencedModules.GetOrCreateValue(referencedPsiModule, createReferencedModule)
+                    referencedModule.ReferencingModules.Add(psiModule) |> ignore
+
                 let referencedFcsProjects = 
                     referencedProjectPsiModules
-                    |> Seq.filter isFSharpProjectModule
-                    |> Seq.map (fun psiModule ->
-                        let referencedFcsProject = fcsProjects[psiModule]
-                        let path = referencedFcsProject.OutputPath.FullPath
-                        FSharpReferencedProject.CreateFSharp(path, referencedFcsProject.ProjectOptions))
+                    |> Seq.choose (fun psiModule ->
+                        if isFSharpProjectModule psiModule then
+                            let referencedFcsProject = fcsProjects[psiModule]
+                            let path = referencedFcsProject.OutputPath.FullPath
+                            Some(FSharpReferencedProject.CreateFSharp(path, referencedFcsProject.ProjectOptions))
+
+                        elif fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedModule psiModule then
+                            match fcsAssemblyReaderShim.GetModuleReader(psiModule) with
+                            | ReferencedAssembly.Ignored -> None
+                            | ReferencedAssembly.ProjectOutput reader ->
+
+                            let referencedModule = referencedModules[psiModule]
+                            let path = referencedModule.ReferencedPath.FullPath
+
+                            let getTimestamp () = fcsAssemblyReaderShim.GetTimestamp(psiModule)
+                            let getReader () = reader :> ILModuleReader
+
+                            Some(FSharpReferencedProject.CreateFromILModuleReader(path, getTimestamp, getReader))
+
+                        else
+                            None)
                     |> Seq.toArray
 
                 let fcsProjectOptions = { fcsProject.ProjectOptions with ReferencedProjects = referencedFcsProjects }
@@ -184,10 +207,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 let projectMark = project.GetProjectMark()
                 projectsProjectMarks[projectMark] <- project
                 projectMarkModules[psiModule] <- projectMark
-
-                for referencedPsiModule in referencedProjectPsiModules do
-                    let referencedModule = referencedModules.GetOrCreateValue(referencedPsiModule, createReferencedModule)
-                    referencedModule.ReferencingModules.Add(psiModule) |> ignore
 
         fcsProjects[psiModule]
 
