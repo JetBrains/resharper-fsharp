@@ -16,21 +16,5 @@ IFSharpSigFile
         FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:B)
-        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        ITypeAbbreviationRepresentation
-          ITypeUsageOrUnionCaseDeclaration
-            IFunctionTypeUsage
-              INamedTypeUsage
-                ITypeReferenceName
-                  ITypeParameterId
-                    FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-                    FSharpIdentifierToken(type:IDENTIFIER, text:T)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              INamedTypeUsage
-                ITypeReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:unit)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

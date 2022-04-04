@@ -26,7 +26,7 @@ type RemoveXmlDocFix(warning: InvalidXmlDocPositionWarning) =
     inherit FSharpQuickFixBase()
 
     let comment = warning.Comment
-    
+
     override this.IsAvailable _ = comment.IsValid()
     override this.Text = "Remove XML comment"
 
@@ -34,4 +34,7 @@ type RemoveXmlDocFix(warning: InvalidXmlDocPositionWarning) =
         use writeCookie = WriteLockCookie.Create(comment.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        deleteChild comment
+        let firstSpaceBefore = getFirstMatchingNodeBefore isInlineSpace comment
+        let firstToDelete = getThisOrPrevNewLine firstSpaceBefore
+
+        deleteChildRange firstToDelete comment

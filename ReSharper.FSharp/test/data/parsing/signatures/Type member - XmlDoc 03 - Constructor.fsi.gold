@@ -27,9 +27,9 @@ IFSharpSigFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IFunctionTypeUsage
               IParameterSignatureTypeUsage
-                IAnonTypeUsage
-                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:unit)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
