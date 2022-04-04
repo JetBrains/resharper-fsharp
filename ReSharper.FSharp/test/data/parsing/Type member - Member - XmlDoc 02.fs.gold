@@ -22,8 +22,6 @@ IFSharpImplFile
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           FSharpIdentifierToken(type:IDENTIFIER, text:B)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-          Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
           FSharpTokenType+WithTokenElement(type:WITH, text:with)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IAccessorDeclaration
@@ -38,31 +36,5 @@ IFSharpImplFile
             IChameleonExpression
               ILiteralExpr
                 FSharpToken(type:INT32, text:5)
-          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-          Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
-          FSharpTokenType+AndTokenElement(type:AND, text:and)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IAccessorDeclaration
-            FSharpIdentifierToken(type:IDENTIFIER, text:set)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IParenPat
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                ITypedPat
-                  IWildPat
-                    FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-                  FSharpTokenType+ColonTokenElement(type:COLON, text::)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IChameleonExpression
-              IUnitExpr
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
