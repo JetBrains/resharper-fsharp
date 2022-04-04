@@ -4,4 +4,4 @@
 ()
 
 ---------------------------------------------------------
-(0): ReSharper Warning: XML comment is not placed on a valid language element.
+(0): ReSharper Warning [FS3520]: XML comment is not placed on a valid language element.
