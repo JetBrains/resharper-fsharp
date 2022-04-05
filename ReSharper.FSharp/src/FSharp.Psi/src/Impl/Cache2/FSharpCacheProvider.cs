@@ -31,8 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
 
     public ProjectFilePart LoadProjectFilePart(IPsiSourceFile sourceFile, ProjectFilePartsTree tree, IReader reader) =>
-      new FSharpProjectFilePart(sourceFile, reader, sourceFile.GetFSharpFileKind(),
-        sourceFile != null && myCheckerService.FcsProjectProvider.HasPairFile(sourceFile));
+      new FSharpProjectFilePart(sourceFile, reader, sourceFile.GetFSharpFileKind());
 
     public Part ReadPart(byte tag, IReader reader) =>
       (FSharpPartKind) tag switch
