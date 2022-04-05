@@ -138,6 +138,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let createReferencedModule psiModule =
         ReferencedModule.create modulePathProvider psiModule
 
+    // todo: split getting parsing options from creating references:
+    //   we don't want to build the whole FcsProject when HasPairFile info is needed
     let createFcsProject (project: IProject) (psiModule: IPsiModule): FcsProject =
         match tryGetValue psiModule fcsProjects with
         | Some fcsProject -> fcsProject
@@ -189,7 +191,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                             let referencedModule = referencedModules[psiModule]
                             let path = referencedModule.ReferencedPath.FullPath
 
-                            let getTimestamp () = fcsAssemblyReaderShim.GetTimestamp(psiModule)
+                            let getTimestamp () = reader.Timestamp
                             let getReader () = reader :> ILModuleReader
 
                             Some(FSharpReferencedProject.CreateFromILModuleReader(path, getTimestamp, getReader))

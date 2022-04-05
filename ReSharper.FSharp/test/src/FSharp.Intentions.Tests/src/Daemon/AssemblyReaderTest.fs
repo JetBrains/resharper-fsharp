@@ -18,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open NUnit.Framework
@@ -25,8 +26,9 @@ open NUnit.Framework
 [<SolutionComponent>]
 type TestAssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager,
         psiModules: IPsiModules, cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim,
-        checkerService: FcsCheckerService, fsOptionsProvider: FSharpOptionsProvider) =
-    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,fsOptionsProvider)
+        checkerService: FcsCheckerService, fsOptionsProvider: FSharpOptionsProvider, symbolCache: ISymbolCache) =
+    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
+        fsOptionsProvider, symbolCache)
 
     let mutable projectPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
     let mutable projectPsiModule = null

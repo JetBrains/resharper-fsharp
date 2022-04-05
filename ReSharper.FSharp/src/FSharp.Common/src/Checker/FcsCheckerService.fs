@@ -111,6 +111,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         let source = FcsCheckerService.getSourceText sourceFile.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
+        x.AssemblyReaderShim.PrepareDependencies(sourceFile.PsiModule)
+
         // todo: don't cancel the computation when file didn't change
         match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask() with
         | Some (parseResults, checkResults) ->
@@ -219,17 +221,3 @@ type IFcsProjectProvider =
 type IScriptFcsProjectProvider =
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetScriptOptions: VirtualFileSystemPath * string -> FSharpProjectOptions option
-
-
-[<RequireQualifiedAccess>]
-type ReferencedAssembly =
-    /// An output of a psi source project except for F# projects.
-    | ProjectOutput of ProjectFcsModuleReader
-
-    /// Not supported file or output assembly for F# project.
-    | Ignored
-
-type IFcsAssemblyReaderShim =
-    abstract IsEnabled: bool
-    abstract GetModuleReader: psiModule: IPsiModule -> ReferencedAssembly
-    abstract GetTimestamp: psiModule: IPsiModule -> DateTime

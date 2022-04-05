@@ -56,6 +56,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let locker = JetFastSemiReenterableRWLock()
 
     let mutable moduleDef: ILModuleDef option = None
+    let mutable realModuleReader: ILModuleReader option = None
 
     // Initial timestamp should be earlier than any modifications observed by FCS.
     let mutable timestamp = DateTime.MinValue
@@ -65,9 +66,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
 
     let typeUsedNames = OneToSetMap<IClrTypeName, string>()
-    let usedNamesToTypes = OneToSetMap<string, IClrTypeName>()
+    let usedShortNamesToUsingTypes = OneToSetMap<string, IClrTypeName>()
 
-    let usedFSharpModulesToTypes = OneToSetMap<IPsiModule, IClrTypeName>() // todo: record F#->F# chains
+    // todo: record F#->F# chains
+    // * base types are required
+    // changes in inferred types/signatures due to changes in unrelated types seem OK to ignore,
+    // since C# will show some error and will require fixing 
+    let usedFSharpModulesToTypes = OneToSetMap<IPsiModule, IClrTypeName>() 
 
     let mutable currentTypeName: IClrTypeName = null
     let mutable currentTypeUnresolvedUsedNames: ISet<string> = null
@@ -83,7 +88,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             usedFSharpModulesToTypes.Add(fsProjectModule, currentTypeName) |> ignore
         else
             let shortName = typeElement.ShortName
-            usedNamesToTypes.Add(shortName, currentTypeName) |> ignore
+            usedShortNamesToUsingTypes.Add(shortName, currentTypeName) |> ignore
             typeUsedNames.Add(currentTypeName, shortName) |> ignore
 
     let isDll (project: IProject) (targetFrameworkId: TargetFrameworkId) =
@@ -645,11 +650,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         ILPropertyDef(name, attrs, setter, getter, callConv, propertyType, init, args, emptyILCustomAttrs)
 
-    member this.Timestamp = timestamp
-    member this.PsiModule = psiModule
-
-    member val RealModuleReader: ILModuleReader option = None with get, set
-
     member this.CreateAllTypeDefs(): unit =
         // todo: keep upToDate/dirty flag, don't do this if not needed
         let rec traverseTypes (ns: INamespace) =
@@ -763,25 +763,15 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             typeDefs[clrTypeName] <- typeDef
             typeDef
 
-    member this.GetClrTypeNamesByShortName(shortName: string) =
-        clrNamesByShortNames.GetValuesSafe(shortName)
-
-    // todo: change to shortName, update short names dict too
     member this.InvalidateTypeDef(clrTypeName: IClrTypeName) =
         use lock = locker.UsingWriteLock()
-        typeDefs.TryRemove(clrTypeName) |> ignore
-        moduleDef <- None
-        timestamp <- DateTime.UtcNow
+        match typeDefs.TryRemove(clrTypeName) with
+        | true, _ ->
+            moduleDef <- None
+            timestamp <- DateTime.UtcNow
+        | _ -> ()
 
-    member this.InvalidateReferencingTypes(referencedName: string) =
-        for referencingTypeName in usedNamesToTypes.GetValuesSafe(referencedName) do
-            this.InvalidateTypeDef(referencingTypeName)
-
-    member this.InvalidateTypesReferencingFSharpModule(fsharpProjectModule: IPsiModule) =
-        for referencingTypeName in usedFSharpModulesToTypes.GetValuesSafe(fsharpProjectModule) do
-            this.InvalidateTypeDef(referencingTypeName)
-    
-    interface ILModuleReader with
+    interface IProjectFcsModuleReader with
         member this.ILModuleDef =
             match moduleDef with
             | Some(moduleDef) -> moduleDef
@@ -795,6 +785,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let isDll = isDll project psiModule.TargetFrameworkId
 
             let typeDefs =
+                // todo: compute later?
                 let result = List<ILPreTypeDef>()
 
                 let rec addTypes (ns: INamespace) =
@@ -825,11 +816,34 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             newModuleDef
 
         member this.Dispose() =
-            match this.RealModuleReader with
+            match realModuleReader with
             | Some(moduleReader) -> moduleReader.Dispose()
             | _ -> ()
 
         member this.ILAssemblyRefs = []
+
+        member this.Timestamp =
+            // todo: don't create types in advance, invalidate via shim
+            //   need to fix the locking issue in TypeMembersCache
+//            shim.InvalidateDirty()
+            timestamp
+
+        member this.PsiModule = psiModule
+        member val RealModuleReader = None with get, set
+
+        member this.InvalidateReferencingTypes(shortName) =
+            for referencingTypeName in usedShortNamesToUsingTypes.GetValuesSafe(shortName) do
+                this.InvalidateTypeDef(referencingTypeName)
+
+        member this.InvalidateTypesReferencingFSharpModule(fsharpProjectModule: IPsiModule) =
+            for referencingTypeName in usedFSharpModulesToTypes.GetValuesSafe(fsharpProjectModule) do
+                this.InvalidateTypeDef(referencingTypeName)
+
+        member this.InvalidateTypeDef(typeName) =
+            this.InvalidateTypeDef(typeName)
+
+        member this.CreateAllTypeDefs() =
+            this.CreateAllTypeDefs()
 
 
 type PreTypeDef(clrTypeName: IClrTypeName, reader: ProjectFcsModuleReader) =
