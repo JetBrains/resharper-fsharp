@@ -17,7 +17,7 @@ open JetBrains.Util.Text
 
 [<CodeCleanupModule>]
 type FSharpReformatCode() =
-    interface IReformatCodeCleanupModule with
+    interface ICodeCleanupModule with
         member x.Name = "Reformat F#"
         member x.LanguageType = FSharpLanguage.Instance :> _
         member x.Descriptors = EmptyList.Instance :> _
@@ -73,3 +73,6 @@ type FSharpReformatCode() =
                 document.ChangeDocument(change, TimeStamp.NextValue)
                 sourceFile.GetPsiServices().Files.CommitAllDocuments()
             | _ -> ()
+
+    interface IReformatCodeCleanupModule
+    interface IWholeFileCleanupOnSaveModule
