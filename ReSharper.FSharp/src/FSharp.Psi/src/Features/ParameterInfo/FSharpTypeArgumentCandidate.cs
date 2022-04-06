@@ -30,7 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
       for (var i = 0; i < parameters.Length; i++)
       {
         var paramRangeStart = text.Length;
-        text.Append(parameters[i].Display);
+        foreach (var displayPart in parameters[i].Display)
+          text.Append(displayPart.Text);
         var paramRangeEnd = text.Length;
 
         newParameterRanges[i] = new TextRange(paramRangeStart, paramRangeEnd);
