@@ -100,7 +100,6 @@ let operatorPrecedence (binaryApp: IBinaryAppExpr) =
 
 let precedence (expr: ITreeNode) =
     match expr with
-    | :? IInterpolatedStringExpr
     | :? ILibraryOnlyExpr
     | :? ITraitCallExpr -> 0
 
@@ -143,6 +142,8 @@ let startsBlock (context: IFSharpExpression) =
     isNotNull (SetExprNavigator.GetByRightExpression(context))
 
 let getContextPrecedence (context: IFSharpExpression) =
+    if context :? IInterpolatedStringExpr then 0 else
+
     if isNotNull (QualifiedExprNavigator.GetByQualifier(context)) then 13 else
 
     if startsBlock context then 0 else precedence context.Parent
