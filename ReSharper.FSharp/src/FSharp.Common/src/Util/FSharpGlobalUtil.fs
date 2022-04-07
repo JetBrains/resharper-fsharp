@@ -20,6 +20,9 @@ module FSharpGlobalUtil =
     let inline notNull<'T when 'T: not struct> (x: 'T) =
         JetBrains.Diagnostics.Assertion.NotNull(x)
 
+    let inline isValid (node: ^T) =
+        isNotNull node && (^T: (member IsValid: unit -> bool) node)
+
     let someUnit = Some ()
 
     let (|NotNull|_|) value =

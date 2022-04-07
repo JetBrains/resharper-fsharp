@@ -405,10 +405,6 @@ let rec skipIntermediatePatParents (fsPattern: IFSharpPattern) =
     skipIntermediateParentsOfSameType<IFSharpPattern> fsPattern
 
 
-let inline isValid (node: ^T) =
-    isNotNull node && (^T: (member IsValid: unit -> bool) node)
-
-
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpExpressionSelectionProvider() =
     inherit ExpressionSelectionProviderBase<IFSharpExpression>()
