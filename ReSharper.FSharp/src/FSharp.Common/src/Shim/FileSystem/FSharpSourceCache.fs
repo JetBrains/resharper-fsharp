@@ -30,6 +30,12 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         logger: ILogger) =
     inherit FileSystemShimChangeProvider(Lifetime.Define(lifetime).Lifetime, changeManager)
 
+    let [<Literal>] RemoveFileChangeType =
+        ProjectModelChangeType.REMOVED ||| ProjectModelChangeType.MOVED_OUT
+
+    let [<Literal>] UpdateFileChangeType =
+        ProjectModelChangeType.EXTERNAL_CHANGE ||| ProjectModelChangeType.ADDED ||| ProjectModelChangeType.MOVED_IN
+
     let files = ConcurrentDictionary<VirtualFileSystemPath, FSharpSource>()
 
     let getText (document: IDocument) =
@@ -140,10 +146,10 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
                 override v.VisitItemDelta(change) =
                     base.VisitItemDelta(change)
 
-                    if change.ContainsChangeType(ProjectModelChangeType.REMOVED) then
+                    if change.ContainsChangeType(RemoveFileChangeType) then
                          files.TryRemove(change.OldLocation) |> ignore
 
-                    if change.ContainsChangeType(ProjectModelChangeType.EXTERNAL_CHANGE) then
+                    if change.ContainsChangeType(UpdateFileChangeType) then
                         let projectFile = change.ProjectItem.As<IProjectFile>()
                         if isNotNull projectFile && projectFile.LanguageType.Is<FSharpProjectFileType>() then () else
 
