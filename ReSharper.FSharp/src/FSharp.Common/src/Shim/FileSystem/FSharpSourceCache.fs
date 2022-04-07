@@ -151,7 +151,7 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
 
                     if change.ContainsChangeType(UpdateFileChangeType) then
                         let projectFile = change.ProjectItem.As<IProjectFile>()
-                        if isNotNull projectFile && projectFile.LanguageType.Is<FSharpProjectFileType>() then
+                        if isValid projectFile && projectFile.LanguageType.Is<FSharpProjectFileType>() then
                             let document = projectFile.GetDocument()
                             if isNotNull document then
                                 applyChange projectFile document "Project model" }
