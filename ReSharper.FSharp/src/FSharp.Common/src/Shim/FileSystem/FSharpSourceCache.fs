@@ -66,15 +66,14 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         if not (isApplicable path) then () else
 
         let text = getText document
-        let fileExists = path.ExistsFile
 
         let mutable fsSource = Unchecked.defaultof<_>
         match files.TryGetValue(path, &fsSource), fsSource with
-        | true, Exists(source, _) when fileExists && source = text -> ()
+        | true, Exists(source, _) when source = text -> ()
         | _ ->
 
         logger.Trace("Add: {0} change: {1}", changeSource, path)
-        files[path] <- if fileExists then Exists(text, DateTime.UtcNow) else NotExists
+        files[path] <- Exists(text, DateTime.UtcNow)
 
     member x.TryGetSource(path: VirtualFileSystemPath, [<Out>] source: byref<FSharpSource>) =
         match files.TryGetValue(path) with
