@@ -96,17 +96,6 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
 
         match symbolReference.GetElement() with
         | :? IReferenceExpr as referenceExpr ->
-            let rec getIndexerExprOrIgnoreParens (funExpr: IFSharpExpression) =
-                let appExpr = PrefixAppExprNavigator.GetByFunctionExpression(funExpr)
-                if isNotNull appExpr && appExpr.IsHighPrecedence && appExpr.ArgumentExpression :? IListExpr then
-                    getIndexerExprOrIgnoreParens appExpr else
-
-                let indexerExpr = IndexerExprNavigator.GetByQualifierIgnoreIndexers(funExpr)
-                if isNotNull indexerExpr then
-                    getIndexerExprOrIgnoreParens indexerExpr else
-
-                funExpr.IgnoreParentParens()
-
             let refExprOrIndexerLikeExpr = getIndexerExprOrIgnoreParens referenceExpr
             if isNotNull (SetExprNavigator.GetByLeftExpression(refExprOrIndexerLikeExpr)) then
                 ReferenceAccessType.WRITE else

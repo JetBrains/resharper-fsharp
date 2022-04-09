@@ -15,6 +15,11 @@ id(a).[1]
 "12"|.|(5)[1]
 "12"|.|(6)[1..]
 
+
+let b = [|[|[|1|]|]|]
+b|.|(7)[1]|.|(8)[1]|.|(9)[1]
+id b|.|(10)[1].[1].[1]
+
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant '.'
 (1): ReSharper Dead Code: Redundant '.'
@@ -23,3 +28,7 @@ id(a).[1]
 (4): ReSharper Dead Code: Redundant '.'
 (5): ReSharper Dead Code: Redundant '.'
 (6): ReSharper Dead Code: Redundant '.'
+(7): ReSharper Dead Code: Redundant '.'
+(8): ReSharper Dead Code: Redundant '.'
+(9): ReSharper Dead Code: Redundant '.'
+(10): ReSharper Dead Code: Redundant '.'

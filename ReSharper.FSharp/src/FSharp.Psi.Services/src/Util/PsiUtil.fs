@@ -486,3 +486,14 @@ let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
                 yield prefixApp.ArgumentExpression
             else currentExpr <- null
     }
+
+let rec getIndexerExprOrIgnoreParens (funExpr: IFSharpExpression) =
+    let appExpr = PrefixAppExprNavigator.GetByFunctionExpression(funExpr)
+    if isNotNull appExpr && appExpr.IsHighPrecedence && appExpr.ArgumentExpression :? IListExpr then
+        getIndexerExprOrIgnoreParens appExpr else
+
+    let indexerExpr = IndexerExprNavigator.GetByQualifierIgnoreIndexers(funExpr)
+    if isNotNull indexerExpr then
+        getIndexerExprOrIgnoreParens indexerExpr else
+
+    funExpr.IgnoreParentParens()
