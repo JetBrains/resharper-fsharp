@@ -9,4 +9,5 @@ type ReplaceWithTripleQuotedInterpolatedStringFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/replaceWithTripleQuotedInterpolatedStringFix"
 
     [<Test>] member x.``01 - Regular interpolated string``() = x.DoNamedTest()
-    [<Test>] member x.``02 - Verbatim interpolated string``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``02 - Not Available - Verbatim interpolated string``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``03 - Not Available - Nested interpolated string``() = x.DoNamedTest()
