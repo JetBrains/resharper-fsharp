@@ -105,6 +105,7 @@
     <Compile Include="src\QuickFixes\DeconstructPatternFixTest.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithRegularStringFixTest.fs" />
     <Compile Include="src\QuickFixes\RemoveIndexerDotFixTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithTripleQuotedInterpolatedStringFixTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
