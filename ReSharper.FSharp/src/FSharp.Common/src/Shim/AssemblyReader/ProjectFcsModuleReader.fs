@@ -49,6 +49,24 @@ module ProjectFcsModuleReader =
     let mkNameFromClrTypeName (clrTypeName: IClrTypeName) =
         mkTypeName clrTypeName.ShortName clrTypeName.TypeParametersCount
 
+
+type FcsTypeDefMembers =
+    { mutable Methods: ILMethodDef[]
+      mutable Fields: ILFieldDef list
+      mutable Events: ILEventDef list
+      mutable Properties: ILPropertyDef list }
+
+    static member Create() =
+        { Fields = Unchecked.defaultof<_>
+          Methods = Unchecked.defaultof<_>
+          Events = Unchecked.defaultof<_>
+          Properties = Unchecked.defaultof<_> }
+
+type FcsTypeDef =
+    { TypeDef: ILTypeDef
+      mutable Members: FcsTypeDefMembers }
+
+
 type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, shim: IFcsAssemblyReaderShim) =
     // todo: is it safe to keep symbolScope?
     let symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, false, true)
@@ -62,7 +80,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mutable timestamp = DateTime.MinValue
 
     /// Type definitions imported by FCS.
-    let typeDefs = ConcurrentDictionary<IClrTypeName, ILTypeDef>() // todo: use non-concurrent, add locks
+    let typeDefs = ConcurrentDictionary<IClrTypeName, FcsTypeDef>() // todo: use non-concurrent, add locks
     let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
 
     let typeUsedNames = OneToSetMap<IClrTypeName, string>()
@@ -650,6 +668,95 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         ILPropertyDef(name, attrs, setter, getter, callConv, propertyType, init, args, emptyILCustomAttrs)
 
+    let usingTypeElement (typeName: IClrTypeName) defaultValue f =
+        use cookie = ReadLockCookie.Create()
+        use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
+
+        let typeElement = symbolScope.GetTypeElementByCLRName(typeName)
+        if isNull typeElement then defaultValue else
+
+        currentTypeName <- typeName
+        currentTypeUnresolvedUsedNames <- HashSet()
+
+        f typeElement
+
+    let getOrCreateMembers (typeName: IClrTypeName) defaultValue (getMemberTable: FcsTypeDefMembers -> 'Table) createTable =
+        use _ = locker.UsingWriteLock()
+
+        let fcsTypeDef = typeDefs.TryGetValue(typeName)
+        if isNull fcsTypeDef then
+            // The type has been invalidated.
+            // Fcs will check the module timestamp and request new data, so return dummy info.
+            defaultValue else
+
+        let members = fcsTypeDef.Members
+        let table = if isNotNull members then getMemberTable members else Unchecked.defaultof<_>
+        if isNotNull table then table else
+
+        lock fcsTypeDef (fun _ ->
+            if isNull fcsTypeDef.Members then
+                fcsTypeDef.Members <- FcsTypeDefMembers.Create()
+
+            let members = fcsTypeDef.Members
+            let table = getMemberTable members
+            if isNotNull table then table else
+
+            usingTypeElement typeName defaultValue (createTable members))
+
+    let mkMethods (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
+        let methods =
+            [| for method in typeElement.GetMembers().OfType<IFunction>() do
+                 yield mkMethod method |]
+
+        table.Methods <- methods
+        methods
+
+    let mkFields (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
+        let fields =
+            match typeElement with
+            | :? IEnum as e -> e.EnumMembers
+            | _ -> typeElement.GetMembers().OfType<IField>()
+
+        let fields =
+            [ for field in fields do
+                yield mkField field ]
+
+        let fields = 
+            match typeElement with
+            | :? IEnum as enum -> mkEnumInstanceValue enum :: fields
+            | _ -> fields
+        
+        table.Fields <- fields
+        fields
+
+    let mkProperties (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
+        let properties = 
+            [ for property in typeElement.Properties do
+                yield mkProperty property ]
+
+        table.Properties <- properties
+        properties
+
+    let mkEvents (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
+        let events =
+            [ for event in typeElement.Events do
+                yield mkEvent event ]
+
+        table.Events <- events
+        events
+
+    let getOrCreateMethods (typeName: IClrTypeName) =
+        getOrCreateMembers typeName EmptyArray.Instance (fun members -> members.Methods) mkMethods
+
+    let getOrCreateFields (typeName: IClrTypeName) =
+        getOrCreateMembers typeName [] (fun members -> members.Fields) mkFields
+
+    let getOrCreateProperties (typeName: IClrTypeName) =
+        getOrCreateMembers typeName [] (fun members -> members.Properties) mkProperties
+
+    let getOrCreateEvents (typeName: IClrTypeName) =
+        getOrCreateMembers typeName [] (fun members -> members.Events) mkEvents
+
     member this.CreateAllTypeDefs(): unit =
         // todo: keep upToDate/dirty flag, don't do this if not needed
         let rec traverseTypes (ns: INamespace) =
@@ -668,7 +775,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         use lock = locker.UsingWriteLock()
 
         match typeDefs.TryGetValue(clrTypeName) with
-        | NotNull typeDef -> typeDef
+        | NotNull typeDef -> typeDef.TypeDef
         | _ ->
 
         currentTypeName <- clrTypeName
@@ -700,12 +807,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 |> Array.map mkType
                 |> Array.toList
 
-            let methods =
-                typeElement.GetMembers().OfType<IFunction>()
-                |> List.ofSeq
-                |> List.map mkMethod
-                |> mkILMethods
-
             let nestedTypes =
                 let preTypeDefs =
                     typeElement.NestedTypes
@@ -719,48 +820,25 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 |> List.rev
                 |> List.map mkGenericParameterDef
 
-            let fields =
-                let fields =
-                    match typeElement with
-                    | :? IEnum as e -> e.EnumMembers
-                    | _ -> typeElement.Fields |> Seq.append typeElement.Constants
-
-                let fields =
-                    fields
-                    |> List.ofSeq
-                    |> List.map mkField
-
-                let fieldDefs =
-                    match typeElement with
-                    | :? IEnum as enum -> mkEnumInstanceValue enum :: fields
-                    | _ -> fields
-
-                match fieldDefs with
-                | [] -> emptyILFields
-                | _ -> mkILFields fieldDefs
-
-            let properties =
-                typeElement.Properties
-                |> List.ofSeq
-                |> List.map mkProperty
-                |> mkILProperties
-
-            let events =
-                typeElement.Events
-                |> List.ofSeq
-                |> List.map mkEvent
-                |> mkILEvents
+            let methods = mkILMethodsComputed (fun _ -> getOrCreateMethods clrTypeName)
+            let fields = mkILFieldsLazy (lazy getOrCreateFields clrTypeName)
+            let properties = mkILPropertiesLazy (lazy getOrCreateProperties clrTypeName)
+            let events = mkILEventsLazy (lazy getOrCreateEvents clrTypeName)
 
             let typeDef =
                 ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
                     extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
                     emptyILSecurityDecls, emptyILCustomAttrs)
 
+            let fcsTypeDef = 
+                { TypeDef = typeDef
+                  Members = Unchecked.defaultof<_> }
+
             currentTypeName <- null
             currentTypeUnresolvedUsedNames <- null
 
             clrNamesByShortNames.Add(typeElement.ShortName, clrTypeName)
-            typeDefs[clrTypeName] <- typeDef
+            typeDefs[clrTypeName] <- fcsTypeDef
             typeDef
 
     member this.InvalidateTypeDef(clrTypeName: IClrTypeName) =
