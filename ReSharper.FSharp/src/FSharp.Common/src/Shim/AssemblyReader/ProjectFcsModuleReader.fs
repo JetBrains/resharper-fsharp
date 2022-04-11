@@ -49,7 +49,7 @@ module ProjectFcsModuleReader =
     let mkNameFromClrTypeName (clrTypeName: IClrTypeName) =
         mkTypeName clrTypeName.ShortName clrTypeName.TypeParametersCount
 
-type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache) =
+type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, shim: IFcsAssemblyReaderShim) =
     // todo: is it safe to keep symbolScope?
     let symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, false, true)
 
@@ -823,9 +823,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         member this.ILAssemblyRefs = []
 
         member this.Timestamp =
-            // todo: don't create types in advance, invalidate via shim
-            //   need to fix the locking issue in TypeMembersCache
-//            shim.InvalidateDirty()
+            shim.InvalidateDirty()
             timestamp
 
         member this.PsiModule = psiModule

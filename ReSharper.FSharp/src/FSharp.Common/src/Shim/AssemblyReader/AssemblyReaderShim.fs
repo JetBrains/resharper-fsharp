@@ -174,7 +174,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         // todo: test web project with multiple modules
         let path = psiModule.Project.GetOutputFilePath(psiModule.TargetFrameworkId)
         let psiModule = psiModules.GetPrimaryPsiModule(psiModule.Project, psiModule.TargetFrameworkId)
-        let reader = ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache))
+        let reader = ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, this))
 
         recordReader path reader
         reader
@@ -188,7 +188,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         let reader = 
             match AssemblyReaderShim.getProjectPsiModuleByOutputAssembly psiModules path with
             | null -> ReferencedAssembly.Ignored
-            | psiModule -> ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache))
+            | psiModule -> ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, this))
 
         recordReader path reader
         reader
@@ -232,19 +232,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                     moduleInvalidated.Fire(referencingModule)
 
         dirtyTypesInModules.Clear()
-
-    // todo: cache for referencing psi module?
-    let rec createAllTypeDefsInDependencies (psiModule: IPsiModule) =
-        for dependencyModule in nonLazyDependenciesForModule.GetValuesSafe(psiModule) do
-            if allTypesCreated.Contains(dependencyModule) then () else
-
-            createAllTypeDefsInDependencies dependencyModule
-
-            match getOrCreateReaderFromModule dependencyModule with
-            | ReferencedAssembly.ProjectOutput(reader) -> reader.CreateAllTypeDefs()
-            | _ -> ()
-
-            allTypesCreated.Add(dependencyModule) |> ignore
 
     let markDirty (typePart: TypePart) =
         use lock = locker.UsingWriteLock()
@@ -315,13 +302,3 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         member this.InvalidateDirty() =
             use lock = locker.UsingWriteLock()
             invalidateDirtyDependencies ()
-
-        member this.PrepareDependencies(psiModule) =
-            if not (isEnabled ()) then () else
-
-            use lock = locker.UsingWriteLock()
-
-            recordDependencies psiModule
-            invalidateDirtyDependencies ()
-            createAllTypeDefsInDependencies psiModule
-

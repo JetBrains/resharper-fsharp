@@ -35,10 +35,3 @@ type IFcsAssemblyReaderShim =
     abstract InvalidateDirty: unit -> unit
 
     abstract GetTimestamp: psiModule: IPsiModule -> DateTime
-
-    /// Creates type defs to prevent C#->F# resolve during accessing typeDefs inside FCS.
-    /// C#->F# resolve may require type checking which currently will lead to a deadlock.
-    /// Known deadlock causes:
-    /// * TypeMembersCache.GetOrCreate uses a single syncRoot object
-    /// * FCS reactor thread access (fixed in FCS now)
-    abstract PrepareDependencies: psiModule: IPsiModule -> unit
