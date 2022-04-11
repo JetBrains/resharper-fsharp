@@ -393,25 +393,29 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         | _ -> None
 
-    let mkCompilerGeneratedAttribute (attrType: IClrTypeName): ILAttribute =
-        let attrType = TypeFactory.CreateTypeByCLRName(attrType, NullableAnnotation.Unknown, psiModule)
+    let mkCompilerGeneratedAttribute (attrTypeName: IClrTypeName) (args: ILAttribElem list): ILAttribute =
+        let attrType = TypeFactory.CreateTypeByCLRName(attrTypeName, NullableAnnotation.Unknown, psiModule)
 
         match attrType.GetTypeElement() with
         | null -> failwithf $"getting param array type element in {psiModule}" // todo: safer handling
         | typeElement ->
 
-        let attrType = mkType attrType
-        let ctor = typeElement.Constructors.First(fun ctor -> ctor.IsParameterless) // todo: safer handling
-        let ctorMethodRef = mkMethodRef ctor
+        let ctor = typeElement.Constructors.First(fun ctor -> args.IsEmpty = ctor.IsParameterless)
+        let methodSpec = ILMethodSpec.Create(mkType attrType, mkMethodRef ctor, [])
+        ILAttribute.Decoded(methodSpec, args, [])
 
-        let methodSpec = ILMethodSpec.Create(attrType, ctorMethodRef, [])
-        ILAttribute.Decoded(methodSpec, [], [])
+    let mkCompilerGeneratedAttributeNoArgs (attrTypeName: IClrTypeName): ILAttribute =
+        mkCompilerGeneratedAttribute attrTypeName []
 
     let paramArrayAttribute () =
-        mkCompilerGeneratedAttribute PredefinedType.PARAM_ARRAY_ATTRIBUTE_CLASS
+        mkCompilerGeneratedAttributeNoArgs PredefinedType.PARAM_ARRAY_ATTRIBUTE_CLASS
 
     let extensionAttribute () =
-        mkCompilerGeneratedAttribute PredefinedType.EXTENSION_ATTRIBUTE_CLASS
+        mkCompilerGeneratedAttributeNoArgs PredefinedType.EXTENSION_ATTRIBUTE_CLASS
+
+    let internalsVisibleToAttribute arg =
+        let args = [ ILAttribElem.String(Some(arg)) ]
+        mkCompilerGeneratedAttribute PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS args
 
     let mkGenericVariance (variance: TypeParameterVariance): ILGenericVariance =
         match variance with
@@ -847,6 +851,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | None ->
 
             use readLockCookie = ReadLockCookie.Create()
+            use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
             let project = psiModule.ContainingProjectModule :?> IProject
             let moduleName = project.Name
@@ -854,7 +859,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let isDll = isDll project psiModule.TargetFrameworkId
 
             let typeDefs =
-                // todo: compute later?
+                // todo: make inner types computed on demand, needs an Fcs patch
                 let result = List<ILPreTypeDef>()
 
                 let rec addTypes (ns: INamespace) =
@@ -868,7 +873,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let preTypeDefs = result.ToArray()
                 mkILTypeDefsComputed (fun _ -> preTypeDefs)
 
-            // todo: add internals visible to test
             let flags = 0 // todo
             let exportedTypes = mkILExportedTypes []
 
@@ -880,6 +884,25 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                     typeDefs
                     None None flags exportedTypes
                     ProjectFcsModuleReader.DummyValues.metadataVersion
+
+            let ivtAttributes =
+                let psiServices = psiModule.GetPsiServices()
+                let attributeInstances =
+                    psiServices.Symbols
+                        .GetModuleAttributes(psiModule)
+                        .GetAttributeInstances(PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS, false)
+
+                [| for instance in attributeInstances do
+                     match instance.PositionParameter(0).ConstantValue.Value with
+                     | :? string as s -> internalsVisibleToAttribute s
+                     | _ -> () |]
+
+            let newModuleDef =
+                if ivtAttributes.IsEmpty() then newModuleDef else
+
+                let attrs = mkILCustomAttrsFromArray ivtAttributes |> storeILCustomAttrs
+                let manifest = { newModuleDef.Manifest.Value with CustomAttrsStored = attrs }
+                { newModuleDef with Manifest = Some(manifest) }
 
             moduleDef <- Some(newModuleDef)
             newModuleDef
