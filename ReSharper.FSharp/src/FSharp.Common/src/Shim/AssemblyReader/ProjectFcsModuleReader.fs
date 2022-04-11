@@ -232,9 +232,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | _ ->
 
             let enclosingTypeNames =
-                containingType.GetClrName().TypeNames
-                |> List.ofSeq
-                |> List.map ProjectFcsModuleReader.mkNameFromTypeNameAndParamsNumber
+                [ for name in containingType.GetClrName().TypeNames do
+                    ProjectFcsModuleReader.mkNameFromTypeNameAndParamsNumber name ]
 
             // The namespace is later split back by FCS during module import.
             // todo: rewrite this in FCS: add extension point, provide split namespaces
@@ -373,9 +372,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         // todo: use method def when available? it'll save things like types calc and other things
         let paramTypes =
-            method.Parameters
-            |> List.ofSeq
-            |> List.map (fun param -> mkType param.Type)
+            [ for parameter in method.Parameters do
+                mkType parameter.Type ]
 
         let returnType = mkType method.ReturnType
 
@@ -425,9 +423,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let mkGenericParameterDef (typeParameter: ITypeParameter): ILGenericParameterDef =
         let typeConstraints =
-            typeParameter.TypeConstraints
-            |> List.ofSeq
-            |> List.map mkType
+            [ for typeConstraint in typeParameter.TypeConstraints do
+                mkType typeConstraint ]
 
         let attributes = storeILCustomAttrs emptyILCustomAttrs // todo
 
@@ -573,9 +570,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
           MetadataIndex = NoMetadataIdx }
 
     let mkParams (method: IFunction): ILParameter list =
-        method.Parameters
-        |> List.ofSeq
-        |> List.map mkParam
+        [ for parameter in method.Parameters do
+            mkParam parameter ]
 
     let voidReturn = mkILReturn ILType.Void
     let methodBodyUnavailable = lazy MethodBody.NotAvailable
@@ -595,9 +591,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let genericParams =
             match method with
             | :? IMethod as method ->
-                method.TypeParameters
-                |> List.ofSeq
-                |> List.map mkGenericParameterDef
+                [ for typeParameter in method.TypeParameters do
+                    mkGenericParameterDef typeParameter ]
             | _ -> []
 
         // todo: other attrs
@@ -652,9 +647,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let init = None // todo
 
         let args =
-            property.Parameters
-            |> List.ofSeq
-            |> List.map (fun p -> mkType p.Type)
+            [ for parameter in property.Parameters do
+                mkType parameter.Type ]
 
         let setter =
             match property.Setter with
@@ -802,23 +796,20 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let extends = extends typeElement
 
             let implements =
-                typeElement.GetSuperTypesWithoutCircularDependent()
-                |> Array.filter (fun t -> t.GetTypeElement() :? IInterface)
-                |> Array.map mkType
-                |> Array.toList
+                [ for declaredType in typeElement.GetSuperTypesWithoutCircularDependent() do
+                    if declaredType.GetTypeElement() :? IInterface then
+                        mkType declaredType ]
 
             let nestedTypes =
                 let preTypeDefs =
-                    typeElement.NestedTypes
-                    |> Array.ofSeq
-                    |> Array.map (fun typeElement -> PreTypeDef(typeElement, this) :> ILPreTypeDef)
+                    [| for typeElement in typeElement.NestedTypes do
+                        PreTypeDef(typeElement, this) :> ILPreTypeDef |]
                 mkILTypeDefsComputed (fun _ -> preTypeDefs)
 
             let genericParams =
-                typeElement.GetAllTypeParameters().ResultingList()
-                |> List.ofSeq
-                |> List.rev
-                |> List.map mkGenericParameterDef
+                let typeParameters = typeElement.GetAllTypeParameters().ResultingList()
+                [ for i in typeParameters.Count - 1 .. -1 .. 0 do
+                    mkGenericParameterDef typeParameters[i] ]
 
             let methods = mkILMethodsComputed (fun _ -> getOrCreateMethods clrTypeName)
             let fields = mkILFieldsLazy (lazy getOrCreateFields clrTypeName)
