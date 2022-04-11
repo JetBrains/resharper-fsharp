@@ -290,11 +290,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     interface IFcsAssemblyReaderShim with
         member this.IsEnabled = isEnabled ()
 
-        member this.GetTimestamp(psiModule) =
-            match assemblyReadersByModule.TryGetValue(psiModule).NotNull() with
-            | ReferencedAssembly.Ignored -> failwith $"Expecting project output for {psiModule}"
-            | ReferencedAssembly.ProjectOutput reader -> reader.Timestamp
-
         member this.GetModuleReader(psiModule) =
             use lock = locker.UsingWriteLock()
             getOrCreateReaderFromModule psiModule
@@ -302,3 +297,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         member this.InvalidateDirty() =
             use lock = locker.UsingWriteLock()
             invalidateDirtyDependencies ()
+
+        member this.RecordDependencies(psiModule) =
+            recordDependencies psiModule

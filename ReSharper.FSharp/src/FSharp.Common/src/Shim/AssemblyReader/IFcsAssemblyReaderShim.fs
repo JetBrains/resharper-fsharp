@@ -32,6 +32,6 @@ type ReferencedAssembly =
 type IFcsAssemblyReaderShim =
     abstract IsEnabled: bool
     abstract GetModuleReader: psiModule: IPsiModule -> ReferencedAssembly
-    abstract InvalidateDirty: unit -> unit
 
-    abstract GetTimestamp: psiModule: IPsiModule -> DateTime
+    abstract InvalidateDirty: unit -> unit
+    abstract RecordDependencies: psiModule: IPsiModule -> unit

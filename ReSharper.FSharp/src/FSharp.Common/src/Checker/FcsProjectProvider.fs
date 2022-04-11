@@ -205,6 +205,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
                 fcsProjects[psiModule] <- fcsProject
                 projectsPsiModules.Add(project, psiModule) |> ignore
+                fcsAssemblyReaderShim.RecordDependencies(psiModule)
 
                 let projectMark = project.GetProjectMark()
                 projectsProjectMarks[projectMark] <- project
