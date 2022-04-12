@@ -4,28 +4,67 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Text
 
 type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuoteError) =
     inherit FSharpQuickFixBase()
 
-    let makeTripleQuoted (node: ITreeNode): ITreeNode =
-        let textWithBorders = node.GetText()
+    let createStart content =
+        FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_START.Create($"$\"\"\"{content}{{")
 
-        match node.GetTokenType() with
-        | tokenType when tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START ->
-            let startBorder = getStringStartingQuotesLength tokenType
-            let stringContent = textWithBorders.Substring(startBorder, textWithBorders.Length - startBorder)
-            FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_START.Create($"$\"\"\"{stringContent}")
-        | tokenType when tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_END ->
-            let endBorder = getStringEndingQuotesLength tokenType
-            let stringContent = textWithBorders.Substring(0, textWithBorders.Length - endBorder)
-            FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END.Create($"{stringContent}\"\"\"")
-        | _ -> node
+    let createMiddle content =
+        FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE.Create($"}}{content}{{")
+
+    let createEnd content =
+        FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END.Create($"}}{content}\"\"\"")
+
+    let checkRegularStringLiteral (literal: ITokenNode) =
+        let tokenContent = getStringContent (literal.GetTokenType()) (literal.GetText())
+        let lexer = RegularInterpolatedStringLexer(StringBuffer(tokenContent))
+
+        let mutable found = false
+        while not found && lexer.CanAdvance do
+            lexer.Advance()
+            found <- lexer.TokenType == StringTokenTypes.ESCAPE_CHARACTER
+            lexer.Position <- lexer.Position + 1
+        found
+
+    let processRegularStringLiteral (literal: ITokenNode)  =
+        let text = literal.GetText()
+        let tokenType = literal.GetTokenType()
+        let content = getStringContent tokenType text
+
+        let resultingNode: ITreeNode =
+            match tokenType with
+            | tokenType when tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START -> createStart content
+            | tokenType when tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE -> createMiddle content
+            | tokenType when tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_END -> createEnd content
+            | _ -> literal
+
+        if literal != resultingNode then
+            ModificationUtil.ReplaceChild(literal, resultingNode) |> ignore
+
+    let processVerbatimStringLiteral (literal: ITokenNode) =
+        let text = literal.GetText()
+        let tokenType = literal.GetTokenType()
+        let content = (getStringContent tokenType text).Replace("\"\"", "\"")
+
+        let resultingNode: ITreeNode =
+            match tokenType with
+            | tokenType when tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START -> createStart content
+            | tokenType when tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE -> createMiddle content
+            | tokenType when tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END -> createEnd content
+            | _ -> literal
+
+        if literal != resultingNode then
+            ModificationUtil.ReplaceChild(literal, resultingNode) |> ignore
 
     override this.IsAvailable _ =
         if not <| isValid error.Expr then false else
@@ -37,8 +76,10 @@ type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuot
         let grandparentExpr = parentExpr.GetContainingNode<IInterpolatedStringExpr>()
         if isNotNull grandparentExpr then false else
 
-        // Executing this quickfix on verbatim strings will change literal semantics, so disabling it
-        parentExpr.FirstChild.GetTokenType() != FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START
+        // Only regular interpolated strings without escape characters are supported
+        if parentExpr.FirstChild.GetTokenType() != FSharpTokenType.REGULAR_INTERPOLATED_STRING_START then true else
+        let containsEscapeCharacter = parentExpr.LiteralsEnumerable |> Seq.exists checkRegularStringLiteral
+        not containsEscapeCharacter
 
     override this.Text = "Replace with triple-quoted interpolated string"
 
@@ -47,8 +88,10 @@ type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuot
 
         use _ = WriteLockCookie.Create()
 
-        ModificationUtil.ReplaceChild(interpolatedExpr.FirstChild, makeTripleQuoted interpolatedExpr.FirstChild)
-        |> ignore
-
-        ModificationUtil.ReplaceChild(interpolatedExpr.LastChild, makeTripleQuoted interpolatedExpr.LastChild)
-        |> ignore
+        let firstChildType = interpolatedExpr.FirstChild.GetTokenType()
+        if firstChildType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START then
+            interpolatedExpr.Literals
+            |> Seq.iter processRegularStringLiteral
+        else if firstChildType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START then
+            interpolatedExpr.Literals
+            |> Seq.iter processVerbatimStringLiteral

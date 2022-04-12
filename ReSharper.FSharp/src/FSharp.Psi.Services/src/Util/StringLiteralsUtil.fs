@@ -108,6 +108,10 @@ let getStringEndingQuote tokenType =
     assertStringTokenType tokenType
     if tokenType == FSharpTokenType.CHARACTER_LITERAL then '\'' else '\"'
 
+let getStringStartingQuotes (tokenType: TokenNodeType) (tokenText: string) =
+    assertStringTokenType tokenType
+    tokenText.Substring(0, getStringStartingQuotesLength tokenType)
+
 let getStringEndingQuotesLength (tokenType: TokenNodeType) =
     assertStringTokenType tokenType
 
@@ -130,6 +134,19 @@ let getStringEndingQuotesLength (tokenType: TokenNodeType) =
     | TripleQuoteInterpolatedStringEnd -> 3
     | ByteArray
     | VerbatimByteArray -> 2
+
+let getStringEndingQuotes (tokenType: TokenNodeType) (tokenText: string) =
+    assertStringTokenType tokenType
+    let endingQuotesLength = getStringEndingQuotesLength tokenType
+    tokenText.Substring(tokenText.Length - endingQuotesLength, endingQuotesLength)
+
+let getStringContent (tokenType: TokenNodeType) (tokenText: string) =
+    assertStringTokenType tokenType
+
+    let startBorderLength = getStringStartingQuotesLength tokenType
+    let endBorderLength = getStringEndingQuotesLength tokenType
+
+    tokenText.Substring(startBorderLength, tokenText.Length - endBorderLength - startBorderLength)
 
 let emptyString = "\"\""
 let emptyChar = "''"
