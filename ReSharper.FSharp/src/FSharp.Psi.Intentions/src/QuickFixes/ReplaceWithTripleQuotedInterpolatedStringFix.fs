@@ -33,7 +33,6 @@ type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuot
         while not found && lexer.CanAdvance do
             lexer.Advance()
             found <- lexer.TokenType == StringTokenTypes.ESCAPE_CHARACTER
-            lexer.Position <- lexer.Position + 1
         found
 
     let processRegularStringLiteral (literal: ITokenNode)  =
