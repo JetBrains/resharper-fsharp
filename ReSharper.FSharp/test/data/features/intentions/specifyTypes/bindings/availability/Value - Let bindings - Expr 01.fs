@@ -7,5 +7,5 @@ do
     let{off} (x{off}: int): int = 1
     let{off} ((x{off}: int)): int = 1
 
-    let{on} foo{on} {off}x {off}= {off}()
+    let{off} foo{off} {on}x {off}= {off}()
     (){off}

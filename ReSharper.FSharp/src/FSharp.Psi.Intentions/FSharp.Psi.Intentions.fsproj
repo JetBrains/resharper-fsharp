@@ -20,11 +20,14 @@
     <Compile Include="src\Intentions\IfToElifAction.fs" />
     <Compile Include="src\Intentions\NegateConditionActions.fs" />
     <Compile Include="src\Intentions\ToMutableAction.fs" />
-    <Compile Include="src\Intentions\FunctionAnnotationAction.fs" />
     <Compile Include="src\Intentions\ToLiteralAction.fs" />
     <Compile Include="src\Intentions\SetNameAction.fs" />
     <Compile Include="src\Intentions\LetToUseAction.fs" />
     <Compile Include="src\Intentions\RenameFileToMatchTypeNameAction.fs" />
+    <Compile Include="src\Intentions\FunctionAnnotationAction.fs" />
+    <Compile Include="src\Intentions\ValueAnnotationAction.fs" />
+    <Compile Include="src\Intentions\TupleAnnotationAction.fs" />
+    <Compile Include="src\Intentions\MemberAnnotationAction.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetFix.fs" />
