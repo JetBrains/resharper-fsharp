@@ -9,13 +9,21 @@ module FSharpGlobalUtil =
             | _ -> Unchecked.defaultof<_>
 
     /// Reference equality.
-    let inline (==) a b = obj.ReferenceEquals(a, b)
+    let inline (==) (a: 'A when 'A: not struct) (b: 'B when 'B: not struct) =
+        obj.ReferenceEquals(a, b)
 
     /// Reference inequality.
     let inline (!=) a b = not (a == b)
 
-    let inline isNull x = x == null
-    let inline isNotNull x = not (isNull x)
+    let inline isNull<'T when 'T: not struct> (x: 'T) =
+        match box x with
+        | null -> true
+        | _ -> false
+
+    let inline isNotNull<'T when 'T: not struct> (x: 'T) =
+        match box x with
+        | null -> false
+        | _ -> true
 
     let inline notNull<'T when 'T: not struct> (x: 'T) =
         JetBrains.Diagnostics.Assertion.NotNull(x)

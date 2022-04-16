@@ -98,7 +98,7 @@ type ITreeNode with
         let document = x.GetSourceFile().Document
         x.GetStartLine(document) = x.GetEndLine(document)
 
-let getNode<'T when 'T :> ITreeNode and 'T : null> (fsFile: IFSharpFile) (range: DocumentRange) =
+let getNode<'T when 'T :> ITreeNode and 'T: not struct and 'T: null> (fsFile: IFSharpFile) (range: DocumentRange) =
     // todo: use IExpressionSelectionProvider
     let node = fsFile.GetNode<'T>(range)
     if isNull node then failwithf "Couldn't get %O from range %O" typeof<'T>.Name range else
@@ -394,7 +394,7 @@ let getNextNodeOfType nodeType (node: ITreeNode) =
     next
 
 
-let rec skipIntermediateParentsOfSameType<'T when 'T :> ITreeNode> (node: 'T) =
+let rec skipIntermediateParentsOfSameType<'T when 'T :> ITreeNode and 'T: not struct> (node: 'T) =
     if isNull node then node else
 
     match node.Parent with
