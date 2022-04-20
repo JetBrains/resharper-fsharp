@@ -81,7 +81,7 @@ type SpecifyParameterTypeFix(qualifiedExpr: IQualifiedExpr) =
 
     override this.SpecifyType(decl, mfv, d) =
         let decl = decl :?> ILocalReferencePat
-        SpecifyTypes.specifyPatternWithParens d mfv.FullType decl
+        SpecifyTypes.specifyPattern d mfv.FullType true decl
 
 
 type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =

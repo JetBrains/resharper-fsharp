@@ -153,7 +153,7 @@ module SpecifyTypes =
         parenPat.SetPattern(pattern) |> ignore
         parenPat :> IFSharpPattern
 
-    let private specifyPattern displayContext (fcsType: FSharpType) needToAddParens (pattern: IFSharpPattern) =
+    let specifyPattern displayContext (fcsType: FSharpType) needToAddParens (pattern: IFSharpPattern) =
         let pattern = pattern.IgnoreParentParens()
         let factory = pattern.CreateElementFactory()
 
@@ -191,16 +191,10 @@ module SpecifyTypes =
 
         ModificationUtil.ReplaceChild(pattern, typedPat) |> ignore
 
-    let specifyPatternWithParens displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
-        specifyPattern displayContext fcsType true pattern
-
-    let specifyPatternWithoutParens displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
-        specifyPattern displayContext fcsType false pattern
-
     let specifyArrayOrListPat (arrayOrListPat: IArrayOrListPat) =
         let symbolUse =
             let checker = arrayOrListPat.FSharpFile.FcsCheckerService
-            checker.ResolveNameAtLocation(arrayOrListPat, [| |], true, "Get declaration")
+            checker.ResolveNameAtLocation(arrayOrListPat, [| |], false, "Get declaration")
 
         match symbolUse with
         | Some symbolUse when (symbolUse.Symbol :? FSharpMemberOrFunctionOrValue) ->
@@ -213,7 +207,7 @@ module SpecifyTypes =
     let specifyWildPat (wildPat: IWildPat) =
         let symbolUse =
             let checker = wildPat.FSharpFile.FcsCheckerService
-            checker.ResolveNameAtLocation(wildPat, [| wildPat.DeclaredName |], true, "Get declaration")
+            checker.ResolveNameAtLocation(wildPat, [| "Wild" |], false, "Get declaration")
 
         match symbolUse with
         | Some symbolUse when (symbolUse.Symbol :? FSharpMemberOrFunctionOrValue) ->
@@ -235,45 +229,44 @@ module SpecifyTypes =
             refPat
             |> PatUtil.tryParentOrReturnSelf<ITypedPat>
 
-        match refPat.Parent with
-        | :? ITuplePat as tuplePatParent ->
-            match tuplePatParent.Parent with
-            | :? IParenPat ->
-                specifyPatternWithoutParens displayContext mfv.FullType patternToChange
-            | _ ->
-            specifyPatternWithParens displayContext mfv.FullType patternToChange
-
-        | _ ->
-            match refPat.Binding with
-            | :? IBinding as localBinding ->
-                match localBinding.BindingKeyword.GetText() with
-                | "let!" | "and!" | "use!" ->
-                    specifyPatternWithParens displayContext mfv.FullType patternToChange
+        let addParens =
+            match refPat.Parent with
+            | :? ITuplePat as tuplePatParent ->
+                match tuplePatParent.Parent with
+                | :? IParenPat ->
+                    false
                 | _ ->
-                    specifyPatternWithoutParens displayContext mfv.FullType patternToChange
+                true
+
             | _ ->
-                specifyPatternWithParens displayContext mfv.FullType patternToChange
+                match refPat.Binding with
+                | :? IBinding as localBinding ->
+                    match localBinding.BindingKeyword.GetText() with
+                    | "let!" | "and!" | "use!" ->
+                        true
+                    | _ ->
+                        false
+                | _ ->
+                    true
+
+        specifyPattern displayContext mfv.FullType addParens patternToChange
 
     let private getTupleChildrenRefPatsReferences (pattern: ITuplePat) =
         [|
             for pattern in pattern.Patterns do
-                match pattern.IgnoreInnerParens() with
-                | :? ILocalReferencePat as localRef ->
-                    let symbol = localRef.GetFcsSymbolUse()
+                let refPat =
+                    match pattern.IgnoreInnerParens() with
+                    | :? ILocalReferencePat as localRef ->
+                        localRef
+                    | :? ITypedPat as typedPat when (typedPat.Pattern :? ILocalReferencePat) ->
+                        typedPat.Pattern :?> ILocalReferencePat
+                    | _ ->
+                        null
+
+                if isNotNull refPat then
+                    let symbol = refPat.GetFcsSymbolUse()
                     if isNotNull symbol then
                         struct (pattern, symbol)
-
-                | :? ITypedPat as typedPat ->
-                    match typedPat.Pattern with
-                    | :? ILocalReferencePat as localRef ->
-                        let symbol = localRef.GetFcsSymbolUse()
-                        if isNotNull symbol then
-                            struct (pattern, symbol)
-                    | _ ->
-                        ()
-
-                | _ ->
-                    ()
         |]
 
     let rec specifyTuplePat (pattern: ITuplePat) =
@@ -297,7 +290,7 @@ module SpecifyTypes =
             for refPat, symbolUse in refPats do
                 let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
                 let displayContext = symbolUse.DisplayContext
-                specifyPatternWithoutParens displayContext mfv.FullType refPat
+                specifyPattern displayContext mfv.FullType false refPat
 
             match tuplePat.IgnoreParentParens() with
             | :? IParenPat ->
@@ -364,6 +357,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         if bindings.Count <> 1 then false else
 
         let binding = bindings[0] // TODO: let .. and!
+
         (binding.ParametersDeclarations.Count > 0 || not (binding.HeadPattern :? ILocalReferencePat))
         && isAtLetExprKeywordOrReferencePattern dataProvider letBindings && not (isAnnotated binding)
 
