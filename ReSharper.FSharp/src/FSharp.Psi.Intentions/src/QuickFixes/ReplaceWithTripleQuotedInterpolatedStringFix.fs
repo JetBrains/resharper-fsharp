@@ -35,35 +35,26 @@ type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuot
             found <- lexer.TokenType == StringTokenTypes.ESCAPE_CHARACTER
         found
 
-    let processRegularStringLiteral (literal: ITokenNode)  =
+    let processStringLiteral (textContentFactory: TokenNodeType -> string -> string) (literal: ITokenNode) =
         let text = literal.GetText()
         let tokenType = literal.GetTokenType()
-        let content = getStringContent tokenType text
+        let content = textContentFactory tokenType text
 
         let resultingNode: ITreeNode =
             match tokenType with
-            | tokenType when tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START -> createStart content
-            | tokenType when tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE -> createMiddle content
-            | tokenType when tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_END -> createEnd content
+            | tokenType when FSharpTokenType.InterpolatedStringsStart[tokenType] -> createStart content
+            | tokenType when FSharpTokenType.InterpolatedStringsMiddle[tokenType] -> createMiddle content
+            | tokenType when FSharpTokenType.InterpolatedStringsEnd[tokenType] -> createEnd content
             | _ -> literal
 
         if literal != resultingNode then
             ModificationUtil.ReplaceChild(literal, resultingNode) |> ignore
 
-    let processVerbatimStringLiteral (literal: ITokenNode) =
-        let text = literal.GetText()
-        let tokenType = literal.GetTokenType()
-        let content = (getStringContent tokenType text).Replace("\"\"", "\"")
+    let regularStringContentFactory (tokenType: TokenNodeType) (text: string)  =
+        getStringContent tokenType text
 
-        let resultingNode: ITreeNode =
-            match tokenType with
-            | tokenType when tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START -> createStart content
-            | tokenType when tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_MIDDLE -> createMiddle content
-            | tokenType when tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END -> createEnd content
-            | _ -> literal
-
-        if literal != resultingNode then
-            ModificationUtil.ReplaceChild(literal, resultingNode) |> ignore
+    let verbatimStringContentFactory (tokenType: TokenNodeType) (text: string) =
+        (getStringContent tokenType text).Replace("\"\"", "\"")
 
     override this.IsAvailable _ =
         if not <| isValid error.Expr then false else
@@ -90,7 +81,7 @@ type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuot
         let firstChildType = interpolatedExpr.FirstChild.GetTokenType()
         if firstChildType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START then
             interpolatedExpr.Literals
-            |> Seq.iter processRegularStringLiteral
+            |> Seq.iter (processStringLiteral regularStringContentFactory)
         else if firstChildType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING_START then
             interpolatedExpr.Literals
-            |> Seq.iter processVerbatimStringLiteral
+            |> Seq.iter (processStringLiteral verbatimStringContentFactory)
