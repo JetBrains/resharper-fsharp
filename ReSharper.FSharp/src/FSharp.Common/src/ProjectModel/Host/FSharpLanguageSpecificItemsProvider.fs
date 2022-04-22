@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host
 
 open System
 open JetBrains.Application
-open JetBrains.Platform.MsBuildHost.Models
+open JetBrains.Platform.MsBuildHost.ProjectModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Extensions
@@ -19,20 +19,20 @@ type FSharpProjectPropertiesBuilder(projectPropertiesRequests) =
     override x.IsApplicable(projectProperties) =
         projectProperties :? FSharpProjectProperties && base.IsApplicable(projectProperties)
 
-    override x.BuildProjectBuildSettings(rdProjectDescriptor, rdProjects, buildSettings) =
+    override x.BuildProjectBuildSettings(project, buildSettings) =
         let fsBuildSettings = buildSettings :?> FSharpBuildSettings
         fsBuildSettings.TailCalls <-
             let mutable value = Unchecked.defaultof<bool>
-            match bool.TryParse(rdProjectDescriptor.GetPropertyValue("Tailcalls"), &value) with
+            match bool.TryParse(project.GetPropertyValue(FSharpProperties.TailCalls), &value) with
             | true -> value
             | _ -> false
 
-        base.BuildProjectBuildSettings(rdProjectDescriptor, rdProjects, buildSettings)
+        base.BuildProjectBuildSettings(project, buildSettings)
 
     override this.BuildProjectConfiguration(rdProjectDescriptor, project, configuration) =
         base.BuildProjectConfiguration(rdProjectDescriptor, project, configuration)
 
-        let languageVersion = project.GetPropertyValueIgnoreCase(MSBuildProjectUtil.LanguageVersionProperty)
+        let languageVersion = project.GetPropertyValue(MSBuildProjectUtil.LanguageVersionProperty, true)
         let languageVersion = FSharpLanguageVersion.parseCompilationOption languageVersion
 
         let configuration = configuration.As<IFSharpProjectConfiguration>()
@@ -48,7 +48,7 @@ type FSharpLanguageSpecificItemsProvider() =
             if project.ProjectProperties :? FSharpProjectProperties then
                 [| EditPropertyItemBuilder
                        .Section(ConfigurationTabProvider.CompileSectionTitle)
-                       .AddCheckBox(properties, "Tailcalls", "Generate tail calls") |] :> _
+                       .AddCheckBox(properties, FSharpProperties.TailCalls, "Generate tail calls") |] :> _
 
             else EmptyList.Instance :> _
 

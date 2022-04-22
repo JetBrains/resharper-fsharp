@@ -191,24 +191,26 @@ module Util =
 
 
 module FSharpProperties =
-    let [<Literal>] TargetProfile = "TargetProfile"
-    let [<Literal>] OtherFlags = "OtherFlags"
-    let [<Literal>] NoWarn = "NoWarn"
-    let [<Literal>] LangVersion = "LangVersion"
-    let [<Literal>] FscToolPath = "FscToolPath"
     let [<Literal>] DotnetFscCompilerPath = "DotnetFscCompilerPath"
+    let [<Literal>] FscToolPath = "FscToolPath"
+    let [<Literal>] LangVersion = "LangVersion"
+    let [<Literal>] NoWarn = "NoWarn"
+    let [<Literal>] OtherFlags = "OtherFlags"
+    let [<Literal>] TailCalls = "TailCalls"
+    let [<Literal>] TargetProfile = "TargetProfile"
     let [<Literal>] WarnOn = "WarnOn"
 
 
 [<ShellComponent>]
 type FSharpProjectPropertiesRequest() =
     let properties =
-        [| FSharpProperties.TargetProfile
+        [| FSharpProperties.DotnetFscCompilerPath
+           FSharpProperties.FscToolPath
+           FSharpProperties.LangVersion
            FSharpProperties.OtherFlags
            FSharpProperties.NoWarn
-           FSharpProperties.LangVersion
-           FSharpProperties.FscToolPath
-           FSharpProperties.DotnetFscCompilerPath
+           FSharpProperties.TailCalls
+           FSharpProperties.TargetProfile
            FSharpProperties.WarnOn |]
 
     interface IProjectPropertiesRequest with
