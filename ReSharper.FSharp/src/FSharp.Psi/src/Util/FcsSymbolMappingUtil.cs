@@ -23,6 +23,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
+using NuGet.Packaging;
 using Range = FSharp.Compiler.Text.Range;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -439,7 +440,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (mfv == null)
         return EmptyList<IParameter>.Instance;
 
-      var paramGroups = mfv.CurriedParameterGroups;
+      var paramGroups = mfv.CurriedParameterGroupsNoInstantiation;
       var isFsExtension = mfv.IsExtensionMember;
       var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit;
 
@@ -450,7 +451,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (paramsCount == 0)
         return EmptyList<IParameter>.Instance;
 
-      var typeParameters = function.AllTypeParameters;
+      var typeParameters = GetTypeParameters(function, mfv); 
       var methodParams = new List<IParameter>(paramsCount);
       if (isFsExtension && mfv.IsInstanceMember)
       {
@@ -473,6 +474,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           param.Type.MapType(typeParameters, function.Module, true)));
 
       return methodParams;
+    }
+
+    private static IList<ITypeParameter> GetTypeParameters<T>(T function, FSharpMemberOrFunctionOrValue mfv)
+      where T : IParametersOwner, IFSharpTypeParametersOwner
+    {
+      if (function.GetContainingType() is not ObjectExpressionType)
+        return function.AllTypeParameters;
+
+      var typeTypeParameters = mfv.DeclaringEntity?.Value is { } entity &&
+                           entity.GetTypeElement(function.Module) is { } typeElement
+        ? typeElement.GetAllTypeParameters().ResultingList().Reverse()
+        : EmptyList<ITypeParameter>.Instance;
+
+      if (function is ITypeParametersOwner typeParametersOwner)
+        return typeTypeParameters.Concat(typeParametersOwner.TypeParameters).AsIList();
+
+      return typeTypeParameters;
     }
   }
 }

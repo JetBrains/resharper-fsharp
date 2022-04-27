@@ -581,7 +581,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build()
         .Name("BlankLinesAroundDifferentModuleMemberKinds")
         .Where(Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET))
-        .MinBlankLines(it => it.BlankLinesAroundDifferentModuleMemberKinds)
+        .MinBlankLines(it => it.BlankLinesAroundDifferentModuleMemberKinds) // todo: different directives a separated now
         .AdditionalCheckForBlankLineAfter((node, context) =>
           node.GetNextMeaningfulSibling()?.NodeType is var nodeType &&
           nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType])

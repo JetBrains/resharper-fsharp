@@ -57,6 +57,10 @@ let createContainer items writer =
             RdProjectItem(itemType, evaluatedInclude, String.Empty, Nullable(false), RdThisProjectItemOrigin(), metadata.ToList(id)))
 
     let rdProject = RdProject(List(), rdItems.ToList(id), List(), List(), List(), List(), List())
+    let scheme = AllowEverythingScheme.Instance
+//    let rdProjectDescription =
+//        RdProjectDescription(projectDirectory.FullPath, projectMark.Location.FullPath, null, List(), List(), List())
+    let msBuildProject = MsBuildProject(scheme, projectMark.Location, Dictionary(), List(), "")
     let projectProperties = FSharpProjectPropertiesFactory.CreateProjectProperties(List())
     let projectDescriptor = ProjectDescriptor.CreateByProjectName(Guid.NewGuid(), projectProperties, null, projectMark.Name)
 
