@@ -164,6 +164,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                     projectsToCreate.Push(referencedPsiModule, referencedProject, None))
 
             | Some referencedProjectPsiModules ->
+                if fcsProjects.ContainsKey(psiModule) then () else
+
                 let fcsProject = fcsProjectBuilder.BuildFcsProject(psiModule, project)
 
                 let referencedFcsProjects = 
