@@ -34,6 +34,7 @@ type FSharpInlineHelper(driver) =
     override x.RemoveCastFromElement _ = raise (NotImplementedException())
     override x.GetArgumentOwner(_, _) = raise (NotImplementedException())
     override x.AllNotQualifiableReferences _ = raise (NotImplementedException())
+    override x.SplitDeclarationAndInitializer _ = raise (NotImplementedException())
 
 type FSharpInlineVariable(workflow, solution, driver) =
     inherit InlineVarBase(workflow, solution, driver)
