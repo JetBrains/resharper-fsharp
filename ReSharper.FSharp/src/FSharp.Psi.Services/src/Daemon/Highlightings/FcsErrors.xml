@@ -200,8 +200,8 @@
     <Range>reference.GetElement().FSharpIdentifier.GetHighlightingRange()</Range>
     <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
     <QuickFix>ToRecursiveFunctionFix</QuickFix>
-    <QuickFix arguments="h.Reference">ImportTypeFix</QuickFix>
-    <QuickFix arguments="h.Reference">ReferenceModuleAndTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UndefinedIndexer" ID="FS0039: Undefined indexer">
@@ -484,6 +484,17 @@
     <Range>getParameterOwnerPatParametersRange pat</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>DeconstructPatternFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="SingleQuoteInSingleQuote" ID="FS3373: Invalid interpolated string. Single quote or verbatim string literals may not be used in interpolated expressions in single quote or verbatim strings. Consider using an explicit 'let' binding for the interpolation expression or use a triple quote string as the outer string literal.">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithTripleQuotedInterpolatedStringFix</QuickFix>
   </Error>
 
 </Errors>

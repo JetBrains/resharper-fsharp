@@ -24,15 +24,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       using var cookie = ProhibitTypeCheckCookie.Create();
 
       var sourceFile = file.GetSourceFile();
-      Assertion.AssertNotNull(sourceFile, "sourceFile != null");
+      Assertion.AssertNotNull(sourceFile);
 
       var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, myCheckerService);
       (file as IFSharpFile)?.Accept(declarationProcessor);
     }
 
     public ProjectFilePart LoadProjectFilePart(IPsiSourceFile sourceFile, ProjectFilePartsTree tree, IReader reader) =>
-      new FSharpProjectFilePart(sourceFile, reader, sourceFile.GetFSharpFileKind(),
-        sourceFile != null && myCheckerService.FcsProjectProvider.HasPairFile(sourceFile));
+      new FSharpProjectFilePart(sourceFile, reader, sourceFile.GetFSharpFileKind());
 
     public Part ReadPart(byte tag, IReader reader) =>
       (FSharpPartKind) tag switch

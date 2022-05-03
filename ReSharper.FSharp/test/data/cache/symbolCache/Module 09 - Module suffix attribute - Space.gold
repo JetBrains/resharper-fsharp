@@ -2,4 +2,5 @@
 FSharpProjectFilePart:ImplFile
  NamedModulePart:SpaceModule->Class:SpaceModule
 []: Namespace:
+ [Space]: Class:SpaceModule[TestProject]
  [SpaceModule]: Class:SpaceModule[TestProject]

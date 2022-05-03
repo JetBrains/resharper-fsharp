@@ -16,12 +16,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class FSharpTypeParametersOwnerPart<T> : FSharpTypePart<T> where T : class, IFSharpTypeOldDeclaration
   {
     private readonly string[] myTypeParameterNames;
+    public override int MeasureTypeParametersCount { get; }
 
     protected FSharpTypeParametersOwnerPart([NotNull] T declaration, MemberDecoration memberDecoration,
-      TreeNodeCollection<ITypeParameterDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
+      IList<ITypeParameterDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder.Intern(declaration.CompiledName), memberDecoration, typeParameters.Count,
         cacheBuilder)
     {
+
+      if (declaration is IFSharpTypeOrExtensionDeclaration { TypeParameterDeclarationList: { } typeParamDeclList })
+        MeasureTypeParametersCount = typeParamDeclList.TypeParametersEnumerable.Count(typeParamDecl =>
+          typeParamDecl.Attributes.HasAttribute("Measure"));
+
       if (typeParameters.Count == 0)
       {
         myTypeParameterNames = EmptyArray<string>.Instance;

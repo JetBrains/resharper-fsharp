@@ -14,6 +14,9 @@
     <Compile Include="src\Util\FSharpCompilerAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpAssemblyUtil.fs" />
     <Compile Include="src\Util\RdTypeProvidersUtil.fs" />
+    <Compile Include="src\Metadata\FSharpMetadataFlags.fs" />
+    <Compile Include="src\Metadata\FSharpDeclaredName.fs" />
+    <Compile Include="src\Metadata\FSharpMetadataUtil.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\FSharpLanguageVersion.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties.fs" />
@@ -33,6 +36,9 @@
     <Compile Include="src\Util\FcsExpressionUtil.fs" />
     <Compile Include="src\Util\FSharpExperimentalFeatures.fs" />
     <Compile Include="src\Util\FcsTaggedText.fs" />
+    <Compile Include="src\Shim\AssemblyReader\IFcsAssemblyReaderShim.fs" />
+    <Compile Include="src\Shim\AssemblyReader\FcsModuleReaderCommonCache.fs" />
+    <Compile Include="src\Shim\AssemblyReader\ProjectFcsModuleReader.fs" />
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
     <Compile Include="src\Checker\FcsCheckerService.fs" />
@@ -40,6 +46,9 @@
     <Compile Include="src\ProjectModel\FSharpFileService.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
     <Compile Include="src\ProjectModel\ProjectLoadDiagnostics.fs" />
+    <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
+    <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
+    <Compile Include="src\Shim\AssemblyReader\AssemblyReaderShim.fs" />
     <Compile Include="src\Shim\TypeProviders\TcImportsHack.fs" />
     <Compile Include="src\Shim\TypeProviders\TypeProvidersManager.fs" />
     <Compile Include="src\Shim\TypeProviders\ExtensionTypingProviderShim.fs" />
@@ -47,11 +56,6 @@
     <Compile Include="src\Checker\ScriptFcsProjectProvider.fs" />
     <Compile Include="src\Checker\FcsProjectBuilder.fs" />
     <Compile Include="src\Checker\FcsProjectProvider.fs" />
-    <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
-    <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
-    <Compile Include="src\Shim\AssemblyReader\FcsModuleReaderCommonCache.fs" />
-    <Compile Include="src\Shim\AssemblyReader\ProjectFcsModuleReader.fs" />
-    <Compile Include="src\Shim\AssemblyReader\AssemblyReaderShim.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
   </ItemGroup>
 

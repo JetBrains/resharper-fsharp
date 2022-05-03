@@ -224,7 +224,7 @@ module rec FSharpMsBuildUtils =
 [<Extension; AutoOpen>]
 module PsiUtil =
     let private getModuleSymbolScope withReferences (psiModule: IPsiModule) =
-        psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, withReferences, true)
+        psiModule.GetPsiServices().Symbols.GetAlternativeNamesSymbolScope(psiModule, withReferences)
 
     [<Extension; CompiledName("GetSymbolScope")>]
     let getSymbolScope (psiModule: IPsiModule) =

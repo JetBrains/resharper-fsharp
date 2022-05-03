@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
-open JetBrains.ReSharper.Intentions.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
@@ -8,7 +8,7 @@ open NUnit.Framework
 
 [<FSharpTest>]
 type ImportTypeTest() =
-    inherit FSharpQuickFixTestBase<ImportTypeFix>()
+    inherit FSharpQuickFixTestBase<FSharpImportTypeFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/importType"
 

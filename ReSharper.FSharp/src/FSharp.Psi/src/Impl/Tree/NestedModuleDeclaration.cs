@@ -2,6 +2,7 @@
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -34,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           continue;
 
         foreach (var typeDeclaration in typeDeclarationGroup.TypeDeclarations)
-          if (typeDeclaration.CompiledName == sourceName && typeDeclaration.TypeParameterDeclarations.IsEmpty)
+          if (typeDeclaration.CompiledName == sourceName && typeDeclaration.TypeParameterDeclarations.IsEmpty())
             return typeDeclaration;
       }
 

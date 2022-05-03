@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -58,6 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override IList<ITypeParameter> TypeParameters => GetTypeParameters();
 
     protected virtual IList<FSharpGenericParameter> MfvTypeParameters =>
-      Mfv?.GenericParameters ?? EmptyList<FSharpGenericParameter>.Instance;
+      Mfv?.GenericParameters.Where(fcsTypeParameter => !fcsTypeParameter.IsMeasure).ToIList() ??
+      EmptyList<FSharpGenericParameter>.Instance;
   }
 }

@@ -96,11 +96,8 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
 
         match symbolReference.GetElement() with
         | :? IReferenceExpr as referenceExpr ->
-            if isNotNull (SetExprNavigator.GetByLeftExpression(referenceExpr.IgnoreParentParens())) then
-                ReferenceAccessType.WRITE else
-
-            let indexerExpr = IndexerExprNavigator.GetByQualifierIgnoreIndexers(referenceExpr)
-            if isNotNull (SetExprNavigator.GetByLeftExpression(indexerExpr)) then
+            let refExprOrIndexerLikeExpr = getIndexerExprOrIgnoreParens referenceExpr
+            if isNotNull (SetExprNavigator.GetByLeftExpression(refExprOrIndexerLikeExpr)) then
                 ReferenceAccessType.WRITE else
 
             let isInstanceFieldOrProperty (element: IDeclaredElement) =

@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class InterfacePart : FSharpTypeMembersOwnerTypePart, Interface.IInterfacePart
+  internal class InterfacePart : FSharpTypeMembersOwnerTypePart, IFSharpInterfacePart
   {
     public InterfacePart([NotNull] IFSharpTypeOrExtensionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)

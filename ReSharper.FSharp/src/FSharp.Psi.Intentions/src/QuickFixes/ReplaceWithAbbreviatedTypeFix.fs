@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Util
 
 type ReplaceWithAbbreviatedTypeFix(error: TypeAbbreviationsCannotHaveAugmentationsError) =
     inherit FSharpQuickFixBase()
@@ -24,7 +25,8 @@ type ReplaceWithAbbreviatedTypeFix(error: TypeAbbreviationsCannotHaveAugmentatio
         isValid typeDecl &&
 
         // todo: fix parameter list range
-        typeDecl.TypeParameterDeclarations.IsEmpty &&
+        let typeParamDeclList = typeDecl.TypeParameterDeclarationList
+        (isNull typeParamDeclList || typeParamDeclList.TypeParametersEnumerable.IsEmpty()) &&
 
         let fcsEntity = typeDecl.GetFcsSymbol().As<FSharpEntity>()
         isNotNull fcsEntity

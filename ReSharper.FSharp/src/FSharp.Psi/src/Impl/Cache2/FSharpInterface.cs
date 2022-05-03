@@ -8,9 +8,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   public class FSharpInterface : Interface, IFSharpTypeElement, IFSharpTypeParametersOwner
   {
-    public FSharpInterface(IInterfacePart part) : base(part)
-    {
-    }
+    public int MeasureTypeParametersCount { get; }
+
+    public FSharpInterface(IFSharpInterfacePart part) : base(part) =>
+      MeasureTypeParametersCount = part.MeasureTypeParametersCount;
+
+    protected override bool AcceptsPart(TypePart part) =>
+      part.ShortName == ShortName &&
+      part is IFSharpInterfacePart interfacePart && interfacePart.MeasureTypeParametersCount == MeasureTypeParametersCount;
 
     protected override MemberDecoration Modifiers => myParts.GetModifiers();
     public string SourceName => this.GetSourceName();

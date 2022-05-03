@@ -28,7 +28,7 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
         member x.TestOutput = text.Text
 
     member x.Text = text
-    member x.IsValid() = not text.IsEmpty && not range.IsEmpty
+    member x.IsValid() = not text.IsEmpty && range.IsEmpty
 
 and [<SolutionComponent>] TypeHintAdornmentProvider() =
     interface IHighlighterIntraTextAdornmentProvider with

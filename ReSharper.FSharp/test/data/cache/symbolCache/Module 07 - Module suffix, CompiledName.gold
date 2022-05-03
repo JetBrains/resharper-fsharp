@@ -6,6 +6,7 @@ FSharpProjectFilePart:ImplFile
    UnionPart:U->Class:MyNamespace.TopModule+U
 []: Namespace:
  [MyNamespace]: Namespace:MyNamespace
+  [Top]: Class:MyNamespace.TopModule[TestProject]
   [TopModule]: Class:MyNamespace.TopModule[TestProject]
-   [U]: Class:MyNamespace.TopModule+U[TestProject]
+   [U]: Class:MyNamespace.TopModule+U[TestProject], Class:MyNamespace.TopModule+UModule[TestProject]
    [UModule]: Class:MyNamespace.TopModule+UModule[TestProject]

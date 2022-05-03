@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class EnumPart : FSharpTypeParametersOwnerPart<IFSharpTypeOrExtensionDeclaration>, Enum.IEnumPart
+  internal class EnumPart : FSharpTypeParametersOwnerPart<IFSharpTypeOrExtensionDeclaration>, IFSharpEnumPart
   {
     public EnumPart([NotNull] IFSharpTypeOrExtensionDeclaration declaration, [NotNull] ICacheBuilder builder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.Attributes),

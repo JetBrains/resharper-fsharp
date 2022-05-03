@@ -21,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected override byte SerializationTag => (byte) FSharpPartKind.AbbreviationOrSingleCaseUnion;
   }
 
-  internal class StructTypeAbbreviationOrDeclarationPart : TypeAbbreviationOrDeclarationPartBase, Struct.IStructPart
+  internal class StructTypeAbbreviationOrDeclarationPart : TypeAbbreviationOrDeclarationPartBase, IFSharpStructPart
   {
     public StructTypeAbbreviationOrDeclarationPart([NotNull] IFSharpTypeDeclaration declaration,
       [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)

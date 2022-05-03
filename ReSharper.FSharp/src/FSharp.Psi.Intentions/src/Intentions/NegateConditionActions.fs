@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 [<AbstractClass>]
-type NegateConditionActionBase<'T when 'T: null and 'T :> IConditionOwnerExpr>(dataProvider) =
+type NegateConditionActionBase<'T when 'T: not struct and 'T :> IConditionOwnerExpr>(dataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
     abstract GetExpression: unit -> 'T

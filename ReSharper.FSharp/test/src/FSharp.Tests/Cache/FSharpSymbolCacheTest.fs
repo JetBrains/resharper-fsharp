@@ -29,6 +29,7 @@ type FSharpSymbolCacheTest() =
     [<Test>] member x.``Module 12 - Module suffix - types group``() = x.DoNamedTest()
     [<Test>] member x.``Module 13 - Module suffix, exception``() = x.DoNamedTest()
     [<Test>] member x.``Module 14 - Module suffix - abbreviation``() = x.DoNamedTest()
+    [<Test>] member x.``Module 15 - CompiledName``() = x.DoNamedTest()
 
     [<Test>] member x.``Namespace 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 02 - Qualified``() = x.DoNamedTest()
@@ -38,6 +39,7 @@ type FSharpSymbolCacheTest() =
 
     [<Test>] member x.``Class 01``() = x.DoNamedTest()
     [<Test>] member x.``Class 02 - Hidden impl``() = x.DoNamedTest()
+    [<Test>] member x.``Class 03 - Type params``() = x.DoNamedTest()
 
     [<Test>] member x.``Interface 01 - Explicit``() = x.DoNamedTest()
     [<Test>] member x.``Interface 02 - Attribute``() = x.DoNamedTest()

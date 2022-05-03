@@ -5,5 +5,7 @@ FSharpProjectFilePart:ImplFile
    NestedModulePart:NestedModule->Class:MyNamespace.TopModule+NestedModule
 []: Namespace:
  [MyNamespace]: Namespace:MyNamespace
+  [Top]: Class:MyNamespace.TopModule[TestProject]
   [TopModule]: Class:MyNamespace.TopModule[TestProject]
+   [Nested]: Class:MyNamespace.TopModule+NestedModule[TestProject]
    [NestedModule]: Class:MyNamespace.TopModule+NestedModule[TestProject]

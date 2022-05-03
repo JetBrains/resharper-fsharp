@@ -11,11 +11,11 @@ FSharpProjectFilePart:ImplFile
   EnumPart:E->Enum:MyNamespace.E
 []: Namespace:
  [MyNamespace]: Namespace:MyNamespace
-  [E]: Enum:MyNamespace.E[TestProject]
+  [E]: Class:MyNamespace.EModule[TestProject], Enum:MyNamespace.E[TestProject]
   [EModule]: Class:MyNamespace.EModule[TestProject]
-  [O]: Class:MyNamespace.O[TestProject]
+  [O]: Class:MyNamespace.O[TestProject], Class:MyNamespace.OModule[TestProject]
   [OModule]: Class:MyNamespace.OModule[TestProject]
-  [R]: Class:MyNamespace.R[TestProject]
+  [R]: Class:MyNamespace.R[TestProject], Class:MyNamespace.RModule[TestProject]
   [RModule]: Class:MyNamespace.RModule[TestProject]
-  [U]: Class:MyNamespace.U[TestProject]
+  [U]: Class:MyNamespace.U[TestProject], Class:MyNamespace.UModule[TestProject]
   [UModule]: Class:MyNamespace.UModule[TestProject]

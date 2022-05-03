@@ -8,10 +8,10 @@ open System.Text.RegularExpressions
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.Platform.MsBuildHost.Models
+open JetBrains.Platform.MsBuildHost.ProjectModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Impl
-open JetBrains.ProjectModel.ProjectsHost.MsBuild
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Internal
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Structure
 open JetBrains.ProjectModel.Update
@@ -57,13 +57,12 @@ let createContainer items writer =
             RdProjectItem(itemType, evaluatedInclude, String.Empty, Nullable(false), RdThisProjectItemOrigin(), metadata.ToList(id)))
 
     let rdProject = RdProject(List(), rdItems.ToList(id), List(), List(), List(), List(), List())
-    let rdProjectDescription =
-        RdProjectDescription(projectDirectory.FullPath, projectMark.Location.FullPath, null, List(), List(), List())
-    let msBuildProject = MsBuildProject(projectMark, Dictionary(), [rdProject].ToList(id), rdProjectDescription)
     let projectProperties = FSharpProjectPropertiesFactory.CreateProjectProperties(List())
     let projectDescriptor = ProjectDescriptor.CreateByProjectName(Guid.NewGuid(), projectProperties, null, projectMark.Name)
 
-    (container :> IFSharpItemsContainer).OnProjectLoaded(projectMark, msBuildProject, projectDescriptor)
+    let projectLoadResult = RdProjectLoadResult(RdProjectId(0), [rdProject].ToList(id), null, null, null)
+    let msBuildProject = MsBuildProject(AllowEverythingScheme.Instance, projectMark.Location, Dictionary(), List(), projectLoadResult)
+    (container :> IFSharpItemsContainer).OnProjectLoaded(projectMark, projectDescriptor, msBuildProject)
     container
 
 

@@ -2,4 +2,5 @@
 FSharpProjectFilePart:ImplFile
  NamedModulePart:BackticksModule->Class:BackticksModule
 []: Namespace:
+ [Backticks]: Class:BackticksModule[TestProject]
  [BackticksModule]: Class:BackticksModule[TestProject]

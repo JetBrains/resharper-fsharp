@@ -24,17 +24,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       HasPairFile = hasPairFile;
     }
 
-    public FSharpProjectFilePart(IPsiSourceFile sourceFile, IReader reader, FSharpFileKind fileKind, bool hasPairFile)
+    public FSharpProjectFilePart(IPsiSourceFile sourceFile, IReader reader, FSharpFileKind fileKind)
       : base(sourceFile, reader)
     {
       FileKind = fileKind;
-      HasPairFile = hasPairFile;
 
+      HasPairFile = reader.ReadBool();
       HasInternalsVisibleTo = reader.ReadBool();
     }
 
     protected override void Write(IWriter writer)
     {
+      writer.WriteBool(HasPairFile);
       writer.WriteBool(HasInternalsVisibleTo);
     }
 

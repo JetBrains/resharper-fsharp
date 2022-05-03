@@ -14,6 +14,7 @@ open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.Platform.MsBuildHost.Models
+open JetBrains.Platform.MsBuildHost.ProjectModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Caches
 open JetBrains.ProjectModel.ProjectsHost
@@ -76,14 +77,14 @@ type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutio
 
 
 type IItemTypeFilterProvider =
-    abstract CreateItemFilter: RdProject * IProjectDescriptor -> MsBuildItemTypeFilter
+    abstract CreateItemFilter: MsBuildProjectPart * IProjectDescriptor -> MsBuildItemTypeFilter
 
 
 [<SolutionInstanceComponent>]
 type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
     interface IItemTypeFilterProvider with
-        member x.CreateItemFilter(rdProject, projectDescriptor) =
-            buildActions.CreateItemFilter(rdProject, projectDescriptor)
+        member x.CreateItemFilter(projectPart, projectDescriptor) =
+            buildActions.CreateItemFilter(projectPart, projectDescriptor)
 
 
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
@@ -92,7 +93,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
         projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider) =
 
     let locker = JetFastSemiReenterableRWLock()
-    let projectMappings = lazy (containerLoader.GetMap())
+    let projectMappings = lazy containerLoader.GetMap()
     let targetFrameworkIdsIntern = DataIntern(setComparer)
 
     let fsProjectLoaded = new Signal<IProjectMark>(lifetime, "fsProjectLoaded")
@@ -116,11 +117,11 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
 
     let getItems (msBuildProject: MsBuildProject) projectDescriptor itemTypeFilter (itemsByName: CompactOneToListMap<_,_>) allowNonDefaultItemType =
         let items = List<RdProjectItemWithTargetFrameworks>()
-        for rdProject in msBuildProject.RdProjects do
-            let targetFrameworkId = msBuildProject.GetTargetFramework(rdProject)
-            let filter = filterProvider.CreateItemFilter(rdProject, projectDescriptor)
+        for projectPart in msBuildProject.Parts do
+            let targetFrameworkId = projectPart.TargetFramework
+            let filter = filterProvider.CreateItemFilter(projectPart, projectDescriptor)
 
-            rdProject.Items
+            projectPart.GetAvailableItems()
             |> Seq.filter (fun item ->
                 itemTypeFilter item.ItemType &&
 
@@ -206,7 +207,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
         x.ProjectMappings.Remove(projectMark) |> ignore
 
     interface IFSharpItemsContainer with
-        member x.OnProjectLoaded(projectMark, msBuildProject, projectDescriptor) =
+        member x.OnProjectLoaded(projectMark, projectDescriptor, msBuildProject) =
             match msBuildProject with
             | null ->
                 use lock = locker.UsingWriteLock()
@@ -216,15 +217,15 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
             match projectMark with
             | FSharpProjectMark ->
                 let itemsByName = CompactOneToListMap()
-                for rdProject in msBuildProject.RdProjects do
+                for rdProject in msBuildProject.Parts do
                     let itemFilter = filterProvider.CreateItemFilter(rdProject, projectDescriptor)
 
-                    let isAllowedItem (item: RdProjectItem) =
+                    let isAllowedItem (item: MsBuildProjectItem) =
                         match item.ItemType with
                         | CompileBefore | CompileAfter -> true
                         | itemType -> not (itemFilter.FilterByItemType(itemType, item.IsImported()))
 
-                    for rdItem in rdProject.Items do
+                    for rdItem in rdProject.GetAvailableItems() do
                         if isAllowedItem rdItem then
                             itemsByName.AddValue(rdItem.EvaluatedInclude, rdItem.ItemType)
 
@@ -731,7 +732,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         let folders = Stack()
         folders.Push(State.Create(projectDirectory, project))
 
-        let parsePaths (item: RdProjectItem) =
+        let parsePaths (item: MsBuildProjectItem) =
             let path = VirtualFileSystemPath.TryParse(item.EvaluatedInclude, InteractionContext.SolutionContext)
             if path.IsEmpty then None else
 
@@ -1065,7 +1066,7 @@ type State =
 
 
 type RdProjectItemWithTargetFrameworks =
-    { Item: RdProjectItem
+    { Item: MsBuildProjectItem
       TargetFrameworkIds: HashSet<TargetFrameworkId> }
 
 

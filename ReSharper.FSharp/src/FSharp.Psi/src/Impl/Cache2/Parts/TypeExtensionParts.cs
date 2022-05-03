@@ -7,7 +7,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class ClassExtensionPart : FSharpTypeMembersOwnerTypePart, Class.IClassPart
+  internal class ClassExtensionPart : FSharpTypeMembersOwnerTypePart, IFSharpClassPart
   {
     public ClassExtensionPart([NotNull] IFSharpTypeOrExtensionDeclaration declaration,
       [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
@@ -24,10 +24,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override TypeElement CreateTypeElement() =>
       new FSharpClass(this);
 
+    public IClass GetSuperClass() => null;
     public override IEnumerable<ITypeElement> GetSuperTypeElements() => EmptyList<ITypeElement>.Instance;
   }
 
-  internal class StructExtensionPart : FSharpTypeMembersOwnerTypePart, Struct.IStructPart
+  internal class StructExtensionPart : FSharpTypeMembersOwnerTypePart, IFSharpStructPart
   {
     public StructExtensionPart([NotNull] IFSharpTypeOrExtensionDeclaration declaration,
       [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)

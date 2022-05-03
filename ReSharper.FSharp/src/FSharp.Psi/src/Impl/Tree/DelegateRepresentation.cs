@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class DelegateRepresentation
   {
     public FSharpEntity Delegate => TypeDeclaration.GetFcsSymbol() as FSharpEntity;
-    public FSharpDelegateSignature DelegateSignature => Delegate.FSharpDelegateSignature;
+    public FSharpDelegateSignature DelegateSignature => Delegate?.FSharpDelegateSignature;
 
     public IReadOnlyList<ITypeMemberDeclaration> GetMemberDeclarations() =>
       EmptyList<ITypeMemberDeclaration>.Instance;

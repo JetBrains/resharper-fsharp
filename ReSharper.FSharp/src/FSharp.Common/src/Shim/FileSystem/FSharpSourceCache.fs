@@ -30,6 +30,12 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         logger: ILogger) =
     inherit FileSystemShimChangeProvider(Lifetime.Define(lifetime).Lifetime, changeManager)
 
+    let [<Literal>] RemoveFileChangeType =
+        ProjectModelChangeType.REMOVED ||| ProjectModelChangeType.MOVED_OUT
+
+    let [<Literal>] UpdateFileChangeType =
+        ProjectModelChangeType.EXTERNAL_CHANGE ||| ProjectModelChangeType.ADDED ||| ProjectModelChangeType.MOVED_IN
+
     let files = ConcurrentDictionary<VirtualFileSystemPath, FSharpSource>()
 
     let getText (document: IDocument) =
@@ -66,15 +72,14 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         if not (isApplicable path) then () else
 
         let text = getText document
-        let fileExists = path.ExistsFile
 
         let mutable fsSource = Unchecked.defaultof<_>
         match files.TryGetValue(path, &fsSource), fsSource with
-        | true, Exists(source, _) when fileExists && source = text -> ()
+        | true, Exists(source, _) when source = text -> ()
         | _ ->
 
         logger.Trace("Add: {0} change: {1}", changeSource, path)
-        files[path] <- if fileExists then Exists(text, DateTime.UtcNow) else NotExists
+        files[path] <- Exists(text, DateTime.UtcNow)
 
     member x.TryGetSource(path: VirtualFileSystemPath, [<Out>] source: byref<FSharpSource>) =
         match files.TryGetValue(path) with
@@ -141,16 +146,15 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
                 override v.VisitItemDelta(change) =
                     base.VisitItemDelta(change)
 
-                    if change.ContainsChangeType(ProjectModelChangeType.REMOVED) then
+                    if change.ContainsChangeType(RemoveFileChangeType) then
                          files.TryRemove(change.OldLocation) |> ignore
 
-                    if change.ContainsChangeType(ProjectModelChangeType.EXTERNAL_CHANGE) then
+                    if change.ContainsChangeType(UpdateFileChangeType) then
                         let projectFile = change.ProjectItem.As<IProjectFile>()
-                        if isNotNull projectFile && projectFile.LanguageType.Is<FSharpProjectFileType>() then () else
-
-                        let document = projectFile.GetDocument()
-                        if isNotNull document then
-                            applyChange projectFile document "Project model" }
+                        if isValid projectFile && projectFile.LanguageType.Is<FSharpProjectFileType>() then
+                            let document = projectFile.GetDocument()
+                            if isNotNull document then
+                                applyChange projectFile document "Project model" }
 
         visitor.VisitDelta(change)
 

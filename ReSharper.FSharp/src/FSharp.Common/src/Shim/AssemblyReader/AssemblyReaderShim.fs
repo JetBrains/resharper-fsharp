@@ -26,14 +26,6 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Threading
 open JetBrains.Util
 
-[<RequireQualifiedAccess>]
-type ReferencedAssembly =
-    /// An output of a psi source project except for F# projects.
-    | ProjectOutput of ProjectFcsModuleReader
-
-    /// Not supported file or output assembly for F# project.
-    | Ignored
-
 module AssemblyReaderShim =
     let isSupportedProjectLanguage (language: ProjectLanguage) =
         language = ProjectLanguage.CSHARP || language = ProjectLanguage.VBASIC
@@ -82,7 +74,7 @@ module AssemblyReaderShim =
 [<SolutionComponent>]
 type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
         cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService,
-        fsOptionsProvider: FSharpOptionsProvider) as this =
+        fsOptionsProvider: FSharpOptionsProvider, symbolCache: ISymbolCache) as this =
     inherit AssemblyReaderShimBase(lifetime, changeManager)
 
     let isEnabled () =
@@ -176,12 +168,13 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         if assemblyReadersByModule.TryGetValue(psiModule, &reader) then reader else
 
         use readLockCookie = ReadLockCookie.Create()
+        if not (AssemblyReaderShim.isSupportedModule psiModule) then ReferencedAssembly.Ignored else
 
         // todo: is getting primary module needed? should we also replace module->primaryModule everywhere else?
         // todo: test web project with multiple modules
         let path = psiModule.Project.GetOutputFilePath(psiModule.TargetFrameworkId)
         let psiModule = psiModules.GetPrimaryPsiModule(psiModule.Project, psiModule.TargetFrameworkId)
-        let reader = ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache))
+        let reader = ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, this))
 
         recordReader path reader
         reader
@@ -195,7 +188,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         let reader = 
             match AssemblyReaderShim.getProjectPsiModuleByOutputAssembly psiModules path with
             | null -> ReferencedAssembly.Ignored
-            | psiModule -> ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache))
+            | psiModule -> ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, this))
 
         recordReader path reader
         reader
@@ -213,7 +206,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     let moduleInvalidated = new Signal<IPsiModule>(lifetime, "AssemblyReaderShim.ModuleInvalidated")
 
-    // todo: invalidate for particular referencing module only?
+    // todo: invalidate for per-referencing module
     let invalidateDirtyDependencies () =
         Assertion.Assert(locker.IsWriteLockHeld, "locker.IsWriteLockHeld")
 
@@ -240,18 +233,25 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         dirtyTypesInModules.Clear()
 
-    // todo: cache for referencing psi module?
-    let rec createAllTypeDefsInDependencies (psiModule: IPsiModule) =
-        for dependencyModule in nonLazyDependenciesForModule.GetValuesSafe(psiModule) do
-            if allTypesCreated.Contains(dependencyModule) then () else
+    let markDirty (typePart: TypePart) =
+        use lock = locker.UsingWriteLock()
 
-            createAllTypeDefsInDependencies dependencyModule
+        let typeElement = typePart.TypeElement
+        let psiModule = typeElement.Module
 
-            match getOrCreateReaderFromModule dependencyModule with
-            | ReferencedAssembly.ProjectOutput(reader) -> reader.CreateAllTypeDefs()
-            | _ -> ()
+        if dependenciesToReferencingModules.ContainsKey(psiModule) then
+            dirtyTypesInModules.Add(psiModule, typeElement.GetClrName().GetPersistent()) |> ignore
+            allTypesCreated.Remove(psiModule) |> ignore
 
-            allTypesCreated.Add(dependencyModule) |> ignore
+    do
+        let typePartChanged = Action<_>(markDirty)
+        lifetime.Bracket(
+            (fun () -> symbolCache.add_OnAfterTypePartAdded(typePartChanged)),
+            (fun () -> symbolCache.remove_OnAfterTypePartAdded(typePartChanged)))
+
+        lifetime.Bracket(
+            (fun () -> symbolCache.add_OnBeforeTypePartRemoved(typePartChanged)),
+            (fun () -> symbolCache.remove_OnBeforeTypePartRemoved(typePartChanged)))
 
     abstract DebugReadRealAssemblies: bool
     default this.DebugReadRealAssemblies = false
@@ -287,39 +287,16 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         reader :> _
 
-    member this.GetModuleReader(pm: IPsiModule): ReferencedAssembly =
-        let mutable reader = Unchecked.defaultof<_>
-        if assemblyReadersByModule.TryGetValue(pm, &reader) then reader else ReferencedAssembly.Ignored
-
-    member this.MarkDirty(typePart: TypePart) =
-        use lock = locker.UsingWriteLock()
-
-        let typeElement = typePart.TypeElement
-        let psiModule = typeElement.Module
-
-        if dependenciesToReferencingModules.ContainsKey(psiModule) then
-            dirtyTypesInModules.Add(psiModule, typeElement.GetClrName().GetPersistent()) |> ignore
-            allTypesCreated.Remove(psiModule) |> ignore
-
     interface IFcsAssemblyReaderShim with
-        member this.PrepareDependencies(psiModule) =
-            if not (isEnabled ()) then () else
+        member this.IsEnabled = isEnabled ()
 
+        member this.GetModuleReader(psiModule) =
             use lock = locker.UsingWriteLock()
+            getOrCreateReaderFromModule psiModule
 
-            recordDependencies psiModule
+        member this.InvalidateDirty() =
+            use lock = locker.UsingWriteLock()
             invalidateDirtyDependencies ()
-            createAllTypeDefsInDependencies psiModule
 
-
-[<SolutionComponent>]
-type SymbolCacheListener(lifetime: Lifetime, symbolCache: ISymbolCache, readerShim: AssemblyReaderShim) =
-    let typePartChanged = Action<_>(readerShim.MarkDirty)
-    do
-        lifetime.Bracket(
-            (fun () -> symbolCache.add_OnAfterTypePartAdded(typePartChanged)),
-            (fun () -> symbolCache.remove_OnAfterTypePartAdded(typePartChanged)))
-
-        lifetime.Bracket(
-            (fun () -> symbolCache.add_OnBeforeTypePartRemoved(typePartChanged)),
-            (fun () -> symbolCache.remove_OnBeforeTypePartRemoved(typePartChanged)))
+        member this.RecordDependencies(psiModule) =
+            recordDependencies psiModule

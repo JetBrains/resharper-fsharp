@@ -1,8 +1,6 @@
 [<Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 
-open System.Collections.Generic
-open JetBrains.Diagnostics
 open JetBrains.Metadata.Reader.API
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
@@ -11,12 +9,30 @@ open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
+open JetBrains.Util.dataStructures
 
 [<CompiledName("InterfaceDataVersionAttrTypeName")>]
 let interfaceDataVersionAttrTypeName = clrTypeName "Microsoft.FSharp.Core.FSharpInterfaceDataVersionAttribute"
 
+[<CompiledName("InterfaceDataVersionAttrConcatTypeName")>]
+let interfaceDataVersionAttrConcatTypeName =
+    StringDotConcat("Microsoft.FSharp.Core", "FSharpInterfaceDataVersionAttribute");
+
 let isFSharpAssemblyKey = Key("IsFSharpAssembly")
 
+
+[<CompiledName("GetFSharpCoreSigdataPath")>]
+let getFSharpCoreSigdataPath (assembly: IMetadataAssembly) =
+    match assembly.Location with
+    | null -> VirtualFileSystemPath.GetEmptyPathFor(assembly.Location.Context)
+    | path ->
+
+    match path.AssemblyPhysicalPath with
+    | null -> VirtualFileSystemPath.GetEmptyPathFor(assembly.Location.Context)
+    | path -> path.ChangeExtension("sigdata")
+
+
+/// Shouldn't be used during an assembly load, as the assembly attributes aren't populated yet.
 [<Extension; CompiledName("IsFSharpAssembly")>]
 let isFSharpAssembly (psiModule: IPsiModule) =
     match psiModule.ContainingProjectModule with
@@ -41,53 +57,24 @@ let isFromFSharpAssembly (declaredElement: IClrDeclaredElement) =
 
 let [<Literal>] FSharpCore = "FSharp.Core"
 
+[<CompiledName("IsFSharpCore")>]
 let isFSharpCore (assemblyName: AssemblyNameInfo) =
     isNotNull assemblyName && AssemblyNameInfo.SimpleNameComparer.Equals(FSharpCore, assemblyName.Name)
 
 
-type FSharpSignatureDataResource =
-    { CompilationUnitName: string
-      MetadataResource: IManifestResourceDisposition }
+let [<Literal>] SignatureInfoResourceName = "FSharpSignatureInfo."
+let [<Literal>] SignatureInfoResourceNameOld = "FSharpSignatureData."
 
-let [<Literal>] signatureInfoResourceName = "FSharpSignatureInfo."
-let [<Literal>] signatureInfoResourceNameOld = "FSharpSignatureData."
-
-let internal isSignatureDataResource (manifestResource: IMetadataManifestResource) (compilationUnitName: outref<string>) =
+[<Extension; CompiledName("IsFSharpMetadataResource")>]
+let isFSharpMetadataResource (manifestResource: IMetadataManifestResource) (compilationUnitName: outref<string>) =
     let name = manifestResource.Name
-    if startsWith signatureInfoResourceName name then
-        compilationUnitName <- name.Substring(signatureInfoResourceName.Length)
+    if startsWith SignatureInfoResourceName name then
+        compilationUnitName <- name.Substring(SignatureInfoResourceName.Length)
         true
-    elif startsWith signatureInfoResourceNameOld name then
-        compilationUnitName <- name.Substring(signatureInfoResourceNameOld.Length)
+    elif startsWith SignatureInfoResourceNameOld name then
+        compilationUnitName <- name.Substring(SignatureInfoResourceNameOld.Length)
         true
     else false
-
-[<CompiledName("GetFSharpMetadataResources")>]
-let getFSharpMetadataResources (psiModule: IPsiModule) =
-    match psiModule.As<IAssemblyPsiModule>() with
-    | null -> null
-    | assemblyPsiModule ->
-
-    let path = assemblyPsiModule.Assembly.Location
-    if isNull path then null else
-
-    Assertion.Assert(isFSharpAssembly psiModule, "isFSharpAssembly psiModule")
-
-    use metadataLoader = new MetadataLoader()
-    let metadataAssembly = metadataLoader.TryLoadFrom(path, JetFunc<_>.False)
-    if isNull metadataAssembly then null else
-
-    let resources = List()
-    for manifestResource in metadataAssembly.GetManifestResources() do
-        let mutable compilationUnitName = Unchecked.defaultof<_>
-        if isSignatureDataResource manifestResource &compilationUnitName then
-            let disposition = manifestResource.GetDisposition()
-            if isNotNull disposition then
-                resources.Add({ CompilationUnitName = compilationUnitName; MetadataResource = disposition })
-
-    // todo: external metadata in FSharp.Core
-
-    resources.AsReadOnly()
 
 
 let getNestedTypes (declaredElement: IClrDeclaredElement) (symbolScope: ISymbolScope): ITypeElement seq =
@@ -95,4 +82,3 @@ let getNestedTypes (declaredElement: IClrDeclaredElement) (symbolScope: ISymbolS
     | :? INamespace as ns -> ns.GetNestedTypeElements(symbolScope) :> _
     | :? ITypeElement as typeElement -> typeElement.NestedTypes :> _
     | _ -> Seq.empty
-

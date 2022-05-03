@@ -229,7 +229,7 @@ type FSharpKeywordCompletionTest() =
     // todo: add recovery in parser, filter member start keywords
     [<Test>] member x.``Open 05``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type - 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Type - Attribute target 01``() = x.DoNamedTest()
     [<Test; Explicit("Can't reparse")>] member x.``Type - Attribute target 02``() = x.DoNamedTest()
     [<Test; Explicit("Can't reparse")>] member x.``Type - Attribute target 03``() = x.DoNamedTest()

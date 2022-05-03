@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
@@ -109,24 +110,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       TreeNodeCollection<IAttribute> attributes)
     {
       var hasModuleSuffix = false;
-      string compiledName = null;
 
       foreach (var attr in attributes)
-      {
-        if (GetCompiledNameValue(attr, out var value))
-          compiledName = value;
-
-        if (!attr.IsModuleSuffixAttribute())
-          continue;
-
-        hasModuleSuffix = true;
-        break;
-      }
+        if (attr.IsModuleSuffixAttribute())
+        {
+          hasModuleSuffix = true;
+          break;
+        }
 
       var sourceName = identifier?.Name;
       return hasModuleSuffix && sourceName != null
         ? sourceName + "Module"
-        : compiledName ?? sourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+        : sourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
     public static bool GetCompiledName(this TreeNodeCollection<IAttribute> attributes, out string name)
@@ -382,11 +377,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static ITypeElement TryGetAssociatedType([NotNull] this CompiledTypeElement moduleTypeElement, string sourceName)
     {
-      Assertion.Assert(moduleTypeElement.IsCompiledModule(), "moduleTypeElement.IsCompiledModule()");
+      Assertion.Assert(moduleTypeElement is FSharpCompiledModule, "moduleTypeElement.IsCompiledModule()");
 
       bool IsAssociatedType(ITypeElement t) =>
         !t.Equals(moduleTypeElement) && t.TypeParameters.Count == 0 &&
-        !t.IsCompiledModule() && t.GetSourceName() == sourceName;
+        t is not FSharpCompiledModule && t.GetSourceName() == sourceName;
 
       var containingType = moduleTypeElement.GetContainingType();
       if (containingType != null)
@@ -399,23 +394,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static string GetSourceName([NotNull] this CompiledTypeElement typeElement)
     {
+      if (typeElement is FSharpCompiledModule compiledModule)
+        return compiledModule.SourceName;
+
       if (typeElement.GetAttributeFirstArgValue(FSharpPredefinedType.SourceNameAttrTypeName) is string sourceName &&
           sourceName != SharedImplUtil.MISSING_DECLARATION_NAME)
         return sourceName;
 
-      var shortName = typeElement.ShortName;
-      if (shortName.HasModuleSuffix() && typeElement.IsCompiledModule())
-      {
-        var shortNameWithoutSuffix = shortName.SubstringBeforeLast(ModuleSuffix);
-        var flags = typeElement.GetAttributeFirstArgValue(FSharpPredefinedType.CompilationRepresentationAttrTypeName);
-        if (flags != null && (CompilationRepresentationFlags) flags == CompilationRepresentationFlags.ModuleSuffix)
-          return shortNameWithoutSuffix;
-
-        if (typeElement.TryGetAssociatedType(shortNameWithoutSuffix) != null)
-          return shortNameWithoutSuffix;
-      }
-
-      return shortName;
+      return typeElement.ShortName;
     }
 
     public static string GetSourceName([NotNull] this IDeclaredElement declaredElement) =>
@@ -629,7 +615,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       var typeSourceName = fsTypeElement.SourceName;
       foreach (var part in typeElement.EnumerateParts())
       {
-        foreach (var child in part.Parent.NotNull("part.Parent != null").Children())
+        foreach (var child in part.Parent.NotNull().Children())
         {
           if (!(child is IModulePart && child is TypePart typePart))
             continue;
@@ -688,8 +674,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     public static bool IsModule(this ITypeElement typeElement) =>
-      typeElement is IFSharpModule ||
-      typeElement is ICompiledElement compiledElement && compiledElement.IsCompiledModule();
+      typeElement is IFSharpModule || typeElement is FSharpCompiledModule;
 
     public static ModuleMembersAccessKind GetAccessType([NotNull] this ITypeElement typeElement)
     {
@@ -839,6 +824,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return autoOpen
         ? ModuleMembersAccessKind.AutoOpen
         : ModuleMembersAccessKind.Normal;
+    }
+
+    public static IList<ITypeParameterDeclaration> GetTypeParameterDeclarations(
+      [NotNull] this IFSharpTypeOrExtensionDeclaration decl)
+    {
+      var decls = decl.TypeParameterDeclarationList?.TypeParameters;
+      if (decls == null)
+        return EmptyList<ITypeParameterDeclaration>.Instance;
+
+      return decls.Value.ToListWhere(typeParamDecl => !typeParamDecl.Attributes.HasAttribute("Measure"));
     }
 
     public static IList<ITypeParameter> GetAllTypeParametersReversed(this ITypeElement typeElement) =>

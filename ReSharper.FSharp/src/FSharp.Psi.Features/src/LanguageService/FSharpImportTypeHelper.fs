@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -45,6 +46,8 @@ type FSharpImportTypeHelper() =
                 let elementId = searchGuru.GetElementId(typeElement)
                 searchGuru.CanContainReferences(sourceFile, elementId)
 
+            let fsAssemblyAutoOpenCache = psiModule.GetSolution().GetComponent<FSharpAssemblyAutoOpenCache>()
+
             let mutable candidates: ITypeElement seq =
                 names
                 |> Seq.collect factory.Invoke
@@ -69,6 +72,10 @@ type FSharpImportTypeHelper() =
                     let moduleDecl, _ = findModuleToInsertTo fsFile referenceStartOffset settings moduleToImport
                     let qualifiedElementList = moduleToImport.GetQualifiedElementList(moduleDecl, true)
                     let names = qualifiedElementList |> List.map (fun el -> el.GetSourceName())
+
+                    let autoOpenedModules = fsAssemblyAutoOpenCache.GetAutoOpenedModules(typeElement.Module)
+                    if autoOpenedModules.Count > 0 && autoOpenedModules.Contains(String.concat "." names) then false else
+
                     let symbolUse = fsFile.CheckerService.ResolveNameAtLocation(context, names, false, opName)
                     Option.isSome symbolUse)
                 |> Seq.cast
