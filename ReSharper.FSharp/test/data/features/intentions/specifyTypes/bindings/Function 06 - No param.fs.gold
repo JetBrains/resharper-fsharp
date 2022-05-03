@@ -1,3 +1,3 @@
 ﻿module Module
 
-let f<'a>: 'a{caret} = Unchecked.defaultof<'a>
+let f<'a> : 'a{caret} = Unchecked.defaultof<'a>

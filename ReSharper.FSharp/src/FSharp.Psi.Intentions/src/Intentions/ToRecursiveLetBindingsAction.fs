@@ -15,10 +15,12 @@ type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider)
     override x.IsAvailable _ =
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
         if isNull letBindings || letBindings.IsRecursive then false else
-        if not (isAtLetExprKeywordOrReferencePattern dataProvider letBindings) then false else
 
         let bindings = letBindings.Bindings
-        bindings.Count = 1 && bindings[0].HasParameters
+
+        bindings.Count = 1
+        && bindings[0].HasParameters
+        && (isAtBindingKeywordOrReferencePatternOrGenericParameters dataProvider letBindings.Bindings[0])
 
     static member Execute(letBindings: ILetBindings) =
         use writeCookie = WriteLockCookie.Create(letBindings.IsPhysical())

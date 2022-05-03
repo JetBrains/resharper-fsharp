@@ -5,25 +5,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-// TODO: use something this if actions get merged or remove this
-[<RequireQualifiedAccess>]
-type private TypeAnnotationContext =
-    | PartiallyAnnotatedTypedPat of ITypedPat
-    | PartiallyAnnotatedReferencePat of ILocalReferencePat
-    | WildPat of IWildPat
-    | FunctionBinding of ILocalBinding
-    | Tuple of ITuplePat
-    | Property of IMemberDeclaration
-    | Method of IMemberDeclaration
-    | ArrayOrList of IArrayOrListPat
-
 [<ContextAction(Name = "AnnotateBinding", Group = "F#",
                 Description = "Annotate value or parameter with explicit type")>]
 type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
     override this.IsAvailable _ =
-        let localReference = dataProvider.GetSelectedElement<IReferencePat>() // Not a reference pat, others too?
+        let localReference = dataProvider.GetSelectedElement<ILocalReferencePat>()
 
         isNotNull localReference
         &&  match localReference.Parent with

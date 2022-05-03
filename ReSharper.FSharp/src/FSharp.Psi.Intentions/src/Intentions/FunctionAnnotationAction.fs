@@ -1,6 +1,5 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
@@ -14,6 +13,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 
 module PatUtil =
     // TODO: there should be an extension for this
@@ -34,6 +34,15 @@ module PatUtil =
                 tryNextSibling sibling
 
         tryNextSibling localRef
+
+    [<return: Struct>]
+    let (|HasMfvReference|_|) (referenceOwner: IFSharpReferenceOwner) =
+        if isNull referenceOwner || isNull referenceOwner.Reference then ValueNone else
+        match referenceOwner.Reference.GetFcsSymbol() with
+        | :? FSharpMemberOrFunctionOrValue as mfv ->
+            ValueSome mfv
+        | _ ->
+            ValueNone
 
     [<return: Struct>]
     let (|IsPartiallyAnnotatedNamedTypeUsage|_|) (namedTypeUsage: INamedTypeUsage) =
@@ -153,43 +162,17 @@ module SpecifyTypes =
         parenPat.SetPattern(pattern) |> ignore
         parenPat :> IFSharpPattern
 
-    let specifyPattern displayContext (fcsType: FSharpType) needToAddParens (pattern: IFSharpPattern) =
-        let pattern = pattern.IgnoreParentParens()
-        let factory = pattern.CreateElementFactory()
-
-        let newPattern =
-            // TODO: move these specific checks to appropriate functions
-
-            match pattern.IgnoreInnerParens() with
-            | :? ITypedPat as partiallyTypedPat ->
-                // extract original untyped pat and use that as a base
-                partiallyTypedPat.Pattern
-
-            | :? ILocalReferencePat as localRef ->
-                // remove partially typed ReturnTypeInfo because it is not a part of a pattern
-                let rec removeReturnTypeInfo (ref: ITreeNode) =
-                    match ref.NextSibling with
-                    | null ->
-                        ()
-                    | :? IReturnTypeInfo as returnTypeInfo ->
-                        ModificationUtil.DeleteChild(returnTypeInfo)
-                    | sibling ->
-                        removeReturnTypeInfo sibling
-
-                removeReturnTypeInfo localRef
-                localRef
-
-            | pattern ->
-                pattern
-
-        let typedPat =
-            let typedPat = factory.CreateTypedPat(newPattern, factory.CreateTypeUsage(fcsType.Format(displayContext)))
+    let specifyPattern displayContext (fcsType: FSharpType) needToAddParens (patternToAnnotate: IFSharpPattern) (patternToChange: IFSharpPattern) =
+        let patternToChange = patternToAnnotate.IgnoreParentParens()
+        let factory = patternToAnnotate.CreateElementFactory()
+        let annotatedPattern =
+            let typedPat = factory.CreateTypedPat(patternToAnnotate, factory.CreateTypeUsage(fcsType.Format(displayContext)))
             if needToAddParens then
                 addParens factory typedPat
             else
                 typedPat :> _
 
-        ModificationUtil.ReplaceChild(pattern, typedPat) |> ignore
+        ModificationUtil.ReplaceChild(patternToChange, annotatedPattern) |> ignore
 
     let specifyArrayOrListPat (arrayOrListPat: IArrayOrListPat) =
         let symbolUse =
@@ -226,8 +209,26 @@ module SpecifyTypes =
         let displayContext = symbolUse.DisplayContext
 
         let patternToChange =
-            refPat
-            |> PatUtil.tryParentOrReturnSelf<ITypedPat>
+            match refPat.IgnoreInnerParens() with
+            | :? ITypedPat as partiallyTypedPat ->
+                partiallyTypedPat :> IFSharpPattern
+
+            | :? ILocalReferencePat as localRef ->
+                // remove partially typed ReturnTypeInfo because it is not a part of a pattern
+                let rec removeReturnTypeInfo (ref: ITreeNode) =
+                    match ref.NextSibling with
+                    | null ->
+                        ()
+                    | :? IReturnTypeInfo as returnTypeInfo ->
+                        ModificationUtil.DeleteChild(returnTypeInfo)
+                    | sibling ->
+                        removeReturnTypeInfo sibling
+
+                removeReturnTypeInfo localRef
+                localRef
+
+            | pattern ->
+                pattern
 
         let addParens =
             match refPat.Parent with
@@ -249,7 +250,7 @@ module SpecifyTypes =
                 | _ ->
                     true
 
-        specifyPattern displayContext mfv.FullType addParens patternToChange
+        specifyPattern displayContext mfv.FullType addParens refPat patternToChange
 
     let private getTupleChildrenRefPatsReferences (pattern: ITuplePat) =
         [|
@@ -266,7 +267,7 @@ module SpecifyTypes =
                 if isNotNull refPat then
                     let symbol = refPat.GetFcsSymbolUse()
                     if isNotNull symbol then
-                        struct (pattern, symbol)
+                        struct (refPat, symbol)
         |]
 
     let rec specifyTuplePat (pattern: ITuplePat) =
@@ -290,7 +291,7 @@ module SpecifyTypes =
             for refPat, symbolUse in refPats do
                 let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
                 let displayContext = symbolUse.DisplayContext
-                specifyPattern displayContext mfv.FullType false refPat
+                specifyReferencePat refPat
 
             match tuplePat.IgnoreParentParens() with
             | :? IParenPat ->
@@ -309,12 +310,19 @@ module SpecifyTypes =
         let returnTypeInfo = factory.CreateReturnTypeInfo(factory.CreateTypeUsage(fcsType.Format(displayContext)))
         ModificationUtil.AddChildAfter(decl.Identifier, returnTypeInfo) |> ignore
 
-    let specifyParameterDeclaration (parameter: IParametersPatternDeclaration) =
+    let specifyParameterDeclaration displayContext (fcsType: FSharpType) addParens (parameter: IParametersPatternDeclaration) =
+        let patternToAnnotate = parameter.Pattern.IgnoreInnerParens()
+        let patternToChange = parameter.Pattern
+
         match parameter.Pattern.IgnoreInnerParens() with
-        | :? ITypedPat as (partiallyTypedPat & PatUtil.IsPartiallyAnnotatedTypedPat) ->
-            match partiallyTypedPat.Pattern.IgnoreInnerParens() with
-            | :? ILocalReferencePat as localRef ->
-                specifyReferencePat localRef
+        | :? ITypedPat as typedPat ->
+            match typedPat with
+            | PatUtil.IsPartiallyAnnotatedTypedPat ->
+                match typedPat.Pattern.IgnoreInnerParens() with
+                | :? ILocalReferencePat as localRef ->
+                    specifyReferencePat localRef
+                | _ ->
+                    specifyPattern displayContext fcsType addParens patternToAnnotate patternToChange
             | _ ->
                 ()
 
@@ -324,14 +332,11 @@ module SpecifyTypes =
         | :? ITuplePat as tuplePat ->
             specifyTuplePat tuplePat
 
-        | :? IArrayOrListPat as arrayOrList ->
-            specifyArrayOrListPat arrayOrList
-
-        | :? IWildPat as wildPat ->
-            specifyWildPat wildPat
+        | :? IConstPat | :? IUnitPat ->
+            ()
 
         | _ ->
-            ()
+            specifyPattern displayContext fcsType addParens patternToAnnotate patternToChange
 
 [<ContextAction(Name = "AnnotateFunction", Group = "F#",
                 Description = "Annotate function with parameter types and return type")>]
@@ -350,22 +355,14 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     override x.Text = "Add function type annotations"
 
     override x.IsAvailable _ =
-        let letBindings = dataProvider.GetSelectedElement<ILetBindings>() // check for IBinding Instead?
-        if isNull letBindings then false else
-
-        let bindings = letBindings.Bindings
-        if bindings.Count <> 1 then false else
-
-        let binding = bindings[0] // TODO: let .. and!
+        let binding = dataProvider.GetSelectedElement<IBinding>() // check for IBinding Instead?
+        if isNull binding then false else
 
         (binding.ParametersDeclarations.Count > 0 || not (binding.HeadPattern :? ILocalReferencePat))
-        && isAtLetExprKeywordOrReferencePattern dataProvider letBindings && not (isAnnotated binding)
+        && isAtBindingKeywordOrReferencePatternOrGenericParameters dataProvider binding && not (isAnnotated binding)
 
     override x.ExecutePsiTransaction _ =
-        // TODO: simplify this one
-
-        let letBindings = dataProvider.GetSelectedElement<ILetBindings>() // IBinding?
-        let binding = letBindings.Bindings |> Seq.exactlyOne
+        let binding = dataProvider.GetSelectedElement<IBinding>() // IBinding?
 
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
@@ -379,7 +376,10 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
         let displayContext = symbolUse.DisplayContext
 
-        binding.ParametersDeclarations |> Seq.iter SpecifyTypes.specifyParameterDeclaration
+        if binding.ParametersDeclarations.Count > 0 then
+            let types = FcsTypeUtil.getFunctionTypeArgs false mfv.FullType
+            (binding.ParametersDeclarations, types)
+            ||> Seq.iter2 (fun parameter fsType -> SpecifyTypes.specifyParameterDeclaration displayContext fsType true parameter)
 
         if isNull binding.ReturnTypeInfo then
             SpecifyTypes.specifyFunctionBindingReturnType displayContext mfv binding

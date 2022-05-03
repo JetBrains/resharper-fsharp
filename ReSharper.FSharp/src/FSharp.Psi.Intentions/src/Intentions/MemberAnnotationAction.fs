@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
@@ -47,7 +48,9 @@ type MemberAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             | :? IFSharpProperty ->
                 SpecifyTypes.specifyPropertyType displayContext mfv.ReturnParameter.Type memberDeclaration
             | _ ->
-                memberDeclaration.ParametersDeclarations |> Seq.iter SpecifyTypes.specifyParameterDeclaration
+                let types = FcsTypeUtil.getFunctionTypeArgs false mfv.FullType
+                (memberDeclaration.ParametersDeclarations, types)
+                ||> Seq.iter2 (fun parameter fsType -> SpecifyTypes.specifyParameterDeclaration displayContext fsType false parameter)
                 SpecifyTypes.specifyMethodReturnType displayContext mfv memberDeclaration
         | _ ->
             ()

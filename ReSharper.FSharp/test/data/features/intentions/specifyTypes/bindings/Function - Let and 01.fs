@@ -1,4 +1,4 @@
 module Module
 
-let f{caret} x = g x
+let rec f{caret} x = g x
 and g x = x
