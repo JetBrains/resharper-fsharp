@@ -497,5 +497,16 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceWithTripleQuotedInterpolatedStringFix</QuickFix>
   </Error>
+  
+  <Error staticGroup="FSharpErrors" name="TypeDoesNotMatchType" ID="FS0001: The type does not match the type">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceReturnTypeFix</QuickFix>
+  </Error>
 
 </Errors>

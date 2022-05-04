@@ -87,6 +87,7 @@ module FSharpErrors =
     let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type \n    '(.+)'    \nis not compatible with type\n    '(.+)'"
 
     let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
+    let [<Literal>] typeDoesNotMatchMessage = "The type '(.+)' does not match the type '(.+)'"
     let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
 
     let isDirectiveSyntaxError number =
@@ -183,6 +184,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     | "unit" -> createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
                     | _ -> TypeEquationError(expectedType, actualType, expr, error.Message) :> _
                 else null
+
+            | Regex typeDoesNotMatchMessage [_expectedType; _actualType] ->
+                createHighlightingFromNodeWithMessage TypeDoesNotMatchTypeError range error
 
             | _ -> createGenericHighlighting error range
 

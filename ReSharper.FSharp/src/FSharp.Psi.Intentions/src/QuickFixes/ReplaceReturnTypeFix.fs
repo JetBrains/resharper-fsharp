@@ -8,31 +8,45 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-type ReplaceReturnTypeFix(error: TypeConstraintMismatchError) =
+type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, replaceFirstType: bool) =
     inherit FSharpQuickFixBase()
     
-    let bodyExpr = error.Expr
-    let getTypesFromErrorMessage (errorMessage:string) =
-        let regexMatches = Regex.Matches(errorMessage, "'.+'")
+    let rec visitParent (expr: IFSharpExpression) =
+        match expr.Parent with
+        | :? IFSharpExpression as parent -> visitParent parent
+        | _ -> expr
+    
+    let parentExpr = visitParent expr
+    
+    let getReplacementTypeFromErrorMessage (errorMessage:string) =
+        let regexMatches = Regex.Matches(errorMessage, "'((\\w|\.|\d)+)'")
 
         if regexMatches.Count <> 2 then
             None
         else
-            let getType idx = regexMatches.[idx].Value.Trim([| '\'' |])
-            Some (getType 0, getType 1)
+            let idx = if replaceFirstType then 0 else 1
+            Some (regexMatches[idx].Value.Trim([| '\'' |]))
 
+    new (error: TypeConstraintMismatchError) =
+        // error FS0193: Type constraint mismatch. The type ↔    'A.B'    ↔is not compatible with type↔    'Thing'
+        ReplaceReturnTypeFix(error.Expr, error.FcsMessage, true)
+    
+    new (error: TypeDoesNotMatchTypeError) =
+        // error FS0001: The type 'double' does not match the type 'int'
+        ReplaceReturnTypeFix(error.Expr, error.FcsMessage, false)
+    
     override this.Text = "Replace return type"
     override this.IsAvailable _ =
-        let binding = BindingNavigator.GetByExpression(bodyExpr)
+        let binding = BindingNavigator.GetByExpression(parentExpr)
         if isNull binding then false else
-        Option.isSome (getTypesFromErrorMessage error.FcsMessage)
+        Option.isSome (getReplacementTypeFromErrorMessage fcsErrorMessage)
     
     override this.ExecutePsiTransaction(_solution) =
-        match getTypesFromErrorMessage error.FcsMessage with
+        match getReplacementTypeFromErrorMessage fcsErrorMessage with
         | None -> ()
-        | Some (actualTypeName, expectedTypeName) ->
+        | Some replacementTypeName ->
 
-        let binding = BindingNavigator.GetByExpression(bodyExpr)
+        let binding = BindingNavigator.GetByExpression(parentExpr)
         
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
@@ -45,6 +59,6 @@ type ReplaceReturnTypeFix(error: TypeConstraintMismatchError) =
 
         if isNotNull binding.ReturnTypeInfo then
             let factory = binding.CreateElementFactory()
-            let typeUsage = factory.CreateTypeUsage(actualTypeName)
+            let typeUsage = factory.CreateTypeUsage(replacementTypeName)
             let currentReturnType = binding.ReturnTypeInfo
             ModificationUtil.ReplaceChild(currentReturnType, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
