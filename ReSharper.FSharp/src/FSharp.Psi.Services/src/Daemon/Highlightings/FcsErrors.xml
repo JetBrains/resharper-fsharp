@@ -381,6 +381,7 @@
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
+    <QuickFix>ReplaceReturnTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="IndeterminateType" ID="FS0072: Lookup on indeterminate type object">
