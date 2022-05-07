@@ -9,6 +9,6 @@ let{off} (x3{off}: int): int = 1
 let{off} ((x4{off}: int)): int = 1
 
 {off}[<CompiledName{off}("Foo")>]{off}
-let{on} foo{on} {off}x {off}= {off}()
+let{off} foo{off} {on}x {on}= {off}()
 
 let{off} f{off} {off}(): unit = ()

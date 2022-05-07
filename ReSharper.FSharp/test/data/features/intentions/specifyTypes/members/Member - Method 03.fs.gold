@@ -1,0 +1,5 @@
+module Members
+type Q() =
+
+    member _.F3{caret}<'a>(): obj -> unit = =
+        fun _ -> ()

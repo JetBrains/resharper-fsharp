@@ -1,0 +1,4 @@
+module Members
+type Q() =
+
+    member val P4: int{caret} = 1

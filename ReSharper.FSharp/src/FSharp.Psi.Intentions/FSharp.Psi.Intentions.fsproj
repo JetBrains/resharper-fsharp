@@ -28,6 +28,7 @@
     <Compile Include="src\Intentions\ValueAnnotationAction.fs" />
     <Compile Include="src\Intentions\TupleAnnotationAction.fs" />
     <Compile Include="src\Intentions\MemberAnnotationAction.fs" />
+    <Compile Include="src\Intentions\AnnotationActions2.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetFix.fs" />

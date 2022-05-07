@@ -9,7 +9,7 @@ open NUnit.Framework
 type FunctionAnnotationActionTest() =
     inherit FSharpContextActionExecuteTestBase<FunctionAnnotationAction>()
 
-    override x.ExtraPath = "specifyTypes/bindings"
+    override x.ExtraPath = "specifyTypes/functions"
 
     [<Test>] member x.``Function - Parameters 01 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Function - Parameters 02 - Wrong types``() = x.DoNamedTest()
@@ -44,36 +44,36 @@ type FunctionAnnotationActionTest() =
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "SpaceBeforeColon", "true")>]
     [<Test>] member x.``Function - Formatting - Add space``() = x.DoNamedTest()
 
-    [<Test>] member x.``Value 01``() = x.DoNamedTest()
-    [<Test>] member x.``Value 02 - Function``() = x.DoNamedTest()
-    [<Test>] member x.``Value 03 - Function, tuple``() = x.DoNamedTest()
-
-    [<Test>] member x.``Function - Caret on let binding``() = x.DoNamedTest()
-
 // TODO: more tests
 type FunctionAnnotationActionActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<FunctionAnnotationAction>()
 
-    override x.ExtraPath = "specifyTypes/bindings"
+    override x.ExtraPath = "specifyTypes/functions"
 
     [<Test>] member x.``Function - Let bindings - Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Let bindings - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Class - member - 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Let bindings - Expr 01``() = x.DoNamedTest()
 
 type ValueAnnotationActionTest() =
     inherit FSharpContextActionExecuteTestBase<ValueAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes/values"
 
-    //[<Test>] member x.``Function - Parameters 01 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Value 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value 02 - Function``() = x.DoNamedTest()
+    [<Test>] member x.``Value 03 - Function, tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Value 04 - TupleLeft``() = x.DoNamedTest()
+    [<Test>] member x.``Value 05 - TupleRight``() = x.DoNamedTest()
 
-// TODO: Tests
 type ValueAnnotationActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<ValueAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes/values"
 
-    //[<Test>] member x.``Value - Let bindings - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Let bindings - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Let bindings - Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Let bindings - Expr 01``() = x.DoNamedTest()
 
 // TODO: Tests
 type MemberAnnotationActionTest() =
@@ -89,7 +89,7 @@ type MemberAnnotationActionAvailabilityTest() =
 
     override x.ExtraPath = "specifyTypes/members"
 
-    //[<Test>] member x.``Value - Let bindings - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Class - member - 01``() = x.DoNamedTest()
 
 // TODO: Tests
 type TupleAnnotationActionTest() =
@@ -97,7 +97,10 @@ type TupleAnnotationActionTest() =
 
     override x.ExtraPath = "specifyTypes/tuples"
 
-    //[<Test>] member x.``Function - Parameters 01 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 02 - Child tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 03 - Parent tuple - 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 04 - Parent tuple - 02``() = x.DoNamedTest()
 
 // TODO: Tests
 type TupleAnnotationActionAvailabilityTest() =

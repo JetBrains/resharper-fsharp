@@ -15,6 +15,13 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 
+/// This is a type used to supply "hints" to annotation functions to skip manual type searching
+type [<Struct>] TypeHint = {
+    FSType: FSharpType
+    DisplayContext: FSharpDisplayContext
+    AddParens: bool voption
+}
+
 module PatUtil =
     // TODO: there should be an extension for this
     let tryParentOrReturnSelf<'a when 'a :> IFSharpPattern> (value: IFSharpPattern) =
@@ -36,9 +43,12 @@ module PatUtil =
         tryNextSibling localRef
 
     [<return: Struct>]
-    let (|HasMfvReference|_|) (referenceOwner: IFSharpReferenceOwner) =
-        if isNull referenceOwner || isNull referenceOwner.Reference then ValueNone else
-        match referenceOwner.Reference.GetFcsSymbol() with
+
+
+    [<return: Struct>]
+    let (|HasMfvSymbolUse|_|) (referencePat: IReferencePat) =
+        if isNull referencePat then ValueNone else
+        match referencePat.GetFcsSymbol() with
         | :? FSharpMemberOrFunctionOrValue as mfv ->
             ValueSome mfv
         | _ ->
@@ -162,12 +172,13 @@ module SpecifyTypes =
         parenPat.SetPattern(pattern) |> ignore
         parenPat :> IFSharpPattern
 
-    let specifyPattern displayContext (fcsType: FSharpType) needToAddParens (patternToAnnotate: IFSharpPattern) (patternToChange: IFSharpPattern) =
+    let specifyPattern (typeHint: TypeHint) (patternToAnnotate: IFSharpPattern) (patternToChange: IFSharpPattern) =
+        let needParens = typeHint.AddParens |> ValueOption.defaultValue false
         let patternToChange = patternToAnnotate.IgnoreParentParens()
         let factory = patternToAnnotate.CreateElementFactory()
         let annotatedPattern =
-            let typedPat = factory.CreateTypedPat(patternToAnnotate, factory.CreateTypeUsage(fcsType.Format(displayContext)))
-            if needToAddParens then
+            let typedPat = factory.CreateTypedPat(patternToAnnotate, factory.CreateTypeUsage(typeHint.FSType.Format(typeHint.DisplayContext)))
+            if needParens then
                 addParens factory typedPat
             else
                 typedPat :> _
@@ -200,7 +211,23 @@ module SpecifyTypes =
         | _ ->
             ()
 
-    let specifyReferencePat (refPat: IReferencePat) =
+    let specifyReferencePat (typeHint: TypeHint voption) (refPat: IReferencePat) =
+
+        let typeHint =
+            match typeHint with
+            | ValueSome _ ->
+                typeHint
+            | _ ->
+                let symbolUse = refPat.GetFcsSymbolUse()
+                if isNull symbolUse then ValueNone else
+
+                let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+                let displayContext = symbolUse.DisplayContext
+                ValueSome { FSType = mfv.FullType; DisplayContext = displayContext; AddParens = ValueNone }
+
+        match typeHint with
+        | ValueNone -> ()
+        | ValueSome typeHint
 
         let symbolUse = refPat.GetFcsSymbolUse()
         if isNull symbolUse then () else
@@ -210,6 +237,7 @@ module SpecifyTypes =
 
         let patternToChange =
             match refPat.IgnoreInnerParens() with
+            // TODO: not sure this is needed any more
             | :? ITypedPat as partiallyTypedPat ->
                 partiallyTypedPat :> IFSharpPattern
 
@@ -225,30 +253,33 @@ module SpecifyTypes =
                         removeReturnTypeInfo sibling
 
                 removeReturnTypeInfo localRef
-                localRef
+                localRef :> IFSharpPattern
 
             | pattern ->
                 pattern
 
         let addParens =
-            match refPat.Parent with
-            | :? ITuplePat as tuplePatParent ->
-                match tuplePatParent.Parent with
-                | :? IParenPat ->
-                    false
-                | _ ->
-                true
-
+            match addParens with
+            | ValueSome addParens -> addParens
             | _ ->
-                match refPat.Binding with
-                | :? IBinding as localBinding ->
-                    match localBinding.BindingKeyword.GetText() with
-                    | "let!" | "and!" | "use!" ->
-                        true
-                    | _ ->
+                match refPat.Parent with
+                | :? ITuplePat as tuplePatParent ->
+                    match tuplePatParent.Parent with
+                    | :? IParenPat ->
                         false
-                | _ ->
+                    | _ ->
                     true
+
+                | _ ->
+                    match refPat.Binding with
+                    | :? IBinding as localBinding ->
+                        match localBinding.BindingKeyword.GetText() with
+                        | "let!" | "and!" | "use!" ->
+                            true
+                        | _ ->
+                            false
+                    | _ ->
+                        true
 
         specifyPattern displayContext mfv.FullType addParens refPat patternToChange
 
@@ -257,10 +288,10 @@ module SpecifyTypes =
             for pattern in pattern.Patterns do
                 let refPat =
                     match pattern.IgnoreInnerParens() with
-                    | :? ILocalReferencePat as localRef ->
+                    | :? IReferencePat as localRef ->
                         localRef
-                    | :? ITypedPat as typedPat when (typedPat.Pattern :? ILocalReferencePat) ->
-                        typedPat.Pattern :?> ILocalReferencePat
+                    | :? ITypedPat as typedPat when (typedPat.Pattern :? IReferencePat) ->
+                        typedPat.Pattern :?> IReferencePat
                     | _ ->
                         null
 
@@ -270,7 +301,7 @@ module SpecifyTypes =
                         struct (refPat, symbol)
         |]
 
-    let rec specifyTuplePat (pattern: ITuplePat) =
+    let rec specifyTuplePat (hint: TypeHint voption) (pattern: ITuplePat) =
 
         let referenceList = ResizeArray(pattern.Patterns.Count)
 
@@ -289,9 +320,7 @@ module SpecifyTypes =
         for i = referenceList.Count - 1 downto 0 do
             let struct (tuplePat, refPats) = referenceList[i]
             for refPat, symbolUse in refPats do
-                let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
-                let displayContext = symbolUse.DisplayContext
-                specifyReferencePat refPat
+                specifyReferencePat (ValueSome false) refPat
 
             match tuplePat.IgnoreParentParens() with
             | :? IParenPat ->
@@ -320,14 +349,14 @@ module SpecifyTypes =
             | PatUtil.IsPartiallyAnnotatedTypedPat ->
                 match typedPat.Pattern.IgnoreInnerParens() with
                 | :? ILocalReferencePat as localRef ->
-                    specifyReferencePat localRef
+                    specifyReferencePat ValueNone localRef
                 | _ ->
                     specifyPattern displayContext fcsType addParens patternToAnnotate patternToChange
             | _ ->
                 ()
 
         | :? ILocalReferencePat as localRef ->
-            specifyReferencePat localRef
+            specifyReferencePat ValueNone localRef
 
         | :? ITuplePat as tuplePat ->
             specifyTuplePat tuplePat
@@ -337,6 +366,13 @@ module SpecifyTypes =
 
         | _ ->
             specifyPattern displayContext fcsType addParens patternToAnnotate patternToChange
+
+// function annotation or member annotation
+// value annotation or parameter annotation -> ...
+
+// 1. basic check
+// 2. try to get type hint
+// 3. save to a context or return false
 
 [<ContextAction(Name = "AnnotateFunction", Group = "F#",
                 Description = "Annotate function with parameter types and return type")>]
@@ -355,8 +391,10 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     override x.Text = "Add function type annotations"
 
     override x.IsAvailable _ =
-        let binding = dataProvider.GetSelectedElement<IBinding>() // check for IBinding Instead?
+        let binding = dataProvider.GetSelectedElement<IBinding>()
         if isNull binding then false else
+
+        // TODO: is function binding helper
 
         (binding.ParametersDeclarations.Count > 0 || not (binding.HeadPattern :? ILocalReferencePat))
         && isAtBindingKeywordOrReferencePatternOrGenericParameters dataProvider binding && not (isAnnotated binding)

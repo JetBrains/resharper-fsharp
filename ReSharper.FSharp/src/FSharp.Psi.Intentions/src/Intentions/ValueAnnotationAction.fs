@@ -11,6 +11,10 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
     override this.IsAvailable _ =
+
+        // this isn't strictly about reference patterns, wilds, array or lists do count too
+        // maybe this should be moved to process parameters only
+
         let localReference = dataProvider.GetSelectedElement<ILocalReferencePat>()
 
         isNotNull localReference
@@ -37,4 +41,4 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         use writeCookie = WriteLockCookie.Create(refPat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        SpecifyTypes.specifyReferencePat refPat
+        SpecifyTypes.specifyReferencePat ValueNone refPat

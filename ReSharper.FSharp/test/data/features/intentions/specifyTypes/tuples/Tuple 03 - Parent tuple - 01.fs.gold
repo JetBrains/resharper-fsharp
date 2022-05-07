@@ -1,0 +1,5 @@
+module Module
+
+let f() =
+    let (x: string{caret}, y: int, (z1: int, z2: int)) = ("foo", 1, (1,2))
+    ()

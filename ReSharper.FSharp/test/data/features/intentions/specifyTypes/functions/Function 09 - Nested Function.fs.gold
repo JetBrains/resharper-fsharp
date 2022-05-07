@@ -1,0 +1,7 @@
+module Module
+
+let f{caret}(): unit -> 'a -> 'b -> 'c -> unit =
+    fun _ ->
+        fun _ ->
+            fun _ ->
+                ()
