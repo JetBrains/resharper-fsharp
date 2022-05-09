@@ -1403,7 +1403,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         1 => ReadPackedInt(),
         2 => ReadByte(),
         var x when x >= 3 && x <= 6 => ReadPackedInt(),
-        var x when x >= 7 && x <= 10 => ReadPackedInt(),
+        var x when x >= 7 && x <= 10 => ReadInt64(),
         11 => ReadPackedInt(),
         12 => ReadInt64(),
         13 => ReadPackedInt(),
