@@ -16,7 +16,6 @@ using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Files.SandboxFiles;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Threading;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -31,8 +30,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     protected readonly IDictionary<IPsiModule, FcsModuleResolvedSymbols> PsiModulesCaches =
       new Dictionary<IPsiModule, FcsModuleResolvedSymbols>();
 
-    private readonly OneToSetMap<IPsiModule, IPsiModule> myReferencingModules = new();
-    private readonly JetFastSemiReenterableRWLock myLocker = new();
+    private readonly OneToSetMap<IPsiModule, IPsiModule> myReferencingModules =
+      new OneToSetMap<IPsiModule, IPsiModule>();
+
+    private readonly object myLock = new object();
     private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
 
     public FcsResolvedSymbolsCache(Lifetime lifetime, FcsCheckerService checkerService, IPsiModules psiModules,
@@ -51,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void Invalidate(IPsiModule psiModule)
     {
-      using var _ = myLocker.UsingWriteLock();
+      lock (myLock)
       {
         InvalidateReferencingModules(psiModule);
         if (PsiModulesCaches.TryGetValue(psiModule, out var symbols) && symbols.FcsProject is { } fcsProject)
@@ -96,7 +97,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (!IsApplicable(sourceFile))
         return;
 
-      using var _ = myLocker.UsingWriteLock();
+      lock (myLock)
         myDirtyFiles.Add(sourceFile);
     }
 
@@ -112,7 +113,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public bool UpToDate(IPsiSourceFile sourceFile)
     {
-      using var _ = myLocker.UsingReadLock();
+      lock (myLock)
         return !myDirtyFiles.Contains(sourceFile);
     }
 
@@ -124,7 +125,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void Drop(IPsiSourceFile sourceFile)
     {
-      using var _ = myLocker.UsingWriteLock();
+      lock (myLock)
       {
         if (PsiModulesCaches.IsEmpty())
           return;
@@ -158,7 +159,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void SyncUpdate(bool underTransaction)
     {
-      using var _ = myLocker.UsingWriteLock();
+      lock (myLock)
         InvalidateDirty();
     }
 
@@ -170,7 +171,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       get
       {
-        using var _ = myLocker.UsingReadLock();
+        lock (myLock)
           return !myDirtyFiles.IsEmpty();
       }
     }
@@ -185,10 +186,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (psiModule.IsMiscFilesProjectModule() && !(psiModule is SandboxPsiModule))
         return FcsModuleResolvedSymbols.Empty;
 
-      using var _ = myLocker.UsingWriteLock();
-      {
-        FcsProjectProvider.InvalidateDirty();
+      FcsProjectProvider.InvalidateDirty();
 
+      lock (myLock)
+      {
         if (HasDirtyFiles)
           InvalidateDirty();
 
