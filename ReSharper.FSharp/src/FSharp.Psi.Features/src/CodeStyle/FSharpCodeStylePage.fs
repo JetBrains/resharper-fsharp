@@ -57,6 +57,7 @@ type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, con
            x.GetItem(fun key -> key.SingleArgumentWebMode)
            x.GetItem(fun key -> key.AlignFunctionSignatureToIndentation)
            x.GetItem(fun key -> key.AlternativeLongMemberDefinitions)
+           x.GetItem(fun key -> key.PlaceCommentsAtFirstColumn)
            x.GetItem(fun key -> key.StickComment)
            x.GetItem(fun key -> key.OutdentBinaryOperators)
            x.GetItem(fun key -> key.NeverOutdentPipeOperators) |] :> _

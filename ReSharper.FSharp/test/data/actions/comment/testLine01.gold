@@ -1,9 +1,16 @@
-﻿StickComment = True
+﻿PlaceCommentsAtFirstColumn = True
+  StickComment = True
 module Module
 
 //let x = "foo"{caret}
 ================
-StickComment = False
+  StickComment = False
+module Module
+
+// let x = "foo"{caret}
+================
+PlaceCommentsAtFirstColumn = False
+  unaffected by StickComment
 module Module
 
 // let x = "foo"{caret}

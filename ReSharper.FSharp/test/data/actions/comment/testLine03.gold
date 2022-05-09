@@ -1,4 +1,5 @@
-﻿StickComment = True
+﻿PlaceCommentsAtFirstColumn = True
+  StickComment = True
 module Module
 
 //let f x ={selstart}
@@ -6,7 +7,16 @@ module Module
 //    (){selend}
 
 ================
-StickComment = False
+  StickComment = False
+module Module
+
+// let f x ={selstart}
+//     let f' = "foo"
+//     (){selend}
+
+================
+PlaceCommentsAtFirstColumn = False
+  unaffected by StickComment
 module Module
 
 // let f x ={selstart}
