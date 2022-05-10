@@ -103,8 +103,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         fcsProjects.Remove(psiModule) |> ignore
         projectsPsiModules.Remove(psiModule.ContainingProjectModule, psiModule) |> ignore
 
-        let projectMark = projectMarkModules[psiModule]
-        projectsProjectMarks.Remove(projectMark) |> ignore
+        match tryGetValue psiModule projectMarkModules with
+        | None -> ()
+        | Some projectMark ->
+            projectsProjectMarks.Remove(projectMark) |> ignore
         projectMarkModules.Remove(psiModule) |> ignore
 
         dirtyModules.Remove(psiModule) |> ignore
