@@ -133,7 +133,79 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
         sourceFiles.ToArray(), implsWithSigs, resources
 
-    member x.BuildFcsProject(psiModule: IPsiModule, project: IProject): FcsProject =
+    member x.BuildParsingOptions(psiModule: IPsiModule, project: IProject): FcsParsingOptions =
+        let targetFrameworkId = psiModule.TargetFrameworkId
+        let projectProperties = project.ProjectProperties
+
+        let filePaths, implsWithSig, _ = x.GetProjectFilesAndResources(project, targetFrameworkId)
+
+        let fileIndices = Dictionary<VirtualFileSystemPath, int>()
+        Array.iteri (fun i p -> fileIndices[p] <- i) filePaths
+
+        let otherOptions = List()
+
+        match projectProperties.ActiveConfigurations.TryGetConfiguration(targetFrameworkId) with
+        | :? IManagedProjectConfiguration as cfg ->
+            let definedConstants = splitAndTrim itemsDelimiters cfg.DefineConstants
+            otherOptions.AddRange(definedConstants |> Seq.map (fun c -> "--define:" + c))
+
+            otherOptions.Add($"--target:{getOutputType cfg.OutputType}")
+
+            otherOptions.Add$"--warn:{cfg.WarningLevel}"
+
+            if cfg.TreatWarningsAsErrors then
+                otherOptions.Add("--warnaserror")
+
+            if Shell.Instance.IsTestShell then
+                let languageLevel = FSharpLanguageLevel.ofPsiModuleNoCache psiModule
+                let langVersionArg =
+                    languageLevel
+                    |> FSharpLanguageLevel.toLanguageVersion
+                    |> FSharpLanguageVersion.toCompilerArg
+
+                otherOptions.Add(langVersionArg)
+
+            let props = cfg.PropertiesCollection
+
+            let getOption f (p: string, compilerArg) =
+                let compilerArg = defaultArg compilerArg (p.ToLower())
+                match props.TryGetValue(p) with
+                | true, v when not (v.IsNullOrWhitespace()) -> Some ("--" + compilerArg + ":" + f v)
+                | _ -> None
+
+            [ FSharpProperties.LangVersion, None ]
+            |> List.choose (getOption id)
+            |> otherOptions.AddRange
+
+            [ FSharpProperties.NoWarn, None; MSBuildProjectUtil.WarningsAsErrorsProperty, Some("warnaserror") ]
+            |> List.choose (getOption (fun v -> (splitAndTrim itemsDelimiters v).Join(",")))
+            |> otherOptions.AddRange
+
+            match props.TryGetValue(FSharpProperties.OtherFlags) with
+            | true, otherFlags when not (otherFlags.IsNullOrWhitespace()) -> splitAndTrim [| ' ' |] otherFlags
+            | _ -> EmptyArray.Instance
+            |> otherOptions.AddRange
+        | _ -> ()
+
+        let parsingOptions, errors =
+            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofSeq otherOptions)
+
+        if not errors.IsEmpty then
+            logger.Warn("Getting parsing options: {0}", concatErrors errors)
+
+
+        let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalCompilationDefines
+
+        let parsingOptions =
+            { parsingOptions with
+                SourceFiles = Array.map (fun (p: VirtualFileSystemPath ) -> p.FullPath) filePaths
+                ConditionalCompilationDefines = defines }
+
+        { ParsingOptions = parsingOptions
+          FileIndices = fileIndices
+          ImplementationFilesWithSignatures = implsWithSig }
+
+    member x.BuildFcsProject(psiModule: IPsiModule, project: IProject, fcsParsingOptions: FcsParsingOptions): FcsProject =
         logger.Verbose("Creating FcsProject: {0}", psiModule)
 
         let targetFrameworkId = psiModule.TargetFrameworkId
@@ -203,11 +275,9 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
             |> otherOptions.AddRange
         | _ -> ()
 
-        let filePaths, implsWithSig, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)
+        let filePaths, _, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)
 
         otherOptions.AddRange(resources |> Seq.map (fun (r: VirtualFileSystemPath) -> "--resource:" + r.FullPath))
-        let fileIndices = Dictionary<VirtualFileSystemPath, int>()
-        Array.iteri (fun i p -> fileIndices[p] <- i) filePaths
 
         let projectOptions =
             { ProjectFileName = $"{project.ProjectFileLocation}.{targetFrameworkId}.fsproj"
@@ -222,21 +292,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
               UnresolvedReferences = None
               Stamp = Some(getNextStamp ()) }
 
-        let parsingOptions, errors =
-            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
-
-        let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalCompilationDefines
-
-        let parsingOptions = { parsingOptions with
-                                    SourceFiles = projectOptions.SourceFiles
-                                    ConditionalCompilationDefines = defines }
-
-        if not errors.IsEmpty then
-            logger.Warn("Getting parsing options: {0}", concatErrors errors)
-
         { OutputPath = outPath
           ProjectOptions = projectOptions
-          ParsingOptions = parsingOptions
-          FileIndices = fileIndices
-          ImplementationFilesWithSignatures = implsWithSig
+          ParsingOptions = fcsParsingOptions
           ReferencedModules = HashSet(referencedModules) }

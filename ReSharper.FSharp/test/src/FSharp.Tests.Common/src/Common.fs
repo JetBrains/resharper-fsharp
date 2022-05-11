@@ -129,7 +129,9 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
     let getFcsProject (psiModule: IPsiModule) =
-        fcsProjectBuilder.BuildFcsProject(psiModule, psiModule.ContainingProjectModule.As<IProject>())
+        let project = psiModule.ContainingProjectModule.As<IProject>().NotNull()
+        let parsingOptions = fcsProjectBuilder.BuildParsingOptions(psiModule, project)
+        fcsProjectBuilder.BuildFcsProject(psiModule, project, parsingOptions)
 
     let getProjectOptions (sourceFile: IPsiSourceFile) =
         let fcsProject = getFcsProject sourceFile.PsiModule
@@ -181,7 +183,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then 0 else
 
             let fcsProject = getFcsProject sourceFile.PsiModule
-            match fcsProject.FileIndices.TryGetValue(sourceFile.GetLocation()) with
+            match fcsProject.ParsingOptions.FileIndices.TryGetValue(sourceFile.GetLocation()) with
             | true, index -> index
             | _ -> -1
 
