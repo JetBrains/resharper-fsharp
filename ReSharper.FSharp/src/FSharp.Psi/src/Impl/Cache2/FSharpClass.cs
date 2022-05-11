@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
@@ -24,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       typePart.MeasureTypeParametersCount == MeasureTypeParametersCount;
 
     protected override MemberDecoration Modifiers => myParts.GetModifiers();
-    public string SourceName => this.GetSourceName();
+    public virtual string SourceName => this.GetSourceName();
 
     public override IClass GetSuperClass()
     {
@@ -43,7 +44,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       return result.ToArray();
     }
 
-    public IList<ITypeParameter> AllTypeParameters =>
+    public virtual IList<ITypeParameter> AllTypeParameters =>
       this.GetAllTypeParametersReversed();
+
+    public new virtual XmlNode GetXMLDoc(bool inherit) => base.GetXMLDoc(inherit);
   }
 }

@@ -17,8 +17,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement() => new FSharpClass(this);
-    protected override byte SerializationTag => (byte) FSharpPartKind.AbbreviationOrSingleCaseUnion;
+    public override TypeElement CreateTypeElement() => new FSharpClassOrProvidedTypeAbbreviation(this);
+
+    protected override byte SerializationTag => (byte)FSharpPartKind.AbbreviationOrSingleCaseUnion;
   }
 
   internal class StructTypeAbbreviationOrDeclarationPart : TypeAbbreviationOrDeclarationPartBase, IFSharpStructPart
@@ -33,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public override TypeElement CreateTypeElement() => new FSharpStruct(this);
-    protected override byte SerializationTag => (byte) FSharpPartKind.StructAbbreviationOrSingleCaseUnion;
+    protected override byte SerializationTag => (byte)FSharpPartKind.StructAbbreviationOrSingleCaseUnion;
 
     public override IDeclaredType GetBaseClassType() => null;
 
@@ -52,9 +53,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
+    public bool IsProvidedAndGenerated =>
+      GetDeclaration() is { } decl &&
+      decl.GetFcsSymbol() is FSharpEntity { IsProvidedAndGenerated: true };
+
     public bool IsUnionCase =>
-      GetDeclaration() is IFSharpTypeDeclaration 
-        { TypeRepresentation: ITypeAbbreviationRepresentation { CanBeUnionCase: true } } decl &&
+      GetDeclaration() is IFSharpTypeDeclaration
+      {
+        TypeRepresentation: ITypeAbbreviationRepresentation { CanBeUnionCase: true }
+      } decl &&
       decl.GetFcsSymbol() is FSharpEntity { IsFSharpUnion: true };
   }
 }

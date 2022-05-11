@@ -13,6 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public IClrDeclaredElement OriginElement => GetDeclaration().OwnerMember.DeclaredElement;
+    public bool IsReadOnly => false;
     public AccessorKind Kind => GetDeclaration()?.Kind ?? AccessorKind.UNKNOWN;
     public override bool IsVisibleFromFSharp => false;
     public override IList<ITypeParameter> AllTypeParameters => GetContainingType().GetAllTypeParametersReversed();
