@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Psi.Modules
 type IProjectFcsModuleReader =
     inherit ILModuleReader
 
+    abstract Path: VirtualFileSystemPath
     abstract PsiModule: IPsiModule
     abstract Timestamp: DateTime
 
@@ -33,5 +34,11 @@ type IFcsAssemblyReaderShim =
     abstract IsEnabled: bool
     abstract GetModuleReader: psiModule: IPsiModule -> ReferencedAssembly
 
+    /// Removes reader for the module if present, another reader is going to be created for it
+    abstract InvalidateModule: psiModule: IPsiModule -> unit
+
+    /// Clears dirty type defs, updating reader timestamps if needed
     abstract InvalidateDirty: unit -> unit
+
+    /// Record referenced project chains, later used for invalidation
     abstract RecordDependencies: psiModule: IPsiModule -> unit

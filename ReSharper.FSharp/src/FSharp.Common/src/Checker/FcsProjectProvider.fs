@@ -64,8 +64,14 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
     let fcsProjects = Dictionary<IPsiModule, FcsProject>()
     let referencedModules = Dictionary<IPsiModule, ReferencedModule>()
+
+    /// Psi modules known to Fcs project model as either an F# project or a supported referenced project output
     let projectsPsiModules = OneToSetMap<IModule, IPsiModule>()
+
+    /// Used to synchronize project model changes with FSharpItemsContainer
     let projectsProjectMarks = Dictionary<IProjectMark, IProject>()
+
+    /// Used to synchronize project model changes with FSharpItemsContainer
     let projectMarkModules = Dictionary<IPsiModule, IProjectMark>()
 
     let dirtyModules = HashSet<IPsiModule>()
@@ -77,38 +83,41 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         | Some referencedModule -> referencedModule.ReferencingModules :> _
 
     let rec invalidateFcsProject (psiModule: IPsiModule) =
+        logger.Trace("Start invalidating referencing modules of psiModule: {0}", psiModule)
+
+        getReferencingModules psiModule |> Seq.iter invalidateFcsProject
+        referencedModules.Remove(psiModule) |> ignore
+        projectsPsiModules.Remove(psiModule.ContainingProjectModule, psiModule) |> ignore
+
+        logger.Trace("Done invalidating referencing modules of psiModule: {0}", psiModule)
+
         match tryGetValue psiModule fcsProjects with
         | None -> ()
         | Some fcsProject ->
+            logger.Trace("Start invalidating FcsProject: {0}", psiModule)
+            fcsProjectInvalidated.Fire(psiModule)
 
-        logger.Trace("Start invalidating project: {0}", psiModule)
-        fcsProjectInvalidated.Fire(psiModule)
+            // Invalidate FCS projects for the old project options, before creating new ones.
+            // todo: try to not invalidate FCS project if a project is not changed actually?
+            checkerService.InvalidateFcsProject(fcsProject.ProjectOptions)
 
-        // Invalidate FCS projects for the old project options, before creating new ones.
-        // todo: try to not invalidate FCS project if a project is not changed actually?
-        checkerService.InvalidateFcsProject(fcsProject.ProjectOptions)
-        getReferencingModules psiModule |> Seq.iter invalidateFcsProject
+            for referencedPsiModule in fcsProject.ReferencedModules do
+                match tryGetValue referencedPsiModule referencedModules with
+                | None -> ()
+                | Some referencedModule -> referencedModule.ReferencingModules.Remove(referencedPsiModule) |> ignore
 
-        for referencedPsiModule in fcsProject.ReferencedModules do
-            match tryGetValue referencedPsiModule referencedModules with
+            fcsProjects.Remove(psiModule) |> ignore
+
+            match tryGetValue psiModule projectMarkModules with
             | None -> ()
-            | Some referencedModule ->
-                referencedModule.ReferencingModules.Remove(referencedPsiModule) |> ignore
+            | Some projectMark -> projectsProjectMarks.Remove(projectMark) |> ignore
 
-        referencedModules.Remove(psiModule) |> ignore
-        fcsProjects.Remove(psiModule) |> ignore
-        projectsPsiModules.Remove(psiModule.ContainingProjectModule, psiModule) |> ignore
+            projectMarkModules.Remove(psiModule) |> ignore
 
-        match tryGetValue psiModule projectMarkModules with
-        | None -> ()
-        | Some projectMark ->
-            projectsProjectMarks.Remove(projectMark) |> ignore
-        projectMarkModules.Remove(psiModule) |> ignore
+            // todo: remove removed psiModules? (don't we remove them anyway?) (standalone projects only?)
+            logger.Trace("Done invalidating FcsProject: {0}", psiModule)
 
         dirtyModules.Remove(psiModule) |> ignore
-
-        // todo: remove removed psiModules? (don't we remove them anyway?) (standalone projects only?)
-        logger.Trace("Done invalidating project: {0}", psiModule)
 
     let processDirtyFcsProjects () =
         use lock = FcsReadWriteLock.WriteCookie.Create()
@@ -188,6 +197,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                             | ReferencedAssembly.Ignored -> None
                             | ReferencedAssembly.ProjectOutput reader ->
 
+                            projectsPsiModules.Add(psiModule.ContainingProjectModule, psiModule) |> ignore 
+
                             let referencedModule = referencedModules[psiModule]
                             let path = referencedModule.ReferencedPath.FullPath
 
@@ -242,6 +253,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let invalidateProject (project: IProject) =
         for psiModule in projectsPsiModules.GetValuesSafe(project) do
             dirtyModules.Add(psiModule) |> ignore
+            fcsAssemblyReaderShim.InvalidateModule(psiModule)
 
     member x.FcsProjectInvalidated = fcsProjectInvalidated
 
@@ -288,7 +300,11 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                      if invalidate then
                          invalidateProject project
 
-             else if project.ProjectProperties.ProjectKind = ProjectKind.SOLUTION_FOLDER then
+             elif fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedProject project then
+                 if change.ContainsChangeType(invalidateProjectChangeType) then
+                     invalidateProject project
+
+             elif project.ProjectProperties.ProjectKind = ProjectKind.SOLUTION_FOLDER then
                  base.VisitDelta(change)
 
          | :? ISolution -> base.VisitDelta(change)

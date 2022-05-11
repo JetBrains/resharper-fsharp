@@ -104,9 +104,10 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     // todo: F#->F#->C# references
     //   change in F#->F# is not seen by C# now
 
+    let dirtyModules = HashSet()
+
     // todo: use short names?
     let dirtyTypesInModules = OneToSetMap<IPsiModule, IClrTypeName>()
-    let allTypesCreated = HashSet<IPsiModule>()
 
     let transitiveReferencedProjectModules (psiModule: IPsiModule) =
         let visited = HashSet()
@@ -174,7 +175,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         // todo: test web project with multiple modules
         let path = psiModule.Project.GetOutputFilePath(psiModule.TargetFrameworkId)
         let psiModule = psiModules.GetPrimaryPsiModule(psiModule.Project, psiModule.TargetFrameworkId)
-        let reader = ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, this))
+        let reader = ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, this, path))
 
         recordReader path reader
         reader
@@ -188,7 +189,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         let reader = 
             match AssemblyReaderShim.getProjectPsiModuleByOutputAssembly psiModules path with
             | null -> ReferencedAssembly.Ignored
-            | psiModule -> ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, this))
+            | psiModule -> ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, this, path))
 
         recordReader path reader
         reader
@@ -205,6 +206,19 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         true
 
     let moduleInvalidated = new Signal<IPsiModule>(lifetime, "AssemblyReaderShim.ModuleInvalidated")
+
+    let rec invalidateModule (psiModule: IPsiModule) =
+        let mutable moduleReader = Unchecked.defaultof<_>
+        if not (tryGetReaderFromModule psiModule &moduleReader) then () else
+
+        assemblyReadersByPath.TryRemove(moduleReader.Path) |> ignore
+        assemblyReadersByModule.TryRemove(psiModule) |> ignore
+
+        for referencingModule in dependenciesToReferencingModules.GetValuesSafe(psiModule) do
+            invalidateModule referencingModule
+            moduleInvalidated.Fire(referencingModule)
+
+        dependenciesToReferencingModules.RemoveKey(psiModule) |> ignore
 
     // todo: invalidate for per-referencing module
     let invalidateDirtyDependencies () =
@@ -241,7 +255,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         if dependenciesToReferencingModules.ContainsKey(psiModule) then
             dirtyTypesInModules.Add(psiModule, typeElement.GetClrName().GetPersistent()) |> ignore
-            allTypesCreated.Remove(psiModule) |> ignore
 
     do
         let typePartChanged = Action<_>(markDirty)
@@ -296,7 +309,12 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         member this.InvalidateDirty() =
             use lock = locker.UsingWriteLock()
+            for psiModule in dirtyModules do
+                invalidateModule psiModule
             invalidateDirtyDependencies ()
 
         member this.RecordDependencies(psiModule) =
             recordDependencies psiModule
+
+        member this.InvalidateModule(psiModule) =
+            dirtyModules.Add(psiModule) |> ignore
