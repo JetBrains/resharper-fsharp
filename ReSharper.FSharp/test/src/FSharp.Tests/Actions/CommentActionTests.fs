@@ -7,7 +7,7 @@ open NUnit.Framework
 
 [<FSharpTest>]
 [<TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
-[<TestSettings("{StickComment:All}")>]
+[<TestSettings("{PlaceCommentsAtFirstColumn:All, StickComment:All}")>]
 type FSharpCommentLineTests() =
     inherit ExecuteActionIteratableTestBase()
 
@@ -20,3 +20,4 @@ type FSharpCommentLineTests() =
     [<Test>] member x.testLine04() = x.DoNamedTest()
     [<Test>] member x.testLine05() = x.DoNamedTest()
     [<Test>] member x.testLine06() = x.DoNamedTest()
+    [<Test>] member x.testLine07() = x.DoNamedTest()

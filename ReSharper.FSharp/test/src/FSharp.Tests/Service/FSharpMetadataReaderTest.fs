@@ -47,5 +47,8 @@ type FSharpMetadataReaderTest() =
     [<Test>]
     member x.FSharpCore() = x.DoTest("FSharp.Core")
 
+    [<Test; TestPackages(PackageReferences.FsPickler)>]
+    member x.FsPickler() = x.DoTest("FSharp.Core")
+
     [<Test; TestReferences("TypeInGlobalNamespace.dll")>]
     member x.``Type in global namespace``() = x.DoTest("TypeInGlobalNamespace")

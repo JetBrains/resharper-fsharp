@@ -146,6 +146,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [EditorConfigEntryAlias("alternative_long_member_definitions", EditorConfigAliasType.LanguageSpecific)]
     public bool AlternativeLongMemberDefinitions;
 
+    [SettingsEntry(false, "Place comments at first column when commenting out code")]
+    public bool PlaceCommentsAtFirstColumn;
+
     [SettingsEntry(true, "Don't indent comments started at first column")]
     public bool StickComment;
 

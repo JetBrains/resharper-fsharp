@@ -1,4 +1,5 @@
-﻿unaffected by StickComment
+﻿unaffected by PlaceCommentsAtFirstColumn
+  unaffected by StickComment
 module Module
 
 {caret}let x = "foo"

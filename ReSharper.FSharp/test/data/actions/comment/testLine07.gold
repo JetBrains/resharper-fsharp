@@ -1,0 +1,31 @@
+﻿PlaceCommentsAtFirstColumn = True
+  StickComment = True
+module Module
+
+do
+//    let f x ={selstart}
+//        let f' = "foo"
+//        (){selend}
+    ()
+
+================
+  StickComment = False
+module Module
+
+do
+    // let f x ={selstart}
+    //     let f' = "foo"
+    //     (){selend}
+    ()
+
+================
+PlaceCommentsAtFirstColumn = False
+  unaffected by StickComment
+module Module
+
+do
+    // let f x ={selstart}
+    //     let f' = "foo"
+    //     (){selend}
+    ()
+
