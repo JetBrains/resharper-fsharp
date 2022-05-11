@@ -53,6 +53,7 @@
     <Compile Include="src\Shim\TypeProviders\TypeProvidersManager.fs" />
     <Compile Include="src\Shim\TypeProviders\ExtensionTypingProviderShim.fs" />
     <Compile Include="src\Shim\TypeProviders\ZoneMarker.fs" />
+    <Compile Include="src\Checker\FcsReadWriteLock.fs" />
     <Compile Include="src\Checker\ScriptFcsProjectProvider.fs" />
     <Compile Include="src\Checker\FcsProjectBuilder.fs" />
     <Compile Include="src\Checker\FcsProjectProvider.fs" />

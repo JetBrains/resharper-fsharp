@@ -26,9 +26,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.Threading
 open JetBrains.Util
-
 
 [<AutoOpen>]
 module FcsProjectProvider =
@@ -63,8 +61,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         modulePathProvider: ModulePathProvider, locks: IShellLocks, logger: ILogger,
         fcsAssemblyReaderShim: IFcsAssemblyReaderShim) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
-
-    let locker = JetFastSemiReenterableRWLock()
 
     let fcsProjects = Dictionary<IPsiModule, FcsProject>()
     let referencedModules = Dictionary<IPsiModule, ReferencedModule>()
@@ -115,7 +111,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         logger.Trace("Done invalidating project: {0}", psiModule)
 
     let processDirtyFcsProjects () =
-        use lock = locker.UsingWriteLock()
+        use lock = FcsReadWriteLock.WriteCookie.Create()
         if dirtyModules.IsEmpty() then () else
 
         logger.Trace("Start invalidating dirty modules")
@@ -125,7 +121,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         logger.Trace("Done invalidating dirty modules")
 
     do
-        // Start listening for the changes after project model is updated.
+        // Start listening for the changes after project model is ready.
         scheduler.EnqueueTask(SolutionLoadTask("FSharpProjectOptionsProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
             changeManager.Changed2.Advise(lifetime, this.ProcessChange)
             fsItemsContainer.FSharpProjectLoaded.Advise(lifetime, this.ProcessFSharpProjectLoaded)))
@@ -134,7 +130,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
     let tryGetFcsProject (psiModule: IPsiModule): FcsProject option =
-        use lock = locker.UsingReadLock()
+        use lock = FcsReadWriteLock.ReadCookie.Create()
         tryGetValue psiModule fcsProjects
 
     let createReferencedModule psiModule =
@@ -224,7 +220,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         match getModuleProject psiModule with
         | FSharpProject project ->
-            use lock = locker.UsingWriteLock()
+            use lock = FcsReadWriteLock.WriteCookie.Create()
             let fcsProject = createFcsProject project psiModule
             Some fcsProject
 
@@ -250,7 +246,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     member x.FcsProjectInvalidated = fcsProjectInvalidated
 
     member private this.ProcessFSharpProjectLoaded(projectMark: IProjectMark) =
-        use lock = locker.UsingWriteLock()
+        use lock = FcsReadWriteLock.WriteCookie.Create()
 
         tryGetValue projectMark projectsProjectMarks
         |> Option.iter invalidateProject
@@ -259,7 +255,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
         if isNull change || change.IsClosingSolution then () else
 
-        use lock = locker.UsingWriteLock()
+        use lock = FcsReadWriteLock.WriteCookie.Create()
         match change with
         | :? ProjectReferenceChange as referenceChange ->
             let referenceOwnerProject = referenceChange.ProjectToModuleReference.OwnerModule
