@@ -27,6 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   public interface ISecondaryDeclaredElement
   {
     [NotNull] IClrDeclaredElement OriginElement { get; }
+    bool IsReadOnly { get; }
   }
 
   public interface IFSharpGeneratedElement : IFSharpDeclaredElement

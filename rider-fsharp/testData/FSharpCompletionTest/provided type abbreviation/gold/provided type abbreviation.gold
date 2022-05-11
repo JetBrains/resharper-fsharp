@@ -1,0 +1,7 @@
+LookupElementPresentation{itemText='Level1', tail=null, typeText='null'}
+LookupElementPresentation{itemText='Level2', tail=null, typeText='null'}
+LookupElementPresentation{itemText='Equals', tail=null, typeText='null'}
+LookupElementPresentation{itemText='GetType', tail=null, typeText='null'}
+LookupElementPresentation{itemText='ToString', tail=null, typeText='null'}
+LookupElementPresentation{itemText='GetHashCode', tail=null, typeText='null'}
+LookupElementPresentation{itemText='Changed', tail=null, typeText='null'}

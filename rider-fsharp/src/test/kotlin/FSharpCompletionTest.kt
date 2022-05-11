@@ -1,12 +1,10 @@
+import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
-import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
-import com.jetbrains.rider.test.scriptingApi.completeWithTab
-import com.jetbrains.rider.test.scriptingApi.typeWithLatency
-import com.jetbrains.rider.test.scriptingApi.waitForCompletion
+import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 
 @Test
@@ -36,6 +34,14 @@ class FSharpCompletionTest : CompletionTestBase() {
     @Test
     fun qualified02() = doTestChooseItem("a")
 
+    @Test
+    @TestEnvironment(solution = "YamlProviderCSharp", toolset = ToolsetVersion.TOOLSET_16)
+    fun `provided type abbreviation`() = doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
+
+    @Test
+    @TestEnvironment(solution = "YamlProviderCSharp", toolset = ToolsetVersion.TOOLSET_16)
+    fun `provided nested type`() = doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
+
     private fun doTestTyping(typed: String) {
         dumpOpenedEditor("Program.fs", "Program.fs") {
             waitForDaemon()
@@ -52,6 +58,17 @@ class FSharpCompletionTest : CompletionTestBase() {
             callBasicCompletion()
             waitForCompletion()
             completeWithTab(item)
+        }
+    }
+
+    private fun doTestDumpLookupItems(relativePath: String, sourceFileName: String) {
+        withOpenedEditor(relativePath, sourceFileName) {
+            waitForDaemon()
+            callBasicCompletion()
+            waitForCompletion()
+            executeWithGold(testGoldFile) {
+                dumpActiveLookupItemsPresentations(it)
+            }
         }
     }
 }

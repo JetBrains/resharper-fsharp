@@ -1,0 +1,2369 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "v1",
+    "title": "API Gateway"
+  },
+  "paths": {
+    "/api/Account/getUserData/{userId}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ApiAccountGetUserDataByUserIdGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/AccountDataDto"
+            }
+          }
+        }
+      }
+    },
+    "/api/Account/getUserData": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ApiAccountGetUserDataGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/UserDataDto"
+            }
+          }
+        }
+      }
+    },
+    "/api/Account/register": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ApiAccountRegisterPost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/RegisterViewModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Result"
+            }
+          }
+        }
+      }
+    },
+    "/api/Account/login": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ApiAccountLoginPost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/LoginViewModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Result"
+            }
+          }
+        }
+      }
+    },
+    "/api/Account/edit": {
+      "put": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ApiAccountEditPut",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/EditAccountViewModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Result"
+            }
+          }
+        }
+      }
+    },
+    "/api/Account/inviteNewLecturer": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ApiAccountInviteNewLecturerPost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/InviteLecturerViewModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Result"
+            }
+          }
+        }
+      }
+    },
+    "/api/Account/google": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ApiAccountGooglePost",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "tokenId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Result"
+            }
+          }
+        }
+      }
+    },
+    "/api/Account/editExternal": {
+      "put": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ApiAccountEditExternalPut",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/EditExternalViewModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Result"
+            }
+          }
+        }
+      }
+    },
+    "/api/Account/getAllStudents": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ApiAccountGetAllStudentsGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AccountDataDto"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/CourseGroups/{courseId}/getAll": {
+      "get": {
+        "tags": [
+          "CourseGroups"
+        ],
+        "operationId": "ApiCourseGroupsByCourseIdGetAllGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/GroupViewModel"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/CourseGroups/{courseId}/create": {
+      "post": {
+        "tags": [
+          "CourseGroups"
+        ],
+        "operationId": "ApiCourseGroupsByCourseIdCreatePost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/CreateGroupViewModel"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "/api/CourseGroups/{courseId}/delete/{groupId}": {
+      "delete": {
+        "tags": [
+          "CourseGroups"
+        ],
+        "operationId": "ApiCourseGroupsByCourseIdDeleteByGroupIdDelete",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/CourseGroups/{courseId}/update/{groupId}": {
+      "post": {
+        "tags": [
+          "CourseGroups"
+        ],
+        "operationId": "ApiCourseGroupsByCourseIdUpdateByGroupIdPost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/UpdateGroupViewModel"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/CourseGroups/{courseId}/get": {
+      "get": {
+        "tags": [
+          "CourseGroups"
+        ],
+        "operationId": "ApiCourseGroupsByCourseIdGetGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/GroupViewModel"
+            }
+          }
+        }
+      }
+    },
+    "/api/CourseGroups/{courseId}/addStudentInGroup/{groupId}": {
+      "post": {
+        "tags": [
+          "CourseGroups"
+        ],
+        "operationId": "ApiCourseGroupsByCourseIdAddStudentInGroupByGroupIdPost",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/CourseGroups/{courseId}/removeStudentFromGroup/{groupId}": {
+      "post": {
+        "tags": [
+          "CourseGroups"
+        ],
+        "operationId": "ApiCourseGroupsByCourseIdRemoveStudentFromGroupByGroupIdPost",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/CourseGroups/get/{groupId}": {
+      "get": {
+        "tags": [
+          "CourseGroups"
+        ],
+        "operationId": "ApiCourseGroupsGetByGroupIdGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/GroupViewModel"
+            }
+          }
+        }
+      }
+    },
+    "/api/CourseGroups/getTasks/{groupId}": {
+      "get": {
+        "tags": [
+          "CourseGroups"
+        ],
+        "operationId": "ApiCourseGroupsGetTasksByGroupIdGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "format": "int64",
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Courses": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesGet",
+        "summary": "get all courses",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CourseViewModel"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Courses/{courseId}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesByCourseIdGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/CourseViewModel"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesByCourseIdDelete",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Courses/create": {
+      "post": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesCreatePost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/CreateCourseViewModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "/api/Courses/update/{courseId}": {
+      "post": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesUpdateByCourseIdPost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/UpdateCourseViewModel"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Courses/signInCourse/{courseId}": {
+      "post": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesSignInCourseByCourseIdPost",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Courses/acceptStudent/{courseId}/{studentId}": {
+      "post": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesAcceptStudentByCourseIdByStudentIdPost",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Courses/rejectStudent/{courseId}/{studentId}": {
+      "post": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesRejectStudentByCourseIdByStudentIdPost",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Courses/userCourses": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesUserCoursesGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UserCourseDescription"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Courses/acceptLecturer/{courseId}/{lecturerEmail}": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesAcceptLecturerByCourseIdByLecturerEmailGet",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "lecturerEmail",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Homeworks/get/{homeworkId}": {
+      "get": {
+        "tags": [
+          "Homeworks"
+        ],
+        "operationId": "ApiHomeworksGetByHomeworkIdGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "homeworkId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/HomeworkViewModel"
+            }
+          }
+        }
+      }
+    },
+    "/api/Homeworks/{courseId}/add": {
+      "post": {
+        "tags": [
+          "Homeworks"
+        ],
+        "operationId": "ApiHomeworksByCourseIdAddPost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "homeworkViewModel",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/CreateHomeworkViewModel"
+            }
+          },
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "/api/Homeworks/delete/{homeworkId}": {
+      "delete": {
+        "tags": [
+          "Homeworks"
+        ],
+        "operationId": "ApiHomeworksDeleteByHomeworkIdDelete",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "homeworkId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Homeworks/update/{homeworkId}": {
+      "put": {
+        "tags": [
+          "Homeworks"
+        ],
+        "operationId": "ApiHomeworksUpdateByHomeworkIdPut",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "homeworkViewModel",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/CreateHomeworkViewModel"
+            }
+          },
+          {
+            "name": "homeworkId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Notifications/get": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "ApiNotificationsGetGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CategorizedNotifications"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Notifications/markAsSeen": {
+      "put": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "ApiNotificationsMarkAsSeenPut",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "notificationIds",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "format": "int64",
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Solutions": {
+      "get": {
+        "tags": [
+          "Solutions"
+        ],
+        "operationId": "ApiSolutionsGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Solution"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Solutions/{solutionId}": {
+      "get": {
+        "tags": [
+          "Solutions"
+        ],
+        "operationId": "ApiSolutionsBySolutionIdGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "solutionId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Solution"
+            }
+          }
+        }
+      }
+    },
+    "/api/Solutions/taskSolution/{taskId}/{studentId}": {
+      "get": {
+        "tags": [
+          "Solutions"
+        ],
+        "operationId": "ApiSolutionsTaskSolutionByTaskIdByStudentIdGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Solution"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Solutions/{taskId}": {
+      "post": {
+        "tags": [
+          "Solutions"
+        ],
+        "operationId": "ApiSolutionsByTaskIdPost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/SolutionViewModel"
+            }
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "/api/Solutions/rateSolution/{solutionId}/{newRating}": {
+      "post": {
+        "tags": [
+          "Solutions"
+        ],
+        "operationId": "ApiSolutionsRateSolutionBySolutionIdByNewRatingPost",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "solutionId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "newRating",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "lecturerComment",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Solutions/markSolutionFinal/{solutionId}": {
+      "post": {
+        "tags": [
+          "Solutions"
+        ],
+        "operationId": "ApiSolutionsMarkSolutionFinalBySolutionIdPost",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "solutionId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Solutions/delete/{solutionId}": {
+      "delete": {
+        "tags": [
+          "Solutions"
+        ],
+        "operationId": "ApiSolutionsDeleteBySolutionIdDelete",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "solutionId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Solutions/{groupId}/{taskId}": {
+      "post": {
+        "tags": [
+          "Solutions"
+        ],
+        "operationId": "ApiSolutionsByGroupIdByTaskIdPost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/SolutionViewModel"
+            }
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "/api/Solutions/{groupId}/taskSolutions/{taskId}": {
+      "get": {
+        "tags": [
+          "Solutions"
+        ],
+        "operationId": "ApiSolutionsByGroupIdTaskSolutionsByTaskIdGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Solution"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Statistics/{courseId}": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "operationId": "ApiStatisticsByCourseIdGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StatisticsCourseMatesModel"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Tasks/get/{taskId}": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "ApiTasksGetByTaskIdGet",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/HomeworkTaskViewModel"
+            }
+          }
+        }
+      }
+    },
+    "/api/Tasks/add/{homeworkId}": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "ApiTasksAddByHomeworkIdPost",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "taskViewModel",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/CreateTaskViewModel"
+            }
+          },
+          {
+            "name": "homeworkId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "/api/Tasks/delete/{taskId}": {
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "ApiTasksDeleteByTaskIdDelete",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Tasks/update/{taskId}": {
+      "put": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "ApiTasksUpdateByTaskIdPut",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "taskViewModel",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/CreateTaskViewModel"
+            }
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AccountDataDto": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "middleName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "readOnly": true
+        },
+        "role": {
+          "type": "string",
+          "readOnly": true
+        },
+        "isExternalAuth": {
+          "type": "boolean",
+          "readOnly": true
+        }
+      }
+    },
+    "UserDataDto": {
+      "type": "object",
+      "properties": {
+        "userData": {
+          "$ref": "#/definitions/AccountDataDto"
+        },
+        "notifications": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CategorizedNotifications"
+          }
+        }
+      }
+    },
+    "CategorizedNotifications": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "format": "int32",
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "integer"
+        },
+        "seenNotifications": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NotificationViewModel"
+          },
+          "readOnly": true
+        },
+        "notSeenNotifications": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NotificationViewModel"
+          },
+          "readOnly": true
+        }
+      }
+    },
+    "NotificationViewModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sender": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "category": {
+          "format": "int32",
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "integer"
+        },
+        "body": {
+          "type": "string"
+        },
+        "hasSeen": {
+          "type": "boolean"
+        }
+      }
+    },
+    "RegisterViewModel": {
+      "required": [
+        "name",
+        "surname",
+        "email",
+        "password",
+        "passwordConfirm"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "middleName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "format": "password",
+          "type": "string"
+        },
+        "passwordConfirm": {
+          "format": "password",
+          "type": "string"
+        }
+      }
+    },
+    "TokenCredentials": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "expiresIn": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "LoginViewModel": {
+      "required": [
+        "email",
+        "password",
+        "rememberMe"
+      ],
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "format": "password",
+          "type": "string"
+        },
+        "rememberMe": {
+          "type": "boolean"
+        }
+      }
+    },
+    "EditAccountViewModel": {
+      "required": [
+        "name",
+        "surname",
+        "currentPassword",
+        "newPassword"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "middleName": {
+          "type": "string"
+        },
+        "currentPassword": {
+          "format": "password",
+          "type": "string"
+        },
+        "newPassword": {
+          "format": "password",
+          "maxLength": 100,
+          "minLength": 6,
+          "type": "string"
+        }
+      }
+    },
+    "Result": {
+      "type": "object",
+      "properties": {
+        "succeeded": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "errors": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "readOnly": true
+        }
+      }
+    },
+    "InviteLecturerViewModel": {
+      "required": [
+        "email"
+      ],
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "EditExternalViewModel": {
+      "required": [
+        "name",
+        "surname"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "middleName": {
+          "type": "string"
+        }
+      }
+    },
+    "GroupViewModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "courseId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "tasks": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "groupMates": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GroupMateViewModel"
+          }
+        }
+      }
+    },
+    "GroupMateViewModel": {
+      "type": "object",
+      "properties": {
+        "studentId": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateGroupViewModel": {
+      "required": [
+        "name",
+        "groupMates",
+        "courseId",
+        "tasks"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "pattern": "^\\S+.*",
+          "type": "string"
+        },
+        "groupMates": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GroupMateViewModel"
+          }
+        },
+        "courseId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "tasks": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "format": "int64",
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "UpdateGroupViewModel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "pattern": "^\\S+.*",
+          "type": "string"
+        },
+        "tasks": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "groupMates": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GroupMateViewModel"
+          }
+        }
+      }
+    },
+    "CourseViewModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "isOpen": {
+          "type": "boolean"
+        },
+        "isCompleted": {
+          "type": "boolean"
+        },
+        "mentorIds": {
+          "type": "string"
+        },
+        "inviteCode": {
+          "type": "string"
+        },
+        "courseMates": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CourseMateViewModel"
+          }
+        },
+        "homeworks": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HomeworkViewModel"
+          }
+        }
+      }
+    },
+    "CourseMateViewModel": {
+      "type": "object",
+      "properties": {
+        "studentId": {
+          "type": "string"
+        },
+        "isAccepted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "HomeworkViewModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "courseId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "tasks": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HomeworkTaskViewModel"
+          }
+        }
+      }
+    },
+    "HomeworkTaskViewModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "maxRating": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "hasDeadline": {
+          "type": "boolean"
+        },
+        "deadlineDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "isDeadlineStrict": {
+          "type": "boolean"
+        },
+        "canSendSolution": {
+          "type": "boolean"
+        },
+        "publicationDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "homeworkId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "isDeferred": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CreateCourseViewModel": {
+      "required": [
+        "name",
+        "isOpen"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "pattern": "^\\S+.*",
+          "type": "string"
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "isOpen": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UpdateCourseViewModel": {
+      "required": [
+        "name",
+        "isOpen"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "pattern": "^\\S+.*",
+          "type": "string"
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "isOpen": {
+          "type": "boolean"
+        },
+        "isComplete": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UserCourseDescription": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "isOpen": {
+          "type": "boolean"
+        },
+        "isCompleted": {
+          "type": "boolean"
+        },
+        "userIsMentor": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CreateHomeworkViewModel": {
+      "required": [
+        "title"
+      ],
+      "type": "object",
+      "properties": {
+        "title": {
+          "pattern": "^\\S+.*",
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "tasks": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CreateTaskViewModel"
+          }
+        }
+      }
+    },
+    "CreateTaskViewModel": {
+      "required": [
+        "title",
+        "maxRating"
+      ],
+      "type": "object",
+      "properties": {
+        "title": {
+          "pattern": "^\\S+.*",
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "hasDeadline": {
+          "type": "boolean"
+        },
+        "deadlineDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "isDeadlineStrict": {
+          "type": "boolean"
+        },
+        "publicationDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "maxRating": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "Solution": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "githubUrl": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "state": {
+          "format": "int32",
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "type": "integer"
+        },
+        "rating": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "studentId": {
+          "type": "string"
+        },
+        "groupId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "taskId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "publicationDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "lecturerComment": {
+          "type": "string"
+        }
+      }
+    },
+    "SolutionViewModel": {
+      "required": [
+        "githubUrl"
+      ],
+      "type": "object",
+      "properties": {
+        "githubUrl": {
+          "pattern": "^\\S+.*",
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "studentId": {
+          "type": "string"
+        },
+        "publicationDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "lecturerComment": {
+          "type": "string"
+        }
+      }
+    },
+    "StatisticsCourseMatesModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "homeworks": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StatisticsCourseHomeworksModel"
+          }
+        }
+      }
+    },
+    "StatisticsCourseHomeworksModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "tasks": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StatisticsCourseTasksModel"
+          }
+        }
+      }
+    },
+    "StatisticsCourseTasksModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "solution": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StatisticsCourseSolutionsModel"
+          }
+        }
+      }
+    },
+    "StatisticsCourseSolutionsModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "state": {
+          "format": "int32",
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "type": "integer"
+        },
+        "rating": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "name": "Authorization",
+      "in": "header",
+      "type": "apiKey",
+      "description": "Please enter into field the word 'Bearer' following by space and JWT"
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
+}

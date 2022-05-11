@@ -192,6 +192,7 @@ type FSharpAtomicRenamesFactory() =
 
     override x.CheckRenameAvailability(element: IDeclaredElement) =
         match element with
+        | :? ISecondaryDeclaredElement as s when s.IsReadOnly -> RenameAvailabilityCheckResult.CanNotBeRenamed
         | :? FSharpGeneratedMemberBase -> RenameAvailabilityCheckResult.CanNotBeRenamed
         | :? IReferencePat as refPat when not refPat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
         | :? IWildPat -> RenameAvailabilityCheckResult.CanBeRenamed
@@ -223,6 +224,7 @@ type FSharpDeclaredElementForRenameProvider() =
         member x.GetPrimaryDeclaredElement(element, _) =
             match element.As<ISecondaryDeclaredElement>() with
             | null -> element
+            | generated when generated.IsReadOnly -> element
             | generated ->
 
             match generated.OriginElement with

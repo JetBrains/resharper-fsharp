@@ -12,6 +12,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
@@ -44,7 +45,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
         var typeElements = psiModule.GetSymbolScope(false).GetTypeElementsByCLRName(clrTypeName);
         if (typeElements.IsEmpty())
-          return null;
+        {
+          if (entity.IsProvidedAndGenerated && // hide ProvidedAbbreviations in psi module?
+              TypeProvidersContext.ProvidedAbbreviations.TryGetValue(clrTypeName.FullName, out var providedType) &&
+              providedType.DeclaringType != null)
+            return providedType.MapType(psiModule).GetTypeElement();
+          return null; 
+        }
 
         if (typeElements.Length == 1)
           return typeElements[0];

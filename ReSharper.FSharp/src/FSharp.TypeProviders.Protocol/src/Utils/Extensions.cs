@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Metadata.Reader.API;
+using JetBrains.Metadata.Reader.Impl;
 using JetBrains.Util.dataStructures;
 using static FSharp.Compiler.ExtensionTyping;
 

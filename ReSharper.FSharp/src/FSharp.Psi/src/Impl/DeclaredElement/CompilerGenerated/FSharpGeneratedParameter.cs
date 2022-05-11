@@ -51,6 +51,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override int GetHashCode() => ShortName.GetHashCode();
     public IClrDeclaredElement OriginElement => Origin;
+    public bool IsReadOnly => false;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new FSharpGeneratedParameterPointer(this);
