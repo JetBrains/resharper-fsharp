@@ -18,6 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     private FSharpUnionTagsClass TagsClass => Union.GetUnionTagsClass();
 
     IClrDeclaredElement ISecondaryDeclaredElement.OriginElement => UnionCase;
+    public bool IsReadOnly => false;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new FSharpUnionCaseTagPointer(this);

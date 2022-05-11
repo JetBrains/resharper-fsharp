@@ -2,6 +2,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Metadata.Reader.API;
+using JetBrains.Metadata.Reader.Impl;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
@@ -16,7 +18,7 @@ using static FSharp.Compiler.ExtensionTyping;
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
   [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-  public class ProxyProvidedType : ProvidedType, IRdProvidedEntity
+  public class ProxyProvidedType : ProvidedType, IProxyProvidedType
   {
     private record ProvidedTypeContent(
       ProxyProvidedType[] Interfaces,
@@ -95,6 +97,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       TypeProvidersContext typeProvidersContext) =>
       type == null ? null : new ProxyProvidedType(type, typeProviderId, typeProvidersContext);
 
+    public string DisplayName => Name;
     public override string Name => myRdProvidedType.Name;
     public override string FullName => myRdProvidedType.FullName;
     public override string Namespace => myRdProvidedType.Namespace;
@@ -116,6 +119,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public override bool IsGenericType => HasFlag(RdProvidedTypeFlags.IsGenericType);
     public override bool IsVoid => HasFlag(RdProvidedTypeFlags.IsVoid);
     public override bool IsMeasure => HasFlag(RdProvidedTypeFlags.IsMeasure);
+    public bool IsCreatedByProvider => HasFlag(RdProvidedTypeFlags.IsCreatedByProvider);
 
     public override int GenericParameterPosition =>
       myGenericParameterPosition ??=
@@ -193,8 +197,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       var key = string.Join(".", fullTypePathAfterArguments) + "+" + string.Join(",", staticArgs);
       var staticArgDescriptions = staticArgs.Select(PrimitiveTypesBoxer.BoxToServerStaticArg).ToArray();
 
-      return myTypeProvidersContext.AppliedProvidedTypesCache.GetOrCreate((EntityId, key), myTypeProviderId,
+      var result = myTypeProvidersContext.AppliedProvidedTypesCache.GetOrCreate((EntityId, key), myTypeProviderId,
         new ApplyStaticArgumentsParameters(EntityId, fullTypePathAfterArguments, staticArgDescriptions));
+
+      return result;
     }
 
     public override ProvidedType[] GetInterfaces() => myContent.Value.Interfaces;
@@ -269,6 +275,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public override bool GetHasTypeProviderEditorHideMethodsAttribute(ITypeProvider _) =>
       myTypeProvidersContext.ProvidedCustomAttributeProvider.GetHasTypeProviderEditorHideMethodsAttribute(
         myCustomAttributes.Value);
+
+    public IClrTypeName GetClrName() => new ClrTypeName(FullName);
+
+    public override bool Equals(object y)
+    {
+      return y switch
+      {
+        ProxyProvidedType x => x.EntityId == EntityId,
+        _ => false
+      };
+    }
 
     private bool HasFlag(RdProvidedTypeFlags flag) => (myRdProvidedType.Flags & flag) == flag;
 

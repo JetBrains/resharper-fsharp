@@ -1,8 +1,11 @@
 package markup
 
+import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.withCultureInfo
 import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.asserts.shouldContains
 import com.jetbrains.rider.test.base.HoverDocTestBase
+import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import org.testng.annotations.Test
 
@@ -25,6 +28,19 @@ class FSharpHoverDocTest : HoverDocTestBase() {
 
     @Test
     fun `test empty xml doc`() = doTest("Program.fs", "Program.fs")
+
+    @Test
+    @TestEnvironment(
+        solution = "SwaggerProviderCSharp",
+        toolset = ToolsetVersion.TOOLSET_17_CORE,
+        coreVersion = CoreVersion.DOT_NET_6
+    )
+    fun `provided method in csharp`() {
+        doTestWithMarkupModel("CSharpLibrary.cs", "CSharpLibrary.cs") {
+            waitForDaemon()
+            generateBackendHoverDoc().shouldContains("get all courses")
+        }
+    }
 
     @Test
     fun `test xml doc parsing error`() {

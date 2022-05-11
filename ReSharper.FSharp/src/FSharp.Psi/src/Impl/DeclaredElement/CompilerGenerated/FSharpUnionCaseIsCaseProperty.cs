@@ -15,6 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override ITypeElement GetContainingType() => UnionCase.GetContainingType();
     public IClrDeclaredElement OriginElement => UnionCase;
+    public bool IsReadOnly => false;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new FSharpUnionCaseIsCasePropertyPointer(this);
