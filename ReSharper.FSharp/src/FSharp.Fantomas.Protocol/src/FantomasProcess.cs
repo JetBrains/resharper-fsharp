@@ -32,14 +32,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 
     protected override ProcessStartInfo GetProcessStartInfo(Lifetime lifetime, int port)
     {
+      var runtimeConfigPath = FantomasDirectory / FantomasProtocolConstants.CoreRuntimeConfigFilename;
       var launchPath = FantomasDirectory / FantomasProtocolConstants.PROCESS_FILENAME;
+      var dotnetArgs = $"--runtimeconfig \"{runtimeConfigPath}\"";
+
       Assertion.Assert(launchPath.ExistsFile, $"can't find '{launchPath}'");
+      Assertion.Assert(runtimeConfigPath.ExistsFile, $"can't find '{runtimeConfigPath.FullPath}'");
 
       return new ProcessStartInfo
       {
         Arguments =
-          $"{port} \"{FantomasProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
-        FileName = launchPath.FullPath
+          $"{dotnetArgs} \"{launchPath.FullPath}\" {port} \"{FantomasProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
+        FileName = "exec"
       };
     }
 
