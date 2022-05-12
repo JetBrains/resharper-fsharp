@@ -16,6 +16,10 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, repl
         | :? ISequentialExpr as seqExpr ->
             if seqExpr.Expressions.Last() <> expr then None else
             visitParent seqExpr
+        | :? IMatchClause as clause ->
+            match clause.Parent with
+            | :? IFSharpExpression as parent -> visitParent parent
+            | _ -> None
         | :? IFSharpExpression as parent -> visitParent parent
         | _ -> Some expr
     
@@ -37,7 +41,15 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, repl
     new (error: TypeDoesNotMatchTypeError) =
         // error FS0001: The type 'double' does not match the type 'int'
         ReplaceReturnTypeFix(error.Expr, error.FcsMessage, false)
-    
+
+    (*
+        match () with
+        | _ -> ""
+    *)
+    new (error: TypeEquationError) =
+        // error FS0001: This expression was expected to have type↔    'int'    ↔but here has type↔    'string'
+        ReplaceReturnTypeFix(error.Expr, error.FcsMessage, false)
+
     override this.Text = "Replace return type"
     override this.IsAvailable _ =
         match parentExpr with

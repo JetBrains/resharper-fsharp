@@ -351,6 +351,7 @@
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ConvertTupleToArrayOrListElementsFix</QuickFix>
+    <QuickFix>ReplaceReturnTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="TypeAbbreviationsCannotHaveAugmentations" ID="FS0964: Type abbreviations cannot have augmentations">
