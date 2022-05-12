@@ -1258,3 +1258,11 @@ type FSharpBuildActionsProvider() =
 
     override x.DefaultBuildActions = buildActions :> _
     override x.IsApplicable(projectProperties) = projectProperties :? FSharpProjectProperties
+
+
+[<ShellComponent>]
+type FSharpProjectSchemeProvider() =
+    interface IMsBuildProjectSchemeProvider with
+        member this.BuildScheme(scheme) =
+            scheme.RegisterItem(ItemTypes.compileBeforeItemType)
+            scheme.RegisterItem(ItemTypes.compileAfterItemType)
