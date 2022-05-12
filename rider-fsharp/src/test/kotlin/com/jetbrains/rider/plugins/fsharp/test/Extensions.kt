@@ -41,6 +41,7 @@ fun BaseTestWithSolution.withDisabledOutOfProcessTypeProviders(function: () -> U
     }
 }
 
+
 fun withEditorConfig(project: Project, function: () -> Unit) {
     withSetting(project, "CodeStyle/EditorConfig/EnableEditorConfigSupport", "true", "false", function)
 }

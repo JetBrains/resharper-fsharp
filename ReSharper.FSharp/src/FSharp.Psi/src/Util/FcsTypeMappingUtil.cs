@@ -15,6 +15,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
 using static FSharp.Compiler.ExtensionTyping;
@@ -179,8 +180,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (providedType is not ProxyProvidedTypeWithContext proxyProvidedType)
         return TypeFactory.CreateUnknownType(module);
 
-      if (proxyProvidedType.IsCreatedByProvider && proxyProvidedType.DeclaringType is {})
-        return TypeFactory.CreateType(new FSharpProvidedNestedClass(providedType, module));
+      if (proxyProvidedType.IsCreatedByProvider && proxyProvidedType.DeclaringType is { } declaringType)
+        return TypeFactory.CreateType(new FSharpProvidedNestedClass(providedType, module,
+          declaringType.MapType(module).GetTypeElement()));
 
       if (providedType.IsArray)
         return TypeFactory.CreateArrayType(providedType.GetElementType().MapType(module), providedType.GetArrayRank(),

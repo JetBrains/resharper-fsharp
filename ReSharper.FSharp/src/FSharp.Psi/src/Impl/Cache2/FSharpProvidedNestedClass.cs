@@ -6,7 +6,6 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
@@ -23,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   {
     private ProvidedType Type { get; }
     private T TypeElement { get; }
-    public XmlNode GetXmlDoc() => Type.GetXmlDoc(TypeElement); //TODO: should be not null
+    public XmlNode GetXmlDoc() => Type.GetXmlDoc(TypeElement);
 
     public FSharpProvidedTypeElement(ProvidedType type, [NotNull] T typeElement)
     {
@@ -155,23 +154,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
   }
 
-  public class FSharpProvidedNestedClass : FSharpGeneratedElementBase, IClass, IFSharpTypeElement,
-    IFSharpTypeParametersOwner, ISecondaryDeclaredElement
+  public class FSharpProvidedNestedClass : FSharpProvidedMember<ProvidedType>, IClass, IFSharpTypeElement
   {
-    public FSharpProvidedNestedClass(ProvidedType type, IPsiModule module, ITypeElement containingType = null)
+    public FSharpProvidedNestedClass(ProvidedType type, IPsiModule module, ITypeElement containingType) :
+      base(type, containingType)
     {
       Assertion.Assert(!type.IsInterface);
       Module = module;
       Type = type;
-      myContainingType = containingType;
       myTypeElement = new FSharpProvidedTypeElement<FSharpProvidedNestedClass>(type, this);
     }
 
     private ProvidedType Type { get; }
-    private readonly ITypeElement myContainingType;
     private readonly FSharpProvidedTypeElement<FSharpProvidedNestedClass> myTypeElement;
-    public override ITypeElement GetContainingType() => ContainingType;
-    public override ITypeMember GetContainingTypeMember() => ContainingType as ITypeMember;
     public override DeclaredElementType GetElementType() => CLRDeclaredElementType.CLASS;
     public override bool IsVisibleFromFSharp => true;
 
@@ -203,42 +198,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public IEnumerable<IField> Fields => myTypeElement.Fields;
     public IList<ITypeElement> NestedTypes => myTypeElement.NestedTypes;
 
-    public IClrDeclaredElement OriginElement
-    {
-      get
-      {
-        var declaringType = Type.DeclaringType;
-        while (declaringType.DeclaringType != null)
-          declaringType = declaringType.DeclaringType;
-
-        return declaringType.MapType(Module).GetTypeElement();
-      }
-    }
-
-    public bool IsReadOnly => true;
-
-    protected override IClrDeclaredElement ContainingElement => ContainingType;
-    public IList<ITypeParameter> AllTypeParameters => TypeParameters;
     public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
 
-    public AccessRights GetAccessRights() =>
+    public override AccessRights GetAccessRights() =>
       Type.IsPublic || Type.IsNestedPublic ? AccessRights.PUBLIC : AccessRights.PRIVATE;
 
-    public bool IsAbstract => Type.IsAbstract;
-    public bool IsSealed => Type.IsSealed;
-    public bool IsVirtual => false;
-    public bool IsOverride => false;
-    public bool IsStatic => true;
-    public bool IsReadonly => false;
-    public bool IsExtern => false;
-    public bool IsUnsafe => false;
-    public bool IsVolatile => false;
-    public string XMLDocId => XMLDocUtil.GetTypeElementXmlDocId(this);
-    public IList<TypeMemberInstance> GetHiddenMembers() => EmptyList<TypeMemberInstance>.Instance;
-    public Hash? CalcHash() => null;
-    public ITypeElement ContainingType => myContainingType ?? Type.DeclaringType.MapType(Module).GetTypeElement();
-    public AccessibilityDomain AccessibilityDomain => new(AccessibilityDomain.AccessibilityDomainType.PUBLIC, null);
-    public MemberHidePolicy HidePolicy => MemberHidePolicy.HIDE_BY_NAME;
+    public override bool IsAbstract => Type.IsAbstract;
+    public override bool IsSealed => Type.IsSealed;
+    public override string XMLDocId => XMLDocUtil.GetTypeElementXmlDocId(this);
     public IDeclaredType GetBaseClassType() => myTypeElement.GetBaseClassType();
     public IClass GetSuperClass() => myTypeElement.GetSuperClass();
     public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;

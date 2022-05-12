@@ -1,12 +1,17 @@
 package typeProviders
 
+import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.test.withOutOfProcessTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.base.BaseTestWithSolution
+import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.scriptingApi.*
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 import java.io.File
@@ -71,3 +76,37 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
     }
 }
 
+
+@Test
+@TestEnvironment(
+    toolset = ToolsetVersion.TOOLSET_17_CORE,
+    coreVersion = CoreVersion.DOT_NET_6
+)
+class TypeProvidersFeaturesTest : EditorTestBase() {
+    override fun getSolutionDirectoryName() = "SwaggerProviderCSharp"
+    override val restoreNuGetPackages = true
+
+    @Test
+    fun `provided member navigation`() = doTest()
+
+    @Test
+    fun `provided abbreviation navigation`() = doTest()
+
+    @Test
+    fun `provided nested type navigation`() = doTest()
+
+    private fun doTest() {
+        withOutOfProcessTypeProviders {
+            withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
+                waitForDaemon()
+                gotoDeclaration {
+                    waitForEditorSwitch("SwaggerProvider.fs")
+                    waitForDaemon()
+                    executeWithGold(testGoldFile) {
+                        dumpOpenedDocument(it, project!!, true)
+                    }
+                }
+            }
+        }
+    }
+}

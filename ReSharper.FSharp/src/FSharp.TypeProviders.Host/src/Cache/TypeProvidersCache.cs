@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
 using JetBrains.Util.dataStructures;
 using Microsoft.FSharp.Core.CompilerServices;
