@@ -149,9 +149,12 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let createReferencedModule psiModule =
         ReferencedModule.create modulePathProvider psiModule
 
-    let getOrCreateParsingOptions (psiModule: IPsiModule) =
+    let tryGetParsingOptions psiModule =
         use lock = FcsReadWriteLock.ReadCookie.Create()
-        match tryGetValue psiModule fcsParsingOptions with
+        tryGetValue psiModule fcsParsingOptions
+
+    let getOrCreateParsingOptions (psiModule: IPsiModule) =
+        match tryGetParsingOptions psiModule with
         | Some fcsParsingOptions -> fcsParsingOptions
         | None ->
 
