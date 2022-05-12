@@ -43,9 +43,6 @@ module PatUtil =
         tryNextSibling localRef
 
     [<return: Struct>]
-
-
-    [<return: Struct>]
     let (|HasMfvSymbolUse|_|) (referencePat: IReferencePat) =
         if isNull referencePat then ValueNone else
         match referencePat.GetFcsSymbol() with
@@ -227,7 +224,7 @@ module SpecifyTypes =
 
         match typeHint with
         | ValueNone -> ()
-        | ValueSome typeHint
+        | ValueSome typeHint ->
 
         let symbolUse = refPat.GetFcsSymbolUse()
         if isNull symbolUse then () else
@@ -259,7 +256,7 @@ module SpecifyTypes =
                 pattern
 
         let addParens =
-            match addParens with
+            match typeHint.AddParens with
             | ValueSome addParens -> addParens
             | _ ->
                 match refPat.Parent with
@@ -281,7 +278,7 @@ module SpecifyTypes =
                     | _ ->
                         true
 
-        specifyPattern displayContext mfv.FullType addParens refPat patternToChange
+        specifyPattern { typeHint with AddParens = ValueSome addParens } refPat patternToChange
 
     let private getTupleChildrenRefPatsReferences (pattern: ITuplePat) =
         [|
@@ -320,7 +317,7 @@ module SpecifyTypes =
         for i = referenceList.Count - 1 downto 0 do
             let struct (tuplePat, refPats) = referenceList[i]
             for refPat, symbolUse in refPats do
-                specifyReferencePat (ValueSome false) refPat
+                specifyReferencePat ValueNone refPat
 
             match tuplePat.IgnoreParentParens() with
             | :? IParenPat ->
@@ -351,7 +348,7 @@ module SpecifyTypes =
                 | :? ILocalReferencePat as localRef ->
                     specifyReferencePat ValueNone localRef
                 | _ ->
-                    specifyPattern displayContext fcsType addParens patternToAnnotate patternToChange
+                    specifyPattern { TypeHint.DisplayContext = displayContext; FSType = fcsType; AddParens = addParens } patternToAnnotate patternToChange
             | _ ->
                 ()
 
@@ -359,13 +356,13 @@ module SpecifyTypes =
             specifyReferencePat ValueNone localRef
 
         | :? ITuplePat as tuplePat ->
-            specifyTuplePat tuplePat
+            specifyTuplePat ValueNone tuplePat
 
         | :? IConstPat | :? IUnitPat ->
             ()
 
         | _ ->
-            specifyPattern displayContext fcsType addParens patternToAnnotate patternToChange
+            specifyPattern { TypeHint.DisplayContext = displayContext; FSType = fcsType; AddParens = addParens } patternToAnnotate patternToChange
 
 // function annotation or member annotation
 // value annotation or parameter annotation -> ...
@@ -417,7 +414,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         if binding.ParametersDeclarations.Count > 0 then
             let types = FcsTypeUtil.getFunctionTypeArgs false mfv.FullType
             (binding.ParametersDeclarations, types)
-            ||> Seq.iter2 (fun parameter fsType -> SpecifyTypes.specifyParameterDeclaration displayContext fsType true parameter)
+            ||> Seq.iter2 (fun parameter fsType -> SpecifyTypes.specifyParameterDeclaration displayContext fsType (ValueSome true) parameter)
 
         if isNull binding.ReturnTypeInfo then
             SpecifyTypes.specifyFunctionBindingReturnType displayContext mfv binding

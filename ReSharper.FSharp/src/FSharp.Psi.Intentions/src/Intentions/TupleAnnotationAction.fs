@@ -23,4 +23,4 @@ type TupleAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         use writeCookie = WriteLockCookie.Create(tuplePat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        SpecifyTypes.specifyTuplePat tuplePat
+        SpecifyTypes.specifyTuplePat ValueNone tuplePat
