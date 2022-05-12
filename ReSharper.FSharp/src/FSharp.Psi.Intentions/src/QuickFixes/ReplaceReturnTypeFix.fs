@@ -11,10 +11,13 @@ open JetBrains.ReSharper.Resources.Shell
 type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, replaceFirstType: bool) =
     inherit FSharpQuickFixBase()
     
-    let rec visitParent (expr: IFSharpExpression) =
+    let rec visitParent (expr: IFSharpExpression): IFSharpExpression option =
         match expr.Parent with
+        | :? ISequentialExpr as seqExpr ->
+            if seqExpr.Expressions.Last() <> expr then None else
+            visitParent seqExpr
         | :? IFSharpExpression as parent -> visitParent parent
-        | _ -> expr
+        | _ -> Some expr
     
     let parentExpr = visitParent expr
     
@@ -37,6 +40,10 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, repl
     
     override this.Text = "Replace return type"
     override this.IsAvailable _ =
+        match parentExpr with
+        | None -> false
+        | Some parentExpr ->
+
         let binding = BindingNavigator.GetByExpression(parentExpr)
         if isNull binding then false else
         Option.isSome (getReplacementTypeFromErrorMessage fcsErrorMessage)
@@ -46,19 +53,21 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, repl
         | None -> ()
         | Some replacementTypeName ->
 
-        let binding = BindingNavigator.GetByExpression(parentExpr)
-        
-        use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
+        parentExpr
+        |> Option.iter (fun parentExpr ->
+            let binding = BindingNavigator.GetByExpression(parentExpr)
+            
+            use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
+            use disableFormatter = new DisableCodeFormatter()
 
-        let refPat = binding.HeadPattern.As<IReferencePat>()
-        if isNull refPat then () else
+            let refPat = binding.HeadPattern.As<IReferencePat>()
+            if isNull refPat then () else
 
-        let symbolUse = refPat.GetFcsSymbolUse()
-        if isNull symbolUse then () else
+            let symbolUse = refPat.GetFcsSymbolUse()
+            if isNull symbolUse then () else
 
-        if isNotNull binding.ReturnTypeInfo then
-            let factory = binding.CreateElementFactory()
-            let typeUsage = factory.CreateTypeUsage(replacementTypeName)
-            let currentReturnType = binding.ReturnTypeInfo
-            ModificationUtil.ReplaceChild(currentReturnType, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
+            if isNotNull binding.ReturnTypeInfo then
+                let factory = binding.CreateElementFactory()
+                let typeUsage = factory.CreateTypeUsage(replacementTypeName)
+                let currentReturnType = binding.ReturnTypeInfo
+                ModificationUtil.ReplaceChild(currentReturnType, factory.CreateReturnTypeInfo(typeUsage)) |> ignore)
