@@ -24,7 +24,7 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
 
     @Test
     fun enableTypeProvidersSetting() {
-        val sourceFile = "TypeProviderLibrary/Library.fs"
+        val sourceFile = "TypeProviderLibrary2/Library.fs"
 
         withOutOfProcessTypeProviders {
             withOpenedEditor(project, sourceFile) {
