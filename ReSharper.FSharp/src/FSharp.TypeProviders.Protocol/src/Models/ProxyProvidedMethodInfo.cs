@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
   public class ProxyProvidedMethodInfo : ProvidedMethodInfo, IRdProvidedEntity
   {
     private readonly RdProvidedMethodInfo myMethodInfo;
-    private readonly int myTypeProviderId;
+    private readonly IProxyTypeProvider myTypeProvider;
     private readonly TypeProvidersContext myTypeProvidersContext;
     public int EntityId => myMethodInfo.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.MethodInfo;
@@ -28,39 +28,39 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private RdProvidedMethodInfoProcessModel RdProvidedMethodInfoProcessModel =>
       myTypeProvidersContext.Connection.ProtocolModel.RdProvidedMethodInfoProcessModel;
 
-    private ProxyProvidedMethodInfo(RdProvidedMethodInfo methodInfo, int typeProviderId,
+    private ProxyProvidedMethodInfo(RdProvidedMethodInfo methodInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myMethodInfo = methodInfo;
-      myTypeProviderId = typeProviderId;
+      myTypeProvider = typeProvider;
       myTypeProvidersContext = typeProvidersContext;
 
       myParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(
         () => myTypeProvidersContext.Connection
           .ExecuteWithCatch(() => RdProvidedMethodInfoProcessModel.GetParameters.Sync(EntityId))
-          .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, typeProvidersContext))
+          .Select(t => ProxyProvidedParameterInfo.Create(t, typeProvider, typeProvidersContext))
           .ToArray());
 
       myStaticParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() => myTypeProvidersContext.Connection
         .ExecuteWithCatch(() => RdProvidedMethodInfoProcessModel.GetStaticParametersForMethod.Sync(EntityId))
-        .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, typeProvidersContext))
+        .Select(t => ProxyProvidedParameterInfo.Create(t, typeProvider, typeProvidersContext))
         .ToArray());
 
       myGenericArguments = new InterruptibleLazy<ProvidedType[]>(() =>
-        myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(methodInfo.GenericArguments, myTypeProviderId));
+        myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(methodInfo.GenericArguments, typeProvider));
 
       myTypes = new InterruptibleLazy<ProvidedType[]>(() =>
         myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(
-          new[] { methodInfo.DeclaringType, methodInfo.ReturnType }, myTypeProviderId));
+          new[] { methodInfo.DeclaringType, methodInfo.ReturnType }, typeProvider));
 
       myCustomAttributes = new InterruptibleLazy<RdCustomAttributeData[]>(() =>
         myTypeProvidersContext.ProvidedCustomAttributeProvider.GetCustomAttributes(this));
     }
 
     [ContractAnnotation("methodInfo:null => null")]
-    public static ProxyProvidedMethodInfo Create(RdProvidedMethodInfo methodInfo, int typeProviderId,
+    public static ProxyProvidedMethodInfo Create(RdProvidedMethodInfo methodInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) =>
-      methodInfo == null ? null : new ProxyProvidedMethodInfo(methodInfo, typeProviderId, typeProvidersContext);
+      methodInfo == null ? null : new ProxyProvidedMethodInfo(methodInfo, typeProvider, typeProvidersContext);
 
     public override string Name => myMethodInfo.Name;
     public override bool IsAbstract => HasFlag(RdProvidedMethodFlags.IsAbstract);
@@ -94,7 +94,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       method = Create(myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
         RdProvidedMethodInfoProcessModel.ApplyStaticArgumentsForMethod.Sync(
           new ApplyStaticArgumentsForMethodArgs(EntityId, fullNameAfterArguments, staticArgDescriptions),
-          RpcTimeouts.Maximal)), myTypeProviderId, myTypeProvidersContext);
+          RpcTimeouts.Maximal)), myTypeProvider, myTypeProvidersContext);
 
       myAppliedMethods.Add(key, method);
 

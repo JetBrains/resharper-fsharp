@@ -79,6 +79,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
     /// Used to synchronize project model changes with FSharpItemsContainer
     let projectMarkModules = Dictionary<IPsiModule, IProjectMark>()
+    let outputPathToPsiModule = Dictionary<VirtualFileSystemPath, IPsiModule>()
 
     let dirtyModules = HashSet<IPsiModule>()
     let fcsProjectInvalidated = new Signal<IPsiModule>(lifetime, "FcsProjectInvalidated")
@@ -121,6 +122,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             | Some projectMark -> projectsProjectMarks.Remove(projectMark) |> ignore
 
             projectMarkModules.Remove(psiModule) |> ignore
+            outputPathToPsiModule.Remove(fcsProject.OutputPath) |> ignore
 
             // todo: remove removed psiModules? (don't we remove them anyway?) (standalone projects only?)
             logger.Trace("Done invalidating FcsProject: {0}", psiModule)
@@ -241,7 +243,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 let fcsProject = { fcsProject with ProjectOptions = fcsProjectOptions }
 
                 fcsProjects[psiModule] <- fcsProject
-
+                outputPathToPsiModule[fcsProject.OutputPath] <- psiModule
                 projectsPsiModules.Add(project, psiModule) |> ignore
                 fcsAssemblyReaderShim.RecordDependencies(psiModule)
 
@@ -423,6 +425,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         member this.GetFcsProject(psiModule) =
             getOrCreateFcsProject psiModule
+
+        member this.GetPsiModule(outputPath) =
+            tryGetValue outputPath outputPathToPsiModule
 
 /// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
 [<SolutionComponent>]

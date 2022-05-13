@@ -13,22 +13,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
   public class ProxyProvidedParameterInfo : ProvidedParameterInfo
   {
     private readonly RdProvidedParameterInfo myParameterInfo;
-    private readonly int myTypeProviderId;
+    private readonly IProxyTypeProvider myTypeProvider;
     private readonly TypeProvidersContext myTypeProvidersContext;
 
-    private ProxyProvidedParameterInfo(RdProvidedParameterInfo parameterInfo, int typeProviderId,
+    private ProxyProvidedParameterInfo(RdProvidedParameterInfo parameterInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myParameterInfo = parameterInfo;
-      myTypeProviderId = typeProviderId;
+      myTypeProvider = typeProvider;
       myTypeProvidersContext = typeProvidersContext;
       RawDefaultValue = myParameterInfo.RawDefaultValue.Unbox();
     }
 
     [ContractAnnotation("parameter:null => null")]
-    public static ProxyProvidedParameterInfo Create(RdProvidedParameterInfo parameter, int typeProviderId,
+    public static ProxyProvidedParameterInfo Create(RdProvidedParameterInfo parameter, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) =>
-      parameter == null ? null : new ProxyProvidedParameterInfo(parameter, typeProviderId, typeProvidersContext);
+      parameter == null ? null : new ProxyProvidedParameterInfo(parameter, typeProvider, typeProvidersContext);
 
     public override string Name => myParameterInfo.Name;
     public override bool IsIn => myParameterInfo.IsIn;
@@ -58,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
           .CustomAttributes);
 
     public override ProvidedType ParameterType =>
-      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myParameterInfo.ParameterType, myTypeProviderId);
+      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myParameterInfo.ParameterType, myTypeProvider);
 
     private string[] myXmlDocs;
   }

@@ -196,6 +196,7 @@ type FSharpParseAndCheckResults =
 
 type IFcsProjectProvider =
     abstract GetFcsProject: psiModule: IPsiModule -> FcsProject option
+    abstract GetPsiModule: outputPath: VirtualFileSystemPath -> IPsiModule option
 
     abstract GetProjectOptions: sourceFile: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetProjectOptions: psiModule: IPsiModule -> FSharpProjectOptions option

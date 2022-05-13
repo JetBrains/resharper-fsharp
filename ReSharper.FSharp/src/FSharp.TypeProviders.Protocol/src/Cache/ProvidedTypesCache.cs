@@ -19,16 +19,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     protected override bool KeyHasValue(int key) => key != ProvidedConst.DefaultId;
 
-    protected override ProxyProvidedType Create(int key, int typeProviderId, ProvidedTypeContext context) =>
+    protected override ProxyProvidedType
+      Create(int key, IProxyTypeProvider typeProvider, ProvidedTypeContext context) =>
       ProxyProvidedType.Create(
         TypeProvidersContext.Connection.ExecuteWithCatch(() =>
           ProvidedTypeProcessModel.GetProvidedType.Sync(key, RpcTimeouts.Maximal)),
-        typeProviderId, TypeProvidersContext);
+        typeProvider, TypeProvidersContext);
 
-    protected override ProxyProvidedType[] CreateBatch(int[] keys, int typeProviderId, ProvidedTypeContext context) =>
+    protected override ProxyProvidedType[] CreateBatch(int[] keys, IProxyTypeProvider typeProvider,
+      ProvidedTypeContext context) =>
       TypeProvidersContext.Connection.ExecuteWithCatch(() =>
           ProvidedTypeProcessModel.GetProvidedTypes.Sync(keys, RpcTimeouts.Maximal))
-        .Select(t => ProxyProvidedType.Create(t, typeProviderId, TypeProvidersContext))
+        .Select(t => ProxyProvidedType.Create(t, typeProvider, TypeProvidersContext))
         .ToArray();
 
     public override string Dump() =>

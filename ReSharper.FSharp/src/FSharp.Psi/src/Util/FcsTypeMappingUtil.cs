@@ -8,8 +8,8 @@ using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -159,7 +159,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           : TypeFactory.CreateUnknownType(psiModule);
       }
 
-      if (entity.IsProvidedAndGenerated && psiModule.GetSolution().TryGetProvidedType(clrName, out var providedType))
+      if (entity.IsProvidedAndGenerated &&
+          ProvidedTypesResolveUtil.TryGetProvidedType(psiModule, clrName, out var providedType))
         return MapType(providedType, psiModule);
 
       var declaredType = clrName.CreateTypeByClrName(psiModule);
@@ -190,7 +191,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (!providedType.IsGenericType)
         return TypeFactory.CreateTypeByCLRName(proxyProvidedType.GetClrName(), NullableAnnotation.Unknown, module);
 
-      if (!(providedType.GetGenericTypeDefinition() is IProxyProvidedType genericTypeDefinition))
+      if (providedType.GetGenericTypeDefinition() is not IProxyProvidedType genericTypeDefinition)
         return TypeFactory.CreateUnknownType(module);
 
       var typeDefinition =

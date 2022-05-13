@@ -29,7 +29,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       ProxyProvidedEventInfo[] Events);
 
     private readonly RdOutOfProcessProvidedType myRdProvidedType;
-    private readonly int myTypeProviderId;
     public TypeProvidersContext TypeProvidersContext { get; }
     public int EntityId => myRdProvidedType.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.TypeInfo;
@@ -37,19 +36,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private RdProvidedTypeProcessModel RdProvidedTypeProcessModel =>
       TypeProvidersContext.Connection.ProtocolModel.RdProvidedTypeProcessModel;
 
-    private ProxyProvidedType(RdOutOfProcessProvidedType rdProvidedType, int typeProviderId,
+    private ProxyProvidedType(RdOutOfProcessProvidedType rdProvidedType, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
+      TypeProvider = typeProvider;
       myRdProvidedType = rdProvidedType;
-      myTypeProviderId = typeProviderId;
       TypeProvidersContext = typeProvidersContext;
 
       myGenericArguments = new InterruptibleLazy<ProvidedType[]>(() =>
-        TypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(myRdProvidedType.GenericArguments, typeProviderId));
+        TypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(myRdProvidedType.GenericArguments, TypeProvider));
 
       myStaticParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() => typeProvidersContext.Connection
         .ExecuteWithCatch(() => RdProvidedTypeProcessModel.GetStaticParameters.Sync(EntityId, RpcTimeouts.Maximal))
-        .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, TypeProvidersContext))
+        .Select(t => ProxyProvidedParameterInfo.Create(t, TypeProvider, TypeProvidersContext))
         .ToArray());
 
       myCustomAttributes = new InterruptibleLazy<RdCustomAttributeData[]>(() =>
@@ -93,11 +92,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     }
 
     [ContractAnnotation("type:null => null")]
-    public static ProxyProvidedType Create(RdOutOfProcessProvidedType type, int typeProviderId,
+    public static ProxyProvidedType Create(RdOutOfProcessProvidedType type, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) =>
-      type == null ? null : new ProxyProvidedType(type, typeProviderId, typeProvidersContext);
+      type == null ? null : new ProxyProvidedType(type, typeProvider, typeProvidersContext);
 
     public string DisplayName => Name;
+    public IProxyTypeProvider TypeProvider { get; }
     public override string Name => myRdProvidedType.Name;
     public override string FullName => myRdProvidedType.FullName;
     public override string Namespace => myRdProvidedType.Namespace;
@@ -127,10 +127,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
           RdProvidedTypeProcessModel.GenericParameterPosition.Sync(myRdProvidedType.EntityId));
 
     public override ProvidedType BaseType =>
-      TypeProvidersContext.ProvidedTypesCache.GetOrCreate(myRdProvidedType.BaseType, myTypeProviderId);
+      TypeProvidersContext.ProvidedTypesCache.GetOrCreate(myRdProvidedType.BaseType, TypeProvider);
 
     public override ProvidedType DeclaringType =>
-      TypeProvidersContext.ProvidedTypesCache.GetOrCreate(myRdProvidedType.DeclaringType, myTypeProviderId);
+      TypeProvidersContext.ProvidedTypesCache.GetOrCreate(myRdProvidedType.DeclaringType, TypeProvider);
 
     public override ProvidedType GetNestedType(string nm) => GetAllNestedTypes().FirstOrDefault(t => t.Name == nm);
 
@@ -144,7 +144,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         myGenericTypeDefinitionId ??=
           TypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.GetGenericTypeDefinition.Sync(EntityId)),
-        myTypeProviderId);
+        TypeProvider);
 
     public override ProvidedPropertyInfo[] GetProperties() => myContent.Value.Properties;
 
@@ -160,7 +160,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         myElementTypeId ??=
           TypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.GetElementType.Sync(EntityId)),
-        myTypeProviderId);
+        TypeProvider);
 
     public override ProvidedType[] GetGenericArguments() => myGenericArguments.Value;
 
@@ -169,7 +169,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         myEnumUnderlyingTypeId ??=
           TypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.GetEnumUnderlyingType.Sync(EntityId)),
-        myTypeProviderId);
+        TypeProvider);
 
     public override ProvidedParameterInfo[] GetStaticParameters(ITypeProvider provider) => myStaticParameters.Value;
 
@@ -186,7 +186,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
           () => RdProvidedTypeProcessModel.ApplyStaticArguments.Sync(
             new ApplyStaticArgumentsParameters(EntityId, fullTypePathAfterArguments, staticArgDescriptions),
             RpcTimeouts.Maximal)),
-        myTypeProviderId);
+        TypeProvider);
     }
 
     // Since we distinguish different generative types by assembly name
@@ -197,7 +197,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       var key = string.Join(".", fullTypePathAfterArguments) + "+" + string.Join(",", staticArgs);
       var staticArgDescriptions = staticArgs.Select(PrimitiveTypesBoxer.BoxToServerStaticArg).ToArray();
 
-      var result = TypeProvidersContext.AppliedProvidedTypesCache.GetOrCreate((EntityId, key), myTypeProviderId,
+      var result = TypeProvidersContext.AppliedProvidedTypesCache.GetOrCreate((EntityId, key), TypeProvider,
         new ApplyStaticArgumentsParameters(EntityId, fullTypePathAfterArguments, staticArgDescriptions));
 
       return result;
@@ -210,7 +210,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public override ProvidedType MakeArrayType() => MakeArrayType(1);
 
     public override ProvidedType MakeArrayType(int rank) =>
-      TypeProvidersContext.ArrayProvidedTypesCache.GetOrCreate((EntityId, rank), myTypeProviderId,
+      TypeProvidersContext.ArrayProvidedTypesCache.GetOrCreate((EntityId, rank), TypeProvider,
         new MakeArrayTypeArgs(EntityId, rank));
 
     public override ProvidedType MakeGenericType(ProvidedType[] args)
@@ -222,7 +222,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         .Select(t => t.EntityId)
         .ToArray();
 
-      return TypeProvidersContext.GenericProvidedTypesCache.GetOrCreate((EntityId, key), myTypeProviderId,
+      return TypeProvidersContext.GenericProvidedTypesCache.GetOrCreate((EntityId, key), TypeProvider,
         new MakeGenericTypeArgs(EntityId, argIds));
     }
 
@@ -231,14 +231,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         myMakePointerTypeId ??=
           TypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.MakePointerType.Sync(EntityId)),
-        myTypeProviderId);
+        TypeProvider);
 
     public override ProvidedType MakeByRefType() =>
       TypeProvidersContext.ProvidedTypesCache.GetOrCreate(
         myMakeByRefTypeId ??=
           TypeProvidersContext.Connection.ExecuteWithCatch(() =>
             RdProvidedTypeProcessModel.MakeByRefType.Sync(EntityId)),
-        myTypeProviderId);
+        TypeProvider);
 
     public override ProvidedEventInfo[] GetEvents() => myContent.Value.Events;
 
@@ -254,7 +254,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       ProxyProvidedTypeWithContext.Create(this, context);
 
     public override ProvidedAssembly Assembly => myProvidedAssembly ??=
-      TypeProvidersContext.ProvidedAssembliesCache.GetOrCreate(myRdProvidedType.Assembly, myTypeProviderId);
+      TypeProvidersContext.ProvidedAssembliesCache.GetOrCreate(myRdProvidedType.Assembly, TypeProvider);
 
     public override ProvidedVar AsProvidedVar(string nm) =>
       ProxyProvidedVar.Create(nm, false, this);
