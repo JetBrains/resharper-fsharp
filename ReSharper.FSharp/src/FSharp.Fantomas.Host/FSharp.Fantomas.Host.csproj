@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</AssemblyName>
         <OutputType>Exe</OutputType>
         <LangVersion>$(CSharpLanguageVersion)</LangVersion>
@@ -9,27 +9,24 @@
         <SignAssembly>false</SignAssembly>
     </PropertyGroup>
 
-    <!-- TODO: remove when targetting netstandard2.0/net5, needed for legacy target frameworks -->
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <PlatformTarget>AnyCPU</PlatformTarget>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <PlatformTarget>AnyCPU</PlatformTarget>
-    </PropertyGroup>
-
     <ItemGroup>
       <ProjectReference Include="..\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Fantomas" Version="4.7.3" />
+      <PackageReference Include="Fantomas" Version="4.7.8" />
       <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
       <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
       <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+      <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.0" />
+      <PackageReference Include="Microsoft.NETCore.Targets" Version="1.1.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.runtimeconfig.json">
+      <None Update="Fantomas.Host.win.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Fantomas.Host.unix.runtimeconfig.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
