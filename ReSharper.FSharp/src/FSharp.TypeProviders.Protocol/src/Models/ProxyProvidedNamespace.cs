@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         new InterruptibleLazy<ProvidedType[]>(() =>
         {
           var types =
-            typeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(providedNamespace.Types, typeProvider.EntityId);
+            typeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(providedNamespace.Types, typeProvider);
 
           typeProvider.IsGenerative = types.Any(t => !t.IsErased);
 

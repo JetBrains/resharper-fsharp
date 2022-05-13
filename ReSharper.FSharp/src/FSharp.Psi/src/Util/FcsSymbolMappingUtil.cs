@@ -47,7 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (typeElements.IsEmpty())
         {
           if (entity.IsProvidedAndGenerated &&
-              psiModule.GetSolution().TryGetProvidedType(clrTypeName, out var providedType) &&
+              ProvidedTypesResolveUtil.TryGetProvidedType(psiModule, clrTypeName, out var providedType) &&
               providedType.DeclaringType != null)
             return providedType.MapType(psiModule).GetTypeElement();
           return null; 

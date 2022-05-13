@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private readonly RdProvidedFieldInfo myFieldInfo;
     private readonly TypeProvidersContext myTypeProvidersContext;
 
-    private ProxyProvidedFieldInfo(RdProvidedFieldInfo fieldInfo, int typeProviderId,
+    private ProxyProvidedFieldInfo(RdProvidedFieldInfo fieldInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myFieldInfo = fieldInfo;
@@ -26,13 +26,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       myTypes = new InterruptibleLazy<ProvidedType[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(
-          new[] { fieldInfo.DeclaringType, fieldInfo.FieldType }, typeProviderId));
+          new[] { fieldInfo.DeclaringType, fieldInfo.FieldType }, typeProvider));
     }
 
     [ContractAnnotation("fieldInfo:null => null")]
-    public static ProxyProvidedFieldInfo Create(RdProvidedFieldInfo fieldInfo, int typeProviderId,
+    public static ProxyProvidedFieldInfo Create(RdProvidedFieldInfo fieldInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) =>
-      fieldInfo == null ? null : new ProxyProvidedFieldInfo(fieldInfo, typeProviderId, typeProvidersContext);
+      fieldInfo == null ? null : new ProxyProvidedFieldInfo(fieldInfo, typeProvider, typeProvidersContext);
 
     public override string Name => myFieldInfo.Name;
     public override bool IsFamily => HasFlag(RdProvidedFieldFlags.IsFamily);

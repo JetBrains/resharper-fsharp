@@ -4,6 +4,7 @@ using System.Reflection;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -23,8 +24,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public int EntityId => myRdTypeProvider.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.TypeProvider;
 
-    public ProxyTypeProvider(RdTypeProvider rdTypeProvider, TypeProvidersContext typeProvidersContext)
+    public ProxyTypeProvider(RdTypeProvider rdTypeProvider, TypeProvidersContext typeProvidersContext,
+      IPsiModule module)
     {
+      Module = module;
       myRdTypeProvider = rdTypeProvider;
       myTypeProvidersContext = typeProvidersContext;
 
@@ -90,6 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       };
 
     public string GetDisplayName(bool fullName) => fullName ? myRdTypeProvider.FullName : myRdTypeProvider.Name;
+    public IPsiModule Module { get; }
 
     public void Dispose()
     {

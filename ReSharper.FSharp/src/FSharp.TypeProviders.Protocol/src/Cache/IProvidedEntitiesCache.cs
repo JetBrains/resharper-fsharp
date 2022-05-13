@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.Threading;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
@@ -10,12 +11,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
   public interface IProvidedEntitiesCache<out T, in TKey, in TParam> where T : class
   {
     [ContractAnnotation("key:null => null")]
-    T GetOrCreate(TKey key, int typeProviderId, TParam parameters = default);
+    T GetOrCreate(TKey key, IProxyTypeProvider typeProvider, TParam parameters = default);
 
     /// <summary>
     /// Returns a batch of provided entities with taking into account the keys order
     /// </summary>
-    T[] GetOrCreateBatch(TKey[] keys, int typeProviderId, TParam parameters = default);
+    T[] GetOrCreateBatch(TKey[] keys, IProxyTypeProvider typeProvider, TParam parameters = default);
 
     void Remove(int typeProviderId);
 
@@ -28,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     protected readonly TypeProvidersContext TypeProvidersContext;
     protected readonly ConcurrentDictionary<TKey, T> Entities;
     protected readonly IDictionary<int, List<TKey>> EntitiesPerProvider;
-    private readonly object myEntitiesPerProviderLockObj = new object();
+    private readonly object myEntitiesPerProviderLockObj = new();
     private SpinWaitLock myEntitiesLock;
 
     protected ProvidedEntitiesCacheBase(TypeProvidersContext typeProvidersContext)
@@ -38,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
       EntitiesPerProvider = new Dictionary<int, List<TKey>>();
     }
 
-    public T GetOrCreate(TKey key, int typeProviderId, TParam parameters = default)
+    public T GetOrCreate(TKey key, IProxyTypeProvider typeProvider, TParam parameters = default)
     {
       if (!KeyHasValue(key)) return null;
       if (Entities.TryGetValue(key, out var providedEntity)) return providedEntity;
@@ -47,8 +48,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
       {
         myEntitiesLock.Enter();
         if (Entities.TryGetValue(key, out providedEntity)) return providedEntity;
-        providedEntity = Create(key, typeProviderId, parameters);
-        AttachToTypeProvider(typeProviderId, key, providedEntity);
+        providedEntity = Create(key, typeProvider, parameters);
+        AttachToTypeProvider(typeProvider.EntityId, key, providedEntity);
         return providedEntity;
       }
       finally
@@ -57,9 +58,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
       }
     }
 
-    public T[] GetOrCreateBatch(TKey[] keys, int typeProviderId, TParam parameters = default)
+    public T[] GetOrCreateBatch(TKey[] keys, IProxyTypeProvider typeProvider, TParam parameters = default)
     {
-      if (keys.Length == 1) return new[] { GetOrCreate(keys[0], typeProviderId, parameters) };
+      if (keys.Length == 1) return new[] { GetOrCreate(keys[0], typeProvider, parameters) };
 
       var entities = new T[keys.Length];
 
@@ -82,12 +83,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
         {
           var keysToCreate = group.Select(t => t.key).ToArray();
           var ids = group.Select(t => t.i).ToArray();
-          var createdEntities = CreateBatch(keysToCreate, typeProviderId, parameters);
+          var createdEntities = CreateBatch(keysToCreate, typeProvider, parameters);
 
           for (var i = 0; i < keysToCreate.Length; i++)
           {
             var entity = createdEntities[i];
-            AttachToTypeProvider(typeProviderId, keysToCreate[i], entity);
+            AttachToTypeProvider(typeProvider.EntityId, keysToCreate[i], entity);
             entities[ids[i]] = entity;
           }
         }
@@ -125,8 +126,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     }
 
     protected abstract bool KeyHasValue(TKey key);
-    protected abstract T Create(TKey key, int typeProviderId, TParam parameters);
-    protected abstract T[] CreateBatch(TKey[] keys, int typeProviderId, TParam parameters);
+    protected abstract T Create(TKey key, IProxyTypeProvider typeProvider, TParam parameters);
+    protected abstract T[] CreateBatch(TKey[] keys, IProxyTypeProvider typeProvider, TParam parameters);
     public abstract string Dump();
   }
 }
