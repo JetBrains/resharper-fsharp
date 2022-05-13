@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public DefaultValue GetDefaultValue() =>
       myInfo.HasDefaultValue
-        ? new DefaultValue(Type, new ConstantValue(myInfo.RawDefaultValue, type: null))
+        ? new DefaultValue(Type, new ConstantValue(myInfo.RawDefaultValue, type: Type))
         : DefaultValue.BAD_VALUE;
 
     public ParameterKind Kind =>
@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         _ => ParameterKind.VALUE
       };
 
-    public bool IsParameterArray => false; //TODO
+    public bool IsParameterArray => false;
     public bool IsValueVariable => false;
     public bool IsOptional => myInfo.IsOptional;
     public bool IsVarArg => false;

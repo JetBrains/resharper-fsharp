@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     public IProvidedCustomAttributeProvider ProvidedCustomAttributeProvider { get; }
 
     //TODO: how to invalidate?
-    public static ConcurrentDictionary<string, ProxyProvidedTypeWithContext> ProvidedAbbreviations { get; } = new();
+    public ConcurrentDictionary<string, ProxyProvidedTypeWithContext> ProvidedAbbreviations { get; } = new();
 
     private RdProvidedTypeProcessModel ProvidedTypeProtocol => Connection.ProtocolModel.RdProvidedTypeProcessModel;
 

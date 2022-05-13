@@ -18,7 +18,6 @@ open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files
-open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     // Triggers FCS resolve
     private FSharpProvidedTypeElement<FSharpClassOrProvidedTypeAbbreviation> ProvidedClass =>
       myParts is TypeAbbreviationOrDeclarationPart { IsProvidedAndGenerated: true } &&
-      TypeProvidersContext.ProvidedAbbreviations.TryGetValue(GetClrName().FullName, out var type)
+      Module.GetSolution().TryGetProvidedType(GetClrName(), out var type)
         ? new FSharpProvidedTypeElement<FSharpClassOrProvidedTypeAbbreviation>(type, this)
         : null;
 
