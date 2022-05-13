@@ -16,26 +16,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
   public class ProxyProvidedPropertyInfo : ProvidedPropertyInfo, IRdProvidedEntity
   {
     private readonly RdProvidedPropertyInfo myPropertyInfo;
-    private readonly int myTypeProviderId;
+    private readonly IProxyTypeProvider myTypeProvider;
     private readonly TypeProvidersContext myTypeProvidersContext;
     public int EntityId => myPropertyInfo.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.PropertyInfo;
 
-    private ProxyProvidedPropertyInfo(RdProvidedPropertyInfo propertyInfo, int typeProviderId,
+    private ProxyProvidedPropertyInfo(RdProvidedPropertyInfo propertyInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myPropertyInfo = propertyInfo;
-      myTypeProviderId = typeProviderId;
+      myTypeProvider = typeProvider;
       myTypeProvidersContext = typeProvidersContext;
 
       myMethods = new InterruptibleLazy<ProxyProvidedMethodInfo[]>(() => GetMethodsInfos()
-        .Select(t => ProxyProvidedMethodInfo.Create(t, typeProviderId, typeProvidersContext))
+        .Select(t => ProxyProvidedMethodInfo.Create(t, typeProvider, typeProvidersContext))
         .ToArray());
 
       myIndexParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(
         () => // ReSharper disable once CoVariantArrayConversion
           propertyInfo.IndexParameters
-            .Select(t => ProxyProvidedParameterInfo.Create(t, typeProviderId, typeProvidersContext))
+            .Select(t => ProxyProvidedParameterInfo.Create(t, typeProvider, typeProvidersContext))
             .ToArray());
 
       myCustomAttributes = new InterruptibleLazy<RdCustomAttributeData[]>(() =>
@@ -43,19 +43,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     }
 
     [ContractAnnotation("propertyInfo:null => null")]
-    public static ProxyProvidedPropertyInfo Create(RdProvidedPropertyInfo propertyInfo, int typeProviderId,
+    public static ProxyProvidedPropertyInfo Create(RdProvidedPropertyInfo propertyInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) =>
-      propertyInfo == null ? null : new ProxyProvidedPropertyInfo(propertyInfo, typeProviderId, typeProvidersContext);
+      propertyInfo == null ? null : new ProxyProvidedPropertyInfo(propertyInfo, typeProvider, typeProvidersContext);
 
     public override string Name => myPropertyInfo.Name;
     public override bool CanRead => myPropertyInfo.CanRead;
     public override bool CanWrite => myPropertyInfo.CanWrite;
 
     public override ProvidedType DeclaringType =>
-      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myPropertyInfo.DeclaringType, myTypeProviderId);
+      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myPropertyInfo.DeclaringType, myTypeProvider);
 
     public override ProvidedType PropertyType =>
-      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myPropertyInfo.PropertyType, myTypeProviderId);
+      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myPropertyInfo.PropertyType, myTypeProvider);
 
     public override ProvidedMethodInfo GetGetMethod() => myMethods.Value[0];
 

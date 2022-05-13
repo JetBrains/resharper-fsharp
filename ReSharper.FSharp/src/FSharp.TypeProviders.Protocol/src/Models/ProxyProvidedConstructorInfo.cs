@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
   public class ProxyProvidedConstructorInfo : ProvidedConstructorInfo, IRdProvidedEntity
   {
     private readonly RdProvidedConstructorInfo myConstructorInfo;
-    private readonly int myTypeProviderId;
+    private readonly IProxyTypeProvider myTypeProvider;
     private readonly TypeProvidersContext myTypeProvidersContext;
     public int EntityId => myConstructorInfo.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.ConstructorInfo;
@@ -27,25 +27,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private RdProvidedConstructorInfoProcessModel RdProvidedConstructorInfoProcessModel =>
       myTypeProvidersContext.Connection.ProtocolModel.RdProvidedConstructorInfoProcessModel;
 
-    private ProxyProvidedConstructorInfo(RdProvidedConstructorInfo constructorInfo, int typeProviderId,
+    private ProxyProvidedConstructorInfo(RdProvidedConstructorInfo constructorInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myConstructorInfo = constructorInfo;
-      myTypeProviderId = typeProviderId;
+      myTypeProvider = typeProvider;
       myTypeProvidersContext = typeProvidersContext;
 
       myParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() =>
         myTypeProvidersContext.Connection
           .ExecuteWithCatch(() => RdProvidedConstructorInfoProcessModel.GetParameters.Sync(EntityId))
-          .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, typeProvidersContext))
+          .Select(t => ProxyProvidedParameterInfo.Create(t, typeProvider, typeProvidersContext))
           .ToArray());
 
       myGenericArguments = new InterruptibleLazy<ProvidedType[]>(() =>
-        myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(constructorInfo.GenericArguments, myTypeProviderId));
+        myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(constructorInfo.GenericArguments, typeProvider));
 
       myStaticParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() => myTypeProvidersContext.Connection
         .ExecuteWithCatch(() => RdProvidedConstructorInfoProcessModel.GetStaticParametersForMethod.Sync(EntityId))
-        .Select(t => ProxyProvidedParameterInfo.Create(t, myTypeProviderId, typeProvidersContext))
+        .Select(t => ProxyProvidedParameterInfo.Create(t, typeProvider, typeProvidersContext))
         .ToArray());
 
       myCustomAttributes = new InterruptibleLazy<RdCustomAttributeData[]>(() =>
@@ -53,11 +53,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     }
 
     [ContractAnnotation("constructorInfo:null => null")]
-    public static ProxyProvidedConstructorInfo Create(RdProvidedConstructorInfo constructorInfo, int typeProviderId,
+    public static ProxyProvidedConstructorInfo Create(RdProvidedConstructorInfo constructorInfo,
+      IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) =>
       constructorInfo == null
         ? null
-        : new ProxyProvidedConstructorInfo(constructorInfo, typeProviderId, typeProvidersContext);
+        : new ProxyProvidedConstructorInfo(constructorInfo, typeProvider, typeProvidersContext);
 
     public override string Name => myConstructorInfo.Name;
     public override bool IsConstructor => HasFlag(RdProvidedMethodFlags.IsConstructor);
@@ -83,13 +84,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       var method = Create(myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
         RdProvidedConstructorInfoProcessModel.ApplyStaticArgumentsForMethod.Sync(
           new ApplyStaticArgumentsForMethodArgs(EntityId, fullNameAfterArguments, staticArgDescriptions),
-          RpcTimeouts.Maximal)), myTypeProviderId, myTypeProvidersContext);
+          RpcTimeouts.Maximal)), myTypeProvider, myTypeProvidersContext);
 
       return method;
     }
 
     public override ProvidedType DeclaringType =>
-      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myConstructorInfo.DeclaringType, myTypeProviderId);
+      myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myConstructorInfo.DeclaringType, myTypeProvider);
 
     public override ProvidedParameterInfo[] GetParameters() => myParameters.Value;
     public override ProvidedType[] GetGenericArguments() => myGenericArguments.Value;
