@@ -35,17 +35,27 @@ class FSharpHoverDocTest : HoverDocTestBase() {
         toolset = ToolsetVersion.TOOLSET_17_CORE,
         coreVersion = CoreVersion.DOT_NET_6
     )
-    fun `provided method in csharp`() {
-        doTestWithMarkupModel("CSharpLibrary.cs", "CSharpLibrary.cs") {
-            waitForDaemon()
-            generateBackendHoverDoc().shouldContains("get all courses")
-        }
-    }
+    fun `provided method in csharp`() = doTestWithTypeProviders("get all courses")
+
+    @Test
+    @TestEnvironment(
+        solution = "SwaggerProviderCSharp",
+        toolset = ToolsetVersion.TOOLSET_17_CORE,
+        coreVersion = CoreVersion.DOT_NET_6
+    )
+    fun `provided abbreviation in csharp`() = doTestWithTypeProviders("OpenAPI Provider for")
 
     @Test
     fun `test xml doc parsing error`() {
         withCultureInfo(project, "en-US") {
             doTest("Program.fs", "Program.fs")
+        }
+    }
+
+    private fun doTestWithTypeProviders(summary: String){
+        doTestWithMarkupModel("CSharpLibrary.cs", "CSharpLibrary.cs") {
+            waitForDaemon()
+            generateBackendHoverDoc().shouldContains(summary)
         }
     }
 }
