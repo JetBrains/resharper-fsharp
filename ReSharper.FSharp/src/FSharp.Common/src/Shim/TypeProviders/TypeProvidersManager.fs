@@ -84,6 +84,7 @@ type IProxyTypeProvidersManager =
         compilerToolsPath: string list *
         m: range -> ITypeProvider list
 
+    abstract member Context: TypeProvidersContext
     abstract member HasGenerativeTypeProviders: project: IProject -> bool
     abstract member Dump: unit -> string
 
@@ -169,6 +170,8 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                      typeProviders.Get(id) :> ITypeProvider ]
 
             typeProviderProxies
+        
+        member this.Context = tpContext
 
         member this.HasGenerativeTypeProviders(project) =
             use lock = lock.Push()

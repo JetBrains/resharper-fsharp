@@ -46,8 +46,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         var typeElements = psiModule.GetSymbolScope(false).GetTypeElementsByCLRName(clrTypeName);
         if (typeElements.IsEmpty())
         {
-          if (entity.IsProvidedAndGenerated && // hide ProvidedAbbreviations in psi module?
-              TypeProvidersContext.ProvidedAbbreviations.TryGetValue(clrTypeName.FullName, out var providedType) &&
+          if (entity.IsProvidedAndGenerated &&
+              psiModule.GetSolution().TryGetProvidedType(clrTypeName, out var providedType) &&
               providedType.DeclaringType != null)
             return providedType.MapType(psiModule).GetTypeElement();
           return null; 

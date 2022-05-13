@@ -17,14 +17,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
   public class ProxyProvidedTypeWithContext : ProvidedType, IProxyProvidedType
   {
     private readonly ProvidedType myProvidedType;
-    private IProxyProvidedType ProxyProvidedType => (IProxyProvidedType)myProvidedType;
+    private ProxyProvidedType ProxyProvidedType => (ProxyProvidedType)myProvidedType;
 
     private ProxyProvidedTypeWithContext(ProvidedType providedType, ProvidedTypeContext context) : base(null, context)
     {
-      Assertion.Assert(providedType is IProxyProvidedType);
+      Assertion.Assert(providedType is ProxyProvidedType);
       myProvidedType = providedType;
       var type = context.TryGetILTypeRef(providedType);
-      if (type != null) TypeProvidersContext.ProvidedAbbreviations[type.Value.BasicQualifiedName] = this; //TODO: invalidate
+      if (type != null)
+        ProxyProvidedType.TypeProvidersContext.ProvidedAbbreviations[type.Value.BasicQualifiedName] = this;
     }
 
     [ContractAnnotation("type:null => null")]

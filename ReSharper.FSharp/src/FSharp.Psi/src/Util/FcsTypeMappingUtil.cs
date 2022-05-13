@@ -159,8 +159,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           : TypeFactory.CreateUnknownType(psiModule);
       }
 
-      if (entity.IsProvidedAndGenerated && // hide ProvidedAbbreviations in psi module?
-          TypeProvidersContext.ProvidedAbbreviations.TryGetValue(clrName.FullName, out var providedType))
+      if (entity.IsProvidedAndGenerated && psiModule.GetSolution().TryGetProvidedType(clrName, out var providedType))
         return MapType(providedType, psiModule);
 
       var declaredType = clrName.CreateTypeByClrName(psiModule);

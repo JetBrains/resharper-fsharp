@@ -22,6 +22,7 @@ type IProxyExtensionTypingProvider =
     abstract RuntimeVersion: unit -> string
     abstract HasGenerativeTypeProviders: project: IProject -> bool
     abstract DumpTypeProvidersProcess: unit -> string
+    abstract TypeProvidersManager: IProxyTypeProvidersManager
 
 [<SolutionComponent>]
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
@@ -123,6 +124,8 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
             // We can determine which projects contain generative provided types
             // only from type providers hosted out-of-process
             isConnectionAlive() && typeProvidersManager.HasGenerativeTypeProviders(project)
+        
+        member this.TypeProvidersManager = typeProvidersManager
 
     interface IDisposable with
         member this.Dispose() = terminateConnection ()
