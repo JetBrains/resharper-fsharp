@@ -62,5 +62,5 @@
 
     <Import Project="$(PsiFeaturesSubplatform)" Condition="Exists('$(PsiFeaturesSubplatform)')" />
 
-    <Import Project="../GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'"/>
+    <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'"/>
 </Project>

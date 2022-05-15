@@ -86,5 +86,5 @@
 
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
 
-  <Import Project="../GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'"/>
+  <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'"/>
 </Project>
