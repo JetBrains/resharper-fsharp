@@ -39,7 +39,7 @@ jobs:
 
       - name: Build ReSharper.FSharp
         working-directory: ./ReSharper.FSharp
-        run: dotnet build
+        run: dotnet build -p:RunOnGitHubActions=true
 
       - name: Test ReSharper.FSharp
         working-directory: ./ReSharper.FSharp

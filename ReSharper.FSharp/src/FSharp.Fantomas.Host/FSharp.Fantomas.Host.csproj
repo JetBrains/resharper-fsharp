@@ -33,4 +33,6 @@
 
     <Import Project="$(PsiFeaturesSubplatform)" Condition="Exists('$(PsiFeaturesSubplatform)')" />
     <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
+
+    <Import Project="../GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'"/>
 </Project>
