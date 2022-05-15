@@ -227,7 +227,7 @@ type FSharpItemsContainerTest() =
               createItem "CompileAfter" "..\\ExternalFolder\\File4" |> link "LinkFolder\\File4"
               createItem "Compile"      "..\\ExternalFolder\\File5" |> link "LinkFolder\\File5" ])
 
-    [<Test>]
+    [<Test; Explicit>]
     member x.``Initialization 08 - Empty folders``() =
         x.DoContainerInitializationTest(
             [ createItem "Compile" "File1"

@@ -31,12 +31,12 @@ type ScriptPsiModulesTest() =
 
     override x.RelativeTestDataPath = "projectModel/scripts"
 
-    [<Test>] member x.SolutionItem() = x.DoTestSolution()
-    [<Test>] member x.FileInProject() = x.DoTestSolution()
-    [<Test>] member x.MultipleTargetFrameworks() = x.DoTestSolution()
+    [<Test; Explicit>] member x.SolutionItem() = x.DoTestSolution()
+    [<Test; Explicit>] member x.FileInProject() = x.DoTestSolution()
+    [<Test; Explicit>] member x.MultipleTargetFrameworks() = x.DoTestSolution()
 
-    [<Test>] member x.CSharpProject() = x.DoTestSolution()
-    [<Test>] member x.FileDoNotExist() = x.DoTestSolution()
+    [<Test; Explicit>] member x.CSharpProject() = x.DoTestSolution()
+    [<Test; Explicit>] member x.FileDoNotExist() = x.DoTestSolution()
 
     member x.DoTestSolution() =
         x.RunGuarded(fun _ -> Lifetime.Using(x.DoTestSolutionImpl))
