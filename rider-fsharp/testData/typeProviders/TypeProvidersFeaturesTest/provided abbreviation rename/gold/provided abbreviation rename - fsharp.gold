@@ -1,0 +1,6 @@
+<caret>module SwaggerProviderLibrary
+
+open SwaggerProvider
+open SwaggerCrossLanguage.Literals
+
+type Renamed = OpenApiClientProvider<Schema>
