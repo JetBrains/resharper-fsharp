@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.IdeActions
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rdclient.testFramework.waitForNextDaemon
-import com.jetbrains.rider.plugins.fsharp.test.withOutOfProcessTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.enums.CoreVersion
@@ -40,46 +39,40 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
 
     @Test
     fun `provided abbreviation rename`() {
-        withOutOfProcessTypeProviders {
-            withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
-                waitForDaemon()
-                defaultRefactoringRename("Renamed")
-                waitForNextDaemon()
-                executeWithGold(File(testGoldFile.path + " - csharp")) {
-                    dumpOpenedDocument(it, project!!)
-                }
+        withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
+            waitForDaemon()
+            defaultRefactoringRename("Renamed")
+            waitForNextDaemon()
+            executeWithGold(File(testGoldFile.path + " - csharp")) {
+                dumpOpenedDocument(it, project!!)
             }
+        }
 
-            withOpenedEditor("SwaggerProviderLibrary/SwaggerProvider.fs") {
-                waitForDaemon()
-                executeWithGold(File(testGoldFile.path + " - fsharp")) {
-                    dumpOpenedDocument(it, project!!)
-                }
+        withOpenedEditor("SwaggerProviderLibrary/SwaggerProvider.fs") {
+            waitForDaemon()
+            executeWithGold(File(testGoldFile.path + " - fsharp")) {
+                dumpOpenedDocument(it, project!!)
             }
         }
     }
 
     private fun doNavigationTest() {
-        withOutOfProcessTypeProviders {
-            withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
+        withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
+            waitForDaemon()
+            gotoDeclaration {
+                waitForEditorSwitch("SwaggerProvider.fs")
                 waitForDaemon()
-                gotoDeclaration {
-                    waitForEditorSwitch("SwaggerProvider.fs")
-                    waitForDaemon()
-                    executeWithGold(testGoldFile) {
-                        dumpOpenedDocument(it, project!!, true)
-                    }
+                executeWithGold(testGoldFile) {
+                    dumpOpenedDocument(it, project!!, true)
                 }
             }
         }
     }
 
     private fun doRenameUnavailableTest() {
-        withOutOfProcessTypeProviders {
-            withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
-                waitForDaemon()
-                assertActionDisabled(project!!, dataContext, ActionPlaces.UNKNOWN, IdeActions.ACTION_RENAME)
-            }
+        withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
+            waitForDaemon()
+            assertActionDisabled(project!!, dataContext, ActionPlaces.UNKNOWN, IdeActions.ACTION_RENAME)
         }
     }
 }
