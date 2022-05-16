@@ -82,4 +82,6 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, repl
                 let factory = binding.CreateElementFactory()
                 let typeUsage = factory.CreateTypeUsage(replacementTypeName)
                 let currentReturnType = binding.ReturnTypeInfo
-                ModificationUtil.ReplaceChild(currentReturnType, factory.CreateReturnTypeInfo(typeUsage)) |> ignore)
+                let replaceWithType = factory.CreateReturnTypeInfo(typeUsage)
+                // TODO: how to add the attributes from the original to the newly created? 
+                ModificationUtil.ReplaceChild(currentReturnType, replaceWithType) |> ignore)

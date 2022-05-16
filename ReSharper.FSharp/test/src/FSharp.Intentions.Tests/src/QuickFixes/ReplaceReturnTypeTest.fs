@@ -14,3 +14,4 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``Replace type in infix application``() = x.DoNamedTest()
     [<Test>] member x.``Replace type in Sequential``() = x.DoNamedTest()
     [<Test>] member x.``Replace type in MatchClause``() = x.DoNamedTest()
+    [<Test>] member x.``Replace type with attribute``() = x.DoNamedTest()
