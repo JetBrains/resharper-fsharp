@@ -109,8 +109,8 @@ type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsPro
 
 
 [<SolutionComponent>]
-type TestFcsProjectBuilder(checkerService: FcsCheckerService, modulePathProvider: ModulePathProvider, logger: ILogger) =
-    inherit FcsProjectBuilder(checkerService, Mock<_>().Object, logger, modulePathProvider)
+type TestFcsProjectBuilder(checkerService: FcsCheckerService, logger: ILogger) =
+    inherit FcsProjectBuilder(checkerService, Mock<_>().Object, logger)
 
     override x.GetProjectItemsPaths(project, targetFrameworkId) =
         project.GetAllProjectFiles()
@@ -129,9 +129,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
     let getFcsProject (psiModule: IPsiModule) =
-        let project = psiModule.ContainingProjectModule.As<IProject>().NotNull()
-        let parsingOptions = fcsProjectBuilder.BuildParsingOptions(psiModule, project)
-        fcsProjectBuilder.BuildFcsProject(psiModule, project, parsingOptions)
+        fcsProjectBuilder.BuildFcsProject(psiModule, psiModule.ContainingProjectModule.As<IProject>())
 
     let getProjectOptions (sourceFile: IPsiSourceFile) =
         let fcsProject = getFcsProject sourceFile.PsiModule
@@ -183,7 +181,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then 0 else
 
             let fcsProject = getFcsProject sourceFile.PsiModule
-            match fcsProject.ParsingOptions.FileIndices.TryGetValue(sourceFile.GetLocation()) with
+            match fcsProject.FileIndices.TryGetValue(sourceFile.GetLocation()) with
             | true, index -> index
             | _ -> -1
 

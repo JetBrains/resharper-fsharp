@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public FcsModuleResolvedSymbols([CanBeNull] FcsProject fcsProject, bool isScript = false)
     {
-      var filesCount = fcsProject?.ParsingOptions.ParsingOptions.SourceFiles.Length ?? (isScript ? 1 : 0);
+      var filesCount = fcsProject?.ParsingOptions.SourceFiles.Length ?? (isScript ? 1 : 0);
       myFileResolvedSymbols = new FcsFileResolvedSymbols[filesCount];
 
       FcsProject = fcsProject;
@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private bool TryGetFileIndex(IPsiSourceFile sourceFile, out int index)
     {
       if (FcsProject != null)
-        return FcsProject.ParsingOptions.FileIndices.TryGetValue(sourceFile.GetLocation(), out index);
+        return FcsProject.FileIndices.TryGetValue(sourceFile.GetLocation(), out index);
 
       if (IsScript)
       {

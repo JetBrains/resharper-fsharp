@@ -31,19 +31,16 @@ module FcsCheckerService =
         SourceText.ofString(document.GetText())
 
 
-type FcsParsingOptions =
-    { ParsingOptions: FSharpParsingOptions
-      FileIndices: Dictionary<VirtualFileSystemPath, int>
-      ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath> }
-
-    member x.IsKnownFile(sourceFile: IPsiSourceFile) =
-        x.FileIndices.ContainsKey(sourceFile.GetLocation())
-
 type FcsProject =
     { OutputPath: VirtualFileSystemPath
       ProjectOptions: FSharpProjectOptions
-      ParsingOptions: FcsParsingOptions
+      ParsingOptions: FSharpParsingOptions
+      FileIndices: Dictionary<VirtualFileSystemPath, int>
+      ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
       ReferencedModules: HashSet<IPsiModule> }
+
+    member x.IsKnownFile(sourceFile: IPsiSourceFile) =
+        x.FileIndices.ContainsKey(sourceFile.GetLocation())
 
 
 [<ShellComponent; AllowNullLiteral>]
