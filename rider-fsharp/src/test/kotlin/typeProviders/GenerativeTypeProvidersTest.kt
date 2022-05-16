@@ -3,7 +3,6 @@ package typeProviders
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rdclient.testFramework.waitForNextDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
-import com.jetbrains.rider.plugins.fsharp.test.withOutOfProcessTypeProviders
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
@@ -24,24 +23,22 @@ class GenerativeTypeProvidersTest : BaseTestWithSolution() {
     fun `generative type providers cross-project analysis`() {
         val generativeProviderProjectPath = "${project.solutionDirectoryPath}/GenerativeTypeProvider/GenerativeTypeProvider.fsproj"
 
-        withOutOfProcessTypeProviders {
-            withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
-                waitForDaemon()
-                markupAdapter.hasErrors.shouldBeTrue()
+        withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
+            waitForDaemon()
+            markupAdapter.hasErrors.shouldBeTrue()
 
-                buildSelectedProjectsWithConsoleBuild(listOf(generativeProviderProjectPath))
+            buildSelectedProjectsWithConsoleBuild(listOf(generativeProviderProjectPath))
 
-                waitForNextDaemon(Duration.ofSeconds(5))
-                markupAdapter.hasErrors.shouldBeFalse()
-            }
+            waitForNextDaemon(Duration.ofSeconds(5))
+            markupAdapter.hasErrors.shouldBeFalse()
+        }
 
-            unloadProject(arrayOf("TypeProviderLibrary", "GenerativeTypeProvider"))
-            reloadProject(arrayOf("TypeProviderLibrary", "GenerativeTypeProvider"))
+        unloadProject(arrayOf("TypeProviderLibrary", "GenerativeTypeProvider"))
+        reloadProject(arrayOf("TypeProviderLibrary", "GenerativeTypeProvider"))
 
-            withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
-                waitForDaemon()
-                markupAdapter.hasErrors.shouldBeFalse()
-            }
+        withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
+            waitForDaemon()
+            markupAdapter.hasErrors.shouldBeFalse()
         }
     }
 }

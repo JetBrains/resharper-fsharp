@@ -3,7 +3,6 @@ package typeProviders
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
-import com.jetbrains.rider.plugins.fsharp.test.withOutOfProcessTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
@@ -52,16 +51,14 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
     fun fsc() = doTest(".NET Framework 4.8")
 
     private fun doTest(expectedRuntime: String) {
-        withOutOfProcessTypeProviders {
-            withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
-                waitForDaemon()
-                this.project!!.fcsHost
+        withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
+            waitForDaemon()
+            this.project!!.fcsHost
                     .typeProvidersRuntimeVersion.sync(Unit)
                     .shouldNotBeNull()
                     .startsWith(expectedRuntime)
                     .shouldBeTrue()
-                markupAdapter.hasErrors.shouldBeFalse()
-            }
+            markupAdapter.hasErrors.shouldBeFalse()
         }
     }
 }
