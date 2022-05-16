@@ -3,7 +3,6 @@ package typeProviders
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
-import com.jetbrains.rider.plugins.fsharp.test.withOutOfProcessTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
@@ -22,9 +21,9 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
 
     @Test
     @TestEnvironment(
-        toolset = ToolsetVersion.TOOLSET_16,
-        coreVersion = CoreVersion.DOT_NET_CORE_3_1,
-        solution = "TypeProviderLibrary")
+            toolset = ToolsetVersion.TOOLSET_16,
+            coreVersion = CoreVersion.DOT_NET_CORE_3_1,
+            solution = "TypeProviderLibrary")
     fun framework461() = doTest(".NET Framework 4.8")
 
     @Test(enabled = false)
@@ -45,23 +44,21 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
 
     @Test(enabled = false)
     @TestEnvironment(
-        toolset = ToolsetVersion.TOOLSET_16_CORE,
-        coreVersion = CoreVersion.DOT_NET_CORE_3_1,
-        solution = "FscTypeProviderLibrary"
+            toolset = ToolsetVersion.TOOLSET_16_CORE,
+            coreVersion = CoreVersion.DOT_NET_CORE_3_1,
+            solution = "FscTypeProviderLibrary"
     )
     fun fsc() = doTest(".NET Framework 4.8")
 
     private fun doTest(expectedRuntime: String) {
-        withOutOfProcessTypeProviders {
-            withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
-                waitForDaemon()
-                this.project!!.fcsHost
+        withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
+            waitForDaemon()
+            this.project!!.fcsHost
                     .typeProvidersRuntimeVersion.sync(Unit)
                     .shouldNotBeNull()
                     .startsWith(expectedRuntime)
                     .shouldBeTrue()
-                markupAdapter.hasErrors.shouldBeFalse()
-            }
+            markupAdapter.hasErrors.shouldBeFalse()
         }
     }
 }
