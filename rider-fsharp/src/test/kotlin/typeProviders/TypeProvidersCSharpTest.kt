@@ -2,7 +2,6 @@ package typeProviders
 
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
-import com.jetbrains.rider.plugins.fsharp.test.withOutOfProcessTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.enums.CoreVersion
@@ -10,6 +9,7 @@ import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 import java.io.File
+
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16)
 class TypeProvidersCSharpTest : BaseTestWithSolution() {
@@ -18,22 +18,20 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
 
     @Test
     fun resolveTest() {
-        withOutOfProcessTypeProviders {
-            withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
-                waitForDaemon()
-                executeWithGold(testGoldFile) {
-                    dumpSevereHighlighters(it)
-                }
+        withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
+            waitForDaemon()
+            executeWithGold(testGoldFile) {
+                dumpSevereHighlighters(it)
             }
+        }
 
-            unloadAllProjects()
-            reloadAllProjects(project)
+        unloadAllProjects()
+        reloadAllProjects(project)
 
-            withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
-                waitForDaemon()
-                executeWithGold(testGoldFile) {
-                    dumpSevereHighlighters(it)
-                }
+        withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
+            waitForDaemon()
+            executeWithGold(testGoldFile) {
+                dumpSevereHighlighters(it)
             }
         }
     }
@@ -45,26 +43,23 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
         coreVersion = CoreVersion.DOT_NET_6
     )
     fun changeStaticArg() {
-        withOutOfProcessTypeProviders {
+        withOpenedEditor(project, "SwaggerProviderLibrary/Literals.fs") {
+            // change schema path from "specification.json" to "specification1.json"
+            typeFromOffset("1", 86)
+        }
 
-            withOpenedEditor(project, "SwaggerProviderLibrary/Literals.fs") {
-                // change schema path from "specification.json" to "specification1.json"
-                typeFromOffset("1", 86)
+        withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
+            waitForDaemon()
+            executeWithGold(File(testGoldFile.path + "_before")) {
+                dumpSevereHighlighters(it)
             }
 
-            withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
-                waitForDaemon()
-                executeWithGold(File(testGoldFile.path + "_before")) {
-                    dumpSevereHighlighters(it)
-                }
+            // change method call from "ApiCoursesGet" to "ApiCoursesGet1"
+            typeFromOffset("1", 194)
+            waitForDaemon()
 
-                // change method call from "ApiCoursesGet" to "ApiCoursesGet1"
-                typeFromOffset("1", 194)
-                waitForDaemon()
-
-                executeWithGold(File(testGoldFile.path + "_after")) {
-                    dumpSevereHighlighters(it)
-                }
+            executeWithGold(File(testGoldFile.path + "_after")) {
+                dumpSevereHighlighters(it)
             }
         }
     }
