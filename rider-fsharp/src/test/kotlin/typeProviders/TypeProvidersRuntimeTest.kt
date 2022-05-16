@@ -21,9 +21,9 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
 
     @Test
     @TestEnvironment(
-            toolset = ToolsetVersion.TOOLSET_16,
-            coreVersion = CoreVersion.DOT_NET_CORE_3_1,
-            solution = "TypeProviderLibrary")
+        toolset = ToolsetVersion.TOOLSET_16,
+        coreVersion = CoreVersion.DOT_NET_CORE_3_1,
+        solution = "TypeProviderLibrary")
     fun framework461() = doTest(".NET Framework 4.8")
 
     @Test(enabled = false)
@@ -44,9 +44,9 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
 
     @Test(enabled = false)
     @TestEnvironment(
-            toolset = ToolsetVersion.TOOLSET_16_CORE,
-            coreVersion = CoreVersion.DOT_NET_CORE_3_1,
-            solution = "FscTypeProviderLibrary"
+        toolset = ToolsetVersion.TOOLSET_16_CORE,
+        coreVersion = CoreVersion.DOT_NET_CORE_3_1,
+        solution = "FscTypeProviderLibrary"
     )
     fun fsc() = doTest(".NET Framework 4.8")
 
