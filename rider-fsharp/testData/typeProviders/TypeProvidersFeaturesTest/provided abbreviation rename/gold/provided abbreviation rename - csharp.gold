@@ -1,0 +1,12 @@
+﻿using static SwaggerProviderLibrary;
+
+namespace CSharpLibrary;
+
+public class Class
+{
+    public void Main()
+    {
+        var client = new Ren<caret>amed.Client();
+        var a = client.ApiCoursesGet().Result;
+    }
+}
