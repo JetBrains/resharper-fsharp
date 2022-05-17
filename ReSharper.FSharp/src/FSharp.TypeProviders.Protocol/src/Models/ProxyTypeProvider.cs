@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public ProxyTypeProvider(RdTypeProvider rdTypeProvider, TypeProvidersContext typeProvidersContext,
       IPsiModule module)
     {
-      Module = module;
+      ProjectModule = module;
       myRdTypeProvider = rdTypeProvider;
       myTypeProvidersContext = typeProvidersContext;
 
@@ -93,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       };
 
     public string GetDisplayName(bool fullName) => fullName ? myRdTypeProvider.FullName : myRdTypeProvider.Name;
-    public IPsiModule Module { get; }
+    public IPsiModule ProjectModule { get; }
 
     public void Dispose()
     {

@@ -27,21 +27,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
       }
     }
 
-    public ProxyProvidedTypeWithContext this[string clrName]
+    public void AddOrUpdate(ProxyProvidedTypeWithContext type)
     {
-      set
+      Invalidate();
+
+      var module = type.TypeProvider.ProjectModule.NotNull();
+      if (!myCache.TryGetValue(module, out var typesGroup))
       {
-        Invalidate();
-
-        var module = value.TypeProvider.Module.NotNull();
-        if (!myCache.TryGetValue(module, out var typesGroup))
-        {
-          typesGroup = new ConcurrentDictionary<string, ProxyProvidedTypeWithContext>();
-          myCache[module] = typesGroup;
-        }
-
-        typesGroup[clrName] = value;
+        typesGroup = new ConcurrentDictionary<string, ProxyProvidedTypeWithContext>();
+        myCache[module] = typesGroup;
       }
+
+      typesGroup[type.GetClrName().FullName] = type;
     }
 
     public bool TryGet(IPsiModule module, IClrTypeName clrName, out ProxyProvidedTypeWithContext providedType)
@@ -56,7 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     public void Remove(IProxyTypeProvider typeProvider)
     {
-      var (module, tpId) = (typeProvider.Module.NotNull(), typeProvider.EntityId);
+      var (module, tpId) = (typeProvider.ProjectModule.NotNull(), typeProvider.EntityId);
       if (myCache.TryGetValue(module, out var typesGroup))
         typesGroup.RemoveAll(t => t.Value.EntityId == tpId);
     }
