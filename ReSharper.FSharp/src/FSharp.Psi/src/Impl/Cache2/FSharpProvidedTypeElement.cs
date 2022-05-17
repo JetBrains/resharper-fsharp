@@ -52,6 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         .Union(Events)
         .Union(Fields)
         .Union(Constructors)
+        .Union(NestedTypes.Cast<ITypeMember>())
         .ToList();
 
     public IEnumerable<IField> Fields =>
