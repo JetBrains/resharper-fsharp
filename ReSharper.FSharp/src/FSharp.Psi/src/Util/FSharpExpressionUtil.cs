@@ -75,7 +75,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
               parent = null;
             }
             break;
-          case IReferenceExpr or IBinaryAppExpr or IParenExpr or IMatchExpr:
+          case IIfThenElseExpr ifThenElseExpr:
+            if (ifThenElseExpr.ThenExpr == currentExpr || ifThenElseExpr.ElseExpr == currentExpr)
+            {
+              currentExpr = ifThenElseExpr;
+              parent = ifThenElseExpr.Parent;
+            }
+            else
+            {
+              currentExpr = null;
+              parent = null;
+            }
+            break;
+          case IReferenceExpr or IBinaryAppExpr or IParenExpr or IMatchExpr or IUnitExpr or ITypedExpr:
             var nextExpr = parent as IFSharpExpression;
             currentExpr = nextExpr;
             parent = nextExpr.Parent;
