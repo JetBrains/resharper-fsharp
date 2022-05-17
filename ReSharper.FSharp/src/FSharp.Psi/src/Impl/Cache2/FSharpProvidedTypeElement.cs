@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using static FSharp.Compiler.ExtensionTyping;
@@ -52,7 +52,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         .Union(Events)
         .Union(Fields)
         .Union(Constructors)
-        .Union(NestedTypes.Cast<ITypeMember>())
         .ToList();
 
     public IEnumerable<IField> Fields =>
@@ -86,33 +85,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       return memberFlags;
     }
 
-    public IEnumerable<string> MemberNames => GetMembers().Select(t => t.ShortName); //ToHashSet?
+    public IEnumerable<string> MemberNames => myMemberNames ??= GetMembers()
+      .Where(t => t is not IConstructor)
+      .Select(t => t.ShortName)
+      .ToArray();
 
     public IDeclaredType GetBaseClassType() =>
       Type.BaseType?.MapType(TypeElement.Module) as IDeclaredType ?? TypeElement.Module.GetPredefinedType().Object;
 
     public IClass GetSuperClass() => GetBaseClassType().GetClassType();
 
-    //TODO: common & hashset
-    public bool HasMemberWithName(string shortName, bool ignoreCase)
-    {
-      var comparisonRule = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-
-      foreach (var name in MemberNames)
-        if (string.Equals(name, shortName, comparisonRule))
-          return true;
-
-      return false;
-    }
+    public bool HasMemberWithName(string shortName, bool ignoreCase) =>
+      SharedImplUtil.HasMemberWithName(myMemberNames, shortName, ignoreCase);
 
     private IEnumerable<IDeclaredType> CalculateSuperTypes()
     {
-      yield return GetBaseClassType();
-      foreach (var type in Type.GetInterfaces())
+      IEnumerable<IDeclaredType> CalculateSuperTypesInternal()
       {
-        if (type.MapType(TypeElement.Module) is IDeclaredType declType)
-          yield return declType;
+        yield return GetBaseClassType();
+        foreach (var type in Type.GetInterfaces())
+        {
+          if (type.MapType(TypeElement.Module) is IDeclaredType declType)
+            yield return declType;
+        }
       }
+
+      return mySuperTypes ??= CalculateSuperTypesInternal().ToList();
     }
 
     private IEnumerable<IMethod> FilterMethods(IEnumerable<IMethod> methodInfos)
@@ -143,6 +141,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       return methodGroups.Values;
     }
 
-    private IList<IMethod> myMethods;
+    private List<IDeclaredType> mySuperTypes;
+    private List<IMethod> myMethods;
+    private string[] myMemberNames;
   }
 }
