@@ -129,6 +129,14 @@ Provided Assemblies:
 15 SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral
 17 TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae
 
+Provided Abbreviations:
+ProjectPsiModule(Name: TypeProviderLibrary, Target: '.NETStandard,Version=v2.0') = 
+	TypeProviderLibrary.SimpleGenerativeProvider+S
+	TypeProviderLibrary.SimpleGenerativeProvider+S+GenerativeSubtype
+	TypeProviderLibrary.SwaggerProvider+PetStore
+	TypeProviderLibrary.SwaggerProvider+PetStore+Client
+	TypeProviderLibrary.SwaggerProvider+PetStore+OperationTypes
+
 [Out-Process dump]:
 
 Type Providers:
