@@ -4,7 +4,6 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
@@ -17,23 +16,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
   public class ProxyProvidedTypeWithContext : ProvidedType, IProxyProvidedType
   {
     private readonly ProvidedType myProvidedType;
+    private IClrTypeName myClrTypeName;
     private ProxyProvidedType ProxyProvidedType => (ProxyProvidedType)myProvidedType;
 
     private ProxyProvidedTypeWithContext(ProvidedType providedType, ProvidedTypeContext context) : base(null, context)
     {
       Assertion.Assert(providedType is ProxyProvidedType);
       myProvidedType = providedType;
+
       var type = context.TryGetILTypeRef(providedType);
-      if (type != null)
-        ProxyProvidedType.TypeProvidersContext.ProvidedAbbreviations[type.Value.BasicQualifiedName] = this;
+      if (type != null && ProxyProvidedType.TypeProvider.ProjectModule != null)
+        ProxyProvidedType.TypeProvidersContext.ProvidedAbbreviations.AddOrUpdate(this);
     }
 
     [ContractAnnotation("type:null => null")]
     public static ProvidedType Create(ProvidedType type, ProvidedTypeContext context) => type switch
     {
       null => null,
-      //IProxyProvidedType { IsCreatedByProvider: true } => new ProxyProvidedTypeWithContext(type, context),
-      _ => new ProxyProvidedTypeWithContext(type, context),
+      ProxyProvidedType { CanHaveProvidedTypeContext: true } => new ProxyProvidedTypeWithContext(type, context),
+      _ => type
     };
 
     public static ProvidedType[] Create(ProvidedType[] propertyInfos, ProvidedTypeContext context)
@@ -181,14 +182,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       };
     }
 
+    public override int GetHashCode() => ProxyProvidedType.FullName.GetHashCode();
+
     public bool IsCreatedByProvider => ProxyProvidedType.IsCreatedByProvider;
 
-    public IClrTypeName GetClrName() => myProvidedType switch
+    public IClrTypeName GetClrName() => myClrTypeName ??= ProxyProvidedType switch
     {
       IProxyProvidedType { IsCreatedByProvider: true } =>
         new ClrTypeName(Context.TryGetILTypeRef(this).Value.BasicQualifiedName),
-      IProxyProvidedType type => type.GetClrName(),
-      _ => throw new ArgumentOutOfRangeException()
+      IProxyProvidedType type => type.GetClrName()
     };
 
     public string DisplayName => Context.TryGetILTypeRef(this).Value.Name;
