@@ -208,6 +208,7 @@ private bindingHeader:
 
 returnTypeInfo:
   COLON<FSHARP_COLON, Colon>
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   typeUsage<TYPE, ReturnType>;
 
 externDeclaration:
