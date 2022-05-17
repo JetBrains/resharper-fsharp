@@ -62,8 +62,14 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, repl
         let symbolUse = refPat.GetFcsSymbolUse()
         if isNull symbolUse then () else
 
-        if isNotNull binding.ReturnTypeInfo then
+        if isNotNull binding.ReturnTypeInfo
+           && isNotNull binding.ReturnTypeInfo.ReturnType then
             let factory = binding.CreateElementFactory()
             let typeUsage = factory.CreateTypeUsage(replacementTypeName)
-            let currentReturnType = binding.ReturnTypeInfo
-            ModificationUtil.ReplaceChild(currentReturnType.ReturnType, typeUsage) |> ignore
+                
+            match binding.ReturnTypeInfo.ReturnType with
+            | :? INamedTypeUsage as ntu ->
+                ModificationUtil.ReplaceChild(ntu, typeUsage) |> ignore
+            | :? IFunctionTypeUsage as ftu ->
+                ftu.SetReturnTypeUsage(typeUsage) |> ignore
+            | _ -> ()
