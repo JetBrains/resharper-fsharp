@@ -141,7 +141,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                 systemRuntimeContainsType: string -> bool, systemRuntimeAssemblyVersion: Version,
                 compilerToolsPath: string list, m: range) =
 
-            let envPath, psiModule =
+            let envPath, projectPsiModule =
                 match resolutionEnvironment.outputFile with
                 | Some file ->
                     file, fcsProjectProvider.GetPsiModule(VirtualFileSystemPath.Parse(file, InteractionContext.SolutionContext))
@@ -159,7 +159,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
 
             let typeProviderProxies =
                 [ for tp in result.TypeProviders ->
-                     let tp = new ProxyTypeProvider(tp, tpContext, Option.toObj psiModule)
+                     let tp = new ProxyTypeProvider(tp, tpContext, Option.toObj projectPsiModule)
 
                      if not isInteractive then
                          tp.ContainsGenerativeTypes.Add(fun _ -> addProjectWithGenerativeProvider envPath)

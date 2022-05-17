@@ -14,6 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     ISecondaryDeclaredElement where T : ProvidedMemberInfo
   {
     private readonly ITypeElement myContainingType;
+    private IClrDeclaredElement myOriginElement;
     protected T Info { get; }
 
     protected FSharpProvidedMember(T info, ITypeElement containingType)
@@ -23,8 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Module = containingType.Module;
     }
 
-    //TODO: remove new modifier
-    public new XmlNode GetXMLDoc(bool inherit) => Info.GetXmlDoc(this);
+    public override XmlNode GetXMLDoc(bool inherit) => Info.GetXmlDoc(this);
     public override IPsiModule Module { get; }
     public override string XMLDocId => XMLDocUtil.GetTypeMemberXmlDocId(this, ShortName);
     public override ITypeElement GetContainingType() => myContainingType;
@@ -33,18 +33,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     protected override IClrDeclaredElement ContainingElement => myContainingType;
     public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
 
-    public IClrDeclaredElement OriginElement
-    {
-      get
-      {
-        var declaringType = Info.DeclaringType;
-        while (declaringType.DeclaringType != null)
-          declaringType = declaringType.DeclaringType;
-
-        return declaringType.MapType(Module).GetTypeElement().NotNull();
-      }
-    }
-
+    public IClrDeclaredElement OriginElement => myOriginElement ??= GetOriginElement();
     public bool IsReadOnly => true;
+
+    private IClrDeclaredElement GetOriginElement()
+    {
+      var declaringType = Info.DeclaringType;
+      while (declaringType.DeclaringType != null)
+        declaringType = declaringType.DeclaringType;
+
+      return declaringType.MapType(Module).GetTypeElement().NotNull();
+    }
   }
 }
