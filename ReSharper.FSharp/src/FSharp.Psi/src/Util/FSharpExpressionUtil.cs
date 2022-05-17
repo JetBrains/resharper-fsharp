@@ -35,5 +35,58 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     public static readonly Func<IFSharpExpression, bool> IsSimpleValueExpressionFunc = IsSimpleValueExpression;
     public static readonly Func<IFSharpExpression, bool> IsLiteralExpressionFunc = IsLiteralExpression;
+
+    // TODO: change name
+    public static IFSharpExpression GetOuterMostParentExpression(this IFSharpExpression expression)
+    {
+      IFSharpTreeNode currentExpr = expression;
+      var parent = currentExpr.Parent;
+      while (parent != null)
+      {
+        switch (parent)
+        {
+          case IChameleonExpression:
+            return currentExpr as IFSharpExpression;
+          case ILiteralExpr literalExpr:
+            currentExpr = literalExpr;
+            parent = literalExpr.Parent;
+            break;
+          case IMatchClause matchClause:
+            if (matchClause.Expression == currentExpr)
+            {
+              currentExpr = matchClause;
+              parent = matchClause.Parent;
+            }
+            else
+            {
+              currentExpr = null;
+              parent = null;
+            }
+            break;
+          case ISequentialExpr sequentialExpr:
+            if (sequentialExpr.Expressions.Last() == currentExpr)
+            {
+              currentExpr = sequentialExpr;
+              parent = sequentialExpr.Parent;
+            }
+            else
+            {
+              currentExpr = null;
+              parent = null;
+            }
+            break;
+          case IReferenceExpr or IBinaryAppExpr or IParenExpr or IMatchExpr:
+            var nextExpr = parent as IFSharpExpression;
+            currentExpr = nextExpr;
+            parent = nextExpr.Parent;
+            break;
+          default:
+            parent = null;
+            break;
+        }
+      }
+
+      return currentExpr as IFSharpExpression;
+    }
   }
 }

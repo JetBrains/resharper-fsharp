@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open System.Text.RegularExpressions
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -10,20 +11,8 @@ open JetBrains.ReSharper.Resources.Shell
 
 type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, replaceFirstType: bool) =
     inherit FSharpQuickFixBase()
-    
-    let rec visitParent (expr: IFSharpExpression): IFSharpExpression option =
-        match expr.Parent with
-        | :? ISequentialExpr as seqExpr ->
-            if seqExpr.Expressions.Last() <> expr then None else
-            visitParent seqExpr
-        | :? IMatchClause as clause ->
-            match clause.Parent with
-            | :? IFSharpExpression as parent -> visitParent parent
-            | _ -> None
-        | :? IFSharpExpression as parent -> visitParent parent
-        | _ -> Some expr
-    
-    let parentExpr = visitParent expr
+
+    let parentExpr = expr.GetOuterMostParentExpression()
     
     let getReplacementTypeFromErrorMessage (errorMessage:string) =
         let regexMatches = Regex.Matches(errorMessage, "'((\\w|\.|\d)+)'")
@@ -52,10 +41,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, repl
 
     override this.Text = "Replace return type"
     override this.IsAvailable _ =
-        match parentExpr with
-        | None -> false
-        | Some parentExpr ->
-
+        if isNull parentExpr then false else
         let binding = BindingNavigator.GetByExpression(parentExpr)
         if isNull binding then false else
         Option.isSome (getReplacementTypeFromErrorMessage fcsErrorMessage)
@@ -65,21 +51,19 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, repl
         | None -> ()
         | Some replacementTypeName ->
 
-        parentExpr
-        |> Option.iter (fun parentExpr ->
-            let binding = BindingNavigator.GetByExpression(parentExpr)
-            
-            use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
-            use disableFormatter = new DisableCodeFormatter()
+        let binding = BindingNavigator.GetByExpression(parentExpr)
+        
+        use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
 
-            let refPat = binding.HeadPattern.As<IReferencePat>()
-            if isNull refPat then () else
+        let refPat = binding.HeadPattern.As<IReferencePat>()
+        if isNull refPat then () else
 
-            let symbolUse = refPat.GetFcsSymbolUse()
-            if isNull symbolUse then () else
+        let symbolUse = refPat.GetFcsSymbolUse()
+        if isNull symbolUse then () else
 
-            if isNotNull binding.ReturnTypeInfo then
-                let factory = binding.CreateElementFactory()
-                let typeUsage = factory.CreateTypeUsage(replacementTypeName)
-                let currentReturnType = binding.ReturnTypeInfo
-                ModificationUtil.ReplaceChild(currentReturnType.ReturnType, typeUsage) |> ignore)
+        if isNotNull binding.ReturnTypeInfo then
+            let factory = binding.CreateElementFactory()
+            let typeUsage = factory.CreateTypeUsage(replacementTypeName)
+            let currentReturnType = binding.ReturnTypeInfo
+            ModificationUtil.ReplaceChild(currentReturnType.ReturnType, typeUsage) |> ignore
