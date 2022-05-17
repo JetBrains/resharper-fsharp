@@ -1,3 +1,4 @@
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using IProvidedCustomAttributeProvider =
@@ -33,13 +34,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     private RdProvidedTypeProcessModel ProvidedTypeProtocol => Connection.ProtocolModel.RdProvidedTypeProcessModel;
 
-    public void Dispose(int typeProviderId)
+    public void Dispose(IProxyTypeProvider typeProvider)
     {
+      var typeProviderId = typeProvider.EntityId;
       ProvidedTypesCache.Remove(typeProviderId);
       ProvidedAssembliesCache.Remove(typeProviderId);
       GenericProvidedTypesCache.Remove(typeProviderId);
       AppliedProvidedTypesCache.Remove(typeProviderId);
       ArrayProvidedTypesCache.Remove(typeProviderId);
+      if (typeProvider.IsGenerative) ProvidedAbbreviations.Remove(typeProvider);
     }
 
     public string Dump() =>

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Concurrent;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 
@@ -19,7 +21,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
              myCache.TryGetValue(itemToInvalidate.module, out var typesGroup) &&
              typesGroup.TryGetValue(itemToInvalidate.clrName, out var type))
       {
-        foreach (var ilTypeRef in type.Context.GetDictionaries().Item1.Values)
+        var (generativeTypesToIlTypeRefsMap, _) = type.Context.GetDictionaries();
+        foreach (var ilTypeRef in generativeTypesToIlTypeRefsMap.Values)
           typesGroup.TryRemove(ilTypeRef.BasicQualifiedName, out _);
       }
     }
@@ -50,5 +53,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     public void MarkAsInvalidated(IPsiModule module, IClrTypeName clrName) =>
       myQueueToInvalidate.Enqueue((module, clrName.FullName));
+
+    public void Remove(IProxyTypeProvider typeProvider)
+    {
+      var (module, tpId) = (typeProvider.Module.NotNull(), typeProvider.EntityId);
+      if (myCache.TryGetValue(module, out var typesGroup))
+        typesGroup.RemoveAll(t => t.Value.EntityId == tpId);
+    }
   }
 }

@@ -103,7 +103,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     {
       if (myIsDisposed) return;
 
-      myTypeProvidersContext.Dispose(EntityId);
+      myTypeProvidersContext.Dispose(this);
 
       myIsDisposed = true;
       Disposed?.Invoke(this, EventArgs.Empty);
