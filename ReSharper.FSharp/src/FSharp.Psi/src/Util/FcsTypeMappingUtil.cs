@@ -177,16 +177,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [NotNull]
     public static IType MapType([NotNull] this ProvidedType providedType, IPsiModule module)
     {
-      if (providedType is not ProxyProvidedTypeWithContext proxyProvidedType)
+      if (providedType is not IProxyProvidedType proxyProvidedType)
         return TypeFactory.CreateUnknownType(module);
 
-      if (proxyProvidedType.IsCreatedByProvider && proxyProvidedType.DeclaringType is { } declaringType)
+      if (proxyProvidedType.IsCreatedByProvider && providedType.DeclaringType is { } declaringType)
         return TypeFactory.CreateType(new FSharpProvidedNestedClass(providedType, module,
           declaringType.MapType(module).GetTypeElement()));
 
       if (providedType.IsArray)
         return TypeFactory.CreateArrayType(providedType.GetElementType().MapType(module), providedType.GetArrayRank(),
           NullableAnnotation.Unknown);
+
+      if (providedType.IsPointer)
+        return TypeFactory.CreatePointerType(providedType.GetElementType().MapType(module));
 
       if (!providedType.IsGenericType)
         return TypeFactory.CreateTypeByCLRName(proxyProvidedType.GetClrName(), NullableAnnotation.Unknown, module);

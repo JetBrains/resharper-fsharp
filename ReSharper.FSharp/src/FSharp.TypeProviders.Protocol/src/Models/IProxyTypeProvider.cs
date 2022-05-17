@@ -10,7 +10,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
   {
     ProvidedExpr GetInvokerExpression(ProvidedMethodBase methodBase, ProvidedVar[] paramExprs);
     string GetDisplayName(bool fullName);
-    [CanBeNull] IPsiModule Module { get; }
+    
+    /// Can be null if type provider instantiated from F# script 
+    [CanBeNull] IPsiModule ProjectModule { get; }
 
     /// Before the proxy type provider receives the invalidation signal,
     /// the out-of-process caches and type provider will already be invalidated

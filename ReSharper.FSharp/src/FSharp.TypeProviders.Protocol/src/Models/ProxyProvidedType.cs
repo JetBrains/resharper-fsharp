@@ -121,6 +121,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public override bool IsMeasure => HasFlag(RdProvidedTypeFlags.IsMeasure);
     public bool IsCreatedByProvider => HasFlag(RdProvidedTypeFlags.IsCreatedByProvider);
 
+    public bool CanHaveProvidedTypeContext =>
+      myCanHaveProvidedTypeContext ??= CanHaveProvidedTypeContextRec(this);
+
     public override int GenericParameterPosition =>
       myGenericParameterPosition ??=
         TypeProvidersContext.Connection.ExecuteWithCatch(() =>
@@ -287,7 +290,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       };
     }
 
+    public override int GetHashCode() => FullName.GetHashCode();
+
     private bool HasFlag(RdProvidedTypeFlags flag) => (myRdProvidedType.Flags & flag) == flag;
+
+    private static bool CanHaveProvidedTypeContextRec(ProvidedType type)
+    {
+      if (type is IProxyProvidedType { IsCreatedByProvider: true }) return true;
+
+      if (type.IsArray || type.IsByRef || type.IsPointer)
+        return CanHaveProvidedTypeContextRec(type.GetElementType());
+
+      if (type.IsGenericType)
+        foreach (var arg in type.GetGenericArguments())
+          if (CanHaveProvidedTypeContextRec(arg))
+            return true;
+
+      return false;
+    }
 
     private int? myArrayRank;
     private string[] myXmlDocs;
@@ -297,6 +317,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private int? myGenericTypeDefinitionId;
     private int? myElementTypeId;
     private int? myEnumUnderlyingTypeId;
+    private bool? myCanHaveProvidedTypeContext;
     private ProvidedAssembly myProvidedAssembly;
     private readonly InterruptibleLazy<ProvidedType[]> myGenericArguments;
     private readonly InterruptibleLazy<ProvidedParameterInfo[]> myStaticParameters;
