@@ -46,6 +46,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     }
 
     public string Dump() =>
-      string.Join("\n\n", ProvidedTypesCache.Dump(), ProvidedAssembliesCache.Dump());
+      string.Join("\n\n", ProvidedTypesCache.Dump(), ProvidedAssembliesCache.Dump(), ProvidedAbbreviations.Dump());
   }
 }
