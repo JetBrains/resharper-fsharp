@@ -62,7 +62,8 @@ module ProjectOptions =
 
 
 [<SolutionComponent>]
-type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer, logger: ILogger) =
+type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
+        modulePathProvider: ModulePathProvider, logger: ILogger) =
 
     let mutable stamp = 0L
 
@@ -229,4 +230,17 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
           ParsingOptions = parsingOptions
           FileIndices = fileIndices
           ImplementationFilesWithSignatures = implsWithSig
-          ReferencedModules = null }
+          ReferencedModules = HashSet() }
+
+    member this.AddReferences(fcsProject, referencedPsiModules: IPsiModule seq) =
+        fcsProject.ReferencedModules.AddRange(referencedPsiModules)
+
+        let paths =
+            referencedPsiModules
+            |> Array.ofSeq
+            |> Array.map modulePathProvider.GetModulePath
+            |> Array.map (fun r -> "-r:" + r.FullPath)
+
+        let otherOptions = Array.append fcsProject.ProjectOptions.OtherOptions paths
+        let projectOptions = { fcsProject.ProjectOptions with OtherOptions = otherOptions}
+        { fcsProject with ProjectOptions = projectOptions }

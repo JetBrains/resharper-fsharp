@@ -200,17 +200,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                     fcsProjectsWithoutReferences.Remove(psiModule) |> ignore
                     fcsProject
 
-                let paths =
-                    referencedPsiModules
-                    |> Array.ofList
-                    |> Array.map modulePathProvider.GetModulePath
-                    |> Array.map (fun r -> "-r:" + r.FullPath)
-
-                let otherOptions = Array.append fcsProject.ProjectOptions.OtherOptions paths
-                let projectOptions = { fcsProject.ProjectOptions with OtherOptions = otherOptions}
-                let fcsProject = { fcsProject with ProjectOptions = projectOptions; ReferencedModules = HashSet() }
-
-                fcsProject.ReferencedModules.AddRange(referencedPsiModules)
+                let fcsProject = fcsProjectBuilder.AddReferences(fcsProject, referencedPsiModules)
 
                 let referencedProjectPsiModules = referencedPsiModules |> Seq.filter isProjectModule
 
