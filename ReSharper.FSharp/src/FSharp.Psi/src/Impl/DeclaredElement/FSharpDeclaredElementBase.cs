@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, AttributesSource attributesSource) =>
       EmptyList<IAttributeInstance>.Instance;
 
-    public XmlNode GetXMLDoc(bool inherit) => null;
+    public virtual XmlNode GetXMLDoc(bool inherit) => null;
     public XmlNode GetXMLDescriptionSummary(bool inherit) => null;
 
     public abstract string ShortName { get; }
