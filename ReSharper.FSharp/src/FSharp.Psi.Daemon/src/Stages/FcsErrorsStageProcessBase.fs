@@ -186,11 +186,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     | _ -> TypeEquationError(expectedType, actualType, expr, error.Message) :> _
                 else null
 
-            | Regex typeDoesNotMatchMessage [_expectedType; _actualType] ->
-                createHighlightingFromNodeWithMessage TypeDoesNotMatchTypeError range error
+            | Regex typeDoesNotMatchMessage [expectedType; actualType] ->
+                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                TypeDoesNotMatchTypeError(expectedType, actualType, expr, error.Message)
 
-            | Regex ifBranchSatisfyContextTypeRequirements [_expectedType; _actualType] ->
-                createHighlightingFromNodeWithMessage IfExpressionNeedsTypeToSatisfyTypeRequirementsError range error
+            | Regex ifBranchSatisfyContextTypeRequirements [expectedType; actualType] ->
+                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                IfExpressionNeedsTypeToSatisfyTypeRequirementsError(expectedType, actualType, expr, error.Message)
             
             | _ -> createGenericHighlighting error range
 
@@ -417,7 +419,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 let expr = getResultExpr expr
                 FunctionValueUnexpectedWarning(expr, error.Message) :> _
 
-            | Regex typeConstraintMismatchMessage [_; typeConstraint] ->
+            | Regex typeConstraintMismatchMessage [mismatchedType; typeConstraint] ->
                 let highlighting =
                     match typeConstraint with
                     | "unit" ->
@@ -428,7 +430,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
                 if isNotNull highlighting then highlighting :> _ else
 
-                createHighlightingFromNodeWithMessage TypeConstraintMismatchError range error
+                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                TypeConstraintMismatchError(mismatchedType, expr, error.Message)
 
             | _ -> null
 
