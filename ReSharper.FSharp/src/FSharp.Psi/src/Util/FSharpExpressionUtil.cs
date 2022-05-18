@@ -43,9 +43,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var currentExpr = expression;
       while (true)
       {
-        if (MatchExprNavigator.GetByClauseExpression(currentExpr) is { } matchExpr)
+        if (MatchClauseListOwnerExprNavigator.GetByClauseExpression(currentExpr) is { } matchExpr)
         {
-          currentExpr = matchExpr;
+          currentExpr = matchExpr as IFSharpExpression;
           continue;
         }
         
@@ -66,19 +66,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (BinaryAppExprNavigator.GetByArgument(currentExpr) is { } binaryAppExpr)
         {
           currentExpr = binaryAppExpr;
-          continue;
-        }
-
-        if (MatchLambdaExprNavigator.GetByClauseExpression(currentExpr) is { } matchLambdaExpr)
-        {
-          currentExpr = matchLambdaExpr;
-          continue;
-        }
-
-        if ((TryWithExprNavigator.GetByTryExpression(currentExpr) ??
-             TryWithExprNavigator.GetByClauseExpression(currentExpr)) is { } tryWithExpr)
-        {
-          currentExpr = tryWithExpr;
           continue;
         }
 
