@@ -89,6 +89,7 @@ module FSharpErrors =
     let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
     let [<Literal>] typeDoesNotMatchMessage = "The type '(.+)' does not match the type '(.+)'"
     let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
+    let [<Literal>] ifBranchSatisfyContextTypeRequirements = "The 'if' expression needs to have type '(.+)' to satisfy context type requirements\. It currently has type '(.+)'"
 
     let isDirectiveSyntaxError number =
         number >= 232 && number <= 235
@@ -188,6 +189,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | Regex typeDoesNotMatchMessage [_expectedType; _actualType] ->
                 createHighlightingFromNodeWithMessage TypeDoesNotMatchTypeError range error
 
+            | Regex ifBranchSatisfyContextTypeRequirements [_expectedType; _actualType] ->
+                createHighlightingFromNodeWithMessage IfExpressionNeedsTypeToSatisfyTypeRequirementsError range error
+            
             | _ -> createGenericHighlighting error range
 
         | NotAFunction ->

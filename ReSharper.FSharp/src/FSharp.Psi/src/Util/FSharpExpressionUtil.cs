@@ -56,8 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           continue;
         }
 
-        if (IfExprNavigator.GetByConditionExpr(currentExpr) is { } ifExpr &&
-            ifExpr.ElseExpr != null)
+        if ((IfThenElseExprNavigator.GetByBranchExpression(currentExpr)) is {ElseExpr: { }} ifExpr)
         {
           currentExpr = ifExpr;
           continue;

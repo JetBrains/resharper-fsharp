@@ -17,8 +17,11 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, repl
     let getReplacementTypeFromErrorMessage (errorMessage:string) =
         let regexMatches = Regex.Matches(errorMessage, "'((\\w|\.|\d)+)'")
 
-        if regexMatches.Count <> 2 then
+        if regexMatches.Count < 2 && regexMatches.Count > 3 then
             None
+        elif regexMatches.Count = 3 then
+            let idx = if replaceFirstType then 1 else 2
+            Some (regexMatches[idx].Value.Trim([| '\'' |]))
         else
             let idx = if replaceFirstType then 0 else 1
             Some (regexMatches[idx].Value.Trim([| '\'' |]))
@@ -39,6 +42,10 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, fcsErrorMessage: string, repl
         // error FS0001: This expression was expected to have type↔    'int'    ↔but here has type↔    'string'
         ReplaceReturnTypeFix(error.Expr, error.FcsMessage, false)
 
+    new (error: IfExpressionNeedsTypeToSatisfyTypeRequirementsError) =
+        // error FS0001: The 'if' expression needs to have type 'string' to satisfy context type requirements. It currently has type 'int'.
+        ReplaceReturnTypeFix(error.Expr, error.FcsMessage, false)
+    
     override this.Text = "Replace return type"
     override this.IsAvailable _ =
         if isNull parentExpr then false else

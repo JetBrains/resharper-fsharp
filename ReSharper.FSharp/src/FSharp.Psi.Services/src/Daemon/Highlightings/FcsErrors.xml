@@ -510,4 +510,15 @@
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="IfExpressionNeedsTypeToSatisfyTypeRequirements" ID="FS0001: The 'if' expression needs to have type">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceReturnTypeFix</QuickFix>
+  </Error>
+  
 </Errors>
