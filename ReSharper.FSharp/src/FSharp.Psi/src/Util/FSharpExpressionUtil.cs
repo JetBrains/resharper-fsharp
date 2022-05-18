@@ -63,18 +63,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           continue;
         }
 
-        if (ForExprNavigator.GetByDoExpression(currentExpr) is { } forExpr)
-        {
-          currentExpr = forExpr;
-          continue;
-        }
-
-        if (WhileExprNavigator.GetByDoExpression(currentExpr) is { } whileExpr)
-        {
-          currentExpr = whileExpr;
-          continue;
-        }
-
         if (BinaryAppExprNavigator.GetByArgument(currentExpr) is { } binaryAppExpr)
         {
           currentExpr = binaryAppExpr;
