@@ -17,6 +17,7 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``Return type with attribute``() = x.DoNamedTest()
     [<Test>] member x.TryWith() = x.DoNamedTest()
     [<Test>] member x.MatchLambda() = x.DoNamedTest()
+    [<Test>] member x.LetOrUse() = x.DoNamedTest()
 
     [<Test; NoHighlightingFound>] member x.``No highlighting 01``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``No highlighting 02``() = x.DoNamedTest()
