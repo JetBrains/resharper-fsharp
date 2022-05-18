@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -39,102 +40,62 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     // TODO: change name
     public static IFSharpExpression GetOuterMostParentExpression(this IFSharpExpression expression)
     {
-      IFSharpTreeNode currentExpr = expression;
-      var parent = currentExpr.Parent;
-      while (parent != null)
+      var currentExpr = expression;
+      while (true)
       {
-        switch (parent)
+        if (MatchExprNavigator.GetByClauseExpression(currentExpr) is { } matchExpr)
         {
-          case IChameleonExpression:
-            return currentExpr as IFSharpExpression;
-          case ILiteralExpr literalExpr:
-            currentExpr = literalExpr;
-            parent = literalExpr.Parent;
-            break;
-          case IMatchClause matchClause:
-            if (matchClause.Expression == currentExpr)
-            {
-              currentExpr = matchClause;
-              parent = matchClause.Parent;
-            }
-            else
-            {
-              currentExpr = null;
-              parent = null;
-            }
-            break;
-          case ISequentialExpr sequentialExpr:
-            if (sequentialExpr.Expressions.Last() == currentExpr)
-            {
-              currentExpr = sequentialExpr;
-              parent = sequentialExpr.Parent;
-            }
-            else
-            {
-              currentExpr = null;
-              parent = null;
-            }
-            break;
-          case IIfThenElseExpr ifThenElseExpr:
-            if (ifThenElseExpr.ThenExpr == currentExpr || ifThenElseExpr.ElseExpr == currentExpr)
-            {
-              currentExpr = ifThenElseExpr;
-              parent = ifThenElseExpr.Parent;
-            }
-            else
-            {
-              currentExpr = null;
-              parent = null;
-            }
-            break;
-          case IForExpr forExpr:
-            if (forExpr.DoExpression == currentExpr)
-            {
-              currentExpr = forExpr;
-              parent = forExpr.Parent;
-            }
-            else
-            {
-              currentExpr = null;
-              parent = null;
-            }
-            break;
-          case ILetOrUseExpr letOrUseExpr:
-            if (letOrUseExpr.InExpression == currentExpr)
-            {
-              currentExpr = letOrUseExpr;
-              parent = letOrUseExpr.Parent;
-            }
-            else
-            {
-              currentExpr = null;
-              parent = null;
-            }
-            break;
-          case IWhileExpr whileExpr:
-            if (whileExpr.DoExpression == currentExpr)
-            {
-              currentExpr = whileExpr;
-              parent = whileExpr.Parent;
-            }
-            else
-            {
-              currentExpr = null;
-              parent = null;
-            }
-            break;
-          case IFSharpExpression fSharpExpression:
-            currentExpr = fSharpExpression;
-            parent = fSharpExpression.Parent;
-            break;
-          default:
-            currentExpr = null;
-            parent = null;
-            break;
+          currentExpr = matchExpr;
+          continue;
         }
-      }
+        
+        if (SequentialExprNavigator.GetByExpression(currentExpr) is { } seqExpr &&
+            seqExpr.ExpressionsEnumerable.Last() == currentExpr)
+        {
+          currentExpr = seqExpr;
+          continue;
+        }
 
-      return currentExpr as IFSharpExpression;
+        if (IfExprNavigator.GetByConditionExpr(currentExpr) is { } ifExpr &&
+            ifExpr.ElseExpr != null)
+        {
+          currentExpr = ifExpr;
+          continue;
+        }
+
+        if (ForExprNavigator.GetByDoExpression(currentExpr) is { } forExpr)
+        {
+          currentExpr = forExpr;
+          continue;
+        }
+
+        if (WhileExprNavigator.GetByDoExpression(currentExpr) is { } whileExpr)
+        {
+          currentExpr = whileExpr;
+          continue;
+        }
+
+        if (BinaryAppExprNavigator.GetByArgument(currentExpr) is { } binaryAppExpr)
+        {
+          currentExpr = binaryAppExpr;
+          continue;
+        }
+
+        if (MatchLambdaExprNavigator.GetByClauseExpression(currentExpr) is { } matchLambdaExpr)
+        {
+          currentExpr = matchLambdaExpr;
+          continue;
+        }
+
+        if ((TryWithExprNavigator.GetByTryExpression(currentExpr) ??
+             TryWithExprNavigator.GetByClauseExpression(currentExpr)) is { } tryWithExpr)
+        {
+          currentExpr = tryWithExpr;
+          continue;
+        }
+
+        return currentExpr;
+      }
     }
   }
 }
