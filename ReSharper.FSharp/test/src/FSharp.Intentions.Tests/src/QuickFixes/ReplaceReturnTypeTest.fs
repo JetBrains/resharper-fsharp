@@ -25,3 +25,4 @@ type ReplaceReturnTypeTest() =
     [<Test; NotAvailable>] member x.``Replace type - Negative 06``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Replace type - Negative 07``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``Replace type - Negative 08``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Replace type - Negative 09``() = x.DoNamedTest()
