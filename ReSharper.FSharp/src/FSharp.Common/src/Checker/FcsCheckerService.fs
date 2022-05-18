@@ -33,9 +33,9 @@ module FcsCheckerService =
 
 type FcsProject =
     { OutputPath: VirtualFileSystemPath
-      FileIndices: Dictionary<VirtualFileSystemPath, int>
       ProjectOptions: FSharpProjectOptions
       ParsingOptions: FSharpParsingOptions
+      FileIndices: Dictionary<VirtualFileSystemPath, int>
       ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
       ReferencedModules: HashSet<IPsiModule> }
 

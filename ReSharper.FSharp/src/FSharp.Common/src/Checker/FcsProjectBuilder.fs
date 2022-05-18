@@ -62,8 +62,8 @@ module ProjectOptions =
 
 
 [<SolutionComponent>]
-type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer, logger: ILogger,
-        modulePathProvider: ModulePathProvider) =
+type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
+        modulePathProvider: ModulePathProvider, logger: ILogger) =
 
     let mutable stamp = 0L
 
@@ -148,15 +148,6 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         otherOptions.AddRange(defaultOptions)
         otherOptions.AddRange(unusedValuesWarns)
 
-        let referencedModules = getReferencedModules psiModule
-
-        let moduleReferences = 
-            referencedModules
-            |> Seq.map modulePathProvider.GetModulePath
-            |> Seq.map (fun r -> "-r:" + r.FullPath)
-
-        otherOptions.AddRange(moduleReferences)
-
         match projectProperties.ActiveConfigurations.TryGetConfiguration(targetFrameworkId) with
         | :? IManagedProjectConfiguration as cfg ->
             let definedConstants = splitAndTrim itemsDelimiters cfg.DefineConstants
@@ -228,8 +219,8 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalCompilationDefines
 
         let parsingOptions = { parsingOptions with
-                                    SourceFiles = projectOptions.SourceFiles
-                                    ConditionalCompilationDefines = defines }
+                                 SourceFiles = projectOptions.SourceFiles
+                                 ConditionalCompilationDefines = defines }
 
         if not errors.IsEmpty then
             logger.Warn("Getting parsing options: {0}", concatErrors errors)
@@ -239,4 +230,17 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
           ParsingOptions = parsingOptions
           FileIndices = fileIndices
           ImplementationFilesWithSignatures = implsWithSig
-          ReferencedModules = HashSet(referencedModules) }
+          ReferencedModules = HashSet() }
+
+    member this.AddReferences(fcsProject, referencedPsiModules: IPsiModule seq) =
+        fcsProject.ReferencedModules.AddRange(referencedPsiModules)
+
+        let paths =
+            referencedPsiModules
+            |> Array.ofSeq
+            |> Array.map modulePathProvider.GetModulePath
+            |> Array.map (fun r -> "-r:" + r.FullPath)
+
+        let otherOptions = Array.append fcsProject.ProjectOptions.OtherOptions paths
+        let projectOptions = { fcsProject.ProjectOptions with OtherOptions = otherOptions}
+        { fcsProject with ProjectOptions = projectOptions }

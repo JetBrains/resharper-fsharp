@@ -67,7 +67,7 @@ type FcsTypeDef =
       mutable Members: FcsTypeDefMembers }
 
 
-type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, shim: IFcsAssemblyReaderShim) =
+type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, shim: IFcsAssemblyReaderShim, path) =
     // todo: is it safe to keep symbolScope?
     let symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, false, true)
 
@@ -918,7 +918,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             shim.InvalidateDirty()
             timestamp
 
+        member this.Path = path
         member this.PsiModule = psiModule
+
         member val RealModuleReader = None with get, set
 
         member this.InvalidateReferencingTypes(shortName) =
