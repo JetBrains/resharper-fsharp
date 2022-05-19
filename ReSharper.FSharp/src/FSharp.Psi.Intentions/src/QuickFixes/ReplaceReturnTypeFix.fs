@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Resources.Shell
 type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) =
     inherit FSharpQuickFixBase()
 
-    let parentExpr = expr.GetOuterMostParentExpression()
+    let mostOuterParentExpr = expr.GetOuterMostParentExpression()
 
     new (error: TypeConstraintMismatchError) =
         // error FS0193: Type constraint mismatch. The type ↔    'A.B'    ↔is not compatible with type↔    'Thing'
@@ -44,12 +44,12 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
 
     override this.Text = "Replace return type"
     override this.IsAvailable _ =
-        if isNull parentExpr then false else
-        let binding = BindingNavigator.GetByExpression(parentExpr)
+        if isNull mostOuterParentExpr then false else
+        let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
         isNotNull binding
 
     override this.ExecutePsiTransaction(_solution) =
-        let binding = BindingNavigator.GetByExpression(parentExpr)
+        let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
         
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
@@ -75,7 +75,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
             | :? IFunctionTypeUsage as ftu ->
                 ftu.SetReturnTypeUsage(typeUsage) |> ignore
             | :? ITupleTypeUsage as ttu ->
-                match parentExpr with
+                match expr.Parent with
                 | :? ITupleExpr as tupleExpr ->
                     if isNotNull tupleExpr && ttu.Items.Count = tupleExpr.Expressions.Count then
                         let index = tupleExpr.Expressions.IndexOf(expr)
