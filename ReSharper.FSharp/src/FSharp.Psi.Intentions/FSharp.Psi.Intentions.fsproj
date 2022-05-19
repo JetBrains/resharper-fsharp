@@ -24,12 +24,10 @@
     <Compile Include="src\Intentions\SetNameAction.fs" />
     <Compile Include="src\Intentions\LetToUseAction.fs" />
     <Compile Include="src\Intentions\RenameFileToMatchTypeNameAction.fs" />
+    <Compile Include="src\Intentions\Annotation\AnnotationUtilities.fs" />
     <Compile Include="src\Intentions\Annotation\FunctionAnnotationAction.fs" />
     <Compile Include="src\Intentions\Annotation\ValueAnnotationAction.fs" />
-    <Compile Include="src\Intentions\Annotation\TupleAnnotationAction.fs" />
     <Compile Include="src\Intentions\Annotation\MemberAnnotationAction.fs" />
-    <Compile Include="src\Intentions\Annotation\AnnotationUtilities.fs" />
-    <Compile Include="src\Intentions\Annotation\FunctionAnnotationAction2.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetFix.fs" />

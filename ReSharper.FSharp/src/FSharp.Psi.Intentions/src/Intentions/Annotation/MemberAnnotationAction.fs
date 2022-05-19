@@ -1,32 +1,21 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
-[<ContextAction(Name = "AnnotateBinding", Group = "F#",
+[<ContextAction(Name = "AnnotateMember", Group = "F#",
                 Description = "Annotate binding with explicit type")>]
 type MemberAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
-    let isAnnotated (memberDeclaration: IMemberDeclaration) =
-        isNotNull memberDeclaration.ReturnTypeInfo &&
-        memberDeclaration.ParametersDeclarations |> Seq.forall (fun parameter ->
-            let pattern = parameter.Pattern.IgnoreInnerParens()
-            match pattern with
-            | :? ITypedPat as PatUtil.IsPartiallyAnnotatedTypedPat -> false
-            | :? ITypedPat | :? IUnitPat -> true
-            | _ -> false)
-
     override this.IsAvailable _ =
         let memberDeclaration = dataProvider.GetSelectedElement<IMemberDeclaration>()
         isNotNull memberDeclaration
-         && not (isAnnotated memberDeclaration)
+         && AnnotationUtil.isFullyAnnotatedMemberDeclaration memberDeclaration
 
     override this.Text = "Add member type annotations"
 
@@ -36,21 +25,18 @@ type MemberAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         use writeCookie = WriteLockCookie.Create(memberDeclaration.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let symbolUse =
-            let checker = memberDeclaration.FSharpFile.FcsCheckerService
-            checker.ResolveNameAtLocation(memberDeclaration, [| memberDeclaration.DeclaredName |], true, "Get declaration")
-
-        match symbolUse with
-        | Some symbolUse when (symbolUse.Symbol :? FSharpMemberOrFunctionOrValue) ->
-            let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+        match memberDeclaration with
+        | Declaration.HasMfvSymbolUse (symbolUse, mfv) ->
             let displayContext = symbolUse.DisplayContext
             match memberDeclaration.DeclaredElement with
             | :? IFSharpProperty ->
-                SpecifyTypes.specifyPropertyType displayContext mfv.ReturnParameter.Type memberDeclaration
+                SpecifyUtil.specifyPropertyType displayContext mfv.ReturnParameter.Type memberDeclaration
             | _ ->
-                let types = FcsTypeUtil.getFunctionTypeArgs false mfv.FullType
-                (memberDeclaration.ParametersDeclarations, types)
-                ||> Seq.iter2 (fun parameter fsType -> SpecifyTypes.specifyParameterDeclaration displayContext fsType (ValueSome(false)) parameter)
-                SpecifyTypes.specifyMethodReturnType displayContext mfv.FullType memberDeclaration
+                let parameters = memberDeclaration.ParametersDeclarations
+                let types = FcsMfvUtil.getFunctionParameterTypes parameters.Count mfv
+                (parameters, types)
+                ||> Seq.iter2 (fun parameter fsType ->
+                    SpecifyUtil.specifyPattern displayContext fsType false parameter.Pattern)
+                SpecifyUtil.specifyMethodReturnType displayContext mfv memberDeclaration
         | _ ->
             ()

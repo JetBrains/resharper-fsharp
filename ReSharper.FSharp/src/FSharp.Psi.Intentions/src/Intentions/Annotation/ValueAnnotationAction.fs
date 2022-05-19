@@ -1,44 +1,61 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
+open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-[<ContextAction(Name = "AnnotateBinding", Group = "F#",
+type [<Struct>] private AnnotationContext =
+    | AnnotationContext of Mfv: FSharpMemberOrFunctionOrValue * DisplayContext: FSharpDisplayContext
+
+[<ContextAction(Name = "AnnotateValue", Group = "F#",
                 Description = "Annotate value or parameter with explicit type")>]
 type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
+
+    let mutable annotationContext = ValueNone
 
     override this.IsAvailable _ =
 
         // this isn't strictly about reference patterns, wilds, array or lists do count too
         // maybe this should be moved to process parameters only
 
-        let localReference = dataProvider.GetSelectedElement<ILocalReferencePat>()
+        // IParameterPatternPat
+        // IValue or whatever ?
 
-        isNotNull localReference
-        &&  match localReference.Parent with
-            | :? ITypedPat as PatUtil.IsPartiallyAnnotatedTypedPat ->
+        // we need to find a type of pattern
+
+        // this is like one big todo
+
+        // IParameterDeclaration
+        // IBinding which is not a function
+
+        let localReference = dataProvider.GetSelectedElement<IReferencePat>() // what is this exactly? ParameterPattern / binding
+
+        let isAvailable =
+            isNotNull localReference
+            && AnnotationUtil.isFullyAnnotatedPat localReference
+
+        isAvailable
+        &&  match localReference with
+            | Declaration.HasMfvSymbolUse (symbolUse, mfv) ->
+                annotationContext <- ValueSome (AnnotationContext(mfv, symbolUse.DisplayContext))
                 true
-            | :? IUnitPat
-            | :? ITypedPat ->
-                false
-            | :? ILocalBinding as localBinding when localBinding.ParameterPatterns.Count > 0 ->
-                false
             | _ ->
-                match localReference with
-                | PatUtil.IsPartiallyAnnotatedLocalRefPat ->
-                    true
-                | _ ->
-                    false
+                false
 
     override this.Text = "Add value type annotations"
 
     override x.ExecutePsiTransaction _ =
-        let refPat = dataProvider.GetSelectedElement<ILocalReferencePat>()
+        let pattern = dataProvider.GetSelectedElement<IReferencePat>()
 
-        use writeCookie = WriteLockCookie.Create(refPat.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(pattern.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        SpecifyTypes.specifyReferencePat ValueNone refPat
+        match annotationContext with
+        | ValueNone ->
+            failwith "impossible" // TODO: better assert
+        | ValueSome (AnnotationContext(mfv, context)) ->
+            SpecifyUtil.specifyPattern context mfv.FullType false pattern
