@@ -5,7 +5,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-type FunctionAnnotationAction = FunctionAnnotationAction2
 
 // TODO: Tests
 type FunctionAnnotationActionTest() =

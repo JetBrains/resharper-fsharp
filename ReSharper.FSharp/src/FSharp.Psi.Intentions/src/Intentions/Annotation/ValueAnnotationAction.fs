@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type [<Struct>] private AnnotationContext =
-    | AnnotationContext of Mfv: FSharpMemberOrFunctionOrValue * DisplayContext: FSharpDisplayContext
+    | AnnotationContext of Pattern: IFSharpPattern * Mfv: FSharpMemberOrFunctionOrValue * DisplayContext: FSharpDisplayContext
 
 [<ContextAction(Name = "AnnotateValue", Group = "F#",
                 Description = "Annotate value or parameter with explicit type")>]
@@ -19,32 +19,31 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
     override this.IsAvailable _ =
 
-        // this isn't strictly about reference patterns, wilds, array or lists do count too
-        // maybe this should be moved to process parameters only
+        let isAvailableForParameter () =
+            let parameter = dataProvider.GetSelectedElement<IParametersPatternDeclaration>()
+            isNotNull parameter
+            && not (AnnotationUtil.isFullyAnnotatedPattern parameter.Pattern)
+            &&  match parameter.Parent with
+                | :? IFSharpDeclaration as Declaration.HasMfvSymbolUse(symbolUse, mfv) ->
+                    annotationContext <- ValueSome (AnnotationContext(parameter.Pattern, mfv, symbolUse.DisplayContext))
+                    true
+                | _ ->
+                    false
 
-        // IParameterPatternPat
-        // IValue or whatever ?
+        let isAvailableForBinding () =
+            let binding = dataProvider.GetSelectedElement<IBinding>()
+            isNotNull binding
+            && AnnotationUtil.isValueBinding binding
+            && not (AnnotationUtil.isFullyAnnotatedPattern binding.HeadPattern)
+            &&  match binding.Parent with
+                | :? IFSharpDeclaration as Declaration.HasMfvSymbolUse(symbolUse, mfv) ->
+                    annotationContext <- ValueSome (AnnotationContext(binding.HeadPattern, mfv, symbolUse.DisplayContext))
+                    true
+                | _ ->
+                    false
 
-        // we need to find a type of pattern
-
-        // this is like one big todo
-
-        // IParameterDeclaration
-        // IBinding which is not a function
-
-        let localReference = dataProvider.GetSelectedElement<IReferencePat>() // what is this exactly? ParameterPattern / binding
-
-        let isAvailable =
-            isNotNull localReference
-            && AnnotationUtil.isFullyAnnotatedPat localReference
-
-        isAvailable
-        &&  match localReference with
-            | Declaration.HasMfvSymbolUse (symbolUse, mfv) ->
-                annotationContext <- ValueSome (AnnotationContext(mfv, symbolUse.DisplayContext))
-                true
-            | _ ->
-                false
+        isAvailableForParameter()
+        || isAvailableForBinding()
 
     override this.Text = "Add value type annotations"
 
@@ -57,5 +56,5 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         match annotationContext with
         | ValueNone ->
             failwith "impossible" // TODO: better assert
-        | ValueSome (AnnotationContext(mfv, context)) ->
+        | ValueSome (AnnotationContext(pattern, mfv, context)) ->
             SpecifyUtil.specifyPattern context mfv.FullType false pattern

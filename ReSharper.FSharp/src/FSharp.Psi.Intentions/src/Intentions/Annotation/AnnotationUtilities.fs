@@ -97,12 +97,12 @@ module AnnotationUtil =
             isFullyAnnotatedFunctionTypeUsage functionTypeUsage
         | _ -> false
 
-    let rec isFullyAnnotatedPat (pattern: IFSharpPattern) =
+    let rec isFullyAnnotatedPattern (pattern: IFSharpPattern) =
         match pattern.IgnoreInnerParens() with
         | :? IUnitPat ->
             true
         | :? ITypedPat as typedPat ->
-            isFullyAnnotatedPat typedPat.Pattern
+            isFullyAnnotatedPattern typedPat.Pattern
         | pattern ->
             match PatUtil.getTypeUsage pattern with
             | ValueSome typeUsage ->
@@ -114,24 +114,24 @@ module AnnotationUtil =
         isNotNull binding.ReturnTypeInfo
         && binding.ParametersDeclarationsEnumerable
            |> Seq.forall (fun parameter ->
-               isFullyAnnotatedPat parameter.Pattern)
+               isFullyAnnotatedPattern parameter.Pattern)
 
     let isFullyAnnotatedMemberDeclaration (memberDeclaration: IMemberDeclaration) =
         isNotNull memberDeclaration.ReturnTypeInfo &&
         memberDeclaration.ParametersDeclarations
         |> Seq.forall (fun parameter ->
-               isFullyAnnotatedPat parameter.Pattern)
-
-    // let x = y
-    // let x = fun y -> ...
-    let isValueBinding (binding: IBinding) =
-        binding.HeadPattern :? ILocalReferencePat
+               isFullyAnnotatedPattern parameter.Pattern)
 
     // let f x ... =
     // let f<'a> = ...
     let isFunctionBinding (binding: IBinding) =
-        // todo: more checks like top level, function in class, local function
-        not (isValueBinding binding)
+        binding.HasParameters
+        || binding.HeadPattern.GetNextMeaningfulSibling() :? IPostfixTypeParameterDeclarationList
+
+    // let x = y
+    // let x = fun y -> ...
+    let isValueBinding (binding: IBinding) =
+       not (isFunctionBinding binding)
 
 module SpecifyUtil =
 
@@ -184,7 +184,6 @@ module SpecifyUtil =
         |> addTypeUsage typeString
         |> addSpaceBeforeColon false
 
-    // can this be just binding ?
     let specifyFunctionBindingReturnType displayContext (mfv: FSharpMemberOrFunctionOrValue) (binding: IBinding) =
         let parameters = binding.ParametersDeclarationsEnumerable
         let fcsType, anchor =

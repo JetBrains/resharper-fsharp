@@ -41,7 +41,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 (parameters, types)
                 ||> Seq.iter2 (fun parameter fsType ->
                     let pattern = parameter.Pattern
-                    if not (AnnotationUtil.isFullyAnnotatedPat pattern) then
+                    if not (AnnotationUtil.isFullyAnnotatedPattern pattern) then
                         SpecifyUtil.specifyPattern displayContext fsType true pattern)
 
             if isNull binding.ReturnTypeInfo then
