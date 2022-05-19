@@ -26,6 +26,7 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``Tuple return type``() = x.DoNamedTest()
     [<Test>] member x.``Tuple return type, mismatch in number of items, to few in return type``() = x.DoNamedTest()
     [<Test>] member x.``Tuple return type, mismatch in number of items, to many in return type``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple return type, to non-tuple``() = x.DoNamedTest()
 
     [<Test; NoHighlightingFound>] member x.``No highlighting 01``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``No highlighting 02``() = x.DoNamedTest()

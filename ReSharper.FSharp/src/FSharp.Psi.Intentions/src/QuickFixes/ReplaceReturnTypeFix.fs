@@ -75,11 +75,14 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
             | :? IFunctionTypeUsage as ftu ->
                 ftu.SetReturnTypeUsage(typeUsage) |> ignore
             | :? ITupleTypeUsage as ttu ->
-                let tupleExpr = parentExpr :?> ITupleExpr
-                if isNotNull tupleExpr && ttu.Items.Count = tupleExpr.Expressions.Count then
-                    let index = tupleExpr.Expressions.IndexOf(expr)
-                    let typeToReplace = ttu.Items.Item(index)
-                    ModificationUtil.ReplaceChild(typeToReplace, typeUsage) |> ignore
-                elif isNotNull tupleExpr then
+                match parentExpr with
+                | :? ITupleExpr as tupleExpr ->
+                    if isNotNull tupleExpr && ttu.Items.Count = tupleExpr.Expressions.Count then
+                        let index = tupleExpr.Expressions.IndexOf(expr)
+                        let typeToReplace = ttu.Items.Item(index)
+                        ModificationUtil.ReplaceChild(typeToReplace, typeUsage) |> ignore
+                    elif isNotNull tupleExpr then
+                        ModificationUtil.ReplaceChild(ttu, typeUsage) |> ignore
+                | _ ->
                     ModificationUtil.ReplaceChild(ttu, typeUsage) |> ignore
             | _ -> ()
