@@ -73,7 +73,10 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
             | :? INamedTypeUsage as ntu ->
                 ModificationUtil.ReplaceChild(ntu, typeUsage) |> ignore
             | :? IFunctionTypeUsage as ftu ->
-                ftu.SetReturnTypeUsage(typeUsage) |> ignore
+                match mostOuterParentExpr with
+                | :? ITupleExpr ->
+                    ModificationUtil.ReplaceChild(ftu, typeUsage) |> ignore
+                | _ -> ftu.SetReturnTypeUsage(typeUsage) |> ignore
             | :? ITupleTypeUsage as ttu ->
                 match expr.Parent with
                 | :? ITupleExpr as tupleExpr ->

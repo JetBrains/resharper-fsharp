@@ -22,6 +22,7 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``IfThenElse - Else``() = x.DoNamedTest()
     [<Test>] member x.``FunctionType 01``() = x.DoNamedTest()
     [<Test>] member x.``FunctionType 02``() = x.DoNamedTest()
+    [<Test>] member x.``FunctionType 03``() = x.DoNamedTest()
     [<Test>] member x.``Paren around return type``() = x.DoNamedTest()
     [<Test>] member x.``Tuple return type``() = x.DoNamedTest()
     [<Test>] member x.``Tuple return type, mismatch in number of items, to few in return type``() = x.DoNamedTest()
