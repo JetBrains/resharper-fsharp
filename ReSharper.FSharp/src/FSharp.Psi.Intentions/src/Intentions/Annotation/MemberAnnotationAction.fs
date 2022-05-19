@@ -51,6 +51,6 @@ type MemberAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 let types = FcsTypeUtil.getFunctionTypeArgs false mfv.FullType
                 (memberDeclaration.ParametersDeclarations, types)
                 ||> Seq.iter2 (fun parameter fsType -> SpecifyTypes.specifyParameterDeclaration displayContext fsType (ValueSome(false)) parameter)
-                SpecifyTypes.specifyMethodReturnType displayContext mfv memberDeclaration
+                SpecifyTypes.specifyMethodReturnType displayContext mfv.FullType memberDeclaration
         | _ ->
             ()

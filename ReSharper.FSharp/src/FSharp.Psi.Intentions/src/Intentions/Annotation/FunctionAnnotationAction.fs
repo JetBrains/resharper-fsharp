@@ -230,9 +230,6 @@ module SpecifyTypes =
         let patternToChange =
             match refPat.IgnoreInnerParens() with
             // TODO: not sure this is needed any more
-            | :? ITypedPat as partiallyTypedPat ->
-                partiallyTypedPat :> IFSharpPattern
-
             | :? ILocalReferencePat as localRef ->
                 // remove partially typed ReturnTypeInfo because it is not a part of a pattern
                 let rec removeReturnTypeInfo (ref: ITreeNode) =
