@@ -34,6 +34,14 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
         // error FS0001: The 'if' expression needs to have type 'string' to satisfy context type requirements. It currently has type 'int'.
         ReplaceReturnTypeFix(error.Expr, error.ActualType)
 
+    new (error: TypeMisMatchTuplesHaveDifferingLengthsError) =
+        // Type mismatch. Expecting a
+        //     'string * string'    
+        // but given a
+        //     'string * string * 'a'
+        // The tuples have differing lengths of 2 and 3
+        ReplaceReturnTypeFix(error.Expr, error.ActualType)
+
     override this.Text = "Replace return type"
     override this.IsAvailable _ =
         if isNull parentExpr then false else
@@ -60,7 +68,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
                 match binding.ReturnTypeInfo.ReturnType.IgnoreParentParens() with
                 | :? IParenTypeUsage as ptu -> ptu.InnerTypeUsage
                 | returnType -> returnType
-            
+
             match returnType with
             | :? INamedTypeUsage as ntu ->
                 ModificationUtil.ReplaceChild(ntu, typeUsage) |> ignore
@@ -72,4 +80,6 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
                     let index = tupleExpr.Expressions.IndexOf(expr)
                     let typeToReplace = ttu.Items.Item(index)
                     ModificationUtil.ReplaceChild(typeToReplace, typeUsage) |> ignore
+                elif isNotNull tupleExpr then
+                    ModificationUtil.ReplaceChild(ttu, typeUsage) |> ignore
             | _ -> ()

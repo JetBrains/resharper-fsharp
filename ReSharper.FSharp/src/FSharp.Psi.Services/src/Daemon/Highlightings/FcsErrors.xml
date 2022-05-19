@@ -525,5 +525,18 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
   </Error>
-  
+
+  <Error staticGroup="FSharpErrors" name="TypeMisMatchTuplesHaveDifferingLengths" ID="FS0001: Type mismatch. Expecting">
+    <Parameter type="string" name="expectedType"/>
+    <Parameter type="string" name="actualType"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceReturnTypeFix</QuickFix>
+  </Error>
+
 </Errors>

@@ -90,6 +90,7 @@ module FSharpErrors =
     let [<Literal>] typeDoesNotMatchMessage = "The type '(.+)' does not match the type '(.+)'"
     let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
     let [<Literal>] ifBranchSatisfyContextTypeRequirements = "The 'if' expression needs to have type '(.+)' to satisfy context type requirements\. It currently has type '(.+)'"
+    let [<Literal>] typeMisMatchTupleLengths = "Type mismatch. Expecting a\n    '(.+)'    \nbut given a\n    '(.+)'    \nThe tuples have differing lengths of \\d+ and \\d+"
 
     let isDirectiveSyntaxError number =
         number >= 232 && number <= 235
@@ -193,7 +194,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | Regex ifBranchSatisfyContextTypeRequirements [expectedType; actualType] ->
                 let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
                 IfExpressionNeedsTypeToSatisfyTypeRequirementsError(expectedType, actualType, expr, error.Message)
-            
+
+            | Regex typeMisMatchTupleLengths [expectedType; actualType] ->
+                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                TypeMisMatchTuplesHaveDifferingLengthsError(expectedType, actualType, expr, error.Message)
             | _ -> createGenericHighlighting error range
 
         | NotAFunction ->
