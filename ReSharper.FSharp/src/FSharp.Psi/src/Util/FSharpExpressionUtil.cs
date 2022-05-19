@@ -74,6 +74,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           continue;
         }
 
+        if (TupleExprNavigator.GetByExpression(currentExpr) is { } tupleExpr)
+        {
+          currentExpr = tupleExpr;
+          continue;
+        }
+
         if (BinaryAppExprNavigator.GetByArgument(currentExpr) is { } binaryAppExpr)
         {
           currentExpr = binaryAppExpr;
