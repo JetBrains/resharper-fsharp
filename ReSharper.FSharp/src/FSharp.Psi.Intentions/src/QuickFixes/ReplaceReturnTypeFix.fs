@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -55,8 +56,12 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
            && isNotNull binding.ReturnTypeInfo.ReturnType then
             let factory = binding.CreateElementFactory()
             let typeUsage = factory.CreateTypeUsage(replacementTypeName)
-                
-            match binding.ReturnTypeInfo.ReturnType with
+            let returnType =
+                match binding.ReturnTypeInfo.ReturnType.IgnoreParentParens() with
+                | :? IParenTypeUsage as ptu -> ptu.InnerTypeUsage
+                | returnType -> returnType
+            
+            match returnType with
             | :? INamedTypeUsage as ntu ->
                 ModificationUtil.ReplaceChild(ntu, typeUsage) |> ignore
             | :? IFunctionTypeUsage as ftu ->
