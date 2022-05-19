@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 /// This is a type used to supply "hints" to annotation functions to skip manual type searching
 type [<Struct>] TypeHint = {
@@ -30,17 +31,11 @@ module PatUtil =
         | _ -> value
 
     let getReturnTypeInfo (localRef: IReferencePat) =
-        // TODO: there should be an extension for this
-        let rec tryNextSibling (ref: ITreeNode) =
-            match ref.NextSibling with
-            | null ->
-                ValueNone
-            | :? IReturnTypeInfo as returnTypeInfo ->
-                ValueSome returnTypeInfo
-            | sibling ->
-                tryNextSibling sibling
-
-        tryNextSibling localRef
+        match localRef.GetNextMeaningfulSibling() with
+        | :? IReturnTypeInfo as returnTypeInfo ->
+            ValueSome returnTypeInfo
+        | _ ->
+            ValueNone
 
     [<return: Struct>]
     let (|HasMfvSymbolUse|_|) (referencePat: IReferencePat) =
@@ -116,8 +111,8 @@ module PatUtil =
 
 module SpecifyTypes =
 
-    let specifyMethodReturnType displayContext (mfv: FSharpMemberOrFunctionOrValue) (method: IMemberDeclaration) =
-        let typeString = mfv.ReturnParameter.Type.Format(displayContext)
+    let specifyMethodReturnType displayContext (returnType: FSharpType) (method: IMemberDeclaration) =
+        let typeString = returnType.Format(displayContext)
         let anchor = method.ParametersDeclarations.Last()
 
         let factory = method.CreateElementFactory()
