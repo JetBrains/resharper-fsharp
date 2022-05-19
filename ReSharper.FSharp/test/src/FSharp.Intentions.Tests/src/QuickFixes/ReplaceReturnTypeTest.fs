@@ -20,6 +20,8 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.LetOrUse() = x.DoNamedTest()
     [<Test>] member x.``IfThenElse - If``() = x.DoNamedTest()
     [<Test>] member x.``IfThenElse - Else``() = x.DoNamedTest()
+    [<Test>] member x.``FunctionType 01``() = x.DoNamedTest()
+    [<Test>] member x.``FunctionType 02``() = x.DoNamedTest()
 
     [<Test; NoHighlightingFound>] member x.``No highlighting 01``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``No highlighting 02``() = x.DoNamedTest()
