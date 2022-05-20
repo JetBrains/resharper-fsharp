@@ -15,7 +15,8 @@ type MemberAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     override this.IsAvailable _ =
         let memberDeclaration = dataProvider.GetSelectedElement<IMemberDeclaration>()
         isNotNull memberDeclaration
-         && AnnotationUtil.isFullyAnnotatedMemberDeclaration memberDeclaration
+        && isAtMemberDeclaration dataProvider memberDeclaration
+        && not (AnnotationUtil.isFullyAnnotatedMemberDeclaration memberDeclaration)
 
     override this.Text = "Add member type annotations"
 
@@ -26,14 +27,14 @@ type MemberAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         use disableFormatter = new DisableCodeFormatter()
 
         match memberDeclaration with
-        | Declaration.HasMfvSymbolUse (symbolUse, mfv) ->
+        | Declaration.IsNotNullAndHasMfvSymbolUse (symbolUse, mfv) ->
             let displayContext = symbolUse.DisplayContext
             match memberDeclaration.DeclaredElement with
             | :? IFSharpProperty ->
                 SpecifyUtil.specifyPropertyType displayContext mfv.ReturnParameter.Type memberDeclaration
             | _ ->
                 let parameters = memberDeclaration.ParametersDeclarations
-                let types = FcsMfvUtil.getFunctionParameterTypes parameters.Count mfv
+                let types = FcsMfvUtil.getFunctionParameterTypes parameters.Count mfv.FullType
                 (parameters, types)
                 ||> Seq.iter2 (fun parameter fsType ->
                     SpecifyUtil.specifyPattern displayContext fsType false parameter.Pattern)

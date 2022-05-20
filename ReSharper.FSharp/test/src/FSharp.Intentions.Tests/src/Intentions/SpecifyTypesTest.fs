@@ -64,8 +64,6 @@ type ValueAnnotationActionTest() =
     [<Test>] member x.``Value 01``() = x.DoNamedTest()
     [<Test>] member x.``Value 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Value 03 - Function, tuple``() = x.DoNamedTest()
-    [<Test>] member x.``Value 04 - TupleLeft``() = x.DoNamedTest()
-    [<Test>] member x.``Value 05 - TupleRight``() = x.DoNamedTest()
 
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 02 - Child tuple``() = x.DoNamedTest()
@@ -77,8 +75,7 @@ type ValueAnnotationActionAvailabilityTest() =
 
     override x.ExtraPath = "specifyTypes/values"
 
-    [<Test>] member x.``Function - Let bindings - Expr 01``() = x.DoNamedTest()
-    [<Test>] member x.``Function - Let bindings - Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Let bindings - Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Value - Let bindings - Expr 01``() = x.DoNamedTest()
 
 // TODO: Tests

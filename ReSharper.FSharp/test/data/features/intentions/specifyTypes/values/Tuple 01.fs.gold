@@ -1,5 +1,5 @@
 module Module
 
 let f() =
-    let (x: string, y: int){caret} = ("foo", 1)
+    let (x: string{caret}, y: int) = ("foo", 1)
     ()

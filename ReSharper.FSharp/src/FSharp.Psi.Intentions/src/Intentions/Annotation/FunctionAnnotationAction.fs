@@ -30,13 +30,13 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         use disableFormatter = new DisableCodeFormatter()
 
         match binding.HeadPattern.As<IReferencePat>() with
-        | Declaration.HasMfvSymbolUse (symbolUse, mfv) ->
+        | Declaration.IsNotNullAndHasMfvSymbolUse (symbolUse, mfv) ->
 
             let displayContext = symbolUse.DisplayContext
             let parameters = binding.ParametersDeclarations
 
             if parameters.Count > 0 then
-                let types = FcsMfvUtil.getFunctionParameterTypes parameters.Count mfv
+                let types = FcsMfvUtil.getFunctionParameterTypes parameters.Count mfv.FullType
 
                 (parameters, types)
                 ||> Seq.iter2 (fun parameter fsType ->

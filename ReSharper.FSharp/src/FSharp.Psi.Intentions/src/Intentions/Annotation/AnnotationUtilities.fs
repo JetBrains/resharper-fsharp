@@ -13,7 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
 module Declaration =
     [<return: Struct>]
-    let (|HasMfvSymbolUse|_|) (declaration: IFSharpDeclaration) =
+    let (|IsNotNullAndHasMfvSymbolUse|_|) (declaration: IFSharpDeclaration) =
         if isNull declaration then ValueNone else
         let symbolUse = declaration.GetFcsSymbolUse()
         if isNull symbolUse then ValueNone else
@@ -41,12 +41,19 @@ module PatUtil =
     let getTypeUsage (pattern: IFSharpPattern) =
         findSibling<ITypeUsage> pattern
 
-    let removeTypeUsage (pattern: IFSharpPattern) =
+    let getReturnTypeInfo (pattern: IFSharpPattern) =
+        findSibling<IReturnTypeInfo> pattern
+
+    let removeTypeAnnotations (pattern: IFSharpPattern) =
         match getTypeUsage pattern with
         | ValueSome typeUsage ->
             ModificationUtil.DeleteChild(typeUsage)
         | _ ->
-            ()
+            match getReturnTypeInfo pattern with
+            | ValueSome typeInfo ->
+                ModificationUtil.DeleteChild(typeInfo)
+            | _ ->
+                ()
         pattern
 
     let removeInnerParens (pattern: IFSharpPattern) =
@@ -57,24 +64,32 @@ module PatUtil =
             ModificationUtil.ReplaceChild(pattern, updatedPattern)
 
 module FcsMfvUtil =
-    let getFunctionReturnType parameters (mfv: FSharpMemberOrFunctionOrValue) =
-        let rec skipFunctionParameters remaining (fullType: FSharpType) =
-            if remaining = 0 then fullType
+    let getFunctionReturnType parameters (fsType: FSharpType) =
+        let rec skipFunctionParameters remaining (fsType: FSharpType) =
+            if remaining = 0 then fsType
             else
-                skipFunctionParameters (remaining - 1) fullType.GenericArguments[1]
+                skipFunctionParameters (remaining - 1) fsType.GenericArguments[1]
 
-        let returnType = skipFunctionParameters parameters mfv.FullType
+        let returnType = skipFunctionParameters parameters fsType
         returnType
 
-    let getFunctionParameterTypes parameters (mfv: FSharpMemberOrFunctionOrValue) =
+    let getFunctionParameterTypes parameters (fsType: FSharpType) =
         let result = Array.zeroCreate parameters
-        let mutable fullType = mfv.FullType
+        let mutable fullType = fsType
 
         for i = 0 to parameters - 1 do
             result[i] <- fullType.GenericArguments[0]
             fullType <- fullType.GenericArguments[1]
 
         result
+
+    let getFunctionParameterAt parameterIndex (fsType: FSharpType) =
+        let rec getParameter index (fsType: FSharpType) =
+            if index = 0 then fsType.GenericArguments[0]
+            else
+                getParameter (index - 1) fsType.GenericArguments[1]
+
+        getParameter parameterIndex fsType
 
 module AnnotationUtil =
 
@@ -97,6 +112,10 @@ module AnnotationUtil =
             isFullyAnnotatedFunctionTypeUsage functionTypeUsage
         | _ -> false
 
+    let isFullyAnnotatedReturnTypeInfo (returnTypeInfo: IReturnTypeInfo) =
+        isNotNull returnTypeInfo.ReturnType
+        && isFullyAnnotatedTypeUsage returnTypeInfo.ReturnType
+
     let rec isFullyAnnotatedPattern (pattern: IFSharpPattern) =
         match pattern.IgnoreInnerParens() with
         | :? IUnitPat ->
@@ -104,11 +123,8 @@ module AnnotationUtil =
         | :? ITypedPat as typedPat ->
             isFullyAnnotatedPattern typedPat.Pattern
         | pattern ->
-            match PatUtil.getTypeUsage pattern with
-            | ValueSome typeUsage ->
-                isFullyAnnotatedTypeUsage typeUsage
-            | ValueNone ->
-                false
+            pattern |> PatUtil.getTypeUsage |> ValueOption.exists isFullyAnnotatedTypeUsage
+            || pattern |> PatUtil.getReturnTypeInfo |> ValueOption.exists isFullyAnnotatedReturnTypeInfo
 
     let isFullyAnnotatedBinding (binding: IBinding) =
         isNotNull binding.ReturnTypeInfo
@@ -135,17 +151,11 @@ module AnnotationUtil =
 
 module SpecifyUtil =
 
-    let private addParens (pattern: IFSharpPattern) =
-        let factory = pattern.CreateElementFactory()
-        let parenPat = factory.CreateParenPat()
-        parenPat.SetPattern(pattern) |> ignore
-        ModificationUtil.ReplaceChild(pattern, parenPat) |> ignore
-
     let private addSpaceBeforeColon forceSpaceBeforeColon (pattern: ITreeNode) =
         if forceSpaceBeforeColon || pattern.GetSettingsStoreWithEditorConfig().GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon) then
             ModificationUtil.AddChildBefore(pattern, Whitespace()) |> ignore
 
-    let private addTypeUsage typeString (node: ITreeNode) =
+    let private addReturnTypeInfo typeString (node: ITreeNode) =
         let factory = node.CreateElementFactory()
         let typeUsage = factory.CreateTypeUsage(typeString)
         ModificationUtil.AddChildAfter(node, factory.CreateReturnTypeInfo(typeUsage))
@@ -155,6 +165,12 @@ module SpecifyUtil =
         let typeUsage = factory.CreateTypeUsage(typeString)
         ModificationUtil.ReplaceChild(pattern, factory.CreateTypedPat(pattern, typeUsage))
 
+    let addParens (pattern: IFSharpPattern) =
+        let factory = pattern.CreateElementFactory()
+        let parenPat = factory.CreateParenPat()
+        parenPat.SetPattern(pattern) |> ignore
+        ModificationUtil.ReplaceChild(pattern, parenPat) |> ignore
+
     let rec private specifyTuplePat displayContext (fcsType: FSharpType) (pattern: ITuplePat) =
         let innerPatterns = pattern.Patterns
         for i = 0 to innerPatterns.Count - 1 do
@@ -163,7 +179,7 @@ module SpecifyUtil =
 
     and specifyPattern displayContext (fcsType: FSharpType) forceParens (pattern: IFSharpPattern) =
         match pattern
-            |> PatUtil.removeTypeUsage
+            |> PatUtil.removeTypeAnnotations
             |> PatUtil.removeInnerParens with
         | :? ITuplePat as tuplePat ->
             specifyTuplePat displayContext fcsType tuplePat
@@ -181,7 +197,7 @@ module SpecifyUtil =
         let anchor = method.ParametersDeclarationsEnumerable.LastOrDefault()
 
         anchor
-        |> addTypeUsage typeString
+        |> addReturnTypeInfo typeString
         |> addSpaceBeforeColon false
 
     let specifyFunctionBindingReturnType displayContext (mfv: FSharpMemberOrFunctionOrValue) (binding: IBinding) =
@@ -199,14 +215,14 @@ module SpecifyUtil =
             else
                 // let f x{here} = ...
                 // this enumerates enumerable 2 times, not sure what can I do about it?
-                let fcsType = FcsMfvUtil.getFunctionReturnType (parameters.Count()) mfv
+                let fcsType = FcsMfvUtil.getFunctionReturnType (parameters.Count()) mfv.FullType
                 fcsType, parameters.LastOrDefault()
 
         let typeString = fcsType.Format(displayContext)
         let forceSpaceBeforeColon = anchor :? IPostfixTypeParameterDeclarationList
 
         anchor
-        |> addTypeUsage typeString
+        |> addReturnTypeInfo typeString
         |> addSpaceBeforeColon forceSpaceBeforeColon
 
     let specifyPropertyType displayContext (fcsType: FSharpType) (decl: IMemberDeclaration) =
@@ -217,3 +233,89 @@ module SpecifyUtil =
         let factory = decl.CreateElementFactory()
         let returnTypeInfo = factory.CreateReturnTypeInfo(factory.CreateTypeUsage(fcsType.Format(displayContext)))
         ModificationUtil.AddChildAfter(decl.Identifier, returnTypeInfo) |> ignore
+
+module StandaloneAnnotationUtil =
+
+    let private specifyTuplePat forceParens (tuplePat: ITuplePat) =
+        // this is a funky quirk
+        // if we specify tuple patterns in sequence manner
+        // then after first modification fcs is unable to find the corresponding symbolUse for next patterns
+        // so we have to find all ref pats and their types first
+
+        let referenceList = ResizeArray()
+
+        let getTupleChildrenRefPatsReferences (tuplePat: ITuplePat) = [|
+            for pattern in tuplePat.PatternsEnumerable do
+                if AnnotationUtil.isFullyAnnotatedPattern pattern then () else
+                let refPat =
+                    match pattern.IgnoreInnerParens() with
+                    | :? IReferencePat as localRef ->
+                        localRef
+                    | :? ITypedPat as typedPat when (typedPat.Pattern :? IReferencePat) ->
+                        typedPat.Pattern :?> IReferencePat
+                    | _ ->
+                        null
+
+                match refPat with
+                | Declaration.IsNotNullAndHasMfvSymbolUse(symbolUse, mfv) ->
+                    struct (refPat, symbolUse.DisplayContext, mfv.FullType)
+                | _ ->
+                    ()
+        |]
+
+        let rec getRefPats (pattern: ITuplePat) =
+            let childrenReferences = getTupleChildrenRefPatsReferences pattern
+            referenceList.Add(struct (pattern, childrenReferences))
+            for pattern in pattern.PatternsEnumerable do
+                match pattern.IgnoreInnerParens() with
+                | :? ITuplePat as nestedTuplePat ->
+                    getRefPats nestedTuplePat
+                | _ ->
+                    ()
+
+        getRefPats tuplePat
+
+        // this is yet another quirk:
+        // we have to specify patterns in backwards order to keep tree valid
+        // otherwise we lose parent property of tuplePat
+        for i = referenceList.Count - 1 downto 0 do
+            let struct (tuplePat, refPats) = referenceList[i]
+            for refPat, displayContext, fsType in refPats do
+                SpecifyUtil.specifyPattern displayContext fsType false refPat
+
+            match tuplePat.IgnoreParentParens() with
+            | :? IParenPat ->
+                ()
+            | _ ->
+                SpecifyUtil.addParens tuplePat
+
+    let rec isSupportedPatternForStandaloneAnnotation (pattern: IFSharpPattern) =
+        match pattern.IgnoreInnerParens() with
+        | :? ITypedPat as typedPat ->
+            isSupportedPatternForStandaloneAnnotation typedPat.Pattern
+        | :? IReferencePat as refPat ->
+            not (AnnotationUtil.isFullyAnnotatedPattern refPat)
+        | :? ITuplePat as tuplePat ->
+            tuplePat.PatternsEnumerable |> Seq.exists isSupportedPatternForStandaloneAnnotation
+        | _ ->
+            false
+
+    let rec specifyPatternThatSupportsStandaloneAnnotation forceParens (pattern: IFSharpPattern) =
+        match pattern.IgnoreInnerParens() with
+        | :? ITypedPat as typedPat ->
+            specifyPatternThatSupportsStandaloneAnnotation forceParens typedPat.Pattern
+
+        | :? IReferencePat as refPat ->
+            match refPat with
+            | Declaration.IsNotNullAndHasMfvSymbolUse(symbolUse, mfv) ->
+                SpecifyUtil.specifyPattern symbolUse.DisplayContext mfv.FullType forceParens pattern
+                if forceParens && not (pattern.Parent :? IParenPat) then
+                    SpecifyUtil.addParens pattern
+            | _ ->
+                ()
+
+        | :? ITuplePat as tuplePat ->
+            specifyTuplePat forceParens tuplePat
+
+        | _ ->
+            ()
