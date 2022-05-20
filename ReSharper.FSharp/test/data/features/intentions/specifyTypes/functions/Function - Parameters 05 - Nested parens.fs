@@ -1,4 +1,4 @@
 module Module
 
-let f{caret} ((a: int)): unit =
+let f{caret} ((a: _)): unit =
     ()

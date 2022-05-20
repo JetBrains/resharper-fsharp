@@ -2,6 +2,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationAc
 
 open FSharp.Compiler.Symbols
 open JetBrains.Diagnostics
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -45,16 +46,25 @@ module PatUtil =
         findSibling<IReturnTypeInfo> pattern
 
     let removeTypeAnnotations (pattern: IFSharpPattern) =
-        match getTypeUsage pattern with
-        | ValueSome typeUsage ->
-            ModificationUtil.DeleteChild(typeUsage)
+        match pattern with
+        | :? ITypedPat as typedPat ->
+            ModificationUtil.ReplaceChild(typedPat, typedPat.Pattern.IgnoreInnerParens())
         | _ ->
-            match getReturnTypeInfo pattern with
-            | ValueSome typeInfo ->
-                ModificationUtil.DeleteChild(typeInfo)
+            match getTypeUsage pattern with
+            | ValueSome typeUsage ->
+                ModificationUtil.DeleteChild(typeUsage)
             | _ ->
-                ()
-        pattern
+                match getReturnTypeInfo pattern with
+                | ValueSome typeInfo ->
+                    ModificationUtil.DeleteChild(typeInfo)
+                | _ ->
+                    ()
+
+            let colon = pattern.GetNextMeaningfulSibling()
+            if isNotNull colon && colon.GetTokenType() == FSharpTokenType.COLON then
+                ModificationUtil.DeleteChild(colon)
+
+            pattern
 
     let removeInnerParens (pattern: IFSharpPattern) =
         let updatedPattern = pattern.IgnoreInnerParens()
@@ -76,6 +86,17 @@ module FcsMfvUtil =
     let getFunctionParameterTypes parameters (fsType: FSharpType) =
         let result = Array.zeroCreate parameters
         let mutable fullType = fsType
+
+        for i = 0 to parameters - 1 do
+            result[i] <- fullType.GenericArguments[0]
+            fullType <- fullType.GenericArguments[1]
+
+        result
+
+    // methods take "this" arg as first parameter so skip it
+    let getMethodParameterTypes parameters (fsType: FSharpType) =
+        let result = Array.zeroCreate parameters
+        let mutable fullType = fsType.GenericArguments[1]
 
         for i = 0 to parameters - 1 do
             result[i] <- fullType.GenericArguments[0]
@@ -133,10 +154,11 @@ module AnnotationUtil =
                isFullyAnnotatedPattern parameter.Pattern)
 
     let isFullyAnnotatedMemberDeclaration (memberDeclaration: IMemberDeclaration) =
-        isNotNull memberDeclaration.ReturnTypeInfo &&
-        memberDeclaration.ParametersDeclarations
-        |> Seq.forall (fun parameter ->
-               isFullyAnnotatedPattern parameter.Pattern)
+        isNotNull memberDeclaration.ReturnTypeInfo
+        && isFullyAnnotatedReturnTypeInfo memberDeclaration.ReturnTypeInfo
+        &&  memberDeclaration.ParametersDeclarations
+            |> Seq.forall (fun parameter ->
+                isFullyAnnotatedPattern parameter.Pattern)
 
     // let f x ... =
     // let f<'a> = ...
@@ -178,9 +200,15 @@ module SpecifyUtil =
         addParens pattern
 
     and specifyPattern displayContext (fcsType: FSharpType) forceParens (pattern: IFSharpPattern) =
-        match pattern
-            |> PatUtil.removeTypeAnnotations
-            |> PatUtil.removeInnerParens with
+
+        let pattern =
+            pattern
+                |> PatUtil.removeInnerParens
+                |> PatUtil.removeTypeAnnotations
+
+        let forceParens = forceParens && not (pattern.Parent :? IParenPat)
+
+        match pattern with
         | :? ITuplePat as tuplePat ->
             specifyTuplePat displayContext fcsType tuplePat
 
@@ -226,9 +254,11 @@ module SpecifyUtil =
         |> addSpaceBeforeColon forceSpaceBeforeColon
 
     let specifyPropertyType displayContext (fcsType: FSharpType) (decl: IMemberDeclaration) =
-        Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
         Assertion.Assert(decl.ParametersDeclarationsEnumerable.IsEmpty(),
             "decl.ParametersDeclarationsEnumerable.IsEmpty()")
+
+        if isNotNull decl.ReturnTypeInfo then
+            ModificationUtil.DeleteChild(decl.ReturnTypeInfo)
 
         let factory = decl.CreateElementFactory()
         let returnTypeInfo = factory.CreateReturnTypeInfo(factory.CreateTypeUsage(fcsType.Format(displayContext)))
@@ -236,7 +266,7 @@ module SpecifyUtil =
 
 module StandaloneAnnotationUtil =
 
-    let private specifyTuplePat forceParens (tuplePat: ITuplePat) =
+    let private specifyTuplePat (tuplePat: ITuplePat) =
         // this is a funky quirk
         // if we specify tuple patterns in sequence manner
         // then after first modification fcs is unable to find the corresponding symbolUse for next patterns
@@ -300,22 +330,23 @@ module StandaloneAnnotationUtil =
         | _ ->
             false
 
-    let rec specifyPatternThatSupportsStandaloneAnnotation forceParens (pattern: IFSharpPattern) =
+    let specifyPatternThatSupportsStandaloneAnnotation forceParens (pattern: IFSharpPattern) =
         match pattern.IgnoreInnerParens() with
         | :? ITypedPat as typedPat ->
-            specifyPatternThatSupportsStandaloneAnnotation forceParens typedPat.Pattern
-
+            match typedPat.Pattern.IgnoreInnerParens() with
+            | :? IReferencePat as Declaration.IsNotNullAndHasMfvSymbolUse(symbolUse, mfv) ->
+                SpecifyUtil.specifyPattern symbolUse.DisplayContext mfv.FullType false pattern
+            | _ ->
+                ()
         | :? IReferencePat as refPat ->
             match refPat with
             | Declaration.IsNotNullAndHasMfvSymbolUse(symbolUse, mfv) ->
                 SpecifyUtil.specifyPattern symbolUse.DisplayContext mfv.FullType forceParens pattern
-                if forceParens && not (pattern.Parent :? IParenPat) then
-                    SpecifyUtil.addParens pattern
             | _ ->
                 ()
 
         | :? ITuplePat as tuplePat ->
-            specifyTuplePat forceParens tuplePat
+            specifyTuplePat tuplePat
 
         | _ ->
             ()

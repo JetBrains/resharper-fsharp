@@ -16,6 +16,8 @@ type FunctionAnnotationActionTest() =
     [<Test>] member x.``Function - Parameters 02 - Wrong types``() = x.DoNamedTest()
     [<Test>] member x.``Function - Parameters 03 - Tuple``() = x.DoNamedTest()
     [<Test>] member x.``Function - Parameters 04 - Nested tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters 05 - Nested parens``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters 06 - Partially typed``() = x.DoNamedTest()
 
     [<Test>] member x.``Function 01 - Unit to unit``() = x.DoNamedTest()
     [<Test>] member x.``Function 02 - Recursive``() = x.DoNamedTest()
@@ -70,13 +72,19 @@ type ValueAnnotationActionTest() =
     [<Test>] member x.``Tuple 03 - Parent tuple - 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 04 - Parent tuple - 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Value - Async - 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Async - 02``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Async - 03``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Async - 04``() = x.DoNamedTest()
+
 type ValueAnnotationActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<ValueAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes/values"
 
-    [<Test>] member x.``Value - Let bindings - Module 01``() = x.DoNamedTest()
-    [<Test>] member x.``Value - Let bindings - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Let bindings - Async``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Let bindings - Module``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Let bindings - Expr``() = x.DoNamedTest()
 
 // TODO: Tests
 type MemberAnnotationActionTest() =
@@ -84,7 +92,18 @@ type MemberAnnotationActionTest() =
 
     override x.ExtraPath = "specifyTypes/members"
 
-    //[<Test>] member x.``Function - Parameters 01 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Method 02``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Method 03``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Method 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Member - Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Property 02``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Property 03``() = x.DoNamedTest()
+
+    // TODO: fix these
+//    [<Test>] member x.``Member - Val 01``() = x.DoNamedTest()
+//    [<Test>] member x.``Member - Val 02``() = x.DoNamedTest()
 
 // TODO: Tests
 type MemberAnnotationActionAvailabilityTest() =

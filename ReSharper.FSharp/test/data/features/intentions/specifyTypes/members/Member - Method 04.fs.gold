@@ -1,7 +1,7 @@
 module Members
 type Q() =
 
-    member _.F4{caret}(): : 'g -> 'h -> 'i -> unit = =
+    member _.F4{caret}(): 'a -> 'b -> 'c -> unit =
         fun _ ->
            fun _ ->
                fun _ ->

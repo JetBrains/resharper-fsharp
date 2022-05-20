@@ -1,4 +1,4 @@
 module Members
 type Q() =
 
-    member _.F1{caret} (x: 'k): 'k = x
+    member _.F1{caret} (x: int): int = x + 1
