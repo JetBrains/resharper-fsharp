@@ -5,8 +5,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-
-// TODO: Tests
 type FunctionAnnotationActionTest() =
     inherit FSharpContextActionExecuteTestBase<FunctionAnnotationAction>()
 
@@ -77,6 +75,8 @@ type ValueAnnotationActionTest() =
     [<Test>] member x.``Value - Async - 03``() = x.DoNamedTest()
     [<Test>] member x.``Value - Async - 04``() = x.DoNamedTest()
 
+    [<Test>] member x.``Value - Interface Method Parameter - 01``() = x.DoNamedTest()
+
 type ValueAnnotationActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<ValueAnnotationAction>()
 
@@ -85,6 +85,7 @@ type ValueAnnotationActionAvailabilityTest() =
     [<Test>] member x.``Value - Let bindings - Async``() = x.DoNamedTest()
     [<Test>] member x.``Value - Let bindings - Module``() = x.DoNamedTest()
     [<Test>] member x.``Value - Let bindings - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Interface Method Parameter``() = x.DoNamedTest()
 
 // TODO: Tests
 type MemberAnnotationActionTest() =
@@ -96,6 +97,8 @@ type MemberAnnotationActionTest() =
     [<Test>] member x.``Member - Method 02``() = x.DoNamedTest()
     [<Test>] member x.``Member - Method 03``() = x.DoNamedTest()
     [<Test>] member x.``Member - Method 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Member - Interface Method 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Member - Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Member - Property 02``() = x.DoNamedTest()
@@ -111,4 +114,5 @@ type MemberAnnotationActionAvailabilityTest() =
 
     override x.ExtraPath = "specifyTypes/members"
 
-    [<Test>] member x.``Function - Class - member - 01``() = x.DoNamedTest()
+    [<Test>] member x.``Class - member - 01``() = x.DoNamedTest()
+    [<Test>] member x.``Interface - member - 01``() = x.DoNamedTest()

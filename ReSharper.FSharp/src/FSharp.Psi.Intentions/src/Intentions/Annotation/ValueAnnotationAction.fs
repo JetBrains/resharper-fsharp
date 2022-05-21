@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.Symbols
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -19,11 +20,12 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
     let mutable annotationContext = ValueNone
 
-    let tryGetParameterAnnotationContextFromDeclaration (parameter: IParametersPatternDeclaration) (parameters: TreeNodeEnumerable<IParametersPatternDeclaration>) (declaration: IFSharpDeclaration) =
+    let tryGetParameterAnnotationContextFromDeclaration (parameter: IParametersPatternDeclaration) (parameters: TreeNodeEnumerable<IParametersPatternDeclaration>) isFromMember declaration =
         match declaration with
         | Declaration.IsNotNullAndHasMfvSymbolUse(symbolUse, mfv) ->
             let parameterIndex = parameters |> Seq.findIndex (fun bindingParam -> bindingParam == parameter)
-            let actualParameterType = FcsMfvUtil.getFunctionParameterAt parameterIndex  mfv.FullType
+            let parameterIndex = if isFromMember then parameterIndex + 1 else parameterIndex
+            let actualParameterType = FcsMfvUtil.getFunctionParameterAt parameterIndex mfv.FullType
             annotationContext <- ValueSome (ParameterContext(parameter.Pattern, symbolUse.DisplayContext, actualParameterType))
             true
         | _ ->
@@ -31,20 +33,28 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
     let isAvailableForParameter() =
         let parameter = dataProvider.GetSelectedElement<IParametersPatternDeclaration>()
-        isNotNull parameter
-        && not (AnnotationUtil.isFullyAnnotatedPattern parameter.Pattern)
-        &&  match parameter.Parent with
-            | :? IBinding as binding ->
-                match binding.HeadPattern with
-                | :? IFSharpDeclaration as bindingDecl ->
-                    tryGetParameterAnnotationContextFromDeclaration parameter binding.ParametersDeclarationsEnumerable bindingDecl
-                | _ ->
-                    false
-
-            | :? IMemberDeclaration as memberDecl ->
-               tryGetParameterAnnotationContextFromDeclaration parameter memberDecl.ParametersDeclarationsEnumerable memberDecl
+        isNotNull parameter &&
+        not (AnnotationUtil.isFullyAnnotatedPattern parameter.Pattern) &&
+        match parameter.Parent with
+        | :? IBinding as binding ->
+            match binding.HeadPattern with
+            | :? IFSharpDeclaration as bindingDecl ->
+                tryGetParameterAnnotationContextFromDeclaration parameter binding.ParametersDeclarationsEnumerable false bindingDecl
             | _ ->
                 false
+
+        | :? IMemberDeclaration as memberDecl ->
+           tryGetParameterAnnotationContextFromDeclaration parameter memberDecl.ParametersDeclarationsEnumerable true memberDecl
+
+        // member val ...
+        | :? IAutoPropertyDeclaration as autoProp ->
+            // TODO: fix this one because now it seems that we can't get returnTypeInfo or namedTypeUsage from it
+            // It is not in range of declaration now
+            // Tests for member val are now disabled
+            false
+
+        | _ ->
+            false
 
     let isAvailableForValue() =
         let binding = dataProvider.GetSelectedElement<IBinding>()
@@ -62,8 +72,8 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 pattern
 
         let isAvailable =
-            AnnotationUtil.isValueBinding binding
-            && StandaloneAnnotationUtil.isSupportedPatternForStandaloneAnnotation pattern
+            AnnotationUtil.isValueBinding binding &&
+            StandaloneAnnotationUtil.isSupportedPatternForStandaloneAnnotation pattern
 
         if isAvailable then
             let forceParens =
@@ -80,11 +90,12 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
     override this.IsAvailable _ =
         // this is rather complex:
-        // for parameter we can annotate anything we want, basically because we can get full type of member declaration
+        // for parameter we can annotate anything we want basically because we can get full type of member/function
         // for value it seems that we can annotate only ref pats because we can't really get type from wild pat, or array pat or list pat
         // I couldn't find a way at least
-        // but check for parameter is rather long
-        // so maybe we should just stick to annotating ref pats only?
+        // but check for parameter is rather long because we have to save context, or maybe it can be moved to actual psi transaction ?
+        // not sure if member declaration can return null symbolUsage
+        // if this is impossible then moving actual transition is won't be too hard
 
         isAvailableForParameter()
         || isAvailableForValue()
@@ -94,11 +105,13 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     override x.ExecutePsiTransaction _ =
         match annotationContext with
         | ValueNone ->
-            failwith "impossible" // TODO: better assert
+            Assertion.Assert(false, "Should not be possible")
+
         | ValueSome (ParameterContext(pattern, context, fsType)) ->
             use writeCookie = WriteLockCookie.Create(pattern.IsPhysical())
             use disableFormatter = new DisableCodeFormatter()
             SpecifyUtil.specifyPattern context fsType true pattern
+
         | ValueSome (ValueContext(pattern, forceParens)) ->
             use writeCookie = WriteLockCookie.Create(pattern.IsPhysical())
             use disableFormatter = new DisableCodeFormatter()

@@ -21,7 +21,7 @@ module Declaration =
 
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as mfv ->
-            ValueSome (symbolUse, mfv)
+            ValueSome struct (symbolUse, mfv)
         | _ ->
             ValueNone
 
@@ -122,8 +122,8 @@ module AnnotationUtil =
            |> not
 
     let rec private isFullyAnnotatedFunctionTypeUsage (functionTypeUsage: IFunctionTypeUsage) =
-        isFullyAnnotatedTypeUsage functionTypeUsage.ArgumentTypeUsage
-        && isFullyAnnotatedTypeUsage functionTypeUsage.ReturnTypeUsage
+        isFullyAnnotatedTypeUsage functionTypeUsage.ArgumentTypeUsage &&
+        isFullyAnnotatedTypeUsage functionTypeUsage.ReturnTypeUsage
 
     and isFullyAnnotatedTypeUsage (typeUsage: ITypeUsage) =
         match typeUsage with
@@ -134,8 +134,8 @@ module AnnotationUtil =
         | _ -> false
 
     let isFullyAnnotatedReturnTypeInfo (returnTypeInfo: IReturnTypeInfo) =
-        isNotNull returnTypeInfo.ReturnType
-        && isFullyAnnotatedTypeUsage returnTypeInfo.ReturnType
+        isNotNull returnTypeInfo.ReturnType &&
+        isFullyAnnotatedTypeUsage returnTypeInfo.ReturnType
 
     let rec isFullyAnnotatedPattern (pattern: IFSharpPattern) =
         match pattern.IgnoreInnerParens() with
@@ -148,17 +148,17 @@ module AnnotationUtil =
             || pattern |> PatUtil.getReturnTypeInfo |> ValueOption.exists isFullyAnnotatedReturnTypeInfo
 
     let isFullyAnnotatedBinding (binding: IBinding) =
-        isNotNull binding.ReturnTypeInfo
-        && binding.ParametersDeclarationsEnumerable
-           |> Seq.forall (fun parameter ->
-               isFullyAnnotatedPattern parameter.Pattern)
+        isNotNull binding.ReturnTypeInfo &&
+        binding.ParametersDeclarationsEnumerable
+        |> Seq.forall (fun parameter ->
+            isFullyAnnotatedPattern parameter.Pattern)
 
     let isFullyAnnotatedMemberDeclaration (memberDeclaration: IMemberDeclaration) =
-        isNotNull memberDeclaration.ReturnTypeInfo
-        && isFullyAnnotatedReturnTypeInfo memberDeclaration.ReturnTypeInfo
-        &&  memberDeclaration.ParametersDeclarations
-            |> Seq.forall (fun parameter ->
-                isFullyAnnotatedPattern parameter.Pattern)
+        isNotNull memberDeclaration.ReturnTypeInfo &&
+        isFullyAnnotatedReturnTypeInfo memberDeclaration.ReturnTypeInfo &&
+        memberDeclaration.ParametersDeclarations
+        |> Seq.forall (fun parameter ->
+            isFullyAnnotatedPattern parameter.Pattern)
 
     // let f x ... =
     // let f<'a> = ...

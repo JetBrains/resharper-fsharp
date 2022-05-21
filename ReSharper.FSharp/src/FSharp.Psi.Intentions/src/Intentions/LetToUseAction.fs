@@ -20,9 +20,13 @@ type LetToUseAction(dataProvider: FSharpContextActionDataProvider) =
 
     override x.IsAvailable _ =
         let letExpr = dataProvider.GetSelectedElement<ILetOrUseExpr>()
-        isNotNull letExpr
-        && isAtBindingKeywordOrReferencePatternOrGenericParameters dataProvider letExpr.Bindings[0]
-        && LetDisposableAnalyzer.isApplicable letExpr
+        if isNull letExpr then false else
+
+        let binding = letExpr.BindingsEnumerable.FirstOrDefault()
+
+        isNotNull binding &&
+        isAtBindingKeywordOrReferencePatternOrGenericParameters dataProvider binding &&
+        LetDisposableAnalyzer.isApplicable letExpr
 
     override x.ExecutePsiTransaction(_, _) =
         let letExpr = dataProvider.GetSelectedElement<ILetOrUseExpr>()
