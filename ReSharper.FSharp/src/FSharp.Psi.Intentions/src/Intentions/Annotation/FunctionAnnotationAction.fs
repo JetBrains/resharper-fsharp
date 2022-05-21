@@ -18,10 +18,10 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
     override x.IsAvailable _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
-        isNotNull binding
-        && AnnotationUtil.isFunctionBinding binding
-        && isAtBindingKeywordOrReferencePatternOrGenericParameters dataProvider binding
-        && not (AnnotationUtil.isFullyAnnotatedBinding binding)
+        isNotNull binding &&
+        AnnotationUtil.isFunctionBinding binding &&
+        isAtBindingKeywordOrReferencePatternOrGenericParameters dataProvider binding &&
+        not (AnnotationUtil.isFullyAnnotatedBinding binding)
 
     override x.ExecutePsiTransaction _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
