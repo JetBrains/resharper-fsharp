@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type private ValueAnnotationContext =
-    | ParameterContext of Pattern: IFSharpPattern * DisplayContext: FSharpDisplayContext * FSType: FSharpType
+    | ParameterContext of Pattern: IFSharpPattern * DisplayContext: FSharpDisplayContext * FCSType: FSharpType
     | ValueContext of Pattern: IFSharpPattern * ForceParens: bool
 
 [<ContextAction(Name = "AnnotateValue", Group = "F#",
@@ -107,10 +107,10 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         | ValueNone ->
             Assertion.Assert(false, "Should not be possible")
 
-        | ValueSome (ParameterContext(pattern, context, fsType)) ->
+        | ValueSome (ParameterContext(pattern, context, fcsType)) ->
             use writeCookie = WriteLockCookie.Create(pattern.IsPhysical())
             use disableFormatter = new DisableCodeFormatter()
-            SpecifyUtil.specifyPattern context fsType true pattern
+            SpecifyUtil.specifyPattern context fcsType true pattern
 
         | ValueSome (ValueContext(pattern, forceParens)) ->
             use writeCookie = WriteLockCookie.Create(pattern.IsPhysical())

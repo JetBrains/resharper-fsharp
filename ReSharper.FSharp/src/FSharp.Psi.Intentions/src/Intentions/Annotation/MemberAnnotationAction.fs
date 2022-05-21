@@ -53,9 +53,9 @@ type MemberAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 let forceParens = not (parameters[0].Parent :? IParenPat)
 
                 (parameters, types)
-                ||> Seq.iter2 (fun parameter fsType ->
+                ||> Seq.iter2 (fun parameter fcsType ->
                     if not (parameter :? IUnitPat) then
-                        SpecifyUtil.specifyPattern displayContext fsType forceParens parameter)
+                        SpecifyUtil.specifyPattern displayContext fcsType forceParens parameter)
                 SpecifyUtil.specifyMethodReturnType displayContext mfv memberDeclaration
         | _ ->
             ()

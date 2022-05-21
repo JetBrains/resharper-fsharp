@@ -74,18 +74,18 @@ module PatUtil =
             ModificationUtil.ReplaceChild(pattern, updatedPattern)
 
 module FcsMfvUtil =
-    let getFunctionReturnType parameters (fsType: FSharpType) =
-        let rec skipFunctionParameters remaining (fsType: FSharpType) =
-            if remaining = 0 then fsType
+    let getFunctionReturnType parameters (fcsType: FSharpType) =
+        let rec skipFunctionParameters remaining (fcsType: FSharpType) =
+            if remaining = 0 then fcsType
             else
-                skipFunctionParameters (remaining - 1) fsType.GenericArguments[1]
+                skipFunctionParameters (remaining - 1) fcsType.GenericArguments[1]
 
-        let returnType = skipFunctionParameters parameters fsType
+        let returnType = skipFunctionParameters parameters fcsType
         returnType
 
-    let getFunctionParameterTypes parameters (fsType: FSharpType) =
+    let getFunctionParameterTypes parameters (fcsType: FSharpType) =
         let result = Array.zeroCreate parameters
-        let mutable fullType = fsType
+        let mutable fullType = fcsType
 
         for i = 0 to parameters - 1 do
             result[i] <- fullType.GenericArguments[0]
@@ -94,9 +94,9 @@ module FcsMfvUtil =
         result
 
     // methods take "this" arg as first parameter so skip it
-    let getMethodParameterTypes parameters (fsType: FSharpType) =
+    let getMethodParameterTypes parameters (fcsType: FSharpType) =
         let result = Array.zeroCreate parameters
-        let mutable fullType = fsType.GenericArguments[1]
+        let mutable fullType = fcsType.GenericArguments[1]
 
         for i = 0 to parameters - 1 do
             result[i] <- fullType.GenericArguments[0]
@@ -104,13 +104,13 @@ module FcsMfvUtil =
 
         result
 
-    let getFunctionParameterAt parameterIndex (fsType: FSharpType) =
-        let rec getParameter index (fsType: FSharpType) =
-            if index = 0 then fsType.GenericArguments[0]
+    let getFunctionParameterAt parameterIndex (fcsType: FSharpType) =
+        let rec getParameter index (fcsType: FSharpType) =
+            if index = 0 then fcsType.GenericArguments[0]
             else
-                getParameter (index - 1) fsType.GenericArguments[1]
+                getParameter (index - 1) fcsType.GenericArguments[1]
 
-        getParameter parameterIndex fsType
+        getParameter parameterIndex fcsType
 
 module AnnotationUtil =
 
@@ -310,8 +310,8 @@ module StandaloneAnnotationUtil =
         // otherwise we lose parent property of tuplePat
         for i = referenceList.Count - 1 downto 0 do
             let struct (tuplePat, refPats) = referenceList[i]
-            for refPat, displayContext, fsType in refPats do
-                SpecifyUtil.specifyPattern displayContext fsType false refPat
+            for refPat, displayContext, fcsType in refPats do
+                SpecifyUtil.specifyPattern displayContext fcsType false refPat
 
             match tuplePat.IgnoreParentParens() with
             | :? IParenPat ->
