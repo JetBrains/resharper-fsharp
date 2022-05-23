@@ -123,6 +123,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Module bindings - Compiled name 03 - Overloads``() = x.DoNamedTest()
 
     [<Test>] member x.``Nested module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Nested module 02 - Compiled name``() = x.DoNamedTest()
 
     [<Test>] member x.``Operators - Math 01 - Addition``() = x.DoNamedTest()
     [<Test>] member x.``Operators - Math 02 - Subtraction``() = x.DoNamedTest()

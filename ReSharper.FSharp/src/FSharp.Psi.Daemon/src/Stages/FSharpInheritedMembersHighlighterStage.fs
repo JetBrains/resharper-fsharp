@@ -27,7 +27,7 @@ type InheritedMembersStageProcess(fsFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let psiModule = fsFile.GetPsiModule()
-    let symbolScope = getSymbolScope psiModule
+    let symbolScope = getSymbolScope psiModule false
     let searchDomain = SearchDomainFactory.Instance.CreateSearchDomain(daemonProcess.Solution, false)
 
     let processDeclaration (result: IList<_>) (typeMemberDeclaration: ITypeMemberDeclaration) =

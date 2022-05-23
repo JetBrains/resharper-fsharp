@@ -360,7 +360,7 @@ type OpenedModulesProvider(fsFile: IFSharpFile) =
 
     let document = fsFile.GetSourceFile().Document
     let psiModule = fsFile.GetPsiModule()
-    let symbolScope = getModuleOnlySymbolScope psiModule
+    let symbolScope = getModuleOnlySymbolScope psiModule false
 
 //    let getQualifiedName (element: IClrDeclaredElement) =
 //        match toQualifiedList element with

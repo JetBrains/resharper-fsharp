@@ -276,7 +276,7 @@ type AssociatedTypeRenameEvaluator() =
                     match fsTypeElement.GetContainingType() with
                     | null ->
                         let ns = fsTypeElement.GetContainingNamespace()
-                        ns.GetNestedTypeElements(getModuleOnlySymbolScope fsTypeElement.Module) :> _
+                        ns.GetNestedTypeElements(getModuleOnlySymbolScope fsTypeElement.Module false) :> _
 
                     | containingType ->
                         containingType.NestedTypes :> _

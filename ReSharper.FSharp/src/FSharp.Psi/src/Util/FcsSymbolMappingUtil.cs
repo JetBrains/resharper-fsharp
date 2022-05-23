@@ -42,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (clrTypeName == null)
           return null;
 
-        var typeElements = psiModule.GetSymbolScope().GetTypeElementsByCLRName(clrTypeName);
+        var typeElements = psiModule.GetSymbolScope(false).GetTypeElementsByCLRName(clrTypeName);
         if (typeElements.IsEmpty())
           return null;
 
@@ -69,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         });
       }
 
-      var symbolScope = psiModule.GetSymbolScope();
+      var symbolScope = psiModule.GetSymbolScope(false);
       while (entity.IsFSharpAbbreviation)
       {
         // FCS returns Clr names for non-abbreviated types only, using fullname
@@ -109,7 +109,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var name = entity.LogicalName;
       var containingNamespace = entity.Namespace?.Value;
       var fullName = containingNamespace != null ? containingNamespace + "." + name : name;
-      var elements = psiModule.GetSymbolScope().GetElementsByQualifiedName(fullName);
+      var elements = psiModule.GetSymbolScope(false).GetElementsByQualifiedName(fullName);
       return elements.FirstOrDefault() as INamespace;
     }
 

@@ -68,7 +68,7 @@ let mayShadowPartially (newExpr: ITreeNode) (data: ElementProblemAnalyzerData) (
     if isNull typeElement then false else
 
     let sourceName = typeElement.GetSourceName()
-    let symbolScope = getSymbolScope data.SourceFile.PsiModule
+    let symbolScope = getSymbolScope data.SourceFile.PsiModule false
     let typeElements =
         symbolScope.GetElementsByShortName(sourceName) // todo: find by source name
         |> Array.filter (fun e -> e :? ITypeElement && not (e.Equals(typeElement)))
