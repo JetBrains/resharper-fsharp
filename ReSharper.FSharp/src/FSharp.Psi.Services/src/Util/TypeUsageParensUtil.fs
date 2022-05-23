@@ -7,8 +7,9 @@ let applicable (typeUsage: ITypeUsage) =
     not (typeUsage :? IUnsupportedTypeUsage) // todo: remove when all FSC types usages are properly mapped
 
 let rec getLongestReturnFromArg (typeUsage: ITypeUsage) =
-    match FunctionTypeUsageNavigator.GetByArgumentTypeUsage(typeUsage.IgnoreParentParens()) with
-    | null -> if typeUsage :? IFunctionTypeUsage then typeUsage else null
+    let typeUsage = typeUsage.IgnoreParentParens()
+    match FunctionTypeUsageNavigator.GetByArgumentTypeUsage(typeUsage) with
+    | null -> if typeUsage :? IFunctionTypeUsage then typeUsage else typeUsage
     | typeUsage -> getLongestReturnFromArg typeUsage
 
 let rec getLongestReturnFromReturn (typeUsage: ITypeUsage) =
@@ -23,21 +24,36 @@ let rec ignoreParentCompoundTypes (typeUsage: ITypeUsage) =
     | :? IFunctionTypeUsage -> ignoreParentCompoundTypes (parent :?> _)
     | _ -> typeUsage
 
+let rec getFirstArg (functionTypeUsage: IFunctionTypeUsage) =
+    match functionTypeUsage.ArgumentTypeUsage.IgnoreInnerParens() with
+    | :? IFunctionTypeUsage as argFunctionTypeUsage -> getFirstArg argFunctionTypeUsage
+    | argTypeUsage -> argTypeUsage
+
+let rec requiresParensInAbbreviation (typeUsage: ITypeUsage) =
+    match typeUsage.IgnoreInnerParens() with
+    | :? ITupleTypeUsage as tupleTypeUsage -> tupleTypeUsage.IsStruct
+    | :? IFunctionTypeUsage as functionTypeUsage ->
+        let argTypeUsage = getFirstArg functionTypeUsage
+        requiresParensInAbbreviation argTypeUsage
+    | _ -> false
+
 let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
     let parentTypeUsage = context.Parent.As<ITypeUsage>()
     if isNotNull parentTypeUsage && not (applicable parentTypeUsage) then true else
     if context.Parent :? ITraitCallExpr then true else
 
     match typeUsage with
-    | :? ITupleTypeUsage as tupleTypeUsage ->
-        // todo: rewrite when top-level-types are supported
+    | :? ITupleTypeUsage ->
         let functionTypeUsage = FunctionTypeUsageNavigator.GetByReturnTypeUsage(context)
+        let argTypeUsage = getLongestReturnFromArg context
+
+        // todo: rewrite when top-level-types are supported
         if isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(context)) then true else
         if isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(functionTypeUsage)) then true else
-        if isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(getLongestReturnFromArg context)) then true else
+        if isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(argTypeUsage)) then true else
 
-        let isStruct = isNotNull tupleTypeUsage.StructKeyword
-        if isStruct && isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(context)) then true else
+        let isInAbbreviation = isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(argTypeUsage))
+        if isInAbbreviation && requiresParensInAbbreviation argTypeUsage then true else
 
         isNotNull (TupleTypeUsageNavigator.GetByItem(context)) ||
         isNotNull (ArrayTypeUsageNavigator.GetByTypeUsage(context)) ||
@@ -58,7 +74,10 @@ let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
 
         let longestReturn = getLongestReturnFromReturn context
         isNotNull (ReturnTypeInfoNavigator.GetByReturnType(longestReturn)) ||
-        isNotNull (ValFieldDeclarationNavigator.GetByTypeUsage(longestReturn))
+        isNotNull (ValFieldDeclarationNavigator.GetByTypeUsage(longestReturn)) ||
+
+        let isInAbbreviation = isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(context))
+        isInAbbreviation && requiresParensInAbbreviation typeUsage
 
     | :? IArrayTypeUsage ->
         isNotNull (IsInstPatNavigator.GetByTypeUsage(ignoreParentCompoundTypes context))
