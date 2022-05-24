@@ -1,0 +1,4 @@
+module Test =
+    type MyAttr() = inherit System.Attribute()
+    [<MyAttr; {caret}>]
+    let f() = ()

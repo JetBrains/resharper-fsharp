@@ -15,13 +15,6 @@ module ToLiteralAction =
 type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
-    let getAttributeList (binding: IBinding): IAttributeList =
-        let attributeLists = binding.AttributeLists
-        if not attributeLists.IsEmpty then attributeLists.First() else
-
-        FSharpAttributesUtil.addAttributeListToLetBinding false binding
-        binding.AttributeLists[0]
-
     let rec isSimplePattern (fsPattern: IFSharpPattern): bool =
         match fsPattern with
         | :? IReferencePat as refPat ->
@@ -59,7 +52,7 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let attributeList = getAttributeList binding
+        let attributeList = FSharpAttributesUtil.getBindingAttributeList binding
         let attribute = binding.CreateElementFactory().CreateAttribute("Literal")
         FSharpAttributesUtil.addAttribute attributeList attribute |> ignore
 

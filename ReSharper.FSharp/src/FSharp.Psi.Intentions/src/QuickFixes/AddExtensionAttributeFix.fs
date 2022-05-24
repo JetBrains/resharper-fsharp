@@ -33,12 +33,10 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
         let attributeList = 
             match declaration with
             | :? IDeclaredModuleDeclaration as moduleDecl ->
-                if moduleDecl.AttributeLists.IsEmpty then
-                    addOuterAttributeList true moduleDecl
-                moduleDecl.AttributeLists[0]
+                getModuleDeclarationAttributeList moduleDecl
 
-            | :? IFSharpTypeOrExtensionDeclaration as t ->
-                getTypeDeclarationAttributeList t
+            | :? IFSharpTypeOrExtensionDeclaration as typeDecl ->
+                getTypeDeclarationAttributeList typeDecl
 
             | _ -> null
 

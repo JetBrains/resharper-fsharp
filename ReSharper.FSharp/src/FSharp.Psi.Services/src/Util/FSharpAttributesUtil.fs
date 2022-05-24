@@ -169,6 +169,11 @@ let addAttributeListToLetBinding newLine (binding: IBinding) =
 let isOuterAttributeList (typeDecl: IFSharpTypeOrExtensionDeclaration) (attrList: IAttributeList) =
     attrList.GetTreeStartOffset().Offset < typeDecl.TypeKeyword.GetTreeStartOffset().Offset
 
+let getModuleDeclarationAttributeList (moduleDecl: IDeclaredModuleDeclaration) =
+    if moduleDecl.AttributeLists.IsEmpty then
+        addOuterAttributeList true moduleDecl
+    moduleDecl.AttributeLists[0]
+
 let getTypeDeclarationAttributeList (typeDecl: #IFSharpTypeOrExtensionDeclaration) =
     if typeDecl.IsPrimary then
         let attributeLists = typeDecl.AttributeLists
@@ -182,6 +187,14 @@ let getTypeDeclarationAttributeList (typeDecl: #IFSharpTypeOrExtensionDeclaratio
         if attributeLists.IsEmpty then
             addAttributeListToTypeDeclaration typeDecl
         typeDecl.AttributeLists[0]
+
+let getMemberDeclarationAttributeList (memberDeclaration: IMemberDeclaration) =
+    let attributeLists = memberDeclaration.AttributeLists
+    if attributeLists.Count > 0 then
+        attributeLists[0]
+    else
+        addOuterAttributeList true memberDeclaration
+        memberDeclaration.AttributeLists[0]
 
 let getParameterDeclarationAttributeList (parameter: IParametersPatternDeclaration) =
     match parameter.Pattern with
@@ -198,6 +211,13 @@ let getParameterDeclarationAttributeList (parameter: IParametersPatternDeclarati
     | pattern ->
         addOuterAttributeList false pattern
         pattern.FirstChild :?> IAttributeList
+
+let getBindingAttributeList (binding: IBinding): IAttributeList =
+    let attributeLists = binding.AttributeLists
+    if not attributeLists.IsEmpty then attributeLists.First() else
+
+    addAttributeListToLetBinding false binding
+    binding.AttributeLists[0]
 
 let resolvesToType (clrTypeName: IClrTypeName) (attr: IAttribute) =
     let reference = attr.ReferenceName.Reference
