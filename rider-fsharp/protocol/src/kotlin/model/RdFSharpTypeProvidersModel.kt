@@ -319,6 +319,7 @@ object RdFSharpTypeProvidersModel : Root() {
         +"bool"
         +"string"
         +"dbnull"
+        +"unknown"
     }
 
     private val RdProvidedEntityType = flags {

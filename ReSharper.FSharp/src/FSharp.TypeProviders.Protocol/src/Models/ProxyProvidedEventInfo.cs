@@ -15,7 +15,7 @@ using static FSharp.Compiler.ExtensionTyping;
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
   [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-  public class ProxyProvidedEventInfo : ProvidedEventInfo
+  public class ProxyProvidedEventInfo : ProvidedEventInfo, IRdProvidedCustomAttributesOwner
   {
     private readonly RdProvidedEventInfo myEventInfo;
     private readonly TypeProvidersContext myTypeProvidersContext;
@@ -74,5 +74,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private string[] myXmlDocs;
     private readonly InterruptibleLazy<ProvidedMethodInfo[]> myMethods;
     private readonly InterruptibleLazy<ProvidedType[]> myTypes;
+    public RdCustomAttributeData[] Attributes => myEventInfo.CustomAttributes;
   }
 }
