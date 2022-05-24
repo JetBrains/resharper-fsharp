@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -76,6 +77,10 @@ module AttributeUtil =
         ranges.Contains(dataProvider.SelectedTreeRange)
 
     let isAtParameterDecl (dataProvider: IContextActionDataProvider) (declaration: IParametersPatternDeclaration) =
+        match declaration.Pattern.IgnoreInnerParens() with
+        | :? IUnitPat -> false
+        | _ ->
+
         let ranges =
             DisjointedTreeTextRange
                 .From(declaration.Pattern)
@@ -217,4 +222,4 @@ type AddEmptyAttributeToParameterAction(dataProvider: FSharpContextActionDataPro
         isNotNull decl &&
         AttributeUtil.isAtParameterDecl dataProvider decl
 
-    override this.Text = "Add attribute"
+    override this.Text = "Add empty attribute"
