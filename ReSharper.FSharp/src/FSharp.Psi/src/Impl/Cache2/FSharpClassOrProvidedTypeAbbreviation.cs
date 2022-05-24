@@ -3,8 +3,8 @@ using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
@@ -22,7 +22,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
     }
 
-    protected override MemberDecoration Modifiers => myParts.GetModifiers();
+    protected override bool AcceptsPart(TypePart part) =>
+      ShortName == part.ShortName &&
+      myParts is TypeAbbreviationOrDeclarationPart &&
+      part is TypeAbbreviationOrDeclarationPart;
 
     public override MemberPresenceFlag GetMemberPresenceFlag() =>
       ProvidedClass is { } x ? x.GetMemberPresenceFlag() : base.GetMemberPresenceFlag();
