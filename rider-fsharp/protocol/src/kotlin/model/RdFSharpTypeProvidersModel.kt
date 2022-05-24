@@ -159,8 +159,6 @@ object RdFSharpTypeProvidersModel : Root() {
     private val RdProvidedTypeProcessModel = aggregatedef("RdProvidedTypeProcessModel") {
         call("GetProvidedType", int, RdOutOfProcessProvidedType)
         call("GetProvidedTypes", array(int), array(RdOutOfProcessProvidedType))
-        call("GetAllNestedTypes", int, array(int))
-        call("GetInterfaces", int, array(int))
         call("GetGenericTypeDefinition", int, int)
         call("GetElementType", int, int)
         call("GetArrayRank", int, int)
@@ -178,11 +176,7 @@ object RdFSharpTypeProvidersModel : Root() {
             field("EntityId", int)
             field("ArgIds", array(int))
         }, int)
-        call("GetFields", int, array(RdProvidedFieldInfo))
-        call("GetConstructors", int, array(RdProvidedConstructorInfo))
-        call("GetMethods", int, array(RdProvidedMethodInfo))
-        call("GetProperties", int, array(RdProvidedPropertyInfo))
-        call("GetEvents", int, array(RdProvidedEventInfo))
+        call("GetContent", int, RdProvidedTypeContent)
     }
 
     private val ApplyStaticArgumentsForMethodArgs = structdef("ApplyStaticArgumentsForMethodArgs") {
@@ -244,6 +238,16 @@ object RdFSharpTypeProvidersModel : Root() {
         field("AddMethod", int)
         field("RemoveMethod", int)
         field("CustomAttributes", array(RdCustomAttributeData))
+    }
+
+    private val RdProvidedTypeContent = structdef {
+        field("Interfaces", array(int))
+        field("Constructors", array(RdProvidedConstructorInfo))
+        field("Methods", array(RdProvidedMethodInfo))
+        field("AllNestedTypes", array(int))
+        field("Properties", array(RdProvidedPropertyInfo))
+        field("Fields", array(RdProvidedFieldInfo))
+        field("Events", array(RdProvidedEventInfo))
     }
 
     private val RdProvidedConstructorInfo = structdef extends RdProvidedMethodBase {

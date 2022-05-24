@@ -15,8 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
 
     public void Initialize(RdProvidedTypeProcessModel processModel)
     {
-      processModel.GetInterfaces.Set(GetInterfaces);
-      processModel.GetAllNestedTypes.Set(GetAllNestedTypes);
+      processModel.GetContent.Set(GetContent);
       processModel.GetGenericTypeDefinition.Set(GetGenericTypeDefinition);
       processModel.GetElementType.Set(GetElementType);
       processModel.GetArrayRank.Set(GetArrayRank);
@@ -28,45 +27,43 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
       processModel.MakeArrayType.Set(MakeArrayType);
       processModel.MakePointerType.Set(MakePointerType);
       processModel.MakeByRefType.Set(MakeByRefType);
-      processModel.GetFields.Set(GetFields);
       processModel.MakeGenericType.Set(MakeGenericType);
       processModel.GetProvidedTypes.Set(GetProvidedTypes);
-      processModel.GetConstructors.Set(GetConstructors);
-      processModel.GetMethods.Set(GetMethods);
-      processModel.GetProperties.Set(GetProperties);
-      processModel.GetEvents.Set(GetEvents);
     }
 
-    private RdProvidedEventInfo[] GetEvents(int typeId)
+    private RdProvidedTypeContent GetContent(int typeId)
     {
       var (type, typeProviderId) = myTypeProvidersContext.ProvidedTypesCache.Get(typeId);
-      return type
-        .GetEvents()
-        .CreateRdModels(myTypeProvidersContext.ProvidedEventRdModelsCreator, typeProviderId);
-    }
 
-    private RdProvidedPropertyInfo[] GetProperties(int typeId)
-    {
-      var (type, typeProviderId) = myTypeProvidersContext.ProvidedTypesCache.Get(typeId);
-      return type
-        .GetProperties()
-        .CreateRdModels(myTypeProvidersContext.ProvidedPropertyRdModelsCreator, typeProviderId);
-    }
+      var interfaces = type
+        .GetInterfaces()
+        .CreateIds(myTypeProvidersContext.ProvidedTypeRdModelsCreator, typeProviderId);
 
-    private RdProvidedMethodInfo[] GetMethods(int typeId)
-    {
-      var (type, typeProviderId) = myTypeProvidersContext.ProvidedTypesCache.Get(typeId);
-      return type
-        .GetMethods()
-        .CreateRdModels(myTypeProvidersContext.ProvidedMethodRdModelsCreator, typeProviderId);
-    }
+      var allNestedTypes = type
+        .GetAllNestedTypes()
+        .CreateIds(myTypeProvidersContext.ProvidedTypeRdModelsCreator, typeProviderId);
 
-    private RdProvidedConstructorInfo[] GetConstructors(int typeId)
-    {
-      var (type, typeProviderId) = myTypeProvidersContext.ProvidedTypesCache.Get(typeId);
-      return type
+      var constructors = type
         .GetConstructors()
         .CreateRdModels(myTypeProvidersContext.ProvidedConstructorRdModelsCreator, typeProviderId);
+
+      var methods = type
+        .GetMethods()
+        .CreateRdModels(myTypeProvidersContext.ProvidedMethodRdModelsCreator, typeProviderId);
+
+      var properties = type
+        .GetProperties()
+        .CreateRdModels(myTypeProvidersContext.ProvidedPropertyRdModelsCreator, typeProviderId);
+
+      var fields = type
+        .GetFields()
+        .CreateRdModels(myTypeProvidersContext.ProvidedFieldRdModelsCreator, typeProviderId);
+
+      var events = type
+        .GetEvents()
+        .CreateRdModels(myTypeProvidersContext.ProvidedEventRdModelsCreator, typeProviderId);
+
+      return new RdProvidedTypeContent(interfaces, constructors, methods, allNestedTypes, properties, fields, events);
     }
 
     private RdOutOfProcessProvidedType[] GetProvidedTypes(int[] typeIds)
@@ -92,14 +89,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
 
       return myTypeProvidersContext.ProvidedTypeRdModelsCreator
         .GetOrCreateId(providedType.MakeGenericType(providedArgs), typeProviderId);
-    }
-
-    private RdProvidedFieldInfo[] GetFields(int entityId)
-    {
-      var (providedType, typeProviderId) = myTypeProvidersContext.ProvidedTypesCache.Get(entityId);
-      return providedType
-        .GetFields()
-        .CreateRdModels(myTypeProvidersContext.ProvidedFieldRdModelsCreator, typeProviderId);
     }
 
     private int MakeByRefType(int entityId)
@@ -177,22 +166,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
       var (providedType, typeProviderId) = myTypeProvidersContext.ProvidedTypesCache.Get(entityId);
       return myTypeProvidersContext.ProvidedTypeRdModelsCreator.GetOrCreateId(providedType.GetGenericTypeDefinition(),
         typeProviderId);
-    }
-
-    private int[] GetAllNestedTypes(int entityId)
-    {
-      var (providedType, typeProviderId) = myTypeProvidersContext.ProvidedTypesCache.Get(entityId);
-      return providedType
-        .GetAllNestedTypes()
-        .CreateIds(myTypeProvidersContext.ProvidedTypeRdModelsCreator, typeProviderId);
-    }
-
-    private int[] GetInterfaces(int entityId)
-    {
-      var (providedType, typeProviderId) = myTypeProvidersContext.ProvidedTypesCache.Get(entityId);
-      return providedType
-        .GetInterfaces()
-        .CreateIds(myTypeProvidersContext.ProvidedTypeRdModelsCreator, typeProviderId);
     }
   }
 }
