@@ -1,0 +1,3 @@
+module Test =
+    [<{caret}>]
+    let f a = ()

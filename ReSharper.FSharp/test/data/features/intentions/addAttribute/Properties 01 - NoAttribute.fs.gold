@@ -1,0 +1,4 @@
+module Test =
+    type A() =
+        [<{caret}>]
+        member _.F = ()

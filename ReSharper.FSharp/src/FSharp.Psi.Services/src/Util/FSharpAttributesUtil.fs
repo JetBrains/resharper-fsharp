@@ -4,6 +4,7 @@ open System
 open JetBrains.Diagnostics
 open JetBrains.Metadata.Reader.API
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -181,6 +182,22 @@ let getTypeDeclarationAttributeList (typeDecl: #IFSharpTypeOrExtensionDeclaratio
         if attributeLists.IsEmpty then
             addAttributeListToTypeDeclaration typeDecl
         typeDecl.AttributeLists[0]
+
+let getParameterDeclarationAttributeList (parameter: IParametersPatternDeclaration) =
+    match parameter.Pattern with
+    | :? IParenPat as parenPat ->
+        match parenPat.Pattern.IgnoreInnerParens() with
+        | :? IAttribPat as attribPat ->
+            attribPat.AttributeLists[0]
+        | pattern ->
+            addOuterAttributeList false pattern
+            pattern.FirstChild :?> IAttributeList
+
+    | :? IAttribPat as attribPat ->
+            attribPat.AttributeLists[0]
+    | pattern ->
+        addOuterAttributeList false pattern
+        pattern.FirstChild :?> IAttributeList
 
 let resolvesToType (clrTypeName: IClrTypeName) (attr: IAttribute) =
     let reference = attr.ReferenceName.Reference
