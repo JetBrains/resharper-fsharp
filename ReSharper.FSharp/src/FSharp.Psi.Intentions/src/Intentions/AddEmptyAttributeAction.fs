@@ -13,6 +13,10 @@ open JetBrains.TextControl
 
 module AttributeUtil =
 
+    let isAvailable dataProvider decl =
+        isNotNull decl &&
+        isAtTreeNode dataProvider decl
+
     let addAttributeToEndOfList name (list: IAttributeList) =
         let factory = list.CreateElementFactory()
         let attribute =
@@ -56,7 +60,7 @@ type AddEmptyAttributeToTypeAction(dataProvider: FSharpContextActionDataProvider
 
     override this.IsAvailable(cache) =
         dataProvider.GetSelectedElement<IFSharpTypeOrExtensionDeclaration>()
-        |> isNotNull
+        |> AttributeUtil.isAvailable dataProvider
 
     override this.Text = "Add empty attribute"
 
@@ -79,7 +83,7 @@ type AddEmptyAttributeToBindingAction(dataProvider: FSharpContextActionDataProvi
 
     override this.IsAvailable(cache) =
         dataProvider.GetSelectedElement<ITopBinding>()
-        |> isNotNull
+        |> AttributeUtil.isAvailable dataProvider
 
     override this.Text = "Add empty attribute"
 
@@ -102,7 +106,7 @@ type AddEmptyAttributeToMemberAction(dataProvider: FSharpContextActionDataProvid
 
     override this.IsAvailable(cache) =
         dataProvider.GetSelectedElement<IMemberDeclaration>()
-        |> isNotNull
+        |> AttributeUtil.isAvailable dataProvider
 
     override this.Text = "Add empty attribute"
 
@@ -124,8 +128,8 @@ type AddEmptyAttributeToModuleAction(dataProvider: FSharpContextActionDataProvid
         |> AttributeUtil.makeMoveCaretToEmptyAttributeAction
 
     override this.IsAvailable(cache) =
-        dataProvider.GetSelectedElement<IModuleDeclaration>()
-        |> isNotNull
+        dataProvider.GetSelectedElement<IDeclaredModuleDeclaration>()
+        |> AttributeUtil.isAvailable dataProvider
 
     override this.Text = "Add empty attribute"
 
@@ -165,6 +169,6 @@ type AddEmptyAttributeToParameterAction(dataProvider: FSharpContextActionDataPro
 
     override this.IsAvailable(cache) =
         dataProvider.GetSelectedElement<IParametersPatternDeclaration>()
-        |> isNotNull
+        |> AttributeUtil.isAvailable dataProvider
 
     override this.Text = "Add attribute"
