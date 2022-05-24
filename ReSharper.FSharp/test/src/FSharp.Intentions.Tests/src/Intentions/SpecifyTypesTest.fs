@@ -76,6 +76,7 @@ type ValueAnnotationActionTest() =
     [<Test>] member x.``Value - Async - 04``() = x.DoNamedTest()
 
     [<Test>] member x.``Value - Interface Method Parameter - 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Method Parameter - 01``() = x.DoNamedTest()
 
 type ValueAnnotationActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<ValueAnnotationAction>()

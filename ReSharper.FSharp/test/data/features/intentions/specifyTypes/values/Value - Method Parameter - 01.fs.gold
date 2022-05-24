@@ -1,0 +1,4 @@
+module Members
+
+    type W() =
+        member this.S (x: int){caret} = x + 1
