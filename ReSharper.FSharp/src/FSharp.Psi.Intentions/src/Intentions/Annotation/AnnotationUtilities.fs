@@ -131,6 +131,8 @@ module AnnotationUtil =
             isFullyAnnotatedNamedTypeUsage namedTypeUsage
         | :? IFunctionTypeUsage as functionTypeUsage ->
             isFullyAnnotatedFunctionTypeUsage functionTypeUsage
+        | :? IConstrainedTypeUsage as constrainedTypeUsage ->
+            isFullyAnnotatedTypeUsage constrainedTypeUsage.TypeUsage
         | _ -> false
 
     let isFullyAnnotatedReturnTypeInfo (returnTypeInfo: IReturnTypeInfo) =
