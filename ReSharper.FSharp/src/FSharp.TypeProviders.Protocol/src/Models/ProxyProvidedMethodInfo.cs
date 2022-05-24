@@ -24,6 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private readonly TypeProvidersContext myTypeProvidersContext;
     public int EntityId => myMethodInfo.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.MethodInfo;
+    public RdCustomAttributeData[] Attributes => myCustomAttributes.Value;
 
     private RdProvidedMethodInfoProcessModel RdProvidedMethodInfoProcessModel =>
       myTypeProvidersContext.Connection.ProtocolModel.RdProvidedMethodInfoProcessModel;

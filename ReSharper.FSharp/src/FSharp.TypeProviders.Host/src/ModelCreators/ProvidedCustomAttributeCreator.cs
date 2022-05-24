@@ -15,20 +15,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
       myTypeProvidersContext = typeProvidersContext;
 
     protected override RdCustomAttributeData CreateRdModelInternal(CustomAttributeData providedModel,
-      int typeProviderId)
-    {
-      var (namedArguments, exn1) =
-        myTypeProvidersContext.Logger.CatchWithException(() => providedModel.NamedArguments?.Select(Convert).ToArray());
-
-      var (constructorArguments, exn2) =
-        myTypeProvidersContext.Logger.CatchWithException(() =>
-          providedModel.ConstructorArguments.Select(Convert).ToArray());
-
-      return new RdCustomAttributeData(
-        providedModel.Constructor.DeclaringType?.FullName ?? "",
-        new(namedArguments ?? Array.Empty<RdCustomAttributeNamedArgument>(), exn1?.Message),
-        new(constructorArguments ?? Array.Empty<RdCustomAttributeTypedArgument>(), exn2?.Message));
-    }
+      int typeProviderId) =>
+      new(providedModel.Constructor.DeclaringType?.FullName ?? "",
+        providedModel.NamedArguments?.Select(Convert).ToArray() ?? Array.Empty<RdCustomAttributeNamedArgument>(),
+        providedModel.ConstructorArguments.Select(Convert).ToArray());
 
     private static RdCustomAttributeNamedArgument Convert(CustomAttributeNamedArgument argument) =>
       new(argument.MemberName, Convert(argument.TypedValue));
@@ -36,6 +26,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
     private static RdCustomAttributeTypedArgument Convert(CustomAttributeTypedArgument argument) =>
       new(argument.ArgumentType.IsArray
         ? null
-        : PrimitiveTypesBoxer.BoxToClientStaticArg(argument.Value));
+        : PrimitiveTypesBoxer.BoxToClientStaticArg(argument.Value, safeMode: true));
   }
 }

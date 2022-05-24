@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
+using JetBrains.Util;
 using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core.CompilerServices;
 using Microsoft.FSharp.Quotations;
@@ -23,6 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public int EntityId => myRdTypeProvider.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.TypeProvider;
+    public RdCustomAttributeData[] Attributes => EmptyArray<RdCustomAttributeData>.Instance;
 
     public ProxyTypeProvider(RdTypeProvider rdTypeProvider, TypeProvidersContext typeProvidersContext,
       IPsiModule module)

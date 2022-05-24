@@ -30,13 +30,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
         bool x => new RdStaticArg(RdTypeName.@bool, x.ToString()),
         string x => new RdStaticArg(RdTypeName.@string, x),
         DBNull _ => new RdStaticArg(RdTypeName.dbnull, ""),
-        _ when value.GetType() is var type && type.IsEnum => BoxToServerStaticArg((int) value),
+        _ when value.GetType() is var type && type.IsEnum => BoxToServerStaticArg((int)value),
         _ => throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
       };
     }
 
-    [ContractAnnotation("null => null")]
-    public static ServerRdStaticArg BoxToClientStaticArg(object value)
+    [ContractAnnotation("value:null => null")]
+    public static ServerRdStaticArg BoxToClientStaticArg(object value, bool safeMode = false)
     {
       if (value == null) return null;
       return value switch
@@ -56,13 +56,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
         bool x => new ServerRdStaticArg(ServerRdTypeName.@bool, x.ToString()),
         string x => new ServerRdStaticArg(ServerRdTypeName.@string, x),
         DBNull _ => new ServerRdStaticArg(ServerRdTypeName.@dbnull, ""),
-        _ when value.GetType() is var type && type.IsEnum => BoxToClientStaticArg((int) value),
-        _ => throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
+        _ when value.GetType() is var type && type.IsEnum => BoxToClientStaticArg((int)value, safeMode),
+        _ => safeMode
+          ? new ServerRdStaticArg(ServerRdTypeName.unknown, value.ToString())
+          : throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
       };
     }
 
-    [ContractAnnotation("null => null")]
-    public static object Unbox(this RdStaticArg arg)
+    [ContractAnnotation("arg: null => null")]
+    public static object Unbox(this RdStaticArg arg, bool safeMode = false)
     {
       if (arg == null) return null;
       return arg.TypeName switch
@@ -82,7 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
         RdTypeName.@bool => bool.Parse(arg.Value),
         RdTypeName.@string => arg.Value,
         RdTypeName.dbnull => DBNull.Value,
-        _ => throw new ArgumentException($"Unexpected static arg with type {arg.TypeName}")
+        _ => safeMode ? arg.Value : throw new ArgumentException($"Unexpected static arg with type {arg.TypeName}")
       };
     }
 
