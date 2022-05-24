@@ -1,5 +1,6 @@
 using System.Xml;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Psi;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -34,7 +35,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         _ => ParameterKind.VALUE
       };
 
-    public bool IsParameterArray => false;
+    public bool IsParameterArray =>
+      myInfo is ProxyProvidedParameterInfoWithContext x &&
+      x.GetAttributeConstructorArgs(null, "System.ParamArrayAttribute") != null;
+
     public bool IsValueVariable => false;
     public bool IsOptional => myInfo.IsOptional;
     public bool IsVarArg => false;
