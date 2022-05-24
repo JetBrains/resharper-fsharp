@@ -172,6 +172,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public int EntityId => ProxyProvidedType.EntityId;
     public RdProvidedEntityType EntityType => ProxyProvidedType.EntityType;
+    public RdCustomAttributeData[] Attributes => ProxyProvidedType.Attributes;
 
     public override bool Equals(object y)
     {

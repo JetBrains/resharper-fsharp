@@ -11,7 +11,7 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
-  public class ProxyProvidedFieldInfo : ProvidedFieldInfo
+  public class ProxyProvidedFieldInfo : ProvidedFieldInfo, IRdProvidedCustomAttributesOwner
   {
     private readonly RdProvidedFieldInfo myFieldInfo;
     private readonly TypeProvidersContext myTypeProvidersContext;
@@ -74,5 +74,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private readonly InterruptibleLazy<ProvidedType[]> myTypes;
     private readonly object myRawConstantValue;
     private string[] myXmlDocs;
+    public RdCustomAttributeData[] Attributes => myFieldInfo.CustomAttributes;
   }
 }

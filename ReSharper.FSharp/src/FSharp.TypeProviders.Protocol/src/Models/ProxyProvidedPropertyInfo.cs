@@ -20,6 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private readonly TypeProvidersContext myTypeProvidersContext;
     public int EntityId => myPropertyInfo.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.PropertyInfo;
+    public RdCustomAttributeData[] Attributes => myCustomAttributes.Value;
 
     private ProxyProvidedPropertyInfo(RdProvidedPropertyInfo propertyInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)

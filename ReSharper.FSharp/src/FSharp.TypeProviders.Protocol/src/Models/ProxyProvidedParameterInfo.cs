@@ -10,7 +10,7 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
-  public class ProxyProvidedParameterInfo : ProvidedParameterInfo
+  public class ProxyProvidedParameterInfo : ProvidedParameterInfo, IRdProvidedCustomAttributesOwner
   {
     private readonly RdProvidedParameterInfo myParameterInfo;
     private readonly IProxyTypeProvider myTypeProvider;
@@ -61,5 +61,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       myTypeProvidersContext.ProvidedTypesCache.GetOrCreate(myParameterInfo.ParameterType, myTypeProvider);
 
     private string[] myXmlDocs;
+    public RdCustomAttributeData[] Attributes => myParameterInfo.CustomAttributes;
   }
 }

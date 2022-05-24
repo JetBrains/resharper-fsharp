@@ -1,5 +1,7 @@
 using System;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
+using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -7,7 +9,7 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
-  public class ProxyProvidedEventInfoWithContext : ProvidedEventInfo
+  public class ProxyProvidedEventInfoWithContext : ProvidedEventInfo, IRdProvidedCustomAttributesOwner
   {
     private readonly ProvidedEventInfo myEventInfo;
     private readonly ProvidedTypeContext myContext;
@@ -59,5 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public override bool GetHasTypeProviderEditorHideMethodsAttribute(ITypeProvider tp) =>
       myEventInfo.GetHasTypeProviderEditorHideMethodsAttribute(tp);
+
+    public RdCustomAttributeData[] Attributes => myEventInfo.GetRdCustomAttributes();
   }
 }
