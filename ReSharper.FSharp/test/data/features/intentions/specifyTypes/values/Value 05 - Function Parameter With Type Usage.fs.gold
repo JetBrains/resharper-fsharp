@@ -1,0 +1,4 @@
+module Module
+
+let f (v{caret}: Map<'a,'a0> when 'a : not struct) =
+    ()

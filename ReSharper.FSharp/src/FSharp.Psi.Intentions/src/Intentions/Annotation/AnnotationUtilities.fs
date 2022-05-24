@@ -193,6 +193,11 @@ module SpecifyUtil =
         parenPat.SetPattern(pattern) |> ignore
         ModificationUtil.ReplaceChild(pattern, parenPat) |> ignore
 
+    let private specifyConstrainedTypeUsage displayContext (fcsType: FSharpType) (typeUsage: IConstrainedTypeUsage) =
+        let typeString = fcsType.Format(displayContext)
+        let factory = typeUsage.CreateElementFactory()
+        typeUsage.SetTypeUsage(factory.CreateTypeUsage(typeString))
+
     let rec private specifyTuplePat displayContext (fcsType: FSharpType) (pattern: ITuplePat) =
         let innerPatterns = pattern.Patterns
         for i = 0 to innerPatterns.Count - 1 do
@@ -201,24 +206,29 @@ module SpecifyUtil =
 
     and specifyPattern displayContext (fcsType: FSharpType) forceParens (pattern: IFSharpPattern) =
 
-        let pattern =
-            pattern
+        match pattern.IgnoreInnerParens() with
+        | :? ITypedPat as typedPat when (typedPat.TypeUsage :? IConstrainedTypeUsage) ->
+            specifyConstrainedTypeUsage displayContext fcsType (typedPat.TypeUsage :?> IConstrainedTypeUsage) |> ignore
+
+        | _ ->
+            let pattern =
+                pattern
                 |> PatUtil.removeInnerParens
                 |> PatUtil.removeTypeAnnotations
 
-        let forceParens = forceParens && not (pattern.Parent :? IParenPat)
+            let forceParens = forceParens && not (pattern.Parent :? IParenPat)
 
-        match pattern with
-        | :? ITuplePat as tuplePat ->
-            specifyTuplePat displayContext fcsType tuplePat
+            match pattern with
+            | :? ITuplePat as tuplePat ->
+                specifyTuplePat displayContext fcsType tuplePat
 
-        | pattern ->
-            let typeString = fcsType.Format(displayContext)
-            pattern
-            |> replaceWithTypedPattern typeString
-            |> fun pattern ->
-                if forceParens then
-                    addParens pattern
+            | pattern ->
+                let typeString = fcsType.Format(displayContext)
+                pattern
+                |> replaceWithTypedPattern typeString
+                |> fun pattern ->
+                    if forceParens then
+                        addParens pattern
 
     let specifyMethodReturnType displayContext (mfv: FSharpMemberOrFunctionOrValue) (method: IMemberDeclaration) =
         let typeString = mfv.ReturnParameter.Type.Format(displayContext)

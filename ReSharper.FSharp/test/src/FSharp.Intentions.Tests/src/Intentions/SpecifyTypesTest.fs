@@ -64,6 +64,8 @@ type ValueAnnotationActionTest() =
     [<Test>] member x.``Value 01``() = x.DoNamedTest()
     [<Test>] member x.``Value 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Value 03 - Function, tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Value 04``() = x.DoNamedTest()
+    [<Test>] member x.``Value 05 - Function Parameter With Type Usage``() = x.DoNamedTest()
 
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 02 - Child tuple``() = x.DoNamedTest()
@@ -86,6 +88,7 @@ type ValueAnnotationActionAvailabilityTest() =
     [<Test>] member x.``Value - Let bindings - Async``() = x.DoNamedTest()
     [<Test>] member x.``Value - Let bindings - Module``() = x.DoNamedTest()
     [<Test>] member x.``Value - Let bindings - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Let bindings - Type Usage``() = x.DoNamedTest()
     [<Test>] member x.``Value - Interface Method Parameter``() = x.DoNamedTest()
 
 // TODO: Tests
