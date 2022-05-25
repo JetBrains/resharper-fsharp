@@ -177,6 +177,7 @@ object RdFSharpTypeProvidersModel : Root() {
             field("ArgIds", array(int))
         }, int)
         call("GetContent", int, RdProvidedTypeContent)
+        call("GetAllNestedTypes", int, array(int))
     }
 
     private val ApplyStaticArgumentsForMethodArgs = structdef("ApplyStaticArgumentsForMethodArgs") {
@@ -244,7 +245,6 @@ object RdFSharpTypeProvidersModel : Root() {
         field("Interfaces", array(int))
         field("Constructors", array(RdProvidedConstructorInfo))
         field("Methods", array(RdProvidedMethodInfo))
-        field("AllNestedTypes", array(int))
         field("Properties", array(RdProvidedPropertyInfo))
         field("Fields", array(RdProvidedFieldInfo))
         field("Events", array(RdProvidedEventInfo))

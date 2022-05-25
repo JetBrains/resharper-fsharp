@@ -29,6 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
       processModel.MakeByRefType.Set(MakeByRefType);
       processModel.MakeGenericType.Set(MakeGenericType);
       processModel.GetProvidedTypes.Set(GetProvidedTypes);
+      processModel.GetAllNestedTypes.Set(GetAllNestedTypes);
     }
 
     private RdProvidedTypeContent GetContent(int typeId)
@@ -37,10 +38,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
 
       var interfaces = type
         .GetInterfaces()
-        .CreateIds(myTypeProvidersContext.ProvidedTypeRdModelsCreator, typeProviderId);
-
-      var allNestedTypes = type
-        .GetAllNestedTypes()
         .CreateIds(myTypeProvidersContext.ProvidedTypeRdModelsCreator, typeProviderId);
 
       var constructors = type
@@ -63,7 +60,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
         .GetEvents()
         .CreateRdModels(myTypeProvidersContext.ProvidedEventRdModelsCreator, typeProviderId);
 
-      return new RdProvidedTypeContent(interfaces, constructors, methods, allNestedTypes, properties, fields, events);
+      return new RdProvidedTypeContent(interfaces, constructors, methods, properties, fields, events);
+    }
+
+    private int[] GetAllNestedTypes(int typeId)
+    {
+      var (type, typeProviderId) = myTypeProvidersContext.ProvidedTypesCache.Get(typeId);
+
+      return type
+        .GetAllNestedTypes()
+        .CreateIds(myTypeProvidersContext.ProvidedTypeRdModelsCreator, typeProviderId);
     }
 
     private RdOutOfProcessProvidedType[] GetProvidedTypes(int[] typeIds)
