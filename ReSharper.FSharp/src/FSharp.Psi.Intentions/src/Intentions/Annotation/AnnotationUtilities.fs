@@ -121,11 +121,6 @@ module SpecifyUtil =
         if forceSpaceBeforeColon || pattern.GetSettingsStoreWithEditorConfig().GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon) then
             ModificationUtil.AddChildBefore(pattern, Whitespace()) |> ignore
 
-    let private addReturnTypeInfo typeString (node: ITreeNode) =
-        let factory = node.CreateElementFactory()
-        let typeUsage = factory.CreateTypeUsage(typeString)
-        ModificationUtil.AddChildAfter(node, factory.CreateReturnTypeInfo(typeUsage))
-
     let private replaceWithTypedPattern typeString (pattern: IFSharpPattern) =
         let factory = pattern.CreateElementFactory()
         let typeUsage = factory.CreateTypeUsage(typeString)
@@ -178,8 +173,9 @@ module SpecifyUtil =
         let typeString = mfv.ReturnParameter.Type.Format(displayContext)
         let anchor = method.ParametersDeclarationsEnumerable.LastOrDefault()
 
-        anchor
-        |> addReturnTypeInfo typeString
+        let factory = anchor.CreateElementFactory()
+        let returnTypeInfo = factory.CreateReturnTypeInfo(factory.CreateTypeUsage(typeString))
+        ModificationUtil.AddChildAfter(anchor, returnTypeInfo)
         |> addSpaceBeforeColon false
 
     let specifyFunctionBindingReturnType displayContext (mfv: FSharpMemberOrFunctionOrValue) (binding: IBinding) =
@@ -203,19 +199,21 @@ module SpecifyUtil =
         let typeString = fcsType.Format(displayContext)
         let forceSpaceBeforeColon = anchor :? IPostfixTypeParameterDeclarationList
 
-        anchor
-        |> addReturnTypeInfo typeString
+        let factory = anchor.CreateElementFactory()
+        let returnTypeInfo = factory.CreateReturnTypeInfo(factory.CreateTypeUsage(typeString))
+        ModificationUtil.AddChildAfter(anchor, returnTypeInfo)
         |> addSpaceBeforeColon forceSpaceBeforeColon
 
     let specifyPropertyType displayContext (fcsType: FSharpType) (decl: IMemberDeclaration) =
         Assertion.Assert(decl.ParametersDeclarationsEnumerable.IsEmpty(),
             "decl.ParametersDeclarationsEnumerable.IsEmpty()")
 
+        let factory = decl.CreateElementFactory()
+        let returnTypeInfo = factory.CreateReturnTypeInfo(factory.CreateTypeUsage(fcsType.Format(displayContext)))
+
         if isNotNull decl.ReturnTypeInfo then
             ModificationUtil.DeleteChild(decl.ReturnTypeInfo)
 
-        let factory = decl.CreateElementFactory()
-        let returnTypeInfo = factory.CreateReturnTypeInfo(factory.CreateTypeUsage(fcsType.Format(displayContext)))
         ModificationUtil.AddChildAfter(decl.Identifier, returnTypeInfo) |> ignore
 
 module StandaloneAnnotationUtil =
