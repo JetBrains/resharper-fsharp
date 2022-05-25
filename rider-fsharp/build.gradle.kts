@@ -261,6 +261,9 @@ tasks {
     withType<RunIdeTask> {
         // Match Rider's default heap size of 1.5Gb (default for runIde is 512Mb)
         maxHeapSize = "1500m"
+        jvmArgs = listOf(
+                "-Drider.backend.netcore=false"
+        )
     }
 
     val resetLexerDirectory = create("resetLexerDirectory") {
