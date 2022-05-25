@@ -2,7 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
@@ -49,7 +50,7 @@ type MemberAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 SpecifyUtil.specifyPropertyType displayContext mfv.ReturnParameter.Type memberDeclaration
             | _ ->
                 let parameters = memberDeclaration.ParameterPatterns
-                let types = FcsMfvUtil.getMethodParameterTypes parameters.Count mfv.FullType
+                let types = FcsTypeUtil.getMethodParameterTypes parameters.Count mfv.FullType
                 let forceParens = not (parameters[0].Parent :? IParenPat)
 
                 (parameters, types)

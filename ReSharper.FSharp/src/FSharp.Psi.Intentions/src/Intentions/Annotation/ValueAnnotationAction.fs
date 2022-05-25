@@ -3,7 +3,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open FSharp.Compiler.Symbols
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
@@ -25,7 +26,7 @@ type ValueAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         | Declaration.IsNotNullAndHasMfvSymbolUse(symbolUse, mfv) ->
             let parameterIndex = parameters |> Seq.findIndex (fun bindingParam -> bindingParam == parameter)
             let parameterIndex = if isFromMember then parameterIndex + 1 else parameterIndex
-            let actualParameterType = FcsMfvUtil.getFunctionParameterAt parameterIndex mfv.FullType
+            let actualParameterType = FcsTypeUtil.getFunctionParameterAt parameterIndex mfv.FullType
             annotationContext <- ValueSome (ParameterContext(parameter.Pattern, symbolUse.DisplayContext, actualParameterType))
             true
         | _ ->

@@ -2,11 +2,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.DataProviders
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions
 
 [<ContextAction(Name = "AnnotateFunction",
                 Group = "F#",
@@ -36,7 +37,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             let parameters = binding.ParametersDeclarations
 
             if parameters.Count > 0 then
-                let types = FcsMfvUtil.getFunctionParameterTypes parameters.Count mfv.FullType
+                let types = FcsTypeUtil.getFunctionParameterTypes parameters.Count mfv.FullType
 
                 (parameters, types)
                 ||> Seq.iter2 (fun parameter fcsType ->

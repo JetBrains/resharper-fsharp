@@ -1,7 +1,8 @@
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions2
+module JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationActions
 
 open FSharp.Compiler.Symbols
 open JetBrains.Diagnostics
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -27,42 +28,24 @@ module Declaration =
 
 module PatUtil =
 
-    let private findSibling<'node when 'node :> ITreeNode> node =
-        let rec find (node: ITreeNode) =
-            match node.NextSibling with
-            | null ->
-                ValueNone
-            | :? 'node as result ->
-                ValueSome result
-            | sibling ->
-                find sibling
-
-        find node
-
-    let getTypeUsage (pattern: IFSharpPattern) =
-        findSibling<ITypeUsage> pattern
-
     let getReturnTypeInfo (pattern: IFSharpPattern) =
-        findSibling<IReturnTypeInfo> pattern
+        let binding = BindingNavigator.GetByHeadPattern(pattern)
+        if isNotNull binding && isNotNull binding.ReturnTypeInfo then
+            ValueSome binding.ReturnTypeInfo
+        else
+            ValueNone
 
     let removeTypeAnnotations (pattern: IFSharpPattern) =
         match pattern with
         | :? ITypedPat as typedPat ->
             ModificationUtil.ReplaceChild(typedPat, typedPat.Pattern.IgnoreInnerParens())
         | _ ->
-            match getTypeUsage pattern with
-            | ValueSome typeUsage ->
-                ModificationUtil.DeleteChild(typeUsage)
+            match getReturnTypeInfo pattern with
+            | ValueSome typeInfo ->
+                ModificationUtil.DeleteChild(typeInfo.Colon)
+                ModificationUtil.DeleteChild(typeInfo)
             | _ ->
-                match getReturnTypeInfo pattern with
-                | ValueSome typeInfo ->
-                    ModificationUtil.DeleteChild(typeInfo)
-                | _ ->
-                    ()
-
-            let colon = pattern.GetNextMeaningfulSibling()
-            if isNotNull colon && colon.GetTokenType() == FSharpTokenType.COLON then
-                ModificationUtil.DeleteChild(colon)
+                ()
 
             pattern
 
@@ -73,53 +56,14 @@ module PatUtil =
         else
             ModificationUtil.ReplaceChild(pattern, updatedPattern)
 
-module FcsMfvUtil =
-    let getFunctionReturnType parameters (fcsType: FSharpType) =
-        let rec skipFunctionParameters remaining (fcsType: FSharpType) =
-            if remaining = 0 then fcsType
-            else
-                skipFunctionParameters (remaining - 1) fcsType.GenericArguments[1]
-
-        let returnType = skipFunctionParameters parameters fcsType
-        returnType
-
-    let getFunctionParameterTypes parameters (fcsType: FSharpType) =
-        let result = Array.zeroCreate parameters
-        let mutable fullType = fcsType
-
-        for i = 0 to parameters - 1 do
-            result[i] <- fullType.GenericArguments[0]
-            fullType <- fullType.GenericArguments[1]
-
-        result
-
-    // methods take "this" arg as first parameter so skip it
-    let getMethodParameterTypes parameters (fcsType: FSharpType) =
-        let result = Array.zeroCreate parameters
-        let mutable fullType = fcsType.GenericArguments[1]
-
-        for i = 0 to parameters - 1 do
-            result[i] <- fullType.GenericArguments[0]
-            fullType <- fullType.GenericArguments[1]
-
-        result
-
-    let getFunctionParameterAt parameterIndex (fcsType: FSharpType) =
-        let rec getParameter index (fcsType: FSharpType) =
-            if index = 0 then fcsType.GenericArguments[0]
-            else
-                getParameter (index - 1) fcsType.GenericArguments[1]
-
-        getParameter parameterIndex fcsType
-
 module AnnotationUtil =
 
     let private isFullyAnnotatedNamedTypeUsage (namedTypeUsage: INamedTypeUsage) =
-        isNull namedTypeUsage.ReferenceName ||
-        isNull namedTypeUsage.ReferenceName.TypeArgumentList ||
+        isNotNull namedTypeUsage.ReferenceName &&
+        (isNull namedTypeUsage.ReferenceName.TypeArgumentList ||
         namedTypeUsage.ReferenceName.TypeArgumentList.TypeUsagesEnumerable
            |> Seq.exists (fun typeUsage -> typeUsage :? IAnonTypeUsage)
-           |> not
+           |> not)
 
     let rec private isFullyAnnotatedFunctionTypeUsage (functionTypeUsage: IFunctionTypeUsage) =
         isFullyAnnotatedTypeUsage functionTypeUsage.ArgumentTypeUsage &&
@@ -133,10 +77,11 @@ module AnnotationUtil =
             isFullyAnnotatedFunctionTypeUsage functionTypeUsage
         | :? IConstrainedTypeUsage as constrainedTypeUsage ->
             isFullyAnnotatedTypeUsage constrainedTypeUsage.TypeUsage
-        | _ -> false
+        | _ ->
+            false
 
     let isFullyAnnotatedReturnTypeInfo (returnTypeInfo: IReturnTypeInfo) =
-        isNotNull returnTypeInfo.ReturnType &&
+        isNotNull returnTypeInfo &&
         isFullyAnnotatedTypeUsage returnTypeInfo.ReturnType
 
     let rec isFullyAnnotatedPattern (pattern: IFSharpPattern) =
@@ -144,29 +89,26 @@ module AnnotationUtil =
         | :? IUnitPat ->
             true
         | :? ITypedPat as typedPat ->
-            isFullyAnnotatedPattern typedPat.Pattern
+            typedPat.TypeUsage
+            |> isFullyAnnotatedTypeUsage
         | pattern ->
-            pattern |> PatUtil.getTypeUsage |> ValueOption.exists isFullyAnnotatedTypeUsage
-            || pattern |> PatUtil.getReturnTypeInfo |> ValueOption.exists isFullyAnnotatedReturnTypeInfo
+            pattern
+            |> PatUtil.getReturnTypeInfo
+            |> ValueOption.exists isFullyAnnotatedReturnTypeInfo
 
     let isFullyAnnotatedBinding (binding: IBinding) =
-        isNotNull binding.ReturnTypeInfo &&
-        binding.ParametersDeclarationsEnumerable
-        |> Seq.forall (fun parameter ->
-            isFullyAnnotatedPattern parameter.Pattern)
+        isFullyAnnotatedReturnTypeInfo binding.ReturnTypeInfo &&
+        binding.ParameterPatternsEnumerable |> Seq.forall isFullyAnnotatedPattern
 
     let isFullyAnnotatedMemberDeclaration (memberDeclaration: IMemberDeclaration) =
-        isNotNull memberDeclaration.ReturnTypeInfo &&
         isFullyAnnotatedReturnTypeInfo memberDeclaration.ReturnTypeInfo &&
-        memberDeclaration.ParametersDeclarations
-        |> Seq.forall (fun parameter ->
-            isFullyAnnotatedPattern parameter.Pattern)
+        memberDeclaration.ParameterPatternsEnumerable |> Seq.forall isFullyAnnotatedPattern
 
     // let f x ... =
     // let f<'a> = ...
     let isFunctionBinding (binding: IBinding) =
-        binding.HasParameters
-        || binding.HeadPattern.GetNextMeaningfulSibling() :? IPostfixTypeParameterDeclarationList
+        binding.HasParameters ||
+        binding.HeadPattern.GetNextMeaningfulSibling() :? IPostfixTypeParameterDeclarationList
 
     // let x = y
     // let x = fun y -> ...
@@ -255,7 +197,7 @@ module SpecifyUtil =
             else
                 // let f x{here} = ...
                 // this enumerates enumerable 2 times, not sure what can I do about it?
-                let fcsType = FcsMfvUtil.getFunctionReturnType (parameters.Count()) mfv.FullType
+                let fcsType = FcsTypeUtil.getFunctionReturnType (parameters.Count()) mfv.FullType
                 fcsType, parameters.LastOrDefault()
 
         let typeString = fcsType.Format(displayContext)
@@ -334,7 +276,8 @@ module StandaloneAnnotationUtil =
     let rec isSupportedPatternForStandaloneAnnotation (pattern: IFSharpPattern) =
         match pattern.IgnoreInnerParens() with
         | :? ITypedPat as typedPat ->
-            isSupportedPatternForStandaloneAnnotation typedPat.Pattern
+            typedPat.Pattern.IgnoreInnerParens() :? IReferencePat &&
+            not (AnnotationUtil.isFullyAnnotatedPattern typedPat)
         | :? IReferencePat as refPat ->
             not (AnnotationUtil.isFullyAnnotatedPattern refPat)
         | :? ITuplePat as tuplePat ->
@@ -350,12 +293,8 @@ module StandaloneAnnotationUtil =
                 SpecifyUtil.specifyPattern symbolUse.DisplayContext mfv.FullType false pattern
             | _ ->
                 ()
-        | :? IReferencePat as refPat ->
-            match refPat with
-            | Declaration.IsNotNullAndHasMfvSymbolUse(symbolUse, mfv) ->
+        | :? IReferencePat as Declaration.IsNotNullAndHasMfvSymbolUse(symbolUse, mfv) ->
                 SpecifyUtil.specifyPattern symbolUse.DisplayContext mfv.FullType forceParens pattern
-            | _ ->
-                ()
 
         | :? ITuplePat as tuplePat ->
             specifyTuplePat tuplePat

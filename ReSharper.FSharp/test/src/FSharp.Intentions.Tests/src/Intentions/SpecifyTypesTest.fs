@@ -112,7 +112,6 @@ type MemberAnnotationActionTest() =
 //    [<Test>] member x.``Member - Val 01``() = x.DoNamedTest()
 //    [<Test>] member x.``Member - Val 02``() = x.DoNamedTest()
 
-// TODO: Tests
 type MemberAnnotationActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<MemberAnnotationAction>()
 
