@@ -66,6 +66,8 @@ type ValueAnnotationActionTest() =
     [<Test>] member x.``Value 03 - Function, tuple``() = x.DoNamedTest()
     [<Test>] member x.``Value 04``() = x.DoNamedTest()
     [<Test>] member x.``Value 05 - Function Parameter With Type Usage``() = x.DoNamedTest()
+    [<Test>] member x.``Value 06 - Partial Tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Value 07 - Attribute On Return Type``() = x.DoNamedTest()
 
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 02 - Child tuple``() = x.DoNamedTest()

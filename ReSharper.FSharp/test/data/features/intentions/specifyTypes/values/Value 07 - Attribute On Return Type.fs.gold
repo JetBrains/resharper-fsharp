@@ -1,0 +1,3 @@
+module Module
+
+let b{caret}: [<A>] [<B>] int = 1

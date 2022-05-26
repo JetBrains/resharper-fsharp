@@ -3,7 +3,6 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.AnnotationAc
 open FSharp.Compiler.Symbols
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -35,13 +34,14 @@ module PatUtil =
         else
             ValueNone
 
-    let removeTypeAnnotations (pattern: IFSharpPattern) =
+    let removeReturnTypeInfo (pattern: IFSharpPattern) =
         match pattern with
         | :? ITypedPat as typedPat ->
-            ModificationUtil.ReplaceChild(typedPat, typedPat.Pattern.IgnoreInnerParens())
+            ModificationUtil.ReplaceChild(typedPat, typedPat.Pattern.IgnoreInnerParens().Copy())
         | _ ->
             match getReturnTypeInfo pattern with
             | ValueSome typeInfo ->
+                // get range and remove whole range?
                 ModificationUtil.DeleteChild(typeInfo.Colon)
                 ModificationUtil.DeleteChild(typeInfo)
             | _ ->
@@ -54,7 +54,7 @@ module PatUtil =
         if pattern == updatedPattern then
             pattern
         else
-            ModificationUtil.ReplaceChild(pattern, updatedPattern)
+            ModificationUtil.ReplaceChild(pattern, updatedPattern.Copy())
 
 module AnnotationUtil =
 
@@ -132,6 +132,31 @@ module SpecifyUtil =
         parenPat.SetPattern(pattern) |> ignore
         ModificationUtil.ReplaceChild(pattern, parenPat) |> ignore
 
+    let private specifyReturnTypeInfo displayContext (fcsType: FSharpType) (returnTypeInfo: IReturnTypeInfo) =
+        let typeString = fcsType.Format(displayContext)
+        let factory = returnTypeInfo.CreateElementFactory()
+        // quirk warning :D
+        // for some reason returnTypeInfo.SetReturnType is failing on a case like let x: [<A>] _ = 1
+        // and sets returnType before AttributeList resulting in something like let x: int[<A>] = 1
+        // so I guess we have to save attribute list and recreate new returnTypeInfo with it
+        let newTypeInfo = factory.CreateReturnTypeInfo(factory.CreateTypeUsage(typeString))
+
+        let mutable idx = 0
+        if not (returnTypeInfo.AttributeListsEnumerable.IsEmpty()) then
+            for attributeList in returnTypeInfo.AttributeListsEnumerable do
+                FSharpAttributesUtil.addAttributeList false newTypeInfo.ReturnType
+                let mutable prevAttribute = null
+                for attribute in attributeList.AttributesEnumerable do
+                    if isNull prevAttribute then
+                        prevAttribute <- FSharpAttributesUtil.addAttribute newTypeInfo.AttributeLists[idx] attribute
+                    else
+                        FSharpAttributesUtil.addAttributeAfter prevAttribute attribute
+                idx <- idx + 1
+
+        ModificationUtil.ReplaceChild(returnTypeInfo, newTypeInfo)
+        // this is what should be used really...
+        //returnTypeInfo.SetReturnType(factory.CreateTypeUsage(typeString))
+
     let private specifyConstrainedTypeUsage displayContext (fcsType: FSharpType) (typeUsage: IConstrainedTypeUsage) =
         let typeString = fcsType.Format(displayContext)
         let factory = typeUsage.CreateElementFactory()
@@ -150,10 +175,16 @@ module SpecifyUtil =
             specifyConstrainedTypeUsage displayContext fcsType (typedPat.TypeUsage :?> IConstrainedTypeUsage) |> ignore
 
         | _ ->
+            // this block can be deleted
+            match PatUtil.getReturnTypeInfo pattern with
+            | ValueSome returnTypeInfo ->
+                specifyReturnTypeInfo displayContext fcsType returnTypeInfo |> ignore
+            | _ ->
+
             let pattern =
                 pattern
                 |> PatUtil.removeInnerParens
-                |> PatUtil.removeTypeAnnotations
+                |> PatUtil.removeReturnTypeInfo // somehow we really need to check  if return type info is present
 
             let forceParens = forceParens && not (pattern.Parent :? IParenPat)
 
