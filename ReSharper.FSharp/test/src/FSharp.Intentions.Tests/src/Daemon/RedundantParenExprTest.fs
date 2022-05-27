@@ -34,6 +34,7 @@ type RedundantParenExprTest() =
     [<Test>] member x.``App - Precedence - High 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Precedence - High 02 - Multiple``() = x.DoNamedTest()
     [<Test>] member x.``App - Precedence - High 03 - Multiple - Last``() = x.DoNamedTest()
+    [<Test>] member x.``App - Precedence - High 04 - Prefix op``() = x.DoNamedTest()
     [<Test>] member x.``App - Precedence - Low 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Precedence - Low 02``() = x.DoNamedTest()
     [<Test>] member x.``App - Precedence - Low 03``() = x.DoNamedTest()

@@ -130,7 +130,10 @@ let precedence (expr: ITreeNode) =
     | :? IDoLikeExpr -> 10
     | :? INewExpr -> 11
 
+    | :? IAddressOfExpr -> 12
+
     | :? IPrefixAppExpr as prefixApp ->
+        if isOperatorReferenceExpr prefixApp.FunctionExpression then 12 else
         if prefixApp.IsHighPrecedence then 13 else 12
 
     | :? IFSharpExpression -> 14
