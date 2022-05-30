@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public XmlNode GetXmlDoc() => Type.GetXmlDoc(TypeElement);
     public IList<ITypeParameter> AllTypeParameters => EmptyList<ITypeParameter>.InstanceList;
-    
+
     // Operators for provided types are compiled into methods
     public IEnumerable<IOperator> Operators => EmptyList<IOperator>.InstanceList;
 
@@ -93,8 +93,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       .Select(t => t.ShortName)
       .ToArray();
 
-    public IDeclaredType GetBaseClassType() =>
-      Type.BaseType?.MapType(TypeElement.Module) as IDeclaredType ?? TypeElement.Module.GetPredefinedType().Object;
+    public IDeclaredType GetBaseClassType()
+    {
+      if (Type.BaseType == null) return TypeElement.Module.GetPredefinedType().Object;
+      return Type.BaseType.MapType(TypeElement.Module) as IDeclaredType ??
+             TypeFactory.CreateUnknownType(TypeElement.Module);
+    }
 
     public IClass GetSuperClass() => GetBaseClassType().GetClassType();
 
@@ -103,17 +107,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     private IEnumerable<IDeclaredType> CalculateSuperTypes()
     {
-      IEnumerable<IDeclaredType> CalculateSuperTypesInternal()
+      yield return GetBaseClassType();
+      foreach (var type in Type.GetInterfaces())
       {
-        yield return GetBaseClassType();
-        foreach (var type in Type.GetInterfaces())
-        {
-          if (type.MapType(TypeElement.Module) is IDeclaredType declType)
-            yield return declType;
-        }
+        if (type.MapType(TypeElement.Module) is IDeclaredType declType)
+          yield return declType;
       }
-
-      return mySuperTypes ??= CalculateSuperTypesInternal().ToList();
     }
 
     private IEnumerable<IMethod> FilterMethods(IEnumerable<IMethod> methodInfos)
@@ -144,7 +143,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       return methodGroups.Values;
     }
 
-    private List<IDeclaredType> mySuperTypes;
     private List<IMethod> myMethods;
     private string[] myMemberNames;
   }
