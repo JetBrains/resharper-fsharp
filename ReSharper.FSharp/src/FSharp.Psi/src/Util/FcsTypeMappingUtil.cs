@@ -178,7 +178,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static IType MapType([NotNull] this ProvidedType providedType, IPsiModule module)
     {
       if (providedType is not IProxyProvidedType proxyProvidedType)
+      {
+        Assertion.Fail("ProvidedType should be IProxyProvidedType");
         return TypeFactory.CreateUnknownType(module);
+      }
 
       if (proxyProvidedType.IsCreatedByProvider && providedType.DeclaringType is { } declaringType)
         return TypeFactory.CreateType(new FSharpProvidedNestedClass(providedType, module,
@@ -195,7 +198,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return TypeFactory.CreateTypeByCLRName(proxyProvidedType.GetClrName(), NullableAnnotation.Unknown, module);
 
       if (providedType.GetGenericTypeDefinition() is not IProxyProvidedType genericTypeDefinition)
+      {
+        Assertion.Fail("providedType.GetGenericTypeDefinition() should be IProxyProvidedType");
         return TypeFactory.CreateUnknownType(module);
+      }
 
       var typeDefinition =
         TypeFactory.CreateTypeByCLRName(genericTypeDefinition.GetClrName(), NullableAnnotation.Unknown, module);
