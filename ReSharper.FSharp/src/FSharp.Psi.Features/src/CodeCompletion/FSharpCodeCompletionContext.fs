@@ -34,6 +34,12 @@ type FcsCodeCompletionContext =
       Coords: DocumentCoords
       mutable DisplayContext: FSharpDisplayContext }
 
+    static member Invalid =
+        { PartialName = PartialLongName.Empty(-1)
+          CompletionContext = None
+          LineText = ""
+          Coords = DocumentCoords.Empty
+          DisplayContext = Unchecked.defaultof<_> }
 
 type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
     let [<Literal>] moniker = "F# reparse context"
@@ -91,7 +97,8 @@ type FSharpReparsedCodeCompletionContext(file: IFSharpFile, treeTextRange, newTe
     member this.GetFcsContext() =
         let node = this.TreeNode
         let documentOffset = node.GetDocumentEndOffset()
-        let file = node.GetContainingFile() :?> IFSharpFile |> notNull
+        let file = node.GetContainingFile().As<IFSharpFile>()
+        if isNull file then FcsCodeCompletionContext.Invalid else
 
         let document =
             match file.StandaloneDocument with
