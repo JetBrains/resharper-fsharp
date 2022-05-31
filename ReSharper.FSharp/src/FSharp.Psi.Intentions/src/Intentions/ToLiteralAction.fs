@@ -45,8 +45,7 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         // todo: check isMutable, isInline
 
         let binding = dataProvider.GetSelectedElement<ITopBinding>()
-        let selectedRange = dataProvider.SelectedTreeRange
-        if not (isValid binding && binding.GetNameRange().Contains(&selectedRange)) then false else
+        if not (isValid binding && binding.GetNameRange().Contains(dataProvider.SelectedTreeRange)) then false else
 
         if not (isSimplePattern binding.HeadPattern) then false else
         if hasLiteralAttribute binding.AttributesEnumerable then false else

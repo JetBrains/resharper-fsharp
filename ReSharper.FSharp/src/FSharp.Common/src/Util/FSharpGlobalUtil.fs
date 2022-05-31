@@ -47,16 +47,38 @@ module FSharpGlobalAbbreviations =
     type InteractionContext = JetBrains.Util.InteractionContext    
     type FormatterHelper = JetBrains.ReSharper.Psi.Impl.CodeStyle.FormatterImplHelper
 
-[<Extension;AutoOpen>]
+[<Extension; AutoOpen>]
 module FSharpFileSystemPathExtensions =
-    type JetBrains.Util.FileSystemPath with
-        [<Extension>]
-        member this.ToVirtualFileSystemPath() = JetBrains.Util.FileSystemPathExtensions.ToVirtualFileSystemPath(this)
-        
-    type JetBrains.Util.VirtualFileSystemPath with
-        [<Extension>]
-        member this.ToNativeFileSystemPath() = JetBrains.Util.VirtualFileSystemPathExtensions.ToNativeFileSystemPath(this)
+    open JetBrains.Util
 
+    type FileSystemPath with
+        [<Extension>]
+        member this.ToVirtualFileSystemPath() =
+            FileSystemPathExtensions.ToVirtualFileSystemPath(this)
+        
+    type VirtualFileSystemPath with
+        [<Extension>]
+        member this.ToNativeFileSystemPath() =
+            VirtualFileSystemPathExtensions.ToNativeFileSystemPath(this)
+
+[<Extension; AutoOpen>]
+module DocumentRangeExtensions =
+    open JetBrains.DocumentModel
+    open JetBrains.ReSharper.Psi
+
+    type DocumentRange with
+        [<Extension>]
+        member inline this.Contains(documentOffset: DocumentOffset) =
+            this.Contains(&documentOffset)
+
+        [<Extension>]
+        member inline this.Contains(documentRange: DocumentRange) =
+            this.Contains(&documentRange)
+
+    type TreeTextRange with
+        [<Extension>]
+        member inline this.Contains(treeTextRange: TreeTextRange) =
+            this.Contains(&treeTextRange)
 
 [<AutoOpen>]
 module IgnoreAll =

@@ -54,8 +54,7 @@ type RenameFileToMatchTypeNameAction(dataProvider: FSharpContextActionDataProvid
         let declaration = dataProvider.GetSelectedElement<IFSharpTypeElementDeclaration>()
         if not (isValid declaration) then false else
 
-        let range = dataProvider.SelectedTreeRange
-        if not (declaration.GetNameRange().Contains(&range)) then false else
+        if not (declaration.GetNameRange().Contains(dataProvider.SelectedTreeRange)) then false else
 
         let typeElement = declaration.DeclaredElement
         if isNull typeElement || not (isApplicable typeElement) then false else

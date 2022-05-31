@@ -60,7 +60,7 @@ type InterpolatedStringCandidateAnalyzer() =
             |> Seq.map (fun (r, arity) ->
                 let textRange = getTextRange document r
                 DocumentRange(document, textRange), arity)
-            |> Seq.filter (fun (range, _) -> argRange.Contains(&range))
+            |> Seq.filter (fun (range, _) -> argRange.Contains(range))
             |> List.ofSeq
 
         if matchingFormatSpecsAndArity.IsEmpty then () else
