@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
   {
     private const string RiderAdditionalProbingPathsEnvVar = "RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS";
     private const string FantomasAssembliesPathEnvVar = "FSHARP_FANTOMAS_ASSEMBLIES_PATH";
-    private static readonly List<string> OurAdditionalProbingPaths = new List<string>();
+    private static readonly List<string> OurAdditionalProbingPaths = new();
 
     static FantomasAssemblyResolver()
     {

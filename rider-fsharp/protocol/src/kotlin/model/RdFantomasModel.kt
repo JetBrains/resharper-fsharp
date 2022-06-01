@@ -40,6 +40,7 @@ object RdFantomasModel : Root() {
             field("range", rdFcsRange)
         }, string)
 
+        call("getVersion", void, string)
         signal("exit", void)
     }
 }

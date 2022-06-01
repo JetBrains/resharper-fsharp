@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Fantomas;
-using FSharp.Compiler.CodeAnalysis;
 using JetBrains.Diagnostics;
 using JetBrains.Extension;
 using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
@@ -18,29 +17,37 @@ using FSharpType = Microsoft.FSharp.Reflection.FSharpType;
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
   // TODO: collect used Fantomas versions
-  internal class FantomasCodeFormatter
+  internal static class FantomasCodeFormatter
   {
-    private static FSharpChecker GetFSharpChecker()
+    private static readonly Version Version45 = Version.Parse("4.5");
+    private static readonly Version Version46 = Version.Parse("4.6");
+
+    private static dynamic GetFSharpChecker()
     {
-      var method = typeof(FSharpChecker).GetMethod("Create");
-      Assertion.AssertNotNull(method, "FSharpChecker must contain static .Create method");
+      var searchedType = CurrentVersion < Version46
+        ? "FSharp.Compiler.SourceCodeServices.FSharpChecker"
+        : "FSharp.Compiler.CodeAnalysis.FSharpChecker";
+
+      var qualifiedName = Assembly.CreateQualifiedName("FSharp.Compiler.Service", searchedType);
+      var type = Type.GetType(qualifiedName).NotNull($"{qualifiedName} must exist");
+      var method = type.GetMethod("Create").NotNull("FSharpChecker must contain static .Create method");
 
       var values = method
         .GetParameters()
         .Select(t => t.ParameterType.GetDefaultValue())
         .ToArray();
-      return method.Invoke(null, values) as FSharpChecker;
+
+      return method.Invoke(null, values);
     }
 
     private static dynamic GetDiagnosticOptions()
     {
-      var assemblyToSearch = typeof(FSharpParsingOptions).Assembly;
-      var fantomasVersion = typeof(CodeFormatter).Assembly.GetName().Version;
+      var assemblyToSearch = FSharpParsingOptionsType.Assembly;
 
-      var optionsTypeName = fantomasVersion switch
+      var optionsTypeName = CurrentVersion switch
       {
-        { } v when v < Version.Parse("4.5") => "FSharp.Compiler.ErrorLogger+FSharpErrorSeverityOptions",
-        { } v when v < Version.Parse("4.6") => "FSharp.Compiler.SourceCodeServices.FSharpDiagnosticOptions",
+        { } v when v < Version45 => "FSharp.Compiler.ErrorLogger+FSharpErrorSeverityOptions",
+        { } v when v < Version46 => "FSharp.Compiler.SourceCodeServices.FSharpDiagnosticOptions",
         _ => "FSharp.Compiler.Diagnostics.FSharpDiagnosticOptions",
       };
 
@@ -50,7 +57,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       return defaultValue;
     }
 
-    private readonly FSharpChecker myChecker = GetFSharpChecker();
+    private static Type GetFSharpParsingOptions()
+    {
+      var searchedType = CurrentVersion < Version46
+        ? "FSharp.Compiler.SourceCodeServices.FSharpParsingOptions"
+        : "FSharp.Compiler.CodeAnalysis.FSharpParsingOptions";
+
+      var qualifiedName = Assembly.CreateQualifiedName("FSharp.Compiler.Service", searchedType);
+      return Type.GetType(qualifiedName).NotNull($"{qualifiedName} must exist");
+    }
+
+    public static Version CurrentVersion { get; } = typeof(CodeFormatter).Assembly.GetName().Version;
+
+    private static readonly dynamic Checker = GetFSharpChecker();
+    private static readonly Type FSharpParsingOptionsType = GetFSharpParsingOptions();
+
+    private static readonly ConstructorInfo
+      CreateFSharpParsingOptions = FSharpParsingOptionsType.GetConstructors().Single();
+
     private static readonly dynamic DefaultDiagnosticOptions = GetDiagnosticOptions();
     private static readonly FormatConfig DefaultFormatConfig = FormatConfig.Default;
     private static readonly Type FormatConfigType = typeof(FormatConfig);
@@ -69,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         .SelectMany(t => FSharpType.GetUnionCases(t, null))
         .ToDictionary(t => t.Name);
 
-    public string FormatSelection(RdFantomasFormatSelectionArgs args)
+    public static string FormatSelection(RdFantomasFormatSelectionArgs args)
     {
       var rdRange = args.Range;
 
@@ -78,20 +102,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       return FSharpAsync.StartAsTask(
           CodeFormatter.FormatSelectionAsync(args.FileName, range,
             SourceOrigin.SourceOrigin.NewSourceString(args.Source), Convert(args.FormatConfig),
-            Convert(args.ParsingOptions), myChecker), null, null)
+            CreateFSharpParsingOptions.Invoke(GetParsingOptions(args.ParsingOptions).ToArray()) as dynamic,
+            Checker), null, null)
         .Result.Replace("\r\n", args.NewLineText);
     }
 
-    public string FormatDocument(RdFantomasFormatDocumentArgs args) =>
+    public static string FormatDocument(RdFantomasFormatDocumentArgs args) =>
       FSharpAsync.StartAsTask(
           CodeFormatter.FormatDocumentAsync(args.FileName, SourceOrigin.SourceOrigin.NewSourceString(args.Source),
-            Convert(args.FormatConfig), Convert(args.ParsingOptions), myChecker), null, null)
+            Convert(args.FormatConfig),
+            CreateFSharpParsingOptions.Invoke(GetParsingOptions(args.ParsingOptions).ToArray()) as dynamic,
+            Checker), null, null)
         .Result.Replace("\r\n", args.NewLineText);
 
-    private static FSharpParsingOptions Convert(RdFcsParsingOptions options) =>
-      new FSharpParsingOptions(new[] { options.LastSourceFile },
-        ListModule.OfArray(options.ConditionalCompilationDefines), DefaultDiagnosticOptions,
-        options.LangVersion, false, options.LightSyntax ?? FSharpOption<bool>.None, false, options.IsExe);
+    private static IEnumerable<object> GetParsingOptions(RdFcsParsingOptions options)
+    {
+      yield return new[] { options.LastSourceFile };
+      yield return ListModule.OfArray(options.ConditionalCompilationDefines);
+      yield return DefaultDiagnosticOptions;
+      if (CurrentVersion >= Version46) yield return options.LangVersion;
+      yield return false; // isInteractive
+      yield return options.LightSyntax ?? FSharpOption<bool>.None;
+      yield return false; // compilingFsLib
+      yield return options.IsExe;
+    }
 
     private static FormatConfig Convert(string[] riderFormatConfigValues)
     {
@@ -103,8 +137,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
                 ? field.Value
                 : field.Value switch
                 {
-                  int _ => int.Parse(valueData),
-                  bool _ => bool.Parse(valueData),
+                  int => int.Parse(valueData),
+                  bool => bool.Parse(valueData),
                   { } => ConvertEnumValue(valueData)
                 }))
           .ToDictionary(x => x.Name, x => x.Value);
@@ -113,6 +147,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         FormatConfigFields
           .Select(field => riderFormatConfigDict.TryGetValue(field.Name, out var value) ? value : field.Value)
           .ToArray();
+
       return FSharpValue.MakeRecord(FormatConfigType, formatConfigValues, null) as FormatConfig;
     }
 
