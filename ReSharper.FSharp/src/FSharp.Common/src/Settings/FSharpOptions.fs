@@ -145,7 +145,7 @@ type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
 type FSharpFantomasSettingsProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpFantomasOptions>(lifetime, solution, settings, settingsSchema)
 
-    member val Version = base.GetValueProperty<FantomasLocationSettings>("Version")
+    member val Location = base.GetValueProperty<FantomasLocationSettings>("Location")
 
 
 module FSharpTypeHintOptions =

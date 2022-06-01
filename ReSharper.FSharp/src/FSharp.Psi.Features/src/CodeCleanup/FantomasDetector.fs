@@ -149,15 +149,15 @@ type FantomasDetector(lifetime, fantomasSettingsProvider: FSharpFantomasSettings
 
         globalTools
         |> Option.ofObj
-        // TODO: GlobalToolCacheEntry should be a single entry instead of list
+        // TODO: GlobalToolCacheEntry should be a single entry instead of a list
         |> Option.map (fun x -> x[0].Version.ToNormalizedString(), x[0].EntryPointPath)
         |> invalidateDotnetTool GlobalDotnetTool
 
     do
-        // Need to work from welcome screen, before solution components loaded 
+        // Required for use from welcome screen, before loading solution components.
         if isNull fantomasSettingsProvider || isNull dotnetToolsTracker then () else
 
-        fantomasSettingsProvider.Version.Change.Advise(lifetime, fun x ->
+        fantomasSettingsProvider.Location.Change.Advise(lifetime, fun x ->
             if not x.HasNew then () else
             use _ = rwLock.UsingWriteLock()
             recalculateState x.New)
@@ -165,7 +165,7 @@ type FantomasDetector(lifetime, fantomasSettingsProvider: FSharpFantomasSettings
         dotnetToolsTracker.DotNetToolCache.Change.Advise(lifetime, fun x ->
             if not x.HasNew || isNull x.New then () else
             use _ = rwLock.UsingWriteLock()
-            let settingsVersion = fantomasSettingsProvider.Version.Value
+            let settingsVersion = fantomasSettingsProvider.Location.Value
             invalidateDotnetTools x.New
             recalculateState settingsVersion)
 
@@ -184,7 +184,7 @@ type FantomasDetector(lifetime, fantomasSettingsProvider: FSharpFantomasSettings
                 notificationSignal.Fire({ Event = FailedToRun; Location = Bundled; FallbackLocation = Bundled })
                 notificationsFired.Add(Bundled) |> ignore
             | _ ->
-            recalculateState fantomasSettingsProvider.Version.Value
+            recalculateState fantomasSettingsProvider.Location.Value
             x.TryRun(runAction)
 
     member x.GetSettings() =
