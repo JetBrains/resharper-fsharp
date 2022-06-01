@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Resources.Shell
 type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) =
     inherit FSharpQuickFixBase()
 
-    let mostOuterParentExpr = expr.GetOuterMostParentExpression()
+    let mostOuterParentExpr = expr.GetOutermostParentExpressionFromItsReturn()
 
     new (error: TypeConstraintMismatchError) =
         // error FS0193: Type constraint mismatch. The type ↔    'A.B'    ↔is not compatible with type↔    'Thing'

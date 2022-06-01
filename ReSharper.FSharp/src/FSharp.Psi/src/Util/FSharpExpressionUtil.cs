@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static readonly Func<IFSharpExpression, bool> IsLiteralExpressionFunc = IsLiteralExpression;
 
     // TODO: change name
-    public static IFSharpExpression GetOuterMostParentExpression(this IFSharpExpression expression)
+    public static IFSharpExpression GetOutermostParentExpressionFromItsReturn(this IFSharpExpression expression)
     {
       var currentExpr = expression;
       while (true)
