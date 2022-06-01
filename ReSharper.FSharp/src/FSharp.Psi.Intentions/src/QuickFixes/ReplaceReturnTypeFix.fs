@@ -46,7 +46,20 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
     override this.IsAvailable _ =
         if isNull mostOuterParentExpr then false else
         let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
-        isNotNull binding
+        if isNull binding then false else
+
+        // Some types cannot be replaced properly solely on the FCS error message.
+        // We will ignore these types for now.
+        match binding.ReturnTypeInfo.ReturnType.IgnoreParentParens() with
+        | :? ITupleTypeUsage
+        | :? IFunctionTypeUsage -> false
+        | _ ->
+            // An invalid binary infix application will yield a similar error and could be mistaken for an invalid return type.
+            // F.ex. 1 + "a", error FS0001: The type 'string' does not match the type 'int'
+            // We ignore this scenario for now.
+            match mostOuterParentExpr with
+            | :? IBinaryAppExpr -> false
+            | _ -> true
 
     override this.ExecutePsiTransaction(_solution) =
         let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
@@ -64,28 +77,9 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
            && isNotNull binding.ReturnTypeInfo.ReturnType then
             let factory = binding.CreateElementFactory()
             let typeUsage = factory.CreateTypeUsage(replacementTypeName)
-            let returnType =
-                match binding.ReturnTypeInfo.ReturnType.IgnoreParentParens() with
-                | :? IParenTypeUsage as ptu -> ptu.InnerTypeUsage
-                | returnType -> returnType
+            let returnType = binding.ReturnTypeInfo.ReturnType.IgnoreInnerParens()
 
             match returnType with
             | :? INamedTypeUsage as ntu ->
                 ModificationUtil.ReplaceChild(ntu, typeUsage) |> ignore
-            | :? IFunctionTypeUsage as ftu ->
-                match mostOuterParentExpr with
-                | :? ITupleExpr ->
-                    ModificationUtil.ReplaceChild(ftu, typeUsage) |> ignore
-                | _ -> ftu.SetReturnTypeUsage(typeUsage) |> ignore
-            | :? ITupleTypeUsage as ttu ->
-                match expr.Parent with
-                | :? ITupleExpr as tupleExpr ->
-                    if isNotNull tupleExpr && ttu.Items.Count = tupleExpr.Expressions.Count then
-                        let index = tupleExpr.Expressions.IndexOf(expr)
-                        let typeToReplace = ttu.Items.Item(index)
-                        ModificationUtil.ReplaceChild(typeToReplace, typeUsage) |> ignore
-                    elif isNotNull tupleExpr then
-                        ModificationUtil.ReplaceChild(ttu, typeUsage) |> ignore
-                | _ ->
-                    ModificationUtil.ReplaceChild(ttu, typeUsage) |> ignore
             | _ -> ()
