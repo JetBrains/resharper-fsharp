@@ -11,12 +11,12 @@ type ReplaceReturnTypeTest() =
     override x.RelativeTestDataPath = "features/quickFixes/replaceReturnType"
 
     [<Test>] member x.``Constraint Mismatch``() = x.DoNamedTest()
-    [<Test>] member x.``Infix application``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Infix application``() = x.DoNamedTest()
     [<Test>] member x.Sequential() = x.DoNamedTest()
     [<Test>] member x.MatchClause() = x.DoNamedTest()
     [<Test>] member x.``Return type with attribute``() = x.DoNamedTest()
     [<Test>] member x.TryWith() = x.DoNamedTest()
-    [<Test>] member x.MatchLambda() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.MatchLambda() = x.DoNamedTest()
     [<Test>] member x.LetOrUse() = x.DoNamedTest()
     [<Test>] member x.``IfThenElse - If``() = x.DoNamedTest()
     [<Test>] member x.``IfThenElse - Else``() = x.DoNamedTest()
