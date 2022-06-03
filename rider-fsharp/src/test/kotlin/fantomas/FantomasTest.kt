@@ -12,7 +12,7 @@ import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(coreVersion = CoreVersion.DOT_NET_CORE_3_1)
+@TestEnvironment(coreVersion = CoreVersion.DOT_NET_6)
 class FantomasTest : EditorTestBase() {
     override fun getSolutionDirectoryName() = "FormatCodeApp"
 
