@@ -41,6 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public bool IsField => false;
     public bool IsConstant => true;
     public bool IsEnumMember => false;
+    public ReferenceKind ReferenceKind => ReferenceKind.VALUE;
     public int? FixedBufferSize => null;
 
     public override bool IsStatic => true;
