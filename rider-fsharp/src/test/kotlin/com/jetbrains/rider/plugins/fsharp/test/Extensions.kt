@@ -6,28 +6,17 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.util.io.createFile
-import com.intellij.util.io.delete
-import com.intellij.util.io.write
 import com.jetbrains.rdclient.protocol.protocolHost
 import com.jetbrains.rider.RiderEnvironment
 import com.jetbrains.rider.inTests.TestHost
-import com.jetbrains.rider.plugins.fsharp.RdEnvironmentVariable
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.projectView.solutionDirectory
-import com.jetbrains.rider.projectView.solutionDirectoryPath
-import com.jetbrains.rider.projectView.solutionPath
-import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.dumpSevereHighlighters
-import java.io.File
 import java.io.PrintStream
 import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.io.path.absolutePathString
 
 fun com.intellij.openapi.editor.Editor.dumpTypeProviders(stream: PrintStream) {
     with(stream) {
