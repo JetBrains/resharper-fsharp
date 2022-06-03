@@ -20,10 +20,7 @@ import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.base.PrepareTestEnvironment
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.framework.frameworkLogger
-import com.jetbrains.rider.test.scriptingApi.reformatCode
-import com.jetbrains.rider.test.scriptingApi.restoreNuGet
-import com.jetbrains.rider.test.scriptingApi.setReSharperEnvVar
-import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.BeforeTest
 import org.testng.annotations.Test
@@ -88,9 +85,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
                     restoreNuGet(project)
                 }
             }
-
             function()
-
         } finally {
             withDotnetToolsUpdate {
                 file.delete()
@@ -244,10 +239,13 @@ class FantomasRunOptionsTest : EditorTestBase() {
     }
 
     private fun doLocalToolTest(version: String, expectedVersion: String) {
-        withOpenedEditor("Program.fs") {
+        withOpenedEditor("Simple.fs") {
             withFantomasLocalTool(version) {
-                reformatCode()
-                checkFantomasVersion(expectedVersion)
+                executeWithGold(testGoldFile) {
+                    reformatCode()
+                    checkFantomasVersion(expectedVersion)
+                    dumpOpenedDocument(it, project!!, false)
+                }
             }
         }
     }
