@@ -35,7 +35,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
         if isConnectionAlive () then formatterHostLifetime.Terminate()
 
     let connect () =
-        // TryRun synchronizes process creation and keeps track it status
+        // TryRun synchronizes process creation and keeps track of its status
         fantomasDetector.TryRun(fun path ->
             if isConnectionAlive () then () else
             formatterHostLifetime <- Lifetime.Define(solutionLifetime)
