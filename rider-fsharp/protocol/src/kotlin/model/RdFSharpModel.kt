@@ -45,10 +45,6 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         })
         call("getLastModificationStamp", string, dateTime)
         call("getCultureInfoAndSetNew", string, string)
-        call("getEnvironmentVariableAndSetNew", structdef("RdEnvironmentVariable") {
-            field("Key", string)
-            field("Value", string.nullable)
-        }, string.nullable)
         call("getSourceCache", string, structdef("RdFSharpSource") {
             field("source", string)
             field("timestamp", dateTime)
