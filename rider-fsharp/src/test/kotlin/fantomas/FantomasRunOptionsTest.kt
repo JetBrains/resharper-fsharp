@@ -8,7 +8,10 @@ import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rdclient.util.idea.waitAndPump
-import com.jetbrains.rider.plugins.fsharp.test.*
+import com.jetbrains.rider.plugins.fsharp.test.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.flushFileChanges
+import com.jetbrains.rider.plugins.fsharp.test.runProcessWaitForExit
+import com.jetbrains.rider.plugins.fsharp.test.withSetting
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.protocol.protocolManager
 import com.jetbrains.rider.test.annotations.TestEnvironment
@@ -17,7 +20,11 @@ import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.base.PrepareTestEnvironment
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.framework.frameworkLogger
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.reformatCode
+import com.jetbrains.rider.test.scriptingApi.restoreNuGet
+import com.jetbrains.rider.test.scriptingApi.setReSharperEnvVar
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import org.testng.annotations.BeforeMethod
 import org.testng.annotations.BeforeTest
 import org.testng.annotations.Test
 import java.io.PrintStream
@@ -25,12 +32,15 @@ import java.nio.file.Paths
 import java.time.Duration
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.createDirectory
 
 @Test
-@TestEnvironment(coreVersion = CoreVersion.DOT_NET_6)
+@TestEnvironment(coreVersion = CoreVersion.DOT_NET_6, reuseSolution = false)
 class FantomasRunOptionsTest : EditorTestBase() {
     override fun getSolutionDirectoryName() = "FormatCodeApp"
+    override val restoreNuGetPackages = false
 
+    private fun getDotnetCliHome() = Path(tempTestDirectory.parent, "dotnetHomeCli")
     private val fantomasNotifications = ArrayList<String>()
     private val bundledVersion = "4.7.8.0"
     private val globalVersion = "4.7.2.0"
@@ -41,91 +51,92 @@ class FantomasRunOptionsTest : EditorTestBase() {
     private fun dumpNotifications(stream: PrintStream, expectedCount: Int) {
         stream.println("\n\nNotifications:")
         waitAndPump(project.lifetime,
-            { fantomasNotifications.size == expectedCount },
+            { fantomasNotifications.size >= expectedCount },
             Duration.ofSeconds(30),
             { "Didn't wait for notifications. Expected $expectedCount, but was ${fantomasNotifications.size}" })
 
         fantomasNotifications.forEach { stream.println(it) }
     }
 
-    private fun withFantomasSetting(value: String, function: () -> Unit) =
-        withSetting(project, "FSharp/FSharpFantomasOptions/Version/@EntryValue", value, "AutoDetected") {
+    private fun withFantomasSetting(value: String, function: () -> Unit) {
+        withSetting(project, "FSharp/FSharpFantomasOptions/Location/@EntryValue", value, "AutoDetected") {
             function()
         }
+    }
 
     private fun withDotnetToolsUpdate(function: () -> Unit) {
         dotnetToolsInvalidated = false
         function()
-        waitAndPump(
-            project.lifetime,
-            { dotnetToolsInvalidated },
-            Duration.ofSeconds(15),
-            { "Dotnet tools wasn't changed." })
+        flushFileChanges(project)
+        waitAndPump(Duration.ofSeconds(15), { dotnetToolsInvalidated == true }, { "Dotnet tools wasn't changed." })
     }
 
-    private fun withFantomasLocalTool(version: String, function: () -> Unit) {
-        val fileName = Paths.get(project.solutionDirectory.absolutePath, ".config", "dotnet-tools.json")
-        val toolResolverCache =
-            Paths.get(project.solutionDirectory.absolutePath, ".dotnet", "toolResolverCache", "1", "fantomas-tool")
-        frameworkLogger.info("Create '$fileName'")
-        val file = fileName.createFile()
-        val toolsJson = """"fantomas-tool": { "version": "$version", "commands": [ "fantomas" ] }"""
+    private fun withFantomasLocalTool(version: String, restore: Boolean = true, function: () -> Unit) {
+        val manifestFile = Paths.get(project.solutionDirectory.absolutePath, ".config", "dotnet-tools.json")
+        frameworkLogger.info("Create '$manifestFile'")
+        val file = manifestFile.createFile()
+
         try {
-            dotnetToolsInvalidated = false
-            file.write("""{ "version": 1, "isRoot": true, "tools": { $toolsJson } }""")
-            flushFileChanges(project, fileName.absolutePathString())
-            waitAndPump(project.lifetime,
-                { dotnetToolsInvalidated },
-                Duration.ofSeconds(15),
-                { "Dotnet tools wasn't changed." })
-            dotnetToolsInvalidated = false
-            // Trigger dotnet tools restore
-            restoreNuGet(project)
-            flushFileChanges(project, toolResolverCache.absolutePathString())
-            waitAndPump(project.lifetime,
-                { dotnetToolsInvalidated },
-                Duration.ofSeconds(15),
-                { "Dotnet tools wasn't changed." })
+            withDotnetToolsUpdate {
+                val toolsJson = """"fantomas-tool": { "version": "$version", "commands": [ "fantomas" ] }"""
+                file.write("""{ "version": 1, "isRoot": true, "tools": { $toolsJson } }""")
+            }
+            if (restore) {
+                withDotnetToolsUpdate {
+                    // Trigger dotnet tools restore
+                    // TODO: use separate dotnet tools restore API
+                    restoreNuGet(project)
+                }
+            }
+
             function()
+
         } finally {
-            file.delete()
-            flushFileChanges(project, fileName.absolutePathString())
+            withDotnetToolsUpdate {
+                file.delete()
+                project.fcsHost.terminateFantomasHost.sync(Unit)
+            }
         }
     }
 
     private fun withFantomasGlobalTool(function: () -> Unit) {
-        val env = mapOf("DOTNET_CLI_HOME" to tempTestDirectory.absolutePath)
-        val fantomasExePath =
-            Path(tempTestDirectory.absolutePath, ".dotnet", "tools", "fantomas.exe").absolutePathString()
-        dotnetToolsInvalidated = false
-        runProcessWaitForExit(
-            Path(PrepareTestEnvironment.dotnetCoreCliPath),
-            listOf("tool", "install", "fantomas-tool", "-g", "--version", globalVersion),
-            env
-        )
-        flushFileChanges(project, fantomasExePath)
-        waitAndPump(project.lifetime,
-            { dotnetToolsInvalidated },
-            Duration.ofSeconds(15),
-            { "Dotnet tools wasn't changed." })
-        function()
+        try {
+            val env = mapOf("DOTNET_CLI_HOME" to getDotnetCliHome().absolutePathString())
+
+            withDotnetToolsUpdate {
+                runProcessWaitForExit(
+                    Path(PrepareTestEnvironment.dotnetCoreCliPath),
+                    listOf("tool", "install", "fantomas-tool", "-g", "--version", globalVersion),
+                    env
+                )
+            }
+            function()
+        } finally {
+            project.fcsHost.terminateFantomasHost.sync(Unit)
+        }
     }
 
     @BeforeTest(alwaysRun = true)
     fun prepareDotnetCliHome() {
         application.protocolManager.protocolHosts.forEach {
-            setReSharperEnvVar("DOTNET_CLI_HOME", tempTestDirectory.absolutePath, it)
+            setReSharperEnvVar("DOTNET_CLI_HOME", getDotnetCliHome().absolutePathString(), it)
         }
     }
 
+    @BeforeMethod(alwaysRun = true)
+    fun clearDotnetCliHomeFolder() {
+        fantomasNotifications.clear()
+        getDotnetCliHome().delete(true)
+        getDotnetCliHome().createDirectory()
+    }
+
     override fun beforeDoTestWithDocuments() {
-        project.fcsHost.fantomasNotificationFired.advise(project.lifetime) {
+        project.fcsHost.fantomasNotificationFired.advise(testLifetimeDef.lifetime) {
             fantomasNotifications.add(it)
         }
-        project.fcsHost.dotnetToolInvalidated.advise(project.lifetime) {
+        project.fcsHost.dotnetToolInvalidated.advise(testLifetimeDef.lifetime) {
             dotnetToolsInvalidated = true
         }
-        super.beforeDoTestWithDocuments()
     }
 
     @Test
@@ -153,7 +164,6 @@ class FantomasRunOptionsTest : EditorTestBase() {
                     reformatCode()
                     checkFantomasVersion("4.7.6.0")
                     dumpNotifications(it, 0)
-                    dotnetToolsInvalidated = false
                 }
 
                 it.println("\n--Without local dotnet tool--")
@@ -202,7 +212,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
     @Test
     fun `local tool has unsupported version`() {
         executeWithGold(testGoldFile) {
-            withFantomasLocalTool("wrong_version") {
+            withFantomasLocalTool("wrong_version", false) {
                 withOpenedEditor("Program.fs") {
                     it.print(dumpRunOptions())
 
@@ -219,7 +229,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
     fun `run global tool if local tool failed to run`() {
         executeWithGold(testGoldFile) {
             withOpenedEditor("Program.fs") {
-                withFantomasLocalTool("wrong_version") {
+                withFantomasLocalTool("wrong_version", false) {
                     withFantomasGlobalTool {
                         it.print(dumpRunOptions())
 
@@ -252,7 +262,6 @@ class FantomasRunOptionsTest : EditorTestBase() {
                     reformatCode()
                     checkFantomasVersion(bundledVersion)
 
-                    it.println("\n")
                     dumpNotifications(it, 1)
                 }
             }

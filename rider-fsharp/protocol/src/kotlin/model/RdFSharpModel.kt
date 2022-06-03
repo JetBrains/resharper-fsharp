@@ -57,6 +57,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         call("dumpSingleProjectLocalReferences", void, immutableList(string))
         call("fantomasVersion", void, string)
         call("dumpFantomasRunOptions", void, string)
+        call("terminateFantomasHost", void, void)
         call("TypeProvidersRuntimeVersion", void, string.nullable)
         call("DumpTypeProvidersProcess", void, string)
     }

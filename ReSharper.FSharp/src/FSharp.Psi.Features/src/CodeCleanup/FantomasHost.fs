@@ -35,6 +35,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
         if isConnectionAlive () then formatterHostLifetime.Terminate()
 
     let connect () =
+        // TryRun synchronizes process creation and keeps track it status
         fantomasDetector.TryRun(fun path ->
             if isConnectionAlive () then () else
             formatterHostLifetime <- Lifetime.Define(solutionLifetime)
@@ -85,8 +86,12 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
     member x.Version() =
         connection.Execute(fun () -> connection.ProtocolModel.GetVersion.Sync(Unit.Instance, RpcTimeouts.Maximal))
 
+    member x.Terminate() = terminateConnection ()
+
     member x.DumpRunOptions() =
+        let versionToRun = fantomasDetector.VersionToRun.Value
         fantomasDetector.GetSettings()
-        |> Seq.map (fun x -> $"{x.Key}: Version = {x.Value.Location}, Status = {x.Value.Status}")
+        |> Seq.sortBy (fun x -> x.Key)
+        |> Seq.map (fun x -> $"{x.Key}: Version = ({x.Value.Location}, {x.Value.Version}), Status = {x.Value.Status}")
         |> String.concat "\n"
-        |> (+) $"Version to run: {fantomasDetector.VersionToRun.Value.Location}\n\n"
+        |> (+) $"Version to run: ({versionToRun.Location}, {versionToRun.Version})\n\n"

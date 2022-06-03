@@ -319,7 +319,6 @@ tasks {
         val rerunSuccessfulTests = false
         outputs.upToDateWhen { !rerunSuccessfulTests }
         ignoreFailures = true
-        //environment["LOCAL_ENV_RUN"] = "true"
     }
 
     create("writeDotNetSdkPathProps") {

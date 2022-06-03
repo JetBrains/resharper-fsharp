@@ -94,9 +94,9 @@ fun withCultureInfo(project: Project, culture: String, function: () -> Unit) {
     }
 }
 
-fun flushFileChanges(project: Project, filePath: String) {
+fun flushFileChanges(project: Project) {
     val fs = LocalFileSystem.getInstance()
-    fs.refreshAndFindFileByPath(filePath).shouldNotBeNull()
+    fs.refresh(false)
     waitBackend(project.protocolHost)
 }
 

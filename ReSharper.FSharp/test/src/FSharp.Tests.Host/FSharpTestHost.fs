@@ -54,7 +54,10 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
         |> Option.defaultWith (fun _ -> List())
 
     let fantomasVersion _ = fantomasHost.Version()
-    let dumpFantomasRunOptions _ = fantomasHost.DumpRunOptions()
+    let dumpFantomasRunOptions _ = fantomasHost.DumpRunOptions()      
+    let terminateFantomasHost _ =
+        fantomasHost.Terminate()
+        JetBrains.Core.Unit.Instance
 
     let typeProvidersRuntimeVersion _ =
         solution.GetComponent<IProxyExtensionTypingProvider>().RuntimeVersion()
@@ -92,5 +95,6 @@ Actions: {notification.AdditionalCommands
         fsTestHost.DumpTypeProvidersProcess.Set(dumpTypeProvidersProcess)
         fsTestHost.GetCultureInfoAndSetNew.Set(getCultureInfoAndSetNew)
         fsTestHost.DumpFantomasRunOptions.Set(dumpFantomasRunOptions)
+        fsTestHost.TerminateFantomasHost.Set(terminateFantomasHost)
         dotnetToolsTracker.DotNetToolCache.Change.Advise(lifetime, fun _ -> fsTestHost.DotnetToolInvalidated())
         notifications.AllNotifications.AddRemove.Property.Change.Advise(lifetime, fun x -> if x.HasNew && isNotNull x.New then fsTestHost.FantomasNotificationFired(formatNotifications x.New.Value))
