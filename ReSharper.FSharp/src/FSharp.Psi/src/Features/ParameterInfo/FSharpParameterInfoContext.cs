@@ -7,17 +7,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
 {
   public class FSharpParameterInfoContext : IParameterInfoContext
   {
+    private readonly int myArgument;
+
     public FSharpParameterInfoContext(int argument, ICandidate[] candidates, TextRange range, string[] namedArgs)
     {
-      Argument = argument;
+      myArgument = argument;
       Candidates = candidates;
       Range = range;
 
       NamedArguments = namedArgs;
     }
 
-    public int Argument { get; }
-
+    public int GetArgument(ICandidate candidate) => myArgument;
     public ICandidate[] Candidates { get; }
     public TextRange Range { get; }
 
