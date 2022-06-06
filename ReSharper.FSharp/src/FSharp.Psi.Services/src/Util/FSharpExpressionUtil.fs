@@ -1,6 +1,7 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 
+open FSharp.Compiler.Syntax
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -187,3 +188,11 @@ let tryGetEffectiveParentComputationExpression (expr: IFSharpExpression) =
         null, false
 
     loop false expr
+
+let isOperatorReferenceExpr (expr: IFSharpExpression) =
+    let refExpr = expr.As<IReferenceExpr>()
+    isNotNull refExpr &&
+
+    let name = refExpr.ShortName
+    name <> SharedImplUtil.MISSING_DECLARATION_NAME &&
+    PrettyNaming.IsOperatorDisplayName name

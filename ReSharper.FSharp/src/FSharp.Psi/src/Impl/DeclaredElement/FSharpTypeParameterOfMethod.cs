@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public INamespace GetContainingNamespace() =>
       Method.GetContainingType()?.GetContainingNamespace() ??
-      Module.GetSymbolScope().GlobalNamespace;
+      Module.GetSymbolScope(false).GlobalNamespace;
 
     public bool HasMemberWithName(string shortName, bool ignoreCase) => false;
 

@@ -13,9 +13,9 @@
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpAutoOpenUtil.fs" />
     <Compile Include="src\Util\OpensUtil.fs" />
+    <Compile Include="src\Util\FSharpExpressionUtil.fs" />
     <Compile Include="src\Util\FSharpParensUtil.fs" />
     <Compile Include="src\Util\TypeUsageParensUtil.fs" />
-    <Compile Include="src\Util\FSharpExpressionUtil.fs" />
     <Compile Include="src\Util\FSharpResolveUtil.fs" />
     <Compile Include="src\Util\FSharpPatternUtil.fs" />
     <Compile Include="src\Util\FSharpMethodInvocationUtil.fs" />

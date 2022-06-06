@@ -285,7 +285,7 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
             if isNotNull interpolationInsertRange then
                 interpolationInsertRange else
 
-            if localParentRange.IsValid() && localParentRange.Contains(&localRange) then
+            if localParentRange.IsValid() && localParentRange.Contains(localRange) then
                 let range = localParentRange.Shift(token.GetTreeStartOffset() + start)
                 FSharpTokenPartSelection(fsFile, range, token) :> _ else
 

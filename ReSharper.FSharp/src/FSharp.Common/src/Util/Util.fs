@@ -223,16 +223,20 @@ module rec FSharpMsBuildUtils =
 
 [<Extension; AutoOpen>]
 module PsiUtil =
-    let private getModuleSymbolScope withReferences (psiModule: IPsiModule) =
-        psiModule.GetPsiServices().Symbols.GetAlternativeNamesSymbolScope(psiModule, withReferences)
+    let private getModuleSymbolScope withReferences (alternativeNames: bool) (psiModule: IPsiModule) =
+        let symbolCache = psiModule.GetPsiServices().Symbols
+        if alternativeNames then
+            symbolCache.GetAlternativeNamesSymbolScope(psiModule, withReferences)
+        else
+            symbolCache.GetSymbolScope(psiModule, withReferences, true)
 
     [<Extension; CompiledName("GetSymbolScope")>]
-    let getSymbolScope (psiModule: IPsiModule) =
-        getModuleSymbolScope true psiModule
+    let getSymbolScope (psiModule: IPsiModule) (alternativeNames: bool) =
+        getModuleSymbolScope true alternativeNames psiModule
 
     [<Extension; CompiledName("GetModuleOnlySymbolScope")>]
-    let getModuleOnlySymbolScope (psiModule: IPsiModule) =
-        getModuleSymbolScope false psiModule
+    let getModuleOnlySymbolScope (psiModule: IPsiModule) (alternativeNames: bool) =
+        getModuleSymbolScope false alternativeNames psiModule
 
     [<Extension; CompiledName("GetTokenTypeSafe")>]
     let getTokenType ([<CanBeNull>] node: ITreeNode) =

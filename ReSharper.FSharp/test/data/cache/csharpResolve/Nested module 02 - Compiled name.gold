@@ -1,0 +1,16 @@
+﻿public class Class
+{
+  public Class()
+  {
+    var t = new Top.Nested();
+    Top.f(t);
+
+    int x = Top.NestedModule.x;
+  }
+}
+
+---------------------------------------------------------
+M:Top.Nested.#ctor
+M:Top.f(Top.Nested)
+M:Top.f(Top.Nested)
+P:Top.NestedModule.x

@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Psi.Tree
 
@@ -15,8 +14,7 @@ type ToMutableAction(dataProvider: FSharpContextActionDataProvider) =
 
     override x.IsAvailable _ =
         let decl = dataProvider.GetSelectedElement<IDeclaration>()
-        let selectedRange = dataProvider.SelectedTreeRange
-        if not (isValid decl && decl.GetNameRange().Contains(&selectedRange)) then false else
+        if not (isValid decl && decl.GetNameRange().Contains(dataProvider.SelectedTreeRange)) then false else
 
         let declaredElement = decl.DeclaredElement
         if not (isValid declaredElement) then false else

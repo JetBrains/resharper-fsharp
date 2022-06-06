@@ -388,7 +388,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return containingType.NestedTypes.FirstOrDefault(IsAssociatedType);
 
       var ns = moduleTypeElement.GetContainingNamespace();
-      var symbolScope = moduleTypeElement.Module.GetModuleOnlySymbolScope();
+      var symbolScope = moduleTypeElement.Module.GetModuleOnlySymbolScope(false);
       return ns.GetNestedTypeElements(symbolScope).FirstOrDefault(IsAssociatedType);
     }
 
