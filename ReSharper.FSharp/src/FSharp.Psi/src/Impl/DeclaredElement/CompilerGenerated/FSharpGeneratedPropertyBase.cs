@@ -48,5 +48,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public bool IsWritable => false;
     public bool IsAuto => false;
     public bool IsDefault => false;
+    public bool IsRequired => false;
   }
 }

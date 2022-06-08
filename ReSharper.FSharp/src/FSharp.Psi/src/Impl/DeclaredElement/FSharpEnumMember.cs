@@ -35,5 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool IsStatic => true;
     public override bool IsReadonly => true;
+
+    public bool IsRequired => false;
   }
 }
