@@ -1,0 +1,14 @@
+Version to run: (Bundled, 4.7.8)
+
+AutoDetected: Version = (Bundled, 4.7.8), Status = Ok
+LocalDotnetTool: Version = (LocalDotnetTool, wrong_version), Status = UnsupportedVersion
+Bundled: Version = (Bundled, 4.7.8), Status = Ok
+
+Notifications:
+
+----------------------------------------------------
+Title: Unable to use specified Fantomas version
+Body: Fantomas specified in 'dotnet-tool.json' is not compatible with the current Rider version.<br><b>Falling back to the bundled formatter.</b><br>Supported versions: 3.2 and later.
+Actions: Open dotnet-tools.json, Settings
+----------------------------------------------------
+        

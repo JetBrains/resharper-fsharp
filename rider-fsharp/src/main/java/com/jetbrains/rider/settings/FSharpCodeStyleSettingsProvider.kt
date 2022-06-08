@@ -14,5 +14,5 @@ abstract class FSharpCodeStyleSettingsProviderBase(private val lang: Language) :
     override fun getLanguage() = lang
     override fun getHelpTopic() = "Settings_Code_Style_FSHARP"
     override fun getConfigurableDisplayName() = lang.displayName
-    override fun getPagesId() = mapOf("FSharpCodeStylePage" to "Formatting Style")
+    override fun getPagesId() = mapOf("FSharpCodeStylePage" to "Formatting Style", "FantomasPage" to "Fantomas")
 }

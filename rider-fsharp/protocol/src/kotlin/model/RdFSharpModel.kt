@@ -37,6 +37,8 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
 
     private val RdFSharpTestHost = aggregatedef("RdFSharpTestHost") {
         sink("fileChecked", string).async
+        sink("dotnetToolInvalidated", void).async
+        sink("fantomasNotificationFired", string).async
         sink("fcsProjectInvalidated", structdef("RdFcsProject") {
             field("projectName", string)
             field("targetFramework", string)
@@ -49,6 +51,9 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         }.nullable)
         call("dumpSingleProjectMapping", void, string)
         call("dumpSingleProjectLocalReferences", void, immutableList(string))
+        call("fantomasVersion", void, string)
+        call("dumpFantomasRunOptions", void, string)
+        call("terminateFantomasHost", void, void)
         call("TypeProvidersRuntimeVersion", void, string.nullable)
         call("DumpTypeProvidersProcess", void, string)
     }

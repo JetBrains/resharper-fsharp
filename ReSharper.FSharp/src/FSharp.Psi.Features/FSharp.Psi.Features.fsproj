@@ -6,7 +6,6 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\CodeStyle\FSharpCodeStylePage.fs" />
     <Compile Include="src\Util\FSharpVisualElementFactory.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
@@ -37,10 +36,13 @@
     <Compile Include="src\Search\FSharpGeneratedElementsSearch.fs" />
     <Compile Include="src\Search\RecordCtorSearch.fs" />
     <Compile Include="src\ExtendSelection\FSharpExtendSelectionProvider.fs" />
+    <Compile Include="src\CodeCleanup\FantomasDetector.fs" />
     <Compile Include="src\CodeCleanup\FantomasSettingsConverterProvider.fs" />
     <Compile Include="src\CodeCleanup\FantomasHost.fs" />
     <Compile Include="src\CodeCleanup\FSharpReformatCode.fs" />
     <Compile Include="src\CodeCleanup\OptimizeImports.fs" />
+    <Compile Include="src\CodeStyle\FSharpCodeStylePage.fs" />
+    <Compile Include="src\CodeStyle\FantomasPage.fs" />
     <Compile Include="src\Fsi\FsiSandboxUtil.fs" />
     <Compile Include="src\Fsi\FsiOptions.fs" />
     <Compile Include="src\Fsi\FsiDetector.fs" />
@@ -89,6 +91,12 @@
     <Reference Include="System.Web" />
     <Reference Include="WindowsBase" />
     <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.FantomasBundledVersionAttribute">
+      <_Parameter1>$(FantomasBundledVersion)</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />

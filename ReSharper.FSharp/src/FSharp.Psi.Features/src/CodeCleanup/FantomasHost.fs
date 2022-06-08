@@ -20,20 +20,28 @@ module internal Reflection =
 
 
 [<SolutionComponent>]
-type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) =
+type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector) =
+    let solutionLifetime = solution.GetLifetime()
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
+    let mutable formatterHostLifetime: LifetimeDefinition = null
 
     let toEditorConfigName name = $"{fSharpEditorConfigPrefix}{StringUtil.MakeUnderscoreCaseName(name)}"
 
     let isConnectionAlive () =
         isNotNull connection && connection.IsActive
 
+    let terminateConnection () =
+        if isConnectionAlive () then formatterHostLifetime.Terminate()
+
     let connect () =
-        if isConnectionAlive () then () else
-        let formatterHostLifetime = Lifetime.Define(solution.GetLifetime())
-        connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime).Run()
-        formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance))
+        // TryRun synchronizes process creation and keeps track of its status
+        fantomasDetector.TryRun(fun path ->
+            if isConnectionAlive () then () else
+            formatterHostLifetime <- Lifetime.Define(solutionLifetime)
+            connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, path).Run()
+            formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance, RpcTimeouts.Maximal))
+        )
 
     let convertRange (range: range) =
         RdFcsRange(range.FileName, range.StartLine, range.StartColumn, range.EndLine, range.EndColumn)
@@ -56,18 +64,34 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory) 
         RdFcsParsingOptions(Array.last options.SourceFiles, lightSyntax,
             List.toArray options.ConditionalCompilationDefines, options.IsExe, options.LangVersionText)
 
+    do fantomasDetector.VersionToRun.Advise(solutionLifetime, fun _ -> terminateConnection ())
+
     member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
+        connect()
         let args =
             RdFantomasFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
                 convertParsingOptions options, newLineText)
 
-        connect()
         connection.Execute(fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
 
     member x.FormatDocument(filePath, source, settings, options, newLineText) =
+        connect()
         let args =
             RdFantomasFormatDocumentArgs(filePath, source, convertFormatSettings settings, convertParsingOptions options,
                 newLineText)
 
-        connect()
         connection.Execute(fun () -> connection.ProtocolModel.FormatDocument.Sync(args, RpcTimeouts.Maximal))
+
+    /// For tests
+    member x.Version() =
+        connection.Execute(fun () -> connection.ProtocolModel.GetVersion.Sync(Unit.Instance, RpcTimeouts.Maximal))
+
+    member x.Terminate() = terminateConnection ()
+
+    member x.DumpRunOptions() =
+        let versionToRun = fantomasDetector.VersionToRun.Value
+        fantomasDetector.GetSettings()
+        |> Seq.sortBy (fun x -> x.Key)
+        |> Seq.map (fun x -> $"{x.Key}: Version = ({x.Value.Location}, {x.Value.Version}), Status = {x.Value.Status}")
+        |> String.concat "\n"
+        |> (+) $"Version to run: ({versionToRun.Location}, {versionToRun.Version})\n\n"

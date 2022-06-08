@@ -44,6 +44,17 @@ type FSharpOptions =
       [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
       mutable TopLevelOpenCompletion: bool }
 
+type FantomasLocationSettings =
+    | AutoDetected = 0
+    | LocalDotnetTool = 1
+    | GlobalDotnetTool = 2
+    | Bundled = 3
+
+[<SettingsKey(typeof<FSharpSettings>, "FSharpFantomasOptions")>]
+type FSharpFantomasOptions =
+    { [<SettingsEntry(FantomasLocationSettings.AutoDetected, "Fantomas location"); DefaultValue>]
+      mutable Location: FantomasLocationSettings }
+
 
 module FSharpScriptOptions =
     let [<Literal>] languageVersion = "Language version"
@@ -128,6 +139,13 @@ type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
 
     member val NonFSharpProjectInMemoryAnalysis = base.GetValueProperty<bool>("NonFSharpProjectInMemoryAnalysis")
+
+
+[<SolutionInstanceComponent>]
+type FSharpFantomasSettingsProvider(lifetime, solution, settings, settingsSchema) =
+    inherit FSharpSettingsProviderBase<FSharpFantomasOptions>(lifetime, solution, settings, settingsSchema)
+
+    member val Location = base.GetValueProperty<FantomasLocationSettings>("Location")
 
 
 module FSharpTypeHintOptions =

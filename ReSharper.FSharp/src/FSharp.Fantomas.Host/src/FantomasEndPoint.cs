@@ -15,14 +15,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
   internal class FantomasEndPoint : ProtocolEndPoint<RdFantomasModel, RdSimpleDispatcher>
   {
-    private readonly FantomasCodeFormatter myCodeFormatter;
     protected override string ProtocolName => "Fantomas Host";
 
-    public FantomasEndPoint() : base(FantomasProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE) =>
-      myCodeFormatter = new FantomasCodeFormatter();
+    public FantomasEndPoint() : base(FantomasProtocolConstants.PARENT_PROCESS_PID_ENV_VARIABLE)
+    {
+    }
 
-    protected override RdSimpleDispatcher InitDispatcher(Lifetime lifetime, ILogger logger) =>
-      new RdSimpleDispatcher(lifetime, logger);
+    protected override RdSimpleDispatcher InitDispatcher(Lifetime lifetime, ILogger logger) => new(lifetime, logger);
 
     protected override void InitLogger(Lifetime lifetime, string path) =>
       ProtocolEndPointUtil.InitLogger(path, lifetime, LoggingLevel.TRACE);
@@ -34,16 +33,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       model.GetFormatConfigFields.Set(GetFormatConfigFields);
       model.FormatSelection.Set(FormatSelection);
       model.FormatDocument.Set(FormatDocument);
+      model.GetVersion.Set(GetVersion);
       model.Exit.Advise(lifetime, Terminate);
 
       return model;
     }
 
+    private static string GetVersion(Unit _) => FantomasCodeFormatter.CurrentVersion.ToString();
+
     private static string[] GetFormatConfigFields(Unit _) =>
       FantomasCodeFormatter.FormatConfigFields.Select(t => t.Name).ToArray();
 
-    private string FormatSelection(RdFantomasFormatSelectionArgs args) => myCodeFormatter.FormatSelection(args);
-    private string FormatDocument(RdFantomasFormatDocumentArgs args) => myCodeFormatter.FormatDocument(args);
+    private static string FormatSelection(RdFantomasFormatSelectionArgs args) =>
+      FantomasCodeFormatter.FormatSelection(args);
+
+    private static string FormatDocument(RdFantomasFormatDocumentArgs args) =>
+      FantomasCodeFormatter.FormatDocument(args);
 
     protected override void Run(Lifetime lifetime, RdSimpleDispatcher dispatcher) => dispatcher.Run();
   }
