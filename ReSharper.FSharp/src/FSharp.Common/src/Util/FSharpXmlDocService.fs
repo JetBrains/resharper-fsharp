@@ -77,7 +77,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
 
             | FSharpXmlDoc.None -> ValueNone
 
-        xmlNode |> ValueOption.filter(fun x -> x.InnerText.IsNullOrWhitespace())
+        xmlNode |> ValueOption.filter(fun x -> not (x.InnerText.IsNullOrWhitespace()))
 
     [<CanBeNull>]
     member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc) =
