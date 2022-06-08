@@ -1,0 +1,3 @@
+let x: string =
+    let _ = 1
+    ""{caret}

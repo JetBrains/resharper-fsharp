@@ -351,6 +351,7 @@
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ConvertTupleToArrayOrListElementsFix</QuickFix>
+    <QuickFix>ReplaceReturnTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="TypeAbbreviationsCannotHaveAugmentations" ID="FS0964: Type abbreviations cannot have augmentations">
@@ -373,6 +374,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="TypeConstraintMismatch" ID="FS0193: Type constraint mismatch">
+    <Parameter type="string" name="mismatchedType"/>
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -381,6 +383,7 @@
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
+    <QuickFix>ReplaceReturnTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="IndeterminateType" ID="FS0072: Lookup on indeterminate type object">
@@ -495,6 +498,44 @@
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceWithTripleQuotedInterpolatedStringFix</QuickFix>
+  </Error>
+  
+  <Error staticGroup="FSharpErrors" name="TypeDoesNotMatchType" ID="FS0001: The type does not match the type">
+    <Parameter type="string" name="expectedType"/>
+    <Parameter type="string" name="actualType"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceReturnTypeFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="IfExpressionNeedsTypeToSatisfyTypeRequirements" ID="FS0001: The 'if' expression needs to have type">
+    <Parameter type="string" name="expectedType"/>
+    <Parameter type="string" name="actualType"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceReturnTypeFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="TypeMisMatchTuplesHaveDifferingLengths" ID="FS0001: Type mismatch. Expecting">
+    <Parameter type="string" name="expectedType"/>
+    <Parameter type="string" name="actualType"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
   </Error>
 
 </Errors>

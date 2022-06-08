@@ -1,0 +1,5 @@
+let s:int =
+    try
+        ""
+    with ex ->
+        1{caret}

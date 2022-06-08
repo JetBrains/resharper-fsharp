@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -35,5 +36,40 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     public static readonly Func<IFSharpExpression, bool> IsSimpleValueExpressionFunc = IsSimpleValueExpression;
     public static readonly Func<IFSharpExpression, bool> IsLiteralExpressionFunc = IsLiteralExpression;
+
+    // TODO: change name
+    public static IFSharpExpression GetOutermostParentExpressionFromItsReturn(this IFSharpExpression expression)
+    {
+      var currentExpr = expression;
+      while (true)
+      {
+        if (MatchClauseListOwnerExprNavigator.GetByClauseExpression(currentExpr) is { } matchExpr)
+        {
+          currentExpr = matchExpr as IFSharpExpression;
+          continue;
+        }
+        
+        if (SequentialExprNavigator.GetByExpression(currentExpr) is { } seqExpr &&
+            seqExpr.ExpressionsEnumerable.Last() == currentExpr)
+        {
+          currentExpr = seqExpr;
+          continue;
+        }
+
+        if ((IfThenElseExprNavigator.GetByBranchExpression(currentExpr)) is {ElseExpr: { }} ifExpr)
+        {
+          currentExpr = ifExpr;
+          continue;
+        }
+
+        if (LetOrUseExprNavigator.GetByInExpression(currentExpr) is { } letOrUseExpr)
+        {
+          currentExpr = letOrUseExpr;
+          continue;
+        }
+
+        return currentExpr;
+      }
+    }
   }
 }

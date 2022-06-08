@@ -88,6 +88,7 @@
     <Compile Include="src\QuickFixes\RemoveIndexerDotFix.fs" />
     <Compile Include="src\QuickFixes\FSharpImportTypeFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithTripleQuotedInterpolatedStringFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceReturnTypeFix.fs" />
     <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\Errors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
