@@ -29,6 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsField => false;
     public bool IsConstant => true;
     public bool IsEnumMember => false;
+    public bool IsRequired => false;
     public ReferenceKind ReferenceKind => ReferenceKind.VALUE;
     public int? FixedBufferSize => null;
   }

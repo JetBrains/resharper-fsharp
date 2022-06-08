@@ -102,8 +102,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return result;
     }
 
-    public MemberPresenceFlag GetMemberPresenceFlag() =>
-      MemberPresenceFlag.MAY_EQUALS_OVERRIDE | MemberPresenceFlag.MAY_TOSTRING_OVERRIDE;
+    public MemberPresenceFlag GetMemberPresenceFlag() => MemberPresenceFlag.MAY_EQUALS_OVERRIDE;
 
     public IClass GetSuperClass() =>
       GetSuperTypeElement() as IClass;
