@@ -173,6 +173,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     let createHighlighting (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
         | TypeEquation ->
+            let createTypeMismatchHighlighting highlightingCtor expected actual : IHighlighting =
+                match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
+                | null -> null
+                | expr -> highlightingCtor (expected, actual, expr, error.Message) :> _
+
             match error.Message with
             | message when message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
                 createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
@@ -185,19 +190,18 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     match expectedType with
                     | "unit" -> createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
                     | _ -> TypeEquationError(expectedType, actualType, expr, error.Message) :> _
-                else null
+                else
+                    null
 
             | Regex typeDoesNotMatchMessage [expectedType; actualType] ->
-                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                TypeDoesNotMatchTypeError(expectedType, actualType, expr, error.Message)
+                createTypeMismatchHighlighting TypeDoesNotMatchTypeError expectedType actualType
 
             | Regex ifBranchSatisfyContextTypeRequirements [expectedType; actualType] ->
-                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                IfExpressionNeedsTypeToSatisfyTypeRequirementsError(expectedType, actualType, expr, error.Message)
+                createTypeMismatchHighlighting IfExpressionNeedsTypeToSatisfyTypeRequirementsError expectedType actualType
 
             | Regex typeMisMatchTupleLengths [expectedType; actualType] ->
-                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                TypeMisMatchTuplesHaveDifferingLengthsError(expectedType, actualType, expr, error.Message)
+                createTypeMismatchHighlighting TypeMisMatchTuplesHaveDifferingLengthsError expectedType actualType
+
             | _ -> createGenericHighlighting error range
 
         | NotAFunction ->

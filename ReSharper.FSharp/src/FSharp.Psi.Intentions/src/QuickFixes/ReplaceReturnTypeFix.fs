@@ -48,9 +48,12 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
         let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
         if isNull binding then false else
 
+        let returnTypeInfo = binding.ReturnTypeInfo
+        if isNull returnTypeInfo then false else
+
         // Some types cannot be replaced properly solely on the FCS error message.
         // We will ignore these types for now.
-        match binding.ReturnTypeInfo.ReturnType.IgnoreParentParens() with
+        match returnTypeInfo.ReturnType.IgnoreParentParens() with
         | :? ITupleTypeUsage
         | :? IFunctionTypeUsage -> false
         | _ ->
