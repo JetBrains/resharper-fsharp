@@ -57,7 +57,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         var isModule = entity.IsFSharpModule;
         return typeElements.FirstOrDefault(typeElement =>
         {
-          if (typeElement.Module.DisplayName != fcsAssemblySimpleName)
+          if (GetModuleName(typeElement.Module) != fcsAssemblySimpleName)
             return false;
 
           // Happens when there are an exception and a module with the same name.
@@ -86,6 +86,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       return entity.GetTypeElement(psiModule);
     }
+
+    private static string GetModuleName([NotNull] IPsiModule psiModule) =>
+      psiModule.ContainingProjectModule is IProject project
+        ? project.GetOutputAssemblyName(psiModule.TargetFrameworkId)
+        : psiModule.DisplayName;
 
     private static IEnumerable<string> GetPossibleNames([NotNull] FSharpEntity entity)
     {
