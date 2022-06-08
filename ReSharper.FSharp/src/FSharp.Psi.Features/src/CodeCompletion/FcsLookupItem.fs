@@ -32,7 +32,7 @@ type FcsLookupCandidate(fcsTooltip: ToolTipElementData, xmlDocService: FSharpXml
 
     interface ICandidate with
         member x.GetSignature(_, _, _, _, _) = x.Description
-        member x.GetDescription() = xmlDocService.GetXmlDoc(x.XmlDoc, true)
+        member x.GetDescription() = xmlDocService.GetXmlDocSummary(x.XmlDoc)
         member x.Matches _ = true
 
         member x.GetParametersInfo(_, _) = ()
@@ -47,7 +47,7 @@ module FcsLookupCandidate =
 
     let getDescription (xmlDocService: FSharpXmlDocService) (fcsTooltip: ToolTipElementData) =
         let mainDescription = RichTextBlock(richText fcsTooltip.MainDescription)
-        match xmlDocService.GetXmlDoc(fcsTooltip.XmlDoc, true) with
+        match xmlDocService.GetXmlDocSummary(fcsTooltip.XmlDoc) with
         | null -> ()
         | xmlDoc ->
             if not (RichTextBlock.IsNullOrWhiteSpace(mainDescription) || RichTextBlock.IsNullOrWhiteSpace(xmlDoc)) then
