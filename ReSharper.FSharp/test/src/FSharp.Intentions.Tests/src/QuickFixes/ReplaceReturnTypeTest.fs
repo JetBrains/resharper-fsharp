@@ -25,8 +25,8 @@ type ReplaceReturnTypeTest() =
     [<Test; NotAvailable>] member x.``FunctionType 03``() = x.DoNamedTest()
     [<Test>] member x.``Paren around return type``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Tuple return type``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Tuple return type, mismatch in number of items, to few in return type``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Tuple return type, mismatch in number of items, to many in return type``() = x.DoNamedTest()
+    [<Test; NoHighlightingFound>] member x.``Tuple return type, mismatch in number of items, to few in return type``() = x.DoNamedTest()
+    [<Test; NoHighlightingFound>] member x.``Tuple return type, mismatch in number of items, to many in return type``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Tuple return type, to non-tuple``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Tuple return type, tuple as part of nested expression``() = x.DoNamedTest()
 

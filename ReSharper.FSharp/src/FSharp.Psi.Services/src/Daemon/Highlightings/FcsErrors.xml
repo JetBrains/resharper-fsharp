@@ -536,7 +536,6 @@
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>ReplaceReturnTypeFix</QuickFix>
   </Error>
 
 </Errors>
