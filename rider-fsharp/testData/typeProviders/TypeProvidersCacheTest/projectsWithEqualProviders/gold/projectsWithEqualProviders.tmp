@@ -1,0 +1,93 @@
+[In-Process dump]:
+
+Type Providers:
+1 FSharp.Text.RegexProvider.RegexProvider
+
+Provided Types:
+1 FSharp.Text.RegexProvider.Regex (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+1 FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+1 FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+1 FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+1 FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+1 FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+1 FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+1 Microsoft.FSharp.Core.FSharpFunc`2 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+1 Microsoft.FSharp.Core.FSharpFunc`2[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType,System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+1 Microsoft.FSharp.Core.FSharpFunc`2[System.Text.RegularExpressions.Match,System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+1 Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+1 Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+1 Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+1 System.Boolean (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+1 System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+1 System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+1 System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+1 System.Int32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+1 System.String (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+1 System.Text.RegularExpressions.Group (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+1 System.Text.RegularExpressions.Match (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+1 System.Text.RegularExpressions.Regex (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+1 System.Text.RegularExpressions.RegexOptions (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+1 System.TimeSpan (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+
+Provided Assemblies:
+1 FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+1 FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+1 netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+
+Provided Abbreviations:
+
+
+[Out-Process dump]:
+
+Type Providers:
+1 FSharp.Text.RegexProvider.RegexProvider, FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary2.dll)
+
+Created by provider Types:
+FSharp.Text.RegexProvider.Regex tp: 1 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)" tp: 1 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True" tp: 1 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType tp: 1 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType tp: 1 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)" tp: 1 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType tp: 1 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+Microsoft.FSharp.Core.FSharpFunc`2[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType,System.String] tp: 1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] tp: 1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] tp: 1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] tp: 1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] tp: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] tp: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] tp: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+
+Provided Types:
+Microsoft.FSharp.Core.FSharpFunc`2 tps: 1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpFunc`2[System.Text.RegularExpressions.Match,System.String] tps: 1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+System.Boolean tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Enum tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Int32 tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Object tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.String tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Text.RegularExpressions.Capture tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Text.RegularExpressions.Group tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Text.RegularExpressions.Match tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Text.RegularExpressions.Regex tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Text.RegularExpressions.RegexOptions tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.TimeSpan tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.ValueType tps: 1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+T tps: 1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+TResult tps: 1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+
+Provided Assemblies:
+FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a tps: 1
+FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null tps: 1
+netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 tps: 1
+
+ProvidedConstructorInfo:
+Count: 9
+
+ProvidedMethodInfo:
+Count: 63
+
+ProvidedPropertyInfo:
+Count: 8
+
+SevereHighlighters:

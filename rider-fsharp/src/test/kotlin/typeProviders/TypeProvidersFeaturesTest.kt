@@ -24,6 +24,9 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
     override fun getSolutionDirectoryName() = "SwaggerProviderCSharp"
     override val restoreNuGetPackages = true
 
+    //TODO: with signature files, wrong abbreviation
+
+
     @Test
     fun `provided member navigation`() = doNavigationTest()
 
