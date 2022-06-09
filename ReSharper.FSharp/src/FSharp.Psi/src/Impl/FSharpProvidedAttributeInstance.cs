@@ -49,15 +49,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       .FirstOrDefault(t =>
       {
         var signature = t.GetSignature(EmptySubstitution.INSTANCE);
-        if (signature.ParametersCount != PositionParameterCount + NamedParameterCount) return false;
+        if (signature.ParametersCount != PositionParameterCount) return false;
 
         for (var i = 0; i < PositionParameterCount; i++)
           if (TypeEqualityComparer.Default.Equals(signature.GetParameterType(i), PositionParameter(i).TypeValue))
-            return false;
-
-        for (var i = PositionParameterCount; i < PositionParameterCount + NamedParameterCount; i++)
-          if (TypeEqualityComparer.Default.Equals(signature.GetParameterType(i),
-                NamedParameters().ElementAt(i).Second.TypeValue))
             return false;
 
         return true;
