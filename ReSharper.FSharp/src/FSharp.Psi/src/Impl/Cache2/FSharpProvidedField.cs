@@ -20,6 +20,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public bool IsConstant => Info.IsLiteral;
     public bool IsField => true;
     public bool IsEnumMember => false;
+    public ReferenceKind ReferenceKind => ReferenceKind.VALUE;
+    public bool IsRequired => false;
     public int? FixedBufferSize => null;
   }
 }

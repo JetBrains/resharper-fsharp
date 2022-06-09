@@ -38,6 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public IAccessor Getter => new ImplicitAccessor(this, AccessorKind.GETTER);
     public IAccessor Setter => new ImplicitAccessor(this, AccessorKind.SETTER);
     public bool IsDefault => Info.Name == StandardMemberNames.DefaultIndexerName;
+    public bool IsRequired => false;
     public bool IsReadable => Info.CanRead;
     public bool IsWritable => Info.CanWrite;
     public bool IsAuto => true;
