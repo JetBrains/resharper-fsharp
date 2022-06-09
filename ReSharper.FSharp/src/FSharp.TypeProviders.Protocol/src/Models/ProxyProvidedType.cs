@@ -61,26 +61,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
           RdProvidedTypeProcessModel.GetContent.Sync(EntityId, RpcTimeouts.Maximal));
 
         var interfaces = TypeProvidersContext.ProvidedTypesCache
-          .GetOrCreateBatch(rdProvidedTypeContent.Interfaces, typeProviderId);
+          .GetOrCreateBatch(rdProvidedTypeContent.Interfaces, TypeProvider);
 
         var constructors = rdProvidedTypeContent.Constructors
-          .Select(t => ProxyProvidedConstructorInfo.Create(t, myTypeProviderId, typeProvidersContext))
+          .Select(t => ProxyProvidedConstructorInfo.Create(t, TypeProvider, typeProvidersContext))
           .ToArray();
 
         var methods = rdProvidedTypeContent.Methods
-          .Select(t => ProxyProvidedMethodInfo.Create(t, typeProviderId, typeProvidersContext))
+          .Select(t => ProxyProvidedMethodInfo.Create(t, TypeProvider, typeProvidersContext))
           .ToArray();
 
         var properties = rdProvidedTypeContent.Properties
-          .Select(t => ProxyProvidedPropertyInfo.Create(t, myTypeProviderId, typeProvidersContext))
+          .Select(t => ProxyProvidedPropertyInfo.Create(t, TypeProvider, typeProvidersContext))
           .ToArray();
 
         var fields = rdProvidedTypeContent.Fields
-          .Select(t => ProxyProvidedFieldInfo.Create(t, myTypeProviderId, typeProvidersContext))
+          .Select(t => ProxyProvidedFieldInfo.Create(t, TypeProvider, typeProvidersContext))
           .ToArray();
 
         var events = rdProvidedTypeContent.Events
-          .Select(t => ProxyProvidedEventInfo.Create(t, myTypeProviderId, typeProvidersContext))
+          .Select(t => ProxyProvidedEventInfo.Create(t, TypeProvider, typeProvidersContext))
           .ToArray();
 
         return new ProvidedTypeContent(interfaces, constructors, methods, properties, fields, events);
@@ -89,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       myAllNestedTypes = new InterruptibleLazy<ProxyProvidedType[]>(() =>
         typeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(
           typeProvidersContext.Connection.ExecuteWithCatch(() =>
-            RdProvidedTypeProcessModel.GetAllNestedTypes.Sync(EntityId, RpcTimeouts.Maximal)), typeProviderId));
+            RdProvidedTypeProcessModel.GetAllNestedTypes.Sync(EntityId, RpcTimeouts.Maximal)), TypeProvider));
     }
 
     [ContractAnnotation("type:null => null")]
