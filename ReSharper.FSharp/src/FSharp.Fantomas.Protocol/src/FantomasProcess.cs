@@ -16,18 +16,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 {
   public class FantomasProcess : ProtocolExternalProcess<RdFantomasModel, FantomasConnection>
   {
+    private readonly VirtualFileSystemPath mySpecifiedPath;
     protected override string Name => "Fantomas";
 
     private static readonly FileSystemPath FantomasDirectory =
       typeof(FantomasProcess).Assembly.GetPath().Directory.Parent / "fantomas";
+    
+    private static readonly FileSystemPath FantomasDllsDirectory = FantomasDirectory / "dll";
 
-    protected override RdFantomasModel CreateModel(Lifetime lifetime, IProtocol protocol) =>
-      new RdFantomasModel(lifetime, protocol);
+    protected override RdFantomasModel CreateModel(Lifetime lifetime, IProtocol protocol) => new(lifetime, protocol);
 
     protected override FantomasConnection CreateConnection(Lifetime lifetime,
       RdFantomasModel model, IProtocol protocol, StartupOutputWriter outputWriter, int processId,
       Signal<int> processUnexpectedExited) =>
-      new FantomasConnection(lifetime, model, protocol, outputWriter, processId,
+      new(lifetime, model, protocol, outputWriter, processId,
         processUnexpectedExited);
 
     protected override ProcessStartInfo GetProcessStartInfo(Lifetime lifetime, int port)
@@ -49,7 +51,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 
     protected override IDictionary<string, string> GetAdditionalProcessEnvVars()
     {
-      return new Dictionary<string, string>()
+      return new Dictionary<string, string>
       {
         {
           "RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS",
@@ -61,7 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
         },
         {
           "FSHARP_FANTOMAS_ASSEMBLIES_PATH",
-          FantomasDirectory.FullPath
+          mySpecifiedPath?.FullPath ?? FantomasDllsDirectory.FullPath
         },
       };
     }
@@ -73,9 +75,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
     }
 
     public FantomasProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
-      IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request)
+      IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, VirtualFileSystemPath specifiedPath = null)
       : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
+      mySpecifiedPath = specifiedPath;
     }
   }
 }

@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       base.GetMemberPresenceFlag() |
       MemberPresenceFlag.INSTANCE_CTOR |
       MemberPresenceFlag.EXPLICIT_OP | MemberPresenceFlag.IMPLICIT_OP |
-      MemberPresenceFlag.MAY_EQUALS_OVERRIDE | MemberPresenceFlag.MAY_TOSTRING_OVERRIDE;
+      MemberPresenceFlag.MAY_EQUALS_OVERRIDE;
 
     public override IDeclaredType GetBaseClassType() =>
       GetPsiModule().GetPredefinedType().Object;

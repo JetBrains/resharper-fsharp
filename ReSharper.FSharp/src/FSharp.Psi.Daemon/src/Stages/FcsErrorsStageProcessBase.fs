@@ -87,7 +87,10 @@ module FSharpErrors =
     let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type \n    '(.+)'    \nis not compatible with type\n    '(.+)'"
 
     let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
+    let [<Literal>] typeDoesNotMatchMessage = "The type '(.+)' does not match the type '(.+)'"
     let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
+    let [<Literal>] ifBranchSatisfyContextTypeRequirements = "The 'if' expression needs to have type '(.+)' to satisfy context type requirements\. It currently has type '(.+)'"
+    let [<Literal>] typeMisMatchTupleLengths = "Type mismatch. Expecting a\n    '(.+)'    \nbut given a\n    '(.+)'    \nThe tuples have differing lengths of \\d+ and \\d+"
 
     let isDirectiveSyntaxError number =
         number >= 232 && number <= 235
@@ -170,6 +173,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     let createHighlighting (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
         | TypeEquation ->
+            let createTypeMismatchHighlighting highlightingCtor expected actual : IHighlighting =
+                match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
+                | null -> null
+                | expr -> highlightingCtor (expected, actual, expr, error.Message) :> _
+
             match error.Message with
             | message when message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
                 createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
@@ -182,7 +190,17 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     match expectedType with
                     | "unit" -> createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
                     | _ -> TypeEquationError(expectedType, actualType, expr, error.Message) :> _
-                else null
+                else
+                    null
+
+            | Regex typeDoesNotMatchMessage [expectedType; actualType] ->
+                createTypeMismatchHighlighting TypeDoesNotMatchTypeError expectedType actualType
+
+            | Regex ifBranchSatisfyContextTypeRequirements [expectedType; actualType] ->
+                createTypeMismatchHighlighting IfExpressionNeedsTypeToSatisfyTypeRequirementsError expectedType actualType
+
+            | Regex typeMisMatchTupleLengths [expectedType; actualType] ->
+                createTypeMismatchHighlighting TypeMisMatchTuplesHaveDifferingLengthsError expectedType actualType
 
             | _ -> createGenericHighlighting error range
 
@@ -409,7 +427,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 let expr = getResultExpr expr
                 FunctionValueUnexpectedWarning(expr, error.Message) :> _
 
-            | Regex typeConstraintMismatchMessage [_; typeConstraint] ->
+            | Regex typeConstraintMismatchMessage [mismatchedType; typeConstraint] ->
                 let highlighting =
                     match typeConstraint with
                     | "unit" ->
@@ -420,7 +438,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
                 if isNotNull highlighting then highlighting :> _ else
 
-                createHighlightingFromNodeWithMessage TypeConstraintMismatchError range error
+                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                TypeConstraintMismatchError(mismatchedType, expr, error.Message)
 
             | _ -> null
 

@@ -1,0 +1,16 @@
+--With local dotnet tool--
+Version to run: (LocalDotnetTool, 4.7.6)
+
+AutoDetected: Version = (LocalDotnetTool, 4.7.6), Status = Ok
+LocalDotnetTool: Version = (LocalDotnetTool, 4.7.6), Status = Ok
+Bundled: Version = (Bundled, 4.7.8), Status = Ok
+
+Notifications:
+
+--Without local dotnet tool--
+Version to run: (Bundled, 4.7.8)
+
+AutoDetected: Version = (Bundled, 4.7.8), Status = Ok
+Bundled: Version = (Bundled, 4.7.8), Status = Ok
+
+Notifications:

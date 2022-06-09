@@ -45,6 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsDefault => false;
     public bool IsReadable => true;
     public virtual bool IsWritable => false;
+    public bool IsRequired => false;
     public IAccessor Getter => new ImplicitAccessor(this, AccessorKind.GETTER);
     public IAccessor Setter => IsWritable ? new ImplicitAccessor(this, AccessorKind.SETTER) : null;
   }

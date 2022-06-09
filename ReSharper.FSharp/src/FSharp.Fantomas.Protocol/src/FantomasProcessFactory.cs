@@ -24,13 +24,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
       myShellLocks = shellLocks;
     }
 
-    public FantomasProcess Create(Lifetime lifetime)
+    public FantomasProcess Create(Lifetime lifetime, VirtualFileSystemPath path = null)
     {
       return new FantomasProcess(lifetime,
         myLogger,
         myShellLocks,
         mySolutionProcessStartInfoPatcher,
-        JetProcessRuntimeRequest.CreateInternalRuntime());
+        JetProcessRuntimeRequest.CreateCore(), path);
     }
   }
 }

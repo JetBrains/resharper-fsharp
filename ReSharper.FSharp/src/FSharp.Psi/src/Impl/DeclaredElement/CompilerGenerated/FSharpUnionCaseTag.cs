@@ -46,6 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override bool IsStatic => true;
     public override bool IsReadonly => true;
+    public bool IsRequired => false;
 
     public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
 

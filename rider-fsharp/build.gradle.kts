@@ -103,13 +103,14 @@ val typeProvidersFiles = listOf(
         "FSharp.TypeProviders.Host/bin/$buildConfiguration/netcoreapp3.1/tploader.net6.unix.runtimeconfig.json")
 
 val fantomasFiles = listOf(
-        "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.dll",
-        "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
-        "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.win.runtimeconfig.json",
-        "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.unix.runtimeconfig.json",
         "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/FSharp.Compiler.Service.dll",
         "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.dll")
 
+val fantomasExecutableFiles = listOf(
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.dll",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.win.runtimeconfig.json",
+        "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.unix.runtimeconfig.json")
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
 val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
@@ -222,6 +223,7 @@ tasks {
     withType<PrepareSandboxTask> {
         var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
         files = files.map { "$resharperPluginPath/src/$it" }
+        val fantomasExecutableFiles = fantomasExecutableFiles.map { "$resharperPluginPath/src/$it" }
         val fantomasFiles = fantomasFiles.map { "$resharperPluginPath/src/$it" }
         val typeProvidersFiles = typeProvidersFiles.map { "$resharperPluginPath/src/$it" }
 
@@ -238,7 +240,8 @@ tasks {
         }
 
         moveToPlugin(files, "dotnet")
-        moveToPlugin(fantomasFiles, "fantomas")
+        moveToPlugin(fantomasExecutableFiles, "fantomas")
+        moveToPlugin(fantomasFiles, "fantomas/dll")
         moveToPlugin(typeProvidersFiles, "typeProviders")
         moveToPlugin(listOf("projectTemplates"), "projectTemplates")
 
@@ -251,6 +254,7 @@ tasks {
                 }
             }
             validateFiles(files, "dotnet")
+            validateFiles(fantomasExecutableFiles, "fantomas")
             validateFiles(fantomasFiles, "fantomas")
             validateFiles(typeProvidersFiles, "typeProviders")
         }

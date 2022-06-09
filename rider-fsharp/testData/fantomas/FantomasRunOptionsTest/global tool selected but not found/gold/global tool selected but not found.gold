@@ -1,0 +1,14 @@
+Version to run: (Bundled, 4.7.8)
+
+AutoDetected: Version = (Bundled, 4.7.8), Status = Ok
+GlobalDotnetTool: Version = (GlobalDotnetTool, ), Status = SelectedButNotFound
+Bundled: Version = (Bundled, 4.7.8), Status = Ok
+
+Notifications:
+
+----------------------------------------------------
+Title: Unable to use specified Fantomas version
+Body: Fantomas is not installed globally.<br><b>Falling back to the bundled formatter.</b>
+Actions: Settings
+----------------------------------------------------
+        

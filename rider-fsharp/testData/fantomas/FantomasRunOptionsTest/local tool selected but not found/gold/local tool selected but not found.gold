@@ -1,0 +1,14 @@
+Version to run: (Bundled, 4.7.8)
+
+AutoDetected: Version = (Bundled, 4.7.8), Status = Ok
+LocalDotnetTool: Version = (LocalDotnetTool, ), Status = SelectedButNotFound
+Bundled: Version = (Bundled, 4.7.8), Status = Ok
+
+Notifications:
+
+----------------------------------------------------
+Title: Unable to use specified Fantomas version
+Body: dotnet-tools.json file not found in the solution directory.<br><b>Falling back to the bundled formatter.</b>
+Actions: Settings
+----------------------------------------------------
+        
