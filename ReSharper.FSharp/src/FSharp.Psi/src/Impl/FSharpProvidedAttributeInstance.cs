@@ -11,6 +11,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
+  //TODO: support array and typeof args 
   internal class FSharpProvidedAttributeInstance : IAttributeInstance
   {
     private readonly RdCustomAttributeData myData;
@@ -45,8 +46,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public IEnumerable<Pair<string, AttributeValue>> NamedParameters() => myData.NamedArguments
       .Select(t => new Pair<string, AttributeValue>(t.MemberName, ConvertToAttributeValue(t.TypedValue)));
 
-    public IConstructor Constructor => myConstructor ??= GetAttributeType().GetTypeElement()?.Constructors
-      .FirstOrDefault(t =>
+    public IConstructor Constructor => myConstructor ??= 
+      GetAttributeType().GetTypeElement()?.Constructors.FirstOrDefault(t =>
       {
         var signature = t.GetSignature(EmptySubstitution.INSTANCE);
         if (signature.ParametersCount != PositionParameterCount) return false;
