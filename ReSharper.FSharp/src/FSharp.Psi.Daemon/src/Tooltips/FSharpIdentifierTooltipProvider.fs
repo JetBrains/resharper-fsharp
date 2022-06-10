@@ -91,7 +91,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                             |> richTextJoin "\n\n"
 
                         let body =
-                            [ match xmlDocService.GetXmlDoc(overload.XmlDoc, false) with
+                            [ match xmlDocService.GetXmlDoc(overload.XmlDoc) with
                               | null -> ()
                               | xmlDocText -> yield xmlDocText.RichText
 

@@ -58,30 +58,37 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
                 Some index
             | _ -> None)
 
-    [<CanBeNull>]
-    member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc, summaryOnly) =
+    let getXmlNode fsXmlDoc =
         let xmlNode =
             match fsXmlDoc with
             | FSharpXmlDoc.FromXmlText(xmlDoc) ->
                 let xmlDocument = XmlDocument()
                 try
                     xmlDocument.LoadXml("<root>" + xmlDoc.GetXmlText() + "</root>")
-                    xmlDocument.SelectSingleNode("root")
+                    ValueSome(xmlDocument.SelectSingleNode("root"))
                 with e ->
                     xmlDocument.LoadXml("<summary>" + e.Message + "</summary>")
-                    xmlDocument :> _
+                    ValueSome(xmlDocument)
 
             | FSharpXmlDoc.FromXmlFile (dllFile, memberName) ->
                 getIndex dllFile
-                |> Option.map (fun index -> index.GetXml(memberName) |> fst)
-                |> Option.defaultValue null
+                |> ValueOption.OfOption
+                |> ValueOption.map (fun index -> index.GetXml(memberName) |> fst)
 
-            | FSharpXmlDoc.None -> null
+            | FSharpXmlDoc.None -> ValueNone
 
-        if isNull xmlNode || xmlNode.InnerText.IsNullOrWhitespace() then null else
+        xmlNode |> ValueOption.filter(fun x -> not (x.InnerText.IsNullOrWhitespace()))
 
-        if summaryOnly then
-            let summary = XMLDocUtil.ExtractSummary(xmlNode)
-            XmlDocRichTextPresenter.Run(summary, false, FSharpLanguage.Instance)
-        else
-            xmlNode |> formatXmlDoc |> RichTextBlock
+    [<CanBeNull>]
+    member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc) =
+        getXmlNode fsXmlDoc
+        |> ValueOption.map formatXmlDoc
+        |> ValueOption.map RichTextBlock
+        |> ValueOption.toObj
+
+    [<CanBeNull>]
+    member x.GetXmlDocSummary(fsXmlDoc: FSharpXmlDoc) =
+        getXmlNode fsXmlDoc
+        |> ValueOption.map XMLDocUtil.ExtractSummary
+        |> ValueOption.map (fun x -> XmlDocRichTextPresenter.Run(x, false, FSharpLanguage.Instance))
+        |> ValueOption.toObj
