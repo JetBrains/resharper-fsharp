@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -15,28 +14,26 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public abstract class FSharpProvidedMember<T> : FSharpGeneratedMemberBase, IOverridableMember,
-    ISecondaryDeclaredElement where T : ProvidedMemberInfo
+  public abstract class FSharpGenerativeProvidedElement<T> : FSharpGeneratedMemberBase
+    where T : IProvidedCustomAttributeProvider
   {
-    private readonly ITypeElement myContainingType;
-    private IClrDeclaredElement myOriginElement;
-    protected T Info { get; }
+    protected readonly ITypeElement ContainingTypeElement;
 
-    protected FSharpProvidedMember(T info, ITypeElement containingType)
+    protected FSharpGenerativeProvidedElement(T info, ITypeElement containingTypeElement)
     {
-      myContainingType = containingType;
+      ContainingTypeElement = containingTypeElement;
       Info = info;
-      Module = containingType.Module;
     }
 
-    public override XmlNode GetXMLDoc(bool inherit) => Info.GetXmlDoc(this);
-    public override IPsiModule Module { get; }
+    protected T Info { get; }
+    public override IPsiModule Module => ContainingTypeElement.Module;
     public override string XMLDocId => XMLDocUtil.GetTypeMemberXmlDocId(this, ShortName);
-    public override ITypeElement GetContainingType() => myContainingType;
-    public override ITypeMember GetContainingTypeMember() => ContainingType as ITypeMember;
-    public override string ShortName => Info.Name;
-    protected override IClrDeclaredElement ContainingElement => myContainingType;
+    public abstract override string ShortName { get; }
+    protected override IClrDeclaredElement ContainingElement => ContainingTypeElement;
     public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
+    public override XmlNode GetXMLDoc(bool inherit) => Info.GetXmlDoc(this);
+    public override ITypeMember GetContainingTypeMember() => ContainingType as ITypeMember;
+    public override ITypeElement GetContainingType() => ContainingTypeElement;
 
     public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) =>
       Info?.GetAttributeConstructorArgs(null, clrName.FullName) != null;
@@ -49,17 +46,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName,
       AttributesSource attributesSource) =>
       GetAttributeInstances(attributesSource).Where(t => t.GetClrName().Equals(clrName)).ToList();
+  }
 
+
+  public abstract class FSharpGenerativeProvidedMember<T> : FSharpGenerativeProvidedElement<T>, IOverridableMember,
+    ISecondaryDeclaredElement where T : ProvidedMemberInfo
+  {
+    private IClrDeclaredElement myOriginElement;
+
+    protected FSharpGenerativeProvidedMember(T info, ITypeElement containingType) : base(info, containingType)
+    {
+    }
+
+    public override string ShortName => Info.Name;
     public IClrDeclaredElement OriginElement => myOriginElement ??= GetOriginElement();
     public bool IsReadOnly => true;
 
     private IClrDeclaredElement GetOriginElement()
     {
-      var declaringType = Info.DeclaringType;
-      while (declaringType.DeclaringType != null)
-        declaringType = declaringType.DeclaringType;
+      var containingType = ContainingTypeElement;
+      while (containingType is FSharpGenerativeProvidedNestedClass)
+        containingType = containingType.GetContainingType();
 
-      return declaringType.MapType(Module).GetTypeElement().NotNull();
+      return containingType;
     }
   }
 }

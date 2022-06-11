@@ -17,17 +17,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     private readonly ConcurrentQueue<(IPsiModule module, string clrName)> myQueueToInvalidate = new();
 
+    //TODO: comment
     private void Invalidate()
     {
       while (myQueueToInvalidate.TryDequeue(out var itemToInvalidate) &&
-             myCache.TryGetValue(itemToInvalidate.module, out var typesGroup) &&
-             typesGroup.TryGetValue(itemToInvalidate.clrName, out var type))
+             myCache.TryGetValue(itemToInvalidate.module, out var moduleGenerativeTypes) &&
+             moduleGenerativeTypes.TryGetValue(itemToInvalidate.clrName, out var type))
       {
         var (generativeTypesToIlTypeRefsMap, _) = type.Context.GetDictionaries();
         foreach (var ilTypeRef in generativeTypesToIlTypeRefsMap.Values)
-          typesGroup.TryRemove(ilTypeRef.BasicQualifiedName, out _);
+          moduleGenerativeTypes.TryRemove(ilTypeRef.BasicQualifiedName, out _);
 
-        if (typesGroup.Count == 0) myCache.TryRemove(itemToInvalidate.module, out _);
+        if (moduleGenerativeTypes.Count == 0) myCache.TryRemove(itemToInvalidate.module, out _);
       }
     }
 
@@ -35,14 +36,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     {
       Invalidate();
 
-      var module = type.TypeProvider.ProjectModule.NotNull();
-      if (!myCache.TryGetValue(module, out var typesGroup))
+      var module = type.TypeProvider.PsiModule.NotNull();
+      if (!myCache.TryGetValue(module, out var moduleTypes))
       {
-        typesGroup = new ConcurrentDictionary<string, ProxyProvidedTypeWithContext>();
-        myCache[module] = typesGroup;
+        moduleTypes = new ConcurrentDictionary<string, ProxyProvidedTypeWithContext>();
+        myCache[module] = moduleTypes;
       }
 
-      typesGroup[type.GetClrName().FullName] = type;
+      moduleTypes[type.GetClrName().FullName] = type;
     }
 
     public bool TryGet(IPsiModule module, IClrTypeName clrName, out ProxyProvidedTypeWithContext providedType)
@@ -57,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     public void Remove(IProxyTypeProvider typeProvider)
     {
-      var (module, tpId) = (typeProvider.ProjectModule.NotNull(), typeProvider.EntityId);
+      var (module, tpId) = (typeProvider.PsiModule.NotNull(), typeProvider.EntityId);
       if (myCache.TryGetValue(module, out var typesGroup))
       {
         typesGroup.RemoveAll(t => t.Value.EntityId == tpId);

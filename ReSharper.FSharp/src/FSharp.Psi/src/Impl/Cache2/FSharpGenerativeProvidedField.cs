@@ -4,9 +4,9 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpProvidedField : FSharpProvidedMember<ProvidedFieldInfo>, IField
+  public class FSharpGenerativeProvidedField : FSharpGenerativeProvidedMember<ProvidedFieldInfo>, IField
   {
-    public FSharpProvidedField(ProvidedFieldInfo info, ITypeElement containingType) : base(info, containingType)
+    public FSharpGenerativeProvidedField(ProvidedFieldInfo info, ITypeElement containingType) : base(info, containingType)
     {
     }
 
@@ -14,6 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public IType Type => Info.FieldType.MapType(Module);
 
+    //TODO: check for enum/array?
     public ConstantValue ConstantValue =>
       IsConstant ? new ConstantValue(Info.GetRawConstantValue(), Type) : ConstantValue.BAD_VALUE;
 
