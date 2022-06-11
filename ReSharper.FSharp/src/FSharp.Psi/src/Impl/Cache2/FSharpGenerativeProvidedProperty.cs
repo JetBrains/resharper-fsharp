@@ -11,9 +11,10 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpProvidedProperty : FSharpProvidedMember<ProvidedPropertyInfo>, IProperty
+  public class FSharpGenerativeProvidedProperty : FSharpGenerativeProvidedMember<ProvidedPropertyInfo>, IProperty
   {
-    public FSharpProvidedProperty(ProvidedPropertyInfo info, ITypeElement containingType) : base(info, containingType)
+    public FSharpGenerativeProvidedProperty(ProvidedPropertyInfo info, ITypeElement containingType) : base(info,
+      containingType)
     {
     }
 
@@ -26,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public IList<IParameter> Parameters => Info
       .GetIndexParameters()
-      .Select(t => (IParameter)new FSharpProvidedParameter(t, this))
+      .Select(t => (IParameter)new FSharpGenerativeProvidedParameter(t, this))
       .ToList();
 
     public IType Type => Info.PropertyType.MapType(Module);

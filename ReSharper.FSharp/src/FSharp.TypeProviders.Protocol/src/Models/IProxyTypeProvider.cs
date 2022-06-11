@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     string GetDisplayName(bool fullName);
     
     /// Can be null if type provider instantiated from F# script 
-    [CanBeNull] IPsiModule ProjectModule { get; }
+    [CanBeNull] IPsiModule PsiModule { get; }
 
     /// Before the proxy type provider receives the invalidation signal,
     /// the out-of-process caches and type provider will already be invalidated

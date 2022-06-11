@@ -1,4 +1,3 @@
-using System.Xml;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Psi;
@@ -6,29 +5,25 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpProvidedParameter : FSharpProvidedMember<ProvidedMemberInfo>, IParameter
+  public class FSharpGenerativeProvidedParameter : FSharpGenerativeProvidedElement<ProvidedParameterInfo>, IParameter
   {
-    private readonly ProvidedParameterInfo myInfo;
-
-    public FSharpProvidedParameter(ProvidedParameterInfo info, IParametersOwner method)
-      : base(null, method.GetContainingType())
+    public FSharpGenerativeProvidedParameter(ProvidedParameterInfo info, IParametersOwner method)
+      : base(info, method.GetContainingType())
     {
-      myInfo = info;
       ContainingParametersOwner = method;
     }
 
-    public new XmlNode GetXMLDoc(bool inherit) => myInfo.GetXmlDoc(this);
-    public override string ShortName => myInfo.Name;
+    public override string ShortName => Info.Name;
     public override DeclaredElementType GetElementType() => CLRDeclaredElementType.PARAMETER;
-    public IType Type => myInfo.ParameterType.MapType(Module);
+    public IType Type => Info.ParameterType.MapType(Module);
 
     public DefaultValue GetDefaultValue() =>
-      myInfo.HasDefaultValue
-        ? new DefaultValue(Type, new ConstantValue(myInfo.RawDefaultValue, type: Type))
+      Info.HasDefaultValue
+        ? new DefaultValue(Type, new ConstantValue(Info.RawDefaultValue, type: Type))
         : DefaultValue.BAD_VALUE;
 
     public ParameterKind Kind =>
-      myInfo switch
+      Info switch
       {
         { IsIn: true } => ParameterKind.INPUT,
         { IsOut: true } => ParameterKind.OUTPUT,
@@ -36,11 +31,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       };
 
     public bool IsParameterArray =>
-      myInfo is ProxyProvidedParameterInfoWithContext x &&
+      Info is ProxyProvidedParameterInfoWithContext x &&
       x.GetAttributeConstructorArgs(null, "System.ParamArrayAttribute") != null;
 
     public bool IsValueVariable => false;
-    public bool IsOptional => myInfo.IsOptional;
+    public bool IsOptional => Info.IsOptional;
     public bool IsVarArg => false;
     public IParametersOwner ContainingParametersOwner { get; }
   }

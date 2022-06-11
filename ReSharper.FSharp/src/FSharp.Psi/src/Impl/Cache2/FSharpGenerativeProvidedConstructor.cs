@@ -6,9 +6,9 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpProvidedConstructor : FSharpProvidedMethodBase<ProvidedConstructorInfo>, IConstructor
+  public class FSharpGenerativeProvidedConstructor : FSharpGenerativeProvidedMethodBase<ProvidedConstructorInfo>, IConstructor
   {
-    public FSharpProvidedConstructor(ProvidedConstructorInfo info, [NotNull] ITypeElement containingType)
+    public FSharpGenerativeProvidedConstructor(ProvidedConstructorInfo info, [NotNull] ITypeElement containingType)
       : base(info, containingType)
     {
     }

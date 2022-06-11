@@ -44,11 +44,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       NamedParameters().SingleOrDefault(t => t.First == name).Second ?? AttributeValue.BAD_VALUE;
 
     public IEnumerable<Pair<string, AttributeValue>> NamedParameters() => myData.NamedArguments
-      .Select(t => new Pair<string, AttributeValue>(t.MemberName, ConvertToAttributeValue(t.TypedValue)));
+      .Select(t => Pair.Of(t.MemberName, ConvertToAttributeValue(t.TypedValue)));
 
     public IConstructor Constructor => myConstructor ??= 
       GetAttributeType().GetTypeElement()?.Constructors.FirstOrDefault(t =>
       {
+        // TODO: check generic attributes
         var signature = t.GetSignature(EmptySubstitution.INSTANCE);
         if (signature.ParametersCount != PositionParameterCount) return false;
 

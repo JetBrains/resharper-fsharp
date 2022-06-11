@@ -183,9 +183,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return TypeFactory.CreateUnknownType(module);
       }
 
-      if (proxyProvidedType.IsCreatedByProvider && providedType.DeclaringType is { } declaringType)
-        return TypeFactory.CreateType(new FSharpProvidedNestedClass(providedType, module,
-          declaringType.MapType(module).GetTypeElement()));
+      if (proxyProvidedType.IsCreatedByProvider &&
+          providedType.DeclaringType is ProxyProvidedTypeWithContext declaringType)
+      {
+        var declaringTypeIType = declaringType.MapType(module);
+
+        if (declaringTypeIType.GetTypeElement() is { } x)
+          return TypeFactory.CreateType(new FSharpGenerativeProvidedNestedClass(providedType, module, x));
+
+        var recoveredTypeElement = module
+          .GetSymbolScope(false)
+          .GetTypeElementsByCLRName(declaringType.GetClrName())
+          .FirstOrDefault(t => t is FSharpClassOrProvidedTypeAbbreviation { IsProvidedAndGenerated: true });
+
+        Assertion.AssertNotNull(recoveredTypeElement,
+          "SymbolScope must contain provided and generated FSharpClassOrProvidedTypeAbbreviation ");
+
+        return TypeFactory.CreateType(
+          new FSharpGenerativeProvidedNestedClass(providedType, module, recoveredTypeElement));
+      }
 
       if (providedType.IsArray)
         return TypeFactory.CreateArrayType(providedType.GetElementType().MapType(module), providedType.GetArrayRank(),

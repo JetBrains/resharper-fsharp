@@ -5,9 +5,9 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpProvidedEvent : FSharpProvidedMember<ProvidedEventInfo>, IEvent
+  public class FSharpGenerativeProvidedEvent : FSharpGenerativeProvidedMember<ProvidedEventInfo>, IEvent
   {
-    public FSharpProvidedEvent(ProvidedEventInfo info, ITypeElement containingType) : base(info, containingType)
+    public FSharpGenerativeProvidedEvent(ProvidedEventInfo info, ITypeElement containingType) : base(info, containingType)
     {
     }
 

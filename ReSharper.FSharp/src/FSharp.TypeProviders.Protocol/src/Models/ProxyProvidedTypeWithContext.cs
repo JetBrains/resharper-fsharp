@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       myProvidedType = providedType;
 
       var type = context.TryGetILTypeRef(providedType);
-      if (type != null && ProxyProvidedType.TypeProvider.ProjectModule != null)
+      if (type != null && ProxyProvidedType.TypeProvider.PsiModule != null)
         ProxyProvidedType.TypeProvidersContext.ProvidedAbbreviations.AddOrUpdate(this);
     }
 
