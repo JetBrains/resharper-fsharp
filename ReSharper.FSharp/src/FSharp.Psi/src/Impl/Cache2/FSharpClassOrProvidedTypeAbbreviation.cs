@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   public class FSharpClassOrProvidedTypeAbbreviation : FSharpClass
   {
     // Triggers FCS resolve
-    private GenerativeMembersConverter<FSharpClassOrProvidedTypeAbbreviation> Class =>
+    private GenerativeMembersConverter<FSharpClassOrProvidedTypeAbbreviation> ProvidedClass =>
       IsProvidedAndGenerated &&
       ProvidedTypesResolveUtil.TryGetProvidedType(Module, GetClrName(), out var type)
         ? new GenerativeMembersConverter<FSharpClassOrProvidedTypeAbbreviation>(type, this)
@@ -23,38 +23,38 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
 
     public override MemberPresenceFlag GetMemberPresenceFlag() =>
-      Class is { } x ? x.GetMemberPresenceFlag() : base.GetMemberPresenceFlag();
+      ProvidedClass is { } x ? x.GetMemberPresenceFlag() : base.GetMemberPresenceFlag();
 
-    public override IClass GetSuperClass() => Class is { } x ? x.GetSuperClass() : base.GetSuperClass();
+    public override IClass GetSuperClass() => ProvidedClass is { } x ? x.GetSuperClass() : base.GetSuperClass();
 
     public override IList<ITypeElement> GetSuperTypeElements() =>
-      Class is { } x ? x.GetSuperTypeElements() : base.GetSuperTypeElements();
+      ProvidedClass is { } x ? x.GetSuperTypeElements() : base.GetSuperTypeElements();
 
     public override IEnumerable<ITypeMember> GetMembers() =>
-      Class is { } x ? x.GetMembers() : base.GetMembers();
+      ProvidedClass is { } x ? x.GetMembers() : base.GetMembers();
 
-    public override IList<ITypeElement> NestedTypes => Class is { } x ? x.NestedTypes : base.NestedTypes;
+    public override IList<ITypeElement> NestedTypes => ProvidedClass is { } x ? x.NestedTypes : base.NestedTypes;
 
     public override IList<ITypeParameter> AllTypeParameters =>
-      Class is { } x ? x.AllTypeParameters : base.AllTypeParameters;
+      ProvidedClass is { } x ? x.AllTypeParameters : base.AllTypeParameters;
 
     public override bool HasMemberWithName(string shortName, bool ignoreCase) =>
-      Class is { } x
+      ProvidedClass is { } x
         ? x.HasMemberWithName(shortName, ignoreCase)
         : base.HasMemberWithName(shortName, ignoreCase);
 
     public override IEnumerable<IConstructor> Constructors =>
-      Class is { } x ? x.Constructors : base.Constructors;
+      ProvidedClass is { } x ? x.Constructors : base.Constructors;
 
-    public override IEnumerable<IOperator> Operators => Class is { } x ? x.Operators : base.Operators;
-    public override IEnumerable<IMethod> Methods => Class is { } x ? x.Methods : base.Methods;
-    public override IEnumerable<IProperty> Properties => Class is { } x ? x.Properties : base.Properties;
-    public override IEnumerable<IEvent> Events => Class is { } x ? x.Events : base.Events;
-    public override IEnumerable<string> MemberNames => Class is { } x ? x.MemberNames : base.MemberNames;
-    public override IEnumerable<IField> Constants => Class is { } x ? x.Constants : base.Constants;
-    public override IEnumerable<IField> Fields => Class is { } x ? x.Fields : base.Fields;
+    public override IEnumerable<IOperator> Operators => ProvidedClass is { } x ? x.Operators : base.Operators;
+    public override IEnumerable<IMethod> Methods => ProvidedClass is { } x ? x.Methods : base.Methods;
+    public override IEnumerable<IProperty> Properties => ProvidedClass is { } x ? x.Properties : base.Properties;
+    public override IEnumerable<IEvent> Events => ProvidedClass is { } x ? x.Events : base.Events;
+    public override IEnumerable<string> MemberNames => ProvidedClass is { } x ? x.MemberNames : base.MemberNames;
+    public override IEnumerable<IField> Constants => ProvidedClass is { } x ? x.Constants : base.Constants;
+    public override IEnumerable<IField> Fields => ProvidedClass is { } x ? x.Fields : base.Fields;
 
     public override XmlNode GetXMLDoc(bool inherit) =>
-      Class is { } x ? x.GetXmlDoc() : base.GetXMLDoc(inherit);
+      ProvidedClass is { } x ? x.GetXmlDoc() : base.GetXMLDoc(inherit);
   }
 }
