@@ -11,12 +11,12 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpProvidedTypeElement<T> where T : ITypeMember, IFSharpTypeElement
+  public class GenerativeMembersConverter<T> where T : ITypeMember, IFSharpTypeElement
   {
     private ProvidedType Type { get; }
     private T TypeElement { get; }
 
-    public FSharpProvidedTypeElement(ProvidedType type, [NotNull] T typeElement)
+    public GenerativeMembersConverter(ProvidedType type, [NotNull] T typeElement)
     {
       Type = type;
       TypeElement = typeElement;
@@ -30,22 +30,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public IEnumerable<IConstructor> Constructors => Type
       .GetConstructors()
-      .Select(t => new FSharpProvidedConstructor(t, TypeElement));
+      .Select(t => new FSharpGenerativeProvidedConstructor(t, TypeElement));
 
     public IEnumerable<IMethod> Methods => myMethods ??=
-      FilterMethods(Type.GetMethods().Select(t => new FSharpProvidedMethod(t, TypeElement))).ToList();
+      FilterMethods(Type.GetMethods().Select(t => new FSharpGenerativeGenerativeProvidedMethod(t, TypeElement))).ToList();
 
     public IEnumerable<IProperty> Properties => Type
       .GetProperties()
-      .Select(t => new FSharpProvidedProperty(t, TypeElement));
+      .Select(t => new FSharpGenerativeProvidedProperty(t, TypeElement));
 
     public IEnumerable<IEvent> Events => Type
       .GetEvents()
-      .Select(t => new FSharpProvidedEvent(t, TypeElement));
+      .Select(t => new FSharpGenerativeProvidedEvent(t, TypeElement));
 
     public IList<ITypeElement> NestedTypes => Type
       .GetNestedTypes()
-      .Select(t => (ITypeElement)new FSharpProvidedNestedClass(t, TypeElement.Module, TypeElement))
+      .Select(t => (ITypeElement)new FSharpGenerativeProvidedNestedClass(t, TypeElement.Module, TypeElement))
       .ToList();
 
     public IEnumerable<ITypeMember> GetMembers() =>
@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public IEnumerable<IField> Fields =>
       Type.GetFields()
-        .Select(t => new FSharpProvidedField(t, TypeElement))
+        .Select(t => new FSharpGenerativeProvidedField(t, TypeElement))
         .ToList();
 
     public IList<IDeclaredType> GetSuperTypes() => CalculateSuperTypes().ToList();
