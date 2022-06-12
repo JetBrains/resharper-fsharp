@@ -3,4 +3,4 @@
 open SwaggerProvider
 open SwaggerCrossLanguage.Literals
 
-type Renamed = OpenApiClientProvider<Schema>
+type PetStore1 = OpenApiClientProvider<Schema>

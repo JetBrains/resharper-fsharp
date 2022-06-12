@@ -1,0 +1,7 @@
+module SwaggerProviderLibrary3
+
+open SwaggerProvider
+open SwaggerCrossLanguage.Literals
+
+type <caret>PetStore = OpenApiClientProvider<Schema>
+type PetStore = int

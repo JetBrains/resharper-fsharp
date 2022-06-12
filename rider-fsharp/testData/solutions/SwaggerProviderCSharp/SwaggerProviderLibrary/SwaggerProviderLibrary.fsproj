@@ -8,6 +8,10 @@
     <ItemGroup>
         <Compile Include="Literals.fs" />
         <Compile Include="SwaggerProvider.fs" />
+        <Compile Include="SwaggerProvider1.fsi" />
+        <Compile Include="SwaggerProvider1.fs" />
+        <Compile Include="SwaggerProvider2.fs" />
+        <Compile Include="SwaggerProvider3.fs" />
     </ItemGroup>
 
     <ItemGroup>

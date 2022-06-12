@@ -6,7 +6,7 @@ public class Class
 {
     public void Main()
     {
-        var client = new Ren<caret>amed.Client();
+        var client = new Pet<caret>Store1.Client();
         var a = client.ApiCoursesGet().Result;
     }
 }
