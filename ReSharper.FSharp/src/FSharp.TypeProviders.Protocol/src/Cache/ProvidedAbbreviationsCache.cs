@@ -61,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
       var (module, tpId) = (typeProvider.PsiModule.NotNull(), typeProvider.EntityId);
       if (myCache.TryGetValue(module, out var typesGroup))
       {
-        typesGroup.RemoveAll(t => t.Value.EntityId == tpId);
+        typesGroup.RemoveAll(t => t.Value.TypeProvider.EntityId == tpId);
         if (typesGroup.Count == 0) myCache.TryRemove(module, out _);
       }
     }
