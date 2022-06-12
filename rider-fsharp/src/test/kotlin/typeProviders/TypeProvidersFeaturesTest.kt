@@ -24,17 +24,23 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
     override fun getSolutionDirectoryName() = "SwaggerProviderCSharp"
     override val restoreNuGetPackages = true
 
-    //TODO: with signature files, wrong abbreviation
-
+    @Test
+    fun `signature file navigation`() = doNavigationTest("SwaggerProvider1.fsi")
 
     @Test
-    fun `provided member navigation`() = doNavigationTest()
+    fun `provided member navigation`() = doNavigationTest("SwaggerProvider.fs")
+
+    @Test
+    fun `provided abbreviation navigation`() = doNavigationTest("SwaggerProvider.fs")
+
+    @Test
+    fun `provided nested type navigation`() = doNavigationTest("SwaggerProvider.fs")
 
     @Test
     fun `provided abbreviation navigation`() = doNavigationTest()
 
     @Test
-    fun `provided nested type navigation`() = doNavigationTest()
+    fun `multiply different abbreviation type parts - after`() = doNavigationTest("SwaggerProvider3.fs")
 
     @Test
     fun `provided member rename disabled`() = doRenameUnavailableTest()
@@ -46,7 +52,7 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
     fun `provided abbreviation rename`() {
         withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
             waitForDaemon()
-            defaultRefactoringRename("Renamed")
+            defaultRefactoringRename("PetStore1")
             waitForNextDaemon()
             markupAdapter.hasErrors.shouldBeFalse()
             executeWithGold(File(testGoldFile.path + " - csharp")) {
@@ -63,11 +69,11 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
         }
     }
 
-    private fun doNavigationTest() {
+    private fun doNavigationTest(declarationFileName: String) {
         withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
             waitForDaemon()
             gotoDeclaration {
-                waitForEditorSwitch("SwaggerProvider.fs")
+                waitForEditorSwitch(declarationFileName)
                 waitForDaemon()
                 executeWithGold(testGoldFile) {
                     dumpOpenedDocument(it, project!!, true)
