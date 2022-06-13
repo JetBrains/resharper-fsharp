@@ -73,11 +73,14 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
             | FSharpXmlDoc.FromXmlFile (dllFile, memberName) ->
                 getIndex dllFile
                 |> ValueOption.OfOption
-                |> ValueOption.map (fun index -> index.GetXml(memberName) |> fst)
+                |> ValueOption.bind (fun index ->
+                    index.GetXml(memberName)
+                    |> fst
+                    |> ValueOption.ofObj)
 
             | FSharpXmlDoc.None -> ValueNone
 
-        xmlNode |> ValueOption.filter(fun x -> not (x.InnerText.IsNullOrWhitespace()))
+        xmlNode |> ValueOption.filter (fun x -> not (x.InnerText.IsNullOrWhitespace()))
 
     [<CanBeNull>]
     member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc) =
