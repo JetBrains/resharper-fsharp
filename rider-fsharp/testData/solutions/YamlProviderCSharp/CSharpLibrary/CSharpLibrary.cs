@@ -15,6 +15,9 @@ namespace CSharpLib
 
             funcWithNestedProvidedType(new GeneratedConfig.Level1_Type());
             funcWithNestedProvidedTypeArray(new[] { new GeneratedConfig.Level1_Type() });
+            F(new GeneratedConfig.Level1_Type());
         }
+
+        private static void F<T>(T x) where T : new() {}
     }
 }
