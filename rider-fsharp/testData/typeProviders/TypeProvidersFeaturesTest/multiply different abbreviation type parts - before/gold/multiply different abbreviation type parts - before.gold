@@ -1,0 +1,9 @@
+Making dump the current popup...
+---------------------------------
+Main popup
+popup layout kind: EditorLayouter
+#0 text:"PetStore  (in SwaggerProviderLibrary2)"; optText:"SwaggerProviderLibrary"; attributes=[enabled,closeOnExecute,]
+#1 text:"PetStore  (in SwaggerProviderLibrary2)"; optText:"SwaggerProviderLibrary"; attributes=[enabled,closeOnExecute,]
+selection: #0 text:"PetStore  (in SwaggerProviderLibrary2)"; optText:"SwaggerProviderLibrary"; attributes=[enabled,closeOnExecute,]
+QuickSearch: not active
+---------------------------------
