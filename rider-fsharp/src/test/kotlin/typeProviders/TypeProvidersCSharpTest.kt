@@ -2,7 +2,10 @@ package typeProviders
 
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rdclient.testFramework.waitForNextDaemon
+import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
@@ -60,6 +63,27 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
 
             executeWithGold(File(testGoldFile.path + "_after")) {
                 dumpSevereHighlighters(it)
+            }
+        }
+    }
+
+    @Test
+    fun `provided abbreviation rename`() {
+        withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
+            waitForDaemon()
+            defaultRefactoringRename("Renamed")
+            waitForNextDaemon()
+            markupAdapter.hasErrors.shouldBeFalse()
+            executeWithGold(File(testGoldFile.path + " - csharp")) {
+                dumpOpenedDocument(it, project!!)
+            }
+        }
+
+        withOpenedEditor("YamlProviderLibrary/Library.fs") {
+            waitForDaemon()
+            markupAdapter.hasErrors.shouldBeFalse()
+            executeWithGold(File(testGoldFile.path + " - fsharp")) {
+                dumpOpenedDocument(it, project!!)
             }
         }
     }
