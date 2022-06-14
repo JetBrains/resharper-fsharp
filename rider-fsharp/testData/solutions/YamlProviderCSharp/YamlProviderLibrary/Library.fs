@@ -2,7 +2,7 @@
 
 open FSharp.Configuration
 
-type GeneratedConfig = YamlConfig<YamlText = """ 
+type GeneratedConfig = YamlConfig<YamlText = """
 Level1:
   Level12:
     Level13:
@@ -16,14 +16,6 @@ Level2:
   Level21: 2""">
 
 let configInstance = GeneratedConfig()
-  
-let funcWithNestedProvidedType (x: GeneratedConfig.Level1_Type) = () 
-let funcWithNestedProvidedTypeArray (x: GeneratedConfig.Level1_Type[]) = () 
 
-
-
-
-
-
-
-
+let funcWithNestedProvidedType (x: GeneratedConfig.Level1_Type) = ()
+let funcWithNestedProvidedTypeArray (x: GeneratedConfig.Level1_Type[]) = ()
