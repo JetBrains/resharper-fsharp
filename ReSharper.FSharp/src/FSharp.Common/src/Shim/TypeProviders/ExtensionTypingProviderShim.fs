@@ -35,6 +35,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
     let lifetime = solution.GetLifetime()
     let defaultShim = ExtensionTypingProvider
     let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
+    let generativeTypeProvidersInMemoryAnalysis = experimentalFeatures.GenerativeTypeProvidersInMemoryAnalysis
     let createProcessLockObj = obj()
 
     let [<VolatileField>] mutable connection: TypeProvidersConnection = null
@@ -56,7 +57,8 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
             typeProvidersHostLifetime <- Lifetime.Define(lifetime)
             let isInternalMode = productConfigurations.IsInternalMode()
             let newConnection = typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime, isInternalMode).Run()
-            typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, scriptPsiModulesProvider, outputAssemblies) :?> _
+            typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, scriptPsiModulesProvider,
+                                                         outputAssemblies, generativeTypeProvidersInMemoryAnalysis.Value) :?> _
             connection <- newConnection)
 
     do
@@ -64,8 +66,11 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
             fun () -> ExtensionTypingProvider <- defaultShim)
 
         toolset.Changed.Advise(lifetime, fun _ -> terminateConnection ())
+
         outOfProcess.Change.Advise(lifetime, fun enabled ->
             if enabled.HasNew && not enabled.New then terminateConnection ())
+
+        generativeTypeProvidersInMemoryAnalysis.Change.Advise(lifetime, fun _ -> terminateConnection ())
 
     interface IProxyExtensionTypingProvider with
         member this.InstantiateTypeProvidersOfAssembly(runTimeAssemblyFileName: string,

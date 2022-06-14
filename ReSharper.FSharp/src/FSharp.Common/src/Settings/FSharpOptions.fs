@@ -80,6 +80,7 @@ module FSharpExperimentalFeatures =
     let [<Literal>] formatter = "Enable F# code formatter"
     let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor"
     let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process"
+    let [<Literal>] generativeTypeProvidersInMemoryAnalysis = "Analyze F# generative type providers in C#/VB projects without build"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
@@ -97,7 +98,10 @@ type FSharpExperimentalFeatures =
       mutable FsiInteractiveEditor: bool
 
       [<SettingsEntry(true, FSharpExperimentalFeatures.outOfProcessTypeProviders)>]
-      mutable OutOfProcessTypeProviders: bool }
+      mutable OutOfProcessTypeProviders: bool
+
+      [<SettingsEntry(true, FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis); DefaultValue>]
+      mutable GenerativeTypeProvidersInMemoryAnalysis: bool }
 
 
 [<AllowNullLiteral>]
@@ -132,6 +136,7 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSc
     member val RedundantParensAnalysis = base.GetValueProperty<bool>("RedundantParensAnalysis")
     member val Formatter = base.GetValueProperty<bool>("Formatter")
     member val OutOfProcessTypeProviders = base.GetValueProperty<bool>("OutOfProcessTypeProviders")
+    member val GenerativeTypeProvidersInMemoryAnalysis = base.GetValueProperty<bool>("GenerativeTypeProvidersInMemoryAnalysis")
 
 
 [<SolutionInstanceComponent>]
@@ -192,6 +197,9 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         this.AddBoolOptionWithComment((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
         this.AddBoolOptionWithComment((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Solution reload required") |> ignore
 
+        this.AddHeader("Experimental features options")
+        this.AddBoolOptionWithComment((fun key -> key.GenerativeTypeProvidersInMemoryAnalysis), FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis, "Solution reload required") |> ignore
+        
         if configurations.IsInternalMode() then
             this.AddHeader("Experimental features")
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
