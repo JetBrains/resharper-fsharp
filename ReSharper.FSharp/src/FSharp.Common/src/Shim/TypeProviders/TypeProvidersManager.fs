@@ -90,10 +90,10 @@ type IProxyTypeProvidersManager =
 
 type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvider: IFcsProjectProvider,
                           scriptPsiModulesProvider: FSharpScriptPsiModulesProvider,
-                          outputAssemblies: OutputAssemblies) =
+                          outputAssemblies: OutputAssemblies, enableGenerativeTypeProvidersInMemoryAnalysis) =
     let protocol = connection.ProtocolModel.RdTypeProviderProcessModel
     let lifetime = connection.Lifetime
-    let tpContext = TypeProvidersContext(connection)
+    let tpContext = TypeProvidersContext(connection, enableGenerativeTypeProvidersInMemoryAnalysis)
     let typeProviders = TypeProvidersCache()
     let lock = SpinWaitLockRef()
     let projectsWithGenerativeProviders = HashSet<IProject>()

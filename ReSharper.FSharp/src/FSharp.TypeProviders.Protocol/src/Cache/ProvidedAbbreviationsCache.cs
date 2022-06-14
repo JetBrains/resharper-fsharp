@@ -10,14 +10,23 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 {
-  public class ProvidedAbbreviationsCache
+  public interface IProvidedAbbreviationsCache
+  {
+    void AddOrUpdate(ProxyProvidedTypeWithContext type);
+    bool TryGet(IPsiModule module, IClrTypeName clrName, out ProxyProvidedTypeWithContext providedType);
+    void MarkAsInvalidated(IPsiModule module, IClrTypeName clrName);
+    void Remove(IProxyTypeProvider typeProvider);
+    string Dump();
+  }
+
+  public class ProvidedAbbreviationsCache : IProvidedAbbreviationsCache
   {
     private readonly ConcurrentDictionary<IPsiModule, ConcurrentDictionary<string, ProxyProvidedTypeWithContext>>
       myCache = new();
 
     private readonly ConcurrentQueue<(IPsiModule module, string clrName)> myQueueToInvalidate = new();
 
-    //TODO: comment
+    //TODO: type provider invalidation does not invalidate myQueueToInvalidate
     private void Invalidate()
     {
       while (myQueueToInvalidate.TryDequeue(out var itemToInvalidate) &&
@@ -71,5 +80,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
         .OrderBy(t => t.Key.ToString())
         .Select(kvp => $"{kvp.Key} = \n\t{kvp.Value.Keys.OrderBy(t => t).Join("\n\t")}")
         .Join("\n"));
+  }
+
+  internal class ProvidedAbbreviationsCacheMock : IProvidedAbbreviationsCache
+  {
+    public void AddOrUpdate(ProxyProvidedTypeWithContext type)
+    {
+    }
+
+    public bool TryGet(IPsiModule module, IClrTypeName clrName, out ProxyProvidedTypeWithContext providedType)
+    {
+      providedType = null;
+      return false;
+    }
+
+    public void MarkAsInvalidated(IPsiModule module, IClrTypeName clrName)
+    {
+    }
+
+    public void Remove(IProxyTypeProvider typeProvider)
+    {
+    }
+
+    public string Dump() => "";
   }
 }

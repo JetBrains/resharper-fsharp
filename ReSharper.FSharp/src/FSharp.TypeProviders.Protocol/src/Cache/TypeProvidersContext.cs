@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 {
   public class TypeProvidersContext
   {
-    public TypeProvidersContext(TypeProvidersConnection connection)
+    public TypeProvidersContext(TypeProvidersConnection connection, bool enableGenerativeTypeProvidersInMemoryAnalysis)
     {
       Connection = connection;
       ProvidedCustomAttributeProvider = new ProvidedCustomAttributeProvider(connection);
@@ -21,6 +21,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
           ProvidedTypeProtocol.ApplyStaticArguments);
       ArrayProvidedTypesCache =
         new DependentProvidedTypesCache<int, MakeArrayTypeArgs>(this, ProvidedTypeProtocol.MakeArrayType);
+
+      ProvidedAbbreviations =
+        enableGenerativeTypeProvidersInMemoryAnalysis
+          ? new ProvidedAbbreviationsCache()
+          : new ProvidedAbbreviationsCacheMock();
     }
 
     public TypeProvidersConnection Connection { get; }
@@ -30,8 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     public DependentProvidedTypesCache<string, ApplyStaticArgumentsParameters> AppliedProvidedTypesCache { get; }
     public DependentProvidedTypesCache<int, MakeArrayTypeArgs> ArrayProvidedTypesCache { get; }
     public IProvidedCustomAttributeProvider ProvidedCustomAttributeProvider { get; }
-    public ProvidedAbbreviationsCache ProvidedAbbreviations { get; } = new();
-
+    public IProvidedAbbreviationsCache ProvidedAbbreviations { get; }
     private RdProvidedTypeProcessModel ProvidedTypeProtocol => Connection.ProtocolModel.RdProvidedTypeProcessModel;
 
     public void Dispose(IProxyTypeProvider typeProvider)
