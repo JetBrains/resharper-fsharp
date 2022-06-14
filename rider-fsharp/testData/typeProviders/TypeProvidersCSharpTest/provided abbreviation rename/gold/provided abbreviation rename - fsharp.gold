@@ -2,7 +2,7 @@
 
 open FSharp.Configuration
 
-type Renamed = YamlConfig<YamlText = """
+type Renamed = YamlConfig<YamlText = """ 
 Level1:
   Level12:
     Level13:
@@ -16,9 +16,9 @@ Level2:
   Level21: 2""">
 
 let configInstance = Renamed()
-
-let funcWithNestedProvidedType (x: Renamed.Level1_Type) = ()
-let funcWithNestedProvidedTypeArray (x: Renamed.Level1_Type[]) = ()
+  
+let funcWithNestedProvidedType (x: Renamed.Level1_Type) = () 
+let funcWithNestedProvidedTypeArray (x: Renamed.Level1_Type[]) = () 
 
 
 
