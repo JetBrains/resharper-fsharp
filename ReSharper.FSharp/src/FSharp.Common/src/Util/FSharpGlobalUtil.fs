@@ -61,6 +61,12 @@ module FSharpFileSystemPathExtensions =
         member this.ToNativeFileSystemPath() =
             VirtualFileSystemPathExtensions.ToNativeFileSystemPath(this)
 
+    type ValueOption<'a> with
+        static member OfOption(option) =
+            match option with
+            | Some x -> ValueSome x
+            | None -> ValueNone
+
 [<Extension; AutoOpen>]
 module DocumentRangeExtensions =
     open JetBrains.DocumentModel
