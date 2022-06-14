@@ -35,7 +35,7 @@ class FSharpHoverDocTest : HoverDocTestBase() {
         toolset = ToolsetVersion.TOOLSET_17_CORE,
         coreVersion = CoreVersion.DOT_NET_6
     )
-    fun `provided method in csharp`() = doTestWithTypeProviders("get all courses")
+    fun `provided method in csharp`() = doTest("CSharpLibrary.cs", "CSharpLibrary.cs")
 
     @Test
     @TestEnvironment(

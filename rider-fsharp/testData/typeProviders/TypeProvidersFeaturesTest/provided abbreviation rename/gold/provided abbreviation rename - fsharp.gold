@@ -1,6 +1,0 @@
-<caret>module SwaggerProviderLibrary
-
-open SwaggerProvider
-open SwaggerCrossLanguage.Literals
-
-type PetStore1 = OpenApiClientProvider<Schema>
