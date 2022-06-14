@@ -9,7 +9,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpMethod<TDeclaration> : FSharpMethodBase<TDeclaration>
+  internal class FSharpMethod<TDeclaration> : FSharpMethodBase<TDeclaration>, IFSharpMethod
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     public FSharpMethod([NotNull] ITypeMemberDeclaration declaration) : base(declaration)

@@ -7,6 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   {
     bool IsHighPrecedence { get; }
 
+    [CanBeNull] IFSharpExpression InvokedExpression { get; }
     [CanBeNull] IReferenceExpr InvokedReferenceExpression { get; }
     [CanBeNull] FSharpSymbolReference InvokedFunctionReference { get; }
   }

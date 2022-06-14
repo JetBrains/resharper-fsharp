@@ -14,9 +14,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     private readonly CachedPsiValue<IList<IArgument>> myParameterArguments = new FileCachedPsiValue<IList<IArgument>>();
 
     public bool IsHighPrecedence =>
-      FunctionExpression is { } funExpr && ArgumentExpression is { } argExpr && funExpr.NextSibling == argExpr;
+      FunctionExpression is { } funExpr && 
+      ArgumentExpression is { } argExpr && funExpr.NextSibling == argExpr;
 
-    public IReferenceExpr InvokedReferenceExpression
+    public IReferenceExpr InvokedReferenceExpression =>
+      InvokedExpression.IgnoreInnerParens() as IReferenceExpr;
+
+    public IFSharpExpression InvokedExpression
     {
       get
       {
@@ -24,10 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         while (funExpr.FunctionExpression.IgnoreInnerParens() is IPrefixAppExpr appExpr) 
           funExpr = appExpr;
 
-        if (!(funExpr.FunctionExpression.IgnoreInnerParens() is IReferenceExpr referenceExpr))
-          return null;
-
-        return referenceExpr;
+        return funExpr.FunctionExpression;
       }
     }
 
@@ -74,7 +75,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IList<IArgument> Arguments => ParameterArguments.Where(arg => arg != null).ToList();
 
     public IList<IArgument> ParameterArguments => myParameterArguments.GetValue(this,
-      expr => expr.InvokedReferenceExpression is { } invokedReferenceExpression
+      static expr => expr.InvokedReferenceExpression is { } invokedReferenceExpression
         ? invokedReferenceExpression.CalculateParameterArguments(expr.AppliedExpressions)
         : EmptyList<IArgument>.InstanceList);
   }

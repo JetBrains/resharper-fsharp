@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(params i: int[]) : unit
+Parameter: 0 'params i: int[]'
+
+--- Accepted invocables: ---
+(params i: int[]) : unit

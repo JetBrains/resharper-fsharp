@@ -37,6 +37,7 @@
     <Compile Include="FSharpOccurenceKindTest.fs" />
     <Compile Include="NavigationTests.fs" />
     <Compile Include="FSharpCompletionTest.fs" />
+    <Compile Include="FSharpParameterInfoTest.fs" />
     <Compile Include="FSharpIconProviderTest.fs" />
     <Compile Include="RearrangeCodeTest.fs" />
   </ItemGroup>
