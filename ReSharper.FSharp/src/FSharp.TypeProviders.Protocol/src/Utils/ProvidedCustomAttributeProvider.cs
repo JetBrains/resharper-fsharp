@@ -74,14 +74,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
     public string[] GetXmlDocAttributes(RdCustomAttributeData[] data) =>
       data.Where(t => t.FullName == TypeProviderXmlDocAttribute && t.ConstructorArguments.Length == 1)
-        .Select(t => t.ConstructorArguments[0] is { TypeName: "System.String" } x ? x.Values[0].Value : null)
+        .Select(t => t.ConstructorArguments[0].Unbox() as string)
         .Where(t => t != null)
         .ToArray();
 
     public bool GetHasTypeProviderEditorHideMethodsAttribute(RdCustomAttributeData[] data) =>
       data.Any(t => t.FullName == TypeProviderEditorHideMethodsAttributeFullName);
 
-    //TODO: arrays
     public FSharpOption<Tuple<FSharpList<FSharpOption<object>>, FSharpList<Tuple<string, FSharpOption<object>>>>>
       GetAttributeConstructorArgs(RdCustomAttributeData[] data, string attribName)
     {
@@ -102,7 +101,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
       value switch
       {
         null => null,
-        { } obj => obj
+        { } => value
       };
 
     private static object TryGetNamedArgumentValue(RdCustomAttributeData attribute, string namedAttributeName) =>
