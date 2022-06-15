@@ -1,0 +1,12 @@
+﻿module Module
+
+let (+) a b : int =
+    |""|(0)
+
+------------------------------------------------
+0: This expression was expected to have type
+    'int'    
+but here has type
+    'string'    
+QUICKFIXES:
+Change type of '+' to 'string'

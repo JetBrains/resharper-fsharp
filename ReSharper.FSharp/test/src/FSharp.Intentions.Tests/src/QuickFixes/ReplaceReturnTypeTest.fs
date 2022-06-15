@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
+open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
@@ -35,9 +36,20 @@ type ReplaceReturnTypeTest() =
     [<Test; NoHighlightingFound>] member x.``No highlighting 02``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``No highlighting 03``() = x.DoNamedTest()
 
+    [<Test; NotAvailable>] member x.``Not available - Pattern - Tuple 01``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``Not available 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 02``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 03``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 04``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 05``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 06``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type ReplaceReturnTypeAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/replaceReturnType"
+
+    [<Test>] member x.``Availability - Ref pat 01``() = x.DoNamedTest()
+    [<Test>] member x.``Availability - Ref pat 02 - Operator``() = x.DoNamedTest()
