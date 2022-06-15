@@ -45,24 +45,20 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
     override this.Text = "Replace return type"
     override this.IsAvailable _ =
         if isNull mostOuterParentExpr then false else
+
         let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
         if isNull binding then false else
 
         let returnTypeInfo = binding.ReturnTypeInfo
         if isNull returnTypeInfo then false else
 
-        // Some types cannot be replaced properly solely on the FCS error message.
-        // We will ignore these types for now.
-        match returnTypeInfo.ReturnType.IgnoreParentParens() with
-        | :? ITupleTypeUsage
-        | :? IFunctionTypeUsage -> false
-        | _ ->
-            // An invalid binary infix application will yield a similar error and could be mistaken for an invalid return type.
-            // F.ex. 1 + "a", error FS0001: The type 'string' does not match the type 'int'
-            // We ignore this scenario for now.
-            match mostOuterParentExpr with
-            | :? IBinaryAppExpr -> false
-            | _ -> true
+        // An invalid binary infix application will yield a similar error and could be mistaken for an invalid return type.
+        // F.ex. 1 + "a", error FS0001: The type 'string' does not match the type 'int'
+        // We ignore this scenario for now.
+        match mostOuterParentExpr with
+        | :? IBinaryAppExpr
+        | :? IMatchLambdaExpr -> false
+        | _ -> true
 
     override this.ExecutePsiTransaction(_solution) =
         let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
@@ -76,13 +72,9 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
         let symbolUse = refPat.GetFcsSymbolUse()
         if isNull symbolUse then () else
 
-        if isNotNull binding.ReturnTypeInfo
-           && isNotNull binding.ReturnTypeInfo.ReturnType then
-            let factory = binding.CreateElementFactory()
-            let typeUsage = factory.CreateTypeUsage(replacementTypeName)
-            let returnType = binding.ReturnTypeInfo.ReturnType.IgnoreInnerParens()
+        let bindingReturnTypeInfo = binding.ReturnTypeInfo
+        if isNotNull bindingReturnTypeInfo && isNotNull bindingReturnTypeInfo.ReturnType then
+            let typeUsage = binding.CreateElementFactory().CreateTypeUsage(replacementTypeName)
+            let returnTypeUsage = bindingReturnTypeInfo.ReturnType.IgnoreInnerParens()
 
-            match returnType with
-            | :? INamedTypeUsage as ntu ->
-                ModificationUtil.ReplaceChild(ntu, typeUsage) |> ignore
-            | _ -> ()
+            ModificationUtil.ReplaceChild(returnTypeUsage, typeUsage) |> ignore
