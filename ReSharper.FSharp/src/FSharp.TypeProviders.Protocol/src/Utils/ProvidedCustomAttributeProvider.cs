@@ -74,13 +74,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
     public string[] GetXmlDocAttributes(RdCustomAttributeData[] data) =>
       data.Where(t => t.FullName == TypeProviderXmlDocAttribute && t.ConstructorArguments.Length == 1)
-        .Select(t => t.ConstructorArguments[0].Value.Unbox() is string s ? s : null)
+        .Select(t => t.ConstructorArguments[0] is { TypeName: "System.String" } x ? x.Values[0].Value : null)
         .Where(t => t != null)
         .ToArray();
 
     public bool GetHasTypeProviderEditorHideMethodsAttribute(RdCustomAttributeData[] data) =>
       data.Any(t => t.FullName == TypeProviderEditorHideMethodsAttributeFullName);
 
+    //TODO: arrays
     public FSharpOption<Tuple<FSharpList<FSharpOption<object>>, FSharpList<Tuple<string, FSharpOption<object>>>>>
       GetAttributeConstructorArgs(RdCustomAttributeData[] data, string attribName)
     {
@@ -89,11 +90,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
       var constructorArgs =
         ListModule.OfSeq(
-          attribute.ConstructorArguments.Select(t => Option(t.Value.Unbox())));
+          attribute.ConstructorArguments.Select(t => Option(t.Values[0].Unbox())));
 
       var namedArgs =
         ListModule.OfSeq(attribute.NamedArguments.Select(t =>
-          Tuple.Create(t.MemberName, Option(t.TypedValue.Value.Unbox()))));
+          Tuple.Create(t.MemberName, Option(t.TypedValue.Values[0].Unbox()))));
 
       return Tuple.Create(constructorArgs, namedArgs);
     }
@@ -107,7 +108,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
     private static object TryGetNamedArgumentValue(RdCustomAttributeData attribute, string namedAttributeName) =>
       attribute.NamedArguments
-        .FirstOrDefault(t => t.MemberName == namedAttributeName)?.TypedValue.Value
-        .Unbox();
+        .FirstOrDefault(t => t.MemberName == namedAttributeName)?.TypedValue.Values[0].Unbox();
   }
 }

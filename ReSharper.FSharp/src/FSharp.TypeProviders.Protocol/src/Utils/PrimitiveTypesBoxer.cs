@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using JetBrains.Annotations;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using ServerRdStaticArg = JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdStaticArg;
 using ServerRdTypeName = JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdTypeName;
+using ServerRdAttributeArgElement = JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdAttributeArgElement;
+using ServerRdAttributeArg = JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdAttributeArg;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 {
@@ -120,5 +125,54 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
       return result;
     }
+
+    public static ServerRdAttributeArg Box(this CustomAttributeTypedArgument arg)
+    {
+      string GetStringValue(object obj) =>
+        obj switch
+        {
+          null => null,
+          decimal x => x.ToString(CultureInfo.InvariantCulture),
+          float x => x.ToString(CultureInfo.InvariantCulture),
+          double x => x.ToString(CultureInfo.InvariantCulture),
+          { } when obj.GetType() is var type && type.IsEnum => ((int)obj).ToString(),
+          { } => obj.ToString()
+        };
+
+      if (arg.Value is IReadOnlyCollection<object> collection)
+      {
+        var elementType = arg.ArgumentType.GetElementType()?.FullName ?? "unknown type";
+        var args = collection
+          .Select(t => new ServerRdAttributeArgElement(t?.GetType().FullName ?? elementType, GetStringValue(t)))
+          .ToArray();
+        return new ServerRdAttributeArg(elementType, true, args);
+      }
+
+      var typeName = arg.ArgumentType.FullName!;
+      return new ServerRdAttributeArg(typeName, false,
+        new[] { new ServerRdAttributeArgElement(typeName, GetStringValue(arg.Value)) });
+    }
+
+    public static object Unbox(this RdAttributeArgElement arg) =>
+      arg.TypeName switch
+      {
+        _ when arg.Value == null => null,
+        "System.SByte" => sbyte.Parse(arg.Value),
+        "System.Int16" => short.Parse(arg.Value),
+        "System.Int32" => int.Parse(arg.Value),
+        "System.Int64" => long.Parse(arg.Value),
+        "System.Byte" => byte.Parse(arg.Value),
+        "System.UInt16" => ushort.Parse(arg.Value),
+        "System.UInt32" => uint.Parse(arg.Value),
+        "System.UInt64" => ulong.Parse(arg.Value),
+        "System.Decimal" => decimal.Parse(arg.Value, CultureInfo.InvariantCulture),
+        "System.Single" => float.Parse(arg.Value, CultureInfo.InvariantCulture),
+        "System.Double" => double.Parse(arg.Value, CultureInfo.InvariantCulture),
+        "System.Char" => char.Parse(arg.Value),
+        "System.Boolean" => bool.Parse(arg.Value),
+        "System.String" => arg.Value,
+        { } when int.TryParse(arg.Value, out var value) => value,
+        { } x => x
+      };
   }
 }
