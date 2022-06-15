@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Metadata.Reader.API;
@@ -46,7 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public IEnumerable<Pair<string, AttributeValue>> NamedParameters() => myData.NamedArguments
       .Select(t => Pair.Of(t.MemberName, ConvertToAttributeValue(t.TypedValue)));
 
-    public IConstructor Constructor => myConstructor ??= 
+    public IConstructor Constructor => myConstructor ??=
       GetAttributeType().GetTypeElement()?.Constructors.FirstOrDefault(t =>
       {
         // TODO: check generic attributes
@@ -63,11 +64,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public int PositionParameterCount => myData.ConstructorArguments.Length;
     public int NamedParameterCount => myData.NamedArguments.Length;
 
-    private AttributeValue ConvertToAttributeValue(RdCustomAttributeTypedArgument arg)
+    private AttributeValue ConvertToAttributeValue(RdAttributeArg arg)
     {
-      var value = arg.Value.Unbox(safeMode: true);
-      var type = value is null ? null : TypeFactory.CreateTypeByCLRName(value.GetType().FullName!, myModule);
-      return new AttributeValue(new ConstantValue(value, type));
+      var elementType = TypeFactory.CreateTypeByCLRName(arg.TypeName, myModule);
+
+      if (!arg.IsArray) return new AttributeValue(new ConstantValue(arg.Values[0].Unbox(), elementType));
+
+      var arrayType = TypeFactory.CreateArrayType(elementType, 1, NullableAnnotation.Unknown);
+      return new AttributeValue(arrayType,
+        arg.Values
+          .Select(t =>
+            new AttributeValue(
+              new ConstantValue(t.Unbox(), TypeFactory.CreateTypeByCLRName(t.TypeName, myModule))))
+          .ToArray());
     }
   }
 }

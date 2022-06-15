@@ -17,9 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
     private static RdCustomAttributeNamedArgument Convert(CustomAttributeNamedArgument argument) =>
       new(argument.MemberName, Convert(argument.TypedValue));
 
-    private static RdCustomAttributeTypedArgument Convert(CustomAttributeTypedArgument argument) =>
-      new(argument.ArgumentType.IsArray
-        ? null
-        : PrimitiveTypesBoxer.BoxToClientStaticArg(argument.Value, safeMode: true));
+    private static RdAttributeArg Convert(CustomAttributeTypedArgument argument) =>
+      argument.Box();
   }
 }
