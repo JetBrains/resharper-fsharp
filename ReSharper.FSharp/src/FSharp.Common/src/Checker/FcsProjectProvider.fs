@@ -97,6 +97,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         logger.Trace("Done invalidating referencing modules of psiModule: {0}", psiModule)
 
+        fcsProjectsWithoutReferences.Remove(psiModule) |> ignore
+
         match tryGetValue psiModule fcsProjects with
         | None -> ()
         | Some fcsProject ->
@@ -113,7 +115,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 | Some referencedModule -> referencedModule.ReferencingModules.Remove(referencedPsiModule) |> ignore
 
             fcsProjects.Remove(psiModule) |> ignore
-            fcsProjectsWithoutReferences.Remove(psiModule) |> ignore
 
             match tryGetValue psiModule projectMarkModules with
             | None -> ()
@@ -160,6 +161,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         use lock = FcsReadWriteLock.WriteCookie.Create()
         let fcsProject = fcsProjectBuilder.BuildFcsProject(psiModule, psiModule.ContainingProjectModule.As())
         fcsProjectsWithoutReferences[psiModule] <- fcsProject
+        projectsPsiModules.Add(psiModule.ContainingProjectModule, psiModule) |> ignore
         fcsProject
 
     let createFcsProject (project: IProject) (psiModule: IPsiModule): FcsProject =
