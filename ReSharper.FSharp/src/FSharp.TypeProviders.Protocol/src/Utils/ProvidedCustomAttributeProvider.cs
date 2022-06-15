@@ -74,14 +74,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
     public string[] GetXmlDocAttributes(RdCustomAttributeData[] data) =>
       data.Where(t => t.FullName == TypeProviderXmlDocAttribute && t.ConstructorArguments.Length == 1)
-        .Select(t => t.ConstructorArguments[0] is { TypeName: "System.String" } x ? x.Values[0].Value : null)
+        .Select(t => t.ConstructorArguments[0].Unbox() as string)
         .Where(t => t != null)
         .ToArray();
 
     public bool GetHasTypeProviderEditorHideMethodsAttribute(RdCustomAttributeData[] data) =>
       data.Any(t => t.FullName == TypeProviderEditorHideMethodsAttributeFullName);
 
-    //TODO: arrays
     public FSharpOption<Tuple<FSharpList<FSharpOption<object>>, FSharpList<Tuple<string, FSharpOption<object>>>>>
       GetAttributeConstructorArgs(RdCustomAttributeData[] data, string attribName)
     {
@@ -90,11 +89,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
       var constructorArgs =
         ListModule.OfSeq(
-          attribute.ConstructorArguments.Select(t => Option(t.Values[0].Unbox())));
+          attribute.ConstructorArguments.Select(t => Option(t.Unbox())));
 
       var namedArgs =
         ListModule.OfSeq(attribute.NamedArguments.Select(t =>
-          Tuple.Create(t.MemberName, Option(t.TypedValue.Values[0].Unbox()))));
+          Tuple.Create(t.MemberName, Option(t.TypedValue.Unbox()))));
 
       return Tuple.Create(constructorArgs, namedArgs);
     }
@@ -103,11 +102,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
       value switch
       {
         null => null,
-        { } obj => obj
+        { } => value
       };
 
     private static object TryGetNamedArgumentValue(RdCustomAttributeData attribute, string namedAttributeName) =>
-      attribute.NamedArguments
-        .FirstOrDefault(t => t.MemberName == namedAttributeName)?.TypedValue.Values[0].Unbox();
+      attribute.NamedArguments.FirstOrDefault(t => t.MemberName == namedAttributeName)?.TypedValue.Unbox();
   }
 }

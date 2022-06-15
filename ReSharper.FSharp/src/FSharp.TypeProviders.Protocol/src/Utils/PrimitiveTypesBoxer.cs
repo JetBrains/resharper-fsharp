@@ -149,8 +149,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
       }
 
       var typeName = arg.ArgumentType.FullName!;
-      return new ServerRdAttributeArg(typeName, false,
-        new[] { new ServerRdAttributeArgElement(typeName, GetStringValue(arg.Value)) });
+      var argElements = new[] { new ServerRdAttributeArgElement(typeName, GetStringValue(arg.Value)) };
+      return new ServerRdAttributeArg(typeName, false, argElements);
+    }
+
+    public static object Unbox(this RdAttributeArg arg)
+    {
+      if (!arg.IsArray) return arg.Values[0].Unbox();
+
+      var values = arg.Values.Select(t => t.Unbox());
+      return arg.TypeName switch
+      {
+        "System.SByte" => values.Cast<sbyte>().ToArray(),
+        "System.Int16" => values.Cast<short>().ToArray(),
+        "System.Int32" => values.Cast<int>().ToArray(),
+        "System.Int64" => values.Cast<long>().ToArray(),
+        "System.Byte" => values.Cast<byte>().ToArray(),
+        "System.UInt16" => values.Cast<ushort>().ToArray(),
+        "System.UInt32" => values.Cast<uint>().ToArray(),
+        "System.UInt64" => values.Cast<ulong>().ToArray(),
+        "System.Decimal" => values.Cast<decimal>().ToArray(),
+        "System.Single" => values.Cast<float>().ToArray(),
+        "System.Double" => values.Cast<double>().ToArray(),
+        "System.Char" => values.Cast<char>().ToArray(),
+        "System.Boolean" => values.Cast<bool>().ToArray(),
+        "System.String" => values.Cast<string>().ToArray(),
+        { } => values.ToArray()
+      };
     }
 
     public static object Unbox(this RdAttributeArgElement arg) =>
