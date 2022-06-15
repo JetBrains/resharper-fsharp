@@ -73,14 +73,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
     }
 
     public string[] GetXmlDocAttributes(RdCustomAttributeData[] data) =>
-      data.Where(t => t.FullName == TypeProviderXmlDocAttribute && GetOrThrow(t.ConstructorArguments).Length == 1)
-        .Select(t => GetOrThrow(t.ConstructorArguments)[0].Value.Unbox() as string)
+      data.Where(t => t.FullName == TypeProviderXmlDocAttribute && t.ConstructorArguments.Length == 1)
+        .Select(t => t.ConstructorArguments[0] is { TypeName: "System.String" } x ? x.Values[0].Value : null)
         .Where(t => t != null)
         .ToArray();
 
     public bool GetHasTypeProviderEditorHideMethodsAttribute(RdCustomAttributeData[] data) =>
       data.Any(t => t.FullName == TypeProviderEditorHideMethodsAttributeFullName);
 
+    //TODO: arrays
     public FSharpOption<Tuple<FSharpList<FSharpOption<object>>, FSharpList<Tuple<string, FSharpOption<object>>>>>
       GetAttributeConstructorArgs(RdCustomAttributeData[] data, string attribName)
     {

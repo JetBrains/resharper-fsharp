@@ -60,13 +60,9 @@ object RdFSharpTypeProvidersModel : Root() {
         field("Types", array(int))
     }
 
-    private val RdCustomAttributeTypedArgument = structdef {
-        field("Value", RdStaticArg.nullable)
-    }
-
     private val RdCustomAttributeNamedArgument = structdef {
         field("MemberName", string)
-        field("TypedValue", RdCustomAttributeTypedArgument)
+        field("TypedValue", RdAttributeArg)
     }
 
     private val RdCustomAttributeData = structdef {
@@ -103,6 +99,17 @@ object RdFSharpTypeProvidersModel : Root() {
     private val RdStaticArg = structdef {
         field("TypeName", RdTypeName)
         field("Value", string)
+    }
+
+    private val RdAttributeArgElement = structdef {
+        field("TypeName", string)
+        field("Value", string.nullable)
+    }
+
+    private val RdAttributeArg = structdef {
+        field("TypeName", string)
+        field("IsArray", bool)
+        field("Values", array(RdAttributeArgElement))
     }
 
     private val ApplyStaticArgumentsParameters = structdef {
