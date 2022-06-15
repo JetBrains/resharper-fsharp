@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Metadata.Reader.API;
@@ -12,7 +11,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
-  //TODO: support array and typeof args 
+  //TODO: support typeof args 
   internal class FSharpProvidedAttributeInstance : IAttributeInstance
   {
     private readonly RdCustomAttributeData myData;
@@ -68,15 +67,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       var elementType = TypeFactory.CreateTypeByCLRName(arg.TypeName, myModule);
 
-      if (!arg.IsArray) return new AttributeValue(new ConstantValue(arg.Values[0].Unbox(), elementType));
+      if (!arg.IsArray) return new AttributeValue(new ConstantValue(arg.Unbox(), elementType));
 
       var arrayType = TypeFactory.CreateArrayType(elementType, 1, NullableAnnotation.Unknown);
-      return new AttributeValue(arrayType,
-        arg.Values
-          .Select(t =>
-            new AttributeValue(
-              new ConstantValue(t.Unbox(), TypeFactory.CreateTypeByCLRName(t.TypeName, myModule))))
-          .ToArray());
+      return new AttributeValue(arrayType, arg.Values
+        .Select(t =>
+          new AttributeValue(new ConstantValue(t.Unbox(), TypeFactory.CreateTypeByCLRName(t.TypeName, myModule))))
+        .ToArray());
     }
   }
 }
