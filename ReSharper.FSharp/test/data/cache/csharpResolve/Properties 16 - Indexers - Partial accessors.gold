@@ -1,4 +1,4 @@
-public class Class1
+﻿public class Class1
 {
   public Class1()
   {
@@ -13,8 +13,8 @@ public class Class1
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: The indexer 'T.this' has no setter
-(1): ReSharper Underlined Error Highlighting: The indexer 'T.this' has no getter
+(0): ReSharper Underlined Error Highlighting: The indexer 'T.this[int]' has no setter
+(1): ReSharper Underlined Error Highlighting: The indexer 'T.this[string]' has no getter
 M:T.#ctor
 P:T.Item(System.Int32)
 P:T.Item(System.Int32)

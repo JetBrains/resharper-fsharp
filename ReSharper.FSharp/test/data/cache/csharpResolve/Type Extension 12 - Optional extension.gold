@@ -8,7 +8,7 @@
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access internal method 'Method' here
+(0): ReSharper Underlined Error Highlighting: Cannot access internal method 'Method(string)' here
 (1): ReSharper Underlined Error Highlighting: Cannot access internal property 'Prop' here
 M:Module.Method(System.String)
 M:Module.Method(System.String)
