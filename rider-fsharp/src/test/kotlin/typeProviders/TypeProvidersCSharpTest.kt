@@ -58,7 +58,7 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
             }
 
             // change method call from "ApiCoursesGet" to "ApiCoursesGet1"
-            typeFromOffset("1", 194)
+            typeFromOffset("1", 195)
             waitForDaemon()
 
             executeWithGold(File(testGoldFile.path + "_after")) {
@@ -84,6 +84,25 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
             markupAdapter.hasErrors.shouldBeFalse()
             executeWithGold(File(testGoldFile.path + " - fsharp")) {
                 dumpOpenedDocument(it, project!!)
+            }
+        }
+    }
+
+    @Test
+    @TestEnvironment(solution = "YamlProviderCSharp", toolset = ToolsetVersion.TOOLSET_16)
+    fun `provided type abbreviation completion`() = doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
+
+    @Test
+    @TestEnvironment(solution = "YamlProviderCSharp", toolset = ToolsetVersion.TOOLSET_16)
+    fun `provided nested type completion`() = doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
+
+    private fun doTestDumpLookupItems(relativePath: String, sourceFileName: String) {
+        withOpenedEditor(relativePath, sourceFileName) {
+            waitForDaemon()
+            callBasicCompletion()
+            waitForCompletion()
+            executeWithGold(testGoldFile) {
+                dumpActiveLookupItemsPresentations(it)
             }
         }
     }

@@ -34,14 +34,6 @@ class FSharpCompletionTest : CompletionTestBase() {
     @Test
     fun qualified02() = doTestChooseItem("a")
 
-    @Test
-    @TestEnvironment(solution = "YamlProviderCSharp", toolset = ToolsetVersion.TOOLSET_16)
-    fun `provided type abbreviation`() = doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
-
-    @Test
-    @TestEnvironment(solution = "YamlProviderCSharp", toolset = ToolsetVersion.TOOLSET_16)
-    fun `provided nested type`() = doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
-
     private fun doTestTyping(typed: String) {
         dumpOpenedEditor("Program.fs", "Program.fs") {
             waitForDaemon()
@@ -58,17 +50,6 @@ class FSharpCompletionTest : CompletionTestBase() {
             callBasicCompletion()
             waitForCompletion()
             completeWithTab(item)
-        }
-    }
-
-    private fun doTestDumpLookupItems(relativePath: String, sourceFileName: String) {
-        withOpenedEditor(relativePath, sourceFileName) {
-            waitForDaemon()
-            callBasicCompletion()
-            waitForCompletion()
-            executeWithGold(testGoldFile) {
-                dumpActiveLookupItemsPresentations(it)
-            }
         }
     }
 }
