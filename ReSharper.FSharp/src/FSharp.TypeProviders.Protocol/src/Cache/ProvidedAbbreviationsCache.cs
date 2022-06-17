@@ -64,7 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     public void MarkAsInvalidated(IPsiModule module, IClrTypeName clrName)
     {
-      if (!myCache.ContainsKey(module)) return;
+      if (!TryGet(module, clrName, out _)) return;
       myQueueToInvalidate.Enqueue((module, clrName.FullName));
     }
 
