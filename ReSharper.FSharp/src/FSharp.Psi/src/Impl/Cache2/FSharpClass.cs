@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       part is IFSharpClassPart classPart && classPart.MeasureTypeParametersCount == MeasureTypeParametersCount;
 
     protected override MemberDecoration Modifiers => myParts.GetModifiers();
-    public virtual string SourceName => this.GetSourceName();
+    public string SourceName => this.GetSourceName();
 
     public override IClass GetSuperClass()
     {
@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       return result.ToArray();
     }
 
-    public virtual IList<ITypeParameter> AllTypeParameters =>
+    public IList<ITypeParameter> AllTypeParameters =>
       this.GetAllTypeParametersReversed();
   }
 }
