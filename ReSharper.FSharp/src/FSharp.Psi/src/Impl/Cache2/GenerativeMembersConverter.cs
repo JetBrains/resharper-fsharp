@@ -23,7 +23,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
 
     public XmlNode GetXmlDoc() => Type.GetXmlDoc(TypeElement);
-    public IList<ITypeParameter> AllTypeParameters => EmptyList<ITypeParameter>.InstanceList;
 
     // Operators for provided types are compiled into methods
     public IEnumerable<IOperator> Operators => EmptyList<IOperator>.InstanceList;

@@ -35,9 +35,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override IList<ITypeElement> NestedTypes => ProvidedClass is { } x ? x.NestedTypes : base.NestedTypes;
 
-    public override IList<ITypeParameter> AllTypeParameters =>
-      ProvidedClass is { } x ? x.AllTypeParameters : base.AllTypeParameters;
-
     public override bool HasMemberWithName(string shortName, bool ignoreCase) =>
       ProvidedClass is { } x
         ? x.HasMemberWithName(shortName, ignoreCase)
