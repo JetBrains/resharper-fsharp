@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     private readonly ConcurrentQueue<(IPsiModule module, string clrName)> myQueueToInvalidate = new();
 
-    //TODO: type provider invalidation does not invalidate myQueueToInvalidate
+    //type provider invalidation does not invalidate myQueueToInvalidate
     private void Invalidate()
     {
       while (myQueueToInvalidate.TryDequeue(out var itemToInvalidate) &&
@@ -62,11 +62,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
              typesGroup.TryGetValue(clrName.FullName, out providedType);
     }
 
-    public void MarkAsInvalidated(IPsiModule module, IClrTypeName clrName) =>
+    public void MarkAsInvalidated(IPsiModule module, IClrTypeName clrName)
+    {
+      if (!myCache.ContainsKey(module)) return;
       myQueueToInvalidate.Enqueue((module, clrName.FullName));
+    }
 
     public void Remove(IProxyTypeProvider typeProvider)
     {
+      Invalidate();
       var (module, tpId) = (typeProvider.PsiModule.NotNull(), typeProvider.EntityId);
       if (myCache.TryGetValue(module, out var typesGroup))
       {
