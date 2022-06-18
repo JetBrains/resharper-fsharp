@@ -174,16 +174,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public RdProvidedEntityType EntityType => ProxyProvidedType.EntityType;
     public RdCustomAttributeData[] Attributes => ProxyProvidedType.Attributes;
 
-    public override bool Equals(object y)
-    {
-      return y switch
+    public override bool Equals(object y) =>
+      y switch
       {
-        ProxyProvidedType x => x.EntityId == EntityId,
+        IProxyProvidedType x => x.EntityId == EntityId,
         _ => false
       };
-    }
 
-    public override int GetHashCode() => ProxyProvidedType.FullName.GetHashCode();
+    public override int GetHashCode() => EntityId.GetHashCode();
 
     public bool IsCreatedByProvider => ProxyProvidedType.IsCreatedByProvider;
 
