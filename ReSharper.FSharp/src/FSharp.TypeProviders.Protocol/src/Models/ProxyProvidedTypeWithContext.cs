@@ -192,7 +192,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       IProxyProvidedType type => type.GetClrName()
     };
 
-    public string DisplayName => Context.TryGetILTypeRef(this).Value.Name;
     public IProxyTypeProvider TypeProvider => ProxyProvidedType.TypeProvider;
   }
 }
