@@ -97,7 +97,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       TypeProvidersContext typeProvidersContext) =>
       type == null ? null : new ProxyProvidedType(type, typeProvider, typeProvidersContext);
 
-    public string DisplayName => Name;
     public IProxyTypeProvider TypeProvider { get; }
     public override string Name => myRdProvidedType.Name;
     public override string FullName => myRdProvidedType.FullName;
