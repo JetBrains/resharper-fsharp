@@ -282,16 +282,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public IClrTypeName GetClrName() => new ClrTypeName(FullName);
 
-    public override bool Equals(object y)
-    {
-      return y switch
+    public override bool Equals(object y) =>
+      y switch
       {
         ProxyProvidedType x => x.EntityId == EntityId,
         _ => false
       };
-    }
 
-    public override int GetHashCode() => FullName.GetHashCode();
+    public override int GetHashCode() => EntityId.GetHashCode();
 
     private bool HasFlag(RdProvidedTypeFlags flag) => (myRdProvidedType.Flags & flag) == flag;
 
