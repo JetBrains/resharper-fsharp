@@ -56,6 +56,7 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Curried 06``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried 07``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried 08``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 09 - Empty``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Lambda 02``() = x.DoNamedTest()
@@ -80,6 +81,8 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Method 10``() = x.DoNamedTest()
     [<Test>] member x.``App - Method 11``() = x.DoNamedTest()
     [<Test>] member x.``App - Method 12``() = x.DoNamedTest()
+    [<Test>] member x.``App - Method 13 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``App - Method 14 - Empty``() = x.DoNamedTest()
 
     [<Test>] member x.``Reference 01``() = x.DoNamedTest()
     [<Test>] member x.``Reference 02``() = x.DoNamedTest()

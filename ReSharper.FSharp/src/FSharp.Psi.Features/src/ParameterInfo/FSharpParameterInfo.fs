@@ -47,7 +47,7 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
         if isNull parametersOwner then null else
 
         let parameters = parametersOwner.Parameters
-        if parameters.Count < index then null else parameters[index]
+        if parameters.Count <= index then null else parameters[index]
 
     let getParameter index =
         let index = if isExtensionMember then index + 1 else index
@@ -78,6 +78,8 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
             let paramInfos =
                 paramInfos <- Array.zeroCreate paramsCount
                 paramInfos
+
+            if parameters.Count = 0 then () else
 
             paramGroups
             |> Seq.concat
@@ -135,9 +137,12 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
             let mutable paramIndex = 0
             for i = 0 to paramGroups.Count - 1 do
                 text.Append("(", TextStyle.Default) |> ignore
-                let groupStart = text.Length
 
                 let paramGroup = paramGroups[i]
+                if paramGroup.Count = 0 then
+                        text.Append("<no parameters>", TextStyle.Default) |> ignore
+
+                let groupStart = text.Length
 
                 if paramIndex = 0 && isExtensionMember then
                     let parameter = getParameterIncludingThis paramIndex
