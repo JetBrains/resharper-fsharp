@@ -170,13 +170,28 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
                             text.Append("params", TextStyle FSharpHighlightingAttributeIds.Keyword) |> ignore
                             text.Append(" ", TextStyle.Default) |> ignore
 
+                    let hasFSharpDeclarationRange = fcsParameter.DeclarationLocation <> Range.range0
+                    if fcsParameter.IsOptionalArg && not parameter.IsOptional && hasFSharpDeclarationRange then
+                        text.Append("?", TextStyle.Default) |> ignore
+
                     match fcsParameter.Name with
                     | Some name ->
                         text.Append(name, TextStyle FSharpHighlightingAttributeIds.Parameter) |> ignore
                         text.Append(": ", TextStyle.Default) |> ignore
                     | _ -> ()
 
-                    text.Append(fcsParameter.Type.FormatLayout(displayContext) |> richText) |> ignore
+                    let fcsParameterType =
+                        let fcsParameterType = fcsParameter.Type
+                        if not fcsParameter.IsOptionalArg || not hasFSharpDeclarationRange then fcsParameterType else
+
+                        match tryGetAbbreviatedTypeEntity fcsParameterType with
+                        | Some entity when entity.QualifiedBaseName = FSharpPredefinedType.fsOptionTypeName.FullName ->
+                            fcsParameterType.GenericArguments
+                            |> Seq.tryExactlyOne
+                            |> Option.defaultValue fcsParameterType
+                        | _ -> fcsParameterType
+
+                    text.Append(fcsParameterType.FormatLayout(displayContext) |> richText) |> ignore
 
                     if isNotNull parameter && parameter.IsOptional then
                         let constantValue = parameter.GetDefaultValue().ConstantValue

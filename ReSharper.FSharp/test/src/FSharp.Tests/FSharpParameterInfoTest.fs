@@ -61,6 +61,10 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Lambda 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``App - Method - Optional 01``() = x.DoNamedTest()
+    [<Test>] member x.``App - Method - Optional 02``() = x.DoNamedTest()
+    [<Test>] member x.``App - Method - Optional 03``() = x.DoNamedTest()
+
     [<Test>] member x.``App - Method - Params 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Method - Params 02``() = x.DoNamedTest()
     [<Test>] member x.``App - Method - Params 03``() = x.DoNamedTest()
