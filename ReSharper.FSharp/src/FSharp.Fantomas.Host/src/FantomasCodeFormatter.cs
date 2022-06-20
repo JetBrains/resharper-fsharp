@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Fantomas;
 using JetBrains.Diagnostics;
 using JetBrains.Extension;
 using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
@@ -11,7 +10,6 @@ using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Reflection;
-using FormatConfig = Fantomas.FormatConfig.FormatConfig;
 using FSharpType = Microsoft.FSharp.Reflection.FSharpType;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
@@ -21,8 +19,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
   {
     private static readonly Version Version45 = Version.Parse("4.5");
     private static readonly Version Version46 = Version.Parse("4.6");
+    private static readonly Version Version50 = Version.Parse("5.0");
 
-    private static dynamic GetFSharpChecker()
+    private static readonly string FantomasAssemblyName = /*CurrentVersion >= Version50*/
+      true ? "Fantomas.Core" : "Fantomas.Core";
+
+    private static Type GetCodeFormatter()
+    {
+      var qualifiedName = Assembly.CreateQualifiedName(FantomasAssemblyName, "CodeFormatter");
+      var type = Type.GetType(qualifiedName).NotNull($"{qualifiedName} must exist");
+
+      return type;
+    }
+
+    private static object GetFSharpChecker()
     {
       var searchedType = CurrentVersion < Version46
         ? "FSharp.Compiler.SourceCodeServices.FSharpChecker"
@@ -40,7 +50,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       return method.Invoke(null, values);
     }
 
-    private static dynamic GetDiagnosticOptions()
+    private static MethodInfo GetSourceOriginStringConstructor()
+    {
+      var qualifiedName = Assembly.CreateQualifiedName(FantomasAssemblyName, "SourceOrigin");
+      return Type
+        .GetType(qualifiedName)
+        .NotNull($"{qualifiedName} must exist")
+        .GetNestedType("SourceOrigin")
+        .NotNull($"{qualifiedName}.SourceOrigin must exist")
+        .GetMethod("NewSourceString")
+        .NotNull($"{qualifiedName}.SourceOrigin must contain static .NewSourceString method");
+    }
+
+    private static object GetDiagnosticOptions()
     {
       var assemblyToSearch = FSharpParsingOptionsType.Assembly;
 
@@ -57,6 +79,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       return defaultValue;
     }
 
+    private static object GetDefaultFormatConfig() =>
+      FormatConfigType.GetProperty("Default")?.GetValue(null).NotNull();
+
     private static Type GetFSharpParsingOptions()
     {
       var searchedType = CurrentVersion < Version46
@@ -67,17 +92,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       return Type.GetType(qualifiedName).NotNull($"{qualifiedName} must exist");
     }
 
-    public static Version CurrentVersion { get; } = typeof(CodeFormatter).Assembly.GetName().Version;
+    private static readonly Type CodeFormatterType = GetCodeFormatter();
+    public static Version CurrentVersion { get; } = CodeFormatterType.Assembly.GetName().Version;
 
-    private static readonly dynamic Checker = GetFSharpChecker();
+    private static readonly object Checker = GetFSharpChecker();
     private static readonly Type FSharpParsingOptionsType = GetFSharpParsingOptions();
 
     private static readonly ConstructorInfo
       CreateFSharpParsingOptions = FSharpParsingOptionsType.GetConstructors().Single();
 
-    private static readonly dynamic DefaultDiagnosticOptions = GetDiagnosticOptions();
-    private static readonly FormatConfig DefaultFormatConfig = FormatConfig.Default;
-    private static readonly Type FormatConfigType = typeof(FormatConfig);
+    private static readonly object DefaultDiagnosticOptions = GetDiagnosticOptions();
+    private static readonly Type FormatConfigType = GetCodeFormatter();
+    private static readonly object DefaultFormatConfig = GetDefaultFormatConfig();
+    private static readonly MethodInfo FormatSelectionMethod = CodeFormatterType.GetMethod("FormatSelectionAsync");
+    private static readonly MethodInfo FormatDocumentMethod = CodeFormatterType.GetMethod("FormatDocumentAsync");
+    private static readonly MethodInfo MakeRangeMethod = CodeFormatterType.GetMethod("MakeRange");
+    private static readonly MethodInfo SourceOriginConstructor = GetSourceOriginStringConstructor();
 
     public static readonly (string Name, object Value)[] FormatConfigFields =
       FSharpType.GetRecordFields(FormatConfigType, null)
@@ -95,25 +125,49 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     public static string FormatSelection(RdFantomasFormatSelectionArgs args)
     {
+      // Fantomas 5 temporary does not support format selection
+      if (CurrentVersion >= Version50) return args.Source;
       var rdRange = args.Range;
 
       var range =
-        CodeFormatter.MakeRange(rdRange.FileName, rdRange.StartLine, rdRange.StartCol, rdRange.EndLine, rdRange.EndCol);
+        MakeRangeMethod.Invoke(null,
+          new object[] { rdRange.FileName, rdRange.StartLine, rdRange.StartCol, rdRange.EndLine, rdRange.EndCol });
+
       return FSharpAsync.StartAsTask(
-          CodeFormatter.FormatSelectionAsync(args.FileName, range,
-            SourceOrigin.SourceOrigin.NewSourceString(args.Source), Convert(args.FormatConfig),
-            CreateFSharpParsingOptions.Invoke(GetParsingOptions(args.ParsingOptions).ToArray()) as dynamic,
-            Checker), null, null)
+          FormatSelectionMethod.Invoke(null, new[]
+          {
+            args.FileName, range,
+            SourceOriginConstructor.Invoke(null, new object[] { args.Source }),
+            ConvertToFormatConfig(args.FormatConfig),
+            CreateFSharpParsingOptions.Invoke(GetParsingOptions(args.ParsingOptions).ToArray()),
+            Checker
+          }) as FSharpAsync<string>, null, null)
         .Result.Replace("\r\n", args.NewLineText);
     }
 
     public static string FormatDocument(RdFantomasFormatDocumentArgs args) =>
       FSharpAsync.StartAsTask(
-          CodeFormatter.FormatDocumentAsync(args.FileName, SourceOrigin.SourceOrigin.NewSourceString(args.Source),
-            Convert(args.FormatConfig),
-            CreateFSharpParsingOptions.Invoke(GetParsingOptions(args.ParsingOptions).ToArray()) as dynamic,
-            Checker), null, null)
+          FormatDocumentMethod.Invoke(null, GetFormatDocumentOptions(args).ToArray()) as FSharpAsync<string>,
+          null, null)
         .Result.Replace("\r\n", args.NewLineText);
+
+    private static IEnumerable<object> GetFormatDocumentOptions(RdFantomasFormatDocumentArgs args)
+    {
+      if (CurrentVersion >= Version50)
+      {
+        yield return args.FileName.EndsWith(".fsi"); // isSignature
+        yield return args.Source;
+        yield return ConvertToFormatConfig(args.FormatConfig);
+      }
+      else
+      {
+        yield return args.FileName;
+        yield return SourceOriginConstructor.Invoke(null, new object[] { args.Source });
+        yield return ConvertToFormatConfig(args.FormatConfig);
+        yield return CreateFSharpParsingOptions.Invoke(GetParsingOptions(args.ParsingOptions).ToArray());
+        yield return Checker;
+      }
+    }
 
     private static IEnumerable<object> GetParsingOptions(RdFcsParsingOptions options)
     {
@@ -127,7 +181,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       yield return options.IsExe;
     }
 
-    private static FormatConfig Convert(string[] riderFormatConfigValues)
+    private static object ConvertToFormatConfig(string[] riderFormatConfigValues)
     {
       var riderFormatConfigDict =
         FormatConfigFields
@@ -148,7 +202,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
           .Select(field => riderFormatConfigDict.TryGetValue(field.Name, out var value) ? value : field.Value)
           .ToArray();
 
-      return FSharpValue.MakeRecord(FormatConfigType, formatConfigValues, null) as FormatConfig;
+      return FSharpValue.MakeRecord(FormatConfigType, formatConfigValues, null);
     }
 
     // TODO: alternatively, we can reuse the logic from
