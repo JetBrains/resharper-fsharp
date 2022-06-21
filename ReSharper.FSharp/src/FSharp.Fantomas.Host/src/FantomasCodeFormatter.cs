@@ -91,6 +91,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private static Type GetFSharpParsingOptions()
     {
       if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return null;
+
       var searchedType = CurrentVersion < Version46
         ? "FSharp.Compiler.SourceCodeServices.FSharpParsingOptions"
         : "FSharp.Compiler.CodeAnalysis.FSharpParsingOptions";
@@ -141,9 +142,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     public static string FormatSelection(RdFantomasFormatSelectionArgs args)
     {
       // Fantomas 5 temporary does not support format selection
-      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return args.Source;
-      var rdRange = args.Range;
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) throw new NotImplementedException();
 
+      var rdRange = args.Range;
       var range =
         MakeRangeMethod.Invoke(null,
           new object[] { rdRange.FileName, rdRange.StartLine, rdRange.StartCol, rdRange.EndLine, rdRange.EndCol });
