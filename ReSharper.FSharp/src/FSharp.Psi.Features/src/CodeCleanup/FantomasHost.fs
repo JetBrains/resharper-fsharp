@@ -73,7 +73,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
 
     do fantomasDetector.VersionToRun.Advise(solutionLifetime, fun _ -> terminateConnection ())
 
-    member x.FormatSelection(filePath, range: range, source: string, settings, options, newLineText) =
+    member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
         connect()
         if runningVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version then
             if showSelectionNotification then

@@ -14,7 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <!--<PackageReference Include="Fantomas.Core" Version="5.0.0-alpha-008" />-->
       <PackageReference Include="Fantomas" Version="$(FantomasBundledVersion)" />
       <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
       <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 {
