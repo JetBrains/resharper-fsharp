@@ -1,13 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
-open System
-open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.FeaturesTestFramework.ParameterInfo
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
-open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
-open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -28,6 +22,12 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Curried - Nested 07``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Nested 08``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Nested 09``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Nested 10``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Nested 11``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Nested 12``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Nested 13``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Nested 14``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Nested 15``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Curried - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Tuple 02``() = x.DoNamedTest()
@@ -47,6 +47,13 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Curried - Tuple 16``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Tuple 17``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Tuple 18``() = x.DoNamedTest()
+
+    [<Test>] member x.``App - Curried - Unit 01``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Unit 02``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Unit 03``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Unit 04``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Unit 05``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Unit 06``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Curried 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried 02``() = x.DoNamedTest()
@@ -87,6 +94,7 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Method 12``() = x.DoNamedTest()
     [<Test>] member x.``App - Method 13 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``App - Method 14 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``App - Method 15 - Empty``() = x.DoNamedTest()
 
     [<Test>] member x.``Reference 01``() = x.DoNamedTest()
     [<Test>] member x.``Reference 02``() = x.DoNamedTest()

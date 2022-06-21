@@ -1,0 +1,15 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(<no parameters>) : [NotNull] string
+Parameter: 1
+(provider: IFormatProvider) : [NotNull] string
+Parameter: 2
+(format: string) : [NotNull] string
+Parameter: 2
+(format: string, provider: IFormatProvider) : [NotNull] string
+Parameter: 3
+--- Accepted invocables: ---
+(<no parameters>) : [NotNull] string
+(provider: IFormatProvider) : [NotNull] string
+(format: string) : [NotNull] string
+(format: string, provider: IFormatProvider) : [NotNull] string

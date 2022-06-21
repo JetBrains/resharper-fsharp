@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -139,8 +140,8 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
                 text.Append("(", TextStyle.Default) |> ignore
 
                 let paramGroup = paramGroups[i]
-                if paramGroup.Count = 0 then
-                        text.Append("<no parameters>", TextStyle.Default) |> ignore
+                if paramGroup.Count = 0 && not isExtensionMember then
+                    text.Append("<no parameters>", TextStyle.Default) |> ignore
 
                 let groupStart = text.Length
 
@@ -291,7 +292,7 @@ type FSharpParameterInfoContext2(caretOffset: DocumentOffset, appExpr: IFSharpEx
 
                     elif argRange.Contains(caretOffset) && argStart <> caretOffset && argEnd <> caretOffset then
                         if parameterGroups[argIndex].Count = 1 then acc else
-                        if arg :? IUnitExpr then acc else
+                        if arg :? IUnitExpr && caretOffset.Offset < argEnd.Offset then acc else
 
                         match arg.IgnoreSingleInnerParens() with
                         | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct ->
@@ -375,8 +376,18 @@ type FSharpParameterInfoContextFactory2() =
         let fsFile = solution.GetPsiServices().GetPsiFile<FSharpLanguage>(caretOffset).As<IFSharpFile>()
         if isNull fsFile then null else
 
-        let token = fsFile.FindTokenAt(caretOffset - 1)
+        let token = fsFile.FindTokenAt(caretOffset)
         if isNull token then null else
+
+        let token =
+            if getTokenType token != FSharpTokenType.RPAREN then
+                token
+            else
+                let prevToken = token.GetPreviousMeaningfulToken()
+                if getTokenType prevToken == FSharpTokenType.RPAREN then
+                    token
+                else
+                    prevToken
 
         let token = token.GetPreviousMeaningfulToken(true)
         if isNull token then null else
@@ -393,9 +404,16 @@ type FSharpParameterInfoContextFactory2() =
         let range = expr.GetDocumentRange()
         let expr =
             match expr with
-            | :? IParenExpr as parenExpr when range.StartOffset <> caretOffset && range.EndOffset <> caretOffset ->
+            | :? IParenExpr as parenExpr when
+                    caretOffset.Offset > range.StartOffset.Offset && caretOffset.Offset < range.EndOffset.Offset ||
+                    isNull (PrefixAppExprNavigator.GetByArgumentExpression(parenExpr)) ->
                 // Only use the inner expression when inside parens
-                parenExpr.InnerExpression
+                match parenExpr.InnerExpression with
+                | :? IPrefixAppExpr as prefixAppExpr when prefixAppExpr.GetDocumentEndOffset() = caretOffset ->
+                    match prefixAppExpr.ArgumentExpression with
+                    | :? IParenExpr | :? IUnitExpr -> expr
+                    | _ -> prefixAppExpr
+                | innerExpr -> innerExpr
             | _ -> expr
 
         if isNull expr then null else
