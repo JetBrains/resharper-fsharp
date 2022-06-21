@@ -86,7 +86,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     }
 
     private static object GetDefaultFormatConfig() =>
-      FormatConfigType.GetProperty("Default")?.GetValue(null).NotNull();
+      FormatConfigType
+        .GetProperty("Default")
+        .NotNull("FormatConfig must contain static .Default property")
+        .GetValue(null)
+        .NotNull();
 
     private static Type GetFSharpParsingOptions()
     {
@@ -100,16 +104,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       return Type.GetType(qualifiedName).NotNull($"{qualifiedName} must exist");
     }
 
-    private static readonly Type CodeFormatterType = GetCodeFormatter();
-
-    private static readonly object Checker = GetFSharpChecker();
-    private static readonly Type FSharpParsingOptionsType = GetFSharpParsingOptions();
-
-    private static readonly ConstructorInfo
-      CreateFSharpParsingOptions = FSharpParsingOptionsType?.GetConstructors().Single();
-
-    private static readonly Type FormatConfigType = GetFormatConfigType();
-
     private static Type GetFormatConfigType() =>
       FantomasAssembly
         .GetType($"{FantomasAssemblyName}.FormatConfig")
@@ -117,8 +111,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         .GetNestedType("FormatConfig")
         .NotNull();
 
+    private static readonly Type CodeFormatterType = GetCodeFormatter();
+    private static readonly Type FSharpParsingOptionsType = GetFSharpParsingOptions();
+    private static readonly Type FormatConfigType = GetFormatConfigType();
+
     private static readonly object DefaultDiagnosticOptions = GetDiagnosticOptions();
     private static readonly object DefaultFormatConfig = GetDefaultFormatConfig();
+    private static readonly object Checker = GetFSharpChecker();
+
+    private static readonly ConstructorInfo
+      CreateFSharpParsingOptions = FSharpParsingOptionsType?.GetConstructors().Single();
 
     private static readonly MethodInfo FormatSelectionMethod = CodeFormatterType.GetMethod("FormatSelectionAsync");
     private static readonly MethodInfo FormatDocumentMethod = CodeFormatterType.GetMethod("FormatDocumentAsync");
