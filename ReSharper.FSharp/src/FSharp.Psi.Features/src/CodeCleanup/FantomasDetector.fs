@@ -172,11 +172,11 @@ type FantomasDetector(lifetime, fantomasSettingsProvider: FSharpFantomasSettings
     static member Create(lifetime) =
         FantomasDetector(lifetime, Unchecked.defaultof<FSharpFantomasSettingsProvider>, Unchecked.defaultof<NuGetDotnetToolsTracker>)
 
-    member x.TryRun(runAction: VirtualFileSystemPath -> unit) =
+    member x.TryRun(runAction: VirtualFileSystemPath * string -> unit) =
         use _ = rwLock.UsingWriteLock()
         fireNotifications()
-        let { Path = path; Location = version; Version = _ } as versionToRun = versionToRun.Value
-        try runAction path
+        let { Path = path; Location = version; Version = v } as versionToRun = versionToRun.Value
+        try runAction (path, v)
         with _ ->
             versionToRun.Status <- FailedToRun
             match version with

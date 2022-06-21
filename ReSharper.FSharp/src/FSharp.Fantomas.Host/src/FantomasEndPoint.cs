@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       return model;
     }
 
-    private static string GetVersion(Unit _) => FantomasCodeFormatter.CurrentVersion.ToString();
+    private static string GetVersion(Unit _) => FantomasCodeFormatter.CurrentVersion.ToNormalizedString();
 
     private static string[] GetFormatConfigFields(Unit _) =>
       FantomasCodeFormatter.FormatConfigFields.Select(t => t.Name).ToArray();

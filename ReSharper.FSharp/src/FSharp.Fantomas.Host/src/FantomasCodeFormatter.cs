@@ -4,12 +4,14 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Diagnostics;
 using JetBrains.Extension;
+using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol;
 using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
 using JetBrains.Util;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Reflection;
+using NuGet.Versioning;
 using FSharpType = Microsoft.FSharp.Reflection.FSharpType;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
@@ -17,23 +19,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
   // TODO: collect used Fantomas versions
   internal static class FantomasCodeFormatter
   {
-    private static readonly Version Version45 = Version.Parse("4.5");
-    private static readonly Version Version46 = Version.Parse("4.6");
-    private static readonly Version Version50 = Version.Parse("5.0");
+    private static readonly (Assembly Assembly, NuGetVersion CurrentVersion) Fantomas =
+      FantomasAssemblyResolver.LoadFantomasAssembly();
 
-    private static readonly string FantomasAssemblyName = /*CurrentVersion >= Version50*/
-      true ? "Fantomas.Core" : "Fantomas.Core";
+    private static readonly Assembly FantomasAssembly = Fantomas.Assembly;
+    public static readonly NuGetVersion CurrentVersion = Fantomas.CurrentVersion;
+    private static readonly string FantomasAssemblyName = FantomasAssembly.GetName().Name;
 
-    private static Type GetCodeFormatter()
-    {
-      var qualifiedName = Assembly.CreateQualifiedName(FantomasAssemblyName, "CodeFormatter");
-      var type = Type.GetType(qualifiedName).NotNull($"{qualifiedName} must exist");
+    private static readonly NuGetVersion Version45 = NuGetVersion.Parse("4.5");
+    private static readonly NuGetVersion Version46 = NuGetVersion.Parse("4.6");
 
-      return type;
-    }
+    private static Type GetCodeFormatter() =>
+      FantomasAssembly
+        .GetType($"{FantomasAssemblyName}.CodeFormatter")
+        .NotNull("CodeFormatter must exist");
 
     private static object GetFSharpChecker()
     {
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return null;
+
       var searchedType = CurrentVersion < Version46
         ? "FSharp.Compiler.SourceCodeServices.FSharpChecker"
         : "FSharp.Compiler.CodeAnalysis.FSharpChecker";
@@ -52,20 +56,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static MethodInfo GetSourceOriginStringConstructor()
     {
-      var qualifiedName = Assembly.CreateQualifiedName(FantomasAssemblyName, "SourceOrigin");
-      return Type
-        .GetType(qualifiedName)
-        .NotNull($"{qualifiedName} must exist")
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return null;
+
+      return FantomasAssembly
+        .GetType($"{FantomasAssemblyName}.SourceOrigin")
+        .NotNull($"SourceOrigin must exist")
         .GetNestedType("SourceOrigin")
-        .NotNull($"{qualifiedName}.SourceOrigin must exist")
+        .NotNull($"SourceOrigin.SourceOrigin must exist")
         .GetMethod("NewSourceString")
-        .NotNull($"{qualifiedName}.SourceOrigin must contain static .NewSourceString method");
+        .NotNull($"SourceOrigin.SourceOrigin must contain static .NewSourceString method");
     }
 
     private static object GetDiagnosticOptions()
     {
-      var assemblyToSearch = FSharpParsingOptionsType.Assembly;
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return null;
 
+      var assemblyToSearch = FSharpParsingOptionsType.Assembly;
       var optionsTypeName = CurrentVersion switch
       {
         { } v when v < Version45 => "FSharp.Compiler.ErrorLogger+FSharpErrorSeverityOptions",
@@ -84,6 +90,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static Type GetFSharpParsingOptions()
     {
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return null;
       var searchedType = CurrentVersion < Version46
         ? "FSharp.Compiler.SourceCodeServices.FSharpParsingOptions"
         : "FSharp.Compiler.CodeAnalysis.FSharpParsingOptions";
@@ -93,17 +100,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     }
 
     private static readonly Type CodeFormatterType = GetCodeFormatter();
-    public static Version CurrentVersion { get; } = CodeFormatterType.Assembly.GetName().Version;
 
     private static readonly object Checker = GetFSharpChecker();
     private static readonly Type FSharpParsingOptionsType = GetFSharpParsingOptions();
 
     private static readonly ConstructorInfo
-      CreateFSharpParsingOptions = FSharpParsingOptionsType.GetConstructors().Single();
+      CreateFSharpParsingOptions = FSharpParsingOptionsType?.GetConstructors().Single();
+
+    private static readonly Type FormatConfigType = GetFormatConfigType();
+
+    private static Type GetFormatConfigType() =>
+      FantomasAssembly
+        .GetType($"{FantomasAssemblyName}.FormatConfig")
+        .NotNull("FormatConfig must exist")
+        .GetNestedType("FormatConfig")
+        .NotNull();
 
     private static readonly object DefaultDiagnosticOptions = GetDiagnosticOptions();
-    private static readonly Type FormatConfigType = GetCodeFormatter();
     private static readonly object DefaultFormatConfig = GetDefaultFormatConfig();
+
     private static readonly MethodInfo FormatSelectionMethod = CodeFormatterType.GetMethod("FormatSelectionAsync");
     private static readonly MethodInfo FormatDocumentMethod = CodeFormatterType.GetMethod("FormatDocumentAsync");
     private static readonly MethodInfo MakeRangeMethod = CodeFormatterType.GetMethod("MakeRange");
@@ -126,7 +141,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     public static string FormatSelection(RdFantomasFormatSelectionArgs args)
     {
       // Fantomas 5 temporary does not support format selection
-      if (CurrentVersion >= Version50) return args.Source;
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return args.Source;
       var rdRange = args.Range;
 
       var range =
@@ -153,7 +168,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static IEnumerable<object> GetFormatDocumentOptions(RdFantomasFormatDocumentArgs args)
     {
-      if (CurrentVersion >= Version50)
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version)
       {
         yield return args.FileName.EndsWith(".fsi"); // isSignature
         yield return args.Source;

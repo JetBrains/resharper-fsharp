@@ -1,5 +1,6 @@
 using JetBrains.Util;
 using JetBrains.Util.Logging;
+using NuGet.Versioning;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 {
@@ -8,6 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
     public const string PROCESS_FILENAME = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.dll";
     public const string PARENT_PROCESS_PID_ENV_VARIABLE = "FSHARP_FANTOMAS_PROCESS_PID";
     public static readonly FileSystemPath LogFolder = Logger.LogFolderPath / "Fantomas";
+    public static readonly NuGetVersion Fantomas5Alpha3Version = NuGetVersion.Parse("5.0.0-alpha-003");
 
     public static string CoreRuntimeConfigFilename =>
       "Fantomas.Host" +

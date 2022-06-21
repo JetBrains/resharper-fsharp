@@ -1,7 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
+open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
+open JetBrains.Application.Notifications
 open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -10,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client
 open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCleanup.FSharpEditorConfig
 open JetBrains.Util
+open NuGet.Versioning
 
 module internal Reflection =
     let formatSettingType = typeof<FSharpFormatSettingsKey>
@@ -20,11 +23,14 @@ module internal Reflection =
 
 
 [<SolutionComponent>]
-type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector) =
+type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector,
+                  notifications: UserNotifications) =
+    let mutable showSelectionNotification = true
     let solutionLifetime = solution.GetLifetime()
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
     let mutable formatterHostLifetime: LifetimeDefinition = null
+    let mutable runningVersion: NuGetVersion = null
 
     let toEditorConfigName name = $"{fSharpEditorConfigPrefix}{StringUtil.MakeUnderscoreCaseName(name)}"
 
@@ -36,10 +42,11 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
 
     let connect () =
         // TryRun synchronizes process creation and keeps track of its status
-        fantomasDetector.TryRun(fun path ->
+        fantomasDetector.TryRun(fun (path, version) ->
             if isConnectionAlive () then () else
+            runningVersion <- NuGetVersion.Parse(version)
             formatterHostLifetime <- Lifetime.Define(solutionLifetime)
-            connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, path).Run()
+            connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, version, path).Run()
             formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance, RpcTimeouts.Maximal))
         )
 
@@ -66,13 +73,21 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
 
     do fantomasDetector.VersionToRun.Advise(solutionLifetime, fun _ -> terminateConnection ())
 
-    member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
+    member x.FormatSelection(filePath, range: range, source: string, settings, options, newLineText) =
         connect()
-        let args =
-            RdFantomasFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
-                convertParsingOptions options, newLineText)
+        if runningVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version then
+            if showSelectionNotification then
+                notifications.CreateNotification(solutionLifetime,
+                    title = "Selection formatting is not supported",
+                    body = "Specified Fantomas version does not support selection formatting.") |> ignore
+                showSelectionNotification <- false
+            raise (NotImplementedException())
+        else
+            let args =
+                RdFantomasFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
+                    convertParsingOptions options, newLineText)
 
-        connection.Execute(fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
+            connection.Execute(fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
 
     member x.FormatDocument(filePath, source, settings, options, newLineText) =
         connect()
