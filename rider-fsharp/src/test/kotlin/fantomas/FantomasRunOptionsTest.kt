@@ -157,7 +157,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
                     it.print(dumpRunOptions())
 
                     reformatCode()
-                    checkFantomasVersion("4.7.6.0")
+                    checkFantomasVersion("4.7.6")
                     dumpNotifications(it, 0)
                 }
 
