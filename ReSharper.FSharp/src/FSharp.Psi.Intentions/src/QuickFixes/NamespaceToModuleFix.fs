@@ -27,7 +27,7 @@ type NamespaceToModuleFix(node: IFSharpTreeNode) =
         | :? IGlobalNamespaceDeclaration -> false
         | _ ->
 
-        let fsFile = FSharpImplFileNavigator.GetByModuleDeclaration(namespaceDeclaration)
+        let fsFile = FSharpFileNavigator.GetByModuleDeclaration(namespaceDeclaration)
         isNotNull fsFile && fsFile.ModuleDeclarations.Count = 1
 
     override x.ExecutePsiTransaction _ =
