@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
           ?.ConstructorArguments.FirstOrDefault();
         return defaultValueAttr == null
           ? new DefaultValue(Type, Type)
-          : new DefaultValue(Type, new ConstantValue(defaultValueAttr.Item2, type: null));
+          : new DefaultValue(Type, ConstantValue.Create(defaultValueAttr.Item2, Type));
       }
       // todo: change exception in FCS
       catch (Exception)

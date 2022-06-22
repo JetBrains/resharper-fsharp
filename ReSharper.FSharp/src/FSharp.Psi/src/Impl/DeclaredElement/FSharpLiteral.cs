@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public ConstantValue ConstantValue =>
       Mfv is { } mfv
-        ? new ConstantValue(mfv.LiteralValue.Value, Type)
+        ? ConstantValue.Create(mfv.LiteralValue.Value, Type)
         : ConstantValue.BAD_VALUE;
 
     public bool IsField => false;

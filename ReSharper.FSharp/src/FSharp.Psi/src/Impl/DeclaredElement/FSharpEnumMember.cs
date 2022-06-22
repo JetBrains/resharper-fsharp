@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public ConstantValue ConstantValue =>
       Field?.LiteralValue?.Value is { } literalValue
-        ? new ConstantValue(literalValue, Type)
+        ? ConstantValue.Create(literalValue, Type)
         : ConstantValue.BAD_VALUE;
 
     public override bool IsStatic => true;
