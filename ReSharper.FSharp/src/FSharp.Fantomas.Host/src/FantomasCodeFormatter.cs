@@ -11,7 +11,6 @@ using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Reflection;
-using NuGet.Versioning;
 using FSharpType = Microsoft.FSharp.Reflection.FSharpType;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
@@ -19,15 +18,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
   // TODO: collect used Fantomas versions
   internal static class FantomasCodeFormatter
   {
-    private static readonly (Assembly Assembly, NuGetVersion CurrentVersion) Fantomas =
-      FantomasAssemblyResolver.LoadFantomasAssembly();
-
-    private static readonly Assembly FantomasAssembly = Fantomas.Assembly;
-    public static readonly NuGetVersion CurrentVersion = Fantomas.CurrentVersion;
+    private static readonly Assembly FantomasAssembly = FantomasAssemblyResolver.LoadFantomasAssembly();
+    public static readonly Version CurrentVersion = FantomasAssembly.GetName().Version;
     private static readonly string FantomasAssemblyName = FantomasAssembly.GetName().Name;
 
-    private static readonly NuGetVersion Version45 = NuGetVersion.Parse("4.5");
-    private static readonly NuGetVersion Version46 = NuGetVersion.Parse("4.6");
+    private static readonly Version Version45 = Version.Parse("4.5");
+    private static readonly Version Version46 = Version.Parse("4.6");
 
     private static Type GetCodeFormatter() =>
       FantomasAssembly

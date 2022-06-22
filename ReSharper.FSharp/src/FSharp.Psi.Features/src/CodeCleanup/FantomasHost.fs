@@ -30,7 +30,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
     let mutable formatterHostLifetime: LifetimeDefinition = null
-    let mutable runningVersion: NuGetVersion = null
+    let mutable runningVersion: Version = null
 
     let toEditorConfigName name = $"{fSharpEditorConfigPrefix}{StringUtil.MakeUnderscoreCaseName(name)}"
 
@@ -44,7 +44,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
         // TryRun synchronizes process creation and keeps track of its status
         fantomasDetector.TryRun(fun (path, version) ->
             if isConnectionAlive () then () else
-            runningVersion <- NuGetVersion.Parse(version)
+            runningVersion <- NuGetVersion.Parse(version).Version
             formatterHostLifetime <- Lifetime.Define(solutionLifetime)
             connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, version, path).Run()
             formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance, RpcTimeouts.Maximal))

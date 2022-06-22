@@ -39,8 +39,8 @@ class FantomasRunOptionsTest : EditorTestBase() {
 
     private fun getDotnetCliHome() = Path(tempTestDirectory.parent, "dotnetHomeCli")
     private val fantomasNotifications = ArrayList<String>()
-    private val bundledVersion = "4.7.8"
-    private val globalVersion = "4.7.2"
+    private val bundledVersion = "4.7.8.0"
+    private val globalVersion = "4.7.2.0"
     private var dotnetToolsInvalidated = false
 
     private fun dumpRunOptions() = project.fcsHost.dumpFantomasRunOptions.sync(Unit)
@@ -157,7 +157,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
                     it.print(dumpRunOptions())
 
                     reformatCode()
-                    checkFantomasVersion("4.7.6")
+                    checkFantomasVersion("4.7.6.0")
                     dumpNotifications(it, 0)
                 }
 
@@ -172,16 +172,16 @@ class FantomasRunOptionsTest : EditorTestBase() {
     }
 
     @Test
-    fun `local tool 3_3`() = doLocalToolTest("fantomas-tool", "3.3.0", "3.3.0")
+    fun `local tool 3_3`() = doLocalToolTest("fantomas-tool", "3.3.0", "3.3.0.0")
 
     @Test
-    fun `local tool 4_5`() = doLocalToolTest("fantomas-tool", "4.5.0", "4.5.0")
+    fun `local tool 4_5`() = doLocalToolTest("fantomas-tool", "4.5.0", "4.5.0.0")
 
     @Test
-    fun `local tool 4_6`() = doLocalToolTest("fantomas-tool", "4.6.0", "4.6.0")
+    fun `local tool 4_6`() = doLocalToolTest("fantomas-tool", "4.6.0", "4.6.0.0")
 
     @Test
-    fun `local tool 5_0_0-alpha-003`() = doLocalToolTest("fantomas", "5.0.0-alpha-003", "5.0.0-alpha-003")
+    fun `local tool 5_0_0-alpha-003`() = doLocalToolTest("fantomas", "5.0.0-alpha-003", "5.0.0.0")
 
     @Test
     fun `global tool`() {

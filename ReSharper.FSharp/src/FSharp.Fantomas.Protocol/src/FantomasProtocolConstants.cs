@@ -1,6 +1,6 @@
+using System;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
-using NuGet.Versioning;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 {
@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
     /// - Fantomas.dll renamed to Fantomas.Core.dll
     /// - removed FormatSelection/MakeRange APIs
     /// - removed FCS-entities from FormatDocument args
-    public static readonly NuGetVersion Fantomas5Version = NuGetVersion.Parse("5.0");
+    public static readonly Version Fantomas5Version = Version.Parse("5.0");
 
     public static string CoreRuntimeConfigFilename =>
       "Fantomas.Host" +
