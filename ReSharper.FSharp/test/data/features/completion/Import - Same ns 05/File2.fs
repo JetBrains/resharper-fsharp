@@ -1,0 +1,4 @@
+// ${COMPLETE_ITEM:M (in Ns1.Ns2)}
+namespace Ns1.Ns2
+
+{caret}

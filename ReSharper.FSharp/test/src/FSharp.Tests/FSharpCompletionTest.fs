@@ -17,6 +17,11 @@ type FSharpCompletionTest() =
 
     override x.TestType = CodeCompletionTestType.Action
 
+    member x.DoTestFiles([<ParamArray>] names: string[]) =
+        let testDir = x.TestDataPath / x.TestMethodName
+        let paths = names |> Array.map (fun name -> testDir.Combine(name).FullPath)
+        x.DoTestSolution(paths)
+
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 02``() = x.DoNamedTest()
 
@@ -139,6 +144,11 @@ type FSharpCompletionTest() =
     [<TestSetting(typeof<FSharpOptions>, "EnableOutOfScopeCompletion", "false")>]
     [<Test>] member x.``Import - Same project 02 - Disabled import``() = x.DoNamedTest()
 
+    [<Test>] member x.``Import - Same ns 01``() = x.DoTestFiles("File1.fs", "File2.fs")
+    [<Test>] member x.``Import - Same ns 02``() = x.DoTestFiles("File1.fs", "File2.fs")
+    [<Test>] member x.``Import - Same ns 03``() = x.DoTestFiles("File1.fs", "File2.fs")
+    [<Test>] member x.``Import - Same ns 04``() = x.DoTestFiles("File1.fs", "File2.fs")
+    [<Test>] member x.``Import - Same ns 05``() = x.DoTestFiles("File1.fs", "File2.fs")
 
 [<FSharpTest>]
 type FSharpPostfixCompletionTest() =
