@@ -75,7 +75,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
 
     member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
         connect()
-        if runningVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version then
+        if runningVersion >= FantomasProtocolConstants.Fantomas5Version then
             if showSelectionNotification then
                 notifications.CreateNotification(solutionLifetime,
                     title = "Selection formatting is not supported",

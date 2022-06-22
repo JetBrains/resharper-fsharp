@@ -59,8 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         throw new ArgumentException("Wrong Fantomas version", fantomasVersionEnv);
 
       var fantomasPath = Environment.GetEnvironmentVariable(FantomasAssembliesPathEnvVar);
-
-      var fantomasDllName = fantomasVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version
+      var fantomasDllName = fantomasVersion >= FantomasProtocolConstants.Fantomas5Version
         ? "Fantomas.Core.dll"
         : "Fantomas.dll";
       return (Assembly.LoadFrom(Path.Combine(fantomasPath, fantomasDllName)), fantomasVersion);

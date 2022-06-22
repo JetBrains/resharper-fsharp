@@ -181,9 +181,6 @@ class FantomasRunOptionsTest : EditorTestBase() {
     fun `local tool 4_6`() = doLocalToolTest("fantomas-tool", "4.6.0", "4.6.0")
 
     @Test
-    fun `local tool 5_0_0-alpha-002`() = doLocalToolTest("fantomas-tool", "5.0.0-alpha-002", "5.0.0-alpha-002")
-
-    @Test
     fun `local tool 5_0_0-alpha-003`() = doLocalToolTest("fantomas", "5.0.0-alpha-003", "5.0.0-alpha-003")
 
     @Test

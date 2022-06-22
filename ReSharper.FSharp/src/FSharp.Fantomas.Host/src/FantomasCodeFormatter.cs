@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static object GetFSharpChecker()
     {
-      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return null;
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version) return null;
 
       var searchedType = CurrentVersion < Version46
         ? "FSharp.Compiler.SourceCodeServices.FSharpChecker"
@@ -56,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static MethodInfo GetSourceOriginStringConstructor()
     {
-      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return null;
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version) return null;
 
       return FantomasAssembly
         .GetType($"{FantomasAssemblyName}.SourceOrigin")
@@ -69,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static object GetDiagnosticOptions()
     {
-      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return null;
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version) return null;
 
       var assemblyToSearch = FSharpParsingOptionsType.Assembly;
       var optionsTypeName = CurrentVersion switch
@@ -94,7 +94,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static Type GetFSharpParsingOptions()
     {
-      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) return null;
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version) return null;
 
       var searchedType = CurrentVersion < Version46
         ? "FSharp.Compiler.SourceCodeServices.FSharpParsingOptions"
@@ -144,7 +144,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     public static string FormatSelection(RdFantomasFormatSelectionArgs args)
     {
       // Fantomas 5 temporary does not support format selection
-      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version) throw new NotImplementedException();
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version) throw new NotImplementedException();
 
       var rdRange = args.Range;
       var range =
@@ -171,7 +171,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static IEnumerable<object> GetFormatDocumentOptions(RdFantomasFormatDocumentArgs args)
     {
-      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Alpha3Version)
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version)
       {
         yield return args.FileName.EndsWith(".fsi"); // isSignature
         yield return args.Source;
