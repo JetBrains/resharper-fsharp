@@ -69,10 +69,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         // If there's a signature file then this type is hidden.
         decoration.AccessRights = AccessRights.INTERNAL;
 
-      if (typePart is TypeAbbreviationOrDeclarationPartBase { IsUnionCase: false })
+      if (typePart is ObjectExpressionTypePart or TypeAbbreviationOrDeclarationPartBase { IsUnionCase: false })
         // Type abbreviation is a union case declaration when its right part is a simple named type
         // that is not resolved to anything.
-        // When the part is abbreviation, we modify it's visibility to hide from other languages.
+        // When the part is an actual abbreviation, we modify its visibility to hide from other languages.
+        // We use the same approach for object expression parts.
         //
         // We cannot set it directly in the part modifiers,
         // since it depends on resolve which needs committed documents and is slow.
