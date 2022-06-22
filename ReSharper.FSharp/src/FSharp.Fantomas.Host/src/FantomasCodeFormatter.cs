@@ -161,26 +161,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     public static string FormatDocument(RdFantomasFormatDocumentArgs args) =>
       FSharpAsync.StartAsTask(
-          FormatDocumentMethod.Invoke(null, GetFormatDocumentOptions(args).ToArray()) as FSharpAsync<string>,
+          FormatDocumentMethod.Invoke(null, GetFormatDocumentOptions(args)) as FSharpAsync<string>,
           null, null)
         .Result.Replace("\r\n", args.NewLineText);
 
-    private static IEnumerable<object> GetFormatDocumentOptions(RdFantomasFormatDocumentArgs args)
+    private static object[] GetFormatDocumentOptions(RdFantomasFormatDocumentArgs args)
     {
       if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version)
+        return new[]
+        {
+          args.FileName.EndsWith(".fsi"), // isSignature
+          args.Source,
+          ConvertToFormatConfig(args.FormatConfig)
+        };
+
+      return new[]
       {
-        yield return args.FileName.EndsWith(".fsi"); // isSignature
-        yield return args.Source;
-        yield return ConvertToFormatConfig(args.FormatConfig);
-      }
-      else
-      {
-        yield return args.FileName;
-        yield return SourceOriginConstructor.Invoke(null, new object[] { args.Source });
-        yield return ConvertToFormatConfig(args.FormatConfig);
-        yield return CreateFSharpParsingOptions.Invoke(GetParsingOptions(args.ParsingOptions).ToArray());
-        yield return Checker;
-      }
+        args.FileName,
+        SourceOriginConstructor.Invoke(null, new object[] { args.Source }),
+        ConvertToFormatConfig(args.FormatConfig),
+        CreateFSharpParsingOptions.Invoke(GetParsingOptions(args.ParsingOptions).ToArray()),
+        Checker
+      };
     }
 
     private static IEnumerable<object> GetParsingOptions(RdFcsParsingOptions options)
