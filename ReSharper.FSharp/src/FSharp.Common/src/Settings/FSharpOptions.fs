@@ -80,7 +80,7 @@ module FSharpExperimentalFeatures =
     let [<Literal>] formatter = "Enable F# code formatter"
     let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor"
     let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process"
-    let [<Literal>] generativeTypeProvidersInMemoryAnalysis = "Analyze F# generative type providers in C#/VB projects without build"
+    let [<Literal>] generativeTypeProvidersInMemoryAnalysis = "Enable generative type providers analysis in C#/VB.NET projects"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
@@ -196,12 +196,16 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOptionWithComment((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
         this.AddBoolOptionWithComment((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Solution reload required") |> ignore
-
-        this.AddHeader("Experimental features options")
-        this.AddBoolOptionWithComment((fun key -> key.GenerativeTypeProvidersInMemoryAnalysis), FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis, "Solution reload required") |> ignore
+        
+        do
+            use indent = this.Indent()
+            [ this.AddBoolOptionWithComment((fun key -> key.GenerativeTypeProvidersInMemoryAnalysis), FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis, "Solution reload required") ]
+            |> Seq.iter (fun checkbox ->
+                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.OutOfProcessTypeProviders), fun t -> t :> obj))
+            
         
         if configurations.IsInternalMode() then
-            this.AddHeader("Internal experimental features options")
+            this.AddHeader("Experimental features options")
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
             this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
