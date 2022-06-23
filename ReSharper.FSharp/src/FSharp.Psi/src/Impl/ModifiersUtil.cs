@@ -64,6 +64,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       var decoration = typePart.Modifiers;
 
+      // todo: use a marker interface to hide the types, as the current approach doesn't work well with IVTs
+
       if (typePart.GetRoot() is FSharpProjectFilePart { HasPairFile: true })
         // We already know there's no type part in a signature file.
         // If there's a signature file then this type is hidden.
