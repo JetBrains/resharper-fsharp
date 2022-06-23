@@ -97,7 +97,7 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
 
         this.AddControl((fun (key: FSharpFantomasOptions) -> key.Location), createComboBox) |> ignore
 
-        this.AddCommentText("To use a specified Fantomas version, install it globally via 'dotnet tool install fantomas-tool -g'\n" +
+        this.AddCommentText("To use a specified Fantomas version, install it globally via 'dotnet tool install fantomas -g'\n" +
                             "or specify it in dotnet-tools.json file in the solution directory.")
         this.AddLinkButton("DotnetToolsLink", "Learn more", fun () -> uiApplication.OpenUri("https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install")) |> ignore
 
