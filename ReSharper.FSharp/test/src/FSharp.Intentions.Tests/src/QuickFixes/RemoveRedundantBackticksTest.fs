@@ -13,3 +13,4 @@ type RemoveRedundantBackticksTest() =
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
 
     [<Test; NoHighlightingFound>] member x.``Keyword 01``() = x.DoNamedTest()
+    [<Test; NoHighlightingFound>] member x.``Underscore 01``() = x.DoNamedTest()
