@@ -471,13 +471,15 @@ type FSharpParameterInfoContextFactory2() =
         let column = int endCoords.Column + 1
         let names = List.ofSeq invokedExpr.Names
 
-        match results.CheckResults.GetMethodsAsSymbols(line, column, "", names) with
-        | Some symbolUses when not symbolUses.IsEmpty ->
-            let documentRange = DocumentRange(&endOffset)
-            let fcsRange = FSharpRangeUtil.ofDocumentRange documentRange
+        let documentRange = DocumentRange(&endOffset)
+        let fcsRange = FSharpRangeUtil.ofDocumentRange documentRange
 
-            FSharpParameterInfoContext2(caretOffset, appExpr, symbolUses, results.CheckResults, fcsRange, mfv)
-        | _ -> null
+        let symbolUses = 
+            match results.CheckResults.GetMethodsAsSymbols(line, column, "", names) with
+            | Some symbolUses when not symbolUses.IsEmpty -> symbolUses
+            | _ -> [symbolUse]
+
+        FSharpParameterInfoContext2(caretOffset, appExpr, symbolUses, results.CheckResults, fcsRange, mfv)
 
     and tryCreateFromParent isAutoPopup caretOffset (expr: IFSharpExpression) =
         let parentExpr = expr.IgnoreParentParens().GetContainingNode<IFSharpExpression>()

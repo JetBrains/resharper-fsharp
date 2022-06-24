@@ -96,6 +96,9 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Method 14 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``App - Method 15 - Empty``() = x.DoNamedTest()
 
+    [<Test>] member x.``Reference - Local 01``() = x.DoNamedTest()
+    [<Test>] member x.``Reference - Local 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Reference 01``() = x.DoNamedTest()
     [<Test>] member x.``Reference 02``() = x.DoNamedTest()
     [<Test>] member x.``Reference 03``() = x.DoNamedTest()
