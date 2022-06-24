@@ -309,7 +309,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var mfvXmlDocId = GetXmlDocId(mfv);
       if (mfvXmlDocId.IsEmpty())
-        return null;
+        return mfv.IsConstructor
+          ? members.FirstOrDefault(member => member is IConstructor { IsDefault: true })
+          : null;
 
       return members.FirstOrDefault(member =>
         // todo: Fix signature for extension properties
