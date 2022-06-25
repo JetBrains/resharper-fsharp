@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       myToolset = toolset;
     }
 
-    public TypeProvidersExternalProcess Create(Lifetime lifetime)
+    public TypeProvidersExternalProcess Create(Lifetime lifetime, bool isInternalMode)
     {
       var sdkVersion = myToolset.GetDotNetCoreToolset()?.Sdk?.Version;
 
@@ -42,7 +42,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         myShellLocks,
         mySolutionProcessStartInfoPatcher,
         GetProcessRuntime(),
-        sdkVersion);
+        sdkVersion,
+        isInternalMode);
     }
 
     private JetProcessRuntimeRequest GetProcessRuntime()

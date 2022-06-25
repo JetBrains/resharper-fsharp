@@ -5,6 +5,8 @@ open FSharp.Compiler
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Compiler.Text
 open FSharp.Core.CompilerServices
+open JetBrains.Application.Environment
+open JetBrains.Application.Environment.Helpers
 open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -27,7 +29,8 @@ type IProxyExtensionTypingProvider =
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         experimentalFeatures: FSharpExperimentalFeaturesProvider, fcsProjectProvider: IFcsProjectProvider,
         scriptPsiModulesProvider: FSharpScriptPsiModulesProvider, outputAssemblies: OutputAssemblies,
-        typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory) as this =
+        typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory,
+        productConfigurations: RunsProducts.ProductConfigurations) as this =
     let lifetime = solution.GetLifetime()
     let defaultShim = ExtensionTypingProvider
     let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
@@ -50,7 +53,8 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
             if isConnectionAlive () then () else
 
             typeProvidersHostLifetime <- Lifetime.Define(lifetime)
-            let newConnection = typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime).Run()
+            let isInternalMode = productConfigurations.IsInternalMode()
+            let newConnection = typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime, isInternalMode).Run()
             typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, scriptPsiModulesProvider, outputAssemblies) :?> _
             connection <- newConnection)
 

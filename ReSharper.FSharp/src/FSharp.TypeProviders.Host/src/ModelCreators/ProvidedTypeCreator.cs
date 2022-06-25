@@ -18,14 +18,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
     {
       var logger = myTypeProvidersContext.Logger;
 
-      var isValueType = logger.Catch(() => !providedModel.IsGenericParameter && providedModel.IsValueType);
-      var isClass = logger.Catch(() => !providedModel.IsGenericParameter && providedModel.IsClass);
+      var isGenericParameter = logger.Catch(() => providedModel.IsGenericParameter);
+      var isValueType = logger.Catch(() => !isGenericParameter && providedModel.IsValueType);
+      var isClass = logger.Catch(() => !isGenericParameter && providedModel.IsClass);
 
-      var baseTypeId = !providedModel.IsGenericParameter
+      var baseTypeId = !isGenericParameter
         ? GetOrCreateId(providedModel.BaseType, typeProviderId)
         : ProvidedConst.DefaultId;
 
-      var declaringTypeId = providedModel.IsGenericParameter ||
+      var declaringTypeId = isGenericParameter ||
                             providedModel.IsArray && providedModel.GetElementType().IsGenericParameter
         ? ProvidedConst.DefaultId
         : GetOrCreateId(providedModel.DeclaringType, typeProviderId);
@@ -47,7 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
       if (logger.Catch(() => providedModel.IsGenericType)) flags |= RdProvidedTypeFlags.IsGenericType;
       if (logger.Catch(() => providedModel.IsNestedPublic)) flags |= RdProvidedTypeFlags.IsNestedPublic;
       if (logger.Catch(() => providedModel.IsSuppressRelocate)) flags |= RdProvidedTypeFlags.IsSuppressRelocate;
-      if (logger.Catch(() => providedModel.IsGenericParameter)) flags |= RdProvidedTypeFlags.IsGenericParameter;
+      if (isGenericParameter) flags |= RdProvidedTypeFlags.IsGenericParameter;
       if (providedModel.IsCreatedByProvider()) flags |= RdProvidedTypeFlags.IsCreatedByProvider;
 
       var genericParameters = providedModel.IsGenericType
