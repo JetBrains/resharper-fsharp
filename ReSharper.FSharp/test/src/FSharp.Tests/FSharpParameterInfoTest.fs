@@ -105,3 +105,18 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``Reference 04``() = x.DoNamedTest()
     [<Test>] member x.``Reference 05 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Reference 06``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type FSharpParameterInfoAutoPopupTest() =
+    inherit ParameterInfoAutoPopupTestBase()
+
+    override this.RelativeTestDataPath = "features/parameterInfo/autoPopup"
+
+    [<Test>] member x.``App 01``() = x.DoNamedTest()
+    [<Test>] member x.``App 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Reference 01``() = x.DoNamedTest()
+    [<Test>] member x.``Reference 02``() = x.DoNamedTest()
+    [<Test>] member x.``Reference 03``() = x.DoNamedTest()
+    [<Test; Explicit "Works in product">] member x.``Reference 04``() = x.DoNamedTest()

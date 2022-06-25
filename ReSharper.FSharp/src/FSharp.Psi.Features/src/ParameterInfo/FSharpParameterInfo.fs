@@ -383,11 +383,11 @@ type FSharpParameterInfoContextFactory2() =
             if getTokenType token != FSharpTokenType.RPAREN then
                 token
             else
-                let prevToken = token.GetPreviousMeaningfulToken()
-                if getTokenType prevToken == FSharpTokenType.RPAREN then
+                let prevSibling = token.PrevSibling
+                if getTokenType prevSibling == FSharpTokenType.RPAREN then
                     token
                 else
-                    prevToken
+                    prevSibling
 
         let token = token.GetPreviousMeaningfulToken(true)
         if isNull token then null else
@@ -500,8 +500,10 @@ type FSharpParameterInfoContextFactory2() =
             else
                 // This is called again before requesting a new context on reparsed file
                 match getExpressionAtOffset caretOffset solution with
-                | :? IPrefixAppExpr
-                | :? IReferenceExpr -> true
+                | :? IPrefixAppExpr -> true
+
+                | :? IReferenceExpr as refExpr when caretOffset.Offset >= refExpr.GetDocumentEndOffset().Offset ->
+                    true
 
                 | :? IUnitExpr as unitExpr ->
                     isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(unitExpr))
