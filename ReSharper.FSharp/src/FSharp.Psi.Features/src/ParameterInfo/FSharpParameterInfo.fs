@@ -44,7 +44,8 @@ type IFcsParameterInfoCandidate =
 
 [<AbstractClass>]
 type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharpSymbol and 'TParameter :> FSharpSymbol>
-        (range: range, symbol: 'TSymbol, symbolUse: FSharpSymbolUse, checkResults: FSharpCheckFileResults, expr: IFSharpReferenceOwner, mainSymbol: FSharpSymbol) =
+        (range: range, symbol: 'TSymbol, symbolUse: FSharpSymbolUse, checkResults: FSharpCheckFileResults,
+        expr: IFSharpReferenceOwner, mainSymbol: FSharpSymbol) =
     let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
 
     let psiModule = expr.GetPsiModule()
