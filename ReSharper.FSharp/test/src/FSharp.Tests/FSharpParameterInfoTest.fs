@@ -112,6 +112,18 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``Reference 05 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Reference 06``() = x.DoNamedTest()
 
+    [<Test>] member x.``Inherit - Overloads 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Inherit 01``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 02``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 03``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 04``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 05``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 06``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 07``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 08``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 09``() = x.DoNamedTest()
+
     [<Test>] member x.``Union case 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case 02``() = x.DoNamedTest()
     [<Test>] member x.``Union case 03``() = x.DoNamedTest()
@@ -130,7 +142,19 @@ type FSharpParameterInfoAutoPopupTest() =
     [<Test>] member x.``App 01``() = x.DoNamedTest()
     [<Test>] member x.``App 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 02``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 03``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Inherit 01``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``New 01``() = x.DoNamedTest()
+    [<Test>] member x.``New 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Reference 01``() = x.DoNamedTest()
     [<Test>] member x.``Reference 02``() = x.DoNamedTest()
     [<Test>] member x.``Reference 03``() = x.DoNamedTest()
     [<Test; Explicit "Works in product">] member x.``Reference 04``() = x.DoNamedTest()
+    [<Test>] member x.``Reference 05``() = x.DoNamedTest()

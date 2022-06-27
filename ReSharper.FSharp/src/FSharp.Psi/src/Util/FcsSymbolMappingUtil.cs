@@ -180,6 +180,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return null;
     }
 
+    [CanBeNull]
+    public static IDeclaredElement GetDeclaredElement([CanBeNull] this FSharpSymbol symbol,
+      [NotNull] FSharpSymbolReference reference) =>
+      symbol != null && reference.GetElement() is var referenceOwner
+        ? symbol.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner)
+        : null;
+
     private static IDeclaredElement GetDeclaredElement(FSharpUnionCase unionCase, IPsiModule psiModule,
       bool preferType = false)
     {

@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -23,6 +24,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
@@ -45,12 +47,15 @@ type IFcsParameterInfoCandidate =
 [<AbstractClass>]
 type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharpSymbol and 'TParameter :> FSharpSymbol>
         (range: range, symbol: 'TSymbol, symbolUse: FSharpSymbolUse, checkResults: FSharpCheckFileResults,
-        expr: IFSharpReferenceOwner, mainSymbol: FSharpSymbol) =
+        reference: FSharpSymbolReference, mainSymbol: FSharpSymbol) =
     let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
 
-    let psiModule = expr.GetPsiModule()
-    let declaredElement = symbol.GetDeclaredElement(psiModule, expr)
-    let parametersOwner = declaredElement.As<IParametersOwnerWithAttributes>()
+    let referenceOwner = reference.GetElement()
+    let psiModule = referenceOwner.GetPsiModule()
+
+    let mainElement = mainSymbol.GetDeclaredElement(reference)
+    let element = symbol.GetDeclaredElement(reference)
+    let parametersOwner = element.As<IParametersOwnerWithAttributes>()
 
     let getParameterIncludingThis index =
         if isNull parametersOwner then null else
@@ -95,7 +100,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
         member this.GetDescription() =
             match checkResults.GetDescription(symbol, [], false, range) with
             | ToolTipText [ ToolTipElement.Group [ elementData ] ] ->
-                let xmlDocService = expr.GetSolution().GetComponent<FSharpXmlDocService>().NotNull()
+                let xmlDocService = referenceOwner.GetSolution().GetComponent<FSharpXmlDocService>().NotNull()
                 xmlDocService.GetXmlDocSummary(elementData.XmlDoc)
             | _ -> null
 
@@ -266,6 +271,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
             text
 
         member this.Matches _ =
+            isNotNull mainElement && mainElement.Equals(element) ||
             symbol.IsEffectivelySameAs(mainSymbol)
 
         member this.IsFilteredOut = false
@@ -331,9 +337,10 @@ type FcsExceptionParameterInfoCandidate(range, entity, symbolUse, checkResults, 
     override this.XmlDoc = entity.XmlDoc
 
 
-[<AllowNullLiteral>]
-type FSharpParameterInfoContext(caretOffset: DocumentOffset, appExpr: IFSharpExpression, r: IReferenceExpr, symbolUses: FSharpSymbolUse list,
-        checkResults, referenceEndOffset: DocumentOffset, mainSymbol: FSharpSymbol) =
+[<AllowNullLiteral; AbstractClass>]
+type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caretOffset: DocumentOffset, context: 'TNode,
+        reference: FSharpSymbolReference, symbolUses: FSharpSymbolUse list, checkResults,
+        referenceEndOffset: DocumentOffset, mainSymbol: FSharpSymbol) =
     let documentRange = DocumentRange(&referenceEndOffset)
     let fcsRange = FSharpRangeUtil.ofDocumentRange documentRange
 
@@ -342,17 +349,20 @@ type FSharpParameterInfoContext(caretOffset: DocumentOffset, appExpr: IFSharpExp
         |> List.choose (fun item ->
             match item.Symbol with
             | :? FSharpMemberOrFunctionOrValue as mfv when not (mfv.CurriedParameterGroups.IsEmpty()) ->
-                Some(FcsMfvParameterInfoCandidate(fcsRange, mfv, item, checkResults, r, mainSymbol) :> ICandidate)
+                Some(FcsMfvParameterInfoCandidate(fcsRange, mfv, item, checkResults, reference, mainSymbol) :> ICandidate)
             | :? FSharpUnionCase as uc when not (uc.Fields.IsEmpty()) ->
-                Some(FcsUnionCaseParameterInfoCandidate(fcsRange, uc, item, checkResults, r, mainSymbol) :> ICandidate)
+                Some(FcsUnionCaseParameterInfoCandidate(fcsRange, uc, item, checkResults, reference, mainSymbol) :> ICandidate)
             | :? FSharpEntity as e when e.IsFSharpExceptionDeclaration && not (e.FSharpFields.IsEmpty()) ->
-                Some(FcsExceptionParameterInfoCandidate(fcsRange, e, item, checkResults, r, mainSymbol) :> ICandidate)
+                Some(FcsExceptionParameterInfoCandidate(fcsRange, e, item, checkResults, reference, mainSymbol) :> ICandidate)
             | _ -> None)
         |> Array.ofList
 
+    abstract ArgGroups: IFSharpExpression list
+    abstract NamedArgs: string[]
+
     interface IParameterInfoContext with
         member this.Range =
-            appExpr.GetDocumentRange().TextRange
+            context.GetDocumentRange().TextRange
 
         member this.GetArgument(candidate) =
             let candidate = candidate :?> IFcsParameterInfoCandidate
@@ -362,15 +372,7 @@ type FSharpParameterInfoContext(caretOffset: DocumentOffset, appExpr: IFSharpExp
 
             if invalidArg = 0 then invalidArg else
 
-            let rec getArgs (expr: IFSharpExpression) acc =
-                match expr with
-                | :? IPrefixAppExpr as prefixAppExpr ->
-                    match prefixAppExpr.ArgumentExpression with
-                    | null -> getArgs prefixAppExpr acc
-                    | argExpr -> getArgs prefixAppExpr.FunctionExpression (argExpr :: acc)
-                | _ -> acc
-
-            let args = getArgs appExpr []
+            let args = this.ArgGroups
 
             let rec loop argIndex (acc: int) (args: IFSharpExpression list) =
                 match args with
@@ -440,52 +442,107 @@ type FSharpParameterInfoContext(caretOffset: DocumentOffset, appExpr: IFSharpExp
         member this.Candidates = candidates
 
         member this.DefaultCandidate =
-            candidates
-            |> Array.tryFind (function
-                | :? IFcsParameterInfoCandidate as candidate -> candidate.Symbol.IsEffectivelySameAs(mainSymbol)
-                | _ -> false)
-            |> Option.defaultValue null
+            let tryToFindCandidate matches =
+                candidates
+                |> Array.tryFind (function
+                    | :? IFcsParameterInfoCandidate as candidate -> matches candidate.Symbol
+                    | _ -> false)
+                |> Option.defaultValue null
 
-        member this.NamedArguments =
-            let appExpr = appExpr.As<IPrefixAppExpr>()
-            if isNull appExpr then [||] else
+            let toFindCandidateFromFcsSymbol () =
+                tryToFindCandidate (fun symbol -> symbol.IsEffectivelySameAs(mainSymbol))
 
-            let funExpr = appExpr.FunctionExpression.IgnoreInnerParens()
-            if not (funExpr :? IReferenceExpr) then [||] else
+            match mainSymbol.GetDeclaredElement(reference) with
+            | null -> toFindCandidateFromFcsSymbol ()
+            | mainElement ->
 
-            let args =
-                match appExpr.ArgumentExpression.IgnoreSingleInnerParens() with
-                | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct -> tupleExpr.Expressions
-                | :? IBinaryAppExpr as binaryAppExpr -> TreeNodeCollection([| binaryAppExpr |])
-                | _ -> TreeNodeCollection.Empty
+            match tryToFindCandidate (fun symbol -> mainElement.Equals(symbol.GetDeclaredElement(reference))) with
+            | null -> toFindCandidateFromFcsSymbol ()
+            | candidate -> candidate
 
-            args
-            |> Array.ofSeq
-            |> Array.map (function
-                | :? IBinaryAppExpr as binaryAppExpr when binaryAppExpr.Operator.ShortName = "=" ->
-                    match binaryAppExpr.LeftArgument with
-                    | :? IReferenceExpr as referenceExpr -> referenceExpr.ShortName
-                    | _ -> null
-                | _ -> null)
+        member this.NamedArguments = this.NamedArgs
 
         member this.ParameterListNodeType = null
         member this.ParameterNodeTypes = null
         member this.NamedArguments with set _ = ()
 
 
+[<AllowNullLiteral>]
+type FSharpPrefixAppParameterInfoContext(caretOffset, context, reference, symbolUses, checkResults, referenceEndOffset,
+        mainSymbol) =
+    inherit FSharpParameterInfoContextBase<IFSharpExpression>(caretOffset, context, reference, symbolUses, checkResults,
+        referenceEndOffset, mainSymbol)
+
+    override this.ArgGroups =
+        let rec getArgs (expr: IFSharpExpression) acc =
+            match expr with
+            | :? IPrefixAppExpr as prefixAppExpr ->
+                match prefixAppExpr.ArgumentExpression with
+                | null -> getArgs prefixAppExpr acc
+                | argExpr -> getArgs prefixAppExpr.FunctionExpression (argExpr :: acc)
+            | _ -> acc
+
+        getArgs context []
+
+    override this.NamedArgs =
+        let appExpr = context.As<IPrefixAppExpr>()
+        if isNull appExpr then [||] else
+
+        let funExpr = appExpr.FunctionExpression.IgnoreInnerParens()
+        if not (funExpr :? IReferenceExpr) then [||] else
+
+        let argExpr = appExpr.ArgumentExpression
+
+        let args =
+            match argExpr.IgnoreSingleInnerParens() with
+            | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct -> tupleExpr.Expressions
+            | :? IBinaryAppExpr as binaryAppExpr -> TreeNodeCollection([| binaryAppExpr |])
+            | _ -> TreeNodeCollection.Empty
+
+        args
+        |> Array.ofSeq
+        |> Array.map (function
+            | :? IBinaryAppExpr as binaryAppExpr when binaryAppExpr.Operator.ShortName = "=" ->
+                match binaryAppExpr.LeftArgument with
+                | :? IReferenceExpr as referenceExpr -> referenceExpr.ShortName
+                | _ -> null
+            | _ -> null)
+
+[<AllowNullLiteral>]
+type FSharpTypeReferenceCtorParameterInfoContext(caretOffset, context, argExpr: IFSharpExpression, reference,
+        symbolUses, checkResults, referenceEndOffset, mainSymbol) =
+    inherit FSharpParameterInfoContextBase<IFSharpReferenceOwner>(caretOffset, context, reference, symbolUses,
+        checkResults, referenceEndOffset, mainSymbol)
+
+    override this.NamedArgs = [||] // todo
+
+    override this.ArgGroups =
+        [ if isNotNull argExpr then argExpr ]
+
+
 [<ParameterInfoContextFactory(typeof<FSharpLanguage>)>]
 type FSharpParameterInfoContextFactory() =
     let popupChars = [| ' '; '('; ',' |]
 
-    let getExpressionAtOffset (caretOffset: DocumentOffset) (solution: ISolution) =
+    let checkNodeBeforeNodeTypes =
+        NodeTypeSet(
+            FSharpTokenType.RPAREN,
+            FSharpTokenType.GREATER_RBRACK,
+            FSharpTokenType.SEMICOLON)
+
+    let rec getTokenAtOffset allowRetry (caretOffset: DocumentOffset) (solution: ISolution) =
         let fsFile = solution.GetPsiServices().GetPsiFile<FSharpLanguage>(caretOffset).As<IFSharpFile>()
         if isNull fsFile then null else
 
-        let token = fsFile.FindTokenAt(caretOffset)
-        if isNull token then null else
+        match fsFile.FindTokenAt(caretOffset), allowRetry with
+        | null, false -> null
+        | null, true ->
+            let caretOffset = caretOffset.Shift(-1)
+            getTokenAtOffset false caretOffset solution
+        | token, _ ->
 
         let token =
-            if getTokenType token != FSharpTokenType.RPAREN then
+            if not checkNodeBeforeNodeTypes[getTokenType token] then
                 token
             else
                 let prevSibling = token.PrevSibling
@@ -495,15 +552,22 @@ type FSharpParameterInfoContextFactory() =
                     prevSibling
 
         let token = token.GetPreviousMeaningfulToken(true)
-        if isNull token then null else
+        if isNull token then null else token
 
-        token.GetContainingNode<IFSharpExpression>(true)
+    let getTypeReferenceName (token: ITokenNode) =
+        if not (token :? FSharpIdentifierToken) then null else
+        token.Parent.As<ITypeReferenceName>()
 
-    let shouldShowPopup (caretOffset: DocumentOffset) (exprRange: DocumentRange) =
-        exprRange.Contains(caretOffset) ||
+    let isInTypeReferenceConstructorNode (referenceName: ITypeReferenceName) =
+        isNotNull (NewExprNavigator.GetByTypeName(referenceName)) ||
+        isNotNull (AttributeNavigator.GetByReferenceName(referenceName)) ||
+        isNotNull (TypeInheritNavigator.GetByTypeName(referenceName))
 
-        caretOffset.Offset >= exprRange.StartOffset.Offset &&
-        caretOffset.ToDocumentCoords().Column > exprRange.StartOffset.ToDocumentCoords().Column
+    let shouldShowPopup (caretOffset: DocumentOffset) (contextRange: DocumentRange) =
+        contextRange.Contains(caretOffset) ||
+
+        caretOffset.Offset >= contextRange.StartOffset.Offset &&
+        caretOffset.ToDocumentCoords().Column > contextRange.StartOffset.ToDocumentCoords().Column
 
     let rec tryCreateContext isAutoPopup (caretOffset: DocumentOffset) (expr: IFSharpExpression) =
         let range = expr.GetDocumentRange()
@@ -525,15 +589,20 @@ type FSharpParameterInfoContextFactory() =
 
         match expr with
         | :? IPrefixAppExpr as appExpr ->
-             // todo: allow on non-refExpr invoked expressions (lambdas, other apps)
-            match createFromExpression isAutoPopup caretOffset appExpr.InvokedReferenceExpression appExpr with
+            // todo: allow on non-refExpr invoked expressions (lambdas, other apps)
+            let reference = 
+                match appExpr.InvokedReferenceExpression with
+                | null -> null
+                | refExpr -> refExpr.Reference
+
+            match createFromExpression isAutoPopup caretOffset reference appExpr with
             | null -> tryCreateFromParent isAutoPopup caretOffset expr
             | context -> context
 
         | :? IReferenceExpr as refExpr ->
             match PrefixAppExprNavigator.GetByArgumentExpression(refExpr.IgnoreParentParens()) with
             | null ->
-                let context = createFromExpression isAutoPopup caretOffset refExpr refExpr
+                let context = createFromExpression isAutoPopup caretOffset refExpr.Reference refExpr
                 if isNull context && not isAutoPopup && caretOffset = refExpr.GetDocumentEndOffset() then
                     tryCreateFromParent isAutoPopup caretOffset refExpr
                 else
@@ -552,9 +621,9 @@ type FSharpParameterInfoContextFactory() =
 
         let isApplicable (fcsSymbol: FSharpSymbol) =
             match fcsSymbol with
-            | :? FSharpMemberOrFunctionOrValue -> true
-            | :? FSharpUnionCase -> true
-            | :? FSharpEntity as entity -> entity.IsFSharpExceptionDeclaration
+            | :? FSharpMemberOrFunctionOrValue
+            | :? FSharpUnionCase
+            | :? FSharpEntity -> true
             | _ -> false
 
         let symbol = symbolUse.Symbol
@@ -582,30 +651,80 @@ type FSharpParameterInfoContextFactory() =
         | Some symbolUses when not symbolUses.IsEmpty -> Some(checkResults, symbol, symbolUses)
         | _ -> Some(checkResults, symbol, [symbolUse])
 
-    and createFromExpression isAutoPopup (caretOffset: DocumentOffset) (invokedExpr: IReferenceExpr)
-            (contextExpr: IFSharpExpression) =
-        if isNull invokedExpr || isNull contextExpr then null else
+    and create (caretOffset: DocumentOffset) (reference: FSharpSymbolReference) (context: IFSharpTreeNode) =
+        if isNull reference || isNull context then null else
 
-        let range = invokedExpr.GetDocumentRange()
+        let endOffset = DocumentOffset(caretOffset.Document, reference.GetTreeTextRange().EndOffset.Offset)
+        if not (shouldShowPopup caretOffset (context.GetDocumentRange())) then null else
+
+        match getSymbols endOffset context reference with
+        | Some(checkResults, symbol, symbolUses) ->
+            FSharpPrefixAppParameterInfoContext(caretOffset, context :?> IFSharpExpression, reference, symbolUses,
+                checkResults, endOffset, symbol) :> IParameterInfoContext
+        | _ -> null
+
+    and createFromTypeReference (caretOffset: DocumentOffset) (reference: FSharpSymbolReference) argExpr =
+        if isNull reference (*|| isNull argExpr*) then null else
+
+        let context = reference.GetElement()
+        let endOffset = DocumentOffset(caretOffset.Document, reference.GetTreeTextRange().EndOffset.Offset)
+        if not (shouldShowPopup caretOffset (context.GetDocumentRange())) then null else
+
+        match getSymbols endOffset context reference with
+        | Some(checkResults, symbol, symbolUses) ->
+            FSharpTypeReferenceCtorParameterInfoContext(caretOffset, context, argExpr, reference, symbolUses,
+                checkResults, endOffset, symbol) :> IParameterInfoContext
+        | _ -> null
+
+    and tryCreateFromTypeReference (caretOffset: DocumentOffset) (token: ITokenNode) =
+        match getTypeReferenceName token with
+        | null -> null
+        | referenceName -> createFromTypeReference caretOffset referenceName.Reference null
+
+    and createFromExpression isAutoPopup (caretOffset: DocumentOffset) (reference: FSharpSymbolReference)
+            (contextExpr: IFSharpExpression) =
+        if isNull reference || isNull contextExpr then null else
+
+        let range = reference.GetTreeTextRange()
+        let endOffset = DocumentOffset(caretOffset.Document, range.EndOffset.Offset)
         let appExpr = getOutermostPrefixAppExpr contextExpr
         let appExpr = appExpr.IgnoreParentParens()
 
         if caretOffset.Offset >= range.StartOffset.Offset && caretOffset.Offset < range.EndOffset.Offset ||
-                caretOffset = range.EndOffset && isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(appExpr)) then
+                caretOffset = endOffset && isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(appExpr)) then
             // Inside invoked function name, try to get context from a parent expression instead 
             tryCreateFromParent isAutoPopup caretOffset appExpr else
 
         let appExpr = getOutermostPrefixAppExpr contextExpr
-        if not (shouldShowPopup caretOffset (appExpr.GetDocumentRange())) then null else
 
-        let mutable endOffset = invokedExpr.GetDocumentEndOffset()
-        match getSymbols endOffset contextExpr invokedExpr.Reference with
-        | Some(checkResults, symbol, symbolUses) ->
-            FSharpParameterInfoContext(caretOffset, appExpr, invokedExpr, symbolUses, checkResults, endOffset, symbol)
-        | _ -> null
+        create caretOffset reference appExpr
 
     and tryCreateFromParent isAutoPopup caretOffset (expr: IFSharpExpression) =
-        let parentExpr = expr.IgnoreParentParens().GetContainingNode<IFSharpExpression>()
+        let expr = expr.IgnoreParentParens()
+
+        let reference, argExpr =
+            let typeInherit = TypeInheritNavigator.GetByCtorArgExpression(expr)
+            if isNotNull typeInherit then
+                typeInherit.Reference, typeInherit.CtorArgExpression else
+            
+            let attribute = AttributeNavigator.GetByExpression(expr)
+            if isNotNull attribute then
+                attribute.Reference, attribute.Expression else
+
+            let newExpr = NewExprNavigator.GetByArgumentExpression(expr)
+            if isNotNull newExpr then
+                newExpr.Reference, newExpr.ArgumentExpression else
+
+            let objExpr = ObjExprNavigator.GetByArgExpression(expr)
+            if isNotNull objExpr then
+                objExpr.TypeName.Reference, objExpr.ArgExpression else
+
+            null, null
+
+        if isNotNull reference && isNotNull argExpr then
+            createFromTypeReference caretOffset reference argExpr else
+
+        let parentExpr = expr.GetContainingNode<IFSharpExpression>()
         tryCreateContext isAutoPopup caretOffset parentExpr
 
     interface IParameterInfoContextFactory with
@@ -622,14 +741,22 @@ type FSharpParameterInfoContextFactory() =
                 Array.contains char popupChars
             else
                 // This is called again before requesting a new context on reparsed file
-                match getExpressionAtOffset caretOffset solution with
+                let token = getTokenAtOffset true caretOffset solution
+                let typeReferenceName = getTypeReferenceName token
+                if isInTypeReferenceConstructorNode typeReferenceName then true else
+
+                let expr = token.GetContainingNode<IFSharpExpression>(true)
+
+                match expr with
                 | :? IPrefixAppExpr -> true
 
                 | :? IReferenceExpr as refExpr when caretOffset.Offset >= refExpr.GetDocumentEndOffset().Offset ->
                     true
 
                 | :? IUnitExpr as unitExpr ->
-                    isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(unitExpr))
+                    isNotNull (AppLikeExprNavigator.GetByArgumentExpression(unitExpr)) ||
+                    isNotNull (AttributeNavigator.GetByExpression(unitExpr)) ||
+                    isNotNull (TypeInheritNavigator.GetByCtorArgExpression(unitExpr))
 
                 | :? ITupleExpr as tupleExpr ->
                     not tupleExpr.IsStruct &&
@@ -643,5 +770,9 @@ type FSharpParameterInfoContextFactory() =
 
         member this.CreateContext(solution, caretOffset, _, char, _) =
             let isAutoPopup = char <> '\000'
-            let expr = getExpressionAtOffset caretOffset solution
-            tryCreateContext isAutoPopup caretOffset expr
+            let token = getTokenAtOffset true caretOffset solution
+            match tryCreateFromTypeReference caretOffset token with
+            | null ->
+                let expr = token.GetContainingNode<IFSharpExpression>(true)
+                tryCreateContext isAutoPopup caretOffset expr
+            | context -> context
