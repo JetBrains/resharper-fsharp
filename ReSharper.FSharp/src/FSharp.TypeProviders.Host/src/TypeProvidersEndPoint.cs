@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using JetBrains.Collections.Viewable;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
@@ -32,6 +34,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     protected override void InitLogger(Lifetime lifetime, string path)
     {
       ProtocolEndPointUtil.InitLogger(path, lifetime, LoggingLevel.TRACE);
+
+      if (Environment.GetEnvironmentVariable("RESHARPER_INTERNAL_MODE") is { } env &&
+          bool.TryParse(env, out var isInternalMode) && isInternalMode)
+      {
+        Trace.Listeners.Clear();
+        Trace.Listeners.Add(new WriteToLogTraceListener(Logger));
+      }
+
       Logger.Log(LoggingLevel.INFO, $"Process Runtime: {RuntimeInformation.FrameworkDescription}");
     }
 

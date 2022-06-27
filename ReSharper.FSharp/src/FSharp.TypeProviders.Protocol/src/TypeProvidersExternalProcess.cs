@@ -20,6 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
   {
     private readonly JetProcessRuntimeRequest myRequest;
     private readonly NuGetVersion myNuGetVersion;
+    private readonly bool myIsInternalMode;
     private Lifetime myLifetime;
 
     protected override string Name => "Out-of-Process TypeProviders";
@@ -81,7 +82,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     protected override IDictionary<string, string> GetAdditionalProcessEnvVars()
     {
-      return new Dictionary<string, string>()
+      return new Dictionary<string, string>
       {
         {
           "RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS",
@@ -90,6 +91,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         {
           TypeProvidersProtocolConstants.TypeProvidersHostPid,
           Process.GetCurrentProcess().Id.ToString()
+        },
+        {
+          "RESHARPER_INTERNAL_MODE", myIsInternalMode.ToString()
         }
       };
     }
@@ -101,11 +105,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     }
 
     public TypeProvidersExternalProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
-      IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, NuGetVersion nuGetVersion)
+      IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, NuGetVersion nuGetVersion,
+      bool isInternalMode)
       : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
       myRequest = request;
       myNuGetVersion = nuGetVersion;
+      myIsInternalMode = isInternalMode;
     }
   }
 }
