@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public IType Type => Info.FieldType.MapType(Module);
 
     public ConstantValue ConstantValue =>
-      IsConstant ? new ConstantValue(Info.GetRawConstantValue(), Type) : ConstantValue.BAD_VALUE;
+      IsConstant ? ConstantValue.Create(Info.GetRawConstantValue(), Type) : ConstantValue.BAD_VALUE;
 
     public bool IsConstant => Info.IsLiteral;
     public bool IsField => true;
