@@ -1,0 +1,3 @@
+exception E
+
+E({caret})

@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
 
+open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Text
@@ -15,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -35,14 +37,19 @@ module FcsParameterInfoCandidate =
     let canBeNullAttrTypeName = clrTypeName "JetBrains.Annotations.CanBeNullAttribute"
     let notNullAttrTypeName = clrTypeName "JetBrains.Annotations.NotNullAttribute"
 
-type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, checkResults: FSharpCheckFileResults, expr: IFSharpExpression, resolvedMfv: FSharpMemberOrFunctionOrValue) =
-    let mfv = fcsSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
-    let displayContext = fcsSymbolUse.DisplayContext.WithShortTypeNames(true)
+type IFcsParameterInfoCandidate =
+    abstract Symbol: FSharpSymbol
+    abstract ParameterGroupCounts: IList<int>
+    abstract ParameterOwner: IParametersOwner
+
+[<AbstractClass>]
+type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharpSymbol and 'TParameter :> FSharpSymbol>
+        (range: range, symbol: 'TSymbol, symbolUse: FSharpSymbolUse, checkResults: FSharpCheckFileResults, expr: IFSharpReferenceOwner, mainSymbol: FSharpSymbol) =
+    let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
 
     let psiModule = expr.GetPsiModule()
-    let declaredElement = mfv.GetDeclaredElement(psiModule)
+    let declaredElement = symbol.GetDeclaredElement(psiModule, expr)
     let parametersOwner = declaredElement.As<IParametersOwnerWithAttributes>()
-    let isExtensionMember = mfv.IsExtensionMember
 
     let getParameterIncludingThis index =
         if isNull parametersOwner then null else
@@ -50,17 +57,42 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
         let parameters = parametersOwner.Parameters
         if parameters.Count <= index then null else parameters[index]
 
-    let getParameter index =
-        let index = if isExtensionMember then index + 1 else index
+    member this.Symbol = symbol
+    member this.ParameterOwner = parametersOwner
+
+    abstract ParameterGroups: IList<IList<'TParameter>>
+    abstract ReturnParameter: FSharpParameter option
+    abstract IsConstructor: bool
+    abstract XmlDoc: FSharpXmlDoc
+
+    abstract GetParamName: 'TParameter -> string option
+    abstract GetParamType: 'TParameter -> FSharpType
+
+    abstract IsExtensionMember: bool
+    default this.IsExtensionMember = false
+
+    abstract IsOptionalParam: 'TParameter -> bool
+    default this.IsOptionalParam _ = false
+
+    abstract ExtendedType: FSharpEntity option
+    default this.ExtendedType = None
+
+    member this.GetParameter(index) =
+        let index = if this.IsExtensionMember then index + 1 else index
         getParameterIncludingThis index
 
-    member this.Mfv = mfv
-    member this.ParameterOwner = parametersOwner
+    interface IFcsParameterInfoCandidate with
+        member this.ParameterGroupCounts =
+            this.ParameterGroups
+            |> Array.ofSeq
+            |> Array.map Seq.length :> _
+
+        member this.ParameterOwner = parametersOwner
+        member this.Symbol = this.Symbol
 
     interface ICandidate with
         member this.GetDescription() =
-            let substitution = fcsSymbolUse.GenericArguments
-            match checkResults.GetDescription(mfv, substitution, false, range) with
+            match checkResults.GetDescription(symbol, [], false, range) with
             | ToolTipText [ ToolTipElement.Group [ elementData ] ] ->
                 let xmlDocService = expr.GetSolution().GetComponent<FSharpXmlDocService>().NotNull()
                 xmlDocService.GetXmlDocSummary(elementData.XmlDoc)
@@ -69,17 +101,18 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
         member this.GetParametersInfo(paramInfos, paramArrayIndex) =
             paramArrayIndex <- -1
 
-            let paramGroups = mfv.CurriedParameterGroups
+            let paramGroups = this.ParameterGroups
             let curriedParamsCount = paramGroups |> Seq.sumBy Seq.length
             let groupParameters = paramGroups.Count
             let paramsCount = curriedParamsCount + groupParameters
-
-            let parameters = parametersOwner.Parameters
 
             let paramInfos =
                 paramInfos <- Array.zeroCreate paramsCount
                 paramInfos
 
+            if isNull parametersOwner then () else
+
+            let parameters = parametersOwner.Parameters
             if parameters.Count = 0 then () else
 
             paramGroups
@@ -91,7 +124,7 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
                 let summary =
                     if parameter.PresentationLanguage.Is<FSharpLanguage>() then
                         // todo: implement providing xml in declared element, remove this code
-                        match mfv.XmlDoc with
+                        match this.XmlDoc with
                         | FSharpXmlDoc.FromXmlText xmlDoc ->
                             match DocCommentBlockUtil.TryGetXml(xmlDoc.UnprocessedLines, null) with
                             | true, node -> XMLDocUtil.ExtractParameterSummary(node, name)
@@ -105,7 +138,7 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
             )
 
         member this.GetSignature(_, _, parameterRanges, mapToOriginalOrder, extensionMethodInfo) =
-            let paramGroups = mfv.CurriedParameterGroups
+            let paramGroups = this.ParameterGroups
             if paramGroups.Count = 0 then RichText() else
 
             let curriedParamsCount = paramGroups |> Seq.sumBy Seq.length 
@@ -140,12 +173,12 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
                 text.Append("(", TextStyle.Default) |> ignore
 
                 let paramGroup = paramGroups[i]
-                if paramGroup.Count = 0 && not isExtensionMember then
+                if paramGroup.Count = 0 && not this.IsExtensionMember then
                     text.Append("<no parameters>", TextStyle.Default) |> ignore
 
                 let groupStart = text.Length
 
-                if paramIndex = 0 && isExtensionMember then
+                if paramIndex = 0 && this.IsExtensionMember then
                     let parameter = getParameterIncludingThis paramIndex
                     if isNotNull parameter then
                         appendNullabilityAttribute parameter |> ignore
@@ -153,14 +186,17 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
                     text.Append("this", TextStyle FSharpHighlightingAttributeIds.Keyword) |> ignore
                     text.Append(" ", TextStyle.Default) |> ignore
 
-                    // todo: type arg is not provided by FCS, add it to the symbols API
-                    text.Append(mfv.ApparentEnclosingEntity.AsType().FormatLayout(displayContext) |> richText) |> ignore
-                    if paramGroup.Count > 0 then
-                        text.Append(", ", TextStyle.Default) |> ignore
+                    match this.ExtendedType with
+                    | Some entity ->
+                        // todo: type arg is not provided by FCS, add it to the symbols API
+                        text.Append(entity.AsType().FormatLayout(displayContext) |> richText) |> ignore
+                        if paramGroup.Count > 0 then
+                            text.Append(", ", TextStyle.Default) |> ignore
+                    | _ -> ()
 
                 for i = 0 to paramGroup.Count - 1 do
                     let fcsParameter = paramGroup[i]
-                    let parameter = getParameter paramIndex
+                    let parameter = this.GetParameter(paramIndex)
 
                     let paramStart = text.Length
 
@@ -171,19 +207,18 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
                             text.Append("params", TextStyle FSharpHighlightingAttributeIds.Keyword) |> ignore
                             text.Append(" ", TextStyle.Default) |> ignore
 
-                    let hasFSharpDeclarationRange = fcsParameter.DeclarationLocation <> Range.range0
-                    if fcsParameter.IsOptionalArg && not parameter.IsOptional && hasFSharpDeclarationRange then
+                    if this.IsOptionalParam(fcsParameter) && not parameter.IsOptional then
                         text.Append("?", TextStyle.Default) |> ignore
 
-                    match fcsParameter.Name with
+                    match this.GetParamName(fcsParameter) with
                     | Some name ->
                         text.Append(name, TextStyle FSharpHighlightingAttributeIds.Parameter) |> ignore
                         text.Append(": ", TextStyle.Default) |> ignore
                     | _ -> ()
 
                     let fcsParameterType =
-                        let fcsParameterType = fcsParameter.Type
-                        if not fcsParameter.IsOptionalArg || not hasFSharpDeclarationRange then fcsParameterType else
+                        let fcsParameterType = this.GetParamType(fcsParameter)
+                        if not (this.IsOptionalParam(fcsParameter)) then fcsParameterType else
 
                         match tryGetAbbreviatedTypeEntity fcsParameterType with
                         | Some entity when entity.QualifiedBaseName = FSharpPredefinedType.fsOptionTypeName.FullName ->
@@ -216,18 +251,21 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
                 if i < paramGroups.Count - 1 then
                     text.Append(" ", TextStyle.Default) |> ignore
 
-            if not mfv.IsConstructor then
+            if not this.IsConstructor then
                 text.Append(" : ", TextStyle.Default) |> ignore
 
                 if isNotNull parametersOwner then
                     appendNullabilityAttribute parametersOwner |> ignore
                 
-                text.Append(mfv.ReturnParameter.Type.FormatLayout(displayContext) |> richText) |> ignore
+                match this.ReturnParameter with
+                | Some parameter ->
+                    text.Append(parameter.Type.FormatLayout(displayContext) |> richText) |> ignore
+                | _ -> ()
 
             text
 
         member this.Matches _ =
-            mfv.IsEffectivelySameAs(resolvedMfv)
+            symbol.IsEffectivelySameAs(mainSymbol)
 
         member this.IsFilteredOut = false
         member this.IsObsolete = false
@@ -236,14 +274,78 @@ type FcsParameterInfoCandidate(range: range, fcsSymbolUse: FSharpSymbolUse, chec
         member this.IsFilteredOut with set _ = ()
 
 
+type FcsMfvParameterInfoCandidate(range: range, mfv, symbolUse, checkResults, expr, mainSymbol) =
+    inherit FcsParameterInfoCandidateBase<FSharpMemberOrFunctionOrValue, FSharpParameter>(range, mfv, symbolUse,
+        checkResults, expr, mainSymbol)
+
+    override val IsConstructor = mfv.IsConstructor
+    override val IsExtensionMember = mfv.IsExtensionMember
+    override val ParameterGroups = mfv.CurriedParameterGroups
+    override val ReturnParameter = Some mfv.ReturnParameter
+    override val XmlDoc = mfv.XmlDoc
+
+    override this.GetParamName(parameter) = parameter.Name
+    override this.GetParamType(parameter) = parameter.Type
+    override this.IsOptionalParam(parameter) = parameter.IsOptionalArg
+
+
+[<AbstractClass>]
+type FcsUnionCaseParameterInfoCandidateBase<'TSymbol when 'TSymbol :> FSharpSymbol>(range, unionCase, symbolUse,
+        checkResults, expr, mainSymbol) =
+    inherit FcsParameterInfoCandidateBase<'TSymbol, FSharpField>(range, unionCase, symbolUse, checkResults, expr,
+        mainSymbol)
+
+    abstract Parameters: IList<FSharpField>
+
+    override this.ParameterGroups =
+        let fields = this.Parameters
+        let result = List()
+        result.Add(fields)
+        result
+
+    override this.GetParamName(field) =
+        if field.IsNameGenerated then None else Some field.Name
+
+    override this.GetParamType(field) = field.FieldType
+    override this.IsOptionalParam _ = false
+    override this.ReturnParameter = None
+    override this.ExtendedType = None
+    override this.IsConstructor = true
+    override val IsExtensionMember = false
+
+
+type FcsUnionCaseParameterInfoCandidate(range, unionCase, symbolUse, checkResults, expr, mainSymbol) =
+    inherit FcsUnionCaseParameterInfoCandidateBase<FSharpUnionCase>(range, unionCase, symbolUse, checkResults, expr,
+        mainSymbol)
+
+    override this.Parameters = unionCase.Fields
+    override this.XmlDoc = unionCase.XmlDoc
+
+
+type FcsExceptionParameterInfoCandidate(range, entity, symbolUse, checkResults, expr, mainSymbol) =
+    inherit FcsUnionCaseParameterInfoCandidateBase<FSharpEntity>(range, entity, symbolUse, checkResults, expr,
+        mainSymbol)
+
+    override this.Parameters = entity.FSharpFields
+    override this.XmlDoc = entity.XmlDoc
+
+
 [<AllowNullLiteral>]
-type FSharpParameterInfoContext2(caretOffset: DocumentOffset, appExpr: IFSharpExpression, methods: FSharpSymbolUse list, checkResults, fcsRange, mfv) =
+type FSharpParameterInfoContext(caretOffset: DocumentOffset, appExpr: IFSharpExpression, r: IReferenceExpr, symbolUses: FSharpSymbolUse list,
+        checkResults, referenceEndOffset: DocumentOffset, mainSymbol: FSharpSymbol) =
+    let documentRange = DocumentRange(&referenceEndOffset)
+    let fcsRange = FSharpRangeUtil.ofDocumentRange documentRange
+
     let candidates =
-        methods
+        symbolUses
         |> List.choose (fun item ->
             match item.Symbol with
-            | :? FSharpMemberOrFunctionOrValue ->
-                Some(FcsParameterInfoCandidate(fcsRange, item, checkResults, appExpr, mfv) :> ICandidate)
+            | :? FSharpMemberOrFunctionOrValue as mfv when not (mfv.CurriedParameterGroups.IsEmpty()) ->
+                Some(FcsMfvParameterInfoCandidate(fcsRange, mfv, item, checkResults, r, mainSymbol) :> ICandidate)
+            | :? FSharpUnionCase as uc when not (uc.Fields.IsEmpty()) ->
+                Some(FcsUnionCaseParameterInfoCandidate(fcsRange, uc, item, checkResults, r, mainSymbol) :> ICandidate)
+            | :? FSharpEntity as e when e.IsFSharpExceptionDeclaration && not (e.FSharpFields.IsEmpty()) ->
+                Some(FcsExceptionParameterInfoCandidate(fcsRange, e, item, checkResults, r, mainSymbol) :> ICandidate)
             | _ -> None)
         |> Array.ofList
 
@@ -252,10 +354,12 @@ type FSharpParameterInfoContext2(caretOffset: DocumentOffset, appExpr: IFSharpEx
             appExpr.GetDocumentRange().TextRange
 
         member this.GetArgument(candidate) =
-            let candidate = candidate :?> FcsParameterInfoCandidate
-            let parameterGroups = candidate.Mfv.CurriedParameterGroups
-            let allParametersCount = parameterGroups |> Seq.sumBy Seq.length
+            let candidate = candidate :?> IFcsParameterInfoCandidate
+            let parameterGroups = candidate.ParameterGroupCounts
+            let allParametersCount = parameterGroups |> Seq.sum
             let invalidArg = allParametersCount + parameterGroups.Count
+
+            if invalidArg = 0 then invalidArg else
 
             let rec getArgs (expr: IFSharpExpression) acc =
                 match expr with
@@ -272,7 +376,7 @@ type FSharpParameterInfoContext2(caretOffset: DocumentOffset, appExpr: IFSharpEx
                 | [] ->
                     if argIndex >= parameterGroups.Count then
                         invalidArg
-                    elif argIndex < parameterGroups.Count && parameterGroups[argIndex].Count = 1 then
+                    elif argIndex < parameterGroups.Count && parameterGroups[argIndex] = 1 then
                         acc
                     else
                         allParametersCount + argIndex
@@ -288,10 +392,10 @@ type FSharpParameterInfoContext2(caretOffset: DocumentOffset, appExpr: IFSharpEx
                         | _ -> false
 
                     if caretOffset.Offset > argEnd.Offset || caretOffset = argEnd && isAtNextArgStart () then
-                        loop (argIndex + 1) (acc + parameterGroups[argIndex].Count) args
+                        loop (argIndex + 1) (acc + parameterGroups[argIndex]) args
 
                     elif argRange.Contains(caretOffset) && argStart <> caretOffset && argEnd <> caretOffset then
-                        if parameterGroups[argIndex].Count = 1 then acc else
+                        if parameterGroups[argIndex] = 1 then acc else
                         if arg :? IUnitExpr && caretOffset.Offset < argEnd.Offset then acc else
 
                         match arg.IgnoreSingleInnerParens() with
@@ -305,17 +409,17 @@ type FSharpParameterInfoContext2(caretOffset: DocumentOffset, appExpr: IFSharpEx
                                 |> Option.defaultValue commas.Count
 
                             let paramGroup = parameterGroups[argIndex]
-                            if commaIndex >= paramGroup.Count then
-                                if paramGroup.Count = 0 then invalidArg else
+                            if commaIndex >= paramGroup then
+                                if paramGroup = 0 then invalidArg else
 
-                                let lastParamIndex = acc + paramGroup.Count - 1
+                                let lastParamIndex = acc + paramGroup - 1
                                 let parameters = candidate.ParameterOwner.Parameters
                                 if lastParamIndex < parameters.Count && parameters[lastParamIndex].IsParameterArray then
                                     lastParamIndex
                                 else
                                     invalidArg
                             else
-                                let maxArgOffset = max 0 (parameterGroups[argIndex].Count - 1)
+                                let maxArgOffset = max 0 (parameterGroups[argIndex] - 1)
                                 let currentArgOffset = min maxArgOffset commaIndex
                                 acc + currentArgOffset
                         | innerArg ->
@@ -324,7 +428,7 @@ type FSharpParameterInfoContext2(caretOffset: DocumentOffset, appExpr: IFSharpEx
                             else
                                 allParametersCount + argIndex
 
-                    elif argIndex < parameterGroups.Count && parameterGroups[argIndex].Count = 1 then
+                    elif argIndex < parameterGroups.Count && parameterGroups[argIndex] = 1 then
                         acc
 
                     else
@@ -337,7 +441,7 @@ type FSharpParameterInfoContext2(caretOffset: DocumentOffset, appExpr: IFSharpEx
         member this.DefaultCandidate =
             candidates
             |> Array.tryFind (function
-                | :? FcsParameterInfoCandidate as candidate -> candidate.Mfv.IsEffectivelySameAs(mfv)
+                | :? IFcsParameterInfoCandidate as candidate -> candidate.Symbol.IsEffectivelySameAs(mainSymbol)
                 | _ -> false)
             |> Option.defaultValue null
 
@@ -369,7 +473,7 @@ type FSharpParameterInfoContext2(caretOffset: DocumentOffset, appExpr: IFSharpEx
 
 
 [<ParameterInfoContextFactory(typeof<FSharpLanguage>)>]
-type FSharpParameterInfoContextFactory2() =
+type FSharpParameterInfoContextFactory() =
     let popupChars = [| ' '; '('; ',' |]
 
     let getExpressionAtOffset (caretOffset: DocumentOffset) (solution: ISolution) =
@@ -421,14 +525,14 @@ type FSharpParameterInfoContextFactory2() =
         match expr with
         | :? IPrefixAppExpr as appExpr ->
              // todo: allow on non-refExpr invoked expressions (lambdas, other apps)
-            match create isAutoPopup caretOffset appExpr.InvokedReferenceExpression appExpr with
+            match createFromExpression isAutoPopup caretOffset appExpr.InvokedReferenceExpression appExpr with
             | null -> tryCreateFromParent isAutoPopup caretOffset expr
             | context -> context
 
         | :? IReferenceExpr as refExpr ->
             match PrefixAppExprNavigator.GetByArgumentExpression(refExpr.IgnoreParentParens()) with
             | null ->
-                let context = create isAutoPopup caretOffset refExpr refExpr
+                let context = createFromExpression isAutoPopup caretOffset refExpr refExpr
                 if isNull context && not isAutoPopup && caretOffset = refExpr.GetDocumentEndOffset() then
                     tryCreateFromParent isAutoPopup caretOffset refExpr
                 else
@@ -440,7 +544,45 @@ type FSharpParameterInfoContextFactory2() =
         | _ ->
             tryCreateFromParent isAutoPopup caretOffset expr
 
-    and create isAutoPopup (caretOffset: DocumentOffset) (invokedExpr: IReferenceExpr) (contextExpr: IFSharpExpression) =
+    // todo: identifier end in f<int>
+    and getSymbols (endOffset: DocumentOffset) (context: IFSharpTreeNode) (reference: FSharpSymbolReference) =
+        let symbolUse = reference.GetSymbolUse()
+        if isNull symbolUse then None else
+
+        let isApplicable (fcsSymbol: FSharpSymbol) =
+            match fcsSymbol with
+            | :? FSharpMemberOrFunctionOrValue -> true
+            | :? FSharpUnionCase -> true
+            | :? FSharpEntity as entity -> entity.IsFSharpExceptionDeclaration
+            | _ -> false
+
+        let symbol = symbolUse.Symbol
+        if not (isApplicable symbol) then None else
+
+        match context.FSharpFile.GetParseAndCheckResults(true, "FSharpParameterInfoContextFactory.getMethods") with
+        | None -> None
+        | Some results ->
+
+        let referenceOwner = reference.GetElement()
+        let names = 
+            match referenceOwner with
+            | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
+            | _ -> [reference.GetName()]
+
+        let identifier = referenceOwner.FSharpIdentifier
+        if isNull identifier then None else
+
+        let endCoords = endOffset.ToDocumentCoords()
+        let line = int endCoords.Line + 1
+        let column = int endCoords.Column + 1
+    
+        let checkResults = results.CheckResults
+        match checkResults.GetMethodsAsSymbols(line, column, "", names) with
+        | Some symbolUses when not symbolUses.IsEmpty -> Some(checkResults, symbol, symbolUses)
+        | _ -> Some(checkResults, symbol, [symbolUse])
+
+    and createFromExpression isAutoPopup (caretOffset: DocumentOffset) (invokedExpr: IReferenceExpr)
+            (contextExpr: IFSharpExpression) =
         if isNull invokedExpr || isNull contextExpr then null else
 
         let range = invokedExpr.GetDocumentRange()
@@ -455,31 +597,11 @@ type FSharpParameterInfoContextFactory2() =
         let appExpr = getOutermostPrefixAppExpr contextExpr
         if not (shouldShowPopup caretOffset (appExpr.GetDocumentRange())) then null else
 
-        let symbolUse = invokedExpr.Reference.GetSymbolUse()
-        if isNull symbolUse then null else
-
-        let mfv = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
-        if isNull mfv then null else
-
-        match contextExpr.FSharpFile.GetParseAndCheckResults(true, "FSharpParameterInfoContextFactory") with
-        | None -> null
-        | Some results ->
-
-        let endOffset = invokedExpr.GetDocumentEndOffset()
-        let endCoords = endOffset.ToDocumentCoords()
-        let line = int endCoords.Line + 1
-        let column = int endCoords.Column + 1
-        let names = List.ofSeq invokedExpr.Names
-
-        let documentRange = DocumentRange(&endOffset)
-        let fcsRange = FSharpRangeUtil.ofDocumentRange documentRange
-
-        let symbolUses = 
-            match results.CheckResults.GetMethodsAsSymbols(line, column, "", names) with
-            | Some symbolUses when not symbolUses.IsEmpty -> symbolUses
-            | _ -> [symbolUse]
-
-        FSharpParameterInfoContext2(caretOffset, appExpr, symbolUses, results.CheckResults, fcsRange, mfv)
+        let mutable endOffset = invokedExpr.GetDocumentEndOffset()
+        match getSymbols endOffset contextExpr invokedExpr.Reference with
+        | Some(checkResults, symbol, symbolUses) ->
+            FSharpParameterInfoContext(caretOffset, appExpr, invokedExpr, symbolUses, checkResults, endOffset, symbol)
+        | _ -> null
 
     and tryCreateFromParent isAutoPopup caretOffset (expr: IFSharpExpression) =
         let parentExpr = expr.IgnoreParentParens().GetContainingNode<IFSharpExpression>()

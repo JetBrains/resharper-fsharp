@@ -64,6 +64,8 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Curried 07``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried 08``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried 09 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 10``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 11``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Lambda 02``() = x.DoNamedTest()
@@ -96,6 +98,10 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Method 14 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``App - Method 15 - Empty``() = x.DoNamedTest()
 
+    [<Test>] member x.``Exception 01``() = x.DoNamedTest()
+    [<Test>] member x.``Exception 02``() = x.DoNamedTest()
+    [<Test>] member x.``Exception 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Reference - Local 01``() = x.DoNamedTest()
     [<Test>] member x.``Reference - Local 02``() = x.DoNamedTest()
 
@@ -105,6 +111,14 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``Reference 04``() = x.DoNamedTest()
     [<Test>] member x.``Reference 05 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Reference 06``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union case 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union case 03``() = x.DoNamedTest()
+    [<Test>] member x.``Union case 04``() = x.DoNamedTest()
+    [<Test>] member x.``Union case 05``() = x.DoNamedTest()
+    [<Test>] member x.``Union case 06``() = x.DoNamedTest()
+    [<Test>] member x.``Union case 07``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
