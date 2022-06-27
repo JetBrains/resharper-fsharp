@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public DefaultValue GetDefaultValue() =>
       Info.HasDefaultValue
-        ? new DefaultValue(Type, new ConstantValue(Info.RawDefaultValue, type: Type))
+        ? new DefaultValue(Type, ConstantValue.Create(Info.RawDefaultValue, type: Type))
         : DefaultValue.BAD_VALUE;
 
     public ParameterKind Kind =>
