@@ -93,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
           Process.GetCurrentProcess().Id.ToString()
         },
         {
-          "INTERNAL_MODE", myIsInternalMode.ToString()
+          "RESHARPER_INTERNAL_MODE", myIsInternalMode.ToString()
         }
       };
     }

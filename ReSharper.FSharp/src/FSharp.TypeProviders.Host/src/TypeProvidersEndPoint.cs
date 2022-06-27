@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     {
       ProtocolEndPointUtil.InitLogger(path, lifetime, LoggingLevel.TRACE);
 
-      if (Environment.GetEnvironmentVariable("INTERNAL_MODE") is { } env &&
+      if (Environment.GetEnvironmentVariable("RESHARPER_INTERNAL_MODE") is { } env &&
           bool.TryParse(env, out var isInternalMode) && isInternalMode)
       {
         Trace.Listeners.Clear();
