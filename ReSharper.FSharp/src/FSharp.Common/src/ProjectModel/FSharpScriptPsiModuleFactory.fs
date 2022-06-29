@@ -12,8 +12,6 @@ open JetBrains.Application.Threading
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.DocumentManagers
-open JetBrains.DocumentManagers.impl
-open JetBrains.DocumentModel
 open JetBrains.Lifetimes
 open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
@@ -21,6 +19,7 @@ open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.Platforms
 open JetBrains.ProjectModel.model2.Assemblies.Impl
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
@@ -56,10 +55,6 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
     let psiModules = List<IPsiModule>()
     let mutable psiModulesCollection = HybridCollection.Empty
 
-    do
-        changeManager.RegisterChangeProvider(lifetime, this)
-        changeManager.Changed2.Advise(lifetime, this.Execute)
-
     let locks = solution.Locks
 
     let targetFrameworkId =
@@ -68,11 +63,6 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
         let platformInfo = platformInfos |> Seq.maxBy (fun info -> info.TargetFrameworkId.Version)
         platformInfo.TargetFrameworkId
-
-    let getScriptOptions (path: VirtualFileSystemPath) (document: IDocument) =
-        scriptOptionsProvider.GetScriptOptions(path, document.GetText())
-        |> Option.orElseWith (fun _ -> failwithf "Could not get script options for: %O" path)
-        |> Option.get
 
     let getScriptReferences (scriptPath: VirtualFileSystemPath) scriptOptions =
         let assembliesPaths = HashSet<VirtualFileSystemPath>()
@@ -120,27 +110,22 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             (projectFileExtensions, projectFileTypeCoordinator, psiModule, path, (fun _ -> psiModule.IsValid),
              (fun _ -> ScriptFileProperties.Instance), documentManager, psiModule.ResolveContext) :> IPsiSourceFile
 
-    let rec createPsiModule path document id sourceFileCtor (changeBuilder: PsiModuleChangeBuilder) =
+    let rec createPsiModule path id sourceFileCtor (changeBuilder: PsiModuleChangeBuilder) =
         let psiModule = FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, id, assemblyFactory, this)
-
         changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Added)
         changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Added)
-
-        queueUpdateReferences path document
         psiModule
 
     and createPsiModuleForPath (path: VirtualFileSystemPath) changeBuilder =
         let modulesForPath = getPsiModulesForPath path
         if modulesForPath.IsEmpty() then
-            let fileDocument = documentManager.GetOrCreateDocument(path)
-            let moduleId = path.FullPath
             let sourceFileCtor = createSourceFileForPath path
-            let psiModule = createPsiModule path fileDocument moduleId sourceFileCtor changeBuilder
+            let psiModule = createPsiModule path path.FullPath sourceFileCtor changeBuilder
 
             scriptsFromPaths[path] <- psiModule
             addPsiModule psiModule
 
-    and queueUpdateReferences (path: VirtualFileSystemPath) (document: IDocument) =
+    and queueUpdateReferences (path: VirtualFileSystemPath) (newOptions: FSharpProjectOptions) =
         locks.QueueReadLock(lifetime, "Request new F# script references", fun _ ->
             let oldReferences =
                 let mutable oldReferences = Unchecked.defaultof<ScriptReferences>
@@ -153,7 +138,6 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
             ira.FuncRun <-
                 fun _ ->
-                    let newOptions = getScriptOptions path document
                     let newReferences = getScriptReferences path newOptions
                     Interruption.Current.CheckAndThrow()
 
@@ -180,6 +164,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                             for path in removed do psiModule.RemoveReference(path)
                             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
                             scriptPsiModuleInvalidated.Fire(psiModule)
+                            solution.GetComponent<IDaemon>().Invalidate()
 
                         changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance)
 
@@ -189,12 +174,18 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
             ira.FuncCancelled <-
                 // Reschedule again
-                fun _ -> queueUpdateReferences path document
+                fun _ -> queueUpdateReferences path newOptions
 
             ira.DoStart())
 
+    do
+        changeManager.RegisterChangeProvider(lifetime, this)
+        scriptOptionsProvider.OptionsUpdated.Advise(lifetime, fun (path, options) ->
+            queueUpdateReferences path options
+        )
+
     member x.CreatePsiModuleForProjectFile(projectFile: IProjectFile, changeBuilder: PsiModuleChangeBuilder,
-                                           [<Out>] resultModule: byref<FSharpScriptPsiModule>) =
+            [<Out>] resultModule: byref<FSharpScriptPsiModule>) =
 
         locks.AssertWriteAccessAllowed()
         let path = projectFile.Location
@@ -220,9 +211,8 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         | Some _ -> false
         | _ ->
 
-        let document = projectFile.GetDocument()
         let sourceFileCtor = createSourceFileForProjectFile projectFile
-        let psiModule = createPsiModule path document moduleId sourceFileCtor changeBuilder 
+        let psiModule = createPsiModule path moduleId sourceFileCtor changeBuilder 
         scriptsFromProjectFiles.Add(path, psiModule)
         addPsiModule psiModule
         resultModule <- psiModule
@@ -271,15 +261,6 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
     member x.TargetFrameworkId =
         targetFrameworkId
-
-    member x.Execute(change: ChangeEventArgs) =
-        // todo: external changes
-        match change.ChangeMap.GetChange<ProjectFileDocumentCopyChange>(documentManager.ChangeProvider) with
-        | null -> ()
-        | change ->
-            let path = change.ProjectFile.Location
-            if scriptsReferences.ContainsKey(path) then
-                queueUpdateReferences path change.Document
 
     member x.Dump(writer: TextWriter) =
         writer.WriteLine(sprintf "Scripts from paths:")

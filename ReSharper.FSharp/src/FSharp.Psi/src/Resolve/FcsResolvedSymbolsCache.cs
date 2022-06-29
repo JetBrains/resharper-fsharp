@@ -34,7 +34,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
 
     public FcsResolvedSymbolsCache(Lifetime lifetime, FcsCheckerService checkerService, IPsiModules psiModules,
-      IFcsProjectProvider fcsProjectProvider, AssemblyReaderShim assemblyReaderShim)
+      IFcsProjectProvider fcsProjectProvider, AssemblyReaderShim assemblyReaderShim,
+      FSharpScriptPsiModulesProvider scriptPsiModulesProvider)
     {
       PsiModules = psiModules;
       CheckerService = checkerService;
@@ -42,6 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       fcsProjectProvider.ModuleInvalidated.Advise(lifetime, Invalidate);
       assemblyReaderShim.ModuleInvalidated.Advise(lifetime, Invalidate);
+      scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime, Invalidate);
     }
 
     private static bool IsApplicable(IPsiSourceFile sourceFile) =>

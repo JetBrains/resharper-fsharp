@@ -219,3 +219,4 @@ type IFcsProjectProvider =
 type IScriptFcsProjectProvider =
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetScriptOptions: VirtualFileSystemPath * string -> FSharpProjectOptions option
+    abstract OptionsUpdated: Signal<VirtualFileSystemPath * FSharpProjectOptions>
