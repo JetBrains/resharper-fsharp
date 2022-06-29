@@ -771,6 +771,8 @@ type FSharpParameterInfoContextFactory() =
         member this.CreateContext(solution, caretOffset, _, char, _) =
             let isAutoPopup = char <> '\000'
             let token = getTokenAtOffset true caretOffset solution
+            if isNull token then null else
+
             match tryCreateFromTypeReference caretOffset token with
             | null ->
                 let expr = token.GetContainingNode<IFSharpExpression>(true)
