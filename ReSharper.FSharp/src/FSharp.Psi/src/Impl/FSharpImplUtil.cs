@@ -413,6 +413,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         _ => declaredElement.ShortName
       };
 
+    public static string GetHeadPatternName([CanBeNull] this IBinding binding) =>
+      binding?.HeadPattern is IReferencePat referencePat
+        ? referencePat.SourceName
+        : SharedImplUtil.MISSING_DECLARATION_NAME;
+
     public static AccessRights GetFSharpRepresentationAccessRights([CanBeNull] this ITypeElement type)
     {
       if (!(type is TypeElement typeElement))

@@ -1,0 +1,9 @@
+﻿module Module
+
+let a = ()
+|and|(0) b x = ()
+
+------------------------------------------------
+0: The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings
+QUICKFIXES:
+Make 'a' recursive
