@@ -742,6 +742,8 @@ type FSharpParameterInfoContextFactory() =
             else
                 // This is called again before requesting a new context on reparsed file
                 let token = getTokenAtOffset true caretOffset solution
+                if isNull token then false else
+
                 let typeReferenceName = getTypeReferenceName token
                 if isInTypeReferenceConstructorNode typeReferenceName then true else
 
