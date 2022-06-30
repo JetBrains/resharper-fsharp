@@ -66,6 +66,9 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Curried 09 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried 10``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried 11``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 12``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 13``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 14``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Lambda 02``() = x.DoNamedTest()
@@ -149,6 +152,7 @@ type FSharpParameterInfoAutoPopupTest() =
 
     [<Test>] member x.``Inherit 01``() = x.DoNamedTest()
     [<Test>] member x.``Inherit 02``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 03``() = x.DoNamedTest()
 
     [<Test>] member x.``New 01``() = x.DoNamedTest()
     [<Test>] member x.``New 02``() = x.DoNamedTest()
