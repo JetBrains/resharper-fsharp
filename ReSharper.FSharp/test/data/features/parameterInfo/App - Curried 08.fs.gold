@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(mapping: 'T -> 'U) (list: 'T list) : 'U list
+Parameter: 0 'mapping: 'T -> 'U'
+
+--- Accepted invocables: ---
+(mapping: 'T -> 'U) (list: 'T list) : 'U list

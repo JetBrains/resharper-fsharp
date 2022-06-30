@@ -42,9 +42,9 @@ public class Class1
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseA' here
-(1): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseB' here
-(2): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseC' here
+(0): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseA(int)' here
+(1): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseB(int)' here
+(2): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseC(int, double)' here
 (3): ReSharper Error Highlighting: Cannot resolve symbol 'CaseA'
 (4): ReSharper Error Highlighting: Cannot resolve symbol 'CaseA'
 (5): ReSharper Error Highlighting: Cannot resolve symbol 'CaseB'

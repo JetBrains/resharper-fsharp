@@ -16,7 +16,7 @@ type RedundantBackticksAnalyzer() =
         if text.Length <= 4 then () else
 
         let withoutBackticks = text.RemoveBackticks()
-        if text.Length = withoutBackticks.Length then () else
+        if text.Length = withoutBackticks.Length || withoutBackticks = "_" then () else
 
         let escaped = FSharpKeywords.AddBackticksToIdentifierIfNeeded withoutBackticks
         if escaped.Length = withoutBackticks.Length then

@@ -50,14 +50,21 @@ type ModuleToImport =
     member this.GetQualifiedElementList(moduleDeclaration: IModuleLikeDeclaration, skipNamespaces) =
         match this with
         | FullName _ -> []
-        | DeclaredElement(declaredElement) ->
+        | DeclaredElement(element) ->
 
-        let elements = toQualifiedList declaredElement
+        let declElement = moduleDeclaration.DeclaredElement
+        if (element :? INamespace && element.Equals(declElement)) then [] else
+
+        let elements = toQualifiedList element
         if not skipNamespaces && not (moduleDeclaration :? IModuleDeclaration) then elements else
 
         // When importing `Ns.Module.NestedModule` inside `Ns.Module`, skip the parent part.
-        match List.skipWhile (moduleDeclaration.DeclaredElement.Equals >> not) elements with
-        | [] -> elements
+        match List.skipWhile (declElement.Equals >> not) elements with
+        | [] ->
+            match declElement with
+            | :? IFSharpModule as fsModule when element.Equals(fsModule.GetContainingNamespace()) -> []
+            | _ -> elements
+
         | _ :: skippedElements ->
 
         // Don't insert `open Ns2.Module` for `Ns1.Ns2.Module`, prefer the full name.

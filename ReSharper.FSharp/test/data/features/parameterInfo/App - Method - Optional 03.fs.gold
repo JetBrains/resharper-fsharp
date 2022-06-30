@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(a: int option = null) : unit
+Parameter: 0 'a: int option = null'
+
+--- Accepted invocables: ---
+(a: int option = null) : unit

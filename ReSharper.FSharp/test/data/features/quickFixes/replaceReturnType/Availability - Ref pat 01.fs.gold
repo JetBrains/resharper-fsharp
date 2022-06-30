@@ -1,0 +1,12 @@
+﻿module Module
+
+let f x : int[] =
+    |1|(0)
+
+------------------------------------------------
+0: This expression was expected to have type
+    'int[]'    
+but here has type
+    'int'    
+QUICKFIXES:
+Change type of 'f' to 'int'

@@ -6,5 +6,5 @@ public class Class1
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access private delegate 'D' here
+(0): ReSharper Underlined Error Highlighting: Cannot access private delegate 'D()' here
 M:Module.f

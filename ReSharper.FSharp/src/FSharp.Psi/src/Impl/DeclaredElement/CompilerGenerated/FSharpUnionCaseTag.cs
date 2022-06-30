@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public ConstantValue ConstantValue =>
       Index is var index && index != -1
-        ? new ConstantValue(index, Type)
+        ? ConstantValue.Create(index, Type)
         : ConstantValue.BAD_VALUE;
 
     public bool IsField => false;

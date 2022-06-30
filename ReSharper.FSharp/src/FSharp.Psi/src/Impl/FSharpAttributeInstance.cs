@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public IDeclaredType GetAttributeType() => TypeFactory.CreateTypeByCLRName(Attr.GetClrName(), Module);
 
     private AttributeValue GetArgValue(Tuple<FSharpType, object> arg) =>
-      new AttributeValue(new ConstantValue(arg.Item2, arg.Item1.MapType(EmptyList<ITypeParameter>.Instance, Module)));
+      new(ConstantValue.Create(arg.Item2, arg.Item1.MapType(EmptyList<ITypeParameter>.Instance, Module)));
 
     public AttributeValue PositionParameter(int paramIndex) =>
       paramIndex >= 0 && AttrConstructorArgs is var args && paramIndex < args.Count
@@ -43,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public AttributeValue NamedParameter(string name) =>
       AttrNamedArgs.FirstOrDefault(p => p.Item2 == name) is { } param
-        ? new AttributeValue(new ConstantValue(param.Item4, type: null))
+        ? new AttributeValue(ConstantValue.Create(param.Item4, param.Item1.MapType(EmptyList<ITypeParameter>.Instance, Module)))
         : AttributeValue.BAD_VALUE;
 
     public IEnumerable<Pair<string, AttributeValue>> NamedParameters() =>

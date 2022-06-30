@@ -87,7 +87,7 @@ module FSharpErrors =
     let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type \n    '(.+)'    \nis not compatible with type\n    '(.+)'"
 
     let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
-    let [<Literal>] typeDoesNotMatchMessage = "The type '(.+)' does not match the type '(.+)'"
+    let [<Literal>] typeDoesNotMatchMessage = "Type mismatch. Expecting a\n    '(.+)'    \nbut given a\n    '(.+)'"
     let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
     let [<Literal>] ifBranchSatisfyContextTypeRequirements = "The 'if' expression needs to have type '(.+)' to satisfy context type requirements\. It currently has type '(.+)'"
     let [<Literal>] typeMisMatchTupleLengths = "Type mismatch. Expecting a\n    '(.+)'    \nbut given a\n    '(.+)'    \nThe tuples have differing lengths of \\d+ and \\d+"
@@ -193,14 +193,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 else
                     null
 
+            | Regex typeMisMatchTupleLengths [expectedType; actualType] ->
+                createTypeMismatchHighlighting TypeMisMatchTuplesHaveDifferingLengthsError expectedType actualType
+
             | Regex typeDoesNotMatchMessage [expectedType; actualType] ->
                 createTypeMismatchHighlighting TypeDoesNotMatchTypeError expectedType actualType
 
             | Regex ifBranchSatisfyContextTypeRequirements [expectedType; actualType] ->
                 createTypeMismatchHighlighting IfExpressionNeedsTypeToSatisfyTypeRequirementsError expectedType actualType
-
-            | Regex typeMisMatchTupleLengths [expectedType; actualType] ->
-                createTypeMismatchHighlighting TypeMisMatchTuplesHaveDifferingLengthsError expectedType actualType
 
             | _ -> createGenericHighlighting error range
 

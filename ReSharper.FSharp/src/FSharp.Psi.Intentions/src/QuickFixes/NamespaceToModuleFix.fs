@@ -20,10 +20,15 @@ type NamespaceToModuleFix(node: IFSharpTreeNode) =
     override x.Text = "Convert namespace to module"
 
     override x.IsAvailable _ =
+        isValid node &&
+
         match namespaceDeclaration with
         | null -> false
         | :? IGlobalNamespaceDeclaration -> false
-        | _ -> isValid node
+        | _ ->
+
+        let fsFile = FSharpFileNavigator.GetByModuleDeclaration(namespaceDeclaration)
+        isNotNull fsFile && fsFile.ModuleDeclarations.Count = 1
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(node.IsPhysical())

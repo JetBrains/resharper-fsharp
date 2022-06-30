@@ -5,9 +5,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class TypeInherit
   {
-    protected override FSharpSymbolReference CreateReference() =>
-      new FSharpSymbolReference(this);
-
+    protected override FSharpSymbolReference CreateReference() => new(this);
     public override IFSharpIdentifier FSharpIdentifier => TypeName?.Identifier;
   }
 }

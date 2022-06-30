@@ -1,4 +1,4 @@
-public class Class1
+﻿public class Class1
 {
   public Class1()
   {
@@ -10,8 +10,8 @@ public class Class1
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access private indexer 'this' here
-(1): ReSharper Underlined Error Highlighting: Cannot access private indexer 'this' here
+(0): ReSharper Underlined Error Highlighting: Cannot access private indexer 'this[int]' here
+(1): ReSharper Underlined Error Highlighting: Cannot access private indexer 'this[int]' here
 M:T.#ctor
 P:T.Item(System.Int32)
 P:T.Item(System.Int32)

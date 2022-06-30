@@ -55,6 +55,9 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
                                      LanguageType = language)
 
     new (lexer, [<NotNull>] sourceFile: IPsiSourceFile, checkerService, symbolsCache) =
+        // During rename of type + file the source file returns the new path,
+        // but the parsing/project options still have the old one. It doesn't seem to affect anything.
+
         let document = if isNotNull sourceFile then sourceFile.Document else null
         let path = if isNotNull sourceFile then sourceFile.GetLocation() else null
         FSharpParser(lexer, document, path, sourceFile, checkerService, symbolsCache)

@@ -68,14 +68,14 @@ class FantomasRunOptionsTest : EditorTestBase() {
         waitAndPump(Duration.ofSeconds(15), { dotnetToolsInvalidated == true }, { "Dotnet tools wasn't changed." })
     }
 
-    private fun withFantomasLocalTool(version: String, restore: Boolean = true, function: () -> Unit) {
+    private fun withFantomasLocalTool(name: String, version: String, restore: Boolean = true, function: () -> Unit) {
         val manifestFile = Paths.get(project.solutionDirectory.absolutePath, ".config", "dotnet-tools.json")
         frameworkLogger.info("Create '$manifestFile'")
         val file = manifestFile.createFile()
 
         try {
             withDotnetToolsUpdate {
-                val toolsJson = """"fantomas-tool": { "version": "$version", "commands": [ "fantomas" ] }"""
+                val toolsJson = """"$name": { "version": "$version", "commands": [ "fantomas" ] }"""
                 file.write("""{ "version": 1, "isRoot": true, "tools": { $toolsJson } }""")
             }
             if (restore) {
@@ -152,7 +152,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
     fun `local tool`() {
         executeWithGold(testGoldFile) {
             withOpenedEditor("Program.fs") {
-                withFantomasLocalTool("4.7.6") {
+                withFantomasLocalTool("fantomas-tool", "4.7.6") {
                     it.println("--With local dotnet tool--")
                     it.print(dumpRunOptions())
 
@@ -172,16 +172,16 @@ class FantomasRunOptionsTest : EditorTestBase() {
     }
 
     @Test
-    fun `local tool 3_3`() = doLocalToolTest("3.3.0", "3.3.0.0")
+    fun `local tool 3_3`() = doLocalToolTest("fantomas-tool", "3.3.0", "3.3.0.0")
 
     @Test
-    fun `local tool 4_5`() = doLocalToolTest("4.5.0", "4.5.0.0")
+    fun `local tool 4_5`() = doLocalToolTest("fantomas-tool", "4.5.0", "4.5.0.0")
 
     @Test
-    fun `local tool 4_6`() = doLocalToolTest("4.6.0", "4.6.0.0")
+    fun `local tool 4_6`() = doLocalToolTest("fantomas-tool", "4.6.0", "4.6.0.0")
 
     @Test
-    fun `local tool 5_0_0-alpha`() = doLocalToolTest("5.0.0-alpha-001", "5.0.0.0")
+    fun `local tool 5_0_0-alpha-003`() = doLocalToolTest("fantomas", "5.0.0-alpha-003", "5.0.0.0")
 
     @Test
     fun `global tool`() {
@@ -207,7 +207,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
     @Test
     fun `local tool has unsupported version`() {
         executeWithGold(testGoldFile) {
-            withFantomasLocalTool("wrong_version", false) {
+            withFantomasLocalTool("fantomas-tool", "wrong_version", false) {
                 withOpenedEditor("Program.fs") {
                     it.print(dumpRunOptions())
 
@@ -224,7 +224,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
     fun `run global tool if local tool failed to run`() {
         executeWithGold(testGoldFile) {
             withOpenedEditor("Program.fs") {
-                withFantomasLocalTool("wrong_version", false) {
+                withFantomasLocalTool("fantomas-tool", "wrong_version", false) {
                     withFantomasGlobalTool {
                         it.print(dumpRunOptions())
 
@@ -238,9 +238,9 @@ class FantomasRunOptionsTest : EditorTestBase() {
         }
     }
 
-    private fun doLocalToolTest(version: String, expectedVersion: String) {
+    private fun doLocalToolTest(name: String, version: String, expectedVersion: String) {
         withOpenedEditor("Simple.fs") {
-            withFantomasLocalTool(version) {
+            withFantomasLocalTool(name, version) {
                 executeWithGold(testGoldFile) {
                     reformatCode()
                     checkFantomasVersion(expectedVersion)

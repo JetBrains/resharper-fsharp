@@ -4,7 +4,9 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
+open JetBrains.Application.FileSystemTracker
 open JetBrains.Diagnostics
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost
@@ -62,8 +64,8 @@ module ProjectOptions =
 
 
 [<SolutionComponent>]
-type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
-        modulePathProvider: ModulePathProvider, logger: ILogger) =
+type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
+        modulePathProvider: ModulePathProvider, fileSystemTracker: IFileSystemTracker, logger: ILogger) =
 
     let mutable stamp = 0L
 
@@ -238,7 +240,11 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         let paths =
             referencedPsiModules
             |> Array.ofSeq
-            |> Array.map modulePathProvider.GetModulePath
+            |> Array.map (fun psiModule ->
+                let path = modulePathProvider.GetModulePath(psiModule)
+                if psiModule :? IProjectPsiModule then
+                    fileSystemTracker.AdviseFileChanges(lifetime, path) |> ignore
+                path)
             |> Array.map (fun r -> "-r:" + r.FullPath)
 
         let otherOptions = Array.append fcsProject.ProjectOptions.OtherOptions paths

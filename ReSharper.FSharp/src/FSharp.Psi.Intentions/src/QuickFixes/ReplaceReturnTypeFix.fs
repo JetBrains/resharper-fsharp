@@ -13,6 +13,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
     inherit FSharpQuickFixBase()
 
     let mostOuterParentExpr = expr.GetOutermostParentExpressionFromItsReturn()
+    let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
 
     new (error: TypeConstraintMismatchError) =
         // error FS0193: Type constraint mismatch. The type ↔    'A.B'    ↔is not compatible with type↔    'Thing'
@@ -42,47 +43,36 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
         // The tuples have differing lengths of 2 and 3
         ReplaceReturnTypeFix(error.Expr, error.ActualType)
 
-    override this.Text = "Replace return type"
+    override this.Text =
+        let refPat = binding.HeadPattern.As<IReferencePat>()
+
+        let name =
+            if isNull refPat || refPat.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME then
+                "binding"
+            else
+                $"'{refPat.SourceName}'"
+
+        $"Change type of {name} to '{replacementTypeName}'"
+
     override this.IsAvailable _ =
-        if isNull mostOuterParentExpr then false else
-        let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
-        if isNull binding then false else
+        if isNull binding || isNull binding.ReturnTypeInfo then false else
+        if not (binding.HeadPattern :? IReferencePat) then false else
 
-        let returnTypeInfo = binding.ReturnTypeInfo
-        if isNull returnTypeInfo then false else
+        // An invalid binary infix application will yield a similar error and could be mistaken for an invalid return type.
+        // F.ex. 1 + "a", error FS0001: The type 'string' does not match the type 'int'
+        // We ignore this scenario for now.
+        match mostOuterParentExpr with
+        | :? IBinaryAppExpr
+        | :? IMatchLambdaExpr -> false
+        | _ -> true
 
-        // Some types cannot be replaced properly solely on the FCS error message.
-        // We will ignore these types for now.
-        match returnTypeInfo.ReturnType.IgnoreParentParens() with
-        | :? ITupleTypeUsage
-        | :? IFunctionTypeUsage -> false
-        | _ ->
-            // An invalid binary infix application will yield a similar error and could be mistaken for an invalid return type.
-            // F.ex. 1 + "a", error FS0001: The type 'string' does not match the type 'int'
-            // We ignore this scenario for now.
-            match mostOuterParentExpr with
-            | :? IBinaryAppExpr -> false
-            | _ -> true
-
-    override this.ExecutePsiTransaction(_solution) =
-        let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
-        
+    override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let refPat = binding.HeadPattern.As<IReferencePat>()
-        if isNull refPat then () else
+        let bindingReturnTypeInfo = binding.ReturnTypeInfo
+        if isNotNull bindingReturnTypeInfo && isNotNull bindingReturnTypeInfo.ReturnType then
+            let typeUsage = binding.CreateElementFactory().CreateTypeUsage(replacementTypeName)
+            let returnTypeUsage = bindingReturnTypeInfo.ReturnType.IgnoreInnerParens()
 
-        let symbolUse = refPat.GetFcsSymbolUse()
-        if isNull symbolUse then () else
-
-        if isNotNull binding.ReturnTypeInfo
-           && isNotNull binding.ReturnTypeInfo.ReturnType then
-            let factory = binding.CreateElementFactory()
-            let typeUsage = factory.CreateTypeUsage(replacementTypeName)
-            let returnType = binding.ReturnTypeInfo.ReturnType.IgnoreInnerParens()
-
-            match returnType with
-            | :? INamedTypeUsage as ntu ->
-                ModificationUtil.ReplaceChild(ntu, typeUsage) |> ignore
-            | _ -> ()
+            ModificationUtil.ReplaceChild(returnTypeUsage, typeUsage) |> ignore

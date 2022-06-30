@@ -111,7 +111,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           try
           {
             var result = Convert.ToInt32(literalText, (int) literalBase);
-            return new ConstantValue(result, GetPsiModule().GetPredefinedType().Int);
+            return ConstantValue.Create(result, GetPsiModule().GetPredefinedType().Int);
           }
           catch (Exception)
           {

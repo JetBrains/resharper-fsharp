@@ -188,12 +188,12 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
             |> Seq.iter (fun checkbox ->
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), fun t -> t :> obj))
 
-        this.AddHeader("FSharp.Compiler.Service options")
+        this.AddHeader("F# Compiler Service")
         this.AddBoolOptionWithComment((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
         this.AddBoolOptionWithComment((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Solution reload required") |> ignore
 
         if configurations.IsInternalMode() then
-            this.AddHeader("Experimental features options")
+            this.AddHeader("Experimental features")
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
             this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore

@@ -13,7 +13,6 @@ import com.jetbrains.rd.lang.toRdLanguageOrThrow
 import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rd.util.lifetime.LifetimeDefinition
-import com.jetbrains.rdclient.editors.FrontendTextControlHost
 import com.jetbrains.rdclient.editors.sandboxes.SandboxManager
 import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
 import com.jetbrains.rdclient.util.idea.fromOffset
@@ -133,18 +132,19 @@ fun withGenericSandBoxing(sandboxInfo: SandboxInfo, project: Project, block: () 
 
 fun createFSharpSandbox(additionalText: String = "", isNonUserCode: Boolean = false, disableTypingAssists: List<Char>): SandboxInfo {
     return SandboxInfo(
-            null,
-            additionalText,
-            RdTextRange.fromOffset(additionalText.length),
-            isNonUserCode,
-            ExtraInfo(emptyList(), emptyList()),
-            emptyList(),
-            true,
-            emptyList(),
-            FSharpScriptLanguage.toRdLanguageOrThrow(),
-            addSemicolon = false,
-            disableTypingActions = true,
-            disableTypingAssists = disableTypingAssists,
-            extraVariables = null
+        "Fsi sandbox",
+        null,
+        additionalText,
+        RdTextRange.fromOffset(additionalText.length),
+        isNonUserCode,
+        ExtraInfo(emptyList(), emptyList()),
+        emptyList(),
+        true,
+        emptyList(),
+        FSharpScriptLanguage.toRdLanguageOrThrow(),
+        addSemicolon = false,
+        disableTypingActions = true,
+        disableTypingAssists = disableTypingAssists,
+        extraVariables = null
     )
 }

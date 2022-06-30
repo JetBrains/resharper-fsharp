@@ -23,6 +23,7 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Threading
 open JetBrains.Util
 open JetBrains.Util.Extension
 open JetBrains.Util.Logging
@@ -62,7 +63,8 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
                     SandBox.CreateSandBoxFor(newFile, fsFile.GetPsiModule())
                     newFile
                 with exn ->
-                    Logger.GetLogger<FSharpReparseContext>().LogException(exn)
+                    if not (exn.IsOperationCanceled()) then
+                        Logger.GetLogger<FSharpReparseContext>().LogException(exn)
                     fsFile
 
             ReparseResult(newFile, fsFile, 0)

@@ -1097,7 +1097,6 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
         solution.GetProjectByMark(projectMark) |> Option.ofObj
 
     let refresh projectMark getFolders =
-        use lock = solution.Locks.UsingReadLock()
         solution.Locks.QueueReadLock(lifetime, "Refresh View", fun _ ->
             tryGetProject projectMark
             |> Option.iter (fun project ->
@@ -1107,7 +1106,6 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
                         | appender -> appender.Refresh(projectFolder)))
 
     let update projectMark path viewItemCtor =
-        use lock = solution.Locks.UsingReadLock()
         solution.Locks.QueueReadLock(lifetime, "Update Items View", fun _ ->
             tryGetProject projectMark
             |> Option.iter (fun project ->

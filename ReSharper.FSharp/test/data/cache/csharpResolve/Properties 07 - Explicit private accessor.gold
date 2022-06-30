@@ -1,4 +1,4 @@
-public class Class1
+﻿public class Class1
 {
   public Class1()
   {
@@ -9,7 +9,7 @@ public class Class1
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access private method 'set_A' here
+(0): ReSharper Underlined Error Highlighting: Cannot access private method 'set_A(int, int)' here
 M:T.#ctor
 M:T.get_A(System.Int32)
 M:T.get_A(System.Int32)

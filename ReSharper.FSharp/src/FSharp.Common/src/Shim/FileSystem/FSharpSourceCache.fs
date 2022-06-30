@@ -6,6 +6,7 @@ open System.Collections.Concurrent
 open System.Runtime.InteropServices
 open System.Text
 open JetBrains.Application.changes
+open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.DocumentManagers
 open JetBrains.DocumentManagers.impl
@@ -29,6 +30,8 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         solutionDocumentChangeProvider: SolutionDocumentChangeProvider, fileExtensions: IProjectFileExtensions,
         logger: ILogger) =
     inherit FileSystemShimChangeProvider(Lifetime.Define(lifetime).Lifetime, changeManager)
+
+    let fileUpdated = new Signal<VirtualFileSystemPath>(lifetime, "FSharpSourceCache.fileUpdated")
 
     let [<Literal>] RemoveFileChangeType =
         ProjectModelChangeType.REMOVED ||| ProjectModelChangeType.MOVED_OUT
@@ -80,6 +83,9 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
 
         logger.Trace("Add: {0} change: {1}", changeSource, path)
         files[path] <- Exists(text, DateTime.UtcNow)
+        fileUpdated.Fire(path)
+
+    member x.FileUpdated = fileUpdated
 
     member x.TryGetSource(path: VirtualFileSystemPath, [<Out>] source: byref<FSharpSource>) =
         match files.TryGetValue(path) with
