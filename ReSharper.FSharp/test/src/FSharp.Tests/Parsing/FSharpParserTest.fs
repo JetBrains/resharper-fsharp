@@ -341,6 +341,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Sequential 05 - Let``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Sequential 06 - Let``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Set 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Set 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - List - Empty 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - List - Comprehension 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - List - Range sequence 01``() = x.DoNamedTest()

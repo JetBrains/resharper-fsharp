@@ -17,6 +17,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       FunctionExpression is { } funExpr && 
       ArgumentExpression is { } argExpr && funExpr.NextSibling == argExpr;
 
+    public bool IsIndexerLike =>
+      IsHighPrecedence && ArgumentExpression is IListExpr;
+
     public IReferenceExpr InvokedReferenceExpression =>
       InvokedExpression.IgnoreInnerParens() as IReferenceExpr;
 

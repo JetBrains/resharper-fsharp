@@ -988,8 +988,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
 
         | SynExpr.DotIndexedSet(expr1, _, expr2, leftRange, _, _) as set ->
             x.PushRange(range, ElementType.SET_EXPR)
-            x.PushRange(leftRange, ElementType.ITEM_INDEXER_EXPR)
             x.PushExpression(expr2)
+            x.PushRange(leftRange, ElementType.ITEM_INDEXER_EXPR)
             x.PushStep(set, indexerArgsProcessor)
             x.ProcessExpression(expr1)
 

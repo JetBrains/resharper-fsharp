@@ -1,0 +1,3 @@
+﻿Suggested names: identity, i
+do
+  let identity = id(1)

@@ -34,6 +34,9 @@ type IntroduceVarTest() =
     [<Test>] member x.``Simple 02``() = x.DoNamedTest()
     [<Test>] member x.``Simple 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``App 01``() = x.DoNamedTest()
+    [<Test>] member x.``App 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Inside other``() = x.DoNamedTest()
@@ -146,8 +149,13 @@ type IntroduceVarTest() =
     [<Test>] member x.``Not allowed - CompExpr 02 - Yield``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - RangeSequenceExpr 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Not allowed - Indexer - Set 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Indexer - Set 02``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Indexer - Set 03``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Indexer - Set 04``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Indexer 01 - Item``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Indexer 02 - Named``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Indexer 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Not allowed - Op 01``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Op 02 - Prefix app``() = x.DoNamedTest()

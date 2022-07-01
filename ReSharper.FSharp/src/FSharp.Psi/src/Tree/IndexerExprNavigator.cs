@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   {
     [CanBeNull]
     public static IIndexerExpr GetByQualifierIgnoreIndexers([CanBeNull] IFSharpExpression param) =>
-      GetByQualifier(param) is var indexer && indexer != null
+      GetByQualifier(param) is { } indexer
         ? GetByQualifierIgnoreIndexers(indexer) ?? indexer
         : null;
   }

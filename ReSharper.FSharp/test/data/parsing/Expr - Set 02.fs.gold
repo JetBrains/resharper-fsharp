@@ -4,19 +4,13 @@ IFSharpImplFile
     IExpressionStatement
       IChameleonExpression
         ISetExpr
-          IItemIndexerExpr
+          IPrefixAppExpr
             IReferenceExpr
-              FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-            FSharpTokenType+DotTokenElement(type:DOT, text:.)
-            IIndexerArgList
+              FSharpIdentifierToken(type:IDENTIFIER, text:x)
+            IListExpr
               FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-              ITupleExpr
-                ILiteralExpr
-                  FSharpToken(type:INT32, text:1)
-                FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
-                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                ILiteralExpr
-                  FSharpToken(type:INT32, text:2)
+              ILiteralExpr
+                FSharpToken(type:INT32, text:1)
               FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
