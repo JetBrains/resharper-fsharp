@@ -606,6 +606,10 @@ type FSharpParameterInfoContextFactory() =
             | context -> context
 
         | :? IReferenceExpr as refExpr ->
+            // todo: enable for non-predefined operators?
+            let binaryAppExpr = BinaryAppExprNavigator.GetByOperator(refExpr)
+            if isNotNull binaryAppExpr then null else
+
             match PrefixAppExprNavigator.GetByArgumentExpression(refExpr.IgnoreParentParens()) with
             | null ->
                 let context = createFromExpression isAutoPopup caretOffset refExpr.Reference refExpr

@@ -102,6 +102,10 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Method 14 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``App - Method 15 - Empty``() = x.DoNamedTest()
 
+    [<Test>] member x.``App - Operator 01``() = x.DoNamedTest()
+    [<Test>] member x.``App - Operator 02``() = x.DoNamedTest()
+    [<Test>] member x.``App - Operator 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Exception 01``() = x.DoNamedTest()
     [<Test>] member x.``Exception 02``() = x.DoNamedTest()
     [<Test>] member x.``Exception 03``() = x.DoNamedTest()

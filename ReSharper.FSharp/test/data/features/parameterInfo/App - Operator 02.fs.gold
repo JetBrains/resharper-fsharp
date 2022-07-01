@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(e1: bool) (e2: bool) : bool
+Parameter: 0 'e1: bool'
+
+--- Accepted invocables: ---
+(e1: bool) (e2: bool) : bool
