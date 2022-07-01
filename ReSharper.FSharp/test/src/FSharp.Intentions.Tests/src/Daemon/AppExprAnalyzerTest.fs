@@ -16,3 +16,5 @@ type AppExprAnalyzerTest() =
     [<Test>] member x.``Id 02 - Shadowed``() = x.DoNamedTest()
 
     [<Test>] member x.``Ignore 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Sprintf 01``() = x.DoNamedTest()
