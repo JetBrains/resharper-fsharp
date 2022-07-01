@@ -627,7 +627,9 @@ type FSharpParameterInfoContextFactory() =
 
         let isApplicable (fcsSymbol: FSharpSymbol) =
             match fcsSymbol with
-            | :? FSharpMemberOrFunctionOrValue
+            | :? FSharpMemberOrFunctionOrValue as mfv ->
+                not mfv.IsProperty && mfv.CurriedParameterGroups.Count > 0
+
             | :? FSharpUnionCase
             | :? FSharpEntity -> true
             | _ -> false
