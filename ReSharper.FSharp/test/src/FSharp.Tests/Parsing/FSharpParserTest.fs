@@ -50,6 +50,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Exception 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 03 - Members``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Exception 04 - Attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Extension - Type parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Extension - Type parameters 02``() = x.DoNamedTest()

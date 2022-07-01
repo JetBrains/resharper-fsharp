@@ -1,0 +1,2 @@
+[<A>]
+exception E
