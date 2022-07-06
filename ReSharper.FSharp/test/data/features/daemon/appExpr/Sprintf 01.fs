@@ -5,3 +5,7 @@ sprintf $""
 
 let s = ""
 sprintf s
+
+sprintf "%s" ""
+(sprintf "%s")
+(sprintf "s")

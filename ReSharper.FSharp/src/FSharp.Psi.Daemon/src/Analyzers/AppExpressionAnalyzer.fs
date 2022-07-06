@@ -33,9 +33,12 @@ type AppExpressionAnalyzer() =
                 consumer.AddHighlighting(RedundantApplicationWarning(appExpr, arg))
 
         |  Predefined "sprintf" arg ->
+            if isNotNull (PrefixAppExprNavigator.GetByFunctionExpression(appExpr)) then () else
+
             let arg = arg.IgnoreInnerParens()
             let literalExpr = arg.As<ILiteralExpr>()
             if isNotNull literalExpr && literalExpr.Type().IsString() || arg :? IInterpolatedStringExpr then
-                consumer.AddHighlighting(RedundantApplicationWarning(appExpr, arg))
+                if not (arg.GetText().Contains("%")) then
+                    consumer.AddHighlighting(RedundantApplicationWarning(appExpr, arg))
 
         | _ -> ()

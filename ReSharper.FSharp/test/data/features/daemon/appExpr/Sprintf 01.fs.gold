@@ -6,7 +6,12 @@
 let s = ""
 sprintf s
 
+sprintf "%s" ""
+(sprintf "%s")
+(|sprintf|(3) "s")
+
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant application
 (1): ReSharper Dead Code: Redundant application
 (2): ReSharper Dead Code: Redundant application
+(3): ReSharper Dead Code: Redundant application
