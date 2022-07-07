@@ -1,0 +1,3 @@
+﻿open Ns
+
+let r = { zzz = 1 }
