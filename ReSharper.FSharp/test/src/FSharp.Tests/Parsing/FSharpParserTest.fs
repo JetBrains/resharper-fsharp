@@ -126,6 +126,12 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Struct 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Struct 02 - Fields``() = x.DoNamedTest()
 
+    [<Test>] member x.``Let - Active pattern - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Active pattern - Parameter 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Active pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Active pattern 02``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Active pattern 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Typed, var type``() = x.DoNamedTest()

@@ -145,6 +145,13 @@ type FSharpRenameTest() =
     [<Test>] member x.``Active patterns - Local - Total 02 - Use in decl``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Local - Total 03 - Use``() = x.DoNamedTest()
 
+    [<Test>] member x.``Active patterns - Module - No param - Single 01 - Decl``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Module - No param - Single 02``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Module - No param - Single 03 - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Module - No param - Total 01 - Decl``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Module - No param - Total 02 - Pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Module - No param - Total 03 - Expr``() = x.DoNamedTest()
+
     [<Test>] member x.``Active patterns - Module - Partial 01 - Decl``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Module - Partial 02 - Pattern``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Module - Single 01 - Decl``() = x.DoNamedTest()

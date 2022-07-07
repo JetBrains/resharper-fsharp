@@ -468,6 +468,14 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
             x.ProcessMemberParams(args, true, true)
 
+        | true, SynPat.Named(IdentRange idRange as id, _, _, _) when IsActivePatternName id.idText ->
+            let mark = x.Mark(idRange)
+            x.ProcessActivePatternDecl(id, isLocal)
+            x.Done(idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
+
+            let elementType = if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
+            x.Done(patMark, elementType)
+
         | _ ->
 
         let elementType =

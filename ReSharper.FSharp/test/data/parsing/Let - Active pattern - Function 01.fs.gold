@@ -1,0 +1,34 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    ILetBindingsDeclaration
+      ITopBinding
+        FSharpTokenType+LetTokenElement(type:LET, text:let)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        ITopReferencePat
+          IExpressionReferenceName
+            IActivePatternId
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+BarTokenElement(type:BAR, text:|)
+              ITopActivePatternCaseDeclaration
+                FSharpIdentifierToken(type:IDENTIFIER, text:A)
+              FSharpTokenType+BarTokenElement(type:BAR, text:|)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IChameleonExpression
+          IMatchLambdaExpr
+            FSharpTokenType+FunctionTokenElement(type:FUNCTION, text:function)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IMatchClause
+              IWildPat
+                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IUnitExpr
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
