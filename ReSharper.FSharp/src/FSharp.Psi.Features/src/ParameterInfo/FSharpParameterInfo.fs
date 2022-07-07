@@ -531,7 +531,7 @@ type FSharpParameterInfoContextFactory() =
             FSharpTokenType.GREATER_RBRACK,
             FSharpTokenType.SEMICOLON)
 
-    let rec getTokenAtOffset allowRetry (caretOffset: DocumentOffset) (solution: ISolution) =
+    let rec getTokenAtOffset isAutoPopup allowRetry (caretOffset: DocumentOffset) (solution: ISolution) =
         let fsFile = solution.GetPsiServices().GetPsiFile<FSharpLanguage>(caretOffset).As<IFSharpFile>()
         if isNull fsFile then null else
 
@@ -539,7 +539,7 @@ type FSharpParameterInfoContextFactory() =
         | null, false -> null
         | null, true ->
             let caretOffset = caretOffset.Shift(-1)
-            getTokenAtOffset false caretOffset solution
+            getTokenAtOffset isAutoPopup false caretOffset solution
         | token, _ ->
 
         let token =
@@ -551,6 +551,14 @@ type FSharpParameterInfoContextFactory() =
                     token
                 else
                     prevSibling
+
+        if isNull token then null else
+
+        let rec isInsideComment checkPrevious (token: ITreeNode) =
+            token.IsCommentToken() && caretOffset.Offset > token.GetTreeStartOffset().Offset ||
+            checkPrevious && getTokenType token == FSharpTokenType.NEW_LINE && isInsideComment false token.PrevSibling 
+
+        if isAutoPopup && isInsideComment true token then null else
 
         let token = token.GetPreviousMeaningfulToken(true)
         if isNull token then null else token
@@ -754,7 +762,7 @@ type FSharpParameterInfoContextFactory() =
                 Array.contains char popupChars
             else
                 // This is called again before requesting a new context on reparsed file
-                let token = getTokenAtOffset true caretOffset solution
+                let token = getTokenAtOffset true true caretOffset solution
                 if isNull token then false else
 
                 let typeReferenceName = getTypeReferenceName token
@@ -782,7 +790,7 @@ type FSharpParameterInfoContextFactory() =
 
         member this.CreateContext(solution, caretOffset, _, char, _) =
             let isAutoPopup = char <> '\000'
-            let token = getTokenAtOffset true caretOffset solution
+            let token = getTokenAtOffset false true caretOffset solution
             if isNull token then null else
 
             let context = tryCreateFromTypeReference caretOffset token

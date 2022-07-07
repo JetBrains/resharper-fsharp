@@ -13,6 +13,10 @@ type FSharpParameterInfoTest() =
     override this.DumpArgumentForEachCandidate = true
     override this.DumpArgumentSignatureText = true
 
+    [<Test>] member x.``App - Curried - Comment 01``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Comment 02``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Comment 03``() = x.DoNamedTest()
+
     [<Test>] member x.``App - Curried - Nested 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Nested 02``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Nested 03``() = x.DoNamedTest()
@@ -147,6 +151,10 @@ type FSharpParameterInfoAutoPopupTest() =
 
     override this.RelativeTestDataPath = "features/parameterInfo/autoPopup"
 
+    [<Test; Explicit "Works in product">] member x.``App - Comment 01``() = x.DoNamedTest()
+    [<Test; Explicit "Works in product">] member x.``App - Comment 02``() = x.DoNamedTest()
+    [<Test>] member x.``App - Comment 03``() = x.DoNamedTest()
+    [<Test>] member x.``App - Comment 04``() = x.DoNamedTest()
     [<Test>] member x.``App 01``() = x.DoNamedTest()
     [<Test>] member x.``App 02``() = x.DoNamedTest()
 
