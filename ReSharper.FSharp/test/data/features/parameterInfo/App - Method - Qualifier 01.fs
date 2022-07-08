@@ -1,0 +1,1 @@
+"".Length.ToString({caret})

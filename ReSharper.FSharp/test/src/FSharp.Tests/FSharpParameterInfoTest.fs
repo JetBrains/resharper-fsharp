@@ -90,6 +90,11 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Method - Params 06``() = x.DoNamedTest()
     [<Test>] member x.``App - Method - Params 07``() = x.DoNamedTest()
 
+    [<Test>] member x.``App - Method - Qualifier 01``() = x.DoNamedTest()
+    [<Test>] member x.``App - Method - Qualifier 02``() = x.DoNamedTest()
+    [<Test>] member x.``App - Method - Qualifier 03``() = x.DoNamedTest()
+    [<Test>] member x.``App - Method - Qualifier 04 - Outer app``() = x.DoNamedTest()
+
     [<Test>] member x.``App - Method 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Method 02``() = x.DoNamedTest()
     [<Test>] member x.``App - Method 03``() = x.DoNamedTest()

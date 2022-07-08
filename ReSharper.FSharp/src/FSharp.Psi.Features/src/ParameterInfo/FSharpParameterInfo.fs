@@ -716,7 +716,7 @@ type FSharpParameterInfoContextFactory() =
             (contextExpr: IFSharpExpression) =
         if isNull reference || isNull contextExpr then null else
 
-        let range = reference.GetTreeTextRange()
+        let range = reference.GetElement().GetTreeTextRange()
         let endOffset = DocumentOffset(caretOffset.Document, range.EndOffset.Offset)
         let appExpr = getOutermostPrefixAppExpr contextExpr
         let appExpr = appExpr.IgnoreParentParens()
