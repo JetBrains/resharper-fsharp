@@ -807,8 +807,8 @@ type FSharpParameterInfoContextFactory() =
                         isArgExpression tupleExpr
 
                     | expr ->
-                        (offset <= expr.GetTreeStartOffset().Offset || offset >= expr.GetTreeEndOffset().Offset) &&
-                        isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(expr))
+                        isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(expr)) &&
+                        (offset <= expr.GetTreeStartOffset().Offset || offset >= expr.GetTreeEndOffset().Offset)
 
                 if not shouldPopup then false else
                 if char <> ' ' then true else
