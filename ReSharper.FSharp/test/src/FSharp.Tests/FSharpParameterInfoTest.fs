@@ -140,6 +140,14 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``Inherit 07``() = x.DoNamedTest()
     [<Test>] member x.``Inherit 08``() = x.DoNamedTest()
     [<Test>] member x.``Inherit 09``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 10``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit 11``() = x.DoNamedTest()
+
+    [<Test>] member x.``New 01``() = x.DoNamedTest()
+    [<Test>] member x.``New 02``() = x.DoNamedTest()
+    [<Test>] member x.``New 03``() = x.DoNamedTest()
+    [<Test>] member x.``New 04``() = x.DoNamedTest()
+    [<Test>] member x.``New 05 - Nested app``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case 02``() = x.DoNamedTest()

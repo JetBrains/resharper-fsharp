@@ -693,12 +693,19 @@ type FSharpParameterInfoContextFactory() =
                 checkResults, endOffset, symbol) :> IParameterInfoContext
         | _ -> null
 
-    and createFromTypeReference (caretOffset: DocumentOffset) (reference: FSharpSymbolReference) argExpr =
+    and createFromTypeReference (caretOffset: DocumentOffset) (reference: FSharpSymbolReference)
+            (argExpr: IFSharpExpression) =
         if isNull reference then null else
 
         let context = reference.GetElement()
         let endOffset = DocumentOffset(caretOffset.Document, reference.GetTreeTextRange().EndOffset.Offset)
         if not (shouldShowPopup caretOffset (context.GetDocumentRange())) then null else
+
+        if caretOffset.Offset <= endOffset.Offset &&
+                (isNull argExpr || caretOffset.Offset < argExpr.GetTreeStartOffset().Offset) then
+            // Inside invoked type reference name, try to get context from a parent node instead
+            let parentExpr = context.GetContainingNode<IFSharpExpression>() 
+            tryCreateFromParent false caretOffset parentExpr else
 
         match getSymbols endOffset context reference with
         | Some(checkResults, symbol, symbolUses) ->
@@ -731,6 +738,8 @@ type FSharpParameterInfoContextFactory() =
         create caretOffset reference appExpr
 
     and tryCreateFromParent isAutoPopup caretOffset (expr: IFSharpExpression) =
+        if isNull expr then null else
+
         let expr = expr.IgnoreParentParens()
 
         let reference, argExpr =
