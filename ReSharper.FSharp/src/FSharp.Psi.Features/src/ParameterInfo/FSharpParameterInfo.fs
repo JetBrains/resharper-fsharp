@@ -39,10 +39,19 @@ module FcsParameterInfoCandidate =
     let canBeNullAttrTypeName = clrTypeName "JetBrains.Annotations.CanBeNullAttribute"
     let notNullAttrTypeName = clrTypeName "JetBrains.Annotations.NotNullAttribute"
 
+
 type IFcsParameterInfoCandidate =
     abstract Symbol: FSharpSymbol
     abstract ParameterGroupCounts: IList<int>
     abstract ParameterOwner: IParametersOwner
+
+
+[<AllowNullLiteral>]
+type IFSharpParameterInfoContext =
+    inherit IParameterInfoContext
+
+    abstract ArgGroups: IFSharpExpression list
+
 
 [<AbstractClass>]
 type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharpSymbol and 'TParameter :> FSharpSymbol>
@@ -358,7 +367,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
     abstract ArgGroups: IFSharpExpression list
     abstract NamedArgs: string[]
 
-    interface IParameterInfoContext with
+    interface IFSharpParameterInfoContext with
         member this.Range =
             context.GetDocumentRange().TextRange
 
@@ -440,6 +449,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
 
             loop 0 0 args
 
+        member this.ArgGroups = this.ArgGroups
         member this.Candidates = candidates
 
         member this.DefaultCandidate =
@@ -546,7 +556,7 @@ type FSharpParameterInfoContextFactory() =
             if not checkNodeBeforeNodeTypes[getTokenType token] then
                 token
             else
-                let prevSibling = token.PrevSibling
+                let prevSibling = token.GetPreviousToken()
                 if getTokenType prevSibling == FSharpTokenType.RPAREN then
                     token
                 else
@@ -748,6 +758,16 @@ type FSharpParameterInfoContextFactory() =
         let parentExpr = expr.GetContainingNode<IFSharpExpression>()
         tryCreateContext isAutoPopup caretOffset parentExpr
 
+    member this.CreateContext(solution, caretOffset, isAutoPopup) =
+        let token = getTokenAtOffset false true caretOffset solution
+        if isNull token then null else
+
+        let context = tryCreateFromTypeReference caretOffset token
+        if isNotNull context then context else
+
+        let expr = token.GetContainingNode<IFSharpExpression>(true)
+        tryCreateContext isAutoPopup caretOffset expr
+
     interface IParameterInfoContextFactory with
         member this.Language = FSharpLanguage.Instance
 
@@ -762,39 +782,53 @@ type FSharpParameterInfoContextFactory() =
                 Array.contains char popupChars
             else
                 // This is called again before requesting a new context on reparsed file
-                let token = getTokenAtOffset true true caretOffset solution
-                if isNull token then false else
+                let offset = caretOffset.Offset
+                let shouldPopup = 
+                    let token = getTokenAtOffset true true caretOffset solution
+                    if isNull token then false else
 
-                let typeReferenceName = getTypeReferenceName token
-                if isInTypeReferenceConstructorNode typeReferenceName then true else
+                    let typeReferenceName = getTypeReferenceName token
+                    if isInTypeReferenceConstructorNode typeReferenceName then true else
 
-                let expr = token.GetContainingNode<IFSharpExpression>(true)
-                match expr with
-                | :? IPrefixAppExpr -> true
+                    let expr = token.GetContainingNode<IFSharpExpression>(true)
+                    match expr with
+                    | :? IPrefixAppExpr -> true
 
-                | :? IReferenceExpr as refExpr when caretOffset.Offset >= refExpr.GetDocumentEndOffset().Offset ->
-                    true
+                    | :? IReferenceExpr as refExpr when offset >= refExpr.GetDocumentEndOffset().Offset ->
+                        true
 
-                | :? IUnitExpr as unitExpr ->
-                    isArgExpression unitExpr
+                    | :? IUnitExpr as unitExpr ->
+                        isArgExpression unitExpr
 
-                | :? ITupleExpr as tupleExpr ->
-                    not tupleExpr.IsStruct &&
+                    | :? ITupleExpr as tupleExpr ->
+                        not tupleExpr.IsStruct &&
 
-                    let tupleExpr = tupleExpr.IgnoreParentParens(true)
-                    isArgExpression tupleExpr
+                        let tupleExpr = tupleExpr.IgnoreParentParens(true)
+                        isArgExpression tupleExpr
 
-                | expr ->
-                    caretOffset.Offset >= expr.GetDocumentEndOffset().Offset &&
-                    isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(expr))
+                    | expr ->
+                        (offset <= expr.GetTreeStartOffset().Offset || offset >= expr.GetTreeEndOffset().Offset) &&
+                        isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(expr))
+
+                if not shouldPopup then false else
+                if char <> ' ' then true else
+
+                let context = this.CreateContext(solution, caretOffset, true).As<IFSharpParameterInfoContext>()
+                if isNull context then false else
+
+                let argGroups = context.ArgGroups
+                if argGroups.IsEmpty then true else
+
+                let lastArg = List.last argGroups
+                if offset < lastArg.GetTreeEndOffset().Offset then true else
+
+                let argGroupsLength = argGroups.Length
+
+                context.Candidates
+                |> Seq.exists (function
+                    | :? IFcsParameterInfoCandidate as candidate -> candidate.ParameterGroupCounts.Count > argGroupsLength
+                    | _ -> false)
 
         member this.CreateContext(solution, caretOffset, _, char, _) =
             let isAutoPopup = char <> '\000'
-            let token = getTokenAtOffset false true caretOffset solution
-            if isNull token then null else
-
-            let context = tryCreateFromTypeReference caretOffset token
-            if isNotNull context then context else
-
-            let expr = token.GetContainingNode<IFSharpExpression>(true)
-            tryCreateContext isAutoPopup caretOffset expr
+            this.CreateContext(solution, caretOffset, isAutoPopup)

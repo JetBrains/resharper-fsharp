@@ -151,12 +151,15 @@ type FSharpParameterInfoAutoPopupTest() =
 
     override this.RelativeTestDataPath = "features/parameterInfo/autoPopup"
 
-    [<Test; Explicit "Works in product">] member x.``App - Comment 01``() = x.DoNamedTest()
-    [<Test; Explicit "Works in product">] member x.``App - Comment 02``() = x.DoNamedTest()
+    [<Test; Explicit "Fix main thread check">] member x.``App - Comment 01``() = x.DoNamedTest()
+    [<Test; Explicit "Fix main thread check">] member x.``App - Comment 02``() = x.DoNamedTest()
     [<Test>] member x.``App - Comment 03``() = x.DoNamedTest()
     [<Test>] member x.``App - Comment 04``() = x.DoNamedTest()
     [<Test>] member x.``App 01``() = x.DoNamedTest()
     [<Test>] member x.``App 02``() = x.DoNamedTest()
+    [<Test; Explicit "Fix main thread check">] member x.``App 03``() = x.DoNamedTest()
+    [<Test>] member x.``App 04``() = x.DoNamedTest()
+    [<Test>] member x.``App 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 02``() = x.DoNamedTest()
@@ -173,5 +176,5 @@ type FSharpParameterInfoAutoPopupTest() =
     [<Test>] member x.``Reference 01``() = x.DoNamedTest()
     [<Test>] member x.``Reference 02``() = x.DoNamedTest()
     [<Test>] member x.``Reference 03``() = x.DoNamedTest()
-    [<Test; Explicit "Works in product">] member x.``Reference 04``() = x.DoNamedTest()
+    [<Test; Explicit "Fix main thread check">] member x.``Reference 04``() = x.DoNamedTest()
     [<Test>] member x.``Reference 05``() = x.DoNamedTest()
