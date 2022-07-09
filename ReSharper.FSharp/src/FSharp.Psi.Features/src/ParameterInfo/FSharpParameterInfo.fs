@@ -51,6 +51,7 @@ type IFSharpParameterInfoContext =
     inherit IParameterInfoContext
 
     abstract ArgGroups: IFSharpExpression list
+    abstract ExpectingMoreArgs: caretOffset: DocumentOffset * allowAtLastArgEnd: bool -> bool
 
 
 [<AbstractClass>]
@@ -407,7 +408,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                         else
                             allParametersCount + argIndex
 
-                    elif argRange.Contains(caretOffset) && argStart <> caretOffset && argEnd <> caretOffset then
+                    elif argRange.Contains(caretOffset) && argStart <> caretOffset && argEnd <> caretOffset && argIndex < parameterGroups.Count then
                         if parameterGroups[argIndex] = 1 then acc else
                         if arg :? IUnitExpr && caretOffset.Offset < argEnd.Offset then acc else
 
@@ -476,6 +477,22 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
         member this.ParameterListNodeType = null
         member this.ParameterNodeTypes = null
         member this.NamedArguments with set _ = ()
+
+        member this.ExpectingMoreArgs(caretOffset, allowAtLastArgEnd) =
+            let argGroups = this.ArgGroups
+            if argGroups.IsEmpty then true else
+
+            let lastArg = List.last argGroups
+            let offset = caretOffset.Offset
+            let lastArgEnd = lastArg.GetTreeEndOffset().Offset
+
+            if allowAtLastArgEnd && offset <= lastArgEnd || offset < lastArgEnd then true else
+
+            let argGroupsLength = argGroups.Length
+            candidates
+            |> Seq.exists (function
+                | :? IFcsParameterInfoCandidate as candidate -> candidate.ParameterGroupCounts.Count > argGroupsLength
+                | _ -> false)
 
 
 [<AllowNullLiteral>]
@@ -690,7 +707,7 @@ type FSharpParameterInfoContextFactory() =
         match getSymbols endOffset context reference with
         | Some(checkResults, symbol, symbolUses) ->
             FSharpPrefixAppParameterInfoContext(caretOffset, context :?> IFSharpExpression, reference, symbolUses,
-                checkResults, endOffset, symbol) :> IParameterInfoContext
+                checkResults, endOffset, symbol) :> IFSharpParameterInfoContext
         | _ -> null
 
     and createFromTypeReference (caretOffset: DocumentOffset) (reference: FSharpSymbolReference)
@@ -710,10 +727,10 @@ type FSharpParameterInfoContextFactory() =
         match getSymbols endOffset context reference with
         | Some(checkResults, symbol, symbolUses) ->
             FSharpTypeReferenceCtorParameterInfoContext(caretOffset, context, argExpr, reference, symbolUses,
-                checkResults, endOffset, symbol) :> IParameterInfoContext
+                checkResults, endOffset, symbol) :> IFSharpParameterInfoContext
         | _ -> null
 
-    and tryCreateFromTypeReference (caretOffset: DocumentOffset) (token: ITokenNode) =
+    and tryCreateFromTypeReference (caretOffset: DocumentOffset) (token: ITokenNode) : IFSharpParameterInfoContext =
         let referenceName = getTypeReferenceName token
         if not (isInTypeReferenceConstructorNode referenceName) then null else
 
@@ -822,22 +839,13 @@ type FSharpParameterInfoContextFactory() =
                 if not shouldPopup then false else
                 if char <> ' ' then true else
 
-                let context = this.CreateContext(solution, caretOffset, true).As<IFSharpParameterInfoContext>()
-                if isNull context then false else
-
-                let argGroups = context.ArgGroups
-                if argGroups.IsEmpty then true else
-
-                let lastArg = List.last argGroups
-                if offset < lastArg.GetTreeEndOffset().Offset then true else
-
-                let argGroupsLength = argGroups.Length
-
-                context.Candidates
-                |> Seq.exists (function
-                    | :? IFcsParameterInfoCandidate as candidate -> candidate.ParameterGroupCounts.Count > argGroupsLength
-                    | _ -> false)
+                let context = this.CreateContext(solution, caretOffset, true)
+                isNull context && context.ExpectingMoreArgs(caretOffset, false)
 
         member this.CreateContext(solution, caretOffset, _, char, _) =
             let isAutoPopup = char <> '\000'
-            this.CreateContext(solution, caretOffset, isAutoPopup)
+            let context = this.CreateContext(solution, caretOffset, isAutoPopup)
+            // todo: platform: ask if typing should close existing session (space/rparen after last expected arg)
+            // todo: platform: allow distinguishing typing inside existing window and requesting info via action
+            // todo: allow invoking after expected args via action
+            if isNotNull context && context.ExpectingMoreArgs(caretOffset, true) then context else null
