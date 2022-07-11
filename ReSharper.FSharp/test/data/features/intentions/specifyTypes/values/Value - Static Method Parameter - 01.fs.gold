@@ -1,0 +1,4 @@
+module Members
+
+    type W =
+        static member S(x: 'a{caret}) = ()
