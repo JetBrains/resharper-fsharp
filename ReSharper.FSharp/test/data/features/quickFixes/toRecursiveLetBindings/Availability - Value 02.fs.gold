@@ -1,0 +1,13 @@
+﻿module Module
+
+let a, b = |()|(0)
+|and|(1) b x = ()
+
+------------------------------------------------
+0: This expression was expected to have type
+    ''a * 'b'    
+but here has type
+    'unit'    
+NO QUICKFIXES
+1: The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings
+NO QUICKFIXES

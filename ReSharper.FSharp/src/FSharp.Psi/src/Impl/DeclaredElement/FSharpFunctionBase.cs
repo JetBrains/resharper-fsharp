@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override IList<IParameter> Parameters => this.GetParameters(Mfv);
 
     public InvocableSignature GetSignature(ISubstitution substitution) =>
-      new InvocableSignature(this, substitution);
+      new(this, substitution, FSharpOverrideSignatureComparer.Instance);
 
     public virtual IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
 

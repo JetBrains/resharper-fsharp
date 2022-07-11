@@ -18,10 +18,10 @@ IFSharpImplFile
                 ILiteralExpr
                   FSharpToken(type:INT32, text:2)
               FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ILiteralExpr
-              FSharpToken(type:INT32, text:1)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ILiteralExpr
+            FSharpToken(type:INT32, text:1)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

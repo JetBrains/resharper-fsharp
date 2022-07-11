@@ -260,9 +260,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessType(typeName)
         x.Done(range, mark, ElementType.OPEN_STATEMENT)
 
-    member x.StartException(SynExceptionDefnRepr(_, unionCase, _, XmlDoc xmlDoc, _, _), exnRange) =
+    member x.StartException(SynExceptionDefnRepr(attributeLists, unionCase, _, XmlDoc xmlDoc, _, _), exnRange) =
         let (SynUnionCase(caseType = unionCaseType)) = unionCase
         let mark = x.MarkXmlDocOwner(xmlDoc, null, exnRange)
+        x.ProcessAttributeLists(attributeLists)
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION)
         mark
 

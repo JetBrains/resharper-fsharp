@@ -21,11 +21,17 @@ type FSharpRenameTest() =
         // "Rename with overloads"
         occurrences.FirstOrDefault()
 
-    member x.DoNamedTestFiles() =
+    member x.DoNamedTestFsCs() =
         let testName = x.TestMethodName
-        let csExtension = CSharpProjectFileType.CS_EXTENSION
-        let fsExtension = FSharpProjectFileType.FsExtension
-        x.DoTestSolution(testName + csExtension, testName + fsExtension)
+        let csExt = CSharpProjectFileType.CS_EXTENSION
+        let fsExt = FSharpProjectFileType.FsExtension
+        x.DoTestSolution(testName + csExt, testName + fsExt)
+
+    member x.DoNamedTestFsiFsProgram() =
+        let testName = x.TestMethodName
+        let fsExt = FSharpProjectFileType.FsExtension
+        let fsiExt = FSharpSignatureProjectFileType.FsiExtension
+        x.DoTestSolution(testName + fsiExt, testName + fsExt, $"{testName} - Program" + fsExt)
 
     [<Test>] member x.``Escaped name 01 - Type``() = x.DoNamedTest()
     [<Test>] member x.``Escaped name 02 - Binding``() = x.DoNamedTest()
@@ -145,6 +151,13 @@ type FSharpRenameTest() =
     [<Test>] member x.``Active patterns - Local - Total 02 - Use in decl``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Local - Total 03 - Use``() = x.DoNamedTest()
 
+    [<Test>] member x.``Active patterns - Module - No param - Single 01 - Decl``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Module - No param - Single 02``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Module - No param - Single 03 - Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Module - No param - Total 01 - Decl``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Module - No param - Total 02 - Pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Module - No param - Total 03 - Expr``() = x.DoNamedTest()
+
     [<Test>] member x.``Active patterns - Module - Partial 01 - Decl``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Module - Partial 02 - Pattern``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Module - Single 01 - Decl``() = x.DoNamedTest()
@@ -179,14 +192,14 @@ type FSharpRenameTest() =
     [<Test>] member x.``Extensions - Optional - Type 02 - Qualified``() = x.DoNamedTest()
     [<Test>] member x.``Extensions - Optional - Type 03 - Qualified 2``() = x.DoNamedTest()
 
-    [<Test>] member x.``Implicit module - From same name 01``() = x.DoNamedTestFiles()
-    [<Test>] member x.``Implicit module - From same name 02``() = x.DoNamedTestFiles()
-    [<Test>] member x.``Implicit module 02 - To same name``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Implicit module - From same name 01``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Implicit module - From same name 02``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Implicit module 02 - To same name``() = x.DoNamedTestFsCs()
 
-    [<Test>] member x.``Generated members - Record fields 01 - Ctor param``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Generated members - Record fields 01 - Ctor param``() = x.DoNamedTestFsCs()
 
-    [<Test>] member x.``Related symbols - Single case union 01 - Union``() = x.DoNamedTestFiles()
-    [<Test>] member x.``Related symbols - Single case union 02 - Case``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Related symbols - Single case union 01 - Union``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Related symbols - Single case union 02 - Case``() = x.DoNamedTestFsCs()
 
     [<Test>] member x.``Object expr 01``() = x.DoNamedTest()
 
@@ -229,5 +242,11 @@ type FSharpRenameTest() =
     [<Test>] member x.``Wild - Let - Top 01``() = x.DoNamedTest()
     [<Test>] member x.``Wild - Match 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Property accessors 01``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Property accessors 01``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Property accessors 02 - Direct call``() = x.DoNamedTest()
+
+    [<Test>] member x.``Sig - Record 01``() = x.DoNamedTestFsiFsProgram()
+    [<Test>] member x.``Sig - Record 02 - Struct``() = x.DoNamedTestFsiFsProgram()
+    [<Test>] member x.``Sig - Union 01``() = x.DoNamedTestFsiFsProgram()
+    [<Test>] member x.``Sig - Union 02``() = x.DoNamedTestFsiFsProgram()
+    [<Test>] member x.``Sig - Union 03 - Struct``() = x.DoNamedTestFsiFsProgram()

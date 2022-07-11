@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(action: 'T -> unit) (list: 'T list) : unit
+Parameter: 0 'action: 'T -> unit'
+
+--- Accepted invocables: ---
+(action: 'T -> unit) (list: 'T list) : unit

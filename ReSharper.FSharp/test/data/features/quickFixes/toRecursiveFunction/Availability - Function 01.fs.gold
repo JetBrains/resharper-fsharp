@@ -1,0 +1,9 @@
+﻿module Module
+
+let hello () =
+    |hello|(0) ()
+
+------------------------------------------------
+0: The value or constructor 'hello' is not defined.
+QUICKFIXES:
+Make 'hello' recursive

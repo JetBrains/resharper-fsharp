@@ -50,6 +50,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Exception 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 02 - Fields``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Exception 03 - Members``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Exception 04 - Attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Extension - Type parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Extension - Type parameters 02``() = x.DoNamedTest()
@@ -124,6 +125,12 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl - Struct 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Struct 02 - Fields``() = x.DoNamedTest()
+
+    [<Test>] member x.``Let - Active pattern - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Active pattern - Parameter 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Active pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Active pattern 02``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Active pattern 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
@@ -339,6 +346,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Sequential 04 - Let``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Sequential 05 - Let``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Sequential 06 - Let``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Set 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Set 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - List - Empty 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - List - Comprehension 01``() = x.DoNamedTest()

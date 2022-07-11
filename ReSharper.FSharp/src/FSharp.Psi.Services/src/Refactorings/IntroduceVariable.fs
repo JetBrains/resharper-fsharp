@@ -574,10 +574,19 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 isNull (NewExprNavigator.GetByArgumentExpression(expr)) &&
                 isAllowedExpr parenExpr.InnerExpression
 
-            | :? IRangeLikeExpr | :? IComputationExpr | :? IYieldOrReturnExpr | :? IFromErrorExpr -> false
+            | :? IRangeLikeExpr | :? IIndexerExpr
+            | :? IComputationExpr | :? IYieldOrReturnExpr
+            | :? IFromErrorExpr -> false
 
             | :? ITupleExpr ->
-                isNull (NewExprNavigator.GetByArgumentExpression(ParenExprNavigator.GetByInnerExpression(expr)))
+                isNull (NewExprNavigator.GetByArgumentExpression(ParenExprNavigator.GetByInnerExpression(expr))) &&
+                
+                let listExpr = ListExprNavigator.GetByExpression(expr.IgnoreParentParens())
+                let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(listExpr)
+                isNull appExpr || not appExpr.IsIndexerLike
+
+            | :? IPrefixAppExpr as appExpr ->
+                not appExpr.IsIndexerLike || isNull (SetExprNavigator.GetByLeftExpression(appExpr.IgnoreParentParens()))
 
             | _ -> true
 

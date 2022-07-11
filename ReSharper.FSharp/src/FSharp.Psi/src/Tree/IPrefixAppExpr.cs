@@ -6,6 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   public partial interface IPrefixAppExpr
   {
     bool IsHighPrecedence { get; }
+    bool IsIndexerLike { get; }
 
     [CanBeNull] IFSharpExpression InvokedExpression { get; }
     [CanBeNull] IReferenceExpr InvokedReferenceExpression { get; }

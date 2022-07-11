@@ -13,21 +13,21 @@ IFSharpImplFile
               ILiteralExpr
                 FSharpToken(type:INT32, text:1)
               FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IRecordExpr
+            FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
+            IRecordFieldBindingList
+              IRecordFieldBinding
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                ILiteralExpr
+                  FSharpToken(type:INT32, text:1)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IRecordExpr
-              FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IRecordFieldBindingList
-                IRecordFieldBinding
-                  IExpressionReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  ILiteralExpr
-                    FSharpToken(type:INT32, text:1)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
+            FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
 

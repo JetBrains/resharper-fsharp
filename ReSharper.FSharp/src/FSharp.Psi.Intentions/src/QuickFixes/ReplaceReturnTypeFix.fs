@@ -44,13 +44,10 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
         ReplaceReturnTypeFix(error.Expr, error.ActualType)
 
     override this.Text =
-        let refPat = binding.HeadPattern.As<IReferencePat>()
-
-        let name =
-            if isNull refPat || refPat.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME then
-                "binding"
-            else
-                $"'{refPat.SourceName}'"
+        let name = 
+            match binding.GetHeadPatternName() with
+            | SharedImplUtil.MISSING_DECLARATION_NAME -> "binding"
+            | name -> $"'{name}'"
 
         $"Change type of {name} to '{replacementTypeName}'"
 

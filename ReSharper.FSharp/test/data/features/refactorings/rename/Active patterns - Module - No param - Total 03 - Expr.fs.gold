@@ -1,0 +1,9 @@
+﻿//${NEW_NAME:Zzz}
+module Module
+
+let (|Zzz|B|) = function _ -> Zzz
+
+match () with
+| Zzz -> ()
+
+let a = (|Zzz|B|)

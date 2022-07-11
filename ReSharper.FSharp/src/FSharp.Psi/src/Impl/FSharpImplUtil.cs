@@ -413,6 +413,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         _ => declaredElement.ShortName
       };
 
+    public static string GetHeadPatternName([CanBeNull] this IBinding binding) =>
+      binding?.HeadPattern is IReferencePat referencePat
+        ? referencePat.SourceName
+        : SharedImplUtil.MISSING_DECLARATION_NAME;
+
     public static AccessRights GetFSharpRepresentationAccessRights([CanBeNull] this ITypeElement type)
     {
       if (!(type is TypeElement typeElement))
@@ -696,24 +701,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       typeElement.GetAccessType() == ModuleMembersAccessKind.RequiresQualifiedAccess;
 
     [CanBeNull]
-    private static T GetOutermostNode<T, TMatchingNode>([CanBeNull] this T node)
+    private static T GetOutermostNode<T, TMatchingNode>([CanBeNull] this T node, bool singleLevel = false)
       where T : class, ITreeNode
       where TMatchingNode : class, T
     {
       if (node == null) return null;
 
       while (node.Parent is TMatchingNode matchingNode)
+      {
+        if (singleLevel)
+          return matchingNode;
+
         node = matchingNode;
+      }
       return node;
     }
 
     [CanBeNull]
-    public static IFSharpExpression IgnoreParentParens([CanBeNull] this IFSharpExpression fsExpr) =>
-      fsExpr.GetOutermostNode<IFSharpExpression, IParenExpr>();
+    public static IFSharpExpression IgnoreParentParens([CanBeNull] this IFSharpExpression fsExpr, 
+        bool singleLevel = false) =>
+      fsExpr.GetOutermostNode<IFSharpExpression, IParenExpr>(singleLevel);
 
     [CanBeNull]
-    public static ITypeUsage IgnoreParentParens([CanBeNull] this ITypeUsage typeUsage) =>
-      typeUsage.GetOutermostNode<ITypeUsage, IParenTypeUsage>();
+    public static ITypeUsage IgnoreParentParens([CanBeNull] this ITypeUsage typeUsage, bool singleLevel = false) =>
+      typeUsage.GetOutermostNode<ITypeUsage, IParenTypeUsage>(singleLevel);
 
     public static ITreeNode IgnoreParentChameleonExpr([NotNull] this ITreeNode treeNode) =>
       treeNode.Parent is IChameleonExpression parenExpr
@@ -721,39 +732,42 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : treeNode.Parent;
 
     [CanBeNull]
-    public static IFSharpExpression IgnoreInnerParens([CanBeNull] this IFSharpExpression fsExpr)
+    public static IFSharpExpression IgnoreInnerParens([CanBeNull] this IFSharpExpression fsExpr, bool singleLevel = false)
     {
       if (fsExpr == null)
         return null;
 
-      while (fsExpr is IParenExpr { InnerExpression: { } } parenExpr)
-        fsExpr = parenExpr.InnerExpression;
+      while (fsExpr is IParenExpr { InnerExpression: { } innerExpr })
+      {
+        if (singleLevel)
+          return innerExpr;
+
+        fsExpr = innerExpr;
+      }
       return fsExpr;
     }
 
-    public static IFSharpExpression IgnoreSingleInnerParens([CanBeNull] this IFSharpExpression fsExpr) =>
-      fsExpr is IParenExpr { InnerExpression: var innerExpr }
-        ? innerExpr
-        : fsExpr;
+    public static IFSharpPattern IgnoreParentParens([CanBeNull] this IFSharpPattern fsPattern, bool singleLevel = false) =>
+      fsPattern.GetOutermostNode<IFSharpPattern, IParenPat>(singleLevel);
 
-    public static IFSharpExpression IgnoreSingleParentParens([CanBeNull] this IFSharpExpression fsExpr) =>
-      fsExpr?.Parent as IParenExpr ?? fsExpr;
-
-    public static IFSharpPattern IgnoreParentParens([CanBeNull] this IFSharpPattern fsPattern) =>
-      fsPattern.GetOutermostNode<IFSharpPattern, IParenPat>();
-
-    public static IFSharpPattern IgnoreInnerParens([CanBeNull] this IFSharpPattern fsPattern)
+    public static IFSharpPattern IgnoreInnerParens([CanBeNull] this IFSharpPattern fsPattern, bool singleLevel = false)
     {
       if (fsPattern == null)
         return null;
 
-      while (fsPattern is IParenPat { Pattern: { } } parenPat)
-        fsPattern = parenPat.Pattern;
+      while (fsPattern is IParenPat { Pattern: { } innerPat })
+      {
+        if (singleLevel)
+          return innerPat;
+
+        fsPattern = innerPat;
+      }
       return fsPattern;
     }
 
     [CanBeNull]
-    public static ITypeUsage IgnoreInnerParens([CanBeNull] this ITypeUsage typeUsage, bool ignoreParameterSignature = true)
+    public static ITypeUsage IgnoreInnerParens([CanBeNull] this ITypeUsage typeUsage, bool singleLevel = false, 
+      bool ignoreParameterSignature = true)
     {
       if (typeUsage == null)
         return null;
@@ -762,8 +776,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (ignoreParameterSignature)
         typeUsage = IgnoreParameterSignature(typeUsage);
 
-      while (typeUsage is IParenTypeUsage { InnerTypeUsage: { } } parenTypeUsage)
-        typeUsage = parenTypeUsage.InnerTypeUsage;
+      while (typeUsage is IParenTypeUsage { InnerTypeUsage: { } innerTypeUsage })
+      {
+        if (singleLevel)
+          return innerTypeUsage;
+
+        typeUsage = innerTypeUsage;
+      }
       return typeUsage;
     }
 

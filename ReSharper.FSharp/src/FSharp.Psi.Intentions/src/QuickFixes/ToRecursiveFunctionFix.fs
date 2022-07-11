@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -38,7 +37,7 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
     let getNameRange (letBindings: ILetBindings) =
         [| letBindings.Bindings[0].HeadPattern.GetNavigationRange() |]
 
-    override x.Text = "Make " + referenceExpr.ShortName + " recursive"
+    override x.Text = $"Make '{referenceExpr.ShortName}' recursive"
 
     override x.IsAvailable _ =
         if not (isValid referenceExpr && isNull referenceExpr.Qualifier) then false else
