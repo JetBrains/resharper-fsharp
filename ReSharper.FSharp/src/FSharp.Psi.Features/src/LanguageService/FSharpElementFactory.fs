@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
@@ -19,7 +20,7 @@ open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IPsiModule) =
+type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: IPsiSourceFile, psiModule: IPsiModule) =
     let [<Literal>] moniker = "F# element factory"
 
     let getNamingService () =
@@ -31,7 +32,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
     let createFile source =
         let document = createDocument source
-        let parser = languageService.CreateParser(document)
+        let parser = languageService.CreateParser(document, sourceFile)
 
         let fsFile = parser.ParseFSharpFile(noCache = true, StandaloneDocument = document)
         SandBox.CreateSandBoxFor(fsFile, psiModule)

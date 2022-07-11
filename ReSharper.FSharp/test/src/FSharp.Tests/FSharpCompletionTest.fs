@@ -177,6 +177,9 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``Let - Type - Named 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Type - Tuple 01``() = x.DoNamedTest()
 
+    [<TestDefines("DEFINE")>]
+    [<Test>] member x.``Let - Preprocessor 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Not available - Let - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Let - Namespace 01``() = x.DoNamedTest()
 

@@ -62,8 +62,8 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
         let path = if isNotNull sourceFile then sourceFile.GetLocation() else null
         FSharpParser(lexer, document, path, sourceFile, checkerService, symbolsCache)
 
-    new (lexer, document, checkerService, symbolsCache) =
-        FSharpParser(lexer, document, FSharpParser.SandBoxPath, null, checkerService, symbolsCache)
+    new (lexer, document, sourceFile, checkerService, symbolsCache) =
+        FSharpParser(lexer, document, FSharpParser.SandBoxPath, sourceFile, checkerService, symbolsCache)
 
     static member val SandBoxPath = VirtualFileSystemPath.Parse("Sandbox.fs", InteractionContext.SolutionContext)
 

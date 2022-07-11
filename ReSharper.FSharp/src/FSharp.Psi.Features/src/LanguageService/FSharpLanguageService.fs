@@ -44,10 +44,6 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
         let psiModule = if isNotNull sourceFile then sourceFile.PsiModule else null
         FSharpParser(lexer, sourceFile, checkerService, getSymbolsCache psiModule) :> _
 
-    member x.CreateParser(document: IDocument, psiModule: IPsiModule) =
-        let lexer = TokenBuffer(lexerFactory.CreateLexer(document.Buffer)).CreateLexer()
-        FSharpParser(lexer, document, checkerService, getSymbolsCache psiModule) :> IParser
-
     override x.IsTypeMemberVisible(typeMember) =
         match typeMember with
         | :? IFSharpTypeMember as fsTypeMember -> fsTypeMember.IsVisibleFromFSharp
@@ -141,8 +137,8 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
     override x.GetTypeConversionRule(_, _) = ClrPredefinedTypeConversionRule.INSTANCE
 
     interface IFSharpLanguageService with
-        member x.CreateParser(document: IDocument) =
+        member x.CreateParser(document: IDocument, sourceFile) =
             let lexer = TokenBuffer(lexerFactory.CreateLexer(document.Buffer)).CreateLexer()
-            FSharpParser(lexer, document, checkerService, null) :> _
+            FSharpParser(lexer, document, sourceFile, checkerService, null) :> _
 
-        member x.CreateElementFactory(psiModule) = FSharpElementFactory(x, psiModule) :> _
+        member x.CreateElementFactory(sourceFile, psiModule) = FSharpElementFactory(x, sourceFile, psiModule) :> _

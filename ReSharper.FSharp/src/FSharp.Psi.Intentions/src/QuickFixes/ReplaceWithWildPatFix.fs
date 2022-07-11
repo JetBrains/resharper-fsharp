@@ -30,7 +30,9 @@ module ReplaceWithWildPat =
             ModificationUtil.AddChildAfter(pat, Whitespace()) |> ignore
 
         for pat in pat.GetPartialDeclarations() do
-            replace pat (pat.GetFSharpLanguageService().CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
+            let sourceFile = pat.GetSourceFile()
+            let psiModule = pat.GetPsiModule()
+            replace pat (pat.GetFSharpLanguageService().CreateElementFactory(sourceFile, psiModule).CreateWildPat())
 
     let getPatOwner (pat: IFSharpPattern) =
         if isNull pat then null else
