@@ -46,10 +46,10 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
             formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance, RpcTimeouts.Maximal))
         )
 
-    let convertRange (range: range) =
+    let toRdFcsRange (range: range) =
         RdFcsRange(range.FileName, range.StartLine, range.StartColumn, range.EndLine, range.EndColumn)
 
-    let convertFormatSettings (settings: FSharpFormatSettingsKey) =
+    let toRdFormatSettings (settings: FSharpFormatSettingsKey) =
         [| for field in formatConfigFields ->
             let fieldName =
                 match field with
@@ -62,7 +62,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
                 else value.ToString()
             if isNull value then "" else value |]
 
-    let convertParsingOptions (options: FSharpParsingOptions) =
+    let toRdFcsParsingOptions (options: FSharpParsingOptions) =
         let lightSyntax = Option.toNullable options.LightSyntax
         RdFcsParsingOptions(Array.last options.SourceFiles, lightSyntax,
             List.toArray options.ConditionalCompilationDefines, options.IsExe, options.LangVersionText)
@@ -72,15 +72,15 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
     member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
         connect()
         let args =
-            RdFantomasFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
-                convertParsingOptions options, newLineText)
+            RdFantomasFormatSelectionArgs(toRdFcsRange range, filePath, source, toRdFormatSettings settings,
+                toRdFcsParsingOptions options, newLineText)
 
         connection.Execute(fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
 
     member x.FormatDocument(filePath, source, settings, options, newLineText) =
         connect()
         let args =
-            RdFantomasFormatDocumentArgs(filePath, source, convertFormatSettings settings, convertParsingOptions options,
+            RdFantomasFormatDocumentArgs(filePath, source, toRdFormatSettings settings, toRdFcsParsingOptions options,
                 newLineText)
 
         connection.Execute(fun () -> connection.ProtocolModel.FormatDocument.Sync(args, RpcTimeouts.Maximal))
