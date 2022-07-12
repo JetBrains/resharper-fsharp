@@ -145,13 +145,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     public static string FormatSelection(RdFantomasFormatSelectionArgs args)
     {
-      // Fantomas 5 temporary does not support format selection
-      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version) throw new NotImplementedException();
-
       var rdRange = args.Range;
       var range =
         MakeRangeMethod.Invoke(null,
           new object[] { rdRange.FileName, rdRange.StartLine, rdRange.StartCol, rdRange.EndLine, rdRange.EndCol });
+
+      if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version)
+        return FSharpAsync.StartAsTask(
+            FormatSelectionMethod.Invoke(null, new[]
+            {
+              args.FileName.EndsWith(".fsi"), // isSignature
+              args.Source,
+              range,
+              ConvertToFormatConfig(args.FormatConfig)
+            }) as dynamic, null, null) // FSharpAsync<Tuple<string, Range>>
+          .Result.Item1.Replace("\r\n", args.NewLineText);
 
       return FSharpAsync.StartAsTask(
           FormatSelectionMethod.Invoke(null, new[]
