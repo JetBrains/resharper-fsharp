@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
-open JetBrains.Application.Notifications
 open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -12,7 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client
 open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCleanup.FSharpEditorConfig
 open JetBrains.Util
-open NuGet.Versioning
 
 module internal Reflection =
     let formatSettingType = typeof<FSharpFormatSettingsKey>
