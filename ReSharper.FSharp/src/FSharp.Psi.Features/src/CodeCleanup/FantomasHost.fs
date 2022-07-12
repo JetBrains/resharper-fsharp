@@ -23,14 +23,11 @@ module internal Reflection =
 
 
 [<SolutionComponent>]
-type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector,
-                  notifications: UserNotifications) =
-    let mutable showSelectionNotification = true
+type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector) =
     let solutionLifetime = solution.GetLifetime()
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
     let mutable formatterHostLifetime: LifetimeDefinition = null
-    let mutable runningVersion: Version = null
 
     let toEditorConfigName name = $"{fSharpEditorConfigPrefix}{StringUtil.MakeUnderscoreCaseName(name)}"
 
@@ -44,7 +41,6 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
         // TryRun synchronizes process creation and keeps track of its status
         fantomasDetector.TryRun(fun (path, version) ->
             if isConnectionAlive () then () else
-            runningVersion <- NuGetVersion.Parse(version).Version
             formatterHostLifetime <- Lifetime.Define(solutionLifetime)
             connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, version, path).Run()
             formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance, RpcTimeouts.Maximal))
@@ -75,19 +71,11 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
 
     member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
         connect()
-        if runningVersion >= FantomasProtocolConstants.Fantomas5Version then
-            if showSelectionNotification then
-                notifications.CreateNotification(solutionLifetime,
-                    title = "Selection formatting is not supported",
-                    body = "Specified Fantomas version does not support selection formatting.") |> ignore
-                showSelectionNotification <- false
-            raise (NotImplementedException())
-        else
-            let args =
-                RdFantomasFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
-                    convertParsingOptions options, newLineText)
+        let args =
+            RdFantomasFormatSelectionArgs(convertRange range, filePath, source, convertFormatSettings settings,
+                convertParsingOptions options, newLineText)
 
-            connection.Execute(fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
+        connection.Execute(fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
 
     member x.FormatDocument(filePath, source, settings, options, newLineText) =
         connect()
