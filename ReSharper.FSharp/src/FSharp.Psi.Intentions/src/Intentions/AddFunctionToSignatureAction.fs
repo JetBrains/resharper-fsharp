@@ -5,6 +5,7 @@ open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -20,57 +21,49 @@ open JetBrains.Util
 type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 
-    let isInSignatureFile (fsu: FSharpSymbolUse) =
-        match fsu.Symbol.SignatureLocation with
-        | None -> false
-        | Some r -> r.FileName.EndsWith(".fsi")
-
-    let getSymbol (): FSharpSymbolUse option =
+    let getSignatureLocation () =
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
         if isNull letBindings then None else
 
         let bindings = letBindings.Bindings
         if bindings.Count <> 1 then None else
         
-        let headPat = bindings.First().HeadPattern.As<IReferencePat>()
+        match bindings.First().HeadPattern.As<IReferencePat>() with
+        | null -> None
+        | pat -> pat.GetFcsSymbol().SignatureLocation
         
-        if isNull headPat then None else
-            
-        let functionName = headPat.Identifier
-        let currentFSharpFile = dataProvider.PsiFile
-        let fcsService = currentFSharpFile.FcsCheckerService
-        fcsService.ResolveNameAtLocation(functionName, [| functionName.Name |], false, functionName.Name)
-    
     override x.Text = "Add to signature file"
     override this.IsAvailable _ =
-        let hasSignature = true // TODO: Check if the current file has an implementation file?
+        let currentFSharpFile = dataProvider.PsiFile
+        let fcsService = currentFSharpFile.FcsCheckerService
+        let hasSignature = fcsService.FcsProjectProvider.HasPairFile dataProvider.SourceFile
         if not hasSignature then false else
-        let symbol = getSymbol ()
-        match symbol with
+        
+        match getSignatureLocation () with
         | None -> false
-        | Some symbol ->
-            not (isInSignatureFile symbol)
-        
+        | Some range -> not (range.FileName.EndsWith(".fsi"))
+
     override this.ExecutePsiTransaction(solution, progress) =
-        let symbol = getSymbol ()
-        match symbol with
-        | None -> Action<_>(ignore)
-        | Some symbol ->
-            match symbol.Symbol with
-            | :? FSharpMemberOrFunctionOrValue as f when f.IsFunction ->
-                let functionName = f.DisplayName
-                let arguments =
-                    f.CurriedParameterGroups
-                    |> Seq.map (fun p ->
-                        let first = Seq.head p
-                        match first.Name with
-                        | None -> first.Type.QualifiedBaseName
-                        | Some name -> $"name : {first.Type.QualifiedBaseName}")
-                    |> String.concat " -> "
-                let returnType = f.ReturnParameter.Type.QualifiedBaseName
-                
-                let signatureEntry = $"val {functionName} : {arguments} -> {returnType}"
-                printfn "something like: %s", signatureEntry
-                Action<_>(fun textControl -> ())
-            | _ -> Action<_>(ignore)
-        
+        Action<_>(ignore)
+        // let symbol = getSymbol ()
+        // match symbol with
+        // | None -> Action<_>(ignore)
+        // | Some symbol ->
+        //     match symbol.Symbol with
+        //     | :? FSharpMemberOrFunctionOrValue as f when f.IsFunction ->
+        //         let functionName = f.DisplayName
+        //         let arguments =
+        //             f.CurriedParameterGroups
+        //             |> Seq.map (fun p ->
+        //                 let first = Seq.head p
+        //                 match first.Name with
+        //                 | None -> first.Type.QualifiedBaseName
+        //                 | Some name -> $"name : {first.Type.QualifiedBaseName}")
+        //             |> String.concat " -> "
+        //         let returnType = f.ReturnParameter.Type.QualifiedBaseName
+        //         
+        //         let signatureEntry = $"val {functionName} : {arguments} -> {returnType}"
+        //         printfn "something like: %s", signatureEntry
+        //         Action<_>(fun textControl -> ())
+        //     | _ -> Action<_>(ignore)
+        //
