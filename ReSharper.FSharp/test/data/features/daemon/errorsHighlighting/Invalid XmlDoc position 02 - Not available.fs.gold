@@ -1,3 +1,10 @@
 ﻿/// Uwu
 let _ = ()
+
+////a
+//// a
+|///a|(0)
+|///  a|(1)
 ---------------------------------------------------------
+(0): ReSharper Warning [FS3520]: XML comment is not placed on a valid language element.
+(1): ReSharper Warning [FS3520]: XML comment is not placed on a valid language element.
