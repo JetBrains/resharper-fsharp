@@ -63,7 +63,7 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
         FSharpParser(lexer, document, path, sourceFile, checkerService, symbolsCache)
 
     new (lexer, document, sourceFile: IPsiSourceFile, checkerService, symbolsCache) =
-        let path = if sourceFile.Name.EndsWith(".fsi") then FSharpParser.SandBoxSignaturePath else FSharpParser.SandBoxPath
+        let path = if isNotNull sourceFile then sourceFile.GetLocation() else FSharpParser.SandBoxPath
         FSharpParser(lexer, document, path, sourceFile, checkerService, symbolsCache)
 
     static member val SandBoxPath = VirtualFileSystemPath.Parse("Sandbox.fs", InteractionContext.SolutionContext)
