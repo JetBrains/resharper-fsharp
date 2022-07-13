@@ -864,7 +864,7 @@ type FSharpParameterInfoContextFactory() =
                 if char <> ' ' then true else
 
                 let context = this.CreateContext(solution, caretOffset, true)
-                isNull context && context.ExpectingMoreArgs(caretOffset, false)
+                isNotNull context && context.ExpectingMoreArgs(caretOffset, false)
 
         member this.CreateContext(solution, caretOffset, _, char, _) =
             let isAutoPopup = char <> '\000'
