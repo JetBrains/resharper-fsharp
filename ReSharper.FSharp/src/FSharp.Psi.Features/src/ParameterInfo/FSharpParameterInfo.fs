@@ -485,14 +485,38 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
             let lastArg = List.last argGroups
             let offset = caretOffset.Offset
             let lastArgEnd = lastArg.GetTreeEndOffset().Offset
-
-            if allowAtLastArgEnd && offset <= lastArgEnd || offset < lastArgEnd then true else
-
             let argGroupsLength = argGroups.Length
-            candidates
-            |> Seq.exists (function
-                | :? IFcsParameterInfoCandidate as candidate -> candidate.ParameterGroupCounts.Count > argGroupsLength
-                | _ -> false)
+
+            let removeParenRange =
+                argGroupsLength = 1 &&
+
+                let expr = argGroups[0]
+                (expr :? IParenExpr || expr :? IUnitExpr) &&
+
+                candidates
+                |> Array.forall (function
+                    :? IFcsParameterInfoCandidate as c ->
+                        c.ParameterGroupCounts.Count = 1 &&
+
+                        match c.Symbol with
+                        | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.IsMember
+                        | _ -> false
+                    | _ -> false)
+
+            if removeParenRange then
+                let parenExpr = argGroups[0].As<IParenExpr>()
+                let range = 
+                    argGroups[0].GetDocumentRange()
+                        .TrimLeft(if isNotNull parenExpr && isNull parenExpr.LeftParen then 0 else 1)
+                        .TrimRight(if isNotNull parenExpr && isNull parenExpr.RightParen then 0 else 1)
+                range.Contains(caretOffset) 
+            else
+                if allowAtLastArgEnd && offset <= lastArgEnd || offset < lastArgEnd then true else
+
+                candidates
+                |> Array.exists (function
+                    | :? IFcsParameterInfoCandidate as c -> c.ParameterGroupCounts.Count > argGroupsLength
+                    | _ -> false)
 
 
 [<AllowNullLiteral>]
