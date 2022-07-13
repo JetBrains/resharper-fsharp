@@ -55,5 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IMemberDeclaration CreatePropertyWithAccessor(string propertyName, string accessorName, FSharpList<IParametersPatternDeclaration> args);
 
     ITypeParameterDeclarationList CreateTypeParameterOfTypeList(FSharpList<string> names);
+
+    IBindingSignature CreateBindingSignature(string name);
   }
 }

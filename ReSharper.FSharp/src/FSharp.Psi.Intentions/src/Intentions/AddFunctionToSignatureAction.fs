@@ -44,26 +44,30 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
         | Some range -> not (range.FileName.EndsWith(".fsi"))
 
     override this.ExecutePsiTransaction(solution, progress) =
-        Action<_>(ignore)
-        // let symbol = getSymbol ()
-        // match symbol with
-        // | None -> Action<_>(ignore)
-        // | Some symbol ->
-        //     match symbol.Symbol with
-        //     | :? FSharpMemberOrFunctionOrValue as f when f.IsFunction ->
-        //         let functionName = f.DisplayName
-        //         let arguments =
-        //             f.CurriedParameterGroups
-        //             |> Seq.map (fun p ->
-        //                 let first = Seq.head p
-        //                 match first.Name with
-        //                 | None -> first.Type.QualifiedBaseName
-        //                 | Some name -> $"name : {first.Type.QualifiedBaseName}")
-        //             |> String.concat " -> "
-        //         let returnType = f.ReturnParameter.Type.QualifiedBaseName
-        //         
-        //         let signatureEntry = $"val {functionName} : {arguments} -> {returnType}"
-        //         printfn "something like: %s", signatureEntry
-        //         Action<_>(fun textControl -> ())
-        //     | _ -> Action<_>(ignore)
-        //
+        use writeCookie = WriteLockCookie.Create(true)
+        use disableFormatter = new DisableCodeFormatter()
+        let letBindings = dataProvider.GetSelectedElement<ILetBindingsDeclaration>()
+        let moduleDecl = ModuleDeclarationNavigator.GetByMember(letBindings)
+        
+        if isNotNull moduleDecl then
+            let allDecls = moduleDecl.DeclaredElement.GetDeclarations() |> Seq.cast<INamedModuleDeclaration> |> Seq.toArray
+            if allDecls.Length = 2 then
+                let implDecl = Array.find (fun (nmd: INamedModuleDeclaration) ->
+                    match nmd.Parent with
+                    | :? IFSharpImplFile -> true
+                    | _ -> false) allDecls
+                let sigDecl = Array.find (fun (nmd: INamedModuleDeclaration) ->
+                    match nmd.Parent with
+                    | :? IFSharpSigFile -> true
+                    | _ -> false) allDecls
+                
+                let elementFactory = sigDecl.CreateElementFactory()
+                let name = letBindings.Bindings.First().HeadPattern.As<IReferencePat>().ReferenceName.Identifier.Name
+                let sigDeclNode : ITreeNode = elementFactory.CreateBindingSignature(name)
+                let lastChild = ModificationUtil.AddChildAfter(sigDecl.LastChild, NewLine(sigDeclNode.GetLineEnding()))
+                let lastChild = ModificationUtil.AddChildAfter(lastChild, NewLine(sigDeclNode.GetLineEnding()))
+                ModificationUtil.AddChildAfter(lastChild, sigDeclNode) |> ignore
+
+            ()
+
+        null
