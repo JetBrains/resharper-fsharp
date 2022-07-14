@@ -358,7 +358,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
 
             typeDeclaration.TypeParameterDeclarationList
 
-        member this.CreateBindingSignature(name) =
-            let source = $"module A\n\nval {name} : unit"
+        member this.CreateBindingSignature(name, signature) =
+            let source = $"module A\n\nval {name}: {signature}"
             let moduleMember = getModuleMember source
             moduleMember :?> IBindingSignature

@@ -5,6 +5,7 @@ open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -60,10 +61,34 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                     match nmd.Parent with
                     | :? IFSharpSigFile -> true
                     | _ -> false) allDecls
-                
+
                 let elementFactory = sigDecl.CreateElementFactory()
-                let name = letBindings.Bindings.First().HeadPattern.As<IReferencePat>().ReferenceName.Identifier.Name
-                let sigDeclNode : ITreeNode = elementFactory.CreateBindingSignature(name)
+                let binding = letBindings.Bindings.First()
+                let refPat = binding.HeadPattern.As<IReferencePat>()
+                let name = refPat.ReferenceName.Identifier.Name
+                let symbolUse = refPat.GetFcsSymbolUse()
+                if isNull symbolUse then () else
+
+                let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+                let types = FcsTypeUtil.getFunctionTypeArgs true mfv.FullType
+                let parameters = binding.ParametersDeclarations
+                let namedParameters =
+                    Seq.zip types parameters
+                    |> Seq.map (fun (t, p) ->
+                        let typeName = t.TypeDefinition.DisplayName
+                        match p.Pattern with
+                        | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}:{typeName}"
+                        | _ -> typeName
+                    )
+
+                let signature =
+                    match Seq.tryLast types with
+                    | None -> mfv.FullType.TypeDefinition.DisplayName
+                    | Some returnType ->
+                        seq { yield! namedParameters; yield returnType.TypeDefinition.DisplayName}
+                        |> String.concat " -> "
+
+                let sigDeclNode : ITreeNode = elementFactory.CreateBindingSignature(name, signature)
                 let lastChild = ModificationUtil.AddChildAfter(sigDecl.LastChild, NewLine(sigDeclNode.GetLineEnding()))
                 let lastChild = ModificationUtil.AddChildAfter(lastChild, NewLine(sigDeclNode.GetLineEnding()))
                 ModificationUtil.AddChildAfter(lastChild, sigDeclNode) |> ignore
