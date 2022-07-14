@@ -77,7 +77,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
       ProvidedFieldRdModelsCreator = new ProvidedFieldCreator(this);
       ProvidedEventRdModelsCreator = new ProvidedEventCreator(this);
       ProvidedConstructorRdModelsCreator = new ProvidedConstructorCreator(this);
-      ProvidedCustomAttributeRdModelsCreator = new ProvidedCustomAttributeCreator();
+      ProvidedCustomAttributeRdModelsCreator = new ProvidedCustomAttributeCreator(this);
     }
   }
 }
