@@ -67,13 +67,22 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                 let types = FcsTypeUtil.getFunctionTypeArgs true mfv.FullType
                 let parameters = binding.ParametersDeclarations
                 let rec getTypeName (t:FSharpType) : string =
-                    if t.HasTypeDefinition && t.GenericArguments.Count = 1 then
-                        let ga = t.GenericArguments[0].GenericParameter
-                        $"'{ga.DisplayName} {t.TypeDefinition.DisplayName}"
+                    if t.HasTypeDefinition then
+                        if Seq.isEmpty t.GenericArguments then
+                            t.TypeDefinition.DisplayName
+                        else
+                            let isPostFix =
+                                set [| "list"; "option"; "array" |]
+                                |> Set.contains t.TypeDefinition.DisplayName
+                                
+                            if isPostFix then
+                                let ga = t.GenericArguments[0].GenericParameter
+                                $"'{ga.DisplayName} {t.TypeDefinition.DisplayName}"
+                            else
+                                let args = Seq.map getTypeName t.GenericArguments |> String.concat ","
+                                $"{t.TypeDefinition.DisplayName}<{args}>"
                     elif t.IsGenericParameter then
                         $"'{t.GenericParameter.DisplayName}"
-                    elif t.HasTypeDefinition then
-                        t.TypeDefinition.DisplayName
                     elif t.IsFunctionType then
                         let rec visit (t: FSharpType) : string seq =
                             if  t.IsFunctionType then

@@ -1,0 +1,6 @@
+module Foo
+
+type Teq<'a,'b> =
+    class end
+
+val map: f: ('b -> 'c) -> t: Teq<'a,'b> -> Teq<'a,'c>
