@@ -1,22 +1,16 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open System
-open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
-open JetBrains.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
 [<ContextAction(Name = "AddFunctionToSignatureFile", Group = "F#", Description = "Add function to signature file")>]
 type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvider) =
@@ -76,8 +70,12 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                     Seq.zip types parameters
                     |> Seq.map (fun (t, p) ->
                         let typeName = t.TypeDefinition.DisplayName
-                        match p.Pattern with
+                        match p.Pattern.IgnoreInnerParens() with
                         | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}:{typeName}"
+                        | :? ITypedPat as tp ->
+                            match tp.Pattern.IgnoreInnerParens() with
+                            | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}:{typeName}"
+                            | _ -> typeName
                         | _ -> typeName
                     )
 

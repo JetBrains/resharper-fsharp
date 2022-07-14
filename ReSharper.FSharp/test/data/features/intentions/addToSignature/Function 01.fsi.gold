@@ -1,0 +1,3 @@
+module Foo
+
+val add: x:int -> y:int -> string
