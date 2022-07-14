@@ -71,10 +71,10 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                     |> Seq.map (fun (t, p) ->
                         let typeName = t.TypeDefinition.DisplayName
                         match p.Pattern.IgnoreInnerParens() with
-                        | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}:{typeName}"
+                        | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}: {typeName}"
                         | :? ITypedPat as tp ->
                             match tp.Pattern.IgnoreInnerParens() with
-                            | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}:{typeName}"
+                            | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}: {typeName}"
                             | _ -> typeName
                         | _ -> typeName
                     )

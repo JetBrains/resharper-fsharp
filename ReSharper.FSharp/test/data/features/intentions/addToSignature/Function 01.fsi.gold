@@ -1,3 +1,3 @@
 module Foo
 
-val add: x:int -> y:int -> string
+val add: x: int -> y: int -> string
