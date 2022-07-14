@@ -469,19 +469,18 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         (if field.IsConstant || field.IsEnumMember then FieldAttributes.Literal else enum 0)
 
     let literalTypes =
-        let unbox f = unbox >> f
-        [| PredefinedType.BOOLEAN_FQN, unbox ILFieldInit.Bool
-           PredefinedType.CHAR_FQN,    unbox ILFieldInit.Char
-           PredefinedType.SBYTE_FQN,   unbox ILFieldInit.Int8
-           PredefinedType.BYTE_FQN,    unbox ILFieldInit.UInt8
-           PredefinedType.SHORT_FQN,   unbox ILFieldInit.Int16
-           PredefinedType.USHORT_FQN,  unbox ILFieldInit.UInt16
-           PredefinedType.INT_FQN,     unbox ILFieldInit.Int32
-           PredefinedType.UINT_FQN,    unbox ILFieldInit.UInt32
-           PredefinedType.LONG_FQN,    unbox ILFieldInit.Int64
-           PredefinedType.ULONG_FQN,   unbox ILFieldInit.UInt64
-           PredefinedType.FLOAT_FQN,   unbox ILFieldInit.Single
-           PredefinedType.DOUBLE_FQN,  unbox ILFieldInit.Double |]
+        [| PredefinedType.BOOLEAN_FQN, fun (c: ConstantValue) -> ILFieldInit.Bool c.BoolValue
+           PredefinedType.CHAR_FQN,    fun (c: ConstantValue) -> ILFieldInit.Char (uint16 c.CharValue) // todo: can use UshortValue?
+           PredefinedType.SBYTE_FQN,   fun (c: ConstantValue) -> ILFieldInit.Int8 c.SbyteValue
+           PredefinedType.BYTE_FQN,    fun (c: ConstantValue) -> ILFieldInit.UInt8 c.ByteValue
+           PredefinedType.SHORT_FQN,   fun (c: ConstantValue) -> ILFieldInit.Int16 c.ShortValue
+           PredefinedType.USHORT_FQN,  fun (c: ConstantValue) -> ILFieldInit.UInt16 c.UshortValue
+           PredefinedType.INT_FQN,     fun (c: ConstantValue) -> ILFieldInit.Int32 c.IntValue
+           PredefinedType.UINT_FQN,    fun (c: ConstantValue) -> ILFieldInit.UInt32 c.UintValue
+           PredefinedType.LONG_FQN,    fun (c: ConstantValue) -> ILFieldInit.Int64 c.LongValue
+           PredefinedType.ULONG_FQN,   fun (c: ConstantValue) -> ILFieldInit.UInt64 c.UlongValue
+           PredefinedType.FLOAT_FQN,   fun (c: ConstantValue) -> ILFieldInit.Single c.FloatValue
+           PredefinedType.DOUBLE_FQN,  fun (c: ConstantValue) -> ILFieldInit.Double c.DoubleValue |]
         |> dict
 
     let nullLiteralValue = Some(ILFieldInit.Null)
@@ -493,13 +492,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         if value.IsNull() then nullLiteralValue else
 
         // A separate case to prevent interning string literals.
-        if value.IsString() then Some(ILFieldInit.String(unbox value.Value)) else
+        if value.IsString() then Some(ILFieldInit.String(value.StringValue)) else
 
         match valueType with
         | :? IDeclaredType as declaredType ->
             let mutable literalType = Unchecked.defaultof<_>
             match literalTypes.TryGetValue(declaredType.GetClrName(), &literalType) with
-            | true -> cache.LiteralValues.Intern(Some(literalType value.Value))
+            | true -> cache.LiteralValues.Intern(Some(literalType value))
             | _ -> None
         | _ -> None
 
@@ -893,9 +892,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                         .GetAttributeInstances(PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS, false)
 
                 [| for instance in attributeInstances do
-                     match instance.PositionParameter(0).ConstantValue.Value with
-                     | :? string as s -> internalsVisibleToAttribute s
-                     | _ -> () |]
+                     match instance.PositionParameter(0).ConstantValue.AsString() with
+                     | null -> ()
+                     | s -> internalsVisibleToAttribute s |]
 
             let newModuleDef =
                 if ivtAttributes.IsEmpty() then newModuleDef else

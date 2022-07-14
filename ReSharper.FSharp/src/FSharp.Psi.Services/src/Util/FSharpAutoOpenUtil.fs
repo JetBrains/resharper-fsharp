@@ -29,7 +29,7 @@ let getAutoOpenModules (psiAssemblyFileLoader: IPsiAssemblyFileLoader) (assembly
         let symbolScope = psiServices.Symbols.GetSymbolScope(psiAssembly.PsiModule, false, true)
 
         for attribute in attributes do
-            let moduleString = attribute.PositionParameter(0).ConstantValue.Value.As<string>()
+            let moduleString = attribute.PositionParameter(0).ConstantValue.AsString()
             if moduleString.IsNullOrEmpty() then () else
 
             for declaredElement in symbolScope.GetElementsByQualifiedName(moduleString) do
