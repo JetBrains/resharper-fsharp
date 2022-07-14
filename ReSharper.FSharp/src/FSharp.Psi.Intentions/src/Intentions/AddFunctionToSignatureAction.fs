@@ -84,6 +84,10 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                         visit t
                         |> String.concat " -> "
                         |> sprintf "(%s)"
+                    elif t.IsTupleType then
+                        t.GenericArguments
+                        |> Seq.map getTypeName
+                        |> String.concat " * "
                     else
                         "???"
 
@@ -102,7 +106,7 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
 
                 let signature =
                     match Seq.tryLast types with
-                    | None -> mfv.FullType.TypeDefinition.DisplayName
+                    | None -> getTypeName mfv.FullType
                     | Some returnType ->
                         seq { yield! namedParameters; yield getTypeName returnType}
                         |> String.concat " -> "

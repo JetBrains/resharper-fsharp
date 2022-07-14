@@ -1,0 +1,3 @@
+module Foo
+
+val v: int * string

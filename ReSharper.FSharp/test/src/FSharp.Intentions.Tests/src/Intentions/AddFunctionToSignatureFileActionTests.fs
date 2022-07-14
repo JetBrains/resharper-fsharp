@@ -16,6 +16,7 @@ type AddFunctionToSignatureFileActionTests() =
         x.DoTestSolution(testName + fsiExt, testName + fsExt)
 
     [<Test>] member x.``Value 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Value 02`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Function 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Generic Function 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Generic Function 02`` () = x.DoNamedTestWithSignature()
