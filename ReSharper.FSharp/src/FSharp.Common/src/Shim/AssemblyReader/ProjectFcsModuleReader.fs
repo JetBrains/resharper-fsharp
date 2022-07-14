@@ -14,6 +14,7 @@ open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Impl.Special
 open JetBrains.ReSharper.Psi.Impl.Types
 open JetBrains.ReSharper.Psi.Modules
@@ -819,10 +820,22 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let properties = mkILPropertiesLazy (lazy getOrCreateProperties clrTypeName)
             let events = mkILEventsLazy (lazy getOrCreateEvents clrTypeName)
 
+            let hasExtensions =
+                let typeElement = typeElement.As<TypeElement>()
+                if isNull typeElement then false else
+
+                typeElement.EnumerateParts()
+                |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMethodInfos))
+
+            // todo: other attributes
+            let customAttrs =
+                if hasExtensions then [ extensionAttribute () ] else []
+                |> mkILCustomAttrs
+
             let typeDef =
                 ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
                     extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
-                    emptyILSecurityDecls, emptyILCustomAttrs)
+                    emptyILSecurityDecls, customAttrs)
 
             let fcsTypeDef = 
                 { TypeDef = typeDef
