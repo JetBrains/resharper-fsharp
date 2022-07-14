@@ -1,0 +1,3 @@
+module Foo
+
+val g: h: 't list -> int

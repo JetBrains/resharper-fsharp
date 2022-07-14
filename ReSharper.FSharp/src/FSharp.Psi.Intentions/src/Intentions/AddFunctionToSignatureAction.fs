@@ -69,7 +69,13 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                 let namedParameters =
                     Seq.zip types parameters
                     |> Seq.map (fun (t, p) ->
-                        let typeName = t.TypeDefinition.DisplayName
+                        let typeName =
+                            if t.GenericArguments.Count = 1 then
+                                let ga = t.GenericArguments[0].GenericParameter
+                                $"'{ga.DisplayName} {t.TypeDefinition.DisplayName}"
+                            else
+                                t.TypeDefinition.DisplayName
+
                         match p.Pattern.IgnoreInnerParens() with
                         | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}: {typeName}"
                         | :? ITypedPat as tp ->
