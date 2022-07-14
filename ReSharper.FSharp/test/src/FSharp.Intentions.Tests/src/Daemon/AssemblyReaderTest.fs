@@ -81,6 +81,8 @@ type AssemblyReaderTest() =
 
      // todo: test InternalsVisibleTo
 
+    [<Test>] member x.``Attribute - Obsolete 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Event 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Field 01``() = x.DoNamedTest()

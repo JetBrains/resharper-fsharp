@@ -1,0 +1,42 @@
+﻿module Module
+
+let c1: |ObsoleteClass|(0) = null
+let c2 = ObsoleteClass()
+
+let s1: |ObsoleteStruct|(1) = ObsoleteStruct()
+let s2 = ObsoleteStruct()
+
+let i1: |IObsoleteInterface|(2) = null
+let i2 = { new |IObsoleteInterface|(3) with
+             member this.P = 1 }
+
+let d1: |ObsoleteDelegate|(4) = null
+let d2 = ObsoleteDelegate(fun _ -> ())
+
+let e1: |ObsoleteEnum|(5) = Unchecked.defaultof<_>
+let e2 = ObsoleteEnum()
+let e3 = |ObsoleteEnum|(6).A
+
+Class() |> ignore
+|Class|(7)(1) |> ignore
+
+|Class.ObsoleteField|(8) |> ignore
+|Class.ObsoleteMethod|(9)()
+|Class.ObsoleteProperty|(10) |> ignore
+Class.ObsoleteEvent |> ignore
+
+|Enum.A|(11) |> ignore
+
+---------------------------------------------------------
+(0): ReSharper Warning: This construct is deprecated. Class is obsolete
+(1): ReSharper Warning: This construct is deprecated. Struct is obsolete
+(2): ReSharper Warning: This construct is deprecated. Interface is obsolete
+(3): ReSharper Warning: This construct is deprecated. Interface is obsolete
+(4): ReSharper Warning: This construct is deprecated. Delegate is obsolete
+(5): ReSharper Warning: This construct is deprecated. Enum is obsolete
+(6): ReSharper Warning: This construct is deprecated. Enum is obsolete
+(7): ReSharper Warning: This construct is deprecated. Constructor is obsolete
+(8): ReSharper Warning: This construct is deprecated. Field is obsolete
+(9): ReSharper Warning: This construct is deprecated. Method is obsolete
+(10): ReSharper Warning: This construct is deprecated. Property is obsolete
+(11): ReSharper Warning: This construct is deprecated. Enum field is obsolete

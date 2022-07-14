@@ -38,3 +38,4 @@ type FcsModuleReaderCommonCache(lifetime: Lifetime, changeManager: ChangeManager
     member val Cultures = DataIntern<string option>()
     member val PublicKeys = DataIntern<PublicKey option>()
     member val LiteralValues = DataIntern<ILFieldInit option>()
+    member val AttributeValues = DataIntern<ILAttribElem>()
