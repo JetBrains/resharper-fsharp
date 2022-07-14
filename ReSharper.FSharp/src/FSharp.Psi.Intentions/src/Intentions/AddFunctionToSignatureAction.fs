@@ -66,16 +66,31 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                 let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
                 let types = FcsTypeUtil.getFunctionTypeArgs true mfv.FullType
                 let parameters = binding.ParametersDeclarations
+                let rec getTypeName (t:FSharpType) : string =
+                    if t.HasTypeDefinition && t.GenericArguments.Count = 1 then
+                        let ga = t.GenericArguments[0].GenericParameter
+                        $"'{ga.DisplayName} {t.TypeDefinition.DisplayName}"
+                    elif t.IsGenericParameter then
+                        $"'{t.GenericParameter.DisplayName}"
+                    elif t.HasTypeDefinition then
+                        t.TypeDefinition.DisplayName
+                    elif t.IsFunctionType then
+                        let rec visit (t: FSharpType) : string seq =
+                            if  t.IsFunctionType then
+                                Seq.collect visit t.GenericArguments
+                            else
+                                Seq.singleton (getTypeName t)
+                        
+                        visit t
+                        |> String.concat " -> "
+                        |> sprintf "(%s)"
+                    else
+                        "???"
+
                 let namedParameters =
                     Seq.zip types parameters
                     |> Seq.map (fun (t, p) ->
-                        let typeName =
-                            if t.GenericArguments.Count = 1 then
-                                let ga = t.GenericArguments[0].GenericParameter
-                                $"'{ga.DisplayName} {t.TypeDefinition.DisplayName}"
-                            else
-                                t.TypeDefinition.DisplayName
-
+                        let typeName = getTypeName t
                         match p.Pattern.IgnoreInnerParens() with
                         | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}: {typeName}"
                         | :? ITypedPat as tp ->
@@ -89,7 +104,7 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                     match Seq.tryLast types with
                     | None -> mfv.FullType.TypeDefinition.DisplayName
                     | Some returnType ->
-                        seq { yield! namedParameters; yield returnType.TypeDefinition.DisplayName}
+                        seq { yield! namedParameters; yield getTypeName returnType}
                         |> String.concat " -> "
 
                 let sigDeclNode : ITreeNode = elementFactory.CreateBindingSignature(name, signature)

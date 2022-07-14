@@ -1,0 +1,3 @@
+module Foo
+
+val k: l: ('a -> 'b -> 'c -> 'd) -> m: 'a -> n: 'b -> o: 'c -> 'd
