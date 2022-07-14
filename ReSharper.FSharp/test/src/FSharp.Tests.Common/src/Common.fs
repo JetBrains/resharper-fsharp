@@ -166,7 +166,9 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
     interface IHideImplementation<FcsProjectProvider>
 
     interface IFcsProjectProvider with
-        member x.HasPairFile _ = true
+        member x.HasPairFile sourceFile =
+            let fcsProject = getFcsProject sourceFile.PsiModule
+            fcsProject.ImplementationFilesWithSignatures.Contains(sourceFile.GetLocation())
 
         member x.GetProjectOptions(sourceFile: IPsiSourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then
