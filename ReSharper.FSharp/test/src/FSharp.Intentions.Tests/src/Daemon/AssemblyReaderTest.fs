@@ -73,7 +73,7 @@ type TestModulePathProvider(shim: TestAssemblyReaderShim) =
 
     interface IHideImplementation<ModulePathProvider>
 
-[<FSharpTest>]
+[<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.AssemblyReaderShim)>]
 type AssemblyReaderTest() =
     inherit TestWithTwoProjectsBase(FSharpProjectFileType.FsExtension, CSharpProjectFileType.CS_EXTENSION)
 
@@ -138,7 +138,6 @@ type AssemblyReaderTest() =
     override this.DoTest(lifetime: Lifetime, project: IProject) =
         let path = this.SecondProject.Location / (this.SecondProjectName + ".dll")
         let psiModule = this.SecondProject.GetPsiModules().SingleItem().NotNull()
-        use assemblyReaderCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.AssemblyReaderShim)
         use cookie = this.Solution.GetComponent<TestAssemblyReaderShim>().CreateProjectCookie(path, psiModule)
 
         base.DoTest(lifetime, project)

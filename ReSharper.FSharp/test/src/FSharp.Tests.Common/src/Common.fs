@@ -98,6 +98,7 @@ type FSharpLanguageLevelAttribute(languageLevel: FSharpLanguageLevel) =
 
         PsiFileCachedDataUtil.InvalidateInAllProjectFiles(project, FSharpLanguage.Instance, FSharpLanguageLevel.key)
 
+
 [<AttributeUsage(AttributeTargets.Method ||| AttributeTargets.Class, Inherited = false)>]
 type TestDefinesAttribute(defines: string) =
     inherit TestAspectAttribute()
@@ -108,6 +109,20 @@ type TestDefinesAttribute(defines: string) =
             let oldDefines = projectConfiguration.DefineConstants
             projectConfiguration.DefineConstants <- defines
             context.TestLifetime.OnTermination(fun _ -> projectConfiguration.DefineConstants <- oldDefines) |> ignore
+
+
+[<AttributeUsage(AttributeTargets.Method ||| AttributeTargets.Class, Inherited = false)>]
+type FSharpExperimentalFeatureAttribute(feature: ExperimentalFeature) =
+    inherit TestAspectAttribute()
+
+    let mutable cookie: IDisposable = Unchecked.defaultof<_>
+
+    override this.OnBeforeTestExecute _ =
+        cookie <- FSharpExperimentalFeatureCookie.Create(feature)
+
+    override this.OnAfterTestExecute _ =
+        cookie.Dispose()
+        cookie <- null
 
 
 [<SolutionComponent>]

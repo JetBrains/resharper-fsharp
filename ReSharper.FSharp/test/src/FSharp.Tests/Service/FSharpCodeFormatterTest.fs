@@ -8,15 +8,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest; TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
+[<FSharpTest; TestSettingsKey(typeof<FSharpFormatSettingsKey>); FSharpExperimentalFeature(ExperimentalFeature.Formatter)>]
 type FSharpCodeFormatterTest() =
     inherit CodeFormatterWithExplicitSettingsTestBase<FSharpLanguage>()
 
     override x.RelativeTestDataPath = "features/service/codeFormatter"
-
-    override x.DoNamedTest() =
-        use cookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
-        base.DoNamedTest()
 
     [<Test>] member x.``Expr - App - CompExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Nested 01``() = x.DoNamedTest()

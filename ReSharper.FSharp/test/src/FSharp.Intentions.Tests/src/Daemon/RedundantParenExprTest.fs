@@ -8,17 +8,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest>]
+[<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.RedundantParenAnalysis)>]
 [<TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
 [<TestSettings("{AllowHighPrecedenceAppParens:All}")>]
 type RedundantParenExprTest() =
     inherit FSharpHighlightingTestBase()
 
     override x.RelativeTestDataPath = "features/daemon/redundantParens/expr"
-
-    override x.DoTest(lifetime, project) =
-        use cookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.RedundantParenAnalysis)
-        base.DoTest(lifetime, project)
 
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? RedundantParenExprWarning

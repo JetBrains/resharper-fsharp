@@ -6,13 +6,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-[<FSharpTest>]
+[<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.RedundantParenAnalysis)>]
 type RemoveRedundantParenExprTest() =
     inherit FSharpQuickFixTestBase<RemoveRedundantParenExprFix>()
-
-    override x.DoTest(lifetime, project) =
-        use cookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.RedundantParenAnalysis)
-        base.DoTest(lifetime, project)
 
     override x.RelativeTestDataPath = "features/quickFixes/removeRedundantParens/expr"
 
