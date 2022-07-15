@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(x: int)
+Parameter: 0 'x: int'
+
+--- Accepted invocables: ---
+(x: int)
