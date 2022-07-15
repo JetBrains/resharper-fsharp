@@ -14,6 +14,7 @@ open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Impl.Special
 open JetBrains.ReSharper.Psi.Impl.Types
 open JetBrains.ReSharper.Psi.Modules
@@ -417,6 +418,53 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let args = [ ILAttribElem.String(Some(arg)) ]
         mkCompilerGeneratedAttribute PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS args
 
+    let attributeValueTypes =
+        [| PredefinedType.BOOLEAN_FQN, fun (c: ConstantValue) -> ILAttribElem.Bool c.BoolValue
+           PredefinedType.CHAR_FQN,    fun (c: ConstantValue) -> ILAttribElem.Char c.CharValue
+           PredefinedType.SBYTE_FQN,   fun (c: ConstantValue) -> ILAttribElem.SByte c.SbyteValue
+           PredefinedType.BYTE_FQN,    fun (c: ConstantValue) -> ILAttribElem.Byte c.ByteValue
+           PredefinedType.SHORT_FQN,   fun (c: ConstantValue) -> ILAttribElem.Int16 c.ShortValue
+           PredefinedType.USHORT_FQN,  fun (c: ConstantValue) -> ILAttribElem.UInt16 c.UshortValue
+           PredefinedType.INT_FQN,     fun (c: ConstantValue) -> ILAttribElem.Int32 c.IntValue
+           PredefinedType.UINT_FQN,    fun (c: ConstantValue) -> ILAttribElem.UInt32 c.UintValue
+           PredefinedType.LONG_FQN,    fun (c: ConstantValue) -> ILAttribElem.Int64 c.LongValue
+           PredefinedType.ULONG_FQN,   fun (c: ConstantValue) -> ILAttribElem.UInt64 c.UlongValue
+           PredefinedType.FLOAT_FQN,   fun (c: ConstantValue) -> ILAttribElem.Single c.FloatValue
+           PredefinedType.DOUBLE_FQN,  fun (c: ConstantValue) -> ILAttribElem.Double c.DoubleValue |]
+        |> dict
+
+    let mkCustomAttribute (attrInstance: IAttributeInstance) =
+        let ctor = attrInstance.Constructor
+        let _namedArgs = attrInstance.NamedParameters() |> List.ofSeq
+
+        let attrType = TypeFactory.CreateType(ctor.ContainingType)
+        let methodSpec = ILMethodSpec.Create(mkType attrType, mkMethodRef ctor, [])
+
+        let positionalArgs = 
+            attrInstance.PositionParameters()
+            |> List.ofSeq
+            |> List.map (fun attrValue ->
+                let constantValue = attrValue.ConstantValue
+                if constantValue.IsString() then ILAttribElem.String(Some constantValue.StringValue) else
+
+                let declaredType = constantValue.Type.As<IDeclaredType>()
+                if isNull declaredType then ILAttribElem.Null else
+
+                // todo: typeof, arrays
+
+                let mutable literalType = Unchecked.defaultof<_>
+                match attributeValueTypes.TryGetValue(declaredType.GetClrName(), &literalType) with
+                | true -> cache.AttributeValues.Intern(literalType constantValue)
+                | _ -> ILAttribElem.Null
+            )
+
+        ILAttribute.Decoded(methodSpec, positionalArgs, [])
+
+    let mkCustomAttributes (attributesSet: IAttributesSet) =
+        attributesSet.GetAttributeInstances(AttributesSource.Self)
+        |> List.ofSeq
+        |> List.map mkCustomAttribute
+
     let mkGenericVariance (variance: TypeParameterVariance): ILGenericVariance =
         match variance with
         | TypeParameterVariance.IN -> ILGenericVariance.ContraVariant
@@ -469,19 +517,18 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         (if field.IsConstant || field.IsEnumMember then FieldAttributes.Literal else enum 0)
 
     let literalTypes =
-        let unbox f = unbox >> f
-        [| PredefinedType.BOOLEAN_FQN, unbox ILFieldInit.Bool
-           PredefinedType.CHAR_FQN,    unbox ILFieldInit.Char
-           PredefinedType.SBYTE_FQN,   unbox ILFieldInit.Int8
-           PredefinedType.BYTE_FQN,    unbox ILFieldInit.UInt8
-           PredefinedType.SHORT_FQN,   unbox ILFieldInit.Int16
-           PredefinedType.USHORT_FQN,  unbox ILFieldInit.UInt16
-           PredefinedType.INT_FQN,     unbox ILFieldInit.Int32
-           PredefinedType.UINT_FQN,    unbox ILFieldInit.UInt32
-           PredefinedType.LONG_FQN,    unbox ILFieldInit.Int64
-           PredefinedType.ULONG_FQN,   unbox ILFieldInit.UInt64
-           PredefinedType.FLOAT_FQN,   unbox ILFieldInit.Single
-           PredefinedType.DOUBLE_FQN,  unbox ILFieldInit.Double |]
+        [| PredefinedType.BOOLEAN_FQN, fun (c: ConstantValue) -> ILFieldInit.Bool c.BoolValue
+           PredefinedType.CHAR_FQN,    fun (c: ConstantValue) -> ILFieldInit.Char (uint16 c.CharValue) // todo: can use UshortValue?
+           PredefinedType.SBYTE_FQN,   fun (c: ConstantValue) -> ILFieldInit.Int8 c.SbyteValue
+           PredefinedType.BYTE_FQN,    fun (c: ConstantValue) -> ILFieldInit.UInt8 c.ByteValue
+           PredefinedType.SHORT_FQN,   fun (c: ConstantValue) -> ILFieldInit.Int16 c.ShortValue
+           PredefinedType.USHORT_FQN,  fun (c: ConstantValue) -> ILFieldInit.UInt16 c.UshortValue
+           PredefinedType.INT_FQN,     fun (c: ConstantValue) -> ILFieldInit.Int32 c.IntValue
+           PredefinedType.UINT_FQN,    fun (c: ConstantValue) -> ILFieldInit.UInt32 c.UintValue
+           PredefinedType.LONG_FQN,    fun (c: ConstantValue) -> ILFieldInit.Int64 c.LongValue
+           PredefinedType.ULONG_FQN,   fun (c: ConstantValue) -> ILFieldInit.UInt64 c.UlongValue
+           PredefinedType.FLOAT_FQN,   fun (c: ConstantValue) -> ILFieldInit.Single c.FloatValue
+           PredefinedType.DOUBLE_FQN,  fun (c: ConstantValue) -> ILFieldInit.Double c.DoubleValue |]
         |> dict
 
     let nullLiteralValue = Some(ILFieldInit.Null)
@@ -493,13 +540,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         if value.IsNull() then nullLiteralValue else
 
         // A separate case to prevent interning string literals.
-        if value.IsString() then Some(ILFieldInit.String(unbox value.Value)) else
+        if value.IsString() then Some(ILFieldInit.String(value.StringValue)) else
 
         match valueType with
         | :? IDeclaredType as declaredType ->
             let mutable literalType = Unchecked.defaultof<_>
             match literalTypes.TryGetValue(declaredType.GetClrName(), &literalType) with
-            | true -> cache.LiteralValues.Intern(Some(literalType value.Value))
+            | true -> cache.LiteralValues.Intern(Some(literalType value))
             | _ -> None
         | _ -> None
 
@@ -524,7 +571,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let literalValue = getLiteralValue value valueType
 
         let marshal = None
-        let customAttrs = emptyILCustomAttrs // todo
+        let customAttrs = mkCustomAttributes field |> mkILCustomAttrs
 
         ILFieldDef(name, fieldType, attributes, data, literalValue, offset, marshal, customAttrs)
 
@@ -599,12 +646,17 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                     mkGenericParameterDef typeParameter ]
             | _ -> []
 
-        // todo: other attrs
-        let attrs =
-            match method with
-            | :? IMethod as method when method.IsExtensionMethod -> [ extensionAttribute () ] // todo: test
-            | _ -> []
-            |> mkILCustomAttrs
+        let customAttrs =
+            let isExtension = 
+                match method with
+                | :? IMethod as method -> method.IsExtensionMethod
+                | _ -> false
+
+            let customAttributes = mkCustomAttributes method
+            [ yield! customAttributes
+              if isExtension then
+                  extensionAttribute () ]
+            |> mkILCustomAttrs 
 
         let implAttributes = MethodImplAttributes.Managed
         let body = methodBodyUnavailable
@@ -612,7 +664,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let isEntryPoint = false
 
         ILMethodDef(name, methodAttrs, implAttributes, callingConv, parameters, ret, body, isEntryPoint, genericParams,
-             securityDecls, attrs)
+             securityDecls, customAttrs)
 
     let mkEvent (event: IEvent): ILEventDef =
         let eventType =
@@ -639,7 +691,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | adder -> Some(mkMethodRef adder)
 
         let otherMethods = []
-        let customAttrs = emptyILCustomAttrs
+        let customAttrs = mkCustomAttributes event |> mkILCustomAttrs
+
         ILEventDef(eventType, name, attributes, addMethod, removeMethod, fireMethod, otherMethods, customAttrs)
 
     let mkProperty (property: IProperty): ILPropertyDef =
@@ -664,7 +717,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | null -> None
             | getter -> Some(mkMethodRef getter)
 
-        ILPropertyDef(name, attrs, setter, getter, callConv, propertyType, init, args, emptyILCustomAttrs)
+        let customAttrs = mkCustomAttributes property |> mkILCustomAttrs
+
+        ILPropertyDef(name, attrs, setter, getter, callConv, propertyType, init, args, customAttrs)
 
     let usingTypeElement (typeName: IClrTypeName) defaultValue f =
         use cookie = ReadLockCookie.Create()
@@ -820,10 +875,24 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let properties = mkILPropertiesLazy (lazy getOrCreateProperties clrTypeName)
             let events = mkILEventsLazy (lazy getOrCreateEvents clrTypeName)
 
+            let hasExtensions =
+                let typeElement = typeElement.As<TypeElement>()
+                if isNull typeElement then false else
+
+                typeElement.EnumerateParts()
+                |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMethodInfos))
+
+            let customAttrs =
+                let customAttributes = mkCustomAttributes typeElement
+                [ yield! customAttributes
+                  if hasExtensions then
+                      extensionAttribute () ]
+                |> mkILCustomAttrs
+
             let typeDef =
                 ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
                     extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
-                    emptyILSecurityDecls, emptyILCustomAttrs)
+                    emptyILSecurityDecls, customAttrs)
 
             let fcsTypeDef = 
                 { TypeDef = typeDef
@@ -893,9 +962,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                         .GetAttributeInstances(PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS, false)
 
                 [| for instance in attributeInstances do
-                     match instance.PositionParameter(0).ConstantValue.Value with
-                     | :? string as s -> internalsVisibleToAttribute s
-                     | _ -> () |]
+                     match instance.PositionParameter(0).ConstantValue.AsString() with
+                     | null -> ()
+                     | s -> internalsVisibleToAttribute s |]
 
             let newModuleDef =
                 if ivtAttributes.IsEmpty() then newModuleDef else

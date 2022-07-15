@@ -1,0 +1,8 @@
+﻿// ${COMPLETE_ITEM:let}
+module Module
+
+open System.Text
+
+#if DEFINE
+let stringBuilder = StringBuilder(){caret}
+#endif

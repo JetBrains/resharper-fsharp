@@ -4,6 +4,6 @@ module Module
 let x =
    true &&
    true &&
-      {caret}true && 
+   {caret}true && 
 
       true

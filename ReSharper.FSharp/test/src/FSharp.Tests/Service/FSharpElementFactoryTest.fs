@@ -25,7 +25,7 @@ type FSharpElementFactoryTest() =
 
     override x.DoTest(_, project: IProject) =
         let psiModule = project.GetPsiModules().Single()
-        let elementFactory = languageService.CreateElementFactory(psiModule)
+        let elementFactory = languageService.CreateElementFactory(null, psiModule)
         testAction elementFactory
 
     [<Test>]

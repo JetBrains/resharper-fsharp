@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:for}
+module Module
+
+let l = []
+for _ in l do
+  (){caret}

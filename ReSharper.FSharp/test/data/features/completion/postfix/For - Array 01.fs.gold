@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:for}
+module Module
+
+let a = [||]
+for _ in a do
+  (){caret}

@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:for}
+module Module
+
+for _ in [1] do
+  (){caret}

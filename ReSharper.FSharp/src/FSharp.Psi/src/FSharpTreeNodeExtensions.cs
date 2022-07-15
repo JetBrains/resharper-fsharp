@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     [NotNull]
     public static IFSharpElementFactory CreateElementFactory([NotNull] this ITreeNode treeNode) =>
-      treeNode.GetFSharpLanguageService().CreateElementFactory(treeNode.GetPsiModule());
+      treeNode.GetFSharpLanguageService().CreateElementFactory(treeNode.GetSourceFile(), treeNode.GetPsiModule());
 
     public static bool IsFSharpSigFile([NotNull] this ITreeNode treeNode) =>
       treeNode.GetContainingFile() is IFSharpSigFile;

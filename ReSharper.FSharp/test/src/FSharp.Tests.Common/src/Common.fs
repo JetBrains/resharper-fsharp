@@ -9,6 +9,7 @@ open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -97,6 +98,17 @@ type FSharpLanguageLevelAttribute(languageLevel: FSharpLanguageLevel) =
 
         PsiFileCachedDataUtil.InvalidateInAllProjectFiles(project, FSharpLanguage.Instance, FSharpLanguageLevel.key)
 
+[<AttributeUsage(AttributeTargets.Method ||| AttributeTargets.Class, Inherited = false)>]
+type TestDefinesAttribute(defines: string) =
+    inherit TestAspectAttribute()
+
+    override this.OnBeforeTestExecute(context) =
+        let projectProperties = context.TestProject.ProjectProperties
+        for projectConfiguration in projectProperties.GetActiveConfigurations<IManagedProjectConfiguration>() do
+            let oldDefines = projectConfiguration.DefineConstants
+            projectConfiguration.DefineConstants <- defines
+            context.TestLifetime.OnTermination(fun _ -> projectConfiguration.DefineConstants <- oldDefines) |> ignore
+
 
 [<SolutionComponent>]
 type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim, scriptModuleProvider) =
@@ -169,7 +181,15 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
                 else
                     let project = sourceFile.GetProject().NotNull()
                     fcsProjectBuilder.GetProjectItemsPaths(project, targetFrameworkId) |> Array.map (fst >> string)
-            let defines = if isScript then ImplicitDefines.scriptDefines else ImplicitDefines.sourceDefines
+
+            let defines =
+                if isScript then
+                    ImplicitDefines.scriptDefines
+                else
+                    sourceFile.GetProject().NotNull()
+                    |> FcsProjectBuilder.getProjectConfiguration targetFrameworkId
+                    |> FcsProjectBuilder.getDefines
+                    |> List.append ImplicitDefines.sourceDefines 
 
             { FSharpParsingOptions.Default with
                 SourceFiles = paths

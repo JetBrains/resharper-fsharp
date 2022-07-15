@@ -81,6 +81,8 @@ type AssemblyReaderTest() =
 
      // todo: test InternalsVisibleTo
 
+    [<Test>] member x.``Attribute - Obsolete 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Event 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Field 01``() = x.DoNamedTest()
@@ -89,6 +91,7 @@ type AssemblyReaderTest() =
     [<Test>] member x.``Method - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Ctor 02 - Param array``() = x.DoNamedTest()
     [<Test>] member x.``Method - Ctor 03 - Optional param``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Extension 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 02 - Accessibility``() = x.DoNamedTest()

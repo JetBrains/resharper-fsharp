@@ -1,0 +1,52 @@
+﻿module Module
+
+open System.Collections.Generic
+
+Class.StringExt("")
+"".StringExt()
+
+Class.ObjSeq([1])
+[obj()].ObjSeq()
+|[1].ObjSeq()|(0)
+
+
+Class.GenericSeqExt<int>([1])
+[1].GenericSeqExt<int>()
+
+Class.GenericSeqExt<string>([""])
+[""].GenericSeqExt<string>()
+
+|[""].GenericSeqExt<int>()|(1)
+|[1].GenericSeqExt<string>()|(2)
+
+Class.StringSeqExt([""])
+[""].StringSeqExt()
+
+Class.StringSeqExt([|1|(3)])
+|[1].StringSeqExt()|(4)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'int list'    
+is not compatible with type
+    'IEnumerable<obj>'    
+
+(1): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'string list'    
+is not compatible with type
+    'IEnumerable<int>'    
+
+(2): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'int list'    
+is not compatible with type
+    'IEnumerable<string>'    
+
+(3): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'string'    
+but here has type
+    'int'    
+(4): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'int list'    
+is not compatible with type
+    'IEnumerable<string>'    
+

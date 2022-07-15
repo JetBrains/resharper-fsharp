@@ -936,7 +936,11 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                     | SynExpr.App (_, true,  rightExpr, leftExpr, range) ->
 
                         if offset >= getStartOffset document range && rightExpr.Range.GetStartLine() > caretLine then
-                            outerExpr <- Some (expr, rightExpr)
+                            match leftExpr, expr with
+                            | _, SynExpr.App(_, true,  rightExpr, leftExpr, _)
+                            | SynExpr.App (_, true, rightExpr, leftExpr, _), _ when
+                                    leftExpr.Range.EndLine = rightExpr.Range.StartLine -> ()
+                            | _ -> outerExpr <- Some (expr, rightExpr)
 
                         if offset >= getEndOffset document leftExpr.Range &&
                                 offset <= getStartOffset document rightExpr.Range then

@@ -1,0 +1,6 @@
+// ${CHAR:Enter} 
+module Module
+
+let x =
+    [] {caret} |> List.map(fun _ ->
+        ()) |> ignore

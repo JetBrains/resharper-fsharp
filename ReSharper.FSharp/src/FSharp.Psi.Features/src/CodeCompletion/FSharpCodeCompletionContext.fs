@@ -52,7 +52,7 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
             let documentFactory = Shell.Instance.GetComponent<IInMemoryDocumentFactory>()
             let document = documentFactory.CreateSimpleDocumentFromText(source, moniker)
 
-            let parser = fsFile.GetFSharpLanguageService().CreateParser(document)
+            let parser = fsFile.GetFSharpLanguageService().CreateParser(document, fsFile.GetSourceFile())
             let newFile =
                 try
                     let newFile =
