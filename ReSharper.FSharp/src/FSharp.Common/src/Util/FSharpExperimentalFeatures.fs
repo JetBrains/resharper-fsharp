@@ -7,12 +7,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
-[<RequireQualifiedAccess>]
 type ExperimentalFeature =
-    | Formatter
-    | PostfixTemplates
-    | RedundantParenAnalysis
-    | AssemblyReaderShim
+    | Formatter = 1
+    | PostfixTemplates = 2
+    | RedundantParenAnalysis = 3
+    | AssemblyReaderShim = 4
 
 type FSharpExperimentalFeatureCookie(feature: ExperimentalFeature) =
     static let cookies = OneToListMap<ExperimentalFeature, IDisposable>()
