@@ -102,6 +102,10 @@ type ForPostfixTemplate() =
 
         ForPostfixTemplateInfo(context) :> _
 
+    override this.IsEnabled(solution) =
+        let configurations = solution.GetComponent<RunsProducts.ProductConfigurations>()
+        configurations.IsInternalMode() || base.IsEnabled(solution)
+
 
 and ForPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
     inherit PostfixTemplateInfo("for", expressionContext)
