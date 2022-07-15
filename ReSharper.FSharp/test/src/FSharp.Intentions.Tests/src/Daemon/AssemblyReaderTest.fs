@@ -92,6 +92,7 @@ type AssemblyReaderTest() =
     [<Test>] member x.``Method - Ctor 02 - Param array``() = x.DoNamedTest()
     [<Test>] member x.``Method - Ctor 03 - Optional param``() = x.DoNamedTest()
     [<Test>] member x.``Method - Extension 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Extern 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 02 - Accessibility``() = x.DoNamedTest()

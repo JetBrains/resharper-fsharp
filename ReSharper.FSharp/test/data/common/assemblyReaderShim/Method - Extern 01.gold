@@ -1,0 +1,17 @@
+﻿module Module
+
+let ni = nativeint 1
+
+let _: int = Class.ExternMethod1(1)
+let _: int = Class.ExternMethod1(|ni|(0))
+
+let _: int = Class.ExternMethod2(1, "")
+let _: int = Class.ExternMethod2(ni, "")
+
+let _: int = Class.ExternMethod3(1)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int'    
+but here has type
+    'nativeint'    
