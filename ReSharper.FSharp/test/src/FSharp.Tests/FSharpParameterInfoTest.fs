@@ -120,6 +120,10 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``Exception 02``() = x.DoNamedTest()
     [<Test>] member x.``Exception 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Delegate 01``() = x.DoNamedTest()
+    [<Test>] member x.``Delegate 02``() = x.DoNamedTest()
+    [<Test>] member x.``Delegate 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Reference - Local 01``() = x.DoNamedTest()
     [<Test>] member x.``Reference - Local 02``() = x.DoNamedTest()
 
