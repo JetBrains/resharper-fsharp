@@ -1,0 +1,7 @@
+﻿public class Class : object, |T1|(0), T2, |T3|(1)
+{
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: 'T1': interface name expected
+(1): ReSharper Underlined Error Highlighting: 'T3': interface name expected
