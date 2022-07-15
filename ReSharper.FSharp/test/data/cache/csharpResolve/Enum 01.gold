@@ -7,9 +7,19 @@ public class Class1
   {
     E f1 = E.Field1;
     int f2 = (int) E.Field2;
+    int f3 = (int) E.|Field2Compiled|(0);
+
+    var _ = f1 switch
+    {
+      E.Field1 => true,
+      E.Field2 => false
+    };
   }
 }
 
 ---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'Field2Compiled'
+F:Module.E.Field1
+F:Module.E.Field2
 F:Module.E.Field1
 F:Module.E.Field2

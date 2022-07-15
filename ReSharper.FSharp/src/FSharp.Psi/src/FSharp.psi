@@ -1020,7 +1020,9 @@ enumCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; 
 }:
   BAR<BAR, Bar>?
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  identifier<IDENTIFIER, Identifier>;
+  identifier<IDENTIFIER, Identifier>
+  EQUALS<FSHARP_EQUALS, EqualsToken>
+  fSharpExpression<EXPR, Expression>;
 
 
 recordRepresentation options { stubBase="TypeRepresentationBase"; } extras {
