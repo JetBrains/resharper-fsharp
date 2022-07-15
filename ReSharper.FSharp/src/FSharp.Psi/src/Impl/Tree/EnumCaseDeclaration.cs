@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class EnumCaseDeclaration
   {
-    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
+    protected override string DeclaredElementName => NameIdentifier.GetSourceName();
     public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() => new FSharpEnumMember(this);
