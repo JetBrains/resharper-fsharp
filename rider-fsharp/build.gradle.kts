@@ -9,10 +9,10 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id ("com.jetbrains.rdgen") version "2022.1.2"
+    id ("com.jetbrains.rdgen") version "2022.3.1"
     id("org.jetbrains.intellij") version "1.6.0" // https://github.com/JetBrains/gradle-intellij-plugin/releases
     id("org.jetbrains.grammarkit") version "2021.2.2"
-    id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
+    id("me.filippov.gradle.jvm.wrapper") version "0.10.0"
     kotlin("jvm") version "1.6.10"
 }
 
@@ -26,7 +26,7 @@ repositories {
     maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
 }
 
-val baseVersion = "2022.2"
+val baseVersion = "2022.3"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
