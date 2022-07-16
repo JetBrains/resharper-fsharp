@@ -35,6 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
         bool x => new RdStaticArg(RdTypeName.@bool, x.ToString()),
         string x => new RdStaticArg(RdTypeName.@string, x),
         DBNull _ => new RdStaticArg(RdTypeName.dbnull, ""),
+        // ReSharper disable once PossibleInvalidCastException
         _ when value.GetType() is var type && type.IsEnum => BoxToServerStaticArg((int)value),
         _ => throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
       };
@@ -61,6 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
         bool x => new ServerRdStaticArg(ServerRdTypeName.@bool, x.ToString()),
         string x => new ServerRdStaticArg(ServerRdTypeName.@string, x),
         DBNull _ => new ServerRdStaticArg(ServerRdTypeName.@dbnull, ""),
+        // ReSharper disable once PossibleInvalidCastException
         _ when value.GetType() is var type && type.IsEnum => BoxToClientStaticArg((int)value, safeMode),
         _ => safeMode
           ? new ServerRdStaticArg(ServerRdTypeName.unknown, value.ToString())
