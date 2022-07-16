@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(array: 'T[]) : bool
+Parameter: 0 'array: 'T[]'
+
+--- Accepted invocables: ---
+(array: 'T[]) : bool

@@ -595,13 +595,29 @@ type FSharpParameterInfoContextFactory() =
 
     let checkNodeBeforeNodeTypes =
         NodeTypeSet(
-            FSharpTokenType.RPAREN,
+            FSharpTokenType.COMMA,
+            FSharpTokenType.COLON,
+            FSharpTokenType.COLON_QMARK,
+            FSharpTokenType.COLON_QMARK_GREATER,
             FSharpTokenType.GREATER_RBRACK,
-            FSharpTokenType.SEMICOLON)
+            FSharpTokenType.ELIF,
+            FSharpTokenType.ELSE,
+            FSharpTokenType.END,
+            FSharpTokenType.IN,
+            FSharpTokenType.RPAREN,
+            FSharpTokenType.RBRACE,
+            FSharpTokenType.RBRACK,
+            FSharpTokenType.BAR_RBRACK,
+            FSharpTokenType.THEN,
+            FSharpTokenType.TO,
+            FSharpTokenType.SEMICOLON
+            )
 
     let rec getTokenAtOffset isAutoPopup allowRetry (caretOffset: DocumentOffset) (solution: ISolution) =
         let fsFile = solution.GetPsiServices().GetPsiFile<FSharpLanguage>(caretOffset).As<IFSharpFile>()
         if isNull fsFile then null else
+
+        // todo: get token from caretOffset - 1, try looking at the next token in nested contexts?
 
         match fsFile.FindTokenAt(caretOffset), allowRetry with
         | null, false -> null
@@ -611,7 +627,7 @@ type FSharpParameterInfoContextFactory() =
         | token, _ ->
 
         let token =
-            if not checkNodeBeforeNodeTypes[getTokenType token] then
+            if not checkNodeBeforeNodeTypes[getTokenType token] || token.GetDocumentStartOffset() <> caretOffset then
                 token
             else
                 let prevSibling = token.GetPreviousToken()

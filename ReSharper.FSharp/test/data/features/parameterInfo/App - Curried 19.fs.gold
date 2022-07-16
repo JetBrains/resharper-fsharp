@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(list: 'T list) : bool
+Parameter: 0 'list: 'T list'
+
+--- Accepted invocables: ---
+(list: 'T list) : bool

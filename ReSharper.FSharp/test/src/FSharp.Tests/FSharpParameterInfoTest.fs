@@ -51,6 +51,7 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Curried - Tuple 16``() = x.DoNamedTest() // todo: allow invoking via action
     [<Test>] member x.``App - Curried - Tuple 17``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Tuple 18``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Tuple 19``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Curried - Unit 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Unit 02``() = x.DoNamedTest()
@@ -74,6 +75,19 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Curried 13``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried 14``() = x.DoNamedTest() // todo: allow invoking via action
     [<Test>] member x.``App - Curried 15``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 16``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 17``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 18``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 19``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 20``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 21``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 22``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 23``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 24``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 25``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 26``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 27``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried 28``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Lambda 02``() = x.DoNamedTest()
