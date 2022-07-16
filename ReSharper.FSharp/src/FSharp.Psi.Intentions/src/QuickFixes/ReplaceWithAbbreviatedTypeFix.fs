@@ -12,7 +12,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Util
 
 type ReplaceWithAbbreviatedTypeFix(error: TypeAbbreviationsCannotHaveAugmentationsError) =
     inherit FSharpQuickFixBase()

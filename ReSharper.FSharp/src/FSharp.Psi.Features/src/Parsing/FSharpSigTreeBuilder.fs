@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Syntax.PrettyNaming
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util

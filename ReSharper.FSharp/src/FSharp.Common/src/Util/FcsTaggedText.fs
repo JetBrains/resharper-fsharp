@@ -1,7 +1,6 @@
 ﻿[<Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 
-open System
 open FSharp.Compiler.Text
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.UI.RichText

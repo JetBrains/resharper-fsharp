@@ -141,10 +141,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       Describe<ContinuousIndentRule>()
         .Name("ContinuousIndent")
-        .Where(Node().In(continuousIndentNodes).Or().In(ElementType.PREFIX_APP_EXPR).Satisfies((node, context) =>
+        .Where(Node().In(continuousIndentNodes).Or().In(ElementType.PREFIX_APP_EXPR).Satisfies((node, _) =>
           !(node.Parent is IPrefixAppExpr)))
         .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
-        .AddException(Node().In(FSharpTokenType.LINE_COMMENT).Satisfies((node, context) => node is DocComment))
+        .AddException(Node().In(FSharpTokenType.LINE_COMMENT).Satisfies((node, _) => node is DocComment))
         .AddException(Node().In(ElementType.COMPUTATION_EXPR).Satisfies((node, context) =>
           !node.HasNewLineBefore(context.CodeFormatter)))
         .AddException(
@@ -163,7 +163,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           Parent().In(ElementType.NESTED_MODULE_DECLARATION),
           Node()
             .In(ElementBitsets.MODULE_MEMBER_BIT_SET.Union(Comments))
-            .Satisfies((node, context) =>
+            .Satisfies((node, _) =>
               {
                 // Find comment preceding a module member only (i.e. don't use comment before `=`)
 
@@ -202,7 +202,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
                 return false;
               }))
-        .CloseNodeGetter((node, context) => GetLastNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET, node))
+        .CloseNodeGetter((node, _) => GetLastNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET, node))
         .Calculate((node, context) => // node is Left()/Node()
         {
           var treeNode = (ITreeNode) node;
@@ -231,9 +231,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Name("SimpleTypeRepr_Accessibility")
         .Where(
           Parent().In(ElementBitsets.ENUM_LIKE_TYPE_REPRESENTATION_BIT_SET),
-          Left().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies((node, context) =>
+          Left().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies((node, _) =>
             AccessModifiers[node.GetPreviousMeaningfulSibling()?.GetTokenType()]))
-        .CloseNodeGetter((node, context) => node.Parent?.LastChild)
+        .CloseNodeGetter((node, _) => node.Parent?.LastChild)
         .Return(IndentType.External)
         .Build();
 
@@ -339,7 +339,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<IndentingRule>().Name("EnumCaseLikeDeclarations")
         .Where(Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET),
           Left().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies(IsFirstNodeOfItsType))
-        .CloseNodeGetter((node, context) => node.Parent?.LastChild)
+        .CloseNodeGetter((node, _) => node.Parent?.LastChild)
         .Return(IndentType.AlignThrough) // through => including the last node (till => without the last one)
         .Build();
 
@@ -374,7 +374,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     private void DescribeNestedAlignment<T>(string title, NodeType nodeType) =>
       Describe<IndentingRule>()
         .Name(title)
-        .Where(Node().In(nodeType).Satisfies((node, context) => !(node.Parent is T)))
+        .Where(Node().In(nodeType).Satisfies((node, _) => !(node.Parent is T)))
         .Return(IndentType.AlignThrough)
         .Build();
 
@@ -383,7 +383,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<IndentingRule>()
         .Name("ListLikePatLikeAlignment")
         .Where(parentPattern, nodeParent)
-        .CloseNodeGetter((node, context) => childrenGetter((TParent) node.Parent).LastOrDefault())
+        .CloseNodeGetter((node, _) => childrenGetter((TParent) node.Parent).LastOrDefault())
         .Return(IndentType.AlignThrough)
         .Build();
 
@@ -462,7 +462,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Name("SpaceInLists")
         .Group(SpaceRuleGroup)
         .Where(
-          Parent().In(ElementBitsets.ARRAY_OR_LIST_PAT_BIT_SET).Satisfies((node, context) =>
+          Parent().In(ElementBitsets.ARRAY_OR_LIST_PAT_BIT_SET).Satisfies((node, _) =>
             !(node is IArrayOrListPat arrayOrListPat && arrayOrListPat.PatternsEnumerable.IsEmpty())))
         .Return(IntervalFormatType.Space)
         .Build();
@@ -483,7 +483,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Where(
           Parent()
             .In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET)
-            .Satisfies((node, context) => ((ISimpleTypeRepresentation) node).AccessModifier != null),
+            .Satisfies((node, _) => ((ISimpleTypeRepresentation) node).AccessModifier != null),
           Right().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies(IsFirstNodeOfItsType))
         .Switch(settings => settings.LineBreakAfterTypeReprAccessModifier,
           When(true).Return(IntervalFormatType.NewLine))
@@ -570,8 +570,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<BlankLinesAroundNodeRule>()
         .AddNodesToGroupBefore(Node().In(Comments))
         .AddNodesToGroupAfter(Node().In(Comments))
-        .AllowedNodesBefore(Node().Satisfies((node, checker) => true))
-        .AllowedNodesAfter(Node().Satisfies((node, checker) => true))
+        .AllowedNodesBefore(Node().Satisfies((_, _) => true))
+        .AllowedNodesAfter(Node().Satisfies((_, _) => true))
         .Priority(1)
         .StartAlternating()
         .Name("BlankLinesAroundDeclarations")
@@ -582,10 +582,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Name("BlankLinesAroundDifferentModuleMemberKinds")
         .Where(Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET))
         .MinBlankLines(it => it.BlankLinesAroundDifferentModuleMemberKinds)
-        .AdditionalCheckForBlankLineAfter((node, context) =>
+        .AdditionalCheckForBlankLineAfter((node, _) =>
           node.GetNextMeaningfulSibling()?.NodeType is var nodeType &&
           nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType])
-        .AdditionalCheckForBlankLineBefore((node, context) =>
+        .AdditionalCheckForBlankLineBefore((node, _) =>
           node.GetPreviousMeaningfulSibling()?.NodeType is var nodeType &&
           nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType])
         .Build()
@@ -631,7 +631,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     private void DescribeLineBreakInDeclarationWithEquals(string name,
       IBuilderAction<IBlankWithSinglePattern> declarationPattern,
       ChildBuilder<IBlankWithSinglePattern, NodePatternBlank> equalsBeforeNodesPattern) =>
-      DescribeLineBreakInNode(name, declarationPattern, equalsBeforeNodesPattern.Satisfies((node, context) =>
+      DescribeLineBreakInNode(name, declarationPattern, equalsBeforeNodesPattern.Satisfies((node, _) =>
           node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS),
         key => key.DeclarationBodyOnTheSameLine, key => key.KeepExistingLineBreakBeforeDeclarationBody);
 

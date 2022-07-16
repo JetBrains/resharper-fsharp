@@ -3,7 +3,6 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSha
 
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree

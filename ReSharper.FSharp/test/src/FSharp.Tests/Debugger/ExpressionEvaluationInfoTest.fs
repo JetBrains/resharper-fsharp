@@ -14,7 +14,7 @@ type ExpressionEvaluationInfoTest() =
 
     override x.RelativeTestDataPath = "features/debugger/evaluateExpression"
 
-    override x.DoTest(lifetime, project) =
+    override x.DoTest(lifetime, _) =
         let textControl = x.OpenTextControl(lifetime)
         let expr = TextControlToPsi.GetElementFromCaretPosition<IFSharpExpression>(x.Solution, textControl)
         let textToEvaluate = FSharpExpressionEvaluationInfoProvider.GetTextToEvaluate(expr)

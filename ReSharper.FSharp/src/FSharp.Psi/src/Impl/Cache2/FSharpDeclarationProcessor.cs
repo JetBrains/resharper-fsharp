@@ -291,8 +291,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     private Part CreateObjectTypePart(IFSharpTypeOrExtensionDeclaration decl, PartKind partKind, bool isExtension) =>
       partKind switch
       {
-        PartKind.Class => isExtension ? (Part) new ClassExtensionPart(decl, Builder) : new ClassPart(decl, Builder),
-        PartKind.Struct => isExtension ? (Part) new StructExtensionPart(decl, Builder) : new StructPart(decl, Builder),
+        PartKind.Class => isExtension ? new ClassExtensionPart(decl, Builder) : new ClassPart(decl, Builder),
+        PartKind.Struct => isExtension ? new StructExtensionPart(decl, Builder) : new StructPart(decl, Builder),
         PartKind.Interface => new InterfacePart(decl, Builder),
         PartKind.Enum => new EnumPart(decl, Builder),
         _ => throw new ArgumentOutOfRangeException()

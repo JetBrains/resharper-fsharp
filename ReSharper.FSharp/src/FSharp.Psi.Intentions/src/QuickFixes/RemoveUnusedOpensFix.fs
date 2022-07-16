@@ -4,8 +4,6 @@ open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Resources.Shell
 
 type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
     inherit FSharpQuickFixBase()

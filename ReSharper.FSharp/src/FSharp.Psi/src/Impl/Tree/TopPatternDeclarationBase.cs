@@ -61,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return new ModuleValue(declaration);
 
       return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
-        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(declaration)
+        ? new FSharpSignOperator<TopPatternDeclarationBase>(declaration)
         : new ModuleFunction(declaration);
     }
 
@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return opDeclaredElement;
 
         return typeDeclaration is IFSharpTypeDeclaration
-          ? (IDeclaredElement) new FSharpTypePrivateMethod(this)
+          ? new FSharpTypePrivateMethod(this)
           : new ModuleFunction(this);
       }
 
@@ -113,7 +113,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [NotNull]
     private IDeclaredElement CreateValue(ITypeDeclaration typeDeclaration) =>
       typeDeclaration is IFSharpTypeDeclaration
-        ? (IDeclaredElement) new FSharpTypePrivateField(this)
+        ? new FSharpTypePrivateField(this)
         : new ModuleValue(this);
 
     public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());

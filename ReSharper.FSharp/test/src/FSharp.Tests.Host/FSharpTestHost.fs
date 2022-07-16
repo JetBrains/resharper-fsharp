@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
-open System
 open System.Collections.Generic
 open System.Globalization
 open System.Linq

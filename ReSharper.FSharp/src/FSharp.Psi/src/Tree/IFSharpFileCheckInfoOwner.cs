@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     IReadOnlyList<FcsResolvedSymbolUse> GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null);
 
     /// Documents are currently used in F# files parsing for getting line index info.
-    /// This property is only set in FSharpElementFactory to make the document accessible without having source file
+    /// This property is only set in FSharpElementFactory to override the document for the context source file
     /// while opening chameleon expressions.
     [CanBeNull]
     IDocument StandaloneDocument { get; set; }

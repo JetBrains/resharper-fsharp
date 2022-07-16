@@ -14,10 +14,10 @@ type RemoveIndexerDotFix(warning: RedundantIndexerDotWarning) =
 
     override x.Text = "Remove redundant '.'"
 
-    override this.IsAvailable(cache) = 
+    override this.IsAvailable _ = 
         isValid indexerExpr
 
-    override this.ExecutePsiTransaction(solution) =
+    override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(indexerExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 

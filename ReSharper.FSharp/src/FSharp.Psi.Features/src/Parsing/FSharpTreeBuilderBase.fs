@@ -841,7 +841,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
-        | SynMemberSig.Member(SynValSig(attrs, id, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, _), flags, range) ->
+        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, _), flags, range) ->
             let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             x.ProcessReturnTypeInfo(arity, synType)
             let elementType =

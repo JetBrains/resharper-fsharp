@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Tooltips
 
 open JetBrains.DocumentModel.DataContext
-open JetBrains.ProjectModel
 open JetBrains.RdBackend.Common.Features.Daemon.Tooltips
 open JetBrains.RdBackend.Common.Features.Daemon.Tooltips.Request
 open JetBrains.ReSharper.Plugins.FSharp.Psi

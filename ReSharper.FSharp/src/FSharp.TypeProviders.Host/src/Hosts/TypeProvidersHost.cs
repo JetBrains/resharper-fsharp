@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators;
@@ -101,7 +100,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
         var typeProviderRdModel =
           myTypeProvidersContext.TypeProviderRdModelsCreator.CreateRdModel(typeProvider, envKey);
 
-        typeProvider.Invalidate += (_, __) =>
+        typeProvider.Invalidate += (_, _) =>
         {
           var tpId = typeProviderRdModel.EntityId;
           Dispose(tpId);

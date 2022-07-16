@@ -232,7 +232,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 if isNotNull indexerExpr && isNotNull indexerExpr.IndexerArgList then
                     Some(indexerExpr.IndexerArgList) else
 
-                let appExpr = (fsFile.GetNode<IPrefixAppExpr>(range))
+                let appExpr = fsFile.GetNode<IPrefixAppExpr>(range)
                 if isNotNull appExpr && appExpr.ArgumentExpression :? IListExpr then
                     Some(appExpr.ArgumentExpression) else
 

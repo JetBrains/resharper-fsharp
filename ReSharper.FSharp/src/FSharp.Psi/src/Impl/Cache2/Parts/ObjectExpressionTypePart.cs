@@ -10,7 +10,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  public class ObjectExpressionTypePart : FSharpTypePart<IObjExpr>, IFSharpClassPart, IFSharpClassLikePart
+  public class ObjectExpressionTypePart : FSharpTypePart<IObjExpr>, IFSharpClassPart
   {
     public ObjectExpressionTypePart([NotNull] IObjExpr declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, declaration.DeclaredName, MemberDecoration.DefaultValue, 0, cacheBuilder)
