@@ -23,7 +23,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public IType GetUnderlyingType()
     {
-      // todo: replace with actual type, F# compiler takes type from first valid case
+      if (GetDeclaration() is IFSharpTypeDeclaration { TypeRepresentation: IEnumRepresentation repr })
+        foreach (var memberDeclaration in repr.EnumCases)
+          if (memberDeclaration.Expression is ILiteralExpr expr)
+            return expr.Type();
+
       return TypeFactory.CreateUnknownType(GetPsiModule());
     }
 

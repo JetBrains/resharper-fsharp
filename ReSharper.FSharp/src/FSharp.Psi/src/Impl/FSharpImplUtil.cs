@@ -500,8 +500,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return PartKind.Class;
 
       foreach (var member in typeMembers)
-        if (!(member is IInterfaceInherit) && !(member is IAbstractMemberDeclaration))
+        if (member is not IInterfaceInherit && member is not IAbstractMemberDeclaration)
           return PartKind.Class;
+
+      if (declaration.PrimaryConstructorDeclaration != null)
+        return PartKind.Class;
 
       return PartKind.Interface;
     }

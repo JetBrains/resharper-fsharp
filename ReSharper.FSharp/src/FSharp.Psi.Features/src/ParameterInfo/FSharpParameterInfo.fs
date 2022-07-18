@@ -55,7 +55,7 @@ type IFSharpParameterInfoContext =
 
 
 [<AbstractClass>]
-type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharpSymbol and 'TParameter :> FSharpSymbol>
+type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharpSymbol>
         (range: range, symbol: 'TSymbol, symbolUse: FSharpSymbolUse, checkResults: FSharpCheckFileResults,
         reference: FSharpSymbolReference, mainSymbol: FSharpSymbol) =
     let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
@@ -77,7 +77,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
     member this.ParameterOwner = parametersOwner
 
     abstract ParameterGroups: IList<IList<'TParameter>>
-    abstract ReturnParameter: FSharpParameter option
+    abstract ReturnType: FSharpType option
     abstract IsConstructor: bool
     abstract XmlDoc: FSharpXmlDoc
 
@@ -272,9 +272,9 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                 if isNotNull parametersOwner then
                     appendNullabilityAttribute parametersOwner |> ignore
                 
-                match this.ReturnParameter with
-                | Some parameter ->
-                    text.Append(parameter.Type.FormatLayout(displayContext) |> richText) |> ignore
+                match this.ReturnType with
+                | Some returnType ->
+                    text.Append(returnType.FormatLayout(displayContext) |> richText) |> ignore
                 | _ -> ()
 
             text
@@ -297,7 +297,7 @@ type FcsMfvParameterInfoCandidate(range: range, mfv, symbolUse, checkResults, ex
     override val IsConstructor = mfv.IsConstructor
     override val ExtendedType = if mfv.IsExtensionMember then Some mfv.ApparentEnclosingEntity else None
     override val ParameterGroups = mfv.CurriedParameterGroups
-    override val ReturnParameter = Some mfv.ReturnParameter
+    override val ReturnType = Some mfv.ReturnParameter.Type
     override val XmlDoc = mfv.XmlDoc
 
     override this.GetParamName(parameter) = parameter.Name
@@ -324,7 +324,7 @@ type FcsUnionCaseParameterInfoCandidateBase<'TSymbol when 'TSymbol :> FSharpSymb
 
     override this.GetParamType(field) = field.FieldType
     override this.IsOptionalParam _ = false
-    override this.ReturnParameter = None
+    override this.ReturnType = None
     override this.ExtendedType = None
     override this.IsConstructor = true
 
@@ -345,6 +345,21 @@ type FcsExceptionParameterInfoCandidate(range, entity, symbolUse, checkResults, 
     override this.XmlDoc = entity.XmlDoc
 
 
+type FcsDelegateParameterInfoCandidate(range: range, entity: FSharpEntity, symbolUse, checkResults, expr, mainSymbol) =
+    inherit FcsParameterInfoCandidateBase<FSharpEntity, string option * FSharpType>(range, entity, symbolUse,
+        checkResults, expr, mainSymbol)
+
+    override val IsConstructor = true
+    override val ExtendedType = None
+    override val ParameterGroups = [| entity.FSharpDelegateSignature.DelegateArguments |]
+    override val ReturnType = Some entity.FSharpDelegateSignature.DelegateReturnType
+    override val XmlDoc = entity.XmlDoc
+
+    override this.GetParamName((name, _)) = name
+    override this.GetParamType((_, paramType)) = paramType
+    override this.IsOptionalParam _ = false
+
+
 [<AllowNullLiteral; AbstractClass>]
 type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caretOffset: DocumentOffset, context: 'TNode,
         reference: FSharpSymbolReference, symbolUses: FSharpSymbolUse list, checkResults,
@@ -362,6 +377,8 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                 Some(FcsUnionCaseParameterInfoCandidate(fcsRange, uc, item, checkResults, reference, mainSymbol) :> ICandidate)
             | :? FSharpEntity as e when e.IsFSharpExceptionDeclaration && not (e.FSharpFields.IsEmpty()) ->
                 Some(FcsExceptionParameterInfoCandidate(fcsRange, e, item, checkResults, reference, mainSymbol) :> ICandidate)
+            | :? FSharpEntity as e when e.IsDelegate ->
+                Some(FcsDelegateParameterInfoCandidate(fcsRange, e, item, checkResults, reference, mainSymbol) :> ICandidate)
             | _ -> None)
         |> Array.ofList
 

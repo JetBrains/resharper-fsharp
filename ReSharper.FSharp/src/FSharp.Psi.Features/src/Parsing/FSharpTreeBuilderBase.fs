@@ -9,7 +9,6 @@ open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -370,9 +369,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         | SynTypeDefnSimpleRepr.Enum(cases, range) ->
             let representationMark = x.Mark(range)
-
             for case in cases do
-                x.ProcessEnumCase case
+                x.ProcessEnumCase(case)
             x.Done(representationMark, ElementType.ENUM_REPRESENTATION)
 
         | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
@@ -446,9 +444,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
-    member x.ProcessEnumCase(SynEnumCase(attrs, _, _, _, XmlDoc xmlDoc, range, _)) =
+    member x.ProcessEnumCase(SynEnumCase(attrs, _, _, valueRange, XmlDoc xmlDoc, range, _)) =
         let mark = x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.BAR, range)
         x.ProcessAttributeLists(attrs)
+        x.MarkAndDone(valueRange, ElementType.LITERAL_EXPR)
         x.Done(range, mark, ElementType.ENUM_CASE_DECLARATION)
 
     member x.ProcessField(SynField(attrs, _, _, synType, _, XmlDoc xmlDoc, _, range)) elementType =
