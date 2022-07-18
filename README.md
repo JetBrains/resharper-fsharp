@@ -70,7 +70,7 @@ Note that the public CI server is not set up at this point but it's going to be 
 
 We suggest that you read docs on the two SDKs that this plugin uses:
 
-* [ReSharper SDK](https://www.jetbrains.com/help/resharper/sdk/README.html)
+* [ReSharper SDK](https://www.jetbrains.com/help/resharper/sdk/welcome.html)
 * [IntelliJ IDEA SDK](https://www.jetbrains.org/intellij/sdk/docs/welcome.html)
 
 
