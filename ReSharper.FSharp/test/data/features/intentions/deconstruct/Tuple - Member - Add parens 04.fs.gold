@@ -1,0 +1,2 @@
+﻿type T2() =
+    member this.M(a, b{caret} as x) = fst x

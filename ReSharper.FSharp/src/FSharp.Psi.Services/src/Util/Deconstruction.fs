@@ -172,6 +172,14 @@ module FSharpDeconstructionImpl =
         let pat, tuplePattern, names = deconstruction.DeconstructInnerPatterns(pat, usedNames)
         let pattern = ParenPatUtil.addParensIfNeeded tuplePattern
 
+        let parenPat = ParenPatNavigator.GetByPattern(pattern)
+        let patternDeclaration = ParametersPatternDeclarationNavigator.GetByPattern(parenPat)
+        let pattern =
+            if isNull pat && isNotNull patternDeclaration then
+                ParenPatUtil.addParens pattern
+            else
+                pattern
+
         let itemPatterns: seq<IFSharpPattern> =
             match pattern with
             | null -> Seq.empty

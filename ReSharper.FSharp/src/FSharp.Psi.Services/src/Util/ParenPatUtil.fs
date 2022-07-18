@@ -180,6 +180,14 @@ let escapesTuplePatParamDecl (context: IFSharpPattern) (innerPattern: IFSharpPat
         | _ -> false
     | _ -> false
 
+let addParens (pattern: IFSharpPattern) =
+    use writeLockCookie = WriteLockCookie.Create(pattern.IsPhysical())
+
+    let parenPattern = pattern.CreateElementFactory().CreatePattern("(_)", false) :?> IParenPat
+    let patternCopy = pattern.Copy()
+    let parenPattern = ModificationUtil.ReplaceChild(pattern, parenPattern)
+    parenPattern.SetPattern(patternCopy)
+
 let addParensIfNeeded (pattern: IFSharpPattern) =
     if isNull pattern then pattern else
 
@@ -187,24 +195,29 @@ let addParensIfNeeded (pattern: IFSharpPattern) =
     if contextPattern == pattern && needsParens contextPattern pattern then
         use writeLockCookie = WriteLockCookie.Create(pattern.IsPhysical())
 
-        let parenPattern = pattern.CreateElementFactory().CreatePattern("(_)", false) :?> IParenPat
-        let patternCopy = pattern.Copy()
-        let parenPattern = ModificationUtil.ReplaceChild(pattern, parenPattern)
-        let pattern = parenPattern.SetPattern(patternCopy)
+        let pattern = addParens pattern
+        let parenPattern = ParenPatNavigator.GetByPattern(pattern)
 
-        let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(parenPattern)
-        if isNotNull parametersOwnerPat then
-            let referenceName = parametersOwnerPat.ReferenceName
-            if isNull referenceName then () else
+        let removeSpace (nameNode: ITreeNode) (pattern: ITreeNode) =
+            if isNull nameNode then () else
 
-            let nextSibling = referenceName.NextSibling
-            if isInlineSpace nextSibling && nextSibling.NextSibling == parenPattern && nextSibling.GetTextLength() = 1 then
+            let nextSibling = nameNode.NextSibling
+            if isInlineSpace nextSibling && nextSibling.NextSibling == pattern && nextSibling.GetTextLength() = 1 then
                 let settingsStore = pattern.GetSettingsStoreWithEditorConfig()
                 let spaceBeforeUppercase =
                     settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeUppercaseInvocation)
 
                 if not spaceBeforeUppercase then
                     ModificationUtil.DeleteChild(nextSibling)
+
+        let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(parenPattern)
+        if isNotNull parametersOwnerPat then
+            removeSpace parametersOwnerPat.ReferenceName parenPattern
+
+        let patternDeclaration = ParametersPatternDeclarationNavigator.GetByPattern(parenPattern)
+        let memberDeclaration = MemberDeclarationNavigator.GetByParametersDeclaration(patternDeclaration)
+        if isNotNull memberDeclaration then
+            removeSpace memberDeclaration.Identifier patternDeclaration
 
         pattern
     else
