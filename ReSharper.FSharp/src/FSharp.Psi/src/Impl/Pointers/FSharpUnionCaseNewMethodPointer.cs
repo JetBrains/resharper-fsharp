@@ -8,7 +8,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers
     {
     }
 
-    public override FSharpUnionCaseNewMethod CreateGenerated(IUnionCase unionCase) =>
-      new FSharpUnionCaseNewMethod(unionCase);
+    public override FSharpUnionCaseNewMethod CreateGenerated(IUnionCase unionCase) => new(unionCase);
   }
 }

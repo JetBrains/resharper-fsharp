@@ -31,7 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     }
 
     public static ProxyProvidedAssembly Create(RdProvidedAssembly assembly, TypeProvidersConnection connection) =>
-      new ProxyProvidedAssembly(assembly, connection);
+      new(assembly, connection);
 
     public override string FullName => myAssembly.FullName;
 

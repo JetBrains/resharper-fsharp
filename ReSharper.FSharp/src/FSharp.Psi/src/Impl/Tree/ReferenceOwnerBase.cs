@@ -30,8 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected abstract FSharpSymbolReference CreateReference();
 
-    public override ReferenceCollection GetFirstClassReferences() =>
-      new ReferenceCollection(Reference);
+    public override ReferenceCollection GetFirstClassReferences() => new(Reference);
 
     public IFSharpReferenceOwner SetName(string name) =>
       FSharpImplUtil.SetName(this, name);

@@ -13,8 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       Type = type;
     }
 
-    public static ProxyProvidedVar Create(string name, bool isMutable, ProvidedType type) =>
-      new ProxyProvidedVar(name, isMutable, type);
+    public static ProxyProvidedVar Create(string name, bool isMutable, ProvidedType type) => new(name, isMutable, type);
 
     public override string Name { get; }
 

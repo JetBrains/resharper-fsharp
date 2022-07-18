@@ -119,8 +119,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       }
     }
 
-    public InvocableSignature GetSignature(ISubstitution substitution) =>
-      new InvocableSignature(this, substitution);
+    public InvocableSignature GetSignature(ISubstitution substitution) => new(this, substitution);
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.PROPERTY;

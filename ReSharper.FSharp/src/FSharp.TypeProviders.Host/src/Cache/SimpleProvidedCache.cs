@@ -5,7 +5,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 {
   public class SimpleProvidedCache<T> : IProvidedCache<(T model, int typeProviderId), int>
   {
-    private readonly Dictionary<int, (T model, int typeProviderId)> myEntities = new Dictionary<int, (T, int)>();
+    private readonly Dictionary<int, (T model, int typeProviderId)> myEntities = new();
 
     public void Add(int id, (T, int) value) => myEntities.Add(id, value);
 

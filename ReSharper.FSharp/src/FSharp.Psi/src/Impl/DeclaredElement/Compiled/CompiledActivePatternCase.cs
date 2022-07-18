@@ -49,7 +49,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled
       Index = index;
     }
 
-    public override CompiledActivePatternCase CreateGenerated(IMethod fsElement) =>
-      new CompiledActivePatternCase(fsElement, ShortName, Index);
+    public override CompiledActivePatternCase CreateGenerated(IMethod fsElement) => new(fsElement, ShortName, Index);
   }
 }

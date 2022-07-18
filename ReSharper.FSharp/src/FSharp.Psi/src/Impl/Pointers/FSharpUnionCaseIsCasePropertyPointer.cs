@@ -10,7 +10,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers
     {
     }
 
-    public override FSharpUnionCaseIsCaseProperty CreateGenerated(IUnionCase unionCase) =>
-      new FSharpUnionCaseIsCaseProperty(unionCase);
+    public override FSharpUnionCaseIsCaseProperty CreateGenerated(IUnionCase unionCase) => new(unionCase);
   }
 }

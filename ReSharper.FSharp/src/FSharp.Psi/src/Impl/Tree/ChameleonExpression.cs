@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public int OriginalStartOffset { get; }
     public int OriginalLineStart { get; }
 
-    [NotNull] private readonly object mySyncObject = new object();
+    [NotNull] private readonly object mySyncObject = new();
     private bool myOpened;
 
     public ChameleonExpression([CanBeNull] SynExpr expr, int startOffset, int lineStart)

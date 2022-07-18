@@ -35,8 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.PROPERTY;
 
-    public InvocableSignature GetSignature(ISubstitution substitution) =>
-      new InvocableSignature(this, substitution);
+    public InvocableSignature GetSignature(ISubstitution substitution) => new(this, substitution);
 
     public IEnumerable<IParametersOwnerDeclaration> GetParametersOwnerDeclarations() =>
       EmptyList<IParametersOwnerDeclaration>.Instance;

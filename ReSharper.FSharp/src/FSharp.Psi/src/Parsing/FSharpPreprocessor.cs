@@ -87,7 +87,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     private class ExpressionParser
     {
-      private static readonly NodeTypeSet ourSkippedTokens = new NodeTypeSet(
+      private static readonly NodeTypeSet ourSkippedTokens = new(
         FSharpTokenType.WHITESPACE,
         FSharpTokenType.PP_IF_SECTION);
 

@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class LiteralExpr
   {
     private static readonly NodeTypeSet LiteralTokenTypes =
-      new NodeTypeSet(
+      new(
         FSharpTokenType.TRUE,
         FSharpTokenType.FALSE,
         FSharpTokenType.IEEE32,

@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
   public static class RiderPluginAssemblyResolver
   {
     private const string AdditionalProbingPathsEnvVar = "RIDER_PLUGIN_ADDITIONAL_PROBING_PATHS";
-    private static readonly List<string> OurAdditionalProbingPaths = new List<string>();
+    private static readonly List<string> OurAdditionalProbingPaths = new();
 
     static RiderPluginAssemblyResolver()
     {

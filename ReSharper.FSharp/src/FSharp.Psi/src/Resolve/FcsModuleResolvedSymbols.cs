@@ -8,12 +8,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
   public class FcsModuleResolvedSymbols
   {
     private readonly FcsFileResolvedSymbols[] myFileResolvedSymbols;
-    private readonly JetFastSemiReenterableRWLock myLock = new JetFastSemiReenterableRWLock();
+    private readonly JetFastSemiReenterableRWLock myLock = new();
 
     public bool IsScript { get; }
     [CanBeNull] public FcsProject FcsProject { get; }
 
-    public static readonly FcsModuleResolvedSymbols Empty = new FcsModuleResolvedSymbols(null);
+    public static readonly FcsModuleResolvedSymbols Empty = new(null);
 
     public FcsModuleResolvedSymbols([CanBeNull] FcsProject fcsProject, bool isScript = false)
     {

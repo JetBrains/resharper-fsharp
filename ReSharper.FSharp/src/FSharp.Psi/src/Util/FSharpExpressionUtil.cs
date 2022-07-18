@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   public static class FSharpExpressionUtil
   {
     private static readonly NodeTypeSet SimpleValueExpressionNodeTypes =
-      new NodeTypeSet(
+      new(
         ElementType.LITERAL_EXPR,
         ElementType.UNIT_EXPR,
         ElementType.ARRAY_EXPR,

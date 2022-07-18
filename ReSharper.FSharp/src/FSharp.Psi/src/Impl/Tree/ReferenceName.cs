@@ -26,8 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IFSharpIdentifier FSharpIdentifier => Identifier;
 
-    protected override FSharpSymbolReference CreateReference() =>
-      new FSharpSymbolReference(this);
+    protected override FSharpSymbolReference CreateReference() => new(this);
 
     public string ShortName => FSharpIdentifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     public string QualifiedName => this.GetQualifiedName();

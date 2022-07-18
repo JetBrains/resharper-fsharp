@@ -10,16 +10,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
   {
     protected override RdCustomAttributeData CreateRdModelInternal(CustomAttributeData providedModel,
       int typeProviderId) =>
-      new RdCustomAttributeData(
+      new(
         providedModel.Constructor.DeclaringType?.FullName ?? "",
         providedModel.NamedArguments?.Select(Convert).ToArray() ?? Array.Empty<RdCustomAttributeNamedArgument>(),
         providedModel.ConstructorArguments.Select(Convert).ToArray());
 
     private static RdCustomAttributeNamedArgument Convert(CustomAttributeNamedArgument argument) =>
-      new RdCustomAttributeNamedArgument(argument.MemberName, Convert(argument.TypedValue));
+      new(argument.MemberName, Convert(argument.TypedValue));
 
     private static RdCustomAttributeTypedArgument Convert(CustomAttributeTypedArgument argument) =>
-      new RdCustomAttributeTypedArgument(argument.ArgumentType.IsArray
+      new(argument.ArgumentType.IsArray
         ? null
         : PrimitiveTypesBoxer.BoxToClientStaticArg(argument.Value));
   }

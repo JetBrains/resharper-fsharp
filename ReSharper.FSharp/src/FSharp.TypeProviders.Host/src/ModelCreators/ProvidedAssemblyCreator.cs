@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
     }
 
     protected override RdProvidedAssembly CreateRdModelInternal(ProvidedAssembly providedModel, int entityId, int _) =>
-      new RdProvidedAssembly(providedModel.FullName, GetName(providedModel), entityId);
+      new(providedModel.FullName, GetName(providedModel), entityId);
 
     private static RdAssemblyName GetName(ProvidedAssembly providedModel)
     {

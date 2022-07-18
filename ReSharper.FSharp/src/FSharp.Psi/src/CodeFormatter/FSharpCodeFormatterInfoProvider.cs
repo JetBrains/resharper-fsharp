@@ -31,10 +31,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     }
 
     protected readonly NodeTypeSet AccessModifiers =
-      new NodeTypeSet(FSharpTokenType.PUBLIC, FSharpTokenType.INTERNAL, FSharpTokenType.PRIVATE);
+      new(FSharpTokenType.PUBLIC, FSharpTokenType.INTERNAL, FSharpTokenType.PRIVATE);
 
     protected readonly NodeTypeSet Comments =
-      new NodeTypeSet(FSharpTokenType.LINE_COMMENT, FSharpTokenType.BLOCK_COMMENT);
+      new(FSharpTokenType.LINE_COMMENT, FSharpTokenType.BLOCK_COMMENT);
 
     protected override void Initialize()
     {

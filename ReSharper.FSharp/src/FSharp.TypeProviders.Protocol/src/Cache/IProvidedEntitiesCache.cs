@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     protected readonly TypeProvidersContext TypeProvidersContext;
     protected readonly ConcurrentDictionary<TKey, T> Entities;
     protected readonly IDictionary<int, List<TKey>> EntitiesPerProvider;
-    private readonly object myEntitiesPerProviderLockObj = new object();
+    private readonly object myEntitiesPerProviderLockObj = new();
     private SpinWaitLock myEntitiesLock;
 
     protected ProvidedEntitiesCacheBase(TypeProvidersContext typeProvidersContext)

@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
   public class TypeProvidersCache
   {
     private readonly BidirectionalMapOnDictionary<int, (ITypeProvider typeProvider, string envKey)> myTypeProviders =
-      new BidirectionalMapOnDictionary<int, (ITypeProvider, string)>(EqualityComparer<int>.Default,
+      new(EqualityComparer<int>.Default,
         new TypeProviderComparer());
 
     public ITypeProvider Get(int typeProviderId) => myTypeProviders[typeProviderId].typeProvider;

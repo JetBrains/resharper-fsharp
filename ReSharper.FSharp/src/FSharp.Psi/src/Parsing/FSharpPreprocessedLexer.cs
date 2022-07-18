@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     private readonly ILexer<int> myLexer;
     private readonly FSharpPreprocessor myPreprocessor;
     private readonly HashSet<string> myDefinedConstants;
-    private readonly PreprocessorState myState = new PreprocessorState();
+    private readonly PreprocessorState myState = new();
 
     public FSharpPreprocessedLexer(ILexer lexer, FSharpPreprocessor preprocessor, HashSet<string> definedConstants)
     {
@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     }
 
     private LexerState DeadCodeToken(int dumpStart) =>
-      new LexerState(FSharpTokenType.DEAD_CODE, dumpStart, myLexer.TokenStart, myLexer.CurrentPosition);
+      new(FSharpTokenType.DEAD_CODE, dumpStart, myLexer.TokenStart, myLexer.CurrentPosition);
 
     private TokenNodeType PreprocessInactiveBranch()
     {
@@ -280,8 +280,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         }
       }
 
-      private readonly Stack<PreprocessorBlockState> myStack = new Stack<PreprocessorBlockState>();
-      private readonly Queue<LexerState> myQueue = new Queue<LexerState>();
+      private readonly Stack<PreprocessorBlockState> myStack = new();
+      private readonly Queue<LexerState> myQueue = new();
 
       public IEnumerable<LexerState> LexerStates() => myQueue;
 

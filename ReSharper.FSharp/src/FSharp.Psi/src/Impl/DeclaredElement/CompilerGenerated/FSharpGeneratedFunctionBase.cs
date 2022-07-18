@@ -10,8 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
   {
     public override MemberHidePolicy HidePolicy => MemberHidePolicy.HIDE_BY_SIGNATURE;
 
-    public InvocableSignature GetSignature(ISubstitution substitution) =>
-      new InvocableSignature(this, substitution);
+    public InvocableSignature GetSignature(ISubstitution substitution) => new(this, substitution);
 
     public override bool Equals(object obj)
     {

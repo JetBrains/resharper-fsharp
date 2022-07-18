@@ -110,8 +110,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public IList<TypeMemberInstance> GetHiddenMembers() => HiddenMemberImpl.GetHiddenMembers(this);
 
-    public AccessibilityDomain AccessibilityDomain =>
-      new AccessibilityDomain(AccessibilityDomain.AccessibilityDomainType.PUBLIC, null);
+    public AccessibilityDomain AccessibilityDomain => new(AccessibilityDomain.AccessibilityDomainType.PUBLIC, null);
 
     public MemberHidePolicy HidePolicy => this is IParametersOwner
       ? MemberHidePolicy.HIDE_BY_SIGNATURE

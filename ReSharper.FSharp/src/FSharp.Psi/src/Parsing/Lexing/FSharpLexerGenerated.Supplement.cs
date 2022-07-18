@@ -49,8 +49,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
   partial class FSharpLexerGenerated : ILexer<FSharpLexerState>
   {
     private TokenNodeType myCurrentTokenType;
-    private readonly ReusableBufferRange myBuffer = new ReusableBufferRange();
-    protected static readonly LexerDictionary<TokenNodeType> Keywords = new LexerDictionary<TokenNodeType>();
+    private readonly ReusableBufferRange myBuffer = new();
+    protected static readonly LexerDictionary<TokenNodeType> Keywords = new();
 
     private int myNestedCommentLevel;
     private int myParenLevel;

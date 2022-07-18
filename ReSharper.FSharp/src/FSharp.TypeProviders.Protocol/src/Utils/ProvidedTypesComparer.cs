@@ -69,6 +69,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
     public int GetHashCode(ProvidedType x) => x.Name.GetHashCode();
 
-    public static readonly ProvidedTypesComparer Instance = new ProvidedTypesComparer();
+    public static readonly ProvidedTypesComparer Instance = new();
   }
 }

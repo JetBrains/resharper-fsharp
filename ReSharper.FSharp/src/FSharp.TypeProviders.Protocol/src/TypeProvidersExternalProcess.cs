@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       typeof(TypeProvidersExternalProcess).Assembly.GetPath().Directory.Parent / "typeProviders";
 
     protected override RdFSharpTypeProvidersModel CreateModel(Lifetime lifetime, IProtocol protocol) =>
-      new RdFSharpTypeProvidersModel(lifetime, protocol);
+      new(lifetime, protocol);
 
     protected override TypeProvidersConnection CreateConnection(Lifetime lifetime,
       RdFSharpTypeProvidersModel model, IProtocol protocol, StartupOutputWriter outputWriter, int processId,

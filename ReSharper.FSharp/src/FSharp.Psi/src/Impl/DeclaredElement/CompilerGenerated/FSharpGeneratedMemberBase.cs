@@ -36,8 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public Hash? CalcHash() => null;
     public ITypeElement ContainingType => GetContainingType();
 
-    public AccessibilityDomain AccessibilityDomain =>
-      new AccessibilityDomain(AccessibilityDomain.AccessibilityDomainType.PUBLIC, null);
+    public AccessibilityDomain AccessibilityDomain => new(AccessibilityDomain.AccessibilityDomainType.PUBLIC, null);
 
     public virtual MemberHidePolicy HidePolicy => MemberHidePolicy.HIDE_BY_NAME;
 

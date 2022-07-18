@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private const string OpName = "FSharpFileResolvedSymbols";
 
     private ResolvedSymbols mySymbols;
-    private readonly object myLock = new object();
+    private readonly object myLock = new();
 
     [NotNull] public IPsiSourceFile SourceFile { get; }
 
@@ -309,7 +309,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private class ResolvedSymbols
     {
-      public static readonly ResolvedSymbols Empty = new ResolvedSymbols();
+      public static readonly ResolvedSymbols Empty = new();
 
       [NotNull] internal readonly CompactMap<int, FcsResolvedSymbolUse> Declarations;
       [NotNull] internal readonly CompactMap<int, FcsResolvedSymbolUse> Uses;
@@ -324,7 +324,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private class ParenMatcher : BracketMatcher
     {
       private static readonly Pair<TokenNodeType, TokenNodeType>[] Parens =
-        {new Pair<TokenNodeType, TokenNodeType>(FSharpTokenType.LESS, FSharpTokenType.GREATER)};
+        {new(FSharpTokenType.LESS, FSharpTokenType.GREATER)};
 
       public ParenMatcher() : base(Parens)
       {
