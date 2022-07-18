@@ -1,0 +1,10 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  DocComment(type:LINE_COMMENT, text:///Kek)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  INamedNamespaceDeclaration
+    FSharpTokenType+NamespaceTokenElement(type:NAMESPACE, text:namespace)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpIdentifierToken(type:IDENTIFIER, text:Ns1)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

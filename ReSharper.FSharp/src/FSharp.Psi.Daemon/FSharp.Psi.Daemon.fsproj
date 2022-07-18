@@ -52,6 +52,7 @@
     <Compile Include="src\Analyzers\IfExpressionAnalyzer.fs" />
     <Compile Include="src\Analyzers\AsPatAnalyzer.fs" />
     <Compile Include="src\Analyzers\IndexerExprAnalyzer.fs" />
+    <Compile Include="src\Analyzers\XmlDocAnalzyer.fs" />
   </ItemGroup>
 
   <ItemGroup>

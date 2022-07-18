@@ -73,7 +73,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         x.Mark()
 
     member x.Mark() =
-        /// The base member is protected and cannot be used in closures.
+        // The base member is protected and cannot be used in closures.
         base.Mark()
 
     member x.Done(mark, elementType) =

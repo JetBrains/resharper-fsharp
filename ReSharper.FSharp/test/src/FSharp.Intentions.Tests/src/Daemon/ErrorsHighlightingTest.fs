@@ -1,10 +1,12 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
 open JetBrains.ReSharper.Daemon.SyntaxHighlighting
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -40,3 +42,13 @@ type ErrorsHighlightingTest() =
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp46)>]
     [<Test>] member x.``Self id - Not available 01``() = x.DoNamedTest()
+
+    [<HighlightOnly(typeof<InvalidXmlDocPositionWarning>)>]
+    [<Test>] member x.``Invalid XmlDoc position 01``() = x.DoNamedTest()
+
+    [<HighlightOnly(typeof<InvalidXmlDocPositionWarning>)>]
+    [<Test>] member x.``Invalid XmlDoc position 02 - Not available``() = x.DoNamedTest()
+
+    [<TestCustomInspectionSeverity(InvalidXmlDocPositionWarningHighlightingId, Severity.ERROR)>]
+    [<HighlightOnly(typeof<InvalidXmlDocPositionWarning>)>]
+    [<Test>] member x.``Invalid XmlDoc position 03 - As error``() = x.DoNamedTest()

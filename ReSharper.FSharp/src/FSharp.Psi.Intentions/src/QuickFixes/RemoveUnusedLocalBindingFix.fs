@@ -66,7 +66,7 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
                 let first =
                     letBindings
                     |> skipMatchingNodesBefore isInlineSpaceOrComment
-                    |> getThisOrPrevNewLIne
+                    |> getThisOrPrevNewLine
 
                 let last =
                     letBindings

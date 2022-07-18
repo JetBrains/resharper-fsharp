@@ -1,0 +1,13 @@
+﻿module Test
+
+|/// Uwu|(0)
+()
+
+------------------------------------------------
+0: XML comment is not placed on a valid language element.
+QUICKFIXES:
+Replace XML comment with line comment
+--Replace XML comment with line comment in file
+--Replace XML comment with line comment in project
+--Replace XML comment with line comment in solution
+Remove XML comment

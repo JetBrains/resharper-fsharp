@@ -49,6 +49,6 @@ type RemoveSubsequentFix(expr: IFSharpExpression) =
             let first =
                 firstExprToRemove
                 |> skipMatchingNodesBefore isInlineSpace
-                |> getThisOrPrevNewLIne
+                |> getThisOrPrevNewLine
 
             ModificationUtil.DeleteChildRange(first, seqExpr.LastChild)

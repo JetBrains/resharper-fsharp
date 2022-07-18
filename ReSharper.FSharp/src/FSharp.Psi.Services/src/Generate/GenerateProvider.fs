@@ -295,7 +295,7 @@ type FSharpOverridingMembersBuilder() =
 
         let anchor =
             if isAtEmptyLine anchor then
-                let first = getFirstMatchingNodeBefore isInlineSpace anchor |> getThisOrPrevNewLIne
+                let first = getFirstMatchingNodeBefore isInlineSpace anchor |> getThisOrPrevNewLine
                 let last = getLastMatchingNodeAfter isInlineSpace anchor
 
                 let anchor = first.PrevSibling
