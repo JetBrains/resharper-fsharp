@@ -380,7 +380,7 @@ fromErrorPat options { stubBase="FSharpPatternBase"; }:
 
 
 interface fSharpExpression:
-  parenExpr |
+  parenOrBeginEndExpr |
   quoteExpr |
   constExpr |
   typedLikeExpr |
@@ -489,10 +489,19 @@ interface castExpr:
   upcastExpr |
   downcastExpr;
 
+interface parenOrBeginEndExpr:
+  parenExpr |
+  beginEndExpr;
+
 parenExpr options { stubBase="FSharpExpressionBase"; }:
   LPAREN<LPAREN, LeftParen>
   fSharpExpression<EXPR, InnerExpression>
   RPAREN<RPAREN, RightParen>;
+
+beginEndExpr options { stubBase="FSharpExpressionBase"; }:
+  BEGIN<FSHARP_BEGIN, Begin>
+  fSharpExpression<EXPR, InnerExpression>
+  END<FSHARP_END, End>;
 
 quoteExpr options { stubBase="FSharpExpressionBase"; }:
   (

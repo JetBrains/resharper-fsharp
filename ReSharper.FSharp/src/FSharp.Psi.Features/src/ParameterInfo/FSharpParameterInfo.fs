@@ -429,7 +429,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                         if parameterGroups[argIndex] = 1 then acc else
                         if arg :? IUnitExpr && caretOffset.Offset < argEnd.Offset then acc else
 
-                        match arg.IgnoreInnerParens(true) with
+                        match arg.IgnoreInnerParens(singleLevel = true) with
                         | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct ->
                             let commaIndex =
                                 let commas = tupleExpr.Commas
@@ -563,7 +563,7 @@ type FSharpPrefixAppParameterInfoContext(caretOffset, context, reference, symbol
         let argExpr = appExpr.ArgumentExpression
 
         let args =
-            match argExpr.IgnoreInnerParens(true) with
+            match argExpr.IgnoreInnerParens(singleLevel = true) with
             | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct -> tupleExpr.Expressions
             | :? IBinaryAppExpr as binaryAppExpr -> TreeNodeCollection([| binaryAppExpr |])
             | _ -> TreeNodeCollection.Empty
@@ -886,7 +886,7 @@ type FSharpParameterInfoContextFactory() =
                     | :? ITupleExpr as tupleExpr ->
                         not tupleExpr.IsStruct &&
 
-                        let tupleExpr = tupleExpr.IgnoreParentParens(true)
+                        let tupleExpr = tupleExpr.IgnoreParentParens(singleLevel = true)
                         isArgExpression tupleExpr
 
                     | expr ->

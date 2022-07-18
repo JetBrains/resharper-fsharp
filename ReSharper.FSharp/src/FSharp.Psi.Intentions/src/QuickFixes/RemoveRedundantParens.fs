@@ -88,7 +88,7 @@ type RemoveRedundantParenExprFix(warning: RedundantParenExprWarning) =
         base.IsAvailable(var0) &&
 
         let innerExpr = warning.ParenExpr.InnerExpression
-        let context = innerExpr.IgnoreParentParens()
+        let context = innerExpr.IgnoreParentParens(includingBeginEndExpr = false)
 
         not (needsParens context innerExpr)
 

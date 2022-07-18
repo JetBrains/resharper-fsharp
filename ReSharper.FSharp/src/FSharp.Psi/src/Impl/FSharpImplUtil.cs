@@ -721,9 +721,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [CanBeNull]
-    public static IFSharpExpression IgnoreParentParens([CanBeNull] this IFSharpExpression fsExpr, 
-        bool singleLevel = false) =>
-      fsExpr.GetOutermostNode<IFSharpExpression, IParenExpr>(singleLevel);
+    public static IFSharpExpression IgnoreParentParens([CanBeNull] this IFSharpExpression fsExpr,
+      bool singleLevel = false, bool includingBeginEndExpr = true) =>
+      includingBeginEndExpr
+        ? fsExpr.GetOutermostNode<IFSharpExpression, IParenOrBeginEndExpr>(singleLevel)
+        : fsExpr.GetOutermostNode<IFSharpExpression, IParenExpr>(singleLevel);
 
     [CanBeNull]
     public static ITypeUsage IgnoreParentParens([CanBeNull] this ITypeUsage typeUsage, bool singleLevel = false) =>
@@ -735,12 +737,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : treeNode.Parent;
 
     [CanBeNull]
-    public static IFSharpExpression IgnoreInnerParens([CanBeNull] this IFSharpExpression fsExpr, bool singleLevel = false)
+    public static IFSharpExpression IgnoreInnerParens([CanBeNull] this IFSharpExpression fsExpr,
+      bool singleLevel = false, bool includingBeginEndExpr = true)
     {
       if (fsExpr == null)
         return null;
 
-      while (fsExpr is IParenExpr { InnerExpression: { } innerExpr })
+      while (fsExpr is IParenOrBeginEndExpr { InnerExpression: { } innerExpr } &&
+             (includingBeginEndExpr || fsExpr is IParenExpr))
       {
         if (singleLevel)
           return innerExpr;

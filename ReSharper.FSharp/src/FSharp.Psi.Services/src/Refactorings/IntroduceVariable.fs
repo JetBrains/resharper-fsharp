@@ -373,7 +373,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
                 let usage =
                     // remove parens in `not ({selstart}v.M(){selend})`, so it becomes `not x`
-                    let argExpr = usage.IgnoreParentParens()
+                    let argExpr = usage.IgnoreParentParens(includingBeginEndExpr = false)
                     let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(argExpr)
                     let funExpr = if isNotNull appExpr then appExpr.FunctionExpression else null
 
@@ -570,7 +570,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                     | :? IReferenceExpr as refExpr -> isAllowedRefExpr false refExpr
                     | _ -> true
 
-            | :? IParenExpr as parenExpr ->
+            | :? IParenOrBeginEndExpr as parenExpr ->
                 isNull (NewExprNavigator.GetByArgumentExpression(expr)) &&
                 isAllowedExpr parenExpr.InnerExpression
 
@@ -579,7 +579,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             | :? IFromErrorExpr -> false
 
             | :? ITupleExpr ->
-                isNull (NewExprNavigator.GetByArgumentExpression(ParenExprNavigator.GetByInnerExpression(expr))) &&
+                isNull (NewExprNavigator.GetByArgumentExpression(ParenOrBeginEndExprNavigator.GetByInnerExpression(expr))) &&
                 
                 let listExpr = ListExprNavigator.GetByExpression(expr.IgnoreParentParens())
                 let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(listExpr)

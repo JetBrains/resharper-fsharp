@@ -34,7 +34,7 @@ module GenerateLambdaInfo =
 
     let needsParens (refExpr: IReferenceExpr) =
         // todo: escape tuple expressions, check expected types and position
-        isNull (ParenExprNavigator.GetByInnerExpression(refExpr))
+        isNull (ParenOrBeginEndExprNavigator.GetByInnerExpression(refExpr))
 
 type GenerateLambdaInfo(text, paramNames: string list list) =
     inherit TextualInfo(text, GenerateLambdaInfo.CreateLambda)

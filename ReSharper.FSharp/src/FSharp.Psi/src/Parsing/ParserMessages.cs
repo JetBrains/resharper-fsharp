@@ -74,6 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_ELSE_CLAUSE = "";
     public const string IDS_RECORD_LIKE_EXPR = "";
     public const string IDS_RANGE_LIKE_EXPR = "";
+    public const string IDS_PAREN_OR_BEGIN_END_EXPR = "";
 
     public static string GetString(string id) => id;
     public static string GetExpectedMessage(string s) => string.Empty;

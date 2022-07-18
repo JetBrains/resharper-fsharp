@@ -408,7 +408,7 @@ type FSharpNamingService(language: FSharpLanguage) =
 
     override x.SuggestRoots(treeNode: ITreeNode, useExpectedTypes, policyProvider) =
         match treeNode with
-        | :? IParenExpr as parenExpr ->
+        | :? IParenOrBeginEndExpr as parenExpr ->
             x.SuggestRoots(parenExpr.InnerExpression, useExpectedTypes, policyProvider)
 
         | :? ITypedExpr as typedExpr ->

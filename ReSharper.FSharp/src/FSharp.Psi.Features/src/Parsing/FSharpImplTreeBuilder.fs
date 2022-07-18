@@ -763,8 +763,10 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushRange(range, ElementType.REFERENCE_EXPR)
             x.ProcessActivePatternExpr(ident)
 
-        | SynExpr.Paren(expr = expr) ->
-            x.PushRangeAndProcessExpression(expr, range, ElementType.PAREN_EXPR)
+        | SynExpr.Paren(expr, leftParenRange, _, _) ->
+            let isParen = leftParenRange.EndColumn - leftParenRange.StartColumn = 1
+            let elementType = if isParen then ElementType.PAREN_EXPR else ElementType.BEGIN_END_EXPR
+            x.PushRangeAndProcessExpression(expr, range, elementType)
 
         | SynExpr.Quote(_, _, expr, _, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.QUOTE_EXPR)

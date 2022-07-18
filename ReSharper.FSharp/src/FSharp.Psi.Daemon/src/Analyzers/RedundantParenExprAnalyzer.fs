@@ -22,7 +22,7 @@ type RedundantParenExprAnalyzer() =
         if isNull innerExpr then () else
         if precedence innerExpr < 13 && data.GetData(redundantParensEnabledKey) != BooleanBoxes.True then () else
 
-        let context = parenExpr.IgnoreParentParens()
+        let context = parenExpr.IgnoreParentParens(includingBeginEndExpr = false)
         if escapesTupleAppArg context innerExpr then () else
 
         let allowHighPrecedenceAppParens () = data.AllowHighPrecedenceAppParens

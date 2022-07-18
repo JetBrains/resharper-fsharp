@@ -175,6 +175,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Active pattern 04 - Qualified``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Paren 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Paren 02 - begin end``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Quote 01 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Quote 02 - Untyped``() = x.DoNamedTest()
 

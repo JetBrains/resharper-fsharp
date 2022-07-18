@@ -243,7 +243,7 @@ let literalsRequiringParens =
 
 let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: IFSharpExpression) (expr: IFSharpExpression) =
     if escapesTupleAppArg context expr then true else
-    if expr :? IParenExpr then false else
+    if expr :? IParenOrBeginEndExpr then false else
 
     let expr = expr.IgnoreInnerParens()
     if isNull expr|| contextRequiresParens context then true else
@@ -416,6 +416,6 @@ let addParens (expr: IFSharpExpression) =
 
 
 let addParensIfNeeded (expr: IFSharpExpression) =
-    let context = expr.IgnoreParentParens()
+    let context = expr.IgnoreParentParens(includingBeginEndExpr = false)
     if context != expr || not (needsParens context expr) then expr else
     addParens expr
