@@ -86,7 +86,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public static FSharpComment CreateLineComment(string text) =>
-      new FSharpComment(FSharpTokenType.LINE_COMMENT, "//" + text);
+      new(FSharpTokenType.LINE_COMMENT, "//" + text);
   }
 
   public class DocComment : FSharpComment
