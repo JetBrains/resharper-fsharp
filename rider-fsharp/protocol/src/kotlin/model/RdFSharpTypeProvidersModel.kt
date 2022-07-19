@@ -71,8 +71,14 @@ object RdFSharpTypeProvidersModel : Root() {
 
     private val RdCustomAttributeData = structdef {
         field("FullName", string)
-        field("NamedArguments", array(RdCustomAttributeNamedArgument))
-        field("ConstructorArguments", array(RdCustomAttributeTypedArgument))
+        field("NamedArguments", structdef("NamedArgumentsResult") {
+            field("Arguments", array(RdCustomAttributeNamedArgument))
+            field("Error", string.nullable)
+        })
+        field("ConstructorArguments", structdef("ConstructorArgumentsResult") {
+            field("Arguments", array(RdCustomAttributeTypedArgument))
+            field("Error", string.nullable)
+        })
     }
 
     private val RdTypeProviderProcessModel = aggregatedef("RdTypeProviderProcessModel") {
