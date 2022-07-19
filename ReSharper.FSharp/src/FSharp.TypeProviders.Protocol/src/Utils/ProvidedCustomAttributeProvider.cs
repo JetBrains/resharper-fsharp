@@ -73,8 +73,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
     }
 
     public string[] GetXmlDocAttributes(RdCustomAttributeData[] data) =>
-      data.Where(t => t.FullName == TypeProviderXmlDocAttribute && t.ConstructorArguments.Length == 1)
-        .Select(t => t.ConstructorArguments[0].Value.Unbox() is string s ? s : null)
+      data.Where(t => t.FullName == TypeProviderXmlDocAttribute && GetOrThrow(t.ConstructorArguments).Length == 1)
+        .Select(t => GetOrThrow(t.ConstructorArguments)[0].Value.Unbox() as string)
         .Where(t => t != null)
         .ToArray();
 
@@ -88,11 +88,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
       if (attribute == null) return null;
 
       var constructorArgs =
-        ListModule.OfSeq(
-          attribute.ConstructorArguments.Select(t => Option(t.Value.Unbox())));
+        ListModule.OfSeq(GetOrThrow(attribute.ConstructorArguments).Select(t => Option(t.Value.Unbox())));
 
       var namedArgs =
-        ListModule.OfSeq(attribute.NamedArguments.Select(t =>
+        ListModule.OfSeq(GetOrThrow(attribute.NamedArguments).Select(t =>
           Tuple.Create(t.MemberName, Option(t.TypedValue.Value.Unbox()))));
 
       return Tuple.Create(constructorArgs, namedArgs);
@@ -106,8 +105,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
       };
 
     private static object TryGetNamedArgumentValue(RdCustomAttributeData attribute, string namedAttributeName) =>
-      attribute.NamedArguments
+      GetOrThrow(attribute.NamedArguments)
         .FirstOrDefault(t => t.MemberName == namedAttributeName)?.TypedValue.Value
         .Unbox();
+
+    private static RdCustomAttributeNamedArgument[] GetOrThrow(NamedArgumentsResult r) =>
+      r.Error is { } error ? throw new Exception(error) : r.Arguments;
+
+    private static RdCustomAttributeTypedArgument[] GetOrThrow(ConstructorArgumentsResult r) =>
+      r.Error is { } error ? throw new Exception(error) : r.Arguments;
   }
 }
