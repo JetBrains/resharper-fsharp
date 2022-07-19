@@ -1,0 +1,4 @@
+﻿let f x : bool =
+    match () with
+    | _ -> ""
+    | _ -> true{caret}

@@ -43,6 +43,11 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
         // The tuples have differing lengths of 2 and 3
         ReplaceReturnTypeFix(error.Expr, error.ActualType)
 
+    new (error: MatchClauseWrongTypeError) =
+        // All branches of a pattern match expression must return values implicitly convertible to the type of the first branch, which here is 'int'.
+        // This branch returns a value of type 'string'.
+        ReplaceReturnTypeFix(error.Expr, error.ActualType)
+
     override this.Text =
         let name = 
             match binding.GetHeadPatternName() with

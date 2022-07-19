@@ -538,6 +538,19 @@
     <Behavour overlapResolvePolicy="NONE"/>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="MatchClauseWrongType" ID="FS0001: 'match' clause has wrong type">
+    <Parameter type="string" name="expectedType"/>
+    <Parameter type="string" name="actualType"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceReturnTypeFix</QuickFix>
+  </Error>
+
   <Warning compilerGroup="FSharpErrors" name="InvalidXmlDocPosition" ID="FS3520: XML comment is not placed on a valid language element">
     <Parameter type="DocComment" name="comment"/>
     <Message value="XML comment is not placed on a valid language element."/>

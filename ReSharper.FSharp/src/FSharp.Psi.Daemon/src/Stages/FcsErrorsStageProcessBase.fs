@@ -90,6 +90,7 @@ module FSharpErrors =
     let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
     let [<Literal>] typeDoesNotMatchMessage = "Type mismatch. Expecting a\n    '(.+)'    \nbut given a\n    '(.+)'"
     let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
+    let [<Literal>] matchClauseHasWrongTypeMessage = "All branches of a pattern match expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
     let [<Literal>] ifBranchSatisfyContextTypeRequirements = "The 'if' expression needs to have type '(.+)' to satisfy context type requirements\. It currently has type '(.+)'"
     let [<Literal>] typeMisMatchTupleLengths = "Type mismatch. Expecting a\n    '(.+)'    \nbut given a\n    '(.+)'    \nThe tuples have differing lengths of \\d+ and \\d+"
 
@@ -194,6 +195,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 else
                     null
 
+            | Regex matchClauseHasWrongTypeMessage [expectedType; actualType] ->
+                createTypeMismatchHighlighting MatchClauseWrongTypeError expectedType actualType
+            
             | Regex typeMisMatchTupleLengths [expectedType; actualType] ->
                 createTypeMismatchHighlighting TypeMisMatchTuplesHaveDifferingLengthsError expectedType actualType
 

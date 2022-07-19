@@ -15,7 +15,12 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``Constraint Mismatch``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``Infix application``() = x.DoNamedTest()
     [<Test>] member x.Sequential() = x.DoNamedTest()
-    [<Test>] member x.MatchClause() = x.DoNamedTest()
+
+    [<Test>] member x.``Match clause 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match clause 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match clause 03``() = x.DoNamedTest()
+    [<Test>] member x.``Match clause 04``() = x.DoNamedTest()
+
     [<Test>] member x.``Return type with attribute``() = x.DoNamedTest()
     [<Test>] member x.TryWith() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.MatchLambda() = x.DoNamedTest()
@@ -32,7 +37,7 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``Tuple return type, to non-tuple``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Tuple return type, tuple as part of nested expression``() = x.DoNamedTest()
 
-    [<Test; NoHighlightingFound>] member x.``No highlighting 01``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``No highlighting 01``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``No highlighting 02``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``No highlighting 03``() = x.DoNamedTest()
 

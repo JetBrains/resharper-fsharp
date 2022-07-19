@@ -1,0 +1,4 @@
+﻿let f x : string =
+    match () with
+    | _ -> ""
+    | _ -> ""{caret}
