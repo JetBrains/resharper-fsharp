@@ -46,11 +46,8 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
         coreVersion = CoreVersion.DOT_NET_6
     )
     fun changeStaticArg() {
-        withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
-            markupAdapter.hasErrors.shouldBeFalse()
-        }
-
         withOpenedEditor(project, "SwaggerProviderLibrary/Literals.fs") {
+            waitForDaemon()
             // change schema path from "specification.json" to "specification1.json"
             typeFromOffset("1", 86)
         }
