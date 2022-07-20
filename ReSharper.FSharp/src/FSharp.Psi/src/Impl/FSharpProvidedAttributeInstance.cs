@@ -34,16 +34,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public AttributeValue PositionParameter(int paramIndex) =>
       paramIndex < PositionParameterCount
-        ? ConvertToAttributeValue(myData.ConstructorArguments[paramIndex])
+        ? ConvertToAttributeValue(myData.ConstructorArguments.GetOrThrow()[paramIndex])
         : AttributeValue.BAD_VALUE;
 
     public IEnumerable<AttributeValue> PositionParameters() =>
-      myData.ConstructorArguments.Select(ConvertToAttributeValue);
+      myData.ConstructorArguments.GetOrThrow().Select(ConvertToAttributeValue);
 
     public AttributeValue NamedParameter(string name) =>
       NamedParameters().SingleOrDefault(t => t.First == name).Second ?? AttributeValue.BAD_VALUE;
 
     public IEnumerable<Pair<string, AttributeValue>> NamedParameters() => myData.NamedArguments
+      .GetOrThrow()
       .Select(t => Pair.Of(t.MemberName, ConvertToAttributeValue(t.TypedValue)));
 
     public IConstructor Constructor => myConstructor ??=
@@ -60,8 +61,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return true;
       });
 
-    public int PositionParameterCount => myData.ConstructorArguments.Length;
-    public int NamedParameterCount => myData.NamedArguments.Length;
+    public int PositionParameterCount => myData.ConstructorArguments.GetOrThrow().Length;
+    public int NamedParameterCount => myData.NamedArguments.GetOrThrow().Length;
 
     private AttributeValue ConvertToAttributeValue(RdAttributeArg arg)
     {

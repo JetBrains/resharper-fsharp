@@ -36,5 +36,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
     public static RdCustomAttributeData[] GetRdCustomAttributes(this ProvidedMemberInfo info) =>
       info is IRdProvidedCustomAttributesOwner x ? x.Attributes : EmptyArray<RdCustomAttributeData>.Instance;
+
+    public static RdCustomAttributeNamedArgument[] GetOrThrow(this NamedArgumentsResult r) =>
+      r.Error is { } error ? throw new Exception(error) : r.Arguments;
+
+    public static RdAttributeArg[] GetOrThrow(this ConstructorArgumentsResult r) =>
+      r.Error is { } error ? throw new Exception(error) : r.Arguments;
   }
 }

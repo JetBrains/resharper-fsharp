@@ -42,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
     }
 
     [ContractAnnotation("value:null => null")]
-    public static ServerRdStaticArg BoxToClientStaticArg(object value, bool safeMode = false)
+    public static ServerRdStaticArg BoxToClientStaticArg(object value)
     {
       if (value == null) return null;
       return value switch
@@ -63,10 +63,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
         string x => new ServerRdStaticArg(ServerRdTypeName.@string, x),
         DBNull _ => new ServerRdStaticArg(ServerRdTypeName.@dbnull, ""),
         // ReSharper disable once PossibleInvalidCastException
-        _ when value.GetType() is var type && type.IsEnum => BoxToClientStaticArg((int)value, safeMode),
-        _ => safeMode
-          ? new ServerRdStaticArg(ServerRdTypeName.unknown, value.ToString())
-          : throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
+        _ when value.GetType() is var type && type.IsEnum => BoxToClientStaticArg((int)value),
+        _ => throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
       };
     }
 

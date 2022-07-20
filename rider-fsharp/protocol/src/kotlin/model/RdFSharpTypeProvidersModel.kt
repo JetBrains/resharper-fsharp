@@ -72,7 +72,7 @@ object RdFSharpTypeProvidersModel : Root() {
             field("Error", string.nullable)
         })
         field("ConstructorArguments", structdef("ConstructorArgumentsResult") {
-            field("Arguments", array(RdCustomAttributeTypedArgument))
+            field("Arguments", array(RdAttributeArg))
             field("Error", string.nullable)
         })
     }
@@ -332,7 +332,6 @@ object RdFSharpTypeProvidersModel : Root() {
         +"bool"
         +"string"
         +"dbnull"
-        +"unknown"
     }
 
     private val RdProvidedEntityType = flags {

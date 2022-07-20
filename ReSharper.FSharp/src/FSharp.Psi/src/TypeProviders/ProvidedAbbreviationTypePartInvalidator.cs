@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.TypeProviders
       if (typePart is not TypeAbbreviationOrDeclarationPart) return;
       if (myTypeProvidersShim.TypeProvidersManager is not { } tpManager) return;
       if (typePart.TypeElement is not { } typeElement) return;
-      tpManager.Context.ProvidedAbbreviations.MarkAsInvalidated(typeElement.Module, typeElement.GetClrName());
+      tpManager.Context.ProvidedAbbreviations.MarkDirty(typeElement.Module, typeElement.GetClrName());
     }
   }
 }

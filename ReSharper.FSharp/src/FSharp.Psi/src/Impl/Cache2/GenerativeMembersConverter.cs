@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public XmlNode GetXmlDoc() => Type.GetXmlDoc(TypeElement);
 
-    // Operators for provided types are compiled into methods
+    // Operators for provided types are compiled into non-operator methods
     public IEnumerable<IOperator> Operators => EmptyList<IOperator>.InstanceList;
 
     public IEnumerable<IConstructor> Constructors => Type

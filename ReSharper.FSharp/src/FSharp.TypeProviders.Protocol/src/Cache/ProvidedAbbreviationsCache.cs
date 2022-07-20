@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
   {
     void AddOrUpdate(ProxyProvidedTypeWithContext type);
     bool TryGet(IPsiModule module, IClrTypeName clrName, out ProxyProvidedTypeWithContext providedType);
-    void MarkAsInvalidated(IPsiModule module, IClrTypeName clrName);
+    void MarkDirty(IPsiModule module, IClrTypeName clrName);
     void Remove(IProxyTypeProvider typeProvider);
     string Dump();
   }
@@ -62,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
              typesGroup.TryGetValue(clrName.FullName, out providedType);
     }
 
-    public void MarkAsInvalidated(IPsiModule module, IClrTypeName clrName)
+    public void MarkDirty(IPsiModule module, IClrTypeName clrName)
     {
       if (!TryGet(module, clrName, out _)) return;
       myQueueToInvalidate.Enqueue((module, clrName.FullName));
@@ -98,7 +98,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
       return false;
     }
 
-    public void MarkAsInvalidated(IPsiModule module, IClrTypeName clrName)
+    public void MarkDirty(IPsiModule module, IClrTypeName clrName)
     {
     }
 
