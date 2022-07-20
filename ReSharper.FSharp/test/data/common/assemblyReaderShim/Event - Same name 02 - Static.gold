@@ -1,0 +1,32 @@
+﻿module Module
+
+Class1.add_Event|(fun (_: System.EventArgs) -> ())|(0)
+Class1.add_Event(|VoidDelegate(ignore)|(1))
+
+Class1().add_Event(fun (|_: System.EventArgs|(2)) -> ())
+Class1().add_Event(VoidDelegate(ignore))
+
+Class2.add_Event(fun (|_: System.EventArgs|(3)) -> ())
+Class2.add_Event(VoidDelegate(ignore)
+
+Class2().add_Event(fun (_: System.EventArgs) -> ())
+Class2().add_Event(VoidDelegate(ignore)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'System.EventArgs -> unit'    
+is not compatible with type
+    'System.EventHandler'    
+
+(1): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'System.EventHandler'    
+but here has type
+    'VoidDelegate'    
+(2): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'unit'    
+but here has type
+    'System.EventArgs'    
+(3): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'unit'    
+but here has type
+    'System.EventArgs'    

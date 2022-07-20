@@ -8,10 +8,5 @@ Class.add_IntEvent(Class.IntHandler(fun (_: obj) (_: int) -> ()))
 
 Class.Event.Add(fun (_: System.EventArgs) -> ())
 
-|Class.EventUnresolvedType|(1).Add(fun (_: System.EventArgs) -> ())
-Class.add_EventUnresolvedType(obj())
-Class.add_EventUnresolvedType(1)
-
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: The event 'VoidEvent' has a non-standard type. If this event is declared in another CLI language, you may need to access this event using the explicit add_VoidEvent and remove_VoidEvent methods for the event. If this event is declared in F#, make the type of the event an instantiation of either 'IDelegateEvent<_>' or 'IEvent<_,_>'.
-(1): ReSharper Underlined Error Highlighting: No Invoke methods found for delegate type

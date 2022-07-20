@@ -1,0 +1,15 @@
+﻿module Module
+
+let _: int = Class1.Field
+let _: int = Class1().|Field|(0)
+let _: double = Class1().|Field|(1)
+
+let _: double = Class2().Field
+let _: double = |Class2.Field|(2)
+let _: int = |Class2.Field|(3)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: 'Field' is static
+(1): ReSharper Underlined Error Highlighting: 'Field' is static
+(2): ReSharper Underlined Error Highlighting: Field 'Field' is not static
+(3): ReSharper Underlined Error Highlighting: Field 'Field' is not static

@@ -9,6 +9,4 @@ public class Class
 
     public delegate void IntHandler(object sender, int i);
     public static event IntHandler IntEvent;
-
-    public static event Foo EventUnresolvedType;
 }

@@ -90,8 +90,17 @@ type AssemblyReaderTest() =
     [<Test>] member x.``Attribute 04``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 05``() = x.DoNamedTest()
 
+    [<Test>] member x.``Event - Same name 01``() = x.DoNamedTest()
+    [<Test>] member x.``Event - Same name 02 - Static``() = x.DoNamedTest()
     [<Test>] member x.``Event 01``() = x.DoNamedTest()
+    [<Test>] member x.``Event 02``() = x.DoNamedTest()
+    [<Test>] member x.``Event 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Field - Const 01``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Const 02 - Wrong type``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Const 03 - Same name``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Same name 01``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Same name 02 - Static``() = x.DoNamedTest()
     [<Test>] member x.``Field 01``() = x.DoNamedTest()
     [<Test>] member x.``Field 02 - Inherit``() = x.DoNamedTest()
 

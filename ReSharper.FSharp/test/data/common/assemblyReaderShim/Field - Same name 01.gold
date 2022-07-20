@@ -1,0 +1,6 @@
+﻿module Module
+
+let _: int = Class1.StaticField
+let _: double = Class2.StaticField
+
+---------------------------------------------------------

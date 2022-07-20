@@ -1,0 +1,24 @@
+﻿match |Class.ConstZero|(0) with
+| 1 -> ()
+
+
+match |0|(1) with
+| Class.ConstZero -> ()
+
+
+match |0|(2) with
+| Class.ConstOne -> ()
+
+
+match |0|(3) with
+| Class.ConstZero -> ()
+| Class.ConstOne -> ()
+
+
+let _: int = Class.ConstZero
+
+---------------------------------------------------------
+(0): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '0' may indicate a case not covered by the pattern(s).
+(1): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '1' may indicate a case not covered by the pattern(s).
+(2): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '0' may indicate a case not covered by the pattern(s).
+(3): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '2' may indicate a case not covered by the pattern(s).

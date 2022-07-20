@@ -1,0 +1,6 @@
+﻿module Module
+
+|Class.EventUnresolvedType|(0).Add(fun (_: System.EventArgs) -> ())
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: No Invoke methods found for delegate type

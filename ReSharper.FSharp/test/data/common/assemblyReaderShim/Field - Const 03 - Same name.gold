@@ -1,0 +1,19 @@
+﻿match 1 with
+| |Class1.Const|(0) -> ()
+| Class2.Const -> ()
+| _ -> ()
+
+match "" with
+| Class1.Const -> ()
+| |Class2.Const|(1) -> ()
+| _ -> ()
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int'    
+but here has type
+    'string'    
+(1): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'string'    
+but here has type
+    'int'    
