@@ -1,0 +1,8 @@
+﻿module Module
+
+[<CustomClass; CustomStruct; |CustomMethod|(0)>]
+type C() =
+    class end
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This attribute is not valid for use on this language element

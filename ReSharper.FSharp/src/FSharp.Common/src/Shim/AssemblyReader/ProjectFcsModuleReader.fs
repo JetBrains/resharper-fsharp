@@ -13,6 +13,7 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Impl.Special
@@ -418,6 +419,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let args = [ ILAttribElem.String(Some(arg)) ]
         mkCompilerGeneratedAttribute PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS args
 
+    // todo: typeof, arrays
     let attributeValueTypes =
         [| PredefinedType.BOOLEAN_FQN, fun (c: ConstantValue) -> ILAttribElem.Bool c.BoolValue
            PredefinedType.CHAR_FQN,    fun (c: ConstantValue) -> ILAttribElem.Char c.CharValue
@@ -435,34 +437,50 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let mkCustomAttribute (attrInstance: IAttributeInstance) =
         let ctor = attrInstance.Constructor
-        let _namedArgs = attrInstance.NamedParameters() |> List.ofSeq
 
         let attrType = TypeFactory.CreateType(ctor.ContainingType)
         let methodSpec = ILMethodSpec.Create(mkType attrType, mkMethodRef ctor, [])
 
+        let mkAttribElement (attrValue: AttributeValue) =
+            let constantValue = attrValue.ConstantValue
+
+            // todo: use default value for type from parameter/property?
+            if constantValue.IsBadValue() then ILAttribElem.Null else
+
+            if constantValue.IsString() then ILAttribElem.String(Some constantValue.StringValue) else
+
+            let valueType = 
+                if constantValue.IsEnum() then
+                    constantValue.Type.GetEnumUnderlying()
+                else
+                    constantValue.Type
+
+            let declaredType = valueType.As<IDeclaredType>()
+
+            let mutable literalType = Unchecked.defaultof<_>
+            match attributeValueTypes.TryGetValue(declaredType.GetClrName(), &literalType) with
+            | true -> cache.AttributeValues.Intern(literalType constantValue)
+            | _ -> ILAttribElem.Null
+
         let positionalArgs = 
             attrInstance.PositionParameters()
             |> List.ofSeq
-            |> List.map (fun attrValue ->
-                let constantValue = attrValue.ConstantValue
-                if constantValue.IsString() then ILAttribElem.String(Some constantValue.StringValue) else
+            |> List.map mkAttribElement
 
-                let declaredType = constantValue.Type.As<IDeclaredType>()
-                if isNull declaredType then ILAttribElem.Null else
+        let namedArgs = 
+            attrInstance.NamedParameters()
+            |> List.ofSeq
+            |> List.map (fun (Pair(name, attributeValue)) ->
+                let attribElement = mkAttribElement attributeValue
+                let valueType = mkType attributeValue.ConstantValue.Type
+                name, valueType, true, attribElement)
 
-                // todo: typeof, arrays
-
-                let mutable literalType = Unchecked.defaultof<_>
-                match attributeValueTypes.TryGetValue(declaredType.GetClrName(), &literalType) with
-                | true -> cache.AttributeValues.Intern(literalType constantValue)
-                | _ -> ILAttribElem.Null
-            )
-
-        ILAttribute.Decoded(methodSpec, positionalArgs, [])
+        ILAttribute.Decoded(methodSpec, positionalArgs, namedArgs)
 
     let mkCustomAttributes (attributesSet: IAttributesSet) =
         attributesSet.GetAttributeInstances(AttributesSource.Self)
         |> List.ofSeq
+        |> List.filter (fun attributeInstance -> isNotNull attributeInstance.Constructor)
         |> List.map mkCustomAttribute
 
     let mkGenericVariance (variance: TypeParameterVariance): ILGenericVariance =
