@@ -1,6 +1,9 @@
-module SwaggerProviderLibrary1
-
-open SwaggerProvider
-open SwaggerCrossLanguage.Literals
-
-type <caret>PetStore = OpenApiClientProvider<Schema>
+Making dump the current popup...
+---------------------------------
+Main popup
+popup layout kind: EditorLayouter
+#0 text:"SwaggerProvider1.fs (6)"; optText:"in <SwaggerProviderCSharp>\<SwaggerProviderLibrary>"; attributes=[enabled,closeOnExecute,]
+#1 text:"SwaggerProvider1.fsi (6)"; optText:"in <SwaggerProviderCSharp>\<SwaggerProviderLibrary>"; attributes=[enabled,closeOnExecute,]
+selection: #0 text:"SwaggerProvider1.fs (6)"; optText:"in <SwaggerProviderCSharp>\<SwaggerProviderLibrary>"; attributes=[enabled,closeOnExecute,]
+QuickSearch: not active
+---------------------------------

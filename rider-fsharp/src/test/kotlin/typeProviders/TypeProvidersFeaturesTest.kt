@@ -22,7 +22,7 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
     override val restoreNuGetPackages = true
 
     @Test
-    fun `signature file navigation`() = doNavigationTest("SwaggerProvider1.fsi")
+    fun `signature file navigation`() = doNavigationTestWithMultipleDeclarations()
 
     @Test
     fun `provided member navigation`() = doNavigationTest("SwaggerProvider.fs")
@@ -43,19 +43,10 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
     fun `provided nested type navigation`() = doNavigationTest("SwaggerProvider.fs")
 
     @Test
-    fun `multiply different abbreviation type parts - before`() {
-        withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
-            waitForDaemon()
-            executeWithGold(testGoldFile) {
-                callActionAndHandlePopup(IdeActions.ACTION_GOTO_DECLARATION, it, true, Duration.ofSeconds(1)) {
-                    this.closeAll()
-                }
-            }
-        }
-    }
+    fun `multiply different abbreviation type parts - before`() = doNavigationTestWithMultipleDeclarations()
 
     @Test
-    fun `multiply different abbreviation type parts - after`() = doNavigationTest("SwaggerProvider3.fs")
+    fun `multiply different abbreviation type parts - after`() = doNavigationTestWithMultipleDeclarations()
 
     @Test
     fun `provided member rename disabled`() = doRenameUnavailableTest()
@@ -71,6 +62,17 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
                 waitForDaemon()
                 executeWithGold(testGoldFile) {
                     dumpOpenedDocument(it, project!!, true)
+                }
+            }
+        }
+    }
+
+    private fun doNavigationTestWithMultipleDeclarations() {
+        withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
+            waitForDaemon()
+            executeWithGold(testGoldFile) {
+                callActionAndHandlePopup(IdeActions.ACTION_GOTO_DECLARATION, it, true, Duration.ofSeconds(1)) {
+                    this.closeAll()
                 }
             }
         }
