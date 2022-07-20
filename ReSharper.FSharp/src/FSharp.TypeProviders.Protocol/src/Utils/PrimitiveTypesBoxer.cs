@@ -69,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
     }
 
     [ContractAnnotation("arg: null => null")]
-    public static object Unbox(this RdStaticArg arg, bool safeMode = false)
+    public static object Unbox(this RdStaticArg arg)
     {
       if (arg == null) return null;
       return arg.TypeName switch
@@ -89,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
         RdTypeName.@bool => bool.Parse(arg.Value),
         RdTypeName.@string => arg.Value,
         RdTypeName.dbnull => DBNull.Value,
-        _ => safeMode ? arg.Value : throw new ArgumentException($"Unexpected static arg with type {arg.TypeName}")
+        _ => throw new ArgumentException($"Unexpected static arg with type {arg.TypeName}")
       };
     }
 
