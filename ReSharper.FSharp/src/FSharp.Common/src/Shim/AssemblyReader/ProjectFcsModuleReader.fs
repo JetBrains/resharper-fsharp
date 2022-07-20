@@ -288,6 +288,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let rec mkType (t: IType): ILType =
         if t.IsVoid() then ILType.Void else
 
+        if not t.IsResolved then
+            // todo: use candidates?
+            mkType (psiModule.GetPredefinedType().Object) else
+
         match t with
         | :? IDeclaredType as declaredType ->
             match declaredType.Resolve() with

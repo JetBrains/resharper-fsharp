@@ -24,6 +24,7 @@ public class Class2<T1, T2, T3>
   }
 }
 
+
 namespace Ns1
 {
   public class NsClass1<T>
@@ -57,4 +58,10 @@ public class Class3<T1, T2>
       }
     }
   }
+}
+
+public class Class4<T, T>
+{
+  public static T StaticField;
+  public virtual T Property { get; }
 }
