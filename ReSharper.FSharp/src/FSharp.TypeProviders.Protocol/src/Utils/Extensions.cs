@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
+using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
+using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -30,5 +33,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
       foreach (var item in itemsToRemove) dict.RemoveLeft(item.Key);
     }
+
+    public static RdCustomAttributeData[] GetRdCustomAttributes(this ProvidedMemberInfo info) =>
+      info is IRdProvidedCustomAttributesOwner x ? x.Attributes : EmptyArray<RdCustomAttributeData>.Instance;
+
+    public static RdCustomAttributeNamedArgument[] GetOrThrow(this NamedArgumentsResult r) =>
+      r.Error is { } error ? throw new Exception(error) : r.Arguments;
+
+    public static RdAttributeArg[] GetOrThrow(this ConstructorArgumentsResult r) =>
+      r.Error is { } error ? throw new Exception(error) : r.Arguments;
   }
 }

@@ -1,5 +1,6 @@
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
@@ -13,13 +14,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
     protected override bool KeyHasValue((int, TKey) key) => true;
 
-    protected override ProvidedType Create((int, TKey) key, int typeProviderId, TArg rdArg)
+    protected override ProvidedType Create((int, TKey) key, IProxyTypeProvider typeProvider, TArg rdArg)
     {
       var typeId = TypeProvidersContext.Connection.ExecuteWithCatch(() => myGetIdCall.Sync(rdArg, RpcTimeouts.Maximal));
-      return TypeProvidersContext.ProvidedTypesCache.GetOrCreate(typeId, typeProviderId);
+      return TypeProvidersContext.ProvidedTypesCache.GetOrCreate(typeId, typeProvider);
     }
 
-    protected override ProvidedType[] CreateBatch((int, TKey)[] _, int __, TArg arg) =>
+    protected override ProvidedType[] CreateBatch((int, TKey)[] _, IProxyTypeProvider __, TArg arg) =>
       throw new System.NotImplementedException();
 
     public override string Dump() => throw new System.NotImplementedException();

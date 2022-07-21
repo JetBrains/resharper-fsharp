@@ -73,8 +73,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
     }
 
     public string[] GetXmlDocAttributes(RdCustomAttributeData[] data) =>
-      data.Where(t => t.FullName == TypeProviderXmlDocAttribute && GetOrThrow(t.ConstructorArguments).Length == 1)
-        .Select(t => GetOrThrow(t.ConstructorArguments)[0].Value.Unbox() as string)
+      data.Where(t => t.FullName == TypeProviderXmlDocAttribute && t.ConstructorArguments.GetOrThrow().Length == 1)
+        .Select(t => t.ConstructorArguments.GetOrThrow()[0].Unbox() as string)
         .Where(t => t != null)
         .ToArray();
 
@@ -88,11 +88,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
       if (attribute == null) return null;
 
       var constructorArgs =
-        ListModule.OfSeq(GetOrThrow(attribute.ConstructorArguments).Select(t => Option(t.Value.Unbox())));
+        ListModule.OfSeq(attribute.ConstructorArguments.GetOrThrow().Select(t => Option(t.Unbox())));
 
       var namedArgs =
-        ListModule.OfSeq(GetOrThrow(attribute.NamedArguments).Select(t =>
-          Tuple.Create(t.MemberName, Option(t.TypedValue.Value.Unbox()))));
+        ListModule.OfSeq(attribute.NamedArguments.GetOrThrow().Select(t =>
+          Tuple.Create(t.MemberName, Option(t.TypedValue.Unbox()))));
 
       return Tuple.Create(constructorArgs, namedArgs);
     }
@@ -101,18 +101,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
       value switch
       {
         null => null,
-        { } obj => obj
+        { } => value
       };
 
     private static object TryGetNamedArgumentValue(RdCustomAttributeData attribute, string namedAttributeName) =>
-      GetOrThrow(attribute.NamedArguments)
-        .FirstOrDefault(t => t.MemberName == namedAttributeName)?.TypedValue.Value
+      attribute.NamedArguments
+        .GetOrThrow()
+        .FirstOrDefault(t => t.MemberName == namedAttributeName)?.TypedValue
         .Unbox();
-
-    private static RdCustomAttributeNamedArgument[] GetOrThrow(NamedArgumentsResult r) =>
-      r.Error is { } error ? throw new Exception(error) : r.Arguments;
-
-    private static RdCustomAttributeTypedArgument[] GetOrThrow(ConstructorArgumentsResult r) =>
-      r.Error is { } error ? throw new Exception(error) : r.Arguments;
   }
 }

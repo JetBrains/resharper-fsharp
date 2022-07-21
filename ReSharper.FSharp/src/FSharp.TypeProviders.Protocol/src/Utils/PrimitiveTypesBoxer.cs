@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using JetBrains.Annotations;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using ServerRdStaticArg = JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdStaticArg;
 using ServerRdTypeName = JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdTypeName;
+using ServerRdAttributeArgElement = JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdAttributeArgElement;
+using ServerRdAttributeArg = JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdAttributeArg;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 {
@@ -30,12 +35,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
         bool x => new RdStaticArg(RdTypeName.@bool, x.ToString()),
         string x => new RdStaticArg(RdTypeName.@string, x),
         DBNull _ => new RdStaticArg(RdTypeName.dbnull, ""),
-        _ when value.GetType() is var type && type.IsEnum => BoxToServerStaticArg((int) value),
+        // ReSharper disable once PossibleInvalidCastException
+        _ when value.GetType() is var type && type.IsEnum => BoxToServerStaticArg((int)value),
         _ => throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
       };
     }
 
-    [ContractAnnotation("null => null")]
+    [ContractAnnotation("value:null => null")]
     public static ServerRdStaticArg BoxToClientStaticArg(object value)
     {
       if (value == null) return null;
@@ -56,12 +62,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
         bool x => new ServerRdStaticArg(ServerRdTypeName.@bool, x.ToString()),
         string x => new ServerRdStaticArg(ServerRdTypeName.@string, x),
         DBNull _ => new ServerRdStaticArg(ServerRdTypeName.@dbnull, ""),
-        _ when value.GetType() is var type && type.IsEnum => BoxToClientStaticArg((int) value),
+        // ReSharper disable once PossibleInvalidCastException
+        _ when value.GetType() is var type && type.IsEnum => BoxToClientStaticArg((int)value),
         _ => throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
       };
     }
 
-    [ContractAnnotation("null => null")]
+    [ContractAnnotation("arg: null => null")]
     public static object Unbox(this RdStaticArg arg)
     {
       if (arg == null) return null;
@@ -118,5 +125,79 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
       return result;
     }
+
+    public static ServerRdAttributeArg Box(this CustomAttributeTypedArgument arg)
+    {
+      string GetStringValue(object obj) =>
+        obj switch
+        {
+          null => null,
+          decimal x => x.ToString(CultureInfo.InvariantCulture),
+          float x => x.ToString(CultureInfo.InvariantCulture),
+          double x => x.ToString(CultureInfo.InvariantCulture),
+          { } when obj.GetType() is var type && type.IsEnum => ((int)obj).ToString(),
+          { } => obj.ToString()
+        };
+
+      if (arg.Value is IReadOnlyCollection<object> collection)
+      {
+        var elementType = arg.ArgumentType.GetElementType()?.FullName ?? "unknown type";
+        var args = collection
+          .Select(t => new ServerRdAttributeArgElement(t?.GetType().FullName ?? elementType, GetStringValue(t)))
+          .ToArray();
+        return new ServerRdAttributeArg(elementType, true, args);
+      }
+
+      var typeName = arg.ArgumentType.FullName!;
+      var argElements = new[] { new ServerRdAttributeArgElement(typeName, GetStringValue(arg.Value)) };
+      return new ServerRdAttributeArg(typeName, false, argElements);
+    }
+
+    public static object Unbox(this RdAttributeArg arg)
+    {
+      if (!arg.IsArray) return arg.Values[0].Unbox();
+
+      var values = arg.Values.Select(t => t.Unbox());
+      return arg.TypeName switch
+      {
+        "System.SByte" => values.Cast<sbyte>().ToArray(),
+        "System.Int16" => values.Cast<short>().ToArray(),
+        "System.Int32" => values.Cast<int>().ToArray(),
+        "System.Int64" => values.Cast<long>().ToArray(),
+        "System.Byte" => values.Cast<byte>().ToArray(),
+        "System.UInt16" => values.Cast<ushort>().ToArray(),
+        "System.UInt32" => values.Cast<uint>().ToArray(),
+        "System.UInt64" => values.Cast<ulong>().ToArray(),
+        "System.Decimal" => values.Cast<decimal>().ToArray(),
+        "System.Single" => values.Cast<float>().ToArray(),
+        "System.Double" => values.Cast<double>().ToArray(),
+        "System.Char" => values.Cast<char>().ToArray(),
+        "System.Boolean" => values.Cast<bool>().ToArray(),
+        "System.String" => values.Cast<string>().ToArray(),
+        { } => values.ToArray()
+      };
+    }
+
+    public static object Unbox(this RdAttributeArgElement arg) =>
+      arg.TypeName switch
+      {
+        _ when arg.Value == null => null,
+        "System.SByte" => sbyte.Parse(arg.Value),
+        "System.Int16" => short.Parse(arg.Value),
+        "System.Int32" => int.Parse(arg.Value),
+        "System.Int64" => long.Parse(arg.Value),
+        "System.Byte" => byte.Parse(arg.Value),
+        "System.UInt16" => ushort.Parse(arg.Value),
+        "System.UInt32" => uint.Parse(arg.Value),
+        "System.UInt64" => ulong.Parse(arg.Value),
+        "System.Decimal" => decimal.Parse(arg.Value, CultureInfo.InvariantCulture),
+        "System.Single" => float.Parse(arg.Value, CultureInfo.InvariantCulture),
+        "System.Double" => double.Parse(arg.Value, CultureInfo.InvariantCulture),
+        "System.Char" => char.Parse(arg.Value),
+        "System.Boolean" => bool.Parse(arg.Value),
+        "System.String" => arg.Value,
+        { } when int.TryParse(arg.Value, out var value) => value,
+        { } x => x
+      };
   }
 }

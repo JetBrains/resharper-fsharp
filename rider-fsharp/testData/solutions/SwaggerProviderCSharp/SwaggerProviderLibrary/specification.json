@@ -1,0 +1,164 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "v1",
+    "title": "API Gateway"
+  },
+  "paths": {
+    "/api/Courses": {
+      "get": {
+        "tags": [
+          "Courses"
+        ],
+        "operationId": "ApiCoursesGet",
+        "summary": "get all courses",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CourseViewModel"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "CourseViewModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "groupName": {
+          "type": "string"
+        },
+        "isOpen": {
+          "type": "boolean"
+        },
+        "isCompleted": {
+          "type": "boolean"
+        },
+        "mentorIds": {
+          "type": "string"
+        },
+        "inviteCode": {
+          "type": "string"
+        },
+        "courseMates": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CourseMateViewModel"
+          }
+        },
+        "homeworks": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HomeworkViewModel"
+          }
+        }
+      }
+    },
+    "CourseMateViewModel": {
+      "type": "object",
+      "properties": {
+        "studentId": {
+          "type": "string"
+        },
+        "isAccepted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "HomeworkViewModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "courseId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "tasks": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HomeworkTaskViewModel"
+          }
+        }
+      }
+    },
+    "HomeworkTaskViewModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "maxRating": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "hasDeadline": {
+          "type": "boolean"
+        },
+        "deadlineDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "isDeadlineStrict": {
+          "type": "boolean"
+        },
+        "canSendSolution": {
+          "type": "boolean"
+        },
+        "publicationDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "homeworkId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "isDeferred": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -27,15 +27,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
       return new RdCustomAttributeData(
         providedModel.Constructor.DeclaringType?.FullName ?? "",
         new(namedArguments ?? Array.Empty<RdCustomAttributeNamedArgument>(), exn1?.Message),
-        new(constructorArguments ?? Array.Empty<RdCustomAttributeTypedArgument>(), exn2?.Message));
+        new(constructorArguments ?? Array.Empty<RdAttributeArg>(), exn2?.Message));
     }
 
     private static RdCustomAttributeNamedArgument Convert(CustomAttributeNamedArgument argument) =>
       new(argument.MemberName, Convert(argument.TypedValue));
 
-    private static RdCustomAttributeTypedArgument Convert(CustomAttributeTypedArgument argument) =>
-      new(argument.ArgumentType.IsArray
-        ? null
-        : PrimitiveTypesBoxer.BoxToClientStaticArg(argument.Value));
+    private static RdAttributeArg Convert(CustomAttributeTypedArgument argument) =>
+      argument.Box();
   }
 }

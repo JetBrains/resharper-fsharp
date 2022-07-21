@@ -223,6 +223,7 @@ type FSharpDeclaredElementForRenameProvider() =
         member x.GetPrimaryDeclaredElement(element, _) =
             match element.As<ISecondaryDeclaredElement>() with
             | null -> element
+            | generated when generated.IsReadOnly -> element
             | generated ->
 
             match generated.OriginElement with

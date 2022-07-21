@@ -1,4 +1,6 @@
 using System;
+using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
+using JetBrains.Util;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -6,7 +8,7 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
-  public class ProxyProvidedParameterInfoWithContext : ProvidedParameterInfo
+  public class ProxyProvidedParameterInfoWithContext : ProvidedParameterInfo, IRdProvidedCustomAttributesOwner
   {
     private readonly ProvidedParameterInfo myParameterInfo;
     private readonly ProvidedTypeContext myContext;
@@ -51,5 +53,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public override bool GetHasTypeProviderEditorHideMethodsAttribute(ITypeProvider tp) =>
       myParameterInfo.GetHasTypeProviderEditorHideMethodsAttribute(tp);
+
+    public RdCustomAttributeData[] Attributes =>
+      myParameterInfo is IRdProvidedCustomAttributesOwner x
+        ? x.Attributes
+        : EmptyArray<RdCustomAttributeData>.Instance;
   }
 }

@@ -4,7 +4,9 @@ using System.Reflection;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
+using JetBrains.Util;
 using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core.CompilerServices;
 using Microsoft.FSharp.Quotations;
@@ -22,9 +24,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public int EntityId => myRdTypeProvider.EntityId;
     public RdProvidedEntityType EntityType => RdProvidedEntityType.TypeProvider;
+    public RdCustomAttributeData[] Attributes => EmptyArray<RdCustomAttributeData>.Instance;
 
-    public ProxyTypeProvider(RdTypeProvider rdTypeProvider, TypeProvidersContext typeProvidersContext)
+    public ProxyTypeProvider(RdTypeProvider rdTypeProvider, TypeProvidersContext typeProvidersContext,
+      IPsiModule module)
     {
+      PsiModule = module;
       myRdTypeProvider = rdTypeProvider;
       myTypeProvidersContext = typeProvidersContext;
 
@@ -90,6 +95,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       };
 
     public string GetDisplayName(bool fullName) => fullName ? myRdTypeProvider.FullName : myRdTypeProvider.Name;
+    public IPsiModule PsiModule { get; }
 
     public void Dispose()
     {
@@ -99,7 +105,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     {
       if (myIsDisposed) return;
 
-      myTypeProvidersContext.Dispose(EntityId);
+      myTypeProvidersContext.Dispose(this);
 
       myIsDisposed = true;
       Disposed?.Invoke(this, EventArgs.Empty);

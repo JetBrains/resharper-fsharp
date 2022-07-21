@@ -43,11 +43,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 
       if (xResult != yResult) return false;
       if (GetAssemblyNameSafe(x) != GetAssemblyNameSafe(y)) return false;
-      if (xResult) return xFullName == yFullName;
 
-      // ReSharper disable PossibleNullReferenceException
-      if (x.Name != y.Name) return false;
-      if (x.Namespace != y.Namespace) return false;
+      if (xResult)
+      {
+        if (xFullName != yFullName) return false;
+      }
+      else
+      {
+        // ReSharper disable PossibleNullReferenceException
+        if (x.Name != y.Name) return false;
+        if (x.Namespace != y.Namespace) return false;
+      }
 
       var xIsGenericType = x.IsGenericType;
       if (xIsGenericType != y.IsGenericType) return false;

@@ -1,3 +1,4 @@
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using IProvidedCustomAttributeProvider =
@@ -7,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 {
   public class TypeProvidersContext
   {
-    public TypeProvidersContext(TypeProvidersConnection connection)
+    public TypeProvidersContext(TypeProvidersConnection connection, bool enableGenerativeTypeProvidersInMemoryAnalysis)
     {
       Connection = connection;
       ProvidedCustomAttributeProvider = new ProvidedCustomAttributeProvider(connection);
@@ -20,6 +21,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
           ProvidedTypeProtocol.ApplyStaticArguments);
       ArrayProvidedTypesCache =
         new DependentProvidedTypesCache<int, MakeArrayTypeArgs>(this, ProvidedTypeProtocol.MakeArrayType);
+
+      ProvidedAbbreviations =
+        enableGenerativeTypeProvidersInMemoryAnalysis
+          ? new ProvidedAbbreviationsCache()
+          : new ProvidedAbbreviationsCacheMock();
     }
 
     public TypeProvidersConnection Connection { get; }
@@ -29,19 +35,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     public DependentProvidedTypesCache<string, ApplyStaticArgumentsParameters> AppliedProvidedTypesCache { get; }
     public DependentProvidedTypesCache<int, MakeArrayTypeArgs> ArrayProvidedTypesCache { get; }
     public IProvidedCustomAttributeProvider ProvidedCustomAttributeProvider { get; }
-
+    public IProvidedAbbreviationsCache ProvidedAbbreviations { get; }
     private RdProvidedTypeProcessModel ProvidedTypeProtocol => Connection.ProtocolModel.RdProvidedTypeProcessModel;
 
-    public void Dispose(int typeProviderId)
+    public void Dispose(IProxyTypeProvider typeProvider)
     {
+      var typeProviderId = typeProvider.EntityId;
       ProvidedTypesCache.Remove(typeProviderId);
       ProvidedAssembliesCache.Remove(typeProviderId);
       GenericProvidedTypesCache.Remove(typeProviderId);
       AppliedProvidedTypesCache.Remove(typeProviderId);
       ArrayProvidedTypesCache.Remove(typeProviderId);
+      if (typeProvider.IsGenerative) ProvidedAbbreviations.Remove(typeProvider);
     }
 
     public string Dump() =>
-      string.Join("\n\n", ProvidedTypesCache.Dump(), ProvidedAssembliesCache.Dump());
+      string.Join("\n\n", ProvidedTypesCache.Dump(), ProvidedAssembliesCache.Dump(), ProvidedAbbreviations.Dump());
   }
 }

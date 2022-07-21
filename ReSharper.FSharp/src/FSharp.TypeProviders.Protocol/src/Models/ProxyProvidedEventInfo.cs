@@ -15,12 +15,12 @@ using static FSharp.Compiler.ExtensionTyping;
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
   [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-  public class ProxyProvidedEventInfo : ProvidedEventInfo
+  public class ProxyProvidedEventInfo : ProvidedEventInfo, IRdProvidedCustomAttributesOwner
   {
     private readonly RdProvidedEventInfo myEventInfo;
     private readonly TypeProvidersContext myTypeProvidersContext;
 
-    private ProxyProvidedEventInfo(RdProvidedEventInfo eventInfo, int typeProviderId,
+    private ProxyProvidedEventInfo(RdProvidedEventInfo eventInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) : base(null, ProvidedConst.EmptyContext)
     {
       myEventInfo = eventInfo;
@@ -30,18 +30,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
         myTypeProvidersContext.Connection.ExecuteWithCatch(() =>
           typeProvidersContext.Connection.ProtocolModel.RdProvidedMethodInfoProcessModel.GetProvidedMethodInfos
             .Sync(new[] { eventInfo.AddMethod, eventInfo.RemoveMethod }, RpcTimeouts.Maximal)
-            .Select(t => ProxyProvidedMethodInfo.Create(t, typeProviderId, typeProvidersContext))
+            .Select(t => ProxyProvidedMethodInfo.Create(t, typeProvider, typeProvidersContext))
             .ToArray()));
 
       myTypes = new InterruptibleLazy<ProvidedType[]>(() =>
         myTypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(
-          new[] { eventInfo.DeclaringType, eventInfo.EventHandlerType }, typeProviderId));
+          new[] { eventInfo.DeclaringType, eventInfo.EventHandlerType }, typeProvider));
     }
 
     [ContractAnnotation("eventInfo:null => null")]
-    public static ProxyProvidedEventInfo Create(RdProvidedEventInfo eventInfo, int typeProviderId,
+    public static ProxyProvidedEventInfo Create(RdProvidedEventInfo eventInfo, IProxyTypeProvider typeProvider,
       TypeProvidersContext typeProvidersContext) =>
-      eventInfo == null ? null : new ProxyProvidedEventInfo(eventInfo, typeProviderId, typeProvidersContext);
+      eventInfo == null ? null : new ProxyProvidedEventInfo(eventInfo, typeProvider, typeProvidersContext);
 
     public override string Name => myEventInfo.Name;
 
@@ -74,5 +74,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private string[] myXmlDocs;
     private readonly InterruptibleLazy<ProvidedMethodInfo[]> myMethods;
     private readonly InterruptibleLazy<ProvidedType[]> myTypes;
+    public RdCustomAttributeData[] Attributes => myEventInfo.CustomAttributes;
   }
 }

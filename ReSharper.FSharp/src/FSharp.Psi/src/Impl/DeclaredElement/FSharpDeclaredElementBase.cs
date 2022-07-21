@@ -21,13 +21,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool HasDeclarationsIn(IPsiSourceFile sourceFile) => false;
     public HybridCollection<IPsiSourceFile> GetSourceFiles() => HybridCollection<IPsiSourceFile>.Empty;
 
-    public bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) => false;
-    public IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource) => EmptyList<IAttributeInstance>.Instance;
+    public virtual bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) => false;
+    public virtual IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource) => EmptyList<IAttributeInstance>.Instance;
 
-    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, AttributesSource attributesSource) =>
+    public virtual IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, AttributesSource attributesSource) =>
       EmptyList<IAttributeInstance>.Instance;
 
-    public XmlNode GetXMLDoc(bool inherit) => null;
+    public virtual XmlNode GetXMLDoc(bool inherit) => null;
     public XmlNode GetXMLDescriptionSummary(bool inherit) => null;
 
     public abstract string ShortName { get; }

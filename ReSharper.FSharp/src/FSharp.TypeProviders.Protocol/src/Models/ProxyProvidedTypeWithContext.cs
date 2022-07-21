@@ -2,6 +2,8 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.Metadata.Reader.API;
+using JetBrains.Metadata.Reader.Impl;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
@@ -11,26 +13,35 @@ using static FSharp.Compiler.ExtensionTyping;
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {
   [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-  public class ProxyProvidedTypeWithContext : ProvidedType, IRdProvidedEntity
+  public class ProxyProvidedTypeWithContext : ProvidedType, IProxyProvidedType
   {
     private readonly ProvidedType myProvidedType;
-    private IRdProvidedEntity RdProvidedEntity => (IRdProvidedEntity)myProvidedType;
+    private IClrTypeName myClrTypeName;
+    private ProxyProvidedType ProxyProvidedType => (ProxyProvidedType)myProvidedType;
 
     private ProxyProvidedTypeWithContext(ProvidedType providedType, ProvidedTypeContext context) : base(null, context)
     {
-      Assertion.Assert(providedType is IRdProvidedEntity);
+      Assertion.Assert(providedType is ProxyProvidedType);
       myProvidedType = providedType;
+
+      var type = context.TryGetILTypeRef(providedType);
+      if (type != null && ProxyProvidedType.TypeProvider.PsiModule != null)
+        ProxyProvidedType.TypeProvidersContext.ProvidedAbbreviations.AddOrUpdate(this);
     }
 
     [ContractAnnotation("type:null => null")]
-    public static ProxyProvidedTypeWithContext Create(ProvidedType type, ProvidedTypeContext context) =>
-      type == null ? null : new ProxyProvidedTypeWithContext(type, context);
-
-    public static ProxyProvidedTypeWithContext[] Create(ProvidedType[] propertyInfos, ProvidedTypeContext context)
+    public static ProvidedType Create(ProvidedType type, ProvidedTypeContext context) => type switch
     {
-      var result = new ProxyProvidedTypeWithContext[propertyInfos.Length];
+      null => null,
+      ProxyProvidedType { CanHaveProvidedTypeContext: true } => new ProxyProvidedTypeWithContext(type, context),
+      _ => type
+    };
+
+    public static ProvidedType[] Create(ProvidedType[] propertyInfos, ProvidedTypeContext context)
+    {
+      var result = new ProvidedType[propertyInfos.Length];
       for (var i = 0; i < propertyInfos.Length; i++)
-        result[i] = new ProxyProvidedTypeWithContext(propertyInfos[i], context);
+        result[i] = Create(propertyInfos[i], context);
 
       return result;
     }
@@ -159,7 +170,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public override bool GetHasTypeProviderEditorHideMethodsAttribute(ITypeProvider tp) =>
       myProvidedType.GetHasTypeProviderEditorHideMethodsAttribute(tp);
 
-    public int EntityId => RdProvidedEntity.EntityId;
-    public RdProvidedEntityType EntityType => RdProvidedEntity.EntityType;
+    public int EntityId => ProxyProvidedType.EntityId;
+    public RdProvidedEntityType EntityType => ProxyProvidedType.EntityType;
+    public RdCustomAttributeData[] Attributes => ProxyProvidedType.Attributes;
+
+    public override bool Equals(object y) =>
+      y switch
+      {
+        IProxyProvidedType x => x.EntityId == EntityId,
+        _ => false
+      };
+
+    public override int GetHashCode() => EntityId.GetHashCode();
+
+    public bool IsCreatedByProvider => ProxyProvidedType.IsCreatedByProvider;
+
+    public IClrTypeName GetClrName() => myClrTypeName ??= ProxyProvidedType switch
+    {
+      IProxyProvidedType { IsCreatedByProvider: true } =>
+        new ClrTypeName(Context.TryGetILTypeRef(this).Value.BasicQualifiedName),
+      IProxyProvidedType type => type.GetClrName()
+    };
+
+    public IProxyTypeProvider TypeProvider => ProxyProvidedType.TypeProvider;
   }
 }
