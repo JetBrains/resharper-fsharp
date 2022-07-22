@@ -3,12 +3,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 open System.Collections.Generic
 open System.Globalization
 open System.Linq
+open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.IO
 open JetBrains.Application.Notifications
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.NuGet.DotNetTools
 open JetBrains.Rd.Tasks
+open JetBrains.RdBackend.Common.Features.ProjectModel.View
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
@@ -16,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
@@ -51,6 +54,24 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
             |> Array.map (fun p -> p.Name)
             |> List)
         |> Option.defaultWith (fun _ -> List())
+
+    let dumpFcsProjectReferences (projectModelId: int) =
+        use cookie = ReadLockCookie.Create()
+
+        let projectModelViewHost = solution.GetComponent<ProjectModelViewHost>()
+        let project = projectModelViewHost.GetItemById<IProject>(projectModelId)
+
+        let psiModules = solution.GetComponent<IPsiModules>()
+        let psiModule = psiModules.GetPsiModules(project) |> Seq.exactlyOne
+
+        let fcsProjectProvider = solution.GetComponent<IFcsProjectProvider>()
+        let projectOptions = fcsProjectProvider.GetProjectOptions(psiModule)
+
+        projectOptions.Value.ReferencedProjects
+        |> Array.map (fun project ->
+            let outputPath = VirtualFileSystemPath.Parse(project.OutputFile, InteractionContext.SolutionContext)
+            outputPath.NameWithoutExtension)
+        |> List
 
     let fantomasVersion _ = fantomasHost.Version()
     let dumpFantomasRunOptions _ = fantomasHost.DumpRunOptions()      
@@ -89,6 +110,7 @@ Actions: {notification.AdditionalCommands
         fsTestHost.GetSourceCache.Set(sourceCache.GetRdFSharpSource)
         fsTestHost.DumpSingleProjectMapping.Set(dumpSingleProjectMapping)
         fsTestHost.DumpSingleProjectLocalReferences.Set(dumpSingleProjectLocalReferences)
+        fsTestHost.DumpFcsRefrencedProjects.Set(dumpFcsProjectReferences)
         fsTestHost.FantomasVersion.Set(fantomasVersion)
         fsTestHost.TypeProvidersRuntimeVersion.Set(typeProvidersRuntimeVersion)
         fsTestHost.DumpTypeProvidersProcess.Set(dumpTypeProvidersProcess)
