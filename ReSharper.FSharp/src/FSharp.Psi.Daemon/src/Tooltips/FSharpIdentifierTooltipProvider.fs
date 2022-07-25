@@ -77,8 +77,8 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
             let (ToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(results.CheckResults, token)
 
             layouts |> List.collect (function
-                | ToolTipElement.None
-                | ToolTipElement.CompositionError _ -> []
+                | ToolTipElement.None -> []
+                | ToolTipElement.CompositionError errorText -> [ RichText(errorText) ]
 
                 | ToolTipElement.Group(overloads) ->
                     overloads |> List.map (fun overload ->
