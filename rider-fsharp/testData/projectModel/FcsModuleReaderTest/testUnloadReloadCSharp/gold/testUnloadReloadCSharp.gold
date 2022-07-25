@@ -1,0 +1,38 @@
+===================
+Init
+
+Module reader:
+-------------------
+Readers by module: 0
+
+Readers by path count: 0
+
+===================
+Add reference
+
+Module reader:
+-------------------
+Readers by module: 1
+CSharpProject
+
+Readers by path count: 1
+
+===================
+Unload project
+
+Module reader:
+-------------------
+Readers by module: 0
+
+Readers by path count: 0
+
+===================
+Reload project
+
+Module reader:
+-------------------
+Readers by module: 1
+CSharpProject
+
+Readers by path count: 1
+

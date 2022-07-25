@@ -1,8 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 
-open System
 open System.Collections.Concurrent
 open System.Collections.Generic
+open System.Text
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
@@ -71,11 +71,16 @@ module AssemblyReaderShim =
            VBLanguage.Instance :> _ |]
         |> HashSet
 
+// todo: support script -> project references
+
 [<SolutionComponent>]
 type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
         cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService,
         fsOptionsProvider: FSharpOptionsProvider, symbolCache: ISymbolCache) as this =
     inherit AssemblyReaderShimBase(lifetime, changeManager)
+
+    // todo: add experimental setting if/when available
+    let isEnabledForAssemblies = false
 
     let isEnabled () =
         FSharpExperimentalFeatureCookie.IsEnabled(ExperimentalFeature.AssemblyReaderShim) ||
@@ -163,13 +168,13 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     let getOrCreateReaderFromModule (psiModule: IPsiModule) =
         let psiModule = psiModule.As<IProjectPsiModule>()
-        if isNull psiModule then ReferencedAssembly.Ignored else
+        if isNull psiModule then ReferencedAssembly.invalid else
 
         let mutable reader = Unchecked.defaultof<_>
         if assemblyReadersByModule.TryGetValue(psiModule, &reader) then reader else
 
         use readLockCookie = ReadLockCookie.Create()
-        if not (AssemblyReaderShim.isSupportedModule psiModule) then ReferencedAssembly.Ignored else
+        if not (AssemblyReaderShim.isSupportedModule psiModule) then ReferencedAssembly.invalid else
 
         // todo: is getting primary module needed? should we also replace module->primaryModule everywhere else?
         // todo: test web project with multiple modules
@@ -188,7 +193,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         let reader = 
             match AssemblyReaderShim.getProjectPsiModuleByOutputAssembly psiModules path with
-            | null -> ReferencedAssembly.Ignored
+            | null -> ReferencedAssembly.Ignored path
             | psiModule -> ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, this, path))
 
         recordReader path reader
@@ -199,7 +204,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         if not (assemblyReadersByModule.TryGetValue(psiModule, &referencedAssembly)) then false else
 
         match referencedAssembly with
-        | ReferencedAssembly.Ignored -> false
+        | ReferencedAssembly.Ignored _ -> false
         | ReferencedAssembly.ProjectOutput(reader) ->
 
         result <- reader
@@ -257,14 +262,13 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             dirtyTypesInModules.Add(psiModule, typeElement.GetClrName().GetPersistent()) |> ignore
 
     do
-        let typePartChanged = Action<_>(markDirty)
         lifetime.Bracket(
-            (fun () -> symbolCache.add_OnAfterTypePartAdded(typePartChanged)),
-            (fun () -> symbolCache.remove_OnAfterTypePartAdded(typePartChanged)))
+            (fun () -> symbolCache.add_OnAfterTypePartAdded(markDirty)),
+            (fun () -> symbolCache.remove_OnAfterTypePartAdded(markDirty)))
 
         lifetime.Bracket(
-            (fun () -> symbolCache.add_OnBeforeTypePartRemoved(typePartChanged)),
-            (fun () -> symbolCache.remove_OnBeforeTypePartRemoved(typePartChanged)))
+            (fun () -> symbolCache.add_OnBeforeTypePartRemoved(markDirty)),
+            (fun () -> symbolCache.remove_OnBeforeTypePartRemoved(markDirty)))
 
     abstract DebugReadRealAssemblies: bool
     default this.DebugReadRealAssemblies = false
@@ -272,6 +276,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     member val ModuleInvalidated = moduleInvalidated
 
     override this.GetLastWriteTime(path) =
+        if not isEnabledForAssemblies then base.GetLastWriteTime(path) else
         if not (isEnabled () && AssemblyReaderShim.isAssembly path) then base.GetLastWriteTime(path) else
 
         match getOrCreateReaderFromPath path with
@@ -279,6 +284,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         | _ -> base.GetLastWriteTime(path)
 
     override this.ExistsFile(path) =
+        if not isEnabledForAssemblies then base.ExistsFile(path) else
         if not (isEnabled () && AssemblyReaderShim.isAssembly path) then base.ExistsFile(path) else
 
         match getOrCreateReaderFromPath path with
@@ -286,11 +292,12 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         | _ -> base.ExistsFile(path)
 
     override this.GetModuleReader(path, readerOptions) =
+        if not isEnabledForAssemblies then base.GetModuleReader(path, readerOptions) else
         if not (isEnabled () && AssemblyReaderShim.isAssembly path) then
             base.GetModuleReader(path, readerOptions) else
 
         match getOrCreateReaderFromPath path with
-        | ReferencedAssembly.Ignored -> base.GetModuleReader(path, readerOptions)
+        | ReferencedAssembly.Ignored _ -> base.GetModuleReader(path, readerOptions)
         | ReferencedAssembly.ProjectOutput reader ->
 
         if this.DebugReadRealAssemblies && reader.RealModuleReader.IsNone then
@@ -318,3 +325,24 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         member this.InvalidateModule(psiModule) =
             dirtyModules.Add(psiModule) |> ignore
+
+        member this.TestDump =
+            use cookie = ReadLockCookie.Create()
+
+            let builder = StringBuilder()
+            builder.AppendLine("Module reader:\n-------------------") |> ignore
+
+            builder.AppendLine($"Readers by module: {assemblyReadersByModule.Count}") |> ignore
+            for psiModule in assemblyReadersByModule.Keys do
+                builder.AppendLine(psiModule.DisplayName) |> ignore
+
+            builder.AppendLine() |> ignore
+            builder.AppendLine($"Readers by path count: {assemblyReadersByPath.Count}") |> ignore
+            
+            builder.ToString()
+
+        member this.RemoveModule(psiModule) =
+            let referencedAssembly = assemblyReadersByModule.TryGetValue(psiModule)
+            if isNotNull referencedAssembly then
+                assemblyReadersByModule.TryRemove(psiModule) |> ignore
+                assemblyReadersByPath.TryRemove(referencedAssembly.Path) |> ignore

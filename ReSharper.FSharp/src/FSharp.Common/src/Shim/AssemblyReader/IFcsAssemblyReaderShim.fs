@@ -22,13 +22,24 @@ type IProjectFcsModuleReader =
     /// Debug data, disabled by default
     abstract RealModuleReader: ILModuleReader option with get, set
 
+
 [<RequireQualifiedAccess>]
 type ReferencedAssembly =
     /// An output of a psi source project except for F# projects.
     | ProjectOutput of IProjectFcsModuleReader
 
     /// Not supported file or output assembly for F# project.
-    | Ignored
+    | Ignored of path: VirtualFileSystemPath
+
+    member this.Path =
+        match this with
+        | ProjectOutput reader -> reader.Path
+        | Ignored path -> path
+
+
+module ReferencedAssembly =
+    let invalid = ReferencedAssembly.Ignored(VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext))
+
 
 type IFcsAssemblyReaderShim =
     abstract IsEnabled: bool
@@ -42,3 +53,7 @@ type IFcsAssemblyReaderShim =
 
     /// Record referenced project chains, later used for invalidation
     abstract RecordDependencies: psiModule: IPsiModule -> unit
+
+    abstract RemoveModule: psiModule: IPsiModule -> unit
+
+    abstract TestDump: string

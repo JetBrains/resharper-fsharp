@@ -41,6 +41,12 @@ fun BaseTestWithSolution.withDisabledOutOfProcessTypeProviders(function: () -> U
     }
 }
 
+fun BaseTestWithSolution.withNonFSharpProjectReferences(function: () -> Unit) {
+    withSetting(project, "FSharp/FSharpOptions/NonFSharpProjectInMemoryAnalysis/@EntryValue", "true", "false") {
+        function()
+    }
+}
+
 fun withEditorConfig(project: Project, function: () -> Unit) {
     withSetting(project, "CodeStyle/EditorConfig/EnableEditorConfigSupport", "true", "false", function)
 }

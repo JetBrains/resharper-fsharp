@@ -222,7 +222,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
                         elif fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedModule psiModule then
                             match fcsAssemblyReaderShim.GetModuleReader(psiModule) with
-                            | ReferencedAssembly.Ignored -> None
+                            | ReferencedAssembly.Ignored _ -> None
                             | ReferencedAssembly.ProjectOutput reader ->
 
                             projectsPsiModules.Add(psiModule.ContainingProjectModule, psiModule) |> ignore 
@@ -340,6 +340,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
              elif fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedProject project then
                  if change.ContainsChangeType(invalidateProjectChangeType) then
                      invalidateProject project
+
+                 if change.IsRemoved then
+                     for psiModule in projectsPsiModules.GetValuesSafe(project) do
+                         fcsAssemblyReaderShim.RemoveModule(psiModule)
 
              elif project.ProjectProperties.ProjectKind = ProjectKind.SOLUTION_FOLDER then
                  base.VisitDelta(change)

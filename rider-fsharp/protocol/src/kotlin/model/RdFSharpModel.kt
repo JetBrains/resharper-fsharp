@@ -57,6 +57,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         call("TypeProvidersRuntimeVersion", void, string.nullable)
         call("DumpTypeProvidersProcess", void, string)
         call("dumpFcsRefrencedProjects", int, immutableList(string))
+        call("dumpFcsModuleReader", void, string)
     }
 
     init {
