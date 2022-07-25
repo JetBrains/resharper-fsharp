@@ -30,7 +30,7 @@ class GenerativeTypeProvidersTest : BaseTestWithSolution() {
             waitForDaemon()
             markupAdapter.hasErrors.shouldBeTrue()
 
-            buildSelectedProjectsWithConsoleBuild(listOf(generativeProviderProjectPath))
+            buildSelectedProjectsWithReSharperBuild(listOf(generativeProviderProjectPath))
 
             waitForNextDaemon(Duration.ofSeconds(5))
             markupAdapter.hasErrors.shouldBeFalse()
