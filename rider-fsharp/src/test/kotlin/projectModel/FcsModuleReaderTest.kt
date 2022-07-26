@@ -1,10 +1,14 @@
 package projectModel
 
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.editor.impl.EditorImpl
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.workspaceModel.ide.WorkspaceModel
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rdclient.testFramework.waitForNextDaemon
+import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.editors.getProjectModelId
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
@@ -16,11 +20,13 @@ import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.framework.assertAllProjectsWereLoaded
+import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.*
 import com.jetbrains.rider.util.idea.syncFromBackend
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.Test
 import java.io.PrintStream
+import java.time.Duration
 
 @Suppress("UnstableApiUsage")
 @Test
@@ -77,6 +83,23 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
         printStream.println()
         printStream.println(project.fcsHost.dumpFcsModuleReader.syncFromBackend(Unit, project))
     }
+
+    // Copied from EditorTestBase
+    private fun waitForEditorSwitch(targetFileName: String, hostTimeout: Duration = Duration.ofSeconds(20)) {
+        frameworkLogger.info("Waiting for editor switch")
+        val instanceEx = FileEditorManagerEx.getInstanceEx(project)
+
+        pumpMessages(hostTimeout) {
+            val name = instanceEx.selectedEditor?.file?.name
+            name == targetFileName
+        }
+
+        val name = instanceEx.selectedEditor?.file?.name
+
+        assert(name == targetFileName) { "Editor should be switched. Current editor: $name" }
+        frameworkLogger.info("Editor switched to $targetFileName")
+    }
+
 
     @TestEnvironment(solution = "ProjectReferencesCSharp")
     fun testUnloadReloadCSharp() {
@@ -180,4 +203,46 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
         }
     }
 
+    @TestEnvironment(solution = "ProjectReferencesCSharp2")
+    fun testGotoUsagesFromCSharp() {
+        withNonFSharpProjectReferences {
+            assertAllProjectsWereLoaded(project)
+            withOpenedEditor(project, "CSharpProject/Class1.cs", "Class1.cs") {
+                callAction(IdeActions.ACTION_GOTO_DECLARATION)
+                waitForEditorSwitch("Library.fs")
+            }
+        }
+    }
+
+    @TestEnvironment(solution = "ProjectReferencesCSharp3")
+    fun testGotoUsagesFromCSharpChangeCSharp() {
+        withNonFSharpProjectReferences {
+            assertAllProjectsWereLoaded(project)
+            withOpenedEditor(project, "CSharpProject/Class1.cs", "Class1.cs") {
+                typeWithLatency("1")
+                callAction(IdeActions.ACTION_GOTO_DECLARATION)
+                waitForEditorSwitch("Library.fs")
+            }
+        }
+    }
+
+    @TestEnvironment(solution = "ProjectReferencesCSharp3")
+    fun testGotoUsagesFromCSharpChangeCSharp2() {
+        withNonFSharpProjectReferences {
+            assertAllProjectsWereLoaded(project)
+
+            withOpenedEditor(project, "FSharpProject/Library.fs") {
+                waitForDaemon()
+            }
+
+            waitForDaemonCloseAllOpenEditors(project)
+
+            withOpenedEditor(project, "CSharpProject/Class1.cs", "Class1.cs") {
+                typeWithLatency("1")
+                waitForNextDaemon()
+                callAction(IdeActions.ACTION_GOTO_DECLARATION)
+                waitForEditorSwitch("Library.fs")
+            }
+        }
+    }
 }

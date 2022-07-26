@@ -32,6 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private readonly OneToSetMap<IPsiModule, IPsiModule> myReferencingModules = new();
     private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
+    private readonly ISet<IPsiModule> myDirtyNonFSharpModules = new HashSet<IPsiModule>();
 
     public FcsResolvedSymbolsCache(Lifetime lifetime, FcsCheckerService checkerService, IPsiModules psiModules,
       IFcsProjectProvider fcsProjectProvider, AssemblyReaderShim assemblyReaderShim,
@@ -93,11 +94,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void MarkAsDirty(IPsiSourceFile sourceFile)
     {
-      if (!IsApplicable(sourceFile))
-        return;
-
       using var _ = FcsReadWriteLock.WriteCookie.Create();
-        myDirtyFiles.Add(sourceFile);
+      {
+        if (IsApplicable(sourceFile))
+          myDirtyFiles.Add(sourceFile);
+        else
+          myDirtyNonFSharpModules.Add(sourceFile.PsiModule);
+      }
     }
 
     public object Load(IProgressIndicator progress, bool enablePersistence) => null;
@@ -112,6 +115,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public bool UpToDate(IPsiSourceFile sourceFile)
     {
+      // todo: is this correct?
       using var _ = FcsReadWriteLock.ReadCookie.Create();
         return !myDirtyFiles.Contains(sourceFile);
     }
@@ -153,6 +157,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       foreach (var sourceFile in myDirtyFiles)
         Invalidate(sourceFile);
 
+      foreach (var psiModule in myDirtyNonFSharpModules)
+        InvalidateReferencingModules(psiModule);
+
       myDirtyFiles.Clear();
     }
 
@@ -170,6 +177,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       get
       {
+        // todo: is this correct?
         using var _ = FcsReadWriteLock.ReadCookie.Create();
           return !myDirtyFiles.IsEmpty();
       }
