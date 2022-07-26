@@ -33,18 +33,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         {
           if (myReferences == null)
           {
+            // todo: add test: use C# ctor in F# without application
             SymbolReference ??= new FSharpSymbolReference(this);
-
-            var appExpr = PrefixAppExprNavigator.GetByFunctionExpression(this.IgnoreParentParens());
-            if (appExpr == null)
-            {
-              myReferences = new IReference[] {SymbolReference};
-            }
-            else
-            {
-              CtorTypeReference = new ReferenceExpressionTypeReference(this);
-              myReferences = new IReference[] {SymbolReference, CtorTypeReference};
-            }
+            CtorTypeReference = new ReferenceExpressionTypeReference(this);
+            myReferences = new IReference[] { SymbolReference, CtorTypeReference };
           }
         }
       }

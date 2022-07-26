@@ -1,6 +1,9 @@
 ﻿Other
 ---
 UsageOther TO: [O] let mutable |aaa| = 123 RANGE: (29,32) @ Write - Expr 02 - Paren.fs
+UsageOther TO: [O] (|aaa|) <- aaa + 1 RANGE: (41,44) @ Write - Expr 02 - Paren.fs
+UsageOther TO: [O] (aaa) <- |aaa| + 1 RANGE: (49,52) @ Write - Expr 02 - Paren.fs
+UsageOther TO: [O] (aaa) <- aaa |+| 1 RANGE: (53,54) @ Write - Expr 02 - Paren.fs
 UsageOther TO: [O] (aaa) <- aaa |+| 1 RANGE: (53,54) @ Write - Expr 02 - Paren.fs
 
 

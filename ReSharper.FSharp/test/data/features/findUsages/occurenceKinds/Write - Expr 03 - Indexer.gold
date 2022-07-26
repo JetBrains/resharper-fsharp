@@ -1,9 +1,12 @@
 ﻿Other
 ---
 UsageOther TO: [O] let |a|: int[] = [||] RANGE: (21,22) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] |a|.[0] <- 1 RANGE: (38,39) @ Write - Expr 03 - Indexer.fs
 UsageOther TO: [O] |a|[0] <- 1 RANGE: (50,51) @ Write - Expr 03 - Indexer.fs
 UsageOther TO: [O] let |b|: int[][] = [||] RANGE: (67,68) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] |b|.[0].[0] <- 1 RANGE: (86,87) @ Write - Expr 03 - Indexer.fs
 UsageOther TO: [O] |b|[0].[0] <- 1 RANGE: (102,103) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] |b|.[0][0] <- 1 RANGE: (117,118) @ Write - Expr 03 - Indexer.fs
 UsageOther TO: [O] |b|[0][0] <- 1 RANGE: (132,133) @ Write - Expr 03 - Indexer.fs
 
 

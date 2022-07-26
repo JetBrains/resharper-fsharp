@@ -13,6 +13,9 @@ Other
 ---
 UsageOther TO: [O] T.|M|(P = 1) RANGE: (98,99) @ Write - Return 01.fs
 UsageOther TO: [O] |T|.M(P = 1) RANGE: (96,97) @ Write - Return 01.fs
+UsageOther TO: [O] |T|.M(P = 1) RANGE: (96,97) @ Write - Return 01.fs
+UsageOther TO: [O] T.M(|P| = 1) RANGE: (100,101) @ Write - Return 01.fs
+UsageOther TO: [O] T.M(P |=| 1) RANGE: (102,103) @ Write - Return 01.fs
 UsageOther TO: [O] T.M(P |=| 1) RANGE: (102,103) @ Write - Return 01.fs
 
 

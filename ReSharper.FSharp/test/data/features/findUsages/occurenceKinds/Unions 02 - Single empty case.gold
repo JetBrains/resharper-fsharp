@@ -8,6 +8,11 @@ New instance creation
 UsageInstanceCreation TO: [O] match |A| with RANGE: (37,38) @ Unions 02 - Single empty case.fs
 
 
+Other
+---
+UsageOther TO: [O] match |A| with RANGE: (37,38) @ Unions 02 - Single empty case.fs
+
+
 Pattern
 ---
 UsagePatternChecking TO: [O] | |A| -> () RANGE: (47,48) @ Unions 02 - Single empty case.fs

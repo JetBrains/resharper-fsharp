@@ -1,6 +1,7 @@
 ﻿Other
 ---
 UsageOther TO: [O] let |e1| = Exn RANGE: (38,40) @ Exception - Singleton 01.fs
+UsageOther TO: [O] let e1 = |Exn| RANGE: (43,46) @ Exception - Singleton 01.fs
 UsageOther TO: [O] let |e2|: Exn = () RANGE: (52,54) @ Exception - Singleton 01.fs
 
 
