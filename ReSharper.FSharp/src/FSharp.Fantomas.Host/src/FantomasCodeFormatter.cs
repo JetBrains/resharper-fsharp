@@ -123,6 +123,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private static readonly MethodInfo MakeRangeMethod = CodeFormatterType.GetMethod("MakeRange");
     private static readonly MethodInfo SourceOriginConstructor = GetSourceOriginStringConstructor();
 
+    private static readonly MethodInfo CreateOptionMethod =
+      typeof(FSharpOption<>)
+        .MakeGenericType(FormatConfigType)
+        .GetMethod("Some")
+        .NotNull("FSharpOption.Some");
+
     public static readonly (string Name, object Value)[] FormatConfigFields =
       FSharpType.GetRecordFields(FormatConfigType, null)
         .Select(x => x.Name)
@@ -218,7 +224,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
           .Select(field => riderFormatConfigDict.TryGetValue(field.Name, out var value) ? value : field.Value)
           .ToArray();
 
-      return FSharpValue.MakeRecord(FormatConfigType, formatConfigValues, null);
+      var formatConfig = FSharpValue.MakeRecord(FormatConfigType, formatConfigValues, null);
+
+      return CurrentVersion >= FantomasProtocolConstants.Fantomas5Version
+        ? CreateOptionMethod.Invoke(null, new[] { formatConfig }) //FSharpOption<FormatConfig>
+        : formatConfig;
     }
 
     // TODO: alternatively, we can reuse the logic from
