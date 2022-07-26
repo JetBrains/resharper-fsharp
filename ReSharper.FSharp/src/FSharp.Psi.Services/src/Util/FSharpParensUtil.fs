@@ -306,7 +306,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
         let attribute = AttributeNavigator.GetByExpression(context)
         isNotNull attribute && (isNotNull attribute.Target || isNotNull typeArgumentList || isNotNull qualifier) ||
 
-        isNotNull (AppExprNavigator.GetByArgument(context)) && getFirstQualifier refExpr :? IAppExpr ||
+        isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(context)) && getFirstQualifier refExpr :? IAppExpr ||
 
         // todo: tests
         isNull typeArgumentList && isNull qualifier && PrettyNaming.IsOperatorDisplayName (refExpr.GetText()) ||
@@ -314,7 +314,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
         checkPrecedence context expr
 
     | :? IIndexerExpr as indexerExpr ->
-        isNotNull (AppExprNavigator.GetByArgument(context)) && getFirstQualifier indexerExpr :? IAppExpr ||
+        isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(context)) && getFirstQualifier indexerExpr :? IAppExpr ||
 
         checkPrecedence context expr
     

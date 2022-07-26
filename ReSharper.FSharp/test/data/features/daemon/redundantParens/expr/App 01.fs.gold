@@ -1,0 +1,27 @@
+﻿module M
+
+type T() =
+    static member M() = ""
+    member this.P = 1
+
+id (id())
+id (id ())
+
+id (T().P)
+id (T.M().Length)
+
+|(|(0)T().P|)|(1) |> ignore
+|(|(2)T.M().Length|)|(3) |> ignore
+
+ignore <| |(|(4)T().P|)|(5)
+ignore <| |(|(6)T.M().Length|)|(7)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses

@@ -22,6 +22,8 @@ type AddIgnoreTest() =
     [<Test>] member x.``Expression 05 - &&``() = x.DoNamedTest()
     [<Test>] member x.``Expression 06 - Same precedence``() = x.DoNamedTest()
     [<Test>] member x.``Expression 07 - Same precedence``() = x.DoNamedTest()
+    [<Test>] member x.``Expression 08 - Qualifier app``() = x.DoNamedTest()
+    [<Test>] member x.``Expression 09 - Qualifier app``() = x.DoNamedTest()
 
     [<Test>] member x.``New line - Lazy 01``() = x.DoNamedTest()
 
