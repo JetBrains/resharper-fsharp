@@ -1,0 +1,65 @@
+===================
+Init
+
+Readers by module: 0
+
+===================
+1. Add reference
+
+Readers by module: 1
+  CSharpProject
+Readers by path count: 1
+
+===================
+2. Type
+
+Readers by module: 1
+  CSharpProject
+Readers by path count: 1
+Dirty types in readers:
+  CSharpProject
+    CSharpProject.CSharpClass
+    CSharpProject.CSharpClass2
+
+===================
+3. Open F#
+
+Readers by module: 1
+  CSharpProject
+Readers by path count: 1
+
+===================
+4. Unload C# projject
+
+Readers by module: 0
+
+===================
+5. Reload C# project
+
+Readers by module: 1
+  CSharpProject
+Readers by path count: 1
+
+===================
+6. Type
+
+Readers by module: 1
+  CSharpProject
+Readers by path count: 1
+Dirty types in readers:
+  CSharpProject
+    CSharpProject.CSharpClass
+    CSharpProject.CSharpClass2
+
+===================
+7. Unload C# projject
+
+Readers by module: 0
+
+===================
+8. Reload C# project
+
+Readers by module: 1
+  CSharpProject
+Readers by path count: 1
+

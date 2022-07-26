@@ -4,19 +4,25 @@ Init
 Readers by module: 0
 
 ===================
-Add reference
+1. Add reference
 
 Readers by module: 1
   CSharpProject
 Readers by path count: 1
 
 ===================
-Unload C# project
+2. Type
 
-Readers by module: 0
+Readers by module: 1
+  CSharpProject
+Readers by path count: 1
+Dirty types in readers:
+  CSharpProject
+    CSharpProject.CSharpClass
+    CSharpProject.CSharpClass2
 
 ===================
-Reload C# project
+3. Open F#
 
 Readers by module: 1
   CSharpProject

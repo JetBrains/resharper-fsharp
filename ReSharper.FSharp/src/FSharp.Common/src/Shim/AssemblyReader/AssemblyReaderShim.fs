@@ -87,8 +87,9 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         fsOptionsProvider.NonFSharpProjectInMemoryAnalysis.Value
 
     do
-        checkerService.AssemblyReaderShim <- this
-        lifetime.OnTermination(fun _ -> checkerService.AssemblyReaderShim <- Unchecked.defaultof<_>) |> ignore
+        if isEnabledForAssemblies then
+            checkerService.AssemblyReaderShim <- this
+            lifetime.OnTermination(fun _ -> checkerService.AssemblyReaderShim <- Unchecked.defaultof<_>) |> ignore
 
     // The shim is injected to get the expected shim shadowing chain, it's expected to be unused.
     do assemblyInfoShim |> ignore
@@ -105,6 +106,10 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     let nonLazyDependenciesForModule = OneToSetMap<IPsiModule, IPsiModule>()
 
     let dependenciesToReferencingModules = OneToSetMap<IPsiModule, IPsiModule>()
+
+    let isKnownModule (psiModule: IPsiModule) =
+        assemblyReadersByModule.ContainsKey(psiModule) ||
+        dependenciesToReferencingModules.ContainsKey(psiModule)
 
     // todo: F#->F#->C# references
     //   change in F#->F# is not seen by C# now
@@ -258,8 +263,18 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         let typeElement = typePart.TypeElement
         let psiModule = typeElement.Module
 
-        if dependenciesToReferencingModules.ContainsKey(psiModule) then
-            dirtyTypesInModules.Add(psiModule, typeElement.GetClrName().GetPersistent()) |> ignore
+        if not (isKnownModule psiModule) then () else
+
+        // todo: use short names
+        dirtyTypesInModules.Add(psiModule, typeElement.GetClrName().GetPersistent()) |> ignore
+
+    let invalidateDirty () =
+        Assertion.Assert(locker.IsWriteLockHeld)
+        
+        for psiModule in dirtyModules do
+            invalidateModule psiModule
+        dirtyModules.Clear()
+        invalidateDirtyDependencies ()
 
     do
         lifetime.Bracket(
@@ -312,33 +327,45 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         member this.GetModuleReader(psiModule) =
             use lock = locker.UsingWriteLock()
+            invalidateDirty ()
             getOrCreateReaderFromModule psiModule
 
         member this.InvalidateDirty() =
             use lock = locker.UsingWriteLock()
-            for psiModule in dirtyModules do
-                invalidateModule psiModule
-            invalidateDirtyDependencies ()
+            invalidateDirty ()
 
         member this.RecordDependencies(psiModule) =
             recordDependencies psiModule
 
         member this.InvalidateModule(psiModule) =
-            dirtyModules.Add(psiModule) |> ignore
+            if isKnownModule psiModule then
+                dirtyModules.Add(psiModule) |> ignore
 
         member this.TestDump =
             use cookie = ReadLockCookie.Create()
+            use lock = locker.UsingReadLock()
 
             let builder = StringBuilder()
-            builder.AppendLine("Module reader:\n-------------------") |> ignore
 
             builder.AppendLine($"Readers by module: {assemblyReadersByModule.Count}") |> ignore
             for psiModule in assemblyReadersByModule.Keys do
-                builder.AppendLine(psiModule.DisplayName) |> ignore
+                builder.AppendLine($"  {psiModule.DisplayName}") |> ignore
 
-            builder.AppendLine() |> ignore
-            builder.AppendLine($"Readers by path count: {assemblyReadersByPath.Count}") |> ignore
-            
+            if assemblyReadersByPath.Count > 0 then
+                builder.AppendLine($"Readers by path count: {assemblyReadersByPath.Count}") |> ignore
+
+            if dirtyModules.Count > 0 then
+                builder.AppendLine($"Dirty readers: {dirtyModules.Count}") |> ignore
+                for psiModule in dirtyModules do
+                    builder.AppendLine($"    {psiModule.DisplayName}") |> ignore
+
+            if dirtyTypesInModules.Count > 0 then
+                builder.AppendLine("Dirty types in readers:") |> ignore
+                for psiModule in dirtyTypesInModules.Keys do
+                    builder.AppendLine($"  {psiModule.DisplayName}") |> ignore
+                    for typeName in dirtyTypesInModules.GetValuesSafe(psiModule) do
+                        builder.AppendLine($"    {typeName.FullName}") |> ignore
+
             builder.ToString()
 
         member this.RemoveModule(psiModule) =
@@ -346,3 +373,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             if isNotNull referencedAssembly then
                 assemblyReadersByModule.TryRemove(psiModule) |> ignore
                 assemblyReadersByPath.TryRemove(referencedAssembly.Path) |> ignore
+
+            dirtyModules.Remove(psiModule) |> ignore
+            dirtyTypesInModules.RemoveKey(psiModule) |> ignore

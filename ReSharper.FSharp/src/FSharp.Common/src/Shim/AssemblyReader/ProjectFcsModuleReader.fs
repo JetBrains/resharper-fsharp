@@ -930,10 +930,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     member this.InvalidateTypeDef(clrTypeName: IClrTypeName) =
         use lock = locker.UsingWriteLock()
         match typeDefs.TryRemove(clrTypeName) with
-        | true, _ ->
-            moduleDef <- None
-            timestamp <- DateTime.UtcNow
+        | true, _ -> moduleDef <- None
         | _ -> ()
+
+        // todo: invalidate timestamp on seen-by-FCS type changes only
+        // todo: add test for adding/removing not-seen-by-FCS types
+        timestamp <- DateTime.UtcNow
 
     interface IProjectFcsModuleReader with
         member this.ILModuleDef =

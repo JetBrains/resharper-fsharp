@@ -1,6 +1,7 @@
 package projectModel
 
 import com.intellij.openapi.editor.impl.EditorImpl
+import com.intellij.openapi.project.Project
 import com.intellij.workspaceModel.ide.WorkspaceModel
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
@@ -58,17 +59,23 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
         expectedReferencedProjects: List<String>
     ) {
         val project = project
-
         withOpenedEditor(project, "FSharpProject/Library.fs") {
             waitForDaemon()
             assert(markupAdapter.hasErrors == hasErrors)
             assertReferencedFcsProjectNames(this, expectedReferencedProjects)
-
-            printStream.appendLine("===================")
-            printStream.println(caption)
-            printStream.println()
-            printStream.println(project.fcsHost.dumpFcsModuleReader.syncFromBackend(Unit, project))
+            dumpModuleReader(printStream, caption, project)
         }
+    }
+
+    private fun dumpModuleReader(
+        printStream: PrintStream,
+        caption: String,
+        project: Project
+    ) {
+        printStream.appendLine("===================")
+        printStream.println(caption)
+        printStream.println()
+        printStream.println(project.fcsHost.dumpFcsModuleReader.syncFromBackend(Unit, project))
     }
 
     @TestEnvironment(solution = "ProjectReferencesCSharp")
@@ -83,11 +90,94 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
                 assertHasErrorsAndProjectReferences(it, "Add reference", false, listOf("CSharpProject"))
 
                 unloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
-                assertHasErrorsAndProjectReferences(it, "Unload project", true, emptyList())
+                assertHasErrorsAndProjectReferences(it, "Unload C# project", true, emptyList())
 
                 reloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
-                assertHasErrorsAndProjectReferences(it, "Reload project", false, listOf("CSharpProject"))
+                assertHasErrorsAndProjectReferences(it, "Reload C# project", false, listOf("CSharpProject"))
             }
         }
     }
+
+    @TestEnvironment(solution = "ProjectReferencesCSharp")
+    fun testTypeInsideClassUnloadReload() {
+        executeWithGold(testGoldFile) {
+            withNonFSharpProjectReferences {
+                assertAllProjectsWereLoaded(project)
+                assertHasErrorsAndProjectReferences(it, "Init", true, emptyList())
+
+                waitForDaemonCloseAllOpenEditors(project)
+                addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
+                assertHasErrorsAndProjectReferences(it, "1. Add reference", false, listOf("CSharpProject"))
+
+                waitForDaemonCloseAllOpenEditors(project)
+                withOpenedEditor(project, "CSharpProject/Class1.cs") {
+                    typeFromOffset(" ", 75)
+                    waitForDaemon()
+                }
+
+                waitForDaemonCloseAllOpenEditors(project)
+                dumpModuleReader(it, "2. Type", project)
+
+                waitForDaemonCloseAllOpenEditors(project)
+                assertHasErrorsAndProjectReferences(it, "3. Open F#", false, listOf("CSharpProject"))
+                waitForDaemonCloseAllOpenEditors(project)
+
+                unloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
+                assertHasErrorsAndProjectReferences(it, "4. Unload C# projject", true, emptyList())
+
+                reloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
+                assertHasErrorsAndProjectReferences(it, "5. Reload C# project", false, listOf("CSharpProject"))
+
+                withOpenedEditor(project, "CSharpProject/Class1.cs") {
+                    typeFromOffset(" ", 75)
+                }
+
+                waitForDaemonCloseAllOpenEditors(project)
+                dumpModuleReader(it, "6. Type", project)
+
+                unloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
+                assertHasErrorsAndProjectReferences(it, "7. Unload C# projject", true, emptyList())
+
+                reloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
+                assertHasErrorsAndProjectReferences(it, "8. Reload C# project", false, listOf("CSharpProject"))
+            }
+        }
+    }
+
+    @TestEnvironment(solution = "ProjectReferencesCSharp")
+    fun testTypeOutsideClassUnloadReload() {
+        executeWithGold(testGoldFile) {
+            withNonFSharpProjectReferences {
+                assertAllProjectsWereLoaded(project)
+                assertHasErrorsAndProjectReferences(it, "Init", true, emptyList())
+
+                waitForDaemonCloseAllOpenEditors(project)
+                addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
+                assertHasErrorsAndProjectReferences(it, "1. Add reference", false, listOf("CSharpProject"))
+
+                waitForDaemonCloseAllOpenEditors(project)
+                withOpenedEditor(project, "CSharpProject/Class1.cs") {
+                    typeFromOffset(" ", 129)
+                }
+
+                waitForDaemonCloseAllOpenEditors(project)
+                dumpModuleReader(it, "2. Type", project)
+
+                waitForDaemonCloseAllOpenEditors(project)
+                assertHasErrorsAndProjectReferences(it, "3. Open F#", false, listOf("CSharpProject"))
+            }
+        }
+    }
+
+
+    @TestEnvironment(solution = "ProjectReferencesCSharp2")
+    fun testLoadReferenced() {
+        executeWithGold(testGoldFile) {
+            withNonFSharpProjectReferences {
+                assertAllProjectsWereLoaded(project)
+                assertHasErrorsAndProjectReferences(it, "Init", false, listOf("CSharpProject"))
+            }
+        }
+    }
+
 }
