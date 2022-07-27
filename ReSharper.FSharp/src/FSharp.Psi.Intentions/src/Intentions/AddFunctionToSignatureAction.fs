@@ -87,12 +87,14 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                                 
                             if isPostFix then
                                 let ga = t.GenericArguments[0].GenericParameter
-                                $"'{ga.DisplayName} {t.TypeDefinition.DisplayName}"
+                                let tick = if ga.IsSolveAtCompileTime then "^" else "'"
+                                $"{tick}{ga.DisplayName} {t.TypeDefinition.DisplayName}"
                             else
                                 let args = Seq.map getTypeName t.GenericArguments |> String.concat ","
                                 $"{t.TypeDefinition.DisplayName}<{args}>"
                     elif t.IsGenericParameter then
-                        $"'{t.GenericParameter.DisplayName}"
+                        let tick = if t.GenericParameter.IsSolveAtCompileTime then "^" else "'"
+                        $"{tick}{t.GenericParameter.DisplayName}"
                     elif t.IsFunctionType then
                         let rec visit (t: FSharpType) : string seq =
                             if  t.IsFunctionType then

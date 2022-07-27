@@ -23,3 +23,4 @@ type AddFunctionToSignatureFileActionTests() =
     [<Test>] member x.``Generic Function 02`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Generic Function 03`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Inline Function 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Statically Resolved Type Parameters 01`` () = x.DoNamedTestWithSignature()

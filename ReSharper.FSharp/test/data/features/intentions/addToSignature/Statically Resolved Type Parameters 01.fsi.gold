@@ -1,0 +1,3 @@
+module Foo
+
+val inline fmap: f: (^a -> ^b) -> a: ^a list -> ^b list
