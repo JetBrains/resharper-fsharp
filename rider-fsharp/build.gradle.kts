@@ -67,6 +67,9 @@ intellij {
 val repoRoot = projectDir.parentFile!!
 val resharperPluginPath = File(repoRoot, "ReSharper.FSharp")
 
+val rdLibDirectory: () -> File = { file("${tasks.setupDependencies.get().idea.get().classes}/lib/rd") }
+extra["rdLibDirectory"] = rdLibDirectory
+
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 val primaryTargetFramework = "net472"
 val outputRelativePath = "bin/$buildConfiguration/$primaryTargetFramework"
@@ -150,11 +153,8 @@ tasks {
         hashFolder = "build/rdgen"
         logger.info("Configuring rdgen params")
         classpath({
-        logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${setupDependencies.get().idea.get()}")
-            val sdkPath = setupDependencies.get().idea.get().classes
-            val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
-
-            "$rdLibDirectory/rider-model.jar"
+            logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${rdLibDirectory().canonicalPath}")
+            rdLibDirectory().resolve("rider-model.jar").canonicalPath
         })
         sources(File(repoRoot, "rider-fsharp/protocol/src/kotlin/model"))
         packages = "model"
