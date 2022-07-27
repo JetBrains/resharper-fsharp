@@ -287,6 +287,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         // todo: use lexer buffer
         if (lexer.FindTokenAt(endOffset - 1) && lexer.TokenType is { } tokenType)
         {
+          if (tokenType == FSharpTokenType.LPAREN_STAR_RPAREN && sourceName == "*")
+            return new TextRange(endOffset - 3, endOffset);
+
           var opText = tokenType == FSharpTokenType.SYMBOLIC_OP ? sourceName : logicalName;
           return new TextRange(endOffset - opText.Length, endOffset);
         }
