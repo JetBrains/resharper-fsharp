@@ -471,9 +471,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             |> List.ofSeq
             |> List.map mkAttribElement
 
-        let namedArgs = 
+        let namedArgs =
             attrInstance.NamedParameters()
             |> List.ofSeq
+            |> List.filter (fun (Pair(_, attributeValue)) -> attributeValue.IsConstant)
             |> List.map (fun (Pair(name, attributeValue)) ->
                 let attribElement = mkAttribElement attributeValue
                 let valueType = mkType attributeValue.ConstantValue.Type

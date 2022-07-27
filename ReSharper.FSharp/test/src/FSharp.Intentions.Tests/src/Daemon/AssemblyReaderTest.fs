@@ -89,6 +89,7 @@ type AssemblyReaderTest() =
     [<Test>] member x.``Attribute 03``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 04``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 05``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 06``() = x.DoNamedTest()
 
     [<Test>] member x.``Event - Same name 01``() = x.DoNamedTest()
     [<Test>] member x.``Event - Same name 02 - Static``() = x.DoNamedTest()
