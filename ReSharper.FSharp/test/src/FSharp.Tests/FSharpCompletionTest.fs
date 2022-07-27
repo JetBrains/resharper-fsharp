@@ -80,6 +80,11 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Pattern - Union case - Qualified 02``() = x.DoNamedTest()
     [<Test; Explicit("Fcs completion fails")>] member x.``Pattern - Union case - Qualified 03``() = x.DoNamedTest()
     [<Test; Explicit("Fcs completion fails")>] member x.``Pattern - Union case - Qualified 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Union case - Rqa 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case - Rqa 02 - Obj expr``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case - Rqa 03 - Extension``() = x.DoNamedTest()
+
     [<Test>] member x.``Pattern - Union case 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Union case 02``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Union case 03``() = x.DoNamedTest()

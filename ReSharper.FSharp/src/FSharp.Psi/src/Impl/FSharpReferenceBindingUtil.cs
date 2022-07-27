@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Naming;
 using JetBrains.ReSharper.Psi.Resolve;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -96,6 +97,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         SetRequiredQualifiers(reference, containingType);
         return;
       }
+
+      var containingTypeDecl = reference.GetElement().GetContainingNode<IFSharpTypeOrExtensionDeclaration>();
+      if (containingTypeDecl is ITypeDeclaration typeDecl && containingType.Equals(typeDecl.DeclaredElement))
+        return;
 
       reference.SetQualifier(containingType);
     }
