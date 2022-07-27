@@ -1,0 +1,3 @@
+module Foo
+
+val x: y: int * z: int -> int

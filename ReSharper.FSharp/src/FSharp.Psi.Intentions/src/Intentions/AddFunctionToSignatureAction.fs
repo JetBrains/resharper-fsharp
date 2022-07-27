@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
+open System
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -26,7 +27,16 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
         match bindings.First().HeadPattern.As<IReferencePat>() with
         | null -> None
         | pat -> pat.GetFcsSymbol().SignatureLocation
-        
+
+    let (|DeclaredNameInPattern|_|) (pat:IFSharpPattern) =
+        match pat with
+        | :? ILocalReferencePat as pat -> Some pat.DeclaredName
+        | :? ITypedPat as tp ->
+            match tp.Pattern.IgnoreInnerParens() with
+            | :? ILocalReferencePat as pat -> Some pat.DeclaredName
+            | _ -> None
+        | _ -> None
+    
     override x.Text = "Add to signature file"
     override this.IsAvailable _ =
         let currentFSharpFile = dataProvider.PsiFile
@@ -105,11 +115,18 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                     |> Seq.map (fun (t, p) ->
                         let typeName = getTypeName t
                         match p.Pattern.IgnoreInnerParens() with
-                        | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}: {typeName}"
-                        | :? ITypedPat as tp ->
-                            match tp.Pattern.IgnoreInnerParens() with
-                            | :? ILocalReferencePat as pat -> $"{pat.DeclaredName}: {typeName}"
-                            | _ -> typeName
+                        | DeclaredNameInPattern name -> $"{name}: {typeName}"
+                        | :? ITuplePat as tuplePat ->
+                            let typesInTuple = typeName.Split([|" * "|], StringSplitOptions.RemoveEmptyEntries)
+                            if tuplePat.Patterns.Count = typesInTuple.Length then
+                                Seq.zip tuplePat.PatternsEnumerable typesInTuple
+                                |> Seq.map (fun (pat, t) ->
+                                    match pat.IgnoreInnerParens() with
+                                    | DeclaredNameInPattern name -> $"{name}: {t}"
+                                    | _ -> t)
+                                |> String.concat " * "
+                            else
+                                typeName
                         | _ -> typeName
                     )
 
