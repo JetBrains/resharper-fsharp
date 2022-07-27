@@ -56,6 +56,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     ITypeParameterDeclarationList CreateTypeParameterOfTypeList(FSharpList<string> names);
 
-    IBindingSignature CreateBindingSignature(string name, string signature);
+    IBindingSignature CreateBindingSignature(bool isInline, string name, string signature);
   }
 }

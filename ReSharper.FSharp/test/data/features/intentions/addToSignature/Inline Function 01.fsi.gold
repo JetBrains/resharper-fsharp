@@ -1,0 +1,3 @@
+module Foo
+
+val inline hey: value: int -> string

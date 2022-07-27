@@ -120,7 +120,12 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                         seq { yield! namedParameters; yield getTypeName returnType}
                         |> String.concat " -> "
 
-                let sigDeclNode : ITreeNode = elementFactory.CreateBindingSignature(name, signature)
+                let isInline =
+                    match mfv.InlineAnnotation with
+                    | FSharpInlineAnnotation.AlwaysInline -> true
+                    | _ -> false
+                
+                let sigDeclNode : ITreeNode = elementFactory.CreateBindingSignature(isInline, name, signature)
                 let lastChild = ModificationUtil.AddChildAfter(sigDecl.LastChild, NewLine(sigDeclNode.GetLineEnding()))
                 let lastChild = ModificationUtil.AddChildAfter(lastChild, NewLine(sigDeclNode.GetLineEnding()))
                 ModificationUtil.AddChildAfter(lastChild, sigDeclNode) |> ignore
