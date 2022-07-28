@@ -87,7 +87,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
             let line = int fcsContext.Coords.Line + 1
 
             let isAttributeReferenceContext = isAttributeReference context
-            let getAllSymbols () = getAllSymbols checkResults
+            let getAllSymbols () = getAllSymbols (checkResults, context.BasicContext.Solution)
 
             try
                 let itemLists =
@@ -117,7 +117,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLookupItemsProvider(logger: ILogger) =
-    inherit FSharpLookupItemsProviderBase(logger, false, fun checkResults ->
+    inherit FSharpLookupItemsProviderBase(logger, false, fun (checkResults, _) ->
         let assemblySignature = checkResults.PartialAssemblySignature
         let getSymbolsAsync = async {
             return AssemblyContent.GetAssemblySignatureContent AssemblyContentType.Full assemblySignature }

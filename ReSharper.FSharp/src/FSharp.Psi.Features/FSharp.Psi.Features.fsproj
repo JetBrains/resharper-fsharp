@@ -15,6 +15,7 @@
     <Compile Include="src\CodeCompletion\Rules\FSharpRelevanceRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\UnionCasePatternRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\RemoveReparsePatternRule.fs" />
+    <Compile Include="src\CodeCompletion\Rules\ImportRule.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
@@ -102,5 +103,5 @@
 
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
 
-  <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'"/>
+  <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
 </Project>

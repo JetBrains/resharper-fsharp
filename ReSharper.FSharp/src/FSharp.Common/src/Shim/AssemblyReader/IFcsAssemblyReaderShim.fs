@@ -45,6 +45,9 @@ type IFcsAssemblyReaderShim =
     abstract IsEnabled: bool
     abstract GetModuleReader: psiModule: IPsiModule -> ReferencedAssembly
 
+    abstract IsKnownModule: IPsiModule -> bool
+    abstract IsKnownModule: VirtualFileSystemPath -> bool
+
     /// Removes reader for the module if present, another reader is going to be created for it
     abstract InvalidateModule: psiModule: IPsiModule -> unit
 

@@ -376,3 +376,9 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
             dirtyModules.Remove(psiModule) |> ignore
             dirtyTypesInModules.RemoveKey(psiModule) |> ignore
+
+        member this.IsKnownModule(psiModule: IPsiModule) =
+            assemblyReadersByModule.ContainsKey(psiModule)
+
+        member this.IsKnownModule(path: VirtualFileSystemPath) =
+            assemblyReadersByPath.ContainsKey(path)
