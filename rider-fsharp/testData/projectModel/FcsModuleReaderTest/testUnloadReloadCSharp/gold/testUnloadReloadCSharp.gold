@@ -4,21 +4,47 @@ Init
 Readers by module: 0
 
 ===================
-Add reference
-
-Readers by module: 1
-  CSharpProject
-Readers by path count: 1
-
-===================
-Unload C# project
+1. Open F# file
 
 Readers by module: 0
 
 ===================
-Reload C# project
+2. Add reference
+
+Readers by module: 0
+
+===================
+3. Open F# file
 
 Readers by module: 1
   CSharpProject
 Readers by path count: 1
+Dependencies to referencing modules:
+  CSharpProject
+    FSharpProject
+
+===================
+4. Unload C# project
+
+Readers by module: 0
+
+===================
+5. Open F# file
+
+Readers by module: 0
+
+===================
+6. Reload C# project
+
+Readers by module: 0
+
+===================
+7. Open F# file
+
+Readers by module: 1
+  CSharpProject
+Readers by path count: 1
+Dependencies to referencing modules:
+  CSharpProject
+    FSharpProject
 

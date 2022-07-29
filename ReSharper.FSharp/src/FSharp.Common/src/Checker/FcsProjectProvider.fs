@@ -105,6 +105,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         | Some fcsProject ->
             logger.Trace("Start invalidating FcsProject: {0}", psiModule)
             fcsProjectInvalidated.Fire(psiModule)
+            fcsAssemblyReaderShim.InvalidateModule(psiModule)
 
             // Invalidate FCS projects for the old project options, before creating new ones.
             // todo: try to not invalidate FCS project if a project is not changed actually?

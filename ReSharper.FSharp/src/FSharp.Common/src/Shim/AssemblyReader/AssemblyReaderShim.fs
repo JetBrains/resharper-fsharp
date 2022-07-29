@@ -219,16 +219,16 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     let rec invalidateModule (psiModule: IPsiModule) =
         let mutable moduleReader = Unchecked.defaultof<_>
-        if not (tryGetReaderFromModule psiModule &moduleReader) then () else
-
-        assemblyReadersByPath.TryRemove(moduleReader.Path) |> ignore
-        assemblyReadersByModule.TryRemove(psiModule) |> ignore
+        if tryGetReaderFromModule psiModule &moduleReader then
+            assemblyReadersByPath.TryRemove(moduleReader.Path) |> ignore
+            assemblyReadersByModule.TryRemove(psiModule) |> ignore
 
         for referencingModule in dependenciesToReferencingModules.GetValuesSafe(psiModule) do
             invalidateModule referencingModule
             moduleInvalidated.Fire(referencingModule)
 
         dependenciesToReferencingModules.RemoveKey(psiModule) |> ignore
+        moduleDependenciesRecorded.Remove(psiModule) |> ignore
 
     // todo: invalidate for per-referencing module
     let invalidateDirtyDependencies () =
@@ -340,6 +340,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         member this.InvalidateModule(psiModule) =
             if isKnownModule psiModule then
                 dirtyModules.Add(psiModule) |> ignore
+            moduleDependenciesRecorded.Remove(psiModule) |> ignore
 
         member this.TestDump =
             use cookie = ReadLockCookie.Create()
@@ -353,6 +354,13 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
             if assemblyReadersByPath.Count > 0 then
                 builder.AppendLine($"Readers by path count: {assemblyReadersByPath.Count}") |> ignore
+
+            if dependenciesToReferencingModules.Count > 0 then
+                builder.AppendLine("Dependencies to referencing modules:") |> ignore
+                for KeyValue(dependency, referencingModules) in dependenciesToReferencingModules do
+                    builder.AppendLine($"  {dependency.DisplayName}") |> ignore
+                    for referencing in referencingModules |> Seq.sortBy (fun psiModule -> psiModule.DisplayName) do
+                        builder.AppendLine($"    {referencing.DisplayName}") |> ignore
 
             if dirtyModules.Count > 0 then
                 builder.AppendLine($"Dirty readers: {dirtyModules.Count}") |> ignore
@@ -376,6 +384,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
             dirtyModules.Remove(psiModule) |> ignore
             dirtyTypesInModules.RemoveKey(psiModule) |> ignore
+            dependenciesToReferencingModules.RemoveKey(psiModule) |> ignore
 
         member this.IsKnownModule(psiModule: IPsiModule) =
             assemblyReadersByModule.ContainsKey(psiModule)

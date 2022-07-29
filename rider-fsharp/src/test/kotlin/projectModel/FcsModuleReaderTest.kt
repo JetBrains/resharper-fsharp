@@ -58,7 +58,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
         assert(expectedReferencedProjects == referencedProjects)
     }
 
-    private fun assertHasErrorsAndProjectReferences(
+    private fun openFsFileDumpModuleReader(
         printStream: PrintStream,
         caption: String,
         hasErrors: Boolean,
@@ -71,6 +71,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
             assertReferencedFcsProjectNames(this, expectedReferencedProjects)
             dumpModuleReader(printStream, caption, project)
         }
+        waitForDaemonCloseAllOpenEditors(project)
     }
 
     private fun dumpModuleReader(
@@ -106,17 +107,24 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
         executeWithGold(testGoldFile) {
             withNonFSharpProjectReferences {
                 assertAllProjectsWereLoaded(project)
-                assertHasErrorsAndProjectReferences(it, "Init", true, emptyList())
+                dumpModuleReader(it, "Init", project)
 
-                waitForDaemonCloseAllOpenEditors(project)
+                openFsFileDumpModuleReader(it, "1. Open F# file", true, emptyList())
+
                 addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
-                assertHasErrorsAndProjectReferences(it, "Add reference", false, listOf("CSharpProject"))
+                dumpModuleReader(it, "2. Add reference", project)
+
+                openFsFileDumpModuleReader(it, "3. Open F# file", false, listOf("CSharpProject"))
 
                 unloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
-                assertHasErrorsAndProjectReferences(it, "Unload C# project", true, emptyList())
+                dumpModuleReader(it, "4. Unload C# project", project)
+
+                openFsFileDumpModuleReader(it, "5. Open F# file", true, emptyList())
 
                 reloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
-                assertHasErrorsAndProjectReferences(it, "Reload C# project", false, listOf("CSharpProject"))
+                dumpModuleReader(it, "6. Reload C# project", project)
+
+                openFsFileDumpModuleReader(it, "7. Open F# file", false, listOf("CSharpProject"))
             }
         }
     }
@@ -126,43 +134,49 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
         executeWithGold(testGoldFile) {
             withNonFSharpProjectReferences {
                 assertAllProjectsWereLoaded(project)
-                assertHasErrorsAndProjectReferences(it, "Init", true, emptyList())
+                openFsFileDumpModuleReader(it, "Init", true, emptyList())
 
-                waitForDaemonCloseAllOpenEditors(project)
                 addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
-                assertHasErrorsAndProjectReferences(it, "1. Add reference", false, listOf("CSharpProject"))
+                dumpModuleReader(it, "1. Add reference", project)
 
-                waitForDaemonCloseAllOpenEditors(project)
+                openFsFileDumpModuleReader(it, "2. Open F# file", false, listOf("CSharpProject"))
+
                 withOpenedEditor(project, "CSharpProject/Class1.cs") {
                     typeFromOffset(" ", 75)
                     waitForDaemon()
                 }
 
                 waitForDaemonCloseAllOpenEditors(project)
-                dumpModuleReader(it, "2. Type", project)
+                dumpModuleReader(it, "3. Type inside C# file", project)
 
-                waitForDaemonCloseAllOpenEditors(project)
-                assertHasErrorsAndProjectReferences(it, "3. Open F#", false, listOf("CSharpProject"))
-                waitForDaemonCloseAllOpenEditors(project)
+                openFsFileDumpModuleReader(it, "4. Open F# file", false, listOf("CSharpProject"))
 
                 unloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
-                assertHasErrorsAndProjectReferences(it, "4. Unload C# projject", true, emptyList())
+                dumpModuleReader(it, "5. Unload C# project", project)
+
+                openFsFileDumpModuleReader(it, "6. Open F# file", true, emptyList())
 
                 reloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
-                assertHasErrorsAndProjectReferences(it, "5. Reload C# project", false, listOf("CSharpProject"))
+                dumpModuleReader(it, "7. Reload C# project", project)
+
+                openFsFileDumpModuleReader(it, "8. Open F# file", false, listOf("CSharpProject"))
 
                 withOpenedEditor(project, "CSharpProject/Class1.cs") {
                     typeFromOffset(" ", 75)
                 }
 
                 waitForDaemonCloseAllOpenEditors(project)
-                dumpModuleReader(it, "6. Type", project)
+                dumpModuleReader(it, "9. Type inside C# file", project)
 
                 unloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
-                assertHasErrorsAndProjectReferences(it, "7. Unload C# projject", true, emptyList())
+                dumpModuleReader(it, "10. Unload C# project", project)
+
+                openFsFileDumpModuleReader(it, "11. Open F# file", true, emptyList())
 
                 reloadProject(arrayOf("ProjectReferencesCSharp", "CSharpProject"))
-                assertHasErrorsAndProjectReferences(it, "8. Reload C# project", false, listOf("CSharpProject"))
+                dumpModuleReader(it, "12. Reload C# project", project)
+
+                openFsFileDumpModuleReader(it, "13. Open F# file", false, listOf("CSharpProject"))
             }
         }
     }
@@ -172,22 +186,21 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
         executeWithGold(testGoldFile) {
             withNonFSharpProjectReferences {
                 assertAllProjectsWereLoaded(project)
-                assertHasErrorsAndProjectReferences(it, "Init", true, emptyList())
+                openFsFileDumpModuleReader(it, "Init", true, emptyList())
 
-                waitForDaemonCloseAllOpenEditors(project)
                 addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
-                assertHasErrorsAndProjectReferences(it, "1. Add reference", false, listOf("CSharpProject"))
+                dumpModuleReader(it, "1. Add reference", project)
 
-                waitForDaemonCloseAllOpenEditors(project)
+                openFsFileDumpModuleReader(it, "2. Open F# file", false, listOf("CSharpProject"))
+
                 withOpenedEditor(project, "CSharpProject/Class1.cs") {
                     typeFromOffset(" ", 129)
                 }
 
                 waitForDaemonCloseAllOpenEditors(project)
-                dumpModuleReader(it, "2. Type", project)
+                dumpModuleReader(it, "3. Type inside C# file", project)
 
-                waitForDaemonCloseAllOpenEditors(project)
-                assertHasErrorsAndProjectReferences(it, "3. Open F#", false, listOf("CSharpProject"))
+                openFsFileDumpModuleReader(it, "4. Open F# file", false, listOf("CSharpProject"))
             }
         }
     }
@@ -198,7 +211,14 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
         executeWithGold(testGoldFile) {
             withNonFSharpProjectReferences {
                 assertAllProjectsWereLoaded(project)
-                assertHasErrorsAndProjectReferences(it, "Init", false, listOf("CSharpProject"))
+                openFsFileDumpModuleReader(it, "Init", false, listOf("CSharpProject"))
+
+                unloadProject(arrayOf("ProjectReferencesCSharp2", "CSharpProject"))
+                waitForDaemonCloseAllOpenEditors(project)
+                dumpModuleReader(it, "2. Unload C# project", project)
+
+                waitForDaemonCloseAllOpenEditors(project)
+                openFsFileDumpModuleReader(it, "3. Open F#", true, emptyList())
             }
         }
     }
