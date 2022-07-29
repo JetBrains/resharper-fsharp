@@ -54,6 +54,7 @@ type RedundantParenExprTest() =
     [<Test>] member x.``App - Attribute 04 - Targets``() = x.DoNamedTest()
 
     [<Test>] member x.``App 01``() = x.DoNamedTest()
+    [<Test>] member x.``App 02 - Indexer``() = x.DoNamedTest()
 
     [<Test>] member x.``Binary - App 01``() = x.DoNamedTest()
     [<Test>] member x.``Binary - App 02 - If``() = x.DoNamedTest()

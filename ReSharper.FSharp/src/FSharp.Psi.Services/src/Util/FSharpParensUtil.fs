@@ -347,8 +347,12 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
 
         checkPrecedence context expr
 
-    | :? IPrefixAppExpr ->
+    | :? IPrefixAppExpr as appExpr ->
         isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(getQualifiedExpr context)) ||
+
+        let isQualifier = isNotNull (QualifiedExprNavigator.GetByQualifier(context))
+        isQualifier && isIndexerLikeAppExpr appExpr && isIndexerLikeAppExpr appExpr.FunctionExpression || 
+
         checkPrecedence context expr
 
     | :? ISequentialExpr as seqExpr ->

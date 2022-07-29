@@ -487,6 +487,11 @@ let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
             else currentExpr <- null
     }
 
+let isIndexerLikeAppExpr (expr: IFSharpExpression) =
+    match expr with
+    | :? IPrefixAppExpr as appExpr -> appExpr.IsIndexerLike
+    | _ -> false
+
 let rec getIndexerExprOrIgnoreParens (expr: IFSharpExpression) =
     let appExpr = PrefixAppExprNavigator.GetByFunctionExpression(expr)
     if isNotNull appExpr && appExpr.IsIndexerLike then
