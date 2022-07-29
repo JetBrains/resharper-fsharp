@@ -235,6 +235,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         Assertion.Assert(locker.IsWriteLockHeld, "locker.IsWriteLockHeld")
 
         let invalidatedModules = HashSet()
+        let checkedTimestamp = HashSet()
 
         for dirtyModule in dirtyTypesInModules.Keys do
             let mutable dirtyModuleReader = Unchecked.defaultof<_>
@@ -246,6 +247,9 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             for referencingModule in dependenciesToReferencingModules.GetValuesSafe(dirtyModule) do
                 let mutable referencingModuleReader = Unchecked.defaultof<_>
                 if not (tryGetReaderFromModule referencingModule &referencingModuleReader) then () else
+
+                if checkedTimestamp.Add(referencingModule) then
+                    referencingModuleReader.UpdateTimestamp()
 
                 for typeName in dirtyTypesInModules.GetValuesSafe(dirtyModule) do
                     referencingModuleReader.InvalidateReferencingTypes(typeName.ShortName)
@@ -273,6 +277,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         
         for psiModule in dirtyModules do
             invalidateModule psiModule
+
         dirtyModules.Clear()
         invalidateDirtyDependencies ()
 

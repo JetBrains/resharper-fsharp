@@ -19,6 +19,8 @@ type IProjectFcsModuleReader =
     abstract InvalidateReferencingTypes: shortName: string -> unit
     abstract InvalidateTypesReferencingFSharpModule: psiModule: IPsiModule -> unit
 
+    abstract UpdateTimestamp: unit -> unit
+
     /// Debug data, disabled by default
     abstract RealModuleReader: ILModuleReader option with get, set
 
