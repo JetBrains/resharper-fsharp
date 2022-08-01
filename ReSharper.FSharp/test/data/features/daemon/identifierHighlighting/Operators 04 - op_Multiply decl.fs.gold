@@ -7,9 +7,12 @@ let (|*|(3)) (_, _) = 0
 
 |(*)|(4)
 
+1 |*|(5) 1
+
 ---------------------------------------------------------
 (0): ReSharper F# Module Identifier: 
 (1): ReSharper F# Class Identifier: 
 (2): ReSharper F# Method Identifier: 
 (3): ReSharper F# Operator Identifier: 
 (4): ReSharper F# Operator Identifier: 
+(5): ReSharper F# Operator Identifier: 
