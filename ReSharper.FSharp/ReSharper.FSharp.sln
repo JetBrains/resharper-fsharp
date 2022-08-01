@@ -39,6 +39,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Intentions.Tests", "
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests.Common", "test\src\FSharp.Tests.Common\FSharp.Tests.Common.fsproj", "{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Host.NetCore", "src\FSharp.TypeProviders.Host.NetCore\FSharp.TypeProviders.Host.NetCore.csproj", "{72982346-1D28-41CB-9CBF-056EC8482305}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -109,6 +111,10 @@ Global
 		{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72982346-1D28-41CB-9CBF-056EC8482305}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72982346-1D28-41CB-9CBF-056EC8482305}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72982346-1D28-41CB-9CBF-056EC8482305}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72982346-1D28-41CB-9CBF-056EC8482305}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -130,5 +136,6 @@ Global
 		{12E28B8B-CB6E-4620-B438-013C93ACC734} = {2E19336B-3133-4C1A-8E65-E2F7C465663B}
 		{24E8C927-A6E4-48DB-B548-DEEEE808EC4E} = {7B41BA27-ACA5-43D2-9EBA-2E604D63A4E2}
 		{B5A9B84B-B69B-4DCD-863A-989023EAEF8C} = {7B41BA27-ACA5-43D2-9EBA-2E604D63A4E2}
+		{72982346-1D28-41CB-9CBF-056EC8482305} = {2E19336B-3133-4C1A-8E65-E2F7C465663B}
 	EndGlobalSection
 EndGlobal

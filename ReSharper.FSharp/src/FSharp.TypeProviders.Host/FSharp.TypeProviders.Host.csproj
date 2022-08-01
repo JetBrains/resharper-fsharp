@@ -1,66 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host</RootNamespace>
-        <LangVersion>$(CSharpLanguageVersion)</LangVersion>
         <OutputType>Exe</OutputType>
-        <TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
-        <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+        <TargetFramework>net472</TargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net472'">
+    <PropertyGroup>
         <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host</AssemblyName>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.NetCore</AssemblyName>
-    </PropertyGroup>
-
     <ItemGroup>
-        <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
-        <ProjectReference Include="..\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj" />
+        <Content Include="app.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <Content Include="app.config">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
-      <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-        <PackageReference Include="System.Collections" Version="4.3.0" />
-        <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-        <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
-        <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.0"/>
-        <PackageReference Include="Microsoft.NETCore.Targets" Version="1.1.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="tploader.netcoreapp31.win.runtimeconfig.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="tploader.netcoreapp31.unix.runtimeconfig.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="tploader.net5.unix.runtimeconfig.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="tploader.net5.win.runtimeconfig.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="tploader.net6.unix.runtimeconfig.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="tploader.net6.win.runtimeconfig.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
-    <Import Project="$(PsiFeaturesSubplatform)" Condition="Exists('$(PsiFeaturesSubplatform)')" />
-
-    <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'"/>
+    <Import Project="$(SolutionDir)/TypeProviders.targets" />
+    <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
 </Project>
