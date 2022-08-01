@@ -396,3 +396,23 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         member this.IsKnownModule(path: VirtualFileSystemPath) =
             assemblyReadersByPath.ContainsKey(path)
+
+        member this.InvalidateAll() =
+            for KeyValue(psiModule, referencedAssembly) in assemblyReadersByModule do
+                match referencedAssembly with
+                | ReferencedAssembly.ProjectOutput reader ->
+                    reader.Invalidate()
+                    moduleInvalidated.Fire(psiModule)
+                | _ -> ()
+
+
+[<SolutionComponent>]
+type AssemblyReaderPsiCache(shim: IFcsAssemblyReaderShim, lifetime, locks, persistentIndexManager) =
+    inherit SimpleICache<obj>(lifetime, locks, persistentIndexManager, null)
+
+    override this.Build(_, _) = null
+
+    // todo: change API, report changed assembly to minimize the readers cache change?
+    override this.OnPsiChange(_, elementType) =
+        if elementType = PsiChangedElementType.CompiledContentsChanged then
+            shim.InvalidateAll()

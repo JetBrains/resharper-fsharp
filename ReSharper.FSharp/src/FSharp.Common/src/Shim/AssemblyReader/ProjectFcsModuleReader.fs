@@ -292,7 +292,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         if not t.IsResolved then
             // todo: use candidates?
-            mkType (psiModule.GetPredefinedType().Object) else
+            mkUnresolvedType psiModule else
 
         match t with
         | :? IDeclaredType as declaredType ->
@@ -350,6 +350,14 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             ILType.Ptr(elementType)
 
         | _ -> failwithf $"mkType: type: {t}"
+
+    and mkUnresolvedType (psiModule: IPsiModule) =
+        let objType = psiModule.GetPredefinedType().Object
+        if objType.IsResolved then
+            mkType objType
+        else
+            // todo: make a typeRef to System.Object in primary assembly
+            ILType.Void
 
     let staticCallingConv = Callconv(ILThisConvention.Static, ILArgConvention.Default)
     let instanceCallingConv = Callconv(ILThisConvention.Instance, ILArgConvention.Default)
@@ -1206,6 +1214,11 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             if not (isUpToDate ()) then
                 moduleDef <- None
                 timestamp <- DateTime.UtcNow
+
+        member this.Invalidate() =
+            typeDefs.Clear()
+            moduleDef <- None
+            timestamp <- DateTime.UtcNow
 
 
 type PreTypeDef(clrTypeName: IClrTypeName, reader: ProjectFcsModuleReader) =

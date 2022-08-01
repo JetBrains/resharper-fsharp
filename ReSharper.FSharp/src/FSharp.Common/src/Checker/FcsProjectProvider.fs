@@ -308,9 +308,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         use lock = FcsReadWriteLock.WriteCookie.Create()
         match change with
         | :? ProjectReferenceChange as referenceChange ->
-            let referenceOwnerProject = referenceChange.ProjectToModuleReference.OwnerModule
-            if referenceOwnerProject.IsFSharp then
-                invalidateProject referenceOwnerProject
+            invalidateProject referenceChange.ProjectToModuleReference.OwnerModule
         | change ->
             x.VisitDelta(change)
 

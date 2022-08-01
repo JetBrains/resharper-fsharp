@@ -12,6 +12,7 @@ type IProjectFcsModuleReader =
     abstract PsiModule: IPsiModule
     abstract Timestamp: DateTime
 
+    abstract Invalidate: unit -> unit
     abstract CreateAllTypeDefs: unit -> unit
 
     // todo: change to shortName, update short names dict too
@@ -52,6 +53,8 @@ type IFcsAssemblyReaderShim =
 
     /// Removes reader for the module if present, another reader is going to be created for it
     abstract InvalidateModule: psiModule: IPsiModule -> unit
+
+    abstract InvalidateAll: unit -> unit
 
     /// Clears dirty type defs, updating reader timestamps if needed
     abstract InvalidateDirty: unit -> unit
