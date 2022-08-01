@@ -32,7 +32,7 @@ type FcsLookupCandidate(fcsTooltip: ToolTipElementData, xmlDocService: FSharpXml
 
     interface ICandidate with
         member x.GetSignature(_, _, _, _, _) = x.Description
-        member x.GetDescription() = xmlDocService.GetXmlDocSummary(x.XmlDoc)
+        member x.GetDescription _ = xmlDocService.GetXmlDocSummary(x.XmlDoc)
         member x.Matches _ = true
 
         member x.GetParametersInfo(_, _) = ()

@@ -106,7 +106,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
         member this.Symbol = this.Symbol
 
     interface ICandidate with
-        member this.GetDescription() =
+        member this.GetDescription _ =
             match checkResults.GetDescription(symbol, [], false, range) with
             | ToolTipText [ ToolTipElement.Group [ elementData ] ] ->
                 let xmlDocService = referenceOwner.GetSolution().GetComponent<FSharpXmlDocService>().NotNull()
