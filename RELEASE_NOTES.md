@@ -27,7 +27,7 @@ The Parameter Info popup was completely rewritten to become available inside cur
 * **Fix**: Type providers analysis inside F# scripts
 * **New**: Analyze reduntand `sprintf` invocations
 
-### Generate
+### Generate overrides
 
 * **New**: Generate setters and accessor parameters
 * Use better checks for existing member overrides in base types
@@ -52,7 +52,7 @@ The Parameter Info popup was completely rewritten to become available inside cur
 * **Fix**: Navigation might not work for types with same full names in different assemblies
 * **Fix**: Rename refactoring: renaming file with type produced an error
 * **Fix**: F# object expressions could be visible inside C# code completion
-* Typing assists: better caret placement after pressing Enter inside binary expressions`
+* Typing assists: better caret placement after pressing Enter inside binary expressions
 * **Fix**: Folding of xml doc comments
 
 ## 2022.1
