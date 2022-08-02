@@ -1,33 +1,88 @@
 # Release notes
 
+### 2022.2
+
+### Parameter info
+
+The Parameter Info popup was completely rewritten to become available inside curried applications. In addition to that, the following was implemented:
+
+* Highlight the currently resolved overload
+* Show method/function and parameter descriptions from xml docs
+* Show parameter default values
+* Show info about extension methods
+* Show CanBeNull/NotNull attributes
+
+### Fantomas
+
+* Automatically restore and use Fantomas version specified with `dotnet tool`
+
+### Analysis
+
+* **Fix**: Significantly improved analysis speed for F# scripts
+* **Fix**: External file changes could be ignored by analysis, e.g. when switching branches in version control system or generating source and output files during build
+* **Fix**: Types with measure type parameters were seen incorrectly in navigation and C# analysis
+* **Fix**: `WarnAsError` could produce errors for disabled warnings
+* **Fix**: Redundant parens analysis fixes for tuple types, operator usages, and interpolated strings
+* **Fix**: `fsi` directive errors weren't reported for scripts
+* **Fix**: Type providers analysis inside F# scripts
+* **New**: Analyze reduntand `sprintf` invocations
+
+### Generate
+
+* **New**: Generate setters and accessor parameters
+* Use better checks for existing member overrides in base types
+* Use better placement of generated overrides
+
+### Quick fixes
+
+* **New**: Replace return type, by [@nojaf](https://github.com/nojaf) ([#367](https://github.com/JetBrains/resharper-fsharp/pull/367))
+* **New**: Replace interpolated strings with triple-quote ones, by [@seclerp](https://github.com/seclerp) ([#364](https://github.com/JetBrains/resharper-fsharp/pull/364))
+* Move caret and select generated code when generating overrides or match branches
+* **Fix**: Import Type: don't try to import own namespace
+* **New**: Import Type: enable for F# types with separate compiled and source names
+
+### Code completion
+
+* **Fix**: Postfix template didn't work inside `#if` blocks
+* **New**: Hide more keywords when they aren't available
+
+### Misc
+
+* **Fix**: Find Usages: write usages weren't marked as Write in the new indexer syntax and when used as named arguments in method returns
+* **Fix**: Navigation might not work for types with same full names in different assemblies
+* **Fix**: Rename refactoring: renaming file with type produced an error
+* **Fix**: F# object expressions could be visible inside C# code completion
+* Typing assists: better caret placement after pressing Enter inside binary expressions`
+* **Fix**: Folding of xml doc comments
+
 ## 2022.1
 
 ### Project model
 
-* Fix race that could lead to Rider freeze during project loading or update
+* **Fix**: race that could lead to Rider freeze during project loading or update
 * Faster loading of solutions that contain F# scripts
-* Fix script package references and file includes might produce errors
-* Fix changes to fsproj files might not be reflected in analysis
-* Use unique project stamps for instant project cache lookup in FSharp.Compiler.Service
-* Fix stack overflow exception when loading big F# project graphs
+* **Fix**: script package references and file includes might produce errors
+* **Fix**: changes to fsproj files might not be reflected in analysis
+* Use unique project stamps for instant project cache lookup in FSharp.Compiler.Service which improves features performance
+* **Fix**: stack overflow exception when loading very big F# project graphs
 
 ### C# interop
-* Support F#-defined InternalsVisibleTo in C# analysis
-* F#-defined generic constraints are now properly seen in C# code
+* **New**: Support F#-defined InternalsVisibleTo in C# analysis
+* **Fix**: F#-defined generic constraints are now properly seen in C# code
 
 ### Refactorings
 * Inline var: produce cleaner code by preventing adding redundant parens in more cases
 
 ### Type providers
-* Fix multiple instantiations of the same type provider could lead to analysis errors
-* Fix performance issue from eagerly loading provided namespaces
+* **Fix**: Multiple instantiations of the same type provider could lead to analysis errors
+* **Fix**: Performance could be decreased due to eagerly analysing provided namespaces
 
 ### Misc
-* Fix Run gutter icons for running entry point methods
-* Typing assists: fix typing inside escaped identifiers might not work in some cases
-* Various fixes for redundant parens analysis
 * Quick fixes - Generate missing record fields: quick fix uses improved fields order, by [@seclerp](https://github.com/seclerp) ([#330](https://github.com/JetBrains/resharper-fsharp/pull/330))
-* Navigation - Go to Everything: fix performance regression in calculating type presentations
+* **Fix**: Run gutter icons for running entry point methods weren't shown
+* **Fix**: Typing assist: typing inside escaped identifiers might not work in some cases
+* Various fixes for redundant parens analysis
+* **Fix**: Navigation - Go to Everything: performance regression in calculating type presentations
 
 
 ## 2021.3
