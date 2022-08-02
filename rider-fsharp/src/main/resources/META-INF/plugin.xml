@@ -104,7 +104,7 @@
       </action>
       <add-to-group group-id="ToolsMenu" anchor="last" />
     </group>
-    <action id="SendFsiRefs" class="com.jetbrains.rider.plugins.fsharp.services.fsi.SendProjectReferencesToFsiAction" icon="/icons/fsharpConsole.png">
+    <action id="SendFsiRefs" class="com.jetbrains.rider.plugins.fsharp.services.fsi.SendProjectReferencesToFsiAction" text="Send Project References to F# Interactive" icon="/icons/fsharpConsole.png">
       <add-to-group group-id="SolutionExplorerPopupMenu.Repl"/>
     </action>
   </actions>
