@@ -702,7 +702,7 @@ type FSharpParameterInfoContextFactory() =
             let binaryAppExpr = BinaryAppExprNavigator.GetByOperator(refExpr)
             if isNotNull binaryAppExpr then null else
 
-            match PrefixAppExprNavigator.GetByArgumentExpression(refExpr.IgnoreParentParens()) with
+            match PrefixAppExprNavigator.GetByArgumentExpression(refExpr) with
             | null ->
                 let context = createFromExpression isAutoPopup caretOffset refExpr.Reference refExpr
                 if isNull context && not isAutoPopup && caretOffset = refExpr.GetDocumentEndOffset() then

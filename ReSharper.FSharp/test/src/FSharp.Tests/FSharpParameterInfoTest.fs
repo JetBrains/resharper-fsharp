@@ -32,6 +32,8 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Curried - Nested 13``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Nested 14``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Nested 15``() = x.DoNamedTest() // todo: allow invoking via action
+    [<Test>] member x.``App - Curried - Nested 16``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Nested 17``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Curried - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Tuple 02``() = x.DoNamedTest()
