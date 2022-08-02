@@ -4,6 +4,7 @@
     <PropertyGroup>
         <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host</RootNamespace>
         <LangVersion>$(CSharpLanguageVersion)</LangVersion>
+        <OutputType>Exe</OutputType>
         <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     </PropertyGroup>
 

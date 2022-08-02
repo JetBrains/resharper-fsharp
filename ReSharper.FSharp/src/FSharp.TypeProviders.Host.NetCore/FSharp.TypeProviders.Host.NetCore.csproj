@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
@@ -9,7 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <CSFile Include="../FSharp.TypeProviders.Host/src/**/*.cs"/>
+        <Compile Include="../FSharp.TypeProviders.Host/src/**/*.cs">
+            <Link>src/*</Link>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
@@ -43,5 +44,4 @@
 
     <Import Project="$(SolutionDir)/TypeProviders.Host.targets"/>
     <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'"/>
-
 </Project>
