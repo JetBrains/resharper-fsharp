@@ -29,6 +29,7 @@
     <Compile Include="src\Util\FSharpExpectedTypesUtil.fs" />
     <Compile Include="src\Util\EnumCaseLikeDeclarationUtil.fs" />
     <Compile Include="src\Util\FSharpStringLexer.fs" />
+    <Compile Include="src\Util\SignatureFileUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\Errors.xml">

@@ -42,6 +42,7 @@ module FSharpErrors =
     let [<Literal>] MatchIncomplete = 25
     let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] ValNotMutable = 27
+    let [<Literal>] SignatureMismatch = 34
     let [<Literal>] VarBoundTwice = 38
     let [<Literal>] UndefinedName = 39
     let [<Literal>] ErrorFromAddingConstraint = 43
@@ -439,6 +440,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let expr = fsFile.GetNode<IDoLikeStatement>(range)
             if isNotNull expr then NamespaceCannotContainExpressionsError(expr) :> _ else null
 
+        | SignatureMismatch ->
+            createHighlightingFromNode SignatureFileMismatchError range
+        
         | _ -> createGenericHighlighting error range
 
     abstract ShouldAddDiagnostic: error: FSharpDiagnostic * range: DocumentRange -> bool

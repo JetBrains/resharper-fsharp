@@ -109,6 +109,7 @@
     <Compile Include="src\QuickFixes\ReplaceWithTripleQuotedInterpolatedStringFixTest.fs" />
     <Compile Include="src\QuickFixes\ReplaceReturnTypeTest.fs" />
     <Compile Include="src\QuickFixes\XmlDocFixesTest.fs" />
+    <Compile Include="src\QuickFixes\UpdateSignatureFileFixTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
