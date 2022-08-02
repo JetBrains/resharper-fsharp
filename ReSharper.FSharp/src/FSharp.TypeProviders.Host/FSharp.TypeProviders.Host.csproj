@@ -14,6 +14,6 @@
         </Content>
     </ItemGroup>
 
-    <Import Project="$(SolutionDir)/TypeProviders.targets" />
+    <Import Project="$(SolutionDir)/TypeProviders.Host.targets" />
     <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
 </Project>

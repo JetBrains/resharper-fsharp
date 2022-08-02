@@ -23,6 +23,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Common.Tests", "test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Host", "src\FSharp.TypeProviders.Host\FSharp.TypeProviders.Host.csproj", "{4EB01188-F511-4991-9A0F-604EE28E8F9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Host.NetCore", "src\FSharp.TypeProviders.Host.NetCore\FSharp.TypeProviders.Host.NetCore.csproj", "{72982346-1D28-41CB-9CBF-056EC8482305}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Protocol", "src\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj", "{912A7F5F-73F2-4DFE-B81A-C13A4F58F31C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Fantomas.Host", "src\FSharp.Fantomas.Host\FSharp.Fantomas.Host.csproj", "{CF12A71A-1296-418B-8C0A-CC4B398AAB16}"
@@ -38,8 +40,6 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Intentions.Tests", "test\src\FSharp.Intentions.Tests\FSharp.Intentions.Tests.fsproj", "{24E8C927-A6E4-48DB-B548-DEEEE808EC4E}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests.Common", "test\src\FSharp.Tests.Common\FSharp.Tests.Common.fsproj", "{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Host.NetCore", "src\FSharp.TypeProviders.Host.NetCore\FSharp.TypeProviders.Host.NetCore.csproj", "{72982346-1D28-41CB-9CBF-056EC8482305}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
