@@ -1,5 +1,35 @@
 # Release notes
 
+## 2022.1
+
+### Project model
+
+* Fix race that could lead to Rider freeze during project loading or update
+* Faster loading of solutions that contain F# scripts
+* Fix script package references and file includes might produce errors
+* Fix changes to fsproj files might not be reflected in analysis
+* Use unique project stamps for instant project cache lookup in FSharp.Compiler.Service
+* Fix stack overflow exception when loading big F# project graphs
+
+### C# interop
+* Support F#-defined InternalsVisibleTo in C# analysis
+* F#-defined generic constraints are now properly seen in C# code
+
+### Refactorings
+* Inline var: produce cleaner code by preventing adding redundant parens in more cases
+
+### Type providers
+* Fix multiple instantiations of the same type provider could lead to analysis errors
+* Fix performance issue from eagerly loading provided namespaces
+
+### Misc
+* Fix Run gutter icons for running entry point methods
+* Typing assists: fix typing inside escaped identifiers might not work in some cases
+* Various fixes for redundant parens analysis
+* Quick fixes - Generate missing record fields: quick fix uses improved fields order, by [@seclerp](https://github.com/seclerp) ([#330](https://github.com/JetBrains/resharper-fsharp/pull/330))
+* Navigation - Go to Everything: fix performance regression in calculating type presentations
+
+
 ## 2021.3
 
 ### Refactorings: introduce variable
