@@ -93,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       var formatterSettings = GetFormattingSettings(task.FirstElement, parameters, myFormatterInfoProvider);
 
       DoDeclarativeFormat(formatterSettings, myFormatterInfoProvider, null, new[] {task},
-        parameters, null, null, null, false);
+        parameters, null, null, false);
 
       return new TreeRange(firstElement, lastElement);
     }
