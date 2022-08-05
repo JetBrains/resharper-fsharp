@@ -1,34 +1,48 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
+open System
 open JetBrains.Application.Infra
 open JetBrains.DocumentModel
 open JetBrains.DocumentModel.Impl
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.CSharp.CodeCleanup
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
+open JetBrains.ReSharper.Feature.Services.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Util
 open JetBrains.Util.Text
 
 [<CodeCleanupModule>]
 type FSharpReformatCode() =
+    let REFORMAT_CODE_DESCRIPTOR = CodeCleanupOptionDescriptor<bool>(
+        "FSReformatCode",
+        CodeCleanupLanguage("F#", 2),
+        CodeCleanupOptionDescriptor.ReformatGroup,
+        typedefof<Strings>,
+        displayName = "Reformat code")
+
     interface IReformatCodeCleanupModule with
         member x.Name = "Reformat F#"
         member x.LanguageType = FSharpLanguage.Instance :> _
-        member x.Descriptors = EmptyList.Instance :> _
+        member x.Descriptors = [| REFORMAT_CODE_DESCRIPTOR |]
         member x.IsAvailableOnSelection = true
-        member x.SetDefaultSetting(_, _) = ()
+        member x.SetDefaultSetting(profile, profileType) =
+            match profileType with
+            | CodeCleanupService.DefaultProfileType.FULL
+            | CodeCleanupService.DefaultProfileType.REFORMAT
+            | CodeCleanupService.DefaultProfileType.CODE_STYLE ->
+                profile.SetSetting<bool>(REFORMAT_CODE_DESCRIPTOR, true)
+            | _ -> 
+                raise(ArgumentException(nameof(profileType)))
 
         member x.IsAvailable(sourceFile: IPsiSourceFile) =
             sourceFile.PrimaryPsiLanguage :? FSharpLanguage
 
         member x.IsAvailable(profile: CodeCleanupProfile) =
-            profile.GetSetting(ReformatCode.REFORMAT_CODE_DESCRIPTOR)
+            profile.GetSetting(REFORMAT_CODE_DESCRIPTOR)
 
         member x.Process(sourceFile, rangeMarker, _, _, _) =
             let fsFile = sourceFile.FSharpFile
