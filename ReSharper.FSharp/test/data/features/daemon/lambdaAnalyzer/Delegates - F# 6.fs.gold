@@ -1,0 +1,26 @@
+type Delegate = delegate of int -> int
+type DelegateAbbreviation = Delegate
+type Type1(x: Delegate) = 
+    static member M1(x: Delegate) = ()
+    static member M2(x: DelegateAbbreviation) = ()
+    static member M3(x: int, y: Delegate) = ()
+
+    static member M4(x: string) = ()
+    static member M4(x: int, y: Delegate) = ()
+
+Type1(|fun x -> x|(0))
+Type1.M1(|fun x -> x|(1))
+Type1.M2(|fun x -> x|(2))
+Type1.M3(0, |fun x -> x|(3))
+Type1.M3(0, y = |fun x -> x|(4))
+Type1.M3(0, y = (|fun x -> x|(5)))
+Type1.M4(0, |fun x -> x|(6))
+
+---------------------------------------------------------
+(0): ReSharper Hint: Lambda can be replaced with 'id'
+(1): ReSharper Hint: Lambda can be replaced with 'id'
+(2): ReSharper Hint: Lambda can be replaced with 'id'
+(3): ReSharper Hint: Lambda can be replaced with 'id'
+(4): ReSharper Hint: Lambda can be replaced with 'id'
+(5): ReSharper Hint: Lambda can be replaced with 'id'
+(6): ReSharper Hint: Lambda can be replaced with 'id'
