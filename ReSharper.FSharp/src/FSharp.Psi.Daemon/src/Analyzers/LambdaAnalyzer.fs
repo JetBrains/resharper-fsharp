@@ -84,7 +84,7 @@ type LambdaAnalyzer() =
 
         compareArgsRec expr 0 null
 
-    let isWarningApplicable (lambda: ILambdaExpr) (exprToReplace: IFSharpExpression) isFSharp6Supported =
+    let getWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, exprToReplace: 'a as arg) isFSharp6Supported =
         let lambda = lambda.IgnoreParentParens()
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
         let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
@@ -92,53 +92,55 @@ type LambdaAnalyzer() =
         let app = getArgsOwner argExpr
 
         let reference = getReference app
-        if not (app :? IPrefixAppExpr && isNotNull reference) then true else
+        if not (app :? IPrefixAppExpr && isNotNull reference) then ctor arg else
 
         match reference.GetFcsSymbol() with
         | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
             let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
 
             let parameterGroups = m.CurriedParameterGroups
-            if parameterGroups.Count = 0 then true else
+            if parameterGroups.Count = 0 then ctor arg else
 
             let args = parameterGroups[0]
-            if args.Count <= lambdaPos then true else
+            if args.Count <= lambdaPos then ctor arg else
 
             let argDecl = args[lambdaPos]
             let argDeclType = argDecl.Type
             let argIsDelegate = argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
-            if argIsDelegate && not isFSharp6Supported then false else
+            if argIsDelegate && not isFSharp6Supported then null else
 
-            match exprToReplace.IgnoreInnerParens() with
+            match exprToReplace.As<IFSharpExpression>().IgnoreInnerParens() with
             | :? IReferenceExpr as ref ->
                 let symbol = ref.Reference.GetFcsSymbol()
                 match symbol with
                 | :? FSharpMemberOrFunctionOrValue as x ->
-                    x.IsFunction || not x.IsMember ||
-                    not argIsDelegate &&
-                    match exprToReplace.FSharpFile.GetParseAndCheckResults(true, "FSharpParameterInfoContextFactory.getMethods") with
-                    | None -> true
-                    | Some results ->
+                    let isApplicable = 
+                        x.IsFunction || not x.IsMember ||
+                        not argIsDelegate &&
+                        match ref.FSharpFile.GetParseAndCheckResults(true, "FSharpParameterInfoContextFactory.getMethods") with
+                        | None -> true
+                        | Some results ->
 
-                    let referenceOwner = reference.GetElement()
-                    let names = 
-                        match referenceOwner with
-                        | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
-                        | _ -> [reference.GetName()]
+                        let referenceOwner = reference.GetElement()
+                        let names = 
+                            match referenceOwner with
+                            | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
+                            | _ -> [reference.GetName()]
 
-                    let identifier = referenceOwner.FSharpIdentifier
-                    if isNull identifier then true else
+                        let identifier = referenceOwner.FSharpIdentifier
+                        if isNull identifier then true else
 
-                    let endCoords = identifier.GetDocumentStartOffset().ToDocumentCoords()
-                    let line = int endCoords.Line + 1
-                    let column = int endCoords.Column + 1
-                
-                    let checkResults = results.CheckResults
-                    let methodGroupItems = checkResults.GetMethods(line, column, "", Some names).Methods
-                    methodGroupItems.Length = 1
-                | _ -> true
-            | _ -> true
-        | _ -> true
+                        let endCoords = identifier.GetDocumentStartOffset().ToDocumentCoords()
+                        let line = int endCoords.Line + 1
+                        let column = int endCoords.Column + 1
+                    
+                        let checkResults = results.CheckResults
+                        let methodGroupItems = checkResults.GetMethods(line, column, "", Some names).Methods
+                        methodGroupItems.Length = 1
+                    if isApplicable then ctor arg else null
+                | _ -> ctor arg
+            | _ -> ctor arg
+        | _ -> ctor arg
 
     let isApplicable (expr: IFSharpExpression) (pats: TreeNodeCollection<IFSharpPattern>) =
         match expr with
@@ -155,16 +157,12 @@ type LambdaAnalyzer() =
 
         if not (isApplicable expr pats) then () else
 
-        let warning =
+        let warning: IHighlighting =
             match compareArgs pats expr with
             | true, true, replaceCandidate ->
-                if isWarningApplicable lambda replaceCandidate isFsharp60Supported then
-                    LambdaCanBeReplacedWithInnerExpressionWarning(lambda, replaceCandidate) :> IHighlighting
-                else null
+                getWarning LambdaCanBeReplacedWithInnerExpressionWarning (lambda, replaceCandidate) isFsharp60Supported :> _
             | true, false, replaceCandidate ->
-                if isWarningApplicable lambda replaceCandidate isFsharp60Supported then
-                    LambdaCanBeSimplifiedWarning(lambda, replaceCandidate) :> _
-                else null
+                getWarning LambdaCanBeSimplifiedWarning (lambda, replaceCandidate) isFsharp60Supported :> _
             | _ ->
 
             if pats.Count = 1 then
@@ -176,21 +174,15 @@ type LambdaAnalyzer() =
                     if isFunctionInApp expr &funExpr &arg then
                         RedundantApplicationWarning(funExpr, arg) :> _
                     else
-                        if isWarningApplicable lambda null isFsharp60Supported then
-                            LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "id") :> _
-                        else null
+                        getWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda,  "id") isFsharp60Supported :> _
                 else
                     match pat with
                     | :? ITuplePat as pat when not pat.IsStruct && pat.PatternsEnumerable.CountIs(2) ->
                         let tuplePats = pat.Patterns
                         if compareArg tuplePats[0] expr then
-                            if isWarningApplicable lambda null isFsharp60Supported then
-                                LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "fst") :> _
-                            else null
+                            getWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "fst") isFsharp60Supported :> _
                         elif compareArg tuplePats[1] expr then
-                            if isWarningApplicable lambda null isFsharp60Supported then
-                                LambdaCanBeReplacedWithBuiltinFunctionWarning(lambda, "snd") :> _
-                            else null
+                            getWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd") isFsharp60Supported :> _
                         else null
                     | _ -> null
 
