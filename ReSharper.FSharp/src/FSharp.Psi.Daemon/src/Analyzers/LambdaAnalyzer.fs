@@ -117,7 +117,7 @@ type LambdaAnalyzer() =
                     let isApplicable = 
                         x.IsFunction || not x.IsMember ||
                         not argIsDelegate &&
-                        match ref.FSharpFile.GetParseAndCheckResults(true, "FSharpParameterInfoContextFactory.getMethods") with
+                        match ref.FSharpFile.GetParseAndCheckResults(true, "LambdaAnalyzer.getMethods") with
                         | None -> true
                         | Some results ->
 
@@ -130,13 +130,12 @@ type LambdaAnalyzer() =
                         let identifier = referenceOwner.FSharpIdentifier
                         if isNull identifier then true else
 
-                        let endCoords = identifier.GetDocumentStartOffset().ToDocumentCoords()
-                        let line = int endCoords.Line + 1
-                        let column = int endCoords.Column + 1
-                    
-                        let checkResults = results.CheckResults
-                        let methodGroupItems = checkResults.GetMethods(line, column, "", Some names).Methods
-                        methodGroupItems.Length = 1
+                        let endCoords = identifier.GetDocumentEndOffset().ToDocumentCoords()
+                        let endLine = int endCoords.Line + 1
+                        let endColumn = int endCoords.Column
+
+                        let overloads = results.CheckResults.GetMethods(endLine, endColumn, "", Some names).Methods
+                        overloads.Length = 1
                     if isApplicable then ctor arg else null
                 | _ -> ctor arg
             | _ -> ctor arg

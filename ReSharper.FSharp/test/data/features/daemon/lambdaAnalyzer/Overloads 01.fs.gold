@@ -1,4 +1,5 @@
 open System
+open System.Runtime.CompilerServices
 
 type A =
     static member M(x: int) = x
@@ -67,14 +68,24 @@ type A5 =
     static member M(x: int) = x
     static member M(x: string) = x
 
-type B5 =
-    static member B(x: int -> int) = ()
-    static member B(x: string) = ()
+type B5() =
+    member _.B(x: int -> int) = ()
+    member _.B1(x: int -> int) = ()
 
-B5.B(fun x -> A5.M x)
-B5.B(A5.M) //ERROR
-B5.B(|fun x -> x|(7))
-B5.B(id) //OK
+[<Extension>]
+type B5Ext =
+    [<Extension>]
+    static member B(this: B5, x: string) = ()
+    [<Extension>]
+    static member B1(this: B5, x: string) = ()
+
+B5().B(fun x -> A5.M x)
+B5().B(A5.M) //ERROR
+B5().B1(fun x -> A5.M x)
+B5().B1(A5.M) //ERROR
+B5().B(|fun x -> x|(7))
+B5().B(id) //OK
+
 
 ---------------------------------------------------------
 (0): ReSharper Hint: Lambda can be replaced with 'A.M'
