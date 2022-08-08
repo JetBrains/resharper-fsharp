@@ -580,5 +580,13 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>UpdateSignatureFileFix</QuickFix>
   </Error>
+  
+  <Warning compilerGroup="FSharpErrors" name="ArgumentNameMismatch" ID=" FS3218: The argument names in the signature and implementation do not match">
+    <Parameter type="IFSharpPattern" name="pattern"/>
+    <Message value="Signature file mismatch"/>
+    <Range>pattern.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateSignatureFileFix</QuickFix>
+  </Warning>
 
 </Errors>

@@ -17,3 +17,4 @@ type UpdateSignatureFileFixTest() =
         x.DoTestSolution(testName + fsiExt, testName + fsExt)
 
     [<Test>] member x.``Value 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Parameter name mismatch 01`` () = x.DoNamedTestWithSignature()

@@ -77,6 +77,7 @@ module FSharpErrors =
     let [<Literal>] TypeAbbreviationsCannotHaveAugmentations = 964
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
+    let [<Literal>] ArgumentNamesInSignatureAndImplementationDoNotMatch = 3218
     let [<Literal>] CantTakeAddressOfExpression = 3236
     let [<Literal>] SingleQuoteInSingleQuote = 3373
     let [<Literal>] InvalidXmlDocPosition = 3520
@@ -442,6 +443,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | SignatureMismatch ->
             createHighlightingFromNode SignatureFileMismatchError range
+            
+        | ArgumentNamesInSignatureAndImplementationDoNotMatch ->
+            createHighlightingFromNode ArgumentNameMismatchWarning range
         
         | _ -> createGenericHighlighting error range
 

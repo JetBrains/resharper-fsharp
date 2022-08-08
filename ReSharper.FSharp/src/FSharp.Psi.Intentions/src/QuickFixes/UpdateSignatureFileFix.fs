@@ -7,11 +7,10 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 
-type UpdateSignatureFileFix(pat: IFSharpPattern) =
+type UpdateSignatureFileFix(binding: IBinding) =
     inherit FSharpQuickFixBase()
 
     let moduleDecl =
-        let binding = BindingNavigator.GetByHeadPattern(pat)
         if isNull binding then None else
         let letBinding = LetBindingsDeclarationNavigator.GetByBinding(binding)
         if isNull letBinding then None else
@@ -19,8 +18,19 @@ type UpdateSignatureFileFix(pat: IFSharpPattern) =
         if isNull moduleDecl then None else Some (letBinding, moduleDecl)
     
     new (error: SignatureFileMismatchError) =
-        UpdateSignatureFileFix(error.Pattern)
+        UpdateSignatureFileFix(BindingNavigator.GetByHeadPattern(error.Pattern))
 
+    new (warning: ArgumentNameMismatchWarning) =
+        // The name is wrong in this case
+        // The parameter pattern is two levels higher
+        match warning.Pattern.Parent with
+        | :? ITypedPat as tp ->
+            match tp.Parent with
+            | :? IParenPat as pat ->
+                UpdateSignatureFileFix(BindingNavigator.GetByParameterPattern(pat))
+            | _ -> UpdateSignatureFileFix(Unchecked.defaultof<IBinding>)
+        | _ -> UpdateSignatureFileFix(Unchecked.defaultof<IBinding>)
+    
     override this.Text = "Update signature file"
     
     override this.IsAvailable _ =
