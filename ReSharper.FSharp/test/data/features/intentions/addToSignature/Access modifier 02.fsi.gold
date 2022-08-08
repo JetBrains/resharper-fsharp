@@ -1,0 +1,3 @@
+module Foo
+
+val internal x: y: int -> z: int -> int

@@ -114,7 +114,16 @@ let tryMkBindingSignature
         | FSharpInlineAnnotation.AlwaysInline -> true
         | _ -> false
     
-    let sigDeclNode : IBindingSignature = elementFactory.CreateBindingSignature(isInline, name, signature)
+    let accessibility =
+        let vis = symbolUse.Symbol.Accessibility
+        if vis.IsPrivate then
+            Some "private"
+        elif vis.IsInternal then
+            Some "internal"
+        else
+            None
+    
+    let sigDeclNode : IBindingSignature = elementFactory.CreateBindingSignature(isInline, accessibility, name, signature)
     let signatureFile = sigDecl.Parent :?> IFSharpSigFile
 
     Some (sigDeclNode, signatureFile)

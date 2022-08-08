@@ -1,0 +1,3 @@
+module Foo
+
+val inline private a: b: int -> int

@@ -2,6 +2,7 @@
 using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
@@ -56,6 +57,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     ITypeParameterDeclarationList CreateTypeParameterOfTypeList(FSharpList<string> names);
 
-    IBindingSignature CreateBindingSignature(bool isInline, string name, string signature);
+    IBindingSignature CreateBindingSignature(bool isInline, FSharpOption<string> accessibility, string name, string signature);
   }
 }

@@ -358,8 +358,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
 
             typeDeclaration.TypeParameterDeclarationList
 
-        member this.CreateBindingSignature(isInline, name, signature) =
+        member this.CreateBindingSignature(isInline, accessibility, name, signature) =
             let inlineKeyword = if isInline then "inline " else ""
-            let source = $"module A\n\nval {inlineKeyword}{name}: {signature}"
+            let accessibility =
+                match accessibility with
+                | None -> ""
+                | Some vis -> $"{vis} "
+            let source = $"module A\n\nval {inlineKeyword}{accessibility}{name}: {signature}"
             let moduleMember = getModuleMember source
             moduleMember :?> IBindingSignature
