@@ -18,7 +18,7 @@ type FSharpCodeCompletionContextProviderInDocComment() =
         let file = context.File.As<IFSharpFile>();
         if isNull file then null else
 
-        if context.CodeCompletionType = CodeCompletionType.BasicCompletion then null else
+        //if context.CodeCompletionType = CodeCompletionType.BasicCompletion then null else
 
         let selectedTreeRange = context.SelectedTreeRange
         if not (selectedTreeRange.IsValid()) || selectedTreeRange.Length > 0 then null else

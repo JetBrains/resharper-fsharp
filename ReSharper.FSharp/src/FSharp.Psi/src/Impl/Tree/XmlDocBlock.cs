@@ -16,10 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
   }
 
-  public class XmlDocBlock : FSharpCompositeElement, IFSharpDocCommentBlock
+  public partial class XmlDocBlock : IFSharpDocCommentBlock
   {
-    public override bool IsFiltered() => true;
-    public override NodeType NodeType => FSharpTokenType.XML_DOC_BLOCK;
 
     private volatile IDocCommentXmlPsi myDocCommentXmlPsi;
 
