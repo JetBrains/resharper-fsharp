@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Xml;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
@@ -18,16 +17,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   public partial class XmlDocBlock : IFSharpDocCommentBlock
   {
-
-    private volatile IDocCommentXmlPsi myDocCommentXmlPsi;
+    private IDocCommentXmlPsi myDocCommentXmlPsi;
 
     public IDocCommentXmlPsi GetXmlPsi()
     {
       Assertion.Assert(IsValid());
-      if (myDocCommentXmlPsi == null)
-      {
-        lock (this) myDocCommentXmlPsi ??= FSharpDocCommentXmlPsi.BuildPsi(this);
-      }
+      myDocCommentXmlPsi ??= FSharpDocCommentXmlPsi.BuildPsi(this);
 
       // Assertion.Assert(myDocCommentXmlPsi != null && myDocCommentXmlPsi.DocCommentBlock == this,
       //   "myDocCommentPsi.DocCommentBlock == this");
@@ -86,6 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return node;
     }
 
+    // TODO
     public IReadOnlyCollection<DocCommentError> GetErrors() => EmptyList<DocCommentError>.Instance;
   }
 }
