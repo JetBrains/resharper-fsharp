@@ -308,13 +308,16 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             getOrCreateReaderFromModule psiModule
 
         member this.InvalidateDirty() =
+            if not (isEnabled()) then () else
             use lock = locker.UsingWriteLock()
             for psiModule in dirtyModules do
                 invalidateModule psiModule
             invalidateDirtyDependencies ()
 
         member this.RecordDependencies(psiModule) =
+            if not (isEnabled()) then () else
             recordDependencies psiModule
 
         member this.InvalidateModule(psiModule) =
+            if not (isEnabled()) then () else
             dirtyModules.Add(psiModule) |> ignore
