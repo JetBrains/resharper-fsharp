@@ -159,6 +159,8 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Import - Same ns 04``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 05``() = x.DoTestFiles("File1.fs", "File2.fs")
 
+    [<Test>] member x.``XmlDoc - tags``() = x.DoNamedTest()
+
 [<FSharpTest>]
 type FSharpPostfixCompletionTest() =
     inherit CodeCompletionTestBase()
