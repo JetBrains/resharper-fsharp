@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.TestRunner.Abstractions.Extensions;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -36,62 +33,54 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     //TODO: abstract members
     //TODO: proerties
-    private static IEnumerable<string> GetParameters(IDeclaration declaration)
-    {
-      if (declaration is IBinding binding)
+    private static IEnumerable<string> GetParameters(IDeclaration declaration) =>
+      declaration switch
       {
-        var list = new List<string>();
-        list.AddRange(binding.ParameterPatterns.SelectMany(GetParametersFromParameter));
-        if (binding.Expression is ILambdaExpr lambda) GetLambdaArgs(lambda, list);
-        return list;
-      }
+        IBinding binding => binding.Expression is ILambdaExpr lambda
+          ? binding.ParameterPatterns.SelectMany(GetParameterNames).Union(GetLambdaArgs(lambda))
+          : binding.ParameterPatterns.SelectMany(GetParameterNames),
 
-      if (declaration is IMemberDeclaration member)
-      {
-        return member.ParameterPatterns.SelectMany(GetParametersFromParameter)
-          .Union(
-            member.AccessorDeclarations.SelectMany(t => t.ParameterPatterns.SelectMany(GetParametersFromParameter)));
-      }
+        IMemberDeclaration member => member.ParameterPatterns.SelectMany(GetParameterNames)
+          .Union(member.AccessorDeclarations.SelectMany(t => t.ParameterPatterns.SelectMany(GetParameterNames))),
 
-      if (declaration is IAbstractMemberDeclaration memberSign)
-      {
-        return GetParametersFromParameter(memberSign.ReturnTypeInfo.ReturnType);
-      }
+        IAbstractMemberDeclaration abstractMember => GetParameterNames(abstractMember.ReturnTypeInfo.ReturnType),
+        IMemberSignature memberSignature => GetParameterNames(memberSignature.TypeUsage),
+        IUnionCaseDeclaration ucDecl => ucDecl.Fields.Select(t => t.SourceName)
+          .Where(t => t != SharedImplUtil.MISSING_DECLARATION_NAME),
+        _ => EmptyList<string>.Enumerable
+      };
 
-      if (declaration is IUnionCaseDeclaration ucDecl)
-        return ucDecl.Fields.Select(t => t.SourceName).Where(t => t != SharedImplUtil.MISSING_DECLARATION_NAME);
-
-      return EmptyList<string>.Enumerable;
-    }
-
-    private static void GetLambdaArgs(ILambdaExpr expr, List<string> pats)
+    private static IEnumerable<string> GetLambdaArgs(ILambdaExpr expr)
     {
       // IgnoreInnerParens()
-      pats.AddRange(expr.PatternsEnumerable.SelectMany(GetParametersFromParameter));
-      if (expr.Expression is ILambdaExpr innerLambda) GetLambdaArgs(innerLambda, pats);
-      return;
+      var parameters = expr.PatternsEnumerable.SelectMany(GetParameterNames);
+      if (expr.Expression is ILambdaExpr innerLambda)
+        parameters = parameters.Union(GetLambdaArgs(innerLambda));
+      return parameters;
     }
 
-    private static IEnumerable<string> GetParametersFromParameter(IFSharpPattern pattern)
+    private static IEnumerable<string> GetParameterNames(IFSharpPattern pattern)
     {
       pattern = pattern.IgnoreInnerParens();
-      if (pattern is ILocalReferencePat local) return new[] { local.SourceName };
-      if (pattern is ITypedPat typed) return GetParametersFromParameter(typed.Pattern);
-      if (pattern is IAsPat asPat) return GetParametersFromParameter(asPat.RightPattern);
-      if (pattern is ITuplePat tuplePat) return tuplePat.PatternsEnumerable.SelectMany(GetParametersFromParameter);
-      return EmptyList<string>.Enumerable;
+      return pattern switch
+      {
+        ILocalReferencePat local => new[] { local.SourceName },
+        ITypedPat typed => GetParameterNames(typed.Pattern),
+        IAsPat asPat => GetParameterNames(asPat.RightPattern),
+        ITuplePat tuplePat => tuplePat.PatternsEnumerable.SelectMany(GetParameterNames),
+        _ => EmptyList<string>.Enumerable
+      };
     }
 
-    private static IEnumerable<string> GetParametersFromParameter(ITypeUsage pattern)
-    {
-      if (pattern is IParenTypeUsage parenUsage) return GetParametersFromParameter(parenUsage.InnerTypeUsage);
-      if (pattern is IParameterSignatureTypeUsage { Identifier: not null } local)
-        return new[] { local.Identifier.Name };
-      if (pattern is IFunctionTypeUsage funPat)
-        return GetParametersFromParameter(funPat.ArgumentTypeUsage)
-          .Union(GetParametersFromParameter(funPat.ReturnTypeUsage));
-      if (pattern is ITupleTypeUsage tuplePat) return tuplePat.Items.SelectMany(GetParametersFromParameter);
-      return EmptyList<string>.Enumerable;
-    }
+    private static IEnumerable<string> GetParameterNames(ITypeUsage pattern) =>
+      pattern switch
+      {
+        IParenTypeUsage parenUsage => GetParameterNames(parenUsage.InnerTypeUsage),
+        IParameterSignatureTypeUsage { Identifier: not null } local => new[] { local.Identifier.Name },
+        IFunctionTypeUsage funPat => GetParameterNames(funPat.ArgumentTypeUsage)
+          .Union(GetParameterNames(funPat.ReturnTypeUsage)),
+        ITupleTypeUsage tuplePat => tuplePat.Items.SelectMany(GetParameterNames),
+        _ => EmptyList<string>.Enumerable
+      };
   }
 }

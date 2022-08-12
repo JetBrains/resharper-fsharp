@@ -1533,7 +1533,11 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let docCommentBlockNode = tokenNode.Parent.As<IDocCommentBlock>()
         
         //TODO: better check
-        if isNull docCommentBlockNode || docCommentBlockNode.GetTextLength() < 3 then true else
+        if isNull docCommentBlockNode ||
+           docCommentBlockNode.GetTextLength() < 4 ||
+           not docCommentBlockNode.IsSingleLine then true else
+        
+        if tokenNode.CommentText.Trim() <> "<" then true else
 
         let docCommentBlockOffset = docCommentBlockNode.GetTreeStartOffset().Offset
         let coords = textControl.Document.GetCoordsByOffset(docCommentBlockOffset)
