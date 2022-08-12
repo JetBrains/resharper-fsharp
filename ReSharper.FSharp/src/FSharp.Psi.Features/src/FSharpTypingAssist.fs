@@ -13,6 +13,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Options
 open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -27,6 +28,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
 open JetBrains.Util
+open JetBrains.Util.Text
 
 [<SolutionComponent>]
 type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
@@ -562,6 +564,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleRightAngleBracketTyped), isSmartParensHandlerAvailable)
         manager.AddTypingHandler(lifetime, '@', this, Func<_,_>(this.HandleAtTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '|', this, Func<_,_>(this.HandleBarTyped), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleXmlDocTag), isTypingHandlerAvailable)
 
     member x.HandleEnterAddBiggerIndentFromBelow(textControl) =
         let document = textControl.Document
@@ -1488,9 +1491,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         if x.SkipCharInRightBracket(context, lexer, offset) then true else
         if x.MakeQuotation(textControl, lexer, offset) then true else
-        if x.MakeEmptyQuotationUntyped(context, lexer, offset) then true else
-
-        false
+        x.MakeEmptyQuotationUntyped(context, lexer, offset)
 
     member x.MakeQuotation(textControl: ITextControl, lexer: CachingLexer, offset) =
         if lexer.TokenType != FSharpTokenType.LESS then false else
@@ -1508,6 +1509,65 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             true else
 
         insertCharInBrackets context lexer atChars typedQuotationBrackets LeftBracketOnly.No
+
+    member x.HandleXmlDocTag(context: ITypingContext) =
+        let textControl = context.TextControl
+        let offset = textControl.Caret.Offset()
+        let mutable lexer = Unchecked.defaultof<_>
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
+
+        if (offset < 2
+          //|| not (lexer.FindTokenAt(offset - 1))
+          //|| lexer.TokenType != FSharpTokenType.END_OF_LINE_COMMENT
+          //|| offset != lexer.TokenStart + 2
+          (*|| lexer.TokenEnd - lexer.TokenStart != 2*)) then false else
+
+        let mutable caretPosition = -1
+        // Check if new doc-comment block is being started
+        context.CallNext()
+        let file = (x :> TypingAssistLanguageBase<_>).CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id)
+
+        let tokenNode = file.FindTokenAt(TreeOffset(offset)).As<DocComment>()
+        if isNull tokenNode then true else
+
+        let docCommentBlockNode = tokenNode.Parent.As<IDocCommentBlock>()
+        
+        //TODO: better check
+        if isNull docCommentBlockNode || docCommentBlockNode.GetTextLength() < 3 then true else
+
+        let docCommentBlockOffset = docCommentBlockNode.GetTreeStartOffset().Offset
+        let coords = textControl.Document.GetCoordsByOffset(docCommentBlockOffset)
+        let docCommentBlockLine = coords.Line
+        let spacesCount = offset - docCommentBlockOffset - 3
+        let spaces = String(' ', spacesCount)
+
+        // Create and insert new doc template
+        let newLine = textControl.Document.GetLineEnding(docCommentBlockLine).ToLineEndingString();
+        let indent = textControl.Document.GetText(TextRange(textControl.Document.GetLineStartOffset(docCommentBlockLine), docCommentBlockOffset))
+
+(*        if (indent.Any(it => !char.IsWhiteSpace(it))) then
+            let buff = new StringBuilder(indent.Length)
+            foreach (var ch in indent) buff.Append(char.IsWhiteSpace(ch) ? ch : ' ');
+            indent = buff.ToString()
+        else  *)
+
+        docCommentBlockNode.GetPsiServices().Files.CommitAllDocuments()
+
+        let template = XmlDocTemplateUtil.GetDocTemplate(
+                            docCommentBlockNode.Parent.As<IDeclaration>(),
+                            (fun i -> if i = 0 then "" else (indent + "///" + spaces)), newLine).TrimEnd(newLine.ToCharArray());
+
+        let position = offset + 1;
+        if position < 0 then true else
+
+        textControl.Document.InsertText(position, template);
+        caretPosition <- offset + $"summary>{newLine}".Length + indent.Length + 3 + spacesCount + 1;//docCommentBlockOffset + 5 + offset;
+        if (caretPosition < 0) then true else
+
+        if caretPosition <> -1 then
+            textControl.Caret.MoveTo(caretPosition, CaretVisualPlacement.DontScrollIfVisible)
+
+        true
 
     member x.TrimTrailingSpacesAtOffset(textControl: ITextControl, startOffset: byref<int>, trimAfterCaret) =
         let isWhitespace c =
