@@ -1336,8 +1336,7 @@ abstractMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationB
   MEMBER<MEMBER, MemberKeyword>?
   identOrOpName{IDENTIFIER, Identifier}
   postfixTypeParameterDeclarationList<TYPE_PARAMETER_LIST, TypeParameterList>?
-  COLON
-  typeUsage<TYPE, TypeUsage>;
+  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>;
 
 valFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<valFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
