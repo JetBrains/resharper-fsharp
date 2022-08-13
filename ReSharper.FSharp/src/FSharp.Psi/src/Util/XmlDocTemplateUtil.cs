@@ -29,26 +29,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return text.ToString();
     }
 
-    private static IEnumerable<string> GetParameters(ITreeNode declaration) =>
-      declaration switch
+    private static IEnumerable<string> GetParameters(ITreeNode declaration)
+    {
+      return declaration switch
       {
         IBinding binding => binding.Expression is ILambdaExpr lambda
           ? binding.ParameterPatterns.SelectMany(GetParameterNames).Union(GetLambdaArgs(lambda))
           : binding.ParameterPatterns.SelectMany(GetParameterNames),
-
         IBindingSignature bindingSignature => GetParameterNames(bindingSignature.ReturnTypeInfo.ReturnType),
-
         IMemberDeclaration member => member.ParameterPatterns.SelectMany(GetParameterNames)
           .Union(member.AccessorDeclarations.SelectMany(t => t.ParameterPatterns.SelectMany(GetParameterNames))),
         IConstructorSignature constructorSignature => GetParameterNames(constructorSignature.ReturnTypeInfo.ReturnType),
         IConstructorDeclaration constructorDeclaration => GetParameterNames(constructorDeclaration.ParameterPatterns),
-
         IAbstractMemberDeclaration abstractMember => GetParameterNames(abstractMember.ReturnTypeInfo.ReturnType),
         IMemberSignature memberSignature => GetParameterNames(memberSignature.TypeUsage),
         IUnionCaseDeclaration ucDecl => ucDecl.Fields.Select(t => t.SourceName)
           .Where(t => t != SharedImplUtil.MISSING_DECLARATION_NAME),
         _ => EmptyList<string>.Enumerable
       };
+    }
 
     private static IEnumerable<string> GetLambdaArgs(ILambdaExpr expr)
     {

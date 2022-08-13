@@ -1,0 +1,6 @@
+// ${CHAR:<}
+module Module
+
+///
+/// {caret}
+let f x = x

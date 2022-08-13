@@ -332,6 +332,14 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Backticks 05 - Before keyword``() = x.DoNamedTest()
     [<Test>] member x.``Backticks 06 - Eof``() = x.DoNamedTest()
 
+    [<Test>] member x.``XmlDoc - Not available 01``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc - Not available 02``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 01 - Binding``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 02 - Lambda``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 03 - Type``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 04 - Union case``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 05 - Abstract member``() = x.DoNamedTest()
+
 [<FSharpTest>]
 type LineIndentsTest() =
     inherit LineIndentsTestBase()
