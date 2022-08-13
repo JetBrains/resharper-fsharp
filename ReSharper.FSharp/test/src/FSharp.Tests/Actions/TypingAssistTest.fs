@@ -334,6 +334,7 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``XmlDoc - Not available 01``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc - Not available 02``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc - Indent``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 01 - Binding``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 02 - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 02 - Lambda 02``() = x.DoNamedTest()
