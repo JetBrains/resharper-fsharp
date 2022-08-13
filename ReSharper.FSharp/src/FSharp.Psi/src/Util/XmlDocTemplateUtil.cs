@@ -66,6 +66,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return pattern switch
         {
           ILocalReferencePat local => new[] { local.SourceName },
+          IOptionalValPat opt => GetParameterNamesInternal(opt.Pattern, isTopLevelParameter),
           ITypedPat typed => GetParameterNamesInternal(typed.Pattern, false),
           IAttribPat attrib => GetParameterNamesInternal(attrib.Pattern, false),
           IAsPat asPat => GetParameterNamesInternal(asPat.RightPattern, false),
