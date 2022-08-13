@@ -33,15 +33,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       declaration switch
       {
         IBinding binding => binding.Expression is ILambdaExpr lambda
-          ? binding.ParameterPatterns.SelectMany(t => GetParameterNames(t, false)).Union(GetLambdaArgs(lambda))
-          : binding.ParameterPatterns.SelectMany(t => GetParameterNames(t, false)),
+          ? binding.ParameterPatterns.SelectMany(GetParameterNames).Union(GetLambdaArgs(lambda))
+          : binding.ParameterPatterns.SelectMany(GetParameterNames),
         IBindingSignature bindingSignature => GetParameterNames(bindingSignature.ReturnTypeInfo.ReturnType),
-        IMemberDeclaration member => member.ParameterPatterns.SelectMany(t => GetParameterNames(t, true))
+        IMemberDeclaration member => member.ParameterPatterns.SelectMany(GetParameterNames)
           .Union(member.AccessorDeclarations.SelectMany(t =>
-            t.ParameterPatterns.SelectMany(t => GetParameterNames(t, true)))),
+            t.ParameterPatterns.SelectMany(GetParameterNames))),
         IConstructorSignature constructorSignature => GetParameterNames(constructorSignature.ReturnTypeInfo.ReturnType),
-        IConstructorDeclaration constructorDeclaration => GetParameterNames(constructorDeclaration.ParameterPatterns,
-          true),
+        IConstructorDeclaration constructorDeclaration => GetParameterNames(constructorDeclaration.ParameterPatterns),
         IAbstractMemberDeclaration abstractMember => GetParameterNames(abstractMember.ReturnTypeInfo.ReturnType),
         IMemberSignature memberSignature => GetParameterNames(((IMemberSignatureOrDeclaration)memberSignature)
           .ReturnTypeInfo.ReturnType),
@@ -52,31 +51,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     private static IEnumerable<string> GetLambdaArgs(ILambdaExpr expr)
     {
-      var parameters = expr.PatternsEnumerable.SelectMany(t => GetParameterNames(t, false));
+      var parameters = expr.PatternsEnumerable.SelectMany(t => GetParameterNames(t));
       if (expr.Expression is ILambdaExpr innerLambda)
         parameters = parameters.Union(GetLambdaArgs(innerLambda));
       return parameters;
     }
 
-    private static IEnumerable<string> GetParameterNames(IFSharpPattern pattern, bool isMember)
+    private static IEnumerable<string> GetParameterNames(IFSharpPattern pattern)
     {
-      IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pattern, bool isMember, bool isTopLevelArg)
+      IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pattern, bool isTopLevelParameter)
       {
         pattern = pattern.IgnoreInnerParens();
         return pattern switch
         {
           ILocalReferencePat local => new[] { local.SourceName },
-          ITypedPat typed => GetParameterNamesInternal(typed.Pattern, isMember, false),
-          IAttribPat attrib => GetParameterNamesInternal(attrib.Pattern, isMember, false),
-          IAsPat asPat => GetParameterNamesInternal(asPat.RightPattern, isMember, false),
-          ITuplePat tuplePat => isMember && !isTopLevelArg
-            ? EmptyList<string>.Enumerable
-            : tuplePat.PatternsEnumerable.SelectMany(t => GetParameterNamesInternal(t, true, false)),
+          ITypedPat typed => GetParameterNamesInternal(typed.Pattern, false),
+          IAttribPat attrib => GetParameterNamesInternal(attrib.Pattern, false),
+          IAsPat asPat => GetParameterNamesInternal(asPat.RightPattern, false),
+          ITuplePat tuplePat when isTopLevelParameter => tuplePat.PatternsEnumerable.SelectMany(t =>
+            GetParameterNamesInternal(t, false)),
           _ => EmptyList<string>.Enumerable
         };
       }
 
-      return GetParameterNamesInternal(pattern, isMember, true);
+      return GetParameterNamesInternal(pattern, true);
     }
 
     private static IEnumerable<string> GetParameterNames(ITypeUsage pattern) =>
