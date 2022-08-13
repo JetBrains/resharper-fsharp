@@ -16,12 +16,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [NotNull]
     public static string GetDocTemplate(ITreeNode owner, Func<int, string> linePrefix, string lineSeparator)
     {
-      // Check owner on null
-
       var text = new StringBuilder();
+      var line = 1;
 
       text.Append($"summary>{lineSeparator}");
-      var line = 1;
       text.Append($"{linePrefix(line++)}{lineSeparator}");
       text.Append($"{linePrefix(line++)}</summary>{lineSeparator}");
 
@@ -31,15 +29,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return text.ToString();
     }
 
-    //TODO: abstract members
-    //TODO: proerties
     private static IEnumerable<string> GetParameters(ITreeNode declaration) =>
       declaration switch
       {
         IBinding binding => binding.Expression is ILambdaExpr lambda
           ? binding.ParameterPatterns.SelectMany(GetParameterNames).Union(GetLambdaArgs(lambda))
           : binding.ParameterPatterns.SelectMany(GetParameterNames),
-      
+
         IBindingSignature bindingSignature => GetParameterNames(bindingSignature.ReturnTypeInfo.ReturnType),
 
         IMemberDeclaration member => member.ParameterPatterns.SelectMany(GetParameterNames)
