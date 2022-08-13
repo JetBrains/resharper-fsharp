@@ -70,6 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       {
         ILocalReferencePat local => new[] { local.SourceName },
         ITypedPat typed => GetParameterNames(typed.Pattern),
+        IAttribPat attrib => GetParameterNames(attrib.Pattern),
         IAsPat asPat => GetParameterNames(asPat.RightPattern),
         ITuplePat tuplePat => tuplePat.PatternsEnumerable.SelectMany(GetParameterNames),
         _ => EmptyList<string>.Enumerable
