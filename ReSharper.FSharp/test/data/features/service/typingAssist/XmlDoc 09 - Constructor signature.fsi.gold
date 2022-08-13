@@ -1,0 +1,9 @@
+﻿// ${CHAR:<}
+module Module
+
+type A =
+    /// <summary>
+    /// {caret}
+    /// </summary>
+    /// <param name="x"></param>
+    new: x: int -> A

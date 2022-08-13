@@ -1,0 +1,11 @@
+﻿// ${CHAR:<}
+module Module
+
+type A =
+    /// <summary>
+    /// {caret}
+    /// </summary>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <param name="n"></param>
+    abstract member M: y: int * z: int -> n: int -> int

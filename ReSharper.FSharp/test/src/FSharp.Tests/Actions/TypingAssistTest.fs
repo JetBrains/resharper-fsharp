@@ -344,6 +344,13 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``XmlDoc 06 - Type member 02 - Primary constructor``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 06 - Type member 03 - Secondary constructor``() = x.DoNamedTest()
 
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``XmlDoc 07 - Member signature``() = x.DoNamedTest()
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``XmlDoc 08 - Module value``() = x.DoNamedTest()
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``XmlDoc 09 - Constructor signature``() = x.DoNamedTest()
+
 [<FSharpTest>]
 type LineIndentsTest() =
     inherit LineIndentsTestBase()

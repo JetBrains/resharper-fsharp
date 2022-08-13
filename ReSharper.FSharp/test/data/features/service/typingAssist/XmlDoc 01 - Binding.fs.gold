@@ -8,4 +8,5 @@ module Module
 /// <param name="y"></param>
 /// <param name="d"></param>
 /// <param name="e"></param>
-let f x (y: int) (a, b as c as d) _ (Some m as e) = ()
+/// <param name="h"></param>
+let f x (y: int) (a, b as c as d) _ (Some m as e) (h, (j, z)) = ()

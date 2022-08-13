@@ -1,0 +1,9 @@
+﻿// ${CHAR:<}
+module Module
+
+/// <summary>
+/// {caret}
+/// </summary>
+/// <param name="kek"></param>
+/// <param name="lol"></param>
+val f: kek: int -> lol: (int * int) -> int
