@@ -33,15 +33,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       declaration switch
       {
         IBinding binding => binding.Expression is ILambdaExpr lambda
-          ? binding.ParameterPatterns.SelectMany(GetParameterNames).Union(GetLambdaArgs(lambda))
-          : binding.ParameterPatterns.SelectMany(GetParameterNames),
+          ? binding.ParameterPatterns.SelectMany(t => GetParameterNames(t, false)).Union(GetLambdaArgs(lambda))
+          : binding.ParameterPatterns.SelectMany(t => GetParameterNames(t, false)),
         IBindingSignature bindingSignature => GetParameterNames(bindingSignature.ReturnTypeInfo.ReturnType),
-        IMemberDeclaration member => member.ParameterPatterns.SelectMany(GetParameterNames)
-          .Union(member.AccessorDeclarations.SelectMany(t => t.ParameterPatterns.SelectMany(GetParameterNames))),
+        IMemberDeclaration member => member.ParameterPatterns.SelectMany(t => GetParameterNames(t, true))
+          .Union(member.AccessorDeclarations.SelectMany(t =>
+            t.ParameterPatterns.SelectMany(t => GetParameterNames(t, true)))),
         IConstructorSignature constructorSignature => GetParameterNames(constructorSignature.ReturnTypeInfo.ReturnType),
-        IConstructorDeclaration constructorDeclaration => GetParameterNames(constructorDeclaration.ParameterPatterns),
+        IConstructorDeclaration constructorDeclaration => GetParameterNames(constructorDeclaration.ParameterPatterns,
+          true),
         IAbstractMemberDeclaration abstractMember => GetParameterNames(abstractMember.ReturnTypeInfo.ReturnType),
-        IMemberSignature memberSignature => GetParameterNames(memberSignature.TypeUsage),
+        IMemberSignature memberSignature => GetParameterNames(((IMemberSignatureOrDeclaration)memberSignature)
+          .ReturnTypeInfo.ReturnType),
         IUnionCaseDeclaration ucDecl => ucDecl.Fields.Select(t => t.SourceName)
           .Where(t => t != SharedImplUtil.MISSING_DECLARATION_NAME),
         _ => EmptyList<string>.Enumerable
@@ -49,25 +52,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     private static IEnumerable<string> GetLambdaArgs(ILambdaExpr expr)
     {
-      // IgnoreInnerParens()
-      var parameters = expr.PatternsEnumerable.SelectMany(GetParameterNames);
+      var parameters = expr.PatternsEnumerable.SelectMany(t => GetParameterNames(t, false));
       if (expr.Expression is ILambdaExpr innerLambda)
         parameters = parameters.Union(GetLambdaArgs(innerLambda));
       return parameters;
     }
 
-    private static IEnumerable<string> GetParameterNames(IFSharpPattern pattern)
+    private static IEnumerable<string> GetParameterNames(IFSharpPattern pattern, bool isMember)
     {
-      pattern = pattern.IgnoreInnerParens();
-      return pattern switch
+      IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pattern, bool isMember, bool isTopLevelArg)
       {
-        ILocalReferencePat local => new[] { local.SourceName },
-        ITypedPat typed => GetParameterNames(typed.Pattern),
-        IAttribPat attrib => GetParameterNames(attrib.Pattern),
-        IAsPat asPat => GetParameterNames(asPat.RightPattern),
-        ITuplePat tuplePat => tuplePat.PatternsEnumerable.SelectMany(GetParameterNames),
-        _ => EmptyList<string>.Enumerable
-      };
+        pattern = pattern.IgnoreInnerParens();
+        return pattern switch
+        {
+          ILocalReferencePat local => new[] { local.SourceName },
+          ITypedPat typed => GetParameterNamesInternal(typed.Pattern, isMember, false),
+          IAttribPat attrib => GetParameterNamesInternal(attrib.Pattern, isMember, false),
+          IAsPat asPat => GetParameterNamesInternal(asPat.RightPattern, isMember, false),
+          ITuplePat tuplePat => isMember && !isTopLevelArg
+            ? EmptyList<string>.Enumerable
+            : tuplePat.PatternsEnumerable.SelectMany(t => GetParameterNamesInternal(t, true, false)),
+          _ => EmptyList<string>.Enumerable
+        };
+      }
+
+      return GetParameterNamesInternal(pattern, isMember, true);
     }
 
     private static IEnumerable<string> GetParameterNames(ITypeUsage pattern) =>
