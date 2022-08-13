@@ -340,6 +340,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``XmlDoc 03 - Type``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 04 - Union case``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 05 - Abstract member``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 06 - Type member 01``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 06 - Type member 02 - Primary constructor``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 06 - Type member 03 - Secondary constructor``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type LineIndentsTest() =
