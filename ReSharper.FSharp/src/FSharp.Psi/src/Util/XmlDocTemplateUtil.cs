@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   public static class XmlDocTemplateUtil
   {
     [NotNull]
-    public static string GetDocTemplate(ITreeNode owner, Func<int, string> linePrefix, string lineSeparator)
+    public static string GetDocTemplate(IDocCommentBlock docCommentBlock, Func<int, string> linePrefix, string lineSeparator)
     {
       var text = new StringBuilder();
       var line = 1;
@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       text.Append($"{linePrefix(line++)}{lineSeparator}");
       text.Append($"{linePrefix(line++)}</summary>{lineSeparator}");
 
-      foreach (var parameter in GetParameters(owner))
+      foreach (var parameter in GetParameters(docCommentBlock.Parent))
         text.Append($"{linePrefix(line++)}<param name=\"{parameter}\"></param>{lineSeparator}");
 
       return text.ToString();

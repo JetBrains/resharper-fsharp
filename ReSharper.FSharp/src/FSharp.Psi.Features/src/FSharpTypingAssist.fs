@@ -1531,8 +1531,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         if isNull tokenNode then true else
 
         let docCommentBlockNode = tokenNode.Parent.As<IDocCommentBlock>()
-        
-        //TODO: better check
+
         if isNull docCommentBlockNode ||
            docCommentBlockNode.GetTextLength() < 4 ||
            not docCommentBlockNode.IsSingleLine then true else
@@ -1545,21 +1544,15 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let spacesCount = offset - docCommentBlockOffset - 3
         let spaces = String(' ', spacesCount)
 
-        // Create and insert new doc template
         let newLine = textControl.Document.GetLineEnding(docCommentBlockLine).ToLineEndingString();
         let indent = textControl.Document.GetText(TextRange(textControl.Document.GetLineStartOffset(docCommentBlockLine), docCommentBlockOffset))
-
-(*        if (indent.Any(it => !char.IsWhiteSpace(it))) then
-            let buff = new StringBuilder(indent.Length)
-            foreach (var ch in indent) buff.Append(char.IsWhiteSpace(ch) ? ch : ' ');
-            indent = buff.ToString()
-        else  *)
 
         docCommentBlockNode.GetPsiServices().Files.CommitAllDocuments()
 
         let template = XmlDocTemplateUtil.GetDocTemplate(
-                            docCommentBlockNode.Parent,
-                            (fun i -> if i = 0 then "" else (indent + "///" + spaces)), newLine).TrimEnd(newLine.ToCharArray());
+                            docCommentBlockNode,
+                            (fun i -> if i = 0 then "" else (indent + "///" + spaces)),
+                            newLine).TrimEnd(newLine.ToCharArray());
 
         let position = offset + 1;
         if position < 0 then true else
