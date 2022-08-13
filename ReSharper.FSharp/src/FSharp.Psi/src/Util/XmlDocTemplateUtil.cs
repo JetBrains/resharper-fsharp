@@ -29,9 +29,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return text.ToString();
     }
 
-    private static IEnumerable<string> GetParameters(ITreeNode declaration)
-    {
-      return declaration switch
+    private static IEnumerable<string> GetParameters(ITreeNode declaration) =>
+      declaration switch
       {
         IBinding binding => binding.Expression is ILambdaExpr lambda
           ? binding.ParameterPatterns.SelectMany(GetParameterNames).Union(GetLambdaArgs(lambda))
@@ -47,7 +46,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           .Where(t => t != SharedImplUtil.MISSING_DECLARATION_NAME),
         _ => EmptyList<string>.Enumerable
       };
-    }
 
     private static IEnumerable<string> GetLambdaArgs(ILambdaExpr expr)
     {
