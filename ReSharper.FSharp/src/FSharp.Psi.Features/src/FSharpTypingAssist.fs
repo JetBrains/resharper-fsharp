@@ -1558,7 +1558,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         docCommentBlockNode.GetPsiServices().Files.CommitAllDocuments()
 
         let template = XmlDocTemplateUtil.GetDocTemplate(
-                            docCommentBlockNode.Parent.As<IDeclaration>(),
+                            docCommentBlockNode.Parent,
                             (fun i -> if i = 0 then "" else (indent + "///" + spaces)), newLine).TrimEnd(newLine.ToCharArray());
 
         let position = offset + 1;

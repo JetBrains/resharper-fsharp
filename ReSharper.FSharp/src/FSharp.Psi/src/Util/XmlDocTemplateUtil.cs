@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   public static class XmlDocTemplateUtil
   {
     [NotNull]
-    public static string GetDocTemplate(IDeclaration owner, Func<int, string> linePrefix, string lineSeparator)
+    public static string GetDocTemplate(ITreeNode owner, Func<int, string> linePrefix, string lineSeparator)
     {
       // Check owner on null
 
@@ -33,15 +33,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     //TODO: abstract members
     //TODO: proerties
-    private static IEnumerable<string> GetParameters(IDeclaration declaration) =>
+    private static IEnumerable<string> GetParameters(ITreeNode declaration) =>
       declaration switch
       {
         IBinding binding => binding.Expression is ILambdaExpr lambda
           ? binding.ParameterPatterns.SelectMany(GetParameterNames).Union(GetLambdaArgs(lambda))
           : binding.ParameterPatterns.SelectMany(GetParameterNames),
+      
+        IBindingSignature bindingSignature => GetParameterNames(bindingSignature.ReturnTypeInfo.ReturnType),
 
         IMemberDeclaration member => member.ParameterPatterns.SelectMany(GetParameterNames)
           .Union(member.AccessorDeclarations.SelectMany(t => t.ParameterPatterns.SelectMany(GetParameterNames))),
+        IConstructorSignature constructorSignature => GetParameterNames(constructorSignature.ReturnTypeInfo.ReturnType),
+        IConstructorDeclaration constructorDeclaration => GetParameterNames(constructorDeclaration.ParameterPatterns),
 
         IAbstractMemberDeclaration abstractMember => GetParameterNames(abstractMember.ReturnTypeInfo.ReturnType),
         IMemberSignature memberSignature => GetParameterNames(memberSignature.TypeUsage),
