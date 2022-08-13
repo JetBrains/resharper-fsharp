@@ -51,8 +51,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     private static IEnumerable<string> GetLambdaArgs(ILambdaExpr expr)
     {
-      var parameters = expr.PatternsEnumerable.SelectMany(t => GetParameterNames(t));
-      if (expr.Expression is ILambdaExpr innerLambda)
+      var lambdaParams = expr.Patterns;
+      var parameters = lambdaParams.SelectMany(GetParameterNames);
+      if (expr.Expression is ILambdaExpr innerLambda && !lambdaParams.Any(t => t.IgnoreInnerParens() is IAsPat))
         parameters = parameters.Union(GetLambdaArgs(innerLambda));
       return parameters;
     }

@@ -1,0 +1,11 @@
+﻿// ${CHAR:<}
+module Module
+
+/// <summary>
+/// {caret}
+/// </summary>
+/// <param name="x"></param>
+/// <param name="m"></param>
+let f x =
+    fun (y, z as m) ->
+        fun n -> 5
