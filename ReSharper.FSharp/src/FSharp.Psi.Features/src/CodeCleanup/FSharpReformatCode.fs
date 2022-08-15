@@ -6,7 +6,6 @@ open JetBrains.DocumentModel
 open JetBrains.DocumentModel.Impl
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
-open JetBrains.ReSharper.Feature.Services.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -21,7 +20,6 @@ type FSharpReformatCode() =
         "FSReformatCode",
         CodeCleanupLanguage("F#", 2),
         CodeCleanupOptionDescriptor.ReformatGroup,
-        typedefof<Strings>,
         displayName = "Reformat code")
 
     interface IReformatCodeCleanupModule with
