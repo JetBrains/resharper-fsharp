@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Comment
 
-open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.CompletionInDocComments
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments

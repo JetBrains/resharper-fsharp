@@ -3,10 +3,8 @@ using System.Xml;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Xml.XmlDocComments;
-using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
