@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.Psi.VB;
 using JetBrains.ReSharper.Psi.Xml.Tree;
 using JetBrains.ReSharper.Psi.Xml.XmlDocComments;
 using JetBrains.Util;
@@ -19,9 +17,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
       [NotNull] IXmlFile xmlFile, bool isShifted)
       : base(docCommentsHolder, xmlFile, isShifted, fSharpDocCommentBlock)
     {
-
-      var infos = new FSharpDocCommentElementFactory(this).DecodeCRefs(XmlFile);
-      BindReferences<IDocCommentReference>(infos);
     }
 
     [NotNull]
