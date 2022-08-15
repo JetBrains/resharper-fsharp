@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
-open System
 open JetBrains.Application.Infra
+open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.DocumentModel.Impl
 open JetBrains.ProjectModel
@@ -34,7 +34,7 @@ type FSharpReformatCode() =
             | CodeCleanupService.DefaultProfileType.CODE_STYLE ->
                 profile.SetSetting<bool>(REFORMAT_CODE_DESCRIPTOR, true)
             | _ -> 
-                raise(ArgumentException(nameof(profileType)))
+                Assertion.Fail($"Unexpected cleanup profile type: {nameof(profileType)}")
 
         member x.IsAvailable(sourceFile: IPsiSourceFile) =
             sourceFile.PrimaryPsiLanguage :? FSharpLanguage
