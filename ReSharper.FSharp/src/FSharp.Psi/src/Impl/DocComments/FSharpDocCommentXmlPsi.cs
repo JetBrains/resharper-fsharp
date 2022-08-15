@@ -9,7 +9,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
 {
-  internal class FSharpDocCommentXmlPsi : ClrDocCommentXmlPsi<XmlDocBlock>
+  public class FSharpDocCommentXmlPsi : ClrDocCommentXmlPsi<XmlDocBlock>
   {
     private FSharpDocCommentXmlPsi(
       [NotNull] InjectedPsiHolderNode docCommentsHolder,
@@ -22,20 +22,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
     [NotNull]
     public static FSharpDocCommentXmlPsi BuildPsi([NotNull] XmlDocBlock block)
     {
-      BuildXmlPsi(
-        FSharpXmlDocLanguage.Instance.NotNull(), block, GetCommentLines(block),
+      BuildXmlPsi(FSharpXmlDocLanguage.Instance.NotNull(), block, GetCommentLines(block),
         out var holderNode, out var xmlPsiFile, out var isShifted);
 
       return new FSharpDocCommentXmlPsi(holderNode, block, xmlPsiFile, isShifted);
     }
 
     [NotNull, Pure]
-    public static IReadOnlyList<string> GetCommentLines([NotNull] XmlDocBlock block)
-    {
-      return block.DocComments
+    public static IReadOnlyList<string> GetCommentLines([NotNull] XmlDocBlock block) =>
+      block.DocComments
         .Select(t => t.CommentText)
         .ToIReadOnlyList();
-    }
 
     protected override IReadOnlyList<ITreeNode> GetDocCommentNodes() => DocCommentBlock.DocComments;
 

@@ -23,10 +23,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       Assertion.Assert(IsValid());
       myDocCommentXmlPsi ??= FSharpDocCommentXmlPsi.BuildPsi(this);
-
-      // Assertion.Assert(myDocCommentXmlPsi != null && myDocCommentXmlPsi.DocCommentBlock == this,
-      //   "myDocCommentPsi.DocCommentBlock == this");
-
       return myDocCommentXmlPsi;
     }
 
@@ -43,35 +39,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public DocComment AddDocCommentBefore(DocComment nodeToAdd, DocComment anchor)
-    {
-      using var cookie = WriteLockCookie.Create(IsPhysical());
-      if (anchor != null)
-        return ModificationUtil.AddChildBefore(anchor, nodeToAdd);
-      if (DocComments.Count > 0)
-        return ModificationUtil.AddChildAfter(DocComments.Last(), nodeToAdd);
-
-      return ModificationUtil.AddChild(this, nodeToAdd);
-    }
-
-    ///Rewrite more optimal
-    public DocComment AddDocCommentAfter(DocComment nodeToAdd, DocComment anchor)
-    {
-      using var cookie = WriteLockCookie.Create(IsPhysical());
-      if (anchor != null)
-        return ModificationUtil.AddChildAfter(anchor, nodeToAdd);
-
-      return DocComments.Count > 0
-        ? ModificationUtil.AddChildBefore(DocComments[0], nodeToAdd)
-        : ModificationUtil.AddChild(this, nodeToAdd);
-    }
+    public DocComment AddDocCommentBefore(DocComment nodeToAdd, DocComment anchor) => nodeToAdd;
+    public DocComment AddDocCommentAfter(DocComment nodeToAdd, DocComment anchor) => nodeToAdd;
 
     public void RemoveDocComment(DocComment docCommentNode)
     {
-      //Assertion.Assert(this == DocCommentBlockNodeNavigator.GetByDocCommentNode(docCommentNode), string.Empty);
-
-      using var cookie = WriteLockCookie.Create(IsPhysical());
-      ModificationUtil.DeleteChild(docCommentNode);
     }
 
     public XmlNode GetXML(ITypeMember element)
@@ -81,7 +53,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return node;
     }
 
-    // TODO
     public IReadOnlyCollection<DocCommentError> GetErrors() => EmptyList<DocCommentError>.Instance;
   }
 }
