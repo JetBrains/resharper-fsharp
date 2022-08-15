@@ -25,7 +25,7 @@ The Parameter Info popup was completely rewritten to become available inside cur
 * **Fix**: Redundant parens analysis fixes for tuple types, operator usages, and interpolated strings
 * **Fix**: `fsi` directive errors weren't reported for scripts
 * **Fix**: Type providers analysis inside F# scripts
-* **New**: Analyze reduntand `sprintf` invocations
+* **New**: Analyze redundant `sprintf` invocations
 
 ### Generate overrides
 
