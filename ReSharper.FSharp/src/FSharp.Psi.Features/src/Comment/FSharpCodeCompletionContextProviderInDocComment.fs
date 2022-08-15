@@ -23,5 +23,5 @@ type FSharpCodeCompletionContextProviderInDocComment() =
         match file.FindTokenAt(selectedTreeRange.StartOffset - 1) with
         | :? ICommentNode as token ->
             let blockComment = DocCommentBlockNodeNavigator.GetByDocCommentNode(token);
-            if blockComment = null then null else token
+            if isNull blockComment then null else token
         | _ -> null
