@@ -7,11 +7,15 @@ public class Class1
     var a = new A("argOne", "argTwo", "argThree");
     var b = new A(1, "argTwo", "argThree");
     f("argOne", "argTwo", "argThree");
+
+    var c = new B(|"argOne", "argTwo"|(0));
   }
 }
 
 ---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Constructor 'B' has 1 parameter(s) but is invoked with 2 argument(s)
 M:Module.A.#ctor(System.String,System.Object[])
 M:Module.A.#ctor(System.Int32,System.Object[])
 M:Module.f(System.String,System.Object[])
 M:Module.f(System.String,System.Object[])
+M:Module.B.#ctor(System.Object[])
