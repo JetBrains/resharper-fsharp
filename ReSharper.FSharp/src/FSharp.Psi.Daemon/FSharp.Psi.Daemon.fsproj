@@ -10,9 +10,8 @@
     <Compile Include="src\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
     <Compile Include="src\Tooltips\FSharpIdentifierTooltipProvider.fs" />
-    <Compile Include="src\Tooltips\FSharpSyntaxHighlightingQuickDocTooltipRequest.fs" />
-    <Compile Include="src\Tooltips\FSharpQuickDocSuppressor.fs" />
     <Compile Include="src\Tooltips\ZoneMarker.fs" />
+    <Compile Include="src\QuickDoc\FSharpQuickDocProvider.fs" />
     <Compile Include="src\Stages\FcsErrorsStageProcessBase.fs" />
     <Compile Include="src\Stages\FSharpCompilerWarningProcessor.fs" />
     <Compile Include="src\Stages\FSharpDaemonBehaviour.fs" />
@@ -61,5 +60,5 @@
   
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
 
-  <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'"/>
+  <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
 </Project>
