@@ -180,6 +180,8 @@ type CSharpResolveTest() =
     [<Test>] member x.``AttributeUsage 01 - AllowMultiple``() = x.DoNamedTest()
     [<Test>] member x.``AttributeUsage 02 - AttributeTargets``() = x.DoNamedTest()
 
+    [<Test>] member x.``Parameters 01``() = x.DoNamedTest()
+
     override x.RelativeTestDataPath = "cache/csharpResolve"
 
     override x.DoTest(project: IProject, _: IProject) =
