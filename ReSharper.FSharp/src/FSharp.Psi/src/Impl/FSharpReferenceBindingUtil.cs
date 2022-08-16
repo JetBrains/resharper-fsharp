@@ -98,9 +98,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return;
       }
 
-      var containingTypeDecl = reference.GetElement().GetContainingNode<IFSharpTypeOrExtensionDeclaration>();
-      if (containingTypeDecl is ITypeDeclaration typeDecl && containingType.Equals(typeDecl.DeclaredElement))
-        return;
+      var containingTypeDecls = reference.GetElement().ContainingNodes<ITypeDeclaration>();
+      foreach (var typeDecl in containingTypeDecls)
+        if (containingType.Equals(typeDecl.DeclaredElement))
+          return;
 
       reference.SetQualifier(containingType);
     }
