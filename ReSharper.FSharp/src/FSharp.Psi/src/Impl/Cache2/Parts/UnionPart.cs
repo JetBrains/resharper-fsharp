@@ -122,7 +122,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     AccessRights RepresentationAccessRights { get; }
   }
 
-  public interface IUnionPart : ISimpleTypePart, IRepresentationAccessRightsOwner
+  public interface IUnionPart : ISimpleTypePart, IRepresentationAccessRightsOwner, IFSharpTypePart
   {
     bool HasNestedTypes { get; }
     bool IsSingleCase { get; }

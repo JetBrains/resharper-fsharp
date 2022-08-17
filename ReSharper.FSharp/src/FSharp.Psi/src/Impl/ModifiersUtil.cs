@@ -104,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       for (var part = typePart; part != null; part = part.NextPart)
       {
         var filePart = part.GetRoot() as FSharpProjectFilePart;
-        if (filePart?.IsSignaturePart ?? false)
+        if (filePart?.IsSignature ?? false)
           return part;
       }
 

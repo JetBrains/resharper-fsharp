@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
@@ -6,5 +7,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   {
     [NotNull] string SourceName { get; }
     int MeasureTypeParametersCount { get; }
+    TypePart GetFirstPart();
   }
 }

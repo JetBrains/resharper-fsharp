@@ -303,7 +303,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     [CanBeNull]
     public static TPart GetPart<TPart>([CanBeNull] this ITypeElement type)
-      where TPart : class, ClassLikeTypeElement.IClassLikePart
+      where TPart : class, IFSharpTypePart
     {
       // todo: check signature first if one is present
 
@@ -316,6 +316,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       return null;
     }
+
+    [CanBeNull]
+    public static TypePart GetFirstTypePart([CanBeNull] this ITypeElement typeElement) =>
+      typeElement.GetPart<IFSharpTypePart>()?.GetFirstPart();
 
     public static bool IsException(this ITypeElement typeElement) =>
       typeElement switch

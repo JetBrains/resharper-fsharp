@@ -56,6 +56,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       ExtensionMethodInfos = methods.ToArray();
     }
 
+    [NotNull]
+    public TypePart GetFirstPart()
+    {
+      var part = (TypePart)this;
+      var offset = Offset;
+
+      for (var nextPart = NextPart; nextPart != null; nextPart = nextPart.NextPart)
+      {
+        var filePart = (FSharpProjectFilePart)part.GetRoot();
+        var nextPartFilePart = (FSharpProjectFilePart)nextPart.GetRoot();
+
+        if (nextPart.Offset < offset && filePart == nextPartFilePart || 
+            filePart.IsImplementation && nextPartFilePart.IsSignature)
+        {
+          part = nextPart;
+          offset = nextPart.Offset;
+        }
+      }
+
+      return part;
+    }
+
     public override HybridCollection<IMethod> FindExtensionMethod(ExtensionMethodInfo info)
     {
       if (!TypeElement.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS, false))

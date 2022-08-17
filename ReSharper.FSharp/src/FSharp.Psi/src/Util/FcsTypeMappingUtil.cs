@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -279,10 +280,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       [NotNull] IList<ITypeParameter> typeParameters, [NotNull] IPsiModule psiModule)
     {
       var paramName = type.GenericParameter.Name;
-      var typeParam = typeParameters.FirstOrDefault(p => p.ShortName == paramName);
+      var typeParam = typeParameters.FirstOrDefault(p => GetTypeParameterFirstName(p) == paramName);
       return typeParam != null
         ? TypeFactory.CreateType(typeParam)
         : TypeFactory.CreateUnknownType(psiModule);
+    }
+
+    private static string GetTypeParameterFirstName([NotNull] ITypeParameter typeParameter)
+    {
+      if (typeParameter.Owner is IFSharpTypeElement fsTypeElement)
+        if (fsTypeElement.GetFirstTypePart() is { } firstTypePart)
+          return firstTypePart.GetTypeParameterName(typeParameter.Index);
+
+      return typeParameter.ShortName;
     }
 
     public static ParameterKind MapParameterKind([NotNull] this FSharpParameter param)

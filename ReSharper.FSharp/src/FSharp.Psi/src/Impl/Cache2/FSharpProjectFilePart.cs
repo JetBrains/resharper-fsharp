@@ -39,8 +39,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       writer.WriteBool(HasInternalsVisibleTo);
     }
 
-    public bool IsSignaturePart => FileKind == FSharpFileKind.SigFile;
-    public bool IsImplementationPart => FileKind == FSharpFileKind.ImplFile;
+    public bool IsSignature => FileKind == FSharpFileKind.SigFile;
+    public bool IsImplementation => FileKind == FSharpFileKind.ImplFile;
 
     public override string ToString() => $"{GetType().Name}:{FileKind}";
 

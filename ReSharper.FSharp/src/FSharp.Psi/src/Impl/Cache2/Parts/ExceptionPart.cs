@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       new FSharpGeneratedConstructorFromFields(this);
   }
 
-  public interface IExceptionPart : Class.IClassPart, IFieldsOwnerPart
+  public interface IExceptionPart : Class.IClassPart, IFieldsOwnerPart, IFSharpTypePart
   {
     bool HasFields { get; }
   }
