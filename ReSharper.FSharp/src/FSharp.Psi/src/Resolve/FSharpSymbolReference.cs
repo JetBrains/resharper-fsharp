@@ -3,6 +3,7 @@ using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader;
@@ -27,10 +28,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ? myOwner.FSharpFile.GetSymbolUse(offset.Offset)
         : null;
 
-    public virtual TreeOffset SymbolOffset =>
-      myOwner.FSharpIdentifier is { } fsIdentifier
-        ? fsIdentifier.NameRange.StartOffset
-        : myOwner.GetTreeStartOffset();
+    public virtual TreeOffset SymbolOffset
+    {
+      get
+      {
+        if (myOwner.FSharpIdentifier is { } fsIdentifier)
+          return fsIdentifier.NodeType == FSharpTokenType.LPAREN_STAR_RPAREN
+            ? fsIdentifier.GetTreeStartOffset()
+            : fsIdentifier.NameRange.StartOffset;
+
+        return myOwner.GetTreeStartOffset();
+      }
+    }
 
     public virtual FSharpSymbol GetFcsSymbol() =>
       GetSymbolUse()?.Symbol;

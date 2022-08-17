@@ -62,7 +62,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     {
       public string Name => GetText();
       public ITokenNode IdentifierToken => this;
-      public TreeTextRange NameRange => this.GetTreeTextRange();
+
+      public TreeTextRange NameRange
+      {
+        get
+        {
+          var textRange = this.GetTreeTextRange();
+
+          return textRange.Length == 3 && NodeType == LPAREN_STAR_RPAREN
+            ? textRange.TrimLeft(1).TrimRight(1)
+            : textRange;
+        }
+      }
     }
 
     private class FixedTokenNodeType : FSharpTokenNodeType, IFixedTokenNodeType
@@ -155,6 +166,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public static readonly NodeTypeSet AccessModifiersKeywords;
     public static readonly NodeTypeSet Keywords;
     public static readonly NodeTypeSet Identifiers;
+    public static readonly NodeTypeSet Operators;
     public static readonly NodeTypeSet StringsLiterals;
     public static readonly NodeTypeSet InterpolatedStrings;
     public static readonly NodeTypeSet InterpolatedStringsStart;
@@ -265,6 +277,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         IDENTIFIER,
         SYMBOLIC_OP,
         AMP_AMP,
+        GREATER,
+        PLUS,
+        MINUS,
+        LESS,
+        LPAREN_STAR_RPAREN);
+
+      Operators = new NodeTypeSet(
+        EQUALS,
+        SYMBOLIC_OP,
         GREATER,
         PLUS,
         MINUS,

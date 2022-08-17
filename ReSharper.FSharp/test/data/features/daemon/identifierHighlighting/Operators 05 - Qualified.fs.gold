@@ -1,0 +1,36 @@
+﻿module |Module|(0)
+
+|Operators|(1).(|=|(2))
+|Operators|(3).(|<|(4))
+|Operators|(5).(|>|(6))
+|Operators|(7).(|+|(8))
+|Operators|(9).(|-|(10))
+|Operators|(11).(|*|(12))
+
+(|=|(13))
+(|<|(14))
+(|>|(15))
+(|+|(16))
+(|-|(17))
+(|*|(18))
+
+---------------------------------------------------------
+(0): ReSharper F# Module Identifier: 
+(1): ReSharper F# Module Identifier: 
+(2): ReSharper F# Operator Identifier: 
+(3): ReSharper F# Module Identifier: 
+(4): ReSharper F# Operator Identifier: 
+(5): ReSharper F# Module Identifier: 
+(6): ReSharper F# Operator Identifier: 
+(7): ReSharper F# Module Identifier: 
+(8): ReSharper F# Operator Identifier: 
+(9): ReSharper F# Module Identifier: 
+(10): ReSharper F# Operator Identifier: 
+(11): ReSharper F# Module Identifier: 
+(12): ReSharper F# Operator Identifier: 
+(13): ReSharper F# Operator Identifier: 
+(14): ReSharper F# Operator Identifier: 
+(15): ReSharper F# Operator Identifier: 
+(16): ReSharper F# Operator Identifier: 
+(17): ReSharper F# Operator Identifier: 
+(18): ReSharper F# Operator Identifier: 

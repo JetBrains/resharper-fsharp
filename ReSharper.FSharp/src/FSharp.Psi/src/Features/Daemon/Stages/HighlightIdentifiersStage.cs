@@ -47,17 +47,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
             ? FSharpHighlightingAttributeIdsModule.ComputationExpression
             : symbol.GetHighlightingAttributeId();
 
-        if (symbolUse.IsFromDefinition && symbol is FSharpMemberOrFunctionOrValue mfv)
-        {
-          if (mfv.LogicalName == StandardMemberNames.Constructor &&
-              myDocument.Buffer.GetText(resolvedSymbolUse.Range) == "new")
-            continue;
+        var documentRange = new DocumentRange(myDocument, resolvedSymbolUse.Range);
 
-          if (mfv.IsActivePattern && !FSharpFile.IsFSharpSigFile())
-            continue;
+        if (symbol is FSharpMemberOrFunctionOrValue mfv)
+        {
+          if (symbolUse.IsFromDefinition)
+          {
+            if (mfv.LogicalName == StandardMemberNames.Constructor &&
+                myDocument.Buffer.GetText(resolvedSymbolUse.Range) == "new")
+              continue;
+
+            if (mfv.IsActivePattern && !FSharpFile.IsFSharpSigFile())
+              continue;
+          }
+
+          if (documentRange.Length == 3 && mfv.LogicalName == "op_Multiply" && 
+              myDocument.Buffer.GetText(resolvedSymbolUse.Range) == "(*)")
+            documentRange = documentRange.TrimLeft(1).TrimRight(1);
         }
 
-        var documentRange = new DocumentRange(myDocument, resolvedSymbolUse.Range);
         var highlighting = new FSharpIdentifierHighlighting(highlightingId, documentRange);
         highlightings.Add(new HighlightingInfo(documentRange, highlighting));
 

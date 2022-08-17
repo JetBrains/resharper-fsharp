@@ -290,7 +290,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           if (tokenType == FSharpTokenType.LPAREN_STAR_RPAREN && sourceName == "*")
             return new TextRange(endOffset - 3, endOffset);
 
-          var opText = tokenType == FSharpTokenType.SYMBOLIC_OP ? sourceName : logicalName;
+          var opText = FSharpTokenType.Operators[tokenType] ? sourceName : logicalName;
           return new TextRange(endOffset - opText.Length, endOffset);
         }
       }
