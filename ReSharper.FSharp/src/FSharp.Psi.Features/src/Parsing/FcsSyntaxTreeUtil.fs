@@ -29,6 +29,9 @@ type SynArgPats with
         | SynArgPats.Pats pats -> pats.IsEmpty
         | SynArgPats.NamePatPairs(idsAndPats, _) -> idsAndPats.IsEmpty
 
+type XmlDoc with
+    member x.HasDeclaration = x.UnprocessedLines.Length > 0
+
 let rec skipGeneratedLambdas expr =
     match expr with
     | SynExpr.Lambda(_, true, _, bodyExpr, _, _, _) ->

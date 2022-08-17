@@ -210,7 +210,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
             // TODO: add range for primary constructor in FCS
             let mark =
-                if not xmlDoc.IsEmpty then
+                if xmlDoc.HasDeclaration then
                     let mark = x.Mark(xmlDoc.Range)
                     x.MarkAndDone(xmlDoc.Range, FSharpTokenType.XML_DOC_BLOCK)
                     mark
@@ -645,7 +645,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
         let expr = x.FixExpression(expr)
         let mark =
-            if xmlDoc.IsEmpty then x.Mark()
+            if not xmlDoc.HasDeclaration then x.Mark()
             else x.MarkXmlDocOwner(xmlDoc, null, range)
 
         match kind with
@@ -694,7 +694,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
 
         let expr = x.FixExpression(expr)
         let mark =
-            if xmlDoc.IsEmpty then x.Mark()
+            if not xmlDoc.HasDeclaration then x.Mark()
             else x.MarkXmlDocOwner(xmlDoc, null, range)
 
         match kind with
