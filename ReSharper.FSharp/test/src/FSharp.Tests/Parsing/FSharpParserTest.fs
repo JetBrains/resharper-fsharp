@@ -653,6 +653,7 @@ type FSharpParserTest() =
 
     [<Test>] member x.``XmlDoc 01 - Simple comment separator``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 02 - Simple comment at the end``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 03 - Empty``() = x.DoNamedTest()
 
 
 [<FSharpSignatureTest>]

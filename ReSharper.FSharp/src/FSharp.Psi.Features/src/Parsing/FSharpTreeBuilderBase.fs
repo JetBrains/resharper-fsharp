@@ -9,6 +9,7 @@ open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing.FcsSyntaxTreeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -123,7 +124,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
     member x.MarkXmlDocOwner(xmlDoc: XmlDoc, expectedType: TokenNodeType, declarationRange: range) =
         let mark = x.MarkTokenOrRange(expectedType, declarationRange)
-        if not xmlDoc.IsEmpty then
+        if xmlDoc.HasDeclaration then
             x.MarkAndDone(xmlDoc.Range, FSharpTokenType.XML_DOC_BLOCK)
         mark
 
