@@ -16,18 +16,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     public FSharpLocks(IShellLocks shellLocks) =>
       ShellLocks = shellLocks;
 
-    public FSharpReadLockCookie CreateReadLock()
+    public FSharpReadLockCookie CreateReadLock() =>
+      CreateReadLock(ShellLocks);
+
+    public static FSharpReadLockCookie CreateReadLock(IShellLocks locks)
     {
-      if (ShellLocks.IsReadAccessAllowed())
+      if (locks.IsReadAccessAllowed())
         // We already have read access from the callee and don't need to transfer the write lock.
         return new FSharpReadLockCookie(null);
 
-      while (!ShellLocks.ContentModelLocks.TryAcquireReadLock(50))
+      while (!locks.ContentModelLocks.TryAcquireReadLock(50))
         // Request transferring write lock in case it's held by main thread waiting for FCS.
         ThreadRequestingWriteLock = Thread.CurrentThread;
 
       ThreadRequestingWriteLock = null;
-      return new FSharpReadLockCookie(ShellLocks.ContentModelLocks);
+      return new FSharpReadLockCookie(locks.ContentModelLocks);
     }
   }
 

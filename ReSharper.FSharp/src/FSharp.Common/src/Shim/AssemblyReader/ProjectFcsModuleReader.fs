@@ -13,6 +13,7 @@ open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.Properties.Managed
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -22,7 +23,6 @@ open JetBrains.ReSharper.Psi.Impl.Types
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Util
-open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Threading
 open JetBrains.Util
 open JetBrains.Util.DataStructures
@@ -73,6 +73,7 @@ type FcsTypeDef =
 
 
 type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, shim: IFcsAssemblyReaderShim, path) =
+    let locks = psiModule.GetPsiServices().Locks
     let symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, false, true)
 
     let locker = JetFastSemiReenterableRWLock()
@@ -785,7 +786,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         ILPropertyDef(name, attrs, setter, getter, callConv, propertyType, init, args, customAttrs)
 
     let usingTypeElement (typeName: IClrTypeName) defaultValue f =
-        use cookie = ReadLockCookie.Create()
+        use cookie = FSharpLocks.CreateReadLock(locks)
         use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
         let typeElement = symbolScope.GetTypeElementByCLRName(typeName)
@@ -1031,7 +1032,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         if typeDefs.IsEmpty then true else
 
-        use cookie = ReadLockCookie.Create()
+        use cookie = FSharpLocks.CreateReadLock(locks)
         use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
         let mutable isUpToDate = true
@@ -1067,7 +1068,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         currentTypeName <- clrTypeName
         currentTypeUnresolvedUsedNames <- HashSet()
 
-        use cookie = ReadLockCookie.Create()
+        use cookie = FSharpLocks.CreateReadLock(locks)
         use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
         match symbolScope.GetTypeElementByCLRName(clrTypeName) with
@@ -1122,7 +1123,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | Some(moduleDef) -> moduleDef
             | None ->
 
-            use readLockCookie = ReadLockCookie.Create()
+            use cookie = FSharpLocks.CreateReadLock(locks)
             use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
             let project = psiModule.ContainingProjectModule :?> IProject
