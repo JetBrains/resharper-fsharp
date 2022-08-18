@@ -34,6 +34,11 @@ jobs:
         working-directory: ./rider-fsharp
         run: ./gradlew prepare
 
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.302'
+
       - name: Add MSBuild to PATH # for tests
         uses: microsoft/setup-msbuild@v1.0.2
 
