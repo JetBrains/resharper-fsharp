@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (Parent is IMemberConstraint)
         return null;
 
-      if (TypeUsage is IFunctionTypeUsage)
+      if (ReturnTypeInfo is { ReturnType: IFunctionTypeUsage })
         return this.CreateMethod();
 
       return GetFcsSymbol() is { } fcsSymbol

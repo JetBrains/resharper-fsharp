@@ -1310,8 +1310,7 @@ memberSignature  options { stubBase="FSharpProperTypeMemberDeclarationBase"; } e
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   identOrOpName{IDENTIFIER, Identifier}
   postfixTypeParameterDeclarationList<TYPE_PARAMETER_LIST, TypeParameterList>?
-  COLON
-  typeUsage<TYPE, TypeUsage>
+  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   accessorDecls?;
 
 private accessorDecls:
