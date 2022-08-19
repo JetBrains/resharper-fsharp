@@ -96,12 +96,12 @@ let resolvesToPredefinedFunction (context: ITreeNode) name opName =
         | _ -> false
     | None -> false
 
-let getAllMethods (file: IFSharpFile) (reference: FSharpSymbolReference) shiftEndColumn opName =
-    match file.GetParseAndCheckResults(true, opName) with
+let getAllMethods (reference: FSharpSymbolReference) shiftEndColumn opName =
+    let referenceOwner = reference.GetElement()
+    match referenceOwner.FSharpFile.GetParseAndCheckResults(true, opName) with
     | None -> None
     | Some results ->
 
-    let referenceOwner = reference.GetElement()
     let names = 
         match referenceOwner with
         | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names

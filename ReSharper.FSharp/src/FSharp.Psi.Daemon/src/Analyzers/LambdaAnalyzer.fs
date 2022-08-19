@@ -137,7 +137,7 @@ type LambdaAnalyzer() =
                     // If the body of the lambda consists of a method call,
                     // and the method to which the lambda is passed has overloads,
                     // then it cannot be unambiguously determined whether the lambda can be simplified
-                    match getAllMethods ref.FSharpFile reference false "LambdaAnalyzer.getMethods" with
+                    match getAllMethods reference false "LambdaAnalyzer.getMethods" with
                     | None
                     | Some (_, None)
                     | Some (_, Some [])
