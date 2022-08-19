@@ -86,13 +86,12 @@ type LambdaAnalyzer() =
         compareArgsRec expr 0 null
 
     let canBeNamedArg (expr: IBinaryAppExpr) =
+        match expr.Parent with
+        | :? IParenExpr -> false
+        | _ ->
         if isNull expr.Operator then false else
-
         let exprReference = expr.Operator.Reference
-        if exprReference.GetName() <> "=" then false else
-
-        let declaredElement = exprReference.Resolve().DeclaredElement.As<IFunction>()
-        isNull declaredElement
+        exprReference.GetName() = "="
 
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
         let lambda = lambda.IgnoreParentParens()
