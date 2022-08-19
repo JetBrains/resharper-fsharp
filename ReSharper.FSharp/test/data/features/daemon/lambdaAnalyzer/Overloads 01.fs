@@ -86,3 +86,13 @@ B5().B1(A5.M) //ERROR
 B5().B(fun x -> x)
 B5().B(id) //OK
 
+
+type A6 =
+    static member M(x: int) = x
+    static member M(x: string) = x
+
+type B6() =
+    member _.B(x: int -> int) = ()
+
+B6().B(fun x -> A6.M x)
+B6().B(A6.M) //OK

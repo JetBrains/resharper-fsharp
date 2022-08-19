@@ -87,6 +87,16 @@ B5().B(|fun x -> x|(7))
 B5().B(id) //OK
 
 
+type A6 =
+    static member M(x: int) = x
+    static member M(x: string) = x
+
+type B6() =
+    member _.B(x: int -> int) = ()
+
+B6().B(|fun x -> A6.M x|(8))
+B6().B(A6.M) //OK
+
 ---------------------------------------------------------
 (0): ReSharper Hint: Lambda can be replaced with 'A.M'
 (1): ReSharper Hint: Lambda can be replaced with 'id'
@@ -96,3 +106,4 @@ B5().B(id) //OK
 (5): ReSharper Hint: Lambda can be replaced with 'id'
 (6): ReSharper Hint: Lambda can be replaced with 'id'
 (7): ReSharper Hint: Lambda can be replaced with 'id'
+(8): ReSharper Hint: Lambda can be replaced with 'A6.M'
