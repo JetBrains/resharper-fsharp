@@ -780,7 +780,7 @@ type FSharpParameterInfoContextFactory() =
             tryCreateFromParentExpr isAutoPopup caretOffset expr
 
     // todo: identifier end in f<int>
-    and getSymbols (endOffset: DocumentOffset) (reference: FSharpSymbolReference) =
+    and getSymbols (context: IFSharpTreeNode) (reference: FSharpSymbolReference) =
         let symbolUse = reference.GetSymbolUse()
         if isNull symbolUse then None else
 
@@ -796,11 +796,7 @@ type FSharpParameterInfoContextFactory() =
         let symbol = symbolUse.Symbol
         if not (isApplicable symbol) then None else
 
-        let endCoords = endOffset.ToDocumentCoords()
-        let line = int endCoords.Line + 1
-        let column = int endCoords.Column + 1
-        
-        match getAllMethods context.FSharpFile reference line column "FSharpParameterInfoContextFactory.getMethods" with
+        match getAllMethods context.FSharpFile reference true "FSharpParameterInfoContextFactory.getMethods" with
         | None -> None
         | Some (checkResults, Some symbolUses) when not symbolUses.IsEmpty -> Some(checkResults, symbol, symbolUses)
         | Some (checkResults, _) -> Some(checkResults, symbol, [symbolUse])
@@ -811,7 +807,7 @@ type FSharpParameterInfoContextFactory() =
         let endOffset = DocumentOffset(caretOffset.Document, reference.GetTreeTextRange().EndOffset.Offset)
         if not (shouldShowPopup caretOffset (context.GetDocumentRange())) then null else
 
-        match getSymbols endOffset reference with
+        match getSymbols context reference with
         | Some(checkResults, symbol, symbolUses) ->
             FSharpPrefixAppParameterInfoContext(caretOffset, context :?> IFSharpExpression, reference, symbolUses,
                 checkResults, endOffset, symbol) :> IFSharpParameterInfoContext
@@ -887,7 +883,7 @@ type FSharpParameterInfoContextFactory() =
             let parentExpr = context.GetContainingNode<IFSharpExpression>() 
             tryCreateFromParentExpr false caretOffset parentExpr else
 
-        match getSymbols endOffset reference with
+        match getSymbols context reference with
         | Some(checkResults, symbol, symbolUses) ->
             FSharpTypeReferenceCtorParameterInfoContext(caretOffset, context, argExpr, reference, symbolUses,
                 checkResults, endOffset, symbol) :> IFSharpParameterInfoContext

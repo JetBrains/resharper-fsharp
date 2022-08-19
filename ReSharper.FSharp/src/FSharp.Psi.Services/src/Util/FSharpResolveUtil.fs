@@ -96,7 +96,7 @@ let resolvesToPredefinedFunction (context: ITreeNode) name opName =
         | _ -> false
     | None -> false
 
-let getAllMethods (file: IFSharpFile) (reference: FSharpSymbolReference) line column opName =
+let getAllMethods (file: IFSharpFile) (reference: FSharpSymbolReference) shiftEndColumn opName =
     match file.GetParseAndCheckResults(true, opName) with
     | None -> None
     | Some results ->
@@ -107,5 +107,12 @@ let getAllMethods (file: IFSharpFile) (reference: FSharpSymbolReference) line co
         | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
         | _ -> [reference.GetName()]
 
+    let identifier = referenceOwner.FSharpIdentifier
+    if isNull identifier then None else
+
+    let endCoords = identifier.GetDocumentEndOffset().ToDocumentCoords()
+    let endLine = int endCoords.Line + 1
+    let endColumn = int endCoords.Column + if shiftEndColumn then 1 else 0
+
     let checkResults = results.CheckResults
-    Some (checkResults, checkResults.GetMethodsAsSymbols(line, column, "", names))
+    Some (checkResults, checkResults.GetMethodsAsSymbols(endLine, endColumn, "", names))

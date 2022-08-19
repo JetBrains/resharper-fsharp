@@ -134,18 +134,10 @@ type LambdaAnalyzer() =
 
                     not parameterIsDelegate &&
 
-                    let referenceOwner = reference.GetElement()
-                    let identifier = referenceOwner.FSharpIdentifier
-                    if isNull identifier then true else
-
-                    let endCoords = identifier.GetDocumentEndOffset().ToDocumentCoords()
-                    let endLine = int endCoords.Line + 1
-                    let endColumn = int endCoords.Column
-
                     // If the body of the lambda consists of a method call,
                     // and the method to which the lambda is passed has overloads,
                     // then it cannot be unambiguously determined whether the lambda can be simplified
-                    match getAllMethods ref.FSharpFile reference endLine endColumn "LambdaAnalyzer.getMethods" with
+                    match getAllMethods ref.FSharpFile reference false "LambdaAnalyzer.getMethods" with
                     | None
                     | Some (_, None)
                     | Some (_, Some [])
