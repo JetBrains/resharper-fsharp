@@ -1,6 +1,8 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 open NUnit.Framework
 
@@ -25,7 +27,10 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Snd``() = x.DoNamedTest()
     [<Test>] member x.``Delegates 01``() = x.DoNamedTest()
     [<Test>] member x.``Delegates 02 - Method overloads``() = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp50)>]
     [<Test>] member x.``Delegates - Not available``() = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp60)>]
+    [<Test>] member x.``Delegates - F# 6``() = x.DoNamedTest()
     [<Test>] member x.``Not available``() = x.DoNamedTest()
-
+    [<Test>] member x.``Overloads 01``() = x.DoNamedTest()
     [<Test>] member x.``Used names - Nested scope``() = x.DoNamedTest()

@@ -12,3 +12,9 @@ fun (a, b) (c, d, e) -> f (a, b) (c, d, e)
 fun x -> "".Foo.Bar(x)
 fun x -> System.Math.Abs(x)
 fun x -> List<int>.Equals(x)
+
+
+type A =
+    static member M(x: string) = x
+
+let a = A.M("" |> fun x -> A.M x)
