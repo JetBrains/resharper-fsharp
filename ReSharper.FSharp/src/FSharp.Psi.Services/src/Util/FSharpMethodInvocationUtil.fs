@@ -12,8 +12,7 @@ let tryGetNamedArgRefExpr (expr: IFSharpExpression) =
     let binaryAppExpr = expr.As<IBinaryAppExpr>()
     if isNull binaryAppExpr then null else
 
-    let operatorExpr = binaryAppExpr.Operator
-    if isNull operatorExpr || operatorExpr.Reference.GetName() <> "=" then null else
+    if binaryAppExpr.ShortName <> "=" then null else
 
     binaryAppExpr.LeftArgument.As<IReferenceExpr>()
 
