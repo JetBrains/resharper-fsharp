@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocation
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
@@ -84,9 +85,19 @@ type LambdaAnalyzer() =
 
         compareArgsRec expr 0 null
 
-    let getWarningIfApplicable (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, exprToReplace: 'a as arg) isFSharp6Supported =
+    let canBeNamedArg (expr: IBinaryAppExpr) =
+        if isNull expr.Operator then false else
+
+        let exprReference = expr.Operator.Reference
+        if exprReference.GetName() <> "=" then false else
+
+        let declaredElement = exprReference.Resolve().DeclaredElement.As<IFunction>()
+        isNull declaredElement
+
+    let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
         let lambda = lambda.IgnoreParentParens()
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
+        if isNotNull binaryExpr && not (canBeNamedArg binaryExpr) then ctor arg else
         let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
         let appTuple = TupleExprNavigator.GetByExpression(argExpr)
         let app = getArgsOwner argExpr
@@ -101,54 +112,54 @@ type LambdaAnalyzer() =
             let parameterGroups = m.CurriedParameterGroups
             if parameterGroups.Count = 0 then ctor arg else
 
-            let args = parameterGroups[0]
-            if args.Count <= lambdaPos then ctor arg else
+            let parameters = parameterGroups[0]
+            if parameters.Count <= lambdaPos then ctor arg else
 
-            let argDecl = args[lambdaPos]
-            let argDeclType = argDecl.Type
-            let argIsDelegate =
-                argDeclType.HasTypeDefinition && (getAbbreviatedEntity argDeclType.TypeDefinition).IsDelegate
+            let parameterDecl = parameters[lambdaPos]
+            let parameterType = parameterDecl.Type
+            let parameterIsDelegate =
+                parameterType.HasTypeDefinition && (getAbbreviatedEntity parameterType.TypeDefinition).IsDelegate
                 
             // If the lambda is passed instead of a delegate,
             // then in F# < 6.0 there is almost never an implicit cast for the lambda simplification 
-            if argIsDelegate && not isFSharp6Supported then null else
+            if parameterIsDelegate && not isFSharp6Supported then null else
 
-            match exprToReplace.As<IFSharpExpression>().IgnoreInnerParens() with
-            | :? IReferenceExpr as ref ->
-                let exprToReplaceSymbol = ref.Reference.GetFcsSymbol()
-                match exprToReplaceSymbol with
-                | :? FSharpMemberOrFunctionOrValue as x ->
-                    let isApplicable =
-                        // If the lambda simplification does not lead to a method group conversation,
-                        // for example, if the body of the lambda does not consist of a method call,
-                        // then everything is OK
-                        x.IsFunction || not x.IsMember ||
+            let ref = replacementExpr.As<IFSharpExpression>().IgnoreInnerParens().As<IReferenceExpr>()
+            if isNull ref then ctor arg else
 
-                        not argIsDelegate &&
-                        // If the body of the lambda consists of a method call,
-                        // and the method to which the lambda is passed has overloads,
-                        // then it cannot be unambiguously determined whether the lambda can be simplified
-                        match ref.FSharpFile.GetParseAndCheckResults(true, "LambdaAnalyzer.getMethods") with
-                        | None -> true
-                        | Some results ->
+            let exprToReplaceSymbol = ref.Reference.GetFcsSymbol()
+            match exprToReplaceSymbol with
+            | :? FSharpMemberOrFunctionOrValue as x ->
+                let isApplicable =
+                    // If the lambda simplification does not convert it to a method group,
+                    // for example, if the body of the lambda does not consist of a method call,
+                    // then everything is OK
+                    x.IsFunction || not x.IsMember ||
 
-                        let referenceOwner = reference.GetElement()
-                        let names = 
-                            match referenceOwner with
-                            | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
-                            | _ -> [reference.GetName()]
+                    not parameterIsDelegate &&
+                    // If the body of the lambda consists of a method call,
+                    // and the method to which the lambda is passed has overloads,
+                    // then it cannot be unambiguously determined whether the lambda can be simplified
+                    match ref.FSharpFile.GetParseAndCheckResults(true, "LambdaAnalyzer.getMethods") with
+                    | None -> true
+                    | Some results ->
 
-                        let identifier = referenceOwner.FSharpIdentifier
-                        if isNull identifier then true else
+                    let referenceOwner = reference.GetElement()
+                    let names = 
+                        match referenceOwner with
+                        | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
+                        | _ -> [reference.GetName()]
 
-                        let endCoords = identifier.GetDocumentEndOffset().ToDocumentCoords()
-                        let endLine = int endCoords.Line + 1
-                        let endColumn = int endCoords.Column
+                    let identifier = referenceOwner.FSharpIdentifier
+                    if isNull identifier then true else
 
-                        let overloads = results.CheckResults.GetMethods(endLine, endColumn, "", Some names).Methods
-                        overloads.Length = 1
-                    if isApplicable then ctor arg else null
-                | _ -> ctor arg
+                    let endCoords = identifier.GetDocumentEndOffset().ToDocumentCoords()
+                    let endLine = int endCoords.Line + 1
+                    let endColumn = int endCoords.Column
+
+                    let overloads = results.CheckResults.GetMethods(endLine, endColumn, "", Some names).Methods
+                    overloads.Length = 1
+                if isApplicable then ctor arg else null
             | _ -> ctor arg
         | _ -> ctor arg
 
@@ -170,9 +181,9 @@ type LambdaAnalyzer() =
         let warning: IHighlighting =
             match compareArgs pats expr with
             | true, true, replaceCandidate ->
-                getWarningIfApplicable LambdaCanBeReplacedWithInnerExpressionWarning (lambda, replaceCandidate) isFsharp60Supported :> _
+                tryCreateWarning LambdaCanBeReplacedWithInnerExpressionWarning (lambda, replaceCandidate) isFsharp60Supported :> _
             | true, false, replaceCandidate ->
-                getWarningIfApplicable LambdaCanBeSimplifiedWarning (lambda, replaceCandidate) isFsharp60Supported :> _
+                tryCreateWarning LambdaCanBeSimplifiedWarning (lambda, replaceCandidate) isFsharp60Supported :> _
             | _ ->
 
             if pats.Count = 1 then
@@ -184,15 +195,15 @@ type LambdaAnalyzer() =
                     if isFunctionInApp expr &funExpr &arg then
                         RedundantApplicationWarning(funExpr, arg) :> _
                     else
-                        getWarningIfApplicable LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda,  "id") isFsharp60Supported :> _
+                        tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda,  "id") isFsharp60Supported :> _
                 else
                     match pat with
                     | :? ITuplePat as pat when not pat.IsStruct && pat.PatternsEnumerable.CountIs(2) ->
                         let tuplePats = pat.Patterns
                         if compareArg tuplePats[0] expr then
-                            getWarningIfApplicable LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "fst") isFsharp60Supported :> _
+                            tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "fst") isFsharp60Supported :> _
                         elif compareArg tuplePats[1] expr then
-                            getWarningIfApplicable LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd") isFsharp60Supported :> _
+                            tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd") isFsharp60Supported :> _
                         else null
                     | _ -> null
 

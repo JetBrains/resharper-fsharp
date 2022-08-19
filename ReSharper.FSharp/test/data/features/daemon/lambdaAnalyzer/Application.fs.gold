@@ -13,6 +13,12 @@
 |fun x -> System.Math.Abs(x)|(8)
 |fun x -> List<int>.Equals(x)|(9)
 
+
+type A =
+    static member M(x: string) = x
+
+let a = A.M("" |> |fun x -> A.M x|(10))
+
 ---------------------------------------------------------
 (0): ReSharper Hint: Lambda can be replaced with 'f'
 (1): ReSharper Hint: Lambda can be replaced with 'f'
@@ -24,3 +30,4 @@
 (7): ReSharper Hint: Lambda can be simplified
 (8): ReSharper Hint: Lambda can be replaced with 'System.Math.Abs'
 (9): ReSharper Hint: Lambda can be simplified
+(10): ReSharper Hint: Lambda can be replaced with 'A.M'
