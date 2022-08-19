@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocation
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
@@ -85,18 +84,15 @@ type LambdaAnalyzer() =
 
         compareArgsRec expr 0 null
 
-    let canBeNamedArg (expr: IBinaryAppExpr) =
+    let isNamedArg (expr: IBinaryAppExpr) =
         match expr.Parent with
         | :? IParenExpr -> false
-        | _ ->
-        if isNull expr.Operator then false else
-        let exprReference = expr.Operator.Reference
-        exprReference.GetName() = "="
+        | _ -> expr.ShortName = "="
 
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
         let lambda = lambda.IgnoreParentParens()
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
-        if isNotNull binaryExpr && not (canBeNamedArg binaryExpr) then ctor arg else
+        if isNotNull binaryExpr && not (isNamedArg binaryExpr) then ctor arg else
         let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
         let appTuple = TupleExprNavigator.GetByExpression(argExpr)
         let app = getArgsOwner argExpr
