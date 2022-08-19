@@ -227,7 +227,7 @@ externDeclaration:
 // todo: extract declaring pattern interface
 
 interface fSharpPattern:
-  referencePat |
+  referenceNameOwnerPat |
   asPat |
   typedLikePat |
   attribPat |
@@ -239,14 +239,17 @@ interface fSharpPattern:
   recordPat |
   optionalValPat |
   listConsPat |
-  parametersOwnerPat |
   wildPat |
   constPat |
-  fieldPat |
   nullPat |
   quoteExprPat |
   charRangePat |
   fromErrorPat;
+
+interface referenceNameOwnerPat:
+  referencePat |
+  parametersOwnerPat |
+  fieldPat;
 
 interface referencePat:
   localReferencePat |

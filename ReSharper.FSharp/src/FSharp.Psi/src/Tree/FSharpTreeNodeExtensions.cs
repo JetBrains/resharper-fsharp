@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     [CanBeNull, Pure]
     public static IFSharpTypeElementDeclaration GetContainingTypeDeclaration([NotNull] this ITreeNode treeNode)
     {
-      while (treeNode != null && !(treeNode is ITypeDeclaration))
+      while (treeNode != null && treeNode is not ITypeDeclaration)
         treeNode = treeNode.Parent;
 
       return (IFSharpTypeElementDeclaration) treeNode;

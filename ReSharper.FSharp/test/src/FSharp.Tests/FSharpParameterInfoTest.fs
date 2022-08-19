@@ -178,6 +178,42 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``Union case 06``() = x.DoNamedTest()
     [<Test>] member x.``Union case 07``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - Active pattern 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Exception 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Exception 02``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Exception 03``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Exception 04``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Exception 05``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Exception 06``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Nested 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Nested 02``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Nested 03``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Nested 04``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Nested 05``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Nested 06``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Nested 07``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Union case 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 02``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 03``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 04``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 05``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 06``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 07``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 08``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 09``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 11``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 12``() = x.DoNamedTest()
+    [<Test; Explicit "Fix parser recovery">] member x.``Pattern - Union case 13``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 14``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 15``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 16``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 17``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 18``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case 19``() = x.DoNamedTest()
+
 
 [<FSharpTest>]
 type FSharpParameterInfoAutoPopupTest() =

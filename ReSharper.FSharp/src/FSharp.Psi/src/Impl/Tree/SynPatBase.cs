@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -24,6 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override IBindingLikeDeclaration Binding => this.GetBindingFromHeadPattern();
+    public FSharpSymbolReference Reference => ReferenceName?.Reference;
   }
 
   internal partial class LocalReferencePat
@@ -49,12 +51,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool CanBeMutable => Binding != null;
 
     public IBindingLikeDeclaration Binding => this.GetBindingFromHeadPattern();
+    public FSharpSymbolReference Reference => ReferenceName?.Reference;
   }
 
   internal partial class ParametersOwnerPat
   {
     public override IEnumerable<IFSharpPattern> NestedPatterns =>
       Parameters.SelectMany(param => param.NestedPatterns);
+
+    public FSharpSymbolReference Reference => ReferenceName?.Reference;
   }
 
   internal partial class AsPat
@@ -150,6 +155,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return pattern2Decls.Prepend(pattern1Decls);
       }
     }
+  }
+
+  internal partial class FieldPat
+  {
+    public FSharpSymbolReference Reference => ReferenceName?.Reference;
   }
 
   internal static class ReferencePatternUtil

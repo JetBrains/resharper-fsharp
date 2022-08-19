@@ -46,11 +46,53 @@ type IFcsParameterInfoCandidate =
     abstract ParameterOwner: IParametersOwner
 
 
+type ParameterInfoArgument =
+    | Expression of IFSharpExpression
+    | Pattern of IFSharpPattern
+
+    member this.Node: IFSharpTreeNode =
+        match this with
+        | Expression expr -> expr
+        | Pattern pat -> pat
+
+    member this.IgnoreSingleInnerParens() =
+        match this with
+        | Expression expr -> Expression(expr.IgnoreInnerParens(true))
+        | Pattern pat -> Pattern(pat.IgnoreInnerParens(true))
+
+    member this.TryGetTupledArgs() =
+        match this with
+        | Expression expr ->
+            match expr.IgnoreInnerParens(true) with
+            | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct ->
+                Some(ParameterInfoTupledArguments.Expression tupleExpr)
+            | _ -> None
+
+        | Pattern pat ->
+            match pat.IgnoreInnerParens(true) with
+            | :? ITuplePat as tuplePat when not tuplePat.IsStruct ->
+                Some(ParameterInfoTupledArguments.Pattern tuplePat)
+            | _ -> None
+
+and ParameterInfoTupledArguments =
+    | Expression of ITupleExpr
+    | Pattern of ITuplePat
+
+    member this.Node: IFSharpTreeNode =
+        match this with
+        | Expression expr -> expr
+        | Pattern pat -> pat
+
+    member this.Commas =
+        match this with
+        | Expression tupleExpr -> tupleExpr.Commas
+        | Pattern pat -> pat.Commas
+
 [<AllowNullLiteral>]
 type IFSharpParameterInfoContext =
     inherit IParameterInfoContext
 
-    abstract ArgGroups: IFSharpExpression list
+    abstract ArgGroups: ParameterInfoArgument list
     abstract ExpectingMoreArgs: caretOffset: DocumentOffset * allowAtLastArgEnd: bool -> bool
 
 
@@ -382,7 +424,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
             | _ -> None)
         |> Array.ofList
 
-    abstract ArgGroups: IFSharpExpression list
+    abstract ArgGroups: ParameterInfoArgument list
     abstract NamedArgs: string[]
 
     interface IFSharpParameterInfoContext with
@@ -399,7 +441,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
 
             let args = this.ArgGroups
 
-            let rec loop argIndex (acc: int) (args: IFSharpExpression list) =
+            let rec loop argIndex (acc: int) (args: ParameterInfoArgument list) =
                 match args with
                 | [] ->
                     if argIndex >= parameterGroups.Count then
@@ -410,14 +452,15 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                         allParametersCount + argIndex
 
                 | arg :: args ->
-                    let argRange = arg.GetDocumentRange()
+                    let argRange = arg.Node.GetDocumentRange()
                     let argEnd = argRange.EndOffset
                     let argStart = argRange.StartOffset
 
                     let isAtNextArgStart () =
                         match args with
-                        | nextArg :: _ -> nextArg.GetDocumentStartOffset() = caretOffset
+                        | nextArg :: _ -> nextArg.Node.GetDocumentStartOffset() = caretOffset
                         | _ -> false
+                    let argRange = arg.Node.GetDocumentRange()
 
                     if caretOffset.Offset > argEnd.Offset || caretOffset = argEnd && isAtNextArgStart () then
                         if argIndex < parameterGroups.Count then
@@ -427,12 +470,12 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
 
                     elif argRange.Contains(caretOffset) && argStart <> caretOffset && argEnd <> caretOffset && argIndex < parameterGroups.Count then
                         if parameterGroups[argIndex] = 1 then acc else
-                        if arg :? IUnitExpr && caretOffset.Offset < argEnd.Offset then acc else
+                        if arg.Node :? IUnitExpr && caretOffset.Offset < argEnd.Offset then acc else
 
-                        match arg.IgnoreInnerParens(singleLevel = true) with
-                        | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct ->
+                        match arg.TryGetTupledArgs() with
+                        | Some tupledArgs ->
                             let commaIndex =
-                                let commas = tupleExpr.Commas
+                                let commas = tupledArgs.Commas
                                 if commas.IsEmpty then 0 else
 
                                 commas
@@ -453,7 +496,8 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                                 let maxArgOffset = max 0 (parameterGroups[argIndex] - 1)
                                 let currentArgOffset = min maxArgOffset commaIndex
                                 acc + currentArgOffset
-                        | innerArg ->
+                        | _ ->
+                            let innerArg = arg.IgnoreSingleInnerParens().Node
                             if innerArg != arg then
                                 acc
                             else
@@ -501,13 +545,13 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
 
             let lastArg = List.last argGroups
             let offset = caretOffset.Offset
-            let lastArgEnd = lastArg.GetTreeEndOffset().Offset
+            let lastArgEnd = lastArg.Node.GetTreeEndOffset().Offset
             let argGroupsLength = argGroups.Length
 
             let removeParenRange =
                 argGroupsLength = 1 &&
 
-                let expr = argGroups[0]
+                let expr = argGroups[0].Node
                 (expr :? IParenExpr || expr :? IUnitExpr) &&
 
                 candidates
@@ -523,7 +567,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
             if removeParenRange then
                 let parenExpr = argGroups[0].As<IParenExpr>()
                 let range = 
-                    argGroups[0].GetDocumentRange()
+                    argGroups[0].Node.GetDocumentRange()
                         .TrimLeft(if isNotNull parenExpr && isNull parenExpr.LeftParen then 0 else 1)
                         .TrimRight(if isNotNull parenExpr && isNull parenExpr.RightParen then 0 else 1)
                 range.Contains(caretOffset) 
@@ -552,6 +596,7 @@ type FSharpPrefixAppParameterInfoContext(caretOffset, context, reference, symbol
             | _ -> acc
 
         getArgs context []
+        |> List.map ParameterInfoArgument.Expression
 
     override this.NamedArgs =
         let appExpr = context.As<IPrefixAppExpr>()
@@ -586,7 +631,24 @@ type FSharpTypeReferenceCtorParameterInfoContext(caretOffset, context, argExpr: 
     override this.NamedArgs = [||] // todo
 
     override this.ArgGroups =
-        [ if isNotNull argExpr then argExpr ]
+        [ if isNotNull argExpr then ParameterInfoArgument.Expression argExpr ]
+
+
+[<AllowNullLiteral>]
+type FSharpPatternParameterInfoContext(caretOffset, pat: IFSharpPattern, reference,
+        symbolUses, checkResults, referenceEndOffset, mainSymbol) =
+    inherit FSharpParameterInfoContextBase<IFSharpPattern>(caretOffset, pat, reference, symbolUses,
+        checkResults, referenceEndOffset, mainSymbol)
+
+    override this.NamedArgs = [||] // todo
+
+    override this.ArgGroups =
+        match pat with
+        | :? IParametersOwnerPat as parameterOwnerPat ->
+            parameterOwnerPat.ParametersEnumerable
+            |> List.ofSeq
+            |> List.map ParameterInfoArgument.Pattern 
+        | _ -> []
 
 
 [<ParameterInfoContextFactory(typeof<FSharpLanguage>)>]
@@ -667,7 +729,7 @@ type FSharpParameterInfoContextFactory() =
         caretOffset.Offset >= contextRange.StartOffset.Offset &&
         caretOffset.ToDocumentCoords().Column > contextRange.StartOffset.ToDocumentCoords().Column
 
-    let rec tryCreateContext isAutoPopup (caretOffset: DocumentOffset) (expr: IFSharpExpression) =
+    let rec tryCreateContext isAutoPopup (caretOffset: DocumentOffset) (expr: IFSharpExpression) = 
         let range = expr.GetDocumentRange()
         let expr =
             match expr with
@@ -694,7 +756,7 @@ type FSharpParameterInfoContextFactory() =
                 | refExpr -> refExpr.Reference
 
             match createFromExpression isAutoPopup caretOffset reference appExpr with
-            | null -> tryCreateFromParent isAutoPopup caretOffset expr
+            | null -> tryCreateFromParentExpr isAutoPopup caretOffset expr
             | context -> context
 
         | :? IReferenceExpr as refExpr ->
@@ -706,7 +768,7 @@ type FSharpParameterInfoContextFactory() =
             | null ->
                 let context = createFromExpression isAutoPopup caretOffset refExpr.Reference refExpr
                 if isNull context && not isAutoPopup && caretOffset = refExpr.GetDocumentEndOffset() then
-                    tryCreateFromParent isAutoPopup caretOffset refExpr
+                    tryCreateFromParentExpr isAutoPopup caretOffset refExpr
                 else
                     context
 
@@ -714,10 +776,10 @@ type FSharpParameterInfoContextFactory() =
                 tryCreateContext isAutoPopup caretOffset prefixAppExpr
 
         | _ ->
-            tryCreateFromParent isAutoPopup caretOffset expr
+            tryCreateFromParentExpr isAutoPopup caretOffset expr
 
     // todo: identifier end in f<int>
-    and getSymbols (endOffset: DocumentOffset) (context: IFSharpTreeNode) (reference: FSharpSymbolReference) =
+    and getSymbols (endOffset: DocumentOffset) (reference: FSharpSymbolReference) =
         let symbolUse = reference.GetSymbolUse()
         if isNull symbolUse then None else
 
@@ -733,11 +795,11 @@ type FSharpParameterInfoContextFactory() =
         let symbol = symbolUse.Symbol
         if not (isApplicable symbol) then None else
 
-        match context.FSharpFile.GetParseAndCheckResults(true, "FSharpParameterInfoContextFactory.getMethods") with
+        let referenceOwner = reference.GetElement()
+        match referenceOwner.FSharpFile.GetParseAndCheckResults(true, "FSharpParameterInfoContextFactory.getMethods") with
         | None -> None
         | Some results ->
 
-        let referenceOwner = reference.GetElement()
         let names = 
             match referenceOwner with
             | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
@@ -761,11 +823,67 @@ type FSharpParameterInfoContextFactory() =
         let endOffset = DocumentOffset(caretOffset.Document, reference.GetTreeTextRange().EndOffset.Offset)
         if not (shouldShowPopup caretOffset (context.GetDocumentRange())) then null else
 
-        match getSymbols endOffset context reference with
+        match getSymbols endOffset reference with
         | Some(checkResults, symbol, symbolUses) ->
             FSharpPrefixAppParameterInfoContext(caretOffset, context :?> IFSharpExpression, reference, symbolUses,
                 checkResults, endOffset, symbol) :> IFSharpParameterInfoContext
         | _ -> null
+
+    and createFromPattern isAutoPopup (caretOffset: DocumentOffset) (pat: IReferenceNameOwnerPat) =
+        let reference = pat.Reference
+        if isNull reference || isNull pat then null else
+        if not (shouldShowPopup caretOffset (pat.GetDocumentRange())) then null else
+
+        let range = reference.GetElement().GetTreeTextRange()
+        let endOffset = DocumentOffset(caretOffset.Document, range.EndOffset.Offset)
+
+        if caretOffset.Offset >= range.StartOffset.Offset && caretOffset.Offset < range.EndOffset.Offset ||
+                caretOffset = endOffset && isNotNull (ParametersOwnerPatNavigator.GetByParameter(pat)) then
+            tryCreateFromParentPat isAutoPopup caretOffset pat else
+
+        match getSymbols endOffset reference with
+        | Some(checkResults, symbol, symbolUses) ->
+            FSharpPatternParameterInfoContext(caretOffset, pat, reference, symbolUses,
+                checkResults, endOffset, symbol) :> IFSharpParameterInfoContext
+        | _ -> null
+
+    and tryCreateContextFromPattern isAutoPopup (caretOffset: DocumentOffset) (pat: IFSharpPattern) : IFSharpParameterInfoContext =
+        if isNull pat then null else
+
+        let range = pat.GetDocumentRange()
+        let pat =
+            match pat with
+            | :? IParenPat as parenPat when
+                    caretOffset.Offset > range.StartOffset.Offset && caretOffset.Offset < range.EndOffset.Offset ||
+                    isNull (ParametersOwnerPatNavigator.GetByParameter(parenPat)) ->
+                // Only use the inner node when inside parens
+                match parenPat.Pattern with
+                | :? IParametersOwnerPat as parametersOwnerPat when
+                    parametersOwnerPat.GetDocumentEndOffset() = caretOffset &&
+                    parametersOwnerPat.ParametersEnumerable.Any() ->
+                    match Seq.last parametersOwnerPat.ParametersEnumerable with
+                    | :? IParenPat | :? IUnitPat -> pat
+                    | _ -> parametersOwnerPat
+                | innerExpr -> innerExpr
+            | _ -> pat
+
+        match pat with
+        | :? IParametersOwnerPat as parametersOwnerPat ->
+            createFromPattern isAutoPopup caretOffset parametersOwnerPat 
+
+        | :? IReferencePat as refPat ->
+            match ParametersOwnerPatNavigator.GetByParameter(refPat) with
+            | null ->
+                let context = createFromPattern isAutoPopup caretOffset refPat
+                if isNull context && not isAutoPopup && caretOffset = refPat.GetDocumentEndOffset() then
+                    tryCreateFromParentPat isAutoPopup caretOffset refPat
+                else
+                    context
+            | parametersOwnerPat ->
+                tryCreateContextFromPattern isAutoPopup caretOffset parametersOwnerPat
+
+        | _ ->
+            tryCreateFromParentPat isAutoPopup caretOffset pat
 
     and createFromTypeReference (caretOffset: DocumentOffset) (reference: FSharpSymbolReference)
             (argExpr: IFSharpExpression) =
@@ -779,9 +897,9 @@ type FSharpParameterInfoContextFactory() =
                 (isNull argExpr || caretOffset.Offset < argExpr.GetTreeStartOffset().Offset) then
             // Inside invoked type reference name, try to get context from a parent node instead
             let parentExpr = context.GetContainingNode<IFSharpExpression>() 
-            tryCreateFromParent false caretOffset parentExpr else
+            tryCreateFromParentExpr false caretOffset parentExpr else
 
-        match getSymbols endOffset context reference with
+        match getSymbols endOffset reference with
         | Some(checkResults, symbol, symbolUses) ->
             FSharpTypeReferenceCtorParameterInfoContext(caretOffset, context, argExpr, reference, symbolUses,
                 checkResults, endOffset, symbol) :> IFSharpParameterInfoContext
@@ -805,13 +923,13 @@ type FSharpParameterInfoContextFactory() =
         if caretOffset.Offset >= range.StartOffset.Offset && caretOffset.Offset < range.EndOffset.Offset ||
                 caretOffset = endOffset && isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(appExpr)) then
             // Inside invoked function name, try to get context from a parent expression instead 
-            tryCreateFromParent isAutoPopup caretOffset appExpr else
+            tryCreateFromParentExpr isAutoPopup caretOffset appExpr else
 
         let appExpr = getOutermostPrefixAppExpr contextExpr
 
         create caretOffset reference appExpr
 
-    and tryCreateFromParent isAutoPopup caretOffset (expr: IFSharpExpression) =
+    and tryCreateFromParentExpr isAutoPopup caretOffset (expr: IFSharpExpression) =
         if isNull expr then null else
 
         let expr = expr.IgnoreParentParens()
@@ -841,9 +959,20 @@ type FSharpParameterInfoContextFactory() =
         let parentExpr = expr.GetContainingNode<IFSharpExpression>()
         tryCreateContext isAutoPopup caretOffset parentExpr
 
-    member this.CreateContext(solution, caretOffset, isAutoPopup) =
+    and tryCreateFromParentPat isAutoPopup caretOffset (pat: IFSharpPattern) =
+        if isNull pat then null else
+
+        let expr = pat.IgnoreParentParens()
+        let parentPat = pat.IgnoreParentParens().GetContainingNode<IFSharpPattern>()
+        tryCreateContextFromPattern isAutoPopup caretOffset parentPat
+
+    member this.CreateContextImpl(solution, caretOffset, isAutoPopup: bool) =
         let token = getTokenAtOffset false true caretOffset solution
         if isNull token then null else
+
+        let pat = token.GetContainingNode<IFSharpPattern>(true)
+        let context = tryCreateContextFromPattern isAutoPopup caretOffset pat
+        if isNotNull context then context else
 
         let context = tryCreateFromTypeReference caretOffset token
         if isNotNull context then context else
@@ -896,12 +1025,12 @@ type FSharpParameterInfoContextFactory() =
                 if not shouldPopup then false else
                 if char <> ' ' then true else
 
-                let context = this.CreateContext(solution, caretOffset, true)
+                let context = this.CreateContextImpl(solution, caretOffset, true)
                 isNotNull context && context.ExpectingMoreArgs(caretOffset, false)
 
         member this.CreateContext(solution, caretOffset, _, char, _) =
             let isAutoPopup = char <> '\000'
-            let context = this.CreateContext(solution, caretOffset, isAutoPopup)
+            let context = this.CreateContextImpl(solution, caretOffset, isAutoPopup)
             // todo: platform: ask if typing should close existing session (space/rparen after last expected arg)
             // todo: platform: allow distinguishing typing inside existing window and requesting info via action
             // todo: allow invoking after expected args via action
