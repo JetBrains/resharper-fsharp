@@ -434,10 +434,7 @@ type FSharpNamingService(language: FSharpLanguage) =
             Seq.append thenRoots elseRoots
 
         | :? IBinaryAppExpr as binaryApp ->
-            let refExpr = binaryApp.Operator
-            if isNull refExpr then EmptyList.Instance :> _ else
-
-            let name = refExpr.Reference.GetName()
+            let name = binaryApp.ShortName
             if pipeRightOperatorNames.Contains(name) && isNotNull binaryApp.RightArgument then
                 x.SuggestRoots(binaryApp.RightArgument, useExpectedTypes, policyProvider) else
 

@@ -571,7 +571,7 @@ type FSharpPrefixAppParameterInfoContext(caretOffset, context, reference, symbol
         args
         |> Array.ofSeq
         |> Array.map (function
-            | :? IBinaryAppExpr as binaryAppExpr when binaryAppExpr.Operator.ShortName = "=" ->
+            | :? IBinaryAppExpr as binaryAppExpr when binaryAppExpr.ShortName = "=" ->
                 match binaryAppExpr.LeftArgument with
                 | :? IReferenceExpr as referenceExpr -> referenceExpr.ShortName
                 | _ -> null

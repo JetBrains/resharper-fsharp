@@ -17,11 +17,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       var referenceOwner = reference.GetElement();
       if (referenceOwner is IReferenceExpr referenceExpr)
       {
-        var infixAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr);
-        if (!(infixAppExpr?.Operator is { ShortName: "=" }))
+        var binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr);
+        if (binaryAppExpr is not { ShortName: "=" })
           return null;
 
-        var innerExpr = (IFSharpExpression) TupleExprNavigator.GetByExpression(infixAppExpr) ?? infixAppExpr;
+        var innerExpr = (IFSharpExpression) TupleExprNavigator.GetByExpression(binaryAppExpr) ?? binaryAppExpr;
         var parenExpr = ParenOrBeginEndExprNavigator.GetByInnerExpression(innerExpr);
 
         if (!(PrefixAppExprNavigator.GetByArgumentExpression(parenExpr)?.FunctionExpression is IReferenceExpr expr))

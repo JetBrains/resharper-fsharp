@@ -65,12 +65,9 @@ let tryGetExpectedFcsType (expr: IFSharpExpression): (FSharpType * FSharpDisplay
         let binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(prefixAppExpr)
         if isNull binaryAppExpr then [] else
 
-        let opReferenceExpr = binaryAppExpr.Operator
-        if isNull opReferenceExpr then [] else
-
         // todo: check isPredefined
         // todo: generalize for other operators
-        match opReferenceExpr.ShortName with
+        match binaryAppExpr.ShortName with
         | "|>" ->
             let arg = binaryAppExpr.LeftArgument
             if isNull arg then [] else
