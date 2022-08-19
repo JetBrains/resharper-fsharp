@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
@@ -132,19 +133,8 @@ type LambdaAnalyzer() =
                     x.IsFunction || not x.IsMember ||
 
                     not parameterIsDelegate &&
-                    // If the body of the lambda consists of a method call,
-                    // and the method to which the lambda is passed has overloads,
-                    // then it cannot be unambiguously determined whether the lambda can be simplified
-                    match ref.FSharpFile.GetParseAndCheckResults(true, "LambdaAnalyzer.getMethods") with
-                    | None -> true
-                    | Some results ->
 
                     let referenceOwner = reference.GetElement()
-                    let names = 
-                        match referenceOwner with
-                        | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
-                        | _ -> [reference.GetName()]
-
                     let identifier = referenceOwner.FSharpIdentifier
                     if isNull identifier then true else
 
@@ -152,8 +142,15 @@ type LambdaAnalyzer() =
                     let endLine = int endCoords.Line + 1
                     let endColumn = int endCoords.Column
 
-                    let overloads = results.CheckResults.GetMethods(endLine, endColumn, "", Some names).Methods
-                    overloads.Length = 1
+                    // If the body of the lambda consists of a method call,
+                    // and the method to which the lambda is passed has overloads,
+                    // then it cannot be unambiguously determined whether the lambda can be simplified
+                    match getAllMethods ref.FSharpFile reference endLine endColumn "LambdaAnalyzer.getMethods" with
+                    | None
+                    | Some (_, None)
+                    | Some (_, Some [])
+                    | Some (_, Some [_]) -> true
+                    | _ -> false
                 if isApplicable then ctor arg else null
             | _ -> ctor arg
         | _ -> ctor arg

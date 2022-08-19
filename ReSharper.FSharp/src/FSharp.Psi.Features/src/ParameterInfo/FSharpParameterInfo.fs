@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Feature.Services.ParameterInfo
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -795,27 +796,14 @@ type FSharpParameterInfoContextFactory() =
         let symbol = symbolUse.Symbol
         if not (isApplicable symbol) then None else
 
-        let referenceOwner = reference.GetElement()
-        match referenceOwner.FSharpFile.GetParseAndCheckResults(true, "FSharpParameterInfoContextFactory.getMethods") with
-        | None -> None
-        | Some results ->
-
-        let names = 
-            match referenceOwner with
-            | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
-            | _ -> [reference.GetName()]
-
-        let identifier = referenceOwner.FSharpIdentifier
-        if isNull identifier then None else
-
         let endCoords = endOffset.ToDocumentCoords()
         let line = int endCoords.Line + 1
         let column = int endCoords.Column + 1
-    
-        let checkResults = results.CheckResults
-        match checkResults.GetMethodsAsSymbols(line, column, "", names) with
-        | Some symbolUses when not symbolUses.IsEmpty -> Some(checkResults, symbol, symbolUses)
-        | _ -> Some(checkResults, symbol, [symbolUse])
+        
+        match getAllMethods context.FSharpFile reference line column "FSharpParameterInfoContextFactory.getMethods" with
+        | None -> None
+        | Some (checkResults, Some symbolUses) when not symbolUses.IsEmpty -> Some(checkResults, symbol, symbolUses)
+        | Some (checkResults, _) -> Some(checkResults, symbol, [symbolUse])
 
     and create (caretOffset: DocumentOffset) (reference: FSharpSymbolReference) (context: IFSharpTreeNode) =
         if isNull reference || isNull context then null else

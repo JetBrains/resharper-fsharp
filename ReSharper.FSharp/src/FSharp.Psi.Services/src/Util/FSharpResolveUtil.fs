@@ -95,3 +95,17 @@ let resolvesToPredefinedFunction (context: ITreeNode) name opName =
             | _ -> false
         | _ -> false
     | None -> false
+
+let getAllMethods (file: IFSharpFile) (reference: FSharpSymbolReference) line column opName =
+    match file.GetParseAndCheckResults(true, opName) with
+    | None -> None
+    | Some results ->
+
+    let referenceOwner = reference.GetElement()
+    let names = 
+        match referenceOwner with
+        | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
+        | _ -> [reference.GetName()]
+
+    let checkResults = results.CheckResults
+    Some (checkResults, checkResults.GetMethodsAsSymbols(line, column, "", names))
