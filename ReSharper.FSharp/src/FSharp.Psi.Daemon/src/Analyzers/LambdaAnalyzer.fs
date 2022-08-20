@@ -93,15 +93,13 @@ type LambdaAnalyzer() =
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
         let lambda = lambda.IgnoreParentParens()
 
-        let replacementExprRef = replacementExpr.As<IFSharpExpression>().IgnoreInnerParens().As<IReferenceExpr>()
+        let replacementRefExpr = replacementExpr.As<IFSharpExpression>().IgnoreInnerParens().As<IReferenceExpr>()
         let replacementExprSymbol =
-            if isNull replacementExprRef then ValueNone else ValueSome(replacementExprRef.Reference.GetFcsSymbol())
+            if isNull replacementRefExpr then ValueNone else ValueSome(replacementRefExpr.Reference.GetFcsSymbol())
 
-        if (isNotNull replacementExprRef &&
-            match replacementExprSymbol with
-            | ValueSome (:? FSharpEntity as entity) when (getAbbreviatedEntity entity).IsDelegate -> true
-            | _ -> false)
-        then null else
+        match replacementExprSymbol with
+        | ValueSome (:? FSharpEntity as entity) when (getAbbreviatedEntity entity).IsDelegate -> null
+        | _ ->
 
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
         if isNotNull binaryExpr && not (isNamedArg binaryExpr) then ctor arg else
