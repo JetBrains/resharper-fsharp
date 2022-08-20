@@ -92,6 +92,17 @@ type LambdaAnalyzer() =
 
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
         let lambda = lambda.IgnoreParentParens()
+
+        let replacementExprRef = replacementExpr.As<IFSharpExpression>().IgnoreInnerParens().As<IReferenceExpr>()
+        let replacementExprSymbol =
+            if isNull replacementExprRef then ValueNone else ValueSome(replacementExprRef.Reference.GetFcsSymbol())
+
+        if (isNotNull replacementExprRef &&
+            match replacementExprSymbol with
+            | ValueSome (:? FSharpEntity as entity) when (getAbbreviatedEntity entity).IsDelegate -> true
+            | _ -> false)
+        then null else
+
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
         if isNotNull binaryExpr && not (isNamedArg binaryExpr) then ctor arg else
         let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
@@ -120,12 +131,8 @@ type LambdaAnalyzer() =
             // then in F# < 6.0 there is almost never an implicit cast for the lambda simplification 
             if parameterIsDelegate && not isFSharp6Supported then null else
 
-            let ref = replacementExpr.As<IFSharpExpression>().IgnoreInnerParens().As<IReferenceExpr>()
-            if isNull ref then ctor arg else
-
-            let exprToReplaceSymbol = ref.Reference.GetFcsSymbol()
-            match exprToReplaceSymbol with
-            | :? FSharpMemberOrFunctionOrValue as x ->
+            match replacementExprSymbol with
+            | ValueSome (:? FSharpMemberOrFunctionOrValue as x) ->
                 let isApplicable =
                     // If the lambda simplification does not convert it to a method group,
                     // for example, if the body of the lambda does not consist of a method call,

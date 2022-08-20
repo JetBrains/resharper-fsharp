@@ -15,3 +15,6 @@ Type1.M3(0, fun x -> x)
 Type1.M3(0, y = fun x -> x)
 Type1.M3(0, y = (fun x -> x))
 Type1.M4(0, fun x -> x)
+
+let a = fun x -> Delegate x
+let b = fun x -> DelegateAbbreviation x
