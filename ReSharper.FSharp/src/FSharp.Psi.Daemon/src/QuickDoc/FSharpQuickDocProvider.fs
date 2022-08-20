@@ -17,7 +17,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, fsFile: IFSharpFile, token) =
+type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFSharpIdentifier) =
     let [<Literal>] opName = "FSharpQuickDocProvider"
 
     let richTextEscapeToHtml (text: RichText) =
@@ -39,7 +39,7 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, fsFile: IFSharp
         else
             (asDefinition header).Append(body)
 
-    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: IFSharpIdentifierToken) =
+    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: IFSharpIdentifier) =
         // todo: fix getting qualifiers
         let tokenNames = [token.Name]
 
@@ -51,38 +51,38 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, fsFile: IFSharp
         checkResults.GetToolTip(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier)
 
     member x.CreateRichTextTooltip() =
-        match fsFile.GetParseAndCheckResults(true, opName) with
-            | None -> RichText()
-            | Some results ->
+        match identifier.FSharpFile.GetParseAndCheckResults(true, opName) with
+        | None -> RichText()
+        | Some results ->
 
-            let (ToolTipText layouts) = FSharpQuickDocPresenter.GetFSharpToolTipText(results.CheckResults, token)
-            layouts |> List.collect (function
-                | ToolTipElement.None -> []
-                | ToolTipElement.CompositionError errorText -> [ RichText(errorText) ]
+        let (ToolTipText layouts) = FSharpQuickDocPresenter.GetFSharpToolTipText(results.CheckResults, identifier)
+        layouts |> List.collect (function
+            | ToolTipElement.None -> []
+            | ToolTipElement.CompositionError errorText -> [ RichText(errorText) ]
 
-                | ToolTipElement.Group(overloads) ->
-                    overloads |> List.map (fun overload ->
-                        let header =
-                            [ if not (isEmpty overload.MainDescription) then
-                                yield overload.MainDescription |> richText
+            | ToolTipElement.Group(overloads) ->
+                overloads |> List.map (fun overload ->
+                    let header =
+                        [ if not (isEmpty overload.MainDescription) then
+                            yield overload.MainDescription |> richText
 
-                              if not overload.TypeMapping.IsEmpty then
-                                yield overload.TypeMapping |> List.map richText |> richTextJoin "\n" ]
-                            |> richTextJoin "\n\n"
+                          if not overload.TypeMapping.IsEmpty then
+                            yield overload.TypeMapping |> List.map richText |> richTextJoin "\n" ]
+                        |> richTextJoin "\n\n"
 
-                        let body =
-                            [ match xmlDocService.GetXmlDoc(overload.XmlDoc) with
-                              | null -> ()
-                              | xmlDocText -> yield xmlDocText.RichText
+                    let body =
+                        [ match xmlDocService.GetXmlDoc(overload.XmlDoc) with
+                          | null -> ()
+                          | xmlDocText -> yield xmlDocText.RichText
 
-                              match overload.Remarks with
-                              | Some remarks when not (isEmpty remarks) ->
-                                yield remarks |> richText |> asContent
-                              | _ -> () ]
-                            |> richTextJoin "\n\n"
+                          match overload.Remarks with
+                          | Some remarks when not (isEmpty remarks) ->
+                            yield remarks |> richText |> asContent
+                          | _ -> () ]
+                        |> richTextJoin "\n\n"
 
-                        createToolTip header body))
-            |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
+                    createToolTip header body))
+        |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
 
     interface IQuickDocPresenter with
         member this.GetHtml _ =
@@ -110,11 +110,8 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
             this.tryFindFSharpFile(context) != null
 
         member this.Resolve(context, resolved) =
-            let fsFile = this.tryFindFSharpFile(context)
-            if isNull fsFile then () else
-
-            let offset = context.GetData(DocumentModelDataConstants.EDITOR_CONTEXT).CaretOffset
-            match fsFile.FindTokenAt(offset) with
-            | :? IFSharpIdentifierToken as token ->
-                resolved.Invoke(FSharpQuickDocPresenter(xmlDocService, fsFile, token), FSharpLanguage.Instance)
-            | _ -> ()
+            context.GetData(PsiDataConstants.SELECTED_TREE_NODES)
+            |> Seq.filter (fun node -> node :? IFSharpIdentifier)
+            |> Seq.tryExactlyOne
+            |> Option.iter (fun token ->
+                resolved.Invoke(FSharpQuickDocPresenter(xmlDocService, token :?> _), FSharpLanguage.Instance))
