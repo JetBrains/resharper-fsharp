@@ -100,13 +100,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
         var typeProviderRdModel =
           myTypeProvidersContext.TypeProviderRdModelsCreator.CreateRdModel(typeProvider, envKey);
 
-        typeProvider.Invalidate += (_, _) =>
+        void OnTypeProviderOnInvalidate(object o, EventArgs eventArgs)
         {
           var tpId = typeProviderRdModel.EntityId;
           Dispose(tpId);
           processModel.Proto.Scheduler.Queue(() => processModel.Invalidate.Fire(tpId));
-        };
+          typeProvider.Invalidate -= OnTypeProviderOnInvalidate;
+        }
 
+        typeProvider.Invalidate += OnTypeProviderOnInvalidate;
         rdTypeProviders.Add(typeProviderRdModel);
       }
 
