@@ -78,10 +78,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override bool Equals(object obj) =>
       obj switch
       {
-        FSharpGenerativeProvidedNestedClass x => ProvidedTypesComparer.Instance.Equals(x.ProvidedType, ProvidedType),
+        FSharpGenerativeProvidedNestedClass x => x.ProvidedType.Equals(ProvidedType),
         _ => false
       };
 
-    public override int GetHashCode() => ProvidedTypesComparer.Instance.GetHashCode(ProvidedType);
+    public override int GetHashCode() => ProvidedType.GetHashCode();
   }
 }
