@@ -1516,54 +1516,39 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
-        if (offset < 2
-          //|| not (lexer.FindTokenAt(offset - 1))
-          //|| lexer.TokenType != FSharpTokenType.END_OF_LINE_COMMENT
-          //|| offset != lexer.TokenStart + 2
-          (*|| lexer.TokenEnd - lexer.TokenStart != 2*)) then false else
+        if offset < 4 then false else
 
-        let mutable caretPosition = -1
         // Check if new doc-comment block is being started
         context.CallNext()
-        let file = (x :> TypingAssistLanguageBase<_>).CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id)
+        let file = x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id)
 
         let tokenNode = file.FindTokenAt(TreeOffset(offset)).As<DocComment>()
-        if isNull tokenNode then true else
+        if isNull tokenNode then false else
 
         let docCommentBlockNode = tokenNode.Parent.As<IDocCommentBlock>()
 
         if isNull docCommentBlockNode ||
            docCommentBlockNode.GetTextLength() < 4 ||
-           not docCommentBlockNode.IsSingleLine then true else
-        
-        if tokenNode.CommentText.Trim() <> "<" then true else
+           not docCommentBlockNode.IsSingleLine ||
+           tokenNode.CommentText.Trim() <> "<" then false else
 
         let docCommentBlockOffset = docCommentBlockNode.GetTreeStartOffset().Offset
-        let coords = textControl.Document.GetCoordsByOffset(docCommentBlockOffset)
+        let document = textControl.Document
+        let coords = document.GetCoordsByOffset(docCommentBlockOffset)
         let docCommentBlockLine = coords.Line
         let spacesCount = offset - docCommentBlockOffset - 3
-        let spaces = String(' ', spacesCount)
-
-        let newLine = textControl.Document.GetLineEnding(docCommentBlockLine).ToLineEndingString();
-        let indent = textControl.Document.GetText(TextRange(textControl.Document.GetLineStartOffset(docCommentBlockLine), docCommentBlockOffset))
-
+        
+        let newLine = document.GetLineEnding(docCommentBlockLine).ToLineEndingString();
+        let indent = document.GetText(TextRange(document.GetLineStartOffset(docCommentBlockLine), docCommentBlockOffset))
+        let templateLinePrefix = newLine + indent + "///" + String(' ', spacesCount)
+        
         docCommentBlockNode.GetPsiServices().Files.CommitAllDocuments()
 
-        let template = XmlDocTemplateUtil.GetDocTemplate(
-                            docCommentBlockNode,
-                            (fun i -> if i = 0 then "" else (indent + "///" + spaces)),
-                            newLine).TrimEnd(newLine.ToCharArray());
+        let struct(template, caretOffset) =
+            XmlDocTemplateUtil.GetDocTemplate(docCommentBlockNode, fun i -> if i = 0 then "" else templateLinePrefix);
 
-        let position = offset + 1;
-        if position < 0 then true else
-
-        textControl.Document.InsertText(position, template);
-        caretPosition <- offset + $"summary>{newLine}".Length + indent.Length + 3 + spacesCount + 1;//docCommentBlockOffset + 5 + offset;
-        if (caretPosition < 0) then true else
-
-        if caretPosition <> -1 then
-            textControl.Caret.MoveTo(caretPosition, CaretVisualPlacement.DontScrollIfVisible)
-
+        document.InsertText(offset + 1, template)
+        textControl.Caret.MoveTo(offset + caretOffset + 1, CaretVisualPlacement.DontScrollIfVisible)
         true
 
     member x.TrimTrailingSpacesAtOffset(textControl: ITextControl, startOffset: byref<int>, trimAfterCaret) =

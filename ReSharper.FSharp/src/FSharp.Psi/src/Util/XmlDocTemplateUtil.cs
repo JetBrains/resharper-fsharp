@@ -14,19 +14,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   public static class XmlDocTemplateUtil
   {
     [NotNull]
-    public static string GetDocTemplate(IDocCommentBlock docCommentBlock, Func<int, string> linePrefix, string lineSeparator)
+    public static (string, int caretOffset) GetDocTemplate(IDocCommentBlock docCommentBlock, Func<int, string> linePrefix)
     {
       var text = new StringBuilder();
       var line = 1;
 
-      text.Append($"summary>{lineSeparator}");
-      text.Append($"{linePrefix(line++)}{lineSeparator}");
-      text.Append($"{linePrefix(line++)}</summary>{lineSeparator}");
+      text.Append("summary>");
+      text.Append($"{linePrefix(line++)}");
+
+      var caretOffset = text.Length;
+      
+      text.Append($"{linePrefix(line++)}</summary>");
 
       foreach (var parameter in GetParameters(docCommentBlock.Parent))
-        text.Append($"{linePrefix(line++)}<param name=\"{parameter}\"></param>{lineSeparator}");
+        text.Append($"{linePrefix(line++)}<param name=\"{parameter}\"></param>");
 
-      return text.ToString();
+      return (text.ToString(), caretOffset);
     }
 
     private static IEnumerable<string> GetParameters(ITreeNode declaration) =>
