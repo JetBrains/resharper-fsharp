@@ -13,7 +13,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public static class XmlDocTemplateUtil
   {
-    [NotNull]
     public static (string, int caretOffset) GetDocTemplate(IDocCommentBlock docCommentBlock, Func<int, string> linePrefix)
     {
       var text = new StringBuilder();

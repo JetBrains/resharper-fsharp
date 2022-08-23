@@ -33,12 +33,6 @@ type FSharpSyntaxHighlightingProcessor() =
     let highlighting = FSharpSyntaxHighlighting()
 
     override x.GetAttributeId(tokenType) = highlighting.GetAttributeId(tokenType)
-    override x.ProcessBeforeInterior(element, context) =
-        match element with
-        | :? IFSharpDocCommentBlock as block ->
-            let xmlFile = block.GetXmlPsi().XmlFile
-            xmlFile.ProcessDescendants(XmlDocSyntaxHighlightingVisitor(), context); //TODO: F# implementation
-        | _ -> ()
 
     override x.ProcessBeforeInterior(element, context) =
         match element with
