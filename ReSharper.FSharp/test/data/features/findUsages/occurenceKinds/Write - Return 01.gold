@@ -1,26 +1,37 @@
-﻿New instance creation
+﻿Other
 ---
-UsageInstanceCreation TO: [O] static member M() = |T|() RANGE: (89,90) @ Write - Return 01.fs
-UsageInstanceCreation TO: [O] static member M() = |T|() RANGE: (89,90) @ Write - Return 01.fs
+UsageOther TO: [O] let |p| = 1 RANGE: (37,38) @ Write - Return 01.fs
+UsageOther TO: [O] do |p| |> ignore RANGE: (51,52) @ Write - Return 01.fs
+UsageOther TO: [O] do p ||>| ignore RANGE: (53,55) @ Write - Return 01.fs
+UsageOther TO: [O] do p ||>| ignore RANGE: (53,55) @ Write - Return 01.fs
+UsageOther TO: [O] do p |> |ignore| RANGE: (56,62) @ Write - Return 01.fs
+UsageOther TO: [O] do p |> |ignore| RANGE: (56,62) @ Write - Return 01.fs
+UsageOther TO: [O] T.|M|(P = 1) RANGE: (135,136) @ Write - Return 01.fs
+UsageOther TO: [O] |T|.M(P = 1) RANGE: (133,134) @ Write - Return 01.fs
+UsageOther TO: [O] |T|.M(P = 1) RANGE: (133,134) @ Write - Return 01.fs
+UsageOther TO: [O] T.M(|P| = 1) RANGE: (137,138) @ Write - Return 01.fs
+UsageOther TO: [O] T.M(P |=| 1) RANGE: (139,140) @ Write - Return 01.fs
+UsageOther TO: [O] T.M(P |=| 1) RANGE: (139,140) @ Write - Return 01.fs
+
+
+Read access
+---
+UsageRead TO: [R] do |p| |> ignore RANGE: (51,52) @ Write - Return 01.fs
+
+
+New instance creation
+---
+UsageInstanceCreation TO: [O] static member M() = |T|() RANGE: (126,127) @ Write - Return 01.fs
+UsageInstanceCreation TO: [O] static member M() = |T|() RANGE: (126,127) @ Write - Return 01.fs
 
 
 Invocation
 ---
-UsageInvocation TO: [O] T.|M|(P = 1) RANGE: (98,99) @ Write - Return 01.fs
-
-
-Other
----
-UsageOther TO: [O] T.|M|(P = 1) RANGE: (98,99) @ Write - Return 01.fs
-UsageOther TO: [O] |T|.M(P = 1) RANGE: (96,97) @ Write - Return 01.fs
-UsageOther TO: [O] |T|.M(P = 1) RANGE: (96,97) @ Write - Return 01.fs
-UsageOther TO: [O] T.M(|P| = 1) RANGE: (100,101) @ Write - Return 01.fs
-UsageOther TO: [O] T.M(P |=| 1) RANGE: (102,103) @ Write - Return 01.fs
-UsageOther TO: [O] T.M(P |=| 1) RANGE: (102,103) @ Write - Return 01.fs
+UsageInvocation TO: [O] T.|M|(P = 1) RANGE: (135,136) @ Write - Return 01.fs
 
 
 Write access
 ---
-UsageWrite TO: [W] T.M(|P| = 1) RANGE: (100,101) @ Write - Return 01.fs
+UsageWrite TO: [W] T.M(|P| = 1) RANGE: (137,138) @ Write - Return 01.fs
 
 

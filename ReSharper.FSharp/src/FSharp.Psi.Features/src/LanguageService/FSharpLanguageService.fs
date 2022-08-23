@@ -98,7 +98,7 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
 
             let isInstanceFieldOrProperty (element: IDeclaredElement) =
                 match element with
-                | :? IField as field -> not field.IsStatic
+                | :? IField as field -> not field.IsStatic && not (field :? IFSharpPatternDeclaredElement)
                 | :? IProperty as property -> not property.IsStatic
                 | _ -> false
 
@@ -106,8 +106,20 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
             if isNotNull indexerExpr && isNotNull (SetExprNavigator.GetByLeftExpression(indexerExpr)) then
                 ReferenceAccessType.READ else
 
-            let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr)
-            if isInstanceFieldOrProperty declaredElement && not referenceExpr.IsQualified && isNotNull binaryAppExpr then
+            let isNamedArg () =
+                not referenceExpr.IsQualified &&
+
+                let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr)
+                isNotNull binaryAppExpr && binaryAppExpr.ShortName = "=" &&
+
+                let tupleExpr = TupleExprNavigator.GetByExpression(binaryAppExpr)
+                let argExpr: IFSharpExpression = if isNull tupleExpr then binaryAppExpr else tupleExpr
+
+                let parenExpr = ParenExprNavigator.GetByInnerExpression(argExpr)
+                let argOwner = FSharpArgumentOwnerNavigator.GetByArgumentExpression(parenExpr)
+                isNotNull argOwner
+
+            if isInstanceFieldOrProperty declaredElement && isNamedArg () then
                 ReferenceAccessType.WRITE else
 
             x.GetDefaultAccessType(declaredElement)
