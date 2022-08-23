@@ -164,6 +164,14 @@ type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionCo
         xmlDocService) =
     inherit ClrSpecificCodeCompletionContext(context, psiModule, nodeInFile)
 
+    member val IsInAttributeContext =
+        let reference = reparsedContext.Reference
+        if isNull reference then false else
+
+        match reference.GetTreeNode() with
+        | :? ITypeReferenceName as name -> isNotNull (AttributeNavigator.GetByReferenceName(name))
+        | _ -> false
+
     override this.ContextId = "FSharpCodeCompletionContext"
 
     member this.FcsCompletionContext = fcsCompletionContext

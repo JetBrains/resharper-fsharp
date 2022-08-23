@@ -29,6 +29,8 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Basic 02 - Insert``() = x.DoNamedTest()
     [<Test>] member x.``Basic 03 - Replace before``() = x.DoNamedTest()
     [<Test>] member x.``Basic 04 - Insert before``() = x.DoNamedTest()
+    [<Test>] member x.``Basic 05 - Attribute suffix``() = x.DoNamedTest()
+    [<Test>] member x.``Basic 06 - Attribute suffix``() = x.DoNamedTest()
 
     [<Test>] member x.``Bind - Rqa module 01``() = x.DoNamedTest()
     [<Test>] member x.``Bind - Rqa module 02``() = x.DoNamedTest()

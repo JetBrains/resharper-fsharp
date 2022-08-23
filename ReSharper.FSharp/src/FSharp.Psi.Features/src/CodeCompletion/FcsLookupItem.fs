@@ -89,7 +89,8 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
         with _ -> null
 
     override x.Text =
-        let name = x.FcsSymbol.DisplayNameCore.DropAttributeSuffix()
+        let name = x.FcsSymbol.DisplayNameCore
+        let name = if context.IsInAttributeContext then name.DropAttributeSuffix() else name
         FSharpKeywords.AddBackticksToIdentifierIfNeeded name
 
     override x.DisplayTypeName =

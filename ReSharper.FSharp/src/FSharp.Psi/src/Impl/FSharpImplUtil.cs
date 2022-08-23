@@ -565,7 +565,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     public static string DropAttributeSuffix([NotNull] this string attrName) =>
-      attrName.SubstringBeforeLast(AttributeSuffix, StringComparison.Ordinal);
+      attrName.Length > "Attribute".Length && attrName.EndsWith("Attribute", StringComparison.Ordinal)
+        ? attrName.SubstringBeforeLast(AttributeSuffix, StringComparison.Ordinal)
+        : attrName;
 
     public static IAttribute GetAttribute(this TreeNodeCollection<IAttribute> attributes, [NotNull] string shortName)
     {
