@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
@@ -25,14 +24,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       
       text.Append($"{linePrefix(line++)}</summary>");
 
-      foreach (var parameter in GetParameters(docCommentBlock.Parent))
+      foreach (var parameter in GetParametersGroupNames(docCommentBlock.Parent).SelectMany(t => t))
         text.Append($"{linePrefix(line++)}<param name=\"{parameter}\"></param>");
 
       return (text.ToString(), caretOffset);
     }
 
-    private static IEnumerable<string> GetParameters(ITreeNode declaration) =>
-      declaration switch
+    private static IEnumerable<string[]> GetParametersGroupNames(ITreeNode node) =>
+      node switch
       {
         IBinding binding => binding.Expression is ILambdaExpr lambda
           ? binding.ParameterPatterns.SelectMany(GetParameterNames).Union(GetLambdaArgs(lambda))
@@ -51,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         _ => EmptyList<string>.Enumerable
       };
 
-    private static IEnumerable<string> GetLambdaArgs(ILambdaExpr expr)
+    private static IEnumerable<string[]> GetLambdaArgs(ILambdaExpr expr)
     {
       var lambdaParams = expr.Patterns;
       var parameters = lambdaParams.SelectMany(GetParameterNames);
@@ -60,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return parameters;
     }
 
-    private static IEnumerable<string> GetParameterNames(IFSharpPattern pattern)
+    private static IEnumerable<string[]> GetParameterNames(IFSharpPattern pattern)
     {
       IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pattern, bool isTopLevelParameter)
       {
@@ -81,7 +80,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return GetParameterNamesInternal(pattern, true);
     }
 
-    private static IEnumerable<string> GetParameterNames(ITypeUsage pattern) =>
+    private static IEnumerable<string[]> GetParameterNames(ITypeUsage pattern) =>
       pattern switch
       {
         IParenTypeUsage parenUsage => GetParameterNames(parenUsage.InnerTypeUsage),
@@ -89,7 +88,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         IFunctionTypeUsage funPat => GetParameterNames(funPat.ArgumentTypeUsage)
           .Union(GetParameterNames(funPat.ReturnTypeUsage)),
         ITupleTypeUsage tuplePat => tuplePat.Items.SelectMany(GetParameterNames),
-        _ => EmptyList<string>.Enumerable
+        _ => EmptyList<string[]>.Enumerable
       };
   }
 }
