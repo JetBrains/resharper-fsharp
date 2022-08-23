@@ -111,7 +111,7 @@ type LambdaAnalyzer() =
             match argExpr with
             | :? IParenExpr as parens ->
                 // M(.., (x = fun -> ...)
-                if isNotNull appTuple then true else
+                isNotNull appTuple ||
                 // M((x = fun -> ...))
                 parens.InnerExpression :? IParenExpr
             | _ -> false)
