@@ -71,6 +71,7 @@ type GenerateMissingMembersFixTest() =
 
     [<Test>] member x.``Context - Common namespace 01``() = x.DoNamedTest()
     [<Test>] member x.``Explicit impl 01``() = x.DoNamedTest()
+    [<Test>] member x.``Default impl 01``() = x.DoNamedTest()
     [<Test>] member x.``Partial type 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Accessor - Setter 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Accessor - Setter 02``() = x.DoNamedTest()

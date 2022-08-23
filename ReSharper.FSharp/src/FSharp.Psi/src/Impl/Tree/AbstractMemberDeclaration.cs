@@ -47,9 +47,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return mfvEntity.Value.MembersFunctionsAndValues.Any(m =>
         m.IsOverrideOrExplicitInterfaceImplementation &&
         logicalName == m.LogicalName &&
-        mfvType.Equals(m.FullType) &&
-        mfv.ImplementedAbstractSignatures.Count == 1 &&
-        mfv.ImplementedAbstractSignatures[0].DeclaringType.Equals(mfvEntity.Value.AsType()));
+        (m.XmlDocSig == mfv.XmlDocSig ||
+         mfvType.Equals(m.FullType) &&
+         mfv.ImplementedAbstractSignatures.Count == 1 &&
+         mfv.ImplementedAbstractSignatures[0].DeclaringType.Equals(mfvEntity.Value.AsType())));
     }
 
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
