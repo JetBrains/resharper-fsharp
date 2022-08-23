@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:<summary>...}
+module Module =
+
+/// <summary>{caret}</summary>
+let f x = x
