@@ -1,6 +1,8 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 
+open System
 open FSharp.Compiler.Symbols
+open JetBrains.ReSharper.Plugins.FSharp.Util
 
 let getFunctionTypeArgs includeReturnType fcsType =
     let rec loop (fcsType: FSharpType) acc =
@@ -19,3 +21,12 @@ let getFunctionTypeArgs includeReturnType fcsType =
                 acc
 
     loop fcsType [] |> List.rev
+
+let isOption (fcsType: FSharpType) =
+    fcsType.StrippedType.QualifiedBaseName = FSharpPredefinedType.fsOptionTypeName.FullName
+
+let isValueOption (fcsType: FSharpType) =
+    fcsType.StrippedType.QualifiedBaseName = FSharpPredefinedType.fsValueOptionTypeName.FullName
+
+let isChoice (fcsType: FSharpType) =
+    fcsType.StrippedType.QualifiedBaseName.StartsWith("Microsoft.FSharp.Core.FSharpChoice`", StringComparison.Ordinal)

@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Feature.Services.ParameterInfo
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -93,47 +94,51 @@ and ParameterInfoTupledArguments =
 type IFSharpParameterInfoContext =
     inherit IParameterInfoContext
 
+    abstract CheckResults: FSharpCheckFileResults
+    abstract FcsRange: range
+    abstract MainSymbol: FSharpSymbol
+    abstract Reference: FSharpSymbolReference
+
     abstract ArgGroups: ParameterInfoArgument list
     abstract ExpectingMoreArgs: caretOffset: DocumentOffset * allowAtLastArgEnd: bool -> bool
 
 
 [<AbstractClass>]
 type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharpSymbol>
-        (range: range, symbol: 'TSymbol, symbolUse: FSharpSymbolUse, checkResults: FSharpCheckFileResults,
-        reference: FSharpSymbolReference, mainSymbol: FSharpSymbol) =
+        (symbol: 'TSymbol, symbolUse: FSharpSymbolUse, fsContext: IFSharpParameterInfoContext) =
     let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
 
-    let referenceOwner = reference.GetElement()
-    let psiModule = referenceOwner.GetPsiModule()
-
-    let mainElement = mainSymbol.GetDeclaredElement(reference)
-    let element = symbol.GetDeclaredElement(reference)
-    let parametersOwner = element.As<IParametersOwnerWithAttributes>()
+    let getMainElement () = fsContext.MainSymbol.GetDeclaredElement(fsContext.Reference)
+    let getElement () = symbol.GetDeclaredElement(fsContext.Reference)
+    let getParametersOwner () = (getElement ()).As<IParametersOwnerWithAttributes>()
 
     let getParameterIncludingThis index =
+        let parametersOwner = getParametersOwner ()
         if isNull parametersOwner then null else
 
         let parameters = parametersOwner.Parameters
         if parameters.Count <= index then null else parameters[index]
 
+    member this.IsExtensionMember = this.ExtendedType.IsSome
     member this.Symbol = symbol
-    member this.ParameterOwner = parametersOwner
 
     abstract ParameterGroups: IList<IList<'TParameter>>
-    abstract ReturnType: FSharpType option
-    abstract IsConstructor: bool
     abstract XmlDoc: FSharpXmlDoc
 
     abstract GetParamName: 'TParameter -> string option
     abstract GetParamType: 'TParameter -> FSharpType
-
-    member this.IsExtensionMember = this.ExtendedType.IsSome
 
     abstract IsOptionalParam: 'TParameter -> bool
     default this.IsOptionalParam _ = false
 
     abstract ExtendedType: FSharpEntity option
     default this.ExtendedType = None
+
+    abstract ReturnType: FSharpType option
+    default this.ReturnType = None
+
+    abstract SkipLastGroupDescription: bool
+    default this.SkipLastGroupDescription = false
 
     member this.GetParameter(index) =
         let index = if this.IsExtensionMember then index + 1 else index
@@ -145,13 +150,14 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
             |> Array.ofSeq
             |> Array.map Seq.length :> _
 
-        member this.ParameterOwner = parametersOwner
+        member this.ParameterOwner = getParametersOwner ()
         member this.Symbol = this.Symbol
 
     interface ICandidate with
         member this.GetDescription _ =
-            match checkResults.GetDescription(symbol, [], false, range) with
+            match fsContext.CheckResults.GetDescription(symbol, [], false, fsContext.FcsRange) with
             | ToolTipText [ ToolTipElement.Group [ elementData ] ] ->
+                let referenceOwner = fsContext.Reference.GetElement()
                 let xmlDocService = referenceOwner.GetSolution().GetComponent<FSharpXmlDocService>().NotNull()
                 xmlDocService.GetXmlDocSummary(elementData.XmlDoc)
             | _ -> null
@@ -160,6 +166,14 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
             paramArrayIndex <- -1
 
             let paramGroups = this.ParameterGroups
+            let paramGroups = 
+                if this.SkipLastGroupDescription then
+                    let paramGroups = List(paramGroups)
+                    paramGroups.RemoveAt(paramGroups.Count - 1)
+                    paramGroups :> IList<_>
+                else
+                    paramGroups
+
             let curriedParamsCount = paramGroups |> Seq.sumBy Seq.length
             let groupParameters = paramGroups.Count
             let paramsCount = curriedParamsCount + groupParameters
@@ -168,6 +182,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                 paramInfos <- Array.zeroCreate paramsCount
                 paramInfos
 
+            let parametersOwner = getParametersOwner ()
             if isNull parametersOwner then () else
 
             let parameters = parametersOwner.Parameters
@@ -176,6 +191,8 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
             paramGroups
             |> Seq.concat
             |> Seq.iteri (fun index _ ->
+                if index >= curriedParamsCount then () else
+
                 let parameter = parameters[index]
                 let name = parameter.ShortName
             
@@ -196,6 +213,8 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
             )
 
         member this.GetSignature(_, _, parameterRanges, mapToOriginalOrder, extensionMethodInfo) =
+            let referenceOwner = fsContext.Reference.GetElement()
+
             let paramGroups = this.ParameterGroups
             if paramGroups.Count = 0 then RichText() else
 
@@ -224,7 +243,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                 appendNullabilityAttribute attrOwner FcsParameterInfoCandidate.notNullAttrTypeName
 
             use _ = ReadLockCookie.Create()
-            use _ = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
+            use _ = CompilationContextCookie.GetOrCreate(referenceOwner.GetPsiModule().GetContextFromModule())
 
             let mutable paramIndex = 0
             for i = 0 to paramGroups.Count - 1 do
@@ -309,22 +328,25 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                 if i < paramGroups.Count - 1 then
                     text.Append(" ", TextStyle.Default) |> ignore
 
-            if not this.IsConstructor then
+            match this.ReturnType with
+            | Some returnType ->
                 text.Append(" : ", TextStyle.Default) |> ignore
 
+                let parametersOwner = getParametersOwner ()
                 if isNotNull parametersOwner then
                     appendNullabilityAttribute parametersOwner |> ignore
-                
-                match this.ReturnType with
-                | Some returnType ->
-                    text.Append(returnType.FormatLayout(displayContext) |> richText) |> ignore
-                | _ -> ()
+
+                text.Append(returnType.FormatLayout(displayContext) |> richText) |> ignore
+            | _ -> ()
 
             text
 
         member this.Matches _ =
+            let element = getElement ()
+            let mainElement = getMainElement ()
+
             isNotNull mainElement && mainElement.Equals(element) ||
-            symbol.IsEffectivelySameAs(mainSymbol)
+            symbol.IsEffectivelySameAs(fsContext.MainSymbol)
 
         member this.IsFilteredOut = false
         member this.IsObsolete = false
@@ -333,14 +355,12 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
         member this.IsFilteredOut with set _ = ()
 
 
-type FcsMfvParameterInfoCandidate(range: range, mfv, symbolUse, checkResults, expr, mainSymbol) =
-    inherit FcsParameterInfoCandidateBase<FSharpMemberOrFunctionOrValue, FSharpParameter>(range, mfv, symbolUse,
-        checkResults, expr, mainSymbol)
+type FcsMfvParameterInfoCandidate(mfv, symbolUse, fsContext) =
+    inherit FcsParameterInfoCandidateBase<FSharpMemberOrFunctionOrValue, FSharpParameter>(mfv, symbolUse, fsContext)
 
-    override val IsConstructor = mfv.IsConstructor
     override val ExtendedType = if mfv.IsExtensionMember then Some mfv.ApparentEnclosingEntity else None
     override val ParameterGroups = mfv.CurriedParameterGroups
-    override val ReturnType = Some mfv.ReturnParameter.Type
+    override val ReturnType = if mfv.IsConstructor then None else Some mfv.ReturnParameter.Type
     override val XmlDoc = mfv.XmlDoc
 
     override this.GetParamName(parameter) = parameter.Name
@@ -349,10 +369,8 @@ type FcsMfvParameterInfoCandidate(range: range, mfv, symbolUse, checkResults, ex
 
 
 [<AbstractClass>]
-type FcsUnionCaseParameterInfoCandidateBase<'TSymbol when 'TSymbol :> FSharpSymbol>(range, unionCase, symbolUse,
-        checkResults, expr, mainSymbol) =
-    inherit FcsParameterInfoCandidateBase<'TSymbol, FSharpField>(range, unionCase, symbolUse, checkResults, expr,
-        mainSymbol)
+type FcsUnionCaseParameterInfoCandidateBase<'TSymbol when 'TSymbol :> FSharpSymbol>(unionCase, symbolUse, fsContext) =
+    inherit FcsParameterInfoCandidateBase<'TSymbol, FSharpField>(unionCase, symbolUse, fsContext)
 
     abstract Parameters: IList<FSharpField>
 
@@ -367,62 +385,124 @@ type FcsUnionCaseParameterInfoCandidateBase<'TSymbol when 'TSymbol :> FSharpSymb
 
     override this.GetParamType(field) = field.FieldType
     override this.IsOptionalParam _ = false
-    override this.ReturnType = None
-    override this.ExtendedType = None
-    override this.IsConstructor = true
 
 
-type FcsUnionCaseParameterInfoCandidate(range, unionCase, symbolUse, checkResults, expr, mainSymbol) =
-    inherit FcsUnionCaseParameterInfoCandidateBase<FSharpUnionCase>(range, unionCase, symbolUse, checkResults, expr,
-        mainSymbol)
+type FcsUnionCaseParameterInfoCandidate(unionCase, symbolUse, fsContext) =
+    inherit FcsUnionCaseParameterInfoCandidateBase<FSharpUnionCase>(unionCase, symbolUse, fsContext)
 
     override this.Parameters = unionCase.Fields
     override this.XmlDoc = unionCase.XmlDoc
 
 
-type FcsExceptionParameterInfoCandidate(range, entity, symbolUse, checkResults, expr, mainSymbol) =
-    inherit FcsUnionCaseParameterInfoCandidateBase<FSharpEntity>(range, entity, symbolUse, checkResults, expr,
-        mainSymbol)
+type FcsExceptionParameterInfoCandidate(entity, symbolUse, fsContext) =
+    inherit FcsUnionCaseParameterInfoCandidateBase<FSharpEntity>(entity, symbolUse, fsContext)
 
     override this.Parameters = entity.FSharpFields
     override this.XmlDoc = entity.XmlDoc
 
 
-type FcsDelegateParameterInfoCandidate(range: range, entity: FSharpEntity, symbolUse, checkResults, expr, mainSymbol) =
-    inherit FcsParameterInfoCandidateBase<FSharpEntity, string option * FSharpType>(range, entity, symbolUse,
-        checkResults, expr, mainSymbol)
+type FcsDelegateParameterInfoCandidate(entity, symbolUse, fsContext) =
+    inherit FcsParameterInfoCandidateBase<FSharpEntity, string option * FSharpType>(entity, symbolUse, fsContext)
 
-    override val IsConstructor = true
-    override val ExtendedType = None
     override val ParameterGroups = [| entity.FSharpDelegateSignature.DelegateArguments |]
-    override val ReturnType = Some entity.FSharpDelegateSignature.DelegateReturnType
     override val XmlDoc = entity.XmlDoc
 
     override this.GetParamName((name, _)) = name
     override this.GetParamType((_, paramType)) = paramType
-    override this.IsOptionalParam _ = false
+
+
+type FcsActivePatternMfvParameterInfoCandidate(apc: FSharpActivePatternCase, mfv: FSharpMemberOrFunctionOrValue, symbolUse, fsContext) =
+    inherit FcsParameterInfoCandidateBase<FSharpMemberOrFunctionOrValue, string option * FSharpType>(mfv, symbolUse, fsContext)
+
+    override this.ParameterGroups =
+        let activePatternGroup = apc.Group
+        let names = activePatternGroup.Names
+
+        let returnType =
+            let mfvReturnType = mfv.ReturnParameter.Type
+            match activePatternGroup.IsTotal with
+            | true when
+                    names.Count > 1 && apc.Index < names.Count &&
+                    apc.Index < mfvReturnType.GenericArguments.Count && FcsTypeUtil.isChoice mfvReturnType ->
+                Some mfvReturnType.GenericArguments[apc.Index]
+
+            | false when
+                    FcsTypeUtil.isOption mfvReturnType ||
+
+                    FcsTypeUtil.isValueOption mfvReturnType &&
+                    mfv.ReturnParameter.Attributes.HasAttributeInstance(FSharpPredefinedType.structAttrTypeName) ->
+                let optionArgType = mfvReturnType.GenericArguments[0]
+                if optionArgType.StrippedType.IsUnit then None else Some optionArgType
+
+            | _ -> Some mfvReturnType
+
+        let parameterGroups =
+            mfv.CurriedParameterGroups
+            |> Seq.map (fun group -> List(group |> Seq.map (fun p -> p.Name, p.Type)) :> IList<_>)
+            |> List
+
+        parameterGroups.RemoveAt(parameterGroups.Count - 1)
+
+        returnType |> Option.iter (fun returnType ->
+            let returnGroup = 
+                if returnType.IsTupleType then
+                    returnType.GenericArguments |> Seq.map (fun t -> None, t)
+                else
+                    [None, returnType]
+            parameterGroups.Add(List(returnGroup)))
+
+        parameterGroups
+
+    override this.GetParamName((name, _)) = name
+    override this.GetParamType((_, paramType)) = paramType
+
+    override this.XmlDoc = mfv.XmlDoc
+    override this.SkipLastGroupDescription = true
 
 
 [<AllowNullLiteral; AbstractClass>]
 type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caretOffset: DocumentOffset, context: 'TNode,
         reference: FSharpSymbolReference, symbolUses: FSharpSymbolUse list, checkResults,
-        referenceEndOffset: DocumentOffset, mainSymbol: FSharpSymbol) =
+        referenceEndOffset: DocumentOffset, mainSymbol: FSharpSymbol) as this =
     let documentRange = DocumentRange(&referenceEndOffset)
     let fcsRange = FSharpRangeUtil.ofDocumentRange documentRange
 
     let candidates =
+        let fsContext = this :> IFSharpParameterInfoContext
         symbolUses
         |> List.choose (fun item ->
             match item.Symbol with
             | :? FSharpMemberOrFunctionOrValue as mfv when not (mfv.CurriedParameterGroups.IsEmpty()) ->
-                Some(FcsMfvParameterInfoCandidate(fcsRange, mfv, item, checkResults, reference, mainSymbol) :> ICandidate)
+                Some(FcsMfvParameterInfoCandidate(mfv, item, fsContext) :> ICandidate)
+
             | :? FSharpUnionCase as uc when not (uc.Fields.IsEmpty()) ->
-                Some(FcsUnionCaseParameterInfoCandidate(fcsRange, uc, item, checkResults, reference, mainSymbol) :> ICandidate)
+                Some(FcsUnionCaseParameterInfoCandidate(uc, item, fsContext))
+
             | :? FSharpEntity as e when e.IsFSharpExceptionDeclaration && not (e.FSharpFields.IsEmpty()) ->
-                Some(FcsExceptionParameterInfoCandidate(fcsRange, e, item, checkResults, reference, mainSymbol) :> ICandidate)
+                Some(FcsExceptionParameterInfoCandidate(e, item, fsContext))
+
             | :? FSharpEntity as e when e.IsDelegate ->
-                Some(FcsDelegateParameterInfoCandidate(fcsRange, e, item, checkResults, reference, mainSymbol) :> ICandidate)
+                Some(FcsDelegateParameterInfoCandidate(e, item, fsContext))
+
+            | :? FSharpActivePatternCase as apc ->
+                match apc.Group.DeclaringEntity with
+                | Some entity ->
+                    entity.MembersFunctionsAndValues
+                    |> Seq.tryFind (fun mfv -> Range.rangeContainsRange mfv.DeclarationLocation apc.DeclarationLocation)
+                | _ ->
+                    let psiModule = context.GetPsiModule()
+                    let referenceOwner = reference.GetElement()
+                    apc.GetActivePatternCaseElement(psiModule, referenceOwner).As<ILocalReferencePat>()
+                    |> Option.ofObj
+                    |> Option.bind (fun refPat ->
+                        let mfv = refPat.GetFcsSymbol().As<FSharpMemberOrFunctionOrValue>()
+                        if isNull mfv then None else Some mfv)
+                |> Option.map (fun mfv -> FcsActivePatternMfvParameterInfoCandidate(apc, mfv, item, fsContext))
+
             | _ -> None)
+        |> List.filter (function
+            | :? FcsActivePatternMfvParameterInfoCandidate as c -> c.ParameterGroups.Count > 0
+            | _ -> true)
         |> Array.ofList
 
     abstract ArgGroups: ParameterInfoArgument list
@@ -579,6 +659,11 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                 |> Array.exists (function
                     | :? IFcsParameterInfoCandidate as c -> c.ParameterGroupCounts.Count > argGroupsLength
                     | _ -> false)
+
+        member this.CheckResults = checkResults
+        member this.FcsRange = fcsRange
+        member this.MainSymbol = mainSymbol
+        member this.Reference = reference
 
 
 [<AllowNullLiteral>]
@@ -789,8 +874,9 @@ type FSharpParameterInfoContextFactory() =
             | :? FSharpMemberOrFunctionOrValue as mfv ->
                 not mfv.IsProperty && mfv.CurriedParameterGroups.Count > 0
 
-            | :? FSharpUnionCase
-            | :? FSharpEntity -> true
+            | :? FSharpActivePatternCase
+            | :? FSharpEntity
+            | :? FSharpUnionCase -> true
             | _ -> false
 
         let symbol = symbolUse.Symbol
@@ -946,7 +1032,6 @@ type FSharpParameterInfoContextFactory() =
     and tryCreateFromParentPat isAutoPopup caretOffset (pat: IFSharpPattern) =
         if isNull pat then null else
 
-        let expr = pat.IgnoreParentParens()
         let parentPat = pat.IgnoreParentParens().GetContainingNode<IFSharpPattern>()
         tryCreateContextFromPattern isAutoPopup caretOffset parentPat
 

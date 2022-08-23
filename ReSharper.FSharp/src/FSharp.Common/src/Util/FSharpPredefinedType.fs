@@ -26,6 +26,9 @@ let requireQualifiedAccessAttrTypeName = clrTypeName "Microsoft.FSharp.Core.Requ
 [<CompiledName("CLIEventAttribute")>]
 let cliEventAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CLIEventAttribute"
 
+[<CompiledName("StructAttribute")>]
+let structAttrTypeName = clrTypeName "Microsoft.FSharp.Core.StructAttribute"
+
 [<CompiledName("FSharpListTypeName")>]
 let fsListTypeName = clrTypeName "Microsoft.FSharp.Collections.FSharpList`1"
 

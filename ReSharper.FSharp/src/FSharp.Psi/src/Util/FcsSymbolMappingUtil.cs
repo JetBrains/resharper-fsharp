@@ -12,7 +12,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
@@ -176,7 +175,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (symbol is FSharpActivePatternCase patternCase)
-        return GetActivePatternCaseElement(psiModule, referenceExpression, patternCase);
+        return GetActivePatternCaseElement(patternCase, psiModule, referenceExpression);
 
       if (symbol is FSharpGenericParameter genericParameter)
         return GetTypeParameter(genericParameter, referenceExpression);
@@ -345,8 +344,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         : null;
     }
 
-    public static IDeclaredElement GetActivePatternCaseElement(IPsiModule psiModule,
-      IFSharpReferenceOwner referenceOwner, FSharpActivePatternCase patternCase)
+    public static IDeclaredElement GetActivePatternCaseElement([NotNull] this FSharpActivePatternCase patternCase,
+      IPsiModule psiModule, IFSharpReferenceOwner referenceOwner)
     {
       var pattern = patternCase.Group;
       var entity = pattern.DeclaringEntity?.Value;
@@ -390,7 +389,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     private static IFSharpDeclaration GetActivePatternDeclaration([NotNull] FSharpActivePatternCase fcsActivePatternCase,
-      [NotNull] IPsiModule psiModule, IFSharpReferenceOwner referenceOwnerToken)
+      [NotNull] IPsiModule psiModule, [CanBeNull] IFSharpReferenceOwner referenceOwnerToken)
     {
       var activePattern = fcsActivePatternCase.Group;
       var declaringEntity = activePattern.DeclaringEntity?.Value;

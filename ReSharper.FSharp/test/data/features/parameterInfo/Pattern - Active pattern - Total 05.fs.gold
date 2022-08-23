@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(l: 'a list) (unit option)
+Parameter: 1 'unit option'
+
+--- Accepted invocables: ---
+(l: 'a list) (unit option)
