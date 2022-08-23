@@ -20,6 +20,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IDocCommentXmlPsi GetXmlPsi()
     {
       Assertion.Assert(IsValid());
+
+      // TODO: compile/bind references in XmlDoc
       myDocCommentXmlPsi ??= FSharpDocCommentXmlPsi.BuildPsi(this);
       return myDocCommentXmlPsi;
     }

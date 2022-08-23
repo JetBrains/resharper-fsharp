@@ -33,6 +33,7 @@ type FSharpSyntaxHighlightingProcessor() =
     let highlighting = FSharpSyntaxHighlighting()
 
     override x.GetAttributeId(tokenType) = highlighting.GetAttributeId(tokenType)
+
     override x.ProcessBeforeInterior(element, context) =
         match element with
         | :? IFSharpDocCommentBlock as block ->
