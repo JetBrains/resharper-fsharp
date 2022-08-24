@@ -561,10 +561,9 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         manager.AddTypingHandler(lifetime, '}', this, Func<_,_>(this.HandleRightBracket), isSmartParensHandlerAvailable)
         manager.AddTypingHandler(lifetime, '>', this, Func<_,_>(this.HandleRightBracket), isSmartParensHandlerAvailable)
 
-        manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleRightAngleBracketTyped), isSmartParensHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleRightAngleBracketTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '@', this, Func<_,_>(this.HandleAtTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '|', this, Func<_,_>(this.HandleBarTyped), isTypingHandlerAvailable)
-        manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleXmlDocTag), isTypingHandlerAvailable)
 
     member x.HandleEnterAddBiggerIndentFromBelow(textControl) =
         let document = textControl.Document
@@ -1435,7 +1434,9 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let textControl = context.TextControl
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
-        x.HandleAngleBracketsInList(context, lexer)
+
+        x.IsTypingSmartParenthesisHandlerAvailable2(context) && x.HandleAngleBracketsInList(context, lexer)
+        || x.HandleXmlDocTag(context)
 
     member x.HandleAngleBracketsInList(context, lexer: CachingLexer) =
         insertCharInBrackets context lexer angledBracketsChars listBrackets LeftBracketOnly.Yes
@@ -1523,14 +1524,14 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let file = x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id)
 
         let tokenNode = file.FindTokenAt(TreeOffset(offset)).As<DocComment>()
-        if isNull tokenNode then false else
+        if isNull tokenNode then true else
 
         let docCommentBlockNode = tokenNode.Parent.As<IDocCommentBlock>()
 
         if isNull docCommentBlockNode ||
            docCommentBlockNode.GetTextLength() < 4 ||
            not docCommentBlockNode.IsSingleLine ||
-           tokenNode.CommentText.Trim() <> "<" then false else
+           tokenNode.CommentText.Trim() <> "<" then true else
 
         let docCommentBlockOffset = docCommentBlockNode.GetTreeStartOffset().Offset
         let document = textControl.Document
