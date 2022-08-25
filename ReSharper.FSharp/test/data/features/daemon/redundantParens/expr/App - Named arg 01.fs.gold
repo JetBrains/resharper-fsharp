@@ -1,0 +1,33 @@
+﻿module M
+   
+type T() =
+    static member M1(a: int) = ()
+    static member M2(a: int, b) = ()
+    
+T.M1(a = 1)
+T.M1((a) = 1)
+T.M1(|(|(0)(a)|)|(1) = 1)
+
+T.M1((a = 1))
+T.M1|(|(2)((a = 1))|)|(3)
+
+T.M1((a) = 1)
+T.M1|(|(4)(|(|(5)a|)|(6) = 1)|)|(7)
+
+T.M2((a) = 1, b = 2)
+T.M2((a = 1), b = 2)
+T.M2(|(|(8)|(|(9)a|)|(10) = 1|)|(11), b = 2)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5): ReSharper Dead Code: Redundant parentheses
+(6):<secondary> ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
+(8): ReSharper Dead Code: Redundant parentheses
+(9): ReSharper Dead Code: Redundant parentheses
+(10):<secondary> ReSharper Dead Code: Redundant parentheses
+(11):<secondary> ReSharper Dead Code: Redundant parentheses

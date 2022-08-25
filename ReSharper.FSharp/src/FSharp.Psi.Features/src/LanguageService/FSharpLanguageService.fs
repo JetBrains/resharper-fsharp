@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
@@ -107,17 +108,9 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
                 ReferenceAccessType.READ else
 
             let isNamedArg () =
-                not referenceExpr.IsQualified &&
-
                 let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr)
-                isNotNull binaryAppExpr && binaryAppExpr.ShortName = "=" &&
-
-                let tupleExpr = TupleExprNavigator.GetByExpression(binaryAppExpr)
-                let argExpr: IFSharpExpression = if isNull tupleExpr then binaryAppExpr else tupleExpr
-
-                let parenExpr = ParenExprNavigator.GetByInnerExpression(argExpr)
-                let argOwner = FSharpArgumentOwnerNavigator.GetByArgumentExpression(parenExpr)
-                isNotNull argOwner
+                FSharpMethodInvocationUtil.hasNamedArgStructure binaryAppExpr &&
+                FSharpMethodInvocationUtil.isTopLevelArg binaryAppExpr
 
             if isInstanceFieldOrProperty declaredElement && isNamedArg () then
                 ReferenceAccessType.WRITE else

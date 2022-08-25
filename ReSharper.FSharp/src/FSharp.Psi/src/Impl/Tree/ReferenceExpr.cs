@@ -52,6 +52,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? qualifierName + "." + ShortName
         : ShortName;
 
+    public bool IsSimpleName =>
+      !IsQualified && TypeArgumentList == null && Identifier is IFSharpIdentifierToken;
+
     public FSharpSymbolReference Reference
     {
       get

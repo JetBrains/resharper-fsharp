@@ -238,6 +238,26 @@ let escapesTupleAppArg (context: IFSharpExpression) (expr: IFSharpExpression) =
         | _ -> false
     | _ -> false
 
+let escapesRefExprAtNamedArgPosition (context: IFSharpExpression) (expr: IFSharpExpression) =
+    let refExpr = expr.As<IReferenceExpr>()
+    isNotNull refExpr && refExpr.IsSimpleName &&
+
+    let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(context)
+    isNotNull binaryAppExpr && FSharpMethodInvocationUtil.isTopLevelArg binaryAppExpr
+
+let escapesAppAtNamedArgPosition (parenExpr: IParenExpr) =
+    match parenExpr.InnerExpression with
+    | :? IParenExpr as innerParenExpr ->
+        match innerParenExpr.InnerExpression with
+        | :? IBinaryAppExpr as binaryAppExpr ->
+            FSharpMethodInvocationUtil.hasNamedArgStructure binaryAppExpr &&
+            isNotNull (FSharpArgumentOwnerNavigator.GetByArgumentExpression(parenExpr.IgnoreParentParens()))
+        | _ -> false
+    | :? IBinaryAppExpr as binaryAppExpr ->
+        FSharpMethodInvocationUtil.hasNamedArgStructure binaryAppExpr &&
+        FSharpMethodInvocationUtil.isTopLevelArg parenExpr
+    | _ -> false
+
 let literalsRequiringParens =
     NodeTypeSet(FSharpTokenType.INT32, FSharpTokenType.IEEE32, FSharpTokenType.IEEE64)
 

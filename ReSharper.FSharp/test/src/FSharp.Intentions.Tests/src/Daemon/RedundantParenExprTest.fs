@@ -25,6 +25,7 @@ type RedundantParenExprTest() =
     [<Test>] member x.``Literal 02 - Qualified``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Local 01``() = x.DoNamedTest()
+    [<Test>] member x.``App - Named arg 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Top level 01``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Precedence - High 01``() = x.DoNamedTest()
