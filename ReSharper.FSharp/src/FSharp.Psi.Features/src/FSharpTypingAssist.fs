@@ -1436,7 +1436,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
         x.IsTypingSmartParenthesisHandlerAvailable2(context) && x.HandleAngleBracketsInList(context, lexer)
-        || x.HandleXmlDocTag(context)
+        || x.HandleXmlDocTag(context, lexer)
 
     member x.HandleAngleBracketsInList(context, lexer: CachingLexer) =
         insertCharInBrackets context lexer angledBracketsChars listBrackets LeftBracketOnly.Yes
@@ -1511,13 +1511,22 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         insertCharInBrackets context lexer atChars typedQuotationBrackets LeftBracketOnly.No
 
-    member x.HandleXmlDocTag(context: ITypingContext) =
+    member x.HandleXmlDocTag(context: ITypingContext, lexer) =
         let textControl = context.TextControl
         let offset = textControl.Caret.Offset()
-        let mutable lexer = Unchecked.defaultof<_>
-        if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
         if offset < 3 then false else
+
+        if not (lexer.FindTokenAt(offset - 1)) then false else
+        if not lexer.TokenType.IsComment then false else
+
+        let tokenLength = lexer.TokenEnd - lexer.TokenStart + 1
+
+        if tokenLength < 3 ||
+           // instead of /// 
+           lexer.Buffer[lexer.TokenStart + 2] <> '/' ||
+           //// instead of /// 
+           tokenLength >= 4 && lexer.Buffer[lexer.TokenStart + 3] = '/' then false else
 
         // Check if new doc-comment block is being started
         context.CallNext()
