@@ -8,7 +8,6 @@ open JetBrains.TextControl.DocumentMarkup
 module FSharpHighlightingAttributeIds =
     let [<Literal>] GroupId = "F#"
     let [<Literal>] LayerSyntaxPlusOne = 3001 // HighlighterLayer.ADDITIONAL_SYNTAX + 1
-    let [<Literal>] VsPriorityPlusOne = 41 // VSPriority.IDENTIFIERS + 1
 
     let [<Literal>] Keyword = "ReSharper F# Keyword"
     let [<Literal>] String = "ReSharper F# String"
@@ -124,7 +123,6 @@ type FSharpSettingsNamesProvider() =
       FallbackAttributeId = DefaultLanguageAttributeIds.STRING_ESCAPE_CHARACTER_1,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       Layer = enum FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
-      VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
       EffectType = EffectType.TEXT, ForegroundColor = "#FF007F", DarkForegroundColor = "#E07A00");
 
   RegisterHighlighter(
@@ -132,7 +130,6 @@ type FSharpSettingsNamesProvider() =
       FallbackAttributeId = DefaultLanguageAttributeIds.STRING_ESCAPE_CHARACTER_2,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       Layer = enum FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
-      VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
       EffectType = EffectType.TEXT, ForegroundColor = "#FF66B2", DarkForegroundColor = "#FF8D1C");
 
   RegisterHighlighter(
@@ -149,7 +146,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Preprocessor//Inactive branch",
       Layer = HighlighterLayer.DEADCODE,
-      VSPriority = VSPriority.DEADCODE,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkGray");
 
   RegisterHighlighter(
@@ -158,7 +154,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Modules and namespaces//Namespace",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -167,7 +162,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Modules and namespaces//Module",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -176,7 +170,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Types//Class",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -185,7 +178,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Types//Static class",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -194,7 +186,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Types//Interface",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -203,7 +194,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Types//Delegate",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -212,7 +202,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Types//Struct",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -221,7 +210,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Types//Enum",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -230,7 +218,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Types//Type parameter",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -247,7 +234,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Types//Union",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -256,7 +242,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Types//Union Case",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -265,7 +250,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Types//Record",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
@@ -274,7 +258,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Values//Literal",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet",
       FontStyle = FontStyle.Bold);
 
@@ -284,7 +267,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Members//Event",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "Magenta", DarkForegroundColor = "Plum");
 
   RegisterHighlighter(
@@ -293,7 +275,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Members//Field",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet");
 
   RegisterHighlighter(
@@ -302,7 +283,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Members//Property",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet");
 
   RegisterHighlighter(
@@ -311,7 +291,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Values//Value",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT);
 
   RegisterHighlighter(
@@ -320,7 +299,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Values//Mutable value",
       Layer = enum FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
-      VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
       EffectType = EffectType.TEXT,
       FontStyle = FontStyle.Bold);
 
@@ -330,7 +308,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Values//Function",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT);
 
   RegisterHighlighter(
@@ -339,7 +316,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Values//Mutable function",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT,
       FontStyle = FontStyle.Bold);
 
@@ -357,7 +333,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Members//Method",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Maroon", DarkForegroundColor = "Cyan");
 
   RegisterHighlighter(
@@ -366,7 +341,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Values//Operator",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Blue", DarkForegroundColor = "Cyan");
 
   RegisterHighlighter(
@@ -375,7 +349,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Values//Active pattern case",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Blue", DarkForegroundColor = "Cyan");
 
   RegisterHighlighter(
@@ -384,7 +357,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Members//Extension method",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Maroon", DarkForegroundColor = "Cyan");
 
   RegisterHighlighter(
@@ -393,7 +365,6 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Members//Extension property",
       Layer = HighlighterLayer.SYNTAX,
-      VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet")>]
 
 type FSharpHighlightingAttributeIds() = class end
