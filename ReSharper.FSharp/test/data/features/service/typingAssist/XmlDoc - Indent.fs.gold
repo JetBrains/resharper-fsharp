@@ -1,8 +1,0 @@
-﻿// ${CHAR:<}
-module Module
-
-///      <summary>
-///      {caret}
-///      </summary>
-///      <param name="x"></param>
-let f x = x

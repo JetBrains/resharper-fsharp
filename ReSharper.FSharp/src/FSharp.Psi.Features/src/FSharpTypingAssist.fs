@@ -1517,7 +1517,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
-        if offset < 4 then false else
+        if offset < 3 then false else
 
         // Check if new doc-comment block is being started
         context.CallNext()
@@ -1537,19 +1537,18 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let document = textControl.Document
         let coords = document.GetCoordsByOffset(docCommentBlockOffset)
         let docCommentBlockLine = coords.Line
-        let spacesCount = offset - docCommentBlockOffset - 3
         
-        let newLine = document.GetLineEnding(docCommentBlockLine).ToLineEndingString();
-        let indent = document.GetText(TextRange(document.GetLineStartOffset(docCommentBlockLine), docCommentBlockOffset))
-        let templateLinePrefix = newLine + indent + "///" + String(' ', spacesCount)
-        
-        docCommentBlockNode.GetPsiServices().Files.CommitAllDocuments()
+        let newLine = x.GetNewLineText(textControl)
+        let lineStart = document.GetLineStartOffset(docCommentBlockLine)
+        let indent = String(' ', docCommentBlockOffset - lineStart)
+        let templateLinePrefix = indent + "/// "
 
         let struct(template, caretOffset) =
-            XmlDocTemplateUtil.GetDocTemplate(docCommentBlockNode, fun i -> if i = 0 then "" else templateLinePrefix);
+            XmlDocTemplateUtil.GetDocTemplate(docCommentBlockNode, templateLinePrefix, newLine);
 
-        document.InsertText(offset + 1, template)
-        textControl.Caret.MoveTo(offset + caretOffset + 1, CaretVisualPlacement.DontScrollIfVisible)
+        document.ReplaceText(TextRange(lineStart, docCommentBlockNode.GetDocumentEndOffset().Offset), "")
+        document.InsertText(lineStart, template)
+        textControl.Caret.MoveTo(lineStart + caretOffset - newLine.Length, CaretVisualPlacement.DontScrollIfVisible)
         true
 
     member x.TrimTrailingSpacesAtOffset(textControl: ITextControl, startOffset: byref<int>, trimAfterCaret) =

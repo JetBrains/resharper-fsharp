@@ -1,0 +1,7 @@
+﻿/// <summary>
+/// {caret}
+/// </summary>
+/// <param name="x"></param>
+let f x = x
+
+// ${CHAR:<}
