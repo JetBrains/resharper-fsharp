@@ -37,7 +37,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public ITypeDeclaration GetContainingTypeDeclaration() => GetContainingNode<ITypeDeclaration>();
 
-    public XmlNode GetXMLDoc(bool inherit) => null;
+    public XmlNode GetXMLDoc(bool inherit) =>
+      Parent is { FirstChild: XmlDocBlock xmlDocBlock } ? xmlDocBlock.GetXML(null) : null;
+
     public bool IsSynthetic() => false;
 
     IFunction IFunctionDeclaration.DeclaredElement =>

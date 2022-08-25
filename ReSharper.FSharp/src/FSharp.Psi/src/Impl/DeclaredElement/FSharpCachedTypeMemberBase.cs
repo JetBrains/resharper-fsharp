@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
@@ -37,10 +38,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       EmptySubstitution.INSTANCE;
 
     // ReSharper disable once InconsistentNaming
-    public XmlNode GetXMLDoc(bool inherit) => null; // todo
+    public virtual XmlNode GetXMLDoc(bool inherit) =>
+      GetDeclaration() is { XmlDocBlock: { } xmlDocBlock } ? xmlDocBlock.GetXML(this as ITypeMember) : null;
 
     // ReSharper disable once InconsistentNaming
-    public XmlNode GetXMLDescriptionSummary(bool inherit) => null; // todo
+    public XmlNode GetXMLDescriptionSummary(bool inherit) =>
+      XMLDocUtil.ExtractSummary(GetXMLDoc(inherit));
 
     public abstract DeclaredElementType GetElementType();
   }

@@ -1,6 +1,7 @@
 ﻿using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -36,5 +37,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     void SetName(string name, ChangeNameKind changeNameKind);
 
     TreeTextRange GetNameIdentifierRange();
+
+    [CanBeNull]
+    XmlDocBlock XmlDocBlock { get; }
   }
 }
