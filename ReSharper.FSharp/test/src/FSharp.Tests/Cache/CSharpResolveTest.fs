@@ -177,3 +177,28 @@ type CSharpResolveFromSignatures() =
 
     [<Test>] member x.``Type Extension 01 - Struct - Signature``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 02 - Class - Signature``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+[<TestFileExtension(".cs")>]
+type CSharpTooltipTest() =
+    inherit IdentifierTooltipTestBase()
+
+    override x.RelativeTestDataPath = "cache/csharpResolve/tooltips"
+
+    member x.DoNamedTestWithFs() =
+        let testName = x.TestMethodName
+        x.DoTestSolution(testName + CSharpProjectFileType.CS_EXTENSION, testName + FSharpProjectFileType.FsExtension)
+
+    member x.DoNamedTestWithFsi() =
+        let testName = x.TestMethodName
+        x.DoTestSolution(testName + CSharpProjectFileType.CS_EXTENSION, testName + FSharpSignatureProjectFileType.FsiExtension)
+    
+    [<Test>] member x.``XmlDoc 01 - Top binding``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 02 - Type``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 03 - Record field``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 04 - Union case``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 05 - Primary constructor``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 06 - Type member``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 07 - Abstract type member``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 08 - Type member signature``() = x.DoNamedTestWithFsi()
