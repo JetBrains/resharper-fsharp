@@ -1538,7 +1538,6 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let docCommentBlockNode = tokenNode.Parent.As<IDocCommentBlock>()
 
         if isNull docCommentBlockNode ||
-           docCommentBlockNode.GetTextLength() < 4 ||
            not docCommentBlockNode.IsSingleLine ||
            tokenNode.CommentText.Trim() <> "<" then true else
 

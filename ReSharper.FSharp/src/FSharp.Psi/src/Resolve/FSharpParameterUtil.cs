@@ -69,8 +69,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return field?.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner);
     }
 
-    public static IEnumerable<IEnumerable<string>> GetParametersGroupNames(ITreeNode node) =>
-      node switch
+    public static IReadOnlyList<IReadOnlyList<string>> GetParametersGroupNames(ITreeNode node) =>
+      (node switch
       {
         IBinding binding => binding.Expression is ILambdaExpr lambda
           ? binding.ParameterPatterns.Select(GetParameterNames).Union(GetLambdaArgs(lambda))
@@ -78,6 +78,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
         IBindingSignature bindingSignature => GetParameterNames(bindingSignature.ReturnTypeInfo.ReturnType),
         IMemberDeclaration member => member.ParameterPatterns.Select(GetParameterNames),
+        // TODO: https://github.com/dotnet/fsharp/issues/13684
         //.Union(member.AccessorDeclarations.Select(t => t.ParameterPatterns.SelectMany(GetParameterNames))),
         IConstructorSignature constructorSignature => GetParameterNames(constructorSignature.ReturnTypeInfo.ReturnType),
 
@@ -91,7 +92,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
         IUnionCaseDeclaration ucDecl => new[] { ucDecl.Fields.Select(t => t.SourceName) },
         _ => EmptyList<string[]>.Enumerable
-      };
+      })
+      .Select(t => t.ToIReadOnlyList())
+      .ToIReadOnlyList();
 
     private static IEnumerable<IEnumerable<string>> GetLambdaArgs(ILambdaExpr expr)
     {
