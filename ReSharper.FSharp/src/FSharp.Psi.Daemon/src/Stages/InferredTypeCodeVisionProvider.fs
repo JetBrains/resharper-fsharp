@@ -52,14 +52,15 @@ type InferredTypeCodeVisionProvider() =
         member x.IsAvailableIn _ = true
 
         member x.OnClick(highlighting, _) =
-            let entry = highlighting.Entry.As<TextCodeLensEntry>()
+            let codeInsightsHighlighting = highlighting.CodeInsightsHighlighting
+            let entry = codeInsightsHighlighting.Entry.As<TextCodeLensEntry>()
             if isNull entry then () else
 
             let shell = Shell.Instance
             shell.GetComponent<Clipboard>().SetText(entry.Text)
             let documentMarkupManager = shell.GetComponent<IDocumentMarkupManager>()
             shell.GetComponent<ITooltipManager>().Show(TypeCopiedTooltipText, PopupWindowContextSource(fun _ ->
-                let documentMarkup = documentMarkupManager.TryGetMarkupModel(highlighting.Range.Document)
+                let documentMarkup = documentMarkupManager.TryGetMarkupModel(codeInsightsHighlighting.Range.Document)
                 if isNull documentMarkup then null else
                 let highlighter =
                     documentMarkup.GetFilteredHighlighters(FSharpInferredTypeHighlighting.ProviderId,
