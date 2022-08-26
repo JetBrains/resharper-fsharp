@@ -1513,7 +1513,9 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
     member x.HandleXmlDocTag(context: ITypingContext, lexer) =
         let textControl = context.TextControl
+        let document = textControl.Document
         let offset = textControl.Caret.Offset()
+        let buffer = lexer.Buffer
 
         if offset < 3 then false else
 
@@ -1523,10 +1525,16 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let tokenLength = lexer.TokenEnd - lexer.TokenStart + 1
 
         if tokenLength < 3 ||
-           // instead of /// 
-           lexer.Buffer[lexer.TokenStart + 2] <> '/' ||
-           //// instead of /// 
-           tokenLength >= 4 && lexer.Buffer[lexer.TokenStart + 3] = '/' then false else
+           // instead of ///
+           buffer[lexer.TokenStart + 2] <> '/' ||
+           //// instead of ///
+           tokenLength >= 4 && buffer[lexer.TokenStart + 3] = '/' then false else
+
+        let mutable containsOnlySpaces = true
+        for i in lexer.TokenStart + 3 .. lexer.TokenEnd - 1 do
+            if buffer[i] <> ' ' then containsOnlySpaces <- false
+
+        if not containsOnlySpaces then false else
 
         // Check if new doc-comment block is being started
         context.CallNext()
@@ -1537,12 +1545,9 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         let docCommentBlockNode = tokenNode.Parent.As<IDocCommentBlock>()
 
-        if isNull docCommentBlockNode ||
-           not docCommentBlockNode.IsSingleLine ||
-           tokenNode.CommentText.Trim() <> "<" then true else
+        if isNull docCommentBlockNode || not docCommentBlockNode.IsSingleLine then true else
 
         let docCommentBlockOffset = docCommentBlockNode.GetTreeStartOffset().Offset
-        let document = textControl.Document
         let coords = document.GetCoordsByOffset(docCommentBlockOffset)
         let docCommentBlockLine = coords.Line
         
@@ -1554,9 +1559,10 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let struct(template, caretOffset) =
             XmlDocTemplateUtil.GetDocTemplate(docCommentBlockNode, templateLinePrefix, newLine);
 
-        document.ReplaceText(TextRange(lineStart, docCommentBlockNode.GetDocumentEndOffset().Offset), "")
+        document.DeleteText(TextRange(lineStart, docCommentBlockNode.GetDocumentEndOffset().Offset))
         document.InsertText(lineStart, template)
         textControl.Caret.MoveTo(lineStart + caretOffset - newLine.Length, CaretVisualPlacement.DontScrollIfVisible)
+
         true
 
     member x.TrimTrailingSpacesAtOffset(textControl: ITextControl, startOffset: byref<int>, trimAfterCaret) =
