@@ -202,3 +202,6 @@ type CSharpTooltipTest() =
     [<Test>] member x.``XmlDoc 06 - Type member``() = x.DoNamedTestWithFs()
     [<Test>] member x.``XmlDoc 07 - Abstract type member``() = x.DoNamedTestWithFs()
     [<Test>] member x.``XmlDoc 08 - Type member signature``() = x.DoNamedTestWithFsi()
+    [<Test>] member x.``XmlDoc 09 - Val``() = x.DoNamedTestWithFsi()
+    [<Test>] member x.``XmlDoc 10 - Module``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 11 - Struct val``() = x.DoNamedTestWithFs()
