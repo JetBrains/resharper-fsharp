@@ -267,6 +267,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Skip right 04 - Angle``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 05 - Multiplication decl``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 06 - Interpolated string``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip right 07 - Less``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip right 08``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Skip 01 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip 02 - Array``() = x.DoNamedTest()

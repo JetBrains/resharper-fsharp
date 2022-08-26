@@ -1250,6 +1250,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
         if x.SkipCharInRightBracket(context, lexer, offset) then true else
+        if x.SkipCharInOperator(context, lexer, offset) then true else
 
         this.HandleRightBracketTyped
             (context,
@@ -1456,6 +1457,21 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         let offsetInToken = offset - lexer.TokenStart
         if not (Array.contains (lexer.TokenType, offsetInToken) offsetInTokens) then false else
+
+        context.TextControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
+        true
+
+    member x.SkipCharInOperator(context, lexer: CachingLexer, offset) =
+        use cookie = LexerStateCookie.Create(lexer)
+        if not (lexer.FindTokenAt(offset)) then false else
+
+        if lexer.TokenType != FSharpTokenType.RPAREN then false else
+
+        lexer.Advance(-1)
+        if lexer.TokenType != FSharpTokenType.LESS && lexer.TokenType != FSharpTokenType.GREATER then false else
+
+        lexer.Advance(-1)
+        if lexer.TokenType != FSharpTokenType.LPAREN then false else
 
         context.TextControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
         true
