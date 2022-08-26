@@ -2,6 +2,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
 open System.Collections.Generic
+open System.IO
 open System.Runtime.InteropServices
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
@@ -41,6 +42,23 @@ type FcsProject =
 
     member x.IsKnownFile(sourceFile: IPsiSourceFile) =
         x.FileIndices.ContainsKey(sourceFile.GetLocation())
+
+    member x.TestDump(writer: StreamWriter) =
+        let projectOptions = x.ProjectOptions
+
+        writer.WriteLine($"Project file: {projectOptions.ProjectFileName}")
+        writer.WriteLine($"Stamp: {projectOptions.Stamp}")
+        writer.WriteLine($"Load time: {projectOptions.LoadTime}")
+
+        writer.WriteLine("Other options:")
+        for option in projectOptions.OtherOptions do
+            writer.WriteLine($"  {option}")
+
+        writer.WriteLine("Referenced projects:")
+        for referencedProject in projectOptions.ReferencedProjects do
+            writer.WriteLine($"  {referencedProject.OutputFile}")
+
+        writer.WriteLine()
 
 
 [<ShellComponent; AllowNullLiteral>]
@@ -215,6 +233,7 @@ type IFcsProjectProvider =
 
     /// True when any F# projects are currently known to project options provider after requesting info from FCS.
     abstract HasFcsProjects: bool
+    abstract GetAllFcsProjects: unit -> FcsProject seq
 
 
 type IScriptFcsProjectProvider =

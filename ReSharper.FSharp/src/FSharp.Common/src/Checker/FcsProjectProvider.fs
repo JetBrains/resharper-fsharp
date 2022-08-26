@@ -424,6 +424,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         member x.HasFcsProjects = not (fcsProjects.IsEmpty())
 
+        member this.GetAllFcsProjects() =
+            fcsProjects.Values
+
         member x.InvalidateDirty() =
             processDirtyFcsProjects ()
 

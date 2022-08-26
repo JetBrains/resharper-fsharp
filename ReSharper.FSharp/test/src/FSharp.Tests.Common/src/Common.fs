@@ -226,7 +226,8 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
 
         member x.InvalidateReferencesToProject _ = false
         member x.HasFcsProjects = false
-        member this.GetProjectOptions(_: IPsiModule): FSharpProjectOptions option = failwith "todo"
+        member this.GetAllFcsProjects() = []
 
+        member this.GetProjectOptions(_: IPsiModule): FSharpProjectOptions option = failwith "todo"
         member this.GetFcsProject(psiModule) = Some (getFcsProject psiModule)
-        member this.GetPsiModule(outputPath) = failwith "todo"
+        member this.GetPsiModule _ = failwith "todo"
