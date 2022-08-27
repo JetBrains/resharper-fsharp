@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Linq;
+using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -20,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     protected override bool CanBindTo(IDeclaration declaration) => declaration is TDeclaration;
 
     [CanBeNull]
-    public new TDeclaration GetDeclaration() => (TDeclaration) base.GetDeclaration();
+    public new TDeclaration GetDeclaration() => (TDeclaration)base.GetDeclaration();
 
     public bool IsSynthetic() => false;
     public bool CaseSensitiveName => true;
@@ -38,8 +39,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       EmptySubstitution.INSTANCE;
 
     // ReSharper disable once InconsistentNaming
-    public virtual XmlNode GetXMLDoc(bool inherit) =>
-      GetDeclaration() is { XmlDocBlock: { } xmlDocBlock } ? xmlDocBlock.GetXML(this as ITypeMember) : null;
+    public virtual XmlNode GetXMLDoc(bool inherit)
+    {
+      var declaration =
+        GetSourceFiles().FirstOrDefault(t => t.LanguageType is FSharpSignatureProjectFileType) is { } signatureFile
+          ? (TDeclaration)GetDeclarationsIn(signatureFile).FirstOrDefault()
+          : GetDeclaration();
+
+      return declaration is { XmlDocBlock: { } xmlDocBlock } ? xmlDocBlock.GetXML(this as ITypeMember) : null;
+    }
 
     // ReSharper disable once InconsistentNaming
     public XmlNode GetXMLDescriptionSummary(bool inherit) =>

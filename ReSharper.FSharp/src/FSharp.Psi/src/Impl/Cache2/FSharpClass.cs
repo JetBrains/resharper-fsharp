@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
@@ -20,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     protected override bool AcceptsPart(TypePart part) =>
       // todo: make UnionPart/RecordPart implement IFSharpClassPart, simplify this check
       part.ShortName == ShortName &&
-      part is IClassPart and IFSharpTypePart typePart and not IModulePart && 
+      part is IClassPart and IFSharpTypePart typePart and not IModulePart &&
       typePart.MeasureTypeParametersCount == MeasureTypeParametersCount;
 
     protected override MemberDecoration Modifiers => myParts.GetModifiers();
@@ -45,5 +47,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public IList<ITypeParameter> AllTypeParameters =>
       this.GetAllTypeParametersReversed();
+
+    public override XmlNode GetXMLDoc(bool inherit)
+    {
+      if (GetSourceFiles().FirstOrDefault(t => t.LanguageType is FSharpSignatureProjectFileType) is { } signatureFile)
+        return GetDeclarationsIn(signatureFile).FirstOrDefault()?.GetXMLDoc(inherit);
+      return base.GetXMLDoc(inherit);
+    }
   }
 }
