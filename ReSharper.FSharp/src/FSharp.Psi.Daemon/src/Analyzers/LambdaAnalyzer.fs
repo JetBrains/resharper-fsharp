@@ -105,17 +105,8 @@ type LambdaAnalyzer() =
         let reference = getReference app
         if not (app :? IPrefixAppExpr) || isNull reference then ctor arg else
 
-        // Is not named arg e.g. (argName = fun -> ...)
         if isNotNull binaryExpr &&
-           (binaryExpr.ShortName <> "=" ||
-            match argExpr with
-            | :? IParenExpr as parens ->
-                // M(.., (x = fun -> ...)
-                isNotNull appTuple ||
-                // M((x = fun -> ...))
-                parens.InnerExpression :? IParenExpr
-            | _ -> false)
-           then ctor arg else
+           not (hasNamedArgStructure binaryExpr && isTopLevelArg binaryExpr) then ctor arg else
 
         match reference.GetFcsSymbol() with
         | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
