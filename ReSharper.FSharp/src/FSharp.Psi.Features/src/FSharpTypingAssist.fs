@@ -1536,7 +1536,6 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         if not containsOnlySpaces then false else
 
-        // Check if new doc-comment block is being started
         context.CallNext()
         let file = x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id)
 
@@ -1550,7 +1549,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let docCommentBlockOffset = docCommentBlockNode.GetTreeStartOffset().Offset
         let coords = document.GetCoordsByOffset(docCommentBlockOffset)
         let docCommentBlockLine = coords.Line
-        
+
         let newLine = x.GetNewLineText(textControl)
         let lineStart = document.GetLineStartOffset(docCommentBlockLine)
         let indent = String(' ', docCommentBlockOffset - lineStart)
@@ -1559,9 +1558,11 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let struct(template, caretOffset) =
             XmlDocTemplateUtil.GetDocTemplate(docCommentBlockNode, templateLinePrefix, newLine);
 
-        document.DeleteText(TextRange(lineStart, docCommentBlockNode.GetDocumentEndOffset().Offset))
-        document.InsertText(lineStart, template)
-        textControl.Caret.MoveTo(lineStart + caretOffset - newLine.Length, CaretVisualPlacement.DontScrollIfVisible)
+        context.QueueCommand(fun _ ->
+            use _ = this.CommandProcessor.UsingCommand("Insert XmlDoc template")
+            document.DeleteText(TextRange(lineStart, docCommentBlockNode.GetDocumentEndOffset().Offset))
+            document.InsertText(lineStart, template)
+            textControl.Caret.MoveTo(lineStart + caretOffset - newLine.Length, CaretVisualPlacement.DontScrollIfVisible))
 
         true
 
