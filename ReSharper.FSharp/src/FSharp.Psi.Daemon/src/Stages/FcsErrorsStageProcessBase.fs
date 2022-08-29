@@ -307,7 +307,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | UnitTypeExpected ->
             let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
             let expr = getResultExpr expr
-            UnitTypeExpectedWarning(expr, error.Message) :> _
+            if isNotNull expr then UnitTypeExpectedWarning(expr, error.Message) else null
 
         | UseBindingsIllegalInModules ->
             createHighlightingFromNode UseBindingsIllegalInModulesWarning range
@@ -430,7 +430,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | x when startsWith expressionIsAFunctionMessage x ->
                 let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
                 let expr = getResultExpr expr
-                FunctionValueUnexpectedWarning(expr, error.Message) :> _
+                if isNotNull expr then FunctionValueUnexpectedWarning(expr, error.Message) else null
 
             | Regex typeConstraintMismatchMessage [mismatchedType; typeConstraint] ->
                 let highlighting =
@@ -444,7 +444,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 if isNotNull highlighting then highlighting :> _ else
 
                 let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                TypeConstraintMismatchError(mismatchedType, expr, error.Message)
+                if isNotNull expr then TypeConstraintMismatchError(mismatchedType, expr, error.Message) else null
 
             | _ -> null
 
