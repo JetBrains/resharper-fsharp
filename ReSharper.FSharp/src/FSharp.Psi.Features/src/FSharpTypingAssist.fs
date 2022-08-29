@@ -28,7 +28,6 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
 open JetBrains.Util
-open JetBrains.Util.Text
 
 [<SolutionComponent>]
 type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
@@ -1520,7 +1519,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         if offset < 3 then false else
 
         if not (lexer.FindTokenAt(offset - 1)) then false else
-        if not lexer.TokenType.IsComment then false else
+        if not (lexer.TokenType == FSharpTokenType.LINE_COMMENT) then false else
 
         let tokenLength = lexer.TokenEnd - lexer.TokenStart + 1
 
@@ -1530,11 +1529,11 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
            //// instead of ///
            tokenLength >= 4 && buffer[lexer.TokenStart + 3] = '/' then false else
 
-        let mutable containsOnlySpaces = true
-        for i in lexer.TokenStart + 3 .. lexer.TokenEnd - 1 do
-            if buffer[i] <> ' ' then containsOnlySpaces <- false
+        let mutable spaceCounter = lexer.TokenStart + 3
+        while buffer[spaceCounter] = ' ' && spaceCounter < lexer.TokenEnd do
+            spaceCounter <- spaceCounter + 1
 
-        if not containsOnlySpaces then false else
+        if spaceCounter <> lexer.TokenEnd then false else
 
         context.CallNext()
         let file = x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id)

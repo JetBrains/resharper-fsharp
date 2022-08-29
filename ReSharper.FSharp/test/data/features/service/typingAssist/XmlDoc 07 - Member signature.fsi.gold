@@ -7,5 +7,5 @@ type A =
     /// </summary>
     /// <param name="y"></param>
     /// <param name="z"></param>
-    /// <param name="n"></param>
-    member M: y: int * z: int -> n: int -> int
+    /// <param name="ded sec"></param>
+    member M: y: int * z: int -> ``ded sec``: int -> int

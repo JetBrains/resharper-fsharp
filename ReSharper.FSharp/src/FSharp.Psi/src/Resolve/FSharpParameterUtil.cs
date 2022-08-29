@@ -96,11 +96,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       .Select(t => t.ToIReadOnlyList())
       .ToIReadOnlyList();
 
-    private static bool IsSimplePattern(IFSharpPattern pattern) => pattern.IgnoreInnerParens() switch
+    private static bool IsSimplePattern(IFSharpPattern pattern, bool isTopLevel) => pattern.IgnoreInnerParens() switch
     {
-      ILocalReferencePat or IAttribPat or ITypedPat or IUnitPat or IWildPat => true,
-      ITuplePat tuplePat => tuplePat.PatternsEnumerable.All(t =>
-        t.IgnoreInnerParens() is ILocalReferencePat or IAttribPat or ITypedPat or IWildPat),
+      ILocalReferencePat or IAttribPat or ITypedPat or IWildPat => true,
+      IUnitPat => isTopLevel,
+      ITuplePat tuplePat => isTopLevel && tuplePat.PatternsEnumerable.All(t => IsSimplePattern(t, false)),
       _ => false
     };
 
@@ -108,7 +108,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       var lambdaParams = expr.Patterns;
       var parameters = lambdaParams.Select(GetParameterNames);
-      if (expr.Expression is ILambdaExpr innerLambda && lambdaParams.All(IsSimplePattern))
+      if (expr.Expression is ILambdaExpr innerLambda && lambdaParams.All(pattern => IsSimplePattern(pattern, true)))
         parameters = parameters.Union(GetLambdaArgs(innerLambda));
       return parameters;
     }
