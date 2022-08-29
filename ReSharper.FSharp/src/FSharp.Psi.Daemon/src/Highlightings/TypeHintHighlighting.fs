@@ -1,12 +1,11 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 
 open System
-open JetBrains.Application.InlayHints
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.TextControl.DocumentMarkup
+open JetBrains.TextControl.DocumentMarkup.IntraTextAdornments
 open JetBrains.UI.RichText
 
 [<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
@@ -40,16 +39,14 @@ and [<SolutionComponent>] TypeHintAdornmentProvider() =
         member x.CreateDataModel(highlighter) =
             match highlighter.UserData with
             | :? TypeHintHighlighting as thh ->
+                let data =
+                    IntraTextAdornmentData(thh.Text, null, enum 0, IntraTextPlacement.DefaultBeforeThisChar,
+                        InlayHintsMode.Default)
+                
                 { new IIntraTextAdornmentDataModel with
-                    override x.Text = thh.Text
-                    override x.HasContextMenu = false
                     override x.ContextMenuTitle = null
                     override x.ContextMenuItems = null
-                    override x.IsNavigable = false
                     override x.ExecuteNavigation _ = ()
                     override x.SelectionRange = Nullable()
-                    override x.IconId = null
-                    override x.IsPreceding = false
-                    override x.Order = 0
-                    override x.InlayHintsMode = InlayHintsMode.Default }
+                    override x.Data = data }
             | _ -> null
