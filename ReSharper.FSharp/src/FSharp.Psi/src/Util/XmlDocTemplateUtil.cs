@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Text;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
