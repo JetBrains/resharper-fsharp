@@ -99,7 +99,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private static bool IsSimplePattern(IFSharpPattern pattern) => pattern.IgnoreInnerParens() switch
     {
       ILocalReferencePat or IAttribPat or ITypedPat or IUnitPat or IWildPat => true,
-      ITuplePat tuplePat => tuplePat.PatternsEnumerable.All(IsSimplePattern),
+      ITuplePat tuplePat => tuplePat.PatternsEnumerable.All(t => t.IgnoreInnerParens() is ILocalReferencePat),
       _ => false
     };
 
