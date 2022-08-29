@@ -78,7 +78,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
             assertHasErrorsAndProjectReferences("FSharpProject/Library.fs", false, listOf("CSharpProject"))
 
             waitForDaemonCloseAllOpenEditors(project)
-            deleteElement(project, arrayOf("ProjectReferencesFSharp", "FSharpProject", "Dependencies", ".NETStandard 2.0", "Projects", "CSharpProject/1.0.0"))
+            deleteElement(project, arrayOf("ProjectReferencesCSharp", "FSharpProject", "Dependencies", ".NETStandard 2.0", "Projects", "CSharpProject/1.0.0"))
             assertHasErrorsAndProjectReferences("FSharpProject/Library.fs", true, emptyList())
 
             waitForDaemonCloseAllOpenEditors(project)
@@ -101,7 +101,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
         assertHasErrorsAndProjectReferences("FSharpProject/Library.fs", false, emptyList())
 
         waitForDaemonCloseAllOpenEditors(project)
-        deleteElement(project, arrayOf("ProjectReferencesFSharp", "FSharpProject", "Dependencies", ".NETStandard 2.0", "Projects", "CSharpProject/1.0.0"))
+        deleteElement(project, arrayOf("ProjectReferencesCSharp", "FSharpProject", "Dependencies", ".NETStandard 2.0", "Projects", "CSharpProject/1.0.0"))
         assertHasErrorsAndProjectReferences("FSharpProject/Library.fs", true, emptyList())
 
         waitForDaemonCloseAllOpenEditors(project)
