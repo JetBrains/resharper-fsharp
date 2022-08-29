@@ -96,11 +96,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       .Select(t => t.ToIReadOnlyList())
       .ToIReadOnlyList();
 
+    private static bool IsSimplePattern(IFSharpPattern pattern) => pattern.IgnoreInnerParens() switch
+    {
+      ILocalReferencePat or IAttribPat or ITypedPat or IUnitPat or IWildPat => true,
+      ITuplePat tuplePat => tuplePat.PatternsEnumerable.All(IsSimplePattern),
+      _ => false
+    };
+
     private static IEnumerable<IEnumerable<string>> GetLambdaArgs(ILambdaExpr expr)
     {
       var lambdaParams = expr.Patterns;
       var parameters = lambdaParams.Select(GetParameterNames);
-      if (expr.Expression is ILambdaExpr innerLambda && !lambdaParams.Any(t => t.IgnoreInnerParens() is IAsPat))
+      if (expr.Expression is ILambdaExpr innerLambda && lambdaParams.All(IsSimplePattern))
         parameters = parameters.Union(GetLambdaArgs(innerLambda));
       return parameters;
     }

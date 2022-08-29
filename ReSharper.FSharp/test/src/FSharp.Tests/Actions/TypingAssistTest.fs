@@ -341,6 +341,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``XmlDoc 01 - Binding``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 02 - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 02 - Lambda 02``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 02 - Lambda 03``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 03 - Type``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 04 - Union case``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 05 - Abstract member``() = x.DoNamedTest()

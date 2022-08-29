@@ -1,0 +1,16 @@
+﻿// ${CHAR:<}
+module Module
+
+/// <summary>
+/// {caret}
+/// </summary>
+/// <param name="a"></param>
+/// <param name="b"></param>
+/// <param name="c"></param>
+/// <param name="d"></param>
+/// <param name="e"></param>
+/// <param name="f"></param>
+/// <param name="n"></param>
+let f a =
+    fun (b) (c: int) ([<NotNull>] d) (e, f) () _ ->
+        fun n -> 5
