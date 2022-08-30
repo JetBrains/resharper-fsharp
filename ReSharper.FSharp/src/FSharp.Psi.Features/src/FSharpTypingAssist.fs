@@ -13,6 +13,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Options
 open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -559,7 +560,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         manager.AddTypingHandler(lifetime, '}', this, Func<_,_>(this.HandleRightBracket), isSmartParensHandlerAvailable)
         manager.AddTypingHandler(lifetime, '>', this, Func<_,_>(this.HandleRightBracket), isSmartParensHandlerAvailable)
 
-        manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleRightAngleBracketTyped), isSmartParensHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleRightAngleBracketTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '@', this, Func<_,_>(this.HandleAtTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '|', this, Func<_,_>(this.HandleBarTyped), isTypingHandlerAvailable)
 
@@ -1432,7 +1433,9 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let textControl = context.TextControl
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
-        x.HandleAngleBracketsInList(context, lexer)
+
+        x.IsTypingSmartParenthesisHandlerAvailable2(context) && x.HandleAngleBracketsInList(context, lexer)
+        || x.HandleXmlDocTag(context, lexer)
 
     member x.HandleAngleBracketsInList(context, lexer: CachingLexer) =
         insertCharInBrackets context lexer angledBracketsChars listBrackets LeftBracketOnly.Yes
@@ -1488,9 +1491,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         if x.SkipCharInRightBracket(context, lexer, offset) then true else
         if x.MakeQuotation(textControl, lexer, offset) then true else
-        if x.MakeEmptyQuotationUntyped(context, lexer, offset) then true else
-
-        false
+        x.MakeEmptyQuotationUntyped(context, lexer, offset)
 
     member x.MakeQuotation(textControl: ITextControl, lexer: CachingLexer, offset) =
         if lexer.TokenType != FSharpTokenType.LESS then false else
@@ -1508,6 +1509,61 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             true else
 
         insertCharInBrackets context lexer atChars typedQuotationBrackets LeftBracketOnly.No
+
+    member x.HandleXmlDocTag(context: ITypingContext, lexer) =
+        let textControl = context.TextControl
+        let document = textControl.Document
+        let offset = textControl.Caret.Offset()
+        let buffer = lexer.Buffer
+
+        if offset < 3 then false else
+
+        if not (lexer.FindTokenAt(offset - 1)) then false else
+        if not (lexer.TokenType == FSharpTokenType.LINE_COMMENT) then false else
+
+        let tokenLength = lexer.TokenEnd - lexer.TokenStart + 1
+
+        if tokenLength < 3 ||
+           // instead of ///
+           buffer[lexer.TokenStart + 2] <> '/' ||
+           //// instead of ///
+           tokenLength >= 4 && buffer[lexer.TokenStart + 3] = '/' then false else
+
+        let mutable spaceCounter = lexer.TokenStart + 3
+        while buffer[spaceCounter] = ' ' && spaceCounter < lexer.TokenEnd do
+            spaceCounter <- spaceCounter + 1
+
+        if spaceCounter <> lexer.TokenEnd then false else
+
+        context.CallNext()
+        let file = x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id)
+
+        let tokenNode = file.FindTokenAt(TreeOffset(offset)).As<DocComment>()
+        if isNull tokenNode then true else
+
+        let docCommentBlockNode = tokenNode.Parent.As<IDocCommentBlock>()
+
+        if isNull docCommentBlockNode || not docCommentBlockNode.IsSingleLine then true else
+
+        let docCommentBlockOffset = docCommentBlockNode.GetTreeStartOffset().Offset
+        let coords = document.GetCoordsByOffset(docCommentBlockOffset)
+        let docCommentBlockLine = coords.Line
+
+        let newLine = x.GetNewLineText(textControl)
+        let lineStart = document.GetLineStartOffset(docCommentBlockLine)
+        let indent = document.GetText(TextRange(lineStart, docCommentBlockOffset))
+        let templateLinePrefix = indent + "/// "
+
+        let struct(template, caretOffset) =
+            XmlDocTemplateUtil.GetDocTemplate(docCommentBlockNode, templateLinePrefix, newLine);
+
+        context.QueueCommand(fun _ ->
+            use _ = this.CommandProcessor.UsingCommand("Insert XmlDoc template")
+            document.DeleteText(TextRange(lineStart, docCommentBlockNode.GetDocumentEndOffset().Offset))
+            document.InsertText(lineStart, template)
+            textControl.Caret.MoveTo(lineStart + caretOffset - newLine.Length, CaretVisualPlacement.DontScrollIfVisible))
+
+        true
 
     member x.TrimTrailingSpacesAtOffset(textControl: ITextControl, startOffset: byref<int>, trimAfterCaret) =
         let isWhitespace c =

@@ -1,0 +1,12 @@
+﻿// ${CHAR:<}
+module Module
+
+type A =
+    /// <summary>
+    /// {caret}
+    /// </summary>
+    /// <param name="y"></param>
+    /// <param name="i"></param>
+    /// <param name="ded sec"></param>
+    /// <param name="z"></param>
+    member x.M(y: int, (a: int, b: int), _: int, [<NotNull>] i: int) (``ded sec``, ?z) = ()

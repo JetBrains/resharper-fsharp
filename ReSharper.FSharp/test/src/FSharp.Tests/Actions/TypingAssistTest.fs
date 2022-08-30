@@ -332,6 +332,30 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Backticks 05 - Before keyword``() = x.DoNamedTest()
     [<Test>] member x.``Backticks 06 - Eof``() = x.DoNamedTest()
 
+    [<Test>] member x.``XmlDoc - Not available 01``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc - Not available 02``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc - Not available 03``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc - Indent 01``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc - Indent 02``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc - Indent 03``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 01 - Binding``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 02 - Lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 02 - Lambda 02``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 02 - Lambda 03``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 03 - Type``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 04 - Union case``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 05 - Abstract member``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 06 - Type member 01``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 06 - Type member 02 - Primary constructor``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 06 - Type member 03 - Secondary constructor``() = x.DoNamedTest()
+
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``XmlDoc 07 - Member signature``() = x.DoNamedTest()
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``XmlDoc 08 - Module value``() = x.DoNamedTest()
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``XmlDoc 09 - Constructor signature``() = x.DoNamedTest()
+
 [<FSharpTest>]
 type LineIndentsTest() =
     inherit LineIndentsTestBase()
