@@ -1551,7 +1551,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         let newLine = x.GetNewLineText(textControl)
         let lineStart = document.GetLineStartOffset(docCommentBlockLine)
-        let indent = String(' ', docCommentBlockOffset - lineStart)
+        let indent = document.GetText(TextRange(lineStart, docCommentBlockOffset))
         let templateLinePrefix = indent + "/// "
 
         let struct(template, caretOffset) =
