@@ -8,16 +8,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
   {
     private readonly ProvidedExprType myExprType;
 
-    public DummyProvidedExpr(ProvidedType type, ProvidedExprType exprType, ProvidedTypeContext context)
+    public DummyProvidedExpr(ProvidedType type, ProvidedTypeContext context)
       : base(FSharpExpr.Value(0), context)
     {
-      myExprType = exprType;
+      myExprType = ProvidedExprType.NewProvidedConstantExpr(null, type);
       Type = type;
-    }
-
-    public DummyProvidedExpr(ProvidedExprType exprType, ProvidedTypeContext context)
-      : this(null, exprType, context)
-    {
     }
 
     public override ProvidedType Type { get; }

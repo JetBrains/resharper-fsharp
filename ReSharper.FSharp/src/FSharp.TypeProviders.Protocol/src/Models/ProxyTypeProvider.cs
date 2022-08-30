@@ -83,14 +83,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       methodBase switch
       {
         ProvidedMethodInfo info =>
-          new DummyProvidedExpr(info.ReturnType,
-            ProvidedExprType.NewProvidedCallExpr(null, info, Array.Empty<ProvidedExpr>()), methodBase.Context),
-
-        ProvidedConstructorInfo info =>
-          new DummyProvidedExpr(ProvidedExprType.NewProvidedNewObjectExpr(info, Array.Empty<ProvidedExpr>()),
+          new DummyProvidedExpr(
+            // Is unit of measure e.g. decimal<m>
+            info.ReturnType is { IsGenericType: true } &&
+            info.ReturnType.GetGenericTypeDefinition() is { IsGenericType: false } unitOfMeasureUnderlyingType
+              ? unitOfMeasureUnderlyingType
+              : info.ReturnType,
             methodBase.Context),
 
-        { } info => throw new ArgumentException($"Unexpected MethodBase: {info}"),
+        ProvidedConstructorInfo info => new DummyProvidedExpr(info.DeclaringType, methodBase.Context),
+
+        { } => throw new ArgumentException($"Unexpected MethodBase: {methodBase}"),
         _ => throw new ArgumentException($"Unexpected MethodBase"),
       };
 
