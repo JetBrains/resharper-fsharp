@@ -82,19 +82,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public ProvidedExpr GetInvokerExpression(ProvidedMethodBase methodBase, ProvidedVar[] paramExprs) =>
       methodBase switch
       {
-        ProvidedMethodInfo info =>
-          new DummyProvidedExpr(
-            // Is unit of measure e.g. decimal<m>
-            info.ReturnType is { IsGenericType: true } &&
-            info.ReturnType.GetGenericTypeDefinition() is { IsGenericType: false } unitOfMeasureUnderlyingType
-              ? unitOfMeasureUnderlyingType
-              : info.ReturnType,
-            methodBase.Context),
-
-        ProvidedConstructorInfo info => new DummyProvidedExpr(info.DeclaringType, methodBase.Context),
-
+        ProvidedMethodInfo info => new DummyProvidedExpr(info),
+        ProvidedConstructorInfo info => new DummyProvidedExpr(info),
         { } => throw new ArgumentException($"Unexpected MethodBase: {methodBase}"),
-        _ => throw new ArgumentException($"Unexpected MethodBase"),
+        _ => throw new ArgumentException("Unexpected MethodBase"),
       };
 
     public string GetDisplayName(bool fullName) => fullName ? myRdTypeProvider.FullName : myRdTypeProvider.Name;

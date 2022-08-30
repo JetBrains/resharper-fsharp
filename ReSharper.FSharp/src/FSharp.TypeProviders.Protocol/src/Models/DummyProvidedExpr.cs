@@ -1,4 +1,5 @@
-﻿using Microsoft.FSharp.Core;
+﻿using JetBrains.Util;
+using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Quotations;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -8,11 +9,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
   {
     private readonly ProvidedExprType myExprType;
 
-    public DummyProvidedExpr(ProvidedType type, ProvidedTypeContext context)
-      : base(FSharpExpr.Value(0), context)
+    public DummyProvidedExpr(ProvidedMethodInfo info) : base(FSharpExpr.Value(0), info.Context)
     {
-      myExprType = ProvidedExprType.NewProvidedConstantExpr(null, type);
-      Type = type;
+      // Is unit of measure e.g. decimal<m>
+      if (info.ReturnType is { IsGenericType: true } &&
+          info.ReturnType.GetGenericTypeDefinition() is { IsGenericType: false } unitOfMeasureUnderlyingType)
+      {
+        Type = unitOfMeasureUnderlyingType;
+        myExprType = ProvidedExprType.NewProvidedConstantExpr(null, unitOfMeasureUnderlyingType);
+      }
+      else
+      {
+        Type = info.ReturnType;
+        myExprType = ProvidedExprType.NewProvidedCallExpr(null, info, EmptyArray<ProvidedExpr>.Instance);
+      }
+    }
+
+    public DummyProvidedExpr(ProvidedConstructorInfo info) : base(FSharpExpr.Value(0), info.Context)
+    {
+      Type = info.DeclaringType;
+      myExprType = ProvidedExprType.NewProvidedConstantExpr(null, info.DeclaringType);
     }
 
     public override ProvidedType Type { get; }
