@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators
       if (isClass) flags |= RdProvidedTypeFlags.IsClass;
       if (isValueType) flags |= RdProvidedTypeFlags.IsValueType;
       if (logger.Catch(() => providedModel.IsVoid)) flags |= RdProvidedTypeFlags.IsVoid;
-      if (logger.Catch(() => providedModel.IsEnum)) flags |= RdProvidedTypeFlags.IsEnum;
+      if (logger.Catch(() => !isClass && providedModel.IsEnum)) flags |= RdProvidedTypeFlags.IsEnum;
       if (logger.Catch(() => providedModel.IsArray)) flags |= RdProvidedTypeFlags.IsArray;
       if (logger.Catch(() => providedModel.IsByRef)) flags |= RdProvidedTypeFlags.IsByRef;
       if (logger.Catch(() => providedModel.IsSealed)) flags |= RdProvidedTypeFlags.IsSealed;

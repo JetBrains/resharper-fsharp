@@ -32,6 +32,14 @@ class TypeProvidersTest : BaseTestWithSolution() {
     @TestEnvironment(solution = "LegacyTypeProviderLibrary")
     fun legacyTypeProviders() = doTest("LegacyTypeProviders")
 
+    @Test
+    @TestEnvironment(
+        solution = "CsvTypeProvider",
+        toolset = ToolsetVersion.TOOLSET_17_CORE,
+        coreVersion = CoreVersion.DOT_NET_6
+    )
+    fun `csvProvider - units of measure`() = doTest("Library")
+
     private fun doTest(fileName: String) {
         withOpenedEditor(project, "TypeProviderLibrary/$fileName.fs") {
             waitForDaemon()
