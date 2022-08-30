@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
 open System
 open JetBrains.Application.Components
-open JetBrains.Application.changes
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -10,25 +9,20 @@ open JetBrains.ReSharper.Daemon.Impl
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
-open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open NUnit.Framework
 
 [<SolutionComponent>]
-type TestAssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager,
-        psiModules: IPsiModules, cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim,
-        checkerService: FcsCheckerService, fsOptionsProvider: FSharpOptionsProvider, symbolCache: ISymbolCache) =
+type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
+        fsOptionsProvider, symbolCache, solution) =
     inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
-        fsOptionsProvider, symbolCache)
+        fsOptionsProvider, symbolCache, solution)
 
     let mutable projectPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
     let mutable projectPsiModule = null
@@ -42,7 +36,7 @@ type TestAssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager,
     member this.CreateProjectCookie(path: VirtualFileSystemPath, psiModule: IPsiModule) =
         projectPath <- path
         projectPsiModule <- psiModule
-        reader <- new ProjectFcsModuleReader(projectPsiModule, cache, this, path)
+        reader <- new ProjectFcsModuleReader(projectPsiModule, cache, path)
 
         { new IDisposable with
             member x.Dispose() =

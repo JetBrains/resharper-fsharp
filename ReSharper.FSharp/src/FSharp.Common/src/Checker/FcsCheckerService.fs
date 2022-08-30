@@ -121,10 +121,14 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
         ProhibitTypeCheckCookie.AssertTypeCheckIsAllowed()
 
-        match x.FcsProjectProvider.GetProjectOptions(sourceFile) with
+        let psiModule = sourceFile.PsiModule
+        match x.FcsProjectProvider.GetFcsProject(psiModule) with
         | None -> None
-        | Some(options) ->
+        | Some fcsProject ->
 
+        x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
+
+        let options = fcsProject.ProjectOptions
         let path = sourceFile.GetLocation().FullPath
         let source = FcsCheckerService.getSourceText sourceFile.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
@@ -212,6 +216,16 @@ type FSharpParseAndCheckResults =
       CheckResults: FSharpCheckFileResults }
 
 
+type ReferencedModule =
+    { ReferencedPath: VirtualFileSystemPath
+      ReferencingModules: HashSet<IPsiModule> }
+
+module ReferencedModule =
+    let create (modulePathProvider: ModulePathProvider) (psiModule: IPsiModule) =
+        { ReferencedPath = modulePathProvider.GetModulePath(psiModule)
+          ReferencingModules = HashSet() }
+
+
 type IFcsProjectProvider =
     abstract GetFcsProject: psiModule: IPsiModule -> FcsProject option
     abstract GetPsiModule: outputPath: VirtualFileSystemPath -> IPsiModule option
@@ -230,6 +244,11 @@ type IFcsProjectProvider =
 
     abstract InvalidateDirty: unit -> unit
     abstract ModuleInvalidated: ISignal<IPsiModule>
+
+    abstract PrepareAssemblyShim: psiModule: IPsiModule -> unit 
+
+    abstract GetReferencedModule: psiModule: IPsiModule -> ReferencedModule option 
+    abstract GetAllReferencedModules: unit -> KeyValuePair<IPsiModule, ReferencedModule> seq
 
     /// True when any F# projects are currently known to project options provider after requesting info from FCS.
     abstract HasFcsProjects: bool

@@ -247,7 +247,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 outputPathToPsiModule[fcsProject.OutputPath] <- psiModule
 
                 projectsPsiModules.Add(project, psiModule) |> ignore
-                fcsAssemblyReaderShim.RecordDependencies(psiModule)
 
                 let projectMark = project.GetProjectMark()
                 projectsProjectMarks[projectMark] <- project
@@ -352,6 +351,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
     interface IFcsProjectProvider with
         member x.GetProjectOptions(sourceFile: IPsiSourceFile) =
+            use lock = FcsReadWriteLock.ReadCookie.Create()
+            locks.AssertReadAccessAllowed()
+            processDirtyFcsProjects ()
+
             let psiModule = sourceFile.PsiModule
 
             // Scripts belong to separate psi modules even when are in projects, project/misc module check is enough.
@@ -436,17 +439,48 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         member this.GetPsiModule(outputPath) =
             tryGetValue outputPath outputPathToPsiModule
 
-/// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
+        member this.GetReferencedModule(psiModule) =
+            tryGetValue psiModule referencedModules
+
+        member this.GetAllReferencedModules() =
+            referencedModules
+
+        member this.PrepareAssemblyShim(psiModule) =
+            if not fcsAssemblyReaderShim.IsEnabled then () else
+
+            lock this (fun _ ->
+                // todo: check that dirty modules are visible to the current one
+                if not fcsAssemblyReaderShim.HasDirtyTypes then () else
+
+                match tryGetFcsProject psiModule with
+                | None -> ()
+                | Some fcsProject ->
+
+                fcsAssemblyReaderShim.InvalidateDirty()
+                use barrier = locks.Tasks.CreateBarrier(lifetime)
+                for referencedModule in fcsProject.ReferencedModules do
+                    if isProjectModule referencedModule && not (isFSharpProjectModule referencedModule) then
+                        barrier.EnqueueJob(fun _ -> fcsAssemblyReaderShim.InvalidateDirty(referencedModule)))
+
+
+/// Invalidates psi caches when either a non-F# project or F# project containing generative type providers is built
+/// which makes FCS cached resolve results stale
 [<SolutionComponent>]
 type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,
         psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
-        typeProvidersShim: IProxyExtensionTypingProvider) =
+        typeProvidersShim: IProxyExtensionTypingProvider, fcsAssemblyReaderShim: IFcsAssemblyReaderShim) =
     do
-        scheduler.EnqueueTask(SolutionLoadTask("FSharpProjectOptionsProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
+        scheduler.EnqueueTask(SolutionLoadTask("FcsProjectProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
             // todo: track file system changes instead? This currently may be triggered on a project model change too.
             outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
-                if not fcsProjectProvider.HasFcsProjects ||
-                   project.IsFSharp && not (typeProvidersShim.HasGenerativeTypeProviders(project)) then () else
+                // No FCS caches to invalidate.
+                if not fcsProjectProvider.HasFcsProjects then () else
+
+                // Only invalidate on F# project changes when project contains generative type providers
+                if project.IsFSharp && not (typeProvidersShim.HasGenerativeTypeProviders(project)) then () else
+
+                // The project change is visible to FCS without build.
+                // if fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedProject project then () else
 
                 if fcsProjectProvider.InvalidateReferencesToProject(project) then
                     psiFiles.IncrementModificationTimestamp(null) // Drop cached values.

@@ -20,16 +20,6 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
-type ReferencedModule =
-    { ReferencedPath: VirtualFileSystemPath
-      ReferencingModules: HashSet<IPsiModule> }
-
-module ReferencedModule =
-    let create (modulePathProvider: ModulePathProvider) (psiModule: IPsiModule) =
-        { ReferencedPath = modulePathProvider.GetModulePath(psiModule)
-          ReferencingModules = HashSet() }
-
-
 [<ShellComponent>]
 type FSharpTargetsProjectLoadModificator() =
     let fsTargets =

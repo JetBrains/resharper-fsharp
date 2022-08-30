@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 
 open System
 open FSharp.Compiler.AbstractIL.ILBinaryReader
-open JetBrains.Metadata.Reader.API
 open JetBrains.ReSharper.Psi.Modules
 
 type IProjectFcsModuleReader =
@@ -12,14 +11,16 @@ type IProjectFcsModuleReader =
     abstract PsiModule: IPsiModule
     abstract Timestamp: DateTime
 
-    abstract Invalidate: unit -> unit
-    abstract CreateAllTypeDefs: unit -> unit
+    /// Marks as possibly needing the timestamp update
+    abstract MarkDirty: unit -> unit
 
-    // todo: change to shortName, update short names dict too
-    abstract InvalidateTypeDef: typeName: IClrTypeName -> unit
-    abstract InvalidateReferencingTypes: shortName: string -> unit
-    abstract InvalidateTypesReferencingFSharpModule: psiModule: IPsiModule -> unit
+    /// Removes created type defs with changed type parts
+    abstract InvalidateTypeDefs: shortName: string -> unit
 
+    /// Removes all created type defs due to invalidation requested externally, e.g. when references assemblies change
+    abstract InvalidateAllTypeDefs: unit -> unit
+
+    /// Removes outdated type defs and updates module timestamp if needed
     abstract UpdateTimestamp: unit -> unit
 
     /// Debug data, disabled by default
@@ -46,6 +47,8 @@ module ReferencedAssembly =
 
 type IFcsAssemblyReaderShim =
     abstract IsEnabled: bool
+    abstract HasDirtyTypes: bool
+
     abstract GetModuleReader: psiModule: IPsiModule -> ReferencedAssembly
 
     abstract IsKnownModule: IPsiModule -> bool
@@ -59,8 +62,8 @@ type IFcsAssemblyReaderShim =
     /// Clears dirty type defs, updating reader timestamps if needed
     abstract InvalidateDirty: unit -> unit
 
-    /// Record referenced project chains, later used for invalidation
-    abstract RecordDependencies: psiModule: IPsiModule -> unit
+    /// Clears dirty type defs, updating reader timestamps if needed
+    abstract InvalidateDirty: psiModule: IPsiModule -> unit
 
     abstract RemoveModule: psiModule: IPsiModule -> unit
 
