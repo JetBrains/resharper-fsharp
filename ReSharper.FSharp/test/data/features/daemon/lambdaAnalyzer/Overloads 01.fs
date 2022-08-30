@@ -18,8 +18,14 @@ type A1 =
 
 type B1 =
     static member B(x: Func<int, int>) = ()
+    static member B(x: int, y: Func<int, int>) = ()
 
 B1.B(fun x -> A1.M x)
+B1.B(x = fun x -> A1.M x)
+B1.B((x = fun x -> A1.M x)) //OK
+B1.B(1, (fun x -> A1.M x))
+B1.B(1, y = (fun x -> A1.M x))
+B1.B(1, (y = fun x -> A1.M x)) //OK
 B1.B(A1.M) //ERROR
 B1.B(fun x -> x)
 B1.B(id) //OK

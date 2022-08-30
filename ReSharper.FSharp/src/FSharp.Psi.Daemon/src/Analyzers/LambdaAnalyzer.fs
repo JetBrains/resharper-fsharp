@@ -85,11 +85,6 @@ type LambdaAnalyzer() =
 
         compareArgsRec expr 0 null
 
-    let isNamedArg (expr: IBinaryAppExpr) =
-        match expr.Parent with
-        | :? IParenExpr -> false
-        | _ -> expr.ShortName = "="
-
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
         let lambda = lambda.IgnoreParentParens()
 
@@ -102,13 +97,16 @@ type LambdaAnalyzer() =
         | _ ->
 
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
-        if isNotNull binaryExpr && not (isNamedArg binaryExpr) then ctor arg else
         let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
+        let argExpr = argExpr.IgnoreParentParens()
         let appTuple = TupleExprNavigator.GetByExpression(argExpr)
         let app = getArgsOwner argExpr
 
         let reference = getReference app
         if not (app :? IPrefixAppExpr) || isNull reference then ctor arg else
+
+        if isNotNull binaryExpr &&
+           not (hasNamedArgStructure binaryExpr && isTopLevelArg binaryExpr) then ctor arg else
 
         match reference.GetFcsSymbol() with
         | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
@@ -124,7 +122,7 @@ type LambdaAnalyzer() =
             let parameterType = parameterDecl.Type
             let parameterIsDelegate =
                 parameterType.HasTypeDefinition && (getAbbreviatedEntity parameterType.TypeDefinition).IsDelegate
-                
+
             // If the lambda is passed instead of a delegate,
             // then in F# < 6.0 there is almost never an implicit cast for the lambda simplification 
             if parameterIsDelegate && not isFSharp6Supported then null else
