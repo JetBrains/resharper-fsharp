@@ -19,7 +19,7 @@ let private (|DeclaredNameInPattern|_|) (pat:IFSharpPattern) =
 let tryMkBindingSignature
     (letBindings: ILetBindings)
     (moduleDecl: IModuleDeclaration)
-    : (IBindingSignature * IFSharpSigFile) option
+    : (IBindingSignature *  IOpenStatement list * IFSharpSigFile) option
     =
     if isNull moduleDecl then None else
     
@@ -46,6 +46,7 @@ let tryMkBindingSignature
     let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
     let types = FcsTypeUtil.getFunctionTypeArgs true mfv.FullType
     let parameters = binding.ParametersDeclarations
+
     let rec getTypeName (t:FSharpType) : string =
         if t.HasTypeDefinition then
             if Seq.isEmpty t.GenericArguments then
@@ -81,6 +82,32 @@ let tryMkBindingSignature
             |> String.concat " * "
         else
             "???"
+
+    let rec visitAccessPath (t: FSharpType) : string list =
+        [
+            if t.HasTypeDefinition then
+                yield t.TypeDefinition.AccessPath
+            if not t.IsGenericParameter && not (Seq.isEmpty t.GenericArguments) then
+                yield! (Seq.collect visitAccessPath t.GenericArguments)
+        ]
+
+    let alwaysOpen =
+        set
+            [|
+                "Microsoft.FSharp.Core"
+                "Microsoft.FSharp.Collections"
+                sigDecl.CompiledName
+            |]
+    
+    let openStatements =
+        List.collect visitAccessPath types
+        |> List.filter (fun p -> Set.contains p alwaysOpen |> not)
+        |> List.distinct
+        |> List.partition (fun p -> p.StartsWith("System"))
+        |> fun (systemPaths, otherPaths) ->
+            [ yield! List.sort systemPaths
+              yield! otherPaths ]
+        |> List.map elementFactory.CreateOpenStatement
 
     let namedParameters =
         Seq.zip types parameters
@@ -126,4 +153,4 @@ let tryMkBindingSignature
     let sigDeclNode : IBindingSignature = elementFactory.CreateBindingSignature(isInline, accessibility, name, signature)
     let signatureFile = sigDecl.Parent :?> IFSharpSigFile
 
-    Some (sigDeclNode, signatureFile)
+    Some (sigDeclNode, openStatements, signatureFile)

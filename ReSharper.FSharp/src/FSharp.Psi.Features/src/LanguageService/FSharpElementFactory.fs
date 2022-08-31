@@ -21,6 +21,7 @@ open JetBrains.ReSharper.Resources.Shell
 
 type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: IPsiSourceFile, psiModule: IPsiModule) =
     let [<Literal>] moniker = "F# element factory"
+    let isSignatureFile = sourceFile.LanguageType.Name = "F# Signature"
 
     let getNamingService () =
         NamingManager.GetNamingLanguageService(FSharpLanguage.Instance)
@@ -98,13 +99,20 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         let expr = createLetExpr (sprintf "(a: %s)" usage)
         expr.Bindings[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().TypeUsage
 
+    let wrapInModule code = $"module A\n\n{code}"
+    
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
             // todo: mangle ns
             let source = "open " + ns
-            let moduleDeclaration = getModuleDeclaration source
+            let moduleDeclaration =
+                if isSignatureFile then
+                    wrapInModule source
+                    |> getModuleMember
+                else
+                    (getModuleDeclaration source).Members.First()
 
-            moduleDeclaration.Members.First() :?> _
+            moduleDeclaration :?> _
 
         member x.CreateWildPat() =
             let source = "let _ = ()"

@@ -43,7 +43,7 @@ type UpdateSignatureFileFix(binding: IBinding) =
 
         match SignatureFile.tryMkBindingSignature letBindings moduleDecl with
         | None -> ()
-        | Some (sigDeclNode, sigFile) ->
+        | Some (sigDeclNode, _, sigFile) ->
             
         let implHeadPat =
             let binding = letBindings.Bindings.FirstOrDefault() in

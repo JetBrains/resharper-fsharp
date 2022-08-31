@@ -6,13 +6,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 
 [<ContextAction(Name = "AddFunctionToSignatureFile", Group = "F#", Description = "Add function to signature file")>]
 type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
-
+    
     let getSignatureLocation () =
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
         if isNull letBindings then None else
@@ -24,6 +25,8 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
         | null -> None
         | pat -> pat.GetFcsSymbol().SignatureLocation
 
+    let addChildAfter child anchor = ModificationUtil.AddChildAfter(anchor, child)
+    
     override x.Text = "Add to signature file"
     override this.IsAvailable _ =
         let currentFSharpFile = dataProvider.PsiFile
@@ -43,10 +46,20 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
 
         match SignatureFile.tryMkBindingSignature letBindings moduleDecl with
         | None -> null
-        | Some (sigDeclNode, sigFile) ->
-            let lastChild = sigFile.LastChild
-            let lastChild = ModificationUtil.AddChildAfter(lastChild, NewLine(sigDeclNode.GetLineEnding()))
-            let lastChild = ModificationUtil.AddChildAfter(lastChild, sigDeclNode)
-            ModificationUtil.AddChildAfter(lastChild, NewLine(sigDeclNode.GetLineEnding())) |> ignore
+        | Some (sigDeclNode, openStatements, sigFile) ->
+            let newlineNode = NewLine(sigDeclNode.GetLineEnding()) :> ITreeNode
+            
+            sigFile.LastChild
+            |> addChildAfter newlineNode
+            |> fun lastChild ->
+                if List.isEmpty openStatements then
+                    lastChild
+                else
+                    (lastChild, openStatements)
+                    ||> List.fold (fun acc openStatement -> addChildAfter openStatement acc |> addChildAfter newlineNode)
+                    |> addChildAfter newlineNode
+            |> addChildAfter sigDeclNode
+            |> addChildAfter newlineNode
+            |> ignore
 
             null

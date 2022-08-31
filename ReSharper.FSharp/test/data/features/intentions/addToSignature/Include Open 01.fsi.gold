@@ -1,0 +1,6 @@
+module Foo
+
+open System
+open System.Collections.Generic
+
+val removeAllEntries: dictionary: IDictionary<string,DateTime> -> IDictionary<string,DateTime>
