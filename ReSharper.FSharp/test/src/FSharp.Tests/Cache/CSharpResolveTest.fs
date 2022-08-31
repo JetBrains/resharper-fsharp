@@ -193,6 +193,12 @@ type CSharpTooltipTest() =
     member x.DoNamedTestWithFsi() =
         let testName = x.TestMethodName
         x.DoTestSolution(testName + CSharpProjectFileType.CS_EXTENSION, testName + FSharpSignatureProjectFileType.FsiExtension)
+
+    member x.DoNamedTestWithFsiAndFs() =
+        let testName = x.TestMethodName
+        x.DoTestSolution(testName + CSharpProjectFileType.CS_EXTENSION,
+                         testName + FSharpSignatureProjectFileType.FsiExtension,
+                         testName + FSharpProjectFileType.FsExtension)
     
     [<Test>] member x.``XmlDoc 01 - Top binding``() = x.DoNamedTestWithFs()
     [<Test>] member x.``XmlDoc 02 - Type``() = x.DoNamedTestWithFs()
@@ -205,3 +211,9 @@ type CSharpTooltipTest() =
     [<Test>] member x.``XmlDoc 09 - Val``() = x.DoNamedTestWithFsi()
     [<Test>] member x.``XmlDoc 10 - Module``() = x.DoNamedTestWithFs()
     [<Test>] member x.``XmlDoc 11 - Struct val``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 01 - Class``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 02 - Struct``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 03 - Delegate``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 04 - Interface``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 05 - Enum``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 06 - Module``() = x.DoNamedTestWithFsiAndFs()
