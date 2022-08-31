@@ -217,3 +217,5 @@ type CSharpTooltipTest() =
     [<Test>] member x.``XmlDoc 12 - Type parts 04 - Interface``() = x.DoNamedTestWithFsiAndFs()
     [<Test>] member x.``XmlDoc 12 - Type parts 05 - Enum``() = x.DoNamedTestWithFsiAndFs()
     [<Test>] member x.``XmlDoc 12 - Type parts 06 - Module``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 13 - Type members 01 - Top binding``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 13 - Type members 02 - Abstract member``() = x.DoNamedTestWithFsiAndFs()
