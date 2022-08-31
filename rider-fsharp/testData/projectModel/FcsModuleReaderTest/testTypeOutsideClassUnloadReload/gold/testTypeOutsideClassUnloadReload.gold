@@ -29,8 +29,8 @@ Dependencies to referencing modules:
     FSharpProject
 Dirty types in readers:
   CSharpProject
-    CSharpProject.CSharpClass
-    CSharpProject.CSharpClass2
+    CSharpClass
+    CSharpClass2
 
 ===================
 4. Open F# file

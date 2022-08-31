@@ -27,6 +27,13 @@ Dependencies to referencing modules:
 4. Unload C# project
 
 Readers by module: 0
+Dependencies to referencing modules:
+  CSharpProject
+    FSharpProject
+Dirty types in readers:
+  CSharpProject
+    CSharpClass2
+    CSharpClass
 
 ===================
 5. Open F# file
