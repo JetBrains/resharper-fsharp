@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
@@ -41,12 +42,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     // ReSharper disable once InconsistentNaming
     public virtual XmlNode GetXMLDoc(bool inherit)
     {
-      var declaration =
-        GetSourceFiles().FirstOrDefault(t => t.LanguageType is FSharpSignatureProjectFileType) is { } signatureFile
-          ? (TDeclaration)GetDeclarationsIn(signatureFile).FirstOrDefault()
-          : GetDeclaration();
+      var declarations = GetDeclarations();
+      var primaryDeclaration = declarations.FirstOrDefault(t => t.IsFSharpSigFile()) ?? declarations.FirstOrDefault();
 
-      return declaration is { XmlDocBlock: { } xmlDocBlock } ? xmlDocBlock.GetXML(this as ITypeMember) : null;
+      return primaryDeclaration is IFSharpDeclaration { XmlDocBlock: { } xmlDocBlock }
+        ? xmlDocBlock.GetXML(this as ITypeMember)
+        : null;
     }
 
     // ReSharper disable once InconsistentNaming

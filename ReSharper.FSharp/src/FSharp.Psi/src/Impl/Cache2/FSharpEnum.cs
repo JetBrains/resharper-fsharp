@@ -1,3 +1,4 @@
+using System.Xml;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
@@ -15,5 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       part is IFSharpEnumPart enumPart && enumPart.MeasureTypeParametersCount == MeasureTypeParametersCount;
 
     public string SourceName => this.GetSourceName();
+
+    public override XmlNode GetXMLDoc(bool inherit) => this.GetXmlDoc(inherit);
   }
 }

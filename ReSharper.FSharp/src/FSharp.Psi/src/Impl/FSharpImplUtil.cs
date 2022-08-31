@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -952,5 +953,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           return accessor;
       return null;
     }
+
+    public static XmlNode GetXmlDoc(this TypeElement typeElement, bool inherit) =>
+      (typeElement.Parts as IFSharpTypePart)?.GetFirstPart()?.GetDeclaration()?.GetXMLDoc(inherit);
   }
 }

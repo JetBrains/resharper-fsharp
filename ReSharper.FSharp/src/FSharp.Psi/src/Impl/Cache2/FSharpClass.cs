@@ -48,11 +48,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public IList<ITypeParameter> AllTypeParameters =>
       this.GetAllTypeParametersReversed();
 
-    public override XmlNode GetXMLDoc(bool inherit)
-    {
-      if (GetSourceFiles().FirstOrDefault(t => t.LanguageType is FSharpSignatureProjectFileType) is { } signatureFile)
-        return GetDeclarationsIn(signatureFile).FirstOrDefault()?.GetXMLDoc(inherit);
-      return base.GetXMLDoc(inherit);
-    }
+    public override XmlNode GetXMLDoc(bool inherit) => this.GetXmlDoc(inherit);
   }
 }
