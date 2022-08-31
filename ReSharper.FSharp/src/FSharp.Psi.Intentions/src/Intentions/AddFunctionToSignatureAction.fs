@@ -25,7 +25,20 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
         | null -> None
         | pat -> pat.GetFcsSymbol().SignatureLocation
 
-    let addChildAfter child anchor = ModificationUtil.AddChildAfter(anchor, child)
+    let addChildAfter (newlineNode: ITreeNode) (insertNewline: bool) (child: ITreeNode) (anchor: ITreeNode) =
+        let anchor =
+            let anchor =
+                if anchor.NodeType <> newlineNode.NodeType then
+                    ModificationUtil.AddChildAfter(anchor, newlineNode)
+                else
+                    anchor
+
+            if insertNewline then
+                ModificationUtil.AddChildAfter(anchor, newlineNode)
+            else
+                anchor
+
+        ModificationUtil.AddChildAfter(ModificationUtil.AddChildAfter(anchor, child), newlineNode)
     
     override x.Text = "Add to signature file"
     override this.IsAvailable _ =
@@ -46,20 +59,33 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
 
         match SignatureFile.tryMkBindingSignature letBindings moduleDecl with
         | None -> null
-        | Some (sigDeclNode, openStatements, sigFile) ->
-            let newlineNode = NewLine(sigDeclNode.GetLineEnding()) :> ITreeNode
+        | Some response ->
+            let sigFile = response.SigFile
+            let openStatements = response.OpenStatements
+            let newlineNode = NewLine(response.SigDeclNode.GetLineEnding()) :> ITreeNode
+            let addChildAfter : bool -> ITreeNode -> ITreeNode -> ITreeNode  = addChildAfter newlineNode
+
+            let lastExistingOpenStatement =
+                response.SigModule.Members
+                |> Seq.choose (function | :? IOpenStatement as os -> Some os | _ -> None)
+                |> Seq.tryLast
             
-            sigFile.LastChild
-            |> addChildAfter newlineNode
-            |> fun lastChild ->
-                if List.isEmpty openStatements then
-                    lastChild
-                else
-                    (lastChild, openStatements)
-                    ||> List.fold (fun acc openStatement -> addChildAfter openStatement acc |> addChildAfter newlineNode)
-                    |> addChildAfter newlineNode
-            |> addChildAfter sigDeclNode
-            |> addChildAfter newlineNode
+            let addOpeningStatements node =
+                (node, openStatements)
+                ||> List.fold (fun acc openStatement -> addChildAfter false openStatement acc)
+            
+            let lastNode =
+                match lastExistingOpenStatement, openStatements.IsEmpty with
+                | Some lastOpenStatement, false ->
+                    // TODO: this won't work if there are other vals in the signature file
+                    addOpeningStatements lastOpenStatement
+                | None, false ->
+                    addOpeningStatements (ModificationUtil.AddChildAfter(sigFile.LastChild, newlineNode))
+                | _, true ->
+                    sigFile.LastChild
+
+            lastNode
+            |> addChildAfter true response.SigDeclNode
             |> ignore
 
             null

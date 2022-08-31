@@ -372,6 +372,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
                 match accessibility with
                 | None -> ""
                 | Some vis -> $"{vis} "
-            let source = $"module A\n\nval {inlineKeyword}{accessibility}{name}: {signature}"
+            let source = wrapInModule $"val {inlineKeyword}{accessibility}{name}: {signature}"
             let moduleMember = getModuleMember source
             moduleMember :?> IBindingSignature

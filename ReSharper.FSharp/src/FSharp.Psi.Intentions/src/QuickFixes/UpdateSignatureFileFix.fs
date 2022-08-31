@@ -43,8 +43,9 @@ type UpdateSignatureFileFix(binding: IBinding) =
 
         match SignatureFile.tryMkBindingSignature letBindings moduleDecl with
         | None -> ()
-        | Some (sigDeclNode, _, sigFile) ->
-            
+        | Some response ->
+
+        let ({ SigDeclNode = sigDeclNode }: SignatureFile.SignatureBindingResponse) = response
         let implHeadPat =
             let binding = letBindings.Bindings.FirstOrDefault() in
             if isNull binding then null else
@@ -54,7 +55,7 @@ type UpdateSignatureFileFix(binding: IBinding) =
 
         if isNull implHeadPat then () else
 
-        let mdl = sigFile.ModuleDeclarations.FirstOrDefault()
+        let mdl = response.SigFile.ModuleDeclarations.FirstOrDefault()
         let existingBinding =
             Seq.cast<IBindingSignature> mdl.MembersEnumerable
             |> Seq.tryFind (fun b ->

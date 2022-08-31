@@ -28,3 +28,4 @@ type AddFunctionToSignatureFileActionTests() =
     [<Test>] member x.``Access modifier 02`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Access modifier 03`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Include Open 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Include Open 02`` () = x.DoNamedTestWithSignature()

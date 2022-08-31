@@ -16,10 +16,19 @@ let private (|DeclaredNameInPattern|_|) (pat:IFSharpPattern) =
         | _ -> None
     | _ -> None
 
+type SignatureBindingResponse =
+    {
+        SigDeclNode: IBindingSignature
+        OpenStatements: IOpenStatement list
+        SigModule: INamedModuleDeclaration
+    }
+    
+    member this.SigFile = this.SigModule.Parent :?> IFSharpSigFile
+
 let tryMkBindingSignature
     (letBindings: ILetBindings)
     (moduleDecl: IModuleDeclaration)
-    : (IBindingSignature *  IOpenStatement list * IFSharpSigFile) option
+    : SignatureBindingResponse option
     =
     if isNull moduleDecl then None else
     
@@ -92,11 +101,17 @@ let tryMkBindingSignature
         ]
 
     let alwaysOpen =
+        let existingOpenStatements =
+            sigDecl.Members
+            |> Seq.choose (function | :? IOpenStatement as os -> Some os | _ -> None)
+            |> Seq.map (fun openStatement -> openStatement.ReferenceName.QualifiedName)
+
         set
             [|
-                "Microsoft.FSharp.Core"
-                "Microsoft.FSharp.Collections"
-                sigDecl.CompiledName
+                yield "Microsoft.FSharp.Core"
+                yield "Microsoft.FSharp.Collections"
+                yield sigDecl.CompiledName
+                yield! existingOpenStatements
             |]
     
     let openStatements =
@@ -151,6 +166,7 @@ let tryMkBindingSignature
             None
     
     let sigDeclNode : IBindingSignature = elementFactory.CreateBindingSignature(isInline, accessibility, name, signature)
-    let signatureFile = sigDecl.Parent :?> IFSharpSigFile
-
-    Some (sigDeclNode, openStatements, signatureFile)
+    Some
+        { SigDeclNode = sigDeclNode
+          OpenStatements = openStatements
+          SigModule = sigDecl }
