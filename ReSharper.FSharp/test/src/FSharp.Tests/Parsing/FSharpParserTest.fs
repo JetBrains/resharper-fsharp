@@ -663,6 +663,7 @@ type FSharpSignatureParserTest() =
     override x.RelativeTestDataPath = "parsing/signatures"
 
     [<Test>] member x.``Type decl - Union 01 - After nested module``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Delegate``() = x.DoNamedTest()
     [<Test>] member x.``Type decl group 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl group 02 - Attributes``() = x.DoNamedTest()
 
