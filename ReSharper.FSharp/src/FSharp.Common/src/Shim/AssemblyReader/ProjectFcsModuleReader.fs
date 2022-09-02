@@ -908,10 +908,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         isUpToDateReturn method methodDef &&
 
+        isUpToDateCustomAttributes method methodDef.CustomAttrs &&
+        
         let method = method.As<IMethod>()
-        isUpToDateTypeParamDefs method.TypeParameters methodDef.GenericParams &&
-
-        isUpToDateCustomAttributes method methodDef.CustomAttrs
+        isNull method || isUpToDateTypeParamDefs method.TypeParameters methodDef.GenericParams
 
     let isUpToDateMethodsDefs (typeElement: ITypeElement) (methodDefs: ILMethodDef[]) =
         isNull methodDefs ||
