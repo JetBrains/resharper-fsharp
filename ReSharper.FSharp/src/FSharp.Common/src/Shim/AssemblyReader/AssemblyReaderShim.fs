@@ -107,6 +107,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         assemblyReadersByModule.ContainsKey(psiModule) ||
         fcsProjectProvider.GetReferencedModule(psiModule).IsSome
 
+    let mutable invalidateAll = false
+
     let dirtyModules = HashSet()
 
     // todo: use short names?
@@ -221,6 +223,14 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     let invalidateDirty () =
         FcsReadWriteLock.assertWriteAccess()
+
+        if invalidateAll then
+            for KeyValue(psiModule, referencedAssembly) in assemblyReadersByModule do
+                match referencedAssembly with
+                | ReferencedAssembly.ProjectOutput reader ->
+                    reader.InvalidateAllTypeDefs()
+                    moduleInvalidated.Fire(psiModule)
+                | _ -> ()
 
         for psiModule in dirtyModules do
             removeModule psiModule
@@ -353,12 +363,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             assemblyReadersByPath.ContainsKey(path)
 
         member this.InvalidateAll() =
-            for KeyValue(psiModule, referencedAssembly) in assemblyReadersByModule do
-                match referencedAssembly with
-                | ReferencedAssembly.ProjectOutput reader ->
-                    reader.InvalidateAllTypeDefs()
-                    moduleInvalidated.Fire(psiModule)
-                | _ -> ()
+            use lock = FcsReadWriteLock.WriteCookie.Create()
+            invalidateAll <- true
 
         member this.HasDirtyTypes =
             use lock = FcsReadWriteLock.ReadCookie.Create()
