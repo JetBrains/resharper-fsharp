@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     protected override bool AcceptsPart(TypePart part) =>
       // todo: make UnionPart/RecordPart implement IFSharpClassPart, simplify this check
       part.ShortName == ShortName &&
-      part is IClassPart and IFSharpTypePart typePart and not IModulePart &&
+      part is IClassPart and IFSharpTypePart typePart and not IModulePart && 
       typePart.MeasureTypeParametersCount == MeasureTypeParametersCount;
 
     protected override MemberDecoration Modifiers => myParts.GetModifiers();

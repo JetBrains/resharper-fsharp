@@ -21,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     protected override bool CanBindTo(IDeclaration declaration) => declaration is TDeclaration;
 
     [CanBeNull]
-    public new TDeclaration GetDeclaration() => (TDeclaration)base.GetDeclaration();
+    public new TDeclaration GetDeclaration() => (TDeclaration) base.GetDeclaration();
 
     public bool IsSynthetic() => false;
     public bool CaseSensitiveName => true;
@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       EmptySubstitution.INSTANCE;
 
     // ReSharper disable once InconsistentNaming
-    public virtual XmlNode GetXMLDoc(bool inherit)
+    public XmlNode GetXMLDoc(bool inherit)
     {
       var declarations = GetDeclarations();
       var primaryDeclaration = declarations.FirstOrDefault(t => t.IsFSharpSigFile()) ?? declarations.FirstOrDefault();
