@@ -40,6 +40,12 @@
         <None Update="tploader.net6.win.runtimeconfig.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="tploader.net7.win.runtimeconfig.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="tploader.net7.unix.runtimeconfig.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <Import Project="$(SolutionDir)/TypeProviders.Host.targets"/>
