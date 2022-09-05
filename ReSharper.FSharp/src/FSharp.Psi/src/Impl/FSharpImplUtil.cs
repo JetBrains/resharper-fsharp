@@ -954,7 +954,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return null;
     }
 
-    public static XmlNode GetXmlDoc(this TypeElement typeElement, bool inherit) =>
-      (typeElement.Parts as IFSharpTypePart)?.GetFirstPart()?.GetDeclaration()?.GetXMLDoc(inherit);
+    public static XmlNode GetXmlDoc(this IFSharpTypeElement typeElement, bool inherit) =>
+      typeElement.GetFirstTypePart()?.GetDeclaration()?.GetXMLDoc(inherit);
   }
 }
