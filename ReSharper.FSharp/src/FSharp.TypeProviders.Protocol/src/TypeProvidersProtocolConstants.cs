@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       majorVersion switch
       {
         3 => "netcoreapp31",
-        var x when x == 5 || x == 6 => $"net{x}",
+        >= 5 and <= 7 => $"net{majorVersion}",
         var x => throw new InvalidOperationException($"Wrong runtime version '{x}'")
       } +
       $".{(PlatformUtil.IsRunningUnderWindows ? "win" : "unix")}.runtimeconfig.json";
