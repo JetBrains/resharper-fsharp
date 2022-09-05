@@ -22,6 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       foreach (var parameter in FSharpParameterUtil.GetParametersGroupNames(docCommentBlock.Parent)
                  .SelectMany(t => t)
+                 .Select(t => t.name)
                  .Where(t => t != SharedImplUtil.MISSING_DECLARATION_NAME))
         text.Append($"{lineEnding}{linePrefix}<param name=\"{parameter}\"></param>");
 

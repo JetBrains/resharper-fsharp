@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -69,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return field?.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner);
     }
 
-    public static IReadOnlyList<IReadOnlyList<string>> GetParametersGroupNames(ITreeNode node) =>
+    public static IReadOnlyList<IReadOnlyList<(string name, DocumentRange range)>> GetParametersGroupNames(ITreeNode node) =>
       (node switch
       {
         IBinding binding => binding.Expression is ILambdaExpr lambda
@@ -108,7 +109,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       _ => false
     };
 
-    private static IEnumerable<IEnumerable<string>> GetLambdaArgs(ILambdaExpr expr)
+    private static IEnumerable<IEnumerable<(string, DocumentRange)>> GetLambdaArgs(ILambdaExpr expr)
     {
       var lambdaParams = expr.Patterns;
       var parameters = lambdaParams.Select(GetParameterNames);
@@ -117,41 +118,49 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return parameters;
     }
 
-    public static IEnumerable<string> GetParameterNames(this IFSharpPattern pattern)
+    public static IEnumerable<(string, DocumentRange)> GetParameterNames(this IFSharpPattern pattern)
     {
-      IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pat, bool isTopLevelParameter)
+      IEnumerable<(string, DocumentRange)> GetParameterNamesInternal(IFSharpPattern pat, bool isTopLevelParameter)
       {
         pat = pat.IgnoreInnerParens();
         return pat switch
         {
-          ILocalReferencePat local => new[] { local.SourceName },
+          ILocalReferencePat local => new[] { (local.SourceName, local.GetDocumentRange()) },
           IOptionalValPat opt => GetParameterNamesInternal(opt.Pattern, isTopLevelParameter),
           ITypedPat typed => GetParameterNamesInternal(typed.Pattern, false),
           IAttribPat attrib => GetParameterNamesInternal(attrib.Pattern, false),
           IAsPat asPat => GetParameterNamesInternal(asPat.RightPattern, false),
           ITuplePat tuplePat when isTopLevelParameter =>
             tuplePat.PatternsEnumerable.SelectMany(t => GetParameterNamesInternal(t, false)),
-          _ => new[] { SharedImplUtil.MISSING_DECLARATION_NAME }
+          _ => new[] { (SharedImplUtil.MISSING_DECLARATION_NAME, DocumentRange.InvalidRange) }
         };
       }
 
       return GetParameterNamesInternal(pattern, true);
     }
 
-    public static IEnumerable<IEnumerable<string>> GetParameterNames(this ITypeUsage pattern) =>
+    public static IEnumerable<IEnumerable<(string, DocumentRange)>> GetParameterNames(this ITypeUsage pattern) =>
       pattern switch
       {
         IParenTypeUsage parenUsage => GetParameterNames(parenUsage.InnerTypeUsage),
         IConstrainedTypeUsage constrained => GetParameterNames(constrained.TypeUsage),
         IParameterSignatureTypeUsage local =>
-          new[] { new[] { local.Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME } },
+          new[]
+          {
+            new[]
+            {
+              local.Identifier is { } identifier
+                ? (identifier.Name, local.GetDocumentRange())
+                : (SharedImplUtil.MISSING_DECLARATION_NAME, DocumentRange.InvalidRange)
+            }
+          },
         IFunctionTypeUsage funPat =>
           GetParameterNames(funPat.ArgumentTypeUsage).Union(GetParameterNames(funPat.ReturnTypeUsage)),
         ITupleTypeUsage tuplePat => tuplePat.Items.SelectMany(GetParameterNames),
-        _ => EmptyList<IEnumerable<string>>.Enumerable
+        _ => EmptyList<IEnumerable<(string, DocumentRange)>>.Enumerable
       };
 
-    public static IReadOnlyList<IReadOnlyList<string>> GetParametersGroups(this IBinding binding)
+    public static IReadOnlyList<IReadOnlyList<(string, DocumentRange)>> GetParametersGroups(this IBinding binding)
     {
       var parameters = binding.ParameterPatterns.Select(GetParameterNames);
       var bodyExpr = binding.Expression;
