@@ -524,6 +524,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Abstract 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Abstract 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Abstract 03 - Function return``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Abstract 04 - Constrained type usage``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Member 01 - Wild self id``() = x.DoNamedTest()
 
@@ -720,6 +721,7 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Type member - Member 03 - Return attribute``() = x.DoNamedTest() // todo: attribute
     [<Test>] member x.``Type member - Member 04 - Tuple``() = x.DoNamedTest() // todo: attribute
     [<Test>] member x.``Type member - Member 05 - Tuple``() = x.DoNamedTest() // todo: attribute
+    [<Test>] member x.``Type member - Constrained type usage``() = x.DoNamedTest() // todo: attribute
 
     [<Test>] member x.``Type member - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - XmlDoc 02 - With attributes``() = x.DoNamedTest()

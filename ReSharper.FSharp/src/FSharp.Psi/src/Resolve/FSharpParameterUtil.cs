@@ -138,6 +138,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       pattern switch
       {
         IParenTypeUsage parenUsage => GetParameterNames(parenUsage.InnerTypeUsage),
+        IConstrainedTypeUsage constrained => GetParameterNames(constrained.TypeUsage),
         IParameterSignatureTypeUsage local =>
           new[] { new[] { local.Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME } },
         IFunctionTypeUsage funPat =>

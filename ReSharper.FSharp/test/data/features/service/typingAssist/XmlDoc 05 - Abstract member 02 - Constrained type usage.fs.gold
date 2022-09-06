@@ -1,0 +1,12 @@
+﻿// ${CHAR:<}
+module Module
+
+type A =
+    /// <summary>
+    /// {caret}
+    /// </summary>
+    /// <param name="resource"></param>
+    /// <param name="binder"></param>
+    abstract member Using: resource:'T * binder:('T -> Async<'U>) -> Async<'U> when 'T :> System.IDisposable
+
+

@@ -1,0 +1,100 @@
+﻿Language: PsiLanguageType:F#
+IFSharpSigFile
+  INamedModuleDeclaration
+    FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpIdentifierToken(type:IDENTIFIER, text:Module)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    ITypeDeclarationGroup
+      IFSharpTypeDeclaration
+        FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpIdentifierToken(type:IDENTIFIER, text:T)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IMemberSignature
+          FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:Using)
+          IReturnTypeInfo
+            FSharpTokenType+ColonTokenElement(type:COLON, text::)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IConstrainedTypeUsage
+              IFunctionTypeUsage
+                ITupleTypeUsage
+                  IParameterSignatureTypeUsage
+                    FSharpIdentifierToken(type:IDENTIFIER, text:resource)
+                    FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        ITypeParameterId
+                          FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                          FSharpIdentifierToken(type:IDENTIFIER, text:T)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  FSharpTokenType+StarTokenElement(type:STAR, text:*)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  IParameterSignatureTypeUsage
+                    FSharpIdentifierToken(type:IDENTIFIER, text:binder)
+                    FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                    IParenTypeUsage
+                      FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                      IFunctionTypeUsage
+                        INamedTypeUsage
+                          ITypeReferenceName
+                            ITypeParameterId
+                              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                              FSharpIdentifierToken(type:IDENTIFIER, text:T)
+                        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                        FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+                        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                        INamedTypeUsage
+                          ITypeReferenceName
+                            FSharpIdentifierToken(type:IDENTIFIER, text:Async)
+                            IPrefixAppTypeArgumentList
+                              FSharpTokenType+LessTokenElement(type:LESS, text:<)
+                              INamedTypeUsage
+                                ITypeReferenceName
+                                  ITypeParameterId
+                                    FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                                    FSharpIdentifierToken(type:IDENTIFIER, text:U)
+                              FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+                      FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                IParameterSignatureTypeUsage
+                  INamedTypeUsage
+                    ITypeReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:Async)
+                      IPrefixAppTypeArgumentList
+                        FSharpTokenType+LessTokenElement(type:LESS, text:<)
+                        INamedTypeUsage
+                          ITypeReferenceName
+                            ITypeParameterId
+                              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                              FSharpIdentifierToken(type:IDENTIFIER, text:U)
+                        FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              ITypeConstraintsClause
+                FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                ISubtypeConstraint
+                  ITypeReferenceName
+                    ITypeParameterId
+                      FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                      FSharpIdentifierToken(type:IDENTIFIER, text:T)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  FSharpTokenType+ColonGreaterTokenElement(type:COLON_GREATER, text::>)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  INamedTypeUsage
+                    ITypeReferenceName
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:System)
+                      FSharpTokenType+DotTokenElement(type:DOT, text:.)
+                      FSharpIdentifierToken(type:IDENTIFIER, text:IDisposable)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

@@ -678,6 +678,11 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         let rec loop paramGroups returnInfo synType =
             match paramGroups, synType with
+            | _, SynType.WithGlobalConstraints(synType, constraints, range) ->
+                let mark = x.Mark(range)
+                loop paramGroups returnInfo synType
+                x.ProcessConstraintsClause(constraints)
+                x.Done(mark, ElementType.CONSTRAINED_TYPE_USAGE)
             | group :: rest, SynType.Fun(arg, returnType, range) ->
                 let mark = x.Mark(range)
                 processParameterGroup group arg
