@@ -141,7 +141,7 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
                 | :? IForEachExpr -> pat :> _, "'for' pattern"
                 | _ -> invalidArg "patOwner.Parent" "unexpected type"
 
-            FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode, LocalScope(scopeNode, scopeText, scopeText))
+            FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode, LocalScope(scopeNode, $"in {scopeText}"))
 
         member x.ExecuteAction(highlightingInfos, _, _) =
             use writeLock = WriteLockCookie.Create(true)
