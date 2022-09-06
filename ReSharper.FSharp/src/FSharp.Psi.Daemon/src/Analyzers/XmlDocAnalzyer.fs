@@ -27,6 +27,8 @@ type XmlDocBlockAnalyzer() =
         let xmlPsi = xmlDocBlock.GetXmlPsi()
 
         let parameters = parameters |> Seq.collect id
+        let paramNodes = xmlPsi.GetParameterNodes(null)
+        if paramNodes.Count = 0 then () else
 
         for struct(name, parameter) in parameters do
             if name = SharedImplUtil.MISSING_DECLARATION_NAME then () else
@@ -38,7 +40,7 @@ type XmlDocBlockAnalyzer() =
                     let attribute = paramTag.Header.Attributes.FirstOrDefault(fun t -> t.AttributeName = "name")
                     consumer.AddHighlighting(XmlDocDuplicateParameterWarning(attribute.Value))
 
-        for paramDoc in xmlPsi.GetParameterNodes(null) do
+        for paramDoc in paramNodes do
             let attribute = paramDoc.Header.Attributes.FirstOrDefault(fun t -> t.AttributeName = "name")
             if isNull attribute then consumer.AddHighlighting(XmlDocMissingParameterNameWarning(paramDoc.Header))else
 
