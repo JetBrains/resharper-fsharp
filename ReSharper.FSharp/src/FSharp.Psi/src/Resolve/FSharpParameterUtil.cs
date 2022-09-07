@@ -91,6 +91,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           .ReturnTypeInfo.ReturnType),
 
         IUnionCaseDeclaration ucDecl => new[] { ucDecl.Fields.Select(t => t.SourceName) },
+
+        IFSharpTypeDeclaration { TypeRepresentation: IDelegateRepresentation repr } =>
+          GetParameterNames(repr.TypeUsage),
+
         _ => EmptyList<string[]>.Enumerable
       })
       .Select(t => t.ToIReadOnlyList())

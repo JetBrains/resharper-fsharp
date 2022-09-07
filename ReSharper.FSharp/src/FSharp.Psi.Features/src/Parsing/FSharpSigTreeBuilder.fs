@@ -87,9 +87,9 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
 
         | SynTypeDefnSigRepr.ObjectModel(kind, members, range) ->
             match kind with
-            | SynTypeDefnKind.Delegate(synType, _) ->
+            | SynTypeDefnKind.Delegate(synType, signatureInfo) ->
                 let mark = x.Mark(range)
-                x.ProcessType(synType)
+                x.ProcessSignatureType(signatureInfo, synType)
                 x.Done(range, mark, ElementType.DELEGATE_REPRESENTATION)
 
             | _ ->
