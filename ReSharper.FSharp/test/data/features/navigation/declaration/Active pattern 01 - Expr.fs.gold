@@ -1,12 +1,12 @@
 ﻿## GotoDeclarationProvider activity:
   Immediate result:
-    TO: [O] let |(|A|_|)| x = Some () RANGE: (21,28) @ Active pattern 01 - Expr.fs
+    TO: [O] let (||A|_||) x = Some () RANGE: (22,27) @ Active pattern 01 - Expr.fs
     Navigation result:
       opened file: Active pattern 01 - Expr.fs
       ------------------
       module Module
 
-      let |CARET|(|A|_|) x = Some ()
+      let (|CARET||A|_|) x = Some ()
 
       let _ = (|A|_|)
       ------------------

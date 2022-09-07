@@ -19,7 +19,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
-using static FSharp.Compiler.ExtensionTyping;
+using static FSharp.Compiler.TypeProviders;
 using Range = FSharp.Compiler.Text.Range;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -62,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       try
       {
         // `Replace` workarounds fix for https://github.com/dotnet/fsharp/issues/9.
-        return new ClrTypeName(entity.QualifiedBaseName.Replace(@"\,", ","));
+        return new ClrTypeName(entity.BasicQualifiedName.Replace(@"\,", ","));
       }
       catch (Exception e)
       {
@@ -111,7 +111,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       try
       {
         // todo: check type vs fcsType
-        if (isFromMethod && type.IsNativePtr && !HasGenericTypeParams(fcsType))
+        if (isFromMethod && type.IsNativePtr() && !HasGenericTypeParams(fcsType))
         {
           var argType = GetSingleTypeArgument(fcsType, typeParams, psiModule, true);
           return TypeFactory.CreatePointerType(argType);
@@ -123,7 +123,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         Logger.LogExceptionSilently(e);
       }
 
-      if (isFromReturn && type.IsUnit)
+      if (isFromReturn && type.IsUnit())
         return psiModule.GetPredefinedType().Void;
 
       if (type.IsGenericParameter)
@@ -300,7 +300,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var fcsType = param.Type;
       if (fcsType.HasTypeDefinition && fcsType.TypeDefinition is var entity && entity.IsByRef)
       {
-        if (param.IsOut || entity.LogicalName == "outref`1")
+        if (param.Attributes.HasAttributeInstance(StandardTypeNames.OutAttribute) || entity.LogicalName == "outref`1")
           return ParameterKind.OUTPUT;
         if (param.IsInArg || entity.LogicalName == "inref`1")
           return ParameterKind.INPUT;

@@ -1,7 +1,7 @@
 using System.Xml;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Xml.XmlDocComments;
-using static FSharp.Compiler.ExtensionTyping;
+using static FSharp.Compiler.TypeProviders;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {

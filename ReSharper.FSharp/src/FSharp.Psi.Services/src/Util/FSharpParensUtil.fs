@@ -81,7 +81,7 @@ let operatorName (binaryApp: IBinaryAppExpr) =
 
     // todo: fix op tokens in references
     let name = refExpr.GetText()
-    PrettyNaming.DecompileOpName(name)
+    PrettyNaming.ConvertValLogicalNameToDisplayNameCore(name)
 
 let operatorPrecedence (binaryApp: IBinaryAppExpr) =
     let name = operatorName binaryApp
@@ -327,9 +327,6 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
         isNotNull attribute && (isNotNull attribute.Target || isNotNull typeArgumentList || isNotNull qualifier) ||
 
         isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(context)) && getFirstQualifier refExpr :? IAppExpr ||
-
-        // todo: tests
-        isNull typeArgumentList && isNull qualifier && PrettyNaming.IsOperatorDisplayName (refExpr.GetText()) ||
 
         checkPrecedence context expr
 

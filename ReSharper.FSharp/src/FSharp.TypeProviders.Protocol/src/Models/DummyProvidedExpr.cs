@@ -1,7 +1,7 @@
 ﻿using JetBrains.Util;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Quotations;
-using static FSharp.Compiler.ExtensionTyping;
+using static FSharp.Compiler.TypeProviders;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {

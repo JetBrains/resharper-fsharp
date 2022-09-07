@@ -1,7 +1,7 @@
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
-using static FSharp.Compiler.ExtensionTyping;
+using static FSharp.Compiler.TypeProviders;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 {

@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
 using JetBrains.Util;
 using Microsoft.FSharp.Core.CompilerServices;
-using static FSharp.Compiler.ExtensionTyping;
+using static FSharp.Compiler.TypeProviders;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
 {

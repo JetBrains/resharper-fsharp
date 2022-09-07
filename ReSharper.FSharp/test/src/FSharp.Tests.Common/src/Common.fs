@@ -208,7 +208,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
 
             { FSharpParsingOptions.Default with
                 SourceFiles = paths
-                ConditionalCompilationDefines = defines
+                ConditionalDefines = defines
                 IsExe = isExe
                 IsInteractive = isScript
                 LangVersionText = "preview" } // todo: fix language level attribute is not applied

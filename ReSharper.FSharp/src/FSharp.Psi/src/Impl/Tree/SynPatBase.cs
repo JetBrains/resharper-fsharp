@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IEnumerable<IFSharpPattern> NestedPatterns => new[] {this};
 
     public override TreeTextRange GetNameIdentifierRange() =>
-      NameIdentifier.GetMemberNameIdentifierRange();
+      NameIdentifier.GetNameIdentifierRange();
 
     public bool IsMutable => Binding?.IsMutable ?? false;
 

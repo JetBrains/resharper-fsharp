@@ -2,7 +2,7 @@
 
 open System
 open FSharp.Compiler
-open FSharp.Compiler.ExtensionTyping
+open FSharp.Compiler.TypeProviders
 open FSharp.Compiler.Text
 open FSharp.Core.CompilerServices
 open JetBrains.Application.Environment
@@ -33,7 +33,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory,
         productConfigurations: RunsProducts.ProductConfigurations) as this =
     let lifetime = solution.GetLifetime()
-    let defaultShim = ExtensionTypingProvider
+    let defaultShim = ExtensionTyping.Provider
     let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
     let generativeTypeProvidersInMemoryAnalysis = experimentalFeatures.GenerativeTypeProvidersInMemoryAnalysis
     let createProcessLockObj = obj()
@@ -62,8 +62,8 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
             connection <- newConnection)
 
     do
-        lifetime.Bracket((fun () -> ExtensionTypingProvider <- this),
-            fun () -> ExtensionTypingProvider <- defaultShim)
+        lifetime.Bracket((fun () -> ExtensionTyping.Provider <- this),
+            fun () -> ExtensionTyping.Provider <- defaultShim)
 
         toolset.Changed.Advise(lifetime, fun _ -> terminateConnection ())
 

@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core.CompilerServices;
-using static FSharp.Compiler.ExtensionTyping;
+using static FSharp.Compiler.TypeProviders;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {

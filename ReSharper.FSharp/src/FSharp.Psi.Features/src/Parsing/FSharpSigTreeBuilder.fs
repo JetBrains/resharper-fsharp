@@ -15,7 +15,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
             x.ProcessTopLevelSignature(s)
         x.FinishFile(mark, ElementType.F_SHARP_SIG_FILE)
 
-    member x.ProcessTopLevelSignature(SynModuleOrNamespaceSig(lid, _, isModule, sigDecls, XmlDoc xmlDoc, attrs, _, range)) =
+    member x.ProcessTopLevelSignature(SynModuleOrNamespaceSig(lid, _, isModule, sigDecls, XmlDoc xmlDoc, attrs, _, range, _)) =
         let mark, elementType = x.StartTopLevelDeclaration(lid, attrs, isModule, xmlDoc, range)
         for sigDecl in sigDecls do
             x.ProcessModuleMemberSignature(sigDecl)
@@ -49,15 +49,15 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
             x.ProcessNamedTypeReference(lid)
             x.MarkAndDone(range, ElementType.MODULE_ABBREVIATION_DECLARATION)
 
-        | SynModuleSigDecl.Val(SynValSig(attrs, id, _, synType, arity, _, _, XmlDoc xmlDoc, _, exprOption, _, _), range) ->
+        | SynModuleSigDecl.Val(SynValSig(attrs, (SynIdentRange idRange as SynIdent(id, _)), _, synType, arity, _, _, XmlDoc xmlDoc, _, exprOption, _, _), range) ->
             let valMark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
 
-            let patMark = x.Mark(id.idRange)
+            let patMark = x.Mark(idRange)
             let referenceNameMark = x.Mark()
             if IsActivePatternName id.idText then
-                x.ProcessActivePatternDecl(id, false)
+                x.ProcessActivePatternDecl(idRange, false)
             else
-                x.AdvanceToEnd(id.idRange)
+                x.AdvanceToEnd(idRange)
 
             x.Done(referenceNameMark, ElementType.EXPRESSION_REFERENCE_NAME)
             x.Done(patMark, ElementType.TOP_REFERENCE_PAT)
@@ -77,7 +77,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
 
         | _ -> ()
 
-    member x.ProcessTypeSignature(SynTypeDefnSig(info, _, repr, _, memberSigs, range), typeKeywordType) =
+    member x.ProcessTypeSignature(SynTypeDefnSig(info, repr, memberSigs, range, _), typeKeywordType) =
         let (SynComponentInfo(attrs, typeParams, constraints, lid, XmlDoc xmlDoc, _, _, _)) = info
 
         let mark = x.StartType(attrs, xmlDoc, typeParams, constraints, lid, range, typeKeywordType)

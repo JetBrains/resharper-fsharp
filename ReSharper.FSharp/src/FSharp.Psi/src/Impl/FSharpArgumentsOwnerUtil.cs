@@ -2,6 +2,7 @@
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -16,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return EmptyList<IArgument>.Instance;
 
       var paramGroups = mfv.CurriedParameterGroups;
-      var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit;
+      var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit();
 
       if (isVoidReturn)
         return EmptyArray<IArgument>.Instance;

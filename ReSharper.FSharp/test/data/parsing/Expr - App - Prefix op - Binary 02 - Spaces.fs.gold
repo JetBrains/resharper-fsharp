@@ -5,11 +5,10 @@ IFSharpImplFile
       IChameleonExpression
         IPrefixAppExpr
           IPrefixAppExpr
-            IParenExpr
+            IReferenceExpr
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IReferenceExpr
-                FSharpTokenType+PlusTokenElement(type:PLUS, text:+)
+              FSharpTokenType+PlusTokenElement(type:PLUS, text:+)
               Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

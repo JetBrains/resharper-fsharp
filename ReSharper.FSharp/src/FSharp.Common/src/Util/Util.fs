@@ -2,6 +2,8 @@
 
 open FSharp.Compiler.Diagnostics
 open FSharp.Compiler.Syntax
+open FSharp.Compiler.SyntaxTrivia
+open FSharp.Compiler.Text
 open FSharp.Compiler.Xml
 open JetBrains.Annotations
 open JetBrains.ProjectModel
@@ -36,7 +38,7 @@ module rec CommonUtil =
 
     [<CompiledName("DecompileOpName")>]
     let decompileOpName name =
-        PrettyNaming.DecompileOpName name
+        PrettyNaming.ConvertValLogicalNameToDisplayNameCore name
 
     type IDictionary<'TKey, 'TValue> with
         member x.remove (key: 'TKey) = x.Remove key |> ignore
@@ -159,18 +161,46 @@ module rec CommonUtil =
 [<AutoOpen>]
 module rec FcsUtil =
     let inline (|ExprRange|) (expr: SynExpr) = expr.Range
-    let inline (|PatRange|) (pat: SynPat) = pat.Range
+
+    let inline (|SynIdentTriviaRange|_|) (trivia) =
+        match trivia with
+        | IdentTrivia.HasParenthesis(lparen, rparen) -> Some(Range.unionRanges lparen rparen)
+        | _ -> None
+
+    let inline (|SynIdentWithTriviaRange|) (id: Ident, trivia) =
+        match id, trivia with
+        | _, Some(IdentTrivia.HasParenthesis(lparen, rparen)) ->
+            Range.unionRanges lparen rparen
+        | _ -> id.idRange
+
+    let inline (|SynIdentRange|) (id: SynIdent) =
+        match id with
+        | SynIdent(_, Some(IdentTrivia.HasParenthesis(lparen, rparen))) ->
+            Range.unionRanges lparen rparen
+        | SynIdent(id, _) -> id.idRange
+
+    let inline (|PatRange|) (pat: SynPat) =
+        match pat with
+        | SynPat.Named(SynIdent(_, Some(IdentTrivia.HasParenthesis(lparen, rparen))), _, _, _)
+        | SynPat.LongIdent(SynLongIdent(_, _, [Some(IdentTrivia.HasParenthesis(lparen, rparen))]), _, _, _, _, _) ->
+            Range.unionRanges lparen rparen
+        | _ -> pat.Range
+
     let inline (|IdentRange|) (id: Ident) = id.idRange
     let inline (|TypeRange|) (typ: SynType) = typ.Range
 
     let inline (|IdentText|_|) text (id: Ident) =
         if id.idText = text then someUnit else None
 
-    let inline (|LongIdentLid|) (lid: LongIdentWithDots) = lid.Lid
+    let inline (|LongIdentLid|) (lid: SynLongIdent) = lid.LongIdent
 
     let (|XmlDoc|) (preXmlDoc: PreXmlDoc) =
         preXmlDoc.ToXmlDoc(false, None)
 
+    let (|TypeTupleSegments|) (segments: SynTupleTypeSegment list) =
+        segments |> List.choose (function
+            | SynTupleTypeSegment.Type synType -> Some synType
+            | _ -> None)
 
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =

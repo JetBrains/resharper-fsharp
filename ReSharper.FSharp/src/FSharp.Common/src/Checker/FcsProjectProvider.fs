@@ -283,7 +283,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let getParsingOptionsForSingleFile ([<NotNull>] sourceFile: IPsiSourceFile) isScript =
         { FSharpParsingOptions.Default with
             SourceFiles = [| sourceFile.GetLocation().FullPath |]
-            ConditionalCompilationDefines = ImplicitDefines.scriptDefines
+            ConditionalDefines = ImplicitDefines.scriptDefines
             IsInteractive = isScript
             IsExe = isScript }
 

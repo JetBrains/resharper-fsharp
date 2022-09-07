@@ -182,16 +182,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     public static TreeTextRange GetNameIdentifierRange([CanBeNull] this IFSharpIdentifierLikeNode identifier) =>
-      identifier?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
-
-    public static TreeTextRange GetMemberNameIdentifierRange([CanBeNull] this IFSharpIdentifierLikeNode identifier)
-    {
-      var range = identifier.GetNameIdentifierRange();
-      return identifier?.GetTokenType() == FSharpTokenType.LPAREN_STAR_RPAREN
-        ? range.TrimLeft(1).TrimRight(1)
-        : range;
-    }
-
+      identifier?.GetNameRange() ?? TreeTextRange.InvalidRange;
 
     [NotNull]
     public static string MakeClrName([NotNull] this IFSharpTypeElementDeclaration declaration)

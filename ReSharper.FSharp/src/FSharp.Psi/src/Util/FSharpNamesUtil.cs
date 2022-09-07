@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static IEnumerable<string> GetPossibleSourceNames([NotNull] IDeclaredElement element)
     {
       var name = element.ShortName;
-      var names = new HashSet<string> {name, DecompileOpName(name)};
+      var names = new HashSet<string> {name, ConvertValLogicalNameToDisplayNameCore(name)};
 
       if (element is IFSharpDeclaredElement fsDeclaredElement)
         names.Add(fsDeclaredElement.SourceName);

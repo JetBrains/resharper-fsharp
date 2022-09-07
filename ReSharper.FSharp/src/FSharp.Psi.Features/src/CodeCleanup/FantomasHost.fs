@@ -61,9 +61,9 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
             if isNull value then "" else value |]
 
     let toRdFcsParsingOptions (options: FSharpParsingOptions) =
-        let lightSyntax = Option.toNullable options.LightSyntax
+        let lightSyntax = Option.toNullable options.IndentationAwareSyntax
         RdFcsParsingOptions(Array.last options.SourceFiles, lightSyntax,
-            List.toArray options.ConditionalCompilationDefines, options.IsExe, options.LangVersionText)
+            List.toArray options.ConditionalDefines, options.IsExe, options.LangVersionText)
 
     do fantomasDetector.VersionToRun.Advise(solutionLifetime, fun _ -> terminateConnection ())
 

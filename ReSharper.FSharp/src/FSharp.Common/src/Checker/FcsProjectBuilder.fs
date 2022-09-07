@@ -51,7 +51,7 @@ module ProjectOptions =
     let sandboxParsingOptions =
         // todo: use script defines in interactive?
         { FSharpParsingOptions.Default with
-            ConditionalCompilationDefines = ImplicitDefines.sourceDefines
+            ConditionalDefines = ImplicitDefines.sourceDefines
             SourceFiles = [| "Sandbox.fs" |] }
 
 module FcsProjectBuilder =
@@ -220,11 +220,11 @@ type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, it
         let parsingOptions, errors =
             checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
 
-        let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalCompilationDefines
+        let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalDefines
 
         let parsingOptions = { parsingOptions with
                                  SourceFiles = projectOptions.SourceFiles
-                                 ConditionalCompilationDefines = defines }
+                                 ConditionalDefines = defines }
 
         if not errors.IsEmpty then
             logger.Warn("Getting parsing options: {0}", concatErrors errors)

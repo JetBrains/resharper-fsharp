@@ -1,5 +1,5 @@
 ﻿using Microsoft.FSharp.Core.CompilerServices;
-using static FSharp.Compiler.ExtensionTyping;
+using static FSharp.Compiler.TypeProviders;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 {

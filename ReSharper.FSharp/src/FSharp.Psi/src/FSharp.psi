@@ -785,7 +785,9 @@ referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
     fSharpExpression<QUALIFIER_EXPR, Qualifier>
     DOT<FSHARP_DELIMITER, Delimiter>
   )?
+  LPAREN<LPAREN, LParen>?
   fSharpIdentifier<IDENTIFIER, Identifier>
+  RPAREN<RPAREN, RParen>?
   prefixAppTypeArgumentList<TYPE_ARG_LIST, TypeArgumentList>?;
 
 matchClause extras {

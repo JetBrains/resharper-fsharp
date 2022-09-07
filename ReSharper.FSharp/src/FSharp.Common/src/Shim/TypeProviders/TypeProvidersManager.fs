@@ -4,7 +4,7 @@ open System
 open System.Collections.Concurrent
 open System.Collections.Generic
 open System.Threading
-open FSharp.Compiler.ExtensionTyping
+open FSharp.Compiler.TypeProviders
 open FSharp.Compiler.Text
 open FSharp.Core.CompilerServices
 open JetBrains.Diagnostics
@@ -142,7 +142,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                 compilerToolsPath: string list, m: range) =
 
             let envPath, projectPsiModule =
-                match resolutionEnvironment.outputFile with
+                match resolutionEnvironment.OutputFile with
                 | Some file ->
                     file, fcsProjectProvider.GetPsiModule(VirtualFileSystemPath.Parse(file, InteractionContext.SolutionContext))
                 | None -> m.FileName, None

@@ -1,7 +1,9 @@
 [<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 
+open System
 open System.Collections.Generic
+open FSharp.Compiler.Symbols
 open JetBrains.Metadata.Reader.API
 open JetBrains.Metadata.Reader.Impl
 open JetBrains.ReSharper.Psi
@@ -127,3 +129,23 @@ let predefinedAbbreviations =
 [<Extension; CompiledName("TryGetPredefinedAbbreviations")>]
 let tryGetPredefinedAbbreviations(clrTypeName: IClrTypeName, names: outref<string[]>) =
     predefinedAbbreviations.TryGetValue(clrTypeName, &names)
+
+
+let isOption (fcsType: FSharpType) =
+    fcsType.StrippedType.BasicQualifiedName = fsOptionTypeName.FullName
+
+let isValueOption (fcsType: FSharpType) =
+    fcsType.StrippedType.BasicQualifiedName = fsValueOptionTypeName.FullName
+
+let isChoice (fcsType: FSharpType) =
+    fcsType.StrippedType.BasicQualifiedName.StartsWith("Microsoft.FSharp.Core.FSharpChoice`", StringComparison.Ordinal)
+
+[<Extension; CompiledName("IsUnit")>]
+let isUnit (fcsType: FSharpType) =
+    try fcsType.StrippedType.BasicQualifiedName = unitTypeName.FullName
+    with _ -> false
+
+[<Extension; CompiledName("IsNativePtr")>]
+let isNativePtr (fcsType: FSharpType) =
+    try fcsType.StrippedType.BasicQualifiedName = StandardTypeNames.IntPtr
+    with _ -> false

@@ -1,7 +1,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil
 
 open FSharp.Compiler.Symbols
-open FSharp.Compiler.Tokenization
+open FSharp.Compiler.Syntax
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -45,7 +45,7 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
     let bind name =
         let factory = pattern.CreateElementFactory()
 
-        let name = FSharpKeywords.AddBackticksToIdentifierIfNeeded name
+        let name = PrettyNaming.AddBackticksToIdentifierIfNeeded name
         let newPattern = factory.CreatePattern(name, false)
         let pat = ModificationUtil.ReplaceChild(pattern, newPattern)
 

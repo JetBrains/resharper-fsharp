@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using static FSharp.Compiler.ExtensionTyping;
+using static FSharp.Compiler.TypeProviders;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils
 {
