@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 
 [<ElementProblemAnalyzer([| typeof<DocComment> |], HighlightingTypes = [| typeof<InvalidXmlDocPositionWarning> |])>]
@@ -23,12 +24,23 @@ type XmlDocBlockAnalyzer() =
     inherit ElementProblemAnalyzer<XmlDocBlock>()
 
     override this.Run(xmlDocBlock, _, consumer) =
-        let parameters = FSharpParameterUtil.GetParametersGroupNames(xmlDocBlock.Parent)
         let xmlPsi = xmlDocBlock.GetXmlPsi()
 
-        let parameters = parameters |> Seq.collect id
         let paramNodes = xmlPsi.GetParameterNodes(null)
         if paramNodes.Count = 0 then () else
+
+        let parameters =
+            let xmlDocOwner = xmlDocBlock.Parent
+            let parameters = FSharpParameterUtil.GetParametersGroupNames(xmlDocOwner)
+            if parameters.Count > 0 then parameters else
+
+            match xmlDocOwner with
+            | :? IFSharpTypeDeclaration as decl when isNotNull decl.PrimaryConstructorDeclaration ->
+                FSharpParameterUtil.GetParametersGroupNames(decl.PrimaryConstructorDeclaration)
+            | _ ->
+                parameters
+
+        let parameters = parameters |> Seq.collect id
 
         for struct(name, parameter) in parameters do
             if name = SharedImplUtil.MISSING_DECLARATION_NAME then () else
