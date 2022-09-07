@@ -69,12 +69,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return field?.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner);
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="node"></param>
-    /// <param name="node"></param>
-    /// <returns></returns>
     public static IReadOnlyList<IReadOnlyList<(string name, ITreeNode node)>> GetParametersGroupNames(ITreeNode node) =>
       (node switch
       {
