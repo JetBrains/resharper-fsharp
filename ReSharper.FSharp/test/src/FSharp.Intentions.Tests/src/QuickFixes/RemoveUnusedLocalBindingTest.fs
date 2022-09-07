@@ -45,7 +45,7 @@ type RemoveUnusedLocalBindingTest() =
 
     [<Test>] member x.``Type - Single 01``() = x.DoNamedTest()
     [<Test>] member x.``Type - Single 02``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Recursive 01``() = x.DoNamedTest()
+    [<Test; Explicit "Regression https://github.com/dotnet/fsharp/issues/13849">] member x.``Type - Recursive 01``() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``Not available 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 02 - Param``() = x.DoNamedTest()

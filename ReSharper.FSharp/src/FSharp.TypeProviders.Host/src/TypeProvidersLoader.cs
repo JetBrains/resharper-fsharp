@@ -9,6 +9,7 @@ using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Core.CompilerServices;
 using Range = FSharp.Compiler.Text.Range;
+using static FSharp.Compiler.TypeProviders.Shim;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
 {
@@ -32,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
       var systemRuntimeAssemblyVersion = Version.Parse(parameters.SystemRuntimeAssemblyVersion);
       var compilerToolsPath = ListModule.OfSeq(parameters.CompilerToolsPath);
 
-      var typeProviders = ExtensionTyping.Shim.ExtensionTypingProvider.InstantiateTypeProvidersOfAssembly(
+      var typeProviders = ExtensionTyping.Provider.InstantiateTypeProvidersOfAssembly(
         parameters.RunTimeAssemblyFileName, parameters.DesignTimeAssemblyNameString,
         resolutionEnvironment, parameters.IsInvalidationSupported, parameters.IsInteractive, systemRuntimeContainsType,
         systemRuntimeAssemblyVersion, compilerToolsPath, myLogError, Range.Zero);

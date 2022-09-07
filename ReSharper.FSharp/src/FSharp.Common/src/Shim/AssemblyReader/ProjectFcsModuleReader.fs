@@ -109,7 +109,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let nestedTypes = emptyILTypeDefs
 
         ILTypeDef(name, attributes, layout, implements, genericParams, extends, emptyILMethods, nestedTypes,
-             emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, emptyILSecurityDecls,
+             emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, false, emptyILSecurityDecls,
              emptyILCustomAttrs)
 
     let mkTypeAccessRights (typeElement: ITypeElement): TypeAttributes =
@@ -1067,7 +1067,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
             let typeDef =
                 ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
-                    extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
+                    extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties, false,
                     emptyILSecurityDecls, customAttrs)
 
             let fcsTypeDef = 

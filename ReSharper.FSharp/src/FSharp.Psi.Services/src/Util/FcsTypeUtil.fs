@@ -21,12 +21,3 @@ let getFunctionTypeArgs includeReturnType fcsType =
                 acc
 
     loop fcsType [] |> List.rev
-
-let isOption (fcsType: FSharpType) =
-    fcsType.StrippedType.QualifiedBaseName = FSharpPredefinedType.fsOptionTypeName.FullName
-
-let isValueOption (fcsType: FSharpType) =
-    fcsType.StrippedType.QualifiedBaseName = FSharpPredefinedType.fsValueOptionTypeName.FullName
-
-let isChoice (fcsType: FSharpType) =
-    fcsType.StrippedType.QualifiedBaseName.StartsWith("Microsoft.FSharp.Core.FSharpChoice`", StringComparison.Ordinal)

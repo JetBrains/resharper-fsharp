@@ -53,21 +53,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         : null;
     }
 
-    public TreeTextRange GetCasesRange()
-    {
-      // todo: remove parens from range?
-
-      var lParen = LParen;
-      var rParen = RParen;
-      if (lParen == null || rParen == null) // todo: better recovery for missing rparen
-        return this.GetTreeTextRange();
-
-      var firstRange = lParen.GetTreeTextRange();
-      var lastRange = rParen.GetTreeTextRange();
-
-      return firstRange.IsValid() && lastRange.IsValid()
-        ? new TreeTextRange(firstRange.StartOffset, lastRange.EndOffset)
+    public TreeTextRange GetCasesRange() =>
+      Bars is { Count: > 0 } bars
+        ? new TreeTextRange(bars.First().GetTreeStartOffset(), bars.Last().GetTreeEndOffset())
         : this.GetTreeTextRange();
-    }
   }
 }

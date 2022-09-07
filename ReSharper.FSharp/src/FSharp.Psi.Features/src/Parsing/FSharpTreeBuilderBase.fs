@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open System.Collections.Generic
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Syntax.PrettyNaming
+open FSharp.Compiler.SyntaxTrivia
 open FSharp.Compiler.Text
 open FSharp.Compiler.Xml
 open JetBrains.Application.Environment
@@ -137,10 +138,39 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             marks.Push(x.Mark())
 
         for id in lid do
+            x.Done(id.idRange, marks.Pop(), ElementType.EXPRESSION_REFERENCE_NAME)
+
+    member x.ProcessReferenceName(lid: SynIdent list) =
+        if lid.IsEmpty then () else
+
+        let marks = Stack()
+        let (SynIdentRange idRange) = lid.Head
+
+        x.AdvanceToStart(idRange)
+        for _ in lid do
+            marks.Push(x.Mark())
+
+        for SynIdentRange idRange as SynIdent(id, _) in lid do
             let isLastId = marks.Count = 1
             if isLastId && IsActivePatternName id.idText then 
-                x.ProcessActivePatternId(id, ElementType.ACTIVE_PATTERN_NAMED_CASE_REFERENCE_NAME)
-            x.Done(id.idRange, marks.Pop(), ElementType.EXPRESSION_REFERENCE_NAME)
+                x.ProcessActivePatternId(idRange, ElementType.ACTIVE_PATTERN_NAMED_CASE_REFERENCE_NAME) // todo
+            x.Done(idRange, marks.Pop(), ElementType.EXPRESSION_REFERENCE_NAME)
+
+    member x.ProcessReferenceName(lid: (Ident * IdentTrivia option) list) =
+        if lid.IsEmpty then () else
+
+        let marks = Stack()
+        let (SynIdentWithTriviaRange idRange) = lid.Head
+
+        x.AdvanceToStart(idRange)
+        for _ in lid do
+            marks.Push(x.Mark())
+
+        for SynIdentWithTriviaRange idRange as (id, _) in lid do
+            let isLastId = marks.Count = 1
+            if isLastId && IsActivePatternName id.idText then 
+                x.ProcessActivePatternId(idRange, ElementType.ACTIVE_PATTERN_NAMED_CASE_REFERENCE_NAME) // todo
+            x.Done(idRange, marks.Pop(), ElementType.EXPRESSION_REFERENCE_NAME)
 
     member x.ProcessReferenceNameSkipLast(lid: Ident list) =
         match lid with
@@ -255,7 +285,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
         match openDeclTarget with
         | SynOpenDeclTarget.ModuleOrNamespace(lid, _) ->
-            x.ProcessNamedTypeReference(lid)
+            x.ProcessNamedTypeReference(lid.LongIdent)
         | SynOpenDeclTarget.Type(typeName, _) ->
             x.ProcessType(typeName)
         x.Done(range, mark, ElementType.OPEN_STATEMENT)
@@ -435,7 +465,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             | _ -> x.Mark(attr.Range)
 
         let lidWithDots = attr.TypeName
-        x.ProcessNamedTypeReference(lidWithDots.Lid)
+        x.ProcessNamedTypeReference(lidWithDots.LongIdent)
 
         let ExprRange argRange as argExpr = attr.ArgExpr
         if lidWithDots.Range <> argRange then
@@ -519,7 +549,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessImplicitCtorParam(pat)
             x.Done(range, mark, ElementType.ATTRIB_PAT)
 
-    member x.ProcessActivePatternId(IdentRange range, caseElementType) =
+    member x.ProcessActivePatternId(range: range, caseElementType) =
         let idMark = x.Mark(range)
 
         let endOffset = x.GetEndOffset(range)
@@ -603,7 +633,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
     member x.ProcessTypeAsTypeReferenceName(synType) =
         match synType with
         | SynType.LongIdent(lid) ->
-            x.ProcessNamedTypeReference(lid.Lid)
+            x.ProcessNamedTypeReference(lid.LongIdent)
 
         | SynType.App(SynType.Var(_, varRange), ltRange, typeArgs, _, gtRange, isPostfix, range) ->
             let mark = x.Mark(range)
@@ -618,9 +648,9 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | SynType.App(typeName, ltRange, typeArgs, _, gtRange, isPostfix, range) ->
             let lid =
                 match typeName with
-                | SynType.LongIdent(lid) -> lid.Lid
-                | SynType.MeasurePower(SynType.LongIdent(lid), _, _) -> lid.Lid
-                | SynType.MeasureDivide(SynType.LongIdent(lid), _, _) -> lid.Lid
+                | SynType.LongIdent(lid) -> lid.LongIdent
+                | SynType.MeasurePower(SynType.LongIdent(lid), _, _) -> lid.LongIdent
+                | SynType.MeasureDivide(SynType.LongIdent(lid), _, _) -> lid.LongIdent
                 | _ -> failwithf "unexpected type: %A" typeName
 
             let mark = x.Mark(range)
@@ -636,7 +666,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | SynType.LongIdentApp(typeName, lid, ltRange, typeArgs, _, gtRange, range) ->
             let mark = x.Mark(range)
             x.ProcessTypeAsTypeReferenceName(typeName)
-            x.MarkTypeReferenceQualifierNames(lid.Lid)
+            x.MarkTypeReferenceQualifierNames(lid.LongIdent)
             x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
             x.Done(mark, ElementType.TYPE_REFERENCE_NAME)
 
@@ -668,9 +698,22 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         let processParameterGroup paramGroup synType =
             match paramGroup, synType with
-            | _, SynType.Tuple(false, types, range) ->
-                let mark = x.Mark(range)
-                List.map snd types |> List.iter2 processParameterSig paramGroup
+            | _, SynType.Tuple(false, TypeTupleSegments types, range) ->
+                let mark =
+                    match paramGroup with
+                    | SynArgInfo(attrList :: _, _, _) :: _ ->
+                        x.Mark(attrList.Range)
+
+                    | SynArgInfo(optional = true) :: _ ->
+                        x.MarkTokenOrRange(FSharpTokenType.QMARK, range)
+
+                    | SynArgInfo(_, _, Some(IdentRange idRange)) :: _ ->
+                        x.Mark(idRange)
+
+                    | _ ->
+                        x.Mark(range)
+
+                types |> List.iter2 processParameterSig paramGroup
                 x.Done(mark, ElementType.TUPLE_TYPE_USAGE)
             | [ param ], _ ->
                 processParameterSig param synType
@@ -678,7 +721,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         let rec loop paramGroups returnInfo synType =
             match paramGroups, synType with
-            | group :: rest, SynType.Fun(arg, returnType, range) ->
+            | group :: rest, SynType.Fun(arg, returnType, range, _) ->
                 let mark = x.Mark(range)
                 processParameterGroup group arg
                 loop rest returnInfo returnType
@@ -691,7 +734,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         match synType with
         | SynType.LongIdent(lid) ->
             let mark = x.Mark(range)
-            x.ProcessNamedTypeReference(lid.Lid)
+            x.ProcessNamedTypeReference(lid.LongIdent)
             x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
         | SynType.App _ ->
@@ -704,9 +747,9 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessTypeAsTypeReferenceName(synType)
             x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
-        | SynType.Tuple (_, types, _) ->
+        | SynType.Tuple (_, TypeTupleSegments types, _) ->
             let mark = x.Mark(range)
-            for _, synType in types do
+            for synType in types do
                 x.ProcessType(synType)
             x.Done(range, mark, ElementType.TUPLE_TYPE_USAGE)
 
@@ -726,7 +769,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | SynType.MeasureDivide(synType1, synType2, _) ->
             x.MarkTypes(synType1, synType2, range, ElementType.UNSUPPORTED_TYPE_USAGE)
 
-        | SynType.Fun(synType1, synType2, _) ->
+        | SynType.Fun(synType1, synType2, _, _) ->
             x.MarkTypes(synType1, synType2, range, ElementType.FUNCTION_TYPE_USAGE)
 
         | SynType.WithGlobalConstraints(synType, constraints, _) ->

@@ -24,7 +24,7 @@ type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FcsChec
         | null -> FSharpLanguage.Instance.LanguageService().GetPrimaryLexerFactory()
         | _ ->
 
-        let defines = fsCheckerService.FcsProjectProvider.GetParsingOptions(sourceFile).ConditionalCompilationDefines
+        let defines = fsCheckerService.FcsProjectProvider.GetParsingOptions(sourceFile).ConditionalDefines
         FSharpPreprocessedLexerFactory(defines) :> _
 
     override x.GetPsiProperties(projectFile, sourceFile, isCompileService) =

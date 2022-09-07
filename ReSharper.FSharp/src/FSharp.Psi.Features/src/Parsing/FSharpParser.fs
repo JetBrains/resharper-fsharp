@@ -35,7 +35,7 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
         let lifetime = lifetimeDefinition.Lifetime
 
         let parsingOptions = checkerService.FcsProjectProvider.GetParsingOptions(sourceFile)
-        let defines = parsingOptions.ConditionalCompilationDefines
+        let defines = parsingOptions.ConditionalDefines
 
         let lexer = FSharpPreprocessedLexerFactory(defines).CreateLexer(lexer).ToCachingLexer()
         let parseResults = checkerService.ParseFile(path, document, parsingOptions, noCache)

@@ -275,9 +275,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           if (buffer[i] == '`' && buffer[i + 1] == '`')
             return new TextRange(i, endOffset);
 
-      if (logicalName != null && PrettyNaming.IsMangledOpName(logicalName))
+      if (logicalName != null && PrettyNaming.IsLogicalOpName(logicalName))
       {
-        var sourceName = PrettyNaming.DecompileOpName(logicalName);
+        var sourceName = PrettyNaming.ConvertValLogicalNameToDisplayNameCore(logicalName);
         var isUnary = sourceName.StartsWith("~", StringComparison.Ordinal);
         var sourceLength = isUnary ? sourceName.Length - 1 : sourceName.Length;
 
@@ -303,7 +303,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       for (var i = endOffset - 1; i > startOffset; i--)
       {
         var c = buffer[i];
-        if (c.Equals('.') || c.Equals('(') && i < endOffset - 1 && buffer[i + 1] != '|')
+        if (c.Equals('.') || c.Equals('(') && i < endOffset - 1)
           return new TextRange(i + 1, endOffset);
       }
 

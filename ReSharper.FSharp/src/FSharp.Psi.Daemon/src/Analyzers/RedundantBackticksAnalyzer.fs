@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
-open FSharp.Compiler.Tokenization
+open FSharp.Compiler.Syntax
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -18,6 +18,6 @@ type RedundantBackticksAnalyzer() =
         let withoutBackticks = text.RemoveBackticks()
         if text.Length = withoutBackticks.Length || withoutBackticks = "_" then () else
 
-        let escaped = FSharpKeywords.AddBackticksToIdentifierIfNeeded withoutBackticks
+        let escaped = PrettyNaming.AddBackticksToIdentifierIfNeeded withoutBackticks
         if escaped.Length = withoutBackticks.Length then
             consumer.AddHighlighting(RedundantBackticksWarning(identifier))

@@ -3,7 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
-open FSharp.Compiler.Tokenization
+open FSharp.Compiler.Syntax
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -274,7 +274,7 @@ module FSharpNamingService =
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
     let mangleNameIfNecessary name =
-        FSharpKeywords.AddBackticksToIdentifierIfNeeded name
+        PrettyNaming.AddBackticksToIdentifierIfNeeded name
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =

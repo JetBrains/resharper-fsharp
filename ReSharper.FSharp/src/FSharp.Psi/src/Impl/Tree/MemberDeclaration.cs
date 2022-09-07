@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override bool IsOverride => this.IsOverride();
 
     public override TreeTextRange GetNameIdentifierRange() =>
-      NameIdentifier.GetMemberNameIdentifierRange();
+      NameIdentifier.GetNameIdentifierRange();
 
     public override void SetOverride(bool value)
     {

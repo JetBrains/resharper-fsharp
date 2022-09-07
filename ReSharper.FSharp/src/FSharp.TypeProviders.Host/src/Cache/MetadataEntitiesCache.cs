@@ -11,7 +11,7 @@ using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
 using JetBrains.Util;
 using JetBrains.Util.Collections;
 using JetBrains.Util.dataStructures;
-using static FSharp.Compiler.ExtensionTyping;
+using static FSharp.Compiler.TypeProviders;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 {

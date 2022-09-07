@@ -284,7 +284,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var singleDeclaration = declarations.SingleItem(decl =>
       {
         var range = decl.GetSourceFile().NotNull().Document.GetTreeTextRange(fcsRange);
-        return range.Contains(decl.GetNameIdentifierRange());
+        var nameIdentifierRange = decl.GetNameIdentifierRange();
+        return range.Contains(nameIdentifierRange);
       });
 
       var singleSourceElement = singleDeclaration?.GetOrCreateDeclaredElement(mfv);
@@ -461,7 +462,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var paramGroups = mfv.CurriedParameterGroups;
       var isFsExtension = mfv.IsExtensionMember;
-      var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit;
+      var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit();
 
       if (!isFsExtension && isVoidReturn)
         return EmptyArray<IParameter>.Instance;

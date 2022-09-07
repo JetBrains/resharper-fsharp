@@ -4,6 +4,7 @@ using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -55,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (invokeMethod == null)
         return EmptyArray<IParameter>.Instance;
 
-      if (types.Count == 1 && types[0].Item2.IsUnit)
+      if (types.Count == 1 && types[0].Item2.IsUnit())
         return EmptyArray<IParameter>.Instance;
 
       const string name = SharedImplUtil.MISSING_DECLARATION_NAME;

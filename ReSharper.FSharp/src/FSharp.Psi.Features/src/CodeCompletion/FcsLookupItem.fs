@@ -2,7 +2,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
-open FSharp.Compiler.Tokenization
+open FSharp.Compiler.Syntax
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.Lookup
@@ -91,7 +91,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
     override x.Text =
         let name = x.FcsSymbol.DisplayNameCore
         let name = if context.IsInAttributeContext then name.DropAttributeSuffix() else name
-        FSharpKeywords.AddBackticksToIdentifierIfNeeded name
+        PrettyNaming.AddBackticksToIdentifierIfNeeded name
 
     override x.DisplayTypeName =
         try
@@ -134,7 +134,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
                 let moduleToOpen = getModuleToOpen typeElement
                 ModuleToImport.DeclaredElement(moduleToOpen) else
 
-            let ns = ns |> Array.map FSharpKeywords.AddBackticksToIdentifierIfNeeded |> String.concat "."
+            let ns = ns |> Array.map PrettyNaming.AddBackticksToIdentifierIfNeeded |> String.concat "."
             ModuleToImport.FullName(ns)
 
         let offset = context.Ranges.InsertRange.StartOffset

@@ -4,7 +4,7 @@ using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
-using static FSharp.Compiler.ExtensionTyping;
+using static FSharp.Compiler.TypeProviders;
 using Unit = JetBrains.Core.Unit;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts

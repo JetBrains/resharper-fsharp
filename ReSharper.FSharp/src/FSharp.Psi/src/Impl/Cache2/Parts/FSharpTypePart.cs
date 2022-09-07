@@ -152,7 +152,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       var result = new FrugalLocalList<IAttributeInstance>();
       foreach (var fcsAttribute in entityAttrs)
-        if (new ClrTypeName(fcsAttribute.AttributeType.QualifiedBaseName).Equals(clrName))
+        if (new ClrTypeName(fcsAttribute.AttributeType.BasicQualifiedName).Equals(clrName))
           result.Add(new FSharpAttributeInstance(fcsAttribute, psiModule));
 
       return result.ResultingList();

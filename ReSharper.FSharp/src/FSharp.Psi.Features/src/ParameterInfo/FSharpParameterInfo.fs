@@ -14,7 +14,6 @@ open JetBrains.ReSharper.Feature.Services.ParameterInfo
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -298,7 +297,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                         if not (this.IsOptionalParam(fcsParameter)) then fcsParameterType else
 
                         match tryGetAbbreviatedTypeEntity fcsParameterType with
-                        | Some entity when entity.QualifiedBaseName = FSharpPredefinedType.fsOptionTypeName.FullName ->
+                        | Some entity when entity.BasicQualifiedName = FSharpPredefinedType.fsOptionTypeName.FullName ->
                             fcsParameterType.GenericArguments
                             |> Seq.tryExactlyOne
                             |> Option.defaultValue fcsParameterType
@@ -423,16 +422,16 @@ type FcsActivePatternMfvParameterInfoCandidate(apc: FSharpActivePatternCase, mfv
             match activePatternGroup.IsTotal with
             | true when
                     names.Count > 1 && apc.Index < names.Count &&
-                    apc.Index < mfvReturnType.GenericArguments.Count && FcsTypeUtil.isChoice mfvReturnType ->
+                    apc.Index < mfvReturnType.GenericArguments.Count && FSharpPredefinedType.isChoice mfvReturnType ->
                 Some mfvReturnType.GenericArguments[apc.Index]
 
             | false when
-                    FcsTypeUtil.isOption mfvReturnType ||
+                    FSharpPredefinedType.isOption mfvReturnType ||
 
-                    FcsTypeUtil.isValueOption mfvReturnType &&
+                    FSharpPredefinedType.isValueOption mfvReturnType &&
                     mfv.ReturnParameter.Attributes.HasAttributeInstance(FSharpPredefinedType.structAttrTypeName) ->
                 let optionArgType = mfvReturnType.GenericArguments[0]
-                if optionArgType.StrippedType.IsUnit then None else Some optionArgType
+                if FSharpPredefinedType.isUnit optionArgType.StrippedType then None else Some optionArgType
 
             | _ -> Some mfvReturnType
 
