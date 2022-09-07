@@ -95,6 +95,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         IFSharpTypeDeclaration { TypeRepresentation: IDelegateRepresentation repr } =>
           GetParameterNames(repr.TypeUsage),
 
+        IFSharpTypeDeclaration { PrimaryConstructorDeclaration: { } constructor } =>
+          GetParametersGroupNames(constructor),
+
         _ => EmptyList<string[]>.Enumerable
       })
       .Select(t => t.ToIReadOnlyList())
