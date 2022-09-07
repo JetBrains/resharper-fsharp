@@ -103,7 +103,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         IFSharpTypeDeclaration { TypeRepresentation: IDelegateRepresentation repr } =>
           GetParameterNames(repr.TypeUsage),
 
-        _ => EmptyList<string[]>.Enumerable
+        _ => EmptyList<IEnumerable<(string, ITreeNode)>>.Enumerable
       })
       .Select(t => t.ToIReadOnlyList())
       .ToIReadOnlyList();
