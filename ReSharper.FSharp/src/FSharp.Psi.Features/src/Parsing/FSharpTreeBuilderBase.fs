@@ -685,7 +685,14 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                 x.Done(mark, ElementType.FUNCTION_TYPE_USAGE)
             | _, _ -> processParameterSig returnInfo synType
 
-        loop paramGroups returnInfo synType
+        match synType with
+        | SynType.WithGlobalConstraints(synType, constraints, range) ->
+            let mark = x.Mark(range)
+            loop paramGroups returnInfo synType
+            x.ProcessConstraintsClause(constraints)
+            x.Done(mark, ElementType.CONSTRAINED_TYPE_USAGE)
+        | _ ->
+            loop paramGroups returnInfo synType
 
     member x.ProcessType(TypeRange range as synType) =
         match synType with
