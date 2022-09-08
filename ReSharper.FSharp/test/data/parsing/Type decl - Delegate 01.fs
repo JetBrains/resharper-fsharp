@@ -1,1 +1,1 @@
-type D = delegate of int -> int
+type D = delegate of x: int -> int

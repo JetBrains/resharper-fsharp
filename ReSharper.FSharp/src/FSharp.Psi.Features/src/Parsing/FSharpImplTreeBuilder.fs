@@ -155,9 +155,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 | _ -> members
 
             match kind with
-            | SynTypeDefnKind.Delegate(synType, _) ->
+            | SynTypeDefnKind.Delegate(synType, signatureInfo) ->
                 let mark = x.Mark(reprRange)
-                x.ProcessType(synType)
+                x.ProcessSignatureType(signatureInfo, synType)
                 x.Done(reprRange, mark, ElementType.DELEGATE_REPRESENTATION)
 
             | _ ->

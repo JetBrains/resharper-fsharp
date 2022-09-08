@@ -343,6 +343,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``XmlDoc 02 - Lambda 02``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 02 - Lambda 03``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 03 - Type``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 03 - Delegate``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 04 - Union case``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 05 - Abstract member``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 06 - Type member 01``() = x.DoNamedTest()
@@ -355,6 +356,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``XmlDoc 08 - Module value``() = x.DoNamedTest()
     [<FSharpSignatureTest>]
     [<Test>] member x.``XmlDoc 09 - Constructor signature``() = x.DoNamedTest()
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``XmlDoc 10 - Delegate - Signature``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type LineIndentsTest() =
