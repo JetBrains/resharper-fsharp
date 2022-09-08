@@ -1,0 +1,8 @@
+﻿// ${CHAR:<}
+module Module
+
+/// <summary>
+/// {caret}
+/// </summary>
+/// <param name="y"></param>
+type A(y) = class end
