@@ -1,0 +1,11 @@
+﻿// ${CHAR:<}
+module Module
+
+type A =
+    /// <summary>
+    /// {caret}
+    /// </summary>
+    /// <param name="Item1"></param>
+    /// <param name="x"></param>
+    /// <param name="Item3"></param>
+    | Case of int * x: int * int

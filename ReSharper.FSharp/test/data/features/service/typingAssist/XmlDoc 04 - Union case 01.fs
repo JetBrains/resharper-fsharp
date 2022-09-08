@@ -3,4 +3,4 @@ module Module
 
 type A =
     /// {caret}
-    | Case of int * x: int
+    | Case of int * x: int * int

@@ -90,11 +90,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         IMemberSignature memberSignature => GetParameterNames(((IMemberSignatureOrDeclaration)memberSignature)
           .ReturnTypeInfo.ReturnType),
 
-        IUnionCaseDeclaration ucDecl => new[] { ucDecl.Fields.Select(t => t.SourceName) },
+        IUnionCaseDeclaration ucDecl => new[] { ProcessUnionCaseFieldNames(ucDecl) },
+
         _ => EmptyList<string[]>.Enumerable
       })
       .Select(t => t.ToIReadOnlyList())
       .ToIReadOnlyList();
+
+    private static IEnumerable<string> ProcessUnionCaseFieldNames(IUnionCaseDeclaration unionsCase)
+    {
+      var fields = unionsCase.Fields;
+      var fieldsCount = fields.Count;
+
+      return fields.Select((field, i) =>
+        field.SourceName == SharedImplUtil.MISSING_DECLARATION_NAME
+          ? fieldsCount > 1 ? $"Item{i + 1}" : "Item"
+          : field.SourceName);
+    }
 
     private static bool IsSimplePattern(IFSharpPattern pattern, bool isTopLevel) => pattern.IgnoreInnerParens() switch
     {

@@ -5,5 +5,5 @@ type A =
     /// <summary>
     /// {caret}
     /// </summary>
-    /// <param name="x"></param>
-    | Case of int * x: int
+    /// <param name="Item"></param>
+    | Case of int
