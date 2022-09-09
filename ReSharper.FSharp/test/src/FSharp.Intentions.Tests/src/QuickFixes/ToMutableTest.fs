@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
+open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
@@ -22,7 +23,17 @@ type ToMutableFixTest() =
     [<Test; Explicit>] member x.``Val - Parameter pattern 02 - Function param``() = x.DoNamedTest()
     [<Test>] member x.``Val - Parameter pattern 03 - Typed``() = x.DoNamedTest()
 
-    [<Test>] member x.``TopAsPat``() = x.DoNamedTest()
-    [<Test>] member x.``LocalAsPat``() = x.DoNamedTest()
+    [<Test>] member x.TopAsPat() = x.DoNamedTest()
+    [<Test>] member x.LocalAsPat() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``LocalAsPat - Pattern matching, not available``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type ToMutableFixAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/toMutable"
+
+    [<Test>] member x.``Availability - Name 01``() = x.DoNamedTest()
+    [<Test>] member x.``Availability - Name 02 - Parens``() = x.DoNamedTest()

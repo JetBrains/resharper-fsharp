@@ -1,0 +1,9 @@
+﻿module Module
+
+let b = 1
+|b|(0) <- 3
+
+------------------------------------------------
+0: b is not mutable
+QUICKFIXES:
+Make 'b' mutable

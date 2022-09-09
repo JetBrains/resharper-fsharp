@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 
 type ToMutableFix(refExpr: IReferenceExpr) =
     inherit FSharpQuickFixBase()
@@ -14,13 +15,16 @@ type ToMutableFix(refExpr: IReferenceExpr) =
     new (error: ValueNotMutableError) =
         ToMutableFix(error.RefExpr)
 
-    override x.Text = "Make " + refExpr.Identifier.GetSourceName() + " mutable"
+    override x.Text = $"Make '{refExpr.Identifier.GetSourceName()}' mutable"
 
     override x.IsAvailable _ =
-        if not (isValid refExpr) then false else
+        isValid refExpr &&
+
+        let name = refExpr.Identifier.GetSourceName()
+        name <> SharedImplUtil.MISSING_DECLARATION_NAME &&
 
         let mutableModifierOwner = refExpr.Reference.Resolve().DeclaredElement.As<IMutableModifierOwner>()
-        if isNull mutableModifierOwner then false else
+        isNotNull mutableModifierOwner &&
 
         mutableModifierOwner.CanBeMutable && not mutableModifierOwner.IsMutable
 

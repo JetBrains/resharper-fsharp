@@ -1,0 +1,8 @@
+﻿module Module
+
+let b = 1
+|(b)|(0) <- 3
+
+------------------------------------------------
+0: A value must be mutable in order to mutate the contents or take the address of a value type, e.g. 'let mutable x = ...'
+NO QUICKFIXES
