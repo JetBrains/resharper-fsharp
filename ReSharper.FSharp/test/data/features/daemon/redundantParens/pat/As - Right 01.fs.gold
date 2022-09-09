@@ -1,0 +1,55 @@
+﻿module Module
+
+let _ as (_, _) = 1, 2
+let _ as |(|(0)(_, _)|)|(1) = 1, 2
+
+let _ as |(|(2)(_ :: _)|)|(3) = []
+let _ as (_ :: _) = []
+
+let _ as (_ as _) = 1
+let _ as |(|(4)(_ as _)|)|(5) = 1
+
+let _ as (None | Some _) = None
+let _ as |(|(6)(None | Some _)|)|(7) = None
+
+let _ as |(|(8)[]|)|(9) = []
+let _ as |(|(10)|(|(11)[]|)|(12)|)|(13) = []
+
+let _ as |(|(14)1|)|(15) = 1
+let _ as |(|(16)|(|(17)1|)|(18)|)|(19) = 1
+
+let _ as |(|(20)null|)|(21) = null
+let _ as |(|(22)|(|(23)null|)|(24)|)|(25) = null
+
+let f (_ as ([<CompiledName "">] x)) = ()
+let f (_ as |(|(26)([<CompiledName "">] x)|)|(27)) = ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
+(8): ReSharper Dead Code: Redundant parentheses
+(9):<secondary> ReSharper Dead Code: Redundant parentheses
+(10): ReSharper Dead Code: Redundant parentheses
+(11): ReSharper Dead Code: Redundant parentheses
+(12):<secondary> ReSharper Dead Code: Redundant parentheses
+(13):<secondary> ReSharper Dead Code: Redundant parentheses
+(14): ReSharper Dead Code: Redundant parentheses
+(15):<secondary> ReSharper Dead Code: Redundant parentheses
+(16): ReSharper Dead Code: Redundant parentheses
+(17): ReSharper Dead Code: Redundant parentheses
+(18):<secondary> ReSharper Dead Code: Redundant parentheses
+(19):<secondary> ReSharper Dead Code: Redundant parentheses
+(20): ReSharper Dead Code: Redundant parentheses
+(21):<secondary> ReSharper Dead Code: Redundant parentheses
+(22): ReSharper Dead Code: Redundant parentheses
+(23): ReSharper Dead Code: Redundant parentheses
+(24):<secondary> ReSharper Dead Code: Redundant parentheses
+(25):<secondary> ReSharper Dead Code: Redundant parentheses
+(26): ReSharper Dead Code: Redundant parentheses
+(27):<secondary> ReSharper Dead Code: Redundant parentheses

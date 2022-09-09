@@ -57,6 +57,16 @@ let rec isAtCompoundPatternRightSide (pat: IFSharpPattern) =
     let parent = getParentPatternFromLeftSide pat
     isAtCompoundPatternRightSide parent
 
+let isCompoundPattern (pat: IFSharpPattern) =
+    match pat with
+    | :? IConstPat
+    | :? IListPat
+    | :? INullPat
+    | :? IRecordPat
+    | :? IReferencePat
+    | :? IWildPat -> false
+    | _ -> true
+
 let rec compoundPatternNeedsParens (strictContext: ITreeNode) (fsPattern: IFSharpPattern) =
     if isNull strictContext then false else
 
@@ -102,6 +112,8 @@ let prefersReferenceResolveRules (refPat: IReferencePat) =
     not (name.IsEmpty()) && name[0].IsUpperFast()
 
 let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
+    if isCompoundPattern fsPattern && isNotNull (AsPatNavigator.GetByRightPattern(context)) then true else
+
     match fsPattern with
     | :? IListConsPat as listConsPat ->
         checkPrecedence context fsPattern ||

@@ -22,6 +22,7 @@ type RedundantParenPatTest() =
     [<Test>] member x.``As - List cons 02 - Tuple``() = x.DoNamedTest()
     [<Test>] member x.``As - Or 01``() = x.DoNamedTest()
     [<Test>] member x.``As - Param owner 01``() = x.DoNamedTest()
+    [<Test>] member x.``As - Right 01``() = x.DoNamedTest()
     [<Test>] member x.``As - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``As - Tuple 02 - List cons``() = x.DoNamedTest()
     [<Test>] member x.``As - Tuple 03 - Typed``() = x.DoNamedTest()
