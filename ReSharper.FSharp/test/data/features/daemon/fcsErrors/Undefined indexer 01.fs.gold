@@ -6,5 +6,5 @@ n|[1]|(2)
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant '.'
-(1): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression
-(2): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression
+(1): ReSharper Underlined Error Highlighting: The type 'Int32' does not define the field, constructor or member 'Item'.
+(2): ReSharper Underlined Error Highlighting: The type 'Int32' does not define the field, constructor or member 'Item'.

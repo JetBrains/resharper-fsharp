@@ -13,7 +13,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 type IIgnoredHighlighting =
@@ -81,8 +80,6 @@ module FSharpErrors =
     let [<Literal>] SingleQuoteInSingleQuote = 3373
     let [<Literal>] InvalidXmlDocPosition = 3520
 
-    let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
-    let [<Literal>] undefinedGetSliceMessageSuffix = " does not define the field, constructor or member 'GetSlice'."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
     let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type \n    '(.+)'    \nis not compatible with type\n    '(.+)'"
@@ -232,30 +229,20 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode VarBoundTwiceError range
 
         | UndefinedName ->
-            let message = error.Message
-            let isUndefinedIndexerText =
-                endsWith undefinedIndexerMessageSuffix message || endsWith undefinedGetSliceMessageSuffix message
+            match nodeSelectionProvider.GetExpressionInRange<IFSharpExpression>(fsFile, range, false, null) with
+            | :? IPrefixAppExpr as prefixAppExpr when prefixAppExpr.IsIndexerLike ->
+                UndefinedIndexerLikeExprError(prefixAppExpr, error.Message) :> _
 
-            let tryGetIndexerExpr (range: DocumentRange): ITreeNode option =
-                let indexerExpr = fsFile.GetNode<IItemIndexerExpr>(range)
-                if isNotNull indexerExpr && isNotNull indexerExpr.IndexerArgList then
-                    Some(indexerExpr.IndexerArgList) else
+            | :? IItemIndexerExpr as indexerExpr ->
+                UndefinedIndexerError(indexerExpr, error.Message)
 
-                let appExpr = fsFile.GetNode<IPrefixAppExpr>(range)
-                if isNotNull appExpr && appExpr.ArgumentExpression :? IListExpr then
-                    Some(appExpr.ArgumentExpression) else
-
-                None
-
-            match isUndefinedIndexerText, tryGetIndexerExpr range with
-            | true, Some(treeNode) -> UndefinedIndexerError(treeNode) :> _
             | _ ->
 
             let identifier = fsFile.GetNode(range)
             let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
-            if isNotNull referenceOwner then UndefinedNameError(referenceOwner.Reference, message) :> _ else
+            if isNotNull referenceOwner then UndefinedNameError(referenceOwner.Reference, error.Message) :> _ else
 
-            UnresolvedHighlighting(message, range) :> _
+            UnresolvedHighlighting(error.Message, range) :> _
 
         | ErrorFromAddingConstraint ->
             createHighlightingFromNodeWithMessage AddingConstraintError range error

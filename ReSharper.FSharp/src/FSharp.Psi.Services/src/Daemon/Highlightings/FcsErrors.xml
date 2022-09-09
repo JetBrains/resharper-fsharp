@@ -205,9 +205,22 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UndefinedIndexer" ID="FS0039: Undefined indexer">
-    <Parameter type="ITreeNode" name="indexerNode"/>
-    <Range>indexerNode.GetHighlightingRange()</Range>
-    <Message value="Cannot apply indexing to an expression"/>
+    <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>indexerExpr.IndexerArgList.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="UndefinedIndexerLikeExpr" ID="FS0039: Undefined indexer">
+    <Parameter type="IPrefixAppExpr" name="prefixAppExpr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>prefixAppExpr.ArgumentExpression.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
   </Error>
 

@@ -1,7 +1,22 @@
 ﻿module Module
 
 ""|.|(0)|[1..2, 1]|(1)
+""|.|(2)|[1 .. 2, 3 .. 4]|(3)
+
+
+open System.Collections.Generic
+
+let l = List([1])
+
+l|[1 .. 2]|(4)
+l|[1 .. 2]|(5) <- 1
+l|[1 .. 2, 3 .. 4]|(6)
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant '.'
-(1): ReSharper Underlined Error Highlighting: Cannot apply indexing to an expression
+(1): ReSharper Underlined Error Highlighting: The type 'String' does not define the field, constructor or member 'GetSlice'.
+(2): ReSharper Dead Code: Redundant '.'
+(3): ReSharper Underlined Error Highlighting: The type 'String' does not define the field, constructor or member 'GetSlice'.
+(4): ReSharper Underlined Error Highlighting: The type 'List<_>' does not define the field, constructor or member 'GetSlice'.
+(5): ReSharper Underlined Error Highlighting: The type 'List<_>' does not define the field, constructor or member 'SetSlice'.
+(6): ReSharper Underlined Error Highlighting: The type 'List<_>' does not define the field, constructor or member 'GetSlice'.
