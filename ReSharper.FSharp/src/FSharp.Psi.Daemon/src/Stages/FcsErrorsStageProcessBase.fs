@@ -172,6 +172,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | null -> null
         | node -> highlightingCtor node :> _
 
+    let createHighlightingFromMappedExpression mapping highlightingCtor range (error: FSharpDiagnostic): IHighlighting =
+        let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> mapping
+        if isNotNull expr then highlightingCtor(expr, error.Message) :> _ else null
+
     let createHighlighting (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
         | TypeEquation ->
@@ -305,9 +309,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             ValueNotMutableError(refExpr) :> _
 
         | UnitTypeExpected ->
-            let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            let expr = getResultExpr expr
-            if isNotNull expr then UnitTypeExpectedWarning(expr, error.Message) else null
+            createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedWarning range error
 
         | UseBindingsIllegalInModules ->
             createHighlightingFromNode UseBindingsIllegalInModulesWarning range
@@ -428,20 +430,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | MissingErrorNumber ->
             match error.Message with
             | x when startsWith expressionIsAFunctionMessage x ->
-                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                let expr = getResultExpr expr
-                if isNotNull expr then FunctionValueUnexpectedWarning(expr, error.Message) else null
+                createHighlightingFromMappedExpression getResultExpr FunctionValueUnexpectedWarning range error
 
             | Regex typeConstraintMismatchMessage [mismatchedType; typeConstraint] ->
                 let highlighting =
                     match typeConstraint with
-                    | "unit" ->
-                        let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                        let expr = getResultExpr expr
-                        if isNull expr then null else UnitTypeExpectedError(expr, error.Message)
+                    | "unit" -> createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedError range error
                     | _ -> null
 
-                if isNotNull highlighting then highlighting :> _ else
+                if isNotNull highlighting then highlighting else
 
                 let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
                 if isNotNull expr then TypeConstraintMismatchError(mismatchedType, expr, error.Message) else null
