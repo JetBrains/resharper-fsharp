@@ -175,4 +175,5 @@ type CSharpResolveTest() =
 type CSharpResolveFromSignatures() =
     inherit CSharpResolveTestBase(FSharpSignatureProjectFileType.FsiExtension)
 
-    [<Test>] member x.``Type Extension 02 - Struct - Signature``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 01 - Struct - Signature``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 02 - Class - Signature``() = x.DoNamedTest()
