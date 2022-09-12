@@ -1,24 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
-open System
-open System.IO
-open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Files
-open JetBrains.ReSharper.Psi.Resolve
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<TestPackages(FSharpCorePackage)>]
+[<FSharpTest>]
 type CSharpResolveTest() =
-    inherit TestWithTwoProjectsBase(CSharpProjectFileType.CS_EXTENSION, FSharpProjectFileType.FsExtension)
-
-    let highlightingManager = HighlightingSettingsManager.Instance
+    inherit CSharpResolveTestBase(FSharpProjectFileType.FsExtension)
 
     [<Test>] member x.``Records 01 - Generated members``() = x.DoNamedTest()
     [<Test>] member x.``Records 02 - CliMutable``() = x.DoNamedTest()
@@ -182,27 +170,9 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Parameters 01``() = x.DoNamedTest()
 
-    override x.RelativeTestDataPath = "cache/csharpResolve"
 
-    override x.DoTest(project: IProject, _: IProject) =
-        x.Solution.GetPsiServices().Files.CommitAllDocuments()
-        x.ExecuteWithGold(fun writer ->
-            let projectFile = project.GetAllProjectFiles() |> Seq.exactlyOne
-            let sourceFile = projectFile.ToSourceFiles().Single()
-            let psiFile = sourceFile.GetPrimaryPsiFile()
+[<FSharpTest>]
+type CSharpResolveFromSignatures() =
+    inherit CSharpResolveTestBase(FSharpSignatureProjectFileType.FsiExtension)
 
-            let daemon = TestHighlightingDumper(sourceFile, writer, null, Func<_,_,_,_>(x.ShouldHighlight))
-            daemon.DoHighlighting(DaemonProcessKind.VISIBLE_DOCUMENT)
-            daemon.Dump()
-
-            let referenceProcessor = RecursiveReferenceProcessor(fun r -> x.ProcessReference(r, writer))
-            psiFile.ProcessThisAndDescendants(referenceProcessor)) |> ignore
-
-    member x.ShouldHighlight highlighting sourceFile settings =
-        let severity = highlightingManager.GetSeverity(highlighting, sourceFile, x.Solution, settings)
-        severity = Severity.ERROR
-
-    member x.ProcessReference(reference: IReference, writer: TextWriter) =
-        match reference.Resolve().DeclaredElement with
-        | :? IFSharpTypeMember as typeMember -> writer.WriteLine(typeMember.XMLDocId)
-        | _ -> ()
+    [<Test>] member x.``Type Extension 02 - Struct - Signature``() = x.DoNamedTest()
