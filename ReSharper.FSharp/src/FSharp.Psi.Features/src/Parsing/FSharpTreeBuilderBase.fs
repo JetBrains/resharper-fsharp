@@ -975,3 +975,17 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             | "I" -> ElementType.I_DIRECTIVE
             | _ -> ElementType.OTHER_DIRECTIVE
         x.Done(range, mark, elementType)
+
+    member x.ProcessTypeParametersAndConstraints(typeParams, constraints, lid) =
+        match typeParams with
+        | Some(SynTyparDecls.PrefixList _ | SynTyparDecls.SinglePrefix _ as typeParams) ->
+            x.ProcessTypeParameters(typeParams, true)
+            x.ProcessReferenceNameSkipLast(lid)
+        | Some(typeParams) ->
+            x.ProcessReferenceNameSkipLast(lid)
+            x.ProcessTypeParameters(typeParams, true)
+        | _ ->
+            x.ProcessReferenceNameSkipLast(lid)
+
+        for typeConstraint in constraints do
+            x.ProcessTypeConstraint(typeConstraint)

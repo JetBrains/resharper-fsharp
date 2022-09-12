@@ -77,8 +77,15 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
 
         | _ -> ()
 
-    member x.ProcessTypeSignature(SynTypeDefnSig(info, repr, memberSigs, range, _), typeKeywordType) =
+    member x.ProcessTypeSignature(SynTypeDefnSig(info, repr, memberSigs, range, _) as defnSig, typeKeywordType) =
         let (SynComponentInfo(attrs, typeParams, constraints, lid, XmlDoc xmlDoc, _, _, _)) = info
+
+        // Representation for type augmentation in signatures
+        // workaround over https://github.com/dotnet/fsharp/issues/13861
+        match repr with
+        | SynTypeDefnSigRepr.Simple(SynTypeDefnSimpleRepr.None _, _) when not memberSigs.IsEmpty ->
+            x.ProcessTypeExtensionSignature(defnSig, attrs)
+        | _ ->
 
         let mark = x.StartType(attrs, xmlDoc, typeParams, constraints, lid, range, typeKeywordType)
         match repr with
@@ -110,3 +117,11 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
     member x.ProcessTypeMembers(members: SynMemberSig list) =
         for m in members do
             x.ProcessTypeMemberSignature(m)
+
+    member x.ProcessTypeExtensionSignature(SynTypeDefnSig(info, _, memberSigs, range, _), attrs) =
+        let (SynComponentInfo(_, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
+        let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
+
+        x.ProcessTypeParametersAndConstraints(typeParams, constraints, lid)
+        x.ProcessTypeMembers(memberSigs)
+        x.Done(range, mark, ElementType.TYPE_EXTENSION_DECLARATION)
