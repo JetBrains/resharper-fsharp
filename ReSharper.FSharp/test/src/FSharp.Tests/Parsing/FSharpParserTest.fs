@@ -704,6 +704,7 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Type repr - None``() = x.DoNamedTest()
     [<Test>] member x.``Type repr - Augmentation 01``() = x.DoNamedTest()
     [<Test>] member x.``Type repr - Augmentation 02 - Attributes and XmlDoc``() = x.DoNamedTest()
+    [<Test>] member x.``Type repr - Augmentation 03 - Type constraints``() = x.DoNamedTest()
 
     [<Test>] member x.``Type repr - Record - XmlDoc 01``() = x.DoNamedTest()
 

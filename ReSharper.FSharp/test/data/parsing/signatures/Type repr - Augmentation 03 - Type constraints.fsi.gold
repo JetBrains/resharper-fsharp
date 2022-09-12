@@ -1,0 +1,51 @@
+﻿Language: PsiLanguageType:F#
+IFSharpSigFile
+  INamedModuleDeclaration
+    FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpIdentifierToken(type:IDENTIFIER, text:Module)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    ITypeDeclarationGroup
+      FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      ITypeExtensionDeclaration
+        FSharpIdentifierToken(type:IDENTIFIER, text:A)
+        IPostfixTypeParameterDeclarationList
+          FSharpTokenType+LessTokenElement(type:LESS, text:<)
+          ITypeParameterOfTypeDeclaration
+            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+            FSharpIdentifierToken(type:IDENTIFIER, text:a)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ITypeConstraintsClause
+            FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ISubtypeConstraint
+              ITypeReferenceName
+                ITypeParameterId
+                  FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                  FSharpIdentifierToken(type:IDENTIFIER, text:a)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+ColonGreaterTokenElement(type:COLON_GREATER, text::>)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:IDisposable)
+          FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+WithTokenElement(type:WITH, text:with)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IMemberSignature
+          FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:M1)
+          IReturnTypeInfo
+            FSharpTokenType+ColonTokenElement(type:COLON, text::)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IParameterSignatureTypeUsage
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:unit)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
