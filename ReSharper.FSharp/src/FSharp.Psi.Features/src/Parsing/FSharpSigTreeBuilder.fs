@@ -118,7 +118,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
         for m in members do
             x.ProcessTypeMemberSignature(m)
 
-    member x.ProcessTypeExtensionSignature(SynTypeDefnSig(info, _, _, _, memberSigs, range), attrs) =
+    member x.ProcessTypeExtensionSignature(SynTypeDefnSig(info, _, memberSigs, range, _), attrs) =
         let (SynComponentInfo(_, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
         let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
 
