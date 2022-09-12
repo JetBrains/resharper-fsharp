@@ -185,19 +185,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         let (SynComponentInfo(_, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
         let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
 
-        match typeParams with
-        | Some(SynTyparDecls.PrefixList _ | SynTyparDecls.SinglePrefix _ as typeParams) ->
-            x.ProcessTypeParameters(typeParams, true)
-            x.ProcessReferenceNameSkipLast(lid)
-        | Some(typeParams) ->
-            x.ProcessReferenceNameSkipLast(lid)
-            x.ProcessTypeParameters(typeParams, true)
-        | _ ->
-            x.ProcessReferenceNameSkipLast(lid)
-
-        for typeConstraint in constraints do
-            x.ProcessTypeConstraint(typeConstraint)
-
+        x.ProcessTypeParametersAndConstraints(typeParams, constraints, lid)
         x.ProcessTypeMembers(members)
         x.Done(range, mark, ElementType.TYPE_EXTENSION_DECLARATION)
 
