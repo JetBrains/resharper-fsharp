@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.TestFramework
 
-[<TestPackages(FSharpCorePackage)>]
+[<TestPackages(FSharpCorePackage); AbstractClass>]
 type CSharpResolveTestBase(fileExtension) =
     inherit TestWithTwoProjectsBase(CSharpProjectFileType.CS_EXTENSION, fileExtension)
     let highlightingManager = HighlightingSettingsManager.Instance
