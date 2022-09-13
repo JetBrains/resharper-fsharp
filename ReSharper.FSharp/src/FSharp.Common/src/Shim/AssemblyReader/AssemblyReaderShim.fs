@@ -225,6 +225,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         FcsReadWriteLock.assertWriteAccess()
 
         if invalidateAll then
+            invalidateAll <- false
             for KeyValue(psiModule, referencedAssembly) in assemblyReadersByModule do
                 match referencedAssembly with
                 | ReferencedAssembly.ProjectOutput reader ->
