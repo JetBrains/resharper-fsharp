@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
           : FSharpHighlightingAttributeIdsModule.Class;
 
       var entity = mfv.DeclaringEntity;
-      if (mfv.IsModuleValueOrMember && (entity != null && !entity.Value.IsFSharpModule || mfv.IsExtensionMember))
+      if (mfv.IsMember && (entity != null && !entity.Value.IsFSharpModule || mfv.IsExtensionMember))
         if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
           return mfv.IsExtensionMember
             ? FSharpHighlightingAttributeIdsModule.ExtensionProperty

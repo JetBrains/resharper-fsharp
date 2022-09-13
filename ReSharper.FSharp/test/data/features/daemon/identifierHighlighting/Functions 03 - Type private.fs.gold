@@ -1,0 +1,22 @@
+﻿type |T|(0)() =
+    let |f|(1) |x|(2) = ()
+    let |x|(3) = 1
+
+    let rec |a|(4) () = ()
+    and |b|(5) () = ()
+
+    static let |c|(6) () = ()
+
+    member _.|M1|(7)() = ()
+    static member |M2|(8)() = ()
+
+---------------------------------------------------------
+(0): ReSharper F# Class Identifier: 
+(1): ReSharper F# Function Identifier: 
+(2): ReSharper F# Value Identifier: 
+(3): ReSharper F# Value Identifier: 
+(4): ReSharper F# Function Identifier: 
+(5): ReSharper F# Function Identifier: 
+(6): ReSharper F# Function Identifier: 
+(7): ReSharper F# Method Identifier: 
+(8): ReSharper F# Method Identifier: 

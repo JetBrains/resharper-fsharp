@@ -56,6 +56,7 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Functions 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Functions 02``() = x.DoNamedTest()
+    [<Test>] member x.``Functions 03 - Type private``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - CompExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - For 01``() = x.DoNamedTest()
