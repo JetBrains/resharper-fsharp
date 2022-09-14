@@ -1,7 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
