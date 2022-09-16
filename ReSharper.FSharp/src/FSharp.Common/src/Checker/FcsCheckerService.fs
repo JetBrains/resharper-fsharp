@@ -173,6 +173,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     
     member x.InvalidateFcsProject(fcsProjectOptions: FSharpProjectOptions) =
         if checker.IsValueCreated then
+            logger.Trace("Invalidate FcsProject: {0}", fcsProjectOptions.ProjectFileName)
             checker.Value.InvalidateConfiguration(fcsProjectOptions)
 
     member x.InvalidateFcsProject(project: IProject) =

@@ -20,9 +20,9 @@ open NUnit.Framework
 
 [<SolutionComponent>]
 type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
-        fsOptionsProvider, symbolCache, solution) =
+        fsOptionsProvider, symbolCache, solution, logger) =
     inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
-        fsOptionsProvider, symbolCache, solution)
+        fsOptionsProvider, symbolCache, solution, logger)
 
     let mutable projectPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
     let mutable projectPsiModule = null
@@ -36,7 +36,7 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
     member this.CreateProjectCookie(path: VirtualFileSystemPath, psiModule: IPsiModule) =
         projectPath <- path
         projectPsiModule <- psiModule
-        reader <- new ProjectFcsModuleReader(projectPsiModule, cache, path)
+        reader <- new ProjectFcsModuleReader(projectPsiModule, cache, path, this)
 
         { new IDisposable with
             member x.Dispose() =

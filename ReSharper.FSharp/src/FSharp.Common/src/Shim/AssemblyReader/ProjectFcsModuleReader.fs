@@ -72,7 +72,8 @@ type FcsTypeDef =
       mutable Members: FcsTypeDefMembers }
 
 
-type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, path) =
+type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, path,
+        shim: IFcsAssemblyReaderShim) =
     let locks = psiModule.GetPsiServices().Locks
     let symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, false, true)
 
@@ -1084,11 +1085,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     member this.InvalidateTypeDef(clrTypeName: IClrTypeName) =
         use lock = locker.UsingWriteLock()
         typeDefs.TryRemove(clrTypeName) |> ignore
+        shim.Logger.Trace("Invalidate TypeDef: {0}: {1}", path, clrTypeName)
 
         // todo: invalidate timestamp on seen-by-FCS type changes only
         // todo: add test for adding/removing not-seen-by-FCS types
         moduleDef <- None
         timestamp <- DateTime.UtcNow
+        shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
     interface IProjectFcsModuleReader with
         member this.ILModuleDef =
@@ -1171,6 +1174,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         member this.InvalidateTypeDefs(shortName) =
             use _ = locker.UsingWriteLock()
+            shim.Logger.Trace("Invalidate types by short name: {0}: {1} ", path, shortName)
             for clrTypeName in clrNamesByShortNames.GetValuesSafe(shortName) do
                 this.InvalidateTypeDef(clrTypeName)
             isDirty <- true
@@ -1178,18 +1182,23 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         member this.UpdateTimestamp() =
             use _ = locker.UsingWriteLock()
+            shim.Logger.Trace("Trying to update timestamp: {0}", path)
             if not (isUpToDate ()) then
                 moduleDef <- None
                 timestamp <- DateTime.UtcNow
+                shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
         member this.InvalidateAllTypeDefs() =
             use _ = locker.UsingWriteLock()
+            shim.Logger.Trace("Invalidate all type defs: {0}", path)
             typeDefs.Clear()
             moduleDef <- None
             timestamp <- DateTime.UtcNow
+            shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
         member this.MarkDirty() =
             use _ = locker.UsingWriteLock()
+            shim.Logger.Trace("Mark dirty: {0}", path)
             isDirty <- true
             upToDateChecked <- null
 

@@ -72,7 +72,8 @@ module AssemblyReaderShim =
 [<SolutionComponent>]
 type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
         cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService,
-        fsOptionsProvider: FSharpOptionsProvider, symbolCache: ISymbolCache, solution: ISolution) as this =
+        fsOptionsProvider: FSharpOptionsProvider, symbolCache: ISymbolCache, solution: ISolution,
+        logger: ILogger) as this =
     inherit AssemblyReaderShimBase(lifetime, changeManager)
 
     // todo: add experimental setting if/when available
@@ -136,7 +137,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         // todo: test web project with multiple modules
         let path = psiModule.Project.GetOutputFilePath(psiModule.TargetFrameworkId)
         let psiModule = psiModules.GetPrimaryPsiModule(psiModule.Project, psiModule.TargetFrameworkId)
-        let reader = ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, path))
+        let reader = ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, path, this))
 
         recordReader path reader
         reader
@@ -150,7 +151,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         let reader = 
             match AssemblyReaderShim.getProjectPsiModuleByOutputAssembly psiModules path with
             | null -> ReferencedAssembly.Ignored path
-            | psiModule -> ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, path))
+            | psiModule -> ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, path, this))
 
         recordReader path reader
         reader
@@ -224,6 +225,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     let invalidateDirty () =
         FcsReadWriteLock.assertWriteAccess()
 
+        logger.Trace("Invalidate dirty: start")
+
         if invalidateAll then
             invalidateAll <- false
             for KeyValue(psiModule, referencedAssembly) in assemblyReadersByModule do
@@ -238,6 +241,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         dirtyModules.Clear()
         invalidateDirtyDependencies ()
+
+        logger.Trace("Invalidate dirty: finish")
 
     do
         lifetime.Bracket(
@@ -370,6 +375,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         member this.HasDirtyTypes =
             use lock = FcsReadWriteLock.ReadCookie.Create()
             not (dirtyTypesInModules.IsEmpty())
+
+        member this.Logger = logger
 
 
 [<SolutionComponent>]

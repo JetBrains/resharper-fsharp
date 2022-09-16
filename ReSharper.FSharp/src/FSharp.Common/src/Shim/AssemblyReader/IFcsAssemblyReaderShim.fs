@@ -48,6 +48,7 @@ module ReferencedAssembly =
 type IFcsAssemblyReaderShim =
     abstract IsEnabled: bool
     abstract HasDirtyTypes: bool
+    abstract Logger: ILogger
 
     abstract GetModuleReader: psiModule: IPsiModule -> ReferencedAssembly
 
