@@ -29,7 +29,7 @@ type ExplicitAttribute = NUnit.Framework.ExplicitAttribute
 type TestFixtureAttribute = NUnit.Framework.TestFixtureAttribute
 
 let projectDirectory = VirtualFileSystemPath.Parse(@"C:\Solution\Project", InteractionContext.SolutionContext)
-let solutionMark = SolutionMarkFactory.Create(projectDirectory.Combine("Solution.sln"))
+let solutionMark = SolutionMarkFactory([]).Create(projectDirectory.Combine("Solution.sln"))
 let projectMark = DummyProjectMark(solutionMark, "Project", Guid.Empty, projectDirectory.Combine("Project.fsproj"))
 
 let projectPath (relativePath: string) = projectDirectory / relativePath
