@@ -192,6 +192,12 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Backspace - String - Triple quote 07``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - String - Verbatim 01 - Empty``() = x.DoNamedTest()
 
+    [<Test>] member x.``New line before 01``() = x.DoNamedTest()
+    [<Test>] member x.``New line before 02 - File start``() = x.DoNamedTest()
+    [<Test>] member x.``New line before 03 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``New line before 04 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``New line before 05 - Selection``() = x.DoNamedTest()
+    [<Test>] member x.``New line before 06 - Selection``() = x.DoNamedTest()
 
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()

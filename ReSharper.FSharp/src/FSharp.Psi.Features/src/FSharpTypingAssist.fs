@@ -371,13 +371,14 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         this.TrimTrailingSpacesAtOffset(textControl, &offset, trimAfterCaret)
         offset
 
-    let insertText (textControl: ITextControl) insertOffset text commandName =
+    let insertText (textControl: ITextControl) insertOffset text commandName moveCaretDelta =
         let inserted =
             this.PsiServices.Transactions.DocumentTransactionManager.DoTransaction(commandName, fun _ ->
                 textControl.Document.InsertText(insertOffset, text)
                 true)
         if inserted then
-            textControl.Caret.MoveTo(insertOffset + text.Length, CaretVisualPlacement.DontScrollIfVisible)
+            let newCaretPos = Option.defaultWith (fun _ -> insertOffset + text.Length) moveCaretDelta
+            textControl.Caret.MoveTo(newCaretPos, CaretVisualPlacement.DontScrollIfVisible)
         inserted
 
     let getLineWhitespaceIndent (textControl: ITextControl) line =
@@ -432,7 +433,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         use command = this.CommandProcessor.UsingCommand("New Line")
         let insertPos = trimTrailingSpaces textControl trimAfterCaret
         let text = this.GetNewLineText(textControl) + String(' ', indent)
-        insertText textControl insertPos text "Indent on Enter"
+        insertText textControl insertPos text "Indent on Enter" None
 
     let insertIndentFromLine textControl line =
         let indentSize = getLineWhitespaceIndent textControl line
@@ -534,6 +535,23 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         doDumpIndent textControl trimSpacesAfterCaret
 
+    let handleStartNewLineBeforePressed (context: IActionContext) =
+        let textControl = context.TextControl
+        textControl.Selection.Delete()
+
+        let document = textControl.Document
+        let caretCoords = textControl.Caret.Position.Value.ToDocLineColumn()
+        let caretLine = caretCoords.Line
+        let lineStartOffset = document.GetLineStartOffset(caretLine)
+
+        let indent =
+            match getLineIndent cachingLexerService textControl caretLine with
+            | Some lineIndent -> lineIndent.Indent
+            | _ -> 0
+
+        let text = String(' ', indent) + this.GetNewLineText(textControl)
+        insertText textControl lineStartOffset text "Start New Line Before" (Some (lineStartOffset + indent))
+
     let handleSpace (context: ITypingContext) =
         this.HandleSpaceInsideEmptyBrackets(context.TextControl)
 
@@ -543,6 +561,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let isSmartParensHandlerAvailable = Predicate<_>(this.IsTypingSmartParenthesisHandlerAvailable2)
 
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
+        manager.AddActionHandler(lifetime, EditorStartNewLineBeforeAction.ACTION_ID, this, Func<_,_>(handleStartNewLineBeforePressed), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Backspace, this, Func<_,_>(this.HandleBackspacePressed), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Tab, this, Func<_,_>(this.HandleTabPressed), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.TabLeft, this, Func<_,_>(this.HandleTabLeftPressed), isActionHandlerAvailable)
@@ -1667,7 +1686,12 @@ type LineIndent =
     // Fallback indent when no code is present on line. Used to guess the desired indentation.
     | Comments of int
 
-let getLineIndent (cachingLexerService: CachingLexerService) (textControl: ITextControl) (line: Line) =
+    member this.Indent =
+        match this with
+        | Source indent
+        | Comments indent -> indent
+
+let getLineIndent (cachingLexerService: CachingLexerService) (textControl: ITextControl) (line: Line) : LineIndent option =
     let document = textControl.Document
     if line >= document.GetLineCount() then None else
 

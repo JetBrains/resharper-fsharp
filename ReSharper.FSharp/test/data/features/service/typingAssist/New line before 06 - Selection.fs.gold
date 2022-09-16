@@ -1,0 +1,5 @@
+﻿// ${CHAR:EditorStartNewLineBefore}
+module Module
+
+{caret}
+do
