@@ -27,9 +27,10 @@ type SynMemberDefn with
         | SynMemberDefn.AutoProperty(attributes = attrs)
         | SynMemberDefn.ValField(SynField(attributes = attrs), _) -> attrs
 
-        | SynMemberDefn.GetSetMember(getBinding, setBinding, _, _) ->
+        | SynMemberDefn.GetSetMember(getBinding, setBinding, _, trivia) ->
             match firstGetSetBinding getBinding setBinding with
-            | Some(SynBinding(attributes = attrs)) -> attrs
+            | Some(SynBinding(attributes = attrs)) ->
+                attrs |> List.takeWhile (fun attrList -> Position.posLt attrList.Range.Start trivia.WithKeyword.Start)
             | _ -> []
 
         | _ -> []

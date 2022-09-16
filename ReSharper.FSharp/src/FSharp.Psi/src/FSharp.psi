@@ -1381,6 +1381,7 @@ accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; 
   get { methodName="Expression" path=<accessorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   get { methodName="ParameterPatterns" path=<accessorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   IDENTIFIER<IDENTIFIER, Identifier>
   (

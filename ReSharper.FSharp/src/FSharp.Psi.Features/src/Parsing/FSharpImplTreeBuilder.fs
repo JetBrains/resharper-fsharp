@@ -246,7 +246,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 with _ -> () // Getting type range throws an exception if base type lid is empty.
                 ElementType.INTERFACE_INHERIT
 
-            | SynMemberDefn.GetSetMember(getBinding, setBinding, range, _) ->
+            | SynMemberDefn.GetSetMember(getBinding, setBinding, range, trivia) ->
+                let withKeywordStart = Some trivia.WithKeyword.Start
                 match getBinding, setBinding with
                 | Some getBinding, Some setBinding ->
                     let binding1, binding2 =
@@ -255,20 +256,20 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                         else
                             setBinding, getBinding
 
-                    x.ProcessMemberBinding(mark, binding1, range) |> ignore
+                    x.ProcessMemberBinding(mark, binding1, range, withKeywordStart) |> ignore
 
                     isFinishingDeclaration <- true
                     unfinishedDeclaration <- None
-                    x.ProcessMemberBinding(mark, binding2, range)
+                    x.ProcessMemberBinding(mark, binding2, range, withKeywordStart)
 
                 | Some binding, _
                 | _, Some binding ->
-                    x.ProcessMemberBinding(mark, binding, range)
+                    x.ProcessMemberBinding(mark, binding, range, withKeywordStart)
 
                 | _ -> failwithf "Unexpected getSet member: %A" typeMember
 
             | SynMemberDefn.Member(binding, range) ->
-                x.ProcessMemberBinding(mark, binding, range)
+                x.ProcessMemberBinding(mark, binding, range, None)
 
             | SynMemberDefn.LetBindings([SynBinding(kind = SynBindingKind.Do; expr = expr)], _, _, range) ->
                 x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
@@ -315,7 +316,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 x.EnsureMembersAreFinished()
                 x.Mark(range)
 
-        let elementType = x.ProcessMemberBinding(mark, binding, range)
+        let elementType = x.ProcessMemberBinding(mark, binding, range, None) // todo: member with attributes
         x.FinishMemberDecl(range, mark, elementType)
 
     member x.ContinueMemberDecl(range: range) =
@@ -331,7 +332,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         if unfinishedDeclaration.IsNone then
             x.Done(range, mark, elementType)
 
-    member x.ProcessMemberBinding(mark, SynBinding(_, _, _, _, _, _, valData, headPat, returnInfo, expr, _, _, _), range) : CompositeNodeType =
+    member x.ProcessMemberBinding(mark, SynBinding(_, _, _, _, attrLists, _, valData, headPat, returnInfo, expr, _, _, _), range, accessorsStart: pos option) : CompositeNodeType =
         let elType =
             match headPat with
             | SynPat.LongIdent(LongIdentWithDots(lid, _), accessorId, typeParamsOpt, memberParams, _, range) ->
@@ -348,7 +349,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                     | _ ->
                         match accessorId with
                         | Some _ ->
-                            x.ProcessAccessor(range, memberParams, expr)
+                            x.ProcessAccessor(range, memberParams, expr, attrLists, accessorsStart)
                             ElementType.MEMBER_DECLARATION
                         | _ ->
 
@@ -363,7 +364,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
                     match accessorId with
                     | Some _ ->
-                        x.ProcessAccessor(range, memberParams, expr)
+                        x.ProcessAccessor(range, memberParams, expr, attrLists, accessorsStart)
                         ElementType.MEMBER_DECLARATION
                     | _ ->
 
@@ -389,8 +390,19 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
         elType
 
-    member x.ProcessAccessor(range: range, memberParams, expr) =
+    member x.ProcessAccessor(range: range, memberParams, expr, attrLists, accessorsStart) =
+        let attrs =
+            match accessorsStart with
+            | Some pos -> attrLists |> List.skipWhile (fun attrList -> Position.posLt attrList.Range.Start pos)
+            | _ -> []
+
+        let range =
+            match attrs with
+            | attrList :: _ -> Range.unionRanges attrList.Range range
+            | _ -> range
+
         let mark = x.Mark(range)
+        x.ProcessAttributeLists(attrs)
 
         let memberParams =
             match memberParams with

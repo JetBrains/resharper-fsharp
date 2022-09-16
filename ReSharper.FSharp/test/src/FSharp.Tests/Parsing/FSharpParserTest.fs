@@ -566,6 +566,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Member - Property - Accessors 05 - Tuple``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property - Accessors 06``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property - Accessors 07``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Property - Accessors 08 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property 02 - Static``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Member - Property 03 - Access modifier``() = x.DoNamedTest()
