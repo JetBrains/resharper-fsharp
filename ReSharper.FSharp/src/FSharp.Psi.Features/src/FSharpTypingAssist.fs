@@ -536,6 +536,8 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         doDumpIndent textControl trimSpacesAfterCaret
 
     let handleStartNewLineBeforePressed (context: IActionContext) =
+        use _ = this.CommandProcessor.UsingCommand("Start New Line Before")
+
         let textControl = context.TextControl
         textControl.Selection.Delete()
 
