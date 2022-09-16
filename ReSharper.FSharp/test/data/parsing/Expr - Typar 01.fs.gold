@@ -1,0 +1,11 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExpressionStatement
+      IChameleonExpression
+        IReferenceExpr
+          ITypeParameterId
+            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+            FSharpIdentifierToken(type:IDENTIFIER, text:T)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

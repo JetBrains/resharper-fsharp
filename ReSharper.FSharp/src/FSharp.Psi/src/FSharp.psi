@@ -723,6 +723,11 @@ binaryAppExpr options { stubBase="FSharpExpressionBase"; } extras {
   referenceExpr<OP_REF_EXPR, Operator>
   fSharpExpression<RIGHT_ARG_EXPR, RightArgument>;
 
+dynamicExpr options { stubBase="FSharpExpressionBase"; }:
+  fSharpExpression<FUNC_EXPR, FunctionExpression>
+  QMARK
+  fSharpExpression<ARG_EXPR, ArgumentExpression>;
+
 letOrUseExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="BoundExpressions" path=<letOrUseExpr:BINDING/localBinding:EXPR> };
 }:

@@ -1138,6 +1138,14 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             | _ ->
                 x.MarkAndDone(range, ElementType.WHOLE_RANGE_EXPR)
 
+        | SynExpr.Dynamic(funExpr, _, argExpr, _) ->
+            x.PushRange(range, ElementType.DYNAMIC_EXPR)
+            x.PushExpression(argExpr)
+            x.ProcessExpression(funExpr)
+
+        | SynExpr.Typar _ ->
+            x.MarkAndDone(range, ElementType.REFERENCE_EXPR, ElementType.TYPE_PARAMETER_ID)
+
         | SynExpr.DebugPoint _ -> failwithf $"Synthetic expression: {expr}"
 
     member x.ProcessAndBangLocalBinding(pat: SynPat, expr: SynExpr, range) =

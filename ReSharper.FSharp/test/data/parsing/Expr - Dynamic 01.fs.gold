@@ -1,0 +1,13 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExpressionStatement
+      IChameleonExpression
+        IDynamicExpr
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:a)
+          FSharpTokenType+QmarkTokenElement(type:QMARK, text:?)
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:b)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
