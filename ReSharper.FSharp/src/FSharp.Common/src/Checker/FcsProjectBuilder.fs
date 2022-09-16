@@ -91,7 +91,8 @@ type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, it
            "--fullpaths"
            "--flaterrors"
            "--highentropyva+"
-           "--noconditionalerasure" |]
+           "--noconditionalerasure"
+           "--ignorelinedirectives" |]
 
     let unusedValuesWarns =
         [| "--warnon:1182" |]
