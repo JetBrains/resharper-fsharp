@@ -42,12 +42,3 @@ type ResolutionEnvironment with
                                 this.ShowResolutionMessages,
                                 this.ReferencedAssemblies,
                                 this.TemporaryFolder)
-
-type JetBrains.Rider.FSharp.TypeProviders.Protocol.Server.RdResolutionEnvironment with
-    [<Extension; CompiledName("ToResolutionEnvironment")>]
-    member this.toResolutionEnvironment() =
-         { ResolutionFolder = this.ResolutionFolder;
-           OutputFile = Option.ofObj(this.OutputFile);
-           ShowResolutionMessages = this.ShowResolutionMessages;
-           ReferencedAssemblies = this.ReferencedAssemblies;
-           TemporaryFolder = this.TemporaryFolder }
