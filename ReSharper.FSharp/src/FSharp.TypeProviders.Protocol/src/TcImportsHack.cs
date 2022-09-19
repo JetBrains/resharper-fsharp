@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
+using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using ClientRdFakeTcImports = JetBrains.Rider.FSharp.TypeProviders.Protocol.Client.RdFakeTcImports;
 using ClientRdFakeDllInfo = JetBrains.Rider.FSharp.TypeProviders.Protocol.Client.RdFakeDllInfo;
@@ -75,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     // This hack allows you to pull this data for transfer between processes.
     public static ClientRdFakeTcImports GetFakeTcImports(FSharpFunc<string, bool> runtimeContainsType)
     {
-      ClientRdFakeDllInfo[] getDllInfos(object imports) => (imports.GetField("dllInfos") as IEnumerable<string>)
+      ClientRdFakeDllInfo[] getDllInfos(object imports) => (imports.GetField("dllInfos") as IEnumerable<object>)
         .Select(dllInfo => new ClientRdFakeDllInfo(dllInfo.GetProperty("FileName") as string))
         .ToArray();
 
