@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Xml;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -31,5 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public IList<ITypeParameter> AllTypeParameters =>
       this.GetAllTypeParametersReversed();
+
+    public override XmlNode GetXMLDoc(bool inherit) => this.GetXmlDoc(inherit);
   }
 }

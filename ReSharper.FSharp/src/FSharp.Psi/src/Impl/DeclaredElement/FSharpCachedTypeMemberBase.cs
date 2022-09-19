@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Linq;
+using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -6,6 +7,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
@@ -37,10 +39,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       EmptySubstitution.INSTANCE;
 
     // ReSharper disable once InconsistentNaming
-    public XmlNode GetXMLDoc(bool inherit) => null; // todo
+    public XmlNode GetXMLDoc(bool inherit)
+    {
+      var declarations = GetDeclarations();
+      var primaryDeclaration = declarations.FirstOrDefault(t => t.IsFSharpSigFile()) ?? declarations.FirstOrDefault();
+
+      return primaryDeclaration is IFSharpDeclaration { XmlDocBlock: { } xmlDocBlock }
+        ? xmlDocBlock.GetXML(this as ITypeMember)
+        : null;
+    }
 
     // ReSharper disable once InconsistentNaming
-    public XmlNode GetXMLDescriptionSummary(bool inherit) => null; // todo
+    public XmlNode GetXMLDescriptionSummary(bool inherit) =>
+      XMLDocUtil.ExtractSummary(GetXMLDoc(inherit));
 
     public abstract DeclaredElementType GetElementType();
   }

@@ -1,7 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -177,3 +180,47 @@ type CSharpResolveFromSignatures() =
 
     [<Test>] member x.``Type Extension 01 - Struct - Signature``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 02 - Class - Signature``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+[<TestFileExtension(".cs")>]
+type CSharpTooltipTest() =
+    inherit IdentifierTooltipTestBase()
+
+    override x.RelativeTestDataPath = "cache/csharpResolve/tooltips"
+
+    member x.DoNamedTestWithFs() =
+        let testName = x.TestMethodName
+        x.DoTestSolution(testName + CSharpProjectFileType.CS_EXTENSION, testName + FSharpProjectFileType.FsExtension)
+
+    member x.DoNamedTestWithFsi() =
+        let testName = x.TestMethodName
+        x.DoTestSolution(testName + CSharpProjectFileType.CS_EXTENSION, testName + FSharpSignatureProjectFileType.FsiExtension)
+
+    member x.DoNamedTestWithFsiAndFs() =
+        let testName = x.TestMethodName
+        x.DoTestSolution(testName + CSharpProjectFileType.CS_EXTENSION,
+                         testName + FSharpSignatureProjectFileType.FsiExtension,
+                         testName + FSharpProjectFileType.FsExtension)
+
+    [<Test>] member x.``XmlDoc 01 - Top binding 01``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 01 - Top binding 02 - Pattern``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 02 - Type``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 03 - Record field``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 04 - Union case``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 05 - Primary constructor``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 06 - Type member``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 07 - Abstract type member``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 08 - Type member signature``() = x.DoNamedTestWithFsi()
+    [<Test>] member x.``XmlDoc 09 - Val``() = x.DoNamedTestWithFsi()
+    [<Test>] member x.``XmlDoc 10 - Module``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 11 - Struct val``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 01 - Class``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 02 - Struct``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 03 - Delegate``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 04 - Interface``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 05 - Enum``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 06 - Module``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 12 - Type parts 07 - Union``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 13 - Type members 01 - Top binding``() = x.DoNamedTestWithFsiAndFs()
+    [<Test>] member x.``XmlDoc 13 - Type members 02 - Abstract member``() = x.DoNamedTestWithFsiAndFs()

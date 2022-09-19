@@ -28,7 +28,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual TreeTextRange GetNameRange() => NameIdentifier.GetNameRange();
     public virtual TreeTextRange GetNameIdentifierRange() => NameIdentifier.GetNameIdentifierRange();
 
-    public XmlNode GetXMLDoc(bool inherit) => null;
+    public virtual XmlDocBlock XmlDocBlock => FirstChild as XmlDocBlock;
+    public XmlNode GetXMLDoc(bool inherit) => XmlDocBlock?.GetXML(null);
+
     public bool IsSynthetic() => false;
 
     public virtual void SetName(string name) =>
