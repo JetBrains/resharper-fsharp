@@ -32,7 +32,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
         env.ReferencedAssemblies,
         env.TemporaryFolder);
 
-
     public IEnumerable<ITypeProvider> InstantiateTypeProvidersOfAssembly(
       InstantiateTypeProvidersOfAssemblyParameters parameters)
     {
