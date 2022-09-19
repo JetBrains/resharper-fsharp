@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
@@ -37,8 +38,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public ITypeDeclaration GetContainingTypeDeclaration() => GetContainingNode<ITypeDeclaration>();
 
-    public XmlNode GetXMLDoc(bool inherit) =>
-      FirstChild is XmlDocBlock xmlDocBlock ? xmlDocBlock.GetXML(null) : null;
+    public XmlNode GetXMLDoc(bool inherit)
+    {
+      Assertion.Fail("Unexpected call TopBinding.GetXMLDoc");
+      return FirstChild is XmlDocBlock xmlDocBlock ? xmlDocBlock.GetXML(null) : null;
+    }
 
     public bool IsSynthetic() => false;
 

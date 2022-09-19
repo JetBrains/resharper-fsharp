@@ -203,8 +203,8 @@ type CSharpTooltipTest() =
                          testName + FSharpSignatureProjectFileType.FsiExtension,
                          testName + FSharpProjectFileType.FsExtension)
 
-    // TODO: type abbreviations for structs
-    [<Test>] member x.``XmlDoc 01 - Top binding``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 01 - Top binding 01``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``XmlDoc 01 - Top binding 02 - Pattern``() = x.DoNamedTestWithFs()
     [<Test>] member x.``XmlDoc 02 - Type``() = x.DoNamedTestWithFs()
     [<Test>] member x.``XmlDoc 03 - Record field``() = x.DoNamedTestWithFs()
     [<Test>] member x.``XmlDoc 04 - Union case``() = x.DoNamedTestWithFs()
