@@ -20,6 +20,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       TreeNodeCollection<IAttribute>.Empty;
 
     public override XmlDocBlock XmlDocBlock =>
-      this.IgnoreParentParens().GetBindingFromHeadPattern()?.FirstChild as XmlDocBlock;
+      this.GetBindingFromHeadPattern()?.FirstChild as XmlDocBlock;
   }
 }

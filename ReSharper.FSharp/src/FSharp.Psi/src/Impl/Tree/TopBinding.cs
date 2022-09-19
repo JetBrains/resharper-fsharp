@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public XmlNode GetXMLDoc(bool inherit)
     {
       Assertion.Fail("Unexpected call TopBinding.GetXMLDoc");
-      return FirstChild is XmlDocBlock xmlDocBlock ? xmlDocBlock.GetXML(null) : null;
+      return null;
     }
 
     public bool IsSynthetic() => false;
