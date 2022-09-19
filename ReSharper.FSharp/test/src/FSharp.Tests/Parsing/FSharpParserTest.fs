@@ -531,6 +531,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Abstract 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Abstract 03 - Function return``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Abstract 04 - Constrained type usage``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Abstract 05 - Static``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Member 01 - Wild self id``() = x.DoNamedTest()
 

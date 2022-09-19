@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
@@ -13,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   {
     public UnionCasePart([NotNull] IUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration), TreeNodeCollection<ITypeParameterDeclaration>.Empty, 
-        cacheBuilder) =>
+        cacheBuilder, PartKind.Class) =>
       ExtendsListShortNames =
         UnionRepresentationNavigator.GetByUnionCase(declaration) is { } repr &&
         FSharpTypeDeclarationNavigator.GetByTypeRepresentation(repr) is { CompiledName: var unionName }

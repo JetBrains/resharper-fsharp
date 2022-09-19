@@ -3,6 +3,7 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
@@ -11,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class ClassPart : FSharpTypeMembersOwnerTypePart, IFSharpClassPart
   {
     public ClassPart([NotNull] IFSharpTypeOrExtensionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder)
+      : base(declaration, cacheBuilder, PartKind.Class)
     {
     }
 

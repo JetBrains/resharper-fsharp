@@ -3,6 +3,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
@@ -14,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class RecordPart : RecordPartBase, Class.IClassPart
   {
     public RecordPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder)
+      : base(declaration, cacheBuilder, PartKind.Class)
     {
     }
 
@@ -32,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class StructRecordPart : RecordPartBase, IFSharpStructPart
   {
     public StructRecordPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder)
+      : base(declaration, cacheBuilder, PartKind.Struct)
     {
     }
 
@@ -65,8 +66,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool CliMutable { get; }
     public AccessRights RepresentationAccessRights { get; }
 
-    protected RecordPartBase([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder)
+    protected RecordPartBase([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder, 
+      PartKind partKind)
+      : base(declaration, cacheBuilder, partKind)
     {
       CliMutable = declaration.Attributes.HasAttribute("CLIMutable");
       RepresentationAccessRights = declaration.GetRepresentationAccessRights();

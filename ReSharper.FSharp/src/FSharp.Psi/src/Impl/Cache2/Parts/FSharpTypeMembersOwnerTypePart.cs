@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.Util;
@@ -11,9 +12,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class FSharpTypeMembersOwnerTypePart : FSharpClassLikePart<IFSharpTypeOldDeclaration>
   {
     protected FSharpTypeMembersOwnerTypePart([NotNull] IFSharpTypeOldDeclaration declaration,
-      [NotNull] ICacheBuilder cacheBuilder, string[] implicitExtendShortNames = null)
+      [NotNull] ICacheBuilder cacheBuilder, PartKind partKind, string[] implicitExtendShortNames = null)
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.Attributes),
-        declaration.TypeParameterDeclarations, cacheBuilder)
+        declaration.TypeParameterDeclarations, cacheBuilder, partKind)
     {
       var extendListShortNames = new FrugalLocalHashSet<string>();
       extendListShortNames = ProcessMembers(declaration.TypeMembersEnumerable, extendListShortNames);

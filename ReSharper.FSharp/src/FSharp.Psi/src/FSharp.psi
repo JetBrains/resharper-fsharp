@@ -1341,6 +1341,7 @@ abstractMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationB
   get { methodName="Attributes" path=<abstractMemberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  STATIC<STATIC, StaticKeyword>?  
   ABSTRACT<ABSTRACT, AbstractKeyword>
   MEMBER<MEMBER, MemberKeyword>?
   identOrOpName{IDENTIFIER, Identifier}

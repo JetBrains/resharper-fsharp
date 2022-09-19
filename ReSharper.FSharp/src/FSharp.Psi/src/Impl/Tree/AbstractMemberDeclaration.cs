@@ -84,5 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       return new FSharpMethod<AbstractMemberDeclaration>(this);
     }
+    
+    public override bool IsStatic => StaticKeyword != null;
   }
 }

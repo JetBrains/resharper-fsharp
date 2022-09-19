@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.Util;
@@ -10,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class ClassExtensionPart : FSharpTypeMembersOwnerTypePart, IFSharpClassPart
   {
     public ClassExtensionPart([NotNull] IFSharpTypeOrExtensionDeclaration declaration,
-      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
+      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder, PartKind.Class)
     {
     }
 
@@ -31,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class StructExtensionPart : FSharpTypeMembersOwnerTypePart, IFSharpStructPart
   {
     public StructExtensionPart([NotNull] IFSharpTypeOrExtensionDeclaration declaration,
-      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
+      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder, PartKind.Struct)
     {
     }
 

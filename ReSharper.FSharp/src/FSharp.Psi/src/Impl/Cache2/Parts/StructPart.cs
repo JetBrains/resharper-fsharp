@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -7,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class StructPart : FSharpTypeMembersOwnerTypePart, IFSharpStructPart
   {
     public StructPart([NotNull] IFSharpTypeOrExtensionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder)
+      : base(declaration, cacheBuilder, PartKind.Struct)
     {
     }
 

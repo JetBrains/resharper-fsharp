@@ -1,6 +1,7 @@
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
@@ -9,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class TypeAbbreviationOrDeclarationPart : TypeAbbreviationOrDeclarationPartBase, Class.IClassPart
   {
     public TypeAbbreviationOrDeclarationPart([NotNull] IFSharpTypeDeclaration declaration,
-      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
+      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder, PartKind.Class)
     {
     }
 
@@ -25,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class StructTypeAbbreviationOrDeclarationPart : TypeAbbreviationOrDeclarationPartBase, IFSharpStructPart
   {
     public StructTypeAbbreviationOrDeclarationPart([NotNull] IFSharpTypeDeclaration declaration,
-      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
+      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder, PartKind.Struct)
     {
     }
 
@@ -45,7 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class TypeAbbreviationOrDeclarationPartBase : UnionPartBase, ITypeAbbreviationOrDeclarationPart
   {
     protected TypeAbbreviationOrDeclarationPartBase([NotNull] IFSharpTypeDeclaration declaration,
-      [NotNull] ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder, false, true)
+      [NotNull] ICacheBuilder cacheBuilder, PartKind partKind) : base(declaration, cacheBuilder, false, true, partKind)
     {
     }
 
