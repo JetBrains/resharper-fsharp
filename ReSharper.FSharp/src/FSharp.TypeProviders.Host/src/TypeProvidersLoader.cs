@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FSharp.Compiler;
-using JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
 using Microsoft.FSharp.Collections;
@@ -36,9 +36,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     public IEnumerable<ITypeProvider> InstantiateTypeProvidersOfAssembly(
       InstantiateTypeProvidersOfAssemblyParameters parameters)
     {
-      FSharpFunc<string, bool> a = FSharpFunc<string, bool>.FromConverter();
       var resolutionEnvironment = ToResolutionEnvironment(parameters.RdResolutionEnvironment);
-      var systemRuntimeContainsType = TcImportsHack.injectFakeTcImports(parameters.FakeTcImports);
+      var systemRuntimeContainsType = TcImportsHack.InjectFakeTcImports(parameters.FakeTcImports);
       var systemRuntimeAssemblyVersion = Version.Parse(parameters.SystemRuntimeAssemblyVersion);
       var compilerToolsPath = ListModule.OfSeq(parameters.CompilerToolsPath);
 

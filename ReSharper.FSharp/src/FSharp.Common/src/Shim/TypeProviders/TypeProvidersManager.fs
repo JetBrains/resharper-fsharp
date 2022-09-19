@@ -13,7 +13,6 @@ open JetBrains.ProjectModel.Build
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.FSharpProjectModelUtil
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
-open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.TcImportsHack
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions
@@ -148,7 +147,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                 | None -> m.FileName, None
 
             let result =
-                let fakeTcImports = getFakeTcImports systemRuntimeContainsType
+                let fakeTcImports = TcImportsHack.GetFakeTcImports(systemRuntimeContainsType)
 
                 connection.ExecuteWithCatch(fun () ->
                     protocol.InstantiateTypeProvidersOfAssembly.Sync(
