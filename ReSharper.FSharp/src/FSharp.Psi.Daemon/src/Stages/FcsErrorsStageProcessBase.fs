@@ -76,6 +76,7 @@ module FSharpErrors =
     let [<Literal>] TypeAbbreviationsCannotHaveAugmentations = 964
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
+    let [<Literal>] ArgumentNamesInSignatureAndImplementationDoNotMatch = 3218
     let [<Literal>] CantTakeAddressOfExpression = 3236
     let [<Literal>] SingleQuoteInSingleQuote = 3373
     let [<Literal>] InvalidXmlDocPosition = 3520
@@ -90,6 +91,7 @@ module FSharpErrors =
     let [<Literal>] matchClauseHasWrongTypeMessage = "All branches of a pattern match expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
     let [<Literal>] ifBranchSatisfyContextTypeRequirements = "The 'if' expression needs to have type '(.+)' to satisfy context type requirements\. It currently has type '(.+)'"
     let [<Literal>] typeMisMatchTupleLengths = "Type mismatch. Expecting a\n    '(.+)'    \nbut given a\n    '(.+)'    \nThe tuples have differing lengths of \\d+ and \\d+"
+    let [<Literal>] argumentNamesInTheSignatureAndImplementationDoNotMatch = "The argument names in the signature '(.+)' and implementation '(.+)' do not match. The argument name from the signature file will be used. This may cause problems when debugging or profiling."
 
     let isDirectiveSyntaxError number =
         number >= 232 && number <= 235
@@ -375,6 +377,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UnusedThisVariable ->
             createHighlightingFromParentNode UnusedThisVariableWarning range
+
+        | ArgumentNamesInSignatureAndImplementationDoNotMatch ->
+            match error.Message with
+            | Regex argumentNamesInTheSignatureAndImplementationDoNotMatch [_; signature; implementation] ->
+                match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
+                | null -> null
+                | expr -> ArgumentNameMismatchWarning(expr, signature, implementation, error.Message) :> _
+
+            | _ -> null
 
         | CantTakeAddressOfExpression ->
             createHighlightingFromNode CantTakeAddressOfExpressionError range
