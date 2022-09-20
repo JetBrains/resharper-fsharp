@@ -9,7 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj"/>
         <ProjectReference Include="..\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj"/>
     </ItemGroup>
 
@@ -18,6 +17,6 @@
         <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)"/>
     </ItemGroup>
 
-    <Import Project="$(PsiFeaturesSubplatform)" Condition="Exists('$(PsiFeaturesSubplatform)')"/>
+    <Import Project="$(RdBackendCommonSubplatform)" Condition="Exists('$(RdBackendCommonSubplatform)')"/>
 
 </Project>

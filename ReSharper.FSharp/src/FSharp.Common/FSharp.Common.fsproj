@@ -50,7 +50,6 @@
     <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
     <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
     <Compile Include="src\Shim\AssemblyReader\AssemblyReaderShim.fs" />
-    <Compile Include="src\Shim\TypeProviders\TcImportsHack.fs" />
     <Compile Include="src\Shim\TypeProviders\TypeProvidersManager.fs" />
     <Compile Include="src\Shim\TypeProviders\ExtensionTypingProviderShim.fs" />
     <Compile Include="src\Shim\TypeProviders\ZoneMarker.fs" />

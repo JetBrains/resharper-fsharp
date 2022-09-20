@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using FSharp.Compiler;
-using JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
-using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
@@ -25,11 +24,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
       FSharpFunc<TypeProviderError, Unit>.FromConverter(e =>
         throw new TypeProvidersInstantiationException(e.ContextualErrorMessage, e.Number));
 
+    private static global::FSharp.Compiler.TypeProviders.ResolutionEnvironment
+      ToResolutionEnvironment(RdResolutionEnvironment env) =>
+      new(env.ResolutionFolder,
+        OptionModule.OfObj(env.OutputFile),
+        env.ShowResolutionMessages,
+        env.ReferencedAssemblies,
+        env.TemporaryFolder);
+
     public IEnumerable<ITypeProvider> InstantiateTypeProvidersOfAssembly(
       InstantiateTypeProvidersOfAssemblyParameters parameters)
     {
-      var resolutionEnvironment = parameters.RdResolutionEnvironment.ToResolutionEnvironment();
-      var systemRuntimeContainsType = TcImportsHack.injectFakeTcImports(parameters.FakeTcImports);
+      var resolutionEnvironment = ToResolutionEnvironment(parameters.RdResolutionEnvironment);
+      var systemRuntimeContainsType = TcImportsHack.InjectFakeTcImports(parameters.FakeTcImports);
       var systemRuntimeAssemblyVersion = Version.Parse(parameters.SystemRuntimeAssemblyVersion);
       var compilerToolsPath = ListModule.OfSeq(parameters.CompilerToolsPath);
 
