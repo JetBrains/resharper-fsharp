@@ -17,3 +17,10 @@ type UpdateParameterNameInSignatureFixTests() =
         x.DoTestSolution(testName + fsiExt, testName + fsExt)
         
     [<Test>] member x.``First parameter`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Middle parameter`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Last parameter`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``First in tupled parameter`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Middle in tupled parameter`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Last in tupled parameter`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Attribute parameter`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Optional parameter`` () = x.DoNamedTestWithSignature()
