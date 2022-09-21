@@ -36,54 +36,72 @@ type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
         let topLevelPat = topLevelPat.IgnoreParentParens()
 
         let binding = BindingNavigator.GetByParameterPattern(topLevelPat)
-        if isNull binding then () else
+        let memberDeclaration = if isNull binding then MemberDeclarationNavigator.GetByParameterPattern(topLevelPat) else null
 
-        let indexInTuple = if isNotNull tuplePat then Some (tuplePat.Patterns.IndexOf(p)) else None
-        let indexOfParameterInBinding =
-            binding.ParameterPatterns.IndexOf(topLevelPat)
-
-        match binding.HeadPattern with
-        | :? IReferencePat as refPat ->
-            // TODO: rename Declarations
-            let declarations =
-                // it has two declarations: one signature, one implementation
-                if  isNull refPat.DeclaredElement then Seq.empty else refPat.DeclaredElement.GetDeclarations()
-
-            let bindingSignatureOption = 
-                declarations
-                |> Seq.tryPick (fun d ->
-                        match d with 
-                        | :? IReferencePat as rp ->
-                            BindingSignatureNavigator.GetByHeadPattern(rp) |> Option.ofObj
-                        | _ -> None)
-
-            match bindingSignatureOption with
-            | None -> ()
-            | Some bs ->
-                let rec loop times (t: ITypeUsage) =
-                    if times = 0 then
-                        match t with
-                        | :? IFunctionTypeUsage as ftu -> ftu.ArgumentTypeUsage
-                        | _ -> t
+        let declaredElementAndParameterPatterns =
+            if isNull binding && isNull memberDeclaration then
+                None
+            elif isNotNull binding then
+                match binding.HeadPattern with
+                | :? IReferencePat as refPat ->
+                    if isNull refPat.DeclaredElement then
+                        None
                     else
-                    match t with
-                    | :? IFunctionTypeUsage as ftu ->
-                        loop (times  - 1) ftu.ReturnTypeUsage
-                    | _ -> t
-                
-                let signatureTypeAtIndex = loop indexOfParameterInBinding bs.ReturnTypeInfo.ReturnType
-                let signatureType =
-                    match signatureTypeAtIndex, indexInTuple with
-                    | :? ITupleTypeUsage as ttu, Some indexInTuple ->
-                        ttu.Items.[indexInTuple]
-                    | _ -> signatureTypeAtIndex
+                        Some (refPat.DeclaredElement, binding.ParameterPatterns)
+                | _ -> None
+            else
+                Some (memberDeclaration.DeclaredElement, memberDeclaration.ParameterPatterns)
+        
+        match declaredElementAndParameterPatterns with
+        | None -> ()
+        | Some (declaredElement, parameterPatterns) ->
+        
+        let indexInTuple = if isNotNull tuplePat then Some (tuplePat.Patterns.IndexOf(p)) else None
+        let indexOfParameterInBinding = parameterPatterns.IndexOf(topLevelPat)
 
-                match signatureType with
-                | :? IParameterSignatureTypeUsage as pstu ->
-                    if isNotNull pstu.Identifier then
-                        pstu.Identifier.ReplaceIdentifier(warning.ImplementationParameterName)
-                | _ -> ()
-        | _ -> ()
+        // TODO: rename Declarations
+        let declarations =
+            // it has two declarations: one signature, one implementation
+            if  isNull declaredElement then Seq.empty else declaredElement.GetDeclarations()
+
+        let returnTypeOption = 
+            declarations
+            |> Seq.tryPick (fun d ->
+                    match d with 
+                    | :? IReferencePat as rp ->
+                        BindingSignatureNavigator.GetByHeadPattern(rp)
+                        |> Option.ofObj
+                        |> Option.map (fun bs -> bs.ReturnTypeInfo.ReturnType)
+                    | :? IMemberSignature as ms ->
+                        Some(ms.ReturnTypeInfo.ReturnType)
+                    | _ -> None)
+
+        match returnTypeOption with
+        | None -> ()
+        | Some returnType ->
+            let rec loop times (t: ITypeUsage) =
+                if times = 0 then
+                    match t with
+                    | :? IFunctionTypeUsage as ftu -> ftu.ArgumentTypeUsage
+                    | _ -> t
+                else
+                match t with
+                | :? IFunctionTypeUsage as ftu ->
+                    loop (times  - 1) ftu.ReturnTypeUsage
+                | _ -> t
+            
+            let signatureTypeAtIndex = loop indexOfParameterInBinding returnType
+            let signatureType =
+                match signatureTypeAtIndex, indexInTuple with
+                | :? ITupleTypeUsage as ttu, Some indexInTuple ->
+                    ttu.Items.[indexInTuple]
+                | _ -> signatureTypeAtIndex
+
+            match signatureType with
+            | :? IParameterSignatureTypeUsage as pstu ->
+                if isNotNull pstu.Identifier then
+                    pstu.Identifier.ReplaceIdentifier(warning.ImplementationParameterName)
+            | _ -> ()
 
     override this.IsAvailable _ =
         isValid warning.Pattern
