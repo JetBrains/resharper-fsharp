@@ -7,12 +7,9 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 //  Library.fs(3, 8): [FS3218] The argument names in the signature 'c' and implementation 'b' do not match. The argument name from the signature file will be used. This may cause problems when debugging or profiling.
-
 // Implementation is source of truth in this quick fix.
 // There should be another quickfix to change the implementation file.
 
-
-// TODO: go through all places where something can go wrong! Null pointers, different types
 type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
     inherit FSharpQuickFixBase()
 
