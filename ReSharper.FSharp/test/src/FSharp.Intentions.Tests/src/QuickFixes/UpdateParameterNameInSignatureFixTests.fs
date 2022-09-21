@@ -24,3 +24,5 @@ type UpdateParameterNameInSignatureFixTests() =
     [<Test>] member x.``Last in tupled parameter`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Attribute parameter`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Optional parameter`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``First in tuple in member definition`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Last in last tuple in member definition`` () = x.DoNamedTestWithSignature()
