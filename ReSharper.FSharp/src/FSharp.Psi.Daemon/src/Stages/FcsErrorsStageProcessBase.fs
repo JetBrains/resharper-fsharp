@@ -380,7 +380,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | ArgumentNamesInSignatureAndImplementationDoNotMatch ->
             match error.Message with
-            | Regex argumentNamesInTheSignatureAndImplementationDoNotMatch [_; signature; implementation] ->
+            | Regex argumentNamesInTheSignatureAndImplementationDoNotMatch [ signature; implementation ] ->
                 match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
                 | null -> null
                 | expr -> ArgumentNameMismatchWarning(expr, signature, implementation, error.Message) :> _
