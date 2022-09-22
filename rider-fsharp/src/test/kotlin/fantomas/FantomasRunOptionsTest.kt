@@ -39,7 +39,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
 
     private fun getDotnetCliHome() = Path(tempTestDirectory.parent, "dotnetHomeCli")
     private val fantomasNotifications = ArrayList<String>()
-    private val bundledVersion = "4.7.8.0"
+    private val bundledVersion = "5.0.0.0"
     private val globalVersion = "4.7.2.0"
     private var dotnetToolsInvalidated = false
 
