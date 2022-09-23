@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -44,8 +45,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       {
         foreach (var metadataResource in metadataResources)
         {
+          var isCompressed =
+            metadataResource.ResourceName
+              .StartsWith(FSharpAssemblyUtil.CompressedSignatureInfoResourceName, StringComparison.Ordinal);
+
           using var stream = metadataResource.CreateResourceReader();
-          ReadMetadata(stream, metadata);
+          using var decompressedStream = isCompressed ? new DeflateStream(stream, CompressionMode.Decompress) : stream;
+
+          ReadMetadata(decompressedStream, metadata);
         }
       }
 

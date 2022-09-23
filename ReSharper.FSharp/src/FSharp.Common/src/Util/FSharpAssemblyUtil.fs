@@ -64,6 +64,7 @@ let isFSharpCore (assemblyName: AssemblyNameInfo) =
 
 let [<Literal>] SignatureInfoResourceName = "FSharpSignatureInfo."
 let [<Literal>] SignatureInfoResourceNameOld = "FSharpSignatureData."
+let [<Literal>] CompressedSignatureInfoResourceName = "FSharpSignatureCompressedData."
 
 [<Extension; CompiledName("IsFSharpMetadataResource")>]
 let isFSharpMetadataResource (manifestResource: IMetadataManifestResource) (compilationUnitName: outref<string>) =
@@ -73,6 +74,9 @@ let isFSharpMetadataResource (manifestResource: IMetadataManifestResource) (comp
         true
     elif startsWith SignatureInfoResourceNameOld name then
         compilationUnitName <- name.Substring(SignatureInfoResourceNameOld.Length)
+        true
+    elif startsWith CompressedSignatureInfoResourceName name then
+        compilationUnitName <- name.Substring(CompressedSignatureInfoResourceName.Length)
         true
     else false
 

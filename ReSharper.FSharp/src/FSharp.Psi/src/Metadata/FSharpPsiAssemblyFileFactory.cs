@@ -17,7 +17,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
     private static bool IsFSharpMetadataResource(IMetadataManifestResource resource) =>
       resource.Name.StartsWith(FSharpAssemblyUtil.SignatureInfoResourceName, StringComparison.Ordinal) ||
-      resource.Name.StartsWith(FSharpAssemblyUtil.SignatureInfoResourceNameOld, StringComparison.Ordinal);
+      resource.Name.StartsWith(FSharpAssemblyUtil.SignatureInfoResourceNameOld, StringComparison.Ordinal) ||
+      resource.Name.StartsWith(FSharpAssemblyUtil.CompressedSignatureInfoResourceName, StringComparison.Ordinal);
 
     private static bool IsFSharpSignatureAttribute(MetadataTypeReference typeReference) =>
       typeReference.FullName.Equals(FSharpAssemblyUtil.InterfaceDataVersionAttrConcatTypeName);
