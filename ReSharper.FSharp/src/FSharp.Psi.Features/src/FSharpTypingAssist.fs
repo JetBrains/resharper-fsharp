@@ -543,6 +543,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Backspace, this, Func<_,_>(this.HandleBackspacePressed), isActionHandlerAvailable)
+        manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Delete, this, Func<_,_>(this.HandleDeletePressed), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Tab, this, Func<_,_>(this.HandleTabPressed), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.TabLeft, this, Func<_,_>(this.HandleTabLeftPressed), isActionHandlerAvailable)
         manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
@@ -1151,6 +1152,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         if this.HandleBackspaceInInterpolatedString(context) then true else
         if this.HandleBackspaceInTripleQuotedString(textControl) then true else
+        if this.HandleBackspaceInRecords(textControl) then true else
 
         this.DoHandleBackspacePressed
             (textControl,
@@ -1209,6 +1211,158 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             true
 
         else false
+
+    member x.HandleBackspaceInRecords(textControl: ITextControl) =
+        let offset = textControl.Caret.Offset()
+        let mutable lexer = Unchecked.defaultof<_>
+
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
+        if not (lexer.FindTokenAt(offset)) then false else
+        if not FSharpTokenType.Identifiers.[lexer.TokenType] && lexer.TokenType != FSharpTokenType.LBRACK_LESS then false else
+
+        match x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id).AsFSharpFile() with
+        | null -> false
+        | fsFile ->
+
+        let document = textControl.Document
+        let documentOffset = DocumentOffset(document, offset)
+        let token = fsFile.FindTokenAt(documentOffset)
+
+        let processRecordDeclarations (declarations: IRecordFieldDeclarationList) =
+            declarations.FieldDeclarationsEnumerable
+            |> Seq.pairwise
+            |> Seq.tryFind (fun (_, second) -> second.GetTreeStartOffset().Offset = offset)
+            |> Option.map (fun (prev, next) ->
+                let newlinesCount = this.GetNewlinesCountBetweenNodes(prev, next)
+                if newlinesCount = 0 then false else
+                if newlinesCount = 1 then
+                    this.DeleteRecordAttributesWhitespaces(textControl, next)
+                    this.TryMoveNextRecordFieldToPrevFieldLine(textControl, prev, next)
+                else this.TryMoveNextRecordFieldToPrevEmptyLine(textControl, next))
+            |> Option.defaultValue false
+
+        let processRecordBinding (bindings: IRecordFieldBindingList) =
+            bindings.FieldBindingsEnumerable
+            |> Seq.pairwise
+            |> Seq.tryFind (fun (_, second) -> second.GetTreeStartOffset().Offset = offset)
+            |> Option.map (fun (prev, next) ->
+                let newlinesCount = this.GetNewlinesCountBetweenNodes(prev, next)
+                if newlinesCount = 0 then false else
+                if newlinesCount = 1 then this.TryMoveNextRecordFieldToPrevFieldLine(textControl, prev, next)
+                else this.TryMoveNextRecordFieldToPrevEmptyLine(textControl, next))
+            |> Option.defaultValue false
+
+        let declarations = token.GetContainingNode<IRecordFieldDeclarationList>()
+        if isNotNull declarations && processRecordDeclarations declarations then true else
+
+        let bindings = token.GetContainingNode<IRecordFieldBindingList>()
+        if isNotNull bindings && processRecordBinding bindings then true else
+
+        false
+
+    member x.HandleDeletePressed(context: IActionContext) =
+        let textControl = context.TextControl
+        if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
+
+        if this.HandleDeleteInRecords(textControl) then true else
+
+        false
+
+    member x.HandleDeleteInRecords(textControl: ITextControl) =
+        let offset = textControl.Caret.Offset()
+        let mutable lexer = Unchecked.defaultof<_>
+
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
+        if not (lexer.FindTokenAt(offset)) then false else
+        if lexer.TokenType != FSharpTokenType.NEW_LINE then false else
+
+        match x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id).AsFSharpFile() with
+        | null -> false
+        | fsFile ->
+
+        let document = textControl.Document
+        let documentOffset = DocumentOffset(document, offset)
+        let token = fsFile.FindTokenAt(documentOffset)
+
+        let processRecordDeclarations (declarations: IRecordFieldDeclarationList) =
+            declarations.FieldDeclarationsEnumerable
+            |> Seq.pairwise
+            |> Seq.tryFind (fun (first, second) ->
+                offset >= first.GetTreeEndOffset().Offset && offset < second.GetTreeStartOffset().Offset)
+            |> Option.map (fun (prev, next) ->
+                let newlinesCount = this.GetNewlinesCountBetweenNodes(prev, next)
+                if newlinesCount <> 1 then false else
+                this.DeleteRecordAttributesWhitespaces(textControl, next)
+                this.TryMoveNextRecordFieldToPrevFieldLine(textControl, prev, next))
+            |> Option.defaultValue false
+
+        let processRecordBinding (bindings: IRecordFieldBindingList) =
+            bindings.FieldBindingsEnumerable
+            |> Seq.pairwise
+            |> Seq.tryFind (fun (first, second) ->
+                offset >= first.GetTreeEndOffset().Offset && offset < second.GetTreeStartOffset().Offset)
+            |> Option.map (fun (prev, next) ->
+                let newlinesCount = this.GetNewlinesCountBetweenNodes(prev, next)
+                if newlinesCount <> 1 then false else
+                this.TryMoveNextRecordFieldToPrevFieldLine(textControl, prev, next))
+            |> Option.defaultValue false
+
+        let declarations = token.GetContainingNode<IRecordFieldDeclarationList>()
+        if isNotNull declarations && processRecordDeclarations declarations then true else
+
+        let bindings = token.GetContainingNode<IRecordFieldBindingList>()
+        if isNotNull bindings && processRecordBinding bindings then true else
+
+        false
+
+    member x.DeleteRecordAttributesWhitespaces(textControl: ITextControl, declaration: IRecordFieldDeclaration) =
+        let mutable removalOffset = 0
+        declaration.AttributeListsEnumerable
+        |> Seq.map (fun current -> (current, TreeNodeExtensions.GetNextNonWhitespaceToken current))
+        |> Seq.filter (snd >> isNotNull)
+        |> Seq.iter (fun (current, next) ->
+            let firstOffset = current.GetTreeEndOffset().Offset
+            let lastOffset = next.GetTreeStartOffset().Offset
+            let replaceRange = TextRange(removalOffset + firstOffset, removalOffset + lastOffset)
+            let replacement = " "
+            textControl.Document.ReplaceText(replaceRange, replacement)
+            removalOffset <- removalOffset - (replaceRange.Length - replacement.Length))
+
+    member x.GetTokensBetweenNodes(fromNode: ITreeNode, toNode: ITreeNode) =
+        TreeNodeExtensions.NextTokens fromNode.LastChild
+        |> Seq.takeWhile (fun token -> token.GetTreeStartOffset().Offset <> toNode.GetTreeStartOffset().Offset)
+
+    member x.GetNewlinesCountBetweenNodes(fromNode: ITreeNode, toNode: ITreeNode): int =
+        this.GetTokensBetweenNodes(fromNode, toNode)
+        |> Seq.filter (getTokenType >> (==) FSharpTokenType.NEW_LINE)
+        |> Seq.length
+
+    member x.TryMoveNextRecordFieldToPrevEmptyLine(textControl: ITextControl, next: ITreeNode) =
+        let currentIndentToken = next.PrevSibling
+        if (currentIndentToken.GetTokenType() != FSharpTokenType.WHITESPACE) then false else
+
+        let prevNewline = currentIndentToken.PrevSibling
+        let afterPrevPrevNewline =
+            prevNewline
+            |> TreeNodeExtensions.PrevTokens
+            |> Seq.takeWhile (getTokenType >> (!=) FSharpTokenType.NEW_LINE)
+
+        if (afterPrevPrevNewline |> Seq.exists (TokenNodeExtensions.IsWhitespaceToken >> not)) then false else
+        let prevPrevNewline =
+            afterPrevPrevNewline
+            |> Seq.rev
+            |> Seq.tryHead
+            |> Option.map (fun token -> token.PrevSibling)
+            |> Option.defaultValue prevNewline.PrevSibling
+
+        let replaceRange = TextRange(prevPrevNewline.GetTreeStartOffset().Offset, prevNewline.GetTreeStartOffset().Offset)
+        textControl.Document.ReplaceText(replaceRange, "")
+        true
+
+    member x.TryMoveNextRecordFieldToPrevFieldLine(textControl: ITextControl, prev: ITreeNode, next: ITreeNode) =
+        let replaceRange = TextRange(prev.GetTreeEndOffset().Offset, next.GetTreeStartOffset().Offset)
+        textControl.Document.ReplaceText(replaceRange, "; ")
+        true
 
     member x.HandleSurroundTyping(typingContext, lChar, rChar, lTokenType, rTokenType, shouldNotSurround) =
         base.HandleSurroundTyping(typingContext, lChar, rChar, lTokenType, rTokenType, shouldNotSurround)
