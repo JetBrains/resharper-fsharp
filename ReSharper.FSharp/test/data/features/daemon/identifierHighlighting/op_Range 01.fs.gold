@@ -1,0 +1,12 @@
+﻿module |Module|(0)
+
+let |a|(1) = []
+let _ = |seq|(2) {
+    for _ = 1 to 16 do yield! |a|(3)
+}
+
+---------------------------------------------------------
+(0): ReSharper F# Module Identifier: 
+(1): ReSharper F# Value Identifier: 
+(2): ReSharper F# Computation Expression Identifier: 
+(3): ReSharper F# Value Identifier: 

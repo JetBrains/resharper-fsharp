@@ -41,6 +41,7 @@ type IdentifierHighlightingTest() =
 
     [<Test>] member x.``Struct constructor``() = x.DoNamedTest()
 
+    [<Test>] member x.``op_Range 01``() = x.DoNamedTest()
     [<Test>] member x.op_RangeStep() = x.DoNamedTest()
 
     [<Test>] member x.``Byrefs 01``() = x.DoNamedTest()
