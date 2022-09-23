@@ -30,7 +30,7 @@ import java.time.Duration
 
 @Suppress("UnstableApiUsage")
 @Test
-@TestEnvironment(coreVersion = CoreVersion.DEFAULT)
+@TestEnvironment(coreVersion = CoreVersion.DOT_NET_CORE_3_1)
 class FcsModuleReaderTest : ProjectModelBaseTest() {
     companion object {
         private var launchCounter = 0

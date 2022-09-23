@@ -9,7 +9,7 @@ import com.jetbrains.rider.test.scriptingApi.waitForPause
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DEFAULT)
+@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
 class AsyncDebuggerTest : DebuggerTestBase() {
     override val projectName = "AsyncProgram"
     override fun getSolutionDirectoryName() = projectName
