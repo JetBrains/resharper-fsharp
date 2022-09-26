@@ -3,7 +3,8 @@
     "tfm": "netcoreapp3.1",
     "framework": {
       "name": "Microsoft.WindowsDesktop.App",
-      "version": "3.1.0"
+      "version": "3.1.0",
+      "rollForward": "Minor"
     }
   }
 }

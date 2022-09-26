@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
         var assemblyPath = Path.Combine(path, $"{new AssemblyName(eventArgs.Name).Name}.dll");
         if (!File.Exists(assemblyPath)) continue;
 
-        var assembly = Assembly.LoadFrom(assemblyPath);
+        var assembly = Assembly.LoadFile(assemblyPath);
         return assembly;
       }
 
