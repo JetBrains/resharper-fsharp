@@ -10,8 +10,6 @@ open JetBrains.ReSharper.Resources.Shell
 // Implementation is source of truth in this quick fix.
 // There should be another quickfix to change the implementation file.
 
-// TODO: add test for constructors!
-
 type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
     inherit FSharpQuickFixBase()
 
@@ -66,6 +64,8 @@ type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
                         |> Option.map (fun bs -> bs.ReturnTypeInfo.ReturnType)
                     | :? IMemberSignature as ms ->
                         Some(ms.ReturnTypeInfo.ReturnType)
+                    | :? IConstructorSignature as cs ->
+                        Some(cs.ReturnTypeInfo.ReturnType)
                     | _ -> None)
 
         match returnTypeOption with
