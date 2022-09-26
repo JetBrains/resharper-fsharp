@@ -5,4 +5,4 @@ type MyAttribute =
     
     new: unit -> MyAttribute
 
-val f: [<My>]v:int -> int
+val f: [<My>]v: int -> int

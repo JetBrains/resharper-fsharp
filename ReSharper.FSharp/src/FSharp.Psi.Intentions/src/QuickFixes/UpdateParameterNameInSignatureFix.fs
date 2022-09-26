@@ -10,13 +10,12 @@ open JetBrains.ReSharper.Resources.Shell
 // Implementation is source of truth in this quick fix.
 // There should be another quickfix to change the implementation file.
 
+// TODO: add test for constructors!
+
 type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
     inherit FSharpQuickFixBase()
 
-    override this.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(warning.Pattern.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-
+    let declaredElementAndParameterPatterns =
         let rec getTopLevelPattern (p: IFSharpPattern) : IFSharpPattern =
             let p = p.IgnoreParentParens()
 
@@ -35,29 +34,22 @@ type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
         let topLevelPat : IFSharpPattern = if isNotNull tuplePat then tuplePat else p
         let topLevelPat = topLevelPat.IgnoreParentParens()
 
-        let binding = BindingNavigator.GetByParameterPattern(topLevelPat)
-        let memberDeclaration = if isNull binding then MemberDeclarationNavigator.GetByParameterPattern(topLevelPat) else null
+        let decl = ParameterOwnerMemberDeclarationNavigator.GetByParameterPattern(topLevelPat)
 
-        let declaredElementAndParameterPatterns =
-            if isNull binding && isNull memberDeclaration then
-                None
-            elif isNotNull binding then
-                match binding.HeadPattern with
-                | :? IReferencePat as refPat ->
-                    if isNull refPat.DeclaredElement then
-                        None
-                    else
-                        Some (refPat.DeclaredElement, binding.ParameterPatterns)
-                | _ -> None
-            else
-                Some (memberDeclaration.DeclaredElement, memberDeclaration.ParameterPatterns)
+        if isNull decl then
+            None
+        else
+            let indexInTuple = if isNotNull tuplePat then Some (tuplePat.Patterns.IndexOf(p)) else None
+            let indexOfParameterInBinding = decl.ParameterPatterns.IndexOf(topLevelPat)
+            Some (decl.DeclaredElement, indexOfParameterInBinding, indexInTuple)
+
+    override this.ExecutePsiTransaction _ =
+        use writeCookie = WriteLockCookie.Create(warning.Pattern.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
         
         match declaredElementAndParameterPatterns with
         | None -> ()
-        | Some (declaredElement, parameterPatterns) ->
-        
-        let indexInTuple = if isNotNull tuplePat then Some (tuplePat.Patterns.IndexOf(p)) else None
-        let indexOfParameterInBinding = parameterPatterns.IndexOf(topLevelPat)
+        | Some (declaredElement, indexOfParameterInBinding, indexInTuple) ->
 
         // TODO: rename Declarations
         let declarations =
@@ -104,5 +96,5 @@ type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
             | _ -> ()
 
     override this.IsAvailable _ =
-        isValid warning.Pattern
+        isValid warning.Pattern && Option.isSome declaredElementAndParameterPatterns
     override this.Text = "Update parameter name in signature file."

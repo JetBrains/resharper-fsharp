@@ -3,6 +3,7 @@ using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -81,5 +82,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
+    IDeclaredElement IParameterOwnerMemberDeclaration.DeclaredElement => HeadPattern is IReferencePat rp ? rp.DeclaredElement : null;
   }
 }

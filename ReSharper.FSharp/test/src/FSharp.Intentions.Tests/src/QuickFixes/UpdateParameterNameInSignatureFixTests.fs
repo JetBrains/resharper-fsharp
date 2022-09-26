@@ -9,13 +9,14 @@ open NUnit.Framework
 type UpdateParameterNameInSignatureFixTests() =
     inherit FSharpQuickFixTestBase<UpdateParameterNameInSignatureFix>()
     override x.RelativeTestDataPath = "features/quickFixes/updateParameterNameInSignatureFixTests"
+    override this.CheckAllFiles = true
 
     member x.DoNamedTestWithSignature() =
         let testName = x.TestMethodName
         let fsExt = FSharpProjectFileType.FsExtension
         let fsiExt = FSharpSignatureProjectFileType.FsiExtension
         x.DoTestSolution(testName + fsiExt, testName + fsExt)
-        
+
     [<Test>] member x.``First parameter`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Middle parameter`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Last parameter`` () = x.DoNamedTestWithSignature()
