@@ -585,4 +585,16 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>UpdateParameterNameInSignatureFix</QuickFix>
   </Warning>
+
+  <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldWasPresent" ID="FS0311: The type definitions for type in the signature and implementation are not compatible because the field was present in the implementation but not in the signature">
+    <Parameter type="IFSharpIdentifier" name="typeName"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>typeName.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateRecordFieldsInSignatureFix</QuickFix>
+  </Error>
+  
 </Errors>

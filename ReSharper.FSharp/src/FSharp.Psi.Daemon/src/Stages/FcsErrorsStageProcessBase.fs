@@ -53,6 +53,7 @@ module FSharpErrors =
     let [<Literal>] MissingErrorNumber = 193
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
+    let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldWasPresent = 311
     let [<Literal>] NoImplementationGiven = 365
     let [<Literal>] NoImplementationGivenWithSuggestion = 366
     let [<Literal>] MemberIsNotAccessible = 491
@@ -311,6 +312,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             match typeDecl.PrimaryConstructorDeclaration with
             | null -> createGenericHighlighting error range
             | ctorDecl -> OnlyClassCanTakeValueArgumentsError(ctorDecl) :> _
+
+        | DefinitionsInSigAndImplNotCompatibleFieldWasPresent ->
+            let node = nodeSelectionProvider.GetExpression(fsFile, range, false, null)
+            DefinitionsInSigAndImplNotCompatibleFieldWasPresentError(node, error.Message)
 
         | NoImplementationGiven ->
             let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)

@@ -91,6 +91,7 @@
     <Compile Include="src\QuickFixes\ReplaceReturnTypeFix.fs" />
     <Compile Include="src\QuickFixes\XmlDocFixes.fs" />
     <Compile Include="src\QuickFixes\UpdateParameterNameInSignatureFix.fs" />
+    <Compile Include="src\QuickFixes\UpdateRecordFieldsInSignatureFix.fs" />
     <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\Errors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
@@ -111,5 +112,6 @@
 
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
 
+  <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
   <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
 </Project>

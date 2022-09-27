@@ -5,6 +5,7 @@ open FSharp.Compiler.Text
 open JetBrains.Annotations
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
+open type JetBrains.ProjectModel.ProjectFileTypeEx
 open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -13,6 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -35,6 +37,9 @@ type IPsiSourceFile with
     member x.FSharpFile =
         if isNull x then null else
         x.GetPrimaryPsiFile().AsFSharpFile()
+
+    member x.IsFSharpSignatureFile =
+        x.LanguageType.Is<FSharpSignatureProjectFileType>()
 
 type ITextControl with
     member x.GetFSharpFile(solution) =
