@@ -29,16 +29,9 @@ type XmlDocBlockAnalyzer() =
         let paramNodes = xmlPsi.GetParameterNodes(null)
         if paramNodes.Count = 0 then () else
 
-        let parameters =
-            let xmlDocOwner = xmlDocBlock.Parent
-            let parameters = FSharpParameterUtil.GetParametersGroupNames(xmlDocOwner)
-            if parameters.Count > 0 then parameters else
-
-            match xmlDocOwner with
-            | :? IFSharpTypeDeclaration as decl when isNotNull decl.PrimaryConstructorDeclaration ->
-                FSharpParameterUtil.GetParametersGroupNames(decl.PrimaryConstructorDeclaration)
-            | _ ->
-                parameters
+        let xmlDocOwner = xmlDocBlock.Parent
+        if xmlDocOwner :? IFSharpTypeDeclaration then () else
+        let parameters = FSharpParameterUtil.GetParametersGroupNames(xmlDocOwner)
 
         let parameters = parameters |> Seq.collect id
 
