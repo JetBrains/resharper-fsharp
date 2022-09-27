@@ -162,7 +162,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         _ => EmptyList<IEnumerable<(string, ITreeNode)>>.Enumerable
       };
 
-    public static IReadOnlyList<IReadOnlyList<(string, ITreeNode)>> GetParametersGroups(this IBinding binding)
+    public static IReadOnlyList<IReadOnlyList<(string name, ITreeNode node)>> GetParametersGroups(this IBinding binding)
     {
       var parameters = binding.ParameterPatterns.Select(GetParameterNames);
       var bodyExpr = binding.Expression;
