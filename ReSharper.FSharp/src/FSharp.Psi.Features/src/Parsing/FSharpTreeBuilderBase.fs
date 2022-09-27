@@ -364,8 +364,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                 x.Done(fieldListMark, ElementType.UNION_CASE_FIELD_DECLARATION_LIST)
             | _ -> ()
 
-        // todo: used in FSharp.Core only, otherwise warning
-        | SynUnionCaseKind.FullType _ -> ()
+        | SynUnionCaseKind.FullType(fullType, fullTypeInfo) ->
+            x.ProcessSignatureType(fullTypeInfo, fullType)
 
     member x.AddObjectModelTypeReprNode(kind: SynTypeDefnKind) =
         match kind with

@@ -1083,6 +1083,10 @@ unionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ex
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   identifier<IDENTIFIER, Identifier>
+  (
+    COLON<FSHARP_COLON, Colon>
+    typeUsage<TYPE, TypeUsage>
+  )?
   unionCaseFieldDeclarationList<FIELD_DECLARATION_LIST, FieldList>?
   typeBodyMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
