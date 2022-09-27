@@ -18,3 +18,4 @@ type UpdateRecordFieldsInSignatureFixTest() =
         x.DoTestSolution(testName + fsiExt, testName + fsExt)
     
     [<Test>] member x.``Single missing field`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Multiple missing fields`` () = x.DoNamedTestWithSignature()
