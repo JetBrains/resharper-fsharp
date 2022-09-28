@@ -6,10 +6,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-//  Library.fs(3, 8): [FS3218] The argument names in the signature 'c' and implementation 'b' do not match. The argument name from the signature file will be used. This may cause problems when debugging or profiling.
-// Implementation is source of truth in this quick fix.
-// There should be another quickfix to change the implementation file.
-
 type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
     inherit FSharpQuickFixBase()
 
@@ -34,12 +30,10 @@ type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
 
         let decl = ParameterOwnerMemberDeclarationNavigator.GetByParameterPattern(topLevelPat)
 
-        if isNull decl then
-            None
-        else
-            let indexInTuple = if isNotNull tuplePat then Some (tuplePat.Patterns.IndexOf(p)) else None
-            let indexOfParameterInBinding = decl.ParameterPatterns.IndexOf(topLevelPat)
-            Some (decl.DeclaredElement, indexOfParameterInBinding, indexInTuple)
+        if isNull decl then None else
+        let indexInTuple = if isNotNull tuplePat then Some (tuplePat.Patterns.IndexOf(p)) else None
+        let indexOfParameterInBinding = decl.ParameterPatterns.IndexOf(topLevelPat)
+        Some (decl.DeclaredElement, indexOfParameterInBinding, indexInTuple)
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(warning.Pattern.IsPhysical())
@@ -49,24 +43,25 @@ type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
         | None -> ()
         | Some (declaredElement, indexOfParameterInBinding, indexInTuple) ->
 
-        // TODO: rename Declarations
         let declarations =
-            // it has two declarations: one signature, one implementation
+            // In most cases it has two declarations: one signature, one implementation.
+            // Exceptions here would be virtual members that have two declarations in implementation files,
+            // or there may be a duplicate declaration (and an error).
             if  isNull declaredElement then Seq.empty else declaredElement.GetDeclarations()
 
         let returnTypeOption = 
             declarations
             |> Seq.tryPick (fun d ->
-                    match d with 
-                    | :? IReferencePat as rp ->
-                        BindingSignatureNavigator.GetByHeadPattern(rp)
-                        |> Option.ofObj
-                        |> Option.map (fun bs -> bs.ReturnTypeInfo.ReturnType)
-                    | :? IMemberSignature as ms ->
-                        Some(ms.ReturnTypeInfo.ReturnType)
-                    | :? IConstructorSignature as cs ->
-                        Some(cs.ReturnTypeInfo.ReturnType)
-                    | _ -> None)
+                match d with 
+                | :? IReferencePat as rp ->
+                    BindingSignatureNavigator.GetByHeadPattern(rp)
+                    |> Option.ofObj
+                    |> Option.map (fun bs -> bs.ReturnTypeInfo.ReturnType)
+                | :? IMemberSignature as ms ->
+                    Some(ms.ReturnTypeInfo.ReturnType)
+                | :? IConstructorSignature as cs ->
+                    Some(cs.ReturnTypeInfo.ReturnType)
+                | _ -> None)
 
         match returnTypeOption with
         | None -> ()
