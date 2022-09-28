@@ -90,6 +90,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         IMemberSignature memberSignature => GetParameterNames(((IMemberSignatureOrDeclaration)memberSignature)
           .ReturnTypeInfo.ReturnType),
 
+        IUnionCaseDeclaration { TypeUsage: { } typeUsage } => GetParameterNames(typeUsage),
         IUnionCaseDeclaration ucDecl => new[] { ucDecl.Fields.Select(t => t.SourceName) },
 
         IFSharpTypeDeclaration { TypeRepresentation: IDelegateRepresentation repr } =>
