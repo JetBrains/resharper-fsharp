@@ -55,6 +55,7 @@ type UpdateRecordFieldsInSignatureFix(error: DefinitionsInSigAndImplNotCompatibl
                 |> Seq.iter (fun implFieldDecl ->
                     let index = implementationRecordRepr.FieldDeclarations.IndexOf(implFieldDecl)
                     let getFieldType (rfd:IRecordFieldDeclaration) =
+                        if isNull rfd then None else
                         let symbolUse = rfd.GetFcsSymbolUse()
                         match symbolUse.Symbol with
                         | :? FSharpField as ff -> Some (ff.FieldType, symbolUse.DisplayContext)
