@@ -25,12 +25,7 @@ type UpdateRecordFieldsInSignatureFix(error: DefinitionsInSigAndImplNotCompatibl
         getRecordRepresentation typeDecl
 
     let createSignatureTypeUsage (factory: IFSharpElementFactory) (t: FSharpType, d: FSharpDisplayContext) : ITypeUsage =
-        let text =
-            t.FormatLayout d
-            |> Array.choose (fun t -> match t.Tag with | TextTag.UnknownEntity -> None | _ -> Some t.Text)
-            |> String.concat ""
-
-        factory.CreateTypeUsage(text)
+        factory.CreateTypeUsage(t.Format d)
     
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(error.TypeName.IsPhysical())
