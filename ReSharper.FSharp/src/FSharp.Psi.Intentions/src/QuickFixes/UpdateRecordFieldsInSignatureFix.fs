@@ -2,8 +2,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open System
 open FSharp.Compiler.Symbols
+open FSharp.Compiler.Text
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -23,6 +24,14 @@ type UpdateRecordFieldsInSignatureFix(error: DefinitionsInSigAndImplNotCompatibl
         let typeDecl = FSharpTypeDeclarationNavigator.GetByIdentifier(error.TypeName)
         getRecordRepresentation typeDecl
 
+    let createSignatureTypeUsage (factory: IFSharpElementFactory) (t: FSharpType, d: FSharpDisplayContext) : ITypeUsage =
+        let text =
+            t.FormatLayout d
+            |> Array.choose (fun t -> match t.Tag with | TextTag.UnknownEntity -> None | _ -> Some t.Text)
+            |> String.concat ""
+
+        factory.CreateTypeUsage(text)
+    
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(error.TypeName.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
@@ -50,17 +59,17 @@ type UpdateRecordFieldsInSignatureFix(error: DefinitionsInSigAndImplNotCompatibl
                 implementationRecordRepr.FieldDeclarations
                 |> Seq.iter (fun implFieldDecl ->
                     let index = implementationRecordRepr.FieldDeclarations.IndexOf(implFieldDecl)
+                    let getFieldType (rfd:IRecordFieldDeclaration) =
+                        let symbolUse = rfd.GetFcsSymbolUse()
+                        match symbolUse.Symbol with
+                        | :? FSharpField as ff -> Some (ff.FieldType, symbolUse.DisplayContext)
+                        | _ -> None
+                    
                     if index < signatureFieldCount then
                         // The signature record definition has a field at the current index
                         // The name or type might be wrong
                         let signatureFieldDecl = signatureRecordRepr.FieldDeclarations[index]
-                        
-                        let getFieldType (rfd:IRecordFieldDeclaration) =
-                            let symbolUse = rfd.GetFcsSymbolUse()
-                            match symbolUse.Symbol with
-                            | :? FSharpField as ff -> Some ff.FieldType
-                            | _ -> None
-                        
+
                         let fieldTypeAreEqual =
                             let signatureFieldType = getFieldType signatureFieldDecl
                             let implementationFieldType =  getFieldType implFieldDecl
@@ -68,7 +77,7 @@ type UpdateRecordFieldsInSignatureFix(error: DefinitionsInSigAndImplNotCompatibl
                             | None, None
                             | Some _, None
                             | None, Some _ -> false
-                            | Some i, Some s -> i = s
+                            | Some (i, _), Some (s, _) -> i = s
 
                         if implFieldDecl.SourceName = signatureFieldDecl.SourceName && fieldTypeAreEqual then
                             // fields are identical
@@ -77,22 +86,36 @@ type UpdateRecordFieldsInSignatureFix(error: DefinitionsInSigAndImplNotCompatibl
                             // field names are different, update signature field name
                             signatureFieldDecl.SetName(implFieldDecl.NameIdentifier.Name)
                         else
-                             // Update entire field, I'm not sure how to update the type only.
-                             ModificationUtil.ReplaceChild(signatureFieldDecl :> IFSharpTreeNode, implFieldDecl)
-                             |> ignore
-                    else
-                        // The signature record definition is out of fields.
-                        // New ones from the implementation should be added.
-                        let lastSignatureFieldDecl = signatureRecordRepr.FieldDeclarations.Last() :> ITreeNode
-                        let newlineNode = NewLine(lastSignatureFieldDecl.GetLineEnding()) :> ITreeNode
-                        ModificationUtil.AddChildAfter(lastSignatureFieldDecl, newlineNode)
-                        |> fun node ->
-                            let startPos = lastSignatureFieldDecl.GetDocumentStartOffset().ToDocumentCoords()
-                            let spaces = Whitespace(Convert.ToInt32(startPos.Column))
-                            ModificationUtil.AddChildAfter(node, spaces)
-                        |> fun node ->
-                            ModificationUtil.AddChildAfter(node, implFieldDecl)
+                            let implementationFieldType = getFieldType implFieldDecl
+                            match implementationFieldType with
+                            | None -> ()
+                            | Some tu ->
+
+                            let updatedTypeUsage = createSignatureTypeUsage (signatureFieldDecl.CreateElementFactory()) tu
+                            ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
                             |> ignore
+                    else
+                    // The signature record definition is out of fields.
+                    // New ones from the implementation should be added.
+                    let factory = implFieldDecl.CreateElementFactory()
+                    let implementationFieldType = getFieldType implFieldDecl
+                    match implementationFieldType with
+                    | None -> ()
+                    | Some implementationFieldType ->
+
+                    let typeUsage = createSignatureTypeUsage factory implementationFieldType
+                    let recordFieldBinding = factory.CreateRecordFieldDeclaration(implFieldDecl.DeclaredName, typeUsage)
+                
+                    let lastSignatureFieldDecl = signatureRecordRepr.FieldDeclarations.Last() :> ITreeNode
+                    let newlineNode = NewLine(lastSignatureFieldDecl.GetLineEnding()) :> ITreeNode
+                    ModificationUtil.AddChildAfter(lastSignatureFieldDecl, newlineNode)
+                    |> fun node ->
+                        let startPos = lastSignatureFieldDecl.GetDocumentStartOffset().ToDocumentCoords()
+                        let spaces = Whitespace(Convert.ToInt32(startPos.Column))
+                        ModificationUtil.AddChildAfter(node, spaces)
+                    |> fun node ->
+                        ModificationUtil.AddChildAfter(node, recordFieldBinding)
+                        |> ignore
                 )
 
     override this.IsAvailable _ =

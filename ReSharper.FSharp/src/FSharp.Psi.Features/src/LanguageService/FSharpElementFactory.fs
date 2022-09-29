@@ -149,6 +149,17 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             | null -> failwith "Could not get record expr"
             | recordExpr -> recordExpr.FieldBindings.First()
 
+        member x.CreateRecordFieldDeclaration(fieldName, typeUsage) =
+            let source = $"{{ {fieldName}: obj }}"
+            let typeDefn = getTypeDecl source
+            match typeDefn.TypeRepresentation with
+            | :? IRecordRepresentation as rr when not rr.FieldDeclarations.IsEmpty ->
+                let field = rr.FieldDeclarations.First()
+                ModificationUtil.ReplaceChild(field.TypeUsage, typeUsage)
+                |> ignore
+                field
+            | _ -> failwith "Could not get record type"
+
         member x.CreateAppExpr(funcName, argExpr) =
             let source = sprintf "%s ()" funcName
             let newExpr = getExpression source :?> IPrefixAppExpr
