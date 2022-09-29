@@ -314,9 +314,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | ctorDecl -> OnlyClassCanTakeValueArgumentsError(ctorDecl) :> _
 
         | DefinitionsInSigAndImplNotCompatibleFieldWasPresent ->
-            match fsFile.GetNode<IFSharpIdentifier>(range) with
-            | null -> createGenericHighlighting error range
-            | typeName -> DefinitionsInSigAndImplNotCompatibleFieldWasPresentError(typeName, error.Message)
+            createHighlightingFromNodeWithMessage DefinitionsInSigAndImplNotCompatibleFieldWasPresentError range error
 
         | NoImplementationGiven ->
             let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
