@@ -101,17 +101,14 @@ type UpdateRecordFieldsInSignatureFix(error: DefinitionsInSigAndImplNotCompatibl
 
                     let typeUsage = createSignatureTypeUsage factory implementationFieldType
                     let recordFieldBinding = factory.CreateRecordFieldDeclaration(implFieldDecl.DeclaredName, typeUsage)
-                
                     let lastSignatureFieldDecl = signatureRecordRepr.FieldDeclarations.Last() :> ITreeNode
                     let newlineNode = NewLine(lastSignatureFieldDecl.GetLineEnding()) :> ITreeNode
-                    ModificationUtil.AddChildAfter(lastSignatureFieldDecl, newlineNode)
-                    |> fun node ->
+                    let spaces =
                         let startPos = lastSignatureFieldDecl.GetDocumentStartOffset().ToDocumentCoords()
-                        let spaces = Whitespace(Convert.ToInt32(startPos.Column))
-                        ModificationUtil.AddChildAfter(node, spaces)
-                    |> fun node ->
-                        ModificationUtil.AddChildAfter(node, recordFieldBinding)
-                        |> ignore
+                        Whitespace(Convert.ToInt32(startPos.Column))
+
+                    addNodesAfter lastSignatureFieldDecl [| newlineNode; spaces; recordFieldBinding |]
+                    |> ignore
                 )
 
     override this.IsAvailable _ =
