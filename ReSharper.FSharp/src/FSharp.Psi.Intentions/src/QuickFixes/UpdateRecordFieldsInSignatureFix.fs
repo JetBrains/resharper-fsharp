@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open System
+open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -53,8 +54,23 @@ type UpdateRecordFieldsInSignatureFix(error: DefinitionsInSigAndImplNotCompatibl
                         // The signature record definition has a field at the current index
                         // The name or type might be wrong
                         let signatureFieldDecl = signatureRecordRepr.FieldDeclarations[index]
-                        if implFieldDecl.SourceName = signatureFieldDecl.SourceName &&
-                           implFieldDecl.DeclaredElement.ContainingType = signatureFieldDecl.DeclaredElement.ContainingType then
+                        
+                        let getFieldType (rfd:IRecordFieldDeclaration) =
+                            let symbolUse = rfd.GetFcsSymbolUse()
+                            match symbolUse.Symbol with
+                            | :? FSharpField as ff -> Some ff.FieldType
+                            | _ -> None
+                        
+                        let fieldTypeAreEqual =
+                            let signatureFieldType = getFieldType signatureFieldDecl
+                            let implementationFieldType =  getFieldType implFieldDecl
+                            match implementationFieldType, signatureFieldType with
+                            | None, None
+                            | Some _, None
+                            | None, Some _ -> false
+                            | Some i, Some s -> i = s
+
+                        if implFieldDecl.SourceName = signatureFieldDecl.SourceName && fieldTypeAreEqual then
                             // fields are identical
                             ()
                         elif implFieldDecl.SourceName <> signatureFieldDecl.SourceName then
