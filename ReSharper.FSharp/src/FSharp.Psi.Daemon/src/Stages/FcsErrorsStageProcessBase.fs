@@ -84,6 +84,7 @@ module FSharpErrors =
 
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
+    let [<Literal>] butItsSignatureSpecifies = "but its signature specifies"
     let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type \n    '(.+)'    \nis not compatible with type\n    '(.+)'"
 
     let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
@@ -434,6 +435,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | x when startsWith expressionIsAFunctionMessage x ->
                 createHighlightingFromMappedExpression getResultExpr FunctionValueUnexpectedWarning range error
 
+            | x when x.Contains(butItsSignatureSpecifies) ->
+                createHighlightingFromNodeWithMessage FieldNotContainedTypesDifferError range error
+            
             | Regex typeConstraintMismatchMessage [mismatchedType; typeConstraint] ->
                 let highlighting =
                     match typeConstraint with
