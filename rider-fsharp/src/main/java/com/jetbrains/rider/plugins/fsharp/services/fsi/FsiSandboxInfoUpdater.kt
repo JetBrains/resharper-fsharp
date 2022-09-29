@@ -44,7 +44,7 @@ class FsiSandboxInfoUpdater(project: Project, private val consoleEditor: EditorE
     private fun updateSandboxInfo() {
         application.invokeLater {
             val sandboxManager = SandboxManager.getInstance()
-            if (sandboxManager.getSandboxInfo(consoleEditor) == null) return@invokeLater
+            if (sandboxManager.getSandboxInfo(consoleEditor.document) == null) return@invokeLater
 
             val startUnpreparedCommandIndex = preparedCommands.size
             val endUnpreparedCommandIndex = correctCommandNumbers.size
