@@ -68,7 +68,7 @@ type FSharpStringProblemAnalyzer() =
 
             | lexer -> lexer
 
-    override x.ExtractElements(literalToken: FSharpString, _) =
+    override x.ExtractElements(literalToken: FSharpString, _ ,_) =
         [| Pair(literalToken :> ITokenNode, getCachedLexer literalToken) |] :> _
 
 
