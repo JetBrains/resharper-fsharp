@@ -1,0 +1,5 @@
+namespace Test
+
+type R2 =
+    { Field2: int
+      Field1: int }
