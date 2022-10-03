@@ -58,7 +58,7 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         ()
     elif implFieldDecl.SourceName <> signatureFieldDecl.SourceName then
         // field names are different, update signature field name
-        signatureFieldDecl.SetName(implFieldDecl.NameIdentifier.Name, ChangeNameKind.CompiledName)
+        signatureFieldDecl.SetName(implFieldDecl.NameIdentifier.Name, ChangeNameKind.SourceName)
     else
         let implementationFieldType = getFieldType implFieldDecl
         match implementationFieldType with
