@@ -11,10 +11,11 @@ IFSharpImplFile
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:foo)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        IParametersPatternDeclaration
-          ILocalReferencePat
-            IExpressionReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:x)
+        IPatternParameterDeclarationGroup
+          IPatternParameterDeclaration
+            ILocalReferencePat
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:x)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"

@@ -20,7 +20,7 @@ module SpecifyTypes =
         let typeString =
             let fullType = mfv.FullType
             if fullType.IsFunctionType then
-                let specifiedTypesCount = binding.ParametersDeclarations.Count
+                let specifiedTypesCount = binding.PatternParameterGroups.Count
 
                 let types = FcsTypeUtil.getFunctionTypeArgs true fullType
                 if types.Length <= specifiedTypesCount then mfv.ReturnParameter.Type.Format(displayContext) else
@@ -37,7 +37,7 @@ module SpecifyTypes =
         let factory = binding.CreateElementFactory()
         let typeUsage = factory.CreateTypeUsage(typeString)
 
-        let parameters = binding.ParametersDeclarations
+        let parameters = binding.PatternParameterGroups
         let anchor =
             if parameters.IsEmpty then binding.HeadPattern :> ITreeNode
             else parameters.Last() :> _
@@ -73,7 +73,7 @@ module SpecifyTypes =
 
     let specifyPropertyType displayContext (fcsType: FSharpType) (decl: IMemberDeclaration) =
         Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
-        Assertion.Assert(decl.ParametersDeclarationsEnumerable.IsEmpty(),
+        Assertion.Assert(decl.PatternParameterGroupsEnumerable.IsEmpty(),
             "decl.ParametersDeclarationsEnumerable.IsEmpty()")
 
         let factory = decl.CreateElementFactory()
@@ -87,17 +87,16 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
     let specifyParameterTypes displayContext (binding: IBinding) (mfv: FSharpMemberOrFunctionOrValue) =
         let types = FcsTypeUtil.getFunctionTypeArgs true mfv.FullType
-        let parameters = binding.ParametersDeclarations
+        let parameters = binding.PatternParameterGroups
 
         for fcsType, parameter in (types, parameters) ||> Seq.zip do
-            match parameter.Pattern.IgnoreInnerParens() with
+            match parameter.ParameterPatterns.SingleItem.IgnoreInnerParens() with // todo: fix for tuples
             | :? IConstPat | :? ITypedPat -> ()
             | pattern -> SpecifyTypes.specifyParameterType displayContext fcsType pattern
 
     let isAnnotated (binding: IBinding) =
         isNotNull binding.ReturnTypeInfo &&
-        binding.ParametersDeclarations |> Seq.forall (fun p ->
-            let pattern = p.Pattern.IgnoreInnerParens()
+        binding.ParameterPatternsEnumerable |> Seq.forall (fun pattern ->
             pattern :? ITypedPat || pattern :? IUnitPat)
 
     override x.Text = "Add type annotations"

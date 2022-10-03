@@ -13,10 +13,13 @@ open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Search
 open JetBrains.ReSharper.Psi.Tree
@@ -102,7 +105,28 @@ module FSharpDeconstructionImpl =
 
         pattern, names
 
-    let deconstructImpl ignoreUsages (deconstruction: IFSharpDeconstruction) (pat: IFSharpPattern) =
+    let convertToParameterGroupIfNeeded (pat: IFSharpPattern) : Choice<IFSharpPattern, IPatternParameterDeclarationGroup> =
+        let paramGroup = PatternParameterDeclarationGroupNavigator.GetByParameterPattern(pat)
+        if isNull paramGroup || paramGroup.Parameters.Count > 1 then Choice1Of2 pat else
+
+        if ParenPatUtil.isCompoundPattern pat && not paramGroup.HasParens then
+            LowLevelModificationUtil.AddChildBefore(paramGroup.FirstChild, FSharpTokenType.LPAREN.CreateLeafElement())
+            LowLevelModificationUtil.AddChild(paramGroup, FSharpTokenType.RPAREN.CreateLeafElement())
+
+        match pat with
+        | :? ITuplePat as tuplePat when not tuplePat.IsStruct ->
+            if paramGroup.Parameters.Count > 1 then Choice1Of2 pat else
+
+            for pat in tuplePat.Patterns do
+                wrapInNode pat ElementType.PATTERN_PARAMETER_DECLARATION |> ignore
+
+            LowLevelModificationUtil.AddChild(paramGroup, tuplePat.Children().AsArray())
+            Choice2Of2 paramGroup
+
+        | _ ->
+            Choice1Of2 pat
+
+    let deconstructImpl ignoreUsages (deconstruction: IFSharpDeconstruction) (pat: IFSharpPattern) : (HotspotsRegistry * ITreeNode) option =
         use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
         let factory = pat.CreateElementFactory()
         let hotspotsRegistry = HotspotsRegistry(pat.GetPsiServices())
@@ -122,7 +146,7 @@ module FSharpDeconstructionImpl =
             let matchClause = MatchClauseNavigator.GetByPattern(pat)
             if isNotNull matchClause then [matchClause.WhenExpression; matchClause.Expression] else
 
-            let lambdaExpr = LambdaExprNavigator.GetByPattern(pat)
+            let lambdaExpr = LambdaExprNavigator.GetByParameterPattern(pat)
             if isNotNull lambdaExpr then [lambdaExpr.Expression] else
 
             let memberDeclaration = MemberDeclarationNavigator.GetByParameterPattern(pat)
@@ -170,23 +194,21 @@ module FSharpDeconstructionImpl =
                 pat
 
         let pat, tuplePattern, names = deconstruction.DeconstructInnerPatterns(pat, usedNames)
-        let pattern = ParenPatUtil.addParensIfNeeded tuplePattern
-
-        let parenPat = ParenPatNavigator.GetByPattern(pattern)
-        let patternDeclaration = ParametersPatternDeclarationNavigator.GetByPattern(parenPat)
-        let pattern =
-            if isNull pat && isNotNull patternDeclaration then
-                ParenPatUtil.addParens pattern
-            else
-                pattern
+        let patOrParamGroup = convertToParameterGroupIfNeeded pat
 
         let itemPatterns: seq<IFSharpPattern> =
-            match pattern with
-            | null -> Seq.empty
-            | :? IAsPat as asPat -> asPat.LeftPattern.As<ITuplePat>().PatternsEnumerable :> _
-            | :? ITuplePat as tuplePat -> tuplePat.PatternsEnumerable :> _
-            | :? IReferencePat as refPat -> Seq.singleton refPat |> Seq.cast
-            | _ -> invalidOp $"Unexpected pattern: {pattern}"
+            match patOrParamGroup with
+            | Choice1Of2 _ ->
+                let pattern = ParenPatUtil.addParensIfNeeded tuplePattern
+                match pattern with
+                | null -> Seq.empty
+                | :? IAsPat as asPat -> asPat.LeftPattern.As<ITuplePat>().PatternsEnumerable :> _
+                | :? ITuplePat as tuplePat -> tuplePat.PatternsEnumerable :> _
+                | :? IReferencePat as refPat -> Seq.singleton refPat |> Seq.cast
+                | _ -> invalidOp $"Unexpected pattern: {pattern}"
+
+            | Choice2Of2 paramGroup ->
+                paramGroup.ParameterPatternsEnumerable
 
         if Seq.isEmpty itemPatterns then None else
 
@@ -195,8 +217,14 @@ module FSharpDeconstructionImpl =
             let rangeMarker = itemPattern.GetDocumentRange().CreateRangeMarker()
             hotspotsRegistry.Register(rangeMarker, nameSuggestionsExpression))
 
-        let pat: IFSharpPattern = if isNotNull pat then pat else tuplePattern
-        Some (hotspotsRegistry, pat)
+        let treeNode: ITreeNode =
+            match patOrParamGroup with
+            | Choice1Of2 pat ->
+                if isNotNull pat then pat else tuplePattern
+            | Choice2Of2 paramGroup ->
+                paramGroup
+
+        Some (hotspotsRegistry, treeNode)
 
 
 [<AbstractClass; AllowNullLiteral>]

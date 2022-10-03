@@ -191,13 +191,13 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
                 |> String.concat " "
 
             let memberBinding = createMemberDecl "P" List.empty parametersSource true
-            memberBinding.ParametersDeclarations |> Seq.toList
+            memberBinding.PatternParameterGroups |> Seq.toList
 
         member x.CreateMemberBindingExpr(name, typeParameters, parameters) =
             let parsedParams = "()" |> List.replicate parameters.Length |> String.concat " "
             let memberDecl = createMemberDecl name typeParameters parsedParams false
 
-            for realArg, fakeArg in Seq.zip parameters memberDecl.ParametersDeclarations do
+            for realArg, fakeArg in Seq.zip parameters memberDecl.PatternParameterGroups do
                 ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
             memberDecl
 
@@ -208,7 +208,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             let typeDecl = getTypeDecl memberSource
             let memberDecl = typeDecl.TypeMembers[0] :?> IMemberDeclaration
 
-            for realArg, fakeArg in Seq.zip parameters memberDecl.AccessorDeclarations[0].ParametersDeclarations do
+            for realArg, fakeArg in Seq.zip parameters memberDecl.AccessorDeclarations[0].PatternParameterGroups do
                 ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
 
             memberDecl

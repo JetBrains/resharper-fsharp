@@ -64,7 +64,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         else
             match expr.IgnoreInnerParens() with
             | :? ILambdaExpr as lambda ->
-                lambda.PatternsEnumerable.Count()
+                lambda.ParameterPatternsEnumerable.Count()
 
             | :? IReferenceExpr as ref ->
                 match ref.Reference.GetFcsSymbol() with

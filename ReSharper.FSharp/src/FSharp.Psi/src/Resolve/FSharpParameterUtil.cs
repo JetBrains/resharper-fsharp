@@ -83,7 +83,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         IConstructorSignature constructorSignature => GetParameterNames(constructorSignature.ReturnTypeInfo.ReturnType),
 
         IConstructorDeclaration constructorDeclaration =>
-          new[] { GetParameterNames(constructorDeclaration.ParameterPatterns) },
+          constructorDeclaration.ParameterPatterns.Select(GetParameterNames),
 
         IAbstractMemberDeclaration abstractMember => GetParameterNames(abstractMember.ReturnTypeInfo.ReturnType),
 
@@ -105,39 +105,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       ILocalReferencePat or IAttribPat or ITypedPat or IWildPat => true,
       IUnitPat => isTopLevel,
-      ITuplePat tuplePat => isTopLevel && tuplePat.PatternsEnumerable.All(t => IsSimplePattern(t, false)),
       _ => false
     };
 
     private static IEnumerable<IEnumerable<string>> GetLambdaArgs(ILambdaExpr expr)
     {
-      var lambdaParams = expr.Patterns;
+      var lambdaParams = expr.ParameterPatterns;
       var parameters = lambdaParams.Select(GetParameterNames);
       if (expr.Expression is ILambdaExpr innerLambda && lambdaParams.All(pattern => IsSimplePattern(pattern, true)))
         parameters = parameters.Union(GetLambdaArgs(innerLambda));
       return parameters;
     }
 
-    public static IEnumerable<string> GetParameterNames(this IFSharpPattern pattern)
-    {
-      IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pat, bool isTopLevelParameter)
+    public static IEnumerable<string> GetParameterNames(this IFSharpPattern pat) =>
+      pat.IgnoreInnerParens() switch
       {
-        pat = pat.IgnoreInnerParens();
-        return pat switch
-        {
-          ILocalReferencePat local => new[] { local.SourceName },
-          IOptionalValPat opt => GetParameterNamesInternal(opt.Pattern, isTopLevelParameter),
-          ITypedPat typed => GetParameterNamesInternal(typed.Pattern, false),
-          IAttribPat attrib => GetParameterNamesInternal(attrib.Pattern, false),
-          IAsPat asPat => GetParameterNamesInternal(asPat.RightPattern, false),
-          ITuplePat tuplePat when isTopLevelParameter =>
-            tuplePat.PatternsEnumerable.SelectMany(t => GetParameterNamesInternal(t, false)),
-          _ => new[] { SharedImplUtil.MISSING_DECLARATION_NAME }
-        };
-      }
-
-      return GetParameterNamesInternal(pattern, true);
-    }
+        ILocalReferencePat local => new[] { local.SourceName },
+        IOptionalValPat opt => GetParameterNames(opt.Pattern),
+        ITypedPat typed => GetParameterNames(typed.Pattern),
+        IAttribPat attrib => GetParameterNames(attrib.Pattern),
+        IAsPat asPat => GetParameterNames(asPat.RightPattern),
+        _ => new[] { SharedImplUtil.MISSING_DECLARATION_NAME }
+      };
 
     public static IEnumerable<IEnumerable<string>> GetParameterNames(this ITypeUsage pattern) =>
       pattern switch

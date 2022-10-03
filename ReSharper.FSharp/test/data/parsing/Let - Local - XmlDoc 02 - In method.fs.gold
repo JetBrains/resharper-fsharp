@@ -17,10 +17,11 @@ IFSharpImplFile
             FSharpIdentifierToken(type:IDENTIFIER, text:x)
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           FSharpIdentifierToken(type:IDENTIFIER, text:M)
-          IParametersPatternDeclaration
-            IUnitPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IPatternParameterDeclarationGroup
+            IPatternParameterDeclaration
+              IUnitPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"

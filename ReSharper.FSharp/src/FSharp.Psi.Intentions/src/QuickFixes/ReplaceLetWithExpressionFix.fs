@@ -31,7 +31,7 @@ type ReplaceLetWithExpressionFix(error: ExpectedExpressionAfterLetError) =
         bindings.Count = 1 &&
 
         let binding = bindings[0]
-        isValid binding.Expression && binding.ParametersDeclarationsEnumerable.IsEmpty()
+        isValid binding.Expression && binding.PatternParameterGroupsEnumerable.IsEmpty()
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(letExpr.IsPhysical())

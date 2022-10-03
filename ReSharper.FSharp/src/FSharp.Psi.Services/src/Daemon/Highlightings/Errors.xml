@@ -181,6 +181,16 @@
     <QuickFix>RemoveRedundantParenPatFix</QuickFix>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="RedundantParameterGroupParens" configurableSeverity="FSharpRedundantParens">
+    <Parameter type="IPatternParameterDeclarationGroup" name="paramGroup"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant parentheses"/>
+    <Range>paramGroup.LeftParen.GetHighlightingRange()</Range>
+    <SecondaryRanges>secondaryRangesFromNode paramGroup.RightParen</SecondaryRanges>
+<!--    <QuickFix>RemoveRedundantParenPatFix</QuickFix>-->
+  </Warning>
+
+
   <Warning staticGroup="FSharpErrors" name="RedundantParenTypeUsage" configurableSeverity="FSharpRedundantParens">
     <Parameter type="IParenTypeUsage" name="parenTypeUsage"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>

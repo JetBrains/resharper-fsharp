@@ -140,8 +140,8 @@ type RearrangeableTupleExprProvider() =
 [<RearrangeableElementType>]
 type RearrangeableLambdaParamPatternProvider() =
     inherit FSharpRearrangeableSimpleSwap<IFSharpPattern, ILambdaExpr>(
-        "lambda parameter", Direction.LeftRight, LambdaExprNavigator.GetByPattern,
-        fun lambdaExpr -> lambdaExpr.PatternsEnumerable)
+        "lambda parameter", Direction.LeftRight, LambdaExprNavigator.GetByParameterPattern,
+        fun lambdaExpr -> lambdaExpr.ParameterPatternsEnumerable)
 
 
 [<RearrangeableElementType>]
@@ -152,9 +152,9 @@ type RearrangeableRecordFieldDeclarationProvider() =
 
 [<RearrangeableElementType>]
 type RearrangeableFunctionParameterProvider() =
-    inherit FSharpRearrangeableSimpleSwap<IParametersPatternDeclaration, IBinding>(
-        "function parameter", Direction.LeftRight, BindingNavigator.GetByParametersDeclaration,
-        fun binding -> binding.ParametersDeclarationsEnumerable)
+    inherit FSharpRearrangeableSimpleSwap<IPatternParameterDeclarationGroup, IBinding>(
+        "function parameter", Direction.LeftRight, BindingNavigator.GetByPatternParameterGroup,
+        fun binding -> binding.PatternParameterGroupsEnumerable)
 
 
 type RearrangeableEnumCaseLikeDeclaration(decl: IEnumCaseLikeDeclaration) =

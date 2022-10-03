@@ -23,8 +23,7 @@ let precedence (treeNode: ITreeNode) =
 
     | :? IParametersOwnerPat -> 7
 
-    | :? ILambdaParametersList
-    | :? IParametersPatternDeclaration -> 8
+    | :? IPatternParameterDeclaration -> 8
 
     // The rest of the patterns.
     | :? IFSharpPattern -> 9
@@ -57,14 +56,14 @@ let rec isAtCompoundPatternRightSide (pat: IFSharpPattern) =
     let parent = getParentPatternFromLeftSide pat
     isAtCompoundPatternRightSide parent
 
-let isCompoundPattern (pat: IFSharpPattern) =
+let rec isCompoundPattern (pat: IFSharpPattern) =
     match pat with
     | :? IConstPat
     | :? IListPat
     | :? INullPat
     | :? IRecordPat
     | :? IReferencePat
-    | :? IWildPat -> false
+    | :? IWildPat -> false // todo: IParenPat?
     | _ -> true
 
 let rec compoundPatternNeedsParens (strictContext: ITreeNode) (fsPattern: IFSharpPattern) =
@@ -112,7 +111,12 @@ let prefersReferenceResolveRules (refPat: IReferencePat) =
     not (name.IsEmpty()) && name[0].IsUpperFast()
 
 let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
-    if isCompoundPattern fsPattern && isNotNull (AsPatNavigator.GetByRightPattern(context)) then true else
+    let isCompoundPattern = isCompoundPattern fsPattern
+
+    let paramGroup = PatternParameterDeclarationGroupNavigator.GetByParameterPattern(context)
+    if isNotNull paramGroup && (paramGroup.HasParens || not isCompoundPattern) then false else
+
+    if isCompoundPattern && isNotNull (AsPatNavigator.GetByRightPattern(context)) then true else
 
     match fsPattern with
     | :? IListConsPat as listConsPat ->
@@ -126,8 +130,7 @@ let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
     | :? IAsPat ->
         isAtCompoundPatternRightSide context ||
         isNotNull (ParametersOwnerPatNavigator.GetByParameter(context)) ||
-        isNotNull (LambdaParametersListNavigator.GetByPattern(context)) ||
-        isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context)) ||
+        isNotNull (PatternParameterDeclarationNavigator.GetByPattern(context)) ||
 
         let strictContext = getStrictContext context
         compoundPatternNeedsParens strictContext fsPattern
@@ -155,8 +158,8 @@ let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
     | :? IAttribPat ->
         checkPrecedence context fsPattern ||
 
+        // todo: parameter decl?
         isNotNull (BindingNavigator.GetByHeadPattern(getBindingPattern context)) ||
-        isNotNull (LambdaParametersListNavigator.GetByPattern(context)) ||
         isNotNull (MatchClauseNavigator.GetByPattern(context)) ||
 
         let tuplePat = TuplePatNavigator.GetByPattern(context)
@@ -176,11 +179,11 @@ let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
     let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(context)
     isNotNull parametersOwnerPat && getNextSibling parametersOwnerPat.ReferenceName == context ||
 
-    let parameterDecl = ParametersPatternDeclarationNavigator.GetByPattern(context)
-    isNotNull (ConstructorDeclarationNavigator.GetByParametersDeclaration(parameterDecl)) ||
+    let parameterDecl = PatternParameterDeclarationNavigator.GetByPattern(context)
+    isNotNull (ConstructorDeclarationNavigator.GetByParameter(parameterDecl)) ||
 
     // todo: add code style setting
-    let memberDeclaration = MemberDeclarationNavigator.GetByParametersDeclaration(parameterDecl)
+    let memberDeclaration = MemberDeclarationNavigator.GetByParameterPattern(context) // todo: GetByParameter
     isNotNull memberDeclaration && getNextSibling memberDeclaration.NameIdentifier == parameterDecl ||
     isNotNull memberDeclaration && getNextSibling memberDeclaration.TypeParameterList == parameterDecl
 
@@ -188,7 +191,7 @@ let escapesTuplePatParamDecl (context: IFSharpPattern) (innerPattern: IFSharpPat
     match innerPattern with
     | :? IParenPat as parenPat ->
         match parenPat.Pattern with
-        | :? ITuplePat -> isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context))
+        | :? ITuplePat -> isNotNull (PatternParameterDeclarationNavigator.GetByPattern(context)) // todo: rewrite
         | _ -> false
     | _ -> false
 
@@ -226,8 +229,8 @@ let addParensIfNeeded (pattern: IFSharpPattern) =
         if isNotNull parametersOwnerPat then
             removeSpace parametersOwnerPat.ReferenceName parenPattern
 
-        let patternDeclaration = ParametersPatternDeclarationNavigator.GetByPattern(parenPattern)
-        let memberDeclaration = MemberDeclarationNavigator.GetByParametersDeclaration(patternDeclaration)
+        let patternDeclaration = PatternParameterDeclarationGroupNavigator.GetByParameterPattern(parenPattern) // todo
+        let memberDeclaration = MemberDeclarationNavigator.GetByPatternParameterGroup(patternDeclaration)
         if isNotNull memberDeclaration then
             removeSpace memberDeclaration.Identifier patternDeclaration
 

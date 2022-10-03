@@ -47,7 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           case IFSharpPattern:
             node = node.Parent;
             break;
-          case IParametersPatternDeclaration when allowFromParameters:
+          case IPatternParameterDeclarationGroup when allowFromParameters:
             node = node.Parent;
             isFromParameter = true;
             break;

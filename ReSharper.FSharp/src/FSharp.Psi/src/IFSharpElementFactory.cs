@@ -50,9 +50,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IAttributeList CreateEmptyAttributeList();
     IAttribute CreateAttribute(string attrName);
 
-    FSharpList<IParametersPatternDeclaration> CreateMemberParamDeclarations(FSharpList<FSharpList<Tuple<string, FSharpType>>> curriedParameterNames, bool isSpaceAfterComma, bool addTypes, bool preferNoParens, FSharpDisplayContext displayContext);
-    IMemberDeclaration CreateMemberBindingExpr(string bindingName, FSharpList<string> typeParameters, FSharpList<IParametersPatternDeclaration> args);
-    IMemberDeclaration CreatePropertyWithAccessor(string propertyName, string accessorName, FSharpList<IParametersPatternDeclaration> args);
+    FSharpList<IPatternParameterDeclarationGroup> CreateMemberParamDeclarations(FSharpList<FSharpList<Tuple<string, FSharpType>>> curriedParameterNames, bool isSpaceAfterComma, bool addTypes, bool preferNoParens, FSharpDisplayContext displayContext);
+    IMemberDeclaration CreateMemberBindingExpr(string bindingName, FSharpList<string> typeParameters, FSharpList<IPatternParameterDeclarationGroup> args);
+    IMemberDeclaration CreatePropertyWithAccessor(string propertyName, string accessorName, FSharpList<IPatternParameterDeclarationGroup> args);
 
     ITypeParameterDeclarationList CreateTypeParameterOfTypeList(FSharpList<string> names);
   }

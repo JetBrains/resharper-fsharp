@@ -1,3 +1,5 @@
 ﻿//${RUN:1}
 type A() =
-    member _.Method(x, _{caret}, _) = x
+    member _.Method(x, _{caret}, _) =
+        let a = 1
+        x

@@ -22,3 +22,13 @@ type RedundantParenPatAnalyzer() =
             consumer.AddHighlighting(RedundantParenPatWarning(parenPat))
 
     interface IFSharpRedundantParenAnalyzer
+
+
+[<ElementProblemAnalyzer(typeof<IPatternParameterDeclarationGroup>,
+                         HighlightingTypes = [| typeof<RedundantParameterGroupParensWarning> |])>]
+type RedundantPatternParameterGroupParenAnalyzer() =
+    inherit ElementProblemAnalyzer<IPatternParameterDeclarationGroup>()
+
+    override this.Run(paramGroup, _, consumer) =
+        if paramGroup.HasParens && isCompoundPattern paramGroup.ParameterPatterns.SingleItem then
+            consumer.AddHighlighting(RedundantParameterGroupParensWarning(paramGroup))

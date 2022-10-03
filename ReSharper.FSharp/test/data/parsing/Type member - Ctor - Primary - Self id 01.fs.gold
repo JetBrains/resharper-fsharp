@@ -12,10 +12,11 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
         IPrimaryConstructorDeclaration
-          IParametersPatternDeclaration
-            IUnitPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IPatternParameterDeclarationGroup
+            IPatternParameterDeclaration
+              IUnitPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ICtorSelfId
             FSharpTokenType+AsTokenElement(type:AS, text:as)

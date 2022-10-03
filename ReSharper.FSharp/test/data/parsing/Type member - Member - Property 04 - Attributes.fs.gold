@@ -11,10 +11,11 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
         IPrimaryConstructorDeclaration
-          IParametersPatternDeclaration
-            IUnitPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IPatternParameterDeclarationGroup
+            IPatternParameterDeclaration
+              IUnitPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
@@ -45,9 +46,9 @@ IFSharpImplFile
           IAccessorDeclaration
             FSharpIdentifierToken(type:IDENTIFIER, text:get)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IParenPat
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IPatternParameterDeclarationGroup
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IPatternParameterDeclaration
                 ITypedPat
                   IWildPat
                     FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
@@ -56,7 +57,7 @@ IFSharpImplFile
                   INamedTypeUsage
                     ITypeReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -70,9 +71,9 @@ IFSharpImplFile
           IAccessorDeclaration
             FSharpIdentifierToken(type:IDENTIFIER, text:set)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IParenPat
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IPatternParameterDeclarationGroup
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IPatternParameterDeclaration
                 ITypedPat
                   IWildPat
                     FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
@@ -81,11 +82,11 @@ IFSharpImplFile
                   INamedTypeUsage
                     ITypeReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IParenPat
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IPatternParameterDeclarationGroup
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IPatternParameterDeclaration
                 ITypedPat
                   IWildPat
                     FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
@@ -94,7 +95,7 @@ IFSharpImplFile
                   INamedTypeUsage
                     ITypeReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

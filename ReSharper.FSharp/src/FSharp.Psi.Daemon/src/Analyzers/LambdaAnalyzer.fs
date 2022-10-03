@@ -31,8 +31,20 @@ type LambdaAnalyzer() =
             |> Seq.exists (fun u -> isNotNull u && not (excludedUseExpr.Contains(u)))
         | _ -> false
 
-    let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
-        match pat.IgnoreInnerParens(), arg.IgnoreInnerParens() with
+    let rec compareArgGroup (paramGroup: IPatternParameterDeclarationGroup) (argExpr: IFSharpExpression) =
+        let paramPatterns = paramGroup.ParameterPatterns
+        if paramPatterns.IsEmpty then false else
+
+        if paramPatterns.Count > 1 then
+            match argExpr.IgnoreInnerParens() with
+            | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct ->
+                compareArgsSeq paramPatterns tupleExpr.Expressions
+            | _ -> false
+        else
+            compareArg paramPatterns[0] argExpr
+
+    and compareArg (pat: IFSharpPattern) (argExpr: IFSharpExpression) =
+        match pat.IgnoreInnerParens(), argExpr.IgnoreInnerParens() with
         | :? ITuplePat as pat, (:? ITupleExpr as expr) ->
             not pat.IsStruct = not expr.IsStruct &&
             compareArgsSeq pat.PatternsEnumerable expr.ExpressionsEnumerable
@@ -55,15 +67,16 @@ type LambdaAnalyzer() =
 
         compareArg (Seq.head pats) (Seq.head args) && compareArgsSeq (Seq.tail pats) (Seq.tail args)
 
-    and compareArgs (pats: TreeNodeCollection<_>) (expr: IFSharpExpression) =
+    and compareArgs (paramGroups: TreeNodeCollection<IPatternParameterDeclarationGroup>) (expr: IFSharpExpression) =
         let rec compareArgsRec (expr: IFSharpExpression) i nameUsages =
             let hasMatches = i > 0
+
             match expr.IgnoreInnerParens() with
-            | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && i <> pats.Count ->
-                let pat = pats[pats.Count - 1 - i]
+            | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && i <> paramGroups.Count ->
+                let paramGroup = paramGroups[paramGroups.Count - 1 - i]
                 let argExpr = app.ArgumentExpression
 
-                if not (compareArg pat argExpr) then
+                if not (compareArgGroup paramGroup argExpr) then
                     hasMatches, false, app :> IFSharpExpression
                 else
                     let funExpr = app.FunctionExpression
@@ -71,7 +84,7 @@ type LambdaAnalyzer() =
                         if isNotNull nameUsages then nameUsages else
                         FSharpNamingService.getUsedNamesUsages [funExpr] EmptyList.Instance null false
 
-                    if not (patIsUsed usedNames argExpr pat) then
+                    if not (paramGroup.ParameterPatternsEnumerable |> Seq.exists (patIsUsed usedNames argExpr)) then
                         compareArgsRec funExpr (i + 1) usedNames
                     else
                         hasMatches, false, app :> _
@@ -81,11 +94,13 @@ type LambdaAnalyzer() =
                     name = SharedImplUtil.MISSING_DECLARATION_NAME || PrettyNaming.IsOperatorDisplayName name ->
                 false, false, null
 
-            | x -> hasMatches, i = pats.Count, x
+            | x -> hasMatches, i = paramGroups.Count, x
 
         compareArgsRec expr 0 null
 
-    let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
+    let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg)
+            isFSharp6Supported =
+
         let lambda = lambda.IgnoreParentParens()
 
         let replacementRefExpr = replacementExpr.As<IFSharpExpression>().IgnoreInnerParens().As<IReferenceExpr>()
@@ -150,50 +165,52 @@ type LambdaAnalyzer() =
             | _ -> ctor arg
         | _ -> ctor arg
 
-    let isApplicable (expr: IFSharpExpression) (pats: TreeNodeCollection<IFSharpPattern>) =
+    let isApplicable (expr: IFSharpExpression) (paramGroups: TreeNodeCollection<IPatternParameterDeclarationGroup>) =
         match expr with
         | :? IPrefixAppExpr
         | :? IReferenceExpr
         | :? ITupleExpr
-        | :? IUnitExpr -> not (pats.Count = 1 && pats.First().IgnoreInnerParens() :? IUnitPat)
+        | :? IUnitExpr ->
+            let singleGroup = paramGroups.SingleItem
+            isNull singleGroup || not (singleGroup.ParameterPatterns.SingleItem.IgnoreInnerParens() :? IUnitPat)
         | _ -> false
 
     override x.Run(lambda, data, consumer) =
         let isFsharp60Supported = data.IsFSharp60Supported
-        let expr = lambda.Expression.IgnoreInnerParens()
-        let pats = lambda.Patterns
+        let bodyExpr = lambda.Expression.IgnoreInnerParens()
+        let paramGroups = lambda.PatternParameterGroups
 
-        if not (isApplicable expr pats) then () else
+        if not (isApplicable bodyExpr paramGroups) then () else
 
         let warning: IHighlighting =
-            match compareArgs pats expr with
+            match compareArgs paramGroups bodyExpr with
             | true, true, replaceCandidate ->
                 tryCreateWarning LambdaCanBeReplacedWithInnerExpressionWarning (lambda, replaceCandidate) isFsharp60Supported :> _
             | true, false, replaceCandidate ->
                 tryCreateWarning LambdaCanBeSimplifiedWarning (lambda, replaceCandidate) isFsharp60Supported :> _
             | _ ->
 
-            if pats.Count = 1 then
-                let pat = pats[0].IgnoreInnerParens()
-                if compareArg pat expr then
-                    let expr = lambda.IgnoreParentParens()
-                    let mutable funExpr = Unchecked.defaultof<_>
-                    let mutable arg = Unchecked.defaultof<_>
-                    if isFunctionInApp expr &funExpr &arg then
-                        RedundantApplicationWarning(funExpr, arg) :> _
-                    else
-                        tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda,  "id") isFsharp60Supported :> _
+            if paramGroups.Count <> 1 then null else
+
+            let paramGroup = paramGroups[0]
+            if compareArgGroup paramGroup bodyExpr then
+                let expr = lambda.IgnoreParentParens()
+                let mutable funExpr = Unchecked.defaultof<_>
+                let mutable arg = Unchecked.defaultof<_>
+                if isFunctionInApp expr &funExpr &arg then
+                    RedundantApplicationWarning(funExpr, arg) :> _
                 else
-                    match pat with
-                    | :? ITuplePat as pat when not pat.IsStruct && pat.PatternsEnumerable.CountIs(2) ->
-                        let tuplePats = pat.Patterns
-                        if compareArg tuplePats[0] expr then
-                            tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "fst") isFsharp60Supported :> _
-                        elif compareArg tuplePats[1] expr then
-                            tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd") isFsharp60Supported :> _
-                        else null
-                    | _ -> null
+                    tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "id") isFsharp60Supported :> _
+            else
+                let pats = paramGroup.ParameterPatterns
+                if pats.Count <> 2 then null else
 
-            else null
+                if compareArg pats[0] bodyExpr then
+                    tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "fst") isFsharp60Supported :> _
+                elif compareArg pats[1] bodyExpr then
+                    tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd") isFsharp60Supported :> _
+                else
+                    null
 
-        if isNotNull warning then consumer.AddHighlighting(warning)
+        if isNotNull warning then
+            consumer.AddHighlighting(warning)

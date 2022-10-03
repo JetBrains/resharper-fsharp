@@ -22,20 +22,23 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpIdentifierToken(type:IDENTIFIER, text:M)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IParametersPatternDeclaration
-            ILocalReferencePat
-              IExpressionReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:a)
+          IPatternParameterDeclarationGroup
+            IPatternParameterDeclaration
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:a)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IParametersPatternDeclaration
-            ILocalReferencePat
-              IExpressionReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:b)
+          IPatternParameterDeclarationGroup
+            IPatternParameterDeclaration
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:b)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IParametersPatternDeclaration
-            ILocalReferencePat
-              IExpressionReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:c)
+          IPatternParameterDeclarationGroup
+            IPatternParameterDeclaration
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:c)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

@@ -20,10 +20,11 @@ IFSharpImplFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:T)
               FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              ILocalReferencePat
-                IExpressionReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:x)
+            IPatternParameterDeclarationGroup
+              IPatternParameterDeclaration
+                ILocalReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:x)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

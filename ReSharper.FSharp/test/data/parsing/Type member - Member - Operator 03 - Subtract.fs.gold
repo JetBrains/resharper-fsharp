@@ -24,17 +24,17 @@ IFSharpImplFile
           FSharpTokenType+MinusTokenElement(type:MINUS, text:-)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IParametersPatternDeclaration
-            IParenPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              ITuplePat
-                IWildPat
-                  FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-                FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
-                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                IWildPat
-                  FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IPatternParameterDeclarationGroup
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IPatternParameterDeclaration
+              IWildPat
+                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+            FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IPatternParameterDeclaration
+              IWildPat
+                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

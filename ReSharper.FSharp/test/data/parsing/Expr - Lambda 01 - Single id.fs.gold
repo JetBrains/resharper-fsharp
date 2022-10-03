@@ -6,10 +6,11 @@ IFSharpImplFile
         ILambdaExpr
           FSharpTokenType+FunTokenElement(type:FUN, text:fun)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          ILambdaParametersList
-            ILocalReferencePat
-              IExpressionReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:x)
+          IPatternParameterDeclarationGroup
+            IPatternParameterDeclaration
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:x)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

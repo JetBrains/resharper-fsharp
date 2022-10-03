@@ -1455,8 +1455,8 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
-        x.IsTypingSmartParenthesisHandlerAvailable2(context) && x.HandleAngleBracketsInList(context, lexer)
-        || x.HandleXmlDocTag(context, lexer)
+        x.IsTypingSmartParenthesisHandlerAvailable2(context) && x.HandleAngleBracketsInList(context, lexer) ||
+        x.HandleXmlDocTag(context, lexer)
 
     member x.HandleAngleBracketsInList(context, lexer: CachingLexer) =
         insertCharInBrackets context lexer angledBracketsChars listBrackets LeftBracketOnly.Yes

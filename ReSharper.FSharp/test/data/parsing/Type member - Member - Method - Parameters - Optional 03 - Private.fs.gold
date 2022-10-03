@@ -18,15 +18,15 @@ IFSharpImplFile
           FSharpTokenType+PrivateTokenElement(type:PRIVATE, text:private)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpIdentifierToken(type:IDENTIFIER, text:M)
-          IParametersPatternDeclaration
-            IParenPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          IPatternParameterDeclarationGroup
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IPatternParameterDeclaration
               IOptionalValPat
                 FSharpTokenType+QmarkTokenElement(type:QMARK, text:?)
                 ILocalReferencePat
                   IExpressionReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:a)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

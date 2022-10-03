@@ -7,10 +7,11 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:T1)
         IPrimaryConstructorDeclaration
-          IParametersPatternDeclaration
-            IUnitPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IPatternParameterDeclarationGroup
+            IPatternParameterDeclaration
+              IUnitPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
@@ -43,9 +44,10 @@ IFSharpImplFile
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:main)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        IParametersPatternDeclaration
-          IWildPat
-            FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+        IPatternParameterDeclarationGroup
+          IPatternParameterDeclaration
+            IWildPat
+              FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"

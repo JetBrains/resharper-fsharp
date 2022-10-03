@@ -170,7 +170,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return true;
 
       var referenceName = refPat.ReferenceName;
-      if (!(referenceName is {Qualifier: null}))
+      if (!(referenceName is {Qualifier: null})) 
         return false;
 
       var name = referenceName.ShortName;

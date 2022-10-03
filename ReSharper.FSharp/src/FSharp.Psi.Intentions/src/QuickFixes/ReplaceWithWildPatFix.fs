@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 // todo: combine with RemoveUnusedNamedAsPat:
@@ -62,11 +63,18 @@ module ReplaceWithWildPat =
         if isNull node then false else
 
         match node.Parent with
-        | :? IBinding | :? IMatchClause | :? ILambdaParametersList | :? IForEachExpr -> true
+        | :? IBinding | :? IMatchClause | :? IForEachExpr -> true
 
-        | :? IParametersPatternDeclaration as parent ->
-            let parent = parent.Parent
-            parent :? IMemberDeclaration || parent :? ISecondaryConstructorDeclaration || parent :? IBinding
+        | :? IPatternParameterDeclaration as paramDecl ->
+            let paramDeclGroup = PatternParameterDeclarationGroupNavigator.GetByParameter(paramDecl)
+            isNotNull paramDeclGroup &&
+
+            match paramDeclGroup.Parent with
+            | :? IMemberDeclaration
+            | :? ISecondaryConstructorDeclaration
+            | :? IBinding
+            | :? ILambdaExpr -> true
+            | _ -> false
 
         | _ -> false
 
@@ -122,26 +130,37 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
             | null -> FileCollectorInfo.Default
             | pat ->
 
-            let (scopeNode: ITreeNode), scopeText =
+            let scopeNode, scopeText =
                 match pat.Parent with
                 | :? IMatchClause ->
                     let patternText =
                         match pat with
                         | :? IParametersOwnerPat as owner -> owner.ReferenceName.ShortName
                         | _ -> "match clause"
-                    pat :> _, sprintf "'%s' pattern" patternText
+                    TreeRange(pat), sprintf "'%s' pattern" patternText
 
-                | :? IParametersPatternDeclaration as p ->
-                    match BindingNavigator.GetByParametersDeclaration(p) with
-                    | null -> pat :> _, "parameter list"
-                    | binding -> binding :> _, "binding patterns"
+                | :? IPatternParameterDeclaration as paramDecl ->
+                    let lambdaExpr = LambdaExprNavigator.GetByParameter(paramDecl)
+                    if isNotNull lambdaExpr && not (lambdaExpr.ParametersEnumerable.IsEmpty()) then
+                        let parameters = lambdaExpr.Parameters
+                        TreeRange(parameters.First(), parameters.Last()), "parameter list" else
 
-                | :? ILambdaParametersList as parametersList -> parametersList :> _, "parameter list"
-                | :? IBinding -> pat :> _, "binding patterns"
-                | :? IForEachExpr -> pat :> _, "'for' pattern"
+                    // todo: unify getting param decls in all groups
+                    match BindingNavigator.GetByParameter(paramDecl) with
+                    | null ->
+                        let paramGroup = PatternParameterDeclarationGroupNavigator.GetByParameter(paramDecl)
+                        if isNotNull paramGroup then
+                            let parameters = paramGroup.Parameters
+                            TreeRange(parameters.First(), parameters.Last()), "parameter list"
+                        else
+                            TreeRange(pat), "parameter list"
+                    | binding -> TreeRange(binding), "binding patterns" // todo: check expr
+
+                | :? IBinding -> TreeRange(pat), "binding patterns"
+                | :? IForEachExpr -> TreeRange(pat), "'for' pattern"
                 | _ -> invalidArg "patOwner.Parent" "unexpected type"
 
-            FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode, LocalScope(scopeNode, $"in {scopeText}"))
+            FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode.First, LocalScope(scopeNode, $"in {scopeText}"))
 
         member x.ExecuteAction(highlightingInfos, _, _) =
             use writeLock = WriteLockCookie.Create(true)

@@ -99,6 +99,14 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         x.Done(range, mark2, elementType2)
         x.Done(mark1, elementType1)
 
+    member x.MarkAndDone(range: range, elementType1, elementType2, elementType3) =
+        let mark1 = x.Mark(range)
+        let mark2 = x.Mark()
+        let mark3 = x.Mark()
+        x.Done(range, mark3, elementType3)
+        x.Done(range, mark2, elementType2)
+        x.Done(mark1, elementType1)
+
     member x.MarkToken(elementType) =
         let caseMark = x.Mark()
         x.AdvanceLexer()
@@ -491,34 +499,23 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
     member x.ProcessImplicitCtorSimplePats(pats: SynSimplePats) =
         let range = pats.Range
-        let paramMark = x.Mark(range)
+        let paramGroupMark = x.Mark(range)
 
         match pats with
         | SynSimplePats.SimplePats([], _) ->
-            x.MarkAndDone(range, ElementType.UNIT_PAT)
-            x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
+            x.MarkAndDone(range, ElementType.PATTERN_PARAMETER_DECLARATION, ElementType.UNIT_PAT)
+            x.Done(range, paramGroupMark, ElementType.PATTERN_PARAMETER_DECLARATION_GROUP)
 
         | _ ->
 
-        let parenPatMark = x.Mark()
-
         match pats with
-        | SynSimplePats.SimplePats([pat], _) ->
-            x.ProcessImplicitCtorParam(pat)
-
-        | SynSimplePats.SimplePats(headPat :: _ as pats, range) ->
-            let tupleMark = x.Mark(headPat.Range)
+        | SynSimplePats.SimplePats(pats, _) ->
             for pat in pats do
-                x.ProcessImplicitCtorParam(pat)
-            x.Done(tupleMark, ElementType.TUPLE_PAT)
-            x.AdvanceToTokenOrRangeEnd(FSharpTokenType.RPAREN, range)
-            if x.TokenType == FSharpTokenType.RPAREN then
-                x.Advance()
+                x.ProcessImplicitCtorParam(pat, true)
 
         | _ -> failwithf $"Unexpected simple pats: {pats}"
 
-        x.Done(range, parenPatMark, ElementType.PAREN_PAT)
-        x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
+        x.Done(range, paramGroupMark, ElementType.PATTERN_PARAMETER_DECLARATION_GROUP)
 
     member x.ProcessReturnTypeInfo(valInfo: SynValInfo, synType: SynType) =
         let (SynValInfo(_, SynArgInfo(returnAttrs, _, _))) = valInfo
@@ -532,22 +529,28 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         x.ProcessSignatureType(valInfo, synType)
         x.Done(returnInfoStart, ElementType.RETURN_TYPE_INFO)
 
-    member x.ProcessImplicitCtorParam(pat: SynSimplePat) =
+    member x.ProcessImplicitCtorParam(pat: SynSimplePat, isTopLevel) =
+        let parameterDeclMark =
+            if isTopLevel then x.Mark(pat.Range) else -1
+
         match pat with
         | SynSimplePat.Id(ident = IdentRange range) ->
             x.MarkAndDone(range, ElementType.LOCAL_REFERENCE_PAT, ElementType.EXPRESSION_REFERENCE_NAME)
 
         | SynSimplePat.Typed(pat, synType, range) ->
             let mark = x.Mark(range)
-            x.ProcessImplicitCtorParam(pat)
+            x.ProcessImplicitCtorParam(pat, false)
             x.ProcessType(synType)
             x.Done(range, mark, ElementType.TYPED_PAT)
 
         | SynSimplePat.Attrib(pat, attrs, range) ->
             let mark = x.Mark(range)
             x.ProcessAttributeLists(attrs)
-            x.ProcessImplicitCtorParam(pat)
+            x.ProcessImplicitCtorParam(pat, false)
             x.Done(range, mark, ElementType.ATTRIB_PAT)
+
+        if isTopLevel then
+            x.Done(parameterDeclMark, ElementType.PATTERN_PARAMETER_DECLARATION)
 
     member x.ProcessActivePatternId(range: range, caseElementType) =
         let idMark = x.Mark(range)

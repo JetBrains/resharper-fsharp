@@ -7,10 +7,11 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:A)
         IPrimaryConstructorDeclaration
-          IParametersPatternDeclaration
-            IUnitPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IPatternParameterDeclarationGroup
+            IPatternParameterDeclaration
+              IUnitPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
@@ -51,10 +52,11 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpIdentifierToken(type:IDENTIFIER, text:get)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IUnitPat
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            IPatternParameterDeclarationGroup
+              IPatternParameterDeclaration
+                IUnitPat
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -79,10 +81,11 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpIdentifierToken(type:IDENTIFIER, text:set)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IUnitPat
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            IPatternParameterDeclarationGroup
+              IPatternParameterDeclaration
+                IUnitPat
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

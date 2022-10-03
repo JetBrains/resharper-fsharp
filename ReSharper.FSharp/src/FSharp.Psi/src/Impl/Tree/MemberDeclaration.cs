@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      if (ParametersDeclarationsEnumerable.Any())
+      if (PatternParameterGroupsEnumerable.Any())
         return this.CreateMethod();
 
       return GetFcsSymbol() is { } fcsSymbol

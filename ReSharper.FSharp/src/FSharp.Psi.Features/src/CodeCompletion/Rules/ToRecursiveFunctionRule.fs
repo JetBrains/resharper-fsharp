@@ -77,7 +77,7 @@ type ToRecursiveFunctionRule() =
 
             | :? IForEachExpr as forEachExpr -> addNames forEachExpr.Pattern
             | :? IMatchClause as matchClause -> addNames matchClause.Pattern
-            | :? ILambdaExpr as lambdaExpr -> Seq.iter addNames lambdaExpr.PatternsEnumerable
+            | :? ILambdaExpr as lambdaExpr -> Seq.iter addNames lambdaExpr.ParameterPatternsEnumerable
 
             | :? IBinding as binding ->
                 let refPat = binding.HeadPattern.As<IReferencePat>()

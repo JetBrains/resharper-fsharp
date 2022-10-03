@@ -34,6 +34,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
 
-    public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
+    public bool HasParameters => !PatternParameterGroupsEnumerable.IsEmpty();
   }
 }

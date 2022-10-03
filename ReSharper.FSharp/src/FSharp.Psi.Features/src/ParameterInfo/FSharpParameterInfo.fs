@@ -567,7 +567,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                                 if paramGroup = 0 then invalidArg else
 
                                 let lastParamIndex = acc + paramGroup - 1
-                                let parameters = candidate.ParameterOwner.Parameters
+                                let parameters = candidate.ParameterOwner.Parameters // todo: nre
                                 if lastParamIndex < parameters.Count && parameters[lastParamIndex].IsParameterArray then
                                     lastParamIndex
                                 else

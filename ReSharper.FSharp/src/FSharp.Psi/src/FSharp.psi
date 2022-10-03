@@ -175,14 +175,16 @@ interface binding:
 topBinding extras {
   get { methodName="Attributes" path=<topBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Expression" path=<topBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
-  get { methodName="ParameterPatterns" path=<topBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="ParameterPatterns" path=<topBinding:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL/patternParameterDeclaration:PATTERN> };
+  get { methodName="Parameters" path=<topBinding:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL> };
 }:
   bindingHeader
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
 localBinding extras {
   get { methodName="Attributes" path=<localBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-  get { methodName="ParameterPatterns" path=<localBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="ParameterPatterns" path=<localBinding:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL/patternParameterDeclaration:PATTERN> };
+  get { methodName="Parameters" path=<localBinding:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL> };
 }:
   bindingHeader
   fSharpExpression<EXPR, Expression>;
@@ -202,7 +204,7 @@ private bindingHeader:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   postfixTypeParameterDeclarationList<TYPE_PARAMETER_LIST, TypeParameterList>?
-  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
+  patternParameterDeclarationGroup<PATTERN_PARAMETER_GROUP, PatternParameterGroups>*
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>;
 
@@ -670,16 +672,14 @@ computationExpr options { stubBase="FSharpExpressionBase"; }:
   RBRACE;
 
 lambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
-  get { methodName="Patterns" path=<lambdaExpr:LAMBDA_PARAMETERS/lambdaParametersList:PAT> };
+  get { methodName="ParameterPatterns" path=<lambdaExpr:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL/patternParameterDeclaration:PATTERN> };
+  get { methodName="Parameters" path=<lambdaExpr:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL> };
 }:
   FUN
-  lambdaParametersList<LAMBDA_PARAMETERS, Parameters>
+  patternParameterDeclarationGroup<PATTERN_PARAMETER_GROUP, PatternParameterGroups>*
   RARROW<RARROW, RArrow>
   fSharpExpression<EXPR, Expression>;
   
-lambdaParametersList:
-  fSharpPattern<PAT, Patterns>*;
-
 interface matchClauseListOwnerExpr:
   matchExpr |
   matchLambdaExpr |
@@ -1180,7 +1180,7 @@ delegateRepresentation options { stubBase="TypeRepresentationBase"; }:
   OF
   typeUsage<TYPE, TypeUsage>;
 
-interface fSharpTypeMemberDeclaration:
+interface fSharpTypeMemberDeclaration options { customParseFunction; noInternalParseFunction; }:
   primaryConstructorDeclaration |
   typeBodyMemberDeclaration;
 
@@ -1243,11 +1243,12 @@ interfaceImplementation:
 otherTypeMember: fakeSeparator;
 
 primaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
-  get { methodName="ParameterPatterns" path=<primaryConstructorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="ParameterPatterns" path=<primaryConstructorDeclaration:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL/patternParameterDeclaration:PATTERN> };
+  get { methodName="Parameters" path=<primaryConstructorDeclaration:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclaration> 
+  patternParameterDeclarationGroup<PATTERN_PARAMETER_GROUP, PatternParameterGroup>*
   ctorSelfId<SELF_ID, SelfIdentifier>?;
 
 interface selfId:
@@ -1276,12 +1277,13 @@ constructorSignature options { stubBase="ConstructorDeclarationBase"; }:
 
 secondaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
   get { methodName="Expression" path=<secondaryConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
-  get { methodName="ParameterPatterns" path=<secondaryConstructorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="ParameterPatterns" path=<secondaryConstructorDeclaration:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL/patternParameterDeclaration:PATTERN> };
+  get { methodName="Parameters" path=<secondaryConstructorDeclaration:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   NEW<NEW, NewKeyword>
-  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclaration>
+  patternParameterDeclarationGroup<PATTERN_PARAMETER_GROUP, PatternParameterGroup>*
   ctorSelfId<SELF_ID, SelfIdentifier>?
   EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
@@ -1294,7 +1296,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETER_LIST/postfixTypeParameterDeclarationList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Expression" path=<memberDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
-  get { methodName="ParameterPatterns" path=<memberDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="ParameterPatterns" path=<memberDeclaration:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL/patternParameterDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
@@ -1307,7 +1309,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   identOrOpName{IDENTIFIER, Identifier}
   postfixTypeParameterDeclarationList<TYPE_PARAMETER_LIST, TypeParameterList>?
   (
-    parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
+    patternParameterDeclarationGroup<PATTERN_PARAMETER_GROUP, PatternParameterGroups>*
     returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
     EQUALS<FSHARP_EQUALS, EqualsToken>
     chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>
@@ -1390,20 +1392,27 @@ accessorsNamesClause:
 
 accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Expression" path=<accessorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
-  get { methodName="ParameterPatterns" path=<accessorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="ParameterPatterns" path=<accessorDeclaration:PATTERN_PARAMETER_GROUP/patternParameterDeclarationGroup:PARAMETER_DECL/patternParameterDeclaration:PATTERN> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   IDENTIFIER<IDENTIFIER, Identifier>
   (
-    parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
+    patternParameterDeclarationGroup<PATTERN_PARAMETER_GROUP, PatternParameterGroups>*
     EQUALS<FSHARP_EQUALS, EqualsToken>
     chameleonExpression<CHAMELEON_EXPR, BodyExpression>
   )?;
 
-parametersPatternDeclaration:
-  fSharpPattern<PATTERN, Pattern>;
+patternParameterDeclarationGroup extras {
+  get { methodName="Parameters" path=<patternParameterDeclarationGroup:PARAMETER_DECL> };
+  get { methodName="ParameterPatterns" path=<patternParameterDeclarationGroup:PARAMETER_DECL/patternParameterDeclaration:PATTERN> };
+}:
+  LPAREN<LPAREN, LeftParen>?
+  LIST patternParameterDeclaration<PARAMETER_DECL, ParameterDecls> SEP COMMA<FSHARP_COMMA, Separators>
+  RPAREN<RPAREN, RightParen>?;
 
+patternParameterDeclaration:
+  fSharpPattern<PATTERN, Pattern>;
 
 // module statements
 
@@ -1793,7 +1802,7 @@ parenTypeUsage:
   typeUsage<TYPE, InnerTypeUsage>
   RPAREN<RPAREN, RightParen>;
 
-parameterSignatureTypeUsage:
+parameterSignatureTypeUsage options { stubBase="FSharpDeclarationBase"; }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   QMARK<QMARK, OptionalMark>?
   (

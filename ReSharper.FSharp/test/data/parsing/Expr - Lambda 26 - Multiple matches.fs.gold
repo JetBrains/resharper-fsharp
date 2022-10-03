@@ -6,9 +6,9 @@ IFSharpImplFile
         ILambdaExpr
           FSharpTokenType+FunTokenElement(type:FUN, text:fun)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          ILambdaParametersList
-            IParenPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          IPatternParameterDeclarationGroup
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IPatternParameterDeclaration
               IAsPat
                 ITuplePat
                   ILocalReferencePat
@@ -25,14 +25,17 @@ IFSharpImplFile
                 ILocalReferencePat
                   IExpressionReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:c)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ILocalReferencePat
-              IExpressionReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:d)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParenPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IPatternParameterDeclarationGroup
+            IPatternParameterDeclaration
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:d)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IPatternParameterDeclarationGroup
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IPatternParameterDeclaration
               IAsPat
                 ITuplePat
                   ILocalReferencePat
@@ -49,14 +52,15 @@ IFSharpImplFile
                 ILocalReferencePat
                   IExpressionReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:g)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParenPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IPatternParameterDeclarationGroup
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IPatternParameterDeclaration
               ILocalReferencePat
                 IExpressionReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:h)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

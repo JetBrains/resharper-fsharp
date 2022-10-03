@@ -74,7 +74,7 @@ type SpecifyParameterTypeFix(qualifiedExpr: IQualifiedExpr) =
             | null -> refPat
             | tuplePat -> tuplePat
 
-        isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(pat))
+        isNotNull (PatternParameterDeclarationGroupNavigator.GetByParameterPattern(pat))
 
     override this.IsApplicable(decl: IDeclaration) =
         decl :? ILocalReferencePat

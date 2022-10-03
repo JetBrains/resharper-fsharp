@@ -14,10 +14,11 @@ IFSharpImplFile
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:f)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        IParametersPatternDeclaration
-          ILocalReferencePat
-            IExpressionReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:x)
+        IPatternParameterDeclarationGroup
+          IPatternParameterDeclaration
+            ILocalReferencePat
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:x)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -40,10 +41,11 @@ IFSharpImplFile
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:g)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        IParametersPatternDeclaration
-          ILocalReferencePat
-            IExpressionReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:x)
+        IPatternParameterDeclarationGroup
+          IPatternParameterDeclaration
+            ILocalReferencePat
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:x)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -67,10 +69,11 @@ IFSharpImplFile
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:k)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        IParametersPatternDeclaration
-          ILocalReferencePat
-            IExpressionReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:x)
+        IPatternParameterDeclarationGroup
+          IPatternParameterDeclaration
+            ILocalReferencePat
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:x)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

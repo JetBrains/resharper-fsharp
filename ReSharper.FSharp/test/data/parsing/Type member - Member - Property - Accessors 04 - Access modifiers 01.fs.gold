@@ -32,9 +32,10 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpIdentifierToken(type:IDENTIFIER, text:get)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IWildPat
-                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+            IPatternParameterDeclarationGroup
+              IPatternParameterDeclaration
+                IWildPat
+                  FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -52,9 +53,10 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpIdentifierToken(type:IDENTIFIER, text:set)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IParametersPatternDeclaration
-              IWildPat
-                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+            IPatternParameterDeclarationGroup
+              IPatternParameterDeclaration
+                IWildPat
+                  FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

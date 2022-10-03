@@ -9,18 +9,18 @@ IFSharpImplFile
           IExpressionReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:op_ColonColon)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        IParametersPatternDeclaration
-          IParenPat
-            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            ITuplePat
-              ILiteralPat
-                FSharpToken(type:INT32, text:1)
-              FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IListPat
-                FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-                FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
-            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        IPatternParameterDeclarationGroup
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          IPatternParameterDeclaration
+            ILiteralPat
+              FSharpToken(type:INT32, text:1)
+          FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IPatternParameterDeclaration
+            IListPat
+              FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
+              FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

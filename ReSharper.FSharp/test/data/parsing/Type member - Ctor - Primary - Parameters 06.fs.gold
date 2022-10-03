@@ -7,19 +7,19 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
         IPrimaryConstructorDeclaration
-          IParametersPatternDeclaration
-            IParenPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              ITuplePat
-                ILocalReferencePat
-                  IExpressionReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:a)
-                FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
-                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                ILocalReferencePat
-                  IExpressionReferenceName
-                    FSharpIdentifierToken(type:IDENTIFIER, text:b)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IPatternParameterDeclarationGroup
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IPatternParameterDeclaration
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:a)
+            FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IPatternParameterDeclaration
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:b)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"

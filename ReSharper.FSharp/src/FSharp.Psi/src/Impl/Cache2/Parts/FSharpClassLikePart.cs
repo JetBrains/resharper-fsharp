@@ -100,7 +100,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
           if (constructorDeclOrSig is IConstructorDeclaration constructorDecl)
           {
-            if (constructorDecl.ParameterPatterns.IgnoreInnerParens() is IUnitPat)
+            if (constructorDecl.Parameters.SingleItem?.Pattern is IUnitPat)
               membersMask |= MemberPresenceFlag.PUBLIC_DEFAULT_CTOR;
           }
           

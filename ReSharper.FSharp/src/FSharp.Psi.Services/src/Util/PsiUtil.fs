@@ -342,6 +342,14 @@ module PsiModificationUtil =
 
         newNode
 
+    let wrapInNode (oldChild: ITreeNode) (newChildNodeType: CompositeNodeType) =
+        use disableFormatter = new DisableCodeFormatter()
+
+        let newNode = ModificationUtil.AddChildBefore(oldChild, newChildNodeType.Create())
+        LowLevelModificationUtil.AddChild(newNode, oldChild)
+
+        newNode
+
     let deleteChildRange first last =
         ModificationUtil.DeleteChildRange(first, last)
 

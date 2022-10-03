@@ -20,15 +20,15 @@ type DeconstructPatternContextAction(provider: FSharpContextActionDataProvider) 
 
         let refPat = provider.GetSelectedElement<IReferencePat>()
         let binding = BindingNavigator.GetByHeadPattern(refPat)
-        if isNotNull binding && binding.ParametersDeclarationsEnumerable.Any() then null else
+        if isNotNull binding && binding.PatternParameterGroupsEnumerable.Any() then null else
 
         refPat :> _
 
     let isApplicablePattern (pat: IFSharpPattern) =
         let binding = BindingNavigator.GetByHeadPattern(pat)
-        if isNotNull binding && binding.ParametersDeclarationsEnumerable.Any() then false else
+        if isNotNull binding && binding.PatternParameterGroupsEnumerable.Any() then false else
 
-        isNull (ConstructorDeclarationNavigator.GetByParameterPatterns(skipIntermediatePatParents pat))
+        isNull (ConstructorDeclarationNavigator.GetByParameterPattern(skipIntermediatePatParents pat))
 
     override this.IsAvailable _ = true
     override this.Text = "Deconstruct pattern"

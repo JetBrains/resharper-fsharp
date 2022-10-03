@@ -451,11 +451,36 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         x.ProcessReturnInfo(returnInfo)
         x.MarkChameleonExpression(expr)
 
+    member x.ProcessPatternParameterGroup(PatRange range as pat, isLocal) =
+        let groupMark = x.Mark(range)
+
+        match pat with
+        | SynPat.Paren(innerPattern, _) ->
+            match innerPattern with
+            | SynPat.Tuple(false, elementPats, _) ->
+                for PatRange range as p in elementPats do
+                    let mark = x.Mark(range)
+                    x.ProcessPat(p, isLocal, false)
+                    x.Done(mark, ElementType.PATTERN_PARAMETER_DECLARATION)
+            | PatRange innerPatternRange as innerPattern ->
+                let mark = x.Mark(innerPatternRange)
+                x.ProcessPat(innerPattern, isLocal, false)
+                x.Done(mark, ElementType.PATTERN_PARAMETER_DECLARATION)
+
+        | _ ->
+            let mark = x.Mark(range)
+            x.ProcessPat(pat, isLocal, false)
+            x.Done(mark, ElementType.PATTERN_PARAMETER_DECLARATION)
+
+        x.Done(range, groupMark, ElementType.PATTERN_PARAMETER_DECLARATION_GROUP)
+
     // isBindingHeadPattern is needed to distinguish function definitions from other long ident pats:
     //   let (Some x) = ...
     //   let Some x = ...
     member x.ProcessPat(PatRange range as pat, isLocal, isBindingHeadPattern) =
         let patMark = x.Mark(range)
+
+        // match isTopLevelParameter with
 
         match pat with
         | SynPat.LongIdent(LongIdentLid [ IdentText "op_ColonColon" ], _, _,
@@ -642,12 +667,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
         | _ -> failwithf "args: %A" args
 
-    member x.ProcessParam(PatRange range as pat, isLocal, markMember) =
-        if not markMember then x.ProcessPat(pat, isLocal, false) else
-
-        let mark = x.Mark(range)
-        x.ProcessPat(pat, isLocal, false)
-        x.Done(range, mark, ElementType.PARAMETERS_PATTERN_DECLARATION)
+    member x.ProcessParam(pat, isLocal, markMember) =
+        if markMember then
+            x.ProcessPatternParameterGroup(pat, isLocal)
+        else
+            x.ProcessPat(pat, isLocal, false)
 
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)
@@ -892,11 +916,9 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushExpression(getLambdaBodyExpr bodyExpr)
 
             match parsedData with
-            | Some(head :: _ as pats, _) ->
-                let patsRange = Range.unionRanges head.Range (List.last pats).Range
-                x.PushRange(patsRange, ElementType.LAMBDA_PARAMETERS_LIST)
+            | Some(pats, _) ->
                 for pat in pats do
-                    x.ProcessPat(pat, true, false)
+                    x.ProcessPatternParameterGroup(pat, true)
             | _ -> ()
 
         | SynExpr.MatchLambda(_, _, clauses, _, _) ->

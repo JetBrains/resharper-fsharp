@@ -16,23 +16,23 @@ IFSharpImplFile
           FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpIdentifierToken(type:IDENTIFIER, text:M)
-          IParametersPatternDeclaration
-            IParenPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              ITuplePat
-                IOptionalValPat
-                  FSharpTokenType+QmarkTokenElement(type:QMARK, text:?)
-                  ILocalReferencePat
-                    IExpressionReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:a)
-                FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
-                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                IOptionalValPat
-                  FSharpTokenType+QmarkTokenElement(type:QMARK, text:?)
-                  ILocalReferencePat
-                    IExpressionReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:b)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IPatternParameterDeclarationGroup
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IPatternParameterDeclaration
+              IOptionalValPat
+                FSharpTokenType+QmarkTokenElement(type:QMARK, text:?)
+                ILocalReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:a)
+            FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IPatternParameterDeclaration
+              IOptionalValPat
+                FSharpTokenType+QmarkTokenElement(type:QMARK, text:?)
+                ILocalReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:b)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
