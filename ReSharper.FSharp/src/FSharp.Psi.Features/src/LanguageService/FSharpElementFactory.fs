@@ -149,8 +149,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             | null -> failwith "Could not get record expr"
             | recordExpr -> recordExpr.FieldBindings.First()
 
-        member x.CreateRecordFieldDeclaration(fieldName, typeUsage) =
-            let source = $"{{ {fieldName}: obj }}"
+        member x.CreateRecordFieldDeclaration(isMutable, fieldName, typeUsage) =
+            let mutableText = if isMutable then " mutable " else ""
+            let source = $"{{ {mutableText}{fieldName}: obj }}"
             let typeDefn = getTypeDecl source
             match typeDefn.TypeRepresentation with
             | :? IRecordRepresentation as rr when not rr.FieldDeclarations.IsEmpty ->

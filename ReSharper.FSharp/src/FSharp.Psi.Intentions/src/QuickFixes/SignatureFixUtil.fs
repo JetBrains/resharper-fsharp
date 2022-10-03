@@ -35,6 +35,11 @@ let getFieldType (rfd:IRecordFieldDeclaration) =
 let createSignatureTypeUsage (factory: IFSharpElementFactory) (t: FSharpType, d: FSharpDisplayContext) : ITypeUsage =
     factory.CreateTypeUsage(t.Format d)
 
+let mkRecordFieldDeclaration isMutable (implFieldDecl: IRecordFieldDeclaration) implementationFieldType =
+    let factory = implFieldDecl.CreateElementFactory()
+    let typeUsage = createSignatureTypeUsage factory implementationFieldType
+    factory.CreateRecordFieldDeclaration(isMutable, implFieldDecl.DeclaredName, typeUsage)
+
 let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signatureFieldDecl: IRecordFieldDeclaration) =
     let fieldTypeAreEqual =
         let signatureFieldType = getFieldType signatureFieldDecl
@@ -45,7 +50,10 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         | None, Some _ -> false
         | Some (i, _), Some (s, _) -> i = s
 
-    if implFieldDecl.SourceName = signatureFieldDecl.SourceName && fieldTypeAreEqual then
+    let isImplMutable = isNotNull implFieldDecl.MutableKeyword
+    let mutableAreEqual = isImplMutable = isNotNull signatureFieldDecl.MutableKeyword
+    
+    if implFieldDecl.SourceName = signatureFieldDecl.SourceName && fieldTypeAreEqual && mutableAreEqual then
         // fields are identical
         ()
     elif implFieldDecl.SourceName <> signatureFieldDecl.SourceName then
@@ -57,9 +65,14 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         | None -> ()
         | Some tu ->
 
-        let updatedTypeUsage = createSignatureTypeUsage (signatureFieldDecl.CreateElementFactory()) tu
-        ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
-        |> ignore
+        if not mutableAreEqual then
+            let updatedSignatureField = mkRecordFieldDeclaration isImplMutable implFieldDecl tu
+            ModificationUtil.ReplaceChild(signatureFieldDecl, updatedSignatureField)
+            |> ignore
+        else
+            let updatedTypeUsage = createSignatureTypeUsage (signatureFieldDecl.CreateElementFactory()) tu
+            ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
+            |> ignore
 
 let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) (signatureRecordRepr: IRecordRepresentation) =
         let signatureFieldCount = signatureRecordRepr.FieldDeclarations.Count
@@ -82,8 +95,7 @@ let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) 
             | None -> ()
             | Some implementationFieldType ->
 
-            let typeUsage = createSignatureTypeUsage factory implementationFieldType
-            let recordFieldBinding = factory.CreateRecordFieldDeclaration(implFieldDecl.DeclaredName, typeUsage)
+            let recordFieldBinding = mkRecordFieldDeclaration (isNotNull implFieldDecl.MutableKeyword) implFieldDecl implementationFieldType
             let lastSignatureFieldDecl = signatureRecordRepr.FieldDeclarations.Last() :> ITreeNode
             let newlineNode = NewLine(lastSignatureFieldDecl.GetLineEnding()) :> ITreeNode
             let spaces =
