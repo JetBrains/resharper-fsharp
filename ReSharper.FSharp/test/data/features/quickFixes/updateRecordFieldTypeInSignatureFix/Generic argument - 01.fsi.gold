@@ -1,0 +1,5 @@
+namespace Test
+
+type R<'B> =
+    { Field1: int
+      Field2: 'B }

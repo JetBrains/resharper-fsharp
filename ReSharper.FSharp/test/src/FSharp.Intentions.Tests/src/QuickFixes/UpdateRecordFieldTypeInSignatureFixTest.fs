@@ -19,3 +19,4 @@ type UpdateRecordFieldTypeInSignatureFixTest() =
 
     [<Test>] member x.``Wrong Record Field Type - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Type Alias - 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Generic argument - 01`` () = x.DoNamedTestWithSignature()
