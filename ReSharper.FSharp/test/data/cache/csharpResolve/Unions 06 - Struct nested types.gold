@@ -4,17 +4,21 @@ public class Class1
 {
   public Class1()
   {
-    U? sa = U.NewCaseA(item: 123);
-    U? sb = U.NewCaseB(named: 123);
-    U? sc = U.NewCaseC(item1: 123, other: 123.0);
+    U? sa = U.NewCaseA(_item: 123);
+    U? sb = U.NewCaseB(_named: 123);
+    U? sc = U.NewCaseC(_item1: 123, _other: 123.0);
+
+    U? saError = U.NewCaseA(|item|(0): 123);
+    U? sbError = U.NewCaseB(|named|(1): 123);
+    U? scError = U.NewCaseC(|item1|(2): 123, |other|(3): 123.0);
 
     U a = sa.Value;
     U b = sb.Value;
     U c = sc.Value;
 
-    U.|CaseA|(0) caError = (U.|CaseA|(1)) a;
-    U.|CaseB|(2) cbError = (U.|CaseB|(3)) b;
-    U.|CaseC|(4) ccError = (U.|CaseC|(5)) c;
+    U.|CaseA|(4) caError = (U.|CaseA|(5)) a;
+    U.|CaseB|(6) cbError = (U.|CaseB|(7)) b;
+    U.|CaseC|(8) ccError = (U.|CaseC|(9)) c;
 
     int aItem = a.Item;
     int bItem = b.Item;
@@ -41,12 +45,22 @@ public class Class1
 }
 
 ---------------------------------------------------------
-(0): ReSharper Error Highlighting: Cannot resolve symbol 'CaseA'
-(1): ReSharper Error Highlighting: Cannot resolve symbol 'CaseA'
-(2): ReSharper Error Highlighting: Cannot resolve symbol 'CaseB'
-(3): ReSharper Error Highlighting: Cannot resolve symbol 'CaseB'
-(4): ReSharper Error Highlighting: Cannot resolve symbol 'CaseC'
-(5): ReSharper Error Highlighting: Cannot resolve symbol 'CaseC'
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'item'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'named'
+(2): ReSharper Error Highlighting: Cannot resolve symbol 'item1'
+(3): ReSharper Error Highlighting: Cannot resolve symbol 'other'
+(4): ReSharper Error Highlighting: Cannot resolve symbol 'CaseA'
+(5): ReSharper Error Highlighting: Cannot resolve symbol 'CaseA'
+(6): ReSharper Error Highlighting: Cannot resolve symbol 'CaseB'
+(7): ReSharper Error Highlighting: Cannot resolve symbol 'CaseB'
+(8): ReSharper Error Highlighting: Cannot resolve symbol 'CaseC'
+(9): ReSharper Error Highlighting: Cannot resolve symbol 'CaseC'
+M:Module.U.NewCaseA(System.Int32)
+M:Module.U.NewCaseA(System.Int32)
+M:Module.U.NewCaseB(System.Int32)
+M:Module.U.NewCaseB(System.Int32)
+M:Module.U.NewCaseC(System.Int32,System.Double)
+M:Module.U.NewCaseC(System.Int32,System.Double)
 M:Module.U.NewCaseA(System.Int32)
 M:Module.U.NewCaseA(System.Int32)
 M:Module.U.NewCaseB(System.Int32)

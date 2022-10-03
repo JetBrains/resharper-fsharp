@@ -10,18 +10,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
   public class FSharpGeneratedParameter : FSharpGeneratedElementBase, IParameter,
     IFSharpGeneratedFromOtherElement
   {
+    private readonly bool myAddPrefix;
     [NotNull] protected IParametersOwner Owner { get; }
 
     [CanBeNull] internal ITypeOwner Origin { get; }
 
-    public FSharpGeneratedParameter([NotNull] IParametersOwner owner, [CanBeNull] ITypeOwner origin)
+    public FSharpGeneratedParameter([NotNull] IParametersOwner owner, [CanBeNull] ITypeOwner origin, bool addPrefix)
     {
+      myAddPrefix = addPrefix;
       Owner = owner;
       Origin = origin;
     }
 
-    public override string ShortName =>
-      Origin?.ShortName.Decapitalize() ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+    public override string ShortName
+    {
+      get
+      {
+        var origin = Origin;
+        if (origin == null) return SharedImplUtil.MISSING_DECLARATION_NAME;
+
+        var name = origin.ShortName.Decapitalize();
+        return myAddPrefix ? "_" + name : name;
+      }
+    }
 
     public IType Type =>
       Origin?.Type ?? TypeFactory.CreateUnknownType(Module);
@@ -54,6 +65,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public bool IsReadOnly => false;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
-      new FSharpGeneratedParameterPointer(this);
+      new FSharpGeneratedParameterPointer(this, myAddPrefix);
   }
 }

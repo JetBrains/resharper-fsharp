@@ -4,7 +4,8 @@ public class Class<T> where T : struct
 {
   public Class()
   {
-    SU u = SU.NewCase(item: 123);
+    SU u = SU.NewCase(_item: 123);
+    SU uError = SU.NewCase(item: 123);
 
     int t = u.Tag;
     int i = u.Item;

@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       var caseWithFields = decl.GetContainingNode<IDeclaration>()?.DeclaredElement as IUnionCase;
       var constructor = caseWithFields?.GetConstructor();
       return constructor != null
-        ? new FSharpGeneratedParameter(constructor, this)
+        ? new FSharpGeneratedParameter(constructor, this, true)
         : null;
     }
   }
@@ -87,7 +87,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetContainingType().GetRepresentationAccessRights();
 
     public virtual IParameter GetGeneratedParameter() =>
-      new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this);
+      new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this, false);
   }
 
   public interface IRecordField : IProperty, IRepresentationAccessRightsOwner, IMutableModifierOwner

@@ -4,18 +4,19 @@ public class Class<T> where T : struct
 {
   public Class()
   {
-    SU u = SU.NewCase(item: 123);
+    SU u = SU.NewCase(_item: 123);
+    SU uError = SU.NewCase(|item|(0): 123);
 
     int t = u.Tag;
     int i = u.Item;
 
-    bool isCaseError = u.|IsCase|(0);
-    int tagsError = U.|Tags|(1).CaseA;
-    U.|Case|(2) c = (U.|Case|(3)) u;
+    bool isCaseError = u.|IsCase|(1);
+    int tagsError = U.|Tags|(2).CaseA;
+    U.|Case|(3) c = (U.|Case|(4)) u;
   }
 }
 
-public class ClassU : Class<|U|(4)>
+public class ClassU : Class<|U|(5)>
 {
 }
 
@@ -24,11 +25,14 @@ public class ClassSU : Class<SU>
 }
 
 ---------------------------------------------------------
-(0): ReSharper Error Highlighting: Cannot resolve symbol 'IsCase'
-(1): ReSharper Error Highlighting: Cannot resolve symbol 'Tags'
-(2): ReSharper Error Highlighting: Cannot resolve symbol 'Case'
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'item'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'IsCase'
+(2): ReSharper Error Highlighting: Cannot resolve symbol 'Tags'
 (3): ReSharper Error Highlighting: Cannot resolve symbol 'Case'
-(4): ReSharper Underlined Error Highlighting: The type 'Module.U' must be a non-nullable value type in order to use it as parameter 'T'
+(4): ReSharper Error Highlighting: Cannot resolve symbol 'Case'
+(5): ReSharper Underlined Error Highlighting: The type 'Module.U' must be a non-nullable value type in order to use it as parameter 'T'
+M:Module.SU.NewCase(System.Int32)
+M:Module.SU.NewCase(System.Int32)
 M:Module.SU.NewCase(System.Int32)
 M:Module.SU.NewCase(System.Int32)
 P:Module.SU.Tag

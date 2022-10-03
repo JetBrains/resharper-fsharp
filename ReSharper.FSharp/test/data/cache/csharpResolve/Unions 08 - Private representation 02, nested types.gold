@@ -4,33 +4,37 @@ public class Class1
 {
   public Class1()
   {
-    U a = U.|NewCaseA|(0)(item: 123);
-    U b = U.|NewCaseB|(1)(named: 123);
-    U c = U.|NewCaseC|(2)(item1: 123, other: 123.0);
+    U a = U.|NewCaseA|(0)(_item: 123);
+    U b = U.|NewCaseB|(1)(_named: 123);
+    U c = U.|NewCaseC|(2)(_item1: 123, _other: 123.0);
 
-    U.|CaseA|(3) ca = (U.|CaseA|(4)) a;
-    U.|CaseB|(5) cb = (U.|CaseB|(6)) b;
-    U.|CaseC|(7) cc = (U.|CaseC|(8)) c;
+    U aError = U.|NewCaseA|(3)(|item|(4): 123);
+    U bError = U.|NewCaseB|(5)(|named|(6): 123);
+    U cError = U.|NewCaseC|(7)(|item1|(8): 123, |other|(9): 123.0);
 
-    int aItem = ca.|Item|(9);
-    int bNamed = cb.|Named|(10);
-    int cItem0 = cc.|Item1|(11);
-    double cOther = cc.|Other|(12);
+    U.|CaseA|(10) ca = (U.|CaseA|(11)) a;
+    U.|CaseB|(12) cb = (U.|CaseB|(13)) b;
+    U.|CaseC|(14) cc = (U.|CaseC|(15)) c;
 
-    int aItemError = a.|Item|(13);
-    int bNamedError = b.|Named|(14);
-    int cItem1Error = c.|Item1|(15);
-    double cOtherError = c.|Other|(16);
+    int aItem = ca.|Item|(16);
+    int bNamed = cb.|Named|(17);
+    int cItem0 = cc.|Item1|(18);
+    double cOther = cc.|Other|(19);
 
-    bool isA = a.|IsCaseA|(17);
-    bool isB = a.|IsCaseB|(18);
-    bool isC = a.|IsCaseC|(19);
+    int aItemError = a.|Item|(20);
+    int bNamedError = b.|Named|(21);
+    int cItem1Error = c.|Item1|(22);
+    double cOtherError = c.|Other|(23);
 
-    int tA = U.|Tags|(20).CaseA;
-    int tB = U.|Tags|(21).CaseB;
-    int tC = U.|Tags|(22).CaseC;
+    bool isA = a.|IsCaseA|(24);
+    bool isB = a.|IsCaseB|(25);
+    bool isC = a.|IsCaseC|(26);
 
-    int t = a.|Tag|(23);
+    int tA = U.|Tags|(27).CaseA;
+    int tB = U.|Tags|(28).CaseB;
+    int tC = U.|Tags|(29).CaseC;
+
+    int t = a.|Tag|(30);
 
     int m = U.Prop;
   }
@@ -40,27 +44,40 @@ public class Class1
 (0): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseA(int)' here
 (1): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseB(int)' here
 (2): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseC(int, double)' here
-(3): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
-(4): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
-(5): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
-(6): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
-(7): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
-(8): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
-(9): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item' here
-(10): ReSharper Underlined Error Highlighting: Cannot access internal property 'Named' here
-(11): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item1' here
-(12): ReSharper Underlined Error Highlighting: Cannot access internal property 'Other' here
-(13): ReSharper Error Highlighting: Cannot resolve symbol 'Item'
-(14): ReSharper Error Highlighting: Cannot resolve symbol 'Named'
-(15): ReSharper Error Highlighting: Cannot resolve symbol 'Item1'
-(16): ReSharper Error Highlighting: Cannot resolve symbol 'Other'
-(17): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseA' here
-(18): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseB' here
-(19): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseC' here
-(20): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
-(21): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
-(22): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
-(23): ReSharper Underlined Error Highlighting: Cannot access internal property 'Tag' here
+(3): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseA(int)' here
+(4): ReSharper Error Highlighting: Cannot resolve symbol 'item'
+(5): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseB(int)' here
+(6): ReSharper Error Highlighting: Cannot resolve symbol 'named'
+(7): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseC(int, double)' here
+(8): ReSharper Error Highlighting: Cannot resolve symbol 'item1'
+(9): ReSharper Error Highlighting: Cannot resolve symbol 'other'
+(10): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
+(11): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
+(12): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
+(13): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
+(14): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
+(15): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
+(16): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item' here
+(17): ReSharper Underlined Error Highlighting: Cannot access internal property 'Named' here
+(18): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item1' here
+(19): ReSharper Underlined Error Highlighting: Cannot access internal property 'Other' here
+(20): ReSharper Error Highlighting: Cannot resolve symbol 'Item'
+(21): ReSharper Error Highlighting: Cannot resolve symbol 'Named'
+(22): ReSharper Error Highlighting: Cannot resolve symbol 'Item1'
+(23): ReSharper Error Highlighting: Cannot resolve symbol 'Other'
+(24): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseA' here
+(25): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseB' here
+(26): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseC' here
+(27): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
+(28): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
+(29): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
+(30): ReSharper Underlined Error Highlighting: Cannot access internal property 'Tag' here
+M:Module.U.NewCaseA(System.Int32)
+M:Module.U.NewCaseA(System.Int32)
+M:Module.U.NewCaseB(System.Int32)
+M:Module.U.NewCaseB(System.Int32)
+M:Module.U.NewCaseC(System.Int32,System.Double)
+M:Module.U.NewCaseC(System.Int32,System.Double)
 M:Module.U.NewCaseA(System.Int32)
 M:Module.U.NewCaseA(System.Int32)
 M:Module.U.NewCaseB(System.Int32)

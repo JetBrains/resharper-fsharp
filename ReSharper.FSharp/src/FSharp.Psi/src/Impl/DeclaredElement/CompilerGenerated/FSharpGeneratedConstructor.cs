@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
         var fields = typePart.Fields;
         var result = new IParameter[fields.Count];
         for (var i = 0; i < fields.Count; i++)
-          result[i] = new FSharpGeneratedParameter(this, fields[i]);
+          result[i] = new FSharpGeneratedParameter(this, fields[i], false);
 
         return result;
       }

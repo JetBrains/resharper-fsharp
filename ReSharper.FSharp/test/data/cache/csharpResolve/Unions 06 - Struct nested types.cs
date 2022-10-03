@@ -4,9 +4,13 @@ public class Class1
 {
   public Class1()
   {
-    U? sa = U.NewCaseA(item: 123);
-    U? sb = U.NewCaseB(named: 123);
-    U? sc = U.NewCaseC(item1: 123, other: 123.0);
+    U? sa = U.NewCaseA(_item: 123);
+    U? sb = U.NewCaseB(_named: 123);
+    U? sc = U.NewCaseC(_item1: 123, _other: 123.0);
+
+    U? saError = U.NewCaseA(item: 123);
+    U? sbError = U.NewCaseB(named: 123);
+    U? scError = U.NewCaseC(item1: 123, other: 123.0);
 
     U a = sa.Value;
     U b = sb.Value;

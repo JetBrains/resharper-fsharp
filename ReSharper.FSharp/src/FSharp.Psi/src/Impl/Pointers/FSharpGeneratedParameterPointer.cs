@@ -5,13 +5,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers
   public class FSharpGeneratedParameterPointer
     : FSharpGeneratedElementPointerBase<FSharpGeneratedParameter, IFSharpFieldProperty>
   {
-    public FSharpGeneratedParameterPointer(FSharpGeneratedParameter element) : base(element)
-    {
-    }
+    private readonly bool myAddPrefix;
+
+    public FSharpGeneratedParameterPointer(FSharpGeneratedParameter element, bool addPrefix) : base(element) =>
+      myAddPrefix = addPrefix;
 
     public override FSharpGeneratedParameter CreateGenerated(IFSharpFieldProperty field) =>
-      field.GetContainingType().GetGeneratedConstructor() is { } constructor
-        ? new FSharpGeneratedParameter(constructor, field)
+      field.ContainingType.GetGeneratedConstructor() is { } constructor
+        ? new FSharpGeneratedParameter(constructor, field, myAddPrefix)
         : null;
   }
 }
