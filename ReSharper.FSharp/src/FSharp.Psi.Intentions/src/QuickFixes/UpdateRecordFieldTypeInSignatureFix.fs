@@ -31,6 +31,10 @@ type UpdateRecordFieldTypeInSignatureFix(error: FieldNotContainedTypesDifferErro
         | None -> ()
         | Some signatureRecordRepr ->
 
+        if implementationRecordRepr.FieldDeclarations.Count <> signatureRecordRepr.FieldDeclarations.Count then
+            updateSignatureFieldDecls implementationRecordRepr signatureRecordRepr
+        else
+
         let signatureFieldDecl =
             signatureRecordRepr.FieldDeclarations
             |> Seq.tryPick (fun fd -> if fd.SourceName = implFieldDecl.SourceName then Some fd else None)

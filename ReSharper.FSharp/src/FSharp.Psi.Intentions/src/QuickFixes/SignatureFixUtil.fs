@@ -1,9 +1,12 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.QuickFixes.SignatureFixUtil
 
+open System
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Psi.Tree
 
 let getRecordRepresentation (typeDecl: IFSharpTypeDeclaration) =
     match typeDecl.TypeRepresentation with
@@ -47,7 +50,7 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         ()
     elif implFieldDecl.SourceName <> signatureFieldDecl.SourceName then
         // field names are different, update signature field name
-        signatureFieldDecl.SetName(implFieldDecl.NameIdentifier.Name)
+        signatureFieldDecl.SetName(implFieldDecl.NameIdentifier.Name, ChangeNameKind.CompiledName)
     else
         let implementationFieldType = getFieldType implFieldDecl
         match implementationFieldType with
@@ -57,3 +60,36 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         let updatedTypeUsage = createSignatureTypeUsage (signatureFieldDecl.CreateElementFactory()) tu
         ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
         |> ignore
+
+let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) (signatureRecordRepr: IRecordRepresentation) =
+        let signatureFieldCount = signatureRecordRepr.FieldDeclarations.Count
+
+        implementationRecordRepr.FieldDeclarations
+        |> Seq.iter (fun implFieldDecl ->
+            let index = implementationRecordRepr.FieldDeclarations.IndexOf(implFieldDecl)
+            
+            if index < signatureFieldCount then
+                // The signature record definition has a field at the current index
+                // The name or type might be wrong
+                let signatureFieldDecl = signatureRecordRepr.FieldDeclarations[index]
+                updateSignatureFieldDecl implFieldDecl signatureFieldDecl
+            else
+            // The signature record definition is out of fields.
+            // New ones from the implementation should be added.
+            let factory = implFieldDecl.CreateElementFactory()
+            let implementationFieldType = getFieldType implFieldDecl
+            match implementationFieldType with
+            | None -> ()
+            | Some implementationFieldType ->
+
+            let typeUsage = createSignatureTypeUsage factory implementationFieldType
+            let recordFieldBinding = factory.CreateRecordFieldDeclaration(implFieldDecl.DeclaredName, typeUsage)
+            let lastSignatureFieldDecl = signatureRecordRepr.FieldDeclarations.Last() :> ITreeNode
+            let newlineNode = NewLine(lastSignatureFieldDecl.GetLineEnding()) :> ITreeNode
+            let spaces =
+                let startPos = lastSignatureFieldDecl.GetDocumentStartOffset().ToDocumentCoords()
+                Whitespace(Convert.ToInt32(startPos.Column))
+
+            addNodesAfter lastSignatureFieldDecl [| newlineNode; spaces; recordFieldBinding |]
+            |> ignore
+        )
