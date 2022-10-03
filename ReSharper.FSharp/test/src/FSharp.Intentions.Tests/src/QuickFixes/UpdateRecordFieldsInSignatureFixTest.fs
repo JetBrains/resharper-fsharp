@@ -20,3 +20,4 @@ type UpdateRecordFieldsInSignatureFixTest() =
     [<Test>] member x.``Single missing field`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Multiple missing fields`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Invalid order of fields - 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Extra field in signature - 01`` () = x.DoNamedTestWithSignature()

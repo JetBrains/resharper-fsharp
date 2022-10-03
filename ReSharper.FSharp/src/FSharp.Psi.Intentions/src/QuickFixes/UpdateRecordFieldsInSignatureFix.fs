@@ -12,12 +12,15 @@ type UpdateRecordFieldsInSignatureFix(typeName: IFSharpIdentifier) =
     let implementationRecordRepr =
         let typeDecl = FSharpTypeDeclarationNavigator.GetByIdentifier(typeName)
         getRecordRepresentation typeDecl
-    
+
     new(error: DefinitionsInSigAndImplNotCompatibleFieldWasPresentError) =
         UpdateRecordFieldsInSignatureFix(error.TypeName)
     new(error: DefinitionsInSigAndImplNotCompatibleFieldOrderDifferError) =
         UpdateRecordFieldsInSignatureFix(error.TypeName)
-    
+
+    new(error: DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecifiedError) =
+        UpdateRecordFieldsInSignatureFix(error.TypeName)
+
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(typeName.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()

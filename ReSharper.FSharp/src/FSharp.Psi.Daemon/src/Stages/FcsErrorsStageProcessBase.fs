@@ -55,6 +55,7 @@ module FSharpErrors =
     let [<Literal>] UnrecognizedOption = 243
     let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldWasPresent = 311
     let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldOrderDiffer = 312
+    let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecified = 313
     let [<Literal>] NoImplementationGiven = 365
     let [<Literal>] NoImplementationGivenWithSuggestion = 366
     let [<Literal>] MemberIsNotAccessible = 491
@@ -321,6 +322,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | DefinitionsInSigAndImplNotCompatibleFieldOrderDiffer ->
             createHighlightingFromNodeWithMessage DefinitionsInSigAndImplNotCompatibleFieldOrderDifferError range error
 
+        | DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecified ->
+            createHighlightingFromNodeWithMessage
+                DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecifiedError
+                range
+                error
+        
         | NoImplementationGiven ->
             let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
             match node.Parent with

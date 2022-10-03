@@ -93,3 +93,8 @@ let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) 
             addNodesAfter lastSignatureFieldDecl [| newlineNode; spaces; recordFieldBinding |]
             |> ignore
         )
+
+        if signatureFieldCount > implementationRecordRepr.FieldDeclarations.Count then
+            [ implementationRecordRepr.FieldDeclarations.Count .. (signatureFieldCount - 1) ]
+            |> List.iter (fun idx -> signatureRecordRepr.FieldDeclarations.Item idx |> deleteChild)
+        
