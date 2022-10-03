@@ -1,0 +1,5 @@
+namespace Test
+
+type A = A of int
+
+type B = { Field1: A; Field2: int }
