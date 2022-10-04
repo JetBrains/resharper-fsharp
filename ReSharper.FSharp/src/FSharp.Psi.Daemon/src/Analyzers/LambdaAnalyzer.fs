@@ -120,6 +120,7 @@ type LambdaAnalyzer() =
 
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
         if isFSharp6Supported && hasExplicitConversion(lambda) then null else
+
         let lambda = lambda.IgnoreParentParens()
 
         let replacementRefExpr = replacementExpr.As<IFSharpExpression>().IgnoreInnerParens().As<IReferenceExpr>()
