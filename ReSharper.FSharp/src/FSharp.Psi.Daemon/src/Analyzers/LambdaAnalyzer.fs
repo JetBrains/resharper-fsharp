@@ -112,7 +112,7 @@ type LambdaAnalyzer() =
                 | _ -> expr.TryGetFcsType()
             | _ -> expr.TryGetFcsType()
 
-        isNotNull exprType &&
+        isNotNull exprType && not exprType.IsUnresolved &&
         not exprType.IsGenericParameter && not lambdaReturnType.IsGenericParameter &&
 
         // TODO: find a better way to compare types, since regular comparison doesn't work in tests
