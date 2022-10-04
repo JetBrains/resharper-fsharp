@@ -36,3 +36,4 @@ let _: string = fun x -> x
 
 let f1 x y = 5
 let _: int -> FSharpFunc<int, int> = fun x -> f1 x
+let _: int -> 'a = fun x -> f1 1 x

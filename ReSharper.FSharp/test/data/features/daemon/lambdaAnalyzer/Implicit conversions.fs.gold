@@ -36,6 +36,7 @@ let _: string = |fun x -> x|(8)
 
 let f1 x y = 5
 let _: int -> FSharpFunc<int, int> = |fun x -> f1 x|(9)
+let _: int -> 'a = |fun x -> f1 1 x|(10)
 
 ---------------------------------------------------------
 (0): ReSharper Hint: Lambda can be replaced with 'g'
@@ -48,3 +49,4 @@ let _: int -> FSharpFunc<int, int> = |fun x -> f1 x|(9)
 (7): ReSharper Hint: Lambda can be replaced with 'h'
 (8): ReSharper Hint: Lambda can be replaced with 'id'
 (9): ReSharper Hint: Lambda can be replaced with 'f1'
+(10): ReSharper Hint: Lambda can be simplified
