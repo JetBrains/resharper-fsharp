@@ -1,0 +1,2 @@
+module Test
+val a: b: int -> c: int -> int

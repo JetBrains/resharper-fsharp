@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.Text
 open FSharp.Compiler.Symbols
@@ -63,6 +63,8 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
         | Some signatureCounterPart ->
 
         let symbolUse = refPat.GetFcsSymbolUse()
+        if isNull symbolUse then None else
+        
         match symbolUse.Symbol with
         | ValFromImpl valSymbol ->
             let text =
@@ -124,7 +126,7 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
 
         let valSig = factory.CreateBindingSignature(refPat, typeInfo)
         let newlineNode = NewLine(signatureModuleOrNamespaceDecl.GetLineEnding()) :> ITreeNode
-        addNodesAfter signatureModuleOrNamespaceDecl.LastChild [| newlineNode; valSig; newlineNode |] |> ignore
+        addNodesAfter signatureModuleOrNamespaceDecl.LastChild [| newlineNode; valSig |] |> ignore
 
         null
 
