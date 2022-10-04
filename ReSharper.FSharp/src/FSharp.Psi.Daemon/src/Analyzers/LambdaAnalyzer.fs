@@ -101,7 +101,7 @@ type LambdaAnalyzer() =
             i <- i - 1
 
         let exprType =
-            match expr.IgnoreInnerParens() with
+            match expr with
             | :? IPrefixAppExpr as prefixApp ->
                 match prefixApp.FunctionExpression with
                 | :? IReferenceExpr as reference ->
