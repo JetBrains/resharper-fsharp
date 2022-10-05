@@ -22,3 +22,7 @@ type AddFunctionToSignatureFileActionTest() =
     [<Test>] member x.``Simple Binding - 02`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Simple Binding - 03`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Simple Binding - 04`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Tuple parameter - 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Tuple parameter - 02`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Attribute in parameter - 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Attribute in parameter - 02`` () = x.DoNamedTestWithSignature()

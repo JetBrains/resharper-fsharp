@@ -12,6 +12,12 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Psi.Tree
 
+[<RequireQualifiedAccess>]
+type private ParameterNameFromPattern =
+    | NoNameFound
+    | SingleName of name: IFSharpIdentifier * attributes: string
+    | TupleName of ParameterNameFromPattern list
+
 [<ContextAction(Name = "AddFunctionToSignatureFile", Group = "F#", Description = "Add function to signature file")>]
 type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
@@ -23,11 +29,26 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
             |> Option.bind (fun range -> if range.FileName.EndsWith(".fs") then Some valSymbol else None)
         | _ -> None
 
-    let rec tryFindParameterName (p: IFSharpPattern) =
+    let rec tryFindParameterName (isTopLevel: bool) (p: IFSharpPattern) : ParameterNameFromPattern =
         match p.IgnoreInnerParens() with
-        | :? ITypedPat as tp -> tryFindParameterName tp.Pattern
-        | :? ILocalReferencePat as rp -> Some rp.Identifier
-        | _ -> None
+        | :? ITypedPat as tp -> tryFindParameterName isTopLevel tp.Pattern
+        | :? ILocalReferencePat as rp -> ParameterNameFromPattern.SingleName (rp.Identifier, "")
+        | :? IAttribPat as ap ->
+            match tryFindParameterName isTopLevel ap.Pattern with
+            | ParameterNameFromPattern.SingleName(name, _) ->
+                let attributes = Seq.map (fun (al:IAttributeList) -> al.GetText()) ap.AttributeListsEnumerable |> String.concat ""
+                ParameterNameFromPattern.SingleName(name, attributes)
+            | _ ->
+                ParameterNameFromPattern.NoNameFound
+        | :? ITuplePat as tp ->
+            if not isTopLevel then
+                ParameterNameFromPattern.NoNameFound
+            else
+
+            Seq.map (tryFindParameterName false) tp.Patterns
+            |> Seq.toList
+            |> ParameterNameFromPattern.TupleName
+        | _ -> ParameterNameFromPattern.NoNameFound
 
     let implBindingAndDecl =
         let currentFSharpFile = dataProvider.PsiFile
@@ -102,22 +123,34 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                     replace t (factory.WrapParenAroundTypeUsageForSignature(t))
                 | _ -> ()
             else
-                // TODO: take tuples into account.
-                let parameterAtIndex = tryFindParameterName (binding.ParameterPatterns.Item(index))
+                let parameterAtIndex = tryFindParameterName true (binding.ParameterPatterns.Item(index))
 
                 match t, parameterAtIndex with
-                | :? IFunctionTypeUsage as ft, Some parameterName ->
+                | :? IFunctionTypeUsage as ft, ParameterNameFromPattern.NoNameFound ->
+                    visit (index + 1) ft.ReturnTypeUsage
+
+                | :? IFunctionTypeUsage as ft, ParameterNameFromPattern.SingleName (name, attributes) ->
                     match ft.ArgumentTypeUsage with
                     | :? IParameterSignatureTypeUsage as pstu ->
-                        // Update the parameter name if it was found in the implementation file
-                        // calling SetIdentifier on pstu does not add a ':' token.
-                        let namedTypeUsage = factory.CreateParameterSignatureTypeUsage(parameterName, pstu.TypeUsage)
-                        replace ft.ArgumentTypeUsage namedTypeUsage
+                        factory.CreateParameterSignatureTypeUsage(attributes, name, pstu.TypeUsage)
+                        |> replace ft.ArgumentTypeUsage 
                     | _ -> ()
 
                     visit (index + 1) ft.ReturnTypeUsage
-                | :? IFunctionTypeUsage as ft, None ->
-                    visit (index + 1) ft.ReturnTypeUsage
+
+                | :? IFunctionTypeUsage as ft, ParameterNameFromPattern.TupleName multipleParameterNames ->
+                    match ft.ArgumentTypeUsage with
+                    | :? ITupleTypeUsage as tt when tt.Items.Count = multipleParameterNames.Length ->
+                        (multipleParameterNames, tt.Items)
+                        ||> Seq.zip
+                        |> Seq.iter (fun (p,t) ->
+                            match t, p with
+                            | :? IParameterSignatureTypeUsage as pstu,  ParameterNameFromPattern.SingleName (name, attributes) ->
+                                factory.CreateParameterSignatureTypeUsage(attributes, name, pstu.TypeUsage) 
+                                |> replace t
+                            | _ -> ()
+                        )
+                    | _ -> visit (index + 1) ft.ReturnTypeUsage
                 | _ ->
                     ()
 
