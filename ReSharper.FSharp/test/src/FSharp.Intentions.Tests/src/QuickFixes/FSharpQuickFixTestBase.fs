@@ -63,6 +63,8 @@ type FSharpQuickFixTestBase<'T when 'T :> IQuickFix>() =
             |> Option.iter (fun psiFile -> DebugUtil.DumpPsi(writer, psiFile))
         )
 
+    override this.CheckAllFiles = true
+
     member this.DoNamedTestWithSignature() =
         let testName = this.TestMethodName
         let fsExt = FSharpProjectFileType.FsExtension
