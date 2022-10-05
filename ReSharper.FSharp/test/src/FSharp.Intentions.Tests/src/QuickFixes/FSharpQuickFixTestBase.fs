@@ -6,6 +6,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions
 open JetBrains.ReSharper.Psi
@@ -61,3 +62,11 @@ type FSharpQuickFixTestBase<'T when 'T :> IQuickFix>() =
             |> Option.map (fun sourceFile -> sourceFile.GetPrimaryPsiFile())
             |> Option.iter (fun psiFile -> DebugUtil.DumpPsi(writer, psiFile))
         )
+
+    override this.CheckAllFiles = true
+
+    member this.DoNamedTestWithSignature() =
+        let testName = this.TestMethodName
+        let fsExt = FSharpProjectFileType.FsExtension
+        let fsiExt = FSharpSignatureProjectFileType.FsiExtension
+        this.DoTestSolution(testName + fsiExt, testName + fsExt)

@@ -5,6 +5,8 @@ open FSharp.Compiler.Syntax
 open JetBrains.Annotations
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -62,10 +64,17 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
         let path = if isNotNull sourceFile then sourceFile.GetLocation() else null
         FSharpParser(lexer, document, path, sourceFile, checkerService, symbolsCache)
 
-    new (lexer, document, sourceFile, checkerService, symbolsCache) =
-        FSharpParser(lexer, document, FSharpParser.SandBoxPath, sourceFile, checkerService, symbolsCache)
+    new (lexer, document, sourceFile: IPsiSourceFile, checkerService, symbolsCache) =
+        let path =
+            if isNotNull sourceFile && sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>() then
+                FSharpParser.SandBoxSignaturePath
+            else
+                FSharpParser.SandBoxPath
+
+        FSharpParser(lexer, document, path, sourceFile, checkerService, symbolsCache)
 
     static member val SandBoxPath = VirtualFileSystemPath.Parse("Sandbox.fs", InteractionContext.SolutionContext)
+    static member val SandBoxSignaturePath = VirtualFileSystemPath.Parse("Sandbox.fsi", InteractionContext.SolutionContext)
 
     interface IFSharpParser with
         member this.ParseFSharpFile(noCache) = parseFile noCache
