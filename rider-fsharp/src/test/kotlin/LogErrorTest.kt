@@ -1,9 +1,10 @@
 import com.intellij.openapi.diagnostic.Logger
 import com.jetbrains.rdclient.util.BackendException
 import com.jetbrains.rider.test.TestCaseRunner
+import com.jetbrains.rider.test.IntegrationTestCaseRunner
 import org.testng.annotations.Test
 
-class LogErrorTest : TestCaseRunner() {
+class LogErrorTest : IntegrationTestCaseRunner() {
 
     @Test(expectedExceptions = [(BackendException::class)])
     fun testThrowEx() {
