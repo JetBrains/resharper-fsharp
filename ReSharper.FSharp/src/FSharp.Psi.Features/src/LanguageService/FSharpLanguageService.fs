@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
+open System.Runtime.InteropServices
 open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
@@ -142,8 +143,8 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
     override x.GetTypeConversionRule(_, _) = ClrPredefinedTypeConversionRule.INSTANCE
 
     interface IFSharpLanguageService with
-        member x.CreateParser(document: IDocument, sourceFile) =
+        member x.CreateParser(document: IDocument, sourceFile, [<Optional; DefaultParameterValue(false)>] useFsExtension) =
             let lexer = TokenBuffer(lexerFactory.CreateLexer(document.Buffer)).CreateLexer()
-            FSharpParser(lexer, document, sourceFile, checkerService, null) :> _
+            FSharpParser(lexer, document, sourceFile, checkerService, null, useFsExtension) :> _
 
         member x.CreateElementFactory(sourceFile, psiModule) = FSharpElementFactory(x, sourceFile, psiModule) :> _

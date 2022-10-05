@@ -64,9 +64,9 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
         let path = if isNotNull sourceFile then sourceFile.GetLocation() else null
         FSharpParser(lexer, document, path, sourceFile, checkerService, symbolsCache)
 
-    new (lexer, document, sourceFile: IPsiSourceFile, checkerService, symbolsCache) =
+    new (lexer, document, sourceFile: IPsiSourceFile, checkerService, symbolsCache, useFsExtension) =
         let path =
-            if isNotNull sourceFile && sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>() then
+            if not useFsExtension && isNotNull sourceFile && sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>() then
                 FSharpParser.SandBoxSignaturePath
             else
                 FSharpParser.SandBoxPath

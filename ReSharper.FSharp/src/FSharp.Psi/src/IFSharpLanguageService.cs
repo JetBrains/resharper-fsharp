@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   public interface IFSharpLanguageService
   {
-    IFSharpParser CreateParser(IDocument document, IPsiSourceFile sourceFile);
+    IFSharpParser CreateParser(IDocument document, IPsiSourceFile sourceFile, bool useFsExtension = false);
     IFSharpElementFactory CreateElementFactory(IPsiSourceFile sourceFile, IPsiModule psiModule);
   }
 }

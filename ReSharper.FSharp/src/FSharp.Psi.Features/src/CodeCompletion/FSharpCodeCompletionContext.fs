@@ -52,7 +52,8 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
             let documentFactory = Shell.Instance.GetComponent<IInMemoryDocumentFactory>()
             let document = documentFactory.CreateSimpleDocumentFromText(source, moniker)
 
-            let parser = fsFile.GetFSharpLanguageService().CreateParser(document, fsFile.GetSourceFile())
+            // todo: reparse as sig?
+            let parser = fsFile.GetFSharpLanguageService().CreateParser(document, fsFile.GetSourceFile(), true)
             let newFile =
                 try
                     let newFile =
