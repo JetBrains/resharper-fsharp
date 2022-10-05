@@ -25,6 +25,13 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
     let (|ValFromImpl|_|) (symbol:FSharpSymbol) =
         match symbol with
         | :? FSharpMemberOrFunctionOrValue as valSymbol ->
+            let hasConstraints =
+                valSymbol.GenericParameters
+                |> Seq.exists (fun gp -> not (Seq.isEmpty gp.Constraints))
+
+            // Ignore constraints for now.
+            if hasConstraints then None else
+
             valSymbol.SignatureLocation
             |> Option.bind (fun range -> if range.FileName.EndsWith(".fs") then Some valSymbol else None)
         | _ -> None

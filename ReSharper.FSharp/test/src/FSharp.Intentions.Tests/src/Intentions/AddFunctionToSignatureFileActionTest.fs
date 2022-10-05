@@ -27,3 +27,7 @@ type AddFunctionToSignatureFileActionTest() =
     [<Test>] member x.``Attribute in parameter - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Attribute in parameter - 02`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Attribute in parameter - 03`` () = x.DoNamedTestWithSignature()
+    // Ignore generic constraints for now
+
+    // This test requires `when 'c: equality` at the end of the signature.
+    [<Test>] member x.``Generic constraints - 01`` () = x.DoNamedTestWithSignature()
