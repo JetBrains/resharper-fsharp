@@ -32,12 +32,9 @@ let getFieldType (rfd:IRecordFieldDeclaration) =
     | :? FSharpField as ff -> Some (ff.FieldType, symbolUse.DisplayContext)
     | _ -> None
 
-let createSignatureTypeUsage (factory: IFSharpElementFactory) (t: FSharpType, d: FSharpDisplayContext) : ITypeUsage =
-    factory.CreateTypeUsage(t.Format d)
-
-let mkRecordFieldDeclaration isMutable (implFieldDecl: IRecordFieldDeclaration) implementationFieldType =
+let mkRecordFieldDeclaration isMutable (implFieldDecl: IRecordFieldDeclaration) (implementationFieldType: FSharpType, displayContext) =
     let factory = implFieldDecl.CreateElementFactory()
-    let typeUsage = createSignatureTypeUsage factory implementationFieldType
+    let typeUsage = factory.CreateTypeUsage(implementationFieldType.Format displayContext)
     factory.CreateRecordFieldDeclaration(isMutable, implFieldDecl.DeclaredName, typeUsage)
 
 let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signatureFieldDecl: IRecordFieldDeclaration) =
@@ -70,7 +67,9 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
             ModificationUtil.ReplaceChild(signatureFieldDecl, updatedSignatureField)
             |> ignore
         else
-            let updatedTypeUsage = createSignatureTypeUsage (signatureFieldDecl.CreateElementFactory()) tu
+            let factory = signatureFieldDecl.CreateElementFactory()
+            let t,d = tu
+            let updatedTypeUsage = factory.CreateTypeUsageForSignature(t.Format d)
             ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
             |> ignore
 
@@ -89,7 +88,6 @@ let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) 
             else
             // The signature record definition is out of fields.
             // New ones from the implementation should be added.
-            let factory = implFieldDecl.CreateElementFactory()
             let implementationFieldType = getFieldType implFieldDecl
             match implementationFieldType with
             | None -> ()

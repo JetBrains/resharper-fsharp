@@ -9,13 +9,6 @@ open NUnit.Framework
 type UpdateRecordFieldsInSignatureFixTest() =
     inherit FSharpQuickFixTestBase<UpdateRecordFieldsInSignatureFix>()
     override x.RelativeTestDataPath = "features/quickFixes/updateRecordFieldsInSignatureFix"
-    override this.CheckAllFiles = true
-
-    member x.DoNamedTestWithSignature() =
-        let testName = x.TestMethodName
-        let fsExt = FSharpProjectFileType.FsExtension
-        let fsiExt = FSharpSignatureProjectFileType.FsiExtension
-        x.DoTestSolution(testName + fsiExt, testName + fsExt)
     
     [<Test>] member x.``Single missing field`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Multiple missing fields`` () = x.DoNamedTestWithSignature()

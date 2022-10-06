@@ -9,13 +9,6 @@ open NUnit.Framework
 type UpdateRecordFieldTypeInSignatureFixTest() =
     inherit FSharpQuickFixTestBase<UpdateRecordFieldTypeInSignatureFix>()
     override x.RelativeTestDataPath = "features/quickFixes/updateRecordFieldTypeInSignatureFix"
-    override this.CheckAllFiles = true
-
-    member x.DoNamedTestWithSignature() =
-        let testName = x.TestMethodName
-        let fsExt = FSharpProjectFileType.FsExtension
-        let fsiExt = FSharpSignatureProjectFileType.FsiExtension
-        x.DoTestSolution(testName + fsiExt, testName + fsExt)
 
     [<Test>] member x.``Wrong Record Field Type - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Type Alias - 01`` () = x.DoNamedTestWithSignature()
