@@ -56,9 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       var buildTool = myToolset.GetBuildTool();
       var mutator = MsBuildConnectionFactory.GetEnvironmentVariablesMutator(buildTool);
 
-      var runtimeRequest = buildTool!.UseDotNetCoreForLaunch && !containsLegacyCompiler
-        ? JetProcessRuntimeRequest.CreateCore(mutator, true)
-        : JetProcessRuntimeRequest.CreateFramework(mutator: mutator);
+      var runtimeRequest = JetProcessRuntimeRequest.CreateFramework(mutator: mutator, useMono: true);
 
       return runtimeRequest;
     }
