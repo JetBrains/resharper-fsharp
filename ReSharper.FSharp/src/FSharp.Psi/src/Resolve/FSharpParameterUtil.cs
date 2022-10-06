@@ -163,19 +163,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ITupleTypeUsage tuplePat => tuplePat.Items.SelectMany(GetParameterNames),
         _ => EmptyList<IEnumerable<(string, ITreeNode)>>.Enumerable
       };
-
-    public static IReadOnlyList<IReadOnlyList<(string, ITreeNode)>> GetParametersGroups(this IBinding binding)
-    {
-      var parameters = binding.ParameterPatterns.Select(GetParameterNames);
-      var bodyExpr = binding.Expression;
-
-      while (bodyExpr.IgnoreInnerParens() is ILambdaExpr lambdaExpr)
-      {
-        parameters = parameters.Union(lambdaExpr.Patterns.Select(GetParameterNames));
-        bodyExpr = lambdaExpr.Expression;
-      }
-
-      return parameters.Select(t => t.ToIReadOnlyList()).ToIReadOnlyList();
-    }
   }
 }
