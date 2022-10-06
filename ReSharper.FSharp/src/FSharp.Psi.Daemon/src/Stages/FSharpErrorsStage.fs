@@ -38,6 +38,7 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
     let analyzerDispatcher = analyzerRegistrar.CreateDispatcher(analyzerData)
 
     do
+        analyzerData.SetDaemonProcess(daemonProcess, DaemonProcessKind.VISIBLE_DOCUMENT);
         analyzerData.PutData(visualElementFactoryKey, VisualElementHighlighter(fsFile.Language, settings))
         analyzerData.PutData(openedModulesProvider, OpenedModulesProvider(fsFile))
 

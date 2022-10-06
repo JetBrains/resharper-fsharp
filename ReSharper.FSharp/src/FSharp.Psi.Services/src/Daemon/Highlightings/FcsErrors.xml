@@ -658,4 +658,15 @@
     <Behavour overlapResolvePolicy="NONE"/>
   </Warning>
 
+  <Warning compilerGroup="FSharpErrors" name="XmlDocCommentSyntax" ID="FS3390: A">
+    <Parameter type="IHighlighting" name="baseHighlighting" />
+    <Parameter type="DocumentRange" name="documentRange" />
+    <Message value="{0}">
+      <Argument>baseHighlighting.ToolTip</Argument>
+    </Message>
+    <Range>documentRange</Range>
+    <IsValid>baseHighlighting.IsValid()</IsValid>
+    <Behavour overlapResolvePolicy="WARNING" />
+  </Warning>
+
 </Errors>

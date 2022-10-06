@@ -87,4 +87,4 @@ type FcsErrorsHighlightingTest() =
 
     [<Test>] member x.``Union case expects tupled args 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Invalid XmlDoc position 01``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc - Missing parameter``() = x.DoNamedTest()
