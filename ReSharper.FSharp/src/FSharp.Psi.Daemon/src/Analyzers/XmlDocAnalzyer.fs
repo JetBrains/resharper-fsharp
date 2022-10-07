@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Xml.Tree
 open JetBrains.ReSharper.Psi.Xml.XmlDocComments
 
@@ -40,11 +41,11 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
         | :? XmlTextIsNotAllowedAtRootHighlighting -> false
         | _ -> true
     
-    let checkXmlSyntax (xmlBlock: IDocCommentXmlPsi) (data: ElementProblemAnalyzerData) (consumer: IHighlightingConsumer) =
+    let checkXmlSyntax (xmlPsi: IDocCommentXmlPsi) (data: ElementProblemAnalyzerData) (consumer: IHighlightingConsumer) =
         let daemonProcess = data.TryGetDaemonProcess()
         if isNull daemonProcess then () else
 
-        let xmlFile = xmlBlock.XmlFile
+        let xmlFile = xmlPsi.XmlFile
         let analyses = List<XmlAnalysis>()
 
         for provider in xmlAnalysisManager.Providers do
@@ -61,14 +62,10 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
             let warning = XmlDocCommentSyntaxWarning(highlighting.Highlighting, highlighting.Range)
             consumer.AddHighlighting(warning, highlighting.Range))
     
-    override this.Run(xmlDocBlock, data, consumer) =
-        let xmlPsi = xmlDocBlock.GetXmlPsi()
-        checkXmlSyntax xmlPsi data consumer
-
+    let checkParameters (xmlPsi: IDocCommentXmlPsi) (xmlDocOwner: ITreeNode) (consumer: IHighlightingConsumer) =
         let paramNodes = xmlPsi.GetParameterNodes(null)
         if paramNodes.Count = 0 then () else
 
-        let xmlDocOwner = xmlDocBlock.Parent
         if xmlDocOwner :? IFSharpTypeDeclaration then () else
         let parameters = FSharpParameterUtil.GetParametersGroupNames(xmlDocOwner)
 
@@ -95,3 +92,11 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
 
             if parameters |> Seq.exists (fun struct(name, _) -> name = attribute.UnquotedValue) then () else
             consumer.AddHighlighting(XmlDocInvalidParameterNameWarning(attribute.Value))
+
+    
+    override this.Run(xmlDocBlock, data, consumer) =
+        let xmlPsi = xmlDocBlock.GetXmlPsi()
+        let xmlDocOwner = xmlDocBlock.Parent
+
+        checkXmlSyntax xmlPsi data consumer
+        checkParameters xmlPsi xmlDocOwner consumer    

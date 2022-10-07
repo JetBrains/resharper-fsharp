@@ -1,0 +1,15 @@
+﻿module M
+
+/// <summary></summary>
+/// <param name=|"x"|(0)></param>
+/// <param name=|"x"|(1)></param>
+/// <param name=|"z"|(2)></param>
+/// |<param>|(3)</param>
+let f x |y|(4) = x + y
+
+---------------------------------------------------------
+(0): ReSharper Warning [FS3390]: Multiple documentation entries for parameter
+(1): ReSharper Warning [FS3390]: Multiple documentation entries for parameter
+(2): ReSharper Warning [FS3390]: Unknown parameter name
+(3): ReSharper Warning [FS3390]: Missing 'name' attribute for parameter or parameter reference
+(4): ReSharper Warning [FS3390]: No documentation for parameter
