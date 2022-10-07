@@ -10,7 +10,7 @@ open JetBrains.Util
 type TypeCheckErrorsStage(logger: ILogger) =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateStageProcess(fsFile, _, daemonProcess) =
+    override x.CreateStageProcess(fsFile, _, daemonProcess, _) =
         TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger) :> _
 
 

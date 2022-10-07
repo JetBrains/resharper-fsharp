@@ -13,7 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 type UnusedOpensStage() =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess) =
+    override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess, _) =
         UnusedOpensStageProcess(fsFile, daemonProcess) :> _
 
 

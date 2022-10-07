@@ -61,7 +61,7 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
 
             let warning = XmlDocCommentSyntaxWarning(highlighting.Highlighting, highlighting.Range)
             consumer.AddHighlighting(warning, highlighting.Range))
-    
+
     let checkParameters (xmlPsi: IDocCommentXmlPsi) (xmlDocOwner: ITreeNode) (consumer: IHighlightingConsumer) =
         let paramNodes = xmlPsi.GetParameterNodes(null)
         if paramNodes.Count = 0 then () else
@@ -93,10 +93,9 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
             if parameters |> Seq.exists (fun struct(name, _) -> name = attribute.UnquotedValue) then () else
             consumer.AddHighlighting(XmlDocInvalidParameterNameWarning(attribute.Value))
 
-    
     override this.Run(xmlDocBlock, data, consumer) =
         let xmlPsi = xmlDocBlock.GetXmlPsi()
         let xmlDocOwner = xmlDocBlock.Parent
 
         checkXmlSyntax xmlPsi data consumer
-        checkParameters xmlPsi xmlDocOwner consumer    
+        checkParameters xmlPsi xmlDocOwner consumer

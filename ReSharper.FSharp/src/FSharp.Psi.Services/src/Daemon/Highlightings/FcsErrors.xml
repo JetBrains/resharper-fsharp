@@ -630,6 +630,17 @@
     <QuickFix>UpdateRecordFieldTypeInSignatureFix</QuickFix>
   </Error>
 
+  <Warning compilerGroup="FSharpErrors" name="XmlDocCommentSyntax" ID="FS3390: This XML comment is invalid">
+    <Parameter type="IHighlighting" name="baseHighlighting" />
+    <Parameter type="DocumentRange" name="documentRange" />
+    <Message value="{0}">
+      <Argument>baseHighlighting.ToolTip</Argument>
+    </Message>
+    <Range>documentRange</Range>
+    <IsValid>baseHighlighting.IsValid()</IsValid>
+    <Behavour overlapResolvePolicy="WARNING" />
+  </Warning>
+
   <Warning compilerGroup="FSharpErrors" name="XmlDocMissingParameter" ID="FS3390: This XML comment is incomplete: no documentation for parameter">
     <Parameter type="ITreeNode" name="parameter"/>
     <Message value="No documentation for parameter"/>
@@ -656,17 +667,6 @@
     <Message value="Missing 'name' attribute for parameter or parameter reference"/>
     <Range>paramTag.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-  </Warning>
-
-  <Warning compilerGroup="FSharpErrors" name="XmlDocCommentSyntax" ID="FS3390: A">
-    <Parameter type="IHighlighting" name="baseHighlighting" />
-    <Parameter type="DocumentRange" name="documentRange" />
-    <Message value="{0}">
-      <Argument>baseHighlighting.ToolTip</Argument>
-    </Message>
-    <Range>documentRange</Range>
-    <IsValid>baseHighlighting.IsValid()</IsValid>
-    <Behavour overlapResolvePolicy="WARNING" />
   </Warning>
 
 </Errors>

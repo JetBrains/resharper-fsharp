@@ -115,6 +115,6 @@ type PipeChainTypeHintStage(logger: ILogger) =
         base.IsSupported(sourceFile, processKind) &&
         not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
 
-    override x.CreateStageProcess(fsFile, settings, daemonProcess) =
+    override x.CreateStageProcess(fsFile, settings, daemonProcess, _) =
         if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then null else
         PipeChainHighlightingProcess(logger, fsFile, settings, daemonProcess) :> _

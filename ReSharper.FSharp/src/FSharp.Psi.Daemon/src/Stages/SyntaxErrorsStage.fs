@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 type SyntaxErrorsStage() =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateStageProcess(fsFile, _, daemonProcess) =
+    override x.CreateStageProcess(fsFile, _, daemonProcess, _) =
         SyntaxErrorsStageProcess(fsFile, daemonProcess) :> _
 
 

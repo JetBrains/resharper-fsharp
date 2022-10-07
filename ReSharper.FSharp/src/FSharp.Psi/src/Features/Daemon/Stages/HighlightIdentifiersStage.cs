@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
       processKind == DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind);
 
     protected override IDaemonStageProcess CreateStageProcess(IFSharpFile psiFile, IContextBoundSettingsStore settings,
-      IDaemonProcess process) =>
+      IDaemonProcess process, DaemonProcessKind _) =>
       new HighlightIdentifiersStageProcess(psiFile, process);
   }
 

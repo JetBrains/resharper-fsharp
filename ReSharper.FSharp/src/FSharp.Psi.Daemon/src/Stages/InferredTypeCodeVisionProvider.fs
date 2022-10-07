@@ -81,7 +81,7 @@ type InferredTypeCodeVisionStage(provider: InferredTypeCodeVisionProvider) =
         processKind = DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind) &&
         not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
 
-    override x.CreateStageProcess(fsFile, settings, daemonProcess) =
+    override x.CreateStageProcess(fsFile, settings, daemonProcess, _) =
         InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provider) :> _
 
 
