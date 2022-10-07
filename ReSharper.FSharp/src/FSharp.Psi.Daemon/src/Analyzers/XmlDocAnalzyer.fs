@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
-open System.Collections.Generic
 open JetBrains.ReSharper.Daemon.Xml.Highlightings
 open JetBrains.ReSharper.Daemon.Xml.Stages
 open JetBrains.ReSharper.Daemon.Xml.Stages.Analysis
@@ -46,11 +45,9 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
         if isNull daemonProcess then () else
 
         let xmlFile = xmlPsi.XmlFile
-        let analyses = List<XmlAnalysis>()
 
         for provider in xmlAnalysisManager.Providers do
-        for analysis in provider.GetAnalyses(xmlFile, daemonProcess, data.SettingsStore) do
-            analyses.Add(analysis)
+        let analyses = provider.GetAnalyses(xmlFile, daemonProcess, data.SettingsStore)
 
         let xmlConsumer = DefaultHighlightingConsumer(data.SourceFile)
         let xmlAnalysisProcess = XmlAnalysisStageProcess(xmlFile, analyses, daemonProcess, xmlConsumer)
