@@ -47,8 +47,9 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
 
         let xmlFile = xmlPsi.XmlFile
 
-        for provider in xmlAnalysisManager.Providers do
-        let analyses = provider.GetAnalyses(xmlFile, daemonProcess, data.SettingsStore)
+        let analyses = xmlAnalysisManager.Providers
+                       |> Seq.collect (fun provider -> provider.GetAnalyses(xmlFile, daemonProcess, data.SettingsStore))
+                       |> Seq.toArray
 
         let xmlConsumer = DefaultHighlightingConsumer(data.SourceFile)
         let xmlAnalysisProcess = XmlAnalysisStageProcess(xmlFile, analyses, daemonProcess, xmlConsumer)
