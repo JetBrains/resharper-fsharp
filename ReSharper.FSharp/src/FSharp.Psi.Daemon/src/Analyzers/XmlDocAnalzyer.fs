@@ -26,7 +26,8 @@ type XmlDocAnalyzer() =
                          HighlightingTypes = [| typeof<XmlDocCommentSyntaxWarning>
                                                 typeof<XmlDocMissingParameterWarning>
                                                 typeof<XmlDocDuplicateParameterWarning>
-                                                typeof<XmlDocInvalidParameterNameWarning> |])>]
+                                                typeof<XmlDocInvalidParameterNameWarning> 
+                                                typeof<XmlDocMissingParameterNameWarning> |])>]
 type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
     inherit ElementProblemAnalyzer<XmlDocBlock>()
 
@@ -39,7 +40,7 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
         | :? XmlNoRootTagDefinedHighlighting
         | :? XmlTextIsNotAllowedAtRootHighlighting -> false
         | _ -> true
-    
+
     let checkXmlSyntax (xmlPsi: IDocCommentXmlPsi) (data: ElementProblemAnalyzerData) (consumer: IHighlightingConsumer) =
         let daemonProcess = data.TryGetDaemonProcess()
         if isNull daemonProcess then () else

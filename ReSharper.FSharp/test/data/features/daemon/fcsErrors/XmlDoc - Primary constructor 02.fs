@@ -1,5 +1,6 @@
 module M
 
-/// <summary></s>
+/// <summary>
+/// </s>
 type A() =
     member x.M() = ()

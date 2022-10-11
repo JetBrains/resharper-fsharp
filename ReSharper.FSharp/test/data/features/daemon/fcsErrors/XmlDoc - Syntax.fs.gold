@@ -1,11 +1,9 @@
 ﻿module M
 
-/// <||summary|(0)|(1)>
-/// ||</s>|(2)|(3)
+/// <|summary|(0)>
+/// |</s>|(1)
 let x = 5
 
 ---------------------------------------------------------
-(0):<overlapped> ReSharper Warning [FS3390]: XML element is not closed
-(1): ReSharper Warning [FS3390]: XML element is not closed
-(2):<overlapped> ReSharper Warning [FS3390]: No open tag found
-(3): ReSharper Warning [FS3390]: No open tag found
+(0): ReSharper Warning [FS3390]: XML element is not closed
+(1): ReSharper Warning [FS3390]: No open tag found
