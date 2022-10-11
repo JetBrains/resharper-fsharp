@@ -1,11 +1,13 @@
-﻿using System.Linq;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using JetBrains.Application.Processes;
 using JetBrains.Application.Threading;
+using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.MsBuildHost;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.NuGet.Packaging;
+using JetBrains.ProjectModel.Build;
+using JetBrains.ProjectModel.Properties;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
@@ -16,24 +18,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     [NotNull] private readonly ISolutionProcessStartInfoPatcher mySolutionProcessStartInfoPatcher;
     [NotNull] private readonly ILogger myLogger;
     [NotNull] private readonly IShellLocks myShellLocks;
-    [NotNull] private readonly ISolution mySolution;
     [NotNull] private readonly ISolutionToolset myToolset;
+    [NotNull] private readonly OutputAssemblies myOutputAssemblies;
 
     public TypeProvidersExternalProcessFactory(
       [NotNull] ISolutionProcessStartInfoPatcher solutionProcessStartInfoPatcher,
       [NotNull] ILogger logger,
       [NotNull] IShellLocks shellLocks,
-      [NotNull] ISolution solution,
-      [NotNull] ISolutionToolset toolset)
+      [NotNull] ISolutionToolset toolset,
+      [NotNull] OutputAssemblies outputAssemblies)
     {
       mySolutionProcessStartInfoPatcher = solutionProcessStartInfoPatcher;
       myLogger = logger;
       myShellLocks = shellLocks;
-      mySolution = solution;
       myToolset = toolset;
+      myOutputAssemblies = outputAssemblies;
     }
 
-    public TypeProvidersExternalProcess Create(Lifetime lifetime, bool isInternalMode)
+    public TypeProvidersExternalProcess Create(Lifetime lifetime,
+      [CanBeNull] string requestingProjectOutputAssemblyPath, bool isInternalMode)
     {
       var sdkVersion = myToolset.GetDotNetCoreToolset()?.Sdk?.Version;
 
@@ -41,22 +44,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         myLogger,
         myShellLocks,
         mySolutionProcessStartInfoPatcher,
-        GetProcessRuntime(),
+        GetProcessRuntime(requestingProjectOutputAssemblyPath),
         sdkVersion,
         isInternalMode);
     }
 
-    private JetProcessRuntimeRequest GetProcessRuntime()
+    private JetProcessRuntimeRequest GetProcessRuntime([CanBeNull] string requestingProjectOutputAssemblyPath)
     {
-      var packageReferenceTracker = mySolution.GetComponent<NuGetPackageReferenceTracker>();
-
-      var installedPackages = packageReferenceTracker.GetAllInstalledPackages();
-      var containsLegacyCompiler = installedPackages.Any(x => x.PackageIdentity.Id == "FSharp.Compiler.Tools");
+      using var @lock = ReadLockCookie.Create();
 
       var buildTool = myToolset.GetBuildTool();
+
+      var runtimeType = buildTool!.UseDotNetCoreForLaunch
+        ? JetProcessRuntimeType.DotNetCore
+        : JetProcessRuntimeType.FullFramework;
+
+      if (requestingProjectOutputAssemblyPath != null)
+      {
+        var path = VirtualFileSystemPath.Parse(requestingProjectOutputAssemblyPath, InteractionContext.SolutionContext);
+        var project = myOutputAssemblies.TryGetProjectByOutputAssemblyLocation(path).NotNull();
+
+        foreach (var configuration in project.ProjectProperties.GetActiveConfigurations<IProjectConfiguration>())
+          if (configuration.PropertiesCollection.TryGetValue("FscToolExe", out var fscTool) &&
+              fscTool is "fsc.exe" or "fsharpc")
+            runtimeType = JetProcessRuntimeType.FullFramework;
+      }
+
       var mutator = MsBuildConnectionFactory.GetEnvironmentVariablesMutator(buildTool);
 
-      var runtimeRequest = JetProcessRuntimeRequest.CreateFramework(mutator: mutator, useMono: true);
+      var runtimeRequest = runtimeType == JetProcessRuntimeType.DotNetCore
+        ? JetProcessRuntimeRequest.CreateCore(mutator, true)
+        : JetProcessRuntimeRequest.CreateFramework(mutator: mutator, useMono: !PlatformUtil.IsRunningUnderWindows);
 
       return runtimeRequest;
     }
