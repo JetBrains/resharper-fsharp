@@ -42,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       {
         var assemblyPath = Path.Combine(path, assemblyName);
         if (!File.Exists(assemblyPath)) continue;
-        return Assembly.LoadFrom(assemblyPath);
+        return Assembly.LoadFile(assemblyPath);
       }
 
       Console.Error.Write($"\nFailed to resolve assembly by name '{eventArgs.Name}'" +
@@ -62,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       var fantomasDllName = fantomasVersion.Version >= FantomasProtocolConstants.Fantomas5Version
         ? "Fantomas.Core.dll"
         : "Fantomas.dll";
-      return Assembly.LoadFrom(Path.Combine(fantomasPath, fantomasDllName));
+      return Assembly.LoadFile(Path.Combine(fantomasPath, fantomasDllName));
     }
   }
 }
