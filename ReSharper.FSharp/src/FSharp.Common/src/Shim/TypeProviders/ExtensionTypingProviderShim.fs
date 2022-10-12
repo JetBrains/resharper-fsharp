@@ -48,7 +48,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
     let terminateConnection () =
         if isConnectionAlive() then typeProvidersHostLifetime.Terminate()
 
-    let connect requestingProjectOutputAssemblyPath =
+    let connect requestingProjectOutputPath =
         if isConnectionAlive () then () else
 
         lock createProcessLockObj (fun () ->
@@ -60,7 +60,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                 typeProvidersLoadersFactory
                     .Create(
                         typeProvidersHostLifetime.Lifetime,
-                        requestingProjectOutputAssemblyPath,
+                        requestingProjectOutputPath,
                         isInternalMode)
                     .Run()
 

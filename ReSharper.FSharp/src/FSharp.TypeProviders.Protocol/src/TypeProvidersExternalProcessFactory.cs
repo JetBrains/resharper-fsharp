@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     }
 
     public TypeProvidersExternalProcess Create(Lifetime lifetime,
-      [CanBeNull] string requestingProjectOutputAssemblyPath, bool isInternalMode)
+      [CanBeNull] string requestingProjectOutputPath, bool isInternalMode)
     {
       var sdkVersion = myToolset.GetDotNetCoreToolset()?.Sdk?.Version;
 
@@ -44,12 +44,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         myLogger,
         myShellLocks,
         mySolutionProcessStartInfoPatcher,
-        GetProcessRuntime(requestingProjectOutputAssemblyPath),
+        GetProcessRuntime(requestingProjectOutputPath),
         sdkVersion,
         isInternalMode);
     }
 
-    private JetProcessRuntimeRequest GetProcessRuntime([CanBeNull] string requestingProjectOutputAssemblyPath)
+    private JetProcessRuntimeRequest GetProcessRuntime([CanBeNull] string requestingProjectOutputPath)
     {
       using var @lock = ReadLockCookie.Create();
 
@@ -59,9 +59,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         ? JetProcessRuntimeType.DotNetCore
         : JetProcessRuntimeType.FullFramework;
 
-      if (requestingProjectOutputAssemblyPath != null)
+      if (requestingProjectOutputPath != null)
       {
-        var path = VirtualFileSystemPath.Parse(requestingProjectOutputAssemblyPath, InteractionContext.SolutionContext);
+        var path = VirtualFileSystemPath.Parse(requestingProjectOutputPath, InteractionContext.SolutionContext);
         var project = myOutputAssemblies.TryGetProjectByOutputAssemblyLocation(path).NotNull();
 
         foreach (var configuration in project.ProjectProperties.GetActiveConfigurations<IProjectConfiguration>())
@@ -74,7 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
       var runtimeRequest = runtimeType == JetProcessRuntimeType.DotNetCore
         ? JetProcessRuntimeRequest.CreateCore(mutator, true)
-        : JetProcessRuntimeRequest.CreateFramework(mutator: mutator, useMono: !PlatformUtil.IsRunningUnderWindows);
+        : JetProcessRuntimeRequest.CreateFramework(mutator: mutator);
 
       return runtimeRequest;
     }
