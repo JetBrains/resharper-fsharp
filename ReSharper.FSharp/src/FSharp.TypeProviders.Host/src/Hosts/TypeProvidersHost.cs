@@ -103,9 +103,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
         void OnTypeProviderOnInvalidate(object o, EventArgs eventArgs)
         {
           var tpId = typeProviderRdModel.EntityId;
-          Dispose(tpId);
-          processModel.Proto.Scheduler.Queue(() => processModel.Invalidate.Fire(tpId));
-          typeProvider.Invalidate -= OnTypeProviderOnInvalidate;
+          processModel.Proto.Scheduler.Queue(() =>
+          {
+            Dispose(tpId);
+            processModel.Invalidate.Fire(tpId);
+            typeProvider.Invalidate -= OnTypeProviderOnInvalidate;
+          });
         }
 
         typeProvider.Invalidate += OnTypeProviderOnInvalidate;
