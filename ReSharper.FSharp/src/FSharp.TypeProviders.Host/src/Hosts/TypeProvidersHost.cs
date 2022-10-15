@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators;
@@ -100,8 +101,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
         var typeProviderRdModel =
           myTypeProvidersContext.TypeProviderRdModelsCreator.CreateRdModel(typeProvider, envKey);
 
+        var isDisposed = 0;
+
         void OnTypeProviderOnInvalidate(object o, EventArgs eventArgs)
         {
+          if (Interlocked.CompareExchange(ref isDisposed, 1, 0) == 1) return;
+
           var tpId = typeProviderRdModel.EntityId;
           processModel.Proto.Scheduler.Queue(() =>
           {
