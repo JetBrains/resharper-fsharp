@@ -367,7 +367,8 @@ type FSharpTypingAssistTest() =
     [<FSharpSignatureTest>]
     [<Test>] member x.``XmlDoc 10 - Delegate - Signature``() = x.DoNamedTest()
 
-    [<Test>] member x.``XmlDoc 11 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 11 - Parens 01``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc 11 - Parens 02``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
