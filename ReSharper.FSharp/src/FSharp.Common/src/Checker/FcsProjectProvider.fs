@@ -224,7 +224,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                         elif fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedModule psiModule then
                             match fcsAssemblyReaderShim.GetModuleReader(psiModule) with
                             | ReferencedAssembly.Ignored _ -> None
-                            | ReferencedAssembly.ProjectOutput reader ->
+                            | ReferencedAssembly.ProjectOutput(reader, _) ->
 
                             projectsPsiModules.Add(psiModule.ContainingProjectModule, psiModule) |> ignore 
 
