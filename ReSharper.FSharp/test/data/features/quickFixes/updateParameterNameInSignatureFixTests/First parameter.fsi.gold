@@ -1,0 +1,3 @@
+module Foo
+
+val f: v: int -> int

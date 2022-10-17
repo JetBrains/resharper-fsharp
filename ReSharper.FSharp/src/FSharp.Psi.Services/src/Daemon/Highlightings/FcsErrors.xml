@@ -572,5 +572,17 @@
     <QuickFix>ReplaceXmlDocWithLineCommentFix</QuickFix>
     <QuickFix>RemoveXmlDocFix</QuickFix>
   </Warning>
-
+  
+  <Warning compilerGroup="FSharpErrors" name="ArgumentNameMismatch" ID="FS3218: The argument names in the signature and implementation do not match">
+    <Parameter type="IFSharpPattern" name="pattern"/>
+    <Parameter type="string" name="signatureParameterName"/>
+    <Parameter type="string" name="implementationParameterName"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>pattern.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateParameterNameInSignatureFix</QuickFix>
+  </Warning>
 </Errors>
