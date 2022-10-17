@@ -35,5 +35,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetDeclaration() is { } decl && decl.GetContainingTypeDeclaration()?.GetFcsSymbol() is FSharpEntity fcsEntity
         ? fcsEntity.GenericParameters.Concat(base.MfvTypeParameters).ToList()
         : base.MfvTypeParameters;
+
+    internal override IFSharpParameterOwnerDeclaration ParameterOwnerDeclaration =>
+      BindingNavigator.GetByHeadPattern((IFSharpPattern)GetDeclaration());
   }
 }

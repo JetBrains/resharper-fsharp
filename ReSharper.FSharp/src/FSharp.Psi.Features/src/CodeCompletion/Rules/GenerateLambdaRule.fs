@@ -67,7 +67,7 @@ type GenerateLambdaBehavior(info: GenerateLambdaInfo) =
 
         let hotspotsRegistry = HotspotsRegistry(lambdaExpr.GetPsiServices())
 
-        (info.Names, lambdaExpr.Parameters.Patterns) ||> Seq.iter2 (fun names itemPattern ->
+        (info.Names, lambdaExpr.Patterns) ||> Seq.iter2 (fun names itemPattern ->
             let nameSuggestionsExpression = NameSuggestionsExpression(names)
             let rangeMarker = itemPattern.GetDocumentRange().CreateRangeMarker()
             hotspotsRegistry.Register(rangeMarker, nameSuggestionsExpression))

@@ -94,6 +94,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
   {
     public static IList<IAttributeInstance> ToAttributeInstances([NotNull] this IList<FSharpAttribute> fsAttributes,
       [NotNull] IPsiModule psiModule) =>
-      fsAttributes.ConvertAll(a => (IAttributeInstance) new FSharpAttributeInstance(a, psiModule));
+      fsAttributes.ConvertAll(a => (IAttributeInstance)new FSharpAttributeInstance(a, psiModule));
+
+    public static IList<IAttributeInstance> GetAttributeInstances([CanBeNull] this FSharpSymbol fcsSymbol, 
+      IPsiModule psiModule) =>
+      fcsSymbol?.Attributes.ToAttributeInstances(psiModule) ?? EmptyList<IAttributeInstance>.Instance;
+
+    public static IList<IAttributeInstance> GetAttributeInstances([CanBeNull] this FSharpSymbol fcsSymbol,
+      IClrTypeName clrName, IPsiModule psiModule) =>
+      fcsSymbol?.Attributes.GetAttributes(clrName.FullName).ToAttributeInstances(psiModule);
+
+    public static bool HasAttributeInstance([CanBeNull] this FSharpSymbol fcsSymbol, IClrTypeName clrName) =>
+      fcsSymbol?.Attributes.HasAttributeInstance(clrName) ?? false;
   }
 }

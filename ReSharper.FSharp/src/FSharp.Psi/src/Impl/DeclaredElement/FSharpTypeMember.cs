@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile) =>
       GetPartialDeclarations(sourceFile);
 
-    private IList<IDeclaration> GetPartialDeclarations([CanBeNull] IPsiSourceFile sourceFile)
+    internal IList<IDeclaration> GetPartialDeclarations([CanBeNull] IPsiSourceFile sourceFile)
     {
       var containingType = GetContainingType();
       if (containingType == null)

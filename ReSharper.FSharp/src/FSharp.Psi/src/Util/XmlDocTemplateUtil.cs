@@ -20,10 +20,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       text.Append($"{linePrefix}</summary>");
 
-      foreach (var parameter in FSharpParameterUtil.GetParametersGroupNames(docCommentBlock.Parent)
-                 .SelectMany(t => t)
-                 .Where(t => t != SharedImplUtil.MISSING_DECLARATION_NAME))
-        text.Append($"{lineEnding}{linePrefix}<param name=\"{parameter}\"></param>");
+      if (docCommentBlock.Parent is IFSharpParameterOwnerDeclaration paramOwnerDecl)
+        foreach (var name in FSharpParameterUtil.GetParametersGroupNames(paramOwnerDecl).SelectMany(t => t))
+          if (name != SharedImplUtil.MISSING_DECLARATION_NAME)
+            text.Append($"{lineEnding}{linePrefix}<param name=\"{name}\"></param>");
 
       return (text.ToString(), caretOffset);
     }

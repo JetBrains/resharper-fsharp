@@ -945,5 +945,101 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static XmlNode GetXmlDoc(this IFSharpTypeElement typeElement, bool inherit) =>
       typeElement.GetFirstTypePart()?.GetDeclaration()?.GetXMLDoc(inherit);
+
+    public static IList<IFSharpParameterDeclarationGroup> GetParameterGroups(
+      [NotNull] this IMemberSignatureLikeDeclaration memberSig)
+    {
+      var returnTypeInfo = memberSig.ReturnTypeInfo;
+      if (returnTypeInfo?.ReturnType is not IFunctionTypeUsage funTypeUsage)
+        return EmptyList<IFSharpParameterDeclarationGroup>.Instance;
+
+      var groups = new List<IFSharpParameterDeclarationGroup>();
+
+      while (funTypeUsage != null)
+      {
+        var group = new List<IFSharpParameterDeclaration>();
+
+        switch (funTypeUsage.ArgumentTypeUsage)
+        {
+          case ITupleTypeUsage ttu:
+          {
+            foreach (var itemTypeUsage in ttu.ItemsEnumerable)
+              if (itemTypeUsage is IParameterSignatureTypeUsage paramSigTypeUsage)
+                group.Add(paramSigTypeUsage);
+            break;
+          }
+          case IParameterSignatureTypeUsage paramSigTypeUsage:
+            group.Add(paramSigTypeUsage);
+            break;
+        }
+
+        groups.Add(new ParameterSignatureGroup(group));
+
+        funTypeUsage = funTypeUsage.ReturnTypeUsage as IFunctionTypeUsage;
+      }
+
+      return groups;
+
+    }
+
+    public static IList<IFSharpParameterDeclarationGroup> GetParameterDeclarations(
+      TreeNodeCollection<IParametersPatternDeclaration> paramDecls) =>
+      paramDecls.IsEmpty
+        ? EmptyList<IFSharpParameterDeclarationGroup>.Instance
+        : paramDecls.Select(paramDecl => paramDecl.ParameterDeclarationGroup).AsIList();
+
+    public static IList<IFSharpParameterDeclaration> GetParameterDeclarations(
+      this IFSharpParameterOwnerDeclaration paramOwnerDecl) =>
+      paramOwnerDecl.ParameterGroups.SelectMany(group => group.ParameterDeclarations).AsIList();
+
+    public static IFSharpParameterDeclaration GetParameter(
+      [NotNull] this IFSharpParameterOwnerDeclaration parametersOwner, (int group, int index) position)
+    {
+      var (group, index) = position;
+      var paramGroups = parametersOwner.ParameterGroups;
+      if (paramGroups.Count <= group) return null;
+
+      var paramGroup = paramGroups[group];
+      return paramGroup.GetParameterDeclaration(index);
+    }
+
+    [CanBeNull]
+    public static IFSharpParameterDeclaration GetParameterDeclaration([NotNull] IFSharpParameterDeclarationGroup group,
+      int index)
+    {
+      var decls = group.ParameterDeclarations;
+      return index < decls.Count ? decls[index] : null;
+    }
+
+    public static IList<IFSharpParameterDeclarationGroup> GetParameterGroups([NotNull] this IBinding binding)
+    {
+      bool IsSimplePattern(IFSharpPattern pattern, bool isTopLevel) => pattern.IgnoreInnerParens() switch
+      {
+        ILocalReferencePat or IAttribPat or ITypedPat or IWildPat => true,
+        IUnitPat => isTopLevel,
+        ITuplePat tuplePat => isTopLevel && tuplePat.PatternsEnumerable.All(t => IsSimplePattern(t, false)),
+        _ => false
+      };
+
+      var result = new List<IFSharpParameterDeclarationGroup>();
+      foreach (var paramDecl in binding.ParametersDeclarations)
+        result.Add(paramDecl.ParameterDeclarationGroup);
+
+      // todo: check Fcs expr if chameleon isn't opened
+      var expr = binding.Expression;
+      while (expr is ILambdaExpr lambdaExpr)
+      {
+        var paramDecls = lambdaExpr.ParametersDeclarations;
+        foreach (var paramDecl in paramDecls)
+          result.Add(paramDecl.ParameterDeclarationGroup);
+
+        if (lambdaExpr.Expression is ILambdaExpr innerLambda && 
+            paramDecls.All(decl => IsSimplePattern(decl.Pattern, true)))
+          expr = innerLambda;
+      }
+
+      // todo: else if functionExpr
+      return result;
+    }
   }
 }

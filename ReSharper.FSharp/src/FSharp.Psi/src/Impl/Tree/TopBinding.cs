@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
@@ -18,9 +20,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     /// file member navigation where we're looking for containing type member.
     [CanBeNull]
     private ITypeMemberDeclaration FirstDeclaration =>
-      HeadPattern is ITypeMemberDeclaration headPattern
-        ? headPattern
-        : HeadPattern?.NestedPatterns.FirstOrDefault() as ITypeMemberDeclaration;
+      HeadPattern as ITypeMemberDeclaration ?? 
+      HeadPattern?.NestedPatterns.FirstOrDefault() as ITypeMemberDeclaration;
 
     public ITypeMember DeclaredElement => FirstDeclaration?.DeclaredElement;
     IDeclaredElement IDeclaration.DeclaredElement => DeclaredElement;
@@ -58,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public void SetIsInline(bool value)
     {
       if (value)
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
 
       using var _ = WriteLockCookie.Create(IsPhysical());
       var inlineKeyword = InlineKeyword;
@@ -73,13 +74,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public void SetIsMutable(bool value)
     {
       if (!value)
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
 
-      var headPat = HeadPattern;
-      if (headPat != null)
-        FSharpImplUtil.AddTokenBefore(headPat, FSharpTokenType.MUTABLE);
+      HeadPattern?.AddTokenBefore(FSharpTokenType.MUTABLE);
     }
 
     public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
+    public IList<IFSharpParameterDeclarationGroup> ParameterGroups => this.GetParameterGroups();
+
+    public IFSharpParameterDeclaration GetParameter((int group, int index) position) =>
+      FSharpImplUtil.GetParameter(this, position);
   }
 }

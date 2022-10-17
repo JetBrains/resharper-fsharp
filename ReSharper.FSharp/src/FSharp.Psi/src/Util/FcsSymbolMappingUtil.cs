@@ -454,6 +454,35 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return idToken?.GetContainingNode<T>(true);
     }
 
+    public static IList<IList<IParameter>> GetParameterGroups<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
+      where T : IParametersOwner, IFSharpTypeParametersOwner
+    {
+      if (mfv == null)
+        return EmptyList<IList<IParameter>>.Instance;
+
+      var fcsParamGroups = mfv.CurriedParameterGroups;
+
+      var paramsCount = fcsParamGroups.Sum(list => list.Count);
+      if (paramsCount == 0)
+        return EmptyList<IList<IParameter>>.Instance;
+
+      var typeParameters = function.AllTypeParameters;
+      var paramGroups = new List<IList<IParameter>>(paramsCount);
+
+      foreach (var paramsGroup in fcsParamGroups)
+      {
+        var group = new List<IParameter>();
+        foreach (var param in paramsGroup)
+          group.Add(new FSharpMethodParameter(param, function, paramGroups.Count,
+            param.Type.MapType(typeParameters, function.Module, true)));
+
+        paramGroups.Add(group);
+      }
+
+      return paramGroups;
+    }
+
+
     public static IList<IParameter> GetParameters<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
       where T : IParametersOwner, IFSharpTypeParametersOwner
     {

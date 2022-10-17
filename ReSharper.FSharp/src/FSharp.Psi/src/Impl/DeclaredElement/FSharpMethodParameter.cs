@@ -4,6 +4,7 @@ using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -26,14 +27,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         : name;
 
     public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) =>
-      FSharpSymbol.Attributes.HasAttributeInstance(clrName.FullName);
+      FSharpSymbol.HasAttributeInstance(clrName);
 
     public override IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource) =>
-      FSharpSymbol.Attributes.ToAttributeInstances(Module);
+      FSharpSymbol.GetAttributeInstances(Module);
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName,
       AttributesSource attributesSource) =>
-      FSharpSymbol.Attributes.GetAttributes(clrName.FullName).ToAttributeInstances(Module);
+      FSharpSymbol.GetAttributeInstances(clrName, Module);
 
     public override DefaultValue GetDefaultValue()
     {
@@ -54,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       }
     }
 
-    public override ParameterKind Kind => FSharpSymbol.MapParameterKind();
+    public override ParameterKind Kind => FSharpSymbol.GetParameterKind();
     public override bool IsParameterArray => Owner is IFSharpFunction && FSharpSymbol.IsParamArrayArg;
 
     // todo: implement IsCliOptional in FCS

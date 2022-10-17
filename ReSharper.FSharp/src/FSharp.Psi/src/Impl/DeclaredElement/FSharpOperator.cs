@@ -39,5 +39,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool IsStatic => true;
     public bool IsChecked => false;
+
+    internal override IFSharpParameterOwnerDeclaration ParameterOwnerDeclaration =>
+      GetDeclaration() switch
+      {
+        IFSharpPattern fsPat => BindingNavigator.GetByHeadPattern(fsPat),
+        var decl => decl as IFSharpParameterOwnerDeclaration
+      };
   }
 }

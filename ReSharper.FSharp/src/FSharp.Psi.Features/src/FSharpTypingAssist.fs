@@ -1575,7 +1575,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let indent = document.GetText(TextRange(lineStart, docCommentBlockOffset))
         let templateLinePrefix = indent + "/// "
 
-        let struct(template, caretOffset) =
+        let struct (template, caretOffset) =
             XmlDocTemplateUtil.GetDocTemplate(docCommentBlockNode, templateLinePrefix, newLine);
 
         context.QueueCommand(fun _ ->

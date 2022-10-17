@@ -132,5 +132,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       NestedPatterns.OfType<IFSharpDeclaration>();
 
     public bool IsLocal => false;
+    
+    public string ShortName { get; }
+    public (int group, int index) Position { get; }
+    public IFSharpParameterOwnerDeclaration OwnerDeclaration { get; }
+    public IList<IFSharpParameter> Parameters { get; }
   }
 }

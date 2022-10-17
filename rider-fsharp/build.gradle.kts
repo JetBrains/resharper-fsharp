@@ -263,7 +263,10 @@ tasks {
         // Match Rider's default heap size of 1.5Gb (default for runIde is 512Mb)
         maxHeapSize = "1500m"
         jvmArgs = listOf(
-                "-Drider.backend.netcore=false"
+            "-Drider.backend.netcore=false",
+            "-Didea.jna.unpacked=true",
+            "-Djna.nounpack=true",
+            "-Djna.boot.library.path=C:/Developer/resharper-fsharp/rider-fsharp/build/riderRD-2022.3-SNAPSHOT/lib/jna/amd64"
         )
     }
 

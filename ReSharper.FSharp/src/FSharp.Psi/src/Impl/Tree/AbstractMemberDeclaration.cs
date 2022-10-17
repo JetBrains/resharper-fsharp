@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
@@ -34,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private static bool CalcHasDefaultImplementation([CanBeNull] FSharpMemberOrFunctionOrValue mfv)
     {
-      if (mfv is not {IsDispatchSlot: true})
+      if (mfv is not { IsDispatchSlot: true })
         return false;
 
       var mfvEntity = mfv.DeclaringEntity;
@@ -54,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode)Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       !(Parent is IMemberConstraint) && GetFcsSymbol() is { } fcsSymbol
@@ -84,7 +85,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       return new FSharpMethod<AbstractMemberDeclaration>(this);
     }
-    
+
     public override bool IsStatic => StaticKeyword != null;
+
+
+    // public IParameterDeclaration AddParameterDeclarationBefore(ParameterKind kind, IType parameterType,
+    //   string parameterName, IParameterDeclaration anchor) =>
+    //   throw new NotImplementedException();
+    //
+    // public IParameterDeclaration AddParameterDeclarationAfter(ParameterKind kind, IType parameterType,
+    //   string parameterName, IParameterDeclaration anchor) =>
+    //   throw new NotImplementedException();
+    //
+    // public void RemoveParameterDeclaration(int index) =>
+    //   throw new NotImplementedException();
+
+    public IParametersOwner DeclaredParametersOwner => (IParametersOwner)DeclaredElement;
+
+    public IList<IFSharpParameterDeclarationGroup> ParameterGroups => this.GetParameterGroups();
+
+    public IFSharpParameterDeclaration GetParameter((int group, int index) position) =>
+      FSharpImplUtil.GetParameter(this, position);
+
+    public IList<IFSharpParameterDeclaration> ParameterDeclarations => this.GetParameterDeclarations();
   }
 }

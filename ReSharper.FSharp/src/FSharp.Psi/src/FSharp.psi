@@ -670,15 +670,13 @@ computationExpr options { stubBase="FSharpExpressionBase"; }:
   RBRACE;
 
 lambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
-  get { methodName="Patterns" path=<lambdaExpr:LAMBDA_PARAMETERS/lambdaParametersList:PAT> };
+  get { methodName="Patterns" path=<lambdaExpr:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
 }:
   FUN
-  lambdaParametersList<LAMBDA_PARAMETERS, Parameters>
+  parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
   RARROW<RARROW, RArrow>
   fSharpExpression<EXPR, Expression>;
   
-lambdaParametersList:
-  fSharpPattern<PAT, Patterns>*;
 
 interface matchClauseListOwnerExpr:
   matchExpr |
@@ -1401,7 +1399,8 @@ accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; 
     chameleonExpression<CHAMELEON_EXPR, BodyExpression>
   )?;
 
-parametersPatternDeclaration:
+// todo: rename to parametersGroupPatternDeclaration
+parametersPatternDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
   fSharpPattern<PATTERN, Pattern>;
 
 
@@ -1793,7 +1792,7 @@ parenTypeUsage:
   typeUsage<TYPE, InnerTypeUsage>
   RPAREN<RPAREN, RightParen>;
 
-parameterSignatureTypeUsage:
+parameterSignatureTypeUsage options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:  
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   QMARK<QMARK, OptionalMark>?
   (

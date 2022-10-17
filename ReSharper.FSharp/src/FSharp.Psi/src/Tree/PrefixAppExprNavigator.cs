@@ -9,4 +9,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
       GetByFunctionExpression(param) ??
       GetByArgumentExpression(param);
   }
+  
+  // public partial class FSharpParameterOwnerDeclarationNavigator
+  // {
+  //   IFSharpParameterOwnerDeclaration GetBy
+  // }
 }

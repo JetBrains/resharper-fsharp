@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Resources.Shell;
@@ -35,5 +36,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
 
     public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
+    
+    public IList<IFSharpParameterDeclarationGroup> ParameterGroups => this.GetParameterGroups();
+
+    public IFSharpParameterDeclaration GetParameter((int group, int index) position) =>
+      FSharpImplUtil.GetParameter(this, position);
   }
 }

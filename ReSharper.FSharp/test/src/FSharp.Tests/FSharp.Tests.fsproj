@@ -23,6 +23,7 @@
     <Compile Include="Cache\CSharpResolveTestBase.fs" />
     <Compile Include="Cache\CSharpResolveTest.fs" />
     <Compile Include="Cache\FSharpSymbolCacheTest.fs" />
+    <Compile Include="Cache\FSharpParameterTest.fs" />
     <Compile Include="Parsing\FSharpLexerTest.fs" />
     <Compile Include="Parsing\FSharpParserTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />

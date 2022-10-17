@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (!base.Equals(obj))
         return false;
 
-      if (!(obj is IFSharpFunction fsFunction) || IsStatic != fsFunction.IsStatic) // RIDER-11321, RSRP-467025
+      if (obj is not IFSharpFunction fsFunction || IsStatic != fsFunction.IsStatic) // RIDER-11321, RSRP-467025
         return false;
 
       return SignatureComparers.Strict.CompareWithoutName(GetSignature(IdSubstitution),
@@ -51,5 +51,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public IAttributesSet ReturnTypeAttributes =>
       new FSharpAttributeSet(Mfv?.ReturnParameter.Attributes ?? EmptyList<FSharpAttribute>.Instance, Module);
+
+    public IFSharpParameter GetParameter((int group, int index) position)
+    {
+      throw new System.NotImplementedException();
+    }
+
+    public IList<IFSharpParameterDeclarationGroup> ParameterDeclarationGroups => 
+      ParameterOwnerDeclaration?.ParameterGroups ?? EmptyList<IFSharpParameterDeclarationGroup>.Instance;
+
+    public IList<IList<IFSharpParameter>> ParameterGroups => this.GetParameterGroups(Mfv);
+
+    internal virtual IFSharpParameterOwnerDeclaration ParameterOwnerDeclaration =>
+      GetDeclaration() as IFSharpParameterOwnerDeclaration; 
   }
 }

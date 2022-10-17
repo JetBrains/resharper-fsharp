@@ -1,14 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Resolve;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         if (binaryAppExpr is not { ShortName: "=" })
           return null;
 
-        var innerExpr = (IFSharpExpression) TupleExprNavigator.GetByExpression(binaryAppExpr) ?? binaryAppExpr;
+        var innerExpr = (IFSharpExpression)TupleExprNavigator.GetByExpression(binaryAppExpr) ?? binaryAppExpr;
         var parenExpr = ParenOrBeginEndExprNavigator.GetByInnerExpression(innerExpr);
 
         if (!(PrefixAppExprNavigator.GetByArgumentExpression(parenExpr)?.FunctionExpression is IReferenceExpr expr))
@@ -69,87 +69,56 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return field?.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner);
     }
 
-    public static IReadOnlyList<IReadOnlyList<string>> GetParametersGroupNames(ITreeNode node) =>
-      (node switch
+    public static IList<IList<string>> GetParametersGroupNames([NotNull] IFSharpParameterOwnerDeclaration decl) =>
+      decl.ParameterGroups
+        .Select(group => group.ParameterDeclarations.Select(paramDecl => paramDecl.ShortName).AsIList())
+        .AsIList();
+
+    public static DefaultValue GetParameterDefaultValue([NotNull] this IFSharpParameter param)
+    {
+      if (param.Symbol is not { } fcsParam)
+        return null;
+
+      try
       {
-        IBinding binding => binding.Expression is ILambdaExpr lambda
-          ? binding.ParameterPatterns.Select(GetParameterNames).Union(GetLambdaArgs(lambda))
-          : binding.ParameterPatterns.Select(GetParameterNames),
+        // todo: implement DefaultValue in FCS
+        var defaultValueAttr = fcsParam.Attributes.FirstOrDefault(a =>
+            a.GetClrName() == PredefinedType.DEFAULTPARAMETERVALUE_ATTRIBUTE_CLASS.FullName)
+          ?.ConstructorArguments.FirstOrDefault();
 
-        IBindingSignature bindingSignature => GetParameterNames(bindingSignature.ReturnTypeInfo.ReturnType),
-        IMemberDeclaration member => member.ParameterPatterns.Select(GetParameterNames),
-        // TODO: https://github.com/dotnet/fsharp/issues/13684
-        //.Union(member.AccessorDeclarations.Select(t => t.ParameterPatterns.SelectMany(GetParameterNames))),
-        IConstructorSignature constructorSignature => GetParameterNames(constructorSignature.ReturnTypeInfo.ReturnType),
-
-        IConstructorDeclaration constructorDeclaration =>
-          new[] { GetParameterNames(constructorDeclaration.ParameterPatterns) },
-
-        IAbstractMemberDeclaration abstractMember => GetParameterNames(abstractMember.ReturnTypeInfo.ReturnType),
-
-        IMemberSignature memberSignature => GetParameterNames(((IMemberSignatureOrDeclaration)memberSignature)
-          .ReturnTypeInfo.ReturnType),
-
-        IUnionCaseDeclaration { TypeUsage: { } typeUsage } => GetParameterNames(typeUsage),
-        IUnionCaseDeclaration ucDecl => new[] { ucDecl.Fields.Select(t => t.SourceName) },
-
-        IFSharpTypeDeclaration { TypeRepresentation: IDelegateRepresentation repr } =>
-          GetParameterNames(repr.TypeUsage),
-
-        _ => EmptyList<string[]>.Enumerable
-      })
-      .Select(t => t.ToIReadOnlyList())
-      .ToIReadOnlyList();
-
-    private static bool IsSimplePattern(IFSharpPattern pattern, bool isTopLevel) => pattern.IgnoreInnerParens() switch
-    {
-      ILocalReferencePat or IAttribPat or ITypedPat or IWildPat => true,
-      IUnitPat => isTopLevel,
-      ITuplePat tuplePat => isTopLevel && tuplePat.PatternsEnumerable.All(t => IsSimplePattern(t, false)),
-      _ => false
-    };
-
-    private static IEnumerable<IEnumerable<string>> GetLambdaArgs(ILambdaExpr expr)
-    {
-      var lambdaParams = expr.Patterns;
-      var parameters = lambdaParams.Select(GetParameterNames);
-      if (expr.Expression is ILambdaExpr innerLambda && lambdaParams.All(pattern => IsSimplePattern(pattern, true)))
-        parameters = parameters.Union(GetLambdaArgs(innerLambda));
-      return parameters;
+        var type = param.Type;
+        return defaultValueAttr == null
+          ? new DefaultValue(type, type)
+          : new DefaultValue(type, ConstantValue.Create(defaultValueAttr.Item2, type));
+      }
+      // todo: change exception in FCS
+      catch (Exception)
+      {
+        return DefaultValue.BAD_VALUE;
+      }
     }
-
-    public static IEnumerable<string> GetParameterNames(this IFSharpPattern pattern)
+    
+    public static ParameterKind GetParameterKind([CanBeNull] this FSharpParameter param)
     {
-      IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pat, bool isTopLevelParameter)
+      if (param == null)
+        return ParameterKind.VALUE;
+
+      var fcsType = param.Type;
+      if (fcsType.HasTypeDefinition && fcsType.TypeDefinition is var entity && entity.IsByRef)
       {
-        pat = pat.IgnoreInnerParens();
-        return pat switch
-        {
-          ILocalReferencePat local => new[] { local.SourceName },
-          IOptionalValPat opt => GetParameterNamesInternal(opt.Pattern, isTopLevelParameter),
-          ITypedPat typed => GetParameterNamesInternal(typed.Pattern, false),
-          IAttribPat attrib => GetParameterNamesInternal(attrib.Pattern, false),
-          IAsPat asPat => GetParameterNamesInternal(asPat.RightPattern, false),
-          ITuplePat tuplePat when isTopLevelParameter =>
-            tuplePat.PatternsEnumerable.SelectMany(t => GetParameterNamesInternal(t, false)),
-          _ => new[] { SharedImplUtil.MISSING_DECLARATION_NAME }
-        };
+        if (param.Attributes.HasAttributeInstance(StandardTypeNames.OutAttribute) || entity.LogicalName == "outref`1")
+          return ParameterKind.OUTPUT;
+        if (param.IsInArg || entity.LogicalName == "inref`1")
+          return ParameterKind.INPUT;
+
+        return ParameterKind.REFERENCE;
       }
 
-      return GetParameterNamesInternal(pattern, true);
+      return ParameterKind.VALUE;
     }
 
-    public static IEnumerable<IEnumerable<string>> GetParameterNames(this ITypeUsage pattern) =>
-      pattern switch
-      {
-        IParenTypeUsage parenUsage => GetParameterNames(parenUsage.InnerTypeUsage),
-        IConstrainedTypeUsage constrained => GetParameterNames(constrained.TypeUsage),
-        IParameterSignatureTypeUsage local =>
-          new[] { new[] { local.Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME } },
-        IFunctionTypeUsage funPat =>
-          GetParameterNames(funPat.ArgumentTypeUsage).Union(GetParameterNames(funPat.ReturnTypeUsage)),
-        ITupleTypeUsage tuplePat => tuplePat.Items.SelectMany(GetParameterNames),
-        _ => EmptyList<IEnumerable<string>>.Enumerable
-      };
+    public static bool IsParameterArray([NotNull] this IFSharpParameter fsParam) =>
+      fsParam.ContainingParametersOwner is IFSharpFunction && 
+      (fsParam.Symbol?.IsParamArrayArg ?? false);
   }
 }

@@ -24,6 +24,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IList<ITypeParameter> AllTypeParameters { get; }
   }
 
+  public interface IFSharpParametersOwner : IParametersOwner, IFSharpDeclaredElement
+  {
+    [NotNull] IFSharpParameter GetParameter((int group, int index) position);
+    [NotNull] IList<IFSharpParameterDeclarationGroup> ParameterDeclarationGroups { get; }
+    [NotNull] IList<IList<IFSharpParameter>> ParameterGroups { get; }
+  }
+
   public interface ISecondaryDeclaredElement
   {
     [NotNull] IClrDeclaredElement OriginElement { get; }

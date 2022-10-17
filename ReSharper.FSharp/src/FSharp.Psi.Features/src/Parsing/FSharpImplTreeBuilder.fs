@@ -643,11 +643,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         | _ -> failwithf "args: %A" args
 
     member x.ProcessParam(PatRange range as pat, isLocal, markMember) =
-        if not markMember then x.ProcessPat(pat, isLocal, false) else
-
-        let mark = x.Mark(range)
-        x.ProcessPat(pat, isLocal, false)
-        x.Done(range, mark, ElementType.PARAMETERS_PATTERN_DECLARATION)
+        if markMember then
+            let mark = x.Mark(range)
+            x.ProcessPat(pat, isLocal, false)
+            x.Done(range, mark, ElementType.PARAMETERS_PATTERN_DECLARATION)
+        else
+            x.ProcessPat(pat, isLocal, false)
 
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)
@@ -892,11 +893,9 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushExpression(getLambdaBodyExpr bodyExpr)
 
             match parsedData with
-            | Some(head :: _ as pats, _) ->
-                let patsRange = Range.unionRanges head.Range (List.last pats).Range
-                x.PushRange(patsRange, ElementType.LAMBDA_PARAMETERS_LIST)
+            | Some(pats, _) ->
                 for pat in pats do
-                    x.ProcessPat(pat, true, false)
+                    x.ProcessParam(pat, true, true)
             | _ -> ()
 
         | SynExpr.MatchLambda(_, _, clauses, _, _) ->

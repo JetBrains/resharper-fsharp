@@ -33,17 +33,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       return typeDeclaration?.DeclaredElement;
     }
 
-    protected IList<FSharpAttribute> Attributes =>
-      Mfv?.Attributes ?? EmptyList<FSharpAttribute>.Instance;
-
     public override IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource) =>
-      Attributes.ToAttributeInstances(Module);
+      Symbol.GetAttributeInstances(Module);
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, AttributesSource attributesSource) =>
-      Attributes.GetAttributes(clrName).ToAttributeInstances(Module);
+      Symbol.GetAttributeInstances(clrName, Module);
 
     public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) =>
-      Attributes.HasAttributeInstance(clrName.FullName);
+      Symbol.HasAttributeInstance(clrName);
+
 
     public IEnumerable<IParametersOwnerDeclaration> GetParametersOwnerDeclarations() =>
       EmptyList<IParametersOwnerDeclaration>.Instance;

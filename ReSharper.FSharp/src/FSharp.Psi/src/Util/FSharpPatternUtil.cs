@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -64,5 +65,77 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [CanBeNull]
     public static IBindingLikeDeclaration GetBindingFromHeadPattern([CanBeNull] this IFSharpPattern pat) =>
       GetBinding(pat, false, out _);
+
+    private static IFSharpPattern GetPossibleContainingParameterPattern([CanBeNull] this IFSharpPattern pat)
+    {
+      while (true)
+      {
+        pat = pat.IgnoreParentParens();
+
+        var typedPat = TypedPatNavigator.GetByPattern(pat);
+        if (typedPat != null)
+        {
+          pat = typedPat;
+          continue;
+        }
+
+        var attribPat = AttribPatNavigator.GetByPattern(pat);
+        if (attribPat != null)
+        {
+          pat = attribPat;
+          continue;
+        }
+
+        var optionalPat = OptionalValPatNavigator.GetByPattern(pat);
+        if (optionalPat != null)
+        {
+          pat = optionalPat;
+          continue;
+        }
+
+        return pat;
+      }
+    }
+
+    [CanBeNull]
+    public static IFSharpParameterDeclaration GetParameterDeclaration([CanBeNull] this IFSharpPattern pat)
+    {
+      if (pat == null)
+        return null;
+
+      pat = GetPossibleContainingParameterPattern(pat);
+
+      var topLevelPat = TuplePatNavigator.GetByPattern(pat) ?? pat;
+      var decl = ParametersPatternDeclarationNavigator.GetByPattern(topLevelPat.IgnoreParentParens());
+      if (decl == null)
+        return null;
+
+      var declPat = decl.Pattern;
+      return declPat == pat || declPat is IParenPat parenPat && parenPat == pat || decl.IgnoresIntermediateParens
+        ? (IFSharpParameterDeclaration)pat // todo
+        : null;
+    }
+
+    public static IParametersPatternDeclaration GetParameterGroupDecl([CanBeNull] this IFSharpPattern pat)
+    {
+      var tuplePat = TuplePatNavigator.GetByPattern(pat);
+      var topLevelPat = tuplePat ?? pat;
+
+      return ParametersPatternDeclarationNavigator.GetByPattern(topLevelPat.IgnoreParentParens());
+    }
+
+    public static bool IsParameterDeclaration([CanBeNull] this IFSharpPattern pat)
+    {
+      var tuplePat = TuplePatNavigator.GetByPattern(pat);
+      var topLevelPat = tuplePat ?? pat;
+
+      var decl = ParametersPatternDeclarationNavigator.GetByPattern(topLevelPat.IgnoreParentParens());
+      return decl != null;
+    }
+
+    // public static IFSharpParameter GetParameter([CanBeNull] this IFSharpPattern pat)
+    // {
+    //   
+    // }
   }
 }

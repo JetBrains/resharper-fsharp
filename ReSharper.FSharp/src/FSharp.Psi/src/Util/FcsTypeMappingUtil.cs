@@ -295,22 +295,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return typeParameter.ShortName;
     }
 
-    public static ParameterKind MapParameterKind([NotNull] this FSharpParameter param)
-    {
-      var fcsType = param.Type;
-      if (fcsType.HasTypeDefinition && fcsType.TypeDefinition is var entity && entity.IsByRef)
-      {
-        if (param.Attributes.HasAttributeInstance(StandardTypeNames.OutAttribute) || entity.LogicalName == "outref`1")
-          return ParameterKind.OUTPUT;
-        if (param.IsInArg || entity.LogicalName == "inref`1")
-          return ParameterKind.INPUT;
-
-        return ParameterKind.REFERENCE;
-      }
-
-      return ParameterKind.VALUE;
-    }
-
     public static bool TryGetFcsRange(this ITreeNode treeNode, out Range range)
     {
       range = default;

@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -11,5 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public override bool IsStatic => true;
+
+    internal override IFSharpParameterOwnerDeclaration ParameterOwnerDeclaration =>
+      BindingNavigator.GetByHeadPattern((IFSharpPattern)GetDeclaration());
   }
 }

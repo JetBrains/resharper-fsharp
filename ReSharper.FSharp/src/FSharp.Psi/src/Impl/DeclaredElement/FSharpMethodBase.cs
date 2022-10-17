@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       CLRDeclaredElementType.METHOD;
 
     public bool IsExtensionMethod =>
-      Attributes.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS);
+      Symbol.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS);
 
     public bool IsAsync => false;
     public bool IsVarArg => false;

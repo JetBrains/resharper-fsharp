@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Xml;
 using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -67,21 +66,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class LocalDeclaration
   {
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
-  }
-
-  internal abstract class LocalPatternDeclarationBase : LocalDeclarationBase, IFSharpPatternDeclaredElement
-  {
-    public TreeNodeCollection<IAttribute> Attributes =>
-      TreeNodeCollection<IAttribute>.Empty;
-
-    public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
-
-    public virtual IEnumerable<IFSharpPattern> NestedPatterns =>
-      EmptyList<IFSharpPattern>.Instance;
-
-    public virtual IEnumerable<IFSharpDeclaration> Declarations =>
-      NestedPatterns.OfType<IFSharpDeclaration>();
-
-    public bool IsLocal => true;
   }
 }

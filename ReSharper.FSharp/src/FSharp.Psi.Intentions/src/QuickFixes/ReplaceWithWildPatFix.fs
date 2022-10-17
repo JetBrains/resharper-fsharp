@@ -62,7 +62,7 @@ module ReplaceWithWildPat =
         if isNull node then false else
 
         match node.Parent with
-        | :? IBinding | :? IMatchClause | :? ILambdaParametersList | :? IForEachExpr -> true
+        | :? IBinding | :? IMatchClause | :? IForEachExpr -> true
 
         | :? IParametersPatternDeclaration as parent ->
             let parent = parent.Parent
@@ -136,7 +136,7 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
                     | null -> pat :> _, "parameter list"
                     | binding -> binding :> _, "binding patterns"
 
-                | :? ILambdaParametersList as parametersList -> parametersList :> _, "parameter list"
+                // | :? ILambdaParametersList as parametersList -> parametersList :> _, "parameter list"
                 | :? IBinding -> pat :> _, "binding patterns"
                 | :? IForEachExpr -> pat :> _, "'for' pattern"
                 | _ -> invalidArg "patOwner.Parent" "unexpected type"

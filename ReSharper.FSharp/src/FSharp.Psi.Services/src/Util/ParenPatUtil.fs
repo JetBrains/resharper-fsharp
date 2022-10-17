@@ -23,7 +23,6 @@ let precedence (treeNode: ITreeNode) =
 
     | :? IParametersOwnerPat -> 7
 
-    | :? ILambdaParametersList
     | :? IParametersPatternDeclaration -> 8
 
     // The rest of the patterns.
@@ -126,7 +125,6 @@ let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
     | :? IAsPat ->
         isAtCompoundPatternRightSide context ||
         isNotNull (ParametersOwnerPatNavigator.GetByParameter(context)) ||
-        isNotNull (LambdaParametersListNavigator.GetByPattern(context)) ||
         isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context)) ||
 
         let strictContext = getStrictContext context
@@ -156,7 +154,7 @@ let rec needsParens (context: IFSharpPattern) (fsPattern: IFSharpPattern) =
         checkPrecedence context fsPattern ||
 
         isNotNull (BindingNavigator.GetByHeadPattern(getBindingPattern context)) ||
-        isNotNull (LambdaParametersListNavigator.GetByPattern(context)) ||
+        isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(context)) ||
         isNotNull (MatchClauseNavigator.GetByPattern(context)) ||
 
         let tuplePat = TuplePatNavigator.GetByPattern(context)

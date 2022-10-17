@@ -202,6 +202,10 @@ type FSharpAtomicRenamesFactory() =
         | :? IFSharpModule as fsModule when fsModule.IsAnonymous ->
             RenameAvailabilityCheckResult.CanNotBeRenamed // todo: needs a special implementation
 
+        // actually SourceName check above does the trick
+        // | :? IFSharpParameter as fsParam when fsParam.IsGenerated ->
+        //     RenameAvailabilityCheckResult.CanNotBeRenamed
+
         | _ ->
 
         match element.ShortName with
