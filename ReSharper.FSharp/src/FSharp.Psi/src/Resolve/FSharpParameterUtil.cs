@@ -120,11 +120,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public static IEnumerable<string> GetParameterNames(this IFSharpPattern pattern)
     {
-      IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pat, bool isTopLevelParameter)
-      {
-        pat = pat.IgnoreInnerParens();
-        return pat switch
+      IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pat, bool isTopLevelParameter) =>
+        pat switch
         {
+          IParenPat { Pattern: not IParenPat } parens => GetParameterNamesInternal(parens.Pattern, isTopLevelParameter),
           ILocalReferencePat local => new[] { local.SourceName },
           IOptionalValPat opt => GetParameterNamesInternal(opt.Pattern, isTopLevelParameter),
           ITypedPat typed => GetParameterNamesInternal(typed.Pattern, false),
@@ -134,7 +133,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             tuplePat.PatternsEnumerable.SelectMany(t => GetParameterNamesInternal(t, false)),
           _ => new[] { SharedImplUtil.MISSING_DECLARATION_NAME }
         };
-      }
 
       return GetParameterNamesInternal(pattern, true);
     }
