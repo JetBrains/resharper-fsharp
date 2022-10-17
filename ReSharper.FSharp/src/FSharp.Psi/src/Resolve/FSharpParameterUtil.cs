@@ -122,9 +122,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pat, bool isTopLevelParameter)
       {
-        pat = pat.IgnoreInnerParens();
+        pat = pat.IgnoreInnerParens(true);
         return pat switch
         {
+          IParenPat { Pattern: { } innerPat } => GetParameterNamesInternal(innerPat, false),
           ILocalReferencePat local => new[] { local.SourceName },
           IOptionalValPat opt => GetParameterNamesInternal(opt.Pattern, isTopLevelParameter),
           ITypedPat typed => GetParameterNamesInternal(typed.Pattern, false),
