@@ -39,6 +39,8 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
         | :? XmlOnlyOneTagAllowedAtRootLevelHighlighting
         | :? XmlNoRootTagDefinedHighlighting
         | :? XmlTextIsNotAllowedAtRootHighlighting -> false
+        | :? XmlSyntaxErrorHighlighting as h when
+            h.ErrorElement.ErrorType = XmlSyntaxErrorType.INVALID_TAG_HEADER -> false 
         | _ -> true
 
     let checkXmlSyntax (xmlPsi: IDocCommentXmlPsi) (data: ElementProblemAnalyzerData) (consumer: IHighlightingConsumer) =
