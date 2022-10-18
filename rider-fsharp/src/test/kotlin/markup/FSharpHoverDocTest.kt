@@ -9,7 +9,7 @@ import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import org.testng.annotations.Test
 
-@TestEnvironment(solution = "CoreConsoleApp", toolset = ToolsetVersion.TOOLSET_16_CORE)
+@TestEnvironment(solution = "CoreConsoleApp", coreVersion = CoreVersion.DOT_NET_6)
 class FSharpHoverDocTest : DocumentationTestBase() {
     @Test
     fun `test hover docs for EntryPoint`() = doTest("Program.fs", "Program.fs")

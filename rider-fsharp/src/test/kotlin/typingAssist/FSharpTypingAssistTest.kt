@@ -7,7 +7,7 @@ import com.jetbrains.rider.test.scriptingApi.typeOrCallAction
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 
-@TestEnvironment(coreVersion = CoreVersion.DEFAULT)
+@TestEnvironment(coreVersion = CoreVersion.LATEST_STABLE)
 class FSharpTypingAssistTest: TypingAssistTestBase() {
 
     override fun getSolutionDirectoryName(): String = "CoreConsoleApp"

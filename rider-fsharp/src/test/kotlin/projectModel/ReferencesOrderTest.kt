@@ -8,7 +8,7 @@ import com.jetbrains.rider.test.enums.CoreVersion
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DEFAULT)
+@TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_6)
 class ReferencesOrder : BaseTestWithSolution() {
     override fun getSolutionDirectoryName() = "ReferencesOrder"
 
