@@ -3,7 +3,6 @@ package templates
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.jetbrains.rider.run.configurations.project.DotNetProjectConfiguration
 import com.jetbrains.rider.test.base.RiderTemplatesTestBase
-import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
@@ -35,15 +34,13 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestBase() {
 
             runAllUnitTestsFromProject(project, projectName, 3, 3, expectedSuccessful = 3)
 
-            //todo enable after move ScriptingAPI.Debug.Temp to ScriptingAPI
-            /*val testsCs = activeSolutionDirectory.resolve(projectName).resolve("UnitTest1.cs").toVirtualFile(true)!!
             debugUnitTests(project, debugGoldFile, {
-                toggleBreakpoint(project, testsCs, 10)
+                toggleBreakpoint(project, "Tests.fs", 8)
             }) {
                 waitForPause()
                 dumpFullCurrentData(2)
                 resumeSession()
-            }*/
+            }
 
         }
     }
