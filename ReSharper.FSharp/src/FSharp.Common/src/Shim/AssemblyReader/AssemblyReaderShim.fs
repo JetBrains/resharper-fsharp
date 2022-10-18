@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open System.Collections.Concurrent
 open System.Collections.Generic
 open System.Text
+open FSharp.Compiler.AbstractIL.ILBinaryReader
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.Lifetimes
@@ -119,9 +120,20 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         assemblyReadersByPath[path] <- reader
 
         match reader with
-        | ReferencedAssembly.ProjectOutput moduleReader ->
+        | ReferencedAssembly.ProjectOutput(moduleReader, _) ->
             assemblyReadersByModule[moduleReader.PsiModule] <- reader
         | _ -> ()
+
+    let readRealAssembly (path: VirtualFileSystemPath) =
+        if not (this.DebugReadRealAssemblies && path.ExistsFile) then None else
+
+        let readerOptions: ILReaderOptions = 
+            { pdbDirPath = None
+              reduceMemoryUsage = ReduceMemoryFlag.Yes
+              metadataOnly = MetadataOnlyFlag.Yes
+              tryGetMetadataSnapshot = fun _ -> None }
+
+        Some(this.DefaultReader.GetILModuleReader(path.FullPath, readerOptions))
 
     let getOrCreateReaderFromModule (psiModule: IPsiModule) =
         let psiModule = psiModule.As<IProjectPsiModule>()
@@ -137,7 +149,9 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         // todo: test web project with multiple modules
         let path = psiModule.Project.GetOutputFilePath(psiModule.TargetFrameworkId)
         let psiModule = psiModules.GetPrimaryPsiModule(psiModule.Project, psiModule.TargetFrameworkId)
-        let reader = ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, path, this))
+        let realReader = readRealAssembly path
+        let reader =
+            ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, path, this), realReader)
 
         recordReader path reader
         reader
@@ -151,7 +165,9 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         let reader = 
             match AssemblyReaderShim.getProjectPsiModuleByOutputAssembly psiModules path with
             | null -> ReferencedAssembly.Ignored path
-            | psiModule -> ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, path, this))
+            | psiModule ->
+                let realReader = readRealAssembly path
+                ReferencedAssembly.ProjectOutput(new ProjectFcsModuleReader(psiModule, cache, path, this), realReader)
 
         recordReader path reader
         reader
@@ -162,7 +178,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         match referencedAssembly with
         | ReferencedAssembly.Ignored _ -> false
-        | ReferencedAssembly.ProjectOutput(reader) ->
+        | ReferencedAssembly.ProjectOutput(reader, _) ->
 
         result <- reader
         true
@@ -231,7 +247,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             invalidateAll <- false
             for KeyValue(psiModule, referencedAssembly) in assemblyReadersByModule do
                 match referencedAssembly with
-                | ReferencedAssembly.ProjectOutput reader ->
+                | ReferencedAssembly.ProjectOutput(reader, _) ->
                     reader.InvalidateAllTypeDefs()
                     moduleInvalidated.Fire(psiModule)
                 | _ -> ()
@@ -263,7 +279,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         if not (isEnabled () && AssemblyReaderShim.isAssembly path) then base.GetLastWriteTime(path) else
 
         match getOrCreateReaderFromPath path with
-        | ReferencedAssembly.ProjectOutput reader -> reader.Timestamp
+        | ReferencedAssembly.ProjectOutput(reader, _) -> reader.Timestamp
         | _ -> base.GetLastWriteTime(path)
 
     override this.ExistsFile(path) =
@@ -281,7 +297,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         match getOrCreateReaderFromPath path with
         | ReferencedAssembly.Ignored _ -> base.GetModuleReader(path, readerOptions)
-        | ReferencedAssembly.ProjectOutput reader ->
+        | ReferencedAssembly.ProjectOutput(reader, _) ->
 
         if this.DebugReadRealAssemblies && reader.RealModuleReader.IsNone then
             try

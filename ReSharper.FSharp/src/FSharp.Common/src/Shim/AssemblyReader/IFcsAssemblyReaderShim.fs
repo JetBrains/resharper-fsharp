@@ -30,14 +30,14 @@ type IProjectFcsModuleReader =
 [<RequireQualifiedAccess>]
 type ReferencedAssembly =
     /// An output of a psi source project except for F# projects.
-    | ProjectOutput of IProjectFcsModuleReader
+    | ProjectOutput of IProjectFcsModuleReader * ILModuleReader option
 
     /// Not supported file or output assembly for F# project.
     | Ignored of path: VirtualFileSystemPath
 
     member this.Path =
         match this with
-        | ProjectOutput reader -> reader.Path
+        | ProjectOutput(reader, _) -> reader.Path
         | Ignored path -> path
 
 

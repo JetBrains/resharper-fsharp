@@ -1,0 +1,7 @@
+﻿// ${CHAR:<}
+module Module
+
+/// <summary>
+/// {caret}
+/// </summary>
+let f ((x, y)) = ()

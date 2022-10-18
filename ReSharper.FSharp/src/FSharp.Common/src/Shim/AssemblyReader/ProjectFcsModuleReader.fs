@@ -414,6 +414,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let extensionAttribute () =
         mkCompilerGeneratedAttributeNoArgs PredefinedType.EXTENSION_ATTRIBUTE_CLASS
 
+    let isReadonlyAttribute () =
+        mkCompilerGeneratedAttributeNoArgs PredefinedType.IS_READ_ONLY_ATTRIBUTE_FQN
+
     let internalsVisibleToAttribute arg =
         let args = [ ILAttribElem.String(Some(arg)) ]
         mkCompilerGeneratedAttribute PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS args
@@ -645,15 +648,32 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let paramType = mkType param.Type
         let defaultValue = mkParamDefaultValue param
 
-        // todo: other attrs
-        let attrs = [ if param.IsParameterArray then paramArrayAttribute () ]
+        let isRef =
+            match param.Kind with
+            | ParameterKind.INPUT
+            | ParameterKind.OUTPUT
+            | ParameterKind.REFERENCE -> true
+            | _ -> false
+
+        let paramType =
+            if isRef then ILType.Byref paramType else paramType
+
+        let customAttributes = mkCustomAttributes param
+        let attrs =
+            [ yield! customAttributes
+
+              if param.IsParameterArray then
+                paramArrayAttribute ()
+            
+              if param.Kind = ParameterKind.INPUT then
+                 isReadonlyAttribute () ]
 
         { Name = Some(name) // todo: intern?
           Type = paramType
           Default = defaultValue
-          Marshal = None // todo: used in infos.fs
-          IsIn = param.Kind.Equals(ParameterKind.INPUT) // todo: add test
-          IsOut = param.Kind.Equals(ParameterKind.OUTPUT) // todo: add test
+          Marshal = None
+          IsIn = param.Kind = ParameterKind.INPUT
+          IsOut = param.Kind = ParameterKind.OUTPUT
           IsOptional = param.IsOptional
           CustomAttrsStored = attrs |> mkILCustomAttrs |> storeILCustomAttrs
           MetadataIndex = NoMetadataIdx }
