@@ -1,0 +1,38 @@
+===================
+Opened
+
+-Project
+ -ClassLibrary * 1 project
+  -ClassLibrary
+   -Dependencies
+    -.NETCoreApp 3.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.7.2
+     -Frameworks
+      Microsoft.NETCore.App
+   Library.fs
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary.sln)[]
+
+Project [Name:ClassLibrary, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary.fsproj)[]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netcoreapp3.1, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+

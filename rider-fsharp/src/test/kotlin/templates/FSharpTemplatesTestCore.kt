@@ -22,54 +22,6 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestBase() {
     }
 
     @Test
-    fun classlibNetCoreAppTemplate() {
-        var templateId = ProjectTemplateIds.currentCore.fsharp_classLibrary
-
-        val projectName = "ClassLibrary"
-        doCoreTest(templateId, projectName, "netcoreapp2.1") { project ->
-            checkSwea(project)
-            checkSelectedRunConfigurationExecutionNotAllowed(project)
-        }
-    }
-
-    @Test
-    fun consoleAppCoreTemplate() {
-        var templateId = ProjectTemplateIds.currentCore.fsharp_consoleApplication
-
-        val projectName = "ConsoleApplication"
-        doCoreTest(templateId, projectName) { project ->
-            checkSwea(project)
-            checkCanExecuteSelectedRunConfiguration(project)
-            executeWithGold(configGoldFile) { printStream ->
-                doTestDumpRunConfigurationsFromRunManager(project, printStream)
-            }
-            val output = runProgram(project)
-            assert(output.contains("Hello World from F#!")) { "Wrong program output: $output" }
-
-            val beforeRun: ExecutionEnvironment.() -> Unit = {
-                this.runProfile as DotNetProjectConfiguration
-                val envVars = mutableMapOf<String, String>()
-                //envVars.putAll(configuration.environmentVariables)
-                envVars["COREHOST_TRACE"] = "1"
-                //configuration.environmentVariables = envVars
-                toggleBreakpoint(project, "Program.fs", 7)
-            }
-            executeWithGold(debugGoldFile, getGoldFileSystemDependentSuffix()) {
-                debugProgram(project, it, beforeRun,
-                    test = {
-                        waitForPause()
-                        dumpFullCurrentData(2)
-                        resumeSession()
-                    },
-                    outputConsumer = {},
-                    exitProcessAfterTest = true
-                )
-            }
-
-        }
-    }
-
-    @Test
     fun xUnitCoreTemplate() {
         var templateId = ProjectTemplateIds.currentCore.fsharp_xUnit
         
@@ -96,4 +48,49 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestBase() {
         }
     }
 
+    fun consoleAppCoreTemplate(expectedOutput: String, breakpointLine: Int) {
+        var templateId = ProjectTemplateIds.currentCore.fsharp_consoleApplication
+
+        val projectName = "ConsoleApplication"
+        doCoreTest(templateId, projectName) { project ->
+            checkSwea(project)
+            checkCanExecuteSelectedRunConfiguration(project)
+            executeWithGold(configGoldFile) { printStream ->
+                doTestDumpRunConfigurationsFromRunManager(project, printStream)
+            }
+            val output = runProgram(project)
+            assert(output.contains(expectedOutput)) { "Wrong program output: '$output'\nExpected to contain: '$expectedOutput'" }
+
+            val beforeRun: ExecutionEnvironment.() -> Unit = {
+                this.runProfile as DotNetProjectConfiguration
+                val envVars = mutableMapOf<String, String>()
+                //envVars.putAll(configuration.environmentVariables)
+                envVars["COREHOST_TRACE"] = "1"
+                //configuration.environmentVariables = envVars
+                toggleBreakpoint(project, "Program.fs", breakpointLine)
+            }
+            executeWithGold(debugGoldFile, getGoldFileSystemDependentSuffix()) {
+                debugProgram(project, it, beforeRun,
+                    test = {
+                        waitForPause()
+                        dumpFullCurrentData(2)
+                        resumeSession()
+                    },
+                    outputConsumer = {},
+                    exitProcessAfterTest = true
+                )
+            }
+
+        }
+    }
+
+    fun classlibNetCoreAppTemplate(targetFramework: String) {
+        var templateId = ProjectTemplateIds.currentCore.fsharp_classLibrary
+
+        val projectName = "ClassLibrary"
+        doCoreTest(templateId, projectName, targetFramework) { project ->
+            checkSwea(project)
+            checkSelectedRunConfigurationExecutionNotAllowed(project)
+        }
+    }
 }
