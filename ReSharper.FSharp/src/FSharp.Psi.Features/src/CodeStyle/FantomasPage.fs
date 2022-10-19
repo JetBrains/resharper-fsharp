@@ -134,16 +134,16 @@ type FantomasNotificationsManager(lifetime, settings: FantomasDetector, notifica
             | FantomasLocation.LocalDotnetTool ->
                 $"""Fantomas specified in 'dotnet-tool.json' failed to run.<br>{fallbackMessage}"""
             | FantomasLocation.GlobalDotnetTool ->
-                $"""Fantomas installed globally via 'dotnet tool install fantomas-tool' failed to run.<br>{fallbackMessage}"""
+                $"""Fantomas global tool failed to run.<br>{fallbackMessage}"""
             | FantomasLocation.Bundled ->
                 "An unexpected error has occurred. Please report this problem through the bug tracker."
 
         | UnsupportedVersion ->
             match version with
             | FantomasLocation.LocalDotnetTool ->
-                $"""Fantomas specified in 'dotnet-tool.json' is not compatible with the current Rider version.<br>{fallbackMessage}<br>Supported versions: {MinimalSupportedVersion} and later."""
+                $"""Fantomas specified in 'dotnet-tool.json' is not compatible with this Rider version.<br>{fallbackMessage}<br>Supported versions: {MinimalSupportedVersion} and later."""
             | FantomasLocation.GlobalDotnetTool ->
-                $"""Fantomas installed globally via 'dotnet tool install fantomas-tool' is not compatible with the current Rider version.<br>{fallbackMessage}<br>Supported versions: {MinimalSupportedVersion} and later."""
+                $"""Fantomas global tool is not compatible with this Rider version.<br>{fallbackMessage}<br>Supported versions: {MinimalSupportedVersion} and later."""
             | _ -> ""
         | _ -> ""
 
