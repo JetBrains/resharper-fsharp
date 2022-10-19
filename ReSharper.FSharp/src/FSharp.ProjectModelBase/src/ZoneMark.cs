@@ -4,7 +4,7 @@ using JetBrains.ProjectModel;
 namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 {
   [ZoneMarker]
-  public class ZoneMarker : IRequire<IProjectModelZone>
+  public class ZoneMarker : IRequire<IProjectModelZone>, IRequire<ILanguageFSharpZone>
   {
   }
 }
