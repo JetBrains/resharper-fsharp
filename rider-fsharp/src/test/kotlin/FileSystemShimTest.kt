@@ -12,7 +12,7 @@ import java.io.File
 import java.time.Duration
 
 @Test
-@TestEnvironment(coreVersion = CoreVersion.DEFAULT)
+@TestEnvironment(coreVersion = CoreVersion.LATEST_STABLE)
 class FileSystemShimTest : BaseTestWithSolution() {
     override fun getSolutionDirectoryName() = "CoreConsoleApp"
 

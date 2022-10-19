@@ -22,7 +22,7 @@ import org.testng.annotations.Test
 
 @Suppress("UnstableApiUsage")
 @Test
-@TestEnvironment(coreVersion = CoreVersion.DEFAULT)
+@TestEnvironment(coreVersion = CoreVersion.LATEST_STABLE)
 class FcsProjectProviderTest : BaseTestWithSolution() {
     override fun getSolutionDirectoryName() = throw Exception("Solutions are set in tests below")
 

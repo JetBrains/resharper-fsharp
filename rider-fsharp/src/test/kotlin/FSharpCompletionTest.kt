@@ -8,7 +8,7 @@ import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DEFAULT)
+@TestEnvironment(coreVersion = CoreVersion.LATEST_STABLE)
 class FSharpCompletionTest : CompletionTestBase() {
     override fun getSolutionDirectoryName() = "CoreConsoleApp"
     override val restoreNuGetPackages = true
