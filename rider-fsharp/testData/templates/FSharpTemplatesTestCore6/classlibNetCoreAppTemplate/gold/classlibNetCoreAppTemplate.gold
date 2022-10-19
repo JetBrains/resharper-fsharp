@@ -10,7 +10,7 @@ Opened
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.2
+      FSharp.Core/6.0.5
      -Frameworks
       Microsoft.NETCore.App
    Library.fs

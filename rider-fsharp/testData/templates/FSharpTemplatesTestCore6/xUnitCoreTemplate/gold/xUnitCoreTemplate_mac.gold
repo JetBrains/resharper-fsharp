@@ -10,9 +10,9 @@ Opened
       -Implicit
        ...
      -Packages
-      coverlet.collector/3.1.0
-      FSharp.Core/6.0.2
-      Microsoft.NET.Test.Sdk/16.11.0
+      coverlet.collector/3.1.2
+      FSharp.Core/6.0.5
+      Microsoft.NET.Test.Sdk/17.1.0
       xunit.runner.visualstudio/2.4.3
       xunit/2.4.1
      -Frameworks
@@ -29,7 +29,7 @@ Project [Name:Miscellaneous Files, GUID:GUID]
 
 Project [Name:UnitTestProject, GUID:GUID]
   Child items:
-    ProjectFileImpl(Path : Microsoft.TestPlatform.PlatformAbstractions.dll (../../../../../../../.nuget/packages/microsoft.testplatform.testhost/16.11.0/build/netcoreapp2.1/Microsoft.TestPlatform.PlatformAbstractions.dll))[Hidden CONTENT ]
+    ProjectFileImpl(Path : Microsoft.TestPlatform.PlatformAbstractions.dll (../../../../../../../.nuget/packages/microsoft.testplatform.testhost/17.1.0/build/netcoreapp2.1/Microsoft.TestPlatform.PlatformAbstractions.dll))[Hidden CONTENT ]
     ProjectFileImpl(Path : Program.fs)[COMPILE ]
     ProjectFileImpl(Path : Tests.fs)[COMPILE ]
     ProjectFileImpl(Path : UnitTestProject.fsproj)[]

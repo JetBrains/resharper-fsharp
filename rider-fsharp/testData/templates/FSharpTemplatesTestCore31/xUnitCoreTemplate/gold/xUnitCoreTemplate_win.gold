@@ -1,0 +1,49 @@
+===================
+Opened
+
+-Project
+ -UnitTestProject * 1 project
+  -UnitTestProject
+   -Dependencies
+    -.NETCoreApp 3.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      coverlet.collector/1.2.0
+      FSharp.Core/4.7.2
+      Microsoft.NET.Test.Sdk/16.5.0
+      xunit.runner.visualstudio/2.4.0
+      xunit/2.4.0
+     -Frameworks
+      Microsoft.NETCore.App
+   Tests.fs
+   Program.fs
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : UnitTestProject.sln)[]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+Project [Name:UnitTestProject, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : Program.fs)[COMPILE ]
+    ProjectFileImpl(Path : Tests.fs)[COMPILE ]
+    ProjectFileImpl(Path : UnitTestProject.fsproj)[]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netcoreapp3.1, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : UnitTestProject.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+    ProjectFileImpl(Path : testhost.dll (.nuget/packages/testhost.dll))[Hidden CONTENT ]
+    ProjectFileImpl(Path : testhost.exe (.nuget/packages/testhost.exe))[Hidden CONTENT ]
+    ProjectFileImpl(Path : xunit.runner.reporters.netcoreapp10.dll (.nuget/packages))[Hidden NONE ]
+    ProjectFileImpl(Path : xunit.runner.utility.netcoreapp10.dll (.nuget/packages))[Hidden NONE ]
+    ProjectFileImpl(Path : xunit.runner.visualstudio.dotnetcore.testadapter.dll (.nuget/packages))[Hidden NONE ]
+
+
+

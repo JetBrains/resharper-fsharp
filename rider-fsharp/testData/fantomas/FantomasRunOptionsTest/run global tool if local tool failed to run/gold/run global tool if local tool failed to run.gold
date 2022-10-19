@@ -9,7 +9,7 @@ Notifications:
 
 ----------------------------------------------------
 Title: Unable to use specified Fantomas version
-Body: Fantomas specified in 'dotnet-tool.json' is not compatible with the current Rider version.<br><b>Falling back to the global dotnet tool Fantomas.</b><br>Supported versions: 3.2 and later.
+Body: Fantomas specified in 'dotnet-tool.json' is not compatible with this Rider version.<br><b>Falling back to the global dotnet tool Fantomas.</b><br>Supported versions: 3.2 and later.
 Actions: Open dotnet-tools.json, Settings
 ----------------------------------------------------
         
