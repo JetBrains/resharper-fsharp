@@ -264,7 +264,35 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             use lock = FcsReadWriteLock.WriteCookie.Create()
             let fcsProject = createFcsProject project psiModule
             Some fcsProject
-        | _ -> None
+        | _ ->
+            match psiModule with
+            | :? FSharpScriptPsiModule as scriptModule ->
+                let path = scriptModule.Path
+                let sourceFile = scriptModule.SourceFile
+                match scriptFcsProjectProvider.GetScriptOptions(sourceFile) with
+                | None -> None
+                | Some projectOptions ->
+
+                let parsingOptions = 
+                    { FSharpParsingOptions.Default with
+                        SourceFiles = [| sourceFile.GetLocation().FullPath |]
+                        ConditionalDefines = ImplicitDefines.scriptDefines
+                        IsInteractive = true
+                        IsExe = true }
+
+                let indices = Dictionary()
+                
+
+                { OutputPath = path
+                  ProjectOptions = projectOptions
+                  ParsingOptions = parsingOptions
+                  FileIndices = indices
+                  ImplementationFilesWithSignatures = EmptySet.Instance
+                  ReferencedModules = EmptySet.Instance }
+                |> Some
+
+            | _ ->
+                None
 
     let getOrCreateFcsProjectForParsing (sourceFile: IPsiSourceFile): FcsProject =
         match tryGetFcsProject sourceFile.PsiModule with

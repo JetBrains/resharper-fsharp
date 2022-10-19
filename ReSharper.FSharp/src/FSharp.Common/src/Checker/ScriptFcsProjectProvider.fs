@@ -20,7 +20,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
 
     let defaultOptionsLock = obj()
 
-    let scriptOptions = Dictionary<VirtualFileSystemPath, FSharpProjectOptions option>()
+    let scriptFcsProjects = Dictionary<VirtualFileSystemPath, FcsProject option>()
 
     let mutable defaultOptions: FSharpProjectOptions option option = None
 
@@ -95,6 +95,24 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             newOptions
         )
 
+    let createFcsProject (path: VirtualFileSystemPath) options =
+        options
+        |> Option.map (fun options ->
+            let parsingOptions = 
+                { FSharpParsingOptions.Default with
+                    SourceFiles = [| path.FullPath |]
+                    ConditionalDefines = ImplicitDefines.scriptDefines
+                    IsInteractive = true
+                    IsExe = true }
+
+            { OutputPath = path
+              ProjectOptions = options
+              ParsingOptions = parsingOptions
+              FileIndices = dict [path, 0]
+              ImplementationFilesWithSignatures = EmptySet.Instance
+              ReferencedModules = EmptySet.Instance }
+        )
+
     let rec updateOptions path source =
         if currentRequests.Contains(path) then () else
 
@@ -104,9 +122,29 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             try
                 currentRequests.Add(path) |> ignore
                 dirtyPaths.Remove(path) |> ignore
-                let oldOptions = tryGetValue path scriptOptions |> Option.bind id
+                let oldOptions = tryGetValue path scriptFcsProjects |> Option.bind id
                 let newOptions = getOptionsImpl path source
-                scriptOptions[path] <- newOptions
+
+                scriptFcsProjects[path] <-
+                    newOptions
+                    |> Option.map (fun options ->
+                        let parsingOptions = 
+                            { FSharpParsingOptions.Default with
+                                SourceFiles = [| path.FullPath |]
+                                ConditionalDefines = ImplicitDefines.scriptDefines
+                                IsInteractive = true
+                                IsExe = true }
+
+                        let indices = Dictionary()
+                        
+
+                        { OutputPath = path
+                          ProjectOptions = options
+                          ParsingOptions = parsingOptions
+                          FileIndices = indices
+                          ImplementationFilesWithSignatures = EmptySet.Instance
+                          ReferencedModules = EmptySet.Instance }
+                    )
 
                 match oldOptions, newOptions with
                 | Some oldOptions, Some newOptions ->
@@ -117,7 +155,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                         arrayEq options1.OtherOptions options2.OtherOptions &&
                         arrayEq options1.SourceFiles options2.SourceFiles
 
-                    if not (areEqualForChecking oldOptions newOptions) then
+                    if not (areEqualForChecking oldOptions.ProjectOptions newOptions) then
                         optionsUpdated.Fire((path, newOptions))
 
                 | _, Some newOptions ->
@@ -129,15 +167,18 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                 currentRequests.Remove(path) |> ignore
         } |> Async.Start
 
-    let getOptions path source =
-        match tryGetValue path scriptOptions with
-        | Some options ->
+    let getFcsProject path source : FcsProject option =
+        match tryGetValue path scriptFcsProjects with
+        | Some fcsProject ->
             if dirtyPaths.Contains(path) then
                 updateOptions path source
-            options
+            fcsProject
         | _ ->
             updateOptions path source
-            getDefaultOptions path
+            getDefaultOptions path |> createFcsProject path
+
+    let getOptions path source : FSharpProjectOptions option =
+        getFcsProject path source |> Option.map (fun fcsProject -> fcsProject.ProjectOptions)
 
     interface IScriptFcsProjectProvider with
         member x.GetScriptOptions(path: VirtualFileSystemPath, source) =
@@ -147,5 +188,10 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             let path = file.GetLocation()
             let source = file.Document.GetText()
             getOptions path source
+
+        member this.GetFcsProject(sourceFile) =
+            let path = sourceFile.GetLocation()
+            let source = sourceFile.Document.GetText()
+            getFcsProject path source
 
         member this.OptionsUpdated = optionsUpdated

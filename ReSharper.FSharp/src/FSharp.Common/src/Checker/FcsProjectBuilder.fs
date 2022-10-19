@@ -37,22 +37,6 @@ type FSharpTargetsProjectLoadModificator() =
         member x.Modify(targets) =
             targets.AddRange(fsTargets)
 
-[<AutoOpen>]
-module ProjectOptions =
-    [<RequireQualifiedAccess>]
-    module ImplicitDefines =
-        // todo: don't pass to FCS, only use in internal lexing; these defines added by FCS too
-        let sourceDefines = [ "EDITING"; "COMPILED" ]
-        let scriptDefines = [ "EDITING"; "INTERACTIVE" ]
-
-        let getImplicitDefines isScript =
-            if isScript then scriptDefines else sourceDefines
-
-    let sandboxParsingOptions =
-        // todo: use script defines in interactive?
-        { FSharpParsingOptions.Default with
-            ConditionalDefines = ImplicitDefines.sourceDefines
-            SourceFiles = [| "Sandbox.fs" |] }
 
 module FcsProjectBuilder =
     let itemsDelimiters = [| ';'; ','; ' ' |]

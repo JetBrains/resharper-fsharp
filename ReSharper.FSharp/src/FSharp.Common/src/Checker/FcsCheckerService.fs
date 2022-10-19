@@ -36,9 +36,9 @@ type FcsProject =
     { OutputPath: VirtualFileSystemPath
       ProjectOptions: FSharpProjectOptions
       ParsingOptions: FSharpParsingOptions
-      FileIndices: Dictionary<VirtualFileSystemPath, int>
+      FileIndices: IDictionary<VirtualFileSystemPath, int>
       ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
-      ReferencedModules: HashSet<IPsiModule> }
+      ReferencedModules: ISet<IPsiModule> }
 
     member x.IsKnownFile(sourceFile: IPsiSourceFile) =
         x.FileIndices.ContainsKey(sourceFile.GetLocation())
@@ -257,6 +257,25 @@ type IFcsProjectProvider =
 
 
 type IScriptFcsProjectProvider =
+    abstract GetFcsProject: IPsiSourceFile -> FcsProject option
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetScriptOptions: VirtualFileSystemPath * string -> FSharpProjectOptions option
     abstract OptionsUpdated: Signal<VirtualFileSystemPath * FSharpProjectOptions>
+
+
+[<AutoOpen>]
+module ProjectOptions =
+    [<RequireQualifiedAccess>]
+    module ImplicitDefines =
+        // todo: don't pass to FCS, only use in internal lexing; these defines added by FCS too
+        let sourceDefines = [ "EDITING"; "COMPILED" ]
+        let scriptDefines = [ "EDITING"; "INTERACTIVE" ]
+
+        let getImplicitDefines isScript =
+            if isScript then scriptDefines else sourceDefines
+
+    let sandboxParsingOptions =
+        // todo: use script defines in interactive?
+        { FSharpParsingOptions.Default with
+            ConditionalDefines = ImplicitDefines.sourceDefines
+            SourceFiles = [| "Sandbox.fs" |] }
