@@ -34,7 +34,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     ITypedPat CreateTypedPat(IFSharpPattern pattern, ITypeUsage typeUsage);
 
     ITypeUsage CreateTypeUsage(string typeUsage);
-    ITypeUsage CreateTypeUsageForSignature(string typeUsage);
 
     IReturnTypeInfo CreateReturnTypeInfo(ITypeUsage typeSignature);
 

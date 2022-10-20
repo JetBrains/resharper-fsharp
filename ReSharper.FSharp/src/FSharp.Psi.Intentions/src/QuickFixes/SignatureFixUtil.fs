@@ -73,8 +73,8 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         match Option.both implementationFieldType displayContext with
         | None -> ()
         | Some (t, d) ->
-        let factory = signatureFieldDecl.CreateElementFactory()
-        let updatedTypeUsage = factory.CreateTypeUsageForSignature(t.Format d)
+        let factory = implFieldDecl.CreateElementFactory()
+        let updatedTypeUsage = factory.CreateTypeUsage(t.Format d)
         ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
         |> ignore
 

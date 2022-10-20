@@ -95,14 +95,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         exprStatement.AttributeLists[0]
 
     let createTypeUsage usage: ITypeUsage =
-        let expr = createLetExpr (sprintf "(a: %s)" usage)
-        expr.Bindings[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().TypeUsage
-
-    let createTypeUsageForSignature usage: ITypeUsage =
-        let source = $"module V\nval a: {usage}"
-        let moduleMember = getModuleMember source
-        let bindingSignature = moduleMember :?> IBindingSignature
-        bindingSignature.ReturnTypeInfo.ReturnType
+        let typeDecl = getTypeDecl $"abstract M: {usage}"
+        let memberDecl = typeDecl.TypeMembers[0] :?> IAbstractMemberDeclaration
+        memberDecl.ReturnTypeInfo.ReturnType
 
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
@@ -331,9 +326,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
 
         member x.CreateTypeUsage(typeUsage: string) : ITypeUsage =
             createTypeUsage typeUsage
-
-        member x.CreateTypeUsageForSignature(typeUsage: string): ITypeUsage =
-            createTypeUsageForSignature typeUsage
 
         member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"
