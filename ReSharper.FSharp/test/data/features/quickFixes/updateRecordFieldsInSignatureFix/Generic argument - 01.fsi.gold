@@ -1,0 +1,4 @@
+module Test
+
+type R<'B> =
+     { Field1: 'B }

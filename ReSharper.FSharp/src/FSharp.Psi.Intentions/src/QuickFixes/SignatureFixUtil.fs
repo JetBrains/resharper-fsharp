@@ -48,11 +48,12 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
 
     let isImplMutable = isNotNull implFieldDecl.MutableKeyword
     let mutableAreEqual = implFieldDecl.IsMutable = signatureFieldDecl.IsMutable
+    let namesAreEqual = implFieldDecl.SourceName = signatureFieldDecl.SourceName
     
-    if implFieldDecl.SourceName = signatureFieldDecl.SourceName && fieldTypeAreEqual && mutableAreEqual then
+    if namesAreEqual && fieldTypeAreEqual && mutableAreEqual then
         // fields are identical
         ()
-    elif implFieldDecl.SourceName <> signatureFieldDecl.SourceName then
+    elif not namesAreEqual && fieldTypeAreEqual && mutableAreEqual then
         // field names are different, update signature field name
         signatureFieldDecl.SetName(implFieldDecl.NameIdentifier.Name, ChangeNameKind.SourceName)
     else
@@ -61,11 +62,13 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         | None -> ()
         | Some tu ->
 
-        if not mutableAreEqual then
+        if not mutableAreEqual || not namesAreEqual then
+            // Replace the entire field declaration
             let updatedSignatureField = mkRecordFieldDeclaration isImplMutable implFieldDecl tu
             ModificationUtil.ReplaceChild(signatureFieldDecl, updatedSignatureField)
             |> ignore
         else
+            // Update only the type
             let factory = signatureFieldDecl.CreateElementFactory()
             let t,d = tu
             let updatedTypeUsage = factory.CreateTypeUsageForSignature(t.Format d)
@@ -73,37 +76,36 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
             |> ignore
 
 let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) (signatureRecordRepr: IRecordRepresentation) =
-        let signatureFieldCount = signatureRecordRepr.FieldDeclarations.Count
+    let signatureFieldCount = signatureRecordRepr.FieldDeclarations.Count
 
-        implementationRecordRepr.FieldDeclarations
-        |> Seq.iter (fun implFieldDecl ->
-            let index = implementationRecordRepr.FieldDeclarations.IndexOf(implFieldDecl)
-            
-            if index < signatureFieldCount then
-                // The signature record definition has a field at the current index
-                // The name or type might be wrong
-                let signatureFieldDecl = signatureRecordRepr.FieldDeclarations[index]
-                updateSignatureFieldDecl implFieldDecl signatureFieldDecl
-            else
-            // The signature record definition is out of fields.
-            // New ones from the implementation should be added.
-            let implementationFieldType = getFieldType implFieldDecl
-            match implementationFieldType with
-            | None -> ()
-            | Some implementationFieldType ->
-
-            let recordFieldBinding = mkRecordFieldDeclaration (isNotNull implFieldDecl.MutableKeyword) implFieldDecl implementationFieldType
-            let lastSignatureFieldDecl = signatureRecordRepr.FieldDeclarations.Last() :> ITreeNode
-            let newlineNode = NewLine(lastSignatureFieldDecl.GetLineEnding()) :> ITreeNode
-            let spaces =
-                let startPos = lastSignatureFieldDecl.GetDocumentStartOffset().ToDocumentCoords()
-                Whitespace(Convert.ToInt32(startPos.Column))
-
-            addNodesAfter lastSignatureFieldDecl [| newlineNode; spaces; recordFieldBinding |]
-            |> ignore
-        )
-
-        if signatureFieldCount > implementationRecordRepr.FieldDeclarations.Count then
-            [ implementationRecordRepr.FieldDeclarations.Count .. (signatureFieldCount - 1) ]
-            |> List.iter (fun idx -> signatureRecordRepr.FieldDeclarations.Item idx |> deleteChild)
+    implementationRecordRepr.FieldDeclarations
+    |> Seq.iter (fun implFieldDecl ->
+        let index = implementationRecordRepr.FieldDeclarations.IndexOf(implFieldDecl)
         
+        if index < signatureFieldCount then
+            // The signature record definition has a field at the current index
+            // The name or type might be wrong
+            let signatureFieldDecl = signatureRecordRepr.FieldDeclarations[index]
+            updateSignatureFieldDecl implFieldDecl signatureFieldDecl
+        else
+        // The signature record definition is out of fields.
+        // New ones from the implementation should be added.
+        let implementationFieldType = getFieldType implFieldDecl
+        match implementationFieldType with
+        | None -> ()
+        | Some implementationFieldType ->
+
+        let recordFieldBinding = mkRecordFieldDeclaration (isNotNull implFieldDecl.MutableKeyword) implFieldDecl implementationFieldType
+        let lastSignatureFieldDecl = signatureRecordRepr.FieldDeclarations.Last() :> ITreeNode
+        let newlineNode = NewLine(lastSignatureFieldDecl.GetLineEnding()) :> ITreeNode
+        let spaces =
+            let startPos = lastSignatureFieldDecl.GetDocumentStartOffset().ToDocumentCoords()
+            Whitespace(Convert.ToInt32(startPos.Column))
+
+        addNodesAfter lastSignatureFieldDecl [| newlineNode; spaces; recordFieldBinding |]
+        |> ignore
+    )
+
+    if signatureFieldCount > implementationRecordRepr.FieldDeclarations.Count then
+        [ implementationRecordRepr.FieldDeclarations.Count .. (signatureFieldCount - 1) ]
+        |> List.iter (fun idx -> signatureRecordRepr.FieldDeclarations.Item idx |> deleteChild)
