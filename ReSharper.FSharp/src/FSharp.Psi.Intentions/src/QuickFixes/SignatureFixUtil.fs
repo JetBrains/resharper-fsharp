@@ -28,6 +28,7 @@ let getSignatureRecordRepr (implementationRecordRepr: IRecordRepresentation) =
 let getFieldType (rfd:IRecordFieldDeclaration) =
     if isNull rfd then None else
     let symbolUse = rfd.GetFcsSymbolUse()
+    if isNull symbolUse then None else
     match symbolUse.Symbol with
     | :? FSharpField as ff -> Some (ff.FieldType, symbolUse.DisplayContext)
     | _ -> None
@@ -42,13 +43,11 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         let signatureFieldType = getFieldType signatureFieldDecl
         let implementationFieldType =  getFieldType implFieldDecl
         match implementationFieldType, signatureFieldType with
-        | None, None
-        | Some _, None
-        | None, Some _ -> false
         | Some (i, _), Some (s, _) -> i = s
+        | _ -> false
 
     let isImplMutable = isNotNull implFieldDecl.MutableKeyword
-    let mutableAreEqual = isImplMutable = isNotNull signatureFieldDecl.MutableKeyword
+    let mutableAreEqual = implFieldDecl.IsMutable = signatureFieldDecl.IsMutable
     
     if implFieldDecl.SourceName = signatureFieldDecl.SourceName && fieldTypeAreEqual && mutableAreEqual then
         // fields are identical
