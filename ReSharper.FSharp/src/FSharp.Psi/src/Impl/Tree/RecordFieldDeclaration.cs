@@ -2,6 +2,8 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -20,8 +22,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (value == IsMutable)
         return;
 
-      if (!value)
-        throw new System.NotImplementedException();
+      if (!value && MutableKeyword != null)
+      {
+        if (MutableKeyword.NextSibling.IsWhitespaceToken())
+        {
+          ModificationUtil.DeleteChild(MutableKeyword.NextSibling);
+        }
+        ModificationUtil.DeleteChild(MutableKeyword);
+        return;
+      }
 
       var identifier = Identifier;
       if (identifier != null)

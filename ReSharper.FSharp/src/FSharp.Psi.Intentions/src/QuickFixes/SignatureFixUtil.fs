@@ -60,32 +60,23 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         | Some i, Some s -> i = s
         | _ -> false
 
-    let isImplMutable = isNotNull implFieldDecl.MutableKeyword
     let mutableAreEqual = implFieldDecl.IsMutable = signatureFieldDecl.IsMutable
     let namesAreEqual = implFieldDecl.SourceName = signatureFieldDecl.SourceName
     
-    if namesAreEqual && fieldTypeAreEqual && mutableAreEqual then
-        // fields are identical
-        ()
-    elif not namesAreEqual && fieldTypeAreEqual && mutableAreEqual then
-        // field names are different, update signature field name
+    if not mutableAreEqual then
+        signatureFieldDecl.SetIsMutable(implFieldDecl.IsMutable)
+
+    if not namesAreEqual then
         signatureFieldDecl.SetName(implFieldDecl.NameIdentifier.Name, ChangeNameKind.SourceName)
-    else
+
+    if not fieldTypeAreEqual then
         match Option.both implementationFieldType displayContext with
         | None -> ()
         | Some (t, d) ->
-
-        if not mutableAreEqual || not namesAreEqual then
-            // Replace the entire field declaration
-            let updatedSignatureField = mkRecordFieldDeclaration isImplMutable implFieldDecl t d
-            ModificationUtil.ReplaceChild(signatureFieldDecl, updatedSignatureField)
-            |> ignore
-        else
-            // Update only the type
-            let factory = signatureFieldDecl.CreateElementFactory()
-            let updatedTypeUsage = factory.CreateTypeUsageForSignature(t.Format d)
-            ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
-            |> ignore
+        let factory = signatureFieldDecl.CreateElementFactory()
+        let updatedTypeUsage = factory.CreateTypeUsageForSignature(t.Format d)
+        ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
+        |> ignore
 
 let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) (signatureRecordRepr: IRecordRepresentation) =
     let signatureFieldCount = signatureRecordRepr.FieldDeclarations.Count
