@@ -10,21 +10,19 @@ type UpdateRecordFieldTypeInSignatureFix(error: FieldNotContainedTypesDifferErro
     inherit FSharpQuickFixBase()
     
     let recordFieldDeclaration =
-        match error.TypeName.Parent with
-        | :? IRecordFieldDeclaration as rfd ->
-            let recordRepresentation = RecordRepresentationNavigator.GetByFieldDeclaration(rfd)
-            if isNull recordRepresentation then None else
-            Some (rfd, recordRepresentation)
-        | _ -> None
+        let recordRepresentation = RecordRepresentationNavigator.GetByFieldDeclaration(error.RecordFieldDeclaration)
+        if isNull recordRepresentation then None else
+        Some recordRepresentation
+
 
     override this.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(error.TypeName.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(error.RecordFieldDeclaration.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
         match recordFieldDeclaration with
         | None -> ()
-        | Some (implFieldDecl, implementationRecordRepr) ->
-
+        | Some implementationRecordRepr ->
+        let implFieldDecl = error.RecordFieldDeclaration
         let signatureRecordRepr = getSignatureRecordRepr implementationRecordRepr
         
         match signatureRecordRepr with
@@ -42,6 +40,6 @@ type UpdateRecordFieldTypeInSignatureFix(error: FieldNotContainedTypesDifferErro
         Option.iter (updateSignatureFieldDecl implFieldDecl) signatureFieldDecl
 
     override this.IsAvailable _ =
-        isValid error.TypeName && Option.isSome recordFieldDeclaration
+        isValid error.RecordFieldDeclaration && Option.isSome recordFieldDeclaration
 
     override this.Text = "Update field type in signature file."

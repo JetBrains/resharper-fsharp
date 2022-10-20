@@ -318,13 +318,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | ctorDecl -> OnlyClassCanTakeValueArgumentsError(ctorDecl) :> _
 
         | DefinitionsInSigAndImplNotCompatibleFieldWasPresent ->
-            createHighlightingFromNodeWithMessage DefinitionsInSigAndImplNotCompatibleFieldWasPresentError range error
+            createHighlightingFromParentNodeWithMessage DefinitionsInSigAndImplNotCompatibleFieldWasPresentError range error
 
         | DefinitionsInSigAndImplNotCompatibleFieldOrderDiffer ->
-            createHighlightingFromNodeWithMessage DefinitionsInSigAndImplNotCompatibleFieldOrderDifferError range error
+            createHighlightingFromParentNodeWithMessage DefinitionsInSigAndImplNotCompatibleFieldOrderDifferError range error
 
         | DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecified ->
-            createHighlightingFromNodeWithMessage
+            createHighlightingFromParentNodeWithMessage
                 DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecifiedError
                 range
                 error
@@ -448,7 +448,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 createHighlightingFromMappedExpression getResultExpr FunctionValueUnexpectedWarning range error
 
             | x when (x.Contains(theModuleContainsTheField) && x.Contains(butItsSignatureSpecifies)) ->
-                createHighlightingFromNodeWithMessage FieldNotContainedTypesDifferError range error
+                createHighlightingFromParentNodeWithMessage FieldNotContainedTypesDifferError range error
             
             | Regex typeConstraintMismatchMessage [mismatchedType; typeConstraint] ->
                 let highlighting =

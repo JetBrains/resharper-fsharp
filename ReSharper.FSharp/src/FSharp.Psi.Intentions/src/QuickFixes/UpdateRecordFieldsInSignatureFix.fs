@@ -6,23 +6,22 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.QuickFixes.SignatureFixUtil
 
-type UpdateRecordFieldsInSignatureFix(typeName: IFSharpIdentifier) =
+type UpdateRecordFieldsInSignatureFix(typeDecl: IFSharpTypeDeclaration) =
     inherit FSharpQuickFixBase()
 
     let implementationRecordRepr =
-        let typeDecl = FSharpTypeDeclarationNavigator.GetByIdentifier(typeName)
         getRecordRepresentation typeDecl
 
     new(error: DefinitionsInSigAndImplNotCompatibleFieldWasPresentError) =
-        UpdateRecordFieldsInSignatureFix(error.TypeName)
+        UpdateRecordFieldsInSignatureFix(error.TypeDeclaration)
     new(error: DefinitionsInSigAndImplNotCompatibleFieldOrderDifferError) =
-        UpdateRecordFieldsInSignatureFix(error.TypeName)
+        UpdateRecordFieldsInSignatureFix(error.TypeDeclaration)
 
     new(error: DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecifiedError) =
-        UpdateRecordFieldsInSignatureFix(error.TypeName)
+        UpdateRecordFieldsInSignatureFix(error.TypeDeclaration)
 
     override this.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(typeName.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(typeDecl.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
         match implementationRecordRepr with
@@ -38,6 +37,6 @@ type UpdateRecordFieldsInSignatureFix(typeName: IFSharpIdentifier) =
         updateSignatureFieldDecls implementationRecordRepr signatureRecordRepr
 
     override this.IsAvailable _ =
-        isValid typeName && Option.isSome implementationRecordRepr
+        isValid typeDecl && Option.isSome implementationRecordRepr
 
     override this.Text = "Update record fields in signature file."
