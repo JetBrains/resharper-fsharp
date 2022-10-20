@@ -8,6 +8,12 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Psi.Tree
 
+module Option =
+    let both o1 o2 =
+        match o1, o2 with
+        | Some o1, Some o2 -> Some (o1, o2)
+        | _ -> None
+
 let getRecordRepresentation (typeDecl: IFSharpTypeDeclaration) =
     match typeDecl.TypeRepresentation with
     | :? IRecordRepresentation as rr -> Some rr
@@ -30,20 +36,28 @@ let getFieldType (rfd:IRecordFieldDeclaration) =
     let symbolUse = rfd.GetFcsSymbolUse()
     if isNull symbolUse then None else
     match symbolUse.Symbol with
-    | :? FSharpField as ff -> Some (ff.FieldType, symbolUse.DisplayContext)
+    | :? FSharpField as ff -> Some ff.FieldType
     | _ -> None
 
-let mkRecordFieldDeclaration isMutable (implFieldDecl: IRecordFieldDeclaration) (implementationFieldType: FSharpType, displayContext) =
+let getDisplayPlayContext (rfd:IRecordFieldDeclaration) =
+    if isNull rfd then None else
+    let symbolUse = rfd.GetFcsSymbolUse()
+    if isNull symbolUse then None else
+    Some symbolUse.DisplayContext
+
+let mkRecordFieldDeclaration isMutable (implFieldDecl: IRecordFieldDeclaration) (implementationFieldType: FSharpType) displayContext =
     let factory = implFieldDecl.CreateElementFactory()
     let typeUsage = factory.CreateTypeUsage(implementationFieldType.Format displayContext)
     factory.CreateRecordFieldDeclaration(isMutable, implFieldDecl.DeclaredName, typeUsage)
 
 let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signatureFieldDecl: IRecordFieldDeclaration) =
+    let signatureFieldType = getFieldType signatureFieldDecl
+    let displayContext = getDisplayPlayContext signatureFieldDecl
+    let implementationFieldType =  getFieldType implFieldDecl
+
     let fieldTypeAreEqual =
-        let signatureFieldType = getFieldType signatureFieldDecl
-        let implementationFieldType =  getFieldType implFieldDecl
         match implementationFieldType, signatureFieldType with
-        | Some (i, _), Some (s, _) -> i = s
+        | Some i, Some s -> i = s
         | _ -> false
 
     let isImplMutable = isNotNull implFieldDecl.MutableKeyword
@@ -57,20 +71,18 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         // field names are different, update signature field name
         signatureFieldDecl.SetName(implFieldDecl.NameIdentifier.Name, ChangeNameKind.SourceName)
     else
-        let implementationFieldType = getFieldType implFieldDecl
-        match implementationFieldType with
+        match Option.both implementationFieldType displayContext with
         | None -> ()
-        | Some tu ->
+        | Some (t, d) ->
 
         if not mutableAreEqual || not namesAreEqual then
             // Replace the entire field declaration
-            let updatedSignatureField = mkRecordFieldDeclaration isImplMutable implFieldDecl tu
+            let updatedSignatureField = mkRecordFieldDeclaration isImplMutable implFieldDecl t d
             ModificationUtil.ReplaceChild(signatureFieldDecl, updatedSignatureField)
             |> ignore
         else
             // Update only the type
             let factory = signatureFieldDecl.CreateElementFactory()
-            let t,d = tu
             let updatedTypeUsage = factory.CreateTypeUsageForSignature(t.Format d)
             ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
             |> ignore
@@ -91,11 +103,22 @@ let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) 
         // The signature record definition is out of fields.
         // New ones from the implementation should be added.
         let implementationFieldType = getFieldType implFieldDecl
-        match implementationFieldType with
-        | None -> ()
-        | Some implementationFieldType ->
+        let displayContext =
+            signatureRecordRepr.FieldDeclarations
+            |> Seq.tryHead
+            |> Option.bind getDisplayPlayContext
 
-        let recordFieldBinding = mkRecordFieldDeclaration (isNotNull implFieldDecl.MutableKeyword) implFieldDecl implementationFieldType
+        match Option.both implementationFieldType displayContext with
+        | None -> ()
+        | Some (implementationFieldType, displayContext) ->
+
+        let recordFieldBinding =
+            mkRecordFieldDeclaration
+                (isNotNull implFieldDecl.MutableKeyword)
+                implFieldDecl
+                implementationFieldType
+                displayContext
+
         let lastSignatureFieldDecl = signatureRecordRepr.FieldDeclarations.Last() :> ITreeNode
         let newlineNode = NewLine(lastSignatureFieldDecl.GetLineEnding()) :> ITreeNode
         let spaces =

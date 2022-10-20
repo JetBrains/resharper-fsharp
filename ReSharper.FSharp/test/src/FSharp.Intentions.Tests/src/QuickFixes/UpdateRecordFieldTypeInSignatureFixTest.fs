@@ -16,3 +16,5 @@ type UpdateRecordFieldTypeInSignatureFixTest() =
     [<Test>] member x.``Update all fields - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Mutable field - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Mutable field - 02`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Missing open - 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Don't prefix type - 01`` () = x.DoNamedTestWithSignature()
