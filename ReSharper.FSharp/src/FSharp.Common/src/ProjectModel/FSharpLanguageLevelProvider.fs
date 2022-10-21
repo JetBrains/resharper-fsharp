@@ -63,7 +63,6 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | 14 -> FSharpLanguageLevel.FSharp45
         | 15 -> FSharpLanguageLevel.FSharp47
         | 16 -> FSharpLanguageLevel.FSharp50
-        | 17 -> FSharpLanguageLevel.FSharp60
         | _ -> FSharpLanguageLevel.Latest
 
     let getVersionMappingByToolset () =
@@ -105,6 +104,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | FSharpLanguageVersion.FSharp47 -> FSharpLanguageLevel.FSharp47
         | FSharpLanguageVersion.FSharp50 -> FSharpLanguageLevel.FSharp50
         | FSharpLanguageVersion.FSharp60 -> FSharpLanguageLevel.FSharp60
+        | FSharpLanguageVersion.FSharp70 -> FSharpLanguageLevel.FSharp70
         | FSharpLanguageVersion.Default -> (getFscPath configuration |> getLanguageLevelByCompiler).DefaultVersion
         | FSharpLanguageVersion.LatestMajor -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMajor
         | FSharpLanguageVersion.Latest -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMinor

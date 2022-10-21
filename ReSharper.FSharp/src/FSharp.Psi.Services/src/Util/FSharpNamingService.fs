@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -384,16 +385,19 @@ type FSharpNamingService(language: FSharpLanguage) =
     override x.IsSameNestedNameAllowedForMembers = true
 
     member x.IsValidName(element: IDeclaredElement, name: string) =
-        let isValidCaseStart char =
+        let isUppercase char =
             // F# 4.1 spec: 8.5 Union Type Definitions
             Char.IsUpper(char) && not (Char.IsLower(char))
 
         let isTypeLike (element: IDeclaredElement) =
             element :? ITypeElement || element :? IUnionCase || element :? INamespace
 
-        let isUnionCaseLike (element: IDeclaredElement) =
+        let requiresUppercaseStart (element: IDeclaredElement) =
             match element with
-            | :? IUnionCase
+            | :? IUnionCase as uc ->
+                FSharpLanguageLevel.ofPsiModuleNoCache uc.Module < FSharpLanguageLevel.FSharp70 ||
+                not (hasRequireQualifiedAccessAttribute uc.ContainingType)
+
             | :? IActivePatternCase -> true
             | :? ITypeElement as typeElement -> typeElement.IsException()
             | _ -> false
@@ -401,7 +405,7 @@ type FSharpNamingService(language: FSharpLanguage) =
         let name = name.RemoveBackticks()
 
         if name.IsEmpty() then false else
-        if isUnionCaseLike element && not (isValidCaseStart name[0]) then false else
+        if requiresUppercaseStart element && not (isUppercase name[0]) then false else
         if isTypeLike element && name.IndexOfAny(notAllowedInTypes) <> -1 then false else
 
         not (name.ContainsNewLine() || name.Contains("``") || endsWith "`" name)

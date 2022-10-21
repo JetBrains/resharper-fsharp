@@ -25,7 +25,10 @@ type FSharpLanguageLevel =
     /// Indexing without dot
     | FSharp60 = 60
 
-    | Latest = 60
+    /// Lowercase union cases
+    | FSharp70 = 70
+
+    | Latest = 70
 
     | Preview = 2147483646 // Int32.MaxValue - 1
 
@@ -36,6 +39,7 @@ type FSharpLanguageVersion =
     | FSharp47 = 47
     | FSharp50 = 50
     | FSharp60 = 60
+    | FSharp70 = 70
     | LatestMajor = 2147483644 // Int32.MaxValue - 3
     | Latest = 2147483645 // Int32.MaxValue - 2
     | Preview = 2147483646 // Int32.MaxValue - 1
@@ -49,6 +53,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageLevel.FSharp47 -> FSharpLanguageVersion.FSharp47
         | FSharpLanguageLevel.FSharp50 -> FSharpLanguageVersion.FSharp50
         | FSharpLanguageLevel.FSharp60 -> FSharpLanguageVersion.FSharp60
+        | FSharpLanguageLevel.FSharp70 -> FSharpLanguageVersion.FSharp70
         | FSharpLanguageLevel.Preview -> FSharpLanguageVersion.Preview
         | _ -> failwithf $"Unexpected language level: {level}"
 
@@ -58,6 +63,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageVersion.FSharp47 -> FSharpLanguageLevel.FSharp47
         | FSharpLanguageVersion.FSharp50 -> FSharpLanguageLevel.FSharp50
         | FSharpLanguageVersion.FSharp60 -> FSharpLanguageLevel.FSharp60
+        | FSharpLanguageVersion.FSharp70 -> FSharpLanguageLevel.FSharp70
         | FSharpLanguageVersion.Preview -> FSharpLanguageLevel.Preview
         | _ -> FSharpLanguageLevel.Latest
 
@@ -108,6 +114,7 @@ module FSharpLanguageVersion =
         | "4.7" -> Some(FSharpLanguageVersion.FSharp47)
         | "5" | "5.0" -> Some(FSharpLanguageVersion.FSharp50)
         | "6" | "6.0" -> Some(FSharpLanguageVersion.FSharp60)
+        | "7" | "7.0" -> Some(FSharpLanguageVersion.FSharp70)
 
         | _ -> None
 
@@ -122,6 +129,7 @@ module FSharpLanguageVersion =
         | FSharpLanguageVersion.FSharp47 -> "F# 4.7"
         | FSharpLanguageVersion.FSharp50 -> "F# 5.0"
         | FSharpLanguageVersion.FSharp60 -> "F# 6.0"
+        | FSharpLanguageVersion.FSharp70 -> "F# 7.0"
         | FSharpLanguageVersion.LatestMajor -> "Latest major"
         | FSharpLanguageVersion.Latest -> "Latest"
         | FSharpLanguageVersion.Preview -> "Preview"
@@ -134,6 +142,7 @@ module FSharpLanguageVersion =
         | FSharpLanguageVersion.FSharp47 -> "4.7"
         | FSharpLanguageVersion.FSharp50 -> "5.0"
         | FSharpLanguageVersion.FSharp60 -> "6.0"
+        | FSharpLanguageVersion.FSharp70 -> "7.0"
         | FSharpLanguageVersion.LatestMajor -> "latestmajor"
         | FSharpLanguageVersion.Latest -> "latest"
         | FSharpLanguageVersion.Preview -> "preview"
