@@ -82,7 +82,6 @@ module FSharpErrors =
     let [<Literal>] ArgumentNamesInSignatureAndImplementationDoNotMatch = 3218
     let [<Literal>] CantTakeAddressOfExpression = 3236
     let [<Literal>] SingleQuoteInSingleQuote = 3373
-    let [<Literal>] XmlDocSignatureCheckFailed = 3390
     let [<Literal>] InvalidXmlDocPosition = 3520
 
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
@@ -476,8 +475,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     abstract ShouldAddDiagnostic: error: FSharpDiagnostic * range: DocumentRange -> bool
     default x.ShouldAddDiagnostic(error: FSharpDiagnostic, _) =
         error.ErrorNumber <> UnrecognizedOption &&
-        error.ErrorNumber <> InvalidXmlDocPosition &&
-        error.ErrorNumber <> XmlDocSignatureCheckFailed
+        error.ErrorNumber <> InvalidXmlDocPosition
 
     member x.Execute(errors: FSharpDiagnostic[], committer: Action<DaemonStageResult>) =
         let daemonProcess = x.DaemonProcess

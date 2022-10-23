@@ -40,7 +40,10 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
         | :? XmlNoRootTagDefinedHighlighting
         | :? XmlTextIsNotAllowedAtRootHighlighting -> false
         | :? XmlSyntaxErrorHighlighting as h when
-            h.ErrorElement.ErrorType = XmlSyntaxErrorType.INVALID_TAG_HEADER -> false 
+            h.ErrorElement.ErrorType = XmlSyntaxErrorType.INVALID_TAG_HEADER -> false
+        | :? XmlTagIsNotClosedHighlighting as h ->
+            let prevSibling = h.Tag.PrevSibling
+            isNull prevSibling || not (prevSibling.GetText().EndsWith("[")) // [<attribute>]
         | _ -> true
 
     let checkXmlSyntax (xmlPsi: IDocCommentXmlPsi) (data: ElementProblemAnalyzerData) (consumer: IHighlightingConsumer) =
