@@ -1,0 +1,10 @@
+﻿module Module
+
+type zzz<'a>() =
+    static member P = 1
+
+new zzz<int>()
+zzz<int>.P
+zzz.P
+
+type A = zzz<int>

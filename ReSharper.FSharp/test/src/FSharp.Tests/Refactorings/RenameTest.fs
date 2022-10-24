@@ -119,6 +119,9 @@ type FSharpRenameTest() =
     [<Test>] member x.``Types - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Ctor 02 - Secondary``() = x.DoNamedTest()
 
+    [<Test>] member x.``Types - Generic 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Generic 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Types - Inheritance 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Inheritance 02 - object expressions``() = x.DoNamedTest()
 

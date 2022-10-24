@@ -242,7 +242,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           if (symbolUse.IsFromPattern || !resolvedSymbols.Declarations.ContainsKey(startOffset))
           {
             if (resolvedSymbols.Uses.TryGetValue(startOffset, out var existingSymbol) &&
-                existingSymbol.SymbolUse.Symbol is FSharpEntity && !isCtor)
+                existingSymbol.SymbolUse.Symbol is FSharpEntity && !isCtor && symbol is not FSharpEntity)
               continue;
 
             resolvedSymbols.Uses[startOffset] = new FcsResolvedSymbolUse(symbolUse, nameRange);
