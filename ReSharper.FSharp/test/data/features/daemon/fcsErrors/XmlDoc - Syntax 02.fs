@@ -1,4 +1,4 @@
 module M
 
-/// <= x
+///<summary>[<Arr>] <= x</summary>
 let x = 5

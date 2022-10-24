@@ -34,6 +34,10 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
     let getNameAttribute (paramTag: IXmlTag) =
         paramTag.Header.Attributes.FirstOrDefault(fun t -> t.AttributeName = "name")
 
+    let checkXmlTagIsNotClosed (tag: IXmlTag) =
+        let prevSibling = tag.PrevSibling
+        isNull prevSibling || not (prevSibling.GetText().EndsWith("[")) // [<attribute>]
+
     let checkXmlHighlighting (highlighting: IHighlighting) =
         match highlighting with
         | :? XmlOnlyOneTagAllowedAtRootLevelHighlighting
@@ -41,9 +45,10 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
         | :? XmlTextIsNotAllowedAtRootHighlighting -> false
         | :? XmlSyntaxErrorHighlighting as h when
             h.ErrorElement.ErrorType = XmlSyntaxErrorType.INVALID_TAG_HEADER -> false
+        | :? XmlTagIsNotClosedHighlighting2 as h ->
+            checkXmlTagIsNotClosed h.Tags[0]
         | :? XmlTagIsNotClosedHighlighting as h ->
-            let prevSibling = h.Tag.PrevSibling
-            isNull prevSibling || not (prevSibling.GetText().EndsWith("[")) // [<attribute>]
+            checkXmlTagIsNotClosed h.Tag
         | _ -> true
 
     let checkXmlSyntax (xmlPsi: IDocCommentXmlPsi) (data: ElementProblemAnalyzerData) (consumer: IHighlightingConsumer) =

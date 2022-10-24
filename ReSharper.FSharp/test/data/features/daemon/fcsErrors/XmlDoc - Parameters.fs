@@ -1,6 +1,10 @@
 module M
 
-/// <summary></summary>
+/// <summary>
+///    <paramref name="x"/>
+///    <paramref name="z"/>
+///    <paramref/>
+/// </summary>
 /// <param name="x"></param>
 /// <param name="x"></param>
 /// <param name="z"></param>
