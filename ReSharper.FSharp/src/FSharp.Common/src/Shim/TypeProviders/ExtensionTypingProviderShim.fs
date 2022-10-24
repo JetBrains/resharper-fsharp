@@ -48,7 +48,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
     let terminateConnection () =
         if isConnectionAlive() then typeProvidersHostLifetime.Terminate()
 
-    let connect () =
+    let connect requestingProjectOutputPath =
         if isConnectionAlive () then () else
 
         lock createProcessLockObj (fun () ->
@@ -56,7 +56,14 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
 
             typeProvidersHostLifetime <- Lifetime.Define(lifetime)
             let isInternalMode = productConfigurations.IsInternalMode()
-            let newConnection = typeProvidersLoadersFactory.Create(typeProvidersHostLifetime.Lifetime, isInternalMode).Run()
+            let newConnection =
+                typeProvidersLoadersFactory
+                    .Create(
+                        typeProvidersHostLifetime.Lifetime,
+                        requestingProjectOutputPath,
+                        isInternalMode)
+                    .Run()
+
             typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, scriptPsiModulesProvider,
                                                          outputAssemblies, generativeTypeProvidersInMemoryAnalysis.Value) :?> _
             connection <- newConnection)
@@ -83,7 +90,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                     resolutionEnvironment, isInvalidationSupported, isInteractive,
                     systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath, logError, m)
             else
-                connect()
+                connect (Option.toObj resolutionEnvironment.OutputFile)
                 try
                     typeProvidersManager.GetOrCreate(runTimeAssemblyFileName, designTimeAssemblyNameString,
                         resolutionEnvironment, isInvalidationSupported, isInteractive, systemRuntimeContainsType,
