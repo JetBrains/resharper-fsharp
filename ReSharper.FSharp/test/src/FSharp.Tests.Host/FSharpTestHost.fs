@@ -29,7 +29,7 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
         assemblyReaderShim: IFcsAssemblyReaderShim, projectProvider: IFcsProjectProvider,
         psiModules: IPsiModules, projectModelViewHost: ProjectModelViewHost) =
 
-    let lifetime = solution.GetLifetime()
+    let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     
     let dumpSingleProjectMapping _ =
         let projectMapping =

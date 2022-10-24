@@ -32,7 +32,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         scriptPsiModulesProvider: FSharpScriptPsiModulesProvider, outputAssemblies: OutputAssemblies,
         typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory,
         productConfigurations: RunsProducts.ProductConfigurations) as this =
-    let lifetime = solution.GetLifetime()
+    let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let defaultShim = ExtensionTyping.Provider
     let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
     let generativeTypeProvidersInMemoryAnalysis = experimentalFeatures.GenerativeTypeProvidersInMemoryAnalysis

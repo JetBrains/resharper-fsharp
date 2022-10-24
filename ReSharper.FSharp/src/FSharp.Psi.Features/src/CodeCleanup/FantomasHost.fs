@@ -22,7 +22,7 @@ module internal Reflection =
 
 [<SolutionComponent>]
 type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector) =
-    let solutionLifetime = solution.GetLifetime()
+    let solutionLifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
     let mutable formatterHostLifetime: LifetimeDefinition = null

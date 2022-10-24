@@ -136,7 +136,8 @@ type UnionCasePatternBehavior(info) =
             let pat = FSharpPatternUtil.toParameterOwnerPat pat UnionCasePatternInfo.Id
             deconstruct fieldsDeconstruction pat else
 
-        solution.Locks.ExecuteOrQueueReadLockEx(solution.GetLifetime(), UnionCasePatternInfo.Id, fun _ ->
+        let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
+        solution.Locks.ExecuteOrQueueReadLockEx(lifetime, UnionCasePatternInfo.Id, fun _ ->
             let jetPopupMenus = solution.GetComponent<JetPopupMenus>()
             jetPopupMenus.ShowModal(JetPopupMenu.ShowWhen.NoItemsBannerIfNoItems, fun lifetime jetPopupMenu ->
                 let textControlLockLifetimeDefinition = Lifetime.Define(lifetime)
