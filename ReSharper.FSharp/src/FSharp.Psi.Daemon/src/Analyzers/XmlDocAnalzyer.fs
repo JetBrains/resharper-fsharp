@@ -68,7 +68,12 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
 
     let checkParameters (xmlPsi: IDocCommentXmlPsi) (xmlDocOwner: ITreeNode) (consumer: IHighlightingConsumer) =
         let paramNodes = xmlPsi.GetParameterNodes(null)
-        if paramNodes.Count = 0 then () else
+        //TODO: move to the platform?
+        let paramRefNodes = xmlPsi.XmlFile.Descendants<IXmlTag>().ToEnumerable()
+                            |> Seq.filter (fun x -> x.GetFullTagName() = "paramref")
+                            |> Seq.toArray
+
+        if paramNodes.Count = 0 && paramRefNodes.Length = 0 then () else
 
         if xmlDocOwner :? IFSharpTypeDeclaration then () else
         let parameters = FSharpParameterUtil.GetParametersGroupNames(xmlDocOwner)
@@ -88,11 +93,11 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
                     let attribute = getNameAttribute paramTag
                     consumer.AddHighlighting(XmlDocDuplicateParameterWarning(attribute.Value))
 
-        for paramDoc in paramNodes do
-            let attribute = getNameAttribute paramDoc
+        for paramRef in Seq.append paramNodes paramRefNodes do
+            let attribute = getNameAttribute paramRef
 
             if isNull attribute then
-                consumer.AddHighlighting(XmlDocMissingParameterNameWarning(paramDoc.Header))else
+                consumer.AddHighlighting(XmlDocMissingParameterNameWarning(paramRef.Header))else
 
             if parameters |> Seq.exists (fun struct(name, _) -> name = attribute.UnquotedValue) then () else
             consumer.AddHighlighting(XmlDocInvalidParameterNameWarning(attribute.Value))
