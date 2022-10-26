@@ -18,5 +18,5 @@
 (4): CodeInsights: obj -> obj
 (5): CodeInsights: unit -> int
 (6): CodeInsights: int -> int
-(7): CodeInsights: (string * string) -> obj -> (string * string * string) -> string
+(7): CodeInsights: (string * string) -> 'a -> (string * string * string) -> string
 (8): CodeInsights: unit -> unit

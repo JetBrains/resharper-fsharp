@@ -13,6 +13,6 @@ let |f|(6) (x, y) z = x + y + z
 (1): CodeInsights: 'a -> 'a
 (2): CodeInsights: int -> int
 (3): CodeInsights: ('a -> int) -> ('b -> int) -> 'a -> 'b -> int
-(4): CodeInsights: (string * string) -> 'a -> (string * obj * string) -> string
+(4): CodeInsights: (string * string) -> 'a -> (string * 'b * string) -> string
 (5): CodeInsights: int * int -> int
 (6): CodeInsights: (int * int) -> int -> int
