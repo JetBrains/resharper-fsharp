@@ -325,7 +325,15 @@ type UnionCasePatternRule() =
 
         let expectedType = getExpectedUnionOrEnumType referenceName
 
+        let expectedTypeElement =
+            match expectedType with
+            | None -> null
+            | Some(fcsEntityInstance, _, _) ->
+                fcsEntityInstance.Entity.GetTypeElement(context.NodeInFile.GetPsiModule())
+
         let matchesType (returnType: FSharpType) =
+            isNotNull expectedTypeElement &&
+
             match expectedType with
             | None -> false
             | Some(fcsEntityInstance, _, _) ->
@@ -371,12 +379,13 @@ type UnionCasePatternRule() =
         match expectedType with
         | None -> ()
         | Some(fcsEntityInstance, fcsType, displayContext) ->
+            if isNull expectedTypeElement then () else
+
             let fcsEntity = fcsEntityInstance.Entity
-            let typeElement = fcsEntity.GetTypeElement(context.NodeInFile.GetPsiModule())
-            let requiresQualifiedName = isNotNull typeElement && typeElement.RequiresQualifiedAccess()
-            let typeName = typeElement.GetSourceName()
+            let typeName = expectedTypeElement.GetSourceName()
 
             if fcsEntity.IsFSharpUnion then
+                let requiresQualifiedName = expectedTypeElement.RequiresQualifiedAccess()
                 for fcsUnionCase in fcsEntity.UnionCases do
                     let text = if requiresQualifiedName then $"{typeName}.{fcsUnionCase.Name}" else fcsUnionCase.Name
                     let item = createUnionCaseItem fcsEntityInstance fcsType displayContext text fcsUnionCase true
