@@ -102,10 +102,10 @@ type LambdaAnalyzer() =
 
         let exprType =
             match expr with
-            | :? IPrefixAppExpr as prefixApp ->
-                match prefixApp.FunctionExpression with
-                | :? IReferenceExpr as reference ->
-                    match reference.Reference.GetFcsSymbol() with
+            | :? IPrefixAppExpr as prefixAppExpr ->
+                match prefixAppExpr.FunctionExpression with
+                | :? IReferenceExpr as referenceExpr ->
+                    match referenceExpr.Reference.GetFcsSymbol() with
                     | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsMember ->
                         mfv.ReturnParameter.Type
                     | _ -> expr.TryGetFcsType()
