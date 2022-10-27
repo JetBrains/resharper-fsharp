@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System.Collections.Generic
+open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
@@ -89,7 +90,8 @@ type ToRecursiveFunctionRule() =
                 usedNames.AddRange(FSharpNamingService.getPatternsNames null parameterPatterns)
 
                 let name = refPat.SourceName
-                if name = SharedImplUtil.MISSING_DECLARATION_NAME || usedNames.Contains(name) then () else
+                if usedNames.Contains(name) then () else
+                if name = SharedImplUtil.MISSING_DECLARATION_NAME || IsActivePatternName name then () else
 
                 let letBindings = LetBindingsNavigator.GetByBinding(binding)
                 if isNull letBindings || letBindings.IsRecursive then () else

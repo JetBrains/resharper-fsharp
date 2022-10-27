@@ -342,7 +342,7 @@ type FSharpFilteredCompletionTest() =
 
             match lookupItem with
             | :? FcsLookupItem as item -> item.Text = this.CompleteItem
-            | _ -> false)
+            | _ -> lookupItem.DisplayName.Text = this.CompleteItem)
 
     [<Test>] member x.``Expr - Base 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Base 02 - Local``() = x.DoNamedTest()
@@ -364,6 +364,7 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Expr - Record - Field 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - No reparse ident 01``() = x.DoNamedTest()
+    [<Test>] member x.``To recursive - Active pattern 01``() = x.DoNamedTest()
 
     override this.BeforeTestStart(_, _, documentText) =
         this.CompleteItem <- FSharpFilteredCompletionTest.GetSetting(documentText, "COMPLETE_ITEM")
