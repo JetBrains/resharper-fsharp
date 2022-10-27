@@ -94,11 +94,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [EditorConfigEntryAlias("space_around_delimiter", EditorConfigAliasType.LanguageSpecific)]
     public bool SpaceAroundDelimiter;
 
-    [SettingsEntry(40, "Maximum width of longer (non multiline) if/then/else expressions")]
+    [SettingsEntry(60, "Maximum width of longer (non multiline) if/then/else expressions")]
     [EditorConfigEntryAlias("max_if_then_else_short_width", EditorConfigAliasType.LanguageSpecific)]
     public int MaxIfThenElseShortWidth;
 
-    [SettingsEntry(50, "Maximum width of single line infix expressions")]
+    [SettingsEntry(80, "Maximum width of single line infix expressions")]
     [EditorConfigEntryAlias("max_infix_operator_expression", EditorConfigAliasType.LanguageSpecific)]
     public int MaxInfixOperatorExpression;
 
@@ -106,11 +106,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [EditorConfigEntryAlias("max_record_width", EditorConfigAliasType.LanguageSpecific)]
     public int MaxRecordWidth;
 
-    [SettingsEntry(40, "Maximum width of single line array expressions")]
+    [SettingsEntry(80, "Maximum width of single line array expressions")]
     [EditorConfigEntryAlias("max_array_or_list_width", EditorConfigAliasType.LanguageSpecific)]
     public int MaxArrayOrListWidth;
 
-    [SettingsEntry(40, "Maximum width of value binding expressions")]
+    [SettingsEntry(80, "Maximum width of value binding expressions")]
     [EditorConfigEntryAlias("max_value_binding_width", EditorConfigAliasType.LanguageSpecific)]
     public int MaxValueBindingWidth;
 
