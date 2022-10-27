@@ -122,7 +122,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [EditorConfigEntryAlias("multiline_block_brackets_on_same_column", EditorConfigAliasType.LanguageSpecific)]
     public bool MultilineBlockBracketsOnSameColumn;
 
-    [SettingsEntry(false, "Newline between type definition and members")]
+    [SettingsEntry(true, "Newline between type definition and members")]
     [EditorConfigEntryAlias("newline_between_type_definition_and_members", EditorConfigAliasType.LanguageSpecific)]
     public bool NewlineBetweenTypeDefinitionAndMembers;
 
