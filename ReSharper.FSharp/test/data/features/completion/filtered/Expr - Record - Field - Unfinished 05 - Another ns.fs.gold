@@ -1,0 +1,30 @@
+﻿# 28 ITEMS #
+
++ Field    int
+CompilationRepresentationFlags
+FSharp
+FSharpFunc
+FSharpInterfaceDataVersionAttribute
+FSharpTypeFunc    FSharpTypeFunc
+Failure    exn
+Format
+FuncConvert
+MatchFailureException
+PrintfFormat
+SourceConstructFlags
+StructuredFormatDisplayAttribute
+VolatileFieldAttribute
+f    unit
+failwith    'T
+failwithf    'T
+false
+finally
+float    float
+float32    float32
+floor    ^T
+for
+fprintf    'T
+fprintfn    'T
+fst    'T1
+fun
+function

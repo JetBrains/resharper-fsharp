@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   public class RecordCtorReference : FSharpSymbolReference
   {
-    internal RecordCtorReference([NotNull] RecordExpr owner) : base(owner)
+    internal RecordCtorReference([NotNull] IRecordExpr owner) : base(owner)
     {
     }
 

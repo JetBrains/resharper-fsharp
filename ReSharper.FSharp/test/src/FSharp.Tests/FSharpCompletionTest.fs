@@ -337,10 +337,31 @@ type FSharpFilteredCompletionTest() =
     member val CompleteItem = null with get, set
 
     override this.ItemSelector =
-        Func<_, _>(function :? FcsLookupItem as item -> item.Text = this.CompleteItem | _ -> false)
+        Func<_, _>(fun lookupItem ->
+            isNull this.CompleteItem ||
+
+            match lookupItem with
+            | :? FcsLookupItem as item -> item.Text = this.CompleteItem
+            | _ -> false)
 
     [<Test>] member x.``Expr - Base 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Base 02 - Local``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Record - Field - Empty 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Empty 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Empty 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Empty 04``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Empty 05 - Another ns``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Unfinished 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Unfinished 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Unfinished 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Unfinished 04``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Unfinished 05 - Another ns``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field 02 - Other type``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field 04``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - No reparse ident 01``() = x.DoNamedTest()
 

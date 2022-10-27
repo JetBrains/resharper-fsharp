@@ -1298,7 +1298,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         x.MarkAndDone(idRange, ElementType.EXPRESSION_REFERENCE_NAME)
         x.ProcessExpression(expr)
 
-    member x.ProcessRecordFieldBinding(SynExprRecordField((lid, _), _, expr, blockSep)) =
+    member x.ProcessRecordFieldBinding(SynExprRecordField((lid, _), equalsRange, expr, blockSep)) =
         let (LidWithTrivia lid) = lid
         match lid, expr with
         | SynIdentWithTriviaRange headRange :: _, Some(ExprRange exprRange as expr) ->
@@ -1307,6 +1307,17 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushRecordBlockSep(blockSep)
             x.ProcessReferenceName(lid)
             x.ProcessExpression(expr)
+
+        | SynIdentWithTriviaRange headRange :: _, _ ->
+            let mark = x.Mark(headRange)
+            let bindingRange = 
+                match equalsRange with
+                | Some range -> range
+                | _ -> headRange
+            x.PushRangeForMark(bindingRange, mark, ElementType.RECORD_FIELD_BINDING)
+            x.PushRecordBlockSep(blockSep)
+            x.ProcessReferenceName(lid)
+
         | _ -> ()
 
     member x.PushRecordBlockSep(blockSep) =

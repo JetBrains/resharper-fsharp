@@ -1,0 +1,326 @@
+﻿# 324 ITEMS #
+
++ Field    int
+#I
+#else
+#endif
+#if
+#load
+#nowarn
+#r
+#time
+AbstractClassAttribute
+AllowNullLiteralAttribute
+Array
+Array2D
+Array3D
+Array4D
+ArrayExtensions
+Async
+AsyncActivation
+AsyncBuilder
+AsyncPrimitives
+AsyncReplyChannel
+AsyncReturn
+AutoOpenAttribute
+AutoSerializableAttribute
+CLIEventAttribute
+CLIMutableAttribute
+Checked
+Choice
+Choice1Of2    Choice<'T1,'T2>
+Choice1Of3    Choice<'T1,'T2,'T3>
+Choice1Of4    Choice<'T1,'T2,'T3,'T4>
+Choice1Of5    Choice<'T1,'T2,'T3,'T4,'T5>
+Choice1Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice1Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice2Of2    Choice<'T1,'T2>
+Choice2Of3    Choice<'T1,'T2,'T3>
+Choice2Of4    Choice<'T1,'T2,'T3,'T4>
+Choice2Of5    Choice<'T1,'T2,'T3,'T4,'T5>
+Choice2Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice2Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice3Of3    Choice<'T1,'T2,'T3>
+Choice3Of4    Choice<'T1,'T2,'T3,'T4>
+Choice3Of5    Choice<'T1,'T2,'T3,'T4,'T5>
+Choice3Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice3Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice4Of4    Choice<'T1,'T2,'T3,'T4>
+Choice4Of5    Choice<'T1,'T2,'T3,'T4,'T5>
+Choice4Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice4Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice5Of5    Choice<'T1,'T2,'T3,'T4,'T5>
+Choice5Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice5Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice6Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice6Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice7Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+ClassAttribute
+Collections
+CommonExtensions
+ComparisonConditionalOnAttribute
+ComparisonIdentity
+CompilationArgumentCountsAttribute
+CompilationMappingAttribute
+CompilationRepresentationAttribute
+CompilationRepresentationFlags
+CompilationSourceNameAttribute
+CompiledNameAttribute
+CompilerMessageAttribute
+CompilerServices
+Control
+Core
+CustomComparisonAttribute
+CustomEqualityAttribute
+CustomOperationAttribute
+Data
+DefaultAugmentationAttribute
+DefaultValueAttribute
+DelegateEvent
+EntryPointAttribute
+EqualityConditionalOnAttribute
+Error    Result<'T,'TError>
+Event
+ExperimentalAttribute
+ExtraTopLevelOperators
+FSharp
+FSharpFunc
+FSharpInterfaceDataVersionAttribute
+FSharpTypeFunc    FSharpTypeFunc
+Failure    exn
+Format
+FuncConvert
+GeneralizableValueAttribute
+Handler
+HashIdentity
+IDelegateEvent
+IEvent
+InterfaceAttribute
+KeyValue
+LanguagePrimitives
+Lazy
+LazyExtensions
+Linq
+List
+LiteralAttribute
+MailboxProcessor
+Map
+MatchFailureException
+MeasureAnnotatedAbbreviationAttribute
+MeasureAttribute
+Microsoft
+NativeInterop
+NoComparisonAttribute
+NoDynamicInvocationAttribute
+NoEqualityAttribute
+NonStructuralComparison
+None    'T option
+Ns1
+NumericLiteralI
+NumericLiterals
+Observable
+Ok    Result<'T,'TError>
+OperatorIntrinsics
+Operators
+OptimizedClosures
+Option
+OptionalArgumentAttribute
+Printf
+PrintfFormat
+ProjectionParameterAttribute
+Quotations
+R2
+ReferenceEqualityAttribute
+ReflectedDefinitionAttribute
+Reflection
+RequireQualifiedAccessAttribute
+RequiresExplicitTypeArgumentsAttribute
+ResizeArray
+Result
+SealedAttribute
+Seq
+Set
+Some    'T option
+SourceConstructFlags
+String
+StructAttribute
+StructuralComparisonAttribute
+StructuralEqualityAttribute
+StructuredFormatDisplayAttribute
+System
+Unchecked
+UnverifiableAttribute
+ValueNone    'T voption
+ValueOption
+ValueSome    'T voption
+VolatileFieldAttribute
+WebExtensions
+[]
+abs    ^T
+acos    ^T
+and
+array
+array2D    'T[,]
+as
+asin    ^T
+assert
+async    AsyncBuilder
+atan    ^T
+atan2    'T2
+base
+begin
+bigint
+bool
+box    obj
+byref
+byte    byte
+ceil    ^T
+char    char
+class
+compare    int
+const
+contents    'T
+cos    ^T
+cosh    ^T
+decimal    decimal
+decr    unit
+defaultArg    'T
+defaultValueArg    'T
+delegate
+dict    IDictionary<'Key,'Value>
+do
+do!
+done
+double    double
+downcast
+downto
+elif
+else
+end
+enum    ^U
+eprintf    'T
+eprintfn    'T
+exit    'T
+exn
+exp    ^T
+f    unit
+failwith    'T
+failwithf    'T
+false
+finally
+float    float
+float32    float32
+floor    ^T
+for
+fprintf    'T
+fprintfn    'T
+fst    'T1
+fun
+function
+global
+hash    int
+id    'T
+if
+ignore    unit
+ilsigptr
+in
+incr    unit
+infinity    float
+infinityf    float32
+inherit
+inref
+int    int
+int16    int16
+int32    int32
+int64    int64
+int8    int8
+interface
+internal
+invalidArg    'T
+invalidOp    'T
+isNull    bool
+lazy
+let
+let!
+limitedHash    int
+list
+lock    'T
+log    ^T
+log10    ^T
+match
+match!
+max    'T
+min    'T
+nameof    string
+nan    float
+nanf    float32
+nativeint    nativeint
+nativeptr
+new
+not
+not    bool
+null
+nullArg    'T
+obj
+option
+or
+outref
+pown    ^T
+printf    'T
+printfn    'T
+private
+public
+query    QueryBuilder
+raise    'T
+readOnlyDict    IReadOnlyDictionary<'Key,'Value>
+rec
+ref    'T ref
+reraise    'T
+return
+return!
+round    ^T
+sbyte    sbyte
+seq    seq<'T>
+set    Set<'T>
+sign    int
+sin    ^T
+single    single
+sinh    ^T
+sizeof    int
+snd    'T2
+sprintf    'T
+sqrt    ^U
+stderr    TextWriter
+stdin    TextReader
+stdout    TextWriter
+string    string
+struct
+tan    ^T
+tanh    ^T
+then
+to
+true
+truncate    ^T
+try
+tryUnbox    'T option
+typedefof    Type
+typeof    Type
+uint    uint
+uint16    uint16
+uint32    uint32
+uint64    uint64
+uint8    uint8
+unativeint    unativeint
+unbox    'T
+unit
+upcast
+use
+use!
+using    'U
+voidptr
+voption
+when
+while
+with
+yield
+yield!

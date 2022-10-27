@@ -32,5 +32,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
       return null;
     }
+
+    public static IFSharpExpression TryGetOriginalRecordExprThroughSandBox([NotNull] this IFSharpExpression sandboxNode)
+    {
+      if (sandboxNode.GetContainingFile()?.Parent is not ISandBox { ContextNode: IFSharpFile fsFile })
+        return null;
+
+      var sandboxNodeStartOffset = sandboxNode.GetTreeStartOffset();
+      var token = fsFile.FindTokenAt(sandboxNodeStartOffset);
+
+      foreach (var treeNode in token.ContainingNodes<IFSharpExpression>(true))
+      {
+        var nodeStartOffset = treeNode.GetTreeStartOffset();
+        if (nodeStartOffset == sandboxNodeStartOffset && treeNode is IRecordLikeExpr || treeNode is IComputationExpr)
+          return treeNode;
+
+        if (nodeStartOffset < sandboxNodeStartOffset)
+          return null;
+      }
+
+      return null;
+    }
   }
 }

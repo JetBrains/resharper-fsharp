@@ -768,6 +768,9 @@ type FSharpErrorsParserTest() =
 
     [<Test>] member x.``Expr - Match 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Yield 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Yield - Seq 01``() = x.DoNamedTest() // Parsed as application by FCS
     [<Test>] member x.``Expr - Yield - Seq 02``() = x.DoNamedTest() // Parsed as application by FCS
