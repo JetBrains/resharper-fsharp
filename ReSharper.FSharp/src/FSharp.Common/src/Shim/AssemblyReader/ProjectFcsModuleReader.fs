@@ -394,18 +394,18 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             if declaredType.GetTypeElement() :? IInterface then
                 mkType declaredType ]
 
-    let mkCompilerGeneratedAttribute (attrTypeName: IClrTypeName) (args: ILAttribElem list): ILAttribute =
+    let mkCompilerGeneratedAttribute (attrTypeName: IClrTypeName) (args: ILAttribElem list): ILAttribute option =
         let attrType = TypeFactory.CreateTypeByCLRName(attrTypeName, NullableAnnotation.Unknown, psiModule)
 
         match attrType.GetTypeElement() with
-        | null -> failwithf $"getting param array type element in {psiModule}" // todo: safer handling
+        | null -> None
         | typeElement ->
 
         let ctor = typeElement.Constructors.First(fun ctor -> args.IsEmpty = ctor.IsParameterless)
         let methodSpec = ILMethodSpec.Create(mkType attrType, mkMethodRef ctor, [])
-        ILAttribute.Decoded(methodSpec, args, [])
+        Some(ILAttribute.Decoded(methodSpec, args, []))
 
-    let mkCompilerGeneratedAttributeNoArgs (attrTypeName: IClrTypeName): ILAttribute =
+    let mkCompilerGeneratedAttributeNoArgs (attrTypeName: IClrTypeName): ILAttribute option =
         mkCompilerGeneratedAttribute attrTypeName []
 
     let paramArrayAttribute () =
@@ -526,7 +526,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let customAttributes = mkCustomAttributes typeElement
         [ yield! customAttributes
           if hasExtensions then
-              extensionAttribute () ]
+              match extensionAttribute () with
+              | Some attribute -> attribute
+              | _ -> () ]
         |> mkILCustomAttrs
 
     let mkEnumInstanceValue (enum: IEnum): ILFieldDef =
@@ -663,10 +665,14 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             [ yield! customAttributes
 
               if param.IsParameterArray then
-                paramArrayAttribute ()
+                match paramArrayAttribute () with
+                | Some attribute -> attribute
+                | _ -> ()
             
               if param.Kind = ParameterKind.INPUT then
-                 isReadonlyAttribute () ]
+                 match isReadonlyAttribute () with
+                 | Some attribute -> attribute
+                 | _ -> () ]
 
         { Name = Some(name) // todo: intern?
           Type = paramType
@@ -714,7 +720,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let customAttributes = mkCustomAttributes method
             [ yield! customAttributes
               if isExtension then
-                  extensionAttribute () ]
+                  match extensionAttribute () with
+                  | Some attribute -> attribute
+                  | _ -> () ]
             |> mkILCustomAttrs 
 
         let implAttributes = MethodImplAttributes.Managed
@@ -1164,7 +1172,11 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 [| for instance in attributeInstances do
                      match instance.PositionParameter(0).ConstantValue.AsString() with
                      | null -> ()
-                     | s -> internalsVisibleToAttribute s |]
+                     | s ->
+
+                     match internalsVisibleToAttribute s with
+                     | Some attribute -> attribute
+                     | _ -> () |]
 
             let newModuleDef =
                 if ivtAttributes.IsEmpty() then newModuleDef else
