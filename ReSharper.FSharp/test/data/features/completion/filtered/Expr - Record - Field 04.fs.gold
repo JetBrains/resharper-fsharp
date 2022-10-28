@@ -1,4 +1,4 @@
-﻿# 66 ITEMS #
+﻿# 65 ITEMS #
 
 + F1    int
 + F2    int
@@ -18,7 +18,6 @@ assert
 base
 begin
 class
-const
 default
 delegate
 do

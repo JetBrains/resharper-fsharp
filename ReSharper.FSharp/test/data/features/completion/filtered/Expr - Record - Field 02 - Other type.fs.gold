@@ -1,4 +1,4 @@
-﻿# 113 ITEMS #
+﻿# 112 ITEMS #
 
 + F4    int
 #I
@@ -64,7 +64,6 @@ assert
 base
 begin
 class
-const
 contents    'T
 default
 delegate

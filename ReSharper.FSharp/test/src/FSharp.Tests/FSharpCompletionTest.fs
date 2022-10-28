@@ -250,6 +250,13 @@ type FSharpKeywordCompletionTest() =
     [<Test>] member x.``Anon module - Expr 02 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Anon module - Expr 03 - After another``() = x.DoNamedTest()
 
+    [<Test>] member x.``Const 01``() = x.DoNamedTest()
+    [<Test>] member x.``Const 02``() = x.DoNamedTest()
+    [<Test>] member x.``Const 03``() = x.DoNamedTest()
+    [<Test>] member x.``Const 04``() = x.DoNamedTest()
+    [<Test>] member x.``Const 05``() = x.DoNamedTest()
+    [<Test>] member x.``Const 06``() = x.DoNamedTest()
+
     [<Test>] member x.``Constraint 01``() = x.DoNamedTest()
     [<Test>] member x.``Constraint 02``() = x.DoNamedTest()
 

@@ -1,4 +1,4 @@
-﻿# 320 ITEMS #
+﻿# 319 ITEMS #
 
 + F1    int
 + F2    int
@@ -181,7 +181,6 @@ ceil    ^T
 char    char
 class
 compare    int
-const
 contents    'T
 cos    ^T
 cosh    ^T

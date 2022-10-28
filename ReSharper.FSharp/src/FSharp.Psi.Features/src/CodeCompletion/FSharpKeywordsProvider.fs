@@ -38,6 +38,7 @@ module FSharpKeywordsProvider =
     let reparseContextAwareKeywords =
         [| "abstract"
            "and!"
+           "const"
            "default"
            "do!"
            "exception"
@@ -147,6 +148,14 @@ module FSharpKeywordsProvider =
             isNotNull (ComputationExprNavigator.GetByExpression(appExpr))
         | _ -> false
 
+    let isAtConstTypePosition (context: FSharpCodeCompletionContext) =
+        let treeNode = context.ReparsedContext.TreeNode
+        isNotNull treeNode &&
+        
+        let prevToken = treeNode.GetPreviousMeaningfulToken()
+        let prevTokenType = getTokenType prevToken
+        prevTokenType == FSharpTokenType.LESS || prevTokenType == FSharpTokenType.COMMA
+
     let mayBeUnionCaseDecl (context: FSharpCodeCompletionContext) =
         match getReferenceOwner context with
         | :? ITypeReferenceName as referenceName ->
@@ -228,6 +237,9 @@ module FSharpKeywordsProvider =
 
         if mayStartInheritExpr context then
             "inherit"
+        
+        if isAtConstTypePosition context then
+            "const"
     }
 
 type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
