@@ -185,6 +185,9 @@ let tryGetEffectiveParentComputationExpression (expr: IFSharpExpression) =
         let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(expr)
         if isNotNull binaryAppExpr then loop isLetInExpr binaryAppExpr else
 
+        let referenceExpr = ReferenceExprNavigator.GetByQualifier(expr)
+        if isNotNull referenceExpr then loop isLetInExpr referenceExpr else
+
         null, false
 
     loop false expr
