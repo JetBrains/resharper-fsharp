@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
                          HighlightingTypes = [| typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>
@@ -85,7 +86,41 @@ type LambdaAnalyzer() =
 
         compareArgsRec expr 0 null
 
+    let hasExplicitConversion (lambda: ILambdaExpr) =
+        let expr = lambda.Expression.IgnoreInnerParens()
+
+        let lambdaType = lambda.TryGetFcsType()
+        if isNull lambdaType then false else
+
+        let lambdaParamsCount = lambda.Patterns.Count
+        let mutable lambdaReturnType = lambdaType
+        let mutable i = lambdaParamsCount
+
+        while i > 0 && lambdaReturnType.IsFunctionType do
+            lambdaReturnType <- lambdaReturnType.GenericArguments[1]
+            i <- i - 1
+
+        let exprType =
+            match expr with
+            | :? IPrefixAppExpr as prefixAppExpr ->
+                match prefixAppExpr.FunctionExpression with
+                | :? IReferenceExpr as referenceExpr ->
+                    match referenceExpr.Reference.GetFcsSymbol() with
+                    | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsMember ->
+                        mfv.ReturnParameter.Type
+                    | _ -> expr.TryGetFcsType()
+                | _ -> expr.TryGetFcsType()
+            | _ -> expr.TryGetFcsType()
+
+        isNotNull exprType && not exprType.IsUnresolved &&
+        not exprType.IsGenericParameter && not lambdaReturnType.IsGenericParameter &&
+
+        // TODO: find a better way to compare types, since regular comparison doesn't work in tests
+        exprType.Format(FSharpDisplayContext.Empty) <> lambdaReturnType.Format(FSharpDisplayContext.Empty)
+
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
+        if isFSharp6Supported && hasExplicitConversion(lambda) then null else
+
         let lambda = lambda.IgnoreParentParens()
 
         let replacementRefExpr = replacementExpr.As<IFSharpExpression>().IgnoreInnerParens().As<IReferenceExpr>()
