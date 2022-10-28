@@ -1,0 +1,6 @@
+﻿namespace Test
+
+type RM =
+  { Field1: int
+    [<A>] Field2: int
+    Field3: int }

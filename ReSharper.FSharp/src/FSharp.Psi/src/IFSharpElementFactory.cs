@@ -5,6 +5,13 @@ using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
+  public enum TypeUsageContext
+  {
+    TopLevel,
+    ParameterSignature,
+    Return
+  }
+
   public interface IFSharpElementFactory
   {
     IOpenStatement CreateOpenStatement(string ns);
@@ -28,12 +35,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     IBinaryAppExpr CreateIgnoreApp(IFSharpExpression expr, bool newLine);
     IRecordFieldBinding CreateRecordFieldBinding(string fieldName, bool addSemicolon);
-
+    IRecordFieldDeclaration CreateRecordFieldDeclaration(bool isMutable, string fieldName, ITypeUsage typeUsage);
     IFSharpPattern CreatePattern(string text, bool topLevel);
     IParenPat CreateParenPat();
     ITypedPat CreateTypedPat(IFSharpPattern pattern, ITypeUsage typeUsage);
 
-    ITypeUsage CreateTypeUsage(string typeUsage);
+    ITypeUsage CreateTypeUsage(string typeUsage, TypeUsageContext context);
 
     IReturnTypeInfo CreateReturnTypeInfo(ITypeUsage typeSignature);
 

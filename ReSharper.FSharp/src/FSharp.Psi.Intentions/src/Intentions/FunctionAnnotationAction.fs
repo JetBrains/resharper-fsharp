@@ -35,7 +35,7 @@ module SpecifyTypes =
                 mfv.ReturnParameter.Type.Format(displayContext)
 
         let factory = binding.CreateElementFactory()
-        let typeUsage = factory.CreateTypeUsage(typeString)
+        let typeUsage = factory.CreateTypeUsage(typeString, TypeUsageContext.Return)
 
         let parameters = binding.ParametersDeclarations
         let anchor =
@@ -63,7 +63,8 @@ module SpecifyTypes =
             | pattern -> pattern
 
         let typedPat =
-            let typedPat = factory.CreateTypedPat(newPattern, factory.CreateTypeUsage(fcsType.Format(displayContext)))
+            let typeUsage = factory.CreateTypeUsage(fcsType.Format(displayContext), TypeUsageContext.TopLevel)
+            let typedPat = factory.CreateTypedPat(newPattern, typeUsage)
             if isNull (TuplePatNavigator.GetByPattern(pattern)) then
                 addParens factory typedPat
             else
@@ -77,7 +78,8 @@ module SpecifyTypes =
             "decl.ParametersDeclarationsEnumerable.IsEmpty()")
 
         let factory = decl.CreateElementFactory()
-        let returnTypeInfo = factory.CreateReturnTypeInfo(factory.CreateTypeUsage(fcsType.Format(displayContext)))
+        let typeUsage = factory.CreateTypeUsage(fcsType.Format(displayContext), TypeUsageContext.TopLevel)
+        let returnTypeInfo = factory.CreateReturnTypeInfo(typeUsage)
         ModificationUtil.AddChildAfter(decl.Identifier, returnTypeInfo) |> ignore
 
 [<ContextAction(Name = "AnnotateFunction", Group = "F#",

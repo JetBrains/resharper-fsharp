@@ -74,7 +74,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
 
         let bindingReturnTypeInfo = binding.ReturnTypeInfo
         if isNotNull bindingReturnTypeInfo && isNotNull bindingReturnTypeInfo.ReturnType then
-            let typeUsage = binding.CreateElementFactory().CreateTypeUsage(replacementTypeName)
+            let typeUsage = binding.CreateElementFactory().CreateTypeUsage(replacementTypeName, TypeUsageContext.Return)
             let returnTypeUsage = bindingReturnTypeInfo.ReturnType.IgnoreInnerParens()
 
             ModificationUtil.ReplaceChild(returnTypeUsage, typeUsage) |> ignore

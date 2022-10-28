@@ -94,10 +94,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         let exprStatement = getExpressionStatement source
         exprStatement.AttributeLists[0]
 
-    let createTypeUsage usage: ITypeUsage =
-        let expr = createLetExpr (sprintf "(a: %s)" usage)
-        expr.Bindings[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().TypeUsage
-
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
             // todo: mangle ns
@@ -148,6 +144,18 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             match newExpr.As<IRecordExpr>() with
             | null -> failwith "Could not get record expr"
             | recordExpr -> recordExpr.FieldBindings.First()
+
+        member x.CreateRecordFieldDeclaration(isMutable, fieldName, typeUsage) =
+            let mutableText = if isMutable then " mutable " else ""
+            let source = $"{{ {mutableText}{fieldName}: obj }}"
+            let typeDefn = getTypeDecl source
+            match typeDefn.TypeRepresentation with
+            | :? IRecordRepresentation as rr when not rr.FieldDeclarations.IsEmpty ->
+                let field = rr.FieldDeclarations.First()
+                ModificationUtil.ReplaceChild(field.TypeUsage, typeUsage)
+                |> ignore
+                field
+            | _ -> failwith "Could not get record type"
 
         member x.CreateAppExpr(funcName, argExpr) =
             let source = sprintf "%s ()" funcName
@@ -311,8 +319,28 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             ModificationUtil.ReplaceChild(returnTypeInfo.ReturnType, typeUsage) |> ignore
             returnTypeInfo
 
-        member x.CreateTypeUsage(typeUsage: string) : ITypeUsage =
-            createTypeUsage typeUsage
+        member x.CreateTypeUsage(typeUsage: string, context) : ITypeUsage =
+            match context with
+            | TypeUsageContext.TopLevel ->
+                let typeDecl = getTypeDecl $"({typeUsage})"
+                let typeUsage = typeDecl.TypeRepresentation.As<ITypeAbbreviationRepresentation>().AbbreviatedType
+                typeUsage.As<IParenTypeUsage>().InnerTypeUsage
+
+            | TypeUsageContext.Return ->
+                let typeDecl = getTypeDecl $"abstract M: {typeUsage}"
+                let memberDecl = typeDecl.TypeMembers[0] :?> IAbstractMemberDeclaration
+                memberDecl.ReturnTypeInfo.ReturnType
+
+            | TypeUsageContext.ParameterSignature ->
+                let typeDecl = getTypeDecl $"abstract M: unit -> ({typeUsage})"
+                let memberDecl = typeDecl.TypeMembers[0] :?> IAbstractMemberDeclaration
+                let funTypeUsage = memberDecl.ReturnTypeInfo.ReturnType.As<IFunctionTypeUsage>()
+                let paramSigTypeUsage = funTypeUsage.ReturnTypeUsage.As<IParameterSignatureTypeUsage>()
+                let innerTypeUsage = paramSigTypeUsage.TypeUsage.As<IParenTypeUsage>().InnerTypeUsage
+                replaceWithCopy paramSigTypeUsage.TypeUsage innerTypeUsage
+                paramSigTypeUsage
+
+            | _ -> System.ArgumentOutOfRangeException() |> raise
 
         member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"

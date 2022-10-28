@@ -1,7 +1,10 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+﻿using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -20,12 +23,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (value == IsMutable)
         return;
 
-      if (!value)
-        throw new System.NotImplementedException();
+      if (value)
+      {
+        Identifier.AddTokenBefore(FSharpTokenType.MUTABLE);
+        return;
+      }
 
-      var identifier = Identifier;
-      if (identifier != null)
-        FSharpImplUtil.AddTokenBefore(identifier, FSharpTokenType.MUTABLE);
+      var mutableKeyword = MutableKeyword.NotNull();
+      var firstMeaningfulToken = FirstChild?.GetNextMeaningfulToken(true);
+      if (mutableKeyword == firstMeaningfulToken && Identifier is { PrevSibling: { } identifierPrevSibling })
+        ModificationUtil.DeleteChildRange(mutableKeyword, identifierPrevSibling);
+      else
+      {
+        if (mutableKeyword.NextSibling is { } mutableNextSibling &&
+            mutableNextSibling.GetTokenType() == FSharpTokenType.WHITESPACE)
+          ModificationUtil.DeleteChild(mutableNextSibling);
+
+        ModificationUtil.DeleteChild(mutableKeyword);
+      }
     }
   }
 }

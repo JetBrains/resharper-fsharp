@@ -585,4 +585,49 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>UpdateParameterNameInSignatureFix</QuickFix>
   </Warning>
+
+  <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldWasPresent" ID="FS0311: The type definitions for type in the signature and implementation are not compatible because the field was present in the implementation but not in the signature">
+    <Parameter type="IFSharpTypeDeclaration" name="typeDeclaration"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>typeDeclaration.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateRecordFieldsInSignatureFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldOrderDiffer" ID="FS0312: The type definitions for type in the signature and implementation are not compatible because the order of the fields is different in the signature and implementation">
+    <Parameter type="IFSharpTypeDeclaration" name="typeDeclaration"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>typeDeclaration.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateRecordFieldsInSignatureFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecified" ID="FS0313: The type definitions for type in the signature and implementation are not compatible because the field Field2 was required by the signature but was not specified by the implementation">
+    <Parameter type="IFSharpTypeDeclaration" name="typeDeclaration"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>typeDeclaration.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateRecordFieldsInSignatureFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="FieldNotContainedTypesDiffer" ID="FS0193: The module contains the field but its signature specifies The types differ">
+    <Parameter type="IRecordFieldDeclaration" name="recordFieldDeclaration"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>recordFieldDeclaration.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateRecordFieldTypeInSignatureFix</QuickFix>
+  </Error>
+
 </Errors>

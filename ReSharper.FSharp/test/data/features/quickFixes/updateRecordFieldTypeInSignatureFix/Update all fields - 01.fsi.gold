@@ -1,0 +1,6 @@
+namespace Test
+
+type R =
+    { Field1: int
+      Field2: string
+      Field3: float }

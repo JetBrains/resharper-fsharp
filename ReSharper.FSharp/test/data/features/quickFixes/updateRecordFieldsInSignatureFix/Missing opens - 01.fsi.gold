@@ -1,0 +1,5 @@
+module Test
+
+type R =
+    { A: int
+      B: System.DateTime }

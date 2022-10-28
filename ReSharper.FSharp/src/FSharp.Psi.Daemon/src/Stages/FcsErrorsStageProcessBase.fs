@@ -53,6 +53,9 @@ module FSharpErrors =
     let [<Literal>] MissingErrorNumber = 193
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
+    let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldWasPresent = 311
+    let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldOrderDiffer = 312
+    let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecified = 313
     let [<Literal>] NoImplementationGiven = 365
     let [<Literal>] NoImplementationGivenWithSuggestion = 366
     let [<Literal>] MemberIsNotAccessible = 491
@@ -83,6 +86,8 @@ module FSharpErrors =
 
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
+    let [<Literal>] butItsSignatureSpecifies = "but its signature specifies"
+    let [<Literal>] theModuleContainsTheField = "The module contains the field"
     let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type \n    '(.+)'    \nis not compatible with type\n    '(.+)'"
 
     let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
@@ -312,6 +317,18 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | null -> createGenericHighlighting error range
             | ctorDecl -> OnlyClassCanTakeValueArgumentsError(ctorDecl) :> _
 
+        | DefinitionsInSigAndImplNotCompatibleFieldWasPresent ->
+            createHighlightingFromParentNodeWithMessage DefinitionsInSigAndImplNotCompatibleFieldWasPresentError range error
+
+        | DefinitionsInSigAndImplNotCompatibleFieldOrderDiffer ->
+            createHighlightingFromParentNodeWithMessage DefinitionsInSigAndImplNotCompatibleFieldOrderDifferError range error
+
+        | DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecified ->
+            createHighlightingFromParentNodeWithMessage
+                DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecifiedError
+                range
+                error
+        
         | NoImplementationGiven ->
             let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
             match node.Parent with
@@ -430,6 +447,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | x when startsWith expressionIsAFunctionMessage x ->
                 createHighlightingFromMappedExpression getResultExpr FunctionValueUnexpectedWarning range error
 
+            | x when (x.Contains(theModuleContainsTheField) && x.Contains(butItsSignatureSpecifies)) ->
+                createHighlightingFromParentNodeWithMessage FieldNotContainedTypesDifferError range error
+            
             | Regex typeConstraintMismatchMessage [mismatchedType; typeConstraint] ->
                 let highlighting =
                     match typeConstraint with
