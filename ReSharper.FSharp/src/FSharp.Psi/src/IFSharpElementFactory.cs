@@ -5,6 +5,13 @@ using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
+  public enum TypeUsageContext
+  {
+    TopLevel,
+    ParameterSignature,
+    Return
+  }
+
   public interface IFSharpElementFactory
   {
     IOpenStatement CreateOpenStatement(string ns);
@@ -33,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IParenPat CreateParenPat();
     ITypedPat CreateTypedPat(IFSharpPattern pattern, ITypeUsage typeUsage);
 
-    ITypeUsage CreateTypeUsage(string typeUsage);
+    ITypeUsage CreateTypeUsage(string typeUsage, TypeUsageContext context);
 
     IReturnTypeInfo CreateReturnTypeInfo(ITypeUsage typeSignature);
 

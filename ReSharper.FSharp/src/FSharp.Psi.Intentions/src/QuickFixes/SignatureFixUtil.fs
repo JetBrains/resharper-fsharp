@@ -47,7 +47,7 @@ let getDisplayPlayContext (rfd:IRecordFieldDeclaration) =
 
 let mkRecordFieldDeclaration isMutable (implFieldDecl: IRecordFieldDeclaration) (implementationFieldType: FSharpType) displayContext =
     let factory = implFieldDecl.CreateElementFactory()
-    let typeUsage = factory.CreateTypeUsage(implementationFieldType.Format displayContext)
+    let typeUsage = factory.CreateTypeUsage(implementationFieldType.Format displayContext, TypeUsageContext.TopLevel)
     factory.CreateRecordFieldDeclaration(isMutable, implFieldDecl.DeclaredName, typeUsage)
 
 let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signatureFieldDecl: IRecordFieldDeclaration) =
@@ -74,7 +74,7 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         | None -> ()
         | Some (t, d) ->
         let factory = implFieldDecl.CreateElementFactory()
-        let updatedTypeUsage = factory.CreateTypeUsage(t.Format d)
+        let updatedTypeUsage = factory.CreateTypeUsage(t.Format d, TypeUsageContext.TopLevel)
         ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
         |> ignore
 

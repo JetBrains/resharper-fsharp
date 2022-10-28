@@ -94,11 +94,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         let exprStatement = getExpressionStatement source
         exprStatement.AttributeLists[0]
 
-    let createTypeUsage usage: ITypeUsage =
-        let typeDecl = getTypeDecl $"abstract M: {usage}"
-        let memberDecl = typeDecl.TypeMembers[0] :?> IAbstractMemberDeclaration
-        memberDecl.ReturnTypeInfo.ReturnType
-
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
             // todo: mangle ns
@@ -324,8 +319,28 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             ModificationUtil.ReplaceChild(returnTypeInfo.ReturnType, typeUsage) |> ignore
             returnTypeInfo
 
-        member x.CreateTypeUsage(typeUsage: string) : ITypeUsage =
-            createTypeUsage typeUsage
+        member x.CreateTypeUsage(typeUsage: string, context) : ITypeUsage =
+            match context with
+            | TypeUsageContext.TopLevel ->
+                let typeDecl = getTypeDecl $"({typeUsage})"
+                let typeUsage = typeDecl.TypeRepresentation.As<ITypeAbbreviationRepresentation>().AbbreviatedType
+                typeUsage.As<IParenTypeUsage>().InnerTypeUsage
+
+            | TypeUsageContext.Return ->
+                let typeDecl = getTypeDecl $"abstract M: {typeUsage}"
+                let memberDecl = typeDecl.TypeMembers[0] :?> IAbstractMemberDeclaration
+                memberDecl.ReturnTypeInfo.ReturnType
+
+            | TypeUsageContext.ParameterSignature ->
+                let typeDecl = getTypeDecl $"abstract M: unit -> ({typeUsage})"
+                let memberDecl = typeDecl.TypeMembers[0] :?> IAbstractMemberDeclaration
+                let funTypeUsage = memberDecl.ReturnTypeInfo.ReturnType.As<IFunctionTypeUsage>()
+                let paramSigTypeUsage = funTypeUsage.ReturnTypeUsage.As<IParameterSignatureTypeUsage>()
+                let innerTypeUsage = paramSigTypeUsage.TypeUsage.As<IParenTypeUsage>().InnerTypeUsage
+                replaceWithCopy paramSigTypeUsage.TypeUsage innerTypeUsage
+                paramSigTypeUsage
+
+            | _ -> System.ArgumentOutOfRangeException() |> raise
 
         member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"
