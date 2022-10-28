@@ -42,6 +42,7 @@
     <Compile Include="src\Intentions\ElifToIfTest.fs" />
     <Compile Include="src\Intentions\IfToElifTest.fs" />
     <Compile Include="src\Intentions\NegateConditionTest.fs" />
+    <Compile Include="src\Intentions\CopyAndUpdateFieldTest.fs" />
     <Compile Include="src\Intentions\ToMutableTest.fs" />
     <Compile Include="src\Intentions\SpecifyTypesTest.fs" />
     <Compile Include="src\Intentions\ToLiteralTest.fs" />
