@@ -207,11 +207,12 @@ type LambdaAnalyzer() =
                 | :? IReferenceExpr as referenceExpr ->
                     containsForcedCalculations <-
                         match referenceExpr.Reference.GetFcsSymbol() with
-                        | :? FSharpMemberOrFunctionOrValue as m when m.IsProperty || m.IsTypeFunction || m.IsMutable -> true
-                        | :? FSharpMemberOrFunctionOrValue as m when m.IsFunction || m.IsMethod ->
+                        | :? FSharpMemberOrFunctionOrValue as m ->
+                            m.IsProperty || m.IsTypeFunction || m.IsMutable ||
                             isNotNull prefixAppExprContext &&
-                            m.CurriedParameterGroups.Count <= prefixAppExprContext.Arguments.Count
-                        | :? FSharpMemberOrFunctionOrValue
+                            (m.IsConstructor ||
+                            (m.IsFunction || m.IsMethod) &&
+                             m.CurriedParameterGroups.Count <= prefixAppExprContext.Arguments.Count)
                         | :? FSharpUnionCase when isNotNull prefixAppExprContext -> true
                         | :? FSharpEntity as e when e.IsDelegate -> true
                         | x when x == null -> true
