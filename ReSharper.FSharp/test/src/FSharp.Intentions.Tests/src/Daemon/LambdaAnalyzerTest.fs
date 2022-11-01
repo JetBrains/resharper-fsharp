@@ -34,4 +34,5 @@ type LambdaAnalyzerTest() =
     [<Test; Description("RIDER-78171")>] member x.``Implicit conversions``() = x.DoNamedTest()
     [<Test>] member x.``Not available``() = x.DoNamedTest()
     [<Test>] member x.``Overloads 01``() = x.DoNamedTest()
+    [<Test>] member x.``Forced calculations``() = x.DoNamedTest()
     [<Test>] member x.``Used names - Nested scope``() = x.DoNamedTest()
