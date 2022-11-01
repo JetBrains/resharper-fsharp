@@ -58,7 +58,13 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
             ] :?> IMatchClause
 
         if generatedExpr = GeneratedClauseExpr.ArgumentOutOfRange then
-            clause.SetExpression(factory.CreateExpr("ArgumentOutOfRangeException() |> raise")) |> ignore
+            let typeName =
+                let typeName = "ArgumentOutOfRangeException"
+                match expr.CheckerService.ResolveNameAtLocation(expr, [typeName], false, "AddMatchAllClauseFix") with
+                | None -> $"System.{typeName}"
+                | Some _ -> typeName
+
+            clause.SetExpression(factory.CreateExpr($"{typeName}() |> raise")) |> ignore
 
         Action<_>(fun textControl ->
             let range = clause.Expression.GetNavigationRange()

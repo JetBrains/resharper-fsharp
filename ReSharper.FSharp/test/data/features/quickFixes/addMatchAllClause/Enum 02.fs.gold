@@ -1,0 +1,10 @@
+﻿module Say
+
+open System
+
+type Enum =
+    | A = 1
+
+match Enum.A with
+| Enum.A -> ()
+| _ -> {selstart}ArgumentOutOfRangeException() |> raise{selend}

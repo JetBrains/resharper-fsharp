@@ -11,6 +11,7 @@ type AddMatchAllClauseFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/addMatchAllClause"
 
     [<Test>] member x.``Enum 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enum 02``() = x.DoNamedTest()
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02 - Indent``() = x.DoNamedTest()
     [<Test>] member x.``Simple 03 - Multiple clauses``() = x.DoNamedTest()
