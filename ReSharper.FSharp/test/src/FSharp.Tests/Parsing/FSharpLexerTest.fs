@@ -41,6 +41,8 @@ type FSharpLexerTest() =
     [<Test>] member x.``Strings - Interpolated - Braces - Escape 01``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Braces - Escape 02``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Braces - Escape 03``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Braces - Escape 04``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Braces - Escape 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Strings - Interpolated - Escape - Regular 01``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Escape - Regular 02``() = x.DoNamedTest()

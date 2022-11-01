@@ -1233,4 +1233,14 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
             |REGULAR_INTERPOLATED_STRING_END ('}"')
             |TRIPLE_QUOTED_STRING_END ('}""${'"'}')""".trimMargin());
     }
+
+    @Test
+    fun `testStrings - Interpolated - Triple quote 01`() {
+        doTest("$\"\"\" \"}} \"\"\"", """TRIPLE_QUOTED_STRING ('${'$'}""${'"'} "}} ""${'"'}')""");
+    }
+
+    @Test
+    fun `testStrings - Interpolated - Triple quote 02`() {
+        doTest("$\"\"\" \"\"}} \"\"\"", """TRIPLE_QUOTED_STRING ('${'$'}""${'"'} ""}} ""${'"'}')""");
+    }
 }
