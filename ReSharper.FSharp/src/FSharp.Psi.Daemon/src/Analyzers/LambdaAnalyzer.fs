@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
@@ -185,6 +186,43 @@ type LambdaAnalyzer() =
             | _ -> ctor arg
         | _ -> ctor arg
 
+    let rec containsForcedCalculations (expression: IFSharpExpression) =
+        let mutable containsForcedCalculations = false
+        let mutable prefixAppExprContext: IPrefixAppExpr = null
+        let processor = { new IRecursiveElementProcessor with
+            member x.ProcessingIsFinished = containsForcedCalculations
+            member x.InteriorShouldBeProcessed(treeNode) = not (treeNode :? ILambdaExpr)
+            member x.ProcessAfterInterior(treeNode) = ()
+            member x.ProcessBeforeInterior(treeNode) =
+                match treeNode with
+                | :? INewExpr
+                | :? IForLikeExpr
+                | :? IIndexerExpr
+                | :? IBinaryAppExpr ->
+                    containsForcedCalculations <- true
+                | :? IPrefixAppExpr as prefixAppExpr ->
+                    if prefixAppExpr.IsIndexerLike then containsForcedCalculations <- true else
+                    if isNull (PrefixAppExprNavigator.GetByFunctionExpression(prefixAppExpr)) then
+                        prefixAppExprContext <- prefixAppExpr
+                | :? IReferenceExpr as referenceExpr ->
+                    containsForcedCalculations <-
+                        match referenceExpr.Reference.GetFcsSymbol() with
+                        | :? FSharpMemberOrFunctionOrValue as m when m.IsProperty || m.IsTypeFunction || m.IsMutable -> true
+                        | :? FSharpMemberOrFunctionOrValue as m when m.IsFunction || m.IsMethod ->
+                            isNotNull prefixAppExprContext &&
+                            m.CurriedParameterGroups.Count <= prefixAppExprContext.Arguments.Count
+                        | :? FSharpMemberOrFunctionOrValue
+                        | :? FSharpUnionCase when isNotNull prefixAppExprContext -> true
+                        | :? FSharpEntity as e when e.IsDelegate -> true
+                        | x when x == null -> true
+                        | _ -> false
+                    prefixAppExprContext <- null
+                | _ -> ()
+            }
+
+        expression.ProcessThisAndDescendants(processor)
+        containsForcedCalculations
+
     let isApplicable (expr: IFSharpExpression) (pats: TreeNodeCollection<IFSharpPattern>) =
         match expr with
         | :? IPrefixAppExpr
@@ -203,6 +241,7 @@ type LambdaAnalyzer() =
         let warning: IHighlighting =
             match compareArgs pats expr with
             | true, true, replaceCandidate ->
+                if containsForcedCalculations replaceCandidate then null else
                 tryCreateWarning LambdaCanBeReplacedWithInnerExpressionWarning (lambda, replaceCandidate) isFsharp60Supported :> _
             | true, false, replaceCandidate ->
                 tryCreateWarning LambdaCanBeSimplifiedWarning (lambda, replaceCandidate) isFsharp60Supported :> _

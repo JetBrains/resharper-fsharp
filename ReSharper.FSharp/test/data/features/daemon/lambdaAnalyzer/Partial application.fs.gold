@@ -1,4 +1,6 @@
-﻿let f x y z = ()
+﻿open System
+
+let f x y z = ()
 
 |fun x -> f x|(0)
 |fun x -> f 1 x|(1)
