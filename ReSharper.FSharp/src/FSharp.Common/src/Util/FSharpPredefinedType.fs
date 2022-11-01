@@ -154,6 +154,6 @@ let hasPureGetter (fcsType: FSharpType) =
     fcsType.HasTypeDefinition && fcsType.TypeDefinition.IsArrayType || 
 
     let name = fcsType.StrippedType.BasicQualifiedName
-    name.StartsWith("Microsoft.FSharp.Collections.FSharpList`", StringComparison.Ordinal) ||
-    name.StartsWith("System.Collections.Generic.List`", StringComparison.Ordinal) ||
-    name.StartsWith("System.String", StringComparison.Ordinal)
+    startsWith "Microsoft.FSharp.Collections.FSharpList`" name ||
+    startsWith "System.Collections.Generic.List`" name ||
+    startsWith "System.String" name
