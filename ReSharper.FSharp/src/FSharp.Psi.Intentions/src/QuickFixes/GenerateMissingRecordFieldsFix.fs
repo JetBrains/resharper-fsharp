@@ -7,7 +7,6 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
@@ -15,7 +14,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -130,7 +131,6 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
     let generateOrderedBindings (existingBindings: TreeNodeCollection<IRecordFieldBinding>) (declaredFields: IList<string>) =
         let indexedBindings = createOrderedIndexedBindings existingBindings declaredFields
-
         generateBindings indexedBindings declaredFields
 
     let generateUnorderedBindings (existingBindings: TreeNodeCollection<IRecordFieldBinding>) (fieldsToAdd: HashSet<string>) =
@@ -176,7 +176,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let elementFactory = fsFile.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
-        use enableFormatter = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
+        use disableFormatter = new DisableCodeFormatter()
 
         let isSingleLine = recordExpr.IsSingleLine
 
@@ -188,13 +188,16 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
         let areBindingsOrdered = areBindingsOrdered existingBindings fieldNames
 
-        let generatedBindings: seq<IRecordFieldBinding> =
+        let generatedBindings: IRecordFieldBinding seq =
             if areBindingsOrdered && not existingBindings.IsEmpty then
                 generateOrderedBindings existingBindings fieldNames generateSingleLine elementFactory
             else
                 generateUnorderedBindings existingBindings fieldsToAdd generateSingleLine elementFactory
 
         let existingBindings = recordExpr.FieldBindings
+
+        if recordExpr.LeftBrace.NextSibling :? IRecordFieldBindingList then
+            ModificationUtil.AddChildAfter(recordExpr.LeftBrace, Whitespace()) |> ignore
 
         if generateSingleLine then
             let lastBinding = existingBindings.Last()
@@ -203,13 +206,44 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
             for binding in existingBindings do
                 if binding.NextSibling :? IRecordFieldBinding then
                     ModificationUtil.AddChildAfter(binding, Whitespace()) |> ignore
+        else
+            let mutable isFirstBinding = true
+            for binding in generatedBindings do
+                if isFirstBinding && generatedBindings.First() == existingBindings.FirstOrDefault() then
+                    isFirstBinding <- false
+                else
+                    let nodeBeforeSpace = skipMatchingNodesBefore isInlineSpaceOrComment binding
+                    if getTokenType nodeBeforeSpace != FSharpTokenType.NEW_LINE then
+                        addNodesBefore binding [
+                            NewLine(binding.GetLineEnding())
+                            Whitespace(existingBindings[0].Indent)
+                        ] |> ignore
 
-        if recordExpr.LeftBrace.NextSibling :? IRecordFieldBindingList then
-            ModificationUtil.AddChildAfter(recordExpr.LeftBrace, Whitespace()) |> ignore
+                    if getTokenType binding.PrevSibling == FSharpTokenType.NEW_LINE then
+                        ModificationUtil.AddChildBefore(binding, Whitespace(existingBindings[0].Indent)) |> ignore
+
+                let nextMeaningfulSibling = binding.GetNextMeaningfulSibling()
+                if nextMeaningfulSibling :? IRecordFieldBinding &&
+                        getTokenType binding.NextSibling != FSharpTokenType.NEW_LINE then
+                    addNodesAfter binding [
+                        NewLine(binding.GetLineEnding())
+                        Whitespace(existingBindings[0].Indent)
+                    ] |> ignore
+
+        let rightBrace = recordExpr.RightBrace
+
+        match rightBrace.PrevSibling with
+        | :? IRecordFieldBindingList ->
+            ModificationUtil.AddChildBefore(rightBrace, Whitespace()) |> ignore
+        | :? Whitespace as ws when ws.GetTextLength() > 1 ->
+            if skipMatchingNodesBefore isInlineSpace rightBrace :? IRecordFieldBinding then
+                let first = getFirstMatchingNodeBefore isInlineSpace rightBrace
+                replaceRangeWithNode first rightBrace.PrevSibling (Whitespace())
+        | _ -> ()
 
         Action<_>(fun textControl ->
             let templatesManager = LiveTemplatesManager.Instance
-            let endCaretPosition = recordExpr.RightBrace.GetDocumentEndOffset()
+            let endCaretPosition = rightBrace.GetDocumentEndOffset()
 
             let hotspotInfos =
                 generatedBindings.ToArray()

@@ -12,7 +12,7 @@ type GenerateMissingRecordFieldsTest() =
 
     [<Test>] member x.``Empty 01``() = x.DoNamedTest()
     [<Test>] member x.``Empty 02 - Space``() = x.DoNamedTest()
-    [<Test>] member x.``Empty 03 - New line``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Empty 03 - New line``() = x.DoNamedTest()
 
     [<Test>] member x.``Single line 01``() = x.DoNamedTest()
     [<Test>] member x.``Single line 02 - Semi``() = x.DoNamedTest()
@@ -34,6 +34,7 @@ type GenerateMissingRecordFieldsTest() =
     [<Test>] member x.``Multiline 07 - Ordered comment 02``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 08 - Ordered comment 03``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 09 - Only middle``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 10``() = x.DoNamedTest()
 
     [<Test>] member x.``Empty function``() = x.DoNamedTest()
 

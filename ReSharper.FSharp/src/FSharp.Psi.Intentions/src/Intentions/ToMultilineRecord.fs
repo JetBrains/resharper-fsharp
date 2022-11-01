@@ -36,7 +36,6 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
         let lineEnding = recordExpr.FSharpFile.GetLineEnding()
 
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
-        use enableFormatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
 
         let bindings = recordExpr.FieldBindings
         let firstBinding = bindings[0]
@@ -46,6 +45,8 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
                 match binding.PrevSibling with
                 | Whitespace node -> ModificationUtil.ReplaceChild(node, NewLine(lineEnding)) |> ignore
                 | node -> ModificationUtil.AddChildAfter(node, NewLine(lineEnding)) |> ignore
+
+                ModificationUtil.AddChildBefore(binding, Whitespace(firstBinding.Indent)) |> ignore
 
             match binding.Semicolon with
             | null -> ()
