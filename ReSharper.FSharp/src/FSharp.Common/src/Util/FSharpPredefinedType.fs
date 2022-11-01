@@ -149,3 +149,11 @@ let isUnit (fcsType: FSharpType) =
 let isNativePtr (fcsType: FSharpType) =
     try fcsType.StrippedType.BasicQualifiedName = StandardTypeNames.IntPtr
     with _ -> false
+
+let hasPureGetter (fcsType: FSharpType) =
+    fcsType.HasTypeDefinition && fcsType.TypeDefinition.IsArrayType || 
+
+    let name = fcsType.StrippedType.BasicQualifiedName
+    name.StartsWith("Microsoft.FSharp.Collections.FSharpList`", StringComparison.Ordinal) ||
+    name.StartsWith("System.Collections.Generic.List`", StringComparison.Ordinal) ||
+    name.StartsWith("System.String", StringComparison.Ordinal)

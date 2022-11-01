@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocation
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -189,6 +190,11 @@ type LambdaAnalyzer() =
     let rec containsForcedCalculations (expression: IFSharpExpression) =
         let mutable containsForcedCalculations = false
         let mutable prefixAppExprContext: IPrefixAppExpr = null
+
+        let typeHasPureGetter (expr: IFSharpExpression) =
+            let fcsType = expr.TryGetFcsType()
+            isNotNull fcsType && hasPureGetter fcsType
+
         let processor = { new IRecursiveElementProcessor with
             member x.ProcessingIsFinished = containsForcedCalculations
             member x.InteriorShouldBeProcessed(treeNode) = not (treeNode :? ILambdaExpr)
@@ -197,25 +203,30 @@ type LambdaAnalyzer() =
                 match treeNode with
                 | :? INewExpr
                 | :? IForLikeExpr
-                | :? IIndexerExpr
+                | :? ISetExpr
+                | :? IWhileExpr
                 | :? IBinaryAppExpr ->
                     containsForcedCalculations <- true
+                | :? IIndexerExpr as indexer when not (typeHasPureGetter indexer.Qualifier) ->
+                    containsForcedCalculations <- true
                 | :? IPrefixAppExpr as prefixAppExpr ->
-                    if prefixAppExpr.IsIndexerLike then containsForcedCalculations <- true else
-                    if isNull (PrefixAppExprNavigator.GetByFunctionExpression(prefixAppExpr)) then
+                    if prefixAppExpr.IsIndexerLike && not (typeHasPureGetter prefixAppExpr.FunctionExpression) then
+                        containsForcedCalculations <- true
+                    elif isNull (PrefixAppExprNavigator.GetByFunctionExpression(prefixAppExpr)) then
                         prefixAppExprContext <- prefixAppExpr
                 | :? IReferenceExpr as referenceExpr ->
                     containsForcedCalculations <-
-                        match referenceExpr.Reference.GetFcsSymbol() with
+                        let fcsSymbol = referenceExpr.Reference.GetFcsSymbol()
+                        isNull fcsSymbol ||
+                        match fcsSymbol with
                         | :? FSharpMemberOrFunctionOrValue as m ->
-                            m.IsProperty || m.IsTypeFunction || m.IsMutable ||
-                            isNotNull prefixAppExprContext &&
-                            (m.IsConstructor ||
+                            (m.IsProperty|| m.IsTypeFunction) && (isNull prefixAppExprContext || not prefixAppExprContext.IsIndexerLike) ||
+                            m.IsMutable ||
+                            isNotNull prefixAppExprContext && (m.IsConstructor ||
                             (m.IsFunction || m.IsMethod) &&
                              m.CurriedParameterGroups.Count <= prefixAppExprContext.Arguments.Count)
                         | :? FSharpUnionCase when isNotNull prefixAppExprContext -> true
                         | :? FSharpEntity as e when e.IsDelegate -> true
-                        | x when x == null -> true
                         | _ -> false
                     prefixAppExprContext <- null
                 | _ -> ()
