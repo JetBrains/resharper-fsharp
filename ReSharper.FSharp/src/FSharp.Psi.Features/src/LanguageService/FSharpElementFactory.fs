@@ -94,6 +94,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         let exprStatement = getExpressionStatement source
         exprStatement.AttributeLists[0]
 
+    let createBindingSignature ()  =
+        let source = "module V\nval a: obj"
+        let moduleMember = getModuleMember source
+        moduleMember :?> IBindingSignature
+    
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
             // todo: mangle ns
@@ -342,6 +347,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
 
             | _ -> System.ArgumentOutOfRangeException() |> raise
 
+        member x.CreateParenType() : IParenTypeUsage =
+            let expr = getExpression "do () : (unit)"
+            let doExpr = expr :?> IDoExpr
+            let typedExpr = doExpr.Expression :?> ITypedExpr
+            typedExpr.TypeUsage :?> IParenTypeUsage
+        
         member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"
             let expr = getExpression source
@@ -385,3 +396,10 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
                 moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations[0] :?> IFSharpTypeDeclaration
 
             typeDeclaration.TypeParameterDeclarationList
+
+        member x.CreateBindingSignature(bindingName: IFSharpPattern, returnType: ITypeUsage) =
+            assert sourceFile.IsFSharpSignatureFile
+            let signature = createBindingSignature ()
+            signature.SetHeadPattern(bindingName) |> ignore
+            replace signature.ReturnTypeInfo.ReturnType returnType
+            signature

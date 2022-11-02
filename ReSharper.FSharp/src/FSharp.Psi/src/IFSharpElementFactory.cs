@@ -41,6 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     ITypedPat CreateTypedPat(IFSharpPattern pattern, ITypeUsage typeUsage);
 
     ITypeUsage CreateTypeUsage(string typeUsage, TypeUsageContext context);
+    IParenTypeUsage CreateParenType();
 
     IReturnTypeInfo CreateReturnTypeInfo(ITypeUsage typeSignature);
 
@@ -62,5 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IMemberDeclaration CreatePropertyWithAccessor(string propertyName, string accessorName, FSharpList<IParametersPatternDeclaration> args);
 
     ITypeParameterDeclarationList CreateTypeParameterOfTypeList(FSharpList<string> names);
+    
+    IBindingSignature CreateBindingSignature(IFSharpPattern bindingName, ITypeUsage returnType);
   }
 }

@@ -116,8 +116,8 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
     
-        let factory = signatureModuleOrNamespaceDecl.CreateElementFactory()
-        let typeInfo = factory.CreateTypeUsageForSignature(text)
+        let factory = binding.CreateElementFactory()
+        let typeInfo = factory.CreateTypeUsage(text, TypeUsageContext.Return)
 
         // Enrich the type info with the found parameters from binding.
         let rec visit (index:int) (t: ITypeUsage) =
@@ -127,7 +127,9 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                     // If the return type is a function itself, the safest thing to do is to wrap it in parentheses.
                     // Example: `let g _ = (*) 3`
                     // `val g: 'a -> int -> int` is not valid, `val g: 'a -> (int -> int)` is.
-                    replace t (factory.WrapParenAroundTypeUsageForSignature(t))
+                    let parenType = factory.CreateParenType()
+                    replace parenType.InnerTypeUsage t
+                    replace t parenType
                 | _ -> ()
             else
                 let parameterAtIndex = tryFindParameterName true (binding.ParameterPatterns.Item(index))
@@ -139,8 +141,7 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                 | :? IFunctionTypeUsage as ft, ParameterNameFromPattern.SingleName (name, attributes) ->
                     match ft.ArgumentTypeUsage with
                     | :? IParameterSignatureTypeUsage as pstu ->
-                        factory.CreateParameterSignatureTypeUsage(attributes, name, pstu.TypeUsage)
-                        |> replace ft.ArgumentTypeUsage 
+                        pstu.SetIdentifier(name) |> ignore
                     | _ -> ()
 
                     visit (index + 1) ft.ReturnTypeUsage
@@ -153,8 +154,7 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
                         |> Seq.iter (fun (p,t) ->
                             match t, p with
                             | :? IParameterSignatureTypeUsage as pstu,  ParameterNameFromPattern.SingleName (name, attributes) ->
-                                factory.CreateParameterSignatureTypeUsage(attributes, name, pstu.TypeUsage) 
-                                |> replace t
+                                pstu.SetIdentifier(name) |> ignore
                             | _ -> ()
                         )
                     | _ -> visit (index + 1) ft.ReturnTypeUsage
@@ -164,7 +164,10 @@ type AddFunctionToSignatureFileAction(dataProvider: FSharpContextActionDataProvi
         if not binding.ParameterPatterns.IsEmpty then
             visit 0 typeInfo
 
-        let valSig = factory.CreateBindingSignature(refPat, typeInfo)
+        let valSig =
+            let signatureFactory = signatureModuleOrNamespaceDecl.CreateElementFactory()
+            signatureFactory.CreateBindingSignature(refPat, typeInfo)
+
         let newlineNode = NewLine(signatureModuleOrNamespaceDecl.GetLineEnding()) :> ITreeNode
         addNodesAfter signatureModuleOrNamespaceDecl.LastChild [| newlineNode; valSig |] |> ignore
 
