@@ -236,7 +236,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         | :? IRecordFieldBindingList ->
             ModificationUtil.AddChildBefore(rightBrace, Whitespace()) |> ignore
         | :? Whitespace as ws when ws.GetTextLength() > 1 ->
-            if skipMatchingNodesBefore isInlineSpace rightBrace :? IRecordFieldBinding then
+            if skipMatchingNodesBefore isInlineSpace rightBrace :? IRecordFieldBindingList then
                 let first = getFirstMatchingNodeBefore isInlineSpace rightBrace
                 replaceRangeWithNode first rightBrace.PrevSibling (Whitespace())
         | _ -> ()
