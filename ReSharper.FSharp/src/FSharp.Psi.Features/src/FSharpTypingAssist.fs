@@ -679,6 +679,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let line = document.GetCoordsByOffset(tokenStart).Line
 
         if x.HandleEnterInsideSingleLineBrackets(textControl, lexer, line) then true else
+        if not encounteredNewLine && x.HandleEnterInEmptyLambda(textControl, lexer) then true else
 
         if leftBracketsToAddIndent.Contains(tokenType) && not (isSingleLineBrackets lexer document) &&
                 not (isLastTokenOnLine lexer) && isFirstTokenOnLine lexer then false else
@@ -881,6 +882,50 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             document.ReplaceText(TextRange(leftBracketEndOffset, firstElementStartOffset), indentString)
 
         textControl.Caret.MoveTo(leftBracketEndOffset + indentString.Length, CaretVisualPlacement.DontScrollIfVisible)
+        true
+
+    member x.HandleEnterInEmptyLambda(textControl: ITextControl, lexer: CachingLexer) =
+        let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
+        if not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.MultiLineLambdaClosingNewline)) then
+            false else
+
+        use cookie = LexerStateCookie.Create(lexer)
+
+        let tokenType = lexer.TokenType
+
+        let nextTokenType =
+            use cookie = LexerStateCookie.Create(lexer)
+            lexer.Advance()
+            while isIgnored lexer.TokenType do
+                lexer.Advance()
+            lexer.TokenType
+
+        if tokenType != FSharpTokenType.RARROW || nextTokenType != FSharpTokenType.RPAREN then false else
+
+        lexer.Advance()
+        while isIgnored lexer.TokenType do
+            lexer.Advance()
+
+        if not (FSharpBracketMatcher().FindMatchingBracket(lexer)) then false else
+
+        let document = textControl.Document
+        let leftBracketStartOffset = lexer.TokenStart
+        let leftBracketLine = document.GetCoordsByOffset(leftBracketStartOffset).Line
+        if document.GetCoordsByOffset(lexer.TokenStart).Line <> leftBracketLine then false else
+
+        let defaultIndent = getIndentSize textControl
+        let line = getContinuedIndentLine textControl leftBracketStartOffset LeadingParenContinuesLine.No
+        match getLineIndent cachingLexerService textControl line with
+        | None -> false
+        | Some indent ->
+
+        let indentSize = defaultIndent + indent.Indent
+        insertNewLineAt textControl indentSize TrimTrailingSpaces.Yes |> ignore
+        let pos = textControl.Caret.Position.Value.ToDocOffset()
+
+        insertNewLineAt textControl indent.Indent TrimTrailingSpaces.Yes |> ignore
+
+        textControl.Caret.MoveTo(pos, CaretVisualPlacement.DontScrollIfVisible)
         true
 
     member x.HandlerEnterInTripleQuotedString(textControl: ITextControl) =

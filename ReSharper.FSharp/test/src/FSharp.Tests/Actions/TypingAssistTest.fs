@@ -19,6 +19,18 @@ type FSharpTypingAssistTest() =
 
     override x.RelativeTestDataPath = "features/service/typingAssist"
 
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "false")>]
+    [<Test>] member x.``Enter - Empty lambda 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "false")>]
+    [<Test>] member x.``Enter - Empty lambda 02``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "true")>]
+    [<Test>] member x.``Enter - Empty lambda 03``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "true")>]
+    [<Test>] member x.``Enter - Empty lambda 04``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "true")>]
+    [<Test>] member x.``Enter - Empty lambda 05``() = x.DoNamedTest()
+
+
     [<Test>] member x.``Enter 00 - File beginning``() = x.DoNamedTest()
     [<Test>] member x.``Enter 01 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Enter 02 - Dumb indent``() = x.DoNamedTest()

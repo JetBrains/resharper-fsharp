@@ -161,6 +161,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [SettingsEntry(true, "Never outdent pipe operators")]
     public bool NeverOutdentPipeOperators;
 
+    [SettingsEntry(false, "Places the closing parenthesis of a multiline lambda argument on the next line")]
+    [EditorConfigEntryAlias("multi_line_lambda_closing_newline", EditorConfigAliasType.LanguageSpecific)]
+    public bool MultiLineLambdaClosingNewline;
+
     [SettingsIndexedEntry("Fantomas settings")]
     public readonly IIndexedEntry<string, string> FantomasSettings;
   }
