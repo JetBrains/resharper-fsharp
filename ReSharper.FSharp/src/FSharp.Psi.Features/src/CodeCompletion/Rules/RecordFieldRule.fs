@@ -30,15 +30,18 @@ type RecordFieldRule() =
         CLRLookupItemRelevance.ExpectedTypeMatch |||
         CLRLookupItemRelevance.FieldsAndProperties
 
+    let getRecordExprFromFieldReference (reference: FSharpSymbolReference) =
+        let referenceName = reference.GetElement().As<IExpressionReferenceName>()
+        let fieldBinding = RecordFieldBindingNavigator.GetByReferenceName(referenceName)
+        RecordExprNavigator.GetByFieldBinding(fieldBinding)
+
     let getRecordReference (context: FSharpCodeCompletionContext) =
         match context.FcsCompletionContext.CompletionContext with
         | Some (CompletionContext.RecordField _) ->
             match context.ReparsedContext.Reference with
             | :? RecordCtorReference as r -> r
             | :? FSharpSymbolReference as fsRef ->
-                let referenceName = fsRef.GetElement().As<IExpressionReferenceName>()
-                let fieldBinding = RecordFieldBindingNavigator.GetByReferenceName(referenceName)
-                let recordExpr = RecordExprNavigator.GetByFieldBinding(fieldBinding)
+                let recordExpr = getRecordExprFromFieldReference fsRef
                 if isNotNull recordExpr then recordExpr.Reference :?> _ else null
             | _ -> null
         | _ -> null
@@ -78,7 +81,9 @@ type RecordFieldRule() =
                 | :? IReferenceExpr as refExpr ->
                     let computationExpr = ComputationExprNavigator.GetByExpression(refExpr)
                     getRecordFromExprType computationExpr
-                | _ -> None
+                | _ ->
+                    let recordExpr = getRecordExprFromFieldReference ref
+                    if isNotNull recordExpr then getRecordEntity recordExpr.Reference else None
             | _ -> None
         )
 
