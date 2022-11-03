@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
+open JetBrains.Application.Settings
 open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -21,7 +22,8 @@ module internal Reflection =
 
 
 [<SolutionComponent>]
-type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector) =
+type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector,
+                  schema: SettingsSchema) =
     let solutionLifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
@@ -54,7 +56,13 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
                     | "IndentSize" -> "INDENT_SIZE"
                     | "MaxLineLength" -> "WRAP_LIMIT"
                     | x -> x
-            let value = Reflection.getFieldValue settings fieldName
+            let value =
+                match Reflection.getFieldValue settings fieldName with
+                | null -> null
+                | x ->
+                match schema.GetEntry(typeof<FSharpFormatSettingsKey>, fieldName) with
+                | :? SettingsScalarEntry as entry when entry.RawDefaultValue <> x -> x
+                | _ -> ""
             let value =
                 if isNull value then settings.FantomasSettings.TryGet(toEditorConfigName fieldName)
                 else value.ToString()
