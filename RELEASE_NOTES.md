@@ -1,6 +1,57 @@
 # Release notes
 
-### 2022.2
+## 2022.3
+
+### Type providers
+
+* **New**: Provided types from generative type providers are properly seen in C# code now
+* **Fix**: Excetion or invalidation inside type provider could break analysis
+* **Fix**: Host type providers in matching runtime when F# compiler is overridden in a project
+
+### Code completion
+
+* **New**: Typing `<` inside a comment will generate a xml documentation template
+* **New**: Additional rule for record fields emphasizes fields from the inferred record type, hides already used fields, and fixes various cases where no suggestions would be shown
+* **Fix**: Rule for union cases could add an unneeded union name for types with `RequireQualifiedAccess`
+* **New**: Parameter info popup is available in patterns
+
+### Code analysis
+
+* **New**: A new analyzer for xml documentation highlights syntax and shows additional warnings
+* **Fix**: Lambda analyzer suggested changes that would change meaning of the code
+* **Fix**: Redundant parens analyzer suggested removing required parens
+* **Fix**: Usages of some custom operators, indexers, and range expressions had incorrect highlighting range
+
+### Quick fixes
+
+* **New**: A new quick fix for updating a parameter name in a signature file, by [@nojaf](https://github.com/nojaf) ([#416](https://github.com/JetBrains/resharper-fsharp/pull/416))
+* **New**: A new quick fix for updating a record field in a signature file, by [@nojaf](https://github.com/nojaf) ([#418](https://github.com/JetBrains/resharper-fsharp/pull/418))
+* **Fix**: Generating missing record fields could break indentation
+* **Fix**: Adding a match-all clause for enums didn't check if `ArgumentOutOfRangeException` is in scope
+* **Fix**: When adding `|> ignore`, extra parens would be added in various cases
+* **Improve**: Replace binding type quick fix is available in additional cases
+
+### Typing assists
+
+* **New**: When pressing Enter inside single-line lambda, the lambda will be reformatted according to `fsharp_multi_line_lambda_closing_newline` Fantomas setting
+* **Fix**: When pressing Enter, an extra indentation would be added after `=` in some cases
+* **New**: Support 'Start new line before' action
+
+### F# 7 support
+
+* FSharp.Compiler.Service is updated with F# 7 support
+* Support for F# 7 features, like abstract static members, in C# interop
+* **New**: When using F# 7, Rename refactoring allows using lowercase names for union cases defined in a type with `[<RequireQualifierAccess>]` attribute
+* **Improve**: support reading compressed F# metadata produced by newer compilers
+
+### Misc
+
+* **Fix**: Deconstruct pattern action wouldn't add required parens in some cases
+* **Fix**: Find usages: references to a constructor could be found when it's used as a method group
+* **Fix**: Find usage: usages of `let` values defined inside types could be shown as 'Write' access
+* **Fix**: Find usages and Rename: types with same name and different type parameters couldn't be distinguished in some cases
+
+## 2022.2
 
 ### Parameter info
 
