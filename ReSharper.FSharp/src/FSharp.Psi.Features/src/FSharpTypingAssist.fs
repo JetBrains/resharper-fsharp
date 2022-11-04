@@ -698,10 +698,15 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         if lexer.FindTokenAt(offset) && isFirstTokenOnLine lexer && not (isLastTokenOnLine lexer) then false else
 
         let indentSize =
+            lexer.FindTokenAt(offset - 1) |> ignore
+            
             let defaultIndent = getIndentSize textControl
             match getLineIndent cachingLexerService textControl caretLine with
             | Some(Comments n) -> n
             | _ ->
+
+            if tokenType == FSharpTokenType.EQUALS && not encounteredNewLine && isFirstTokenOnLine lexer then
+                getOffsetInLine document line tokenStart else
 
             if indentFromToken.Contains(tokenType) then
                 defaultIndent + getOffsetInLine document line tokenStart else
