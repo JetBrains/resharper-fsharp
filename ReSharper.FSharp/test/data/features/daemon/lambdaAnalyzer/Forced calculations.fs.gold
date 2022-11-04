@@ -27,11 +27,9 @@ let _ = |fun x y -> f mutableLet y|(5)
 let _ = |fun x -> f ((+) 1) x|(6)
 let _ = |fun x -> f ((|ActPat|) 1) x|(7)
 let _ = |fun x -> f list.[0] x|(8)  
-let _ = |fun x -> f array.[0] x|(9)  
-let _ = |fun x -> f arrayList.[0] x|(10)
-let _ = |fun x -> f str[0] x|(11)
-let _ = |fun x -> f list[0] x|(12)
-let _ = |fun x -> f (indexed.Prop[0]) x|(13)  
+let _ = |fun x -> f str[0] x|(9)
+let _ = |fun x -> f list[0] x|(10)
+let _ = |fun x -> f (indexed.Prop[0]) x|(11)  
 
 // NOT OK
 let _ = fun x -> f mutableLet x
@@ -57,6 +55,8 @@ let _ = fun x -> f ((|ActPat|) 1 2) x
 let _ = fun x -> f (mutableLet <- 5) x
 let _ = fun x -> f (indexed[0]) x
 let _ = fun x -> f (while true do ()) x
+let _ = fun x -> f array.[0] x  
+let _ = fun x -> f arrayList.[0] x
 
 ---------------------------------------------------------
 (0): ReSharper Hint: Lambda can be replaced with 'DateTime.FromBinary'
@@ -71,5 +71,3 @@ let _ = fun x -> f (while true do ()) x
 (9): ReSharper Hint: Lambda can be simplified
 (10): ReSharper Hint: Lambda can be simplified
 (11): ReSharper Hint: Lambda can be simplified
-(12): ReSharper Hint: Lambda can be simplified
-(13): ReSharper Hint: Lambda can be simplified
