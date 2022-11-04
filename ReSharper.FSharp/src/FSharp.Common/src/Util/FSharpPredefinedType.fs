@@ -151,6 +151,8 @@ let isNativePtr (fcsType: FSharpType) =
     with _ -> false
 
 let isReadOnly (fcsType: FSharpType) =
+    if fcsType.HasTypeDefinition && fcsType.TypeDefinition.IsArrayType then false else
+
     let name = fcsType.StrippedType.BasicQualifiedName
     startsWith "Microsoft.FSharp.Collections.FSharpList`" name ||
     startsWith "System.String" name
