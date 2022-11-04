@@ -191,9 +191,9 @@ type LambdaAnalyzer() =
         let mutable containsForcedCalculations = false
         let mutable prefixAppExprContext: IPrefixAppExpr = null
 
-        let typeHasPureGetter (expr: IFSharpExpression) =
+        let typeIsReadOnly (expr: IFSharpExpression) =
             let fcsType = expr.TryGetFcsType()
-            isNotNull fcsType && hasPureGetter fcsType
+            isNotNull fcsType && isReadOnly fcsType
 
         let processor = { new IRecursiveElementProcessor with
             member x.ProcessingIsFinished = containsForcedCalculations
@@ -207,10 +207,10 @@ type LambdaAnalyzer() =
                 | :? IWhileExpr
                 | :? IBinaryAppExpr ->
                     containsForcedCalculations <- true
-                | :? IIndexerExpr as indexer when not (typeHasPureGetter indexer.Qualifier) ->
+                | :? IIndexerExpr as indexer when not (typeIsReadOnly indexer.Qualifier) ->
                     containsForcedCalculations <- true
                 | :? IPrefixAppExpr as prefixAppExpr ->
-                    if prefixAppExpr.IsIndexerLike && not (typeHasPureGetter prefixAppExpr.FunctionExpression) then
+                    if prefixAppExpr.IsIndexerLike && not (typeIsReadOnly prefixAppExpr.FunctionExpression) then
                         containsForcedCalculations <- true
                     elif isNull (PrefixAppExprNavigator.GetByFunctionExpression(prefixAppExpr)) then
                         prefixAppExprContext <- prefixAppExpr
