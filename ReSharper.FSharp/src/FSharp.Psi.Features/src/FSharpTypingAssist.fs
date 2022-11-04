@@ -678,8 +678,8 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let offset = textControl.Caret.Offset()
         let line = document.GetCoordsByOffset(tokenStart).Line
 
-        if x.HandleEnterInsideSingleLineBrackets(textControl, lexer, line) then true else
         if not encounteredNewLine && x.HandleEnterInEmptyLambda(textControl, lexer) then true else
+        if x.HandleEnterInsideSingleLineBrackets(textControl, lexer, line) then true else
 
         if leftBracketsToAddIndent.Contains(tokenType) && not (isSingleLineBrackets lexer document) &&
                 not (isLastTokenOnLine lexer) && isFirstTokenOnLine lexer then false else
@@ -827,9 +827,25 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         use cookie = LexerStateCookie.Create(lexer)
 
         let document = textControl.Document
-        let tokenType = lexer.TokenType
-        let leftBracketStartOffset = lexer.TokenStart
-        let leftBracketEndOffset = lexer.TokenEnd
+        let lambdaExpr =
+            if lexer.TokenType != FSharpTokenType.RARROW then null else
+            let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
+            if settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.MultiLineLambdaClosingNewline) then
+                getLambdaExprFromRarrow lexer.TokenStart textControl solution else null
+
+        let tokenType, leftBracketStartOffset, leftBracketEndOffset =
+            if isNotNull lambdaExpr && isNotNull lambdaExpr.Expression then
+                let rarrowStartOffset = lexer.TokenStart
+                let rarrowEndOffset = lexer.TokenEnd
+                let parenExpr = ParenExprNavigator.GetByInnerExpression(lambdaExpr)
+                if isNotNull parenExpr && isNotNull parenExpr.LeftParen then
+                    lexer.FindTokenAt(parenExpr.LeftParen.GetDocumentStartOffset().Offset) |> ignore
+
+                let lparenTokenType = lexer.TokenType
+                lparenTokenType, rarrowStartOffset, rarrowEndOffset
+            else
+                lexer.TokenType, lexer.TokenStart, lexer.TokenEnd
+
         let leftBracketLine = document.GetCoordsByOffset(leftBracketStartOffset).Line
 
         if not (findRightBracket lexer) then false else
@@ -876,7 +892,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                     lexer.Advance()
                 lexer.TokenStart
 
-            if tokenType != FSharpTokenType.LPAREN then
+            if tokenType != FSharpTokenType.LPAREN || isNotNull lambdaExpr then
                 document.ReplaceText(TextRange(lastElementEndOffset, rightBracketStartOffset), baseIndentString)
 
             document.ReplaceText(TextRange(leftBracketEndOffset, firstElementStartOffset), indentString)
@@ -901,6 +917,9 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             lexer.TokenType
 
         if tokenType != FSharpTokenType.RARROW || nextTokenType != FSharpTokenType.RPAREN then false else
+
+        let lambdaExpr = getLambdaExprFromRarrow lexer.TokenStart textControl solution
+        if isNull lambdaExpr then false else
 
         lexer.Advance()
         while isIgnored lexer.TokenType do
@@ -1829,6 +1848,13 @@ let isFirstTokenOnLine (lexer: CachingLexer) =
         lexer.Advance(-1)
     isNull lexer.TokenType || lexer.TokenType == FSharpTokenType.NEW_LINE
 
+let getLambdaExprFromRarrow offset (textControl: ITextControl) (solution: ISolution) : ILambdaExpr =
+    let file = textControl.GetFSharpFile(solution)
+    let node = file.FindTokenAt(TreeOffset(offset))
+    if isNull node then null else
+
+    let parent = node.Parent.As<ILambdaExpr>()
+    if isNotNull parent && parent.RArrow == node then parent else null
 
 let lineEndsWithString (lexer: CachingLexer) (document: IDocument) line =
     use cookie = LexerStateCookie.Create(lexer)

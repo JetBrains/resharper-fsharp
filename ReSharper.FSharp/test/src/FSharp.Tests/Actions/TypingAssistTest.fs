@@ -30,6 +30,14 @@ type FSharpTypingAssistTest() =
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "true")>]
     [<Test>] member x.``Enter - Empty lambda 05``() = x.DoNamedTest()
 
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "false")>]
+    [<Test>] member x.``Enter - Lambda 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "false")>]
+    [<Test>] member x.``Enter - Lambda 02``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "true")>]
+    [<Test>] member x.``Enter - Lambda 03``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "true")>]
+    [<Test>] member x.``Enter - Lambda 04``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter 00 - File beginning``() = x.DoNamedTest()
     [<Test>] member x.``Enter 01 - No indent``() = x.DoNamedTest()
