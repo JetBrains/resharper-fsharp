@@ -5,14 +5,14 @@ Opened
  -ClassLibrary * 1 project
   -ClassLibrary
    -Dependencies
-    -.NETStandard 2.1
+    -.NET 7.0
      -Assemblies
       -Implicit
        ...
      -Packages
       FSharp.Core/7.0.0-beta.22473.1
      -Frameworks
-      NETStandard.Library
+      Microsoft.NETCore.App
    Library.fs
 
 
@@ -28,7 +28,7 @@ Project [Name:ClassLibrary, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:netstandard2.1, IsHidden:true]
+            Folder [Name:net7.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 

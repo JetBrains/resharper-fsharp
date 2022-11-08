@@ -9,7 +9,7 @@ import org.testng.annotations.Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_7)
 class FSharpTemplatesTestCore7 : FSharpTemplatesTestCore()
 {
-    @Test
+    @Test()
     fun classlibNetCoreAppTemplate() = super.classlibNetCoreAppTemplate(targetFramework = "net7.0")
 
     @Test
