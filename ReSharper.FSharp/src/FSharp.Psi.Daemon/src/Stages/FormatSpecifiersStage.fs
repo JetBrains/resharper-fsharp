@@ -33,5 +33,5 @@ type FormatSpecifiersStage() =
     override x.IsSupported(sourceFile, processKind) =
         processKind = DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind)
 
-    override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess) =
+    override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess, _) =
         FormatSpecifiersStageProcess(fsFile, daemonProcess) :> _

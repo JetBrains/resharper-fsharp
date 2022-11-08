@@ -19,7 +19,7 @@ type ScriptLoadPathsStage() =
         override x.IsSupported(sourceFile, processKind) =
             processKind = DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind)
 
-        override x.CreateStageProcess(fsFile, _, daemonProcess) =
+        override x.CreateStageProcess(fsFile, _, daemonProcess, _) =
             ScriptLoadPathsStageProcess(fsFile, daemonProcess) :> _
 
 

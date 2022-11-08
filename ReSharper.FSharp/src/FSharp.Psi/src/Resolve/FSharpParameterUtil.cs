@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         if (binaryAppExpr is not { ShortName: "=" })
           return null;
 
-        var innerExpr = (IFSharpExpression) TupleExprNavigator.GetByExpression(binaryAppExpr) ?? binaryAppExpr;
+        var innerExpr = (IFSharpExpression)TupleExprNavigator.GetByExpression(binaryAppExpr) ?? binaryAppExpr;
         var parenExpr = ParenOrBeginEndExprNavigator.GetByInnerExpression(innerExpr);
 
         if (!(PrefixAppExprNavigator.GetByArgumentExpression(parenExpr)?.FunctionExpression is IReferenceExpr expr))
@@ -69,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return field?.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner);
     }
 
-    public static IReadOnlyList<IReadOnlyList<string>> GetParametersGroupNames(ITreeNode node) =>
+    public static IReadOnlyList<IReadOnlyList<(string name, ITreeNode node)>> GetParametersGroupNames(ITreeNode node) =>
       (node switch
       {
         IBinding binding => binding.Expression is ILambdaExpr lambda
@@ -91,12 +91,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           .ReturnTypeInfo.ReturnType),
 
         IUnionCaseDeclaration { TypeUsage: { } typeUsage } => GetParameterNames(typeUsage),
-        IUnionCaseDeclaration ucDecl => new[] { ucDecl.Fields.Select(t => t.SourceName) },
+        IUnionCaseDeclaration ucDecl => new[] { ucDecl.Fields.Select(t => (t.SourceName, (ITreeNode)t)) },
 
         IFSharpTypeDeclaration { TypeRepresentation: IDelegateRepresentation repr } =>
           GetParameterNames(repr.TypeUsage),
 
-        _ => EmptyList<string[]>.Enumerable
+        _ => EmptyList<IEnumerable<(string, ITreeNode)>>.Enumerable
       })
       .Select(t => t.ToIReadOnlyList())
       .ToIReadOnlyList();
@@ -109,7 +109,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       _ => false
     };
 
-    private static IEnumerable<IEnumerable<string>> GetLambdaArgs(ILambdaExpr expr)
+    private static IEnumerable<IEnumerable<(string, ITreeNode)>> GetLambdaArgs(ILambdaExpr expr)
     {
       var lambdaParams = expr.Patterns;
       var parameters = lambdaParams.Select(GetParameterNames);
@@ -118,39 +118,47 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return parameters;
     }
 
-    public static IEnumerable<string> GetParameterNames(this IFSharpPattern pattern)
+    public static IEnumerable<(string, ITreeNode)> GetParameterNames(this IFSharpPattern pattern)
     {
-      IEnumerable<string> GetParameterNamesInternal(IFSharpPattern pat, bool isTopLevelParameter)
+      IEnumerable<(string, ITreeNode)> GetParameterNamesInternal(IFSharpPattern pat, bool isTopLevelParameter)
       {
         pat = pat.IgnoreInnerParens(true);
         return pat switch
         {
           IParenPat { Pattern: { } innerPat } => GetParameterNamesInternal(innerPat, false),
-          ILocalReferencePat local => new[] { local.SourceName },
+          ILocalReferencePat local => new[] { (local.SourceName, (ITreeNode)local) },
           IOptionalValPat opt => GetParameterNamesInternal(opt.Pattern, isTopLevelParameter),
           ITypedPat typed => GetParameterNamesInternal(typed.Pattern, false),
           IAttribPat attrib => GetParameterNamesInternal(attrib.Pattern, false),
           IAsPat asPat => GetParameterNamesInternal(asPat.RightPattern, false),
           ITuplePat tuplePat when isTopLevelParameter =>
             tuplePat.PatternsEnumerable.SelectMany(t => GetParameterNamesInternal(t, false)),
-          _ => new[] { SharedImplUtil.MISSING_DECLARATION_NAME }
+          var x => new[] { (SharedImplUtil.MISSING_DECLARATION_NAME, (ITreeNode)x) }
         };
       }
 
       return GetParameterNamesInternal(pattern, true);
     }
 
-    public static IEnumerable<IEnumerable<string>> GetParameterNames(this ITypeUsage pattern) =>
+    public static IEnumerable<IEnumerable<(string, ITreeNode)>> GetParameterNames(this ITypeUsage pattern) =>
       pattern switch
       {
         IParenTypeUsage parenUsage => GetParameterNames(parenUsage.InnerTypeUsage),
         IConstrainedTypeUsage constrained => GetParameterNames(constrained.TypeUsage),
         IParameterSignatureTypeUsage local =>
-          new[] { new[] { local.Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME } },
+          new[]
+          {
+            new[]
+            {
+              local.Identifier is { } identifier
+                ? (identifier.Name, (ITreeNode)identifier)
+                : (SharedImplUtil.MISSING_DECLARATION_NAME, null)
+            }
+          },
         IFunctionTypeUsage funPat =>
           GetParameterNames(funPat.ArgumentTypeUsage).Union(GetParameterNames(funPat.ReturnTypeUsage)),
         ITupleTypeUsage tuplePat => tuplePat.Items.SelectMany(GetParameterNames),
-        _ => EmptyList<IEnumerable<string>>.Enumerable
+        _ => EmptyList<IEnumerable<(string, ITreeNode)>>.Enumerable
       };
   }
 }

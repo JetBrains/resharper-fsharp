@@ -25,14 +25,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
       if (!(daemonProcess.SourceFile.GetPrimaryPsiFile() is IFSharpFile fsFile))
         return EmptyList<IDaemonStageProcess>.Instance;
 
-      var process = CreateStageProcess(fsFile, settings, daemonProcess);
+      var process = CreateStageProcess(fsFile, settings, daemonProcess, processKind);
       return process != null
-        ? new[] {process}
+        ? new[] { process }
         : EmptyList<IDaemonStageProcess>.InstanceList;
     }
 
     [CanBeNull]
     protected abstract IDaemonStageProcess CreateStageProcess([NotNull] IFSharpFile fsFile,
-      IContextBoundSettingsStore settings, [NotNull] IDaemonProcess process);
+      IContextBoundSettingsStore settings, [NotNull] IDaemonProcess process, DaemonProcessKind processKind);
   }
 }

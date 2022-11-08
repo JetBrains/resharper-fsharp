@@ -25,11 +25,12 @@ module FSharpErrorsStage =
 type FSharpErrorsStage(elementProblemAnalyzerRegistrar) =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateStageProcess(fsFile, settings, daemonProcess) =
-        FSharpErrorStageProcess(fsFile, daemonProcess, settings, elementProblemAnalyzerRegistrar) :> _
+    override x.CreateStageProcess(fsFile, settings, daemonProcess, processKind) =
+        FSharpErrorStageProcess(fsFile, daemonProcess, settings, elementProblemAnalyzerRegistrar, processKind) :> _
 
 
-and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: ElementProblemAnalyzerRegistrar) =
+and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: ElementProblemAnalyzerRegistrar,
+                            processKind: DaemonProcessKind) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let analyzerRunKind = ElementProblemAnalyzerRunKind.FullDaemon
@@ -38,6 +39,7 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
     let analyzerDispatcher = analyzerRegistrar.CreateDispatcher(analyzerData)
 
     do
+        analyzerData.SetDaemonProcess(daemonProcess, processKind);
         analyzerData.PutData(visualElementFactoryKey, VisualElementHighlighter(fsFile.Language, settings))
         analyzerData.PutData(openedModulesProvider, OpenedModulesProvider(fsFile))
 
