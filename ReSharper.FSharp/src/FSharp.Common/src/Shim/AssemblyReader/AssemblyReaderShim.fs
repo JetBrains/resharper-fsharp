@@ -403,5 +403,5 @@ type AssemblyReaderPsiCache(shim: IFcsAssemblyReaderShim, lifetime, locks, persi
 
     // todo: change API, report changed assembly to minimize the readers cache change?
     override this.OnPsiChange(_, elementType) =
-        if elementType = PsiChangedElementType.CompiledContentsChanged then
+        if elementType = PsiChangedElementType.CompiledContentsChanged && shim.IsEnabled then
             shim.InvalidateAll()
