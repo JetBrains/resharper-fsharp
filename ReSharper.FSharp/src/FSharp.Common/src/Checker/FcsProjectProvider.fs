@@ -379,7 +379,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
     interface IFcsProjectProvider with
         member x.GetProjectOptions(sourceFile: IPsiSourceFile) =
-            use lock = FcsReadWriteLock.ReadCookie.Create()
             locks.AssertReadAccessAllowed()
             processDirtyFcsProjects ()
 
