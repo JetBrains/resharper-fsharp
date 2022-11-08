@@ -655,7 +655,7 @@
     <Behavour overlapResolvePolicy="NONE"/>
   </Warning>
 
-  <Warning compilerGroup="FSharpErrors" name="XmlDocInvalidParameterName" ID="FS3390: This XML comment is invalid: unknown parameter">
+  <Warning compilerGroup="FSharpErrors" name="XmlDocUnresolvedParameter" ID="FS3390: This XML comment is invalid: unknown parameter">
     <Parameter type="ITreeNode" name="paramEntry"/>
     <Message value="Unknown parameter name"/>
     <Range>paramEntry.GetHighlightingRange()</Range>

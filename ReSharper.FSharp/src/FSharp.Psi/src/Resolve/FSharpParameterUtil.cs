@@ -126,7 +126,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return pat switch
         {
           IParenPat { Pattern: { } innerPat } => GetParameterNamesInternal(innerPat, false),
-          ILocalReferencePat local => new[] { local.SourceName },
+          ILocalReferencePat local => new[] { (local.SourceName, (ITreeNode)local) },
           IOptionalValPat opt => GetParameterNamesInternal(opt.Pattern, isTopLevelParameter),
           ITypedPat typed => GetParameterNamesInternal(typed.Pattern, false),
           IAttribPat attrib => GetParameterNamesInternal(attrib.Pattern, false),
@@ -151,7 +151,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             new[]
             {
               local.Identifier is { } identifier
-                ? (identifier.Name, (ITreeNode)local)
+                ? (identifier.Name, (ITreeNode)identifier)
                 : (SharedImplUtil.MISSING_DECLARATION_NAME, null)
             }
           },

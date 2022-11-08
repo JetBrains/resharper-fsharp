@@ -89,6 +89,7 @@ type FcsErrorsHighlightingTest() =
 
     [<Test>] member x.``Invalid XmlDoc position 01``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc - Parameters``() = x.DoNamedTest()
+    [<Test>] member x.``XmlDoc - Parameters - Highlightings``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc - Primary constructor 01``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc - Primary constructor 02``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc - Syntax 01``() = x.DoNamedTest()

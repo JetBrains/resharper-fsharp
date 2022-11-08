@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Xml.Impl.Tree
 open JetBrains.ReSharper.Psi.Xml.Tree
 open JetBrains.ReSharper.Psi.Xml.XmlDocComments
 
@@ -26,7 +27,7 @@ type XmlDocAnalyzer() =
                          HighlightingTypes = [| typeof<XmlDocCommentSyntaxWarning>
                                                 typeof<XmlDocMissingParameterWarning>
                                                 typeof<XmlDocDuplicateParameterWarning>
-                                                typeof<XmlDocInvalidParameterNameWarning> 
+                                                typeof<XmlDocUnresolvedParameterWarning>
                                                 typeof<XmlDocMissingParameterNameWarning> |])>]
 type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
     inherit ElementProblemAnalyzer<XmlDocBlock>()
@@ -34,21 +35,11 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
     let getNameAttribute (paramTag: IXmlTag) =
         paramTag.Header.Attributes.FirstOrDefault(fun t -> t.AttributeName = "name")
 
-    let checkXmlTagIsNotClosed (tag: IXmlTag) =
-        let prevSibling = tag.PrevSibling
-        isNull prevSibling || not (prevSibling.GetText().EndsWith("[")) // [<attribute>]
-
     let checkXmlHighlighting (highlighting: IHighlighting) =
         match highlighting with
         | :? XmlOnlyOneTagAllowedAtRootLevelHighlighting
         | :? XmlNoRootTagDefinedHighlighting
         | :? XmlTextIsNotAllowedAtRootHighlighting -> false
-        | :? XmlSyntaxErrorHighlighting as h when
-            h.ErrorElement.ErrorType = XmlSyntaxErrorType.INVALID_TAG_HEADER -> false
-        | :? XmlTagIsNotClosedHighlighting2 as h ->
-            checkXmlTagIsNotClosed h.Tags[0]
-        | :? XmlTagIsNotClosedHighlighting as h ->
-            checkXmlTagIsNotClosed h.Tag
         | _ -> true
 
     let checkXmlSyntax (xmlPsi: IDocCommentXmlPsi) (data: ElementProblemAnalyzerData) (consumer: IHighlightingConsumer) =
@@ -73,7 +64,6 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
 
     let checkParameters (xmlPsi: IDocCommentXmlPsi) (xmlDocOwner: ITreeNode) (consumer: IHighlightingConsumer) =
         let paramNodes = xmlPsi.GetParameterNodes(null)
-        //TODO: move to the platform?
         let paramRefNodes = xmlPsi.XmlFile.Descendants<IXmlTag>().ToEnumerable()
                             |> Seq.filter (fun x -> x.GetFullTagName() = "paramref")
                             |> Seq.toArray
@@ -83,7 +73,7 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
         if xmlDocOwner :? IFSharpTypeDeclaration then () else
         let parameters = FSharpParameterUtil.GetParametersGroupNames(xmlDocOwner)
 
-        let parameters = parameters |> Seq.collect id
+        let parameters = parameters |> Seq.collect id |> Seq.toArray
 
         for struct(name, parameter) in parameters do
             if name = SharedImplUtil.MISSING_DECLARATION_NAME then () else
@@ -102,14 +92,20 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
             let attribute = getNameAttribute paramRef
 
             if isNull attribute then
-                consumer.AddHighlighting(XmlDocMissingParameterNameWarning(paramRef.Header))else
+                consumer.AddHighlighting(XmlDocMissingParameterNameWarning(paramRef.Header)) else
 
-            if parameters |> Seq.exists (fun struct(name, _) -> name = attribute.UnquotedValue) then () else
-            consumer.AddHighlighting(XmlDocInvalidParameterNameWarning(attribute.Value))
+            if parameters |> Seq.forall (fun struct(name, _) -> name <> attribute.UnquotedValue) then
+                consumer.AddHighlighting(XmlDocUnresolvedParameterWarning(attribute.Value))
 
     override this.Run(xmlDocBlock, data, consumer) =
         let xmlPsi = xmlDocBlock.GetXmlPsi()
         let xmlDocOwner = xmlDocBlock.Parent
+
+        if not (xmlPsi.XmlFile.FindNextNode(fun x ->
+             match x with
+             | :? XmlWhitespaceToken -> TreeNodeActionType.CONTINUE
+             | _ -> TreeNodeActionType.ACCEPT
+         ) :? IXmlTag) then () else
 
         checkXmlSyntax xmlPsi data consumer
         checkParameters xmlPsi xmlDocOwner consumer
