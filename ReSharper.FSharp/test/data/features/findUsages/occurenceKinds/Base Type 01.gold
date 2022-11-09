@@ -1,11 +1,11 @@
-﻿Other
----
-UsageOther TO: [O] inherit System.|Object|() RANGE: (48,54) @ Base Type 01.fs
-UsageOther TO: [O] inherit |System|.Object() RANGE: (41,47) @ Base Type 01.fs
-
-
-Base type
+﻿Base type
 ---
 UsageExtendedType TO: [O] inherit System.|Object|() RANGE: (48,54) @ Base Type 01.fs
+UsageExtendedType TO: [O] inherit System.|Object|() RANGE: (48,54) @ Base Type 01.fs
+
+
+Other
+---
+UsageOther TO: [O] inherit |System|.Object() RANGE: (41,47) @ Base Type 01.fs
 
 

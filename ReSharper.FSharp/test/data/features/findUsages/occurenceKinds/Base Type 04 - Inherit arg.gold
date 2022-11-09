@@ -6,7 +6,6 @@ Fsharp TO: [O] open |System| RANGE: (21,27) @ Base Type 04 - Inherit arg.fs
 Other
 ---
 UsageOther TO: [O] type Base(|s|: String) = RANGE: (63,64) @ Base Type 04 - Inherit arg.fs
-UsageOther TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (165,169) @ Base Type 04 - Inherit arg.fs
 UsageOther TO: [O] inherit |Module1|.Base(String('a', 1)) RANGE: (157,164) @ Base Type 04 - Inherit arg.fs
 
 
@@ -17,6 +16,7 @@ UsageOther TO: [O] type Base(s: |String|) = RANGE: (66,72) @ Base Type 04 - Inhe
 
 Base type
 ---
+UsageExtendedType TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (165,169) @ Base Type 04 - Inherit arg.fs
 UsageExtendedType TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (165,169) @ Base Type 04 - Inherit arg.fs
 
 
