@@ -25,6 +25,7 @@ type FSharpSettings() = class end
 [<AutoOpen>]
 module FSharpOptions =
     let [<Literal>] skipImplementationAnalysis = "Skip implementation files analysis when possible"
+    let [<Literal>] parallelProjectReferencesAnalysis = "Analyze project references in parallel"
     let [<Literal>] nonFSharpProjectInMemoryAnalysis = "Analyze C#/VB projects without build"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
@@ -34,6 +35,9 @@ module FSharpOptions =
 type FSharpOptions =
     { [<SettingsEntry(true, skipImplementationAnalysis); DefaultValue>]
       mutable SkipImplementationAnalysis: bool
+
+      [<SettingsEntry(false, parallelProjectReferencesAnalysis); DefaultValue>]
+      mutable ParallelProjectReferencesAnalysis: bool
 
       [<SettingsEntry(false, nonFSharpProjectInMemoryAnalysis); DefaultValue>]
       mutable NonFSharpProjectInMemoryAnalysis: bool
@@ -200,6 +204,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
 
         this.AddHeader("F# Compiler Service")
         this.AddBoolOptionWithComment((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
+        this.AddBoolOptionWithComment((fun key -> key.ParallelProjectReferencesAnalysis), parallelProjectReferencesAnalysis, "Requires restart") |> ignore
         this.AddBoolOptionWithComment((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Solution reload required") |> ignore
         
         do

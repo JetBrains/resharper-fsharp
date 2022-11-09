@@ -75,13 +75,15 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             settingsStoreLive.GetValueProperty(lifetime, setting, null)
 
         let skipImpl = getSettingProperty "SkipImplementationAnalysis"
+        let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
 
         lazy
             let checker =
                 FSharpChecker.Create(projectCacheSize = 200,
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
-                                     enablePartialTypeChecking = skipImpl.Value)
+                                     enablePartialTypeChecking = skipImpl.Value,
+                                     parallelReferenceResolution = analyzerProjectReferencesInParallel.Value)
 
             checker
 
