@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi.RegExp.ClrRegex
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex.Tree
 
 [<SolutionComponent>]
-type FSharpInjectionProvider
+type FSharpRegexInjectionProvider
         (lifetime: Lifetime, solution: ISolution, persistentIndexManager: IPersistentIndexManager,
          providersViewer: InjectionNodeProvidersViewer, injectionTargetLanguage: FSharpLiteralInjectionTarget) =
     inherit LanguageInjectorProviderInLiteralsWithRangeMarkersBase<IClrRegularExpressionFile, FSharpToken, FSharpLiteralInjectionTarget>

@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Features.RegExp.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
