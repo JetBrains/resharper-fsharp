@@ -1,4 +1,6 @@
+using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.Application.Settings;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.EditorConfig;
 using JetBrains.ReSharper.Psi.Format;
@@ -167,5 +169,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
     [SettingsIndexedEntry("Fantomas settings")]
     public readonly IIndexedEntry<string, string> FantomasSettings;
+  }
+
+  [ZoneMarker]
+  public class ZoneMarker : IRequire<IProjectModelZone>, IRequire<ILanguageFSharpZone>
+  {
   }
 }
