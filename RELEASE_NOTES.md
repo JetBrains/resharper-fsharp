@@ -46,6 +46,7 @@
 
 ### Misc
 
+* Update formatting settings to match newer Fantomas defaults
 * **Fix**: Deconstruct pattern action wouldn't add required parens in some cases
 * **Fix**: Find usages: references to a constructor could be found when it's used as a method group
 * **Fix**: Find usage: usages of `let` values defined inside types could be shown as 'Write' access
