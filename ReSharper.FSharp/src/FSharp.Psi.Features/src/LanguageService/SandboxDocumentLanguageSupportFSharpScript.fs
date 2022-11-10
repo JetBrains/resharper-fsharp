@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
+open System
 open JetBrains.ProjectModel
 open JetBrains.RdBackend.Common.Features.Documents
 open JetBrains.ReSharper.Plugins.FSharp
@@ -12,4 +13,4 @@ type SandboxDocumentLanguageSupportFSharpScript() =
         member x.DocumentFileExtension = FSharpScriptProjectFileType.FsxExtension
         member x.ProjectFileType = FSharpScriptProjectFileType.Instance :> ProjectFileType
         member x.SetupSandboxFile(_, _, _) = ()
-        member x.GetExtraInfos _ = null
+        member x.GetExtraInfos _ = Nullable()
