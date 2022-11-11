@@ -163,6 +163,13 @@ type FSharpCompletionTest() =
 
     [<Test>] member x.``XmlDoc - tags``() = x.DoNamedTest()
 
+    [<Test>] member x.``Interpolated string 01``() = x.DoNamedTest()
+    [<Test>] member x.``Interpolated string 02 - Before``() = x.DoNamedTest()
+    [<Test>] member x.``Interpolated string 02 - After``() = x.DoNamedTest()
+    [<Test>] member x.``Interpolated string 03 - Start``() = x.DoNamedTest()
+    [<Test>] member x.``Interpolated string 03 - Middle``() = x.DoNamedTest()
+    [<Test>] member x.``Interpolated string 03 - End``() = x.DoNamedTest()
+
 [<FSharpTest>]
 type FSharpPostfixCompletionTest() =
     inherit CodeCompletionTestBase()

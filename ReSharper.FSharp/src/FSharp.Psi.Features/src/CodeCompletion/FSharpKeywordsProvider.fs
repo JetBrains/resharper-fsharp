@@ -319,7 +319,7 @@ type FSharpKeywordsProvider() =
            tokenBeforeType == FSharpTokenType.RESERVED_LITERAL_FORMATS ||
            isNotNull tokenBeforeType && tokenBeforeType.IsConstantLiteral ||
            tokenBeforeCaret == context.TokenAtCaret && isNotNull tokenBeforeType &&
-               (tokenBeforeType.IsComment || tokenBeforeType.IsStringLiteral || tokenBeforeType.IsConstantLiteral)
+               (tokenBeforeType.IsComment || FSharpTokenType.Strings[tokenBeforeType] || tokenBeforeType.IsConstantLiteral)
         then false else
 
         if not fcsCompletionContext.PartialName.QualifyingIdents.IsEmpty then false else

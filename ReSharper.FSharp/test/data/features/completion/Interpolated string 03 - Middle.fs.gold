@@ -1,0 +1,4 @@
+﻿// ${COMPLETE_ITEM:false}
+namespace Ns
+
+let _ = $" { false{caret} } "
