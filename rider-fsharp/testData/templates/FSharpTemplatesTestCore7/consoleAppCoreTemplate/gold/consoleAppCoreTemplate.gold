@@ -10,7 +10,7 @@ Opened
       -Implicit
        ...
      -Packages
-      FSharp.Core/7.0.0-beta.22473.1
+      FSharp.Core/7.0.0
      -Frameworks
       Microsoft.NETCore.App
    Program.fs

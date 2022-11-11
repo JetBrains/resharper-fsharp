@@ -66,7 +66,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestBase() {
                 //configuration.environmentVariables = envVars
                 toggleBreakpoint(project, "Program.fs", breakpointLine)
             }
-            executeWithGold(debugGoldFile, getGoldFileSystemDependentSuffix()) {
+            executeWithGold(debugGoldFile) {
                 debugProgram(project, it, beforeRun,
                     test = {
                         waitForPause()
