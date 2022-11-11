@@ -117,8 +117,10 @@ let precedence (expr: ITreeNode) =
     // todo: type test, cast, typed
     | :? ITypedLikeExpr -> 5
     | :? ILambdaExpr -> 6
-    | :? ISequentialExpr -> 7
-    
+
+    | :? ISequentialExpr
+    | :? ISetExpr -> 7
+
     | :? ITupleExpr -> 8
 
     | :? IBinaryAppExpr as binaryAppExpr ->
