@@ -199,6 +199,7 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``Pattern - Active pattern - Total 10``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Active pattern - Total 11``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Active pattern - Total 12``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Active pattern - Regex``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - Exception 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Exception 02``() = x.DoNamedTest()

@@ -910,10 +910,22 @@ type FSharpParameterInfoContextFactory() =
                 caretOffset = endOffset && isNotNull (ParametersOwnerPatNavigator.GetByParameter(pat)) then
             tryCreateFromParentPat isAutoPopup caretOffset pat else
 
-        match getSymbols reference with
-        | Some(checkResults, symbol, symbolUses) ->
-            FSharpPatternParameterInfoContext(caretOffset, pat, reference, symbolUses,
-                checkResults, endOffset, symbol) :> IFSharpParameterInfoContext
+        let symbolUse = reference.GetSymbolUse()
+        if isNull symbolUse then null else
+
+        let isApplicable =
+            match symbolUse.Symbol with
+            | :? FSharpEntity as e -> e.IsFSharpExceptionDeclaration
+            | :? FSharpActivePatternCase
+            | :? FSharpUnionCase -> true
+            | _ -> false
+
+        if not isApplicable then null else
+
+        match pat.FSharpFile.GetParseAndCheckResults(true, "FSharpParameterInfoContextFactory.createFromPattern") with
+        | Some results ->
+            FSharpPatternParameterInfoContext(caretOffset, pat, reference, [symbolUse],
+                results.CheckResults, endOffset, symbolUse.Symbol) :> IFSharpParameterInfoContext
         | _ -> null
 
     and tryCreateContextFromPattern isAutoPopup (caretOffset: DocumentOffset) (pat: IFSharpPattern) : IFSharpParameterInfoContext =

@@ -138,9 +138,7 @@ type FSharpItemOccurenceKindProvider() =
                 EmptyList.Instance :> _
 
             | :? ITypeInherit ->
-                // Inherit type produces ctor reference.
-                // We don't want base ctor to show as New Instance Creation.
-                EmptyList.Instance :> _
+                [| OccurrenceKind.ExtendedType |] :> _
 
             | :? IReferenceExpr as refExpr ->
                 let refExpr = refExpr.IgnoreInnerParens()
