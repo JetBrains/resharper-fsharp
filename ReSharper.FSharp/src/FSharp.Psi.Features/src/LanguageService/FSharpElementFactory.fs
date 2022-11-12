@@ -385,3 +385,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
                 moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations[0] :?> IFSharpTypeDeclaration
 
             typeDeclaration.TypeParameterDeclarationList
+
+        member this.CreateAccessorsNamesClause(withGetter, withSetter) =
+            let accessors = [|
+                if withGetter then "get"
+                if withSetter then "set" |] |> String.concat ", "
+
+            let source = $"member val P = 3 with {accessors}"
+            let t = getTypeDecl source
+            t.MemberDeclarations[0].As<IAutoPropertyDeclaration>().AccessorsClause

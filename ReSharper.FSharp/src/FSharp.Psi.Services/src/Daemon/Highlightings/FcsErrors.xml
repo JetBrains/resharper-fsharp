@@ -494,6 +494,16 @@
     <QuickFix>ReplaceWithTypeRefExprFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="PropertyCannotBeSet" ID="FS0810: Property cannot be set">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message value="Property '{0}' cannot be set">
+      <Argument>refExpr.ShortName</Argument>
+    </Message>
+    <Range>refExpr.Identifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddSetterFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="CantTakeAddressOfExpression" ID="FS3236: Can't take address of expression">
     <Parameter type="IAddressOfExpr" name="expr"/>
     <Message value="Can't take address of expression"/>
