@@ -1,4 +1,0 @@
---> Program.fs:7(93,123) // printfn "Hello World from F#!"
-Program.main() in , ConsoleApplication.dll
-    argv = string[0]: string[]
-
