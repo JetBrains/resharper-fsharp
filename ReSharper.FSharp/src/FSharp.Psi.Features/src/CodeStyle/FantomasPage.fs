@@ -104,8 +104,8 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
 
 [<SolutionComponent>]
 type FantomasNotificationsManager(lifetime, settings: FantomasDetector, notifications: UserNotifications,
-                                  optionsManager: OptionsManager, dotnetToolsTracker: NuGetDotnetToolsTracker,
-                                  uiApplication: IUIApplication) =
+        optionsManager: OptionsManager, dotnetToolsTracker: SolutionDotnetToolsTracker,
+        uiApplication: IUIApplication) =
     let goToSettings = [| UserNotificationCommand("Settings", fun _ -> optionsManager.BeginShowOptions(nameof(FantomasPage))) |]
     let goToYouTrack = [| UserNotificationCommand("Report issue", fun _ -> uiApplication.OpenUri("https://youtrack.jetbrains.com/newissue?project=RIDER&clearDraft=true")) |]
     let openDotnetToolsOrGoToSettings toolsManifestPath =
@@ -151,7 +151,7 @@ type FantomasNotificationsManager(lifetime, settings: FantomasDetector, notifica
         | FantomasLocation.Bundled ->
             goToYouTrack
         | FantomasLocation.LocalDotnetTool ->
-            let manifestPath = dotnetToolsTracker.GetSolutionManifestPath()
+            let manifestPath = dotnetToolsTracker.GetToolsManifestPath()
             if isNotNull manifestPath && manifestPath.ExistsFile then
                 openDotnetToolsOrGoToSettings manifestPath.FullPath
             else goToSettings

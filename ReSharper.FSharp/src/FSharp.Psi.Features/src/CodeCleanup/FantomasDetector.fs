@@ -41,7 +41,7 @@ type FantomasDiagnosticNotification =
 
 [<SolutionInstanceComponent>]
 type FantomasDetector(lifetime, fantomasSettingsProvider: FSharpFantomasSettingsProvider,
-                      dotnetToolsTracker: NuGetDotnetToolsTracker) =
+        dotnetToolsTracker: SolutionDotnetToolsTracker) =
     let [<Literal>] fantomasToolPackageId = "fantomas-tool"
     let [<Literal>] fantomasPackageId = "fantomas"
     let minimalSupportedVersion = NuGetVersion(MinimalSupportedVersion)
@@ -170,7 +170,7 @@ type FantomasDetector(lifetime, fantomasSettingsProvider: FSharpFantomasSettings
             recalculateState settingsVersion)
 
     static member Create(lifetime) =
-        FantomasDetector(lifetime, Unchecked.defaultof<FSharpFantomasSettingsProvider>, Unchecked.defaultof<NuGetDotnetToolsTracker>)
+        FantomasDetector(lifetime, Unchecked.defaultof<_>, Unchecked.defaultof<_>)
 
     member x.TryRun(runAction: VirtualFileSystemPath * string -> unit) =
         use _ = rwLock.UsingWriteLock()

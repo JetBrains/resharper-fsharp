@@ -25,7 +25,7 @@ open JetBrains.Util
 
 [<SolutionComponent>]
 type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer,
-        fantomasHost: FantomasHost, dotnetToolsTracker: NuGetDotnetToolsTracker, notifications: UserNotifications,
+        fantomasHost: FantomasHost, dotnetToolsTracker: SolutionDotnetToolsTracker, notifications: UserNotifications,
         assemblyReaderShim: IFcsAssemblyReaderShim, projectProvider: IFcsProjectProvider,
         psiModules: IPsiModules, projectModelViewHost: ProjectModelViewHost) =
 
