@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
@@ -65,6 +66,10 @@ let rec getResultExpr (expr: IFSharpExpression) =
     | :? ISequentialExpr as seqExpr ->
         let lastExpr = seqExpr.Expressions.LastOrDefault()
         if isNotNull lastExpr then getResultExpr lastExpr else expr
+
+    | :? IParenExpr as parenExpr ->
+        let innerExpr = parenExpr.InnerExpression
+        if isNotNull innerExpr && not parenExpr.IsSingleLine then getResultExpr innerExpr else expr
 
     | _ -> expr
 

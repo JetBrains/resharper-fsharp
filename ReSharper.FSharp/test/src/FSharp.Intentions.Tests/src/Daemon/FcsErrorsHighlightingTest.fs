@@ -42,6 +42,7 @@ type FcsErrorsHighlightingTest() =
     [<Test>] member x.``Unused value - Partial pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Unused value - Partial pattern 02 - And``() = x.DoNamedTest()
     [<Test>] member x.``Unused value 01 - Object expression``() = x.DoNamedTest()
+    [<Test>] member x.``Unused value 02 - Parens``() = x.DoNamedTest()
 
     [<Test>] member x.``Unfinished let``() = x.DoNamedTest()
 
