@@ -32,23 +32,23 @@
   </Error>
 
   <Warning compilerGroup="FSharpErrors" name="MatchIncomplete" ID="FS0025: Match incomplete">
-    <Parameter type="IMatchExpr" name="expr"/>
+    <Parameter type="IMatchLikeExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.Expression.GetHighlightingRange()</Range>
+    <Range>getMatchLikeExprIncompleteRange expr</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddMatchAllClauseFix</QuickFix>
   </Warning>
 
   <Warning compilerGroup="FSharpErrors" name="EnumMatchIncomplete" ID="FS0104: Match incomplete for enum">
-    <Parameter type="IMatchExpr" name="expr"/>
+    <Parameter type="IMatchLikeExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.Expression.GetHighlightingRange()</Range>
+    <Range>getMatchLikeExprIncompleteRange expr</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddMatchAllClauseFix</QuickFix>
   </Warning>

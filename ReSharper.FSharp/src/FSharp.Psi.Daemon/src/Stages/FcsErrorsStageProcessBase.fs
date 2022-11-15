@@ -286,9 +286,6 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let fsPattern = fsFile.GetNode<IFSharpPattern>(range)
             if isNotNull fsPattern then createGenericHighlighting error range else
 
-            let matchLambdaExpr = fsFile.GetNode<IMatchLambdaExpr>(range)
-            if isNotNull matchLambdaExpr then createGenericHighlighting error range else
-
             createHighlightingFromParentNodeWithMessage MatchIncompleteWarning range error
 
         | EnumMatchIncomplete ->

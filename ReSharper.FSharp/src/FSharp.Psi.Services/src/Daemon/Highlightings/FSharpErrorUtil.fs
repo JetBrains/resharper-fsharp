@@ -159,3 +159,12 @@ let getParameterOwnerPatParametersRange (pat : IParametersOwnerPat) =
     let last = parameters.Last()
 
     getTreeNodesDocumentRange first last
+
+let getMatchLikeExprIncompleteRange (expr: IMatchLikeExpr) =
+    let treeNode: ITreeNode = 
+        match expr with
+        | :? IMatchExpr as matchExpr -> matchExpr.Expression
+        | :? IMatchLambdaExpr as functionExpr -> functionExpr.FunctionKeyword
+        | _ -> expr
+
+    treeNode.GetHighlightingRange()

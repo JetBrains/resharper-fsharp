@@ -6,10 +6,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
+
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+
 
 [<RequireQualifiedAccess>]
 type GeneratedClauseExpr =
@@ -17,7 +21,7 @@ type GeneratedClauseExpr =
     | ArgumentOutOfRange
 
 
-type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) =
+type AddMatchAllClauseFix(expr: IMatchLikeExpr, generatedExpr: GeneratedClauseExpr) =
     inherit FSharpQuickFixBase()
 
     new (warning: MatchIncompleteWarning) =
@@ -40,6 +44,13 @@ type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) 
         let isSingleLineMatch = expr.IsSingleLine
 
         let addToNewLine = not isSingleLineMatch // todo: cover more cases
+
+        let singleClause = expr.Clauses.SingleItem
+        if isNotNull singleClause && isNull singleClause.Bar && singleClause.StartLine <> expr.StartLine then
+            addNodesBefore singleClause.FirstChild [
+                FSharpTokenType.BAR.CreateLeafElement()
+                Whitespace()
+            ] |> ignore
 
         let clause =
             addNodesAfter expr.LastChild [

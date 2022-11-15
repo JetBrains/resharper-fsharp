@@ -692,7 +692,7 @@ interface matchLikeExpr:
 matchLambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="ClauseExpressions" path=<matchLambdaExpr:MATCH_CLAUSE/matchClause:EXPR> };
 }:
-  FUNCTION
+  FUNCTION<FUNCTION, FunctionKeyword>
   matchClause<MATCH_CLAUSE, Clauses>*;
 
 // todo: separate nodes for bang exprs?
