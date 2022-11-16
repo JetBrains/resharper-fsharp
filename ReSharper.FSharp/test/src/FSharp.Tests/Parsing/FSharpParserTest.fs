@@ -534,6 +534,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Abstract 03 - Function return``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Abstract 04 - Constrained type usage``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Abstract 05 - Static``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Abstract 06 - Accessors``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Member 01 - Wild self id``() = x.DoNamedTest()
 
@@ -719,6 +720,7 @@ type FSharpSignatureParserTest() =
 
     [<Test>] member x.``Type repr - Record - XmlDoc 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Abstract 01 - Accessors``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit 02 - Qualifiers``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit 03 - Generic``() = x.DoNamedTest()
