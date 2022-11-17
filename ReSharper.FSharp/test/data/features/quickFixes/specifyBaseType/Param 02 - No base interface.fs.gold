@@ -1,0 +1,3 @@
+﻿let f (x: obj) =
+    match x with
+    | :? System.IDisposable{caret} -> ()

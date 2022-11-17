@@ -15,6 +15,17 @@
     <Group name="F# Errors" key="FSharpErrors"/>
   </StaticSeverityGroups>
 
+  <Error staticGroup="FSharpErrors" name="IndeterminateTypeRuntimeCoercion" ID="FS0008: Runtime coercion or type test involves an indeterminate type">
+    <Parameter type="IIsInstPat" name="isInstPat"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>isInstPat.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>SpecifyParameterBaseTypeFix</QuickFix>
+  </Error>
+
   <Warning compilerGroup="FSharpErrors" name="UseBindingsIllegalInModules" ID="FS0524: 'use' bindings illegal in modules">
     <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
     <Message value="'use' bindings are treated as 'let' bindings in modules"/>

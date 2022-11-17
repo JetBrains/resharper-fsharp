@@ -37,6 +37,7 @@ module FSharpErrors =
     let [<Literal>] TypeEquation = 1
     let [<Literal>] NotAFunction = 3
     let [<Literal>] FieldNotMutable = 5
+    let [<Literal>] IndeterminateRuntimeCoercion = 8
     let [<Literal>] RuntimeCoercionSourceSealed = 16
     let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] MatchIncomplete = 25
@@ -227,6 +228,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | FieldNotMutable ->
             createHighlightingFromNode FieldNotMutableError range
+
+        | IndeterminateRuntimeCoercion ->
+            createHighlightingFromNodeWithMessage IndeterminateTypeRuntimeCoercionError range error
 
         | RuntimeCoercionSourceSealed ->
             match fsFile.GetNode<IFSharpPattern>(range) with
