@@ -116,6 +116,8 @@ let tryGetCommonParentModuleDecl (context: ITreeNode) (moduleToImport: ModuleToI
             | :? IGlobalNamespaceDeclaration :: decls -> decls
             | _ -> moduleDecls
 
+        if moduleDecls.IsEmpty then None else
+
         let importModuleQualifiedList = toQualifiedList declaredElement
         let topLevelDecl = List.head moduleDecls
 
