@@ -39,4 +39,4 @@ type UpdateRecordFieldsInSignatureFix(typeDecl: IFSharpTypeDeclaration) =
     override this.IsAvailable _ =
         isValid typeDecl && Option.isSome implementationRecordRepr
 
-    override this.Text = "Update record fields in signature file."
+    override this.Text = "Update record fields in signature file"

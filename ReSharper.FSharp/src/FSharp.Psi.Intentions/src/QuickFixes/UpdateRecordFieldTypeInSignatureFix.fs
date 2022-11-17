@@ -42,4 +42,4 @@ type UpdateRecordFieldTypeInSignatureFix(error: FieldNotContainedTypesDifferErro
     override this.IsAvailable _ =
         isValid error.RecordFieldDeclaration && Option.isSome recordFieldDeclaration
 
-    override this.Text = "Update field type in signature file."
+    override this.Text = "Update field type in signature file"

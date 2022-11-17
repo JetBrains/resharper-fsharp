@@ -92,4 +92,4 @@ type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
 
     override this.IsAvailable _ =
         isValid warning.Pattern && Option.isSome declaredElementAndParameterPatterns
-    override this.Text = "Update parameter name in signature file."
+    override this.Text = "Update parameter name in signature file"
