@@ -11,7 +11,7 @@ type AddSetterFix(error: PropertyCannotBeSetError) =
     inherit FSharpQuickFixBase()
 
     let refExpr = error.RefExpr
-    let mutable declaration: IAutoPropertyDeclaration = null
+    let mutable declaration: IAccessorsNamesClauseOwner = null
 
     override this.IsAvailable _ =
         isValid refExpr &&
@@ -19,15 +19,19 @@ type AddSetterFix(error: PropertyCannotBeSetError) =
         let declaredElement = refExpr.Reference.Resolve().DeclaredElement
         let decl = declaredElement.GetDeclarations() |> Seq.tryExactlyOne
 
+        declaredElement :? IFSharpProperty &&
+
         match decl with
         | None -> false
         | Some decl ->
 
-        match decl with
-        | :? IAutoPropertyDeclaration as decl ->
-            declaration <- decl
-            true
-        | _ -> false
+        declaration <-
+            match decl with
+            | :? IAbstractMemberDeclaration as decl -> decl :> IAccessorsNamesClauseOwner
+            | :? IAutoPropertyDeclaration as decl when not decl.IsVirtual -> decl
+            | _ -> null
+
+        isNotNull declaration
 
     override this.Text = $"Add setter to '{refExpr.ShortName}'"
 
@@ -35,8 +39,9 @@ type AddSetterFix(error: PropertyCannotBeSetError) =
         use writeCookie = WriteLockCookie.Create(refExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let factory = declaration.CreateElementFactory()
+        let factory = refExpr.CreateElementFactory()
         let accessors = factory.CreateAccessorsNamesClause(true, true)
 
         declaration.SetAccessorsClause(accessors) |> ignore
-        addNodeBefore declaration.AccessorsClause (Whitespace(1))
+        if not (declaration.AccessorsClause.PrevSibling :? Whitespace) then
+            addNodeBefore declaration.AccessorsClause (Whitespace(1))

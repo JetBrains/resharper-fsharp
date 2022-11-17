@@ -1,0 +1,4 @@
+[<AbstractClass>]
+type T() =
+    abstract member P: int with get, set
+    member x.M() = x.P{caret} <- 23
