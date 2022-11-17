@@ -12,6 +12,7 @@ open JetBrains.Application.PersistentMap
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
+open JetBrains.DocumentManagers.Transactions.ProjectHostActions.Ordering
 open JetBrains.Lifetimes
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.Platform.MsBuildHost.ProjectModel
@@ -28,7 +29,6 @@ open JetBrains.ReSharper.Feature.Services.Navigation.NavigationProviders
 open JetBrains.RdBackend.Common.Features.ProjectModel.View
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.Appenders
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.Ordering
-open JetBrains.RdBackend.Common.Features.Util.Tree
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
