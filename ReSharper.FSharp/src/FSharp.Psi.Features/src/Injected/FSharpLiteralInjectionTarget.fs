@@ -1,10 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected
 
-open System
 open System.Text.RegularExpressions
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi.CSharp.Util.Literals
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex
@@ -22,11 +22,10 @@ type FSharpLiteralInjectionTarget() =
             false
 
         override _.GetStartOffsetForString(originalNode) =
-            match originalNode.GetTokenType().GetLiteralType() with
-            | FSharpLiteralType.VerbatimString -> 2
-            | _ -> 1
+            originalNode.GetTokenType() |> getStringStartingQuotesLength
 
-        override _.GetEndOffsetForString _ = 1
+        override _.GetEndOffsetForString(originalNode) =
+            originalNode.GetTokenType() |> getStringEndingQuotesLength
 
         override _.UpdateNode(_, _, _, length, _, _, _, _) =
             length <- -1
@@ -36,19 +35,29 @@ type FSharpLiteralInjectionTarget() =
 
         override _.IsInjectionAllowed(literalNode) =
             let tokenType = literalNode.GetTokenType()
-            if isNull tokenType || not tokenType.IsStringLiteral then false else
 
-            match tokenType.GetLiteralType() with
-            | FSharpLiteralType.VerbatimString
-            | FSharpLiteralType.RegularString -> true
-            | _ -> false
+            FSharpTokenType.Strings[tokenType] &&
+            tokenType <> FSharpTokenType.CHARACTER_LITERAL &&
+            tokenType <> FSharpTokenType.VERBATIM_BYTEARRAY &&
+            tokenType <> FSharpTokenType.BYTEARRAY
 
         override _.GetCorrespondingCommentTextForLiteral _ = null
 
-        override _.CreateBuffer(_, text, options) =
+        override _.CreateBuffer(literalNode, text, options) =
             let literalType =
-                if text.StartsWith("@", StringComparison.Ordinal) then CSharpLiteralType.VerbatimString
-                else CSharpLiteralType.RegularString
+                match literalNode.GetTokenType().GetLiteralType() with
+                | RegularString ->
+                    CSharpLiteralType.RegularString :> CSharpLiteralType
+                | InterpolatedString ->
+                    CSharpLiteralType.RegularInterpolatedString
+                | InterpolatedStringStart ->
+                    CSharpLiteralType.RegularInterpolatedStringStart
+                | InterpolatedStringMiddle ->
+                    CSharpLiteralType.RegularInterpolatedStringMiddle
+                | InterpolatedStringEnd ->
+                    CSharpLiteralType.RegularInterpolatedStringEnd
+                | _ ->
+                    CSharpLiteralType.VerbatimString
 
             let lexerOptions =
                 match options with
@@ -62,23 +71,19 @@ type FSharpLiteralInjectionTarget() =
         override _.DoNotProcessNodeInterior _ = false
 
         override _.IsPrimaryLanguageApplicable(sourceFile) =
-            match sourceFile.LanguageType with
-            | :? FSharpProjectFileType -> true
-            | _ -> false
+            sourceFile.LanguageType :? FSharpProjectFileType
 
         override _.CreateLexerFactory(languageService) =
             languageService.GetPrimaryLexerFactory()
 
-        override _.AllowsLineBreaks(literalNode) =
-            match literalNode.GetTokenType().GetLiteralType() with
-            | FSharpLiteralType.VerbatimString -> true
-            | _ -> false
+        override _.AllowsLineBreaks _ = true
 
         override _.IsWhitespaceToken(token) =
             token.GetTokenType().IsWhitespace
 
+        // Used only in JS/JSON for now
         override x.FixValueRangeForLiteral(element) =
             let startOffset = (x :> IInjectionTargetLanguage).GetStartOffsetForString(element)
             element.GetTreeTextRange().TrimLeft(startOffset).TrimRight(1)
 
-        override _.Language = FSharpLanguage.Instance :> _
+        override _.Language = FSharpLanguage.Instance

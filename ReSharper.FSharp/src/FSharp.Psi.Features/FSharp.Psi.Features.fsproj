@@ -78,10 +78,12 @@
     <Compile Include="src\LanguageService\SandboxDocumentLanguageSupportFSharpScript.fs" />
     <Compile Include="src\LanguageService\FSharpLanguageSpecificCopyPasteBehavior.fs" />
     <Compile Include="src\Internal\FSharpInternalActionGroup.fs" />
+    <Compile Include="src\Injected\FSharpInjectionUtil.fs" />
+    <Compile Include="src\Injected\RegexPatternDetector.fs" />
     <Compile Include="src\Injected\FSharpLiteralInjectionTarget.fs" />
-    <Compile Include="src\Injected\FSharpRegexInjectionProvider.fs" />
+    <Compile Include="src\Injected\FSharpRegexProviders.fs" />
     <Compile Include="src\Injected\FSharpRegexNodeProvider.fs" />
-    <Compile Include="src\Injected\RegExpPsiProvider.fs" />
+    <Compile Include="src\Injected\ZoneMarker.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>

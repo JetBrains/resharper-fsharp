@@ -18,7 +18,7 @@ type FSharpLiteralType =
     | TripleQuoteString
     /// "{string}"B
     | ByteArray
-    /// $"{string}"
+    /// $"string"
     | InterpolatedString
     /// $"{string}{
     | InterpolatedStringStart
