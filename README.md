@@ -14,6 +14,7 @@ F# support in Rider makes use of open source software, most notably [FSharp.Comp
 ### Requirements
 
 * [.NET SDK 5](https://www.microsoft.com/net/download/windows) or newer
+* [Gradle](https://gradle.org/)
 
 ### Optional
 
