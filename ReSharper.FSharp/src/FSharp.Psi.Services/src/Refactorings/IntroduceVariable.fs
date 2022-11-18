@@ -749,7 +749,7 @@ type FSharpIntroduceVarHelper() =
 
         let occurrences =
             let valueText = getOccurrenceText boundType "' value"
-            [| WorkflowPopupMenuOccurrence(valueText, null, null)
+            [| WorkflowPopupMenuOccurrence(valueText, null, null, null)
                WorkflowPopupMenuOccurrence(RichText(deconstruction.Text), null, deconstruction) |]
 
         let selectedOccurrence = workflow.ShowOccurrences(occurrences, context)
