@@ -111,6 +111,7 @@
     <Compile Include="src\QuickFixes\UpdateParameterNameInSignatureFixTests.fs" />
     <Compile Include="src\QuickFixes\UpdateRecordFieldsInSignatureFixTest.fs" />
     <Compile Include="src\QuickFixes\UpdateRecordFieldTypeInSignatureFixTest.fs" />
+    <Compile Include="src\QuickFixes\UnionCaseDoesNotTakeArgumentsFixTest.fs" />
   </ItemGroup>
 
   <ItemGroup>

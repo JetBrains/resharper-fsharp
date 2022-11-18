@@ -69,6 +69,7 @@ module FSharpErrors =
     let [<Literal>] SuccessiveArgsShouldBeSpacedOrTupled = 597
     let [<Literal>] StaticFieldUsedWhenInstanceFieldExpected = 627
     let [<Literal>] InstanceMemberRequiresTarget = 673
+    let [<Literal>] UnionCaseDoesNotTakeArguments = 725
     let [<Literal>] UnionCaseExpectsTupledArguments = 727
     let [<Literal>] ConstructRequiresListArrayOrSequence = 747
     let [<Literal>] ConstructRequiresComputationExpression = 748
@@ -471,7 +472,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
             let expr = fsFile.GetNode<IDoLikeStatement>(range)
             if isNotNull expr then NamespaceCannotContainExpressionsError(expr) :> _ else null
-
+        
+        | UnionCaseDoesNotTakeArguments ->
+            createHighlightingFromNode UnionCaseDoesNotTakeArgumentsError range
+            
         | _ -> createGenericHighlighting error range
 
     abstract ShouldAddDiagnostic: error: FSharpDiagnostic * range: DocumentRange -> bool
