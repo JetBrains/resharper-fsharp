@@ -1245,11 +1245,11 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         this.DoHandleBackspacePressed
             (textControl,
-             (fun lexer ->
-                lexer.TokenType == FSharpTokenType.STRING ||
-                lexer.TokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING ||
-                lexer.TokenType == FSharpTokenType.VERBATIM_STRING ||
-                lexer.TokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING),
+             (fun tokenType ->
+                tokenType == FSharpTokenType.STRING ||
+                tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING ||
+                tokenType == FSharpTokenType.VERBATIM_STRING ||
+                tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING),
              (fun _ -> FSharpBracketMatcher() :> _))
 
     member x.HandleBackspaceInTripleQuotedString(textControl: ITextControl) =
