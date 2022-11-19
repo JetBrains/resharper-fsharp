@@ -7,6 +7,9 @@ RiderSdkPackageVersion.props
 # Rider-specific files
 .idea
 
+# Visual Studio specific files
+.vs
+
 # Build results
 [Dd]ebug/
 [Rr]elease/
