@@ -2,37 +2,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Resources.Shell
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpModulesUtil
-open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Resources.Shell
 
-type UnionCaseDoesNotTakeArgumentsFix(node: IFSharpPattern) =
+type UnionCaseDoesNotTakeArgumentsFix(error: UnionCaseDoesNotTakeArgumentsError) =
     inherit FSharpQuickFixBase()
 
-    let pattern =
-        match node with
-        | :? IParametersOwnerPat as pat when not pat.Parameters.IsEmpty -> Some pat
-        | _ -> None
-
-    new (error: UnionCaseDoesNotTakeArgumentsError) = UnionCaseDoesNotTakeArgumentsFix(error.Pattern)
+    let pat = error.Pattern.As<IParametersOwnerPat>()
 
     override x.Text = "This union case does not take arguments"
 
     override x.IsAvailable _ =
-        isValid node && pattern.IsSome
+        isValid pat
 
     override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(node.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        match pattern with
-        | None -> ()
-        | Some pat ->
-            let factory = pat.CreateElementFactory()
-            let newPat = factory.CreatePattern(pat.Identifier.Name, true)
-            PsiModificationUtil.replace pat newPat
+
+        let isTopLevel = pat.GetBindingFromHeadPattern() :? ITopBinding
+        let nodeType = if isTopLevel then ElementType.TOP_REFERENCE_PAT else ElementType.LOCAL_REFERENCE_PAT
+
+        let oldNode = pat.IgnoreParentParens() // possibly containing parens (or the old param owner pat)
+        let topReferencePat = nodeType.Create() // new node
+        let topReferencePat = ModificationUtil.AddChildBefore(oldNode, topReferencePat) // new node inserted into the tree before old pattern
+        ModificationUtil.AddChild(topReferencePat, pat.ReferenceName) |> ignore // reference name node moved to the new one
+        ModificationUtil.DeleteChild(oldNode) // remove the old node

@@ -11,6 +11,9 @@ type UnionCaseDoesNotTakeArgumentsFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/unionCaseDoesNotTakeArgumentsFix"
 
         
+    [<Test>] member x.``Two names`` () = x.DoNamedTest()
+    [<Test; DumpPsiTree>] member x.``Local 01`` () = x.DoNamedTest()
+    [<Test; DumpPsiTree>] member x.``Local 02`` () = x.DoNamedTest()
     [<Test>] member x.``Single parameter`` () = x.DoNamedTest()
     
     [<Test>] member x.``Two parameters`` () = x.DoNamedTest()
