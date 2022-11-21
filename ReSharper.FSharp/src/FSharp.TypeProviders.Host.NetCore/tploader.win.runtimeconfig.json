@@ -1,10 +1,9 @@
 ﻿{
   "runtimeOptions": {
-    "tfm": "net7",
+    "tfm": "netcoreapp3.1",
     "framework": {
       "name": "Microsoft.WindowsDesktop.App",
-      "version": "7.0.0-preview",
-      "rollForward": "Minor"
+      "version": "3.1.0"
     }
   }
 }

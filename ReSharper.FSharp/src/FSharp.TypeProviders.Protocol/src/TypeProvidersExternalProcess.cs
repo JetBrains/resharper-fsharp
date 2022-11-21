@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Application.Processes;
 using JetBrains.Application.Threading;
 using JetBrains.Core;
@@ -8,10 +9,10 @@ using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
+using JetBrains.ProjectModel.BuildTools;
 using JetBrains.Rd;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
 using JetBrains.Util;
-using NuGet.Versioning;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 {
@@ -19,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     TypeProvidersExternalProcess : ProtocolExternalProcess<RdFSharpTypeProvidersModel, TypeProvidersConnection>
   {
     private readonly JetProcessRuntimeRequest myRequest;
-    private readonly NuGetVersion myNuGetVersion;
+    private readonly DotNetCoreToolset myToolset;
     private readonly bool myIsInternalMode;
     private Lifetime myLifetime;
 
@@ -47,11 +48,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     private ProcessStartInfo GetCoreProcessStartInfo(int port, FileSystemPath basePath)
     {
-      var sdkMajorVersion = myNuGetVersion.Major.Clamp(3, 7);
-      var runtimeConfigPath = basePath / TypeProvidersProtocolConstants.CoreRuntimeConfigFilename(sdkMajorVersion);
-      var fileSystemPath = basePath / TypeProvidersProtocolConstants.TypeProvidersHostCoreFilename;
-      var dotnetArgs = $"--runtimeconfig \"{runtimeConfigPath}\"";
+      var sdkMajorVersion = myToolset.Sdk.NotNull().Version.Major;
+      var sharedFrameworkName = PlatformUtil.IsRunningUnderWindows
+        ? "Microsoft.WindowsDesktop.App"
+        : "Microsoft.NETCore.App";
 
+      var sharedFrameworkVersions = myToolset.Cli.Runtimes
+        .FirstOrDefault(t => t.Name == sharedFrameworkName)
+        .NotNull($"{sharedFrameworkName} should exists");
+
+      var majorVersions = sharedFrameworkVersions.Versions
+        .Where(v => v.Major == sdkMajorVersion)
+        .ToList();
+      Assertion.Assert(majorVersions.Any(),
+        $"{sharedFrameworkName} shoul contains at least one {sdkMajorVersion} major version");
+
+      var versionToRun = majorVersions.Max();
+
+      var runtimeConfigPath = basePath / TypeProvidersProtocolConstants.CoreRuntimeConfigFilename;
+      var fileSystemPath = basePath / TypeProvidersProtocolConstants.TypeProvidersHostCoreFilename;
+      var dotnetArgs = $"--fx-version {versionToRun} --runtimeconfig \"{runtimeConfigPath}\"";
       Assertion.Assert(fileSystemPath.ExistsFile, $"can't find '{fileSystemPath.FullPath}'");
       Assertion.Assert(runtimeConfigPath.ExistsFile, $"can't find '{runtimeConfigPath.FullPath}'");
 
@@ -105,12 +121,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     }
 
     public TypeProvidersExternalProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
-      IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, NuGetVersion nuGetVersion,
+      IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, DotNetCoreToolset toolset,
       bool isInternalMode)
       : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
       myRequest = request;
-      myNuGetVersion = nuGetVersion;
+      myToolset = toolset;
       myIsInternalMode = isInternalMode;
     }
   }
