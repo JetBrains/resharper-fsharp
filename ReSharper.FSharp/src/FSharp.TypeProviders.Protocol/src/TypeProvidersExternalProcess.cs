@@ -61,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         .Where(v => v.Major == sdkMajorVersion)
         .ToList();
       Assertion.Assert(majorVersions.Any(),
-        $"{sharedFrameworkName} shoul contains at least one {sdkMajorVersion} major version");
+        $"{sharedFrameworkName} should contains at least one {sdkMajorVersion} major version");
 
       var versionToRun = majorVersions.Max();
 
