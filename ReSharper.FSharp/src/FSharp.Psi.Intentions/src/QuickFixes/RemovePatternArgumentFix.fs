@@ -10,12 +10,15 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type UnionCaseDoesNotTakeArgumentsFix(error: UnionCaseDoesNotTakeArgumentsError) =
+type RemovePatternArgumentFix(node: IFSharpPattern) =
     inherit FSharpQuickFixBase()
 
-    let pat = error.Pattern.As<IParametersOwnerPat>()
+    let pat = node.As<IParametersOwnerPat>()
+    
+    new (error: UnionCaseDoesNotTakeArgumentsError) = RemovePatternArgumentFix(error.Pattern)
+    new (error: LiteralPatternDoesNotTakeArgumentsError) = RemovePatternArgumentFix(error.Pattern)
 
-    override x.Text = "This union case does not take arguments"
+    override x.Text = "Remove argument"
 
     override x.IsAvailable _ =
         isValid pat
