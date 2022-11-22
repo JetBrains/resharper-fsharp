@@ -75,6 +75,7 @@
     <Compile Include="src\QuickFixes\UseWildSelfIdFix.fs" />
     <Compile Include="src\QuickFixes\AddParensToTypedLikeExprFix.fs" />
     <Compile Include="src\QuickFixes\SpecifyParameterTypeFix.fs" />
+    <Compile Include="src\QuickFixes\SpecifyParameterTypeFromMemberFix.fs" />
     <Compile Include="src\QuickFixes\SpecifyParameterBaseTypeFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithInterpolatedStringFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithPredefinedOperatorFix.fs" />

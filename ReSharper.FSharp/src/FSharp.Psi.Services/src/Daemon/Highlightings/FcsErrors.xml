@@ -417,6 +417,7 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>SpecifyParameterTypeFix</QuickFix>
     <QuickFix>SpecifyPropertyTypeFix</QuickFix>
+    <QuickFix>SpecifyParameterTypeFromMemberFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="IndexerIndeterminateType" ID="FS0752: Use of indexer on indeterminate type object">
