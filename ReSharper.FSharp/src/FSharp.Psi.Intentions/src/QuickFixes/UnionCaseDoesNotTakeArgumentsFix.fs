@@ -27,8 +27,8 @@ type UnionCaseDoesNotTakeArgumentsFix(error: UnionCaseDoesNotTakeArgumentsError)
         let isTopLevel = pat.GetBindingFromHeadPattern() :? ITopBinding
         let nodeType = if isTopLevel then ElementType.TOP_REFERENCE_PAT else ElementType.LOCAL_REFERENCE_PAT
 
-        let oldNode = pat.IgnoreParentParens() // possibly containing parens (or the old param owner pat)
-        let topReferencePat = nodeType.Create() // new node
-        let topReferencePat = ModificationUtil.AddChildBefore(oldNode, topReferencePat) // new node inserted into the tree before old pattern
-        ModificationUtil.AddChild(topReferencePat, pat.ReferenceName) |> ignore // reference name node moved to the new one
-        ModificationUtil.DeleteChild(oldNode) // remove the old node
+        let oldNode = if not(pat.ReferenceName.IsQualified) then pat.IgnoreParentParens() else pat
+        let topReferencePat = nodeType.Create()
+        let topReferencePat = ModificationUtil.AddChildBefore(oldNode, topReferencePat)
+        ModificationUtil.AddChild(topReferencePat, pat.ReferenceName) |> ignore
+        ModificationUtil.DeleteChild(oldNode)

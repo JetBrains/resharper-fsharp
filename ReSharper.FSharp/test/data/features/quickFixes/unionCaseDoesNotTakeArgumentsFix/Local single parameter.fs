@@ -1,3 +1,3 @@
 do
-            let (Option.None x{caret}) = None
-            ()
+    let (Option.None x{caret}) = None
+    ()

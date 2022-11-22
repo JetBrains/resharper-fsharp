@@ -1,2 +1,2 @@
 match None with
-       | None x{caret} -> ()
+| None x{caret} -> ()

@@ -19,3 +19,4 @@ type UnionCaseDoesNotTakeArgumentsFixTest() =
     [<Test>] member x.``Local two parameter`` () = x.DoNamedTest()
     [<Test>] member x.``Qualified single parameter`` () = x.DoNamedTest()
     [<Test>] member x.``Qualified two parameters`` () = x.DoNamedTest()
+    [<Test>] member x.``Local match qualified single parens parameter`` () = x.DoNamedTest()

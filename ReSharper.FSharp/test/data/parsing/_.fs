@@ -1,3 +1,3 @@
 namespace global
 
-let (None _) = None
+let (Option.None x) = None
