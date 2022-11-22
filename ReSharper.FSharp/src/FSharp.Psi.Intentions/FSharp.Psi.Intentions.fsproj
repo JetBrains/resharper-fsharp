@@ -95,6 +95,7 @@
     <Compile Include="src\QuickFixes\SignatureFixUtil.fs" />
     <Compile Include="src\QuickFixes\UpdateRecordFieldsInSignatureFix.fs" />
     <Compile Include="src\QuickFixes\UpdateRecordFieldTypeInSignatureFix.fs" />
+    <Compile Include="src\QuickFixes\RemovePatternArgumentFix.fs" />
     <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\Errors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
