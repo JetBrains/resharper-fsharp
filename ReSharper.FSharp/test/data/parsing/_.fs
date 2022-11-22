@@ -1,3 +1,4 @@
 namespace global
 
-let (Option.None x) = None
+match None with
+| (Option.None x) -> ()
