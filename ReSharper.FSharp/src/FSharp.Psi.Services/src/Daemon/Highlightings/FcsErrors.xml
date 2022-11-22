@@ -680,12 +680,12 @@
     <Behavour overlapResolvePolicy="NONE"/>
   </Warning>
 
-  <Error staticGroup="FSharpErrors" name="RemovePatternArgument" ID="FS0725: This pattern does not take arguments">
+  <Error staticGroup="FSharpErrors" name="UnionCaseDoesNotTakeArguments" ID="FS0725: This union case does not take arguments">
     <Parameter type="IFSharpPattern" name="pattern"/>
-    <Message value="This pattern does not take arguments"/>
+    <Message value="This union case does not take arguments"/>
     <Range>pattern.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>RemovePatternArgumentFix</QuickFix>
+    <QuickFix>UnionCaseDoesNotTakeArgumentsFix</QuickFix>
   </Error>
 
 </Errors>

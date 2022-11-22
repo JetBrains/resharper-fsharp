@@ -5,9 +5,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
-type RemovePatternArgumentFixTest() =
-    inherit FSharpQuickFixTestBase<RemovePatternArgumentFix>()
-    override x.RelativeTestDataPath = "features/quickFixes/removePatternArgumentFix"
+type UnionCaseDoesNotTakeArgumentsFixTest() =
+    inherit FSharpQuickFixTestBase<UnionCaseDoesNotTakeArgumentsFix>()
+    override x.RelativeTestDataPath = "features/quickFixes/unionCaseDoesNotTakeArgumentsFix"
 
     [<Test>] member x.``Single parameter`` () = x.DoNamedTest()
     [<Test>] member x.``Two parameters`` () = x.DoNamedTest()
