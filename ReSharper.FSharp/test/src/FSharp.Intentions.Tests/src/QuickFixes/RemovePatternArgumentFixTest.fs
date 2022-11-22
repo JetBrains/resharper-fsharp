@@ -7,6 +7,7 @@ open NUnit.Framework
 [<FSharpTest>]
 type RemovePatternArgumentFixTest() =
     inherit FSharpQuickFixTestBase<RemovePatternArgumentFix>()
+
     override x.RelativeTestDataPath = "features/quickFixes/removePatternArgumentFix"
 
     [<Test>] member x.``Single parameter`` () = x.DoNamedTest()

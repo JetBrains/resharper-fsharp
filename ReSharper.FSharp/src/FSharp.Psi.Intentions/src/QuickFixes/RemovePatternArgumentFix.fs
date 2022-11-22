@@ -10,14 +10,14 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type RemovePatternArgumentFix(node: IFSharpPattern) =
+type RemovePatternArgumentFix(pat: IParametersOwnerPat) =
     inherit FSharpQuickFixBase()
 
-    let pat = node.As<IParametersOwnerPat>()
-    
-    new (error: UnionCaseDoesNotTakeArgumentsError) = RemovePatternArgumentFix(error.Pattern)
+    new (error: UnionCaseDoesNotTakeArgumentsError) =
+        RemovePatternArgumentFix(error.Pattern)
 
-    new (error: LiteralPatternDoesNotTakeArgumentsError) = RemovePatternArgumentFix(error.Pattern)
+    new (error: LiteralPatternDoesNotTakeArgumentsError) =
+        RemovePatternArgumentFix(error.Pattern)
 
     override x.Text = "Remove argument"
 

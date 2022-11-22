@@ -681,7 +681,7 @@
   </Warning>
 
   <Error staticGroup="FSharpErrors" name="UnionCaseDoesNotTakeArguments" ID="FS0725: This union case does not take arguments">
-    <Parameter type="IFSharpPattern" name="pattern"/>
+    <Parameter type="IParametersOwnerPat" name="pattern"/>
     <Message value="This union case does not take arguments"/>
     <Range>pattern.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
@@ -689,7 +689,7 @@
   </Error>
   
   <Error staticGroup="FSharpErrors" name="LiteralPatternDoesNotTakeArguments" ID="FS3191: This literal pattern does not take arguments">
-    <Parameter type="IFSharpPattern" name="pattern"/>
+    <Parameter type="IParametersOwnerPat" name="pattern"/>
     <Message value="This literal pattern does not take arguments"/>
     <Range>pattern.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
