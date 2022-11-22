@@ -16,6 +16,7 @@ type RemovePatternArgumentFix(node: IFSharpPattern) =
     let pat = node.As<IParametersOwnerPat>()
     
     new (error: UnionCaseDoesNotTakeArgumentsError) = RemovePatternArgumentFix(error.Pattern)
+
     new (error: LiteralPatternDoesNotTakeArgumentsError) = RemovePatternArgumentFix(error.Pattern)
 
     override x.Text = "Remove argument"
