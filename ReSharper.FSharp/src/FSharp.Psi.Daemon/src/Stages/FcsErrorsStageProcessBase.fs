@@ -81,6 +81,7 @@ module FSharpErrors =
     let [<Literal>] TypeAbbreviationsCannotHaveAugmentations = 964
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
+    let [<Literal>] LiteralPatternDoesNotTakeArguments = 3191
     let [<Literal>] ArgumentNamesInSignatureAndImplementationDoNotMatch = 3218
     let [<Literal>] CantTakeAddressOfExpression = 3236
     let [<Literal>] SingleQuoteInSingleQuote = 3373
@@ -433,8 +434,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | null -> null
             | memberDecl -> InstanceMemberRequiresTargetError(memberDecl) :> _
 
+        | LiteralPatternDoesNotTakeArguments
         | UnionCaseDoesNotTakeArguments ->
-            createHighlightingFromNode UnionCaseDoesNotTakeArgumentsError range
+            createHighlightingFromNode RemovePatternArgumentError range
 
         | UnionCaseExpectsTupledArguments ->
             createHighlightingFromNodeWithMessage UnionCaseExpectsTupledArgumentsError range error
