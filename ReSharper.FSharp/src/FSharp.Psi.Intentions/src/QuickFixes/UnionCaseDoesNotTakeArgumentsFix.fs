@@ -24,10 +24,10 @@ type UnionCaseDoesNotTakeArgumentsFix(error: UnionCaseDoesNotTakeArgumentsError)
         use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let headPattern = pat.GetBindingFromHeadPattern()
-        let isTopLevel = headPattern :? ITopBinding
+        let binding = pat.GetBindingFromHeadPattern()
+        let isTopLevel = binding :? ITopBinding
         let nodeType = if isTopLevel then ElementType.TOP_REFERENCE_PAT else ElementType.LOCAL_REFERENCE_PAT
-        let ignoreParens = not(pat.ReferenceName.IsQualified) && isNotNull(headPattern) || isNull(headPattern)
+        let ignoreParens = not pat.ReferenceName.IsQualified && isNotNull(binding) || isNull(binding)
 
         let oldNode = if ignoreParens then pat.IgnoreParentParens() else pat
         let topReferencePat = nodeType.Create()

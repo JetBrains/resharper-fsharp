@@ -433,6 +433,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | null -> null
             | memberDecl -> InstanceMemberRequiresTargetError(memberDecl) :> _
 
+        | UnionCaseDoesNotTakeArguments ->
+            createHighlightingFromNode UnionCaseDoesNotTakeArgumentsError range
+
         | UnionCaseExpectsTupledArguments ->
             createHighlightingFromNodeWithMessage UnionCaseExpectsTupledArgumentsError range error
 
@@ -472,10 +475,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
             let expr = fsFile.GetNode<IDoLikeStatement>(range)
             if isNotNull expr then NamespaceCannotContainExpressionsError(expr) :> _ else null
-        
-        | UnionCaseDoesNotTakeArguments ->
-            createHighlightingFromNode UnionCaseDoesNotTakeArgumentsError range
-            
+
         | _ -> createGenericHighlighting error range
 
     abstract ShouldAddDiagnostic: error: FSharpDiagnostic * range: DocumentRange -> bool
