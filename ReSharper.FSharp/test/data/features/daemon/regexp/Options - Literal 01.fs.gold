@@ -1,16 +1,0 @@
-﻿open System.Text.RegularExpressions
-
-let [<Literal>] options = RegexOptions.IgnorePatternWhitespace
-
-Regex.IsMatch("hello", @"|^|(0)ab|(|(1)group|)|(2)
-                         |# comment|(3)
-                         |\d|(4)|+|(5)|$|(6)", options) |> ignore
-
----------------------------------------------------------
-(0): ReSharper Regex Identifier: 
-(1): ReSharper Regex Group: 
-(2): ReSharper Regex Group: 
-(3): ReSharper Regex Comment: 
-(4): ReSharper Regex Identifier: 
-(5): ReSharper Regex Identifier: 
-(6): ReSharper Regex Identifier: 

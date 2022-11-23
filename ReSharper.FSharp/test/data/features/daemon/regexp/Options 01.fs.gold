@@ -1,0 +1,25 @@
+﻿open System.Text.RegularExpressions
+
+let [<Literal>] options = RegexOptions.IgnorePatternWhitespace
+
+let _ = Regex("|[|(0)123|]|(1)
+              #comment
+              ")
+
+let _ = Regex("|[|(2)123|]|(3)
+              |#comment|(4)
+              ", RegexOptions.IgnorePatternWhitespace)
+
+let _ = Regex("|[|(5)123|]|(6)
+              |#comment|(7)
+              ", options)
+
+---------------------------------------------------------
+(0): ReSharper Regex Set: 
+(1): ReSharper Regex Set: 
+(2): ReSharper Regex Set: 
+(3): ReSharper Regex Set: 
+(4): ReSharper Regex Comment: 
+(5): ReSharper Regex Set: 
+(6): ReSharper Regex Set: 
+(7): ReSharper Regex Comment: 

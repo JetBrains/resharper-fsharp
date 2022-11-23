@@ -1,0 +1,21 @@
+﻿module Kke
+
+open JetBrains.Annotations
+
+type A() =
+    [<RegexPattern>]
+    member x.R = "|[|(0)123|]|(1)"
+
+    member x.K = "[123]"
+
+let f ([<RegexPattern>] x: string) = ()
+f ("|[|(2)123|]|(3)")
+
+let g (x: string) = ()
+g ("[123]")
+
+---------------------------------------------------------
+(0): ReSharper Regex Set: 
+(1): ReSharper Regex Set: 
+(2): ReSharper Regex Set: 
+(3): ReSharper Regex Set: 

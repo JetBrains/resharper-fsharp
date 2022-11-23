@@ -1,0 +1,11 @@
+﻿open System.Text.RegularExpressions
+
+let _ = Regex(@"||\д|(0)|(1)")
+let _ = Regex("|(|(2)|[|(3)])|"|(4))
+
+---------------------------------------------------------
+(0): ReSharper Regex Invalid Character: 
+(1): ReSharper Underlined Error Highlighting: Invalid character
+(2): ReSharper Regex Group: 
+(3): ReSharper Regex Set: 
+(4): ReSharper Underlined Error Highlighting: Unexpected token
