@@ -62,6 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsConstant => false;
     public bool IsWritable => false;
     public bool IsStatic => false;
+    public DeclarationScope Scope => DeclarationScope.Unscoped;
   }
 
   internal partial class LocalDeclaration
