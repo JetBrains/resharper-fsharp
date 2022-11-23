@@ -806,8 +806,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.MarkChameleonExpression(expr)
             x.Done(range, mark, ElementType.EXPR_STATIC_CONSTANT_TYPE_USAGE)
 
-        | SynType.StaticConstant(synConst, _) ->
-            x.MarkAndDone(range, ElementType.EXPR_STATIC_CONSTANT_TYPE_USAGE, x.GetConstElementType(synConst))
+        | SynType.StaticConstant(synConst, constRange) ->
+            let mark = x.Mark(range)
+            x.MarkChameleonExpression(SynExpr.Const(synConst, constRange))
+            x.Done(range, mark, ElementType.EXPR_STATIC_CONSTANT_TYPE_USAGE)
 
         | SynType.Anon _ ->
             x.MarkAndDone(range, ElementType.ANON_TYPE_USAGE)

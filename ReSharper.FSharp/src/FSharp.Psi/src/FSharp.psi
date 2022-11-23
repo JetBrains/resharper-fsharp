@@ -1806,12 +1806,8 @@ parameterSignatureTypeUsage:
 exprStaticConstantTypeUsage extras {
   get { methodName="Expression" path=<exprStaticConstantTypeUsage:CHAMELEON_EXPR/chameleonExpression:EXPR> };
 }:
-  (
-    CONST?
-    chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>
-  |
-    constExpr<CONST_EXPR, ConstantExpression>
-  );
+  CONST?
+  chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
 namedStaticConstantTypeUsage:
   typeUsage
