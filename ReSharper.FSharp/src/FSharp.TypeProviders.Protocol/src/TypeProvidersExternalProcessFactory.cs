@@ -38,14 +38,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     public TypeProvidersExternalProcess Create(Lifetime lifetime,
       [CanBeNull] string requestingProjectOutputPath, bool isInternalMode)
     {
-      var sdkVersion = myToolset.GetDotNetCoreToolset()?.Sdk?.Version;
+      var toolset = myToolset.GetDotNetCoreToolset();
 
       return new TypeProvidersExternalProcess(lifetime,
         myLogger,
         myShellLocks,
         mySolutionProcessStartInfoPatcher,
         GetProcessRuntime(requestingProjectOutputPath),
-        sdkVersion,
+        toolset,
         isInternalMode);
     }
 

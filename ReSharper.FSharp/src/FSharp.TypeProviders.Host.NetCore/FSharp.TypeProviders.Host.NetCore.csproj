@@ -22,28 +22,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="tploader.netcoreapp31.win.runtimeconfig.json">
+        <None Update="tploader.win.runtimeconfig.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="tploader.netcoreapp31.unix.runtimeconfig.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="tploader.net5.unix.runtimeconfig.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="tploader.net5.win.runtimeconfig.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="tploader.net6.unix.runtimeconfig.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="tploader.net6.win.runtimeconfig.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="tploader.net7.win.runtimeconfig.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="tploader.net7.unix.runtimeconfig.json">
+        <None Update="tploader.unix.runtimeconfig.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
