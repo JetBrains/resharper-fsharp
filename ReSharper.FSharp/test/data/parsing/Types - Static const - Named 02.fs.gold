@@ -22,8 +22,9 @@ IFSharpImplFile
                         FSharpIdentifierToken(type:IDENTIFIER, text:x)
                     FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
                     IExprStaticConstantTypeUsage
-                      ILiteralExpr
-                        FSharpToken(type:INT32, text:1)
+                      IChameleonExpression
+                        ILiteralExpr
+                          FSharpToken(type:INT32, text:1)
                   FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
