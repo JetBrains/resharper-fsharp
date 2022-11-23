@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   public class ParserMessages
   {
-    public const string IDS_CHAMELEON_EXPRESSION = "";
+    public const string IDS_EXPR_STATIC_CONSTANT_TYPE_USAGE = "";
     public const string IDS_TOP_LEVEL_MODULE_LIKE_DECLARATION = "";
     public const string IDS_QUALIFIABLE_DECLARATION = "";
     public const string IDS_QUALIFIABLE_MODULE_LIKE_DECLARATION = "";
