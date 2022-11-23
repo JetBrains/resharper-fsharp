@@ -43,6 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.PARAMETER;
 
+    public DeclarationScope Scope => DeclarationScope.Unscoped;
     public IParametersOwner ContainingParametersOwner => Owner;
     protected override IClrDeclaredElement ContainingElement => Owner;
     public override ITypeMember GetContainingTypeMember() => Owner as ITypeMember;
