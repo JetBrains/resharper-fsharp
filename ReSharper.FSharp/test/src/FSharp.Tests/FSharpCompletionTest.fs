@@ -405,3 +405,6 @@ type FSharpRegexCompletionTest() =
     [<Test>] member x.``Verbatim string completion 02``() = x.DoNamedTest()
     [<Test>] member x.``Verbatim string completion 03``() = x.DoNamedTest()
     [<Test>] member x.``Verbatim string completion 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Brackets 01``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets 02 - Interpolation``() = x.DoNamedTest()
