@@ -6,10 +6,9 @@ import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.framework.TestProjectModelContext
 import com.jetbrains.rider.test.framework.waitBackend
-import com.jetbrains.rider.test.scriptingApi.changeFileContent
-import com.jetbrains.rider.test.scriptingApi.cutItem
-import com.jetbrains.rider.test.scriptingApi.pasteItem
-import com.jetbrains.rider.test.scriptingApi.renameItem
+import com.jetbrains.rider.test.scriptingApi.*
+import io.qameta.allure.Issue
+import io.qameta.allure.Issues
 import org.testng.annotations.Test
 import java.io.File
 
@@ -110,12 +109,38 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
                         arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1", "Foo.fs"),
                         arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1"), ActionOrderType.Before)
             }
-            dump2("Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'", false, true) {
+            dump2("13. Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'", false, true) {
                 moveItem(
                         arrayOf(
                                 arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "File1.fs"),
                                 arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "Class1.fs")),
                         arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1"), ActionOrderType.Before)
+            }
+        }
+    }
+
+    @Test
+    @Issues(Issue("RIDER-69084"), Issue("RIDER-69562"))
+    @TestEnvironment(coreVersion = CoreVersion.LATEST_STABLE, toolset = ToolsetVersion.TOOLSET_17_CORE)
+    fun testFSharpDirectoryManipulation() {
+        doTestDumpProjectsView {
+            dump2("1. Create project", checkSlnFile = false, compareProjFile = true) {
+                addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplateIds.currentCore.fsharp_classLibrary)
+            }
+            dump2("2. Create folder 'NewFolder'", checkSlnFile = false, compareProjFile = true) {
+                addNewFolder(arrayOf("Solution", "ClassLibrary"), "NewFolder")
+            }
+            dump2("3. Create subfolder 'NewFolder/NewSub'", checkSlnFile = false, compareProjFile = true) {
+                addNewFolder(arrayOf("Solution", "ClassLibrary", "NewFolder"), "NewSub")
+            }
+            dump2("4. Move folder 'NewFolder/NewSub' to project root", checkSlnFile = false, compareProjFile = true) {
+                moveItem(
+                    arrayOf("Solution", "ClassLibrary", "NewFolder", "NewSub"),
+                    arrayOf("Solution", "ClassLibrary")
+                )
+            }
+            dump2("5. Delete folder 'NewSub'", checkSlnFile = false, compareProjFile = true) {
+                deleteElement(arrayOf("Solution", "ClassLibrary", "NewSub"))
             }
         }
     }

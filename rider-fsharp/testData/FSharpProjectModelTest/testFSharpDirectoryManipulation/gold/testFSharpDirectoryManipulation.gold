@@ -1,0 +1,309 @@
+===================
+1. Create project
+
+-Project
+ -Solution * 1 project
+  -ClassLibrary
+   -Dependencies
+    -.NETStandard 2.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.7.2
+     -Frameworks
+      NETStandard.Library
+   Library.fs
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : Solution.sln)[]
+
+Project [Name:ClassLibrary, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary.fsproj)[]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netstandard2.1, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary/ClassLibrary.fsproj
+  ClassLibrary/Library.fs
+  ClassLibrary/obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+  Solution.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:netstandard2.1[1]
+      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary.AssemblyInfo.fs (CompileBefore)
+2:Library.fs
+
+.NETStandard,Version=v2.1
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
+obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+Library.fs
+
+===================
+2. Create folder 'NewFolder'
+
+-Project
+ -Solution * 1 project
+  -ClassLibrary
+   -Dependencies
+    -.NETStandard 2.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.7.2
+     -Frameworks
+      NETStandard.Library
+   Library.fs
+   NewFolder
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : Solution.sln)[]
+
+Project [Name:ClassLibrary, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary.fsproj)[]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+    Folder [Name:NewFolder]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netstandard2.1, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary/ClassLibrary.fsproj
+  ClassLibrary/Library.fs
+  ClassLibrary/obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+  Solution.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:netstandard2.1[1]
+      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary.AssemblyInfo.fs (CompileBefore)
+2:Library.fs
+3:NewFolder[1]
+
+.NETStandard,Version=v2.1
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
+obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+Library.fs
+
+===================
+3. Create subfolder 'NewFolder/NewSub'
+
+-Project
+ -Solution * 1 project
+  -ClassLibrary
+   -Dependencies
+    -.NETStandard 2.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.7.2
+     -Frameworks
+      NETStandard.Library
+   Library.fs
+   -NewFolder
+    NewSub
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : Solution.sln)[]
+
+Project [Name:ClassLibrary, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary.fsproj)[]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+    Folder [Name:NewFolder]
+      Child items:
+        Folder [Name:NewSub]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netstandard2.1, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary/ClassLibrary.fsproj
+  ClassLibrary/Library.fs
+  ClassLibrary/obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+  Solution.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:netstandard2.1[1]
+      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary.AssemblyInfo.fs (CompileBefore)
+2:Library.fs
+3:NewFolder[1]
+  1:NewSub[1]
+
+.NETStandard,Version=v2.1
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
+obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+Library.fs
+
+===================
+4. Move folder 'NewFolder/NewSub' to project root
+
+-Project
+ -Solution * 1 project
+  -ClassLibrary
+   -Dependencies
+    -.NETStandard 2.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.7.2
+     -Frameworks
+      NETStandard.Library
+   Library.fs
+   NewSub
+   NewFolder
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : Solution.sln)[]
+
+Project [Name:ClassLibrary, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary.fsproj)[]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+    Folder [Name:NewFolder]
+    Folder [Name:NewSub]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netstandard2.1, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary/ClassLibrary.fsproj
+  ClassLibrary/Library.fs
+  ClassLibrary/obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+  Solution.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:netstandard2.1[1]
+      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary.AssemblyInfo.fs (CompileBefore)
+2:Library.fs
+3:NewSub[1]
+4:NewFolder[1]
+
+.NETStandard,Version=v2.1
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
+obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+Library.fs
+
+===================
+5. Delete folder 'NewSub'
+
+-Project
+ -Solution * 1 project
+  -ClassLibrary
+   -Dependencies
+    -.NETStandard 2.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/4.7.2
+     -Frameworks
+      NETStandard.Library
+   Library.fs
+   NewFolder
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : Solution.sln)[]
+
+Project [Name:ClassLibrary, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary.fsproj)[]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+    Folder [Name:NewFolder]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netstandard2.1, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary/ClassLibrary.fsproj
+  ClassLibrary/Library.fs
+  ClassLibrary/obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+  Solution.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:netstandard2.1[1]
+      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
+      2:ClassLibrary.AssemblyInfo.fs (CompileBefore)
+2:Library.fs
+3:NewFolder[1]
+
+.NETStandard,Version=v2.1
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
+obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+Library.fs
+
