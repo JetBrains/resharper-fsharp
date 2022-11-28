@@ -805,6 +805,9 @@ type FSharpErrorsParserTest() =
     // todo: parse as anon module/namespace?
     [<Test>] member x.``Module member - Expr - Before namespace 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type arguments - Empty arg 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type arguments - Empty arg 02``() = x.DoNamedTest()
+
     [<Test; Explicit>] member x.``Type - Attribute target 01``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Type - Attribute target 02``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Type - Attribute target 03``() = x.DoNamedTest()
