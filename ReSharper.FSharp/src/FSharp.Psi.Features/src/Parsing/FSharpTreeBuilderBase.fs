@@ -770,12 +770,13 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                 x.Done(range, mark, ElementType.ANON_RECORD_FIELD)
             x.Done(range, mark, ElementType.ANON_RECORD_TYPE_USAGE)
 
-        | SynType.StaticConstantNamed(synType1, synType2, constRange) ->
-            // StaticConstantNamed can be dummy, if the corresponding type parameter is empty
-            // i.e. T<int, {caret}>
-            // The real StaticConstantNamed cannot have a length of 1
-            if (getDocumentRange document constRange).Length > 1 then
-                x.MarkTypes(synType1, synType2, range, ElementType.NAMED_STATIC_CONSTANT_TYPE_USAGE)
+        // StaticConstantNamed can be dummy, if the corresponding type parameter is empty
+        // i.e. T<int, {caret}>
+        | SynType.StaticConstantNamed(ident = SynType.LongIdent(SynLongIdent([ident], [], _))) when ident.idText = "" ->
+            ()
+
+        | SynType.StaticConstantNamed(synType1, synType2, _) ->
+            x.MarkTypes(synType1, synType2, range, ElementType.NAMED_STATIC_CONSTANT_TYPE_USAGE)
 
         | SynType.MeasureDivide(synType1, synType2, _) ->
             x.MarkTypes(synType1, synType2, range, ElementType.UNSUPPORTED_TYPE_USAGE)
