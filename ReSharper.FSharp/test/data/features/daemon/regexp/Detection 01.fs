@@ -1,6 +1,7 @@
-﻿module Kke
+﻿module Kek
 
 open JetBrains.Annotations
+open System.Diagnostics.CodeAnalysis
 
 type A() =
     [<RegexPattern>]
@@ -13,3 +14,9 @@ f ("[123]")
 
 let g (x: string) = ()
 g ("[123]")
+
+[<RegexPattern>]
+let x = "[123]"
+
+[<StringSyntax("regex")>]
+let y = "[123]"

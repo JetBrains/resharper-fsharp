@@ -67,8 +67,9 @@ type FSharpRegexNodeProvider() =
             regexPatternInfo ||
 
             let languageName = getAnnotationInfo<StringSyntaxAnnotationProvider, _>(attributesOwner)
-            equalsIgnoreCase StringSyntaxAnnotationProvider.Regex languageName ||
-            equalsIgnoreCase InjectedLanguageIDs.ClrRegExpLanguage languageName
+            isNotNull languageName &&
+            (equalsIgnoreCase StringSyntaxAnnotationProvider.Regex languageName ||
+             equalsIgnoreCase InjectedLanguageIDs.ClrRegExpLanguage languageName)
 
         if not isSuccess then ValueNone else
 
@@ -78,17 +79,17 @@ type FSharpRegexNodeProvider() =
 
     let checkForRegexActivePattern (pat: ILiteralPat) =
         let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(pat.IgnoreParentParens())
-        if isNull parametersOwnerPat ||
-           parametersOwnerPat.Identifier.GetText() <> "Regex" then ValueNone
+        if isNull parametersOwnerPat || parametersOwnerPat.Identifier.GetText() <> "Regex" then ValueNone
         else ValueSome RegexOptions.None
 
     let checkForRegexTypeProvider (expr: IConstExpr) =
-        ExprStaticConstantTypeUsageNavigator.GetByConstantExpression(expr)
+        ExprStaticConstantTypeUsageNavigator.GetByExpression(expr)
         |> ValueOption.ofObj
         |> ValueOption.map PrefixAppTypeArgumentListNavigator.GetByTypeUsage
         |> ValueOption.map TypeReferenceNameNavigator.GetByTypeArgumentList
         |> ValueOption.bind (fun refName ->
-            if refName.Identifier.GetText() = "Regex" then ValueSome RegexOptions.None else ValueNone)
+            if refName.Identifier.GetText() = "Regex" then ValueSome RegexOptions.None
+            else ValueNone)
 
     interface IInjectionNodeProvider with
         override _.Check(node, _, data) =

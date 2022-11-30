@@ -25,6 +25,9 @@ type RegexpHighlightingTest() =
     [<Test>] member x.``Options 01``() = x.DoNamedTest()
     [<Test>] member x.``Errors 01``() = x.DoNamedTest()
 
-    [<Test; TestNet50; TestPackages(JetBrainsAnnotationsPackage)>] member x.``Detection 01``() = x.DoNamedTest()
+    [<Test; TestNet70; TestPackages(JetBrainsAnnotationsPackage)>] member x.``Detection 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Detection 02 - Regex type provider``() = x.DoNamedTest()
+    [<Test>] member x.``Detection 03 - Active pattern``() = x.DoNamedTest()
+
+    [<Test>] member x.``Injection 01 - Comments``() = x.DoNamedTest()

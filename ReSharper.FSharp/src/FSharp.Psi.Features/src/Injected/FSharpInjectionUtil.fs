@@ -26,7 +26,7 @@ let getAttributesOwner (expr: IFSharpExpression) =
     let declaration: IDeclaration =
         let typeMemberDecl = MemberDeclarationNavigator.GetByExpression(expr)
         if isNotNull typeMemberDecl then typeMemberDecl else
-        BindingNavigator.GetByExpression(expr)
+        TopBindingNavigator.GetByExpression(expr)
 
     if isNull declaration then ValueNone else
     declaration.DeclaredElement.As<IAttributesOwner>() |> ValueOption.ofObj

@@ -1,6 +1,7 @@
-﻿module Kke
+﻿module Kek
 
 open JetBrains.Annotations
+open System.Diagnostics.CodeAnalysis
 
 type A() =
     [<RegexPattern>]
@@ -14,8 +15,18 @@ f ("|[|(2)123|]|(3)")
 let g (x: string) = ()
 g ("[123]")
 
+[<RegexPattern>]
+let x = "|[|(4)123|]|(5)"
+
+[<StringSyntax("regex")>]
+let y = "|[|(6)123|]|(7)"
+
 ---------------------------------------------------------
 (0): ReSharper Regex Set: 
 (1): ReSharper Regex Set: 
 (2): ReSharper Regex Set: 
 (3): ReSharper Regex Set: 
+(4): ReSharper Regex Set: 
+(5): ReSharper Regex Set: 
+(6): ReSharper Regex Set: 
+(7): ReSharper Regex Set: 

@@ -36,7 +36,6 @@ type RegExprPsiProvider(injectorProvider: FSharpRegexInjectionProvider) =
     override _.ProvidedLanguageCanHaveNestedInjects = false
 
 
-
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpRegularExpressionCompletionProvider() =
     interface IRegexLanguageSpecificCompletionProvider with

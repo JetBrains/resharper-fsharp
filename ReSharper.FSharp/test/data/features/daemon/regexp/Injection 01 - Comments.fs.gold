@@ -1,0 +1,10 @@
+﻿let _ = "|[|(0)123|]|(1)" // language=Regex
+let _ = (*language=Regexp*) "|[|(2)123|]|(3)"
+
+let _ = "[123]"
+
+---------------------------------------------------------
+(0): ReSharper Regex Set: 
+(1): ReSharper Regex Set: 
+(2): ReSharper Regex Set: 
+(3): ReSharper Regex Set: 
