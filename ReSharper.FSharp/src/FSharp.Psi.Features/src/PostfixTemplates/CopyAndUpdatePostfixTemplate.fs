@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
 open System
 open System.Collections.Generic
+open System.Text.RegularExpressions
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
@@ -10,8 +11,10 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
+open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
+open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -26,6 +29,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open System.Linq
 open JetBrains.TextControl
+open JetBrains.UI.RichText
 
 module private Helpers =
     /// e.g. innerWith ["Customer"] "Name" "somename" -> "{ Customer with Name = somename }"
@@ -58,7 +62,7 @@ module private Helpers =
     type RecordExprContext =
         {
             OuterRecord: IReferenceExpr option
-            Fields: string list
+            Fields: IReferenceExpr list
         }
         static member Default = { OuterRecord = None; Fields = [] }
 
@@ -76,47 +80,107 @@ module private Helpers =
                 match prev.Reference.GetFcsSymbol() with
                 | :? FSharpField as field ->
                     match fieldBelongsToRecord field with
-                    | true -> loop { acc with Fields = field.Name :: acc.Fields } prev
+                    | true -> loop { acc with Fields = prev :: acc.Fields } prev
                     | false -> None // found union case instead
-                | :? FSharpMemberOrFunctionOrValue as outer ->
+                | :? FSharpMemberOrFunctionOrValue ->
                     match acc.OuterRecord with
-                    // would have multiple function calls, don't want that
-                    // e.g { r() with r1 = { r().r1 with {caret} }
-                    | _ when outer.IsFunction -> None
                     // already have the outer qualified name
                     | Some _ -> Some acc
                     | _ -> loop { acc with OuterRecord = Some prev } prev
                 | _ -> None
-            | _ -> None
+            // Some other expr, e.g. Class(r).field1.field2
+            | _ -> Some acc
+            
 
         loop RecordExprContext.Default refExpr
 
     /// Gets the innermost record expr in the generated recursive record expr
-    let rec getInnermostExpr (recordExpr: IRecordExpr) =
-        match recordExpr.FieldBindingList with
-        | null -> recordExpr
-        | bindingList ->
-            let innerChildren =
-                // there is only one child in bindingList
-                bindingList
-                    .Children()
-                    .First()
-                    .As<IRecordFieldBinding>()
-                    .Children()
+    let rec getInnermostRecordExpr (recordExpr: IRecordExpr) =
+        // couldnt find a way to create a IRecordFieldBindingList with a single element
+        // so i can only traverse by IRecordFieldBinding in children directly
+        recordExpr.Children()
+        |> Seq.tryPick (fun f ->
+            match f with | :? IRecordFieldBinding as b -> Some b | _ -> None
+        )
+        |> Option.map (fun binding ->
+            let innerExpression = binding.Expression
+            match innerExpression with
+            | null -> recordExpr
+            | :? IRecordExpr as innerRecordExpr -> getInnermostRecordExpr innerRecordExpr
+            | _ -> failwith "non recordexpr inner expression" 
+        )
+        |> Option.defaultValue recordExpr
 
-            innerChildren
-            |> Seq.tryPick (fun f ->
-                match f with
-                | :? IRecordExpr as innerRecordExpr -> Some(getInnermostExpr innerRecordExpr)
-                | _ -> None)
-            |> Option.defaultValue recordExpr
+    
+    
+    /// Creates recursive record expr from IReferenceExpr list
+    let createRecordExpr
+        (fields: IReferenceExpr list)
+        (factory:IFSharpElementFactory)
+        : IRecordExpr =
+            
+        let rec loop (xs:IReferenceExpr list) : IRecordExpr =
+            match xs with
+            | [] -> failwith "this should never happen"
+            | head :: tail ->
+                let currentRecordExpr = factory.CreateExpr("{ x with P = 1 }") :?> IRecordExpr
+                ModificationUtil.ReplaceChild( currentRecordExpr.CopyInfoExpression, head.Qualifier ) |> ignore
+                let fieldBindingExpr = factory.CreateRecordFieldBinding(head.ShortName,false)
+                // either delete or add inner binding
+                match tail with
+                | [] -> ModificationUtil.DeleteChild(fieldBindingExpr.Expression) 
+                | _ -> 
+                    let innerBinding = loop tail
+                    ModificationUtil.ReplaceChild(fieldBindingExpr.Expression, innerBinding) |> ignore
+                //
+                ModificationUtil.ReplaceChild(currentRecordExpr.FieldBindingList, fieldBindingExpr) |> ignore
+                currentRecordExpr
+            
+        loop fields 
+     
+    /// Popup titles and respective record exprs to generate
+    type PopupContext =
+        { TitleAndExprList: (string*IRecordExpr) list; PrevFields: IReferenceExpr list; }
+        static member Default = { TitleAndExprList = [] ; PrevFields = [] }
+        
+    let createPopupMenu (popupContext: PopupContext) =
+        popupContext.TitleAndExprList
+        |> Seq.map (fun (title,expr) ->
+            WorkflowPopupMenuOccurrence(
+                RichText(title),
+                RichText.Empty,
+                title,
+                (fun appData -> [||])
+            ))
+        |> Array.ofSeq
 
+    /// Creates popup titles and respective record expressions 
+    let createPopupContext (ctx:RecordExprContext) (factory: IFSharpElementFactory): PopupContext =
+        let defaultTitle = ctx.OuterRecord.Value :: ctx.Fields |> List.map (fun f -> f.ShortName)
+        
+        let rec loop (acc:PopupContext) (list: IReferenceExpr list) =
+            match list with
+            | [] -> acc
+            | head :: tail ->
+                let recordExpr = createRecordExpr (head :: acc.PrevFields) factory
+                    
+                let currTitle =
+                    defaultTitle
+                    |> Seq.skip (ctx.Fields.Length - acc.PrevFields.Length)
+                    |> String.concat "."
+                
+                let acc' =
+                    {
+                        PopupContext.TitleAndExprList = (currTitle , recordExpr) :: acc.TitleAndExprList
+                        PopupContext.PrevFields = head :: acc.PrevFields }
+                loop acc' tail
+
+        loop PopupContext.Default (ctx.Fields |> List.rev)
 
 [<PostfixTemplate("with", "Copies and updates the record field", "{ record with field }")>]
 type CopyAndUpdatePostfixTemplate() =
     inherit FSharpPostfixTemplateBase()
 
-    //FSharpGlobalUtil
     let isApplicable (expr: IFSharpExpression) =
         let refExpr = expr.As<IReferenceExpr>()
 
@@ -161,27 +225,61 @@ and CopyAndUpdatePostfixTemplateBehavior(info) =
         let psiModule = context.PostfixContext.PsiModule
         let psiServices = psiModule.GetPsiServices()
 
+        let popupMenu =
+            psiServices.Solution.GetComponent<WorkflowPopupMenu>()
+
+        let textControl = info.ExecutionContext.TextControl
+
+        let lifetime =
+            // textControl.Lifetime // closes instantly
+            psiServices
+                .Solution
+                .GetSolutionLifetimes()
+                .UntilSolutionCloseLifetime
+
+        let showPopup occurrences id =
+            popupMenu.ShowPopup(
+                lifetime,
+                occurrences,
+                CustomHighlightingKind.Other,
+                textControl,
+                null,
+                id
+            )
+
+        
+
         psiServices.Transactions.Execute(
             x.ExpandCommandName,
             fun _ ->
                 let node = context.Expression :?> IReferenceExpr
+                let factory = node.CreateElementFactory()
+
 
                 match node |> Helpers.tryGetContext with
-                | None -> context.Expression // same expression
+                | None -> context.Expression // something failed, do nothing
                 | Some ctx ->
+                    
+                    let popupContext = Helpers.createPopupContext ctx factory
+                    let popupMenu = popupContext |> Helpers.createPopupMenu
+
+                    let chosenPopup =
+                        showPopup popupMenu (nameof CopyAndUpdatePostfixTemplate)
+
                     use writeCookie =
                         WriteLockCookie.Create(node.IsPhysical())
 
                     use disableFormatter = new DisableCodeFormatter()
 
-                    let factory = node.CreateElementFactory()
+                    match chosenPopup with
+                    | null -> context.Expression
+                    | occ ->
+                        popupContext.TitleAndExprList
+                        |> Seq.tryFind (fun (title,expr) -> title = occ.Name.Text)
+                        |> Option.map (fun (title,expr) ->
+                            ModificationUtil.ReplaceChild(node.Parent, expr) :> ITreeNode)
+                        |> Option.defaultValue context.Expression
 
-                    let copyAndUpdate =
-                        ctx.OuterRecord.Value.QualifiedName :: ctx.Fields
-                        |> Helpers.createCopyAndUpdate
-
-                    let newExpr = factory.CreateExpr(copyAndUpdate)
-                    ModificationUtil.ReplaceChild(node.Parent, newExpr) :> ITreeNode
         )
 
     override x.AfterComplete(textControl, node, _) =
@@ -191,7 +289,7 @@ and CopyAndUpdatePostfixTemplateBehavior(info) =
             ()
         else
             let innermostExpr =
-                Helpers.getInnermostExpr recordExpr
+                Helpers.getInnermostRecordExpr recordExpr
 
             let range = innermostExpr.GetNavigationRange()
-            textControl.Caret.MoveTo(range.EndOffset - 2, CaretVisualPlacement.DontScrollIfVisible)
+            textControl.Caret.MoveTo(range.EndOffset - 1, CaretVisualPlacement.DontScrollIfVisible)
