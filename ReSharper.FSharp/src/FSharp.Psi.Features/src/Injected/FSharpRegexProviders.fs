@@ -26,6 +26,7 @@ type FSharpRegexInjectionProvider
     override _.GetCommentInjectionIDs() = [|InjectedLanguageIDs.ClrRegExpLanguage; "REGEX"|]
     override _.SupportedOriginalLanguage = FSharpLanguage.Instance
     override _.ProvidedLanguage = ClrRegexLanguage.Instance
+    override _.SupportsInjectionComment = true
 
 
 [<SolutionComponent>]

@@ -4,7 +4,9 @@ open System.Text.RegularExpressions
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.CSharp.Util.Literals
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex
@@ -41,7 +43,12 @@ type FSharpLiteralInjectionTarget() =
             tokenType <> FSharpTokenType.VERBATIM_BYTEARRAY &&
             tokenType <> FSharpTokenType.BYTEARRAY
 
-        override _.GetCorrespondingCommentTextForLiteral _ = null
+        override _.GetCorrespondingCommentTextForLiteral node =
+            let literal = node.Parent
+            if not (literal :? ILiteralExpression) then null else
+            let x = node.GetContainingNode<IInitializerOwnerDeclaration>(fun _ -> true)
+            if x.Initializer <> literal then null else
+            LiteralInjectorProviderUtil.GetNearestCommentNode(x.As<ITopBinding>()).As<IComment>().CommentText
 
         override _.CreateBuffer(literalNode, text, options) =
             let literalType =
