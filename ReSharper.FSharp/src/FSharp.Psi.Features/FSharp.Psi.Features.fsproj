@@ -66,6 +66,7 @@
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />
     <Compile Include="src\PostfixTemplates\MatchPostfixTemplate.fs" />
     <Compile Include="src\PostfixTemplates\ForPostfixTemplate.fs" />
+    <Compile Include="src\PostfixTemplates\CopyAndUpdatePostfixTemplate.fs" />
     <Compile Include="src\RearrangeCode\RearrangeCode.fs" />
     <Compile Include="src\RunMarkers\FSharpRunMarkerProvider.fs" />
     <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
