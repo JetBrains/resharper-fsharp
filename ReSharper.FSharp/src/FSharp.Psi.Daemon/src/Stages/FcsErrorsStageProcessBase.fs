@@ -77,6 +77,7 @@ module FSharpErrors =
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] PropertyIsStatic = 809
+    let [<Literal>] PropertyCannotBeSet = 810
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
     let [<Literal>] TypeAbbreviationsCannotHaveAugmentations = 964
     let [<Literal>] UnusedValue = 1182
@@ -385,6 +386,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | PropertyIsStatic ->
             createHighlightingFromNode PropertyIsStaticError range
+
+        | PropertyCannotBeSet ->
+            createHighlightingFromNode PropertyCannotBeSetError range
 
         | LocalClassBindingsCannotBeInline ->
             createHighlightingFromParentNode LocalClassBindingsCannotBeInlineError range
