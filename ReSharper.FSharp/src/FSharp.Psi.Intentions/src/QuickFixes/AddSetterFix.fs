@@ -17,10 +17,9 @@ type AddSetterFix(error: PropertyCannotBeSetError) =
         isValid refExpr &&
 
         let declaredElement = refExpr.Reference.Resolve().DeclaredElement
-        let decl = declaredElement.GetDeclarations() |> Seq.tryExactlyOne
-
         declaredElement :? IFSharpProperty &&
 
+        let decl = declaredElement.GetDeclarations() |> Seq.tryExactlyOne
         match decl with
         | None -> false
         | Some decl ->
