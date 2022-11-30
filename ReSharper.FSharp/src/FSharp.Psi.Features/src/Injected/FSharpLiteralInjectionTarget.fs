@@ -43,12 +43,7 @@ type FSharpLiteralInjectionTarget() =
             tokenType <> FSharpTokenType.VERBATIM_BYTEARRAY &&
             tokenType <> FSharpTokenType.BYTEARRAY
 
-        override _.GetCorrespondingCommentTextForLiteral node =
-            let literal = node.Parent
-            if not (literal :? ILiteralExpression) then null else
-            let x = node.GetContainingNode<IInitializerOwnerDeclaration>(fun _ -> true)
-            if x.Initializer <> literal then null else
-            LiteralInjectorProviderUtil.GetNearestCommentNode(x.As<ITopBinding>()).As<IComment>().CommentText
+        override _.GetCorrespondingCommentTextForLiteral _ = null
 
         override _.CreateBuffer(literalNode, text, options) =
             let literalType =

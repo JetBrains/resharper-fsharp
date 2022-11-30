@@ -64,7 +64,7 @@ type FSharpRegexNodeProvider() =
 
         let isSuccess =
             let regexPatternInfo = getAnnotationInfo<RegexPatternAnnotationProvider, _>(attributesOwner)
-            if regexPatternInfo then true else
+            regexPatternInfo ||
 
             let languageName = getAnnotationInfo<StringSyntaxAnnotationProvider, _>(attributesOwner)
             equalsIgnoreCase StringSyntaxAnnotationProvider.Regex languageName ||
