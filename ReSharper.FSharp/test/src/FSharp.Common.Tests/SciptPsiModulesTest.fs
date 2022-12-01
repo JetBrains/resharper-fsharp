@@ -84,7 +84,7 @@ type MyTestSolutionToolset(lifetime: Lifetime, logger: ILogger) =
 
     let changed = new Signal<_>(lifetime, "MySolutionToolset::Changed")
 
-    let cli = DotNetCoreRuntimesDetector.DetectDotNetCoreRuntimes(InteractionContext.SolutionContext).FirstOrDefault().NotNull()
+    let cli = DotNetCoreInstallationsDetector.DetectSdkInstallations(InteractionContext.SolutionContext).FirstOrDefault().NotNull()
     let dotnetCoreToolset = DotNetCoreToolset(cli, cli.Sdks.FirstOrDefault().NotNull())
 
     let env = BuildToolEnvironment.Create(dotnetCoreToolset, null)
