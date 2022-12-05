@@ -21,7 +21,7 @@ let getAttributesOwner (expr: IFSharpExpression) =
     if isNotNull argsOwner then
         let parameter = expr.As<IArgument>().MatchingParameter
         if isNull parameter then ValueNone else
-        parameter.Element.As<IAttributesOwner>() |> ValueOption.ofObj
+        parameter.Element :> IAttributesOwner |> ValueOption.ofObj
     else
 
     let declaration: IDeclaration =
