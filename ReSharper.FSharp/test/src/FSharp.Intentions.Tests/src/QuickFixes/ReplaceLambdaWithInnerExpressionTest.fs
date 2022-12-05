@@ -13,7 +13,8 @@ type ReplaceLambdaWithInnerExpressionTest() =
     [<Test>] member x.``Reference``() = x.DoNamedTest()
     [<Test>] member x.``Partial application``() = x.DoNamedTest()
     [<Test>] member x.``Inner lambda``() = x.DoNamedTest()
-    [<Test>] member x.``Need parens``() = x.DoNamedTest()
+    [<Test>] member x.``Parens 01``() = x.DoNamedTest()
+    [<Test>] member x.``Parens 02``() = x.DoNamedTest()
     [<Test>] member x.``Multiline``() = x.DoNamedTest()
 
 

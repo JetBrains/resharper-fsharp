@@ -3,9 +3,10 @@
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
 type ReplaceLambdaWithInnerExpressionFix(warning: LambdaCanBeReplacedWithInnerExpressionWarning) =
-    inherit ReplaceWithInnerTreeNodeFixBase(warning.LambdaExpr, warning.ReplaceCandidate)
+    inherit ReplaceWithInnerTreeNodeFixBase(warning.LambdaExpr.IgnoreParentParens(), warning.ReplaceCandidate, true)
 
     let replaceCandidate = warning.ReplaceCandidate
 
