@@ -7,11 +7,18 @@ let _ = Regex("|[|(0)123|]|(1)
               ")
 
 let _ = Regex("|[|(2)123|]|(3)
-              |#comment|(4)
+              |#comment
+|(4)
               ", RegexOptions.IgnorePatternWhitespace)
 
 let _ = Regex("|[|(5)123|]|(6)
-              |#comment|(7)
+              |#comment
+|(7)
+              ", RegexOptions.Compiled ||| RegexOptions.IgnorePatternWhitespace)
+
+let _ = Regex("|[|(8)123|]|(9)
+              |#comment
+|(10)
               ", options)
 
 ---------------------------------------------------------
@@ -23,3 +30,6 @@ let _ = Regex("|[|(5)123|]|(6)
 (5): ReSharper Regex Set: 
 (6): ReSharper Regex Set: 
 (7): ReSharper Regex Comment: 
+(8): ReSharper Regex Set: 
+(9): ReSharper Regex Set: 
+(10): ReSharper Regex Comment: 

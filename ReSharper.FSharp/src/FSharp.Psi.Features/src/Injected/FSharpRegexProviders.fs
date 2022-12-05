@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Psi.RegExp.ClrRegex
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex.Tree
 open JetBrains.ReSharper.Psi.RegExp.Resources
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 
 [<SolutionComponent>]
 type FSharpRegexInjectionProvider
@@ -45,14 +46,10 @@ type FSharpRegularExpressionCompletionProvider() =
             | null -> ""
             | literalExpr ->
 
-            let literalType = literalExpr.Literal.NodeType
+            let literalType = literalExpr.Literal.GetTokenType()
             let mutable result = text
 
-            if literalType == FSharpTokenType.STRING ||
-               literalType == FSharpTokenType.REGULAR_INTERPOLATED_STRING ||
-               literalType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START ||
-               literalType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE ||
-               literalType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_END then
+            if isRegularStringToken literalType then
                 result <- result.Replace(@"\", @"\\");
 
             if FSharpTokenType.InterpolatedStrings[literalType] then

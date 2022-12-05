@@ -16,12 +16,13 @@ when 'AnnotationProvider :> CodeAnnotationInfoProvider<IAttributesOwner, 'TAnnot
         .GetInfo(attributesOwner)
 
 let getAttributesOwner (expr: IFSharpExpression) =
-    match getArgsOwner expr with
-    | NotNull _ ->
+    let argsOwner = getArgsOwner expr
+
+    if isNotNull argsOwner then
         let parameter = expr.As<IArgument>().MatchingParameter
         if isNull parameter then ValueNone else
         parameter.Element.As<IAttributesOwner>() |> ValueOption.ofObj
-    | _ ->
+    else
 
     let declaration: IDeclaration =
         let typeMemberDecl = MemberDeclarationNavigator.GetByExpression(expr)

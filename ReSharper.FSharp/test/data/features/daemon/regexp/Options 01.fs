@@ -12,4 +12,8 @@ let _ = Regex("[123]
 
 let _ = Regex("[123]
               #comment
+              ", RegexOptions.Compiled ||| RegexOptions.IgnorePatternWhitespace)
+
+let _ = Regex("[123]
+              #comment
               ", options)

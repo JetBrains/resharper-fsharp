@@ -24,8 +24,7 @@ type FSharpRegexNodeProvider() =
             | :? IField as field when field.IsEnumMember || field.IsConstant ->
                 let typeElement = field.Type.GetTypeElement()
                 if isNotNull typeElement && typeElement.GetClrName() = RegExpPredefinedType.REGEX_OPTIONS_FQN then
-                    let value = field.ConstantValue.Value :?> RegexOptions
-                    value
+                    LanguagePrimitives.EnumOfValue (field.ConstantValue.ToIntUnchecked())
                 else
                     RegexOptions.None
             | _ -> RegexOptions.None
@@ -119,7 +118,7 @@ type FSharpRegexNodeProvider() =
         override _.SupportedOriginalLanguage = FSharpLanguage.Instance :> _
         override _.ProvidedLanguageID = InjectedLanguageIDs.ClrRegExpLanguage
         override _.Summary = ".NET Regular Expressions in F#"
-        override _.Description = "Injects .NET Regular Expression in calls from F# code to Regex members"
+        override _.Description = "Injects .NET Regular Expression in F# strings"
         override _.Guid = "7e4d8d57-335f-4692-9ff8-6b2fa003fb51"
         override _.Words = [|"\""|] // any string
         override _.Attributes = [| RegexPatternAnnotationProvider.RegexPatternAttributeShortName
