@@ -3,7 +3,6 @@
 open System
 open System.Collections.Concurrent
 open System.Collections.Generic
-open System.Threading
 open FSharp.Compiler.TypeProviders
 open FSharp.Compiler.Text
 open FSharp.Core.CompilerServices
@@ -21,6 +20,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.Rd.Tasks
 open JetBrains.Rider.FSharp.TypeProviders.Protocol.Client
 open JetBrains.Util.Concurrency
+open JetBrains.Util.Logging
 
 type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = ConcurrentDictionary<_, ConcurrentDictionary<_, IProxyTypeProvider>>()
@@ -50,10 +50,9 @@ type internal TypeProvidersCache() =
         addTypeProvider projectAssembly tp
 
     member x.Get(id) =
-        let hasValue = SpinWait.SpinUntil((fun () -> proxyTypeProvidersPerId.ContainsKey id), 15_000)
-
-        if not hasValue then failwith $"Cannot get type provider {id} from TypeProvidersCache"
-        else proxyTypeProvidersPerId[id]
+        match proxyTypeProvidersPerId.TryGetValue(id) with
+        | true, provider -> provider
+        | _ -> Assertion.Fail($"Cannot get type provider {id} from TypeProvidersCache"); null
 
     member x.Get(projectOutputPath) =
         match typeProvidersPerAssembly.TryGetValue(projectOutputPath) with
@@ -146,31 +145,30 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                     file, fcsProjectProvider.GetPsiModule(VirtualFileSystemPath.Parse(file, InteractionContext.SolutionContext))
                 | None -> m.FileName, None
 
-            let result =
-                let fakeTcImports = TcImportsHack.GetFakeTcImports(systemRuntimeContainsType)
+            let fakeTcImports = TcImportsHack.GetFakeTcImports(systemRuntimeContainsType)
 
+            let typeProviderProxies =
                 connection.ExecuteWithCatch(fun () ->
-                    protocol.InstantiateTypeProvidersOfAssembly.Sync(
+                    let result = protocol.InstantiateTypeProvidersOfAssembly.Sync(
                         InstantiateTypeProvidersOfAssemblyParameters(runTimeAssemblyFileName,
                             designTimeAssemblyNameString, resolutionEnvironment.toRdResolutionEnvironment(),
                             isInvalidationSupported, isInteractive, systemRuntimeAssemblyVersion.ToString(),
-                            compilerToolsPath |> Array.ofList, fakeTcImports, envPath), RpcTimeouts.Maximal))
+                            compilerToolsPath |> Array.ofList, fakeTcImports, envPath), RpcTimeouts.Maximal)
 
-            let typeProviderProxies =
-                [ for tp in result.TypeProviders ->
-                     let tp = new ProxyTypeProvider(tp, tpContext, Option.toObj projectPsiModule)
+                    [ for tp in result.TypeProviders ->
+                         let tp = new ProxyTypeProvider(tp, tpContext, Option.toObj projectPsiModule)
 
-                     if not isInteractive then
-                         tp.ContainsGenerativeTypes.Add(fun _ -> addProjectWithGenerativeProvider envPath)
+                         if not isInteractive then
+                             tp.ContainsGenerativeTypes.Add(fun _ -> addProjectWithGenerativeProvider envPath)
 
-                     typeProviders.Add(envPath, tp)
-                     tp :> ITypeProvider
+                         typeProviders.Add(envPath, tp)
+                         tp :> ITypeProvider
 
-                  for id in result.CachedIds ->
-                     typeProviders.Get(id) :> ITypeProvider ]
+                      for id in result.CachedIds ->
+                         typeProviders.Get(id) :> ITypeProvider ])
 
             typeProviderProxies
-        
+
         member this.Context = tpContext
 
         member this.HasGenerativeTypeProviders(project) =
