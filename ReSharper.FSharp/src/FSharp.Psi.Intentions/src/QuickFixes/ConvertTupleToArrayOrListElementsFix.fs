@@ -17,7 +17,7 @@ open JetBrains.Util
 type ConvertTupleToArrayOrListElementsFix(warning: TypeEquationError) =
     inherit FSharpQuickFixBase()
 
-    let regex = Regex("[\w\d]*( \* [\w\d]*)+")
+    let regex = Regex("['?\w\d]*( \* ['?\w\d]*)+")
     let expr = warning.Expr
     let actualType = warning.ActualType
     let arrayOrListExpr = ArrayOrListExprNavigator.GetByExpression(expr.IgnoreParentParens())
