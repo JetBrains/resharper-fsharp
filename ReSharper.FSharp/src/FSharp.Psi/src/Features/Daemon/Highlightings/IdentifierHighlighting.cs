@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
   [DaemonTooltipProvider(typeof(IFSharpIdentifierTooltipProvider))]
   [StaticSeverityHighlighting(Severity.INFO, typeof(HighlightingGroupIds.IdentifierHighlightings),
     OverlapResolve = OverlapResolveKind.NONE, ShowToolTipInStatusBar = false)]
-  public class FSharpIdentifierHighlighting : ICustomAttributeIdHighlighting
+  public class FSharpIdentifierHighlighting : ICustomAttributeIdHighlighting, IHighlightingWithFeatureStatisticsKey
   {
     private readonly DocumentRange myRange;
 
@@ -26,5 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
     public string ErrorStripeToolTip => string.Empty;
     public bool IsValid() => true;
     public DocumentRange CalculateRange() => myRange;
+
+    public int? GetStatisticsKey() => null;
   }
 }
