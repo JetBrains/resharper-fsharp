@@ -11,6 +11,7 @@ type ConvertTupleToArrayOrListElementsFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/convertTupleToArrayOrListElements"
 
     [<Test>] member x.``Array 01``() = x.DoNamedTest()
+    [<Test>] member x.``Array 02``() = x.DoNamedTest()
 
     [<Test>] member x.``In parens``() = x.DoNamedTest()
     [<Test>] member x.``Large tuple``() = x.DoNamedTest()
