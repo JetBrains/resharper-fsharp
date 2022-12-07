@@ -1,0 +1,4 @@
+﻿let f x y = ()
+let funcs = [id]
+
+f (fun{caret}cs[0]) 1 
