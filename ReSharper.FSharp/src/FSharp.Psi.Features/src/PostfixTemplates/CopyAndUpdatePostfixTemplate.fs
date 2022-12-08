@@ -32,65 +32,34 @@ open JetBrains.TextControl
 open JetBrains.UI.RichText
 
 module private Helpers =
-    /// e.g. innerWith ["Customer"] "Name" "somename" -> "{ Customer with Name = somename }"
-    let innerWith (prefix: string list) (propName: string) =
-        let pref = prefix |> String.concat "."
-        (fun (inner: string) -> $"""{{ {pref} with {propName} = {inner} }}""")
-
-    /// createCopyAndUpdate ["Customer"; "Phone" ; "Number"] -> "{ Customer with Phone = { Customer.Phone with Number =  } }"
-    let rec createCopyAndUpdate (identifiers: string list) =
-        let rec loop
-            (innerString: string)
-            (usedIdentifers: string list)
-            (identifiers: string list)
-            =
-            match identifiers with
-            | []
-            | [ _ ] -> innerString
-            | _ ->
-                let reference = usedIdentifers @ [ identifiers[0] ]
-                let property = identifiers[1]
-
-                let recursivepart =
-                    identifiers[1 .. identifiers.Length - 1]
-
-                innerWith reference property (loop innerString reference recursivepart)
-
-        loop "" [] identifiers
-
-
-    type RecordExprContext =
-        {
-            OuterRecord: IReferenceExpr option
-            Fields: IReferenceExpr list
-        }
-        static member Default = { OuterRecord = None; Fields = [] }
-
+    
+    let isRecord (expr: IFSharpExpression) =
+        let fcsType = expr.TryGetFcsType()
+        if isNull fcsType then false else
+        let fcsType = Util.FSharpSymbolUtil.getAbbreviatedType fcsType
+        if not fcsType.HasTypeDefinition then false else
+        fcsType.TypeDefinition.IsFSharpRecord
+    
     let fieldBelongsToRecord (fsf: FSharpField) =
         fsf.DeclaringEntity
         |> Option.map (fun f -> f.IsFSharpRecord)
         |> Option.defaultValue false
+    
+    type RecordExprContext =
+        {
+            Records: IReferenceExpr list
+        }
+        static member Default = { Records = [] }
+    
 
-    /// Gets all record qualifiers, returns None if not a record field chain
-    let rec tryGetContext (refExpr: IReferenceExpr) =
+    let rec tryGetContext2 (refExpr: IReferenceExpr) =
         let rec loop (acc: RecordExprContext) (refExpr: IReferenceExpr) =
             match refExpr.Qualifier with
             | null -> Some acc
-            | :? IReferenceExpr as prev ->
-                match prev.Reference.GetFcsSymbol() with
-                | :? FSharpField as field ->
-                    match fieldBelongsToRecord field with
-                    | true -> loop { acc with Fields = prev :: acc.Fields } prev
-                    | false -> None // found union case instead
-                | :? FSharpMemberOrFunctionOrValue ->
-                    match acc.OuterRecord with
-                    // already have the outer qualified name
-                    | Some _ -> Some acc
-                    | _ -> loop { acc with OuterRecord = Some prev } prev
-                | _ -> None
+            | :? IReferenceExpr as prev when isRecord prev ->
+                loop { acc with Records = refExpr :: acc.Records } prev
             // Some other expr, e.g. Class(r).field1.field2
             | _ -> Some acc
-            
 
         loop RecordExprContext.Default refExpr
 
@@ -107,6 +76,7 @@ module private Helpers =
             match innerExpression with
             | null -> recordExpr
             | :? IRecordExpr as innerRecordExpr -> getInnermostRecordExpr innerRecordExpr
+            | :? IPrefixAppExpr as failwithExpr -> recordExpr
             | _ -> failwith "non recordexpr inner expression" 
         )
         |> Option.defaultValue recordExpr
@@ -126,14 +96,15 @@ module private Helpers =
                 let currentRecordExpr = factory.CreateExpr("{ x with P = 1 }") :?> IRecordExpr
                 ModificationUtil.ReplaceChild( currentRecordExpr.CopyInfoExpression, head.Qualifier ) |> ignore
                 let fieldBindingExpr = factory.CreateRecordFieldBinding(head.ShortName,false)
-                // either delete or add inner binding
+                // either delete or add field binding
                 match tail with
-                | [] -> ModificationUtil.DeleteChild(fieldBindingExpr.Expression) 
+                | [] ->
+                    ModificationUtil.DeleteChild(currentRecordExpr.FieldBindingList)
                 | _ -> 
                     let innerBinding = loop tail
                     ModificationUtil.ReplaceChild(fieldBindingExpr.Expression, innerBinding) |> ignore
+                    ModificationUtil.ReplaceChild(currentRecordExpr.FieldBindingList, fieldBindingExpr) |> ignore
                 //
-                ModificationUtil.ReplaceChild(currentRecordExpr.FieldBindingList, fieldBindingExpr) |> ignore
                 currentRecordExpr
             
         loop fields 
@@ -156,7 +127,7 @@ module private Helpers =
 
     /// Creates popup titles and respective record expressions 
     let createPopupContext (ctx:RecordExprContext) (factory: IFSharpElementFactory): PopupContext =
-        let defaultTitle = ctx.OuterRecord.Value :: ctx.Fields |> List.map (fun f -> f.ShortName)
+        let defaultTitle = ctx.Records |> List.item (ctx.Records.Length - 2) |> (fun f -> f.Names)
         
         let rec loop (acc:PopupContext) (list: IReferenceExpr list) =
             match list with
@@ -166,7 +137,7 @@ module private Helpers =
                     
                 let currTitle =
                     defaultTitle
-                    |> Seq.skip (ctx.Fields.Length - acc.PrevFields.Length)
+                    |> Seq.skip (ctx.Records.Length - acc.PrevFields.Length - 1)
                     |> String.concat "."
                 
                 let acc' =
@@ -175,7 +146,7 @@ module private Helpers =
                         PopupContext.PrevFields = head :: acc.PrevFields }
                 loop acc' tail
 
-        loop PopupContext.Default (ctx.Fields |> List.rev)
+        loop PopupContext.Default (ctx.Records |> List.rev)
 
 [<PostfixTemplate("with", "Copies and updates the record field", "{ record with field }")>]
 type CopyAndUpdatePostfixTemplate() =
@@ -187,11 +158,10 @@ type CopyAndUpdatePostfixTemplate() =
         if isNull refExpr then
             false
         else
-            match Helpers.tryGetContext refExpr with
+            match Helpers.tryGetContext2 refExpr with
             | None -> false
-            | Some { Fields = [] } -> false
+            | Some { Records = [] } -> false
             | Some _ -> true
-
 
     override x.CreateBehavior(info) = CopyAndUpdatePostfixTemplateBehavior(info) :> _
 
@@ -206,10 +176,10 @@ type CopyAndUpdatePostfixTemplate() =
         else
             CopyAndUpdatePostfixTemplateInfo(context) :> _
 
-    override this.IsEnabled(solution) =
+    override this.IsEnabled(solution) = 
         let configurations =
             solution.GetComponent<RunsProducts.ProductConfigurations>()
-
+        
         configurations.IsInternalMode()
         || ``base``.IsEnabled(solution)
 
@@ -256,7 +226,7 @@ and CopyAndUpdatePostfixTemplateBehavior(info) =
                 let factory = node.CreateElementFactory()
 
 
-                match node |> Helpers.tryGetContext with
+                match node |> Helpers.tryGetContext2 with
                 | None -> context.Expression // something failed, do nothing
                 | Some ctx ->
                     
@@ -277,7 +247,8 @@ and CopyAndUpdatePostfixTemplateBehavior(info) =
                         popupContext.TitleAndExprList
                         |> Seq.tryFind (fun (title,expr) -> title = occ.Name.Text)
                         |> Option.map (fun (title,expr) ->
-                            ModificationUtil.ReplaceChild(node.Parent, expr) :> ITreeNode)
+                            ModificationUtil.ReplaceChild(node, expr) :> ITreeNode)
+                            // ModificationUtil.ReplaceChild(node.Parent, expr) :> ITreeNode)
                         |> Option.defaultValue context.Expression
 
         )
@@ -292,4 +263,4 @@ and CopyAndUpdatePostfixTemplateBehavior(info) =
                 Helpers.getInnermostRecordExpr recordExpr
 
             let range = innermostExpr.GetNavigationRange()
-            textControl.Caret.MoveTo(range.EndOffset - 1, CaretVisualPlacement.DontScrollIfVisible)
+            textControl.Caret.MoveTo(range.EndOffset - 2, CaretVisualPlacement.DontScrollIfVisible)
