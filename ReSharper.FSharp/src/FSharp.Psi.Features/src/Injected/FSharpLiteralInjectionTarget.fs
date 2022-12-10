@@ -17,6 +17,14 @@ open JetBrains.Text
 
 [<SolutionComponent>]
 type FSharpLiteralInjectionTarget() =
+
+    let tryOpenChameleon (node: ITreeNode) =
+        match node with
+        | :? IChameleonExpression as expr ->
+            if ChameleonExpressionUtil.IsLiteralExpression(expr) then
+                expr.FirstChild |> ignore
+        | _ -> ()
+
     interface IInjectionTargetLanguage with
         override _.ShouldInjectByAnnotation(_, prefix, postfix) =
             prefix <- null
@@ -35,8 +43,10 @@ type FSharpLiteralInjectionTarget() =
 
         override _.SupportsRegeneration = false
 
-        override _.IsInjectionAllowed(literalNode) =
-            let tokenType = literalNode.GetTokenType()
+        override _.IsInjectionAllowed(node) =
+            tryOpenChameleon node
+
+            let tokenType = node.GetTokenType()
 
             FSharpTokenType.Strings[tokenType] &&
             tokenType <> FSharpTokenType.CHARACTER_LITERAL &&

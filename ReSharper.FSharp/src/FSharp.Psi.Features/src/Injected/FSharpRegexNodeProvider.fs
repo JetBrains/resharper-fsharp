@@ -32,7 +32,6 @@ type FSharpRegexNodeProvider() =
         | :? IBinaryAppExpr as binaryAppExpr ->
             let left = evalOptionsArg binaryAppExpr.LeftArgument
             let right = evalOptionsArg binaryAppExpr.RightArgument
-
             if isPredefinedInfixOpApp "|||" binaryAppExpr then left ||| right
             elif isPredefinedInfixOpApp "&&&" binaryAppExpr then left &&& right
             elif isPredefinedInfixOpApp "^^^" binaryAppExpr then left ^^^ right
@@ -87,7 +86,7 @@ type FSharpRegexNodeProvider() =
         |> ValueOption.map PrefixAppTypeArgumentListNavigator.GetByTypeUsage
         |> ValueOption.map TypeReferenceNameNavigator.GetByTypeArgumentList
         |> ValueOption.bind (fun refName ->
-            if refName.Identifier.GetText() = "Regex" then ValueSome RegexOptions.None
+            if refName.Identifier.GetSourceName() = "Regex" then ValueSome RegexOptions.None
             else ValueNone)
 
     interface IInjectionNodeProvider with
@@ -120,6 +119,6 @@ type FSharpRegexNodeProvider() =
         override _.Summary = ".NET Regular Expressions in F#"
         override _.Description = "Injects .NET Regular Expression in F# strings"
         override _.Guid = "7e4d8d57-335f-4692-9ff8-6b2fa003fb51"
-        override _.Words = [|"\""|] // any string
+        override _.Words = null
         override _.Attributes = [| RegexPatternAnnotationProvider.RegexPatternAttributeShortName
                                    StringSyntaxAnnotationProvider.StringSyntaxAttributeShortName |]

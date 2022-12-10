@@ -58,5 +58,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
+    public ITreeNode Initializer => ChameleonExpression.Expression;
   }
 }

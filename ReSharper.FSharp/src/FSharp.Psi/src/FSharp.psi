@@ -1841,3 +1841,9 @@ private literalToken:
   BYTEARRAY<LITERAL, Literal> |
   VERBATIM_BYTEARRAY<LITERAL, Literal> |
   BYTECHAR<LITERAL, Literal>;
+
+interface attributesOwnerDeclaration:
+  overridableMemberDeclaration
+  fSharpTypeOldDeclaration
+  fSharpTypeDeclaration
+  attribPat;
