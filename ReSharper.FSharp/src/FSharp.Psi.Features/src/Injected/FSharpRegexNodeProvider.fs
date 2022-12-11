@@ -9,32 +9,30 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeAnnotations
 open JetBrains.ReSharper.Psi.Impl.Shared.InjectedPsi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected.FSharpInjectionAnnotationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
 [<SolutionComponent>]
 type FSharpRegexNodeProvider() =
     let rec evalOptionsArg (expr: IFSharpExpression) =
         match expr.IgnoreInnerParens() with
-        | :? IReferenceExpr as refExpr ->
-            match refExpr.Reference.Resolve().DeclaredElement with
-            | :? IField as field when field.IsEnumMember || field.IsConstant ->
-                let typeElement = field.Type.GetTypeElement()
-                if isNotNull typeElement && typeElement.GetClrName() = RegExpPredefinedType.REGEX_OPTIONS_FQN then
-                    LanguagePrimitives.EnumOfValue (field.ConstantValue.ToIntUnchecked())
-                else
-                    RegexOptions.None
-            | _ -> RegexOptions.None
-
+        //TODO: move to IBinaryExpr
         | :? IBinaryAppExpr as binaryAppExpr ->
             let left = evalOptionsArg binaryAppExpr.LeftArgument
             let right = evalOptionsArg binaryAppExpr.RightArgument
             if isPredefinedInfixOpApp "|||" binaryAppExpr then left ||| right
             elif isPredefinedInfixOpApp "&&&" binaryAppExpr then left &&& right
             elif isPredefinedInfixOpApp "^^^" binaryAppExpr then left ^^^ right
+            else RegexOptions.None
+
+        | expr when expr.ConstantValue <> ConstantValue.BAD_VALUE ->
+            let constant = expr.ConstantValue
+            let constantType = constant.Type.GetTypeElement()
+            if isNotNull constantType && constantType.GetClrName() = RegExpPredefinedType.REGEX_OPTIONS_FQN then
+                LanguagePrimitives.EnumOfValue (constant.ToIntUnchecked())
             else RegexOptions.None
 
         | _ -> RegexOptions.None
@@ -81,13 +79,13 @@ type FSharpRegexNodeProvider() =
         else ValueSome RegexOptions.None
 
     let checkForRegexTypeProvider (expr: IConstExpr) =
-        ExprStaticConstantTypeUsageNavigator.GetByExpression(expr)
-        |> ValueOption.ofObj
-        |> ValueOption.map PrefixAppTypeArgumentListNavigator.GetByTypeUsage
-        |> ValueOption.map TypeReferenceNameNavigator.GetByTypeArgumentList
-        |> ValueOption.bind (fun refName ->
-            if refName.Identifier.GetSourceName() = "Regex" then ValueSome RegexOptions.None
-            else ValueNone)
+        let providedTypeName =
+            ExprStaticConstantTypeUsageNavigator.GetByExpression(expr)
+            |> PrefixAppTypeArgumentListNavigator.GetByTypeUsage
+            |> TypeReferenceNameNavigator.GetByTypeArgumentList
+
+        let isRegexProvider = isNotNull providedTypeName && providedTypeName.Identifier.GetSourceName() = "Regex"
+        if isRegexProvider then ValueSome RegexOptions.None else ValueNone
 
     interface IInjectionNodeProvider with
         override _.Check(node, _, data) =

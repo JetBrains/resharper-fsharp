@@ -90,6 +90,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public IList<string> Names => this.GetNames();
+
+    public override ConstantValue ConstantValue =>
+      Reference.Resolve().DeclaredElement switch
+      {
+        IField { IsEnumMember: true } x => x.ConstantValue,
+        IField { IsConstant: true } x => x.ConstantValue,
+        _ => ConstantValue.BAD_VALUE
+      };
   }
 
   public class ReferenceExpressionTypeReference : FSharpSymbolReference
