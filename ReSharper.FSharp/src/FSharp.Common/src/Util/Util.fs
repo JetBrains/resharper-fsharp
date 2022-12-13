@@ -120,6 +120,7 @@ module rec CommonUtil =
         if exn.IsOperationCanceled() then someUnit else None
 
     let equalsIgnoreCase other (string: string) =
+        if isNull string then isNull other else
         string.Equals(other, StringComparison.OrdinalIgnoreCase)
 
     let (|IgnoreCase|_|) other string =

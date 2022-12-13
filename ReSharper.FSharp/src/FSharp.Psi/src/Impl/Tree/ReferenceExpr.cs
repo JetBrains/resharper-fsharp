@@ -96,8 +96,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         IField { IsEnumMember: true } x => x.ConstantValue,
         IField { IsConstant: true } x => x.ConstantValue,
-        _ => ConstantValue.BAD_VALUE
+        _ => ConstantValue.NOT_COMPILE_TIME_CONSTANT
       };
+
+    public override bool IsConstantValue() => !ConstantValue.IsErrorOrNonCompileTimeConstantValue();
   }
 
   public class ReferenceExpressionTypeReference : FSharpSymbolReference

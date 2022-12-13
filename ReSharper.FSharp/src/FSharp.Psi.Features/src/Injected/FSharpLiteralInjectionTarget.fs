@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp.Util.Literals
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex
@@ -83,7 +84,7 @@ type FSharpLiteralInjectionTarget() =
         override _.DoNotProcessNodeInterior _ = false
 
         override _.IsPrimaryLanguageApplicable(sourceFile) =
-            sourceFile.LanguageType :? FSharpProjectFileType
+            sourceFile.LanguageType.Is<FSharpProjectFileType>()
 
         override _.CreateLexerFactory(languageService) =
             languageService.GetPrimaryLexerFactory()
@@ -93,9 +94,7 @@ type FSharpLiteralInjectionTarget() =
         override _.IsWhitespaceToken(token) =
             token.GetTokenType().IsWhitespace
 
-        // Used only in JS/JSON for now
         override x.FixValueRangeForLiteral(element) =
-            let startOffset = (x :> IInjectionTargetLanguage).GetStartOffsetForString(element)
-            element.GetTreeTextRange().TrimLeft(startOffset).TrimRight(1)
+            element.GetTreeTextRange()
 
         override _.Language = FSharpLanguage.Instance

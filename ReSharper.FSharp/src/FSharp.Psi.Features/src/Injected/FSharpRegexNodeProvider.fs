@@ -28,14 +28,13 @@ type FSharpRegexNodeProvider() =
             elif isPredefinedInfixOpApp "^^^" binaryAppExpr then left ^^^ right
             else RegexOptions.None
 
-        | expr when expr.ConstantValue <> ConstantValue.BAD_VALUE ->
+        | expr ->
             let constant = expr.ConstantValue
+            if constant.IsErrorOrNonCompileTimeConstantValue() then RegexOptions.None else
             let constantType = constant.Type.GetTypeElement()
             if isNotNull constantType && constantType.GetClrName() = RegExpPredefinedType.REGEX_OPTIONS_FQN then
                 LanguagePrimitives.EnumOfValue (constant.ToIntUnchecked())
             else RegexOptions.None
-
-        | _ -> RegexOptions.None
 
     let getOptionsArg (argumentsOwner: IFSharpArgumentsOwner) =
         if isNull argumentsOwner then None else
@@ -59,13 +58,12 @@ type FSharpRegexNodeProvider() =
         | ValueSome attributesOwner ->
 
         let isSuccess =
-            let regexPatternInfo = getAnnotationInfo<RegexPatternAnnotationProvider, _>(attributesOwner)
-            regexPatternInfo ||
+            let hasAnnotation = getAnnotationInfo<RegexPatternAnnotationProvider, _>(attributesOwner)
+            hasAnnotation ||
 
             let languageName = getAnnotationInfo<StringSyntaxAnnotationProvider, _>(attributesOwner)
-            isNotNull languageName &&
-            (equalsIgnoreCase StringSyntaxAnnotationProvider.Regex languageName ||
-             equalsIgnoreCase InjectedLanguageIDs.ClrRegExpLanguage languageName)
+            equalsIgnoreCase StringSyntaxAnnotationProvider.Regex languageName ||
+            equalsIgnoreCase InjectedLanguageIDs.ClrRegExpLanguage languageName
 
         if not isSuccess then ValueNone else
 
@@ -75,8 +73,8 @@ type FSharpRegexNodeProvider() =
 
     let checkForRegexActivePattern (pat: ILiteralPat) =
         let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(pat.IgnoreParentParens())
-        if isNull parametersOwnerPat || parametersOwnerPat.Identifier.GetText() <> "Regex" then ValueNone
-        else ValueSome RegexOptions.None
+        let isRegexActivePat = isNotNull parametersOwnerPat && parametersOwnerPat.Identifier.GetSourceName() = "Regex"
+        if isRegexActivePat then ValueSome RegexOptions.None else ValueNone
 
     let checkForRegexTypeProvider (expr: IConstExpr) =
         let providedTypeName =

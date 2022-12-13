@@ -71,7 +71,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 
       public override void VisitTopBinding(ITopBinding topBinding)
       {
-        foreach (var declaration in topBinding.HeadPattern.Declarations)
+        var headPattern = topBinding.HeadPattern;
+        if (headPattern == null) return;
+
+        foreach (var declaration in headPattern.Declarations)
         {
           if (declaration is not ITypeMemberDeclaration decl)
             continue;

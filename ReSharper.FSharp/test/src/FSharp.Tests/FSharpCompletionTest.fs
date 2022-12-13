@@ -408,3 +408,6 @@ type FSharpRegexCompletionTest() =
 
     [<Test>] member x.``Brackets 01``() = x.DoNamedTest()
     [<Test>] member x.``Brackets 02 - Interpolation``() = x.DoNamedTest()
+
+    [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type provider 01``() = x.DoNamedTest()

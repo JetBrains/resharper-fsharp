@@ -40,7 +40,7 @@ type RegExprPsiProvider(injectorProvider: FSharpRegexInjectionProvider) =
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpRegularExpressionCompletionProvider() =
     interface IRegexLanguageSpecificCompletionProvider with
-        override this.InitializeContext(owner, _) = owner :? ILiteralExpression
+        override this.InitializeContext(_, _) = true
         override this.GetReplacementText(owner, text) =
             match owner.As<ILiteralExpression>() with
             | null -> ""
