@@ -5,6 +5,7 @@ open JetBrains.Application
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Occurrences
 open JetBrains.ReSharper.Feature.Services.Resources
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -29,7 +30,8 @@ module FSharpOccurrenceKinds =
         [| copyAndUpdate, ServicesNavigationThemedIcons.UsageInstanceCreation.Id
            import, ServicesNavigationThemedIcons.UsageInUsings.Id
            pattern, ServicesNavigationThemedIcons.UsagePatternChecking.Id
-           typeExtension, ServicesNavigationThemedIcons.UsageExtensionMethod.Id |]
+           typeExtension, ServicesNavigationThemedIcons.UsageExtensionMethod.Id
+           partialApplication, FSharpIcons.UsagePartialApplication.Id |]
         |> dict
 
 

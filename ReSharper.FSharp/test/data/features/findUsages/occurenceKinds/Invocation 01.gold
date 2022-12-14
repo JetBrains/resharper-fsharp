@@ -22,6 +22,6 @@ UsageInvocation TO: [O] |f| "" null RANGE: (56,57) @ Invocation 01.fs
 
 Partial application
 ---
-UsageOther TO: [O] |f| 1 RANGE: (67,68) @ Invocation 01.fs
+UsagePartialApplication TO: [O] |f| 1 RANGE: (67,68) @ Invocation 01.fs
 
 
