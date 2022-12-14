@@ -367,7 +367,3 @@ tasks {
     }
     defaultTasks(prepare)
 }
-
-configurations.all {
-    resolutionStrategy.cacheDynamicVersionsFor(10, "days")
-}
