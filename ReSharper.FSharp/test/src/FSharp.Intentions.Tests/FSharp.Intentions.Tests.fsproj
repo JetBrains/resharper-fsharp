@@ -76,6 +76,7 @@
     <Compile Include="src\QuickFixes\RemoveRedundantAttributeSuffixTest.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithAssignmentExpressionTest.fs" />
     <Compile Include="src\QuickFixes\AddMatchAllClauseFixTest.fs" />
+    <Compile Include="src\QuickFixes\AddMissingMatchClausesFixTest.fs" />
     <Compile Include="src\QuickFixes\ToAbstractFixTest.fs" />
     <Compile Include="src\QuickFixes\RemoveYieldTest.fs" />
     <Compile Include="src\QuickFixes\RemoveRedundantQualifierTest.fs" />

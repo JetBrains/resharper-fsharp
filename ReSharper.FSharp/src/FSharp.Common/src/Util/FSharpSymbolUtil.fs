@@ -183,6 +183,9 @@ type FcsEntityInstance =
     { Entity: FSharpEntity
       Substitution: (FSharpGenericParameter * FSharpType) list }
 
+    member this.FcsType =
+        this.Entity.AsType().Instantiate(this.Substitution)
+
     override x.ToString() = x.Entity.ToString()
 
 module FcsEntityInstance =

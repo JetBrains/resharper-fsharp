@@ -92,7 +92,7 @@ module FSharpDeconstructionImpl =
                 |> FSharpNamingService.prepareNamesCollection usedNames pat
                 |> fun names ->
                     let names = List.ofSeq names @ [if isSingle then "item" else $"item{i + 1}"; "_"]
-                    usedNames.Add(names.Head) |> ignore
+                    usedNames.Add(names.Head.RemoveBackticks()) |> ignore
                     List.distinct names)
 
         let isTopLevel = binding :? ITopBinding
@@ -136,7 +136,9 @@ module FSharpDeconstructionImpl =
         let containingType = FSharpNamingService.getPatternContainingType pat
         let usedNames = FSharpNamingService.getUsedNames inExprs EmptyList.InstanceList containingType true
 
-        let patternUsedNames = FSharpNamingService.getPatternContextUsedNames pat
+        let patternUsedNames =
+            FSharpNamingService.getPatternContextUsedNames pat
+            |> Seq.map (fun name -> name.RemoveBackticks())
         usedNames.AddRange(patternUsedNames)
 
         if isFromParameter && isNotNull binding then
@@ -145,7 +147,7 @@ module FSharpDeconstructionImpl =
 
                 parameterPattern.NestedPatterns
                 |> Seq.iter (function
-                    | :? IReferencePat as refPat -> usedNames.Add(refPat.SourceName) |> ignore
+                    | :? IReferencePat as refPat -> usedNames.Add(refPat.SourceName.RemoveBackticks()) |> ignore
                     | _ -> ())
 
         let hasUsages =
@@ -153,10 +155,10 @@ module FSharpDeconstructionImpl =
             if isNull refPat then false else
 
             if not ignoreUsages && hasUsages pat then
-                usedNames.Add(refPat.SourceName) |> ignore
+                usedNames.Add(refPat.SourceName.RemoveBackticks()) |> ignore
                 true
             else
-                usedNames.Remove(refPat.SourceName) |> ignore
+                usedNames.Remove(refPat.SourceName.RemoveBackticks()) |> ignore
                 false
 
         let pat =

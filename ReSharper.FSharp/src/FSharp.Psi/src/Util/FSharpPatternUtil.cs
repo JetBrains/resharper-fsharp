@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
@@ -64,5 +66,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [CanBeNull]
     public static IBindingLikeDeclaration GetBindingFromHeadPattern([CanBeNull] this IFSharpPattern pat) =>
       GetBinding(pat, false, out _);
+
+    [NotNull]
+    public static ConstantValue GetConstantValue([CanBeNull] this IReferencePat pat)
+    {
+      var fcsSymbol = pat?.Reference?.GetFcsSymbol();
+      if (fcsSymbol is FSharpMemberOrFunctionOrValue { LiteralValue: { Value: { } mfvValue } } mfv)
+        return ConstantValue.Create(mfvValue, mfv.FullType.MapType(pat));
+
+      if (fcsSymbol is FSharpField  { LiteralValue: { Value: { } fieldValue } } field)
+        return ConstantValue.Create(fieldValue, field.FieldType.MapType(pat));
+      
+      return ConstantValue.NOT_COMPILE_TIME_CONSTANT;
+    }
   }
 }

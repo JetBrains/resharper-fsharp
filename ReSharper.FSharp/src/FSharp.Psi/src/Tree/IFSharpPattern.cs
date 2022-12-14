@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IFSharpPattern
+  public partial interface IFSharpPattern : IConstantValueOwner
   {
     bool IsDeclaration { get; }
     IEnumerable<IFSharpDeclaration> Declarations { get; }

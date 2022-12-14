@@ -20,5 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public TreeNodeCollection<IAttribute> Attributes => TreeNodeCollection<IAttribute>.Empty;
 
     public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
+
+    public virtual ConstantValue ConstantValue => ConstantValue.NOT_COMPILE_TIME_CONSTANT;
   }
 }

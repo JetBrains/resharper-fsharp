@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public abstract class FSharpExpressionBase : FSharpCompositeElement, IFSharpExpression, IArgument
   {
-    public virtual ConstantValue ConstantValue => ConstantValue.BAD_VALUE;
+    public virtual ConstantValue ConstantValue => ConstantValue.NOT_COMPILE_TIME_CONSTANT;
     public virtual bool IsConstantValue() => false;
 
     public ExpressionAccessType GetAccessType() => ExpressionAccessType.None;

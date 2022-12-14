@@ -1,0 +1,8 @@
+﻿module Say
+
+match struct (true, true){caret} with
+| struct (true, true) -> ()
+| false, false -> ()
+| struct (true, false) -> failwith "todo"
+| struct (false, true) -> failwith "todo"
+| struct (false, false) -> failwith "todo"

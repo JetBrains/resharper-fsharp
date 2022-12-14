@@ -5,6 +5,7 @@ open FSharp.Compiler.Syntax
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -12,6 +13,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Transactions
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
@@ -39,6 +41,18 @@ let toParameterOwnerPat (pat: IFSharpPattern) opName =
         newPat
     | _ -> failwith $"Unexpected pattern: {pat}"
 
+let bindFcsSymbolToReference (context: ITreeNode) (referenceName: IReferenceName) (fcsSymbol: FSharpSymbol) opName =
+    let declaredElement = fcsSymbol.GetDeclaredElement(context.GetPsiModule()).As<IClrDeclaredElement>()
+    if isNull referenceName || referenceName.IsQualified || isNull declaredElement then () else
+
+    let reference = referenceName.Reference
+    FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, declaredElement)
+
+    if not (FSharpResolveUtil.resolvesToQualified declaredElement reference true opName) then
+        // todo: use declared element directly
+        let typeElement = declaredElement.GetContainingType()
+        addOpens reference typeElement |> ignore
+
 // todo: replace Fcs symbols with R# elements when possible
 let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
     // todo: move to reference binding
@@ -58,16 +72,7 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
         if isNotNull oldQualifierWithDot then
             ModificationUtil.AddChildRangeAfter(referenceName, null, oldQualifierWithDot) |> ignore
 
-        let declaredElement = fcsSymbol.GetDeclaredElement(pat.GetPsiModule()).As<IClrDeclaredElement>()
-        if isNull referenceName || referenceName.IsQualified || isNull declaredElement then pat else
-
-        let reference = referenceName.Reference
-        FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, declaredElement)
-
-        if not (FSharpResolveUtil.resolvesToQualified declaredElement reference true opName) then
-            // todo: use declared element directly
-            let typeElement = declaredElement.GetContainingType()
-            addOpens reference typeElement |> ignore
+        bindFcsSymbolToReference pat referenceName fcsSymbol opName
 
         pat
     

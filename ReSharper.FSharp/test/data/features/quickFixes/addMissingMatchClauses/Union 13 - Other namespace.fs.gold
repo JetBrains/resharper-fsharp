@@ -1,0 +1,16 @@
+﻿namespace Ns1
+
+type U =
+    | A
+    | B
+    | C
+
+namespace Ns2
+
+open Ns1
+
+module Module =    
+    match Ns1.U.A{caret} with
+    | Ns1.U.A -> ()
+    | B -> failwith "todo"
+    | C -> failwith "todo"

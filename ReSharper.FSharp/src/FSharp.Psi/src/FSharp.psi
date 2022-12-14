@@ -355,11 +355,7 @@ interface constPat:
   literalPat;
 
 literalPat options { stubBase="FSharpPatternBase"; }:
-  (
-    TRUE |
-    FALSE |
-    STRING // todo: add more
-  );
+  literalToken;
 
 unitPat options { stubBase="FSharpPatternBase"; }:
   LPAREN<LPAREN, LParen>
@@ -527,30 +523,7 @@ unitExpr options { stubBase="UnitExpressionBase"; }:
   RPAREN<RPAREN, RParen>;
 
 literalExpr options { stubBase="FSharpExpressionBase"; }:
-  TRUE<LITERAL, Literal> |
-  FALSE<LITERAL, Literal> |
-  NULL<LITERAL, Literal> |
-  SBYTE<LITERAL, Literal> |
-  BYTE<LITERAL, Literal> |
-  INT16<LITERAL, Literal> |
-  UINT16<LITERAL, Literal> |
-  INT32<LITERAL, Literal> |
-  UINT32<LITERAL, Literal> |
-  INT64<LITERAL, Literal> |
-  UINT64<LITERAL, Literal> |
-  IEEE32<LITERAL, Literal> |
-  IEEE64<LITERAL, Literal> |
-  DECIMAL<LITERAL, Literal> |
-  BIGNUM<LITERAL, Literal> |
-  NATIVEINT<LITERAL, Literal> |
-  UNATIVEINT<LITERAL, Literal> |
-  CHARACTER_LITERAL<LITERAL, Literal> |
-  STRING<LITERAL, Literal> |
-  VERBATIM_STRING<LITERAL, Literal> |
-  TRIPLE_QUOTED_STRING<LITERAL, Literal> |
-  BYTEARRAY<LITERAL, Literal> |
-  VERBATIM_BYTEARRAY<LITERAL, Literal> |
-  BYTECHAR<LITERAL, Literal>;
+  literalToken;
 
 typedExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>
@@ -1833,3 +1806,29 @@ private topLevelTypeAttribute:
 private topLevelTypeParameterName:
   IDENTIFIER
   COLON;
+
+private literalToken:
+  TRUE<LITERAL, Literal> |
+  FALSE<LITERAL, Literal> |
+  NULL<LITERAL, Literal> |
+  SBYTE<LITERAL, Literal> |
+  BYTE<LITERAL, Literal> |
+  INT16<LITERAL, Literal> |
+  UINT16<LITERAL, Literal> |
+  INT32<LITERAL, Literal> |
+  UINT32<LITERAL, Literal> |
+  INT64<LITERAL, Literal> |
+  UINT64<LITERAL, Literal> |
+  IEEE32<LITERAL, Literal> |
+  IEEE64<LITERAL, Literal> |
+  DECIMAL<LITERAL, Literal> |
+  BIGNUM<LITERAL, Literal> |
+  NATIVEINT<LITERAL, Literal> |
+  UNATIVEINT<LITERAL, Literal> |
+  CHARACTER_LITERAL<LITERAL, Literal> |
+  STRING<LITERAL, Literal> |
+  VERBATIM_STRING<LITERAL, Literal> |
+  TRIPLE_QUOTED_STRING<LITERAL, Literal> |
+  BYTEARRAY<LITERAL, Literal> |
+  VERBATIM_BYTEARRAY<LITERAL, Literal> |
+  BYTECHAR<LITERAL, Literal>;

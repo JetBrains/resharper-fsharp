@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpComple
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Transactions
@@ -69,7 +70,10 @@ type ToRecursiveFunctionRule() =
 
         let addNames pattern =
             if isNotNull pattern then
-                usedNames.AddRange(FSharpNamingService.getPatternsNames null [pattern])
+                let names =
+                    FSharpNamingService.getPatternsNames null [pattern]
+                    |> Seq.map (fun name -> name.RemoveBackticks())
+                usedNames.AddRange(names)
 
         for node in referenceOwner.ContainingNodes<ITreeNode>() do
             match node with
@@ -87,7 +91,10 @@ type ToRecursiveFunctionRule() =
                 let parameterPatterns = binding.ParameterPatternsEnumerable
                 if Seq.isEmpty parameterPatterns then () else
 
-                usedNames.AddRange(FSharpNamingService.getPatternsNames null parameterPatterns)
+                let names =
+                    FSharpNamingService.getPatternsNames null parameterPatterns
+                    |> Seq.map (fun name -> name.RemoveBackticks())
+                usedNames.AddRange(names)
 
                 let name = refPat.SourceName
                 if usedNames.Contains(name) then () else

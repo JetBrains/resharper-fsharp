@@ -290,12 +290,13 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             expr
 
         member x.CreatePattern(text, topLevel) =
+            let text = $"({text})"
             let letBindings: ILetBindings =
                 match topLevel with
                 | true -> createLetDecl text :> _
                 | _ -> createLetExpr text :> _
 
-            letBindings.Bindings[0].HeadPattern
+            letBindings.Bindings[0].HeadPattern.As<IParenPat>().Pattern
 
         member x.CreateParenPat() =
             let expr = createLetExpr "(())"

@@ -58,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override void SetName(string name) =>
       NameIdentifier.ReplaceIdentifier(name);
 
-    public ConstantValue ConstantValue => ConstantValue.BAD_VALUE;
+    public virtual ConstantValue ConstantValue => ConstantValue.NOT_COMPILE_TIME_CONSTANT;
     public bool IsConstant => false;
     public bool IsWritable => false;
     public bool IsStatic => false;

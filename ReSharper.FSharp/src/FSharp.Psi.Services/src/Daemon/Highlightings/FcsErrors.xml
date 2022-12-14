@@ -50,6 +50,7 @@
     </Message>
     <Range>getMatchLikeExprIncompleteRange expr</Range>
     <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddMissingMatchClausesFix</QuickFix>
     <QuickFix>AddMatchAllClauseFix</QuickFix>
   </Warning>
 

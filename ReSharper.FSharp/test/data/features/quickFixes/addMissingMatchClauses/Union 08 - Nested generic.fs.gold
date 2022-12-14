@@ -1,0 +1,7 @@
+﻿module Say
+
+match None{caret} with
+| Some(Some true) -> ()
+| None -> failwith "todo"
+| Some None -> failwith "todo"
+| Some(Some false) -> failwith "todo"

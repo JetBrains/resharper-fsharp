@@ -132,5 +132,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       NestedPatterns.OfType<IFSharpDeclaration>();
 
     public bool IsLocal => false;
+
+    public virtual ConstantValue ConstantValue => ConstantValue.NOT_COMPILE_TIME_CONSTANT;
   }
 }

@@ -30,9 +30,9 @@ module FSharpNamingService =
         let usages = HashSet(usages)
         let usedNames = OneToListMap<string, ITreeNode>()
 
-        let addUsedNames names =
+        let addUsedNames (names: string seq) =
             for name in names do
-                usedNames.Add(name, null)
+                usedNames.Add(name.RemoveBackticks(), null)
 
         // Type element is not null when checking names for declaration in a module/class.
         // Consider all member names used.
@@ -90,7 +90,7 @@ module FSharpNamingService =
                                 scopedNames.ContainsKey(name) || usedNames.ContainsKey(name) then () else
 
                         if not checkFcsSymbols || refExpr.Reference.HasFcsSymbol then
-                            usedNames.Add(name, refExpr)
+                            usedNames.Add(name.RemoveBackticks(), refExpr)
 
                     | :? ILetOrUseExpr as letExpr ->
                         let patterns = letExpr.BindingsEnumerable |> Seq.map (fun b -> b.HeadPattern)
@@ -258,17 +258,15 @@ module FSharpNamingService =
             |> Seq.iter (fun root -> namesCollection.Add(root, options))
         namesCollection
 
-    let prepareNamesCollection
-            (usedNames: ISet<string>) (fsTreeNode: IFSharpTreeNode) (namesCollection: INamesCollection) =
-
-        let sourceFile = fsTreeNode.GetSourceFile()
+    let prepareNamesCollection (usedNames: ISet<string>) (context: ITreeNode) (namesCollection: INamesCollection) =
+        let sourceFile = context.GetSourceFile()
         let namingManager = namesCollection.Solution.GetPsiServices().Naming
 
-        let settingsStore = fsTreeNode.GetSettingsStoreWithEditorConfig()
+        let settingsStore = context.GetSettingsStoreWithEditorConfig()
         let elementKind = NamedElementKinds.Locals
         let descriptor = ElementKindOfElementType.LOCAL_VARIABLE
         let namingRule =
-            namingManager.Policy.GetDefaultRule(sourceFile, fsTreeNode.Language, settingsStore, elementKind, descriptor)
+            namingManager.Policy.GetDefaultRule(sourceFile, context.Language, settingsStore, elementKind, descriptor)
 
         let usedNamesFilter = Func<_,_>(usedNames.Contains >> not)
         let suggestionOptions = SuggestionOptions(null, DefaultName = "foo", UsedNamesFilter = usedNamesFilter)
