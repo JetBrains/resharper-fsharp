@@ -1226,6 +1226,7 @@ otherTypeMember: fakeSeparator;
 
 primaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
   get { methodName="ParameterPatterns" path=<primaryConstructorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="Attributes" path=<primaryConstructorDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
@@ -1250,7 +1251,9 @@ namedSelfId options { stubBase="LocalDeclarationBase"; }:
 wildSelfId options { stubBase="LocalDeclarationBase"; }:
   UNDERSCORE<UNDERSCORE, Underscore>;
 
-constructorSignature options { stubBase="ConstructorDeclarationBase"; }:
+constructorSignature options { stubBase="ConstructorDeclarationBase"; } extras {
+  get { methodName="Attributes" path=<constructorSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   NEW<NEW, NewKeyword>
@@ -1259,6 +1262,7 @@ constructorSignature options { stubBase="ConstructorDeclarationBase"; }:
 secondaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; } extras {
   get { methodName="Expression" path=<secondaryConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   get { methodName="ParameterPatterns" path=<secondaryConstructorDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="Attributes" path=<secondaryConstructorDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
@@ -1843,7 +1847,13 @@ private literalToken:
   BYTECHAR<LITERAL, Literal>;
 
 interface attributesOwnerDeclaration:
+  constructorSignatureOrDeclaration
+  memberSignatureLikeDeclaration
   overridableMemberDeclaration
+  declaredModuleDeclaration
   fSharpTypeOldDeclaration
   fSharpTypeDeclaration
+  valFieldDeclaration
+  bindingSignature
+  topBinding
   attribPat;

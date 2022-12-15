@@ -188,8 +188,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         ProcessBinding(binding);
     }
 
-    public override void VisitBindingSignature(IBindingSignature binding) =>
-      ProcessBinding(binding);
+    public override void VisitBindingSignature(IBindingSignature bindingSignature) =>
+      ProcessBinding(bindingSignature);
 
     public override void VisitExceptionDeclaration(IExceptionDeclaration decl)
     {

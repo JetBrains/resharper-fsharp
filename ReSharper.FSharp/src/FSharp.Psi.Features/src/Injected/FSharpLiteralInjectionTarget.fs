@@ -7,7 +7,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp.Util.Literals
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex
@@ -21,9 +20,8 @@ type FSharpLiteralInjectionTarget() =
 
     let tryOpenChameleon (node: ITreeNode) =
         match node with
-        | :? IChameleonExpression as expr ->
-            if ChameleonExpressionUtil.IsLiteralExpression(expr) then
-                expr.FirstChild |> ignore
+        | :? IChameleonExpression as expr when expr.IsLiteralExpression() ->
+            expr.FirstChild |> ignore
         | _ -> ()
 
     interface IInjectionTargetLanguage with

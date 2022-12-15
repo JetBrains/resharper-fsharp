@@ -1,5 +1,5 @@
 [<MyAttribute>]
-module TestModule
+module TestModuleWithAttr
 
 let binding = ()
 
@@ -30,5 +30,24 @@ type MyType
 
   member x.MethodWithAttrPat([<MyAttribute>] p) = ()
 
+[<AbstractClass>]
+type MyAbstractType =
+  abstract member AbstractMethod: unit -> unit
+
+  [<MyAttribute>]
+  abstract member AbstractMethodWithAttr: unit -> unit
+
 type MyTypeWithAttrCtor([<MyAttribute>] x) =
   new(x: int, [<MyAttribute>] y) = MyTypeWithAttrCtor(y)
+
+type StructType =
+  struct
+    [<MyAttribute>]
+    val valFieldWithAttr: float
+    val valField: float
+  end
+
+module NestedModule = ()
+
+[<MyAttribute>]
+module NestedModuleWithAttr = ()

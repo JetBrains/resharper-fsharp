@@ -57,10 +57,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
         CollectAttributes(fSharpTypeDeclaration, fSharpTypeDeclaration.CLRName);
 
       public override void VisitPrimaryConstructorDeclaration(IPrimaryConstructorDeclaration primaryConstructor) =>
-        VisitConstructor(primaryConstructor);
+        VisitConstructorDecl(primaryConstructor);
 
       public override void VisitSecondaryConstructorDeclaration(ISecondaryConstructorDeclaration ctor) =>
-        VisitConstructor(ctor);
+        VisitConstructorDecl(ctor);
+
+      public override void VisitConstructorSignature(IConstructorSignature constructorSignature)
+      {
+        var typeDeclaration = constructorSignature.GetContainingTypeDeclaration();
+        if (typeDeclaration == null) return;
+
+        var defaultMemberName = typeDeclaration.DeclaredName;
+        CollectAttributes(constructorSignature, defaultMemberName);
+
+        if (AttributeUtil.HasAttributeSuffix(defaultMemberName, out var nameWithoutAttributeSuffix))
+          CollectAttributes(constructorSignature, nameWithoutAttributeSuffix);
+      }
 
       public override void VisitTopBinding(ITopBinding topBinding)
       {
@@ -72,46 +84,47 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
           if (declaration is not ITypeMemberDeclaration decl) continue;
 
           var declaredName = decl.DeclaredName;
-          CollectAttributes(topBinding, declaredName);
-
           if (declaredName == SharedImplUtil.MISSING_DECLARATION_NAME) continue;
-
-          VisitParametersOwner(topBinding, declaredName);
+          VisitAttributesAndParametersOwner(topBinding, declaredName);
 
           if (topBinding.ChameleonExpression.IsLambdaExpression())
             VisitBindingNestedLambda(topBinding.Expression, declaredName);
         }
       }
 
+      public override void VisitBindingSignature(IBindingSignature bindingSignature)
+      {
+        var headPattern = bindingSignature.HeadPattern;
+        if (headPattern == null) return;
+
+        foreach (var declaration in headPattern.Declarations)
+        {
+          if (declaration is not ITypeMemberDeclaration decl) continue;
+
+          var declaredName = decl.DeclaredName;
+          CollectAttributes(bindingSignature, declaredName);
+        }
+      }
+
       public override void VisitMemberDeclaration(IMemberDeclaration memberDeclaration)
       {
         var memberName = memberDeclaration.DeclaredName;
-        VisitParametersOwner(memberDeclaration, memberName);
+        VisitAttributesAndParametersOwner(memberDeclaration, memberName);
 
         foreach (var accessor in memberDeclaration.AccessorDeclarationsEnumerable)
           VisitParametersOwner(accessor, memberName);
-
-        base.VisitMemberDeclaration(memberDeclaration);
       }
 
-      private void VisitParametersOwner(IParameterOwnerMemberDeclaration decl, string memberName)
-      {
-        foreach (var parameterDeclaration in decl.ParameterPatterns)
-          VisitPatternDeclaration(parameterDeclaration, memberName);
-      }
-
-      private void VisitConstructor(IConstructorDeclaration constructorDeclaration)
+      private void VisitConstructorDecl(IConstructorDeclaration constructorDeclaration)
       {
         var typeDeclaration = constructorDeclaration.GetContainingTypeDeclaration();
         if (typeDeclaration == null) return;
 
         var defaultMemberName = typeDeclaration.DeclaredName;
-        VisitParametersOwner(constructorDeclaration, defaultMemberName);
+        VisitAttributesAndParametersOwner(constructorDeclaration, defaultMemberName);
 
         if (AttributeUtil.HasAttributeSuffix(defaultMemberName, out var nameWithoutAttributeSuffix))
-          VisitParametersOwner(constructorDeclaration, nameWithoutAttributeSuffix);
-
-        VisitNode(constructorDeclaration);
+          VisitAttributesAndParametersOwner(constructorDeclaration, nameWithoutAttributeSuffix);
       }
 
       private void CollectAttributes(IAttributesOwnerDeclaration owner, string memberName)
@@ -143,6 +156,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
           yield return name;
           yield return name + StandardTypeNames.AttributeSuffix;
         }
+      }
+
+      private void VisitAttributesAndParametersOwner<T>(T decl, string memberName)
+        where T : IParameterOwnerMemberDeclaration, IAttributesOwnerDeclaration
+      {
+        CollectAttributes(decl, memberName);
+        VisitParametersOwner(decl, memberName);
+      }
+
+      private void VisitParametersOwner(IParameterOwnerMemberDeclaration decl, string memberName)
+      {
+        foreach (var parameterDeclaration in decl.ParameterPatterns)
+          VisitPatternDeclaration(parameterDeclaration, memberName);
       }
 
       private void VisitBindingNestedLambda(IFSharpExpression expr, string bindingName)

@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open System.Collections.Generic
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
@@ -18,6 +19,11 @@ type FSharpAnnotatedEntitiesCacheTest() =
     override x.RelativeTestDataPath = "cache/annotatedEntities"
 
     [<Test>] member x.``Declarations 01``() = x.DoNamedTest()
+    [<Test>] member x.``Declarations 02 - Signatures``() = x.DoNamedTestWithFsi()
+
+    member x.DoNamedTestWithFsi() =
+        let testName = x.TestMethodName
+        x.DoTestSolution(testName + FSharpSignatureProjectFileType.FsiExtension)
 
     override x.DoTest(_: Lifetime, project: IProject) =
         let dumpMap (map: OneToListMap<_, _>) toString =
@@ -42,5 +48,5 @@ type FSharpAnnotatedEntitiesCacheTest() =
             writer.WriteLine("\nMEMBERS:")
             writer.WriteLine(dumpMap cache.AttributeToMembers id)
             writer.WriteLine("\nFULL MEMBERS:")
-            writer.WriteLine(dumpMap cache.AttributeToFullMembers (fun x -> $"{x.TypeName}+{x.TypeName}")))
+            writer.WriteLine(dumpMap cache.AttributeToFullMembers (fun x -> $"{x.TypeName}+{x.MemberName}")))
         |> ignore
