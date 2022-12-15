@@ -25,8 +25,15 @@ let rec isConstExpression (synExpr: SynExpr) =
         | _ -> true
     | _ -> false
 
+let isLambdaExpression = function
+    | SynExpr.Lambda _ -> true
+    | _ -> false
+
 [<CompiledName("IsLiteralExpressionFunc")>]
 let isConstExpressionFunc = Func<_,_>(isConstExpression)
 
 [<CompiledName("IsSimpleValueExpressionFunc")>]
 let isSimpleValueExpressionFunc = Func<_,_>(isSimpleValueExpression)
+
+[<CompiledName("IsLambdaExpressionFunc")>]
+let isLambdaExpressionFunc = Func<_,_>(isLambdaExpression)

@@ -23,7 +23,7 @@ type FSharpAnnotatedEntitiesCacheTest() =
         let dumpMap (map: OneToListMap<_, _>) toString =
             map |> Seq.map(fun x ->
                 $"[<{x.Key}>]\n" + (x.Value
-                                   |> Seq.map toString
+                                   |> Seq.map (fun y -> "- " + toString y)
                                    |> String.concat "\n"))
                 |> String.concat "\n\t"
 
