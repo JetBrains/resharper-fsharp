@@ -26,7 +26,12 @@ type MyType
   member x.Method() = ()
 
   [<MyAttribute>]
+  member val AutoPropertyWithAttr = 5 
+
+  [<MyAttribute>]
   member x.MethodWithAttr() = ()
+
+  member x.PropertyWithAttrSetter with set([<MyAttribute>] v) = ()
 
   member x.MethodWithAttrPat([<MyAttribute>] p) = ()
 

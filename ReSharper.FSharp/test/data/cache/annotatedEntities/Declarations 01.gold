@@ -12,7 +12,9 @@ MEMBERS:
 - bindingWithInnerFun
 - RecordFieldWithAttr
 - MyType
+- AutoPropertyWithAttr
 - MethodWithAttr
+- PropertyWithAttrSetter
 - MethodWithAttrPat
 - AbstractMethodWithAttr
 - MyTypeWithAttrCtor
@@ -23,6 +25,7 @@ FULL MEMBERS:
 - TestModuleWithAttr+bindingWithAttr
 - TestModuleWithAttr+RecordType+RecordFieldWithAttr
 - TestModuleWithAttr+MyType+MyType
+- TestModuleWithAttr+MyType+AutoPropertyWithAttr
 - TestModuleWithAttr+MyType+MethodWithAttr
 - TestModuleWithAttr+MyAbstractType+AbstractMethodWithAttr
 - TestModuleWithAttr+StructType+valFieldWithAttr
