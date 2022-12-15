@@ -22,6 +22,11 @@ type AddMissingMatchClausesFixTest() =
     [<Test>] member x.``Enum 04 - Unnamed``() = x.DoNamedTest()
     [<Test>] member x.``Enum 05 - Rqa module``() = x.DoNamedTest()
 
+    [<Test>] member x.``List 01``() = x.DoNamedTest()
+    [<Test>] member x.``List 02``() = x.DoNamedTest()
+    [<Test>] member x.``List 03``() = x.DoNamedTest()
+    [<Test>] member x.``List 04``() = x.DoNamedTest()
+
     [<Test>] member x.``Tuple - Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Union 02 - Escaped name``() = x.DoNamedTest()
 

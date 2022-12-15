@@ -21,17 +21,21 @@ type MatchType =
     | Tuple of isStruct: bool * types: MatchType array
     | Union of union: FcsEntityInstance
     | UnionCase of case: FSharpUnionCase * union: FcsEntityInstance
+    | List of fcsType: FSharpType
     | Other of fcsType: FSharpType
     | Error
 
     member this.FcsType =
         match this with
         | Bool fcsType
+        | List fcsType
         | Other fcsType -> Some fcsType
         | Union fcsEntityInstance -> Some fcsEntityInstance.FcsType
         | Enum(fcsEntity, _) -> Some(fcsEntity.AsType())
         | _ -> None
 
+
+[<RequireQualifiedAccess>]
 type MatchTest =
     | Discard
     | Named of name: string option
@@ -41,6 +45,7 @@ type MatchTest =
     | Union of index: int
     | UnionCase
     | UnionCaseField of index: int
+    | List of isEmpty: bool
     | Error
     | ActivePatternCase of index: int * group: FSharpActivePatternGroup
 
@@ -99,7 +104,7 @@ module MatchType =
         let entityFqn = fcsEntity.BasicQualifiedName
         match entityFqn with
         | "System.Boolean" -> MatchType.Bool fcsType
-        | "Microsoft.FSharp.Collections.FSharpList`1" -> MatchType.Other fcsType
+        | "Microsoft.FSharp.Collections.FSharpList`1" -> MatchType.List fcsType
         | _ ->
 
         if fcsEntity.IsFSharpUnion then MatchType.Union(FcsEntityInstance.create fcsType) else
@@ -125,32 +130,34 @@ module MatchType =
 module MatchTest =
     let rec matches (node: MatchNode) (existingNode: MatchNode) : bool =
         match existingNode.Pattern, node.Pattern with
-        | (Discard, _), _ -> true
-        | (Named _, _), _ -> true
-        | (Value existingValue, _), (Value value, _) -> existingValue.Equals(value)
+        | (MatchTest.Discard, _), _ -> true
+        | (MatchTest.Named _, _), _ -> true
+        | (MatchTest.Value existingValue, _), (MatchTest.Value value, _) -> existingValue.Equals(value)
 
-        | (ActivePatternCase(existingIndex, existingGroup), _), (ActivePatternCase(index, group), _) ->
+        | (MatchTest.ActivePatternCase(existingIndex, existingGroup), _), (MatchTest.ActivePatternCase(index, group), _) ->
             existingIndex = index &&
             existingGroup.Name = group.Name &&
             existingGroup.DeclaringEntity = group.DeclaringEntity
 
         // todo: add test with different unions
-        | (Union existingIndex, [node1]), (Union index, [node2]) ->
+        | (MatchTest.Union existingIndex, [node1]), (MatchTest.Union index, [node2]) ->
             existingIndex = index &&
             matches node2 node1
 
-        | (UnionCase, [{ Pattern = Discard, _ }]), (UnionCase, _) -> true
+        | (MatchTest.UnionCase, [{ Pattern = MatchTest.Discard, _ }]), (MatchTest.UnionCase, _) -> true
 
-        | (UnionCase, fields1), (UnionCase, fields2) ->
+        | (MatchTest.UnionCase, fields1), (MatchTest.UnionCase, fields2) ->
             List.forall2 matches fields2 fields1
 
-        | (UnionCaseField _, [node1]), (UnionCaseField _, [node2]) ->
+        | (MatchTest.UnionCaseField _, [node1]), (MatchTest.UnionCaseField _, [node2]) ->
             matches node2 node1
 
         // todo: add test with different lengths
-        | (Tuple isStruct1, nodes1), (Tuple isStruct2, nodes2) ->
+        | (MatchTest.Tuple isStruct1, nodes1), (MatchTest.Tuple isStruct2, nodes2) ->
             isStruct1 = isStruct2 &&
             List.forall2 matches nodes2 nodes1 
+
+        | (MatchTest.List true, _), (MatchTest.List true, _) -> true
 
         | _ -> false
 
@@ -211,6 +218,9 @@ module MatchTest =
 
                 MatchTest.UnionCase, fieldNodes
 
+            | MatchType.List _ ->
+                MatchTest.List true, []
+
             | _ -> failwith "todo"
 
         | _ ->
@@ -263,7 +273,7 @@ module MatchNode =
             Seq.iter2 (bind usedNames) tuplePat.Patterns nodes
 
         match node.Pattern with
-        | Named name, _ ->
+        | MatchTest.Named name, _ ->
             let names =
                 // todo: ignore `value` name in option/voption
                 let namesCollection = FSharpNamingService.createEmptyNamesCollection oldPat
@@ -286,14 +296,14 @@ module MatchNode =
 
             factory.CreatePattern(name, false) |> replaceWithPattern oldPat |> ignore
 
-        | ActivePatternCase(index, group), _ ->
+        | MatchTest.ActivePatternCase(index, group), _ ->
             let text = FSharpNamingService.mangleNameIfNecessary group.Names[index]
             factory.CreatePattern(text, false) |> replaceWithPattern oldPat |> ignore
 
-        | Tuple isStruct, nodes ->
+        | MatchTest.Tuple isStruct, nodes ->
             replaceTuplePat isStruct oldPat nodes
 
-        | Union _, [{ Value = { Type = MatchType.UnionCase(unionCase, _) } } as node] ->
+        | MatchTest.Union _, [{ Value = { Type = MatchType.UnionCase(unionCase, _) } } as node] ->
             let patText = if not unionCase.HasFields then unionCase.Name else $"{unionCase.Name} _"
             let pat = factory.CreatePattern(patText, false) |> replaceWithPattern oldPat :?> IReferenceNameOwnerPat
             FSharpPatternUtil.bindFcsSymbolToReference pat pat.ReferenceName unionCase "get pattern"
@@ -304,19 +314,19 @@ module MatchNode =
             let paramsPat = unionCasePat.Parameters[0]
 
             match node.Pattern with
-            | UnionCase, nodes ->
+            | MatchTest.UnionCase, nodes ->
                 match nodes with
                 | [] -> ()
                 | [node] -> bind usedNames paramsPat node
                 | nodes -> replaceTuplePat false paramsPat nodes
             | _ -> ()
 
-        | Value value, _ when value.IsBoolean() ->
+        | MatchTest.Value value, _ when value.IsBoolean() ->
             match value.BoolValue with
             | true -> factory.CreatePattern("true", false) |> replaceWithPattern oldPat |> ignore
             | false -> factory.CreatePattern("false", false) |> replaceWithPattern oldPat |> ignore
 
-        | Value constantValue, _ ->
+        | MatchTest.Value constantValue, _ ->
             match node.Value.Type with
             | MatchType.Enum(_, fields) ->
                 let field, _ = fields |> Array.find (snd >> ((=) constantValue))
@@ -325,6 +335,9 @@ module MatchNode =
                 FSharpPatternUtil.bindFcsSymbolToReference pat pat.ReferenceName field "get pattern"
 
             | valueType -> failwith $"Unexpected value type: {valueType}"
+
+        | MatchTest.List true, _ ->
+            factory.CreatePattern("[]", false) |> replaceWithPattern oldPat |> ignore
 
         | _ -> ()
 
@@ -419,6 +432,13 @@ module MatchNode =
 
         | MatchTest.UnionCaseField _, [node] ->
             increment deconstructions context node
+
+        | MatchTest.List isEmpty, _ ->
+            if isEmpty then
+                node.Pattern <- MatchTest.Named None, []
+                true
+            else
+                false
 
         | nodePattern -> failwith $"Unexpected pattern: {nodePattern}"
 
@@ -574,6 +594,17 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
             | pat -> makeSingleFieldNode pat
 
         MatchTest.Union index, [MatchNode.Create(caseValue, innerPatterns)]
+
+    | :? IListPat as listPat, MatchType.List _ ->
+        addDeconstruction value.Path Deconstruction.InnerPatterns
+
+        let isEmpty = Seq.isEmpty listPat.PatternsEnumerable
+        MatchTest.List isEmpty, []
+
+    | :? IListConsPat, MatchType.List _ ->
+        addDeconstruction value.Path Deconstruction.InnerPatterns
+
+        MatchTest.List false, []
 
     | _ -> MatchTest.Error, []
 
