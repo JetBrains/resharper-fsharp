@@ -1,7 +1,8 @@
 ﻿{
   "runtimeOptions": {
     "configProperties": {
-      "System.GC.Server": true
+      "System.GC.Server": true,
+      "System.GC.NoAffinitize": true
     },
     "tfm": "net6",
     "rollForward": "Major",
