@@ -3,6 +3,7 @@
 - TestModuleWithAttr
 - TestModuleWithAttr+RecordType
 - UnionCaseWithAttr
+- ExnWithAttr
 - NestedModuleWithAttr
 
 MEMBERS:

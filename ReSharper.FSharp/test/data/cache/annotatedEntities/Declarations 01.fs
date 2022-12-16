@@ -52,6 +52,9 @@ type StructType =
     val valField: float
   end
 
+[<MyAttribute>]
+exception ExnWithAttr of string
+
 module NestedModule = ()
 
 [<MyAttribute>]
