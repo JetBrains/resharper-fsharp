@@ -1,0 +1,8 @@
+﻿module Say
+
+match true, true{caret} with
+| true, true, true -> ()
+| true, true -> failwith "todo"
+| true, false -> failwith "todo"
+| false, true -> failwith "todo"
+| false, false -> failwith "todo"

@@ -480,10 +480,42 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
         if isNull unionCase || not (equals unionCase.ReturnType union.FcsType) then None else
         union.Entity.UnionCases |> Seq.tryFindIndex (fun uc -> uc.XmlDocSig = unionCase.XmlDocSig)
 
+    let addTupleItemDeconstructions parentPath testCtor count =
+        for i in 0 .. count do
+            let itemPath = testCtor i :: parentPath
+            addDeconstruction itemPath Deconstruction.InnerPatterns
+
     match pat.IgnoreInnerParens(), value.Type with
     | :? IWildPat, _ ->
         addDeconstruction value.Path Deconstruction.Discard
         MatchTest.Discard, []
+
+    | :? ITuplePat as tuplePat, MatchType.Tuple(_, types) ->
+        addDeconstruction value.Path Deconstruction.InnerPatterns
+
+        let pats = tuplePat.Patterns
+        if pats.Count <> types.Length then
+            addTupleItemDeconstructions value.Path MatchTest.TupleItem types.Length
+            MatchTest.Error, [] else
+
+        let itemNodes =
+            (types, pats)
+            ||> Seq.mapi2 (fun i itemType itemPat ->
+                let itemTest = MatchTest.TupleItem i
+                let itemPath = itemTest :: value.Path
+                let itemValue = { Type = itemType; Path = itemPath }
+                let matchPattern = getMatchPattern deconstructions itemValue itemPat
+                MatchNode.Create(itemValue, matchPattern)
+            )
+            |> List.ofSeq
+
+        MatchTest.Tuple tuplePat.IsStruct, itemNodes
+
+    | _, MatchType.Tuple(_, types) ->
+        addDeconstruction value.Path Deconstruction.InnerPatterns
+        addTupleItemDeconstructions value.Path MatchTest.TupleItem types.Length
+
+        MatchTest.Error, []
 
     | :? IConstPat as constPat, _ ->
         // todo: add test for bad value
@@ -529,26 +561,6 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
             | _ ->
                 MatchTest.Error, []
 
-    | :? ITuplePat as tuplePat, MatchType.Tuple(isStruct, types) ->
-        addDeconstruction value.Path Deconstruction.InnerPatterns
-
-        let pats = tuplePat.Patterns
-        if pats.Count <> types.Length || tuplePat.IsStruct <> isStruct then
-            MatchTest.Error, [] else
-
-        let itemNodes =
-            (types, pats)
-            ||> Seq.mapi2 (fun i itemType itemPat ->
-                let test = MatchTest.TupleItem i
-                let path = test :: value.Path
-                let itemValue = { Type = itemType; Path = path }
-                let matchPattern = getMatchPattern deconstructions itemValue itemPat
-                MatchNode.Create(itemValue, matchPattern)
-            )
-            |> List.ofSeq
-
-        MatchTest.Tuple tuplePat.IsStruct, itemNodes
-
     | :? IParametersOwnerPat as paramOwnerPat, MatchType.Union unionEntityInstance ->
         let unionCase = paramOwnerPat.Reference.GetFcsSymbol().As<FSharpUnionCase>()
         match getUnionCaseIndex unionEntityInstance unionCase with
@@ -574,10 +586,10 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
             MatchNode.Create(itemValue, matchPattern)
 
         let makeSingleFieldNode pat =
-            if unionCase.Fields.Count <> 1 then MatchTest.Error, [] else
-
             addDeconstruction casePath Deconstruction.InnerPatterns
             let fieldNode = makeFieldNode 0 unionCase.Fields[0] pat
+
+            if unionCase.Fields.Count <> 1 then MatchTest.Error, [] else
             MatchTest.UnionCase, [fieldNode]
 
         // todo: named patterns for fields
@@ -591,9 +603,16 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
                     addDeconstruction casePath Deconstruction.InnerPatterns
 
                     let innerPatterns = tuplePat.Patterns
-                    if innerPatterns.Count <> unionCase.Fields.Count then MatchTest.Error, [] else
+                    let caseFields = unionCase.Fields
+                    if innerPatterns.Count <> caseFields.Count then
+                        let n = min innerPatterns.Count caseFields.Count
+                        (Seq.take n caseFields, Seq.take n innerPatterns)
+                        ||> Seq.mapi2 makeFieldNode
+                        |> List.ofSeq
+                        |> ignore
+                        MatchTest.Error, [] else
 
-                    let fieldNodes = Seq.mapi2 makeFieldNode unionCase.Fields innerPatterns |> List.ofSeq
+                    let fieldNodes = Seq.mapi2 makeFieldNode caseFields innerPatterns |> List.ofSeq
                     caseTest, fieldNodes
 
                 | pat -> makeSingleFieldNode pat
