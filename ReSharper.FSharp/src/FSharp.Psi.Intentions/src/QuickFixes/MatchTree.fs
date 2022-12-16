@@ -46,20 +46,24 @@ type MatchTest =
     | UnionCase
     | UnionCaseField of index: int
     | List of isEmpty: bool
+    | And
+    | Or
     | Error
     | ActivePatternCase of index: int * group: FSharpActivePatternGroup
 
-type MatchValue =
+and MatchValue =
     { Type: MatchType
       Path: MatchTest list }
 
-type MatchNode =
+and MatchNode =
     { Value: MatchValue
-      mutable Pattern: MatchTest * MatchNode list }
+      mutable Pattern: Pattern }
 
     static member Create(value, pattern) =
         { Value = value
           Pattern = pattern }
+
+and Pattern = MatchTest * MatchNode list
 
 [<RequireQualifiedAccess>]
 type Deconstruction =
@@ -158,6 +162,8 @@ module MatchTest =
             List.forall2 matches nodes2 nodes1 
 
         | (MatchTest.List true, _), (MatchTest.List true, _) -> true
+
+        | (MatchTest.Or, nodes), _ -> List.exists (matches node) nodes
 
         | _ -> false
 
@@ -605,6 +611,20 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
         addDeconstruction value.Path Deconstruction.InnerPatterns
 
         MatchTest.List false, []
+
+    | :? IAndsPat as andsPat, _ ->
+        let nodes = 
+            andsPat.Patterns
+            |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat))
+            |> List.ofSeq
+        MatchTest.And, nodes
+
+    | :? IOrPat as orPat, _ ->
+        let nodes = 
+            orPat.Patterns
+            |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat))
+            |> List.ofSeq
+        MatchTest.Or, nodes
 
     | _ -> MatchTest.Error, []
 

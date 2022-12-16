@@ -89,6 +89,34 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return pattern2Decls.Prepend(pattern1Decls);
       }
     }
+
+    public IList<IFSharpPattern> Patterns
+    {
+      get
+      {
+        var result = new List<IFSharpPattern>();
+
+        var pat = this;
+        while (pat != null)
+        {
+          var pat2 = pat.Pattern2;
+          if (pat2 != null)
+            result.Add(pat2);
+
+          if (pat.Pattern1 is OrPat orPat)
+          {
+            pat = orPat;
+          }
+          else
+          {
+            result.Add(pat.Pattern1);
+            pat = null;
+          }
+        }
+
+        return result;
+      }
+    }
   }
 
   internal partial class AndsPat
