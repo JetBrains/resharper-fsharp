@@ -75,7 +75,7 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
 
         let newExpr =
             factory.CreateExpr(
-                [| if needParens then "("
+                [|
                    "fun "
                    if isMethodOrConstructor && not isSingleParameter then "("
                    paramNamesText
@@ -86,11 +86,11 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
                    if isMethodOrConstructor then "("
                    if paramNamesText <> "()" then paramNamesText
                    if isMethodOrConstructor then ")"
-                   if needParens then ")"
                 |]
-                |> String.concat "")
+                |> String.concat "") //TODO: FIX func ()
 
-        replaceWithCopy referenceExpr newExpr
+        let newExpr = ModificationUtil.ReplaceChild(referenceExpr, newExpr.Copy())
+        let newExpr = FSharpParensUtil.addParensIfNeeded newExpr
         // let refExprIdent = referenceExpr.Indent
         //
         // let newExpr = ModificationUtil.ReplaceChild(referenceExpr, newExpr.Copy())
@@ -100,4 +100,5 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
 
         // TODO: extension
         // TODO: overloads
+        // TODO: parens
         null
