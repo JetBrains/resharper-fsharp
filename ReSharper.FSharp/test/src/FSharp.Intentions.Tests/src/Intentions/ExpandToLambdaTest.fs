@@ -21,11 +21,5 @@ type ExpandToLambdaTest() =
     [<Test>] member x.``Binding 03 - Fun``() = x.DoNamedTest()
     [<Test>] member x.``Binding 04 - Local``() = x.DoNamedTest()
 
-
-type ExpandToLambdaAvailabilityTest() =
-    inherit FSharpContextActionAvailabilityTestBase<ExpandToLambdaAction>()
-
-    override x.ExtraPath = "expandToLambda"
-
     [<Test; ActionNotAvailable>] member x.``Application 01 - Not available``() = x.DoNamedTest()
     [<Test; ActionNotAvailable>] member x.``Bindings 01``() = x.DoNamedTest()
