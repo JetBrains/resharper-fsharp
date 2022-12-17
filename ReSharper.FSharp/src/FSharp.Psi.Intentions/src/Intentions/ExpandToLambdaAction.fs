@@ -32,6 +32,7 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
         | :? IParametersOwnerDeclaration -> true
         | :? IParameterOwnerMemberDeclaration -> true
         | :? ILocalReferencePat -> true
+        | :? IUnionCase -> true
         | _ -> false
 
     override this.Text = "Expand to lambda"
@@ -49,10 +50,11 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
         let isMethod, isSingleParameter, paramNamesText =
             match referenceSymbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
-                let isMethod = mfv.IsMethod
+                let isMethod = mfv.IsMethod || mfv.IsConstructor
                 let parameters = mfv.CurriedParameterGroups
-                isMethod, parameters.Count = 1 && parameters[0].Count = 1,
+                isMethod, parameters.Count = 1 && parameters[0].Count <= 1,
                 if isMethod && parameters.Count = 1 then
+                    if parameters[0].Count = 0 then "()" else
                     parameters[0]
                     |> Seq.map (fun x -> x.Name |> Option.defaultWith getNewName)
                     |> String.concat ", "
