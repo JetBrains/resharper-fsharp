@@ -47,7 +47,7 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
             let mutable argI = 0
             fun () -> argI <- argI + 1; $"arg{argI}"
 
-        let isMethod, isSingleParameter, paramNamesText =
+        let isMethodOrConstructor, isSingleParameter, paramNamesText =
             match referenceSymbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
                 let isMethod = mfv.IsMethod || mfv.IsConstructor
@@ -74,15 +74,15 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
             factory.CreateExpr(
                 [| if needParens then "("
                    "fun "
-                   if isMethod && not isSingleParameter then "("
+                   if isMethodOrConstructor && not isSingleParameter then "("
                    paramNamesText
-                   if isMethod && not isSingleParameter then ")"
+                   if isMethodOrConstructor && not isSingleParameter then ")"
                    " -> "
                    referenceExpr.GetText()
-                   if not isMethod then " "
-                   if isMethod then "("
-                   paramNamesText
-                   if isMethod then ")"
+                   if not isMethodOrConstructor then " "
+                   if isMethodOrConstructor then "("
+                   if paramNamesText <> "()" then paramNamesText
+                   if isMethodOrConstructor then ")"
                    if needParens then ")"
                 |]
                 |> String.concat "")
