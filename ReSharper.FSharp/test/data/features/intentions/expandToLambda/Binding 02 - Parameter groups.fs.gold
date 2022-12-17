@@ -1,0 +1,3 @@
+﻿let f x (y, z) (Some l) = ()
+
+fun x arg1 arg2 -> f x arg1 arg2{caret}

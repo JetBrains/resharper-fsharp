@@ -1,0 +1,3 @@
+﻿type Union = Union of int * x: int
+
+fun (item1, x) -> Union.Union(item1, x){caret}

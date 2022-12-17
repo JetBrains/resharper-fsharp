@@ -1,0 +1,3 @@
+﻿let _ =
+    let g x = ()
+    id (fun arg1 -> g arg1){caret} |> ignore

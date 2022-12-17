@@ -1,0 +1,5 @@
+﻿type A =
+    static member M (x, y) z = ()
+
+fun arg1 z -> A.M arg1 z{caret}
+

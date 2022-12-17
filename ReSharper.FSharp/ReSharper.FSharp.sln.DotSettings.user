@@ -1,0 +1,16 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=aefd7de9_002D8189_002D405c_002D8023_002D93bfce598e9d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="FSharpAnnotatedEntitiesCacheTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaTest.Method 01 - Simple&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaTest.Method 02 - Parameter groups&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaTest.Method 03 - Extension&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaTest.Method 04 - Unit&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaTest.Constructor 01 - Simple&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaTest.Constructor 02 - Union case&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaTest.Binding 01 - Simple&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaTest.Binding 02 - Parameter groups&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaTest.Binding 03 - Fun&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaTest.Binding 04 - Local&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::24E8C927-A6E4-48DB-B548-DEEEE808EC4E::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions.ExpandToLambdaAvailabilityTest.Application 01 - Not available&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

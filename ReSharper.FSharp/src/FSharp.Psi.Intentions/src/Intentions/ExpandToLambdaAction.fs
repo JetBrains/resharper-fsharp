@@ -1,4 +1,4 @@
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Intentions.ExpandToLambdaAction
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ContextActions
 
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.ContextActions
@@ -8,8 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.Util
 open JetBrains.ReSharper.Psi.Tree
@@ -19,6 +17,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
                 Description = "Expand partial application to lambda")>]
 type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
+
+    override this.Text = "Expand to lambda"
+
     override this.IsAvailable _ =
         let referenceExpr = dataProvider.GetSelectedElement<IReferenceExpr>()
 
@@ -29,37 +30,37 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
         match declaredElement with
         | :? IFunction
         | :? IUnionCase -> true
+        | :? ITopLevelPatternDeclaredElement -> true //TODO
         | :? IReferencePat as refPat ->
             match refPat.GetFcsSymbol() with
             | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.CurriedParameterGroups.Count > 0
             | _ -> false
         | _ -> false
 
-    override this.Text = "Expand to lambda"
-
     override x.ExecutePsiTransaction(_, _) =
         let referenceExpr = dataProvider.GetSelectedElement<IReferenceExpr>()
+        let referenceFcsSymbol = referenceExpr.Reference.GetFcsSymbol()
         let factory = referenceExpr.CreateElementFactory()
 
-        let referenceSymbol = referenceExpr.Reference.GetFcsSymbol()
-        let getNewName =
+        let getArgName =
             let mutable argI = 0
             fun () -> argI <- argI + 1; $"arg{argI}"
 
-        let isMethodOrConstructor, isSingleParameter, paramNamesText =
-            match referenceSymbol with
+        let isSimpleMethodLike, isSingleParameter, paramNamesText =
+            match referenceFcsSymbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
-                let isMethod = mfv.IsMethod || mfv.IsConstructor
-                let parameters = mfv.CurriedParameterGroups
-                isMethod, parameters.Count = 1 && parameters[0].Count <= 1,
-                if isMethod && parameters.Count = 1 then
-                    if parameters[0].Count = 0 then "()" else
-                    parameters[0]
-                    |> Seq.map (fun x -> x.Name |> Option.defaultWith getNewName)
+                let parameterGroups = mfv.CurriedParameterGroups
+                let isSimpleMethodLike = (mfv.IsMethod || mfv.IsConstructor) && parameterGroups.Count = 1
+
+                isSimpleMethodLike, parameterGroups.Count = 1 && parameterGroups[0].Count <= 1,
+                if isSimpleMethodLike && parameterGroups.Count = 1 then
+                    if parameterGroups[0].Count = 0 then "()" else
+                    parameterGroups[0]
+                    |> Seq.map (fun x -> x.Name |> Option.defaultWith getArgName)
                     |> String.concat ", "
                 else
-                    parameters
-                    |> Seq.map (fun x -> if x.Count = 1 then (if isUnit x[0].Type then "()" else x[0].Name |> Option.defaultWith getNewName) else getNewName())
+                    parameterGroups
+                    |> Seq.map (fun x -> if x.Count = 1 then (if isUnit x[0].Type then "()" else x[0].Name |> Option.defaultWith getArgName) else getArgName())
                     |> String.concat " "
             | :? FSharpUnionCase as unionCase ->
                 let fields = unionCase.Fields
@@ -73,15 +74,15 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
             factory.CreateExpr(
                 [|
                    "fun "
-                   if isMethodOrConstructor && not isSingleParameter then "("
+                   if isSimpleMethodLike && not isSingleParameter then "("
                    paramNamesText
-                   if isMethodOrConstructor && not isSingleParameter then ")"
+                   if isSimpleMethodLike && not isSingleParameter then ")"
                    " -> "
                    referenceExpr.GetText()
-                   if not isMethodOrConstructor then " "
-                   if isMethodOrConstructor then "("
+                   if not isSimpleMethodLike then " "
+                   if isSimpleMethodLike then "("
                    if paramNamesText <> "()" then paramNamesText
-                   if isMethodOrConstructor then ")"
+                   if isSimpleMethodLike then ")"
                 |]
                 |> String.concat "") //TODO: FIX func ()
 
