@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.Util
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 
 [<ContextAction(Name = "Expand to lambda", Group = "F#",
                 Description = "Expand partial application to lambda")>]
@@ -26,7 +27,12 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
         isValid referenceExpr &&
 
         let declaredElement = referenceExpr.Reference.Resolve().DeclaredElement
-        isNotNull (declaredElement.As<IFunction>())
+        match declaredElement with
+        | :? IFunction -> true
+        | :? IParametersOwnerDeclaration -> true
+        | :? IParameterOwnerMemberDeclaration -> true
+        | :? ILocalReferencePat -> true
+        | _ -> false
 
     override this.Text = "Expand to lambda"
 
@@ -40,28 +46,41 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
             let mutable argI = 0
             fun () -> argI <- argI + 1; $"arg{argI}"
 
-        let isMethod, parameters =
+        let isMethod, isSingleParameter, paramNamesText =
             match referenceSymbol with
-            | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.IsMethod, mfv.CurriedParameterGroups
-            | _ -> false, [||]
-
-        let paramNamesText =
-            if isMethod && parameters.Count = 1 then
-                "(" + (parameters[0] |> Seq.map (fun x -> x.Name |> Option.defaultWith getNewName) |> String.concat ", ") + ")"
-            else
-            parameters
-            |> Seq.map (fun x -> if x.Count = 1 then x[0].Name |> Option.defaultWith getNewName else getNewName())
-            |> String.concat " "
+            | :? FSharpMemberOrFunctionOrValue as mfv ->
+                let isMethod = mfv.IsMethod
+                let parameters = mfv.CurriedParameterGroups
+                isMethod, parameters.Count = 1 && parameters[0].Count = 1,
+                if isMethod && parameters.Count = 1 then
+                    parameters[0]
+                    |> Seq.map (fun x -> x.Name |> Option.defaultWith getNewName)
+                    |> String.concat ", "
+                else
+                    parameters
+                    |> Seq.map (fun x -> if x.Count = 1 then (if isUnit x[0].Type then "()" else x[0].Name |> Option.defaultWith getNewName) else getNewName())
+                    |> String.concat " "
+            | :? FSharpUnionCase as unionCase ->
+                let fields = unionCase.Fields
+                true, fields.Count = 1,
+                unionCase.Fields
+                |> Seq.map (fun x -> StringUtil.Decapitalize(x.Name))
+                |> String.concat ", "
+            | _ -> false, true, "_"
 
         let newExpr =
             factory.CreateExpr(
                 [| if needParens then "("
                    "fun "
+                   if isMethod && not isSingleParameter then "("
                    paramNamesText
+                   if isMethod && not isSingleParameter then ")"
                    " -> "
-                   referenceExpr.QualifiedName
+                   referenceExpr.GetText()
                    if not isMethod then " "
+                   if isMethod then "("
                    paramNamesText
+                   if isMethod then ")"
                    if needParens then ")"
                 |]
                 |> String.concat "")
@@ -74,4 +93,6 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
         // let indentDiff = newExprIndent - refExprIdent
         // shiftNode indentDiff (newExpr.Parent.Parent :?> _)
 
+        // TODO: extension
+        // TODO: overloads
         null
