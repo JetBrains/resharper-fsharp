@@ -10,8 +10,10 @@ type RemoveUnusedNamedPatternFixTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/removeUnusedNamedPattern"
     
-    [<Test>] member x.``local literal constant pattern qualified parens parameter`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern first position`` () = x.DoNamedTest()
     
-    [<Test>] member x.``local literal constant pattern qualified parens parameter 2`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern middle position`` () = x.DoNamedTest()
     
-    [<Test>] member x.``local literal constant pattern qualified parens parameter 3`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern last position`` () = x.DoNamedTest()
+    
+    [<Test>] member x.``Unused record named pattern with a single field`` () = x.DoNamedTest()
