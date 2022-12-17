@@ -25,6 +25,7 @@
     <Compile Include="src\Intentions\SetNameAction.fs" />
     <Compile Include="src\Intentions\LetToUseAction.fs" />
     <Compile Include="src\Intentions\RenameFileToMatchTypeNameAction.fs" />
+    <Compile Include="src\Intentions\ExpandToLambdaAction.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetFix.fs" />
