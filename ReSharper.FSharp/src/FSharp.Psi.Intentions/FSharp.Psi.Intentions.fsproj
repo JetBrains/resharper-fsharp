@@ -28,6 +28,7 @@
     <Compile Include="src\Intentions\RenameFileToMatchTypeNameAction.fs" />
     <Compile Include="src\Intentions\UseNamedAccessAction.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedNamedPatternFix.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetFix.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />

@@ -108,6 +108,7 @@
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
     <QuickFix>RemoveUnusedNamedAsPatFix</QuickFix>
     <QuickFix>AddUnderscorePrefixFix</QuickFix>
+    <QuickFix>RemoveUnusedNamedPatternFix</QuickFix>
   </Warning>
 
   <Warning compilerGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0020: 'unit' type expected">

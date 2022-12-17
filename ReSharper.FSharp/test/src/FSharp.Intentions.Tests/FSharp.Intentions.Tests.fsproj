@@ -56,6 +56,7 @@
     <Compile Include="src\QuickFixes\ReplaceWithWildPatTest.fs" />
     <Compile Include="src\QuickFixes\AddIgnoreTest.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedNamedAsPatTest.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedNamedPatternFixTest.fs" />
     <Compile Include="src\QuickFixes\GenerateMissingRecordFieldsTest.fs" />
     <Compile Include="src\QuickFixes\ToRecursiveLetBindingsTest.fs" />
     <Compile Include="src\QuickFixes\RemoveInlineTest.fs" />
