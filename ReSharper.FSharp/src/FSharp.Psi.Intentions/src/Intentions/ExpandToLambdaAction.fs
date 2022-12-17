@@ -22,27 +22,23 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
     override this.IsAvailable _ =
         let referenceExpr = dataProvider.GetSelectedElement<IReferenceExpr>()
 
-        isNotNull referenceExpr &&
-        isNull (PrefixAppExprNavigator.GetByFunctionExpression(referenceExpr.IgnoreParentParens())) &&
         isValid referenceExpr &&
+        isNull (PrefixAppExprNavigator.GetByFunctionExpression(referenceExpr.IgnoreParentParens())) &&
 
         let declaredElement = referenceExpr.Reference.Resolve().DeclaredElement
         match declaredElement with
-        | :? IFunction -> true
-        | :? IParametersOwnerDeclaration -> true
-        | :? IParameterOwnerMemberDeclaration -> true
-        | :? IReferencePat as localPat ->
-            match localPat.GetFcsSymbol() with
+        | :? IFunction
+        | :? IUnionCase -> true
+        | :? IReferencePat as refPat ->
+            match refPat.GetFcsSymbol() with
             | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.CurriedParameterGroups.Count > 0
             | _ -> false
-        | :? IUnionCase -> true
         | _ -> false
 
     override this.Text = "Expand to lambda"
 
     override x.ExecutePsiTransaction(_, _) =
         let referenceExpr = dataProvider.GetSelectedElement<IReferenceExpr>()
-        let needParens = ParenExprNavigator.GetByInnerExpression(referenceExpr) |> isNull
         let factory = referenceExpr.CreateElementFactory()
 
         let referenceSymbol = referenceExpr.Reference.GetFcsSymbol()
@@ -89,16 +85,10 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
                 |]
                 |> String.concat "") //TODO: FIX func ()
 
-        let newExpr = ModificationUtil.ReplaceChild(referenceExpr, newExpr.Copy())
-        let newExpr = FSharpParensUtil.addParensIfNeeded newExpr
-        // let refExprIdent = referenceExpr.Indent
-        //
-        // let newExpr = ModificationUtil.ReplaceChild(referenceExpr, newExpr.Copy())
-        // let newExprIndent = newExpr.IgnoreInnerParens().As<ILambdaExpr>().Expression.Indent
-        // let indentDiff = newExprIndent - refExprIdent
-        // shiftNode indentDiff (newExpr.Parent.Parent :?> _)
+        ModificationUtil.ReplaceChild(referenceExpr, newExpr.Copy())
+        |> FSharpParensUtil.addParensIfNeeded
+        |> ignore
 
-        // TODO: extension
-        // TODO: overloads
-        // TODO: parens
+        // TODO: shifting
+        // TODO: deconstruction
         null
