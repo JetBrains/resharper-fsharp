@@ -31,7 +31,10 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
         | :? IFunction -> true
         | :? IParametersOwnerDeclaration -> true
         | :? IParameterOwnerMemberDeclaration -> true
-        | :? ILocalReferencePat -> true
+        | :? IReferencePat as localPat ->
+            match localPat.GetFcsSymbol() with
+            | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.CurriedParameterGroups.Count > 0
+            | _ -> false
         | :? IUnionCase -> true
         | _ -> false
 
