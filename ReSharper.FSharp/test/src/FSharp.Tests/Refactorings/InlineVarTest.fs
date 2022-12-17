@@ -69,6 +69,9 @@ type InlineVarTest() =
     [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Qualifier - App - High 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualifier - App 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualifier - Ident 01``() = x.DoNamedTest()

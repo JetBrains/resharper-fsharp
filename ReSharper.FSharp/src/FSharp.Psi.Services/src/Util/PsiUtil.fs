@@ -437,7 +437,7 @@ let shiftWhitespaceBefore shift (whitespace: Whitespace) =
     else
         ModificationUtil.DeleteChild(whitespace)
 
-let shiftNode shift (expr: #IFSharpTreeNode) =
+let shiftNode shift (expr: #ITreeNode) =
     if shift = 0 || isNull expr then () else
 
     for child in List.ofSeq (expr.Tokens()) do

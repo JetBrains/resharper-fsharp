@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -48,13 +49,24 @@ type FSharpInlineVariable(workflow, solution, driver) =
         use cookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
 
         let expr = info.InlinedMethodInfo.Expression :?> IFSharpExpression
-        let exprCopy = expr.Copy()
+
+        let oldNode, newNode =
+            match referenceOwner with
+            | :? IExpressionReferenceName as referenceName when
+                    isNotNull (ReferenceNameOwnerPatNavigator.GetByReferenceName(referenceName)) ->
+                let factory = expr.CreateElementFactory()
+                let newPattern = factory.CreatePattern(expr.GetText(), false) :> ITreeNode
+                let oldPattern = ReferenceNameOwnerPatNavigator.GetByReferenceName(referenceName) :> ITreeNode
+                oldPattern, newPattern
+            | _ -> referenceOwner, expr.Copy()
 
         let indentShift = referenceOwner.Indent - exprIndent
-        shiftNode indentShift exprCopy
+        shiftNode indentShift newNode
 
-        let newExpr = ModificationUtil.ReplaceChild(referenceOwner, exprCopy)
-        addParensIfNeeded newExpr |> ignore
+        let newNode = ModificationUtil.ReplaceChild(oldNode, newNode)
+        let newExpr = newNode.As<IFSharpExpression>()
+        if isNotNull newExpr then
+            addParensIfNeeded newExpr |> ignore
 
     override x.Ignore _ = false
 
@@ -94,6 +106,15 @@ type FSharpInlineVarAnalyser(workflow) =
     let mutable inlineExpr = null
     let mutable inlineReferences = null
 
+    let canTransformToPattern (expr: IFSharpExpression) =
+        match expr.IgnoreInnerParens() with
+        | :? IConstExpr -> true
+        | :? IReferenceExpr as refExpr ->
+            match refExpr.Reference.Resolve().DeclaredElement with
+            | :? IField as field -> field.IsEnumMember || field.IsConstant && field.IsStatic
+            | _ -> false
+        | _ -> false
+
     override val InlineAll = true with get, set
 
     override x.References = inlineReferences
@@ -123,19 +144,27 @@ type FSharpInlineVarAnalyser(workflow) =
             if isTopLevel && treeNode.GetContainingFile() != refPat.GetContainingFile() then
                 Some "Value has non-local usages." else
 
-            let expr = treeNode.As<IReferenceExpr>().IgnoreParentParens()
-            if isNull expr then None else
+            match treeNode with
+            | :? IReferenceExpr as refExpr ->
+                let expr = refExpr.IgnoreParentParens()
+                if isNull expr then None else
 
-            let setExpr = SetExprNavigator.GetByLeftExpression(expr)
-            let indexerExpr = IndexerExprNavigator.GetByQualifier(expr).IgnoreParentParens()
-            let indexerSetExpr = SetExprNavigator.GetByLeftExpression(indexerExpr).IgnoreParentParens()
-            if isNotNull setExpr || isNotNull indexerSetExpr then
-                Some "Value has write usages." else
+                let setExpr = SetExprNavigator.GetByLeftExpression(expr)
+                let indexerExpr = IndexerExprNavigator.GetByQualifier(expr).IgnoreParentParens()
+                let indexerSetExpr = SetExprNavigator.GetByLeftExpression(indexerExpr).IgnoreParentParens()
+                if isNotNull setExpr || isNotNull indexerSetExpr then
+                    Some "Value has write usages." else
 
-            if isNotNull (AddressOfExprNavigator.GetByExpression(expr)) then
-                Some "Value has 'address of' usages." else
+                if isNotNull (AddressOfExprNavigator.GetByExpression(expr)) then
+                    Some "Value has 'address of' usages." else
 
-            None)
+                None
+
+            | :? IReferencePat when not (canTransformToPattern binding.Expression) ->
+                Some "Can't inline expression to a pattern"
+
+            | _ -> None
+        )
         |> Option.map (fun error -> Pair(false, error))
         |> Option.defaultWith (fun _ ->
             inlineExpr <- binding.Expression
