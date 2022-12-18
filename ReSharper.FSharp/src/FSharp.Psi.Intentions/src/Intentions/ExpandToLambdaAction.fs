@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 
 [<ContextAction(Name = "Expand to lambda", Group = "F#",
-                Description = "Expand partial application to lambda")>]
+                Description = "Expand function reference to lambda")>]
 type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
@@ -28,9 +28,10 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
 
         let declaredElement = referenceExpr.Reference.Resolve().DeclaredElement
         match declaredElement with
-        | :? IFunction
+        | :? IFunction -> true
         | :? IUnionCase -> true
-        | :? ITopLevelPatternDeclaredElement -> true //TODO
+        | :? IFSharpMember as m ->
+            m.Mfv.CurriedParameterGroups.Count > 0
         | :? IReferencePat as refPat ->
             match refPat.GetFcsSymbol() with
             | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.CurriedParameterGroups.Count > 0
