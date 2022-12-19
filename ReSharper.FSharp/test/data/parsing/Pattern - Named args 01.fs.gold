@@ -10,16 +10,17 @@ IFSharpImplFile
           IParametersOwnerPat
             IExpressionReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:UnionCase)
-            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            IFieldPat
-              IExpressionReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldArg)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              ITopReferencePat
+            INamedUnionCaseFieldsPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IFieldPat
                 IExpressionReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldPat)
+                  FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldArg)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                ITopReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldPat)
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

@@ -13,27 +13,28 @@ IFSharpImplFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:Union)
               FSharpTokenType+DotTokenElement(type:DOT, text:.)
               FSharpIdentifierToken(type:IDENTIFIER, text:UnionCase)
-            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            IFieldPat
-              IExpressionReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldArg1)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              ITopReferencePat
+            INamedUnionCaseFieldsPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IFieldPat
                 IExpressionReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldPat1)
-            FSharpTokenType+SemicolonTokenElement(type:SEMICOLON, text:;)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IFieldPat
-              IExpressionReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldArg2)
+                  FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldArg1)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                ITopReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldPat1)
+              FSharpTokenType+SemicolonTokenElement(type:SEMICOLON, text:;)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              ITopReferencePat
+              IFieldPat
                 IExpressionReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldPat2)
+                  FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldArg2)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                ITopReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldPat2)
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

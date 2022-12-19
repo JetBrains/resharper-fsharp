@@ -628,12 +628,16 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             for pat in pats do
                 x.ProcessParam(pat, isLocal, markMember)
 
-        | SynArgPats.NamePatPairs(idsAndPats, _) ->
+        | SynArgPats.NamePatPairs(idsAndPats, argsRange) ->
+            let argsMark = x.MarkTokenOrRange(FSharpTokenType.LPAREN, argsRange)
+
             for IdentRange range, _, pat in idsAndPats do
                 let mark = x.Mark(range)
                 x.MarkAndDone(range, ElementType.EXPRESSION_REFERENCE_NAME)
                 x.ProcessParam(pat, isLocal, markMember)
                 x.Done(range, mark, ElementType.FIELD_PAT)
+
+            x.Done(argsMark, ElementType.NAMED_UNION_CASE_FIELDS_PAT)
 
     member x.ProcessMemberParams(args: SynArgPats, isLocal, markMember) =
         match args with

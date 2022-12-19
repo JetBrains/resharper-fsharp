@@ -236,7 +236,7 @@ interface fSharpPattern:
   tuplePat |
   arrayOrListPat |
   parenPat |
-  recordPat |
+  namedPatternsListPat|
   optionalValPat |
   listConsPat |
   wildPat |
@@ -250,6 +250,10 @@ interface referenceNameOwnerPat:
   referencePat |
   parametersOwnerPat |
   fieldPat;
+
+interface namedPatternsListPat:
+  recordPat |
+  namedUnionCaseFieldsPat;
 
 interface referencePat:
   localReferencePat |
@@ -324,9 +328,14 @@ parenPat options { stubBase="FSharpPatternBase"; }:
   RPAREN<RPAREN, RightParen>;
 
 recordPat options { stubBase="FSharpPatternBase"; }:
-  LBRACE
+  LBRACE<LEFT_BRACE, LeftBrace>
   fieldPat<FIELD_PAT, FieldPatterns>*
-  RBRACE;
+  RBRACE<RIGHT_BRACE, RightBrace>;
+
+namedUnionCaseFieldsPat options { stubBase="FSharpPatternBase"; }:
+  LPAREN<LPAREN, LeftParen>
+  fieldPat<FIELD_PAT, FieldPatterns>*
+  RPAREN<RPAREN, RightParen>;
 
 fieldPat options { stubBase="FSharpPatternBase"; }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
