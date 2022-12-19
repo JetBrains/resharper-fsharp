@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open System
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -9,7 +8,6 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
 
 type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
     inherit FSharpQuickFixBase()
@@ -55,21 +53,13 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
                 let rangeEnd =
                     nextFieldPat.PrevSibling
                 TreeRange(rangeStart, rangeEnd)
-            
             ModificationUtil.DeleteChildRange(rangeToDelete)
-            
-            let offset =nextFieldPat.GetNavigationRange().StartOffsetRange().StartOffset
-            Action<_>(fun textControl ->
-                textControl.Caret.MoveTo(offset, CaretVisualPlacement.DontScrollIfVisible))
+            null
         else
             let prevFieldPat = recordPat.FieldPatterns.[indexPat - 1]
             let rangeToDelete =
                 let rangeStart = prevFieldPat.NextSibling
                 let rangeEnd = fieldPat
-                TreeRange(rangeStart, rangeEnd)
-                
+                TreeRange(rangeStart, rangeEnd)    
             ModificationUtil.DeleteChildRange(rangeToDelete)
-            let offset = prevFieldPat.GetNavigationRange().EndOffsetRange().EndOffset
-
-            Action<_>(fun textControl ->
-                textControl.Caret.MoveTo(offset, CaretVisualPlacement.DontScrollIfVisible))
+            null
