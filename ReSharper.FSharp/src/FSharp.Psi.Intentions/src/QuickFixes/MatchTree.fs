@@ -463,7 +463,7 @@ let getMatchExprMatchType (matchExpr: IMatchExpr) : MatchType =
         let fcsType = expr.TryGetFcsType()
         MatchType.ofFcsType matchExpr fcsType
 
-let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (pat: IFSharpPattern) =
+let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (pat: IFSharpPattern) discardOnError =
     let addDeconstruction path deconstruction =
         if not (deconstructions.ContainsKey(path)) then
             deconstructions[path] <- deconstruction
@@ -504,7 +504,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
                 let itemTest = MatchTest.TupleItem i
                 let itemPath = itemTest :: value.Path
                 let itemValue = { Type = itemType; Path = itemPath }
-                let matchPattern = getMatchPattern deconstructions itemValue itemPat
+                let matchPattern = getMatchPattern deconstructions itemValue itemPat false
                 MatchNode.Create(itemValue, matchPattern)
             )
             |> List.ofSeq
@@ -576,23 +576,22 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
         let caseTest = MatchTest.UnionCase
         let casePath = caseTest :: caseValue.Path
 
-        let makeFieldNode index (field: FSharpField) pat =
+        let makeFieldNode discardOnError index (field: FSharpField) pat =
             let test = MatchTest.UnionCaseField index
             let path = test :: casePath
             let fieldFcsType = field.FieldType.Instantiate(unionEntityInstance.Substitution)
             let fieldType = MatchType.ofFcsType pat fieldFcsType
             let itemValue = { Type = fieldType; Path = path }
-            let matchPattern = getMatchPattern deconstructions itemValue pat
+            let matchPattern = getMatchPattern deconstructions itemValue pat discardOnError
             MatchNode.Create(itemValue, matchPattern)
 
         let makeSingleFieldNode pat =
             addDeconstruction casePath Deconstruction.InnerPatterns
-            let fieldNode = makeFieldNode 0 unionCase.Fields[0] pat
+            let fieldNode = makeFieldNode false 0 unionCase.Fields[0] pat
 
             if unionCase.Fields.Count <> 1 then MatchTest.Error, [] else
             MatchTest.UnionCase, [fieldNode]
 
-        // todo: named patterns for fields
         let innerPatterns =
             match paramOwnerPat.Parameters.SingleItem with
             | :? IWildPat -> MatchTest.Discard, []
@@ -607,15 +606,39 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
                     if innerPatterns.Count <> caseFields.Count then
                         let n = min innerPatterns.Count caseFields.Count
                         (Seq.take n caseFields, Seq.take n innerPatterns)
-                        ||> Seq.mapi2 makeFieldNode
+                        ||> Seq.mapi2 (makeFieldNode false)
                         |> List.ofSeq
                         |> ignore
                         MatchTest.Error, [] else
 
-                    let fieldNodes = Seq.mapi2 makeFieldNode caseFields innerPatterns |> List.ofSeq
+                    let fieldNodes = Seq.mapi2 (makeFieldNode false) caseFields innerPatterns |> List.ofSeq
                     caseTest, fieldNodes
 
                 | pat -> makeSingleFieldNode pat
+
+            | :? INamedPatternsListPat as namedPatListPat ->
+                addDeconstruction casePath Deconstruction.InnerPatterns
+
+                let fieldPatterns = Array.create unionCase.Fields.Count null 
+                namedPatListPat.FieldPatterns
+                |> Seq.iter (fun pat ->
+                    match pat.Reference.GetFcsSymbol() with
+                    | :? FSharpField as fcsField ->
+                        unionCase.Fields
+                        |> Seq.tryFindIndex ((=) fcsField)
+                        |> Option.iter (fun index ->
+                            if isNull fieldPatterns[index] then
+                                fieldPatterns[index] <- pat.Pattern)
+                    | _ -> ()
+                )
+
+                let fieldNodes = 
+                    unionCase.Fields
+                    |> Seq.mapi (fun i fcsField -> makeFieldNode true i fcsField fieldPatterns[i])
+                    |> List.ofSeq
+
+                MatchTest.UnionCase, fieldNodes
+
             | pat -> makeSingleFieldNode pat
 
         MatchTest.Union index, [MatchNode.Create(caseValue, innerPatterns)]
@@ -634,14 +657,14 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
     | :? IAndsPat as andsPat, _ ->
         let nodes = 
             andsPat.Patterns
-            |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat))
+            |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat false))
             |> List.ofSeq
         MatchTest.And, nodes
 
     | :? IOrPat as orPat, _ ->
         let nodes = 
             orPat.Patterns
-            |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat))
+            |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat false))
             |> List.ofSeq
         MatchTest.Or, nodes
 
@@ -657,7 +680,7 @@ let ofMatchExpr (matchExpr: IMatchExpr) =
     for clause in matchExpr.ClausesEnumerable do
         if isNull clause.Pattern then () else
 
-        let pattern = getMatchPattern deconstructions matchValue clause.Pattern
+        let pattern = getMatchPattern deconstructions matchValue clause.Pattern false
         if isNull clause.WhenExpressionClause then
             matchNodes.Add(MatchNode.Create(matchValue, pattern))
 

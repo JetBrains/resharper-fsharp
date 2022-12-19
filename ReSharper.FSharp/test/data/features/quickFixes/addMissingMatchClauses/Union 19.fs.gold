@@ -1,0 +1,10 @@
+﻿module Say
+
+type U =
+    | A
+    | B of int * named: bool
+
+match A{caret} with
+| B(named = true) -> ()
+| A -> failwith "todo"
+| B(_, false) -> failwith "todo"

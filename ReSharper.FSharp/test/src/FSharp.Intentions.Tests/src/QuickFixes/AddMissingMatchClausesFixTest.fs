@@ -63,3 +63,4 @@ type AddMissingMatchClausesFixTest() =
     [<Test>] member x.``Union 16``() = x.DoNamedTest()
     [<Test>] member x.``Union 17``() = x.DoNamedTest()
     [<Test>] member x.``Union 18``() = x.DoNamedTest()
+    [<Test>] member x.``Union 19``() = x.DoNamedTest()
