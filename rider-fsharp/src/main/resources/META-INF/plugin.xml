@@ -18,7 +18,7 @@
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />
     <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
     <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
-    <completion.contributor language="F#" implementationClass="com.jetbrains.rdclient.completion.ProtocolCompletionContributor" />
+    <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ProtocolCompletionContributor" />
     <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
     <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
@@ -39,7 +39,7 @@
     <backend.typedHandler language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />
     <backend.actions.support language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
     <backend.markup.adapterFactory language="F# Script" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
-    <completion.contributor language="F# Script" implementationClass="com.jetbrains.rdclient.completion.ProtocolCompletionContributor" />
+    <completion.contributor language="F# Script" implementationClass="com.jetbrains.rider.completion.ProtocolCompletionContributor" />
     <completion.completionSessionStrategy language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
     <backend.autoPopup.support language="F# Script" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
     <codeInsight.parameterInfo language="F# Script" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
