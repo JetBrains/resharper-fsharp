@@ -54,6 +54,7 @@ type FSharpLiteralInjectionTarget() =
 
         override _.GetCorrespondingCommentTextForLiteral _ = null
 
+        // TODO: Implement FSharpRegExpBuffer & add needed abstractions to ReSharper
         override _.CreateBuffer(literalNode, text, options) =
             let literalType =
                 match literalNode.GetTokenType().GetLiteralType() with

@@ -2,7 +2,6 @@
 using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
@@ -31,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       foreach (var declaration in GetDeclarations())
         if (declaration is IMemberDeclaration member)
           foreach (var accessorDeclaration in member.AccessorDeclarationsEnumerable)
-            if (accessorDeclaration is ITypeMemberDeclaration { DeclaredElement: IFSharpExplicitAccessor accessor })
+            if (accessorDeclaration is { DeclaredElement: IFSharpExplicitAccessor accessor })
               yield return accessor;
     }
 

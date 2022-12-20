@@ -91,13 +91,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public IList<string> Names => this.GetNames();
 
-    public override ConstantValue ConstantValue =>
-      Reference.Resolve().DeclaredElement switch
+    // Check FSC Symbol.LiteralValue
+    public override ConstantValue ConstantValue
+    {
+      get
       {
-        IField { IsEnumMember: true } x => x.ConstantValue,
-        IField { IsConstant: true } x => x.ConstantValue,
-        _ => ConstantValue.NOT_COMPILE_TIME_CONSTANT
-      };
+        if (Reference.GetFcsSymbol()
+            is FSharpMemberOrFunctionOrValue { LiteralValue: { } }
+            or FSharpField { LiteralValue: { } })
+        {
+          return Reference.Resolve().DeclaredElement switch
+          {
+            IField { IsEnumMember: true } x => x.ConstantValue,
+            IField { IsConstant: true } x => x.ConstantValue,
+            _ => ConstantValue.NOT_COMPILE_TIME_CONSTANT
+          };
+        }
+
+        return ConstantValue.NOT_COMPILE_TIME_CONSTANT;
+      }
+    }
 
     public override bool IsConstantValue() => !ConstantValue.IsErrorOrNonCompileTimeConstantValue();
   }

@@ -112,7 +112,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
         VisitAttributesAndParametersOwner(memberDeclaration, memberName);
 
         foreach (var accessor in memberDeclaration.AccessorDeclarationsEnumerable)
-          VisitParametersOwner(accessor, memberName);
+          if (accessor is IParameterOwnerMemberDeclaration accessorDecl)
+            VisitParametersOwner(accessorDecl, memberName);
       }
 
       private void VisitConstructorDecl(IConstructorDeclaration constructorDeclaration)
