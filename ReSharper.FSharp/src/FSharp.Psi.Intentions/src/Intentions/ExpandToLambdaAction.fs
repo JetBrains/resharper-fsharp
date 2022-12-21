@@ -24,18 +24,27 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
         let referenceExpr = dataProvider.GetSelectedElement<IReferenceExpr>()
 
         isValid referenceExpr &&
-        isNull (PrefixAppExprNavigator.GetByFunctionExpression(referenceExpr.IgnoreParentParens())) &&
 
-        let declaredElement = referenceExpr.Reference.Resolve().DeclaredElement
-        match declaredElement with
-        | :? IFunction -> true
-        | :? IUnionCase -> true
-        | :? IFSharpMember as m ->
-            m.Mfv.CurriedParameterGroups.Count > 0
-        | :? IReferencePat as refPat ->
-            match refPat.GetFcsSymbol() with
-            | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.CurriedParameterGroups.Count > 0
-            | _ -> false
+        let actualParametersCount =
+            let outermostPrefixApp = getOutermostPrefixAppExpr(referenceExpr.IgnoreParentParens())
+            match outermostPrefixApp with
+            | :? IPrefixAppExpr as prefixApp -> ValueOption.Some prefixApp.Arguments.Count
+            | _ -> ValueNone
+
+        let expectedParametersCount =
+            let declaredElement = referenceExpr.Reference.Resolve().DeclaredElement
+            match declaredElement with
+            | :? IFunction as f -> ValueSome f.Parameters.Count
+            | :? IUnionCase as uc -> if uc.HasFields then ValueSome 1 else ValueSome 0
+            | :? IFSharpMember as m -> ValueSome m.Mfv.CurriedParameterGroups.Count
+            | :? IReferencePat as refPat ->
+                match refPat.GetFcsSymbol() with
+                | :? FSharpMemberOrFunctionOrValue as mfv -> ValueSome mfv.CurriedParameterGroups.Count
+                | _ -> ValueNone
+            | _ -> ValueNone
+
+        match actualParametersCount, expectedParametersCount with
+        | ValueSome x, ValueSome y -> x < y
         | _ -> false
 
     override x.ExecutePsiTransaction(_, _) =
