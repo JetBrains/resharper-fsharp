@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class AccessorDeclaration
+  internal partial class AccessorDeclaration: IParameterOwnerMemberDeclaration
   {
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 

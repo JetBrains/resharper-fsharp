@@ -119,7 +119,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           }
         }
 
-        return ConstantValue.BAD_VALUE;
+        return ConstantValue.NOT_COMPILE_TIME_CONSTANT;
       }
     }
 

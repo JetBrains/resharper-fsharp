@@ -1,0 +1,46 @@
+﻿module Kek
+
+open JetBrains.Annotations
+open System.Diagnostics.CodeAnalysis
+
+type A() =
+    [<RegexPattern>]
+    member x.R = "|[|(0)123|]|(1)"
+
+    member x.K = "[123]"
+
+let f ([<RegexPattern>] x: string) = ()
+f ("|[|(2)123|]|(3)")
+
+let f1 =
+    fun _ ->
+        fun ([<RegexPattern>] x: string) -> ()
+f1 "[123]" "|[|(4)123|]|(5)"
+
+let g (x: string) = ()
+g ("[123]")
+
+[<RegexPattern>]
+let x = "|[|(6)123|]|(7)"
+
+[<StringSyntax("regex")>]
+let y = "|[|(8)123|]|(9)"
+
+let _ =
+    ()
+    let _ = "|[|(10)123|]|(11)" //language=regex
+    ()
+
+---------------------------------------------------------
+(0): ReSharper Regex Set: 
+(1): ReSharper Regex Set: 
+(2): ReSharper Regex Set: 
+(3): ReSharper Regex Set: 
+(4): ReSharper Regex Set: 
+(5): ReSharper Regex Set: 
+(6): ReSharper Regex Set: 
+(7): ReSharper Regex Set: 
+(8): ReSharper Regex Set: 
+(9): ReSharper Regex Set: 
+(10): ReSharper Regex Set: 
+(11): ReSharper Regex Set: 

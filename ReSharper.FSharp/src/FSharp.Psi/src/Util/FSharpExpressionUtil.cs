@@ -34,8 +34,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static bool IsLiteralExpression([CanBeNull] this IFSharpExpression fsExpr) =>
       fsExpr.IgnoreInnerParens() is ILiteralExpr literalExpr && literalExpr.IsConstantValue();
 
+    /// Checks exactly for ILambdaExpr
+    public static bool IsLambdaExpression([CanBeNull] this IFSharpExpression fsExpr) => fsExpr is ILambdaExpr;
+
     public static readonly Func<IFSharpExpression, bool> IsSimpleValueExpressionFunc = IsSimpleValueExpression;
     public static readonly Func<IFSharpExpression, bool> IsLiteralExpressionFunc = IsLiteralExpression;
+    public static readonly Func<IFSharpExpression, bool> IsLambdaExpressionFunc = IsLambdaExpression;
 
     // TODO: change name
     public static IFSharpExpression GetOutermostParentExpressionFromItsReturn(this IFSharpExpression expression)

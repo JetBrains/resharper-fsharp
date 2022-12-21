@@ -1,0 +1,6 @@
+﻿type MyRegex = Regex< @"|[|(0)123|]|(1)">
+type B = A< @"[123]">
+
+---------------------------------------------------------
+(0): ReSharper Regex Set: 
+(1): ReSharper Regex Set: 

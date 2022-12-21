@@ -386,3 +386,28 @@ type FSharpFilteredCompletionTest() =
 
     override this.BeforeTestStart(_, _, documentText) =
         this.CompleteItem <- FSharpFilteredCompletionTest.GetSetting(documentText, "COMPLETE_ITEM")
+
+
+[<FSharpTest>]
+[<TestReferences("System")>]
+type FSharpRegexCompletionTest() =
+    inherit CodeCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion/regex"
+    override x.TestType = CodeCompletionTestType.Action
+
+    [<Test>] member x.``Non-verbatim string completion 01``() = x.DoNamedTest()
+    [<Test>] member x.``Non-verbatim string completion 02``() = x.DoNamedTest()
+    [<Test>] member x.``Non-verbatim string completion 03``() = x.DoNamedTest()
+    [<Test>] member x.``Non-verbatim string completion 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Verbatim string completion 01``() = x.DoNamedTest()
+    [<Test>] member x.``Verbatim string completion 02``() = x.DoNamedTest()
+    [<Test>] member x.``Verbatim string completion 03``() = x.DoNamedTest()
+    [<Test>] member x.``Verbatim string completion 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Brackets 01``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets 02 - Interpolation``() = x.DoNamedTest()
+
+    [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type provider 01``() = x.DoNamedTest()

@@ -1,0 +1,32 @@
+﻿TYPES:
+[<MyAttribute>]
+- TestModuleWithAttr
+- TestModuleWithAttr+RecordType
+- UnionCaseWithAttr
+- ExnWithAttr
+- NestedModuleWithAttr
+
+MEMBERS:
+[<MyAttribute>]
+- bindingWithAttr
+- bindingWithAttrPat
+- bindingWithInnerFun
+- RecordFieldWithAttr
+- MyType
+- AutoPropertyWithAttr
+- MethodWithAttr
+- PropertyWithAttrSetter
+- MethodWithAttrPat
+- AbstractMethodWithAttr
+- MyTypeWithAttrCtor
+- valFieldWithAttr
+
+FULL MEMBERS:
+[<MyAttribute>]
+- TestModuleWithAttr+bindingWithAttr
+- TestModuleWithAttr+RecordType+RecordFieldWithAttr
+- TestModuleWithAttr+MyType+MyType
+- TestModuleWithAttr+MyType+AutoPropertyWithAttr
+- TestModuleWithAttr+MyType+MethodWithAttr
+- TestModuleWithAttr+MyAbstractType+AbstractMethodWithAttr
+- TestModuleWithAttr+StructType+valFieldWithAttr

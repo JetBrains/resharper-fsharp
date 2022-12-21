@@ -169,5 +169,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public static bool IsLiteralExpression([NotNull] this IChameleonExpression expr) =>
       expr.NotNull().Check(FSharpExpressionUtil.IsLiteralExpressionFunc, FcsExpressionUtil.IsLiteralExpressionFunc);
+
+    public static bool IsLambdaExpression([NotNull] this IChameleonExpression expr) =>
+      expr.NotNull().Check(FSharpExpressionUtil.IsLambdaExpressionFunc, FcsExpressionUtil.IsLambdaExpressionFunc);
   }
 }

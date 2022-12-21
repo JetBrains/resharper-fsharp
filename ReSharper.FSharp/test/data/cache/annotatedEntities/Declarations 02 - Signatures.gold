@@ -1,0 +1,22 @@
+﻿TYPES:
+[<MyAttribute>]
+- TestModuleWithAttr
+- Test.TestModuleWithAttr+RecordType
+- UnionCaseWithAttr
+
+MEMBERS:
+[<MyAttribute>]
+- bindingWithAttr
+- RecordFieldWithAttr
+- MyType
+- MethodWithAttr
+- AbstractMethodWithAttr
+- valFieldWithAttr
+
+FULL MEMBERS:
+[<MyAttribute>]
+- Test.TestModuleWithAttr+RecordType+RecordFieldWithAttr
+- Test.TestModuleWithAttr+MyType+MyType
+- Test.TestModuleWithAttr+MyType+MethodWithAttr
+- Test.TestModuleWithAttr+MyAbstractType+AbstractMethodWithAttr
+- Test.TestModuleWithAttr+StructType+valFieldWithAttr

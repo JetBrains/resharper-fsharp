@@ -18,7 +18,7 @@ type FSharpLiteralType =
     | TripleQuoteString
     /// "{string}"B
     | ByteArray
-    /// $"{string}"
+    /// $"string"
     | InterpolatedString
     /// $"{string}{
     | InterpolatedStringStart
@@ -156,6 +156,13 @@ let getCorrespondingQuotesPair char =
     | '"' -> emptyString
     | '\'' -> emptyChar
     | _ -> failwithf "Got char: %O" char
+
+let isRegularStringToken (tokenType: TokenNodeType) =
+    tokenType == FSharpTokenType.STRING ||
+    tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING ||
+    tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START ||
+    tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_MIDDLE ||
+    tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_END
 
 let isInterpolatedStringStartToken (tokenType: TokenNodeType) =
     tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START ||
