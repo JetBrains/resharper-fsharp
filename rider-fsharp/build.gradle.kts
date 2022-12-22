@@ -60,8 +60,9 @@ intellij {
     // Uncomment when need to install plugin into a different IDE build.
     // updateSinceUntilBuild = false
 
-    // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
-    plugins.set(listOf("rider-plugins-appender"))
+    // rider-plugins-appender: workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
+    // org.intellij.intelliLang needed for tests with language injection marks
+    plugins.set(listOf("rider-plugins-appender", "org.intellij.intelliLang"))
 }
 
 val repoRoot = projectDir.parentFile!!
