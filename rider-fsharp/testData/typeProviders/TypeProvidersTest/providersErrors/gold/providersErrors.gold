@@ -3,5 +3,5 @@ ReSharper Error Underlined - (218, 278) - OpenApiClientProvider<const (__SOURCE_
 ReSharper Error Underlined - (296, 356) - OpenApiClientProvider<const (__SOURCE_DIRECTORY__ + Schema)> - 
 ReSharper Error Underlined - (368, 378) - YamlConfig - 
 ReSharper Error Underlined - (412, 424) - AbstractType - 
-ReSharper Error Underlined - (427, 468) - SimpleErasedType().ReadonlyStringProperty - 
+ReSharper Error Underlined - (446, 468) - ReadonlyStringProperty - 
 ReSharper Error Underlined - (502, 503) - 1 - 

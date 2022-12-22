@@ -1,17 +1,17 @@
 package typeProviders
 
-import com.jetbrains.rdclient.testFramework.executeWithGold
-import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.dumpTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.reloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import com.jetbrains.rider.test.waitForDaemon
 import org.testng.annotations.Test
 import java.io.File
 

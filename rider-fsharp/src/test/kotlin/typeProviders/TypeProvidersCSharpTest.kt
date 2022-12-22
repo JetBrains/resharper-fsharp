@@ -1,15 +1,15 @@
 package typeProviders
 
-import com.jetbrains.rdclient.testFramework.executeWithGold
-import com.jetbrains.rdclient.testFramework.waitForDaemon
-import com.jetbrains.rdclient.testFramework.waitForNextDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.waitForDaemon
+import com.jetbrains.rider.test.waitForNextDaemon
 import org.testng.annotations.Test
 import java.io.File
 

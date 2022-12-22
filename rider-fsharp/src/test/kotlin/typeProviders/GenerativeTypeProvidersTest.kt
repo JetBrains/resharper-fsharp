@@ -1,8 +1,5 @@
 package typeProviders
 
-import com.jetbrains.rdclient.testFramework.executeWithGold
-import com.jetbrains.rdclient.testFramework.waitForDaemon
-import com.jetbrains.rdclient.testFramework.waitForNextDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.test.dumpTypeProviders
 import com.jetbrains.rider.projectView.solutionDirectoryPath
@@ -12,7 +9,10 @@ import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.waitForDaemon
+import com.jetbrains.rider.test.waitForNextDaemon
 import org.testng.annotations.Test
 import java.time.Duration
 
