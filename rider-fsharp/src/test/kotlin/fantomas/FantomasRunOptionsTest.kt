@@ -118,20 +118,19 @@ class FantomasRunOptionsTest : EditorTestBase() {
         }
     }
 
-    @BeforeMethod(alwaysRun = true)
-    fun clearDotnetCliHomeFolder() {
-        fantomasNotifications.clear()
-        getDotnetCliHome().delete(true)
-        getDotnetCliHome().createDirectory()
-    }
-
     override fun beforeDoTestWithDocuments() {
+        fantomasNotifications.clear()
+
         project.fcsHost.fantomasNotificationFired.advise(testLifetimeDef.lifetime) {
             fantomasNotifications.add(it)
         }
         project.fcsHost.dotnetToolInvalidated.advise(testLifetimeDef.lifetime) {
             dotnetToolsInvalidated = true
         }
+
+        getDotnetCliHome().delete(true)
+        getDotnetCliHome().createDirectory()
+        flushFileChanges(project)
     }
 
     @Test
