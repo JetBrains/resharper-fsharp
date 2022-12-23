@@ -12,41 +12,37 @@ open JetBrains.ReSharper.Resources.Shell
 type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
     inherit FSharpQuickFixBase()
     
-    let fieldAndRecord =
-        match warning.Pat.IgnoreInnerParens().Parent with
-        | :? IFieldPat as fieldPat ->
-            match fieldPat.Parent with
-            | :? IRecordPat as recordPat ->
-                Some(fieldPat, recordPat)
-            | _ -> None
-        | _ -> None
+    let fieldPatterns =
+        NamedPatternsListPatNavigator.GetByFieldPattern(warning.Pat.IgnoreInnerParens().Parent.As<IFieldPat>()).FieldPatterns
         
     override x.Text = "Remove unused value"
 
     override x.IsAvailable _ =
-        match fieldAndRecord with
-        | None -> false
-        | Some(fieldPat, recordPat) ->
-            isValid fieldPat && isValid recordPat
+        fieldPatterns |> Seq.exists isValid
 
     override x.ExecutePsiTransaction(_, _) =
-        match fieldAndRecord with
-        | None -> null
-        | Some(fieldPat, recordPat) ->
+        let fieldPat = warning.Pat.IgnoreInnerParens().Parent.As<IFieldPat>()
 
         use writeLock = WriteLockCookie.Create(fieldPat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let indexPat = recordPat.FieldPatterns.IndexOf(fieldPat)
-
-        if recordPat.FieldPatterns.Count = 1 then
-            let factory = recordPat.CreateElementFactory()
+        let indexPat = fieldPatterns.IndexOf(fieldPat)
+        
+        if fieldPatterns.Count = 1 then
+            let factory = fieldPatterns.[0].CreateElementFactory()
             let wildPat = factory.CreateWildPat()
-            ModificationUtil.ReplaceChild(recordPat, wildPat) |> ignore
+            for pat in fieldPatterns do
+                match pat.Parent with
+                | :? IRecordPat as recordPat ->
+                    ModificationUtil.ReplaceChild(recordPat, wildPat) |> ignore
+                | :? INamedUnionCaseFieldsPat as unionPat ->
+                    ModificationUtil.ReplaceChild(unionPat.IgnoreParentChameleonExpr(), wildPat) |> ignore
+                | _ -> ()
+                
             null
             
-        elif indexPat < recordPat.FieldPatterns.Count - 1 then
-            let nextFieldPat = recordPat.FieldPatterns.[indexPat + 1]
+        elif indexPat < fieldPatterns.Count - 1 then
+            let nextFieldPat = fieldPatterns.[indexPat + 1]
             
             let rangeToDelete =
                 let rangeStart = fieldPat
@@ -56,7 +52,7 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
             ModificationUtil.DeleteChildRange(rangeToDelete)
             null
         else
-            let prevFieldPat = recordPat.FieldPatterns.[indexPat - 1]
+            let prevFieldPat = fieldPatterns.[indexPat - 1]
             let rangeToDelete =
                 let rangeStart = prevFieldPat.NextSibling
                 let rangeEnd = fieldPat
