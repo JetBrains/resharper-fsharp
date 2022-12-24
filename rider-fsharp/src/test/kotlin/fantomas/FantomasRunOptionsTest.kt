@@ -21,7 +21,6 @@ import com.jetbrains.rider.test.base.PrepareTestEnvironment
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.*
-import org.testng.annotations.BeforeMethod
 import org.testng.annotations.BeforeTest
 import org.testng.annotations.Test
 import java.io.PrintStream
@@ -150,13 +149,16 @@ class FantomasRunOptionsTest : EditorTestBase() {
     @Test
     fun `local tool`() {
         executeWithGold(testGoldFile) {
-            withOpenedEditor("Program.fs") {
+            withOpenedEditor("Types.fs") {
                 withFantomasLocalTool("fantomas-tool", "4.7.6") {
                     it.println("--With local dotnet tool--")
                     it.print(dumpRunOptions())
 
                     reformatCode()
                     checkFantomasVersion("4.7.6.0")
+
+                    it.println("\nFormatted:")
+                    dumpOpenedDocument(it, project!!)
                     dumpNotifications(it, 0)
                 }
 
@@ -165,6 +167,9 @@ class FantomasRunOptionsTest : EditorTestBase() {
 
                 reformatCode()
                 checkFantomasVersion(bundledVersion)
+
+                it.println("\nFormatted:")
+                dumpOpenedDocument(it, project!!)
                 dumpNotifications(it, 0)
             }
         }

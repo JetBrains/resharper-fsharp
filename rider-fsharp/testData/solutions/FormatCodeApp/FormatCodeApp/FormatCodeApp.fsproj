@@ -9,6 +9,7 @@
         <Compile Include="Folder\EditorConfig.fs" />
         <Content Include="Folder\.editorconfig" />
         <Compile Include="Simple.fs" />
+        <Compile Include="Types.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
