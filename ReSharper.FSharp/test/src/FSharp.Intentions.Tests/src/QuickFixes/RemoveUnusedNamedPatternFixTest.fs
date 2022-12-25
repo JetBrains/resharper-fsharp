@@ -17,3 +17,9 @@ type RemoveUnusedNamedPatternFixTest() =
     [<Test>] member x.``Unused record named pattern last position`` () = x.DoNamedTest()
     
     [<Test>] member x.``Unused record named pattern with a single field`` () = x.DoNamedTest()
+    
+    [<Test>] member x.``Unused union case named pattern last position`` () = x.DoNamedTest()
+    
+    [<Test>] member x.``Unused union case named pattern first position`` () = x.DoNamedTest()
+    
+    [<Test>] member x.``Unused union case named pattern middle position`` () = x.DoNamedTest()
