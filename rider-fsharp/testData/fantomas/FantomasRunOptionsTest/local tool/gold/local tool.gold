@@ -4,6 +4,14 @@ Version to run: (LocalDotnetTool, 4.7.6)
 AutoDetected: Version = (LocalDotnetTool, 4.7.6), Status = Ok
 LocalDotnetTool: Version = (LocalDotnetTool, 4.7.6), Status = Ok
 Bundled: Version = (Bundled, 5.0.0), Status = Ok
+Formatted:
+<caret>module Types
+
+type Range =
+  { From: float
+    To: float }
+  member this.Length = this.To - this.From
+
 
 Notifications:
 
@@ -12,5 +20,14 @@ Version to run: (Bundled, 5.0.0)
 
 AutoDetected: Version = (Bundled, 5.0.0), Status = Ok
 Bundled: Version = (Bundled, 5.0.0), Status = Ok
+Formatted:
+<caret>module Types
+
+type Range =
+  { From: float
+    To: float }
+
+  member this.Length = this.To - this.From
+
 
 Notifications:
