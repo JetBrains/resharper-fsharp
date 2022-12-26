@@ -18,6 +18,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
+    let mutable myPrefixApp: IPrefixAppExpr = null
+    let mutable argsToAddCount = 0
+
     override this.Text = "Expand to lambda"
 
     override this.IsAvailable _ =
@@ -28,7 +31,9 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
         let actualParametersCount =
             let outermostPrefixApp = getOutermostPrefixAppExpr(referenceExpr.IgnoreParentParens())
             match outermostPrefixApp with
-            | :? IPrefixAppExpr as prefixApp -> ValueOption.Some prefixApp.Arguments.Count
+            | :? IPrefixAppExpr as prefixApp ->
+                myPrefixApp <- prefixApp
+                ValueOption.Some prefixApp.Arguments.Count
             | _ -> ValueNone
 
         let expectedParametersCount =
@@ -44,7 +49,9 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
             | _ -> ValueNone
 
         match actualParametersCount, expectedParametersCount with
-        | ValueSome x, ValueSome y -> x < y
+        | ValueSome actual, ValueSome expected ->
+            argsToAddCount <- expected - actual
+            argsToAddCount > 0
         | _ -> false
 
     override x.ExecutePsiTransaction(_, _) =
@@ -59,11 +66,15 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
         let isSimpleMethodLike, isSingleParameter, paramNamesText =
             match referenceFcsSymbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
-                let parameterGroups = mfv.CurriedParameterGroups
-                let isSimpleMethodLike = (mfv.IsMethod || mfv.IsConstructor) && parameterGroups.Count = 1
+                let parameterGroups =
+                   mfv.CurriedParameterGroups
+                   |> Seq.skip myPrefixApp.Arguments.Count
+                   |> Array.ofSeq
 
-                isSimpleMethodLike, parameterGroups.Count = 1 && parameterGroups[0].Count <= 1,
-                if isSimpleMethodLike && parameterGroups.Count = 1 then
+                let isSimpleMethodLike = (mfv.IsMethod || mfv.IsConstructor) && parameterGroups.Length = 1
+
+                isSimpleMethodLike, parameterGroups.Length = 1 && parameterGroups[0].Count <= 1,
+                if isSimpleMethodLike && parameterGroups.Length = 1 then
                     if parameterGroups[0].Count = 0 then "()" else
                     parameterGroups[0]
                     |> Seq.map (fun x -> x.Name |> Option.defaultWith getArgName)
@@ -72,6 +83,7 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
                     parameterGroups
                     |> Seq.map (fun x -> if x.Count = 1 then (if isUnit x[0].Type then "()" else x[0].Name |> Option.defaultWith getArgName) else getArgName())
                     |> String.concat " "
+
             | :? FSharpUnionCase as unionCase ->
                 let fields = unionCase.Fields
                 true, fields.Count = 1,
@@ -88,7 +100,7 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
                    paramNamesText
                    if isSimpleMethodLike && not isSingleParameter then ")"
                    " -> "
-                   referenceExpr.GetText()
+                   myPrefixApp.GetText()
                    if not isSimpleMethodLike then " "
                    if isSimpleMethodLike then "("
                    if paramNamesText <> "()" then paramNamesText
@@ -96,7 +108,7 @@ type ExpandToLambdaAction(dataProvider: FSharpContextActionDataProvider) =
                 |]
                 |> String.concat "") //TODO: FIX func ()
 
-        ModificationUtil.ReplaceChild(referenceExpr, newExpr.Copy())
+        ModificationUtil.ReplaceChild(myPrefixApp, newExpr.Copy())
         |> FSharpParensUtil.addParensIfNeeded
         |> ignore
 
