@@ -50,7 +50,6 @@ object RdFSharpTypeProvidersModel : Root() {
         field("ResolutionFolder", string)
         field("OutputFile", string.nullable)
         field("ShowResolutionMessages", bool)
-        field("ReferencedAssemblies", array(string))
         field("TemporaryFolder", string)
     }
 
@@ -82,6 +81,7 @@ object RdFSharpTypeProvidersModel : Root() {
         call("InvalidateExternalTP", int, void)
         call("GetProvidedNamespaces", int, array(RdProvidedNamespace))
         call("Dispose", array(int), void)
+        callback("GetReferencedAssemblies", string, array(string))
         call("GetCustomAttributes", structdef("GetCustomAttributesArgs") {
             field("EntityId", int)
             field("ProvidedEntityType", RdProvidedEntityType)

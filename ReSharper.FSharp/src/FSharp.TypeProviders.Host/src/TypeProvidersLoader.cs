@@ -20,22 +20,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
 
   public class TypeProvidersLoader : ITypeProvidersLoader
   {
+    private readonly RdTypeProviderProcessModel myModel;
+
     private readonly FSharpFunc<TypeProviderError, Unit> myLogError =
       FSharpFunc<TypeProviderError, Unit>.FromConverter(e =>
         throw new TypeProvidersInstantiationException(e.ContextualErrorMessage, e.Number));
 
+    public TypeProvidersLoader(RdTypeProviderProcessModel model) => myModel = model;
+
     private static global::FSharp.Compiler.TypeProviders.ResolutionEnvironment
-      ToResolutionEnvironment(RdResolutionEnvironment env) =>
+      ToResolutionEnvironment(RdResolutionEnvironment env, GetReferencedAssembliesCallback callback) =>
       new(env.ResolutionFolder,
         OptionModule.OfObj(env.OutputFile),
         env.ShowResolutionMessages,
-        env.ReferencedAssemblies,
+        callback,
         env.TemporaryFolder);
 
     public IEnumerable<ITypeProvider> InstantiateTypeProvidersOfAssembly(
       InstantiateTypeProvidersOfAssemblyParameters parameters)
     {
-      var resolutionEnvironment = ToResolutionEnvironment(parameters.RdResolutionEnvironment);
+      var getReferencedAssemblies = new GetReferencedAssembliesCallback(myModel, parameters.EnvironmentPath);
+      var resolutionEnvironment = ToResolutionEnvironment(parameters.RdResolutionEnvironment, getReferencedAssemblies);
       var systemRuntimeContainsType = TcImportsHack.InjectFakeTcImports(parameters.FakeTcImports);
       var systemRuntimeAssemblyVersion = Version.Parse(parameters.SystemRuntimeAssemblyVersion);
       var compilerToolsPath = ListModule.OfSeq(parameters.CompilerToolsPath);
@@ -45,6 +50,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
         resolutionEnvironment, parameters.IsInvalidationSupported, parameters.IsInteractive, systemRuntimeContainsType,
         systemRuntimeAssemblyVersion, compilerToolsPath, myLogError, Range.Zero);
       return typeProviders;
+    }
+
+    private class GetReferencedAssembliesCallback : FSharpFunc<Unit, string[]>
+    {
+      private readonly RdTypeProviderProcessModel myModel;
+      private readonly string myEnvKey;
+
+      public GetReferencedAssembliesCallback(RdTypeProviderProcessModel model, string envKey)
+      {
+        myModel = model;
+        myEnvKey = envKey;
+      }
+
+      public override string[] Invoke(Unit func) => myModel.GetReferencedAssemblies.Sync(myEnvKey);
     }
   }
 }

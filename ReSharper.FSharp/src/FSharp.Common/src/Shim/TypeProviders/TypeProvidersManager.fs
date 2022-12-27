@@ -20,7 +20,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.Rd.Tasks
 open JetBrains.Rider.FSharp.TypeProviders.Protocol.Client
 open JetBrains.Util.Concurrency
-open JetBrains.Util.Logging
 
 type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = ConcurrentDictionary<_, ConcurrentDictionary<_, IProxyTypeProvider>>()
@@ -92,9 +91,10 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
     let protocol = connection.ProtocolModel.RdTypeProviderProcessModel
     let lifetime = connection.Lifetime
     let tpContext = TypeProvidersContext(connection, enableGenerativeTypeProvidersInMemoryAnalysis)
-    let typeProviders = TypeProvidersCache()
+    let referencedAssembliesMap = ConcurrentDictionary<string, unit -> string[]>()
     let lock = SpinWaitLockRef()
     let projectsWithGenerativeProviders = HashSet<IProject>()
+    let typeProviders = TypeProvidersCache()
 
     let addProjectWithGenerativeProvider outputPath =
         let outputAssemblyPath = VirtualFileSystemPath.Parse(outputPath, InteractionContext.SolutionContext)
@@ -118,7 +118,8 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
 
     do
         connection.Execute(fun () ->
-            protocol.Invalidate.Advise(lifetime, fun id -> typeProviders.Get(id).OnInvalidate()))
+            protocol.Invalidate.Advise(lifetime, fun id -> typeProviders.Get(id).OnInvalidate())
+            protocol.GetReferencedAssemblies.Set(fun key -> referencedAssembliesMap[key]()))
 
         fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun psiModule ->
             use lock = lock.Push()
@@ -154,6 +155,8 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                             designTimeAssemblyNameString, resolutionEnvironment.toRdResolutionEnvironment(),
                             isInvalidationSupported, isInteractive, systemRuntimeAssemblyVersion.ToString(),
                             compilerToolsPath |> Array.ofList, fakeTcImports, envPath), RpcTimeouts.Maximal)
+
+                    referencedAssembliesMap.TryAdd(envPath, resolutionEnvironment.GetReferencedAssemblies) |> ignore
 
                     [ for tp in result.TypeProviders ->
                          let tp = new ProxyTypeProvider(tp, tpContext, Option.toObj projectPsiModule)

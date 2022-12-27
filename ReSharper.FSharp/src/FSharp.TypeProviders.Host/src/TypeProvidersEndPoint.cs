@@ -48,7 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     protected override RdFSharpTypeProvidersModel InitModel(Lifetime lifetime, Rd.Impl.Protocol protocol)
     {
       var model = new RdFSharpTypeProvidersModel(lifetime, protocol);
-      var typeProvidersContext = new TypeProvidersContext(Logger, myDispatcher.AsTaskScheduler());
+      var typeProvidersContext = new TypeProvidersContext(model.RdTypeProviderProcessModel, Logger, myDispatcher.AsTaskScheduler());
 
       new TypeProvidersHost(typeProvidersContext).Initialize(model.RdTypeProviderProcessModel);
       new ProvidedTypesHost(typeProvidersContext).Initialize(model.RdProvidedTypeProcessModel);

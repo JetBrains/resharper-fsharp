@@ -54,11 +54,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     public IProvidedRdModelsCreator<CustomAttributeData, RdCustomAttributeData>
       ProvidedCustomAttributeRdModelsCreator { get; }
 
-    public TypeProvidersContext(ILogger logger, TaskScheduler taskScheduler)
+    public TypeProvidersContext(RdTypeProviderProcessModel model, ILogger logger, TaskScheduler taskScheduler)
     {
       Logger = logger;
       TaskScheduler = taskScheduler;
-      TypeProvidersLoader = new TypeProvidersLoader();
+      TypeProvidersLoader = new TypeProvidersLoader(model);
 
       TypeProvidersCache = new TypeProvidersCache();
       ProvidedTypesCache = new ProvidedTypesCache(ProvidedTypesComparer.Instance);

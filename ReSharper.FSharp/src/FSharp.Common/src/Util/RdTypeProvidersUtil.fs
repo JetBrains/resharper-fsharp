@@ -40,5 +40,4 @@ type ResolutionEnvironment with
         RdResolutionEnvironment(this.ResolutionFolder,
                                 Option.toObj this.OutputFile,
                                 this.ShowResolutionMessages,
-                                this.ReferencedAssemblies,
                                 this.TemporaryFolder)

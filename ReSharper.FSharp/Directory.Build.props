@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <FSharpCompilerServiceVersion>2022.3.5</FSharpCompilerServiceVersion>
-    <FSharpCoreVersion>6.0.6</FSharpCoreVersion>
+    <FSharpCoreVersion>7.0.0</FSharpCoreVersion>
     <FantomasBundledVersion>5.0.0</FantomasBundledVersion>
   </PropertyGroup>
 
