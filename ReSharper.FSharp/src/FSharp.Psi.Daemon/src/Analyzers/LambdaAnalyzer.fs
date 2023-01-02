@@ -190,7 +190,7 @@ type LambdaAnalyzer() =
             let memberParamGroups = x.CurriedParameterGroups
             let lambdaPatterns = lambda.Patterns
 
-            let hasOptionalArgsInMember =
+            let memberHasOptionalParams =
                 memberParamGroups.Count = 1 && lambdaPatterns.Count = 1 &&
 
                 let memberTupleParams = memberParamGroups[0]
@@ -202,7 +202,7 @@ type LambdaAnalyzer() =
                 memberTupleParams.Count >= lambdaTupleParamsCount &&
                 memberTupleParams[lambdaTupleParamsCount - 1].IsOptionalArg
 
-            if hasOptionalArgsInMember then null else ctor arg
+            if memberHasOptionalParams then null else ctor arg
         | _ -> ctor arg
 
     let rec containsForcedCalculations (expression: IFSharpExpression) =
