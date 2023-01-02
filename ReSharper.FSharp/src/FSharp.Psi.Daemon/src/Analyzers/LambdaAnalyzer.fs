@@ -123,7 +123,7 @@ type LambdaAnalyzer() =
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
         if isFSharp6Supported && hasExplicitConversion(lambda) then null else
 
-        let lambda = lambda.IgnoreParentParens()
+        let lambdaWithParens = lambda.IgnoreParentParens()
 
         let replacementRefExpr = replacementExpr.As<IFSharpExpression>().IgnoreInnerParens().As<IReferenceExpr>()
         let replacementExprSymbol =
@@ -133,8 +133,8 @@ type LambdaAnalyzer() =
         | ValueSome (:? FSharpEntity as entity) when (getAbbreviatedEntity entity).IsDelegate -> null
         | _ ->
 
-        let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
-        let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
+        let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambdaWithParens)
+        let argExpr = if isNull binaryExpr then lambdaWithParens else binaryExpr :> _
         let argExpr = argExpr.IgnoreParentParens()
         let appTuple = TupleExprNavigator.GetByExpression(argExpr)
         let app = getArgsOwner argExpr
@@ -145,31 +145,28 @@ type LambdaAnalyzer() =
         if isNotNull binaryExpr &&
            not (hasNamedArgStructure binaryExpr && isTopLevelArg binaryExpr) then ctor arg else
 
-        match reference.GetFcsSymbol() with
-        | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
-            let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
+        let checkOuterReference =
+            match reference.GetFcsSymbol() with
+            | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
+                let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
 
-            let parameterGroups = m.CurriedParameterGroups
-            if parameterGroups.Count = 0 then ctor arg else
+                let parameterGroups = m.CurriedParameterGroups
+                if parameterGroups.Count = 0 then true else
 
-            let parameters = parameterGroups[0]
-            if parameters.Count <= lambdaPos then ctor arg else
+                let parameters = parameterGroups[0]
+                if parameters.Count <= lambdaPos then true else
 
-            let parameterDecl = parameters[lambdaPos]
-            let parameterType = parameterDecl.Type
-            let parameterIsDelegate =
-                parameterType.HasTypeDefinition && (getAbbreviatedEntity parameterType.TypeDefinition).IsDelegate
+                let parameterDecl = parameters[lambdaPos]
+                let parameterType = parameterDecl.Type
+                let parameterIsDelegate =
+                    parameterType.HasTypeDefinition && (getAbbreviatedEntity parameterType.TypeDefinition).IsDelegate
 
-            // If the lambda is passed instead of a delegate,
-            // then in F# < 6.0 there is almost never an implicit cast for the lambda simplification 
-            if parameterIsDelegate && not isFSharp6Supported then null else
+                // If the lambda is passed instead of a delegate,
+                // then in F# < 6.0 there is almost never an implicit cast for the lambda simplification
+                if parameterIsDelegate && not isFSharp6Supported then false else
 
-            match replacementExprSymbol with
-            | ValueSome (:? FSharpMemberOrFunctionOrValue as x) ->
-                let isApplicable =
-                    // If the lambda simplification does not convert it to a method group,
-                    // for example, if the body of the lambda does not consist of a method call,
-                    // then everything is OK
+                match replacementExprSymbol with
+                | ValueSome (:? FSharpMemberOrFunctionOrValue as x) ->
                     x.IsFunction || not x.IsMember ||
 
                     not parameterIsDelegate &&
@@ -183,8 +180,29 @@ type LambdaAnalyzer() =
                     | Some (_, Some [])
                     | Some (_, Some [_]) -> true
                     | _ -> false
-                if isApplicable then ctor arg else null
-            | _ -> ctor arg
+                | _ -> true
+            | _ -> true
+
+        if not checkOuterReference then null else
+
+        match replacementExprSymbol with
+        | ValueSome (:? FSharpMemberOrFunctionOrValue as x) when x.IsMember ->
+            let memberParamGroups = x.CurriedParameterGroups
+            let lambdaPatterns = lambda.Patterns
+
+            let hasOptionalArgsInMember =
+                memberParamGroups.Count = 1 && lambdaPatterns.Count = 1 &&
+
+                let memberTupleParams = memberParamGroups[0]
+                let lambdaTupleParamsCount =
+                    match lambdaPatterns[0].IgnoreInnerParens() with
+                    | :? ITuplePat as tuple -> tuple.Patterns.Count
+                    | _ -> 1
+
+                memberTupleParams.Count >= lambdaTupleParamsCount &&
+                memberTupleParams[lambdaTupleParamsCount - 1].IsOptionalArg
+
+            if hasOptionalArgsInMember then null else ctor arg
         | _ -> ctor arg
 
     let rec containsForcedCalculations (expression: IFSharpExpression) =
