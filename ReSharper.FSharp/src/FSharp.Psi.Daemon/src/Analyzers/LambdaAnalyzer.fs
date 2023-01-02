@@ -145,7 +145,7 @@ type LambdaAnalyzer() =
         if isNotNull binaryExpr &&
            not (hasNamedArgStructure binaryExpr && isTopLevelArg binaryExpr) then ctor arg else
 
-        let checkOuterReference =
+        let outerReferenceCheck =
             match reference.GetFcsSymbol() with
             | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
                 let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
@@ -183,7 +183,7 @@ type LambdaAnalyzer() =
                 | _ -> true
             | _ -> true
 
-        if not checkOuterReference then null else
+        if not outerReferenceCheck then null else
 
         match replacementExprSymbol with
         | ValueSome (:? FSharpMemberOrFunctionOrValue as x) when x.IsMember ->
