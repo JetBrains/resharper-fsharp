@@ -10,6 +10,7 @@ type C1(_a: int) = class end
 [(1, 1)] |> List.map (fun (a, b) -> A(a, b))
 [(1, 1)] |> List.map (|fun (a, b) -> A.M(a, b)|(0))
 [(1, 1)] |> List.map (fun (a, b) -> A.M1(a, b))
+[(1, 1)] |> List.map (fun (a, b) (c, d) -> A.M1(c, d))
 
 [(1, 1)] |> List.map (|fun (a, b) -> A1(a, b)|(1))
 

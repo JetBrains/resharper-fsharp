@@ -123,7 +123,7 @@ type LambdaAnalyzer() =
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
         if isFSharp6Supported && hasExplicitConversion(lambda) then null else
 
-        let lambdaWithParens = lambda.IgnoreParentParens()
+        let lambda = lambda.IgnoreParentParens()
 
         let replacementRefExpr = replacementExpr.As<IFSharpExpression>().IgnoreInnerParens().As<IReferenceExpr>()
         let replacementExprSymbol =
@@ -133,8 +133,8 @@ type LambdaAnalyzer() =
         | ValueSome (:? FSharpEntity as entity) when (getAbbreviatedEntity entity).IsDelegate -> null
         | _ ->
 
-        let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambdaWithParens)
-        let argExpr = if isNull binaryExpr then lambdaWithParens else binaryExpr :> _
+        let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
+        let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
         let argExpr = argExpr.IgnoreParentParens()
         let appTuple = TupleExprNavigator.GetByExpression(argExpr)
         let app = getArgsOwner argExpr
@@ -187,22 +187,11 @@ type LambdaAnalyzer() =
 
         match replacementExprSymbol with
         | ValueSome (:? FSharpMemberOrFunctionOrValue as x) when x.IsMember ->
-            let memberParamGroups = x.CurriedParameterGroups
-            let lambdaPatterns = lambda.Patterns
-
-            let memberHasOptionalParams =
-                memberParamGroups.Count = 1 && lambdaPatterns.Count = 1 &&
-
-                let memberTupleParams = memberParamGroups[0]
-                let lambdaTupleParamsCount =
-                    match lambdaPatterns[0].IgnoreInnerParens() with
-                    | :? ITuplePat as tuple -> tuple.Patterns.Count
-                    | _ -> 1
-
-                memberTupleParams.Count >= lambdaTupleParamsCount &&
-                memberTupleParams[lambdaTupleParamsCount - 1].IsOptionalArg
-
-            if memberHasOptionalParams then null else ctor arg
+            let hasOptionalArg =
+                x.CurriedParameterGroups
+                |> Seq.concat
+                |> Seq.exists (fun x -> x.IsOptionalArg)
+            if hasOptionalArg then null else ctor arg
         | _ -> ctor arg
 
     let rec containsForcedCalculations (expression: IFSharpExpression) =
