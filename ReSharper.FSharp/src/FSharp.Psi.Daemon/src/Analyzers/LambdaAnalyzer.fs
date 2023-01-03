@@ -139,13 +139,13 @@ type LambdaAnalyzer() =
         let appTuple = TupleExprNavigator.GetByExpression(argExpr)
         let app = getArgsOwner argExpr
 
-        let reference = getReference app
-        if not (app :? IPrefixAppExpr) || isNull reference then ctor arg else
-
-        if isNotNull binaryExpr &&
-           not (hasNamedArgStructure binaryExpr && isTopLevelArg binaryExpr) then ctor arg else
-
         let outerReferenceCheck =
+            let reference = getReference app
+            if not (app :? IPrefixAppExpr) || isNull reference then true else
+
+            if isNotNull binaryExpr &&
+               not (hasNamedArgStructure binaryExpr && isTopLevelArg binaryExpr) then true else
+
             match reference.GetFcsSymbol() with
             | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
                 let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
