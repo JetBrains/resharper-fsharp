@@ -167,6 +167,9 @@ type LambdaAnalyzer() =
 
                 match replacementExprSymbol with
                 | ValueSome (:? FSharpMemberOrFunctionOrValue as x) ->
+                    // If the lambda simplification does not convert it to a method group,
+                    // for example, if the body of the lambda does not consist of a method call,
+                    // then everything is OK
                     x.IsFunction || not x.IsMember ||
 
                     not parameterIsDelegate &&
