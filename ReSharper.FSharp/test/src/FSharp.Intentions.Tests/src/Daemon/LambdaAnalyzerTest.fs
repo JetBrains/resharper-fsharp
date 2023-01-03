@@ -36,3 +36,4 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Overloads 01``() = x.DoNamedTest()
     [<Test>] member x.``Forced calculations``() = x.DoNamedTest()
     [<Test>] member x.``Used names - Nested scope``() = x.DoNamedTest()
+    [<Test>] member x.``Optional parameters``() = x.DoNamedTest()

@@ -139,34 +139,34 @@ type LambdaAnalyzer() =
         let appTuple = TupleExprNavigator.GetByExpression(argExpr)
         let app = getArgsOwner argExpr
 
-        let reference = getReference app
-        if not (app :? IPrefixAppExpr) || isNull reference then ctor arg else
+        let outerReferenceCheck =
+            let reference = getReference app
+            if not (app :? IPrefixAppExpr) || isNull reference then true else
 
-        if isNotNull binaryExpr &&
-           not (hasNamedArgStructure binaryExpr && isTopLevelArg binaryExpr) then ctor arg else
+            if isNotNull binaryExpr &&
+               not (hasNamedArgStructure binaryExpr && isTopLevelArg binaryExpr) then true else
 
-        match reference.GetFcsSymbol() with
-        | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
-            let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
+            match reference.GetFcsSymbol() with
+            | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
+                let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
 
-            let parameterGroups = m.CurriedParameterGroups
-            if parameterGroups.Count = 0 then ctor arg else
+                let parameterGroups = m.CurriedParameterGroups
+                if parameterGroups.Count = 0 then true else
 
-            let parameters = parameterGroups[0]
-            if parameters.Count <= lambdaPos then ctor arg else
+                let parameters = parameterGroups[0]
+                if parameters.Count <= lambdaPos then true else
 
-            let parameterDecl = parameters[lambdaPos]
-            let parameterType = parameterDecl.Type
-            let parameterIsDelegate =
-                parameterType.HasTypeDefinition && (getAbbreviatedEntity parameterType.TypeDefinition).IsDelegate
+                let parameterDecl = parameters[lambdaPos]
+                let parameterType = parameterDecl.Type
+                let parameterIsDelegate =
+                    parameterType.HasTypeDefinition && (getAbbreviatedEntity parameterType.TypeDefinition).IsDelegate
 
-            // If the lambda is passed instead of a delegate,
-            // then in F# < 6.0 there is almost never an implicit cast for the lambda simplification 
-            if parameterIsDelegate && not isFSharp6Supported then null else
+                // If the lambda is passed instead of a delegate,
+                // then in F# < 6.0 there is almost never an implicit cast for the lambda simplification
+                if parameterIsDelegate && not isFSharp6Supported then false else
 
-            match replacementExprSymbol with
-            | ValueSome (:? FSharpMemberOrFunctionOrValue as x) ->
-                let isApplicable =
+                match replacementExprSymbol with
+                | ValueSome (:? FSharpMemberOrFunctionOrValue as x) ->
                     // If the lambda simplification does not convert it to a method group,
                     // for example, if the body of the lambda does not consist of a method call,
                     // then everything is OK
@@ -183,8 +183,18 @@ type LambdaAnalyzer() =
                     | Some (_, Some [])
                     | Some (_, Some [_]) -> true
                     | _ -> false
-                if isApplicable then ctor arg else null
-            | _ -> ctor arg
+                | _ -> true
+            | _ -> true
+
+        if not outerReferenceCheck then null else
+
+        match replacementExprSymbol with
+        | ValueSome (:? FSharpMemberOrFunctionOrValue as x) when x.IsMember ->
+            let hasOptionalArg =
+                x.CurriedParameterGroups
+                |> Seq.concat
+                |> Seq.exists (fun x -> x.IsOptionalArg)
+            if hasOptionalArg then null else ctor arg
         | _ -> ctor arg
 
     let rec containsForcedCalculations (expression: IFSharpExpression) =
