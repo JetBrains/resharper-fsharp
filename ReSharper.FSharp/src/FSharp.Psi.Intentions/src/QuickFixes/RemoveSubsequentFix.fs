@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
@@ -29,6 +30,8 @@ type RemoveSubsequentFix(expr: IFSharpExpression) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
+
         let seqExpr = SequentialExprNavigator.GetByExpression(expr)
 
         let exprs = seqExpr.Expressions
@@ -37,7 +40,7 @@ type RemoveSubsequentFix(expr: IFSharpExpression) =
         let firstExprToRemove =
             Seq.skip (exprIndex + 1) exprs |> Seq.head
 
-        if exprIndex = 0 && exprs.Count = 2 then
+        if exprIndex = 0 then
             // replace the whole sequential expression with the expression to keep
             let last =
                 skipMatchingNodesBefore isInlineSpace firstExprToRemove

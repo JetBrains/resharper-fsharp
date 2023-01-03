@@ -5,7 +5,7 @@ IFSharpImplFile
       FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITypeExtensionDeclaration
-        IExpressionReferenceName
+        ITypeReferenceName
           FSharpIdentifierToken(type:IDENTIFIER, text:System)
         FSharpTokenType+DotTokenElement(type:DOT, text:.)
         FSharpIdentifierToken(type:IDENTIFIER, text:String)

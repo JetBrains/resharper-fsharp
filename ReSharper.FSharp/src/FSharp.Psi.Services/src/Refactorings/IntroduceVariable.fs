@@ -187,14 +187,18 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 LowLevelModificationUtil.AddChild(newSeqExpr, Array.ofSeq inRange)
 
                 let replaceRange =
+                    if index = 0 then TreeRange(sequentialExpr) else
                     if removeSourceExpr then TreeRange(contextExpr, newSeqExpr) else TreeRange(newSeqExpr)
 
                 {| ReplaceRange = replaceRange
                    InRange = TreeRange(newSeqExpr)
                    AddNewLine = not removeSourceExpr |}
             else
+                let replaceRange = 
+                    if index = 0 then TreeRange(sequentialExpr) else TreeRange(contextExpr, sequentialExpr.LastChild)
+                
                 // The last expression can be moved as is.
-                {| ReplaceRange = TreeRange(contextExpr, sequentialExpr.LastChild)
+                {| ReplaceRange = replaceRange
                    InRange = inRange
                    AddNewLine = not removeSourceExpr |}
         else
@@ -281,7 +285,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
         addNodesBefore contextExpr [
             NewLine(contextExpr.GetLineEnding())
-            Whitespace(indent)
+            if indent > 0 then
+                Whitespace(indent)
         ] |> ignore
 
     static member val ExpressionToRemoveKey = Key("FSharpIntroduceVariable.ExpressionToRemove")
@@ -415,7 +420,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 if alwaysGenerateCompleteBindingExpr then
                     addNodesAfter letBindings.LastChild [
                         NewLine(lineEnding)
-                        Whitespace(contextIndent)
+                        if contextIndent > 0 then
+                            Whitespace(contextIndent)
 
                         if removeSourceExpr then
                             elementFactory.CreateExpr("()")
@@ -449,7 +455,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                     ] |> ignore
                 elif ranges.AddNewLine then
                     let anchor = ModificationUtil.AddChildBefore(replaced.First, NewLine(lineEnding))
-                    ModificationUtil.AddChildAfter(anchor, Whitespace(contextIndent)) |> ignore
+                    if contextIndent > 0 then
+                        ModificationUtil.AddChildAfter(anchor, Whitespace(contextIndent)) |> ignore
 
                 ModificationUtil.DeleteChildRange(ranges.ReplaceRange)
                 letBindings
@@ -461,7 +468,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                     let letBindings = ModificationUtil.AddChildBefore(contextDecl, letBindings)
                     addNodesAfter letBindings [
                         NewLine(lineEnding)
-                        Whitespace(contextIndent)
+                        if contextIndent > 0 then
+                            Whitespace(contextIndent)
                     ] |> ignore
                     letBindings
 

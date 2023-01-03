@@ -38,7 +38,9 @@ type AddMissingMatchClausesFix(warning: MatchIncompleteWarning) =
             let matchClause = 
                 addNodesAfter matchExpr.LastChild [
                     NewLine(matchExpr.GetLineEnding())
-                    Whitespace(matchExpr.Indent)
+                    let indent = matchExpr.Indent
+                    if indent > 0 then
+                        Whitespace(indent)
                     factory.CreateMatchClause()
                 ] :?> IMatchClause
 

@@ -121,7 +121,8 @@ let addAttributeListWithIndent newLine (indent: int) (anchor: ITreeNode) =
         anchor.CreateElementFactory().CreateEmptyAttributeList()
         if newLine then
             NewLine(anchor.GetLineEnding())
-            Whitespace(indent)
+            if indent > 0 then
+                Whitespace(indent)
         else
             Whitespace()
     ] |> ignore

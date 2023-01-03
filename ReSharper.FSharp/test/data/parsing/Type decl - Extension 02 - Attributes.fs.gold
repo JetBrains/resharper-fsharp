@@ -19,7 +19,7 @@ IFSharpImplFile
               FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
           FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        IExpressionReferenceName
+        ITypeReferenceName
           FSharpIdentifierToken(type:IDENTIFIER, text:System)
         FSharpTokenType+DotTokenElement(type:DOT, text:.)
         FSharpIdentifierToken(type:IDENTIFIER, text:String)

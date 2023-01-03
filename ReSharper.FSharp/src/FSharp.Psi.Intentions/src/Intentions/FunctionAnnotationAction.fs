@@ -35,7 +35,7 @@ module SpecifyTypes =
                 mfv.ReturnParameter.Type.Format(displayContext)
 
         let factory = binding.CreateElementFactory()
-        let typeUsage = factory.CreateTypeUsage(typeString, TypeUsageContext.Return)
+        let typeUsage = factory.CreateTypeUsage(typeString, TypeUsageContext.TopLevel)
 
         let parameters = binding.ParametersDeclarations
         let anchor =

@@ -3,7 +3,7 @@ IFSharpImplFile
   INamedNamespaceDeclaration
     FSharpTokenType+NamespaceTokenElement(type:NAMESPACE, text:namespace)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-    IExpressionReferenceName
+    ITypeReferenceName
       FSharpIdentifierToken(type:IDENTIFIER, text:Ns1)
     FSharpTokenType+DotTokenElement(type:DOT, text:.)
     FSharpIdentifierToken(type:IDENTIFIER, text:Ns2)

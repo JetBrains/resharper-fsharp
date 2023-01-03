@@ -172,7 +172,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                 x.ProcessActivePatternId(idRange, ElementType.ACTIVE_PATTERN_NAMED_CASE_REFERENCE_NAME) // todo
             x.Done(idRange, marks.Pop(), ElementType.EXPRESSION_REFERENCE_NAME)
 
-    member x.ProcessReferenceNameSkipLast(lid: Ident list) =
+    member x.ProcessTypeReferenceNameSkipLast(lid: Ident list) =
         match lid with
         | [] -> ()
         | [IdentRange idRange] -> x.AdvanceToEnd(idRange)
@@ -189,7 +189,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         for IdentRange idRange in lid do
             if marks.Count > 0 then
-                x.Done(idRange, marks.Pop().Mark, ElementType.EXPRESSION_REFERENCE_NAME)
+                x.Done(idRange, marks.Pop().Mark, ElementType.TYPE_REFERENCE_NAME)
 
         x.AdvanceToEnd(lastIdRangeAndMark.Range)
 
@@ -260,7 +260,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                 x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
 
         if moduleKind <> SynModuleOrNamespaceKind.AnonModule then
-            x.ProcessReferenceNameSkipLast(lid)
+            x.ProcessTypeReferenceNameSkipLast(lid)
 
         let elementType =
             match moduleKind with
@@ -996,12 +996,12 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         match typeParams with
         | Some(SynTyparDecls.PrefixList _ | SynTyparDecls.SinglePrefix _ as typeParams) ->
             x.ProcessTypeParameters(typeParams, true)
-            x.ProcessReferenceNameSkipLast(lid)
+            x.ProcessTypeReferenceNameSkipLast(lid)
         | Some(typeParams) ->
-            x.ProcessReferenceNameSkipLast(lid)
+            x.ProcessTypeReferenceNameSkipLast(lid)
             x.ProcessTypeParameters(typeParams, true)
         | _ ->
-            x.ProcessReferenceNameSkipLast(lid)
+            x.ProcessTypeReferenceNameSkipLast(lid)
 
         for typeConstraint in constraints do
             x.ProcessTypeConstraint(typeConstraint)

@@ -62,7 +62,10 @@ type AddMatchAllClauseFix(expr: IMatchLikeExpr, generatedExpr: GeneratedClauseEx
                         NewLine(lineEnding)
 
                     NewLine(lineEnding)
-                    Whitespace(lastClause.Indent) // may be wrong in some cases
+
+                    let indent = lastClause.Indent
+                    if indent > 0 then
+                        Whitespace(indent) // may be wrong in some cases
                 else
                     Whitespace()
                 factory.CreateMatchClause()

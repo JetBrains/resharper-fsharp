@@ -122,7 +122,7 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
         if isNull lastParam then () else
 
         let typeString = mfv.ReturnParameter.Type.Instantiate(element.Substitution)
-        let typeUsage = factory.CreateTypeUsage(typeString.Format(displayContext), TypeUsageContext.Return)
+        let typeUsage = factory.CreateTypeUsage(typeString.Format(displayContext), TypeUsageContext.TopLevel)
         ModificationUtil.AddChildAfter(lastParam, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
 
     memberDeclaration

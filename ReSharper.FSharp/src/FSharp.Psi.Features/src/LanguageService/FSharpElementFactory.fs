@@ -327,7 +327,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
                 let typeUsage = typeDecl.TypeRepresentation.As<ITypeAbbreviationRepresentation>().AbbreviatedType
                 typeUsage.As<IParenTypeUsage>().InnerTypeUsage
 
-            | TypeUsageContext.Return ->
+            | TypeUsageContext.Signature ->
                 let typeDecl = getTypeDecl $"abstract M: {typeUsage}"
                 let memberDecl = typeDecl.TypeMembers[0] :?> IAbstractMemberDeclaration
                 memberDecl.ReturnTypeInfo.ReturnType

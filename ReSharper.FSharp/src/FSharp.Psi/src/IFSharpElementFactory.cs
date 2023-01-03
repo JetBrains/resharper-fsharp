@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   {
     TopLevel,
     ParameterSignature,
-    Return
+    Signature,
   }
 
   public interface IFSharpElementFactory

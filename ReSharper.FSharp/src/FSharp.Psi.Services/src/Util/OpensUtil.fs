@@ -212,7 +212,8 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
             // Add space after new opens group.
             if not (moduleMember :? IOpenStatement) then
                 NewLine(lineEnding)
-                Whitespace(indent)
+                if indent > 0 then
+                    Whitespace(indent)
         ] |> ignore
 
     let insertAfterAnchor (ns: string) (anchor: ITreeNode) indent =
