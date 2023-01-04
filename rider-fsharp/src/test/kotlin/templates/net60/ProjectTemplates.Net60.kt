@@ -21,6 +21,9 @@ object Net60 {
         override val expectedNumOfAnalyzedFiles: Int = 1
         override val expectedNumOfSkippedFiles: Int = 0
         override val targetFramework: String = "net6.0"
+        init {
+            addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
+        }
     }
 
     class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase() {
@@ -31,6 +34,9 @@ object Net60 {
         override val breakpointLine: Int = 2
         override val expectedOutput: String = "Hello from F#"
         override val debugFileName: String = "Program.fs"
+        init {
+            addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
+        }
     }
 
     class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase() {
@@ -43,7 +49,8 @@ object Net60 {
         override val breakpointLine: Int = 8
 
         init {
-            //addMute(Mute("No run configuration"), ::runConfiguration)
+            addMute(Mute("No run configuration"), ::runConfiguration)
+            addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
         }
     }
 }
