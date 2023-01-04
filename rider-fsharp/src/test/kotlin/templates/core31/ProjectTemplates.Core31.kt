@@ -1,5 +1,6 @@
 package templates.core31
 
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.templates.sdk.ClassLibProjectTemplateTestBase
 import com.jetbrains.rider.test.base.templates.sdk.ConsoleAppProjectTemplateTestBase
@@ -22,6 +23,9 @@ object Core31 {
         override val expectedNumOfAnalyzedFiles: Int = 1
         override val expectedNumOfSkippedFiles: Int = 0
         override val targetFramework: String = "netcoreapp3.1"
+        init {
+            addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
+        }
     }
 
     class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase() {
@@ -32,6 +36,9 @@ object Core31 {
         override val breakpointLine: Int = 7
         override val expectedOutput: String = "Hello World from F#!"
         override val debugFileName: String = "Program.fs"
+        init {
+            addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
+        }
     }
 
     class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase() {
@@ -44,7 +51,8 @@ object Core31 {
         override val breakpointLine: Int = 8
 
         init {
-            //addMute(Mute("No run configuration"), ::runConfiguration)
+            addMute(Mute("No run configuration"), ::runConfiguration)
+            addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
         }
     }
 }

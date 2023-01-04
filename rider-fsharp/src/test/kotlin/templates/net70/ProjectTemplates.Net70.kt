@@ -22,6 +22,9 @@ object Net70 {
         override val expectedNumOfSkippedFiles: Int = 0
         override val targetFramework: String = "net7.0"
         override val flakyFiles: Array<String> = emptyArray()
+        init {
+            addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
+        }
     }
 
     class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase() {
@@ -32,6 +35,9 @@ object Net70 {
         override val breakpointLine: Int = 2
         override val expectedOutput: String = "Hello from F#"
         override val debugFileName: String = "Program.fs"
+        init {
+            addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
+        }
     }
 
     class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase() {
@@ -43,8 +49,9 @@ object Net70 {
         override val debugFileName: String = "Tests.fs"
         override val breakpointLine: Int = 8
 
-//        init {
-//            addMute(Mute("No run configuration"), ::runConfiguration)
-//        }
+        init {
+            addMute(Mute("No run configuration"), ::runConfiguration)
+            addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
+        }
     }
 }
