@@ -31,10 +31,12 @@ type TestWithTwoProjectsBase(mainFileExtension: string, secondFileExtension: str
 
     member x.AddProjectReference(project: IProject) =
         let lock = x.Locks.UsingWriteLock()
-        let progressIndicator = NullProgressIndicator.Create()
-        use cookie = x.Solution.CreateTransactionCookie(DefaultAction.Commit, "Add reference", progressIndicator)
-        cookie.AddModuleReference(project, x.SecondProject, project.GetSingleTargetFrameworkId()) |> ignore
-        lock.Dispose()
+        try
+            let progressIndicator = NullProgressIndicator.Create()
+            use cookie = x.Solution.CreateTransactionCookie(DefaultAction.Commit, "Add reference", progressIndicator)
+            cookie.AddModuleReference(project, x.SecondProject, project.GetSingleTargetFrameworkId()) |> ignore
+        finally
+            lock.Dispose()
 
     member x.CreateProjectDescriptor(name, filePath, libs, guid) =
         let targetFrameworkId = x.GetTargetFrameworkId()
