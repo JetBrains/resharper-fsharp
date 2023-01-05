@@ -258,5 +258,5 @@ type FSharpProjectsRequiringFrameworkVisitor(lifetime, solution: ISolution, chan
 
     interface IProjectsRequiringFrameworkVisitor with
         member x.RequiresNetFramework(projectOutputPath: string) =
-            let _ = rwLock.UsingReadLock()
+            use _ = rwLock.UsingReadLock()
             projectOutputsRequiringFramework.Contains(projectOutputPath)
