@@ -224,7 +224,7 @@ type FSharpProjectPropertiesRequest() =
 
 
 [<SolutionComponent>]
-type FSharpProjectsRequiringFrameworkVisitor(lifetime, solution, changeManager: ChangeManager) as this =
+type FSharpProjectsRequiringFrameworkVisitor(lifetime, solution: ISolution, changeManager: ChangeManager) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let rwLock = JetFastSemiReenterableRWLock()
