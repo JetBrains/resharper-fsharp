@@ -5,7 +5,6 @@ open System
 open System.Collections.Generic
 open System.Runtime.InteropServices
 open JetBrains.Application.changes
-open JetBrains.Lifetimes
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Impl.Build
