@@ -229,12 +229,13 @@ type FSharpProjectsRequiringFrameworkVisitor(lifetime, solution: ISolution, chan
     let rwLock = JetFastSemiReenterableRWLock()
     let projectOutputsRequiringFramework = HashSet()
 
-    do changeManager.Changed2.Advise(lifetime, Action<_>(this.ProcessChange));
+    do changeManager.Changed2.Advise(lifetime, Action<_>(this.ProcessChange))
 
     member x.ProcessChange (obj: ChangeEventArgs) =
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
         if isNull change || change.IsClosingSolution then () else x.VisitDelta change
 
+    //TODO: invalidate
     override x.VisitDelta (change: ProjectModelChange) =
         match change.ProjectModelElement with
         | :? ISolution -> base.VisitDelta(change)
@@ -243,13 +244,11 @@ type FSharpProjectsRequiringFrameworkVisitor(lifetime, solution: ISolution, chan
             if project.IsFSharp then
                 use _ = rwLock.UsingWriteLock()
                 for configuration in projectProperties.GetActiveConfigurations<IProjectConfiguration>() do
-                    let projectOutputPath = project.GetOutputFilePath(configuration.TargetFrameworkId)
-                    if projectOutputPath.IsEmpty then () else
-
-                    projectOutputsRequiringFramework.Remove(projectOutputPath.FullPath) |> ignore
                     match configuration.PropertiesCollection.TryGetValue(FSharpProperties.FscToolExe) with
                     | true, "fsc.exe"
                     | true, "fsharpc" when not change.IsRemoved ->
+                        let projectOutputPath = project.GetOutputFilePath(configuration.TargetFrameworkId)
+                        if projectOutputPath.IsEmpty then () else
                         projectOutputsRequiringFramework.Add(projectOutputPath.FullPath) |> ignore
                     | _ -> ()
 
