@@ -243,20 +243,20 @@ type FSharpProjectsRequiringFrameworkVisitor(lifetime, solution: ISolution, chan
             if project.IsFSharp then
                 use _ = rwLock.UsingWriteLock()
                 for configuration in projectProperties.GetActiveConfigurations<IProjectConfiguration>() do
-                    let virtualFileSystemPath = project.GetOutputFilePath(configuration.TargetFrameworkId)
-                    if virtualFileSystemPath.IsEmpty then () else
+                    let projectOutputPath = project.GetOutputFilePath(configuration.TargetFrameworkId)
+                    if projectOutputPath.IsEmpty then () else
 
-                    projectOutputsRequiringFramework.Remove(virtualFileSystemPath.FullPath) |> ignore
+                    projectOutputsRequiringFramework.Remove(projectOutputPath.FullPath) |> ignore
                     match configuration.PropertiesCollection.TryGetValue(FSharpProperties.FscToolExe) with
                     | true, "fsc.exe"
                     | true, "fsharpc" when not change.IsRemoved ->
-                        projectOutputsRequiringFramework.Add(virtualFileSystemPath.FullPath) |> ignore
+                        projectOutputsRequiringFramework.Add(projectOutputPath.FullPath) |> ignore
                     | _ -> ()
 
             elif projectProperties.ProjectKind = ProjectKind.SOLUTION_FOLDER then base.VisitDelta(change)
         | _ -> ()
 
-    interface IProjectsRequiringFrameworkVisitor with
-        member x.RequiresNetFramework(projectOutputPath: string) =
+    interface IFSharpProjectsRequiringFrameworkCache  with
+        member x.Contains(projectOutputPath: string) =
             use _ = rwLock.UsingReadLock()
             projectOutputsRequiringFramework.Contains(projectOutputPath)

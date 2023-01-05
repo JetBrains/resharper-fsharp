@@ -8,9 +8,9 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 {
-  public interface IProjectsRequiringFrameworkVisitor
+  public interface IFSharpProjectsRequiringFrameworkCache
   {
-    bool RequiresNetFramework(string projectOutputPath);
+    bool Contains(string projectOutputPath);
   }
 
 
@@ -53,14 +53,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     private JetProcessRuntimeRequest GetProcessRuntime([CanBeNull] string requestingProjectOutputPath)
     {
-      var projectVisitor = mySolution.GetComponent<IProjectsRequiringFrameworkVisitor>();
+      var projectsRequiringFrameworkCache = mySolution.GetComponent<IFSharpProjectsRequiringFrameworkCache>();
       var buildTool = myToolset.GetBuildTool();
 
       var runtimeType = buildTool!.UseDotNetCoreForLaunch
         ? JetProcessRuntimeType.DotNetCore
         : JetProcessRuntimeType.FullFramework;
 
-      if (requestingProjectOutputPath != null && projectVisitor.RequiresNetFramework(requestingProjectOutputPath))
+      if (requestingProjectOutputPath != null && projectsRequiringFrameworkCache.Contains(requestingProjectOutputPath))
         runtimeType = JetProcessRuntimeType.FullFramework;
 
       var mutator = MsBuildConnectionFactory.GetEnvironmentVariablesMutator(buildTool);
