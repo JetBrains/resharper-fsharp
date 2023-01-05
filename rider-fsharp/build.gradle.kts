@@ -300,7 +300,9 @@ tasks {
     }
 
     withType<Test> {
-        useTestNG()
+        useTestNG {
+            groupByInstances = true
+        }
 
         testLogging {
             showStandardStreams = true
