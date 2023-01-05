@@ -236,20 +236,20 @@ type FSharpProjectsRequiringFrameworkVisitor(lifetime: Lifetime, solution: ISolu
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
         if isNull change || change.IsClosingSolution then () else x.VisitDelta change
 
-    //TODO: invalidate
     override x.VisitDelta (change: ProjectModelChange) =
         match change.ProjectModelElement with
         | :? ISolution -> base.VisitDelta(change)
         | :? IProject as project ->
             if project.IsFSharp then
+                use _ = rwLock.UsingWriteLock()
                 for configuration in project.ProjectProperties.GetActiveConfigurations<IProjectConfiguration>() do
+                    let virtualFileSystemPath = project.GetOutputFilePath(configuration.TargetFrameworkId)
+                    if virtualFileSystemPath.IsEmpty then () else
+
+                    projectOutputsRequiringFramework.Remove(virtualFileSystemPath.FullPath) |> ignore
                     match configuration.PropertiesCollection.TryGetValue(FSharpProperties.FscToolExe) with
                     | true, "fsc.exe"
-                    | true, "fsharpc" ->
-                        use _ = rwLock.UsingWriteLock()
-                        let virtualFileSystemPath = project.GetOutputFilePath(configuration.TargetFrameworkId)
-                        if virtualFileSystemPath.IsNotEmpty then
-                            projectOutputsRequiringFramework.Add(virtualFileSystemPath.FullPath) |> ignore
+                    | true, "fsharpc" -> projectOutputsRequiringFramework.Add(virtualFileSystemPath.FullPath) |> ignore
                     | _ -> ()
         | _ -> ()
 
