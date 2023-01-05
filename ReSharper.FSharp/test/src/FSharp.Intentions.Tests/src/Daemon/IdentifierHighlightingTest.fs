@@ -16,6 +16,8 @@ type IdentifierHighlightingTest() =
 
     [<Test>] member x.``Backticks 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Members 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Operators 01 - ==``() = x.DoNamedTest()
     [<Test>] member x.``Operators 02 - Custom``() = x.DoNamedTest()
     [<Test>] member x.``Operators 03 - Unary``() = x.DoNamedTest()

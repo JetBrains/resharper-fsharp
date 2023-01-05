@@ -1,0 +1,27 @@
+﻿module |Module|(0)
+
+[<|AbstractClass|(1)>]
+type |A|(2)() =
+    abstract |M|(3): |unit|(4) -> |unit|(5)
+    default |this|(6).|M|(7)() = ()
+
+type |B|(8)() =
+    inherit |A|(9)()
+
+    override |this|(10).|M|(11)() =
+        base.|M|(12)()
+
+---------------------------------------------------------
+(0): ReSharper F# Module Identifier: 
+(1): ReSharper F# Class Identifier: 
+(2): ReSharper F# Class Identifier: 
+(3): ReSharper F# Method Identifier: 
+(4): ReSharper F# Class Identifier: 
+(5): ReSharper F# Class Identifier: 
+(6): ReSharper F# Value Identifier: 
+(7): ReSharper F# Method Identifier: 
+(8): ReSharper F# Class Identifier: 
+(9): ReSharper F# Class Identifier: 
+(10): ReSharper F# Value Identifier: 
+(11): ReSharper F# Method Identifier: 
+(12): ReSharper F# Method Identifier: 

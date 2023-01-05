@@ -191,6 +191,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         }
         else
         {
+          if (mfv is { IsBaseValue: true })
+            continue;
+          
           // workaround for indexer properties, visualfsharp#3933
           if (startOffset == endOffset || mfv is { IsProperty: true } && buffer[endOffset - 1] == ']')
             continue;
