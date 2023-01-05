@@ -17,24 +17,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
   [SolutionComponent]
   public class TypeProvidersExternalProcessFactory
   {
-    [NotNull] private readonly ISolution mySolution;
     [NotNull] private readonly ISolutionProcessStartInfoPatcher mySolutionProcessStartInfoPatcher;
     [NotNull] private readonly ILogger myLogger;
     [NotNull] private readonly IShellLocks myShellLocks;
     [NotNull] private readonly ISolutionToolset myToolset;
+    [NotNull] private readonly IFSharpProjectsRequiringFrameworkCache myProjectsRequiringFrameworkCache;
 
     public TypeProvidersExternalProcessFactory(
-      [NotNull] ISolution solution,
       [NotNull] ISolutionProcessStartInfoPatcher solutionProcessStartInfoPatcher,
       [NotNull] ILogger logger,
       [NotNull] IShellLocks shellLocks,
-      [NotNull] ISolutionToolset toolset)
+      [NotNull] ISolutionToolset toolset,
+      [NotNull] IFSharpProjectsRequiringFrameworkCache projectsRequiringFrameworkCache)
     {
-      mySolution = solution;
       mySolutionProcessStartInfoPatcher = solutionProcessStartInfoPatcher;
       myLogger = logger;
       myShellLocks = shellLocks;
       myToolset = toolset;
+      myProjectsRequiringFrameworkCache = projectsRequiringFrameworkCache;
     }
 
     public TypeProvidersExternalProcess Create(Lifetime lifetime,
@@ -53,14 +53,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     private JetProcessRuntimeRequest GetProcessRuntime([CanBeNull] string requestingProjectOutputPath)
     {
-      var projectsRequiringFrameworkCache = mySolution.GetComponent<IFSharpProjectsRequiringFrameworkCache>();
       var buildTool = myToolset.GetBuildTool();
 
       var runtimeType = buildTool!.UseDotNetCoreForLaunch
         ? JetProcessRuntimeType.DotNetCore
         : JetProcessRuntimeType.FullFramework;
 
-      if (requestingProjectOutputPath != null && projectsRequiringFrameworkCache.Contains(requestingProjectOutputPath))
+      if (requestingProjectOutputPath != null && myProjectsRequiringFrameworkCache.Contains(requestingProjectOutputPath))
         runtimeType = JetProcessRuntimeType.FullFramework;
 
       var mutator = MsBuildConnectionFactory.GetEnvironmentVariablesMutator(buildTool);
