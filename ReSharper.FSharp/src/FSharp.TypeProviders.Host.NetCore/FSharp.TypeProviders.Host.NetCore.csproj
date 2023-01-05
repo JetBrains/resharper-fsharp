@@ -17,7 +17,7 @@
         <PackageReference Include="System.Collections" Version="4.3.0"/>
         <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0"/>
         <PackageReference Include="System.IO.FileSystem" Version="4.3.0"/>
-        <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.0"/>
+        <PackageReference Include="Microsoft.NETCore.Platforms" Version="6.0.7"/>
         <PackageReference Include="Microsoft.NETCore.Targets" Version="1.1.0"/>
     </ItemGroup>
 
