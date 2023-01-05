@@ -249,7 +249,8 @@ type FSharpProjectsRequiringFrameworkVisitor(lifetime: Lifetime, solution: ISolu
                     projectOutputsRequiringFramework.Remove(virtualFileSystemPath.FullPath) |> ignore
                     match configuration.PropertiesCollection.TryGetValue(FSharpProperties.FscToolExe) with
                     | true, "fsc.exe"
-                    | true, "fsharpc" -> projectOutputsRequiringFramework.Add(virtualFileSystemPath.FullPath) |> ignore
+                    | true, "fsharpc" when not change.IsRemoved ->
+                        projectOutputsRequiringFramework.Add(virtualFileSystemPath.FullPath) |> ignore
                     | _ -> ()
         | _ -> ()
 
