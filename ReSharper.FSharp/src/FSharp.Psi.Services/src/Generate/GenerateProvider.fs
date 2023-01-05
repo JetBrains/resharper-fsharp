@@ -242,7 +242,10 @@ type FSharpOverridingMembersBuilder() =
             let typeMembers = typeDecl.TypeMembers
             if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
 
-            let typeRepr = typeDecl.TypeRepresentation.NotNull()
+            let typeRepr = typeDecl.TypeRepresentation
+            if isNull typeRepr then
+                typeDecl.EqualsToken.NotNull() else
+
             let objModelTypeRepr = typeRepr.As<IObjectModelTypeRepresentation>()
             if isNull objModelTypeRepr then typeRepr :> _ else
 
