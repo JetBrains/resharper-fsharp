@@ -240,9 +240,10 @@ type FSharpProjectsRequiringFrameworkVisitor(lifetime: Lifetime, solution: ISolu
         match change.ProjectModelElement with
         | :? ISolution -> base.VisitDelta(change)
         | :? IProject as project ->
+            let projectProperties = project.ProjectProperties
             if project.IsFSharp then
                 use _ = rwLock.UsingWriteLock()
-                for configuration in project.ProjectProperties.GetActiveConfigurations<IProjectConfiguration>() do
+                for configuration in projectProperties.GetActiveConfigurations<IProjectConfiguration>() do
                     let virtualFileSystemPath = project.GetOutputFilePath(configuration.TargetFrameworkId)
                     if virtualFileSystemPath.IsEmpty then () else
 
@@ -252,6 +253,8 @@ type FSharpProjectsRequiringFrameworkVisitor(lifetime: Lifetime, solution: ISolu
                     | true, "fsharpc" when not change.IsRemoved ->
                         projectOutputsRequiringFramework.Add(virtualFileSystemPath.FullPath) |> ignore
                     | _ -> ()
+
+            elif projectProperties.ProjectKind = ProjectKind.SOLUTION_FOLDER then base.VisitDelta(change)
         | _ -> ()
 
     interface IProjectsRequiringFrameworkVisitor with
