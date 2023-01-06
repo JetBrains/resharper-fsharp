@@ -24,6 +24,8 @@ type FSharpRefactoringLanguageService() =
 and FSharpRefactoringsHelper() =
     inherit RefactoringsHelper()
 
+    override this.CanInlineField _ = false
+
     override x.CreateInlineVarAnalyser(workflow) =
         FSharpInlineVarAnalyser(workflow) :> _
 
