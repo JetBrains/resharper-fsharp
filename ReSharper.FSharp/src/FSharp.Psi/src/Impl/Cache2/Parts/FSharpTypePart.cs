@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -10,7 +13,6 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.dataStructures;
 using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -138,24 +140,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName)
     {
+      bool IsInDeclarationBounds(FSharpAttribute fcsAttribute, DocumentRange declarationRange) =>
+        declarationRange.StartOffset.GetPos().Line <= fcsAttribute.Range.StartLine
+        && declarationRange.StartOffset.GetPos().Column <= fcsAttribute.Range.StartColumn
+        && declarationRange.EndOffset.GetPos().Line >= fcsAttribute.Range.EndLine
+        && declarationRange.EndOffset.GetPos().Column >= fcsAttribute.Range.StartColumn;
+
       if (AttributeClassNames.IsEmpty())
         return EmptyList<IAttributeInstance>.Instance;
 
-      if (!(GetDeclaration()?.GetFcsSymbol() is FSharpEntity entity))
+      var declaration = GetDeclaration();
+      if (declaration?.GetFcsSymbol() is not FSharpEntity entity)
         return EmptyList<IAttributeInstance>.Instance;
 
-      var psiModule = GetPsiModule();
-      var entityAttrs = entity.Attributes;
-
-      if (entityAttrs.Count == 0)
+      if (entity.Attributes.Count == 0)
         return EmptyList<IAttributeInstance>.Instance;
 
-      var result = new FrugalLocalList<IAttributeInstance>();
-      foreach (var fcsAttribute in entityAttrs)
-        if (new ClrTypeName(fcsAttribute.AttributeType.BasicQualifiedName).Equals(clrName))
-          result.Add(new FSharpAttributeInstance(fcsAttribute, psiModule));
+      Func<FSharpAttribute, bool> attributesFilter = clrName == null
+        ? _ => true // If clrName is null we need to return all available attributes
+        : fcsAttribute => new ClrTypeName(fcsAttribute.AttributeType.BasicQualifiedName).Equals(clrName);
 
-      return result.ResultingList();
+      var declarationRange = declaration.GetDocumentRange();
+      return entity.Attributes
+        .Where(attributesFilter)
+        .Where(fcsAttribute => IsInDeclarationBounds(fcsAttribute, declarationRange))
+        .Select(fcsAttribute => new FSharpAttributeInstance(fcsAttribute, GetPsiModule()))
+        .OfType<IAttributeInstance>()
+        .ToList();
     }
 
     public override bool HasAttributeInstance(IClrTypeName clrTypeName)
