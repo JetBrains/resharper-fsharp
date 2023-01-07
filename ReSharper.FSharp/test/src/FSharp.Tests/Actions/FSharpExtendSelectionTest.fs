@@ -97,3 +97,4 @@ type FSharpExtendSelectionTest() =
     [<Test>] member x.``Strings - Interpolated - Triple quoted 02 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Triple quoted 03 - Complex insertion``() = x.DoNamedTest()
 
+    [<Test>] member x.``Strings - Injections 01``() = x.DoNamedTest()
