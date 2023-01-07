@@ -125,7 +125,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
 
 and FSharpDotSelection(fsFile, offset, selectBetterToken, useCamelHumps) =
-    inherit DotSelection<IFSharpFile>(fsFile, offset, selectBetterToken, useCamelHumps, false)
+    inherit DotSelection<IFSharpFile>(fsFile, offset, selectBetterToken, useCamelHumps, true)
 
     override x.IsWordToken(token) =
         let tokenType = token.GetTokenType()
