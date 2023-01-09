@@ -10,6 +10,7 @@ open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Application.Settings
+open JetBrains.Application.Threading
 open JetBrains.DataFlow
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
@@ -63,7 +64,7 @@ type FcsProject =
 
 [<ShellComponent; AllowNullLiteral>]
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-        settingsStore: ISettingsStore) =
+        settingsStore: ISettingsStore, locks: IShellLocks) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -99,6 +100,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
     member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
         try
+            locks.AssertReadAccessAllowed()
             let source = FcsCheckerService.getSourceText document
             let fullPath = getFullPath path
             let parseAsync = x.Checker.ParseFile(fullPath, source, parsingOptions, cache = not noCache)
@@ -122,6 +124,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         | _ ->
 
         ProhibitTypeCheckCookie.AssertTypeCheckIsAllowed()
+        locks.AssertReadAccessAllowed()
 
         let psiModule = sourceFile.PsiModule
         match x.FcsProjectProvider.GetFcsProject(psiModule) with

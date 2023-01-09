@@ -14,6 +14,7 @@ open JetBrains.ProjectModel.Build
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.Tasks
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -474,6 +475,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         member this.PrepareAssemblyShim(psiModule) =
             if not fcsAssemblyReaderShim.IsEnabled then () else
+
+            FSharpAsyncUtil.ProcessEnqueuedReadRequests()
 
             lock this (fun _ ->
                 // todo: check that dirty modules are visible to the current one
