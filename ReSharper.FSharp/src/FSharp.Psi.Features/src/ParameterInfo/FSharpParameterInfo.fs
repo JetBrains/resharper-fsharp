@@ -190,9 +190,9 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
             paramGroups
             |> Seq.concat
             |> Seq.iteri (fun index _ ->
-                if index >= curriedParamsCount then () else
+                let parameter = this.GetParameter(index)
+                if isNull parameter then () else
 
-                let parameter = parameters[index]
                 let name = parameter.ShortName
             
                 let summary =
