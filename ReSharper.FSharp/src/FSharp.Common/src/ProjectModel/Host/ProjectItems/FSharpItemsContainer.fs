@@ -89,14 +89,14 @@ type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
 
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
 [<SolutionInstanceComponent>]
-type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: FSharpItemsContainerLoader,
+type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainerLoader,
         projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider) =
 
     let locker = JetFastSemiReenterableRWLock()
     let projectMappings = lazy containerLoader.GetMap()
     let targetFrameworkIdsIntern = DataIntern(setComparer)
 
-    let fsProjectLoaded = new Signal<IProjectMark>(lifetime, "fsProjectLoaded")
+    let fsProjectLoaded = new Signal<IProjectMark>("fsProjectLoaded")
  
     let tryGetProjectMark (projectItem: IProjectItem) =
         match projectItem.GetProject() with

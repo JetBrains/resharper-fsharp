@@ -183,7 +183,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         result <- reader
         true
 
-    let moduleInvalidated = new Signal<IPsiModule>(lifetime, "AssemblyReaderShim.ModuleInvalidated")
+    let moduleInvalidated = new Signal<IPsiModule>("AssemblyReaderShim.ModuleInvalidated")
 
     let rec removeModule (psiModule: IPsiModule) =
         let mutable moduleReader = Unchecked.defaultof<_>

@@ -83,7 +83,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let outputPathToPsiModule = Dictionary<VirtualFileSystemPath, IPsiModule>()
 
     let dirtyModules = HashSet<IPsiModule>()
-    let fcsProjectInvalidated = new Signal<IPsiModule>(lifetime, "FcsProjectInvalidated")
+    let fcsProjectInvalidated = new Signal<IPsiModule>("FcsProjectInvalidated")
 
     let getReferencingModules (psiModule: IPsiModule) =
         match tryGetValue psiModule referencedModules with

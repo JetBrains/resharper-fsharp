@@ -41,7 +41,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         platformManager: IPlatformManager, assemblyFactory: AssemblyFactory, projectFileExtensions,
         projectFileTypeCoordinator, checkerService: FcsCheckerService) as this =
 
-    let scriptPsiModuleInvalidated = new Signal<FSharpScriptPsiModule>(lifetime, "ScriptPsiModuleInvalidated")
+    let scriptPsiModuleInvalidated = new Signal<FSharpScriptPsiModule>("ScriptPsiModuleInvalidated")
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.
     let scriptsFromProjectFiles = OneToListMap<VirtualFileSystemPath, FSharpScriptPsiModule>()

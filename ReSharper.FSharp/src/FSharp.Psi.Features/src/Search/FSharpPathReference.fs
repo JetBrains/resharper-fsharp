@@ -12,8 +12,8 @@ open JetBrains.Util
 open System
 
 [<ReferenceProviderFactory>]
-type FSharpPathReferenceProviderFactory(lifetime) as this =
-    let changed = new Signal<IReferenceProviderFactory>(lifetime, this.GetType().FullName)
+type FSharpPathReferenceProviderFactory() as this =
+    let changed = new Signal<IReferenceProviderFactory>(this.GetType().FullName)
 
     interface IReferenceProviderFactory with
         member x.CreateFactory(sourceFile, file, _) =

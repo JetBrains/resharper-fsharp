@@ -31,7 +31,7 @@ type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, d
         logger: ILogger) =
     inherit FileSystemShimChangeProvider(Lifetime.Define(lifetime).Lifetime, changeManager)
 
-    let fileUpdated = new Signal<VirtualFileSystemPath>(lifetime, "FSharpSourceCache.fileUpdated")
+    let fileUpdated = new Signal<VirtualFileSystemPath>("FSharpSourceCache.fileUpdated")
 
     let [<Literal>] RemoveFileChangeType =
         ProjectModelChangeType.REMOVED ||| ProjectModelChangeType.MOVED_OUT

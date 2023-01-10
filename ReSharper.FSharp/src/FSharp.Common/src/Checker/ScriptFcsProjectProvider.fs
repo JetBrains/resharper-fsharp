@@ -28,7 +28,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
     let dirtyPaths = HashSet<VirtualFileSystemPath>()
 
     let optionsUpdated =
-        new Signal<VirtualFileSystemPath * FSharpProjectOptions>(lifetime, "ScriptFcsProjectProvider.optionsUpdated")
+        new Signal<VirtualFileSystemPath * FSharpProjectOptions>("ScriptFcsProjectProvider.optionsUpdated")
 
     do
         fsSourceCache.FileUpdated.Advise(lifetime, fun (path: VirtualFileSystemPath) ->
