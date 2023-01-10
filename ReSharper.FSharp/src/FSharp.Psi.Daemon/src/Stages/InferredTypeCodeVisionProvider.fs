@@ -46,14 +46,14 @@ type InferredTypeCodeVisionProvider() =
     interface ICodeInsightsProvider with
         member x.ProviderId = FSharpInferredTypeHighlighting.ProviderId
         member x.DisplayName = FSharpInferredTypeHighlighting.ProviderId
-        member x.DefaultAnchor = CodeLensAnchorKind.Default
-        member x.RelativeOrderings = [| CodeLensRelativeOrderingFirst() :> CodeLensRelativeOrdering |] :> _
+        member x.DefaultAnchor = CodeVisionAnchorKind.Default
+        member x.RelativeOrderings = [| CodeVisionRelativeOrderingFirst() :> CodeVisionRelativeOrdering |] :> _
 
         member x.IsAvailableIn _ = true
 
         member x.OnClick(highlighting, _) =
             let codeInsightsHighlighting = highlighting.CodeInsightsHighlighting
-            let entry = codeInsightsHighlighting.Entry.As<TextCodeLensEntry>()
+            let entry = codeInsightsHighlighting.Entry.As<TextCodeVisionEntry>()
             if isNull entry then () else
 
             let shell = Shell.Instance
