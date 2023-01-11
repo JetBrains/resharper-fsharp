@@ -228,7 +228,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             if ns.IsEmpty() then enclosingTypeNames else
 
             match enclosingTypeNames with
-            | hd :: tl -> String.Concat(ns, ".", hd) :: tl
+            | hd :: tl -> $"{ns}.{hd}" :: tl
             | [] -> failwithf $"mkTypeRef: {clrTypeName}"
 
         let name =
@@ -349,6 +349,50 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mkCallingThisConv (func: IModifiersOwner): ILThisConvention =
         if func.IsStatic then ILThisConvention.Static else ILThisConvention.Instance
 
+    let rec mkExplicitImplTypeName (declaredType: IDeclaredType) =
+        let typeElement = declaredType.GetTypeElement()
+        if isNull typeElement then "" else
+
+        let clrTypeName = typeElement.GetClrName()
+
+        let typeNames = 
+            clrTypeName.TypeNames
+            |> Seq.map (fun n -> n.TypeName)
+            |> String.concat "."
+
+        let name = 
+            match clrTypeName.GetNamespaceName() with
+            | "" -> typeNames
+            | ns -> $"{ns}.{typeNames}"
+
+        let typeParameters = typeElement.TypeParameters
+        if typeParameters.Count = 0 then name else
+
+        let substitution = declaredType.GetSubstitution()
+        let typeArgs = 
+            typeParameters
+            |> Seq.map (fun tp ->
+                let declaredType = substitution[tp].As<IDeclaredType>()
+                mkExplicitImplTypeName declaredType
+            )
+            |> String.concat ","
+
+        $"{name}<{typeArgs}>"
+
+    let mkOverridableMemberName (typeMember: ITypeMember) =
+        let overridableMember = typeMember.As<IOverridableMember>()
+        if isNotNull overridableMember && overridableMember.IsExplicitImplementation then
+            overridableMember.ExplicitImplementations
+            |> Seq.tryHead
+            |> Option.map (fun impl ->
+                let memberName = impl.MemberName
+                match mkExplicitImplTypeName impl.DeclaringType with
+                | "" -> memberName
+                | typeName -> $"{typeName}.{memberName}"
+            )
+            |> Option.defaultWith (fun _ -> typeMember.ShortName) 
+        else
+            typeMember.ShortName
 
     let mkMethodRef (method: IFunction): ILMethodRef =
         let typeRef =
@@ -360,7 +404,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             mkTypeRef typeElement
 
         let callingConv = mkCallingConv method
-        let name = method.ShortName // todo: type parameter suffix?
+        let name = mkOverridableMemberName method
 
         let typeParamsCount =
             match method with
@@ -699,7 +743,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         mkType returnType |> mkILReturn
 
     let mkMethodDef (method: IFunction): ILMethodDef =
-        let name = method.ShortName // todo: type parameter suffix?
+        let name = mkOverridableMemberName method
         let methodAttrs = mkMethodAttributes method
         let callingConv = mkCallingConv method
         let parameters = mkParams method
@@ -756,7 +800,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let mkEventDef (event: IEvent): ILEventDef =
         let eventType = mkEventDefType event
-        let name = event.ShortName
+        let name = mkOverridableMemberName event
         let attributes = enum 0 // Not used by FCS.
         let addMethod = mkEventAddMethod event
         let removeMethod = mkEventRemoveMethod event
@@ -781,7 +825,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | getter -> Some(mkMethodRef getter)
 
     let mkPropertyDef (property: IProperty): ILPropertyDef =
-        let name = property.ShortName
+        let name = mkOverridableMemberName property
         let attrs = enum 0 // todo
         let callConv = mkCallingThisConv property
         let propertyType = mkType property.Type
