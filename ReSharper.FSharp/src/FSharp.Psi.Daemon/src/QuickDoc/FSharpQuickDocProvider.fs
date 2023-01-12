@@ -110,8 +110,11 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
             this.tryFindFSharpFile(context) != null
 
         member this.Resolve(context, resolved) =
+            let sourceFile = context.GetData(PsiDataConstants.SOURCE_FILE)
+            if isNull sourceFile then () else
+
             context.GetData(PsiDataConstants.SELECTED_TREE_NODES)
-            |> Seq.filter (fun node -> node :? IFSharpIdentifier)
+            |> Seq.filter (fun node -> node :? IFSharpIdentifier && node.GetSourceFile() = sourceFile)
             |> Seq.tryExactlyOne
             |> Option.iter (fun token ->
                 resolved.Invoke(FSharpQuickDocPresenter(xmlDocService, token :?> _), FSharpLanguage.Instance))
