@@ -14,6 +14,7 @@ type FSharpLexerTest() =
     [<Test>] member x.``Empty file 02 - New lines``() = x.DoNamedTest()
 
     [<Test>] member x.``Literals 01 - simple numbers``() = x.DoNamedTest()
+    [<Test>] member x.``Literals 02 - complex numbers``() = x.DoNamedTest()
     [<Test>] member x.``Literals 02 - numbers with suffices``() = x.DoNamedTest()
     [<Test>] member x.``Literals 03 - digits``() = x.DoNamedTest()
     [<Test>] member x.``Literals 04 - escape characters``() = x.DoNamedTest()

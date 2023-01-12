@@ -77,3 +77,4 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Method - Application 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Parameters - Optional 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Parameters - Optional 02 - Private``() = x.DoNamedTest()
+    [<Test>] member x.``Numbers``() = x.DoNamedTest()
