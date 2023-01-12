@@ -4,7 +4,6 @@ open JetBrains.Application
 open System
 open System.Collections.Generic
 open System.Runtime.InteropServices
-open JetBrains.Application.changes
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Impl.Build
@@ -14,8 +13,6 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic.Components
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Common
 open JetBrains.ProjectModel.Properties.Managed
-open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
-open JetBrains.Threading
 open JetBrains.Util
 open JetBrains.Util.PersistentMap
 
@@ -220,42 +217,3 @@ type FSharpProjectPropertiesRequest() =
 
     interface IProjectPropertiesRequest with
         member x.RequestedProperties = properties :> _
-
-
-[<SolutionComponent>]
-type FSharpProjectsRequiringFrameworkVisitor(lifetime, solution: ISolution, changeManager: ChangeManager) as this =
-    inherit RecursiveProjectModelChangeDeltaVisitor()
-
-    let rwLock = JetFastSemiReenterableRWLock()
-    let projectOutputsRequiringFramework = HashSet()
-
-    do changeManager.Changed2.Advise(lifetime, Action<_>(this.ProcessChange))
-
-    member x.ProcessChange (obj: ChangeEventArgs) =
-        let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
-        if isNull change || change.IsClosingSolution then () else x.VisitDelta change
-
-    //TODO: invalidate
-    override x.VisitDelta (change: ProjectModelChange) =
-        match change.ProjectModelElement with
-        | :? ISolution -> base.VisitDelta(change)
-        | :? IProject as project ->
-            let projectProperties = project.ProjectProperties
-            if project.IsFSharp then
-                use _ = rwLock.UsingWriteLock()
-                for configuration in projectProperties.GetActiveConfigurations<IProjectConfiguration>() do
-                    match configuration.PropertiesCollection.TryGetValue(FSharpProperties.FscToolExe) with
-                    | true, "fsc.exe"
-                    | true, "fsharpc" when not change.IsRemoved ->
-                        let projectOutputPath = project.GetOutputFilePath(configuration.TargetFrameworkId)
-                        if projectOutputPath.IsEmpty then () else
-                        projectOutputsRequiringFramework.Add(projectOutputPath.FullPath) |> ignore
-                    | _ -> ()
-
-            elif projectProperties.ProjectKind = ProjectKind.SOLUTION_FOLDER then base.VisitDelta(change)
-        | _ -> ()
-
-    interface IFSharpProjectsRequiringFrameworkCache  with
-        member x.Contains(projectOutputPath: string) =
-            use _ = rwLock.UsingReadLock()
-            projectOutputsRequiringFramework.Contains(projectOutputPath)
