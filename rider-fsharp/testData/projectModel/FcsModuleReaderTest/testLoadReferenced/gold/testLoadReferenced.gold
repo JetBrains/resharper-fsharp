@@ -7,6 +7,8 @@ Readers by path count: 1
 Dependencies to referencing modules:
   CSharpProject
     FSharpProject
+Invalidations since last dump:
+  Invalidate all: Assemblies or modules changed
 
 ===================
 2. Unload C# project
@@ -23,4 +25,6 @@ Dirty types in readers:
 3. Open F#
 
 Readers by module: 0
+Invalidations since last dump:
+  Invalidate all: Assemblies or modules changed
 

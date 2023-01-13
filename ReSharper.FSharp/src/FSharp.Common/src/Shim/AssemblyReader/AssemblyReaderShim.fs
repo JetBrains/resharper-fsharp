@@ -109,12 +109,20 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         assemblyReadersByModule.ContainsKey(psiModule) ||
         fcsProjectProvider.GetReferencedModule(psiModule).IsSome
 
-    let mutable invalidateAll = false
+    let mutable invalidateAllReason = None
 
     let dirtyModules = HashSet()
 
     // todo: use short names?
     let dirtyTypesInModules = OneToSetMap<IPsiModule, string>()
+
+    let invalidationsSinceLastTestDump = Queue()
+
+    let mutable recordInvalidations = false
+
+    let recordInvalidation invalidation =
+        if recordInvalidations then
+            invalidationsSinceLastTestDump.Enqueue(invalidation)
 
     let recordReader path reader =
         assemblyReadersByPath[path] <- reader
@@ -191,6 +199,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             assemblyReadersByPath.TryRemove(moduleReader.Path) |> ignore
             assemblyReadersByModule.TryRemove(psiModule) |> ignore
 
+            recordInvalidation psiModule.DisplayName
+
         for referencingModule in getReferencingModules psiModule do
             removeModule referencingModule
             moduleInvalidated.Fire(referencingModule)
@@ -243,14 +253,18 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         logger.Trace("Invalidate dirty: start")
 
-        if invalidateAll then
-            invalidateAll <- false
+        invalidateAllReason
+        |> Option.iter (fun reason ->
+            recordInvalidation $"Invalidate all: {reason}"
+
+            invalidateAllReason <- None
             for KeyValue(psiModule, referencedAssembly) in assemblyReadersByModule do
                 match referencedAssembly with
                 | ReferencedAssembly.ProjectOutput(reader, _) ->
                     reader.InvalidateAllTypeDefs()
                     moduleInvalidated.Fire(psiModule)
                 | _ -> ()
+        )
 
         for psiModule in dirtyModules do
             removeModule psiModule
@@ -367,6 +381,11 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                     for typeName in dirtyTypesInModules.GetValuesSafe(psiModule) do
                         builder.AppendLine($"    {typeName}") |> ignore
 
+            if invalidationsSinceLastTestDump.Count > 0 then
+                builder.AppendLine("Invalidations since last dump:") |> ignore
+                while invalidationsSinceLastTestDump.Count > 0 do
+                    builder.AppendLine($"  {invalidationsSinceLastTestDump.Dequeue()}") |> ignore
+
             builder.ToString()
 
         member this.RemoveModule(psiModule) =
@@ -384,24 +403,34 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         member this.IsKnownModule(path: VirtualFileSystemPath) =
             assemblyReadersByPath.ContainsKey(path)
 
-        member this.InvalidateAll() =
+        member this.InvalidateAll(reason) =
             use lock = FcsReadWriteLock.WriteCookie.Create()
-            invalidateAll <- true
+            invalidateAllReason <- Some reason
 
         member this.HasDirtyTypes =
             use lock = FcsReadWriteLock.ReadCookie.Create()
-            not (dirtyTypesInModules.IsEmpty())
+            invalidateAllReason.IsSome || not (dirtyTypesInModules.IsEmpty())
 
         member this.Logger = logger
 
+        member this.RecordInvalidations with set value =
+            recordInvalidations <- value
+
+        member this.MarkTypesDirty(psiModule) =
+            if not (isKnownModule psiModule) then () else
+            dirtyTypesInModules.Add(psiModule, "") |> ignore 
+
 
 [<SolutionComponent>]
-type AssemblyReaderPsiCache(shim: IFcsAssemblyReaderShim, lifetime, locks, persistentIndexManager) =
-    inherit SimpleICache<obj>(lifetime, locks, persistentIndexManager, null)
-
-    override this.Build(_, _) = null
-
-    // todo: change API, report changed assembly to minimize the readers cache change?
-    override this.OnPsiChange(_, elementType) =
-        if elementType = PsiChangedElementType.CompiledContentsChanged && shim.IsEnabled then
-            shim.InvalidateAll()
+type AssemblyReaderPsiCache(lifetime: Lifetime, psiModules: IPsiModules, changeManager: ChangeManager,
+        shim: IFcsAssemblyReaderShim) as this =
+    do
+        changeManager.RegisterChangeProvider(lifetime, this)
+        changeManager.AddDependency(lifetime, this, psiModules)
+    
+    interface IChangeProvider with
+        member this.Execute(map) =
+            let change = map.GetChange<PsiModuleChange>(psiModules)
+            if isNotNull change && (change.AssemblyChanges.Count > 0 || change.ModuleChanges.Count > 0) then
+                shim.InvalidateAll("Assemblies or modules changed")
+            null

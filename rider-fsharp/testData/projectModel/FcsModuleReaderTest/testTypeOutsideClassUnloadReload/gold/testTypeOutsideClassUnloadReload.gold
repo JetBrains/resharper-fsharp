@@ -2,6 +2,8 @@
 Init
 
 Readers by module: 0
+Invalidations since last dump:
+  Invalidate all: Assemblies or modules changed
 
 ===================
 1. Add reference
@@ -17,6 +19,8 @@ Readers by path count: 1
 Dependencies to referencing modules:
   CSharpProject
     FSharpProject
+Invalidations since last dump:
+  Invalidate all: Assemblies or modules changed
 
 ===================
 3. Type inside C# file

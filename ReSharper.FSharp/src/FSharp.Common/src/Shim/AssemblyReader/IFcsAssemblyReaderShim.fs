@@ -58,7 +58,9 @@ type IFcsAssemblyReaderShim =
     /// Removes reader for the module if present, another reader is going to be created for it
     abstract InvalidateModule: psiModule: IPsiModule -> unit
 
-    abstract InvalidateAll: unit -> unit
+    abstract InvalidateAll: reason: string -> unit
+
+    abstract MarkTypesDirty: IPsiModule -> unit
 
     /// Clears dirty type defs, updating reader timestamps if needed
     abstract InvalidateDirty: unit -> unit
@@ -69,3 +71,4 @@ type IFcsAssemblyReaderShim =
     abstract RemoveModule: psiModule: IPsiModule -> unit
 
     abstract TestDump: string
+    abstract RecordInvalidations: bool with set

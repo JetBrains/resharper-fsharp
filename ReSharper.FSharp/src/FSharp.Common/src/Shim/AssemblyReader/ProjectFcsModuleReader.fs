@@ -96,6 +96,16 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mutable currentTypeName: IClrTypeName = null
     let mutable currentTypeUnresolvedUsedNames: ISet<string> = null
 
+    let readData f =
+        FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun _ ->
+            use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
+
+            if not (psiModule.GetPsiServices().CachesState.IsIdle.Value) then
+                shim.MarkTypesDirty(psiModule)
+
+            f ()
+        )
+
     let isDll (project: IProject) (targetFrameworkId: TargetFrameworkId) =
         let projectProperties = project.ProjectProperties
         match projectProperties.ActiveConfigurations.TryGetConfiguration(targetFrameworkId) with
@@ -839,9 +849,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let usingTypeElement (typeName: IClrTypeName) defaultValue f =
         let mutable result = Unchecked.defaultof<_>
-        FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun _ ->
-            use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
-
+        readData (fun _ ->
             let typeElement = symbolScope.GetTypeElementByCLRName(typeName)
             if isNull typeElement then
                 result <- defaultValue else
@@ -1096,8 +1104,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         let mutable isUpToDate = true
 
-        use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
-
         for KeyValue(clrTypeName, fcsTypeDef) in List.ofSeq typeDefs do
             Interruption.Current.CheckAndThrow()
 
@@ -1109,6 +1115,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
             upToDateChecked.Add(clrTypeName) |> ignore
 
+        isDirty <- false
         isUpToDate
 
     member this.CreateTypeDef(clrTypeName: IClrTypeName) =
@@ -1121,9 +1128,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         currentTypeName <- clrTypeName
         currentTypeUnresolvedUsedNames <- HashSet()
 
-        FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun _ ->
-            use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
-
+        readData (fun _ ->
             match symbolScope.GetTypeElementByCLRName(clrTypeName) with
             | null ->
                 // The type doesn't exist in the module anymore.
@@ -1182,9 +1187,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | Some(moduleDef) -> moduleDef
             | None ->
 
-            FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun _ ->
-                use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
-
+            readData (fun _ ->
                 let project = psiModule.ContainingProjectModule :?> IProject
                 let moduleName = project.Name
                 let assemblyName = project.GetOutputAssemblyName(psiModule.TargetFrameworkId)

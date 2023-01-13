@@ -7,6 +7,8 @@ Readers by module: 0
 1. Open F# file
 
 Readers by module: 0
+Invalidations since last dump:
+  Invalidate all: Assemblies or modules changed
 
 ===================
 2. Add reference
@@ -22,6 +24,8 @@ Readers by path count: 1
 Dependencies to referencing modules:
   CSharpProject
     FSharpProject
+Invalidations since last dump:
+  Invalidate all: Assemblies or modules changed
 
 ===================
 4. Unload C# project
@@ -39,6 +43,8 @@ Dirty types in readers:
 5. Open F# file
 
 Readers by module: 0
+Invalidations since last dump:
+  Invalidate all: Assemblies or modules changed
 
 ===================
 6. Reload C# project
@@ -54,4 +60,6 @@ Readers by path count: 1
 Dependencies to referencing modules:
   CSharpProject
     FSharpProject
+Invalidations since last dump:
+  Invalidate all: Assemblies or modules changed
 

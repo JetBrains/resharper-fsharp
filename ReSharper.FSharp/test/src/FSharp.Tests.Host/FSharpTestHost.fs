@@ -30,7 +30,10 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
         psiModules: IPsiModules, projectModelViewHost: ProjectModelViewHost) =
 
     let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
-    
+
+    do
+        assemblyReaderShim.RecordInvalidations <- true
+
     let dumpSingleProjectMapping _ =
         let projectMapping =
             itemsContainer.ProjectMappings.Values.SingleOrDefault().NotNull("Expected single project mapping.")
@@ -119,4 +122,6 @@ Actions: {notification.AdditionalCommands
         fsTestHost.DumpFantomasRunOptions.Set(dumpFantomasRunOptions)
         fsTestHost.TerminateFantomasHost.Set(terminateFantomasHost)
         dotnetToolsTracker.DotNetToolCache.Change.Advise(lifetime, fun _ -> fsTestHost.DotnetToolInvalidated())
-        notifications.AllNotifications.AddRemove.Property.Change.Advise(lifetime, fun x -> if x.HasNew && isNotNull x.New then fsTestHost.FantomasNotificationFired(formatNotifications x.New.Value))
+
+        notifications.AllNotifications.AddRemove.Property.Change.Advise(lifetime, fun x ->
+            if x.HasNew && isNotNull x.New then fsTestHost.FantomasNotificationFired(formatNotifications x.New.Value))
