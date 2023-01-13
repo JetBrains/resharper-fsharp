@@ -102,6 +102,8 @@ type AssemblyReaderTest() =
     [<Test>] member x.``Method - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Ctor 02 - Param array``() = x.DoNamedTest()
     [<Test>] member x.``Method - Ctor 03 - Optional param``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Duplicate 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Duplicate 02 - Visibility``() = x.DoNamedTest()
     [<Test>] member x.``Method - Explicit impl 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Explicit impl 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Method - Extension 01``() = x.DoNamedTest()
@@ -110,6 +112,7 @@ type AssemblyReaderTest() =
     [<Test; Explicit "Can't reference attribute in net451">]
     member x.``Method - Param 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Property - Duplicate 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Explicit impl 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 02 - Accessibility``() = x.DoNamedTest()

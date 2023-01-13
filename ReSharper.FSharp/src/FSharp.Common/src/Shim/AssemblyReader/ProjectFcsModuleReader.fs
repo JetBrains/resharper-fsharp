@@ -17,6 +17,7 @@ open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.CSharp.Impl
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Impl.Special
 open JetBrains.ReSharper.Psi.Impl.Types
@@ -389,21 +390,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         $"{name}<{typeArgs}>"
 
-    let mkOverridableMemberName (typeMember: ITypeMember) =
-        let overridableMember = typeMember.As<IOverridableMember>()
-        if isNotNull overridableMember && overridableMember.IsExplicitImplementation then
-            overridableMember.ExplicitImplementations
-            |> Seq.tryHead
-            |> Option.map (fun impl ->
-                let memberName = impl.MemberName
-                match mkExplicitImplTypeName impl.DeclaringType with
-                | "" -> memberName
-                | typeName -> $"{typeName}.{memberName}"
-            )
-            |> Option.defaultWith (fun _ -> typeMember.ShortName) 
-        else
-            typeMember.ShortName
-
     let mkMethodRef (method: IFunction): ILMethodRef =
         let typeRef =
             let typeElement =
@@ -414,7 +400,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             mkTypeRef typeElement
 
         let callingConv = mkCallingConv method
-        let name = mkOverridableMemberName method
+        let name = method.ShortName
 
         let typeParamsCount =
             match method with
@@ -753,7 +739,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         mkType returnType |> mkILReturn
 
     let mkMethodDef (method: IFunction): ILMethodDef =
-        let name = mkOverridableMemberName method
+        let name = method.ShortName
         let methodAttrs = mkMethodAttributes method
         let callingConv = mkCallingConv method
         let parameters = mkParams method
@@ -810,7 +796,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let mkEventDef (event: IEvent): ILEventDef =
         let eventType = mkEventDefType event
-        let name = mkOverridableMemberName event
+        let name = event.ShortName
         let attributes = enum 0 // Not used by FCS.
         let addMethod = mkEventAddMethod event
         let removeMethod = mkEventRemoveMethod event
@@ -835,7 +821,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | getter -> Some(mkMethodRef getter)
 
     let mkPropertyDef (property: IProperty): ILPropertyDef =
-        let name = mkOverridableMemberName property
+        let name = property.ShortName
         let attrs = enum 0 // todo
         let callConv = mkCallingThisConv property
         let propertyType = mkType property.Type
@@ -884,10 +870,19 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
             usingTypeElement typeName defaultValue (createTable members))
 
+    let isExplicitImpl (typeMember: ITypeMember) =
+        let overridableMember = typeMember.As<IOverridableMember>()
+        isNotNull overridableMember && overridableMember.IsExplicitImplementation
+
+    let getSignature (parametersOwner: IParametersOwner) =
+        parametersOwner.GetSignature(parametersOwner.IdSubstitution)
+
     let mkMethods (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
         let methods =
+            let seenMethods = HashSet(CSharpInvocableSignatureComparer.Overload)
             [| for method in typeElement.GetMembers().OfType<IFunction>() do
-                 yield mkMethodDef method |]
+                if not (isExplicitImpl method) && seenMethods.Add(getSignature method) then
+                    yield mkMethodDef method |]
 
         table.Methods <- methods
         methods
@@ -911,9 +906,11 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         fields
 
     let mkProperties (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
-        let properties = 
+        let properties =
+            let seenProperties = HashSet(CSharpInvocableSignatureComparer.Overload)
             [ for property in typeElement.Properties do
-                yield mkPropertyDef property ]
+                if not (isExplicitImpl property) && seenProperties.Add(getSignature property) then
+                    yield mkPropertyDef property ]
 
         table.Properties <- properties
         properties
@@ -1182,6 +1179,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
     interface IProjectFcsModuleReader with
+        // todo: concurrent access
         member this.ILModuleDef =
             match moduleDef with
             | Some(moduleDef) -> moduleDef

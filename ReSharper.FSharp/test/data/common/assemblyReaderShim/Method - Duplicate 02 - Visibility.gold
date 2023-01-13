@@ -1,0 +1,7 @@
+﻿module Module
+
+let m1: unit = C.M1()
+let m2: unit = C.|M2|(0)()
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: The type 'C' does not define the field, constructor or member 'M2'.

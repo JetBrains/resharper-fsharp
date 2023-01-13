@@ -1,0 +1,10 @@
+module Module
+
+let u1: unit = C.M1()
+let u2: unit = C.M2<int>()
+
+let i3: unit = C.M3<int>()
+let u3: unit = C.M3()
+
+let u4: unit = C.M4()
+let i4: int = C.M4<int>()
