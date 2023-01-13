@@ -30,6 +30,10 @@ class FSharpHoverDocTest : DocumentationTestBase() {
     fun `test empty xml doc`() = doTest("Program.fs", "Program.fs")
 
     @Test
+    @TestEnvironment(solution = "ConsoleAppTwoTargetFrameworks")
+    fun `test multiple frameworks`() = doTest("Program.fs", "Program.fs")
+
+    @Test
     @TestEnvironment(
         solution = "SwaggerProviderCSharp",
         toolset = ToolsetVersion.TOOLSET_17_CORE,
