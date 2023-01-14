@@ -14,10 +14,10 @@ type FSharpLexerTest() =
     [<Test>] member x.``Empty file 02 - New lines``() = x.DoNamedTest()
 
     [<Test>] member x.``Literals 01 - simple numbers``() = x.DoNamedTest()
-    [<Test>] member x.``Literals 02 - complex numbers``() = x.DoNamedTest()
     [<Test>] member x.``Literals 02 - numbers with suffices``() = x.DoNamedTest()
     [<Test>] member x.``Literals 03 - digits``() = x.DoNamedTest()
     [<Test>] member x.``Literals 04 - escape characters``() = x.DoNamedTest()
+    [<Test>] member x.``Literals 05 - numbers with separators``() = x.DoNamedTest()
 
     [<Test>] member x.``Strings - Byte array 01``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Byte array 02 - Verbatim``() = x.DoNamedTest()

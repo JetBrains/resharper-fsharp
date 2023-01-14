@@ -10,7 +10,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
     @Test
     fun testDigit() {
-        doTest("1234567890 1234567890u 1234567890l 0XABCDEFy 0x001100010s 3.0F 0x0000000000000000LF 0x0000_0000_0000_0000LF 34742626263193832612536171N 0o7 0b1 0b1_1 1F",
+        doTest("1234567890 1234567890u 1234567890l 0XABCDEFy 0x001100010s 3.0F 0x0000000000000000LF 0x0000_0000_0000_0000LF 34742626263193832612536171N 0o7 0b1 0o1___1 1F",
                 """
                 |INT32 ('1234567890')
                 |WHITESPACE (' ')
@@ -34,7 +34,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
                 |WHITESPACE (' ')
                 |INT32 ('0b1')
                 |WHITESPACE (' ')
-                |INT32 ('0b1_1')
+                |INT32 ('0o1___1')
                 |WHITESPACE (' ')
                 |IEEE32 ('1F')
                 """.trimMargin()

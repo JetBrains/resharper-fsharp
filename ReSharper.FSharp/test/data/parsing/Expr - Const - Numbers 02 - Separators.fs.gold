@@ -4,6 +4,6 @@ IFSharpImplFile
     IExpressionStatement
       IChameleonExpression
         ILiteralExpr
-          FSharpToken(type:INT32, text:0x1_2_3)
+          FSharpToken(type:INT32, text:0x1_2__3___4)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

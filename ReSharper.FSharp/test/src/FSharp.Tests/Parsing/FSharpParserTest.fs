@@ -194,7 +194,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Tuple 03 - Struct``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Const - Numbers 01``() = x.DoNamedTest()
-    [<Test>] member x.``Expr - Const - Numbers 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Numbers 02 - Separators``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const - String 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const - Unit 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const - Unit 02 - Parens``() = x.DoNamedTest()
