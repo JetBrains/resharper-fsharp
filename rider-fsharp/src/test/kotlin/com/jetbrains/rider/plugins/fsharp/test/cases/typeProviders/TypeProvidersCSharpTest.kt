@@ -65,7 +65,7 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
 
             // change method call from "ApiCoursesGet" to "ApiCoursesGet1"
             typeFromOffset("1", 195)
-            waitForDaemon()
+            waitForNextDaemon()
 
             executeWithGold(File(testGoldFile.path + "_after")) {
                 dumpSevereHighlighters(it)
