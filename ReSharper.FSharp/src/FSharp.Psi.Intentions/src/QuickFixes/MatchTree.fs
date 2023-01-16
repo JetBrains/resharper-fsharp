@@ -19,6 +19,7 @@ type MatchType =
     | Bool of fcsType: FSharpType
     | Enum of enumEntity: FSharpEntity * fields: (FSharpField * ConstantValue) array
     | Tuple of isStruct: bool * types: MatchType array
+    | Record of record: FcsEntityInstance
     | Union of union: FcsEntityInstance
     | UnionCase of case: FSharpUnionCase * union: FcsEntityInstance
     | List of fcsType: FSharpType
@@ -30,6 +31,7 @@ type MatchType =
         | Bool fcsType
         | List fcsType
         | Other fcsType -> Some fcsType
+        | Record fcsEntityInstance
         | Union fcsEntityInstance -> Some fcsEntityInstance.FcsType
         | Enum(fcsEntity, _) -> Some(fcsEntity.AsType())
         | _ -> None
@@ -37,19 +39,20 @@ type MatchType =
 
 [<RequireQualifiedAccess>]
 type MatchTest =
-    | Discard
+    | Discard of skipInBind: bool
     | Named of name: string option
     | Value of ConstantValue
     | Tuple of isStruct: bool
     | TupleItem of index: int
     | Union of index: int
     | UnionCase
-    | UnionCaseField of index: int
+    | Field of index: int * name: string
     | List of isEmpty: bool
     | And
     | Or
     | Error
     | ActivePatternCase of index: int * group: FSharpActivePatternGroup
+    | Record
 
 and MatchValue =
     { Type: MatchType
@@ -67,7 +70,7 @@ and Pattern = MatchTest * MatchNode list
 
 [<RequireQualifiedAccess>]
 type Deconstruction =
-    | Discard
+    | Discard of skipInBind: bool
     | Named of name: string
     | ActivePattern of activePattern: FSharpActivePatternGroup
     | InnerPatterns
@@ -112,6 +115,7 @@ module MatchType =
         | _ ->
 
         if fcsEntity.IsFSharpUnion then MatchType.Union(FcsEntityInstance.create fcsType) else
+        if fcsEntity.IsFSharpRecord then MatchType.Record(FcsEntityInstance.create fcsType) else
 
         MatchType.Other fcsType
 
@@ -134,7 +138,7 @@ module MatchType =
 module MatchTest =
     let rec matches (node: MatchNode) (existingNode: MatchNode) : bool =
         match existingNode.Pattern, node.Pattern with
-        | (MatchTest.Discard, _), _ -> true
+        | (MatchTest.Discard _, _), _ -> true
         | (MatchTest.Named _, _), _ -> true
         | (MatchTest.Value existingValue, _), (MatchTest.Value value, _) -> existingValue.Equals(value)
 
@@ -148,12 +152,12 @@ module MatchTest =
             existingIndex = index &&
             matches node2 node1
 
-        | (MatchTest.UnionCase, [{ Pattern = MatchTest.Discard, _ }]), (MatchTest.UnionCase, _) -> true
+        | (MatchTest.UnionCase, [{ Pattern = MatchTest.Discard _, _ }]), (MatchTest.UnionCase, _) -> true
 
         | (MatchTest.UnionCase, fields1), (MatchTest.UnionCase, fields2) ->
             List.forall2 matches fields2 fields1
 
-        | (MatchTest.UnionCaseField _, [node1]), (MatchTest.UnionCaseField _, [node2]) ->
+        | (MatchTest.Field _, [node1]), (MatchTest.Field _, [node2]) ->
             matches node2 node1
 
         // todo: add test with different lengths
@@ -165,11 +169,28 @@ module MatchTest =
 
         | (MatchTest.Or, nodes), _ -> List.exists (matches node) nodes
 
+        | (MatchTest.Record, fields1), (MatchTest.Record, fields2) ->
+            List.forall2 matches fields2 fields1
+
         | _ -> false
 
     let rec initialPattern (deconstructions: Deconstructions) (context: ITreeNode) (value: MatchValue) =
+        let makeInitialFieldPatterns substitution path (fields: FSharpField seq) =
+            fields
+            |> Seq.mapi (fun i field ->
+                let test = MatchTest.Field(i, field.DisplayNameCore)
+                let path = test :: path
+
+                let fieldFcsType = field.FieldType.Instantiate(substitution)
+                let fieldType = MatchType.ofFcsType context fieldFcsType
+                let itemValue = { Type = fieldType; Path = path }
+                let matchPattern = initialPattern deconstructions context itemValue
+                MatchNode.Create(itemValue, matchPattern)
+            )
+            |> List.ofSeq
+        
         match deconstructions.TryGetValue(value.Path) with
-        | true, Deconstruction.Discard -> MatchTest.Discard, []
+        | true, Deconstruction.Discard skipInBind -> MatchTest.Discard skipInBind, []
         | true, Deconstruction.Named name -> MatchTest.Named(Some name), []
         | true, Deconstruction.ActivePattern group -> MatchTest.ActivePatternCase(0, group), []
 
@@ -197,37 +218,28 @@ module MatchTest =
                 let unionCase = unionEntityInstance.Entity.UnionCases[0]
 
                 let test = MatchTest.Union 0
-                let path = test :: value.Path
+                let unionPath = test :: value.Path
                 let caseMatchType = MatchType.UnionCase(unionCase, unionEntityInstance)
-                let caseValue = { Type = caseMatchType; Path = path }
+                let caseValue = { Type = caseMatchType; Path = unionPath }
 
                 let casePattern =
-                    if not unionCase.HasFields then MatchTest.Discard, [] else
+                    if not unionCase.HasFields then MatchTest.Discard true, [] else
                     initialPattern deconstructions context caseValue
 
-                MatchTest.Union 0, [MatchNode.Create(caseValue, casePattern)]
-
-            | MatchType.UnionCase(unionCase, unionEntityInstance) ->
-                let fieldNodes =
-                    unionCase.Fields
-                    |> Seq.mapi (fun i field ->
-                        let test = MatchTest.UnionCaseField i
-                        let path = test :: value.Path
-
-                        let fieldFcsType = field.FieldType.Instantiate(unionEntityInstance.Substitution)
-                        let fieldType = MatchType.ofFcsType context fieldFcsType
-                        let itemValue = { Type = fieldType; Path = path }
-                        let matchPattern = initialPattern deconstructions context itemValue
-                        MatchNode.Create(itemValue, matchPattern)
-                    )
-                    |> List.ofSeq
-
-                MatchTest.UnionCase, fieldNodes
+                test, [MatchNode.Create(caseValue, casePattern)]
 
             | MatchType.List _ ->
                 MatchTest.List true, []
 
-            | _ -> failwith "todo"
+            | MatchType.Record recordInstance ->
+                let test = MatchTest.Record
+                let recordPath = test :: value.Path
+                let fields = recordInstance.Entity.FSharpFields
+                let fieldNodes = makeInitialFieldPatterns recordInstance.Substitution recordPath fields
+                test, fieldNodes
+
+            | _ ->
+                MatchTest.Named None, []
 
         | _ ->
             match value.Type with
@@ -241,7 +253,7 @@ module MatchTest =
                 let fieldNodes =
                     fields
                     |> Seq.mapi (fun i field ->
-                        let fieldTest = MatchTest.UnionCaseField i
+                        let fieldTest = MatchTest.Field(i, field.DisplayNameCore)
                         let fieldPath = fieldTest :: casePath
                         let fieldFcsType = field.FieldType.Instantiate(unionEntityInstance.Substitution)
                         let fieldType = MatchType.ofFcsType context fieldFcsType
@@ -345,6 +357,29 @@ module MatchNode =
         | MatchTest.List true, _ ->
             factory.CreatePattern("[]", false) |> replaceWithPattern oldPat |> ignore
 
+        | MatchTest.Record, nodes ->
+            let fieldNodes = 
+                nodes
+                |> List.filter (fun node ->
+                    match node.Pattern with
+                    | MatchTest.Discard true, _ -> false
+                    | _ -> true)
+
+            let recordFieldsText =
+                fieldNodes
+                |> List.map (fun node ->
+                    match node.Value.Path with
+                    | MatchTest.Field(_, name) :: _ -> $"{name} = _"
+                    | _ -> failwith $"Unexpected node: {node}"
+                )
+                |> String.concat "; "
+
+            let recordPat = factory.CreatePattern($"{{ {recordFieldsText} }}", false)
+            let recordPat = replaceWithPattern oldPat recordPat :?> IRecordPat
+            let fieldPats = recordPat.FieldPatterns |> Seq.map (fun p -> p.As<IFieldPat>().Pattern)
+            
+            Seq.iter2 (bind usedNames) fieldPats fieldNodes
+
         | _ -> ()
 
     /// Return true if successfully incremented the value
@@ -392,7 +427,7 @@ module MatchNode =
                 )
                 true
 
-        | MatchTest.Discard, _
+        | MatchTest.Discard _, _
         | MatchTest.Named _, _ ->
             false
 
@@ -425,18 +460,26 @@ module MatchNode =
             | _ ->
                 false
 
-        | MatchTest.UnionCase, nodes ->
+        | MatchTest.UnionCase, nodes
+        | MatchTest.Record, nodes ->
             match List.tryFindIndexBack (increment deconstructions context) nodes with
             | None -> false
             | Some index ->
-                nodes
-                |> List.skip (index + 1)
-                |> List.iter (fun node ->
-                    node.Pattern <- MatchTest.initialPattern deconstructions context node.Value
-                )
-                true
+                match MatchTest.initialPattern deconstructions context node.Value with
+                | MatchTest.UnionCase, newNodes
+                | MatchTest.Record, newNodes ->
+                    (nodes, newNodes)
+                    ||> List.zip
+                    |> List.skip (index + 1)
+                    |> List.iter (fun (node, newNode) ->
+                        node.Pattern <- newNode.Pattern
+                    )
+                    true
 
-        | MatchTest.UnionCaseField _, [node] ->
+                | _ ->
+                    false
+
+        | MatchTest.Field _, [node] ->
             increment deconstructions context node
 
         | MatchTest.List isEmpty, _ ->
@@ -463,7 +506,7 @@ let getMatchExprMatchType (matchExpr: IMatchExpr) : MatchType =
         let fcsType = expr.TryGetFcsType()
         MatchType.ofFcsType matchExpr fcsType
 
-let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (pat: IFSharpPattern) discardOnError =
+let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (pat: IFSharpPattern) skipOnNull =
     let addDeconstruction path deconstruction =
         if not (deconstructions.ContainsKey(path)) then
             deconstructions[path] <- deconstruction
@@ -485,10 +528,40 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
             let itemPath = testCtor i :: parentPath
             addDeconstruction itemPath Deconstruction.InnerPatterns
 
+    let makeFieldNode discardOnError parentPath substitution index (field: FSharpField) pat =
+        let test = MatchTest.Field(index, field.DisplayNameCore)
+        let path = test :: parentPath
+        let fieldFcsType = field.FieldType.Instantiate(substitution)
+        let fieldType = MatchType.ofFcsType pat fieldFcsType
+        let itemValue = { Type = fieldType; Path = path }
+        let matchPattern = getMatchPattern deconstructions itemValue pat discardOnError
+        MatchNode.Create(itemValue, matchPattern)
+
+    let makeNamedFieldPatternNodes parentPath substitution (fields: IList<FSharpField>) (fieldPatterns: IFieldPat seq) =
+        let matchedPatterns = Array.create fields.Count null 
+        fieldPatterns
+        |> Seq.iter (fun pat ->
+            match pat.Reference.GetFcsSymbol() with
+            | :? FSharpField as fcsField ->
+                fields
+                |> Seq.tryFindIndex (fun f -> f.XmlDocSig = fcsField.XmlDocSig)
+                |> Option.iter (fun index ->
+                    if isNull matchedPatterns[index] then
+                        matchedPatterns[index] <- pat.Pattern)
+            | _ -> ()
+        )
+
+        let fieldNodes = 
+            (fields, matchedPatterns)
+            ||> Seq.mapi2 (makeFieldNode true parentPath substitution)
+            |> List.ofSeq
+
+        fieldNodes
+
     match pat.IgnoreInnerParens(), value.Type with
     | :? IWildPat, _ ->
-        addDeconstruction value.Path Deconstruction.Discard
-        MatchTest.Discard, []
+        addDeconstruction value.Path (Deconstruction.Discard false)
+        MatchTest.Discard false, []
 
     | :? ITuplePat as tuplePat, MatchType.Tuple(_, types) ->
         addDeconstruction value.Path Deconstruction.InnerPatterns
@@ -553,7 +626,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
                     let caseMatchType = MatchType.UnionCase(unionCase, unionEntityInstance)
                     let caseValue = { Type = caseMatchType; Path = path }
 
-                    MatchTest.Union index, [MatchNode.Create(caseValue, (MatchTest.Discard, []))]
+                    MatchTest.Union index, [MatchNode.Create(caseValue, (MatchTest.Discard false, []))]
 
                 | _ ->
                     MatchTest.Error, []
@@ -576,25 +649,17 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
         let caseTest = MatchTest.UnionCase
         let casePath = caseTest :: caseValue.Path
 
-        let makeFieldNode discardOnError index (field: FSharpField) pat =
-            let test = MatchTest.UnionCaseField index
-            let path = test :: casePath
-            let fieldFcsType = field.FieldType.Instantiate(unionEntityInstance.Substitution)
-            let fieldType = MatchType.ofFcsType pat fieldFcsType
-            let itemValue = { Type = fieldType; Path = path }
-            let matchPattern = getMatchPattern deconstructions itemValue pat discardOnError
-            MatchNode.Create(itemValue, matchPattern)
-
+        // todo: matching over case with no fields
         let makeSingleFieldNode pat =
             addDeconstruction casePath Deconstruction.InnerPatterns
-            let fieldNode = makeFieldNode false 0 unionCase.Fields[0] pat
+            let fieldNode = makeFieldNode false casePath unionEntityInstance.Substitution 0 unionCase.Fields[0] pat
 
             if unionCase.Fields.Count <> 1 then MatchTest.Error, [] else
             MatchTest.UnionCase, [fieldNode]
 
         let innerPatterns =
             match paramOwnerPat.Parameters.SingleItem with
-            | :? IWildPat -> MatchTest.Discard, []
+            | :? IWildPat -> MatchTest.Discard false, []
 
             | :? IParenPat as parenPat ->
                 match parenPat.Pattern with
@@ -606,17 +671,17 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
                     if innerPatterns.Count <> caseFields.Count then
                         let n = min innerPatterns.Count caseFields.Count
                         (Seq.take n caseFields, Seq.take n innerPatterns)
-                        ||> Seq.mapi2 (makeFieldNode false)
+                        ||> Seq.mapi2 (makeFieldNode false casePath unionEntityInstance.Substitution)
                         |> List.ofSeq
                         |> ignore
                         MatchTest.Error, [] else
 
-                    let fieldNodes = Seq.mapi2 (makeFieldNode false) caseFields innerPatterns |> List.ofSeq
+                    let fieldNodes = Seq.mapi2 (makeFieldNode false casePath unionEntityInstance.Substitution) caseFields innerPatterns |> List.ofSeq
                     caseTest, fieldNodes
 
                 | pat -> makeSingleFieldNode pat
 
-            | :? INamedPatternsListPat as namedPatListPat ->
+            | :? INamedUnionCaseFieldsPat as namedPatListPat ->
                 addDeconstruction casePath Deconstruction.InnerPatterns
 
                 let fieldPatterns = Array.create unionCase.Fields.Count null 
@@ -634,7 +699,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
 
                 let fieldNodes = 
                     unionCase.Fields
-                    |> Seq.mapi (fun i fcsField -> makeFieldNode true i fcsField fieldPatterns[i])
+                    |> Seq.mapi (fun i fcsField -> makeFieldNode true casePath unionEntityInstance.Substitution i fcsField fieldPatterns[i])
                     |> List.ofSeq
 
                 MatchTest.UnionCase, fieldNodes
@@ -667,6 +732,27 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
             |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat false))
             |> List.ofSeq
         MatchTest.Or, nodes
+
+    | :? IRecordPat as recordPat, MatchType.Record recordEntityInstance ->
+        addDeconstruction value.Path Deconstruction.InnerPatterns
+
+        let test = MatchTest.Record
+        let recordPath = test :: value.Path
+
+        addDeconstruction recordPath Deconstruction.InnerPatterns
+
+        let fields = recordEntityInstance.Entity.FSharpFields
+        let substitution = recordEntityInstance.Substitution
+
+        let fieldNodes = makeNamedFieldPatternNodes recordPath substitution fields recordPat.FieldPatterns
+        test, fieldNodes
+
+    | :? IFieldPat as fieldPat, _ ->
+        getMatchPattern deconstructions value fieldPat.Pattern skipOnNull
+
+    | null, _ when skipOnNull ->
+        addDeconstruction value.Path (Deconstruction.Discard true)
+        MatchTest.Discard true, []
 
     | _ -> MatchTest.Error, []
 

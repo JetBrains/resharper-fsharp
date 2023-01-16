@@ -31,6 +31,9 @@ type AddMissingMatchClausesFixTest() =
 
     [<Test>] member x.``Or 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Tuple - Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Union 02 - Escaped name``() = x.DoNamedTest()
 
@@ -63,4 +66,4 @@ type AddMissingMatchClausesFixTest() =
     [<Test>] member x.``Union 16``() = x.DoNamedTest()
     [<Test>] member x.``Union 17``() = x.DoNamedTest()
     [<Test>] member x.``Union 18``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Union 19``() = x.DoNamedTest()
+    [<Test>] member x.``Union 19``() = x.DoNamedTest()

@@ -2,10 +2,10 @@
 
 type U =
     | A
-    | B of bool * bool * bool
+    | B of bool * bool * bool * named: bool
 
 match A{caret} with
 | B(_, true) -> ()
 | A -> failwith "todo"
-| B(_, true, b) -> failwith "todo"
-| B(_, false, b) -> failwith "todo"
+| B(_, true, b, named) -> failwith "todo"
+| B(_, false, b, named) -> failwith "todo"
