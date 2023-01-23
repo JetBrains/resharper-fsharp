@@ -125,6 +125,29 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             scriptsFromPaths[path] <- psiModule
             addPsiModule psiModule
 
+    and updateReferences path newReferences added (removed: _ list) changeBuilder =
+        use cookie = WriteLockCookie.Create()
+        scriptsReferences[path] <- newReferences
+
+        for filePath in newReferences.Files do
+            createPsiModuleForPath filePath changeBuilder
+
+        for psiModule in getPsiModulesForPath path do
+            for path in added do psiModule.AddReference(path)
+            for path in removed do psiModule.RemoveReference(path)
+            if not scriptOptionsProvider.SyncUpdate then
+                changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
+                scriptPsiModuleInvalidated.Fire(psiModule)
+
+        solution.GetComponent<IDaemon>().Invalidate()
+
+        if not scriptOptionsProvider.SyncUpdate then
+            changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance)
+
+        if not removed.IsEmpty then
+            locks.QueueReadLock(lifetime, "AssemblyGC after removing F# script reference", fun _ ->
+                solution.GetComponent<AssemblyGC>().ForceGC())
+
     and queueUpdateReferences (path: VirtualFileSystemPath) (newOptions: FSharpProjectOptions) =
         locks.QueueReadLock(lifetime, "Request new F# script references", fun _ ->
             let oldReferences =
@@ -152,25 +175,9 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
                     Interruption.Current.CheckAndThrow()
                     locks.ExecuteOrQueue(lifetime, "Update F# script references", fun _ ->
-                        use cookie = WriteLockCookie.Create()
                         let changeBuilder = PsiModuleChangeBuilder()
-                        scriptsReferences[path] <- newReferences
-
-                        for filePath in newReferences.Files do
-                            createPsiModuleForPath filePath changeBuilder
-
-                        for psiModule in getPsiModulesForPath path do
-                            for path in added do psiModule.AddReference(path)
-                            for path in removed do psiModule.RemoveReference(path)
-                            changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
-                            scriptPsiModuleInvalidated.Fire(psiModule)
-                            solution.GetComponent<IDaemon>().Invalidate()
-
-                        changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance)
-
-                        if removed.IsEmpty then () else
-                        locks.QueueReadLock(lifetime, "AssemblyGC after removing F# script reference", fun _ ->
-                            solution.GetComponent<AssemblyGC>().ForceGC()))
+                        updateReferences path newReferences added removed changeBuilder
+                    )
 
             ira.FuncCancelled <-
                 // Reschedule again
@@ -180,9 +187,11 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
     do
         changeManager.RegisterChangeProvider(lifetime, this)
-        scriptOptionsProvider.OptionsUpdated.Advise(lifetime, fun (path, options) ->
-            queueUpdateReferences path options
-        )
+
+        if not scriptOptionsProvider.SyncUpdate then
+            scriptOptionsProvider.OptionsUpdated.Advise(lifetime, fun (path, options) ->
+                queueUpdateReferences path options
+            )
 
     member x.CreatePsiModuleForProjectFile(projectFile: IProjectFile, changeBuilder: PsiModuleChangeBuilder,
             [<Out>] resultModule: byref<FSharpScriptPsiModule>) =
@@ -216,6 +225,14 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         scriptsFromProjectFiles.Add(path, psiModule)
         addPsiModule psiModule
         resultModule <- psiModule
+
+        if scriptOptionsProvider.SyncUpdate then
+            scriptOptionsProvider.GetFcsProject(psiModule.SourceFile)
+            |> Option.iter (fun fcsProject ->
+                let references = getScriptReferences path fcsProject.ProjectOptions
+                updateReferences path references references.Assemblies [] changeBuilder 
+            )
+
         true
 
     member x.CreatePsiModuleForPath(path: VirtualFileSystemPath, changeBuilder: PsiModuleChangeBuilder) =
@@ -263,11 +280,11 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         targetFrameworkId
 
     member x.Dump(writer: TextWriter) =
-        writer.WriteLine(sprintf "Scripts from paths:")
+        writer.WriteLine("Scripts from paths:")
         for KeyValue (path, _) in scriptsFromPaths do
             writer.WriteLine("  " + path.ToString())
 
-        writer.WriteLine(sprintf "Scripts from project files:")
+        writer.WriteLine("Scripts from project files:")
         for fsPsiModule in scriptsFromProjectFiles.Values do
             writer.WriteLine("  " + fsPsiModule.SourceFile.ToProjectFile().GetPersistentID())
 
@@ -349,15 +366,15 @@ type FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, moduleId, a
     let psiModules = solution.PsiModules()
 
     let containingModule = FSharpScriptModule(path, solution)
-    let sourceFile = lazy (sourceFileCtor this)
-    let resolveContext = lazy (PsiModuleResolveContext(this, modulesProvider.TargetFrameworkId, null))
+    let sourceFile = lazy sourceFileCtor this
+    let resolveContext = lazy PsiModuleResolveContext(this, modulesProvider.TargetFrameworkId, null)
 
     // There is a separate project handler for each target framework.
     // Each overriden handler provides a psi module and a source file for each script project file.
     // We create at most one psi module for each project file and update list of handlers pointing to it.
     let projectHandlers = List<IProjectPsiModuleHandler>()
 
-    let assemblyCookies = DictionaryEvents<VirtualFileSystemPath, IAssemblyCookie>(lifetime, moduleId)
+    let assemblyCookies = DictionaryEvents<VirtualFileSystemPath, IAssemblyCookie>(moduleId)
 
     do
         assemblyCookies.AddRemove.Advise_Remove(lifetime, fun (AddRemoveArgs (KeyValue (_, assemblyCookie))) ->
