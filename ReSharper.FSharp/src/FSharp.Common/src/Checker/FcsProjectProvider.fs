@@ -306,8 +306,11 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         createFcsProjectWithoutReferences sourceFile.PsiModule
 
-    let isScriptLike file =
-        fsFileService.IsScriptLike(file) || isMiscModule file.PsiModule || isNull (file.GetProject())
+    let isScriptLike (file: IPsiSourceFile) =
+        not file.Properties.ProvidesCodeModel ||
+        fsFileService.IsScriptLike(file) ||
+        isMiscModule file.PsiModule ||
+        isNull (file.GetProject())
 
     let getParsingOptionsForSingleFile ([<NotNull>] sourceFile: IPsiSourceFile) isScript =
         { FSharpParsingOptions.Default with
