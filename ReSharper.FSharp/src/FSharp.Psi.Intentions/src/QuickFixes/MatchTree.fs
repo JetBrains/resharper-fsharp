@@ -41,7 +41,7 @@ type MatchType =
 type MatchTest =
     | Discard of skipInBind: bool
     | Named of name: string option
-    | Value of ConstantValue
+    | Value of value: ConstantValue
     | Tuple of isStruct: bool
     | TupleItem of index: int
     | Union of index: int
@@ -108,6 +108,7 @@ module MatchType =
                 |> Array.ofSeq
             MatchType.Enum(fcsEntity, fieldLiterals) else
 
+        // todo: list
         let entityFqn = fcsEntity.BasicQualifiedName
         match entityFqn with
         | "System.Boolean" -> MatchType.Bool fcsType
@@ -146,6 +147,14 @@ module MatchTest =
             existingIndex = index &&
             existingGroup.Name = group.Name &&
             existingGroup.DeclaringEntity = group.DeclaringEntity
+
+        
+        | (MatchTest.Union existingIndex, [existingCaseNode]), (MatchTest.Union index, []) ->
+            existingIndex = index &&
+
+            match existingCaseNode.Pattern with
+            | MatchTest.Discard _, _ -> true
+            | _ -> false
 
         // todo: add test with different unions
         | (MatchTest.Union existingIndex, [node1]), (MatchTest.Union index, [node2]) ->
@@ -223,8 +232,10 @@ module MatchTest =
                 let caseValue = { Type = caseMatchType; Path = unionPath }
 
                 let casePattern =
-                    if not unionCase.HasFields then MatchTest.Discard true, [] else
-                    initialPattern deconstructions context caseValue
+                    if unionCase.HasFields then
+                        initialPattern deconstructions context caseValue
+                    else
+                        MatchTest.Discard false, []
 
                 test, [MatchNode.Create(caseValue, casePattern)]
 
@@ -245,6 +256,8 @@ module MatchTest =
             match value.Type with
             | MatchType.UnionCase(unionCase, unionEntityInstance) ->
                 let fields = unionCase.Fields
+                if fields.Count = 0 then MatchTest.Discard false, [] else
+
                 let isSingleField = fields.Count = 1
 
                 let caseTest = MatchTest.UnionCase
@@ -382,8 +395,150 @@ module MatchNode =
 
         | _ -> ()
 
+    let rec duplicate (node: MatchNode) : MatchNode =
+        let test, nodes = node.Pattern
+        let nodes = nodes |> List.map duplicate
+
+        let test =
+            match test with
+            | MatchTest.Discard skipInBind -> MatchTest.Discard skipInBind
+            | MatchTest.Named name -> MatchTest.Named name
+            | MatchTest.Value value -> MatchTest.Value value
+            | MatchTest.Tuple isStruct -> MatchTest.Tuple isStruct
+            | MatchTest.TupleItem index -> MatchTest.TupleItem index
+            | MatchTest.Union index -> MatchTest.Union index
+            | MatchTest.UnionCase -> MatchTest.UnionCase
+            | MatchTest.Field(index, name) -> MatchTest.Field(index, name)
+            | MatchTest.List isEmpty -> MatchTest.List isEmpty
+            | MatchTest.And -> MatchTest.And
+            | MatchTest.Or -> MatchTest.Or
+            | MatchTest.Error -> MatchTest.Error
+            | MatchTest.ActivePatternCase(index, group) -> MatchTest.ActivePatternCase(index, group)
+            | MatchTest.Record -> MatchTest.Record
+        
+        let pattern = test, nodes
+        MatchNode.Create(node.Value, pattern)
+
+    
+    let tryRejectDiscardPattern (rejected: List<MatchNode>) wholeNode (node: MatchNode) (context: ITreeNode) =
+        let nodePattern = node.Pattern
+
+        let valueType = node.Value.Type
+
+        let ignores (node: MatchNode) =
+            match fst node.Pattern with
+            | MatchTest.Discard _
+            | MatchTest.Named _ -> true
+            | _ -> false
+
+        let ignoresNestedValues (types: IList<_>) (nodes: MatchNode list) =
+            types.Count = nodes.Length &&
+            nodes |> List.forall ignores
+
+        let allRejected =
+            match valueType, nodePattern with
+            | MatchType.Tuple(_, types), (_, nodes) ->
+                ignoresNestedValues types nodes &&
+                rejected |> Seq.exists (MatchTest.matches wholeNode)
+
+            | MatchType.UnionCase(unionCase, _), (_, nodes) ->
+                let fields = unionCase.Fields
+
+                fields.Count > 0 &&
+                ignoresNestedValues fields nodes &&
+                rejected |> Seq.exists (MatchTest.matches wholeNode)
+
+            | MatchType.Record recordInstance, (MatchTest.Record, nodes) ->
+                let fields = recordInstance.Entity.FSharpFields
+
+                ignoresNestedValues fields nodes &&
+                rejected |> Seq.exists (MatchTest.matches wholeNode)
+
+            | _ ->
+            
+            let tests = 
+                match valueType with
+                | MatchType.Bool _ ->
+                    [ MatchTest.Value(ConstantValue.Bool(true, context.GetPsiModule()))
+                      MatchTest.Value(ConstantValue.Bool(false, context.GetPsiModule())) ]
+                
+                | MatchType.Enum(_, fields) ->
+                    fields
+                    |> Array.map (snd >> MatchTest.Value)
+                    |> Array.toList
+
+                | MatchType.Union unionInstance ->
+                    unionInstance.Entity.UnionCases
+                    |> Seq.mapi (fun i _ -> MatchTest.Union i)
+                    |> Seq.toList
+
+                | _ -> []
+
+            not tests.IsEmpty &&
+            tests
+            |> List.forall (fun test ->
+               node.Pattern <- test, []
+               rejected |> Seq.exists (MatchTest.matches wholeNode) 
+            )
+
+        if allRejected then
+            node.Pattern <- MatchTest.Discard false, []
+
+            let duplicated = duplicate wholeNode
+            rejected.Add(duplicated)
+
+        else
+            node.Pattern <- nodePattern
+
+    let tryRecordRejectedDiscard (rejected: List<MatchNode>) (node: MatchNode) (context: ITreeNode) =
+        // todo: don't duplicate unless there's some last case node
+        let node = duplicate node
+        let wholeNode = node
+
+        let rec loop (node: MatchNode) =
+            match node.Pattern with
+            | MatchTest.Value value, _ ->
+                match node.Value.Type with
+                | MatchType.Bool _ ->
+                    match value.BoolValue with
+                    | false -> tryRejectDiscardPattern rejected wholeNode node context
+                    | _ -> ()
+
+                | MatchType.Enum(_, fields) ->
+                    let index = fields |> Array.findIndex (snd >> (=) value)
+                    if index = fields.Length - 1 then
+                        tryRejectDiscardPattern rejected wholeNode node context
+
+                | _ -> failwith "todo"
+
+            | MatchTest.Tuple _, nodes ->
+                nodes |> List.iter loop
+                tryRejectDiscardPattern rejected wholeNode node context
+
+            | MatchTest.Union caseIndex, [caseNode] ->
+                match node.Value.Type with
+                | MatchType.Union unionInstance ->
+                    loop caseNode
+                    if caseIndex = unionInstance.Entity.UnionCases.Count - 1 then
+                        tryRejectDiscardPattern rejected wholeNode node context
+
+                | _ -> failwith "todo"
+
+            | MatchTest.UnionCase, nodes
+            | MatchTest.Record, nodes ->
+                nodes |> List.iter loop
+                tryRejectDiscardPattern rejected wholeNode node context
+
+            | MatchTest.Field _, [node] ->
+                loop node
+
+            | _ -> ()
+
+        loop node
+
     /// Return true if successfully incremented the value
-    let rec increment (deconstructions: Deconstructions) (context: ITreeNode) (node: MatchNode) =
+    let rec increment (deconstructions: Deconstructions) (context: ITreeNode)
+            (wholeNode: MatchNode) (node: MatchNode) =
         match node.Pattern with
         | MatchTest.Value value, _ ->
             match node.Value.Type with
@@ -415,10 +570,12 @@ module MatchNode =
         | MatchTest.Tuple _, nodes ->
             let changedIndex =
                 nodes
-                |> List.tryFindIndexBack (increment deconstructions context)
+                |> List.tryFindIndexBack (increment deconstructions context wholeNode)
 
             match changedIndex with
-            | None -> false
+            | None ->
+                false
+
             | Some index ->
                 nodes
                 |> List.skip (index + 1)
@@ -439,7 +596,7 @@ module MatchNode =
                 false
 
         | MatchTest.Union index, [caseNode] ->
-            increment deconstructions context caseNode ||
+            increment deconstructions context wholeNode caseNode ||
 
             match node.Value.Type with
             | MatchType.Union unionEntityInstance ->
@@ -452,7 +609,7 @@ module MatchNode =
                     let caseValue = { Type = caseMatchType; Path = unionPath }
                     let casePattern = MatchTest.initialPattern deconstructions context caseValue
 
-                    node.Pattern <- MatchTest.Union(newIndex), [MatchNode.Create(caseValue, casePattern)]
+                    node.Pattern <- unionTest, [MatchNode.Create(caseValue, casePattern)]
                     true
                 else
                     false
@@ -462,7 +619,7 @@ module MatchNode =
 
         | MatchTest.UnionCase, nodes
         | MatchTest.Record, nodes ->
-            match List.tryFindIndexBack (increment deconstructions context) nodes with
+            match List.tryFindIndexBack (increment deconstructions context wholeNode) nodes with
             | None -> false
             | Some index ->
                 match MatchTest.initialPattern deconstructions context node.Value with
@@ -480,7 +637,7 @@ module MatchNode =
                     false
 
         | MatchTest.Field _, [node] ->
-            increment deconstructions context node
+            increment deconstructions context wholeNode node
 
         | MatchTest.List isEmpty, _ ->
             if isEmpty then
@@ -490,6 +647,11 @@ module MatchNode =
                 false
 
         | nodePattern -> failwith $"Unexpected pattern: {nodePattern}"
+
+    let incrementAndTryReject (deconstructions: Deconstructions) (rejected: List<MatchNode>) (context: ITreeNode)
+            (wholeNode: MatchNode) (node: MatchNode) =
+        tryRecordRejectedDiscard rejected node context
+        increment deconstructions context wholeNode node
 
 
 let getMatchExprMatchType (matchExpr: IMatchExpr) : MatchType =
@@ -626,7 +788,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
                     let caseMatchType = MatchType.UnionCase(unionCase, unionEntityInstance)
                     let caseValue = { Type = caseMatchType; Path = path }
 
-                    MatchTest.Union index, [MatchNode.Create(caseValue, (MatchTest.Discard false, []))]
+                    test, [MatchNode.Create(caseValue, (MatchTest.Discard false, []))]
 
                 | _ ->
                     MatchTest.Error, []
@@ -642,8 +804,8 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
 
         addDeconstruction value.Path Deconstruction.InnerPatterns
 
-        let test = MatchTest.Union index
-        let unionPath = test :: value.Path
+        let unionTest = MatchTest.Union index
+        let unionPath = unionTest :: value.Path
         let caseMatchType = MatchType.UnionCase(unionCase, unionEntityInstance)
         let caseValue = { Type = caseMatchType; Path = unionPath }
         let caseTest = MatchTest.UnionCase

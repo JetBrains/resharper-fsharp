@@ -1,0 +1,12 @@
+﻿module Say
+
+type U =
+    | A
+    | B of bool
+
+match A{caret}, true with
+| B true, true -> ()
+| B false, true -> ()
+| B _, _ -> ()
+| A, true -> failwith "todo"
+| A, false -> failwith "todo"

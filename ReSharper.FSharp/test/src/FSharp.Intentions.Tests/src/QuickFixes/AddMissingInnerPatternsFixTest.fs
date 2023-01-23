@@ -5,10 +5,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
-type AddMissingMatchClausesFixTest() =
-    inherit FSharpQuickFixTestBase<AddMissingMatchClausesFix>()
+type AddMissingInnerPatternsFixTest() =
+    inherit FSharpQuickFixTestBase<AddMissingInnerPatternsFix>()
 
-    override x.RelativeTestDataPath = "features/quickFixes/addMissingMatchClauses"
+    override x.RelativeTestDataPath = "features/quickFixes/addMissingMatchClauses/inner"
 
     [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()
 
@@ -67,3 +67,34 @@ type AddMissingMatchClausesFixTest() =
     [<Test>] member x.``Union 17``() = x.DoNamedTest()
     [<Test>] member x.``Union 18``() = x.DoNamedTest()
     [<Test>] member x.``Union 19``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type AddMissingPatternsFixTest() =
+    inherit FSharpQuickFixTestBase<AddMissingPatternsFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/addMissingMatchClauses/simplified"
+
+    [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 02``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 03``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 04``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 05``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 06``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 07``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 08``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union 03``() = x.DoNamedTest()
+    [<Test>] member x.``Union 04``() = x.DoNamedTest()
+    [<Test>] member x.``Union 05``() = x.DoNamedTest()
+    [<Test>] member x.``Union 06``() = x.DoNamedTest()
+    [<Test>] member x.``Union 07``() = x.DoNamedTest()
+    [<Test>] member x.``Union 08``() = x.DoNamedTest()
+    [<Test>] member x.``Union 09``() = x.DoNamedTest()
+    [<Test>] member x.``Union 10``() = x.DoNamedTest()
+    [<Test>] member x.``Union 11``() = x.DoNamedTest()
+    [<Test>] member x.``Union 12``() = x.DoNamedTest()
+    [<Test>] member x.``Union 13``() = x.DoNamedTest()
+    [<Test>] member x.``Union 14``() = x.DoNamedTest()
