@@ -17,7 +17,7 @@ open JetBrains.Util
 
 [<SolutionComponent>]
 type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerService: FcsCheckerService,
-        scriptSettings: FSharpScriptSettingsProvider, fsSourceCache: FSharpSourceCache) =
+        scriptSettings: FSharpScriptSettingsProvider, fsSourceCache: FSharpSourceCache, toolset: ISolutionToolset) =
 
     let defaultOptionsLock = obj()
 
@@ -65,10 +65,22 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
     let getOptionsImpl (path: VirtualFileSystemPath) source =
         let path = path.FullPath
         let source = SourceText.ofString source
+        let targetNetFramework = not PlatformUtil.IsRunningOnCore && scriptSettings.TargetNetFramework.Value
+
+        let toolset = toolset.GetDotNetCoreToolset()
         let getScriptOptionsAsync =
-            let targetNetFramework = not PlatformUtil.IsRunningOnCore && scriptSettings.TargetNetFramework.Value
-            checkerService.Checker.GetProjectOptionsFromScript(path, source,
-                otherFlags = otherFlags.Value.Value, assumeDotNetFramework = targetNetFramework)
+            if isNull toolset then
+                let sdkRootFolder = toolset.Cli.SdkRootFolder
+                let sdkFolderPath = sdkRootFolder / toolset.Sdk.FolderName
+                checkerService.Checker.GetProjectOptionsFromScript(path, source,
+                    otherFlags = otherFlags.Value.Value,
+                    assumeDotNetFramework = targetNetFramework,
+                    sdkDirOverride = sdkFolderPath.FullPath)
+            else
+                checkerService.Checker.GetProjectOptionsFromScript(path, source,
+                    otherFlags = otherFlags.Value.Value,
+                    assumeDotNetFramework = targetNetFramework)
+
         try
             let options, errors = getScriptOptionsAsync.RunAsTask()
             if not errors.IsEmpty then
