@@ -13,12 +13,16 @@ class FSharpCodeFoldingProvider : RiderCodeFoldingOptionsProvider<FSharpCodeFold
 @Suppress("unused")
 @State(name = "FSharpCodeFoldingSettings", storages = [(Storage("editor.codeinsight.xml"))])
 class FSharpCodeFoldingSettings : RiderCodeFoldingSettings(), PersistentStateComponent<FSharpCodeFoldingSettings> {
-    var collapseHashDirectives by foldingCheckBox("ReSharper F# Hash Directives Block Folding", "F# hash directives blocks", true)
+  var collapseHashDirectives by foldingCheckBox(
+    "ReSharper F# Hash Directives Block Folding",
+    "F# hash directives blocks",
+    true
+  )
 
-    override fun getState(): FSharpCodeFoldingSettings = this
-    override fun loadState(state: FSharpCodeFoldingSettings) = XmlSerializerUtil.copyBean(state, this)
+  override fun getState(): FSharpCodeFoldingSettings = this
+  override fun loadState(state: FSharpCodeFoldingSettings) = XmlSerializerUtil.copyBean(state, this)
 
-    companion object {
-        val instance: FSharpCodeFoldingSettings by lazy { ServiceManager.getService(FSharpCodeFoldingSettings::class.java) }
-    }
+  companion object {
+    val instance: FSharpCodeFoldingSettings by lazy { ServiceManager.getService(FSharpCodeFoldingSettings::class.java) }
+  }
 }

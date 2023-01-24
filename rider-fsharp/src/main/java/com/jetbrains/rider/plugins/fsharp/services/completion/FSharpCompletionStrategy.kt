@@ -6,7 +6,7 @@ import com.intellij.psi.PsiFile
 import com.jetbrains.rider.completion.CompletionSessionStrategy
 
 class FSharpCompletionStrategy : CompletionSessionStrategy {
-    override fun shouldForbidCompletion(editor: Editor, type: CompletionType) = editor.selectionModel.hasSelection()
-    override fun shouldRescheduleCompletion(prefix: String, psiFile: PsiFile, char: Char?, offset: Int) =
-            prefix.isEmpty()
+  override fun shouldForbidCompletion(editor: Editor, type: CompletionType) = editor.selectionModel.hasSelection()
+  override fun shouldRescheduleCompletion(prefix: String, psiFile: PsiFile, char: Char?, offset: Int) =
+    prefix.isEmpty()
 }

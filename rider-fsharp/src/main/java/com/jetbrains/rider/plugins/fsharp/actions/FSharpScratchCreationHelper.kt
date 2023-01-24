@@ -6,9 +6,9 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
 
 class FSharpScratchCreationHelper : ScratchFileCreationHelper() {
-    override fun prepareText(project: Project, context: Context, dataContext: DataContext): Boolean {
-        context.language = FSharpScriptLanguage
-        context.fileExtension = "fsx"
-        return false
-    }
+  override fun prepareText(project: Project, context: Context, dataContext: DataContext): Boolean {
+    context.language = FSharpScriptLanguage
+    context.fileExtension = "fsx"
+    return false
+  }
 }

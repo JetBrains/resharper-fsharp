@@ -8,9 +8,9 @@ import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 
 class FSharpProjectModelViewExtensions(project: Project) : ProjectModelViewExtensions(project) {
-    override fun getBestParentProjectModelNode(targetLocation: VirtualFile): ProjectModelEntity? {
-        val entities = WorkspaceModel.getInstance(project).getProjectModelEntities(targetLocation, project).toList()
-        if (entities.isEmpty() || !entities[0].isFromFSharpProject()) return null
-        return entities.maxByOrNull { it.getSortKey() }
-    }
+  override fun getBestParentProjectModelNode(targetLocation: VirtualFile): ProjectModelEntity? {
+    val entities = WorkspaceModel.getInstance(project).getProjectModelEntities(targetLocation, project).toList()
+    if (entities.isEmpty() || !entities[0].isFromFSharpProject()) return null
+    return entities.maxByOrNull { it.getSortKey() }
+  }
 }

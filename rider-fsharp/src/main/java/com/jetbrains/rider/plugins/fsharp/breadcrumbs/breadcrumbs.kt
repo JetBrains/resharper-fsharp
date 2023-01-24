@@ -5,9 +5,9 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
 
 class FSharpBreadcrumbsInfoProvider : BackendBreadcrumbsInfoProvider() {
-    override val language get() = FSharpLanguage
+  override val language get() = FSharpLanguage
 }
 
 class FSharpScriptBreadcrumbsInfoProvider : BackendBreadcrumbsInfoProvider() {
-    override val language get() = FSharpScriptLanguage
+  override val language get() = FSharpScriptLanguage
 }

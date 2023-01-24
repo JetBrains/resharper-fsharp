@@ -9,12 +9,12 @@ import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 
 class FSharpSolutionExplorerCustomization(project: Project) : SolutionExplorerCustomization(project) {
 
-    override fun updateNode(presentation: PresentationData, entity: ProjectModelEntity) {
-        val descriptor = entity.descriptor
-        if (descriptor is RdProjectFileDescriptor && FSharpMoveProviderExtension.isSpecialCompileType(descriptor)) {
-            presentation.addText(" [${descriptor.buildAction}]", SimpleTextAttributes.GRAY_ATTRIBUTES)
-        }
+  override fun updateNode(presentation: PresentationData, entity: ProjectModelEntity) {
+    val descriptor = entity.descriptor
+    if (descriptor is RdProjectFileDescriptor && FSharpMoveProviderExtension.isSpecialCompileType(descriptor)) {
+      presentation.addText(" [${descriptor.buildAction}]", SimpleTextAttributes.GRAY_ATTRIBUTES)
     }
+  }
 
-    override fun ignoreFoldersOnTop(entity: ProjectModelEntity) = entity.isFromFSharpProject()
+  override fun ignoreFoldersOnTop(entity: ProjectModelEntity) = entity.isFromFSharpProject()
 }

@@ -12,46 +12,46 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(coreVersion = CoreVersion.LATEST_STABLE)
 class FSharpCompletionTest : CompletionTestBase() {
-    override fun getSolutionDirectoryName() = "CoreConsoleApp"
-    override val restoreNuGetPackages = true
+  override fun getSolutionDirectoryName() = "CoreConsoleApp"
+  override val restoreNuGetPackages = true
 
-    @Test
-    fun namespaceKeyword() = doTestTyping("names")
+  @Test
+  fun namespaceKeyword() = doTestTyping("names")
 
-    @Test
-    fun listModule() = doTestChooseItem("List")
+  @Test
+  fun listModule() = doTestChooseItem("List")
 
-    @Test
-    fun listModuleValue() = doTestTyping("filt")
+  @Test
+  fun listModuleValue() = doTestTyping("filt")
 
-    @Test(enabled = false)
-    fun localVal01() = doTestChooseItem("x")
+  @Test(enabled = false)
+  fun localVal01() = doTestChooseItem("x")
 
-    @Test
-    fun localVal02() = doTestTyping("x")
+  @Test
+  fun localVal02() = doTestTyping("x")
 
-    @Test
-    fun qualified01() = doTestChooseItem("a")
+  @Test
+  fun qualified01() = doTestChooseItem("a")
 
-    @Test
-    fun qualified02() = doTestChooseItem("a")
+  @Test
+  fun qualified02() = doTestChooseItem("a")
 
-    private fun doTestTyping(typed: String) {
-        dumpOpenedEditor("Program.fs", "Program.fs") {
-            waitForDaemon()
-            typeWithLatency(typed)
-            callBasicCompletion()
-            waitForCompletion()
-            completeWithTab()
-        }
+  private fun doTestTyping(typed: String) {
+    dumpOpenedEditor("Program.fs", "Program.fs") {
+      waitForDaemon()
+      typeWithLatency(typed)
+      callBasicCompletion()
+      waitForCompletion()
+      completeWithTab()
     }
+  }
 
-    private fun doTestChooseItem(item: String) {
-        dumpOpenedEditor("Program.fs", "Program.fs") {
-            waitForDaemon()
-            callBasicCompletion()
-            waitForCompletion()
-            completeWithTab(item)
-        }
+  private fun doTestChooseItem(item: String) {
+    dumpOpenedEditor("Program.fs", "Program.fs") {
+      waitForDaemon()
+      callBasicCompletion()
+      waitForCompletion()
+      completeWithTab(item)
     }
+  }
 }

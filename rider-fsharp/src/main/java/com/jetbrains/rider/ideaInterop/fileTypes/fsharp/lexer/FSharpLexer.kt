@@ -8,29 +8,30 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer._FSharpLexer.YYINI
 
 @Suppress("UnstableApiUsage")
 class FSharpLexer : FlexAdapter(_FSharpLexer()), RestartableLexer {
-    override fun getStartState() = YYINITIAL
+  override fun getStartState() = YYINITIAL
 
-    override fun isRestartableState(state: Int) =
-        state == YYINITIAL || state == LINE
+  override fun isRestartableState(state: Int) =
+    state == YYINITIAL || state == LINE
 
-    override fun getState(): Int {
-        val flex = flex
-        return if (flex is _FSharpLexer && !flex.isRestartableState ||
-            FSharpTokenType.INTERPOLATED_STRING_ENDS.contains(tokenType)) -1 else super.getState()
+  override fun getState(): Int {
+    val flex = flex
+    return if (flex is _FSharpLexer && !flex.isRestartableState ||
+      FSharpTokenType.INTERPOLATED_STRING_ENDS.contains(tokenType)
+    ) -1 else super.getState()
+  }
+
+  override fun start(
+    buffer: CharSequence, startOffset: Int, endOffset: Int, initialState: Int, tokenIterator: TokenIterator?
+  ) {
+    val flex = flex
+    if (flex is _FSharpLexer) {
+      flex.myInterpolatedStringStates.clear()
+      flex.myNestedCommentLevel = 0
+      flex.myParenLevel = 0
+      flex.myTokenLength = 0
+      flex.myBrackLevel = 0
+      flex.myIsAfterUnfinishedIdent = false
     }
-
-    override fun start(
-        buffer: CharSequence, startOffset: Int, endOffset: Int, initialState: Int, tokenIterator: TokenIterator?
-    ) {
-        val flex = flex
-        if (flex is _FSharpLexer) {
-            flex.myInterpolatedStringStates.clear()
-            flex.myNestedCommentLevel = 0
-            flex.myParenLevel = 0
-            flex.myTokenLength = 0
-            flex.myBrackLevel = 0
-            flex.myIsAfterUnfinishedIdent = false
-        }
-        super.start(buffer, startOffset, endOffset, initialState)
-    }
+    super.start(buffer, startOffset, endOffset, initialState)
+  }
 }

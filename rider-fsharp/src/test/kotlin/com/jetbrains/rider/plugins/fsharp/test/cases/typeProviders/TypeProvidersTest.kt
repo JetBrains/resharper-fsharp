@@ -13,39 +13,39 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
 class TypeProvidersTest : BaseTestWithSolution() {
-    override fun getSolutionDirectoryName() = "TypeProviderLibrary"
-    override val restoreNuGetPackages = true
+  override fun getSolutionDirectoryName() = "TypeProviderLibrary"
+  override val restoreNuGetPackages = true
 
-    @Test
-    fun swaggerProvider() = doTest("SwaggerProvider")
+  @Test
+  fun swaggerProvider() = doTest("SwaggerProvider")
 
-    @Test
-    fun simpleErasedProvider() = doTest("SimpleErasedProvider")
+  @Test
+  fun simpleErasedProvider() = doTest("SimpleErasedProvider")
 
-    @Test
-    fun simpleGenerativeProvider() = doTest("SimpleGenerativeProvider")
+  @Test
+  fun simpleGenerativeProvider() = doTest("SimpleGenerativeProvider")
 
-    @Test
-    fun providersErrors() = doTest("ProvidersErrors")
+  @Test
+  fun providersErrors() = doTest("ProvidersErrors")
 
-    @Test(description = "RIDER-60909")
-    @TestEnvironment(solution = "LegacyTypeProviderLibrary")
-    fun legacyTypeProviders() = doTest("LegacyTypeProviders")
+  @Test(description = "RIDER-60909")
+  @TestEnvironment(solution = "LegacyTypeProviderLibrary")
+  fun legacyTypeProviders() = doTest("LegacyTypeProviders")
 
-    @Test
-    @TestEnvironment(
-        solution = "CsvTypeProvider",
-        toolset = ToolsetVersion.TOOLSET_17_CORE,
-        coreVersion = CoreVersion.DOT_NET_6
-    )
-    fun `csvProvider - units of measure`() = doTest("Library")
+  @Test
+  @TestEnvironment(
+    solution = "CsvTypeProvider",
+    toolset = ToolsetVersion.TOOLSET_17_CORE,
+    coreVersion = CoreVersion.DOT_NET_6
+  )
+  fun `csvProvider - units of measure`() = doTest("Library")
 
-    private fun doTest(fileName: String) {
-        withOpenedEditor(project, "TypeProviderLibrary/$fileName.fs") {
-            waitForDaemon()
-            executeWithGold(testGoldFile) {
-                dumpSevereHighlighters(it)
-            }
-        }
+  private fun doTest(fileName: String) {
+    withOpenedEditor(project, "TypeProviderLibrary/$fileName.fs") {
+      waitForDaemon()
+      executeWithGold(testGoldFile) {
+        dumpSevereHighlighters(it)
+      }
     }
+  }
 }

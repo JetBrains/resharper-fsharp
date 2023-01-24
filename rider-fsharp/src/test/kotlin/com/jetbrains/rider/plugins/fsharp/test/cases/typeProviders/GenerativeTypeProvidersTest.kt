@@ -19,48 +19,48 @@ import java.time.Duration
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
 class GenerativeTypeProvidersTest : BaseTestWithSolution() {
-    override fun getSolutionDirectoryName() = "TypeProviderLibrary"
+  override fun getSolutionDirectoryName() = "TypeProviderLibrary"
 
-    @Test
-    fun `generative type providers cross-project analysis`() {
-        val generativeProviderProjectPath =
-            "${project.solutionDirectoryPath}/GenerativeTypeProvider/GenerativeTypeProvider.fsproj"
+  @Test
+  fun `generative type providers cross-project analysis`() {
+    val generativeProviderProjectPath =
+      "${project.solutionDirectoryPath}/GenerativeTypeProvider/GenerativeTypeProvider.fsproj"
 
-        withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
-            waitForDaemon()
-            markupAdapter.hasErrors.shouldBeTrue()
+    withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
+      waitForDaemon()
+      markupAdapter.hasErrors.shouldBeTrue()
 
-            buildSelectedProjectsWithReSharperBuild(listOf(generativeProviderProjectPath))
+      buildSelectedProjectsWithReSharperBuild(listOf(generativeProviderProjectPath))
 
-            waitForNextDaemon(Duration.ofSeconds(5))
-            markupAdapter.hasErrors.shouldBeFalse()
-        }
-
-        unloadProject(arrayOf("TypeProviderLibrary", "GenerativeTypeProvider"))
-        reloadProject(arrayOf("TypeProviderLibrary", "GenerativeTypeProvider"))
-
-        withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
-            waitForDaemon()
-            markupAdapter.hasErrors.shouldBeFalse()
-        }
+      waitForNextDaemon(Duration.ofSeconds(5))
+      markupAdapter.hasErrors.shouldBeFalse()
     }
 
-    @Test
-    fun `change abbreviation`() {
-        executeWithGold(testGoldFile) {
-            withOpenedEditor(project, "GenerativeTypeProvider/Library.fs") {
-                waitForDaemon()
+    unloadProject(arrayOf("TypeProviderLibrary", "GenerativeTypeProvider"))
+    reloadProject(arrayOf("TypeProviderLibrary", "GenerativeTypeProvider"))
 
-                it.println("Before:\n")
-                dumpTypeProviders(it)
-
-                // change abbreviation from "SimpleGenerativeTypeAbbr" to "SimpleGenerativeTypeAbbr1"
-                typeFromOffset("1", 103)
-                waitForDaemon()
-
-                it.println("\n\nAfter:\n")
-                dumpTypeProviders(it)
-            }
-        }
+    withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
+      waitForDaemon()
+      markupAdapter.hasErrors.shouldBeFalse()
     }
+  }
+
+  @Test
+  fun `change abbreviation`() {
+    executeWithGold(testGoldFile) {
+      withOpenedEditor(project, "GenerativeTypeProvider/Library.fs") {
+        waitForDaemon()
+
+        it.println("Before:\n")
+        dumpTypeProviders(it)
+
+        // change abbreviation from "SimpleGenerativeTypeAbbr" to "SimpleGenerativeTypeAbbr1"
+        typeFromOffset("1", 103)
+        waitForDaemon()
+
+        it.println("\n\nAfter:\n")
+        dumpTypeProviders(it)
+      }
+    }
+  }
 }
