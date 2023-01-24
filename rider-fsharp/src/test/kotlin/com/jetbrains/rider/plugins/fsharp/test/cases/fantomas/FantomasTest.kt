@@ -14,26 +14,26 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(coreVersion = CoreVersion.DOT_NET_6)
 class FantomasTest : EditorTestBase() {
-    override fun getSolutionDirectoryName() = "FormatCodeApp"
+  override fun getSolutionDirectoryName() = "FormatCodeApp"
 
-    @Test
-    fun withEditorConfig() = doTest("EditorConfig.fs")
+  @Test
+  fun withEditorConfig() = doTest("EditorConfig.fs")
 
-    @Test
-    fun simpleFormatting() = doTest("Simple.fs")
+  @Test
+  fun simpleFormatting() = doTest("Simple.fs")
 
-    @Test
-    fun formatLastFile() = doTest("Program.fs")
+  @Test
+  fun formatLastFile() = doTest("Program.fs")
 
-    private fun doTest(fileName: String) {
-        withEditorConfig(project) {
-            withOpenedEditor(fileName) {
-                waitForDaemon()
-                reformatCode()
-                executeWithGold(testGoldFile) {
-                    dumpOpenedDocument(it, project!!, false)
-                }
-            }
+  private fun doTest(fileName: String) {
+    withEditorConfig(project) {
+      withOpenedEditor(fileName) {
+        waitForDaemon()
+        reformatCode()
+        executeWithGold(testGoldFile) {
+          dumpOpenedDocument(it, project!!, false)
         }
+      }
     }
+  }
 }

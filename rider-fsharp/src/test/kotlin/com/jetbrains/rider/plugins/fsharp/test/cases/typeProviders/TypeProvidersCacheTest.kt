@@ -18,81 +18,81 @@ import java.io.File
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
 class TypeProvidersCacheTest : BaseTestWithSolution() {
-    override fun getSolutionDirectoryName() = "TypeProviderLibrary"
-    override val restoreNuGetPackages = true
-    private val defaultSourceFile = "TypeProviderLibrary/Caches.fs"
+  override fun getSolutionDirectoryName() = "TypeProviderLibrary"
+  override val restoreNuGetPackages = true
+  private val defaultSourceFile = "TypeProviderLibrary/Caches.fs"
 
-    private fun checkTypeProviders(testGoldFile: File, sourceFile: String) {
-        withOpenedEditor(project, sourceFile) {
-            waitForDaemon()
-            executeWithGold(testGoldFile) {
-                dumpTypeProviders(it)
-            }
-        }
+  private fun checkTypeProviders(testGoldFile: File, sourceFile: String) {
+    withOpenedEditor(project, sourceFile) {
+      waitForDaemon()
+      executeWithGold(testGoldFile) {
+        dumpTypeProviders(it)
+      }
     }
+  }
 
-    @Test
-    fun checkCachesWhenProjectReloading() {
-        checkTypeProviders(File(testGoldFile.path + "_before"), defaultSourceFile)
+  @Test
+  fun checkCachesWhenProjectReloading() {
+    checkTypeProviders(File(testGoldFile.path + "_before"), defaultSourceFile)
 
-        unloadAllProjects()
-        reloadAllProjects(project)
+    unloadAllProjects()
+    reloadAllProjects(project)
 
-        checkTypeProviders(File(testGoldFile.path + "_after"), defaultSourceFile)
+    checkTypeProviders(File(testGoldFile.path + "_after"), defaultSourceFile)
+  }
+
+  @Test
+  fun invalidation() {
+    val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
+
+    withOpenedEditor(project, defaultSourceFile) {
+      waitForDaemon()
+
+      testDirectory.deleteRecursively().shouldBeTrue()
+      typeWithLatency("//")
+      waitForDaemon()
+
+      executeWithGold(File(testGoldFile.path + "_before")) {
+        dumpTypeProviders(it)
+      }
+
+      testDirectory.mkdir().shouldBeTrue()
+      typeWithLatency(" ")
+      waitForDaemon()
+
+      executeWithGold(File(testGoldFile.path + "_after")) {
+        dumpTypeProviders(it)
+      }
     }
+  }
 
-    @Test
-    fun invalidation() {
-        val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
-
-        withOpenedEditor(project, defaultSourceFile) {
-            waitForDaemon()
-
-            testDirectory.deleteRecursively().shouldBeTrue()
-            typeWithLatency("//")
-            waitForDaemon()
-
-            executeWithGold(File(testGoldFile.path + "_before")) {
-                dumpTypeProviders(it)
-            }
-
-            testDirectory.mkdir().shouldBeTrue()
-            typeWithLatency(" ")
-            waitForDaemon()
-
-            executeWithGold(File(testGoldFile.path + "_after")) {
-                dumpTypeProviders(it)
-            }
-        }
+  @Test
+  fun typing() {
+    withOpenedEditor(project, defaultSourceFile) {
+      waitForDaemon()
+      typeWithLatency("//")
+      checkTypeProviders(testGoldFile, defaultSourceFile)
     }
+  }
 
-    @Test
-    fun typing() {
-        withOpenedEditor(project, defaultSourceFile) {
-            waitForDaemon()
-            typeWithLatency("//")
-            checkTypeProviders(testGoldFile, defaultSourceFile)
-        }
+  @Test
+  fun projectsWithEqualProviders() {
+    withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
+      waitForDaemon()
     }
-
-    @Test
-    fun projectsWithEqualProviders() {
-        withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
-            waitForDaemon()
-        }
-        withOpenedEditor(project, "TypeProviderLibrary2/Library.fs") {
-            waitForDaemon()
-            checkTypeProviders(testGoldFile, defaultSourceFile)
-        }
+    withOpenedEditor(project, "TypeProviderLibrary2/Library.fs") {
+      waitForDaemon()
+      checkTypeProviders(testGoldFile, defaultSourceFile)
     }
+  }
 
-    @Test(description = "RIDER-73091", enabled = false)
-    fun script() {
-        checkTypeProviders(File(testGoldFile.path + "_before"), "TypeProviderLibrary/Script.fsx")
+  @Test(description = "RIDER-73091", enabled = false)
+  fun script() {
+    checkTypeProviders(File(testGoldFile.path + "_before"), "TypeProviderLibrary/Script.fsx")
 
-        unloadAllProjects()
-        reloadAllProjects(project)
+    unloadAllProjects()
+    reloadAllProjects(project)
 
-        checkTypeProviders(File(testGoldFile.path + "_after"), "TypeProviderLibrary/Script.fsx")
-    }
+    checkTypeProviders(File(testGoldFile.path + "_after"), "TypeProviderLibrary/Script.fsx")
+  }
 }

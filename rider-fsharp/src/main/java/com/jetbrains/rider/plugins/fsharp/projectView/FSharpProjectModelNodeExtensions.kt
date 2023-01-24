@@ -7,11 +7,11 @@ import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 
 fun ProjectModelEntity.isFromFSharpProject(): Boolean =
-        containingProjectEntity()?.url?.toVirtualFile()?.extension.equals("fsproj", true)
+  containingProjectEntity()?.url?.toVirtualFile()?.extension.equals("fsproj", true)
 
 fun ProjectModelEntity.getSortKey(): Int =
-        when (val descriptor = this.descriptor) {
-            is RdProjectFileDescriptor -> descriptor.sortKey ?: -1
-            is RdProjectFolderDescriptor -> descriptor.sortKey ?: -1
-            else -> -1
-        }
+  when (val descriptor = this.descriptor) {
+    is RdProjectFileDescriptor -> descriptor.sortKey ?: -1
+    is RdProjectFolderDescriptor -> descriptor.sortKey ?: -1
+    else -> -1
+  }

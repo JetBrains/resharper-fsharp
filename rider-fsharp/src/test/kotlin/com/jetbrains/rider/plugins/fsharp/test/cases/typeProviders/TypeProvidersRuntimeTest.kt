@@ -16,53 +16,54 @@ import org.testng.annotations.Test
 
 @Test
 class TypeProvidersRuntimeTest : BaseTestWithSolution() {
-    override fun getSolutionDirectoryName() = "CoreTypeProviderLibrary"
-    override val restoreNuGetPackages = true
+  override fun getSolutionDirectoryName() = "CoreTypeProviderLibrary"
+  override val restoreNuGetPackages = true
 
-    @Test
-    @TestEnvironment(
-        toolset = ToolsetVersion.TOOLSET_16,
-        coreVersion = CoreVersion.DOT_NET_CORE_3_1,
-        solution = "TypeProviderLibrary")
-    fun framework461() = doTest(".NET Framework 4.8")
+  @Test
+  @TestEnvironment(
+    toolset = ToolsetVersion.TOOLSET_16,
+    coreVersion = CoreVersion.DOT_NET_CORE_3_1,
+    solution = "TypeProviderLibrary"
+  )
+  fun framework461() = doTest(".NET Framework 4.8")
 
-    @Test(enabled = false)
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_2_1)
-    fun core21() = doTest(".NET Core 3.1")
+  @Test(enabled = false)
+  @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_2_1)
+  fun core21() = doTest(".NET Core 3.1")
 
-    @Test
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
-    fun core31() = doTest(".NET Core 3.1")
+  @Test
+  @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
+  fun core31() = doTest(".NET Core 3.1")
 
-    @Test
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_5)
-    fun net5() = doTest(".NET 5")
+  @Test
+  @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_5)
+  fun net5() = doTest(".NET 5")
 
-    @Test
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_6)
-    fun net6() = doTest(".NET 6")
+  @Test
+  @TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_6)
+  fun net6() = doTest(".NET 6")
 
-    @Test
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_7)
-    fun net7() = doTest(".NET 7")
+  @Test
+  @TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_7)
+  fun net7() = doTest(".NET 7")
 
-    @Test(enabled = false)
-    @TestEnvironment(
-        toolset = ToolsetVersion.TOOLSET_16_CORE,
-        coreVersion = CoreVersion.DOT_NET_CORE_3_1,
-        solution = "FscTypeProviderLibrary"
-    )
-    fun fsc() = doTest(".NET Framework 4.8")
+  @Test(enabled = false)
+  @TestEnvironment(
+    toolset = ToolsetVersion.TOOLSET_16_CORE,
+    coreVersion = CoreVersion.DOT_NET_CORE_3_1,
+    solution = "FscTypeProviderLibrary"
+  )
+  fun fsc() = doTest(".NET Framework 4.8")
 
-    private fun doTest(expectedRuntime: String) {
-        withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
-            waitForDaemon()
-            this.project!!.fcsHost
-                    .typeProvidersRuntimeVersion.sync(Unit)
-                    .shouldNotBeNull()
-                    .startsWith(expectedRuntime)
-                    .shouldBeTrue()
-            markupAdapter.hasErrors.shouldBeFalse()
-        }
+  private fun doTest(expectedRuntime: String) {
+    withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
+      waitForDaemon()
+      this.project!!.fcsHost
+        .typeProvidersRuntimeVersion.sync(Unit)
+        .shouldNotBeNull()
+        .startsWith(expectedRuntime)
+        .shouldBeTrue()
+      markupAdapter.hasErrors.shouldBeFalse()
     }
+  }
 }

@@ -11,22 +11,22 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_6)
 class AsyncDebuggerTest : DebuggerTestBase() {
-    override val projectName = "AsyncProgram"
-    override fun getSolutionDirectoryName() = projectName
+  override val projectName = "AsyncProgram"
+  override fun getSolutionDirectoryName() = projectName
 
-    override val waitForCaches = true
-    override val restoreNuGetPackages = true
+  override val waitForCaches = true
+  override val restoreNuGetPackages = true
 
-    @Test(description = "RIDER-27263")
-    fun testAsyncBreakpoint() {
-        // Note that this test doesn't checks the behavior of FSharpBreakpointVariantsProvider, since it's never called
-        // in tests. But the test breakpoints are multi-method by default, and we should just check that multi-method
-        // breakpoints work well in F# code.
-        testDebugProgram({
-            toggleBreakpoint("Program.fs", 9)
-        }, {
-            waitForPause()
-            dumpLocals()
-        }, true)
-    }
+  @Test(description = "RIDER-27263")
+  fun testAsyncBreakpoint() {
+    // Note that this test doesn't checks the behavior of FSharpBreakpointVariantsProvider, since it's never called
+    // in tests. But the test breakpoints are multi-method by default, and we should just check that multi-method
+    // breakpoints work well in F# code.
+    testDebugProgram({
+      toggleBreakpoint("Program.fs", 9)
+    }, {
+      waitForPause()
+      dumpLocals()
+    }, true)
+  }
 }

@@ -10,11 +10,11 @@ import org.testng.annotations.Test
 @TestEnvironment(solution = "CoreConsoleApp", coreVersion = CoreVersion.LATEST_STABLE)
 class CodeFoldingTest : CodeFoldingTestBase() {
 
-    @Test
-    fun codeFolding() {
-        doTestWithMarkupModel("CodeFolding.fs", "CodeFolding.fs") {
-            waitForDaemon()
-            dumpFoldingHighlightersWithText()
-        }
+  @Test
+  fun codeFolding() {
+    doTestWithMarkupModel("CodeFolding.fs", "CodeFolding.fs") {
+      waitForDaemon()
+      dumpFoldingHighlightersWithText()
     }
+  }
 }

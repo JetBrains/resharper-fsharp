@@ -21,38 +21,38 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
 class TypeProvidersSettingTest : BaseTestWithSolution() {
-    override fun getSolutionDirectoryName() = "TypeProviderLibrary"
-    override val restoreNuGetPackages = true
-    private val rdFcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
+  override fun getSolutionDirectoryName() = "TypeProviderLibrary"
+  override val restoreNuGetPackages = true
+  private val rdFcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
 
-    @Test
-    fun enableTypeProvidersSetting() {
-        val sourceFile = "TypeProviderLibrary2/Library.fs"
+  @Test
+  fun enableTypeProvidersSetting() {
+    val sourceFile = "TypeProviderLibrary2/Library.fs"
 
-        withOpenedEditor(project, sourceFile) {
-            waitForDaemon()
-            rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()
-            markupAdapter.hasErrors.shouldBeFalse()
-        }
-
-        withDisabledOutOfProcessTypeProviders {
-            unloadAllProjects()
-            reloadAllProjects(project)
-
-            withOpenedEditor(project, sourceFile) {
-                waitForDaemon()
-                rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldBeNull()
-                markupAdapter.hasErrors.shouldBeFalse()
-            }
-        }
-
-        unloadAllProjects()
-        reloadAllProjects(project)
-
-        withOpenedEditor(project, sourceFile) {
-            waitForDaemon()
-            rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()
-            markupAdapter.hasErrors.shouldBeFalse()
-        }
+    withOpenedEditor(project, sourceFile) {
+      waitForDaemon()
+      rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()
+      markupAdapter.hasErrors.shouldBeFalse()
     }
+
+    withDisabledOutOfProcessTypeProviders {
+      unloadAllProjects()
+      reloadAllProjects(project)
+
+      withOpenedEditor(project, sourceFile) {
+        waitForDaemon()
+        rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldBeNull()
+        markupAdapter.hasErrors.shouldBeFalse()
+      }
+    }
+
+    unloadAllProjects()
+    reloadAllProjects(project)
+
+    withOpenedEditor(project, sourceFile) {
+      waitForDaemon()
+      rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()
+      markupAdapter.hasErrors.shouldBeFalse()
+    }
+  }
 }

@@ -13,16 +13,19 @@ import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.isProject
 
 class SendProjectReferencesToFsiAction : ProjectViewActionBase() {
-    override fun actionPerformedInternal(entity: ProjectModelEntity, project: Project) {
-        val id = entity.getId(project) ?: return
-        val fSharpInteractiveHost = project.solution.rdFSharpModel.fSharpInteractiveHost
-        fSharpInteractiveHost.getProjectReferences.start(project.lifetime, id).result.adviseOnce(Lifetime.Eternal) { result ->
-            val text = result.unwrap().joinToString("\n") { "#r @\"$it\"" } +
-                    "\n" +
-                    "# 1 \"stdin\"\n;;\n"
-            project.getComponent<FsiHost>().sendToFsi(text, text, false)
-        }
+  override fun actionPerformedInternal(entity: ProjectModelEntity, project: Project) {
+    val id = entity.getId(project) ?: return
+    val fSharpInteractiveHost = project.solution.rdFSharpModel.fSharpInteractiveHost
+    fSharpInteractiveHost.getProjectReferences.start(
+      project.lifetime,
+      id
+    ).result.adviseOnce(Lifetime.Eternal) { result ->
+      val text = result.unwrap().joinToString("\n") { "#r @\"$it\"" } +
+        "\n" +
+        "# 1 \"stdin\"\n;;\n"
+      project.getComponent<FsiHost>().sendToFsi(text, text, false)
     }
+  }
 
-    override fun getItemInternal(entity: ProjectModelEntity, project: Project) = if (entity.isProject()) entity else null
+  override fun getItemInternal(entity: ProjectModelEntity, project: Project) = if (entity.isProject()) entity else null
 }

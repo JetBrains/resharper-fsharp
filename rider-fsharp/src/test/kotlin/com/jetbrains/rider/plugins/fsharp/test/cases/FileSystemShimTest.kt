@@ -16,26 +16,30 @@ import java.time.Duration
 @Test
 @TestEnvironment(coreVersion = CoreVersion.LATEST_STABLE)
 class FileSystemShimTest : BaseTestWithSolution() {
-    override fun getSolutionDirectoryName() = "CoreConsoleApp"
+  override fun getSolutionDirectoryName() = "CoreConsoleApp"
 
-    @Test
-    fun externalFileChange() {
-        val file = activeSolutionDirectory.resolve("Program.fs")
-        val stampBefore = getTimestamp(file)
+  @Test
+  fun externalFileChange() {
+    val file = activeSolutionDirectory.resolve("Program.fs")
+    val stampBefore = getTimestamp(file)
 
-        val newText = "namespace NewTextHere"
-        changeFileContent(project, file) { newText }
+    val newText = "namespace NewTextHere"
+    changeFileContent(project, file) { newText }
 
-        LocalFileSystem.getInstance().refresh(false)
-        waitAndPump(project.lifetime, { getTimestamp(file) > stampBefore }, Duration.ofSeconds(15000), { "Timestamp wasn't changed." })
-        val stampAfter = getTimestamp(file)
+    LocalFileSystem.getInstance().refresh(false)
+    waitAndPump(
+      project.lifetime,
+      { getTimestamp(file) > stampBefore },
+      Duration.ofSeconds(15000),
+      { "Timestamp wasn't changed." })
+    val stampAfter = getTimestamp(file)
 
-        val (source, timestamp) = project.fcsHost.getSourceCache.sync(file.path).shouldNotBeNull("Couldn't get the source.")
-        assert(source == newText) { "Source differs from new text." }
-        assert(timestamp == stampAfter) { "Timestamp differs from expected." }
-    }
+    val (source, timestamp) = project.fcsHost.getSourceCache.sync(file.path).shouldNotBeNull("Couldn't get the source.")
+    assert(source == newText) { "Source differs from new text." }
+    assert(timestamp == stampAfter) { "Timestamp differs from expected." }
+  }
 
-    private fun getTimestamp(file: File) =
-            project.fcsHost.getLastModificationStamp.sync(file.path)
+  private fun getTimestamp(file: File) =
+    project.fcsHost.getLastModificationStamp.sync(file.path)
 
 }
