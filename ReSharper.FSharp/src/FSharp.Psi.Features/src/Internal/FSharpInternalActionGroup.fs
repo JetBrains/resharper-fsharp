@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Internal
 
-open System.Diagnostics
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Diagnostics
 open JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu
 open JetBrains.Application.UI.Actions.InternalMenu
 open JetBrains.Application.UI.ActionsRevised.Menu
@@ -9,7 +9,6 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Psi
-open JetBrains.Util
 
 [<Action("FSharp_Internal_DumpFcsProjects", "Dump all FCS projects")>]
 type DumpFcsProjectsAction() =
@@ -21,13 +20,10 @@ type DumpFcsProjectsAction() =
             let solution = context.GetData(ProjectModelDataConstants.SOLUTION)
             let fcsProjectProvider = solution.GetPsiServices().GetComponent<IFcsProjectProvider>()
 
-            let tempPath = FileSystemDefinition.CreateTemporaryFile(extensionWithDot = ".txt")
-            tempPath.WriteTextStreamDenyWrite(fun writer ->
+            Dumper.DumpToNotepad(fun writer ->
                 let allFcsProjects = fcsProjectProvider.GetAllFcsProjects() |> List.ofSeq
                 for fcsProject in allFcsProjects do
                     writer.WriteLine(fcsProject.TestDump(writer)))
-
-            Process.Start(tempPath.FullPath) |> ignore
 
 
 [<Action("FSharp_Internal_DumpCurrentFcsProject", "Dump current FCS project")>]
@@ -41,14 +37,11 @@ type DumpCurrentFcsProjectAction() =
             let solution = project.GetSolution()
             let fcsProjectProvider = solution.GetComponent<IFcsProjectProvider>()
 
-            let tempPath = FileSystemDefinition.CreateTemporaryFile(extensionWithDot = ".txt")
-            tempPath.WriteTextStreamDenyWrite(fun writer ->
+            Dumper.DumpToNotepad(fun writer ->
                 for psiModule in solution.GetPsiServices().Modules.GetPsiModules(project) do
                     match fcsProjectProvider.GetFcsProject(psiModule) with
                     | Some fcsProject -> writer.WriteLine(fcsProject.TestDump(writer))
                     | _ -> ())
-
-            Process.Start(tempPath.FullPath) |> ignore
 
 
 [<ActionGroup(ActionGroupInsertStyles.Submenu ||| ActionGroupInsertStyles.Separated, Text = "F#")>]
@@ -62,4 +55,3 @@ type FSharpInternalActionGroup(
 [<ZoneMarker>]
 type ZoneMarker() =
     interface IRequire<IInternalVisibilityZone>
-    // interface IRequire<IReSpellerZone>
