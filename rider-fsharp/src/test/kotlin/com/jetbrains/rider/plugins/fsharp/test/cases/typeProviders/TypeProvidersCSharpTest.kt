@@ -46,7 +46,7 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
     coreVersion = CoreVersion.DOT_NET_6
   )
   fun changeStaticArg() {
-    withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
+    withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
       waitForDaemon()
       markupAdapter.hasErrors.shouldBeFalse()
     }
@@ -57,7 +57,7 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
       typeFromOffset("1", 86)
     }
 
-    withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
+    withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
       waitForNextDaemon()
       executeWithGold(File(testGoldFile.path + "_before")) {
         dumpSevereHighlighters(it)
