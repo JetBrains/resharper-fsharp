@@ -56,7 +56,8 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
     call("terminateFantomasHost", void, void)
     call("TypeProvidersRuntimeVersion", void, string.nullable)
     call("DumpTypeProvidersProcess", void, string)
-    call("dumpFcsRefrencedProjects", int, immutableList(string))
+    call("dumpFcsProjectStamp", int, long)
+    call("dumpFcsReferencedProjects", int, immutableList(string))
     call("dumpFcsModuleReader", void, string)
   }
 

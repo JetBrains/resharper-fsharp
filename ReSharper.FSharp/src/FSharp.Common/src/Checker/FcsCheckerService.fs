@@ -44,7 +44,7 @@ type FcsProject =
     member x.IsKnownFile(sourceFile: IPsiSourceFile) =
         x.FileIndices.ContainsKey(sourceFile.GetLocation())
 
-    member x.TestDump(writer: StreamWriter) =
+    member x.TestDump(writer: TextWriter) =
         let projectOptions = x.ProjectOptions
 
         writer.WriteLine($"Project file: {projectOptions.ProjectFileName}")
@@ -117,6 +117,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         let parsingOptions = x.FcsProjectProvider.GetParsingOptions(sourceFile)
         x.ParseFile(sourceFile.GetLocation(), sourceFile.Document, parsingOptions)
 
+    // todo: assert that no modification was done? force pin check results or allow via cookie?
     member x.ParseAndCheckFile([<NotNull>] sourceFile: IPsiSourceFile, opName,
             [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
         match PinTypeCheckResultsCookie.PinnedResults with
@@ -246,7 +247,7 @@ type IFcsProjectProvider =
     abstract HasPairFile: IPsiSourceFile -> bool
 
     /// Returns True when the project has been invalidated.
-    abstract InvalidateReferencesToProject: IProject -> bool
+    abstract InvalidateReferencesToProject: IProject * forceInvalidateFcs: bool -> bool
 
     abstract InvalidateDirty: unit -> unit
     abstract ModuleInvalidated: ISignal<IPsiModule>

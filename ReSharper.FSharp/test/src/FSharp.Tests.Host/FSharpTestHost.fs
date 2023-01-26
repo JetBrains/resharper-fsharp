@@ -61,14 +61,20 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
             |> List)
         |> Option.defaultWith (fun _ -> List())
 
-    let dumpFcsProjectReferences (projectModelId: int) =
+    let getProjectOptions (projectModelId: int) =
         use cookie = ReadLockCookie.Create()
 
         let project = projectModelViewHost.GetItemById<IProject>(projectModelId)
         let psiModule = psiModules.GetPsiModules(project) |> Seq.exactlyOne
-        let projectOptions = projectProvider.GetProjectOptions(psiModule)
+        projectProvider.GetProjectOptions(psiModule).Value
 
-        projectOptions.Value.ReferencedProjects
+    let dumpFcsProjectStamp (projectModelId: int) =
+        let projectOptions = getProjectOptions projectModelId
+        projectOptions.Stamp.Value
+
+    let dumpFcsProjectReferences (projectModelId: int) =
+        let projectOptions = getProjectOptions projectModelId
+        projectOptions.ReferencedProjects
         |> Array.map (fun project ->
             let outputPath = VirtualFileSystemPath.Parse(project.OutputFile, InteractionContext.SolutionContext)
             outputPath.NameWithoutExtension)
@@ -113,7 +119,8 @@ Actions: {notification.AdditionalCommands
         fsTestHost.GetSourceCache.Set(sourceCache.GetRdFSharpSource)
         fsTestHost.DumpSingleProjectMapping.Set(dumpSingleProjectMapping)
         fsTestHost.DumpSingleProjectLocalReferences.Set(dumpSingleProjectLocalReferences)
-        fsTestHost.DumpFcsRefrencedProjects.Set(dumpFcsProjectReferences)
+        fsTestHost.DumpFcsProjectStamp.Set(dumpFcsProjectStamp)
+        fsTestHost.DumpFcsReferencedProjects.Set(dumpFcsProjectReferences)
         fsTestHost.DumpFcsModuleReader.Set(dumpFcsModuleReader)
         fsTestHost.FantomasVersion.Set(fantomasVersion)
         fsTestHost.TypeProvidersRuntimeVersion.Set(typeProvidersRuntimeVersion)

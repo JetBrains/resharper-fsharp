@@ -227,7 +227,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member x.InvalidateDirty() = ()
         member x.ModuleInvalidated = new Signal<_>("Todo") :> _
 
-        member x.InvalidateReferencesToProject _ = false
+        member x.InvalidateReferencesToProject(_, _) = false
         member x.HasFcsProjects = false
         member this.GetAllFcsProjects() = []
 
