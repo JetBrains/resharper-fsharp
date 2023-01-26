@@ -18,6 +18,9 @@ type DeconstructPatternTest() =
         popupMenu.SetTestData(lifetime, fun _ occurrences _ _ _ -> occurrences.FirstOrDefault())
         base.DoTest(lifetime, testProject)
 
+    [<Test>] member x.``KeyValuePair 01``() = x.DoNamedTest()
+    [<Test>] member x.``KeyValuePair 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Tuple - Accessor 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple - Lambda 02 - Parens``() = x.DoNamedTest()

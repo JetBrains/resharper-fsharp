@@ -41,9 +41,12 @@ type DeconstructPatternContextAction(provider: FSharpContextActionDataProvider) 
         let fcsType = getAbbreviatedType fcsType
         if isNull fcsType then Seq.empty else
 
-        [ DeconstructionFromTuple.TryCreate(pattern, fcsType)
-          DeconstructionFromUnionCase.TryCreateFromSingleCaseUnionType(pattern, fcsType)
-          DeconstructionFromUnionCaseFields.TryCreate(pattern, true) ]
-        |> List.tryFind isNotNull // todo: allow multiple
+        seq {
+            DeconstructionFromTuple.TryCreate(pattern, fcsType)
+            DeconstructionFromUnionCase.TryCreateFromSingleCaseUnionType(pattern, fcsType)
+            DeconstructionFromUnionCaseFields.TryCreate(pattern, true)
+            DeconstructionFromKeyValuePair.TryCreate(pattern, fcsType)
+        }
+        |> Seq.tryFind isNotNull // todo: allow multiple
         |> Option.map (fun d -> DeconstructAction(pattern, d).ToContextActionIntentions() :> seq<IntentionAction>)
         |> Option.defaultValue Seq.empty

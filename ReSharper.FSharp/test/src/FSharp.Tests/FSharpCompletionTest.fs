@@ -223,6 +223,7 @@ type FSharpPostfixCompletionTest() =
 
     [<Test>] member x.``Let - Type - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Type - Function 02``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Type - KeyValuePair 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Type - Named 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Type - Tuple 01``() = x.DoNamedTest()
 

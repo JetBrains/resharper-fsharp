@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:let}
+module Module
+
+open System.Collections.Generic
+
+let (KeyValue(i, i1){caret}) = KeyValuePair(1,2)
