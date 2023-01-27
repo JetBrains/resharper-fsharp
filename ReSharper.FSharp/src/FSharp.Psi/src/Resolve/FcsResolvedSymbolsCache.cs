@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using FSharp.Compiler.CodeAnalysis;
@@ -49,6 +50,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private static bool IsApplicable(IPsiSourceFile sourceFile) =>
       sourceFile.LanguageType.Is<FSharpProjectFileType>();
+
+    private void Invalidate(Tuple<IPsiModule, FcsProject> project)
+    {
+      var (psiModule, _) = project;
+      Invalidate(psiModule);
+    }
 
     public void Invalidate(IPsiModule psiModule)
     {

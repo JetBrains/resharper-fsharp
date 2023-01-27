@@ -92,7 +92,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     /// FCS is not trying to check previously not-found assemblies after a builder creation.
     /// When assembly module reader is disabled, we invalidate FCS when referenced C# project output is changed.
     let dirtyModules = Dictionary<IPsiModule, bool>()
-    let fcsProjectInvalidated = new Signal<IPsiModule>("FcsProjectInvalidated")
+    let fcsProjectInvalidated = new Signal<IPsiModule * FcsProject>("FcsProjectInvalidated")
 
     let getReferencingModules (psiModule: IPsiModule) =
         match tryGetValue psiModule referencedModules with
@@ -373,10 +373,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 else
                     solution.PsiModules().GetById(deletedPsiModule.GetPersistentID())
 
-            if isNull psiModule then () else ()
+            if isNull psiModule then () else
 
             let project = psiModule.ContainingProjectModule.As<IProject>()
-            if isNull project then () else ()
+            if isNull project then () else
 
             let fcsProject = createOrRecoverFcsProject project psiModule deletedProjects
             if not forceInvalidateFcs && fcsProject.ProjectOptions.Stamp = deletedFcsProject.ProjectOptions.Stamp then
@@ -396,7 +396,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         tryRecoverFcsProjects deletedProjects
 
         for KeyValue(_, (psiModule, fcsProject, _)) in deletedProjects do
-            fcsProjectInvalidated.Fire(psiModule)
+            fcsProjectInvalidated.Fire((psiModule, fcsProject))
             fcsAssemblyReaderShim.InvalidateModule(psiModule)
             checkerService.InvalidateFcsProject(fcsProject.ProjectOptions)
 

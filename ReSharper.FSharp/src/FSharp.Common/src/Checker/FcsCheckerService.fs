@@ -250,7 +250,7 @@ type IFcsProjectProvider =
     abstract InvalidateReferencesToProject: IProject * forceInvalidateFcs: bool -> bool
 
     abstract InvalidateDirty: unit -> unit
-    abstract ModuleInvalidated: ISignal<IPsiModule>
+    abstract ModuleInvalidated: ISignal<IPsiModule * FcsProject>
 
     abstract PrepareAssemblyShim: psiModule: IPsiModule -> unit 
 

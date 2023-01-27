@@ -20,11 +20,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.Rd.Tasks
 open JetBrains.Rider.FSharp.TypeProviders.Protocol.Client
 open JetBrains.Util.Concurrency
-open JetBrains.Util.Logging
 
 type internal TypeProvidersCache() =
-    let typeProvidersPerAssembly = ConcurrentDictionary<_, ConcurrentDictionary<_, IProxyTypeProvider>>()
-    let proxyTypeProvidersPerId = ConcurrentDictionary<_, _>()
+    let typeProvidersPerAssembly = ConcurrentDictionary<string, ConcurrentDictionary<int, IProxyTypeProvider>>()
+    let proxyTypeProvidersPerId = ConcurrentDictionary<int, IProxyTypeProvider>()
 
     let rec addTypeProvider projectAssembly (tp: IProxyTypeProvider) =
         match typeProvidersPerAssembly.TryGetValue(projectAssembly) with
@@ -57,7 +56,7 @@ type internal TypeProvidersCache() =
     member x.Get(projectOutputPath) =
         match typeProvidersPerAssembly.TryGetValue(projectOutputPath) with
         | true, x -> x.Values
-        | _ -> JetBrains.Util.EmptyArray.Instance :> _
+        | _ -> [||]
 
     member x.Dump() =
         let typeProviders =
@@ -94,7 +93,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
     let tpContext = TypeProvidersContext(connection, enableGenerativeTypeProvidersInMemoryAnalysis)
     let typeProviders = TypeProvidersCache()
     let lock = SpinWaitLockRef()
-    let projectsWithGenerativeProviders = HashSet<IProject>()
+    let projectsWithGenerativeProviders = HashSet<string>()
 
     let addProjectWithGenerativeProvider outputPath =
         let outputAssemblyPath = VirtualFileSystemPath.Parse(outputPath, InteractionContext.SolutionContext)
@@ -103,7 +102,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
         | null -> ()
         | project ->
             use lock = lock.Push()
-            projectsWithGenerativeProviders.Add(project) |> ignore
+            projectsWithGenerativeProviders.Add(project.GetPersistentID()) |> ignore
 
     let disposeTypeProviders (path: string) =
         let providersToDispose = typeProviders.Get(path)
@@ -120,15 +119,12 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
         connection.Execute(fun () ->
             protocol.Invalidate.Advise(lifetime, fun id -> typeProviders.Get(id).OnInvalidate()))
 
-        fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun psiModule ->
+        fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun (psiModule, fcsProject) ->
             use lock = lock.Push()
             let project = getModuleProject psiModule |> notNull
-            projectsWithGenerativeProviders.Remove(project) |> ignore
-
-            let fcsProject = fcsProjectProvider.GetFcsProject(psiModule)
-            match fcsProject with
-            | Some fcsProject -> disposeTypeProviders fcsProject.OutputPath.FullPath
-            | None -> ())
+            projectsWithGenerativeProviders.Remove(project.GetPersistentID()) |> ignore
+            disposeTypeProviders fcsProject.OutputPath.FullPath
+        )
 
         scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime,
             fun psiModule -> disposeTypeProviders psiModule.Path.FullPath)
@@ -173,7 +169,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
 
         member this.HasGenerativeTypeProviders(project) =
             use lock = lock.Push()
-            projectsWithGenerativeProviders.Contains(project)
+            projectsWithGenerativeProviders.Contains(project.GetPersistentID())
 
         member this.Dump() =
             $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"
