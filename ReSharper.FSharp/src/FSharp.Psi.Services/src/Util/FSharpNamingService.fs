@@ -277,7 +277,7 @@ module FSharpNamingService =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =
-    inherit ClrNamingLanguageServiceBase(language)
+    inherit ClrNamingLanguageServiceBase(language, EmptyArray.Instance)
 
     let notAllowedInTypes =
         // F# 4.1 spec: 3.4 Identifiers and Keywords
