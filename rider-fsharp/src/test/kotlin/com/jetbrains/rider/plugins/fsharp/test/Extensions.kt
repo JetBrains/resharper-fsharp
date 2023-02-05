@@ -8,9 +8,9 @@ import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.jetbrains.rdclient.protocol.protocolHost
 import com.jetbrains.rider.RiderEnvironment
-import com.jetbrains.rider.inTests.TestHost
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.settings.RiderSettingMaintenanceController
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.framework.waitBackend
@@ -27,11 +27,12 @@ fun com.intellij.openapi.editor.Editor.dumpTypeProviders(stream: PrintStream) {
 }
 
 fun withSetting(project: Project, setting: String, enterValue: String, exitValue: String, function: () -> Unit) {
-  TestHost.getInstance(project.protocolHost).setSetting(setting, enterValue)
+  val settingController = RiderSettingMaintenanceController.getInstance(project.protocolHost)
+  settingController.setSetting(setting, enterValue)
   try {
     function()
   } finally {
-    TestHost.getInstance(project.protocolHost).setSetting(setting, exitValue)
+    settingController.setSetting(setting, exitValue)
   }
 }
 
