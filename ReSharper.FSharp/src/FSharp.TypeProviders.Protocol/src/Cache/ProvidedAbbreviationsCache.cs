@@ -21,10 +21,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
 
   public class ProvidedAbbreviationsCache : IProvidedAbbreviationsCache
   {
-    private readonly ConcurrentDictionary<IPsiModule, ConcurrentDictionary<string, ProxyProvidedTypeWithContext>>
+    private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, ProxyProvidedTypeWithContext>>
       myCache = new();
 
-    private readonly ConcurrentQueue<(IPsiModule module, string clrName)> myQueueToInvalidate = new();
+    private readonly ConcurrentQueue<(string module, string clrName)> myQueueToInvalidate = new();
 
     //type provider invalidation does not invalidate myQueueToInvalidate
     private void Invalidate()
@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     {
       Invalidate();
 
-      var module = type.TypeProvider.PsiModule.NotNull();
+      var module = type.TypeProvider.PsiModule.NotNull().GetPersistentID();
       if (!myCache.TryGetValue(module, out var moduleTypes))
       {
         moduleTypes = new ConcurrentDictionary<string, ProxyProvidedTypeWithContext>();
@@ -58,24 +58,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
     public bool TryGet(IPsiModule module, IClrTypeName clrName, out ProxyProvidedTypeWithContext providedType)
     {
       providedType = null;
-      return myCache.TryGetValue(module, out var typesGroup) &&
+      return myCache.TryGetValue(module.GetPersistentID(), out var typesGroup) &&
              typesGroup.TryGetValue(clrName.FullName, out providedType);
     }
 
     public void MarkDirty(IPsiModule module, IClrTypeName clrName)
     {
       if (!TryGet(module, clrName, out _)) return;
-      myQueueToInvalidate.Enqueue((module, clrName.FullName));
+      myQueueToInvalidate.Enqueue((module.GetPersistentID(), clrName.FullName));
     }
 
     public void Remove(IProxyTypeProvider typeProvider)
     {
       Invalidate();
       var (module, tpId) = (typeProvider.PsiModule.NotNull(), typeProvider.EntityId);
-      if (myCache.TryGetValue(module, out var typesGroup))
+      if (myCache.TryGetValue(module.GetPersistentID(), out var typesGroup))
       {
         typesGroup.RemoveAll(t => t.Value.TypeProvider.EntityId == tpId);
-        if (typesGroup.Count == 0) myCache.TryRemove(module, out _);
+        if (typesGroup.Count == 0) myCache.TryRemove(module.GetPersistentID(), out _);
       }
     }
 

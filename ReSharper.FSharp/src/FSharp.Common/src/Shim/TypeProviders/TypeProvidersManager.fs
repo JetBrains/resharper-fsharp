@@ -25,7 +25,7 @@ type internal TypeProvidersCache() =
     let typeProvidersPerAssembly = ConcurrentDictionary<string, ConcurrentDictionary<int, IProxyTypeProvider>>()
     let proxyTypeProvidersPerId = ConcurrentDictionary<int, IProxyTypeProvider>()
 
-    let rec addTypeProvider projectAssembly (tp: IProxyTypeProvider) =
+    let rec addTypeProvider (projectAssembly: string) (tp: IProxyTypeProvider) =
         match typeProvidersPerAssembly.TryGetValue(projectAssembly) with
         | true, assemblyCache ->
             match assemblyCache.TryGetValue(tp.EntityId) with

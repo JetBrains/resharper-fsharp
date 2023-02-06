@@ -94,18 +94,17 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let dirtyModules = Dictionary<IPsiModule, bool>()
     let fcsProjectInvalidated = new Signal<IPsiModule * FcsProject>("FcsProjectInvalidated")
 
+    let recentlyDeletedProjects = Dictionary<string, IPsiModule * FcsProject * bool>()
+
     let getReferencingModules (psiModule: IPsiModule) =
         match tryGetValue psiModule referencedModules with
         | None -> Seq.empty
         | Some referencedModule -> referencedModule.ReferencingModules :> _
 
-    let rec invalidateFcsProject
-            forceInvalidateFcs
-            (deletedProjects: IDictionary<string, IPsiModule * FcsProject * bool>)
-            (psiModule: IPsiModule) =
+    let rec invalidateFcsProject forceInvalidateFcs (psiModule: IPsiModule) =
         logger.Trace("Start invalidating referencing modules of psiModule: {0}", psiModule)
 
-        getReferencingModules psiModule |> Seq.iter (invalidateFcsProject forceInvalidateFcs deletedProjects)
+        getReferencingModules psiModule |> Seq.iter (invalidateFcsProject forceInvalidateFcs)
         referencedModules.Remove(psiModule) |> ignore
         projectsPsiModules.Remove(psiModule.ContainingProjectModule, psiModule) |> ignore
 
@@ -118,7 +117,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         | Some fcsProject ->
             logger.Trace("Start invalidating FcsProject: {0}", psiModule)
 
-            deletedProjects[psiModule.GetPersistentID()] <- psiModule, fcsProject, forceInvalidateFcs
+            recentlyDeletedProjects[psiModule.GetPersistentID()] <- psiModule, fcsProject, forceInvalidateFcs
 
             for referencedPsiModule in fcsProject.ReferencedModules do
                 match tryGetValue referencedPsiModule referencedModules with
@@ -197,7 +196,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         projectsPsiModules.Add(psiModule.ContainingProjectModule, psiModule) |> ignore
         fcsProject
 
-    let createOrRecoverFcsProject (project: IProject) (psiModule: IPsiModule) (recentlyDeletedProjects: IDictionary<string, IPsiModule * FcsProject * bool>): FcsProject =
+    let createOrRecoverFcsProject (project: IProject) (psiModule: IPsiModule): FcsProject =
         psiModule.AssertIsValid()
 
         match tryGetValue psiModule fcsProjects with
@@ -310,7 +309,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         fcsProjects[psiModule]
 
     let createFcsProject (project: IProject) (psiModule: IPsiModule): FcsProject =
-        createOrRecoverFcsProject project psiModule EmptyDictionary.Instance
+        createOrRecoverFcsProject project psiModule
 
     let getOrCreateFcsProject (psiModule: IPsiModule): FcsProject option =
         match tryGetFcsProject psiModule with
@@ -363,42 +362,51 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         createFcsProjectWithoutReferences sourceFile.PsiModule
 
+    let notifyProjectInvalidated moduleId psiModule fcsProject =
+        fcsProjectInvalidated.Fire((psiModule, fcsProject))
+        fcsAssemblyReaderShim.InvalidateModule(psiModule)
+        checkerService.InvalidateFcsProject(fcsProject.ProjectOptions)
+
+        recentlyDeletedProjects.Remove(moduleId) |> ignore
+
     /// Try to reuse the unique stamp from existing fcs project options
     /// and to not invalidate FCS project when it is the same for checking.
-    let tryRecoverFcsProjects (deletedProjects: IDictionary<string, IPsiModule * FcsProject * bool>) =
-        for KeyValue(moduleId, (deletedPsiModule, deletedFcsProject, forceInvalidateFcs)) in List.ofSeq deletedProjects do
+    let tryRecoverFcsProjects () =
+        let projects = List.ofSeq recentlyDeletedProjects
+        for KeyValue(moduleId, (deletedPsiModule, deletedFcsProject, forceInvalidateFcs)) in projects do
+            let notifyProjectInvalidated () =
+                notifyProjectInvalidated moduleId deletedPsiModule deletedFcsProject
+
             let psiModule = 
                 if deletedPsiModule.IsValid() then
                     deletedPsiModule
                 else
                     solution.PsiModules().GetById(deletedPsiModule.GetPersistentID())
 
-            if isNull psiModule then () else
+            if isNull psiModule then
+                notifyProjectInvalidated () else
 
             let project = psiModule.ContainingProjectModule.As<IProject>()
-            if isNull project then () else
+            if isNull project then
+                notifyProjectInvalidated () else
 
-            let fcsProject = createOrRecoverFcsProject project psiModule deletedProjects
-            if not forceInvalidateFcs && fcsProject.ProjectOptions.Stamp = deletedFcsProject.ProjectOptions.Stamp then
-                deletedProjects.Remove(moduleId) |> ignore
+            let fcsProject = createOrRecoverFcsProject project psiModule
+            if forceInvalidateFcs || fcsProject.ProjectOptions.Stamp <> deletedFcsProject.ProjectOptions.Stamp then
+                notifyProjectInvalidated ()
+
+            recentlyDeletedProjects.Remove(moduleId) |> ignore
 
     let processDirtyFcsProjects () =
         use lock = FcsReadWriteLock.WriteCookie.Create()
-        if dirtyModules.IsEmpty() then () else
+        if dirtyModules.IsEmpty() && recentlyDeletedProjects.IsEmpty() then () else
 
         logger.Trace("Start invalidating dirty modules")
 
-        let deletedProjects = Dictionary()
         let modulesToInvalidate = List(dirtyModules)
         for KeyValue(psiModule, forceInvalidateFcs) in modulesToInvalidate do
-            invalidateFcsProject forceInvalidateFcs deletedProjects psiModule
+            invalidateFcsProject forceInvalidateFcs psiModule
 
-        tryRecoverFcsProjects deletedProjects
-
-        for KeyValue(_, (psiModule, fcsProject, _)) in deletedProjects do
-            fcsProjectInvalidated.Fire((psiModule, fcsProject))
-            fcsAssemblyReaderShim.InvalidateModule(psiModule)
-            checkerService.InvalidateFcsProject(fcsProject.ProjectOptions)
+        tryRecoverFcsProjects ()
 
         logger.Trace("Done invalidating dirty modules")
 
@@ -562,7 +570,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                     ||> Seq.fold (fun invalidated psiModule -> markDirty forceInvalidateFcs psiModule || invalidated))
                 |> Option.defaultValue invalidated)
 
-        member x.HasFcsProjects = not (fcsProjects.IsEmpty())
+        member x.HasFcsProjects = not (fcsProjects.IsEmpty()) || not (recentlyDeletedProjects.IsEmpty())
 
         member this.GetAllFcsProjects() =
             fcsProjects.Values
