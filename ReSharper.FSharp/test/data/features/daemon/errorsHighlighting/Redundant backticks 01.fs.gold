@@ -1,0 +1,10 @@
+﻿module Module
+
+let |``|(0)a|``|(1) = 1
+let ``a b`` = 1
+
+let ``const`` = 1
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant identifier escaping
+(1):<secondary> ReSharper Dead Code: Redundant identifier escaping

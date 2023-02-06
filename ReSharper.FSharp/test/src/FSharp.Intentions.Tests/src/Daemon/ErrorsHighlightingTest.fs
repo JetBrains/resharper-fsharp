@@ -34,6 +34,8 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Redundant as pat 01``() = x.DoNamedTest()
     [<Test>] member x.``Redundant as pat 02 - Parens``() = x.DoNamedTest()
 
+    [<Test>] member x.``Redundant backticks 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Redundant union case pattern - Active pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Redundant union case pattern - Nested 01``() = x.DoNamedTest()
 
