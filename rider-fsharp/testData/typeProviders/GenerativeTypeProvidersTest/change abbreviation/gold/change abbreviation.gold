@@ -19,7 +19,7 @@ Provided Assemblies:
 2 TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae
 
 Provided Abbreviations:
-ProjectPsiModule(Name: GenerativeTypeProvider, Target: '.NETStandard,Version=v2.0') = 
+2178a420-42c0-437c-a71f-ed080577878f(GenerativeTypeProvider)-A6CC28E6[.NETStandard,Version=v2.0] = 
 	GenerativeTypeProvider.SimpleGenerativeTypeAbbr
 
 [Out-Process dump]:
@@ -75,7 +75,7 @@ Provided Assemblies:
 2 TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae
 
 Provided Abbreviations:
-ProjectPsiModule(Name: GenerativeTypeProvider, Target: '.NETStandard,Version=v2.0') = 
+2178a420-42c0-437c-a71f-ed080577878f(GenerativeTypeProvider)-A6CC28E6[.NETStandard,Version=v2.0] = 
 	GenerativeTypeProvider.SimpleGenerativeTypeAbbr1
 
 [Out-Process dump]:
