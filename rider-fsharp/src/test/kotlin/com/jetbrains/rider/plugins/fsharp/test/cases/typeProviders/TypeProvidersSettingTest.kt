@@ -24,10 +24,8 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
 
   @Test
   fun enableTypeProvidersSetting() {
-    val sourceFile = "TypeProviderLibrary2/Library.fs"
-
     withDisabledOutOfProcessTypeProviders {
-      withOpenedEditor(project, sourceFile) {
+      withOpenedEditor(project, "TypeProviderLibrary2/Library.fs") {
         waitForDaemon()
         rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldBeNull()
         markupAdapter.hasErrors.shouldBeFalse()

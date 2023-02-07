@@ -34,8 +34,8 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         productConfigurations: RunsProducts.ProductConfigurations) as this =
     let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let defaultShim = ExtensionTyping.Provider
-    let outOfProcessHosting = experimentalFeatures.OutOfProcessTypeProviders.Value
-    let generativeTypeProvidersInMemoryAnalysisEnabled = experimentalFeatures.GenerativeTypeProvidersInMemoryAnalysis.Value
+    let outOfProcessHosting = lazy experimentalFeatures.OutOfProcessTypeProviders.Value
+    let generativeTypeProvidersInMemoryAnalysisEnabled = lazy experimentalFeatures.GenerativeTypeProvidersInMemoryAnalysis.Value
     let createProcessLockObj = obj()
 
     let [<VolatileField>] mutable connection: TypeProvidersConnection = null
@@ -65,7 +65,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                     .Run()
 
             typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, scriptPsiModulesProvider,
-                                                         outputAssemblies, generativeTypeProvidersInMemoryAnalysisEnabled) :?> _
+                                                         outputAssemblies, generativeTypeProvidersInMemoryAnalysisEnabled.Value) :?> _
             connection <- newConnection)
 
     do
@@ -80,7 +80,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                 isInvalidationSupported: bool, isInteractive: bool, systemRuntimeContainsType: string -> bool,
                 systemRuntimeAssemblyVersion: Version, compilerToolsPath: string list,
                 logError: TypeProviderError -> unit, m: range) =
-            if not outOfProcessHosting then
+            if not outOfProcessHosting.Value then
                defaultShim.InstantiateTypeProvidersOfAssembly(runTimeAssemblyFileName, designTimeAssemblyNameString,
                     resolutionEnvironment, isInvalidationSupported, isInteractive,
                     systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath, logError, m)
