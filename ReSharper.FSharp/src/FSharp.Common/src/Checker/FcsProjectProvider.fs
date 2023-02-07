@@ -61,7 +61,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         scriptFcsProjectProvider: IScriptFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
         fsFileService: IFSharpFileService, fsItemsContainer: FSharpItemsContainer,
         modulePathProvider: ModulePathProvider, locks: IShellLocks, logger: ILogger,
-        fcsAssemblyReaderShim: IFcsAssemblyReaderShim) as this =
+        fcsAssemblyReaderShim: IFcsAssemblyReaderShim,
+        experimentalFeatures: FSharpExperimentalFeaturesProvider) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     /// The main cache for FCS project model and related things.
@@ -406,7 +407,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         for KeyValue(psiModule, forceInvalidateFcs) in modulesToInvalidate do
             invalidateFcsProject forceInvalidateFcs psiModule
 
-        tryRecoverFcsProjects ()
+        if experimentalFeatures.TryRecoverFcsProjects.Value then
+            tryRecoverFcsProjects ()
 
         logger.Trace("Done invalidating dirty modules")
 
