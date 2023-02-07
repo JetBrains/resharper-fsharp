@@ -25,6 +25,7 @@
     <Compile Include="src\Util\FSharpModulesUtil.fs" />
     <Compile Include="src\Util\FcsTypeUtil.fs" />
     <Compile Include="src\Util\Deconstruction.fs" />
+    <Compile Include="src\Util\MatchTree.fs" />
     <Compile Include="src\Util\FSharpLambdaUtil.fs" />
     <Compile Include="src\Util\FSharpExpectedTypesUtil.fs" />
     <Compile Include="src\Util\EnumCaseLikeDeclarationUtil.fs" />

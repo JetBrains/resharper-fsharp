@@ -1,17 +1,16 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
-open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
-open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
-open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.TextControl
 
 [<PostfixTemplate("match", "Pattern match expression", "match expr with | _ -> ()")>]
 type MatchPostfixTemplate() =
@@ -37,21 +36,13 @@ and MatchPostfixTemplateBehavior(info) =
             use disableFormatter = new DisableCodeFormatter()
 
             let expr = x.GetExpression(context)
-            let appExpr = expr.CreateElementFactory().CreateMatchExpr(expr)
-            ModificationUtil.ReplaceChild(expr, appExpr) :> ITreeNode)
+            let matchExpr = ModificationUtil.ReplaceChild(expr, expr.CreateElementFactory().CreateMatchExpr(expr))
+            let matchClause = matchExpr.Clauses[0]
+            ModificationUtil.DeleteChildRange(matchClause.Pattern, matchClause.LastChild)
+
+            matchExpr :> ITreeNode
+        )
 
     override x.AfterComplete(textControl, node, _) =
-        let matchExpr = node.As<IMatchExpr>()
-        if isNull matchExpr then () else
-
-        let matchClause = matchExpr.Clauses[0]
-        let hotspotInfos =
-            let templateField = TemplateField("Foo", SimpleHotspotExpression(null), 0)
-            HotspotInfo(templateField, matchClause.Pattern.GetDocumentRange(), KeepExistingText = true)
-
-        let hotspotSession =
-            LiveTemplatesManager.Instance.CreateHotspotSessionAtopExistingText(
-                info.ExecutionContext.Solution, matchClause.Expression.GetDocumentEndOffset(), textControl,
-                LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
-
-        hotspotSession.ExecuteAndForget()
+        textControl.Caret.MoveTo(node.GetDocumentEndOffset() + 1, CaretVisualPlacement.DontScrollIfVisible)
+        textControl.RescheduleCompletion(node.GetSolution())

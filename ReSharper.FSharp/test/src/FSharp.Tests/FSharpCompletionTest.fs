@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Settings
@@ -54,6 +55,11 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Lambda - Pipe 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Pipe 02``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Pipe 03 - Parens``() = x.DoNamedTest()
+
+    [<Test>] member x.``Match - Bool 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Bool 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Bool 03``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Tuple 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - Enum - Matched type 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Enum - Rqa 01``() = x.DoNamedTest()
@@ -170,7 +176,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Interpolated string 03 - Middle``() = x.DoNamedTest()
     [<Test>] member x.``Interpolated string 03 - End``() = x.DoNamedTest()
 
-[<FSharpTest>]
+[<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.PostfixTemplates)>]
 type FSharpPostfixCompletionTest() =
     inherit CodeCompletionTestBase()
 
@@ -229,6 +235,8 @@ type FSharpPostfixCompletionTest() =
 
     [<TestDefines("DEFINE")>]
     [<Test>] member x.``Let - Preprocessor 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Match - Bool 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available - Let - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Let - Namespace 01``() = x.DoNamedTest()

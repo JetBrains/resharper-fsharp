@@ -222,4 +222,6 @@ Void
 WeakReference
 Web
 Windows
-_AppDomain{caret}
+_AppDomain
+match
+not{caret}

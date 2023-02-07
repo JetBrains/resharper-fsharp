@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:Match values}
+module Module =
+
+match true with // foo
+| true -> failwith "todo"{caret}
+| false -> failwith "todo"

@@ -17,6 +17,7 @@
     <Compile Include="src\CodeCompletion\Rules\RecordFieldRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\RemoveReparsePatternRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\ImportRule.fs" />
+    <Compile Include="src\CodeCompletion\Rules\GenerateMatchExprPatternsRule.fs" />
     <Compile Include="src\CodeCompletion\FSharpScriptNugetReferencesCompletionProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.fs" />

@@ -1,0 +1,8 @@
+﻿// ${COMPLETE_ITEM:Match values}
+module Module =
+
+match true, true with
+| true, true -> failwith "todo"{caret}
+| true, false -> failwith "todo"
+| false, true -> failwith "todo"
+| false, false -> failwith "todo"

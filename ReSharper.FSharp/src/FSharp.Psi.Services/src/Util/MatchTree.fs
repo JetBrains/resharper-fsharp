@@ -1,10 +1,11 @@
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.QuickFixes.MatchTree
+module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.MatchTree
 
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -537,8 +538,7 @@ module MatchNode =
         loop node
 
     /// Return true if successfully incremented the value
-    let rec increment (deconstructions: Deconstructions) (context: ITreeNode)
-            (wholeNode: MatchNode) (node: MatchNode) =
+    let rec increment (deconstructions: Deconstructions) (context: ITreeNode) (node: MatchNode) =
         match node.Pattern with
         | MatchTest.Value value, _ ->
             match node.Value.Type with
@@ -570,7 +570,7 @@ module MatchNode =
         | MatchTest.Tuple _, nodes ->
             let changedIndex =
                 nodes
-                |> List.tryFindIndexBack (increment deconstructions context wholeNode)
+                |> List.tryFindIndexBack (increment deconstructions context)
 
             match changedIndex with
             | None ->
@@ -596,7 +596,7 @@ module MatchNode =
                 false
 
         | MatchTest.Union index, [caseNode] ->
-            increment deconstructions context wholeNode caseNode ||
+            increment deconstructions context caseNode ||
 
             match node.Value.Type with
             | MatchType.Union unionEntityInstance ->
@@ -619,7 +619,7 @@ module MatchNode =
 
         | MatchTest.UnionCase, nodes
         | MatchTest.Record, nodes ->
-            match List.tryFindIndexBack (increment deconstructions context wholeNode) nodes with
+            match List.tryFindIndexBack (increment deconstructions context) nodes with
             | None -> false
             | Some index ->
                 match MatchTest.initialPattern deconstructions context node.Value with
@@ -637,7 +637,7 @@ module MatchNode =
                     false
 
         | MatchTest.Field _, [node] ->
-            increment deconstructions context wholeNode node
+            increment deconstructions context node
 
         | MatchTest.List isEmpty, _ ->
             if isEmpty then
@@ -649,9 +649,9 @@ module MatchNode =
         | nodePattern -> failwith $"Unexpected pattern: {nodePattern}"
 
     let incrementAndTryReject (deconstructions: Deconstructions) (rejected: List<MatchNode>) (context: ITreeNode)
-            (wholeNode: MatchNode) (node: MatchNode) =
+            (node: MatchNode) =
         tryRecordRejectedDiscard rejected node context
-        increment deconstructions context wholeNode node
+        increment deconstructions context node
 
 
 let getMatchExprMatchType (matchExpr: IMatchExpr) : MatchType =
@@ -933,3 +933,44 @@ let ofMatchExpr (matchExpr: IMatchExpr) =
             matchNodes.Add(MatchNode.Create(matchValue, pattern))
 
     matchValue, matchNodes, deconstructions
+
+
+let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
+    let factory = matchExpr.CreateElementFactory()
+
+    let tryAddClause (node: MatchNode) =
+        if nodes |> Seq.exists (MatchTest.matches node) then
+            () else
+
+        let matchClause = 
+            addNodesAfter matchExpr.LastChild [
+                NewLine(matchExpr.GetLineEnding())
+                let indent = matchExpr.Indent
+                if indent > 0 then
+                    Whitespace(indent)
+                factory.CreateMatchClause()
+            ] :?> IMatchClause
+
+        let usedNames = HashSet()
+        MatchNode.bind usedNames matchClause.Pattern node
+
+    let matchPattern = MatchTest.initialPattern deconstructions matchExpr value
+    let node = MatchNode.Create(value, matchPattern)
+
+    tryAddClause node
+    while MatchNode.increment deconstructions matchExpr node do
+        tryAddClause node
+
+let markToLevelDeconstructions (deconstructions: Deconstructions) (value: MatchValue) =
+    deconstructions[value.Path] <- Deconstruction.InnerPatterns
+
+    match value.Type with
+    | MatchType.Tuple(_, matchTypes) ->
+        matchTypes
+        |> Array.iteri (fun i _ ->
+            let itemPath = MatchTest.TupleItem i :: value.Path
+            deconstructions[itemPath] <- Deconstruction.InnerPatterns
+        )
+
+    | _ ->
+        ()
