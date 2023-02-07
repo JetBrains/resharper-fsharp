@@ -205,11 +205,11 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         this.AddHeader("F# Compiler Service")
         this.AddBoolOptionWithComment((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
         this.AddBoolOptionWithComment((fun key -> key.ParallelProjectReferencesAnalysis), parallelProjectReferencesAnalysis, "Requires restart") |> ignore
-        this.AddBoolOptionWithComment((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Solution reload required") |> ignore
+        this.AddBoolOptionWithComment((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Requires restart") |> ignore
         
         do
             use indent = this.Indent()
-            [ this.AddBoolOptionWithComment((fun key -> key.GenerativeTypeProvidersInMemoryAnalysis), FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis, "Solution reload required") ]
+            [ this.AddBoolOptionWithComment((fun key -> key.GenerativeTypeProvidersInMemoryAnalysis), FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis, "Requires restart") ]
             |> Seq.iter (fun checkbox ->
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.OutOfProcessTypeProviders), fun t -> t :> obj))
             
