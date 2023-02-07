@@ -58,7 +58,9 @@ type ImportRule() =
 
     override this.IsAvailable(context) =
         not context.IsQualified &&
-        context.ReparsedContext.Reference :? FSharpSymbolReference
+        context.ReparsedContext.Reference :? FSharpSymbolReference &&
+
+        context.BasicContext.Solution.GetComponent<IFcsAssemblyReaderShim>().IsEnabled
 
     override this.AddLookupItems(context, collector) =
         let reference = context.ReparsedContext.Reference :?> FSharpSymbolReference

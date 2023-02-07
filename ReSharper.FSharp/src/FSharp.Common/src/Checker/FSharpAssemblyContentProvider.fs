@@ -35,9 +35,6 @@ type FSharpAssemblyContentProvider(lifetime, onSolutionCloseNotifier: OnSolution
                                   // get Content.Entities from it.
 
                   let assembliesByFileName =
-                      let experimentalFeatures = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
-                      if not experimentalFeatures.ReSharperImportCompletion.Value then assembliesByFileName else
-
                       let assemblyReaderShim = solution.GetComponent<IFcsAssemblyReaderShim>()
                       if not assemblyReaderShim.IsEnabled then assembliesByFileName else
 
