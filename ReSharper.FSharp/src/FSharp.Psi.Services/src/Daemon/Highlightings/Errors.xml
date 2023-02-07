@@ -123,6 +123,13 @@
     <Message value="Extension type doesn't have any extension members"/>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="ExtensionAttributeIsRedundant">
+    <Parameter type="IAttribute" name="attr"/>
+    <Range>attr.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <Message value="Extension attribute is redundant"/>
+  </Warning>
+
   <Warning staticGroup="FSharpErrors" name="ExtensionMemberShouldBeStatic">
     <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>

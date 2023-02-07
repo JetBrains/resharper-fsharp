@@ -9,10 +9,11 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 
 [<ElementProblemAnalyzer(typeof<IFSharpTypeElementDeclaration>,
-                         HighlightingTypes = [| typeof<ExtensionMemberInNonExtensionTypeWarning>
+                         HighlightingTypes = [| typeof<ExtensionAttributeIsRedundantWarning>
+                                                typeof<ExtensionMemberInNonExtensionTypeWarning>
                                                 typeof<ExtensionTypeWithNoExtensionMembersWarning>
                                                 typeof<ExtensionMemberShouldBeStaticWarning> |])>]
-type ExtensionAttributeAnalyzer() =
+type  ExtensionAttributeAnalyzer() =
     inherit ElementProblemAnalyzer<IFSharpTypeElementDeclaration>()
 
     let mayHaveExtensions (typeElement: TypeElement) =
@@ -22,7 +23,7 @@ type ExtensionAttributeAnalyzer() =
     let isExtension attr =
         FSharpAttributesUtil.resolvesToType PredefinedType.EXTENSION_ATTRIBUTE_CLASS attr
 
-    override x.Run(typeDeclaration, _, consumer) =
+    override x.Run(typeDeclaration, data, consumer) =
         match typeDeclaration.DeclaredElement.As<TypeElement>() with
         | null -> ()
         | typeElement ->
@@ -30,11 +31,15 @@ type ExtensionAttributeAnalyzer() =
         let mutable typeDeclHasExtensionAttr = false
         let membersMayHaveExtensionAttrs = mayHaveExtensions typeElement
 
+        let typeAttributeIsRequired = not data.IsFSharpExperimentalSupported
+
         for attr in typeDeclaration.GetAttributes() do
             if not typeDeclHasExtensionAttr && isExtension attr then
                 typeDeclHasExtensionAttr <- true
 
-                if not membersMayHaveExtensionAttrs then
+                if not typeAttributeIsRequired then
+                    consumer.AddHighlighting(ExtensionAttributeIsRedundantWarning(attr))
+                elif not membersMayHaveExtensionAttrs then
                     consumer.AddHighlighting(ExtensionTypeWithNoExtensionMembersWarning(attr))
 
         if not typeDeclHasExtensionAttr && not membersMayHaveExtensionAttrs then () else
@@ -47,7 +52,7 @@ type ExtensionAttributeAnalyzer() =
             for attr in memberDecl.GetAttributes() do
                 if not (isExtension attr) then () else
 
-                if not typeHasExtensionAttr then
+                if typeAttributeIsRequired && not typeHasExtensionAttr then
                     consumer.AddHighlighting(ExtensionMemberInNonExtensionTypeWarning(attr))
 
                 let memberDeclaration = memberDecl.As<IMemberDeclaration>()
