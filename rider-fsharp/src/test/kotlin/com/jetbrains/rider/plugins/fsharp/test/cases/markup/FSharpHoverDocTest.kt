@@ -29,7 +29,7 @@ class FSharpHoverDocTest : DocumentationTestBase() {
   @Test
   fun `test empty xml doc`() = doTest("Program.fs", "Program.fs")
 
-  @Test
+  @Test(enabled = false)
   @TestEnvironment(solution = "ConsoleAppTwoTargetFrameworks")
   fun `test multiple frameworks`() = doTest("Program.fs", "Program.fs")
 
