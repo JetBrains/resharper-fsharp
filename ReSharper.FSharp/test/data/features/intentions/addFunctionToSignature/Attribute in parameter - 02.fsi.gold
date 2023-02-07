@@ -1,0 +1,2 @@
+module Test
+val x: [<System.Diagnostics.CodeAnalysis.NotNull>] y: int -> int
