@@ -23,7 +23,7 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
   private val rdFcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
 
   @Test
-  fun enableTypeProvidersSetting() {
+  fun disabledTypeProvidersSetting() {
     withDisabledOutOfProcessTypeProviders {
       withOpenedEditor(project, "TypeProviderLibrary2/Library.fs") {
         waitForDaemon()
