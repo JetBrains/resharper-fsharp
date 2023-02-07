@@ -8,13 +8,10 @@ import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeNull
-import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.scriptingApi.markupAdapter
-import com.jetbrains.rider.test.scriptingApi.reloadAllProjects
-import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
@@ -29,30 +26,12 @@ class TypeProvidersSettingTest : BaseTestWithSolution() {
   fun enableTypeProvidersSetting() {
     val sourceFile = "TypeProviderLibrary2/Library.fs"
 
-    withOpenedEditor(project, sourceFile) {
-      waitForDaemon()
-      rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()
-      markupAdapter.hasErrors.shouldBeFalse()
-    }
-
     withDisabledOutOfProcessTypeProviders {
-      unloadAllProjects()
-      reloadAllProjects(project)
-
       withOpenedEditor(project, sourceFile) {
         waitForDaemon()
         rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldBeNull()
         markupAdapter.hasErrors.shouldBeFalse()
       }
-    }
-
-    unloadAllProjects()
-    reloadAllProjects(project)
-
-    withOpenedEditor(project, sourceFile) {
-      waitForDaemon()
-      rdFcsHost.typeProvidersRuntimeVersion.sync(Unit).shouldNotBeNull()
-      markupAdapter.hasErrors.shouldBeFalse()
     }
   }
 }

@@ -34,8 +34,8 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         productConfigurations: RunsProducts.ProductConfigurations) as this =
     let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let defaultShim = ExtensionTyping.Provider
-    let outOfProcess = experimentalFeatures.OutOfProcessTypeProviders
-    let generativeTypeProvidersInMemoryAnalysis = experimentalFeatures.GenerativeTypeProvidersInMemoryAnalysis
+    let outOfProcessHosting = experimentalFeatures.OutOfProcessTypeProviders.Value
+    let generativeTypeProvidersInMemoryAnalysisEnabled = experimentalFeatures.GenerativeTypeProvidersInMemoryAnalysis.Value
     let createProcessLockObj = obj()
 
     let [<VolatileField>] mutable connection: TypeProvidersConnection = null
@@ -65,7 +65,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                     .Run()
 
             typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, scriptPsiModulesProvider,
-                                                         outputAssemblies, generativeTypeProvidersInMemoryAnalysis.Value) :?> _
+                                                         outputAssemblies, generativeTypeProvidersInMemoryAnalysisEnabled) :?> _
             connection <- newConnection)
 
     do
@@ -74,18 +74,13 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
 
         toolset.Changed.Advise(lifetime, fun _ -> terminateConnection ())
 
-        outOfProcess.Change.Advise(lifetime, fun enabled ->
-            if enabled.HasNew && not enabled.New then terminateConnection ())
-
-        generativeTypeProvidersInMemoryAnalysis.Change.Advise(lifetime, fun _ -> terminateConnection ())
-
     interface IProxyExtensionTypingProvider with
         member this.InstantiateTypeProvidersOfAssembly(runTimeAssemblyFileName: string,
                 designTimeAssemblyNameString: string, resolutionEnvironment: ResolutionEnvironment,
                 isInvalidationSupported: bool, isInteractive: bool, systemRuntimeContainsType: string -> bool,
                 systemRuntimeAssemblyVersion: Version, compilerToolsPath: string list,
                 logError: TypeProviderError -> unit, m: range) =
-            if not outOfProcess.Value then
+            if not outOfProcessHosting then
                defaultShim.InstantiateTypeProvidersOfAssembly(runTimeAssemblyFileName, designTimeAssemblyNameString,
                     resolutionEnvironment, isInvalidationSupported, isInteractive,
                     systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath, logError, m)
