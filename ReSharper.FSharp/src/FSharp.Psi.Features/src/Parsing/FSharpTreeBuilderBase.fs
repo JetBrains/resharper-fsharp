@@ -287,7 +287,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | SynOpenDeclTarget.ModuleOrNamespace(lid, _) ->
             x.ProcessNamedTypeReference(lid.LongIdent)
         | SynOpenDeclTarget.Type(typeName, _) ->
-            x.ProcessType(typeName)
+            x.ProcessTypeAsTypeReferenceName(typeName)
         x.Done(range, mark, ElementType.OPEN_STATEMENT)
 
     member x.StartException(SynExceptionDefnRepr(attributeLists, unionCase, _, XmlDoc xmlDoc, _, _), exnRange) =

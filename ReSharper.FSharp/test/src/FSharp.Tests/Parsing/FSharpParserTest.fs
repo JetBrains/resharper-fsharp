@@ -610,7 +610,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 02 - Qualifier``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open - Type 01``() = x.DoNamedTest()
-    [<Test>] member x.``Module member - Open - Type 02 - Type param``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Open - Type - App 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Open - Type - App 02``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Open - Type - App 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - Array 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Array 02 - Multiline``() = x.DoNamedTest()

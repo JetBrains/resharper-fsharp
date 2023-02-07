@@ -42,6 +42,8 @@ type ImportTypeTest() =
     [<Test>] member x.``Nested Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Nested Module 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Open group 01 - Type``() = x.DoNamedTest()
+
     [<Test>] member x.``Qualifiers - Expr - Imported 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Expr - Imported 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Expr 01``() = x.DoNamedTest()
