@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open System.Collections.Generic
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -25,10 +26,11 @@ type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
         isValid matchExpr &&
 
         // todo: fix parser match expr recovery when no clause is present
-        matchExpr.ClausesEnumerable
-        |> Seq.tryHead
-        |> Option.map (fun clause -> isNotNull clause.Bar)
-        |> Option.defaultValue false
+        let firstClause = matchExpr.ClausesEnumerable.FirstOrDefault()
+
+        isNotNull firstClause &&
+        isNotNull firstClause.Bar &&
+        firstClause.Indent = matchExpr.Indent
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(matchExpr.IsPhysical())
