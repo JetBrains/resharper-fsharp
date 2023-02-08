@@ -892,6 +892,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                 x.ProcessType(synType)
             x.Done(range, mark, ElementType.DELEGATE_CONSTRAINT)
 
+        | SynTypeConstraint.WhereSelfConstrained(synType, range) ->
+            x.ProcessTypeAsTypeReferenceName(synType)
+            x.Done(range, mark, ElementType.SELF_CONSTRAINT)
+
     member x.ProcessTypeParameter(SynTypar(IdentRange range, _, _)) =
         let mark = x.Mark(range)
         x.MarkAndDone(range, ElementType.TYPE_PARAMETER_ID)

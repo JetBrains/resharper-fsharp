@@ -1570,7 +1570,8 @@ interface typeConstraint:
   subtypeConstraint |
   memberConstraint |
   enumConstraint |
-  delegateConstraint;
+  delegateConstraint |
+  selfConstraint;
 
 valueTypeConstraint:
   typeReferenceName<TYPE_REFERENCE, ReferenceNames>
@@ -1607,6 +1608,9 @@ defaultsToConstraint:
 subtypeConstraint:
   typeReferenceName<TYPE_REFERENCE, ReferenceNames>
   COLON;
+
+selfConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>;
 
 memberConstraint:
   (

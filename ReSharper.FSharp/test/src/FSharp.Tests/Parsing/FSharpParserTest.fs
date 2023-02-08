@@ -83,6 +83,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type parameters - Constraints 03 - Or``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 04 - Or and member``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters - Constraints 05 - Ctor``() = x.DoNamedTest()
+    [<Test>] member x.``Type parameters - Constraints 06 - Self``() = x.DoNamedTest()
     [<Test>] member x.``Type Parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Parameters 02 - Attribute``() = x.DoNamedTest()
 
