@@ -74,6 +74,10 @@ type GenerateMatchExprPatternsBehavior(info) =
 type GenerateMatchExprPatternsRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
+    let [<Literal>] Precedence =
+        CLRLookupItemRelevance.ExpectedTypeMatch |||
+        CLRLookupItemRelevance.ExpectedTypeMatchLambda
+
     let getMatchExpr (context: FSharpCodeCompletionContext) =
         let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
         if isNull reference then null else
@@ -96,7 +100,7 @@ type GenerateMatchExprPatternsRule() =
                 .WithPresentation(fun _ -> TextualPresentation(RichText("Match values"), info) :> _)
                 .WithBehavior(fun _ -> GenerateMatchExprPatternsBehavior(info) :> _)
                 .WithMatcher(fun _ -> TextualMatcher("Match values", info) :> _)
-                .WithRelevance(CLRLookupItemRelevance.ExpectedTypeMatchLambda)
+                .WithRelevance(Precedence)
 
         item.Placement.Location <- PlacementLocation.Top
         collector.Add(item)
