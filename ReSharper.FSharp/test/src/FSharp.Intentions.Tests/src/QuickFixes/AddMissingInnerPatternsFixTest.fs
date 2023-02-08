@@ -75,6 +75,15 @@ type AddMissingPatternsFixTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/addMissingMatchClauses/simplified"
 
+    [<Test; NotAvailable>] member x.``Not available - Bar 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Empty line 01``() = x.DoNamedTest()
+    [<Test>] member x.``Empty line 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Indent 01``() = x.DoNamedTest()
+    [<Test>] member x.``Indent 02``() = x.DoNamedTest()
+    [<Test>] member x.``Indent 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 02``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 03``() = x.DoNamedTest()

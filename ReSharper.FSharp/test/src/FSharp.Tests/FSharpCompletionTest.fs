@@ -56,6 +56,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Lambda - Pipe 02``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Pipe 03 - Parens``() = x.DoNamedTest()
 
+    [<Test>] member x.``Match - Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Bool 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Bool 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Bool 03``() = x.DoNamedTest()

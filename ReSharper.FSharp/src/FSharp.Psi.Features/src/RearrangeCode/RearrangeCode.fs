@@ -9,10 +9,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
@@ -179,32 +179,9 @@ type RearrangeableEnumCaseLikeDeclarationProvider() =
 type RearrangeableMatchClause(matchClause: IMatchClause, matchExpr: IMatchLikeExpr) =
     inherit FSharpRearrangeableElementSwap<IMatchClause>(matchClause, "match clause", Direction.All)
 
-    let isLastClause (clause: IMatchClause) =
-        clause == matchExpr.Clauses.Last()
-
     let missingIndent (clause: IMatchClause) =
         let expr = clause.Expression
         isNotNull expr && clause.Indent = expr.Indent
-
-    let addIndent (clause: IMatchClause) =
-        if not (isLastClause clause) then () else
-
-        let expr = clause.Expression
-        if isNull expr || expr.Indent <> clause.Indent then () else
-
-        if expr.IsSingleLine then
-            let oldRange = TreeRange(clause.RArrow.NextSibling, expr.PrevSibling)
-            ModificationUtil.ReplaceChildRange(oldRange, TreeRange(Whitespace())) |> ignore
-        else
-            if clause.RArrow.StartLine.Plus1() < expr.StartLine then
-                let lineEnding = expr.GetLineEnding()
-                let oldRange = TreeRange(clause.RArrow.NextSibling, expr.PrevSibling)
-                ModificationUtil.DeleteChildRange(oldRange)
-                ModificationUtil.AddChildAfter(clause.RArrow, Whitespace(clause.Indent)) |> ignore
-                ModificationUtil.AddChildAfter(clause.RArrow, NewLine(lineEnding)) |> ignore
-
-            let indentSize = expr.GetIndentSize()
-            shiftWithWhitespaceBefore indentSize expr
 
     let removeIndent (clause: IMatchClause) (expr: IFSharpExpression) =
         let clauseIndent = clause.Indent
@@ -226,8 +203,8 @@ type RearrangeableMatchClause(matchClause: IMatchClause, matchExpr: IMatchLikeEx
             ] |> ignore
 
     override this.BeforeSwap(child, target) =
-        addIndent child
-        addIndent target
+        MatchExprUtil.addIndent child
+        MatchExprUtil.addIndent target
 
     override this.GetSiblings() =
         matchExpr.Clauses :> _
@@ -237,13 +214,13 @@ type RearrangeableMatchClause(matchClause: IMatchClause, matchExpr: IMatchLikeEx
 
         // todo: comments
 
-        match isLastClause matchClause, matchClause.Expression, missingIndent matchClause, direction with
+        match MatchExprUtil.isLastClause matchClause, matchClause.Expression, missingIndent matchClause, direction with
         | true, NotNull expr, _, Direction.Down ->
             removeIndent matchClause expr
             expr :> _
 
         | true, NotNull expr, true, Direction.Up ->
-            addIndent matchClause
+            MatchExprUtil.addIndent matchClause
             expr :> _
 
         | _ -> base.MoveUnderPsiTransaction(direction)
@@ -251,7 +228,7 @@ type RearrangeableMatchClause(matchClause: IMatchClause, matchExpr: IMatchLikeEx
     override this.CanMove(direction) =
         base.CanMove(direction) ||
 
-        match isLastClause matchClause, matchClause.Expression, missingIndent matchClause, direction with
+        match MatchExprUtil.isLastClause matchClause, matchClause.Expression, missingIndent matchClause, direction with
         | true, NotNull expr, _, Direction.Down ->
             let seqExpr = SequentialExprNavigator.GetByExpression(matchExpr)
             let seqExprs = if isNotNull seqExpr then seqExpr.Expressions else TreeNodeCollection.Empty

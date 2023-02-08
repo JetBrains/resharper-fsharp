@@ -25,7 +25,10 @@ type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
         isValid matchExpr &&
 
         // todo: fix parser match expr recovery when no clause is present
-        matchExpr.ClausesEnumerable |> Seq.isEmpty |> not
+        matchExpr.ClausesEnumerable
+        |> Seq.tryHead
+        |> Option.map (fun clause -> isNotNull clause.Bar)
+        |> Option.defaultValue false
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(matchExpr.IsPhysical())

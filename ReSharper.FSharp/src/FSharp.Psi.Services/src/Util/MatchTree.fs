@@ -2,16 +2,19 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.MatchTree
 
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 
 // todo: isInstPat
 
@@ -956,6 +959,27 @@ let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
 
     let matchPattern = MatchTest.initialPattern deconstructions matchExpr value
     let node = MatchNode.Create(value, matchPattern)
+
+    let firstClause = Seq.tryHead matchExpr.ClausesEnumerable
+    let lastClause = Seq.tryLast matchExpr.ClausesEnumerable
+
+    lastClause |> Option.iter MatchExprUtil.addIndent
+
+    let addEmptyLineBeforeClauses =
+        match firstClause, lastClause with
+        | Some firstClause, Some lastClause ->
+            if firstClause == lastClause then
+                let pat = lastClause.Pattern
+                let expr = lastClause.Expression
+                isNull pat || isNull expr || pat.EndLine <> expr.StartLine
+            else
+                let prevSibling = lastClause.GetPreviousMeaningfulSibling().NotNull()
+                lastClause.StartLine - prevSibling.EndLine > docLine 1
+
+        | _ -> false
+
+    if addEmptyLineBeforeClauses then
+        addNodeAfter matchExpr.LastChild (NewLine(matchExpr.GetLineEnding()))
 
     tryAddClause node
     while MatchNode.increment deconstructions matchExpr node do
