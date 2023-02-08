@@ -409,6 +409,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         if experimentalFeatures.TryRecoverFcsProjects.Value then
             tryRecoverFcsProjects ()
+        else
+            recentlyDeletedProjects.Clear()
 
         logger.Trace("Done invalidating dirty modules")
 
@@ -617,7 +619,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 [<SolutionComponent>]
 type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,
         psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
-        typeProvidersShim: IProxyExtensionTypingProvider, fcsAssemblyReaderShim: IFcsAssemblyReaderShim) =
+        typeProvidersShim: IProxyExtensionTypingProvider, fcsAssemblyReaderShim: IFcsAssemblyReaderShim,
+        experimentalFeatures: FSharpExperimentalFeaturesProvider) =
     do
         scheduler.EnqueueTask(SolutionLoadTask("FcsProjectProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
             // todo: track file system changes instead? This currently may be triggered on a project model change too.
@@ -629,7 +632,8 @@ type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: Outpu
                 if project.IsFSharp && not (typeProvidersShim.HasGenerativeTypeProviders(project)) then () else
 
                 // The project change is visible to FCS without build.
-                if fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedProject project then () else
+                if experimentalFeatures.TryRecoverFcsProjects.Value &&
+                        fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedProject project then () else
 
                 if fcsProjectProvider.InvalidateReferencesToProject(project, true) then
                     psiFiles.IncrementModificationTimestamp(null) // Drop cached values.

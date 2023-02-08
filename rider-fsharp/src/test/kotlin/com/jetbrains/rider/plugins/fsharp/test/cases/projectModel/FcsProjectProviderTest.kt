@@ -19,6 +19,7 @@ import com.jetbrains.rider.test.scriptingApi.*
 import com.jetbrains.rider.util.idea.syncFromBackend
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
+import kotlin.test.assertEquals
 
 @Suppress("UnstableApiUsage")
 @Test
@@ -47,7 +48,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
     val projectProjectModelId = fileProjectModelEntity?.containingProjectEntity()?.getId(project)!!
 
     val stamp = fcsHost.dumpFcsProjectStamp.syncFromBackend(projectProjectModelId, project)!!
-    assert(expectedStamp == stamp)
+    assertEquals(expectedStamp, stamp)
 
     val referencedProjects = fcsHost.dumpFcsReferencedProjects.syncFromBackend(projectProjectModelId, project)!!
     assert(expectedReferencedProjects == referencedProjects)
@@ -62,7 +63,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
     withOpenedEditor(project, fileName) {
       waitForDaemon()
       project!!.fcsHost.dumpFcsModuleReader.sync(Unit)
-      assert(markupAdapter.hasErrors == hasErrors)
+      assertEquals(hasErrors, markupAdapter.hasErrors)
       assertFcsStampAndReferencedProjectNames(this, expectedStamp, expectedReferencedProjects)
     }
   }
@@ -102,7 +103,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
       assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, 1, listOf("CSharpProject"))
 
       buildSolutionWithReSharperBuild()
-      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, 1, listOf("CSharpProject"))
+      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, 2, listOf("CSharpProject"))
 
       waitForDaemonCloseAllOpenEditors(project)
       deleteElement(
@@ -116,11 +117,11 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
           "CSharpProject/1.0.0"
         )
       )
-      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, 2, emptyList())
+      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, 3, emptyList())
 
       waitForDaemonCloseAllOpenEditors(project)
       addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
-      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, 3, listOf("CSharpProject"))
+      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, 4, listOf("CSharpProject"))
     }
   }
 
@@ -135,7 +136,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
 
     waitForDaemonCloseAllOpenEditors(project)
     buildSolutionWithReSharperBuild()
-    assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, 1, emptyList())
+    assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, 2, emptyList())
 
     waitForDaemonCloseAllOpenEditors(project)
     deleteElement(
