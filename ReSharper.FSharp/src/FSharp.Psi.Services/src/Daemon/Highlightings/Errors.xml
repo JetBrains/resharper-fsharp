@@ -9,251 +9,253 @@
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Resources
-</Usings>
+  </Usings>
+
   <SeverityConfiguration>
     <Group name="HighlightingGroupIds.CodeRedundancy">
       <Tag name="FSharpRedundantParens" default="WARNING">
-        <Title resourceName="RemoveRedundantParentheses" resourceType="Strings" />
-        <Description resourceName="ParenthesesCanBeSafelyRemovedWithoutChangingCodeSemantics" resourceType="Strings" />
+        <Title resourceName="RemoveRedundantParentheses" resourceType="Strings"/>
+        <Description resourceName="ParenthesesCanBeSafelyRemovedWithoutChangingCodeSemantics" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantOpen" default="WARNING">
-        <Title resourceName="RedundantOpenDirective" resourceType="Strings" />
-        <Description resourceName="OpenDirectiveIsNotRequiredByTheCodeAndCanBeSafelyRemoved" resourceType="Strings" />
+        <Title resourceName="RedundantOpenDirective" resourceType="Strings"/>
+        <Description resourceName="OpenDirectiveIsNotRequiredByTheCodeAndCanBeSafelyRemoved" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantBackticks" default="WARNING">
-        <Title resourceName="RedundantIdentifierEscaping" resourceType="Strings" />
-        <Description resourceName="RedundantUseOfEscapingSequences" resourceType="Strings" />
+        <Title resourceName="RedundantIdentifierEscaping" resourceType="Strings"/>
+        <Description resourceName="RedundantUseOfEscapingSequences" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantNameQualifier" default="WARNING">
-        <Title resourceName="RedundantNameQualifier" resourceType="Strings" />
-        <Description resourceName="RedundantUseOfQualifierForName" resourceType="Strings" />
+        <Title resourceName="RedundantNameQualifier" resourceType="Strings"/>
+        <Description resourceName="RedundantUseOfQualifierForName" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantNew" default="WARNING">
-        <Title resourceName="RedundantNewKeyword" resourceType="Strings" />
-        <Description resourceName="NewKeywordIsNotRequiredAndCanBeSafelyRemoved" resourceType="Strings" />
+        <Title resourceName="RedundantNewKeyword" resourceType="Strings"/>
+        <Description resourceName="NewKeywordIsNotRequiredAndCanBeSafelyRemoved" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantAttributeParens" default="WARNING">
-        <Title resourceName="RedundantAttributeParenthesesArgument" resourceType="Strings" />
-        <Description resourceName="ParenthesesAreRedundantIfAttributeHasNoArguments" resourceType="Strings" />
+        <Title resourceName="RedundantAttributeParenthesesArgument" resourceType="Strings"/>
+        <Description resourceName="ParenthesesAreRedundantIfAttributeHasNoArguments" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantAttributeSuffix" default="WARNING">
-        <Title resourceName="RedundantAttributeSuffix" resourceType="Strings" />
-        <Description resourceName="RedundantAttributeSuffix1" resourceType="Strings" />
+        <Title resourceName="RedundantAttributeSuffix" resourceType="Strings"/>
+        <Description resourceName="RedundantAttributeSuffix1" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantUnionCaseFieldPatterns" default="WARNING">
-        <Title resourceName="RedundantUnionCaseFieldsMatching" resourceType="Strings" />
-        <Description resourceName="ExplicitFieldsMatchingIsRedundantAndCanBeReplacedWith" resourceType="Strings" />
+        <Title resourceName="RedundantUnionCaseFieldsMatching" resourceType="Strings"/>
+        <Description resourceName="ExplicitFieldsMatchingIsRedundantAndCanBeReplacedWith" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpConsWithEmptyListPat" default="SUGGESTION">
-        <Title resourceName="RedundantConcatenationWithEmptyList" resourceType="Strings" />
-        <Description resourceName="RedundantConcatenationWithEmptyList2" resourceType="Strings" />
+        <Title resourceName="RedundantConcatenationWithEmptyList" resourceType="Strings"/>
+        <Description resourceName="RedundantConcatenationWithEmptyList2" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantApplication" default="WARNING">
-        <Title resourceName="RedundantApplication" resourceType="Strings" />
-        <Description resourceName="ApplicationIsRedundantAndCanBeReplacedWithItsArgument" resourceType="Strings" />
+        <Title resourceName="RedundantApplication" resourceType="Strings"/>
+        <Description resourceName="ApplicationIsRedundantAndCanBeReplacedWithItsArgument" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantRequireQualifiedAccessAttribute" default="WARNING">
-        <Title resourceName="RedundantRequireQualifiedAccessAttribute" resourceType="Strings" />
-        <Description resourceName="EnumTypeAlwaysRequiresQualifiedAccess" resourceType="Strings" />
+        <Title resourceName="RedundantRequireQualifiedAccessAttribute" resourceType="Strings"/>
+        <Description resourceName="EnumTypeAlwaysRequiresQualifiedAccess" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpLambdaCanBeSimplified" default="HINT">
-        <Title resourceName="LambdaExpressionCanBeSimplified" resourceType="Strings" />
-        <Description resourceName="LambdaExpressionCanBeSimplified3" resourceType="Strings" />
+        <Title resourceName="LambdaExpressionCanBeSimplified" resourceType="Strings"/>
+        <Description resourceName="LambdaExpressionCanBeSimplified3" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpLambdaCanBeReplacedWithInnerExpression" default="HINT">
-        <Title resourceName="LambdaExpressionCanBeReplacedWithInnerExpression" resourceType="Strings" />
-        <Description resourceName="LambdaExpressionCanBeReplacedWithInnerExpression4" resourceType="Strings" />
+        <Title resourceName="LambdaExpressionCanBeReplacedWithInnerExpression" resourceType="Strings"/>
+        <Description resourceName="LambdaExpressionCanBeReplacedWithInnerExpression4" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpBuiltinFunctionReimplementation" default="HINT">
-        <Title resourceName="LambdaExpressionCanBeReplacedWithBuiltInFunction" resourceType="Strings" />
-        <Description resourceName="LambdaExpressionCanBeReplacedWithBuiltInFunction5" resourceType="Strings" />
+        <Title resourceName="LambdaExpressionCanBeReplacedWithBuiltInFunction" resourceType="Strings"/>
+        <Description resourceName="LambdaExpressionCanBeReplacedWithBuiltInFunction5" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpUseWildSelfId" default="SUGGESTION">
-        <Title resourceName="UseSelfId" resourceType="Strings" />
-        <Description resourceName="UseSelfId6" resourceType="Strings" />
+        <Title resourceName="UseSelfId" resourceType="Strings"/>
+        <Description resourceName="UseSelfId6" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantStringInterpolation" default="SUGGESTION">
-        <Title resourceName="RedundantStringInterpolation" resourceType="Strings" />
-        <Description resourceName="StringInterpolationExpressionWithoutArgumentsIsRedundant" resourceType="Strings" />
+        <Title resourceName="RedundantStringInterpolation" resourceType="Strings"/>
+        <Description resourceName="StringInterpolationExpressionWithoutArgumentsIsRedundant" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpInterpolatedString" default="SUGGESTION">
-        <Title resourceName="FormatStringCanBeReplacedWithAnInterpolatedString" resourceType="Strings" />
-        <Description resourceName="FormatStringCanBeReplacedWithAnInterpolatedString7" resourceType="Strings" />
+        <Title resourceName="FormatStringCanBeReplacedWithAnInterpolatedString" resourceType="Strings"/>
+        <Description resourceName="FormatStringCanBeReplacedWithAnInterpolatedString7" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpExpressionCanBeReplacedWithCondition" default="HINT">
-        <Title resourceName="IfExpressionCanBeReplacedWithItsCondition" resourceType="Strings" />
-        <Description resourceName="IfExpressionCanBeReplacedWithItsCondition8" resourceType="Strings" />
+        <Title resourceName="IfExpressionCanBeReplacedWithItsCondition" resourceType="Strings"/>
+        <Description resourceName="IfExpressionCanBeReplacedWithItsCondition8" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantAsPattern" default="WARNING">
-        <Title resourceName="RedundantAsPattern" resourceType="Strings" />
-        <Description resourceName="AsPatternCanBeReplacedWithItsName" resourceType="Strings" />
+        <Title resourceName="RedundantAsPattern" resourceType="Strings"/>
+        <Description resourceName="AsPatternCanBeReplacedWithItsName" resourceType="Strings"/>
       </Tag>
       <Tag name="FSharpRedundantDotInIndexer" default="WARNING">
-        <Title resourceName="RedundantInIndexer" resourceType="Strings" />
-        <Description resourceName="CanBeRemovedInIndexers" resourceType="Strings" />
+        <Title resourceName="RedundantInIndexer" resourceType="Strings"/>
+        <Description resourceName="CanBeRemovedInIndexers" resourceType="Strings"/>
       </Tag>
 
     </Group>
   </SeverityConfiguration>
+
   <StaticSeverityGroups>
-    <Group name="F# Errors" key="FSharpErrors" />
+    <Group name="F# Errors" key="FSharpErrors"/>
   </StaticSeverityGroups>
 
   <Warning name="UnusedOpen" configurableSeverity="FSharpRedundantOpen">
-    <Parameter type="IOpenStatement" name="openStatement" />
-    <Message resourceName="OpenDirectiveIsNotRequiredByTheCodeAndCanBeSafelyRemovedMessage" resourceType="Strings" />
+    <Parameter type="IOpenStatement" name="openStatement"/>
+    <Message resourceName="OpenDirectiveIsNotRequiredByTheCodeAndCanBeSafelyRemovedMessage" resourceType="Strings"/>
     <Range>openStatement.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" />
+    <Behavour attributeID="DEADCODE"/>
     <QuickFix>RemoveUnusedOpensFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionMemberInNonExtensionType">
-    <Parameter type="IAttribute" name="attr" />
+    <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE" />
-    <Message resourceName="ExtensionMemberInNonExtensionTypeLooksSuspiciousMessage" resourceType="Strings" />
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message resourceName="ExtensionMemberInNonExtensionTypeLooksSuspiciousMessage" resourceType="Strings"/>
     <QuickFix>AddExtensionAttributeFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionTypeWithNoExtensionMembers">
-    <Parameter type="IAttribute" name="attr" />
+    <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE" />
-    <Message resourceName="ExtensionTypeDoesnTHaveAnyExtensionMembersMessage" resourceType="Strings" />
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <Message resourceName="ExtensionTypeDoesnTHaveAnyExtensionMembersMessage" resourceType="Strings"/>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionAttributeIsRedundant">
-    <Parameter type="IAttribute" name="attr" />
+    <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE" />
-    <Message resourceName="ExtensionAttributeIsRedundantMessage" resourceType="Strings" />
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <Message resourceName="ExtensionAttributeIsRedundantMessage" resourceType="Strings"/>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionMemberShouldBeStatic">
-    <Parameter type="IAttribute" name="attr" />
+    <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE" />
-    <Message resourceName="ExtensionMemberShouldBeStaticMessage" resourceType="Strings" />
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message resourceName="ExtensionMemberShouldBeStaticMessage" resourceType="Strings"/>
   </Warning>
 
   <Warning name="RedundantRequireQualifiedAccessAttribute" configurableSeverity="FSharpRedundantRequireQualifiedAccessAttribute">
-    <Parameter type="IAttribute" name="attr" />
+    <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
-    <Message resourceName="RedundantRequireQualifiedAccessAttributeMessage" resourceType="Strings" />
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="RedundantRequireQualifiedAccessAttributeMessage" resourceType="Strings"/>
     <QuickFix>RemoveRedundantAttributeFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantBackticks" configurableSeverity="FSharpRedundantBackticks">
-    <Parameter type="FSharpIdentifierToken" name="identifier" />
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
-    <Message resourceName="RedundantIdentifierEscapingMessage" resourceType="Strings" />
+    <Parameter type="FSharpIdentifierToken" name="identifier"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="RedundantIdentifierEscapingMessage" resourceType="Strings"/>
     <Range>identifier.GetHighlightingRange().StartOffsetRange().ExtendRight(2)</Range>
     <SecondaryRanges>[| identifier.GetHighlightingRange().EndOffsetRange().ExtendLeft(2) |] :&gt; _</SecondaryRanges>
     <QuickFix>RemoveRedundantBackticksFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantNew" configurableSeverity="FSharpRedundantNew">
-    <Parameter type="INewExpr" name="newExpr" />
+    <Parameter type="INewExpr" name="newExpr"/>
     <Range>newExpr.NewKeyword.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
-    <Message resourceName="NewKeywordIsRedundantMessage" resourceType="Strings" />
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="NewKeywordIsRedundantMessage" resourceType="Strings"/>
     <QuickFix>RemoveRedundantNewFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ConvertToUseBinding">
-    <Parameter type="ILetOrUseExpr" name="letExpr" />
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.BindingKeyword.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE" />
-    <Message resourceName="ConvertToUseBindingMessage" resourceType="Strings" />
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message resourceName="ConvertToUseBindingMessage" resourceType="Strings"/>
     <QuickFix>ConvertToUseFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" configurableSeverity="FSharpRedundantParens" isSuppressedInTests="true">
-    <Parameter type="IParenExpr" name="parenExpr" />
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
-    <Message resourceName="RedundantParenthesesMessage" resourceType="Strings" />
+    <Parameter type="IParenExpr" name="parenExpr"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="RedundantParenthesesMessage" resourceType="Strings"/>
     <Range>parenExpr.LeftParen.GetHighlightingRange()</Range>
     <SecondaryRanges>secondaryRangesFromNode parenExpr.RightParen</SecondaryRanges>
     <QuickFix>RemoveRedundantParenExprFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="RedundantParenPat" configurableSeverity="FSharpRedundantParens">
-    <Parameter type="IParenPat" name="parenPat" />
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
-    <Message resourceName="RedundantParenthesesMessage" resourceType="Strings" />
+    <Parameter type="IParenPat" name="parenPat"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="RedundantParenthesesMessage" resourceType="Strings"/>
     <Range>parenPat.LeftParen.GetHighlightingRange()</Range>
     <SecondaryRanges>secondaryRangesFromNode parenPat.RightParen</SecondaryRanges>
     <QuickFix>RemoveRedundantParenPatFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="RedundantParenTypeUsage" configurableSeverity="FSharpRedundantParens">
-    <Parameter type="IParenTypeUsage" name="parenTypeUsage" />
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
-    <Message resourceName="RedundantParenthesesMessage" resourceType="Strings" />
+    <Parameter type="IParenTypeUsage" name="parenTypeUsage"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="RedundantParenthesesMessage" resourceType="Strings"/>
     <Range>parenTypeUsage.LeftParen.GetHighlightingRange()</Range>
     <SecondaryRanges>secondaryRangesFromNode parenTypeUsage.RightParen</SecondaryRanges>
     <QuickFix>RemoveRedundantParenTypeUsageFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantAttributeParens" configurableSeverity="FSharpRedundantAttributeParens">
-    <Parameter type="IAttribute" name="attribute" />
+    <Parameter type="IAttribute" name="attribute"/>
     <Range>attribute.ArgExpression.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
-    <Message resourceName="ParenthesesAreRedundantIfAttributeHasNoArgumentsMessage" resourceType="Strings" />
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="ParenthesesAreRedundantIfAttributeHasNoArgumentsMessage" resourceType="Strings"/>
     <QuickFix>RemoveRedundantAttributeParensFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantAttributeSuffix" configurableSeverity="FSharpRedundantAttributeSuffix">
-    <Parameter type="IAttribute" name="attribute" />
+    <Parameter type="IAttribute" name="attribute"/>
     <Range>getAttributeSuffixRange attribute</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
-    <Message resourceName="AttributeSuffixIsRedundantMessage" resourceType="Strings" />
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="AttributeSuffixIsRedundantMessage" resourceType="Strings"/>
     <QuickFix>RemoveRedundantAttributeSuffixFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantQualifier" configurableSeverity="FSharpRedundantNameQualifier">
-    <Parameter type="ITreeNode" name="treeNode" />
+    <Parameter type="ITreeNode" name="treeNode"/>
     <Range>getQualifierRange treeNode</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
-    <Message resourceName="QualifierIsRedundantMessage" resourceType="Strings" />
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="QualifierIsRedundantMessage" resourceType="Strings"/>
     <QuickFix>RemoveRedundantQualifierFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantUnionCaseFieldPatterns" configurableSeverity="FSharpRedundantUnionCaseFieldPatterns">
-    <Parameter type="IParenPat" name="parenPat" />
+    <Parameter type="IParenPat" name="parenPat"/>
     <Range>parenPat.GetHighlightingRange()</Range>
-    <Message resourceName="RedundantUnionCaseFieldsMatchingMessage" resourceType="Strings" />
+    <Message resourceName="RedundantUnionCaseFieldsMatchingMessage" resourceType="Strings"/>
     <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
   </Warning>
 
   <Warning name="ConsWithEmptyListPat" configurableSeverity="FSharpConsWithEmptyListPat">
-    <Parameter type="IListConsPat" name="listConsPat" />
+    <Parameter type="IListConsPat" name="listConsPat"/>
     <Range>listConsPat.GetHighlightingRange()</Range>
-    <Message resourceName="PatternCanBeSimplifiedMessage" resourceType="Strings" />
+    <Message resourceName="PatternCanBeSimplifiedMessage" resourceType="Strings"/>
     <QuickFix>SimplifyListConsPatFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantApplication" configurableSeverity="FSharpRedundantApplication">
-    <Parameter type="IAppExpr" name="appExpr" />
-    <Parameter type="IFSharpExpression" name="argExpr" />
+    <Parameter type="IAppExpr" name="appExpr"/>
+    <Parameter type="IFSharpExpression" name="argExpr"/>
     <Range>getFunctionApplicationRange appExpr</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
-    <Message resourceName="RedundantApplicationMessage" resourceType="Strings" />
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="RedundantApplicationMessage" resourceType="Strings"/>
     <QuickFix>ReplaceAppExprWithArgFix</QuickFix>
   </Warning>
 
   <Warning name="LambdaCanBeSimplified" configurableSeverity="FSharpLambdaCanBeSimplified">
-    <Parameter type="ILambdaExpr" name="lambdaExpr" />
-    <Parameter type="IFSharpExpression" name="replaceCandidate" />
+    <Parameter type="ILambdaExpr" name="lambdaExpr"/>
+    <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
-    <Message resourceName="LambdaCanBeSimplifiedMessage" resourceType="Strings" />
+    <Message resourceName="LambdaCanBeSimplifiedMessage" resourceType="Strings"/>
     <QuickFix>SimplifyLambdaFix</QuickFix>
   </Warning>
 
   <Warning name="LambdaCanBeReplacedWithInnerExpression" configurableSeverity="FSharpLambdaCanBeReplacedWithInnerExpression">
-    <Parameter type="ILambdaExpr" name="lambdaExpr" />
-    <Parameter type="IFSharpExpression" name="replaceCandidate" />
+    <Parameter type="ILambdaExpr" name="lambdaExpr"/>
+    <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
     <Message resourceName="Message" resourceType="Strings">
       <Argument>getLambdaCanBeReplacedWarningText replaceCandidate</Argument>
@@ -262,8 +264,8 @@
   </Warning>
 
   <Warning name="LambdaCanBeReplacedWithBuiltinFunction" configurableSeverity="FSharpBuiltinFunctionReimplementation">
-    <Parameter type="ILambdaExpr" name="lambda" />
-    <Parameter type="string" name="funName" />
+    <Parameter type="ILambdaExpr" name="lambda"/>
+    <Parameter type="string" name="funName"/>
     <Range>lambda.GetHighlightingRange()</Range>
     <Message resourceName="Message" resourceType="Strings">
       <Argument>sprintf "Lambda can be replaced with '%s'" funName</Argument>
@@ -272,33 +274,33 @@
   </Warning>
 
   <Warning name="UseWildSelfId" configurableSeverity="FSharpUseWildSelfId">
-    <Parameter type="INamedSelfId" name="selfId" />
-    <Message resourceName="UseMessage" resourceType="Strings" />
+    <Parameter type="INamedSelfId" name="selfId"/>
+    <Message resourceName="UseMessage" resourceType="Strings"/>
     <Range>selfId.GetDocumentRange()</Range>
     <QuickFix>UseWildSelfIdFix</QuickFix>
   </Warning>
 
   <Warning name="InterpolatedStringCandidate" configurableSeverity="FSharpInterpolatedString">
-    <Parameter type="ILiteralExpr" name="formatStringExpr" />
-    <Parameter type="IPrefixAppExpr" name="prefixAppExpr" />
-    <Parameter type="IFSharpExpression" name="outerPrefixAppExpr" />
-    <Parameter type="(DocumentRange * IFSharpExpression) list" name="formatSpecsAndExprs" isValid="skip" />
+    <Parameter type="ILiteralExpr" name="formatStringExpr"/>
+    <Parameter type="IPrefixAppExpr" name="prefixAppExpr"/>
+    <Parameter type="IFSharpExpression" name="outerPrefixAppExpr"/>
+    <Parameter type="(DocumentRange * IFSharpExpression) list" name="formatSpecsAndExprs" isValid="skip"/>
     <Range>formatStringExpr.GetHighlightingRange()</Range>
-    <Message resourceName="FormatStringCanBeReplacedWithAnInterpolatedStringMessage" resourceType="Strings" />
+    <Message resourceName="FormatStringCanBeReplacedWithAnInterpolatedStringMessage" resourceType="Strings"/>
     <QuickFix>ReplaceWithInterpolatedStringFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantStringInterpolation" configurableSeverity="FSharpRedundantStringInterpolation">
-    <Parameter type="IInterpolatedStringExpr" name="expr" />
-    <Message resourceName="RedundantStringInterpolationMessage" resourceType="Strings" />
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
+    <Parameter type="IInterpolatedStringExpr" name="expr"/>
+    <Message resourceName="RedundantStringInterpolationMessage" resourceType="Strings"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>expr.GetDollarSignRange()</Range>
     <QuickFix>ReplaceWithRegularStringFix</QuickFix>
   </Warning>
 
   <Warning name="ExpressionCanBeReplacedWithCondition" configurableSeverity="FSharpExpressionCanBeReplacedWithCondition">
-    <Parameter type="IIfThenElseExpr" name="expr" />
-    <Parameter type="bool" name="needsNegation" />
+    <Parameter type="IIfThenElseExpr" name="expr"/>
+    <Parameter type="bool" name="needsNegation"/>
     <Message resourceName="Message" resourceType="Strings">
       <Argument>
         if needsNegation then "Expression can be replaced with condition negation"
@@ -310,19 +312,18 @@
   </Warning>
 
   <Warning name="RedundantAsPattern" configurableSeverity="FSharpRedundantAsPattern">
-    <Parameter type="IAsPat" name="asPat" />
-    <Message resourceName="RedundantAsPatternMessage" resourceType="Strings" />
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
+    <Parameter type="IAsPat" name="asPat"/>
+    <Message resourceName="RedundantAsPatternMessage" resourceType="Strings"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getAsPatternRange asPat</Range>
     <QuickFix>RemoveRedundantAsPatFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantIndexerDot" configurableSeverity="FSharpRedundantDotInIndexer">
-    <Parameter type="IItemIndexerExpr" name="indexerExpr" />
-    <Message resourceName="RedundantMessage" resourceType="Strings" />
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE" />
+    <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
+    <Message resourceName="RedundantMessage" resourceType="Strings"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getIndexerDotRange indexerExpr</Range>
     <QuickFix>RemoveIndexerDotFix</QuickFix>
   </Warning>
-
 </Errors>
