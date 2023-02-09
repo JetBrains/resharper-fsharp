@@ -90,7 +90,7 @@
       <Argument>pat.SourceName</Argument>
     </Message>
     <Range>pat.GetNavigationRange()</Range>
-    <SecondaryRanges>pat.GetPartialDeclarations() |&gt; Seq.filter ((!=) pat) |&gt; getNodeRanges</SecondaryRanges>
+    <SecondaryRanges>pat.GetPartialDeclarations() |> Seq.filter ((!=) pat) |> getNodeRanges</SecondaryRanges>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
@@ -265,7 +265,7 @@
       <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
     </Message>
     <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression.GetHighlightingRange()</Range>
-    <SecondaryRanges>getPrefixAppExprArgs expr |&gt; Seq.tail |&gt; getNodeRanges</SecondaryRanges>
+    <SecondaryRanges>getPrefixAppExprArgs expr |> Seq.tail |> getNodeRanges</SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddParensToApplicationFix</QuickFix>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>

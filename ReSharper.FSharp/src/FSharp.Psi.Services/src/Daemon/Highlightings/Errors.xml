@@ -151,7 +151,7 @@
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message resourceName="RedundantIdentifierEscapingMessage" resourceType="Strings"/>
     <Range>identifier.GetHighlightingRange().StartOffsetRange().ExtendRight(2)</Range>
-    <SecondaryRanges>[| identifier.GetHighlightingRange().EndOffsetRange().ExtendLeft(2) |] :&gt; _</SecondaryRanges>
+    <SecondaryRanges>[| identifier.GetHighlightingRange().EndOffsetRange().ExtendLeft(2) |] :> _</SecondaryRanges>
     <QuickFix>RemoveRedundantBackticksFix</QuickFix>
   </Warning>
 
