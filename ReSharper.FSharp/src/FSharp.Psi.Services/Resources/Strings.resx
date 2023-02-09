@@ -20,28 +20,28 @@
         <value>Application is redundant and can be replaced with its argument.</value>
     </data>
     <data name="AsPatternCanBeReplacedWithItsName" xml:space="preserve">
-        <value>&apos;as&apos; pattern can be replaced with its name.</value>
+        <value>'as' pattern can be replaced with its name.</value>
     </data>
     <data name="AttributeSuffixIsRedundantMessage" xml:space="preserve">
         <value>Attribute suffix is redundant</value>
     </data>
     <data name="CanBeRemovedInIndexers" xml:space="preserve">
-        <value>&apos;.&apos; can be removed in indexers.</value>
+        <value>'.' can be removed in indexers.</value>
     </data>
     <data name="CanTTakeAddressOfExpressionMessage" xml:space="preserve">
-        <value>Can&apos;t take address of expression</value>
+        <value>Can't take address of expression</value>
     </data>
     <data name="ClassLocalBindingsCannotBeInlineMessage" xml:space="preserve">
         <value>Class local bindings cannot be inline</value>
     </data>
     <data name="ConvertToUseBindingMessage" xml:space="preserve">
-        <value>Convert to &apos;use&apos; binding</value>
+        <value>Convert to 'use' binding</value>
     </data>
     <data name="EnumTypeAlwaysRequiresQualifiedAccess" xml:space="preserve">
         <value>Enum type always requires qualified access.</value>
     </data>
     <data name="ExplicitFieldsMatchingIsRedundantAndCanBeReplacedWith" xml:space="preserve">
-        <value>Explicit fields matching is redundant and can be replaced with &apos;_&apos;.</value>
+        <value>Explicit fields matching is redundant and can be replaced with '_'.</value>
     </data>
     <data name="ExtensionAttributeIsRedundantMessage" xml:space="preserve">
         <value>Extension attribute is redundant</value>
@@ -53,7 +53,7 @@
         <value>Extension member should be static</value>
     </data>
     <data name="ExtensionTypeDoesnTHaveAnyExtensionMembersMessage" xml:space="preserve">
-        <value>Extension type doesn&apos;t have any extension members</value>
+        <value>Extension type doesn't have any extension members</value>
     </data>
     <data name="FormatStringCanBeReplacedWithAnInterpolatedString" xml:space="preserve">
         <value>Format string can be replaced with an interpolated string</value>
@@ -65,25 +65,25 @@
         <value>Format string can be replaced with an interpolated string</value>
     </data>
     <data name="IfExpressionCanBeReplacedWithItsCondition" xml:space="preserve">
-        <value>&apos;if&apos; expression can be replaced with its condition</value>
+        <value>'if' expression can be replaced with its condition</value>
     </data>
     <data name="IfExpressionCanBeReplacedWithItsCondition8" xml:space="preserve">
-        <value>&apos;if&apos; expression can be replaced with its condition.</value>
+        <value>'if' expression can be replaced with its condition.</value>
     </data>
     <data name="InstanceMemberRequiresAParameterToRepresentTheObjectMessage" xml:space="preserve">
         <value>Instance member requires a parameter to represent the object</value>
     </data>
     <data name="IsBoundMultipleTimesMessage" xml:space="preserve">
-        <value>&apos;{0}&apos; is bound multiple times</value>
+        <value>'{0}' is bound multiple times</value>
     </data>
     <data name="IsMissingExpressionMessage" xml:space="preserve">
-        <value>&apos;{0}&apos; is missing expression</value>
+        <value>'{0}' is missing expression</value>
     </data>
     <data name="IsNotMutableMessage" xml:space="preserve">
         <value>{0} is not mutable</value>
     </data>
     <data name="IsStaticMessage" xml:space="preserve">
-        <value>&apos;{0}&apos; is static</value>
+        <value>'{0}' is static</value>
     </data>
     <data name="LambdaCanBeSimplifiedMessage" xml:space="preserve">
         <value>Lambda can be simplified</value>
@@ -113,7 +113,7 @@
         <value>{0}</value>
     </data>
     <data name="MissingNameAttributeForParameterOrParameterReferenceMessage" xml:space="preserve">
-        <value>Missing &apos;name&apos; attribute for parameter or parameter reference</value>
+        <value>Missing 'name' attribute for parameter or parameter reference</value>
     </data>
     <data name="MultipleDocumentationEntriesForParameterMessage" xml:space="preserve">
         <value>Multiple documentation entries for parameter</value>
@@ -125,10 +125,10 @@
         <value>Namespaces cannot contain expressions</value>
     </data>
     <data name="NewKeywordIsNotRequiredAndCanBeSafelyRemoved" xml:space="preserve">
-        <value>&apos;new&apos; keyword is not required and can be safely removed.</value>
+        <value>'new' keyword is not required and can be safely removed.</value>
     </data>
     <data name="NewKeywordIsRedundantMessage" xml:space="preserve">
-        <value>&apos;new&apos; keyword is redundant</value>
+        <value>'new' keyword is redundant</value>
     </data>
     <data name="NoDocumentationForParameterMessage" xml:space="preserve">
         <value>No documentation for parameter</value>
@@ -155,7 +155,7 @@
         <value>Pattern can be simplified</value>
     </data>
     <data name="PropertyCannotBeSetMessage" xml:space="preserve">
-        <value>Property &apos;{0}&apos; cannot be set</value>
+        <value>Property '{0}' cannot be set</value>
     </data>
     <data name="ProtectedMembersCannotBeAccessedFromClosuresMessage" xml:space="preserve">
         <value>Protected members cannot be accessed from closures</value>
@@ -170,19 +170,19 @@
         <value>Redundant application</value>
     </data>
     <data name="RedundantAsPattern" xml:space="preserve">
-        <value>Redundant &apos;as&apos; pattern</value>
+        <value>Redundant 'as' pattern</value>
     </data>
     <data name="RedundantAsPatternMessage" xml:space="preserve">
-        <value>Redundant &apos;as&apos; pattern</value>
+        <value>Redundant 'as' pattern</value>
     </data>
     <data name="RedundantAttributeParenthesesArgument" xml:space="preserve">
         <value>Redundant attribute parentheses argument</value>
     </data>
     <data name="RedundantAttributeSuffix" xml:space="preserve">
-        <value>Redundant &apos;Attribute&apos; suffix</value>
+        <value>Redundant 'Attribute' suffix</value>
     </data>
     <data name="RedundantAttributeSuffix1" xml:space="preserve">
-        <value>Redundant &apos;Attribute&apos; suffix.</value>
+        <value>Redundant 'Attribute' suffix.</value>
     </data>
     <data name="RedundantConcatenationWithEmptyList" xml:space="preserve">
         <value>Redundant concatenation with empty list</value>
@@ -197,19 +197,19 @@
         <value>Redundant identifier escaping</value>
     </data>
     <data name="RedundantInIndexer" xml:space="preserve">
-        <value>Redundant &apos;.&apos; in indexer</value>
+        <value>Redundant '.' in indexer</value>
     </data>
     <data name="RedundantMessage" xml:space="preserve">
-        <value>Redundant &apos;.&apos;</value>
+        <value>Redundant '.'</value>
     </data>
     <data name="RedundantNameQualifier" xml:space="preserve">
         <value>Redundant name qualifier</value>
     </data>
     <data name="RedundantNewKeyword" xml:space="preserve">
-        <value>Redundant &apos;new&apos; keyword</value>
+        <value>Redundant 'new' keyword</value>
     </data>
     <data name="RedundantOpenDirective" xml:space="preserve">
-        <value>Redundant &apos;open&apos; directive</value>
+        <value>Redundant 'open' directive</value>
     </data>
     <data name="RedundantParenthesesMessage" xml:space="preserve">
         <value>Redundant parentheses</value>
@@ -251,16 +251,16 @@
         <value>Successive arguments should be separated by spaces, tupled, or parenthesized</value>
     </data>
     <data name="TheDeclarationFormLetAndIsOnlyAllowedForRecursiveBindingsConsiderUsingASequenceOfLetBindingsMessage" xml:space="preserve">
-        <value>The declaration form &apos;let ... and ...&apos; is only allowed for recursive bindings. Consider using a sequence of &apos;let&apos; bindings</value>
+        <value>The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings</value>
     </data>
     <data name="TheOperatorExprIdxHasBeenUsedOnAnObjectOfIndeterminateTypeBasedOnInformationPriorToThisProgramPointMessage" xml:space="preserve">
-        <value>The operator &apos;expr.[idx]&apos; has been used on an object of indeterminate type based on information prior to this program point.</value>
+        <value>The operator 'expr.[idx]' has been used on an object of indeterminate type based on information prior to this program point.</value>
     </data>
     <data name="TheSelfReferenceIsUnusedAndAddsRuntimeInitializationChecksToMembersInThisAndDerivedTypesMessage" xml:space="preserve">
         <value>The self reference is unused and adds runtime initialization checks to members in this and derived types</value>
     </data>
     <data name="TheValueIsUnusedMessage" xml:space="preserve">
-        <value>The value &apos;{0}&apos; is unused</value>
+        <value>The value '{0}' is unused</value>
     </data>
     <data name="ThisLiteralPatternDoesNotTakeArgumentsMessage" xml:space="preserve">
         <value>This literal pattern does not take arguments</value>
@@ -281,13 +281,13 @@
         <value>Upcast is unnecessary</value>
     </data>
     <data name="UseBindingsAreNotPermittedInPrimaryConstructorsMessage" xml:space="preserve">
-        <value>&apos;use&apos; bindings are not permitted in primary constructors</value>
+        <value>'use' bindings are not permitted in primary constructors</value>
     </data>
     <data name="UseBindingsAreTreatedAsLetBindingsInModulesMessage" xml:space="preserve">
-        <value>&apos;use&apos; bindings are treated as &apos;let&apos; bindings in modules</value>
+        <value>'use' bindings are treated as 'let' bindings in modules</value>
     </data>
     <data name="UseMessage" xml:space="preserve">
-        <value>Use &apos;_&apos;</value>
+        <value>Use '_'</value>
     </data>
     <data name="UseSelfId" xml:space="preserve">
         <value>Use `_` self id</value>
