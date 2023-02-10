@@ -74,29 +74,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             x.ProcessOpenDeclTarget(openDeclTarget, range)
 
         | SynModuleDecl.Let(_, bindings, range) ->
-            // `extern` declarations are represented as normal `let` bindings with fake rhs expressions in FCS AST.
-            // This is a workaround to mark such declarations and not to mark the non-existent expressions inside it.
-            match bindings with
-            | [SynBinding(attributes = attrs; headPat = headPat; returnInfo = returnInfo; trivia = trivia; xmlDoc = XmlDoc xmlDoc)] when
-                trivia.LetKeyword.IsNone ->
-
-                let mark = x.MarkXmlDocOwner(xmlDoc, null, range)
-                x.ProcessAttributeLists(attrs)
-                x.AdvanceToTokenOrRangeStart(FSharpTokenType.EXTERN, headPat.Range)
-                Assertion.Assert(x.TokenType == FSharpTokenType.EXTERN, "Expecting EXTERN, got: {0}", x.TokenType)
-
-                match returnInfo with
-                | Some(SynBindingReturnInfo(attributes = attrs)) ->
-                    x.ProcessAttributeLists(attrs)
-                | _ -> ()
-                // todo: mark parameters
-                x.Done(range, mark, ElementType.EXTERN_DECLARATION)
-
-            | _ ->
-
-            let letMark = x.Mark(range)
-            x.ProcessTopLevelBindings(bindings)
-            x.Done(range, letMark, ElementType.LET_BINDINGS_DECLARATION)
+            x.ProcessTopLevelBindings(bindings, range)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
             x.ProcessHashDirective(hashDirective)
@@ -216,15 +194,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
     member x.ProcessTypeMember(typeMember: SynMemberDefn) =
         match typeMember with
         | SynMemberDefn.ImplicitCtor _ -> ()
+        | SynMemberDefn.LetBindings(bindings, _, _, range) ->
+            x.ProcessTopLevelBindings(bindings, range)
         | _ ->
 
         let mark =
             match x.ContinueMemberDecl(typeMember.Range) with
             | ValueSome(mark) -> mark
-            | _ ->
-
-            match typeMember with
-            | SynMemberDefn.LetBindings _ -> x.Mark(typeMember.Range)
             | _ -> x.MarkAndProcessIntro(typeMember.Attributes, typeMember.XmlDoc, null, typeMember.Range)
 
         let memberType =
@@ -270,16 +246,6 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
             | SynMemberDefn.Member(binding, range) ->
                 x.ProcessMemberBinding(mark, binding, range, None)
-
-            | SynMemberDefn.LetBindings([SynBinding(kind = SynBindingKind.Do; expr = expr)], _, _, range) ->
-                x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
-                let expr = x.RemoveDoExpr(expr)
-                x.MarkChameleonExpression(expr)
-                ElementType.DO_STATEMENT
-
-            | SynMemberDefn.LetBindings(bindings, _, _, _) ->
-                x.ProcessTopLevelBindings(bindings)
-                ElementType.LET_BINDINGS_DECLARATION
 
             | SynMemberDefn.AbstractSlot(SynValSig(explicitTypeParams = typeParams; synType = synType; arity = arity; trivia = trivia), _, range) ->
                 match typeParams with
@@ -688,14 +654,41 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
         x.Done(binding.RangeOfBindingWithRhs, mark, ElementType.TOP_BINDING)
 
-    member x.ProcessTopLevelBindings(bindings) =
+    member x.ProcessTopLevelBindings(bindings, range) =
         match bindings with
         | [] -> ()
+        | [SynBinding(kind = SynBindingKind.Do; expr = expr)] ->
+            let mark = x.Mark(range)
+            x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
+            let expr = x.RemoveDoExpr(expr)
+            x.MarkChameleonExpression(expr)
+            x.Done(range, mark, ElementType.DO_STATEMENT)
+
+        // `extern` declarations are represented as normal `let` bindings with fake rhs expressions in FCS AST.
+        // This is a workaround to mark such declarations and not to mark the non-existent expressions inside it.
+        | [SynBinding(attributes = attrs; headPat = headPat; returnInfo = returnInfo; trivia = trivia; xmlDoc = XmlDoc xmlDoc)] when
+            trivia.LetKeyword.IsNone ->
+
+            let mark = x.MarkXmlDocOwner(xmlDoc, null, range)
+            x.ProcessAttributeLists(attrs)
+            x.AdvanceToTokenOrRangeStart(FSharpTokenType.EXTERN, headPat.Range)
+            Assertion.Assert(x.TokenType == FSharpTokenType.EXTERN, "Expecting EXTERN, got: {0}", x.TokenType)
+
+            match returnInfo with
+            | Some(SynBindingReturnInfo(attributes = attrs)) ->
+                x.ProcessAttributeLists(attrs)
+            | _ -> ()
+            // todo: mark parameters
+            x.Done(range, mark, ElementType.EXTERN_DECLARATION)
+
         | binding :: rest ->
+        let mark = x.Mark(range)
 
         x.ProcessTopLevelBinding(binding, false)
         for binding in rest do
             x.ProcessTopLevelBinding(binding, true)
+
+        x.Done(range, mark, ElementType.LET_BINDINGS_DECLARATION)
 
     member x.ProcessActivePatternExpr(range: range) =
         x.ProcessActivePatternId(range, ElementType.ACTIVE_PATTERN_NAMED_CASE_REFERENCE_NAME)

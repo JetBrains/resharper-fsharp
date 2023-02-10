@@ -1174,6 +1174,7 @@ interface typeBodyMemberDeclaration:
   valFieldDeclaration |
   letBindingsDeclaration |
   overridableMemberDeclaration |
+  externDeclaration |
   doStatement;
 
 interface overridableMemberDeclaration:
