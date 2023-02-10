@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Util.XmlDocUtil
 open JetBrains.ReSharper.Psi
 
 type FSharpSyntaxHighlighting() =
@@ -38,6 +39,7 @@ type FSharpSyntaxHighlightingProcessor() =
         match element with
         | :? IFSharpDocCommentBlock as block ->
             let xmlFile = block.GetXmlPsi().XmlFile
+            if xmlFile.IsSimpleSummaryDoc then () else
             xmlFile.ProcessDescendants(XmlDocSyntaxHighlightingVisitor(), context); //TODO: F# implementation
         | _ -> ()
 
