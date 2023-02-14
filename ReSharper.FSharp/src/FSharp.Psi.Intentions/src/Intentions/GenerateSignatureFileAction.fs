@@ -1,57 +1,72 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ContextActions
 
 open System.IO
+open JetBrains.ReSharper.Psi.Tree
+open JetBrains.DocumentManagers.Transactions.ProjectHostActions.Ordering
+open JetBrains.ProjectModel.ProjectsHost
+open JetBrains.RdBackend.Common.Features.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
-open type JetBrains.ReSharper.Psi.PsiSourceFileExtensions
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open  JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
-type TopLevelModuleOrNamespace =
-    {
-        IsModule: bool
-        Name: string
-        NestedModules: NestedModule list
-    }
-
-and NestedModule =
-    {
-        Name: string
-        NestedModules: NestedModule list
-    }
+// extract value -> ctrl alt v
+// undo that -> ctrl alt n
 
 [<ContextAction(Group = "F#", Name = "Generate signature file for current file", Priority = 1s,
                 Description = "Generate signature file for current file.")>]
 type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
-    
+
     let mkSignatureFile (fsharpFile: IFSharpFile) : IFSharpFile =
         let factory : IFSharpElementFactory = fsharpFile.CreateElementFactory()
         let signatureFile : IFSharpFile = factory.CreateEmptyFile()
-        
-        let rec processModuleMembers (parent: IFSharpTreeNode) (members: IModuleMember seq) =
-            for m in members do
-                match m with
-                | :? INestedModuleDeclaration as nmd ->
-                    let nestedModuleNode = factory.CreateNestedModule(nmd.NameIdentifier.Name)
-                    // TODO: if the nested module has nested modules, clear the content (`begin end`) and process them.
-                    ModificationUtil.AddChild(parent, nestedModuleNode) |> ignore
-                | _ -> ()
+        let lineEnding = fsharpFile.GetLineEnding()
+
+        let rec processModuleLikeDeclaration (indentation: int) (moduleDecl: IModuleLikeDeclaration) (moduleSig: IModuleLikeDeclaration) : IFSharpTreeNode =
+            for moduleMember in moduleDecl.Members do
+                // newline + indentation whitespace
+                addNodesAfter moduleSig.LastChild [
+                    NewLine(lineEnding)
+                    Whitespace(indentation)
+                    match moduleMember with
+                    | :? INestedModuleDeclaration as nestedNestedModule ->
+                        let nestedSigModule = factory.CreateNestedModule(nestedNestedModule.NameIdentifier.Name)
+                        let members = nestedNestedModule.Members
+                        let shouldEmptyContent =
+                            not members.IsEmpty
+                            && members |> Seq.forall (function | :? IExpressionStatement -> false | _ -> true)
+
+                        if shouldEmptyContent then
+                            ModificationUtil.DeleteChildRange (nestedSigModule.EqualsToken.NextSibling, nestedSigModule.LastChild)
+                        processModuleLikeDeclaration (indentation + moduleDecl.GetIndentSize()) nestedNestedModule nestedSigModule
+                    | :? IOpenStatement as openStatement ->
+                        openStatement.Copy()
+                    | _ -> ()
+                ]
+                |> ignore
+
+            moduleSig
         
         for decl in fsharpFile.ModuleDeclarations do
-            match decl with
-            | :? INamedModuleDeclaration as nmd ->
-                let moduleNode = factory.CreateModule(nmd.NameIdentifier.Name)
-                processModuleMembers moduleNode nmd.Members
-                ModificationUtil.AddChild(signatureFile, moduleNode) |> ignore
-            | :? INamedNamespaceDeclaration as nnd ->
-                let namespaceNode = factory.CreateModule(nnd.NameIdentifier.Name)
-                processModuleMembers namespaceNode nnd.Members
-                ModificationUtil.AddChild(signatureFile, namespaceNode) |> ignore
-            | _ -> ()
+            let signatureModule : IModuleLikeDeclaration =
+                match decl with
+                | :? INamedModuleDeclaration as nmd ->
+                    factory.CreateModule(nmd.DeclaredElement.GetClrName().FullName)
+                | :? IGlobalNamespaceDeclaration ->
+                    factory.CreateNamespace("global") :?> _
+                | :? INamedNamespaceDeclaration as nnd ->
+                    // TODO: add an interface that could unify named and global namespace.
+                    factory.CreateNamespace(nnd.QualifiedName) :?> _
+                | decl -> failwithf $"Unexpected declaration, got: %A{decl}"
+
+            ModificationUtil.AddChildAfter(signatureModule.LastChild, NewLine(lineEnding)) |> ignore
+            let signatureModule = processModuleLikeDeclaration 0 decl signatureModule 
+            ModificationUtil.AddChild(signatureFile, signatureModule) |> ignore
 
         signatureFile
 
@@ -71,30 +86,18 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
         let fsharpFile = projectFile.GetPrimaryPsiFile().AsFSharpFile()
         let physicalPath = dataProvider.SourceFile.ToProjectFile().Location.FileAccessPath
         let fsiFile = Path.ChangeExtension(physicalPath, ".fsi")
-        
         let signatureFile = mkSignatureFile fsharpFile
-        // try
-        //     let currentFSharpFile = dataProvider.PsiFile
-        //     let fcsService = currentFSharpFile.FcsCheckerService
-        //     let checkResult = fcsService.ParseAndCheckFile(currentFSharpFile.GetSourceFile(), "for signature file", true)
-        //     do
-        //         match checkResult with
-        //         | None -> ()
-        //         | Some { CheckResults = checkResult } ->
-        //         
-        //         match checkResult.GenerateSignature() with
-        //         | None -> ()
-        //         | Some signatureSourceText ->
-        //             let content = string signatureSourceText
-        //             File.WriteAllText(fsiFile, content)
-        // with ex ->
-        //     // TODO: show some balloon thing?
-        //     ()
+        File.WriteAllText(fsiFile, signatureFile.GetText())
 
-        // solution.InvokeUnderTransaction(fun transactionCookie ->
-        //     let virtualPath = FileSystemPath.TryParse(fsiFile).ToVirtualFileSystemPath()
-        //     let relativeTo = RelativeTo(projectFile, RelativeToType.Before)
-        //     transactionCookie.AddFile(projectFile.ParentFolder, virtualPath, context = OrderingContext(relativeTo))
-        //     |> ignore)
+        solution.InvokeUnderTransaction(fun transactionCookie ->
+            let virtualPath = FileSystemPath.TryParse(fsiFile).ToVirtualFileSystemPath()
+            let relativeTo = RelativeTo(projectFile, RelativeToType.Before)
+            transactionCookie.AddFile(projectFile.ParentFolder, virtualPath, context = OrderingContext(relativeTo))
+            |> ignore)
 
+        // TODO: it would be nice if we opened the signature file that was just created. Maybe split?
         null
+        
+        // First test name would be: ``ModuleStructure 01`` , ``NamespaceStructure 01``
+        
+        // TODO: raise parser issue.
