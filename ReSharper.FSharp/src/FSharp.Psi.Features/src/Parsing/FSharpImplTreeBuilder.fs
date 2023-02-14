@@ -35,11 +35,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         let (SynModuleOrNamespace(lid, _, moduleKind, decls, XmlDoc xmlDoc, attrs, _, range, _)) = moduleOrNamespace
         let mark, elementType = x.StartTopLevelDeclaration(lid, attrs, moduleKind, xmlDoc, range)
         for decl in decls do
-            x.ProcessModuleMemberDeclaration(decl)
+            x.ProcessModuleMemberDeclaration(decl, moduleOrNamespace.Range)
         x.EnsureMembersAreFinished()
         x.FinishTopLevelDeclaration(mark, range, elementType)
 
-    member x.ProcessModuleMemberDeclaration(moduleMember) =
+    member x.ProcessModuleMemberDeclaration(moduleMember, parentRange) =
         match unfinishedDeclaration with
         | None -> ()
         | Some(mark, range, elementType) ->
@@ -53,7 +53,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         | SynModuleDecl.NestedModule(SynComponentInfo(attrs, _, _, _, XmlDoc xmlDoc, _, _, _), _, decls, _, range, _) ->
             let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             for decl in decls do
-                x.ProcessModuleMemberDeclaration(decl)
+                x.ProcessModuleMemberDeclaration(decl, parentRange)
+
+            if decls.IsEmpty then
+                x.AdvanceToTokenOrRangeEnd(FSharpTokenType.END, parentRange)
+                x.Advance()
+                
             x.Done(range, mark, ElementType.NESTED_MODULE_DECLARATION)
 
         | SynModuleDecl.Types(typeDefns, range) ->
