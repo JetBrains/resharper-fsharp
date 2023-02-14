@@ -5,22 +5,37 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 
 let [<Literal>] OpName = "RedundantQualifierAnalyzer"
 
 // todo: module decls
 
+// todo: add better check for `global`
+let isModuleOrNamespace (fcsReference: FSharpSymbolReference) =
+    let entity = fcsReference.GetFcsSymbol().As<FSharpEntity>()
+    if isNotNull entity then
+        entity.IsFSharpModule || entity.IsNamespace
+    else
+        not fcsReference.IsQualified &&
+
+        let referenceOwner = fcsReference.GetElement()
+        isNotNull referenceOwner && getTokenType referenceOwner.FSharpIdentifier == FSharpTokenType.GLOBAL
+
 let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpReferenceOwner) =
     let reference = referenceOwner.Reference
 
-    let qualifierExpr = reference.QualifierReference
-    if isNull qualifierExpr then false else
+    let qualifierExprReference = reference.QualifierReference
+    if isNull qualifierExprReference then false else
 
-    let qualifierName = qualifierExpr.GetName()
+    let qualifierName = qualifierExprReference.GetName()
     if qualifierName = SharedImplUtil.MISSING_DECLARATION_NAME then false else
+
+    if not (isModuleOrNamespace qualifierExprReference) then false else
 
     let opens = data.GetData(openedModulesProvider).OpenedModuleScopes
     let scopes = opens.GetValuesSafe(qualifierName)
