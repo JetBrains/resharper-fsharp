@@ -1754,6 +1754,7 @@ tupleTypeUsage:
 
 anonRecordTypeUsage:
   topLevelTypeParameterDecl
+  STRUCT<STRUCT, StructKeyword>?
   LBRACE_BAR
   anonRecordField<FIELD, Fields>*
   BAR_RBRACE;
