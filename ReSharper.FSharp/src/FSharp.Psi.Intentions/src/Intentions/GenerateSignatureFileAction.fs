@@ -1,6 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ContextActions
 
 open System.IO
+open JetBrains.Application.UI.PopupLayout
+open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.DocumentManagers.Transactions.ProjectHostActions.Ordering
 open JetBrains.ProjectModel.ProjectsHost
@@ -13,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open  JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Resources.Shell
 
 // extract value -> ctrl alt v
 // undo that -> ctrl alt n
@@ -92,10 +95,19 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
         solution.InvokeUnderTransaction(fun transactionCookie ->
             let virtualPath = FileSystemPath.TryParse(fsiFile).ToVirtualFileSystemPath()
             let relativeTo = RelativeTo(projectFile, RelativeToType.Before)
-            transactionCookie.AddFile(projectFile.ParentFolder, virtualPath, context = OrderingContext(relativeTo))
-            |> ignore)
+            let projectFile = transactionCookie.AddFile(projectFile.ParentFolder, virtualPath, context = OrderingContext(relativeTo))
+            
+            if (not Shell.Instance.IsTestShell) then
+                let navigationOptions = NavigationOptions.FromWindowContext(Shell.Instance.GetComponent<IMainWindowPopupWindowContext>().Source, "")
+                NavigationManager
+                    .GetInstance(solution)
+                    .Navigate(
+                        ProjectFileNavigationPoint(projectFile),
+                        navigationOptions
+                    )
+                    |> ignore
+        )
 
-        // TODO: it would be nice if we opened the signature file that was just created. Maybe split?
         null
         
         // First test name would be: ``ModuleStructure 01`` , ``NamespaceStructure 01``
