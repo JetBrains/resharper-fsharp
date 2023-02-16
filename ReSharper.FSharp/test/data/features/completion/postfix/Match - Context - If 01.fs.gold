@@ -1,0 +1,9 @@
+﻿
+CompareTo
+Equals
+GetHashCode
+GetType
+GetTypeCode
+ToString
+let
+not{caret}

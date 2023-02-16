@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:match}
+module Module
+
+if true then
+    match true with
+    | {caret} 

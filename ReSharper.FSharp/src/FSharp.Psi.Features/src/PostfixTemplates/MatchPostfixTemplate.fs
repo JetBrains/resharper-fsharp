@@ -17,7 +17,21 @@ type MatchPostfixTemplate() =
     inherit FSharpPostfixTemplateBase()
 
     override x.CreateBehavior(info) = MatchPostfixTemplateBehavior(info) :> _
-    override x.TryCreateInfo(context) = MatchPostfixTemplateInfo(context.AllExpressions[0]) :> _
+
+    override x.TryCreateInfo(context) =
+        let context = context.AllExpressions[0]
+        let expr = context.Expression.As<IReferenceExpr>()
+        if isNull expr then null else
+
+        let expr =
+            expr
+            |> FSharpPostfixTemplates.getContainingArgExpr
+            |> FSharpPostfixTemplates.getContainingTupleExpr
+
+        if FSharpPostfixTemplates.canBecomeStatement expr then
+            MatchPostfixTemplateInfo(context) :> _
+        else
+            null
 
 
 and MatchPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
@@ -36,6 +50,7 @@ and MatchPostfixTemplateBehavior(info) =
             use disableFormatter = new DisableCodeFormatter()
 
             let expr = x.GetExpression(context)
+            let expr = FSharpPostfixTemplates.getContainingTupleExpr expr
             let matchExpr = ModificationUtil.ReplaceChild(expr, expr.CreateElementFactory().CreateMatchExpr(expr))
             let matchClause = matchExpr.Clauses[0]
             ModificationUtil.DeleteChildRange(matchClause.Pattern, matchClause.LastChild)
