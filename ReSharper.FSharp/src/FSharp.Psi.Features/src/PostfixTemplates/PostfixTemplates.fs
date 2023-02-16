@@ -21,6 +21,91 @@ module FSharpPostfixTemplates =
         let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
         isNotNull typedExpr
 
+    let canBecomeStatement (expr: IFSharpExpression) : bool =
+        if isNull expr then false else
+
+        let isBlockLike (getParent: IFSharpExpression -> #ITreeNode) parentIsApplicable =
+            let parent = getParent expr
+            parentIsApplicable parent &&
+
+            let expr: ITreeNode = 
+                match ChameleonExpressionNavigator.GetByExpression(expr) with
+                | null -> expr
+                | chameleon -> chameleon
+
+            isOnlyMeaningfulNodeOnLine expr
+
+        let isLetExprApplicable (letExpr: ILetOrUseExpr) =
+            isNotNull letExpr && letExpr.Indent <= expr.Indent 
+
+        let isSequentialExprApplicable (seqExpr: ISequentialExpr) =
+            isNotNull seqExpr // todo
+
+        let isExprStmtApplicable (exprStmt: IDoLikeStatement) =
+            isNotNull exprStmt && Seq.isEmpty exprStmt.AttributesEnumerable
+
+        isBlockLike ArrayOrListExprNavigator.GetByExpression isNotNull ||
+        isBlockLike ComputationExprNavigator.GetByExpression isNotNull ||
+        isBlockLike BindingNavigator.GetByExpression isNotNull ||
+        isBlockLike BinaryAppExprNavigator.GetByArgument isNotNull ||
+        isBlockLike DoLikeExprNavigator.GetByExpression isNotNull ||
+        isBlockLike DoLikeStatementNavigator.GetByExpression isExprStmtApplicable ||
+        isBlockLike ForEachExprNavigator.GetByDoExpression isNotNull ||
+        isBlockLike IfExprNavigator.GetByBranchExpression isNotNull ||
+        isBlockLike LambdaExprNavigator.GetByExpression isNotNull ||
+        isBlockLike LetOrUseExprNavigator.GetByInExpression isLetExprApplicable ||
+        isBlockLike MatchClauseNavigator.GetByExpression isNotNull ||
+        isBlockLike QuoteExprNavigator.GetByQuotedExpression isNotNull ||
+        isBlockLike TryFinallyExprNavigator.GetByFinallyExpression isNotNull ||
+        isBlockLike TryLikeExprNavigator.GetByTryExpression isNotNull ||
+        isBlockLike SequentialExprNavigator.GetByExpression isSequentialExprApplicable ||
+        isBlockLike SetExprNavigator.GetByRightExpression isNotNull ||
+        isBlockLike WhileExprNavigator.GetByDoExpression isNotNull
+
+    let rec getContainingTupleExpr (expr: IFSharpExpression) =
+        let tupleExpr = TupleExprNavigator.GetByExpression(expr)
+        if isNotNull tupleExpr && tupleExpr.Expressions.LastOrDefault() == expr then
+            getContainingTupleExpr tupleExpr
+        else
+            expr
+
+    let rec getContainingArgExpr (expr: IFSharpExpression) =
+        match PrefixAppExprNavigator.GetByArgumentExpression(expr) with
+        | null -> expr
+        | appExpr -> getContainingArgExpr appExpr
+
+    let getContainingTypeExpression (typeName: ITypeReferenceName) =
+        let namedTypeUsage = NamedTypeUsageNavigator.GetByReferenceName(typeName)
+        let tupleTypeUsage = TupleTypeUsageNavigator.GetByItem(namedTypeUsage)
+
+        let typeUsage: ITypeUsage =
+            if isNotNull tupleTypeUsage && tupleTypeUsage.Items.Last() == namedTypeUsage then
+                tupleTypeUsage :> _
+            else
+                namedTypeUsage :> _
+
+        let functionTypeUsage = FunctionTypeUsageNavigator.GetByReturnTypeUsage(typeUsage)
+        let typeUsage: ITypeUsage = if isNotNull functionTypeUsage then functionTypeUsage :> _ else typeUsage
+
+        let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
+        if isNotNull typedExpr then
+            getContainingArgExpr typedExpr else
+
+        null
+
+    let rec removeTemplateAndGetParentExpression (token: IFSharpTreeNode): IFSharpExpression =
+        match token with
+        | :? IReferenceExpr as refExpr ->
+            let qualifier = refExpr.Qualifier.NotNull()
+            ModificationUtil.ReplaceChild(refExpr, qualifier.Copy())
+
+        | :? ITypeReferenceName as referenceName ->
+            let qualifier = referenceName.Qualifier.As<ITypeReferenceName>().NotNull()
+            let newReferenceName = ModificationUtil.ReplaceChild(referenceName, qualifier.Copy())
+            getContainingTypeExpression newReferenceName
+
+        | _ -> null
+
 
 [<AllowNullLiteral>]
 type FSharpPostfixTemplateContext(node: ITreeNode, executionContext: PostfixTemplateExecutionContext) =
@@ -79,50 +164,9 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
 type FSharpPostfixTemplateBehaviorBase(info) =
     inherit PostfixTemplateBehavior(info)
 
-    let rec getContainingArgExpr (expr: IFSharpExpression) =
-        match PrefixAppExprNavigator.GetByArgumentExpression(expr) with
-        | null ->
-            match BinaryAppExprNavigator.GetByRightArgument(expr) with
-            | null -> expr
-            | binaryAppExpr -> binaryAppExpr :> _
-        | appExpr -> getContainingArgExpr appExpr
-
-    let getContainingTypeExpression (typeName: ITypeReferenceName) =
-        let namedTypeUsage = NamedTypeUsageNavigator.GetByReferenceName(typeName)
-        let tupleTypeUsage = TupleTypeUsageNavigator.GetByItem(namedTypeUsage)
-
-        let typeUsage: ITypeUsage =
-            if isNotNull tupleTypeUsage && tupleTypeUsage.Items.Last() == namedTypeUsage then
-                tupleTypeUsage :> _
-            else
-                namedTypeUsage :> _
-
-        let functionTypeUsage = FunctionTypeUsageNavigator.GetByReturnTypeUsage(typeUsage)
-        let typeUsage: ITypeUsage = if isNotNull functionTypeUsage then functionTypeUsage :> _ else typeUsage
-
-        let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
-        if isNotNull typedExpr then
-            getContainingArgExpr typedExpr else
-
-        null
-
-    let rec getParentExpression (token: IFSharpTreeNode): IFSharpExpression =
-        match token with
-        | :? IReferenceExpr as refExpr ->
-            let qualifier = refExpr.Qualifier.NotNull()
-            ModificationUtil.ReplaceChild(refExpr, qualifier.Copy())
-
-        | :? ITypeReferenceName as referenceName ->
-            let qualifier = referenceName.Qualifier.As<ITypeReferenceName>().NotNull()
-            let newReferenceName = ModificationUtil.ReplaceChild(referenceName, qualifier.Copy())
-            getContainingTypeExpression newReferenceName
-
-        | _ -> null
-
     member this.GetExpression(context: PostfixExpressionContext) =
         let node = context.Expression :?> IFSharpTreeNode
-        let parent = getParentExpression node
-        getContainingArgExpr parent
+        FSharpPostfixTemplates.removeTemplateAndGetParentExpression node
 
 
 [<AbstractClass>]

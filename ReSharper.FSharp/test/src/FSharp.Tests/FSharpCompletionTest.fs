@@ -237,7 +237,25 @@ type FSharpPostfixCompletionTest() =
     [<TestDefines("DEFINE")>]
     [<Test>] member x.``Let - Preprocessor 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Match - Context - Binary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Binary 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - If 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - If 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - If 03``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Let 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Let 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Let 03``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Let 04``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - List 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - List 02 - For``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Match 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Match 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Match 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Match - Bool 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Bool 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Tuple 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available - Let - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Let - Namespace 01``() = x.DoNamedTest()

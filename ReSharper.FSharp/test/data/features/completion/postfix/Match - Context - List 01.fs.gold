@@ -1,0 +1,7 @@
+﻿// ${COMPLETE_ITEM:match}
+module Module
+
+let x = [
+    match true with
+    | {caret}
+]
