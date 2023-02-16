@@ -416,6 +416,7 @@ interface fSharpExpression:
   joinInExpr |
   implicitZeroExpr |
   yieldOrReturnExpr |
+  dynamicExpr |
 
   // todo: cover cases
   interpolatedStringExpr |

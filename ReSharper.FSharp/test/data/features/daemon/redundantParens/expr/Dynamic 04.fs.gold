@@ -1,0 +1,7 @@
+﻿module M
+
+a?b?|(|(0)c|)|(1)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
