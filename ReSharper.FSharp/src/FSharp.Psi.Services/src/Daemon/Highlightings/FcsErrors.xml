@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Errors language="F#" implementationLanguage="FSHARP">
 
   <Usings>
@@ -8,7 +9,8 @@
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-    JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Resources
   </Usings>
 
   <StaticSeverityGroups>
@@ -18,7 +20,7 @@
   <Error staticGroup="FSharpErrors" name="IndeterminateTypeRuntimeCoercion" ID="FS0008: Runtime coercion or type test involves an indeterminate type">
     <Parameter type="IIsInstPat" name="isInstPat"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>isInstPat.GetHighlightingRange()</Range>
@@ -28,7 +30,7 @@
 
   <Warning compilerGroup="FSharpErrors" name="UseBindingsIllegalInModules" ID="FS0524: 'use' bindings illegal in modules">
     <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
-    <Message value="'use' bindings are treated as 'let' bindings in modules"/>
+    <Message resourceName="UseBindingsAreTreatedAsLetBindingsInModulesMessage" resourceType="Strings"/>
     <Range>letBindings.BindingKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
@@ -36,7 +38,7 @@
 
   <Error staticGroup="FSharpErrors" name="UseKeywordIllegalInPrimaryCtor" ID="FS0523: 'use' bindings illegal in implicit constructors">
     <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
-    <Message value="'use' bindings are not permitted in primary constructors"/>
+    <Message resourceName="UseBindingsAreNotPermittedInPrimaryConstructorsMessage" resourceType="Strings"/>
     <Range>letBindings.BindingKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
@@ -45,7 +47,7 @@
   <Warning compilerGroup="FSharpErrors" name="MatchIncomplete" ID="FS0025: Match incomplete">
     <Parameter type="IMatchLikeExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>getMatchLikeExprIncompleteRange expr</Range>
@@ -58,7 +60,7 @@
   <Warning compilerGroup="FSharpErrors" name="EnumMatchIncomplete" ID="FS0104: Match incomplete for enum">
     <Parameter type="IMatchLikeExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>getMatchLikeExprIncompleteRange expr</Range>
@@ -68,7 +70,7 @@
 
   <Warning compilerGroup="FSharpErrors" name="RuleNeverMatched" ID="FS0026: Rule never matched">
     <Parameter type="IMatchClause" name="matchClause"/>
-    <Message value="This rule will never be matched"/>
+    <Message resourceName="ThisRuleWillNeverBeMatchedMessage" resourceType="Strings"/>
     <Range>matchClause.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveNeverMatchingRuleFix</QuickFix>
@@ -76,7 +78,7 @@
 
   <Warning compilerGroup="FSharpErrors" name="UnusedThisVariable" ID="FS1183: Unused 'this' value">
     <Parameter type="ICtorSelfId" name="selfId"/>
-    <Message value="The self reference is unused and adds runtime initialization checks to members in this and derived types"/>
+    <Message resourceName="TheSelfReferenceIsUnusedAndAddsRuntimeInitializationChecksToMembersInThisAndDerivedTypesMessage" resourceType="Strings"/>
     <Range>selfId.Identifier.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnusedSelfIdVariableFix</QuickFix>
@@ -84,7 +86,7 @@
 
   <Warning compilerGroup="FSharpErrors" name="UnusedValue" ID="FS1182: Unused value">
     <Parameter type="IReferencePat" name="pat"/>
-    <Message value="The value '{0}' is unused">
+    <Message resourceName="TheValueIsUnusedMessage" resourceType="Strings">
       <Argument>pat.SourceName</Argument>
     </Message>
     <Range>pat.GetNavigationRange()</Range>
@@ -99,7 +101,7 @@
   <Warning compilerGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0001: 'unit' type expected">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -113,7 +115,7 @@
   <Warning compilerGroup="FSharpErrors" name="FunctionValueUnexpected" ID="FS0193: Function type expected">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -126,7 +128,7 @@
   <Error staticGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0001: 'unit' type expected">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -139,7 +141,7 @@
   <Warning compilerGroup="FSharpErrors" name="TypeTestUnnecessary" ID="FS0067: Type test is unnecessary">
     <Parameter type="IDowncastExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -150,7 +152,7 @@
   <Error staticGroup="FSharpErrors" name="FieldRequiresAssignment" ID="FS0764: Field requires assignment">
     <Parameter type="IRecordExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -161,7 +163,7 @@
   <Error staticGroup="FSharpErrors" name="EmptyRecordInvalid" ID="FS0789: '{}' is not a valid expression">
     <Parameter type="IRecordExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -173,7 +175,7 @@
     <Parameter type="ILetBindings" name="letBindings"/>
     <Range>getSecondBindingKeyword letBindings</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <Message value="The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings"/>
+    <Message resourceName="TheDeclarationFormLetAndIsOnlyAllowedForRecursiveBindingsConsiderUsingASequenceOfLetBindingsMessage" resourceType="Strings"/>
     <QuickFix>ToRecursiveLetBindingsFix</QuickFix>
   </Error>
 
@@ -181,7 +183,7 @@
     <Parameter type="ITopBinding" name="binding"/>
     <Range>binding.InlineKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <Message value="Class local bindings cannot be inline"/>
+    <Message resourceName="ClassLocalBindingsCannotBeInlineMessage" resourceType="Strings"/>
     <QuickFix>RemoveInlineFix</QuickFix>
   </Error>
 
@@ -189,13 +191,13 @@
     <Parameter type="IUpcastExpr" name="upcastExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getUpcastRange upcastExpr</Range>
-    <Message value="Upcast is unnecessary"/>
+    <Message resourceName="UpcastIsUnnecessaryMessage" resourceType="Strings"/>
     <QuickFix>RemoveUnnecessaryUpcastFix</QuickFix>
   </Warning>
 
   <Error staticGroup="FSharpErrors" name="VarBoundTwice" ID="FS0038: Pattern bound twice">
     <Parameter type="IReferencePat" name="pat"/>
-    <Message value="'{0}' is bound multiple times">
+    <Message resourceName="IsBoundMultipleTimesMessage" resourceType="Strings">
       <Argument>pat.SourceName</Argument>
     </Message>
     <Range>pat.GetNavigationRange()</Range>
@@ -204,9 +206,10 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UndefinedName" ID="FS0039: Undefined name">
-    <Parameter type="FSharpSymbolReference" name="reference"/> <!-- todo: change to IReference? -->
+    <Parameter type="FSharpSymbolReference" name="reference"/>
+    <!-- todo: change to IReference? -->
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <!--todo: identifier null check-->
@@ -220,7 +223,7 @@
   <Error staticGroup="FSharpErrors" name="UndefinedIndexer" ID="FS0039: Undefined indexer">
     <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>indexerExpr.IndexerArgList.GetHighlightingRange()</Range>
@@ -230,7 +233,7 @@
   <Error staticGroup="FSharpErrors" name="UndefinedIndexerLikeExpr" ID="FS0039: Undefined indexer">
     <Parameter type="IPrefixAppExpr" name="prefixAppExpr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>prefixAppExpr.ArgumentExpression.GetHighlightingRange()</Range>
@@ -240,7 +243,7 @@
   <Error staticGroup="FSharpErrors" name="SuccessiveArgsShouldBeSpacedOrTupled" ID="FS0597: Successive args should be separated with spaces or have parens">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Range>expr.GetHighlightingRange()</Range>
-    <Message value="Successive arguments should be separated by spaces, tupled, or parenthesized"/>
+    <Message resourceName="SuccessiveArgumentsShouldBeSeparatedBySpacesTupledOrParenthesizedMessage" resourceType="Strings"/>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddParensFix</QuickFix>
   </Error>
@@ -249,7 +252,7 @@
     <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.BindingKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <Message value="'{0}' is missing expression">
+    <Message resourceName="IsMissingExpressionMessage" resourceType="Strings">
       <Argument>getLetTokenText letExpr.BindingKeyword</Argument>
     </Message>
     <QuickFix>ReplaceLetWithExpressionFix</QuickFix>
@@ -258,7 +261,7 @@
   <Error staticGroup="FSharpErrors" name="NotAFunction" ID="FS0003: Value is not a function">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="IPrefixAppExpr" name="prefixApp"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
     </Message>
     <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression.GetHighlightingRange()</Range>
@@ -270,7 +273,7 @@
 
   <Error staticGroup="FSharpErrors" name="FieldNotMutable" ID="FS0005: Field is not mutable">
     <Parameter type="IReferenceExpr" name="refExpr"/>
-    <Message value="{0} is not mutable">
+    <Message resourceName="IsNotMutableMessage" resourceType="Strings">
       <Argument>refExpr.Identifier.GetSourceName()</Argument>
     </Message>
     <Range>getRefExprNameRange refExpr</Range>
@@ -280,7 +283,7 @@
 
   <Error staticGroup="FSharpErrors" name="ValueNotMutable" ID="FS0027: Value is not mutable">
     <Parameter type="IReferenceExpr" name="refExpr"/>
-    <Message value="{0} is not mutable">
+    <Message resourceName="IsNotMutableMessage" resourceType="Strings">
       <Argument>refExpr.Identifier.GetSourceName()</Argument>
     </Message>
     <Range>getRefExprNameRange refExpr</Range>
@@ -291,7 +294,7 @@
   <Error staticGroup="FSharpErrors" name="NoImplementationGivenInType" ID="FS0365: No implementation given">
     <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>typeDecl.GetNameDocumentRange()</Range>
@@ -303,7 +306,7 @@
   <Error staticGroup="FSharpErrors" name="NoImplementationGivenInTypeWithSuggestion" ID="FS0366: No implementation given">
     <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>typeDecl.GetNameDocumentRange()</Range>
@@ -315,7 +318,7 @@
   <Error staticGroup="FSharpErrors" name="NoImplementationGivenInInterface" ID="FS0365: No implementation given">
     <Parameter type="IInterfaceImplementation" name="impl"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>getInterfaceImplHeaderRange impl</Range>
@@ -326,7 +329,7 @@
   <Error staticGroup="FSharpErrors" name="NoImplementationGivenInInterfaceWithSuggestion" ID="FS0366: No implementation given">
     <Parameter type="IInterfaceImplementation" name="impl"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>getInterfaceImplHeaderRange impl</Range>
@@ -336,7 +339,7 @@
 
   <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression" ID="FS0748: 'return' is not allowed">
     <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
-    <Message value="`return` may only be used within computation expressions"/>
+    <Message resourceName="ReturnMayOnlyBeUsedWithinComputationExpressionsMessage" resourceType="Strings"/>
     <Range>yieldExpr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveYieldFix</QuickFix>
@@ -344,7 +347,7 @@
 
   <Error staticGroup="FSharpErrors" name="YieldRequiresSeqExpression" ID="FS0747: 'yield' is not allowed">
     <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
-    <Message value="`yield` may only be used within list, array, and sequence expressions"/>
+    <Message resourceName="YieldMayOnlyBeUsedWithinListArrayAndSequenceExpressionsMessage" resourceType="Strings"/>
     <Range>yieldExpr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveYieldFix</QuickFix>
@@ -352,7 +355,7 @@
 
   <Error staticGroup="FSharpErrors" name="NamespaceCannotContainBindings" ID="FS0201: Namespaces can't contain values">
     <Parameter type="IBindingLikeDeclaration" name="binding"/>
-    <Message value="Namespaces cannot contain bindings"/>
+    <Message resourceName="NamespacesCannotContainBindingsMessage" resourceType="Strings"/>
     <Range>binding.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>NamespaceToModuleFix</QuickFix>
@@ -360,7 +363,7 @@
 
   <Error staticGroup="FSharpErrors" name="NamespaceCannotContainExpressions" ID="FS0201: Namespaces can't contain values">
     <Parameter type="IDoLikeStatement" name="expr"/>
-    <Message value="Namespaces cannot contain expressions"/>
+    <Message resourceName="NamespacesCannotContainExpressionsMessage" resourceType="Strings"/>
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>NamespaceToModuleFix</QuickFix>
@@ -371,7 +374,7 @@
     <Parameter type="string" name="actualType"/>
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -382,7 +385,7 @@
 
   <Error staticGroup="FSharpErrors" name="TypeAbbreviationsCannotHaveAugmentations" ID="FS0964: Type abbreviations cannot have augmentations">
     <Parameter type="ITypeExtensionDeclaration" name="extensionDecl"/>
-    <Message value="Type abbreviations cannot have augmentations"/>
+    <Message resourceName="TypeAbbreviationsCannotHaveAugmentationsMessage" resourceType="Strings"/>
     <Range>extensionDecl.Identifier.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceWithAbbreviatedTypeFix</QuickFix>
@@ -391,7 +394,7 @@
   <Error staticGroup="FSharpErrors" name="RuntimeCoercionSourceSealed" ID="FS0016: Can't coerce sealed type">
     <Parameter type="ITypedLikeExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -403,7 +406,7 @@
     <Parameter type="string" name="mismatchedType"/>
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -414,7 +417,7 @@
 
   <Error staticGroup="FSharpErrors" name="IndeterminateType" ID="FS0072: Lookup on indeterminate type object">
     <Parameter type="IReferenceExpr" name="refExpr"/>
-    <Message value="Lookup on object of indeterminate type based on information prior to this program point. A type annotation may be needed constrain the type of the object."/>
+    <Message resourceName="LookupOnObjectOfIndeterminateTypeBasedOnInformationPriorToThisProgramPointATypeAnnotationMayBeNeededConstrainTheTypeOfTheObjectMessage" resourceType="Strings"/>
     <Range>refExpr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>SpecifyParameterTypeFix</QuickFix>
@@ -423,7 +426,7 @@
 
   <Error staticGroup="FSharpErrors" name="IndexerIndeterminateType" ID="FS0752: Use of indexer on indeterminate type object">
     <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
-    <Message value="The operator 'expr.[idx]' has been used on an object of indeterminate type based on information prior to this program point."/>
+    <Message resourceName="TheOperatorExprIdxHasBeenUsedOnAnObjectOfIndeterminateTypeBasedOnInformationPriorToThisProgramPointMessage" resourceType="Strings"/>
     <Range>indexerExpr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>SpecifyParameterTypeFix</QuickFix>
@@ -433,7 +436,7 @@
   <Error staticGroup="FSharpErrors" name="AddingConstraint" ID="FS0043: Error from adding type constraint">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -443,7 +446,7 @@
 
   <Error staticGroup="FSharpErrors" name="OnlyClassCanTakeValueArguments" ID="FS0552: Only class and struct types may have constructors">
     <Parameter type="IPrimaryConstructorDeclaration" name="ctorDecl"/>
-    <Message value="Only class and struct types may have constructors"/>
+    <Message resourceName="OnlyClassAndStructTypesMayHaveConstructorsMessage" resourceType="Strings"/>
     <Range>ctorDecl.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveConstructorFix</QuickFix>
@@ -451,7 +454,7 @@
 
   <Error staticGroup="FSharpErrors" name="InstanceMemberRequiresTarget" ID="FS0673: Missing 'this' identifier">
     <Parameter type="IMemberDeclaration" name="memberDecl"/>
-    <Message value="Instance member requires a parameter to represent the object"/>
+    <Message resourceName="InstanceMemberRequiresAParameterToRepresentTheObjectMessage" resourceType="Strings"/>
     <Range>memberDecl.Identifier.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddInstanceMemberSelfIdFix</QuickFix>
@@ -460,7 +463,7 @@
 
   <Error staticGroup="FSharpErrors" name="MemberIsNotAccessible" ID="FS0491: Member is inaccessible">
     <Parameter type="IReferenceExpr" name="refExpr"/>
-    <Message value="Protected members cannot be accessed from closures"/>
+    <Message resourceName="ProtectedMembersCannotBeAccessedFromClosuresMessage" resourceType="Strings"/>
     <Range>refExpr.Identifier.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>IntroduceVarFix</QuickFix>
@@ -468,7 +471,7 @@
 
   <Error staticGroup="FSharpErrors" name="FieldIsStatic" ID="FS0493: Static field used on instance">
     <Parameter type="IReferenceExpr" name="refExpr"/>
-    <Message value="'{0}' is static">
+    <Message resourceName="IsStaticMessage" resourceType="Strings">
       <Argument>refExpr.ShortName</Argument>
     </Message>
     <Range>refExpr.Identifier.GetHighlightingRange()</Range>
@@ -478,7 +481,7 @@
 
   <Error staticGroup="FSharpErrors" name="MethodIsStatic" ID="FS0493: Static method used on instance">
     <Parameter type="IReferenceExpr" name="refExpr"/>
-    <Message value="'{0}' is static">
+    <Message resourceName="IsStaticMessage" resourceType="Strings">
       <Argument>refExpr.ShortName</Argument>
     </Message>
     <Range>refExpr.Identifier.GetHighlightingRange()</Range>
@@ -488,7 +491,7 @@
 
   <Error staticGroup="FSharpErrors" name="PropertyIsStatic" ID="FS0809: Static propery used on instance">
     <Parameter type="IReferenceExpr" name="refExpr"/>
-    <Message value="'{0}' is static">
+    <Message resourceName="IsStaticMessage" resourceType="Strings">
       <Argument>refExpr.ShortName</Argument>
     </Message>
     <Range>refExpr.Identifier.GetHighlightingRange()</Range>
@@ -498,7 +501,7 @@
 
   <Error staticGroup="FSharpErrors" name="PropertyCannotBeSet" ID="FS0810: Property cannot be set">
     <Parameter type="IReferenceExpr" name="refExpr"/>
-    <Message value="Property '{0}' cannot be set">
+    <Message resourceName="PropertyCannotBeSetMessage" resourceType="Strings">
       <Argument>refExpr.ShortName</Argument>
     </Message>
     <Range>refExpr.Identifier.GetHighlightingRange()</Range>
@@ -508,7 +511,7 @@
 
   <Error staticGroup="FSharpErrors" name="CantTakeAddressOfExpression" ID="FS3236: Can't take address of expression">
     <Parameter type="IAddressOfExpr" name="expr"/>
-    <Message value="Can't take address of expression"/>
+    <Message resourceName="CanTTakeAddressOfExpressionMessage" resourceType="Strings"/>
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>IntroduceVarFix</QuickFix>
@@ -517,7 +520,7 @@
   <Error staticGroup="FSharpErrors" name="UnionCaseExpectsTupledArguments" ID="FS0727: Union case expects tupled arguments">
     <Parameter type="IParametersOwnerPat" name="pat"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>getParameterOwnerPatParametersRange pat</Range>
@@ -528,20 +531,20 @@
   <Error staticGroup="FSharpErrors" name="SingleQuoteInSingleQuote" ID="FS3373: Invalid interpolated string. Single quote or verbatim string literals may not be used in interpolated expressions in single quote or verbatim strings. Consider using an explicit 'let' binding for the interpolation expression or use a triple quote string as the outer string literal.">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceWithTripleQuotedInterpolatedStringFix</QuickFix>
   </Error>
-  
+
   <Error staticGroup="FSharpErrors" name="TypeDoesNotMatchType" ID="FS0001: The type does not match the type">
     <Parameter type="string" name="expectedType"/>
     <Parameter type="string" name="actualType"/>
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -554,7 +557,7 @@
     <Parameter type="string" name="actualType"/>
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -567,7 +570,7 @@
     <Parameter type="string" name="actualType"/>
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -579,7 +582,7 @@
     <Parameter type="string" name="actualType"/>
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>expr.GetHighlightingRange()</Range>
@@ -589,19 +592,19 @@
 
   <Warning compilerGroup="FSharpErrors" name="InvalidXmlDocPosition" ID="FS3520: XML comment is not placed on a valid language element">
     <Parameter type="DocComment" name="comment"/>
-    <Message value="XML comment is not placed on a valid language element."/>
+    <Message resourceName="XMLCommentIsNotPlacedOnAValidLanguageElementMessage" resourceType="Strings"/>
     <Range>comment.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceXmlDocWithLineCommentFix</QuickFix>
     <QuickFix>RemoveXmlDocFix</QuickFix>
   </Warning>
-  
+
   <Warning compilerGroup="FSharpErrors" name="ArgumentNameMismatch" ID="FS3218: The argument names in the signature and implementation do not match">
     <Parameter type="IFSharpPattern" name="pattern"/>
     <Parameter type="string" name="signatureParameterName"/>
     <Parameter type="string" name="implementationParameterName"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>pattern.GetHighlightingRange()</Range>
@@ -612,7 +615,7 @@
   <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldWasPresent" ID="FS0311: The type definitions for type in the signature and implementation are not compatible because the field was present in the implementation but not in the signature">
     <Parameter type="IFSharpTypeDeclaration" name="typeDeclaration"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>typeDeclaration.GetHighlightingRange()</Range>
@@ -623,7 +626,7 @@
   <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldOrderDiffer" ID="FS0312: The type definitions for type in the signature and implementation are not compatible because the order of the fields is different in the signature and implementation">
     <Parameter type="IFSharpTypeDeclaration" name="typeDeclaration"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>typeDeclaration.GetHighlightingRange()</Range>
@@ -634,7 +637,7 @@
   <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecified" ID="FS0313: The type definitions for type in the signature and implementation are not compatible because the field Field2 was required by the signature but was not specified by the implementation">
     <Parameter type="IFSharpTypeDeclaration" name="typeDeclaration"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>typeDeclaration.GetHighlightingRange()</Range>
@@ -645,7 +648,7 @@
   <Error staticGroup="FSharpErrors" name="FieldNotContainedTypesDiffer" ID="FS0193: The module contains the field but its signature specifies The types differ">
     <Parameter type="IRecordFieldDeclaration" name="recordFieldDeclaration"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Message value="{0}">
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
     <Range>recordFieldDeclaration.GetHighlightingRange()</Range>
@@ -654,58 +657,57 @@
   </Error>
 
   <Warning compilerGroup="FSharpErrors" name="XmlDocCommentSyntax" ID="FS3390: This XML comment is invalid">
-    <Parameter type="IHighlighting" name="baseHighlighting" />
-    <Parameter type="DocumentRange" name="documentRange" />
-    <Message value="{0}">
+    <Parameter type="IHighlighting" name="baseHighlighting"/>
+    <Parameter type="DocumentRange" name="documentRange"/>
+    <Message resourceName="Message" resourceType="Strings">
       <Argument>baseHighlighting.ToolTip</Argument>
     </Message>
     <Range>documentRange</Range>
     <IsValid>baseHighlighting.IsValid()</IsValid>
-    <Behavour overlapResolvePolicy="WARNING" />
+    <Behavour overlapResolvePolicy="WARNING"/>
   </Warning>
 
   <Warning compilerGroup="FSharpErrors" name="XmlDocMissingParameter" ID="FS3390: This XML comment is incomplete: no documentation for parameter">
     <Parameter type="ITreeNode" name="parameter"/>
-    <Message value="No documentation for parameter"/>
+    <Message resourceName="NoDocumentationForParameterMessage" resourceType="Strings"/>
     <Range>parameter.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
   </Warning>
 
   <Warning compilerGroup="FSharpErrors" name="XmlDocDuplicateParameter" ID="FS3390: This XML comment is invalid: multiple documentation entries for parameter">
     <Parameter type="ITreeNode" name="paramEntry"/>
-    <Message value="Multiple documentation entries for parameter"/>
+    <Message resourceName="MultipleDocumentationEntriesForParameterMessage" resourceType="Strings"/>
     <Range>paramEntry.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
   </Warning>
 
   <Warning compilerGroup="FSharpErrors" name="XmlDocUnresolvedParameter" ID="FS3390: This XML comment is invalid: unknown parameter">
     <Parameter type="ITreeNode" name="paramEntry"/>
-    <Message value="Unknown parameter name"/>
+    <Message resourceName="UnknownParameterNameMessage" resourceType="Strings"/>
     <Range>paramEntry.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
   </Warning>
 
   <Warning compilerGroup="FSharpErrors" name="XmlDocMissingParameterName" ID="FS3390: This XML comment is invalid: missing 'name' attribute for parameter or parameter reference">
     <Parameter type="ITreeNode" name="paramTag"/>
-    <Message value="Missing 'name' attribute for parameter or parameter reference"/>
+    <Message resourceName="MissingNameAttributeForParameterOrParameterReferenceMessage" resourceType="Strings"/>
     <Range>paramTag.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
   </Warning>
 
   <Error staticGroup="FSharpErrors" name="UnionCaseDoesNotTakeArguments" ID="FS0725: This union case does not take arguments">
     <Parameter type="IParametersOwnerPat" name="pattern"/>
-    <Message value="This union case does not take arguments"/>
-    <Range>pattern.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>RemovePatternArgumentFix</QuickFix>
-  </Error>
-  
-  <Error staticGroup="FSharpErrors" name="LiteralPatternDoesNotTakeArguments" ID="FS3191: This literal pattern does not take arguments">
-    <Parameter type="IParametersOwnerPat" name="pattern"/>
-    <Message value="This literal pattern does not take arguments"/>
+    <Message resourceName="ThisUnionCaseDoesNotTakeArgumentsMessage" resourceType="Strings"/>
     <Range>pattern.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemovePatternArgumentFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="LiteralPatternDoesNotTakeArguments" ID="FS3191: This literal pattern does not take arguments">
+    <Parameter type="IParametersOwnerPat" name="pattern"/>
+    <Message resourceName="ThisLiteralPatternDoesNotTakeArgumentsMessage" resourceType="Strings"/>
+    <Range>pattern.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemovePatternArgumentFix</QuickFix>
+  </Error>
 </Errors>
