@@ -1,7 +1,7 @@
 ﻿ParameterInfo is available
 --- All invocables: ----
-(x: int)
-Parameter: 0 'x: int'
+(int -> unit)
+Parameter: 0 'int -> unit'
 
 --- Accepted invocables: ---
-(x: int)
+(int -> unit)
