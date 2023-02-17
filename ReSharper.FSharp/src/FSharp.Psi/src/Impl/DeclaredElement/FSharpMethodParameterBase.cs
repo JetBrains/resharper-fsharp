@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public abstract bool IsParameterArray { get; }
     public bool IsValueVariable => false;
     public abstract bool IsOptional { get; }
-    public DeclarationScope Scope => DeclarationScope.Unscoped;
+    public ScopedKind Scope => ScopedKind.None;
     public IParametersOwner ContainingParametersOwner => Owner;
 
     public IPsiServices GetPsiServices() => Owner.GetPsiServices();
