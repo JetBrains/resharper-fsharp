@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public bool IsValueVariable => false;
     public bool IsOptional => Info.IsOptional;
     public bool IsVarArg => false;
-    public DeclarationScope Scope => DeclarationScope.Unscoped;
+    public ScopedKind Scope => ScopedKind.None;
     public IParametersOwner ContainingParametersOwner { get; }
   }
 }
