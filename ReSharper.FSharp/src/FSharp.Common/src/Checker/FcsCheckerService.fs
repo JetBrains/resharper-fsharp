@@ -132,9 +132,11 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         | None -> None
         | Some fcsProject ->
 
+        let options = fcsProject.ProjectOptions
+        if not (fcsProject.IsKnownFile(sourceFile)) && not options.UseScriptResolutionRules then None else
+
         x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
 
-        let options = fcsProject.ProjectOptions
         let path = sourceFile.GetLocation().FullPath
         let source = FcsCheckerService.getSourceText sourceFile.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
