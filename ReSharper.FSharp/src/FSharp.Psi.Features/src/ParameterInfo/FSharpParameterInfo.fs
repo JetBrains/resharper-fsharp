@@ -400,14 +400,22 @@ type FcsExceptionParameterInfoCandidate(entity, symbolUse, fsContext) =
     override this.XmlDoc = entity.XmlDoc
 
 
-type FcsDelegateParameterInfoCandidate(entity, symbolUse, fsContext) =
-    inherit FcsParameterInfoCandidateBase<FSharpEntity, string option * FSharpType>(entity, symbolUse, fsContext)
+type FcsDelegateParameterInfoCandidate(fcsEntityInstance: FcsEntityInstance, symbolUse, fsContext) =
+    inherit FcsParameterInfoCandidateBase<FSharpEntity, FSharpType>(fcsEntityInstance.Entity, symbolUse, fsContext)
 
-    override val ParameterGroups = [| entity.FSharpDelegateSignature.DelegateArguments |]
-    override val XmlDoc = entity.XmlDoc
+    let mfv =
+        fcsEntityInstance.Entity.MembersFunctionsAndValues
+        |> Seq.tryFind (fun mfv -> mfv.LogicalName = "Invoke")
 
-    override this.GetParamName((name, _)) = name
-    override this.GetParamType((_, paramType)) = paramType
+    override val ParameterGroups =
+        mfv
+        |> Option.map (fun mfv -> [| [| mfv.FullType |] :> IList<_> |] :> IList<_>)
+        |> Option.defaultValue EmptyList.InstanceList
+
+    override val XmlDoc = fcsEntityInstance.Entity.XmlDoc
+
+    override this.GetParamName _ = None
+    override this.GetParamType(fcsType) = fcsType.Instantiate(fcsEntityInstance.Substitution)
 
 
 type FcsActivePatternMfvParameterInfoCandidate(apc: FSharpActivePatternCase, mfv: FSharpMemberOrFunctionOrValue, symbolUse, fsContext) =
@@ -481,7 +489,29 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                 Some(FcsExceptionParameterInfoCandidate(e, item, fsContext))
 
             | :? FSharpEntity as e when e.IsDelegate ->
-                Some(FcsDelegateParameterInfoCandidate(e, item, fsContext))
+                let fcsEntityInstance =
+                    if e.GenericParameters.IsEmpty() then
+                        let fcsType = e.AsType()
+                        FcsEntityInstance.create fcsType |> Some
+                    else
+                        let getTypeExpr =
+                            match e.IsFSharp, box context with
+                            | true, (:? IPrefixAppExpr as prefixAppExpr) ->
+                                match prefixAppExpr.ArgumentExpression with
+                                | :? IUnitExpr -> context :> IFSharpTreeNode
+                                | argExpr -> argExpr :> _
+                            | _ -> context :> _
+
+                        if isNull getTypeExpr then None else
+
+                        let exprType = getTypeExpr.TryGetFcsType()
+                        if isNull exprType then None else
+
+                        FcsEntityInstance.create exprType |> Some
+
+                fcsEntityInstance
+                |> Option.map (fun fcsEntityInstance ->
+                    FcsDelegateParameterInfoCandidate(fcsEntityInstance, item, fsContext))
 
             | :? FSharpActivePatternCase as apc ->
                 match apc.Group.DeclaringEntity with
