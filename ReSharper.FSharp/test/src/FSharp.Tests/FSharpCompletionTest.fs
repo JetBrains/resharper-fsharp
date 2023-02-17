@@ -246,6 +246,8 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``Match - Context - If 03``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Lambda 02``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "true")>]
+    [<Test>] member x.``Match - Context - Lambda 03``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Let 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Let 03``() = x.DoNamedTest()

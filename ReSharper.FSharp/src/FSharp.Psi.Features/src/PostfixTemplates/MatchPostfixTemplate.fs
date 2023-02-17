@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
+open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -7,6 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpComple
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -63,6 +65,8 @@ and MatchPostfixTemplateBehavior(info) =
                 | chameleon -> chameleon
 
             if not (isFirstMeaningfulNodeOnLine contextExpr) then
+                let lineEnding = expr.GetLineEnding()
+
                 let contextIndent = 
                     let matchClause = MatchClauseNavigator.GetByExpression(expr)
                     let tryFinallyExpr = TryWithExprNavigator.GetByClause(matchClause)
@@ -72,12 +76,26 @@ and MatchPostfixTemplateBehavior(info) =
                     let lambdaExpr = LambdaExprNavigator.GetByExpression(expr)
                     if isNotNull lambdaExpr then
                         let formatter = lambdaExpr.Language.LanguageServiceNotNull().CodeFormatter
-                        FormatterImplHelper.CalcLineIndent(lambdaExpr, formatter).Length else
+                        let indent = FormatterImplHelper.CalcLineIndent(lambdaExpr, formatter).Length
 
-                    contextExpr.Parent.Indent
+                        let parenExpr = ParenExprNavigator.GetByInnerExpression(lambdaExpr)
+                        if isNotNull parenExpr && isNotNull parenExpr.RightParen then
+                            let moveRparenToNewLine =
+                                context.PostfixContext.ExecutionContext.SettingsStore
+                                    .GetValue(fun (key: FSharpFormatSettingsKey) -> key.MultiLineLambdaClosingNewline)
+
+                            if moveRparenToNewLine then
+                                addNodesBefore parenExpr.RightParen [
+                                    NewLine(lineEnding)
+                                    Whitespace(indent)
+                                ] |> ignore
+
+                        indent
+                    else
+                        contextExpr.Parent.Indent
 
                 addNodesBefore contextExpr [
-                    NewLine(expr.GetLineEnding())
+                    NewLine(lineEnding)
                     Whitespace(contextIndent + expr.GetIndentSize())
                 ] |> ignore
 
