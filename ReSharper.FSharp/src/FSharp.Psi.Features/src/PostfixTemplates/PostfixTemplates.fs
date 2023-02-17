@@ -16,6 +16,8 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 module FSharpPostfixTemplates =
+    type FormatterImplHelper = JetBrains.ReSharper.Psi.Impl.CodeStyle.FormatterImplHelper
+
     let isApplicableTypeUsage (typeUsage: ITypeUsage) =
         let typeUsage = skipIntermediateParentsOfSameType<ITypeUsage> typeUsage
         let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
@@ -24,43 +26,62 @@ module FSharpPostfixTemplates =
     let canBecomeStatement (expr: IFSharpExpression) : bool =
         if isNull expr then false else
 
+        let formatter = expr.Language.LanguageServiceNotNull().CodeFormatter
+
+        let isLastMeaningfulNodeOnLine (node: ITreeNode) =
+            FormatterImplHelper.HasNewLineAfter(node, formatter) ||
+            isNull (node.GetNextToken())
+
+        let isFirstMeaningfulNodeOnLine node =
+            FormatterImplHelper.HasNewLineBefore(node, formatter)
+
         let isBlockLike (getParent: IFSharpExpression -> #ITreeNode) parentIsApplicable =
             let parent = getParent expr
-            parentIsApplicable parent &&
+            parentIsApplicable parent
 
-            let expr: ITreeNode = 
-                match ChameleonExpressionNavigator.GetByExpression(expr) with
-                | null -> expr
-                | chameleon -> chameleon
+        let isParentApplicable (parent: ITreeNode) =
+            isNotNull parent &&
+            isLastMeaningfulNodeOnLine parent
 
-            isOnlyMeaningfulNodeOnLine expr
+        let isLambdaExprApplicable (lambdaExpr: ILambdaExpr) =
+            isNotNull lambdaExpr &&
+            isLastMeaningfulNodeOnLine lambdaExpr ||
+
+            let parenExpr = ParenExprNavigator.GetByInnerExpression(lambdaExpr)
+            isNotNull parenExpr && isLastMeaningfulNodeOnLine parenExpr
 
         let isLetExprApplicable (letExpr: ILetOrUseExpr) =
-            isNotNull letExpr && letExpr.Indent <= expr.Indent 
+            isNotNull letExpr &&
+            isLastMeaningfulNodeOnLine letExpr &&
+            letExpr.Indent <= expr.Indent 
 
         let isSequentialExprApplicable (seqExpr: ISequentialExpr) =
-            isNotNull seqExpr // todo
+            isNotNull seqExpr &&
+            isLastMeaningfulNodeOnLine seqExpr &&
+            isFirstMeaningfulNodeOnLine expr
 
         let isExprStmtApplicable (exprStmt: IDoLikeStatement) =
-            isNotNull exprStmt && Seq.isEmpty exprStmt.AttributesEnumerable
+            isNotNull exprStmt &&
+            isLastMeaningfulNodeOnLine exprStmt &&
+            Seq.isEmpty exprStmt.AttributesEnumerable
 
-        isBlockLike ArrayOrListExprNavigator.GetByExpression isNotNull ||
-        isBlockLike ComputationExprNavigator.GetByExpression isNotNull ||
-        isBlockLike BindingNavigator.GetByExpression isNotNull ||
-        isBlockLike BinaryAppExprNavigator.GetByArgument isNotNull ||
-        isBlockLike DoLikeExprNavigator.GetByExpression isNotNull ||
+        isBlockLike ArrayOrListExprNavigator.GetByExpression isParentApplicable ||
+        isBlockLike ComputationExprNavigator.GetByExpression isParentApplicable ||
+        isBlockLike BindingNavigator.GetByExpression isParentApplicable ||
+        isBlockLike BinaryAppExprNavigator.GetByArgument isParentApplicable ||
+        isBlockLike DoLikeExprNavigator.GetByExpression isParentApplicable ||
         isBlockLike DoLikeStatementNavigator.GetByExpression isExprStmtApplicable ||
-        isBlockLike ForEachExprNavigator.GetByDoExpression isNotNull ||
-        isBlockLike IfExprNavigator.GetByBranchExpression isNotNull ||
-        isBlockLike LambdaExprNavigator.GetByExpression isNotNull ||
+        isBlockLike ForEachExprNavigator.GetByDoExpression isParentApplicable ||
+        isBlockLike IfExprNavigator.GetByBranchExpression isParentApplicable ||
+        isBlockLike LambdaExprNavigator.GetByExpression isLambdaExprApplicable ||
         isBlockLike LetOrUseExprNavigator.GetByInExpression isLetExprApplicable ||
-        isBlockLike MatchClauseNavigator.GetByExpression isNotNull ||
-        isBlockLike QuoteExprNavigator.GetByQuotedExpression isNotNull ||
-        isBlockLike TryFinallyExprNavigator.GetByFinallyExpression isNotNull ||
-        isBlockLike TryLikeExprNavigator.GetByTryExpression isNotNull ||
+        isBlockLike MatchClauseNavigator.GetByExpression isParentApplicable ||
+        isBlockLike QuoteExprNavigator.GetByQuotedExpression isParentApplicable ||
+        isBlockLike TryFinallyExprNavigator.GetByFinallyExpression isParentApplicable ||
+        isBlockLike TryLikeExprNavigator.GetByTryExpression isParentApplicable ||
         isBlockLike SequentialExprNavigator.GetByExpression isSequentialExprApplicable ||
-        isBlockLike SetExprNavigator.GetByRightExpression isNotNull ||
-        isBlockLike WhileExprNavigator.GetByDoExpression isNotNull
+        isBlockLike SetExprNavigator.GetByRightExpression isParentApplicable ||
+        isBlockLike WhileExprNavigator.GetByDoExpression isParentApplicable
 
     let rec getContainingTupleExpr (expr: IFSharpExpression) =
         let tupleExpr = TupleExprNavigator.GetByExpression(expr)

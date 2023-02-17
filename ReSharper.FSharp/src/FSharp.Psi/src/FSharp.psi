@@ -727,13 +727,13 @@ tryWithExpr options { stubBase="FSharpExpressionBase"; } extras {
 }:
   TRY<TRY_KEYWORD, TryKeyword>
   fSharpExpression<TRY_EXPR, TryExpression>
-  WITH
+  WITH<WITH_KEYWORD, WithKeyword>
   matchClause<MATCH_CLAUSE, Clauses>*;
 
 tryFinallyExpr options { stubBase="FSharpExpressionBase"; }:
   TRY<TRY_KEYWORD, TryKeyword>
   fSharpExpression<TRY_EXPR, TryExpression>
-  FINALLY
+  FINALLY<FINALLY_KEYWORD, FinallyKeyword>
   fSharpExpression<FINALLY_EXPR, FinallyExpression>;
 
 lazyExpr options { stubBase="FSharpExpressionBase"; }:

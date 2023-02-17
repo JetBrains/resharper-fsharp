@@ -4,13 +4,18 @@ open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
+
+type FormatterImplHelper = JetBrains.ReSharper.Psi.Impl.CodeStyle.FormatterImplHelper
 
 [<PostfixTemplate("match", "Pattern match expression", "match expr with | _ -> ()")>]
 type MatchPostfixTemplate() =
@@ -28,7 +33,7 @@ type MatchPostfixTemplate() =
             |> FSharpPostfixTemplates.getContainingArgExpr
             |> FSharpPostfixTemplates.getContainingTupleExpr
 
-        if FSharpPostfixTemplates.canBecomeStatement expr then
+        if FSharpPostfixTemplates.canBecomeStatement expr && FSharpIntroduceVariable.CanIntroduceVar(expr, true) then
             MatchPostfixTemplateInfo(context) :> _
         else
             null
@@ -51,6 +56,31 @@ and MatchPostfixTemplateBehavior(info) =
 
             let expr = x.GetExpression(context)
             let expr = FSharpPostfixTemplates.getContainingTupleExpr expr
+
+            let contextExpr: ITreeNode = 
+                match ChameleonExpressionNavigator.GetByExpression(expr) with
+                | null -> expr
+                | chameleon -> chameleon
+
+            if not (isFirstMeaningfulNodeOnLine contextExpr) then
+                let contextIndent = 
+                    let matchClause = MatchClauseNavigator.GetByExpression(expr)
+                    let tryFinallyExpr = TryWithExprNavigator.GetByClause(matchClause)
+                    if isNotNull tryFinallyExpr && matchClause.StartLine = tryFinallyExpr.WithKeyword.StartLine then
+                        tryFinallyExpr.WithKeyword.Indent else
+
+                    let lambdaExpr = LambdaExprNavigator.GetByExpression(expr)
+                    if isNotNull lambdaExpr then
+                        let formatter = lambdaExpr.Language.LanguageServiceNotNull().CodeFormatter
+                        FormatterImplHelper.CalcLineIndent(lambdaExpr, formatter).Length else
+
+                    contextExpr.Parent.Indent
+
+                addNodesBefore contextExpr [
+                    NewLine(expr.GetLineEnding())
+                    Whitespace(contextIndent + expr.GetIndentSize())
+                ] |> ignore
+
             let matchExpr = ModificationUtil.ReplaceChild(expr, expr.CreateElementFactory().CreateMatchExpr(expr))
             let matchClause = matchExpr.Clauses[0]
             ModificationUtil.DeleteChildRange(matchClause.Pattern, matchClause.LastChild)

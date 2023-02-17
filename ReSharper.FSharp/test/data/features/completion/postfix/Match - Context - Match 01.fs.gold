@@ -1,9 +1,8 @@
-﻿
-CompareTo
-Equals
-GetHashCode
-GetType
-GetTypeCode
-ToString
-let
-not{caret}
+﻿// ${COMPLETE_ITEM:match}
+module Module
+
+do
+    match () with
+    | a -> 
+      match true with
+      | {caret}

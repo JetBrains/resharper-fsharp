@@ -1,6 +1,4 @@
 ﻿// ${COMPLETE_ITEM:match}
 module Module
 
-let _ = 
-  match true with
-  | {caret}
+true.{caret}
