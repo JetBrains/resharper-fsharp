@@ -1,0 +1,8 @@
+﻿// ${COMPLETE_ITEM:match}
+module Module
+
+do
+   try ()
+   finally 
+     match true with
+     | {caret}

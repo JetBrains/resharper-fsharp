@@ -1,6 +1,6 @@
 ﻿// ${COMPLETE_ITEM:match}
 module Module
 
-let _ = 
-  match true with
-  | {caret}
+do
+   try ()
+   finally true.{caret}

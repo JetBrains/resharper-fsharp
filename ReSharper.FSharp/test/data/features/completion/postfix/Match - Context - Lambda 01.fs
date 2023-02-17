@@ -2,5 +2,5 @@
 module Module
 
 do
-    match () with
-    | a -> true.{caret}
+   [] |> List.map (fun _ -> true.{caret}
+   )
