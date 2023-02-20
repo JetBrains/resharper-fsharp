@@ -12,6 +12,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 using JetBrains.Util.DataStructures;
+using JetBrains.Util.Extension;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
@@ -160,7 +161,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override bool HasAttributeInstance(IClrTypeName clrTypeName)
     {
-      if (AttributeClassNames.Contains(clrTypeName.ShortName))
+      if (!MayHaveAttribute(clrTypeName))
         return false;
 
       // todo: get entity without getting declaration
@@ -173,6 +174,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override bool HasTypeParameterAttributeInstance(int index, IClrTypeName typeName) =>
       false; // todo
+
+    // todo: attribute type abbreviation
+    private bool MayHaveAttribute(IClrTypeName clrTypeName) =>
+      AttributeClassNames.Contains(clrTypeName.ShortName) || 
+      AttributeClassNames.Contains(clrTypeName.ShortName.SubstringBeforeLast("Attribute"));
 
     public override string[] AttributeClassNames { get; }
 
