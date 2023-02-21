@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:let}
+//${OCCURRENCE:1}
+module Module
+
+let i = 1{caret}
+ignore i

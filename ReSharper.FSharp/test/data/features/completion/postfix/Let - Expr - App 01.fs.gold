@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:let}
+// ${OCCURRENCE:ignore 1}
+module Module
+
+let ignore = ignore 1{caret}
