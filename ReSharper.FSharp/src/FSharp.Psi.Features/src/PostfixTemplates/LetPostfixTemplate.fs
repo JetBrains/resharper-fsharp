@@ -42,7 +42,8 @@ and LetPostfixTemplateBehavior(info) =
         let psiServices = context.PostfixContext.PsiModule.GetPsiServices()
         psiServices.Transactions.Execute(this.ExpandCommandName, fun _ ->
             use writeCookie = WriteLockCookie.Create(context.Expression.IsPhysical())
-            this.GetExpression(context) :> ITreeNode)
+            let expr = this.GetExpression(context)
+            FSharpPostfixTemplates.getContainingAppExprFromLastArg expr :> ITreeNode)
 
     override this.AfterComplete(textControl, node, _) =
         FSharpIntroduceVariable.IntroduceVar(node :?> _, textControl, false, false, false)

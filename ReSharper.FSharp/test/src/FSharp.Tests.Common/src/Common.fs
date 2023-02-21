@@ -11,6 +11,7 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
+open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
@@ -237,3 +238,24 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member this.GetReferencedModule _ = None
         member this.GetPsiModule _ = failwith "todo"
         member this.GetAllReferencedModules() = failwith "todo"
+
+
+module FSharpTestPopup =
+    let [<Literal>] OccurrenceName = "OCCURRENCE"
+
+    let setOccurrence occurrenceName assertExists (solution: ISolution) (lifetime: Lifetime) =
+        if isNull occurrenceName then () else
+
+        let workflowPopupMenu = solution.GetComponent<TestWorkflowPopupMenu>()
+        workflowPopupMenu.SetTestData(lifetime, fun _ occurrences _ _ _ ->
+            occurrences
+            |> Array.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
+            |> Option.defaultWith (fun _ ->
+                if assertExists then
+                    failwithf $"Could not find %s{occurrenceName} occurrence"
+                else
+                    occurrences
+                    |> Seq.tryLast
+                    |> Option.defaultValue null
+            )
+        )

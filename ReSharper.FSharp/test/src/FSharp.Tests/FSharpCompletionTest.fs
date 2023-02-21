@@ -185,6 +185,11 @@ type FSharpPostfixCompletionTest() =
 
     override x.TestType = CodeCompletionTestType.Action
 
+    override this.ExecuteCodeCompletion(suffix, textControl, intellisenseManager, automatic, settingsStore) =
+        let occurrenceName = BaseTestWithTextControl.GetSetting(textControl, FSharpTestPopup.OccurrenceName)
+        FSharpTestPopup.setOccurrence occurrenceName false this.Solution this.TestLifetime
+        base.ExecuteCodeCompletion(suffix, textControl, intellisenseManager, automatic, settingsStore)
+
     [<Test>] member x.``For - Array - Literal 01``() = x.DoNamedTest()
     [<Test>] member x.``For - Array - Literal 02``() = x.DoNamedTest()
     [<Test>] member x.``For - Array 01``() = x.DoNamedTest()
@@ -218,6 +223,9 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``Let - Decl 02``() = x.DoNamedTest()
     [<Test>] member x.``Let - Decl 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Let - Expr - App 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Expr - App 02``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Expr - App 03``() = x.DoNamedTest()
     [<Test>] member x.``Let - Expr - Op - Pipe 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Expr - Ref 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Expr - Ref 02 - Ctor``() = x.DoNamedTest()

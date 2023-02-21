@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:let}
+module Module
+
+let i = 1{caret}
+ignore i

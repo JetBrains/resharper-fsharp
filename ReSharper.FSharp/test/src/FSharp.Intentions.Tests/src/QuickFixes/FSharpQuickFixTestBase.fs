@@ -2,10 +2,8 @@
 
 open System
 open System.IO
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
-open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions
@@ -31,18 +29,11 @@ type DumpPsiTreeAttribute() =
 type FSharpQuickFixTestBase<'T when 'T :> IQuickFix>() =
     inherit QuickFixTestBase<'T>()
 
-    let [<Literal>] OccurrenceName = "OCCURRENCE"
-
     override x.OnQuickFixNotAvailable(_, _) = Assert.Fail(ErrorText.NotAvailable)
 
     override x.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile) =
-        let occurrenceName = QuickFixTestBase.GetSetting(textControl, OccurrenceName)
-        if isNotNull occurrenceName then
-            let workflowPopupMenu = x.Solution.GetComponent<TestWorkflowPopupMenu>()
-            workflowPopupMenu.SetTestData(x.TestLifetime, fun _ occurrences _ _ _ ->
-                occurrences
-                |> Array.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
-                |> Option.defaultWith (fun _ -> failwithf $"Could not find %s{occurrenceName} occurrence"))
+        let occurrenceName = BaseTestWithTextControl.GetSetting(textControl, FSharpTestPopup.OccurrenceName)
+        FSharpTestPopup.setOccurrence occurrenceName true x.Solution x.TestLifetime
 
         base.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile)
 
