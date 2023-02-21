@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators;
@@ -21,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
     {
       processModel.GetProvidedNamespaces.Set(GetProvidedNamespaces);
       processModel.GetCustomAttributes.Set(GetCustomAttributes);
-      processModel.Dispose.Set(Dispose);
+      processModel.Dispose.SetVoidAsync(Dispose);
       processModel.InstantiateTypeProvidersOfAssembly.Set(
         args => InstantiateTypeProvidersOfAssembly(args, processModel));
       processModel.Kill.Set(Die);
@@ -73,11 +74,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
       myTypeProvidersContext.TypeProvidersCache.Remove(typeProviderId);
     }
 
-    private RdTask<Unit> Dispose(Lifetime lifetime, int[] providerIds) =>
+    private Task Dispose(Lifetime lifetime, int[] providerIds) =>
       lifetime.Start(myTypeProvidersContext.TaskScheduler, () =>
       {
         foreach (var providerId in providerIds) Dispose(providerId);
-      }).ToRdTask();
+      });
 
     private InstantiationResult InstantiateTypeProvidersOfAssembly(InstantiateTypeProvidersOfAssemblyParameters @params,
       RdTypeProviderProcessModel processModel)
