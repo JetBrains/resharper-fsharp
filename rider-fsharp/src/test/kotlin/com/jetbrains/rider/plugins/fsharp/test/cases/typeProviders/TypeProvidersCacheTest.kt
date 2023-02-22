@@ -31,7 +31,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
     }
   }
 
-  @Test(enabled=false)
+  @Test
   fun checkCachesWhenProjectReloading() {
     checkTypeProviders(File(testGoldFile.path + "_before"), defaultSourceFile)
 
