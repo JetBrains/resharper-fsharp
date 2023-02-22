@@ -1,5 +1,5 @@
 ﻿// ${COMPLETE_ITEM:for}
 module Module
 
-for _ in [||] do
-  (){caret}
+for o in [||] do
+  {caret}

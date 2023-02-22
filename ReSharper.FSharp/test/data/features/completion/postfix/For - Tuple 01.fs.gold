@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:for}
+// ${OCCURRENCE:Deconstruct tuple}
+module Module
+
+for i{caret}, s in [1, ""] do
+  

@@ -1,5 +1,5 @@
 ﻿// ${COMPLETE_ITEM:let}
-//${OCCURRENCE:1}
+// ${OCCURRENCE:1}
 module Module
 
 ignore 1.{caret}
