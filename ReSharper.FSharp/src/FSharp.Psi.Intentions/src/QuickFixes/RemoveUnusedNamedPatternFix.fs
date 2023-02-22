@@ -8,6 +8,22 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.Tree
+
+module RemoveUnusedNamedPatternFix =
+    let replaceWithWildPat (pat: IFSharpPattern) =
+        if isIdentifierOrKeyword (pat.GetPreviousToken()) then
+            ModificationUtil.AddChildBefore(pat, Whitespace()) |> ignore
+
+        if isIdentifierOrKeyword (pat.GetNextToken()) then
+            ModificationUtil.AddChildAfter(pat, Whitespace()) |> ignore
+
+        for pat in pat.GetPartialDeclarations() do
+            let sourceFile = pat.GetSourceFile()
+            let psiModule = pat.GetPsiModule()
+            replace pat (pat.GetFSharpLanguageService().CreateElementFactory(sourceFile, psiModule).CreateWildPat())
 
 type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
     inherit FSharpQuickFixBase()
@@ -29,15 +45,12 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
         let indexPat = fieldPatterns.IndexOf(fieldPat)
         
         if fieldPatterns.Count = 1 then
-            let factory = fieldPatterns.[0].CreateElementFactory()
-            let wildPat = factory.CreateWildPat()
-            for pat in fieldPatterns do
-                match pat.Parent with
-                | :? IRecordPat as recordPat ->
-                    ModificationUtil.ReplaceChild(recordPat, wildPat) |> ignore
-                | :? INamedUnionCaseFieldsPat as unionPat ->
-                    ModificationUtil.ReplaceChild(unionPat.IgnoreParentChameleonExpr(), wildPat) |> ignore
-                | _ -> ()
+            let parent = fieldPatterns.[0].Parent
+            match parent with
+            | :? IRecordPat
+            | :? INamedUnionCaseFieldsPat ->
+                RemoveUnusedNamedPatternFix.replaceWithWildPat warning.Pat
+            | _ -> ()
                 
             null
             
