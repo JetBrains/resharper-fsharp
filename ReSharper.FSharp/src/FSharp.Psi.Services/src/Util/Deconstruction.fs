@@ -91,7 +91,7 @@ module FSharpDeconstructionImpl =
                     | _ -> namesCollection)
                 |> FSharpNamingService.prepareNamesCollection usedNames pat
                 |> fun names ->
-                    let names = List.ofSeq names @ [if isSingle then "item" else $"item{i + 1}"; "_"]
+                    let names = List.ofSeq names @ [(if isSingle then "item" else $"item{i + 1}"); "_"]
                     usedNames.Add(names.Head.RemoveBackticks()) |> ignore
                     List.distinct names)
 

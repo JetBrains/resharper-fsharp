@@ -23,14 +23,9 @@ type LetPostfixTemplate() =
 
     override this.IsEnabled _ = true
 
-    override this.CreateBehavior(info) =
-        LetPostfixTemplateBehavior(info) :> _
-
-    override this.TryCreateInfo(context) =
-        let context = context.AllExpressions[0]
-        if not (isApplicable context.Expression) then null else
-
-        LetPostfixTemplateInfo(context) :> _
+    override this.CreateBehavior(info) = LetPostfixTemplateBehavior(info) :> _
+    override this.CreateInfo(context) = LetPostfixTemplateInfo(context) :> _
+    override this.IsApplicable(expr) = isApplicable expr
 
 and LetPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
     inherit PostfixTemplateInfo("let", expressionContext)

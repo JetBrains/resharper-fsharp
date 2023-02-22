@@ -1,6 +1,6 @@
 ﻿// ${COMPLETE_ITEM:for}
 module Module
 
-let l = []
-for o in l do
-  {caret}
+do 
+  for i in [1] do
+    {caret}

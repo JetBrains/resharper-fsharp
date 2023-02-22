@@ -16,7 +16,8 @@ type NotPostfixTemplate() =
     inherit FSharpPostfixTemplateBase()
 
     override x.CreateBehavior(info) = NotPostfixTemplateBehavior(info) :> _
-    override x.TryCreateInfo(context) = NotPostfixTemplateInfo(context.AllExpressions[0]) :> _
+    override x.CreateInfo(context) = NotPostfixTemplateInfo(context) :> _
+    override this.IsApplicable _ = true
 
 
 and NotPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =

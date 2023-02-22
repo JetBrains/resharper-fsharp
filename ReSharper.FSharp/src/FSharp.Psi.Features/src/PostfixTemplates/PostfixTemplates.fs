@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
+open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.PostfixTemplates
@@ -8,8 +9,11 @@ open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -23,8 +27,45 @@ module FSharpPostfixTemplates =
         let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
         isNotNull typedExpr
 
+    let rec getContainingAppExprFromLastArg (expr: IFSharpExpression) =
+        match PrefixAppExprNavigator.GetByArgumentExpression(expr) with
+        | null -> expr
+        | appExpr -> getContainingAppExprFromLastArg appExpr
+
+    let getContainingTypeExpression (typeName: ITypeReferenceName) =
+        let namedTypeUsage = NamedTypeUsageNavigator.GetByReferenceName(typeName)
+        let tupleTypeUsage = TupleTypeUsageNavigator.GetByItem(namedTypeUsage)
+
+        let typeUsage: ITypeUsage =
+            if isNotNull tupleTypeUsage && tupleTypeUsage.Items.Last() == namedTypeUsage then
+                tupleTypeUsage :> _
+            else
+                namedTypeUsage :> _
+
+        let functionTypeUsage = FunctionTypeUsageNavigator.GetByReturnTypeUsage(typeUsage)
+        let typeUsage: ITypeUsage = if isNotNull functionTypeUsage then functionTypeUsage :> _ else typeUsage
+
+        let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
+        if isNotNull typedExpr then
+            getContainingAppExprFromLastArg typedExpr else
+
+        null
+
+    let rec getContainingTupleExprFromLastItem (expr: IFSharpExpression) =
+        let tupleExpr = TupleExprNavigator.GetByExpression(expr)
+        if isNotNull tupleExpr && tupleExpr.Expressions.LastOrDefault() == expr then
+            getContainingTupleExprFromLastItem tupleExpr
+        else
+            expr
+
     let canBecomeStatement (expr: IFSharpExpression) : bool =
+        let expr = 
+            expr
+            |> getContainingAppExprFromLastArg
+            |> getContainingTupleExprFromLastItem
+
         if isNull expr then false else
+        if not (FSharpIntroduceVariable.CanIntroduceVar(expr, true)) then false else
 
         let formatter = expr.Language.LanguageServiceNotNull().CodeFormatter
 
@@ -83,37 +124,6 @@ module FSharpPostfixTemplates =
         isBlockLike SetExprNavigator.GetByRightExpression isParentApplicable ||
         isBlockLike WhileExprNavigator.GetByDoExpression isParentApplicable
 
-    let rec getContainingTupleExpr (expr: IFSharpExpression) =
-        let tupleExpr = TupleExprNavigator.GetByExpression(expr)
-        if isNotNull tupleExpr && tupleExpr.Expressions.LastOrDefault() == expr then
-            getContainingTupleExpr tupleExpr
-        else
-            expr
-
-    let rec getContainingArgExpr (expr: IFSharpExpression) =
-        match PrefixAppExprNavigator.GetByArgumentExpression(expr) with
-        | null -> expr
-        | appExpr -> getContainingArgExpr appExpr
-
-    let getContainingTypeExpression (typeName: ITypeReferenceName) =
-        let namedTypeUsage = NamedTypeUsageNavigator.GetByReferenceName(typeName)
-        let tupleTypeUsage = TupleTypeUsageNavigator.GetByItem(namedTypeUsage)
-
-        let typeUsage: ITypeUsage =
-            if isNotNull tupleTypeUsage && tupleTypeUsage.Items.Last() == namedTypeUsage then
-                tupleTypeUsage :> _
-            else
-                namedTypeUsage :> _
-
-        let functionTypeUsage = FunctionTypeUsageNavigator.GetByReturnTypeUsage(typeUsage)
-        let typeUsage: ITypeUsage = if isNotNull functionTypeUsage then functionTypeUsage :> _ else typeUsage
-
-        let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
-        if isNotNull typedExpr then
-            getContainingArgExpr typedExpr else
-
-        null
-
     let rec removeTemplateAndGetParentExpression (token: IFSharpTreeNode): IFSharpExpression =
         match token with
         | :? IReferenceExpr as refExpr ->
@@ -126,6 +136,49 @@ module FSharpPostfixTemplates =
             getContainingTypeExpression newReferenceName
 
         | _ -> null
+
+    let convertToBlockLikeExpr expr (context: PostfixExpressionContext) =
+        let expr = getContainingTupleExprFromLastItem expr
+
+        let contextExpr: ITreeNode = 
+            match ChameleonExpressionNavigator.GetByExpression(expr) with
+            | null -> expr
+            | chameleon -> chameleon
+
+        if not (isFirstMeaningfulNodeOnLine contextExpr) then
+            let lineEnding = expr.GetLineEnding()
+
+            let contextIndent = 
+                let matchClause = MatchClauseNavigator.GetByExpression(expr)
+                let tryFinallyExpr = TryWithExprNavigator.GetByClause(matchClause)
+                if isNotNull tryFinallyExpr && matchClause.StartLine = tryFinallyExpr.WithKeyword.StartLine then
+                    tryFinallyExpr.WithKeyword.Indent else
+
+                let lambdaExpr = LambdaExprNavigator.GetByExpression(expr)
+                if isNotNull lambdaExpr then
+                    let formatter = lambdaExpr.Language.LanguageServiceNotNull().CodeFormatter
+                    let indent = FormatterImplHelper.CalcLineIndent(lambdaExpr, formatter).Length
+
+                    let parenExpr = ParenExprNavigator.GetByInnerExpression(lambdaExpr)
+                    if isNotNull parenExpr && isNotNull parenExpr.RightParen then
+                        let moveRparenToNewLine =
+                            context.PostfixContext.ExecutionContext.SettingsStore
+                                .GetValue(fun (key: FSharpFormatSettingsKey) -> key.MultiLineLambdaClosingNewline)
+
+                        if moveRparenToNewLine then
+                            addNodesBefore parenExpr.RightParen [
+                                NewLine(lineEnding)
+                                Whitespace(indent)
+                            ] |> ignore
+
+                    indent
+                else
+                    contextExpr.Parent.Indent
+
+            addNodesBefore contextExpr [
+                NewLine(lineEnding)
+                Whitespace(contextIndent + expr.GetIndentSize())
+            ] |> ignore
 
 
 [<AllowNullLiteral>]
@@ -194,8 +247,9 @@ type FSharpPostfixTemplateBehaviorBase(info) =
 type FSharpPostfixTemplateBase() =
     member this.Language = FSharpLanguage.Instance
 
+    abstract IsApplicable: ITreeNode -> bool
     abstract CreateBehavior: PostfixTemplateInfo -> PostfixTemplateBehavior
-    abstract TryCreateInfo: PostfixTemplateContext -> PostfixTemplateInfo
+    abstract CreateInfo: PostfixExpressionContext -> PostfixTemplateInfo
 
     abstract IsEnabled: ISolution -> bool
     default this.IsEnabled(solution) =
@@ -205,8 +259,12 @@ type FSharpPostfixTemplateBase() =
         member this.Language = this.Language :> _
         member this.CreateBehavior(info) = this.CreateBehavior(info)
 
-        member this.TryCreateInfo(context) =
-            if this.IsEnabled(context.PsiModule.GetSolution()) then
-                this.TryCreateInfo(context)
+        member this.TryCreateInfo(templateContext) =
+            if not (this.IsEnabled(templateContext.PsiModule.GetSolution())) then null else
+
+            let exprContext = templateContext.AllExpressions[0]
+            let node = exprContext.Expression
+            if isNotNull node && this.IsApplicable(node) then
+                this.CreateInfo(exprContext)
             else
                 null

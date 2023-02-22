@@ -143,6 +143,18 @@ module FSharpIntroduceVariable =
             getOutermostLambda parent
         | _ -> parent
 
+    let getOccurrenceText (displayContext: FSharpDisplayContext) (fcsType: FSharpType) (text: string) =
+        let richText = RichText("Bind '")
+        richText.Append(fcsType.Format(displayContext), TextStyle(JetFontStyles.Bold)) |> ignore
+        richText.Append(text, TextStyle()) |> ignore
+        richText
+
+    let getDeconstructionOccurrences fcsType displayContext (deconstruction: IFSharpDeconstruction) =
+        let valueText = getOccurrenceText displayContext fcsType "' value"
+        [| WorkflowPopupMenuOccurrence(valueText, null, null, null)
+           WorkflowPopupMenuOccurrence(RichText(deconstruction.Text), null, deconstruction) |]
+
+
 type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, driver) =
     inherit IntroduceVariableBase(workflow, solution, driver)
 
@@ -587,8 +599,9 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             | :? IFromErrorExpr -> false
 
             | :? ITupleExpr ->
-                isNull (NewExprNavigator.GetByArgumentExpression(ParenOrBeginEndExprNavigator.GetByInnerExpression(expr))) &&
-                
+                let parenOrBeginEndExpr = ParenOrBeginEndExprNavigator.GetByInnerExpression(expr)
+                isNull (NewExprNavigator.GetByArgumentExpression(parenOrBeginEndExpr)) &&
+
                 let listExpr = ListExprNavigator.GetByExpression(expr.IgnoreParentParens())
                 let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(listExpr)
                 isNull appExpr || not appExpr.IsIndexerLike
@@ -702,17 +715,14 @@ type FSharpIntroduceVarHelper() =
 
                     Some(lambdaType.Instantiate(substitution).GenericArguments[0], allMembers)))
 
-        let getOccurrenceText (fcsType: FSharpType) (text: string) =
-            let richText = RichText("Bind '")
-            richText.Append(fcsType.Format(displayContext), TextStyle(JetFontStyles.Bold)) |> ignore
-            richText.Append(text, TextStyle()) |> ignore
-            richText
-
         let boundType =
             match computationType with
             | None -> Some(fcsType, false)
             | Some(computationType, _) ->
                 let occurrences =
+                    let getOccurrenceText =
+                        FSharpIntroduceVariable.getOccurrenceText displayContext
+
                     let computationText = getOccurrenceText computationType "' computation with let!"
                     let valueText = getOccurrenceText fcsType "' value"
                     [| WorkflowPopupMenuOccurrence(valueText, null, (fcsType, false))
@@ -755,10 +765,7 @@ type FSharpIntroduceVarHelper() =
         | None -> true
         | Some(deconstruction) ->
 
-        let occurrences =
-            let valueText = getOccurrenceText boundType "' value"
-            [| WorkflowPopupMenuOccurrence(valueText, null, null, null)
-               WorkflowPopupMenuOccurrence(RichText(deconstruction.Text), null, deconstruction) |]
+        let occurrences = FSharpIntroduceVariable.getDeconstructionOccurrences fcsType displayContext deconstruction
 
         let selectedOccurrence = workflow.ShowOccurrences(occurrences, context)
         if isNull selectedOccurrence then false else
