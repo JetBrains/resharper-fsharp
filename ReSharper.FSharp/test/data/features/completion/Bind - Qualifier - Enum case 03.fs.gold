@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:Aa}
+
+type E =
+    | Aa = 1
+
+E.Aa{caret}

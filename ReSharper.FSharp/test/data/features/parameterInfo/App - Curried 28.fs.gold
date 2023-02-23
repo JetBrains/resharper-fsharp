@@ -1,7 +1,7 @@
 ﻿ParameterInfo is available
 --- All invocables: ----
-(array: 'T[]) : bool
-Parameter: 0 'array: 'T[]'
+(array: 'T array) : bool
+Parameter: 0 'array: 'T array'
 
 --- Accepted invocables: ---
-(array: 'T[]) : bool
+(array: 'T array) : bool

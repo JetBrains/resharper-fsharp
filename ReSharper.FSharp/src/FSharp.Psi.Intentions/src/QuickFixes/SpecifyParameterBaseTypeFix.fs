@@ -60,7 +60,7 @@ type SpecifyParameterBaseTypeFix(error: IndeterminateTypeRuntimeCoercionError) =
                 match fcsType.BaseType with
                 | Some baseType ->
                     let acc =
-                        if fcsEntity.IsInterface && baseType.StrippedType.BasicQualifiedName = "System.Object" then
+                        if fcsEntity.IsInterface && baseType.ErasedType.BasicQualifiedName = "System.Object" then
                             types, level + 1
                         else
                             acc

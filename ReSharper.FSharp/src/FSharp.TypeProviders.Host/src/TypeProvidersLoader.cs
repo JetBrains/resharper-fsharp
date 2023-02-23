@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
       new(env.ResolutionFolder,
         OptionModule.OfObj(env.OutputFile),
         env.ShowResolutionMessages,
-        env.ReferencedAssemblies,
+        new GetReferencedAssembliesCallback(env.ReferencedAssemblies),
         env.TemporaryFolder);
 
     public IEnumerable<ITypeProvider> InstantiateTypeProvidersOfAssembly(
@@ -46,5 +46,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
         systemRuntimeAssemblyVersion, compilerToolsPath, myLogError, Range.Zero);
       return typeProviders;
     }
+  }
+
+  internal class GetReferencedAssembliesCallback : FSharpFunc<Unit, string[]>
+  {
+    private readonly string[] myReferencedAssemblies;
+
+    public GetReferencedAssembliesCallback(string[] referencedAssemblies) =>
+      myReferencedAssemblies = referencedAssemblies;
+
+    public override string[] Invoke(Unit func) => myReferencedAssemblies;
   }
 }

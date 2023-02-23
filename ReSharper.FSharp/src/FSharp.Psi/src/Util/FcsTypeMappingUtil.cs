@@ -89,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     {
       try
       {
-        return fcsType.StrippedType;
+        return fcsType.ErasedType;
       }
       catch (Exception e)
       {

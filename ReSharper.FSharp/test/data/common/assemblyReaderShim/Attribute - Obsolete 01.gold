@@ -23,9 +23,9 @@ Class() |> ignore
 |Class.ObsoleteField|(14) |> ignore
 |Class.ObsoleteMethod|(15)()
 |Class.ObsoleteProperty|(16) |> ignore
-Class.ObsoleteEvent |> ignore
+|Class.ObsoleteEvent|(17) |> ignore
 
-|Enum.A|(17) |> ignore
+|Enum.A|(18) |> ignore
 
 ---------------------------------------------------------
 (0): ReSharper Warning: This construct is deprecated. Class is obsolete
@@ -45,4 +45,5 @@ Class.ObsoleteEvent |> ignore
 (14): ReSharper Warning: This construct is deprecated. Field is obsolete
 (15): ReSharper Warning: This construct is deprecated. Method is obsolete
 (16): ReSharper Warning: This construct is deprecated. Property is obsolete
-(17): ReSharper Warning: This construct is deprecated. Enum field is obsolete
+(17): ReSharper Warning: This construct is deprecated. Event is obsolete
+(18): ReSharper Warning: This construct is deprecated. Enum field is obsolete

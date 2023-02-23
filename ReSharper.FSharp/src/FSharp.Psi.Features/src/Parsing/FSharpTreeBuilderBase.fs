@@ -475,13 +475,13 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
-    member x.ProcessEnumCase(SynEnumCase(attrs, _, _, valueRange, XmlDoc xmlDoc, range, _)) =
+    member x.ProcessEnumCase(SynEnumCase(attrs, _, expr, XmlDoc xmlDoc, range, _)) =
         let mark = x.MarkXmlDocOwner(xmlDoc, FSharpTokenType.BAR, range)
         x.ProcessAttributeLists(attrs)
-        x.MarkAndDone(valueRange, ElementType.LITERAL_EXPR)
+        x.MarkChameleonExpression(expr)
         x.Done(range, mark, ElementType.ENUM_CASE_DECLARATION)
 
-    member x.ProcessField(SynField(attrs, _, _, synType, _, XmlDoc xmlDoc, _, range)) elementType =
+    member x.ProcessField(SynField(attrs, _, _, synType, _, XmlDoc xmlDoc, _, range, _)) elementType =
         let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
         x.ProcessType(synType)
         x.Done(range, mark, elementType)
@@ -650,7 +650,6 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                 match typeName with
                 | SynType.LongIdent(lid) -> lid.LongIdent
                 | SynType.MeasurePower(SynType.LongIdent(lid), _, _) -> lid.LongIdent
-                | SynType.MeasureDivide(SynType.LongIdent(lid), _, _) -> lid.LongIdent
                 | _ -> failwithf "unexpected type: %A" typeName
 
             let mark = x.Mark(range)
@@ -778,9 +777,6 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | SynType.StaticConstantNamed(synType1, synType2, _) ->
             x.MarkTypes(synType1, synType2, range, ElementType.NAMED_STATIC_CONSTANT_TYPE_USAGE)
 
-        | SynType.MeasureDivide(synType1, synType2, _) ->
-            x.MarkTypes(synType1, synType2, range, ElementType.UNSUPPORTED_TYPE_USAGE)
-
         | SynType.Fun(synType1, synType2, _, _) ->
             x.MarkTypes(synType1, synType2, range, ElementType.FUNCTION_TYPE_USAGE)
 
@@ -823,6 +819,15 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             let mark = x.Mark(range)
             x.ProcessType(innerType)
             x.Done(range, mark, ElementType.PAREN_TYPE_USAGE)
+
+        | SynType.SignatureParameter(_, _, _, synType, _) ->
+            x.ProcessType(synType)
+
+        | SynType.Or(lhsType, rhsType, range, _) ->
+            let mark = x.Mark(range)
+            x.ProcessTypeAsTypeReferenceName(lhsType)
+            x.ProcessTypeAsTypeReferenceName(rhsType)
+            x.Done(range, mark, ElementType.OR_TYPE_USAGE)
 
     member x.MarkTypes(synType1, synType2, range: range, elementType) =
         let mark = x.Mark(range)
@@ -869,9 +874,17 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessType(synType)
             x.Done(range, mark, ElementType.SUBTYPE_CONSTRAINT)
 
-        | SynTypeConstraint.WhereTyparSupportsMember(typeParameterTypes, memberSig, _) ->
-            for synType in typeParameterTypes do
-                x.ProcessTypeAsTypeReferenceName(synType)
+        | SynTypeConstraint.WhereTyparSupportsMember(synType, memberSig, _) ->
+            let rec (|OrTypes|) t =
+                match t with
+                | SynType.Or(lhsType, OrTypes types, _, _) -> lhsType :: types
+                | _ -> [t]
+
+            match synType with
+            | SynType.Paren(OrTypes types, _) ->
+                for synType in types do
+                    x.ProcessTypeAsTypeReferenceName(synType)
+            | _ -> x.ProcessTypeAsTypeReferenceName(synType)
 
             match memberSig with
             | SynMemberSig.Member _ ->
@@ -911,7 +924,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
-        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, trivia), flags, range) ->
+        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, trivia), flags, range, _) ->
             let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             x.ProcessReturnTypeInfo(arity, synType)
             let elementType =
@@ -924,7 +937,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                     | _ -> ElementType.MEMBER_SIGNATURE
             x.Done(range, mark, elementType)
 
-        | SynMemberSig.ValField(SynField(attrs, _, id, synType, _, XmlDoc xmlDoc, _, _), range) ->
+        | SynMemberSig.ValField(SynField(attrs, _, id, synType, _, XmlDoc xmlDoc, _, _, _), range) ->
             if id.IsSome then
                 let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
                 x.ProcessType(synType)

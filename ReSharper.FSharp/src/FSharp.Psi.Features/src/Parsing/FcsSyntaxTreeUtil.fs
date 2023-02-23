@@ -23,7 +23,7 @@ type SynMemberDefn with
     member x.Attributes =
         match x with
         | SynMemberDefn.Member(SynBinding(attributes = attrs), _)
-        | SynMemberDefn.AbstractSlot(SynValSig(attributes = attrs), _, _)
+        | SynMemberDefn.AbstractSlot(SynValSig(attributes = attrs), _, _, _)
         | SynMemberDefn.AutoProperty(attributes = attrs)
         | SynMemberDefn.ValField(SynField(attributes = attrs), _) -> attrs
 
@@ -40,7 +40,7 @@ type SynMemberDefn with
         | SynMemberDefn.Member(SynBinding(xmlDoc = xmlDoc), _)
         | SynMemberDefn.ImplicitCtor(xmlDoc = xmlDoc)
         | SynMemberDefn.LetBindings(SynBinding(xmlDoc = xmlDoc) :: _, _, _, _)
-        | SynMemberDefn.AbstractSlot(SynValSig(xmlDoc = xmlDoc), _, _)
+        | SynMemberDefn.AbstractSlot(SynValSig(xmlDoc = xmlDoc), _, _, _)
         | SynMemberDefn.ValField(SynField(xmlDoc = xmlDoc), _)
         | SynMemberDefn.AutoProperty(xmlDoc = xmlDoc) -> xmlDoc.ToXmlDoc(false, None)
 
@@ -55,7 +55,7 @@ type SynArgPats with
     member x.IsEmpty =
         match x with
         | SynArgPats.Pats pats -> pats.IsEmpty
-        | SynArgPats.NamePatPairs(idsAndPats, _) -> idsAndPats.IsEmpty
+        | SynArgPats.NamePatPairs(idsAndPats, _, _) -> idsAndPats.IsEmpty
 
 type XmlDoc with
     member x.HasDeclaration = x.UnprocessedLines.Length > 0

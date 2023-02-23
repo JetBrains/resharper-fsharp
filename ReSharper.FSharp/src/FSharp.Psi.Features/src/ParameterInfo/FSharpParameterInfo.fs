@@ -439,7 +439,7 @@ type FcsActivePatternMfvParameterInfoCandidate(apc: FSharpActivePatternCase, mfv
                     FSharpPredefinedType.isValueOption mfvReturnType &&
                     mfv.ReturnParameter.Attributes.HasAttributeInstance(FSharpPredefinedType.structAttrTypeName) ->
                 let optionArgType = mfvReturnType.GenericArguments[0]
-                if FSharpPredefinedType.isUnit optionArgType.StrippedType then None else Some optionArgType
+                if FSharpPredefinedType.isUnit optionArgType.ErasedType then None else Some optionArgType
 
             | _ -> Some mfvReturnType
 

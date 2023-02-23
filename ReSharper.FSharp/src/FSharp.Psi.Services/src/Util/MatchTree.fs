@@ -95,9 +95,9 @@ module MatchType =
         if fcsType.IsTupleType then createTupleType context false fcsType.GenericArguments else
         if fcsType.IsStructTupleType then createTupleType context true fcsType.GenericArguments else
 
-        if not fcsType.StrippedType.HasTypeDefinition then MatchType.Other fcsType else
+        if not fcsType.ErasedType.HasTypeDefinition then MatchType.Other fcsType else
 
-        let fcsEntity = fcsType.StrippedType.TypeDefinition
+        let fcsEntity = fcsType.ErasedType.TypeDefinition
 
         if fcsEntity.IsEnum then
             let fieldLiterals =
@@ -678,8 +678,8 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
 
     let getUnionCaseIndex (union: FcsEntityInstance) (unionCase: FSharpUnionCase) =
         let equals (t1: FSharpType) (t2: FSharpType) =
-            let t1 = t1.StrippedType
-            let t2 = t2.StrippedType
+            let t1 = t1.ErasedType
+            let t2 = t2.ErasedType
 
             // todo: fix checking Equals in tests
             t1.HasTypeDefinition && t2.HasTypeDefinition &&

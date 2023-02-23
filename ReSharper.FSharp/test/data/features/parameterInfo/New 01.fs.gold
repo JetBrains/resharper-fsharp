@@ -6,8 +6,8 @@ Parameter: 0 'value: nativeptr<char>'
 (value: nativeptr<sbyte>)
 Parameter: 0 'value: nativeptr<sbyte>'
 
-(value: char[])
-Parameter: 0 'value: char[]'
+(value: char array)
+Parameter: 0 'value: char array'
 
 (c: char, count: int)
 Parameter: 0 'c: char'
@@ -18,8 +18,8 @@ Parameter: 0 'value: nativeptr<char>'
 (value: nativeptr<sbyte>, startIndex: int, length: int)
 Parameter: 0 'value: nativeptr<sbyte>'
 
-([NotNull] value: char[], startIndex: int, length: int)
-Parameter: 0 '[NotNull] value: char[]'
+([NotNull] value: char array, startIndex: int, length: int)
+Parameter: 0 '[NotNull] value: char array'
 
 (value: nativeptr<sbyte>, startIndex: int, length: int, enc: Encoding)
 Parameter: 0 'value: nativeptr<sbyte>'
@@ -27,9 +27,9 @@ Parameter: 0 'value: nativeptr<sbyte>'
 --- Accepted invocables: ---
 (value: nativeptr<char>)
 (value: nativeptr<sbyte>)
-(value: char[])
+(value: char array)
 (c: char, count: int)
 (value: nativeptr<char>, startIndex: int, length: int)
 (value: nativeptr<sbyte>, startIndex: int, length: int)
-([NotNull] value: char[], startIndex: int, length: int)
+([NotNull] value: char array, startIndex: int, length: int)
 (value: nativeptr<sbyte>, startIndex: int, length: int, enc: Encoding)

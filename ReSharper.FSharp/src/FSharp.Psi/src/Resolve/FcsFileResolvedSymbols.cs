@@ -97,7 +97,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       var document = SourceFile.Document;
       var lexer = fsFile.CachingLexer;
       var buffer = document.Buffer;
-      var resolvedSymbols = new ResolvedSymbols(symbolUses.Length);
+      var resolvedSymbols = new ResolvedSymbols(); // todo: set length to avoid copying
       foreach (var symbolUse in symbolUses)
       {
         var symbol = symbolUse.Symbol;
