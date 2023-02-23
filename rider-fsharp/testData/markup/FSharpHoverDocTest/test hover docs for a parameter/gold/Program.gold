@@ -1,1 +1,1 @@
-<span style="color:#000080"><div class='content'></span><span style="color:#000080">val</span> <span style="color:#000000">argv</span>: <span style="color:#000000">string[]</div></span>
+<span style="color:#000080"><div class='content'></span><span style="color:#000080">val</span> <span style="color:#000000">argv</span>: <span style="color:#000000">string</span> <span style="color:#000000">array</div></span>
