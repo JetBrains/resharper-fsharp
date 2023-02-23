@@ -1,7 +1,9 @@
 ﻿// ${COMPLETE_ITEM:for}
 module Module
 
-let f (x, y) =
+let (|Id|) x = x
+
+let f (Id x) =
     for a in x do
       {caret}
     ()

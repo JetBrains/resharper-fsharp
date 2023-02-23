@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 open System.Collections.Generic
 open System.Linq
 open FSharp.Compiler.Symbols
-open JetBrains.Application.Progress
 open JetBrains.Application.Threading
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Bulbs
@@ -16,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruction
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -24,7 +22,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.Psi.Search
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -89,40 +86,11 @@ type ForPostfixTemplate() =
 
         fcsType.IsGenericParameter && Seq.isEmpty fcsType.AllInterfaces
 
-    let isApplicableDeclaredElement (refExpr: IReferenceExpr) =
-        if isNull refExpr then false else
-
-        let refPat = refExpr.Reference.Resolve().DeclaredElement.As<ILocalReferencePat>()
-        if isNull refPat then false else
-
-        let rec tryGetTopLevelPatternFromUntypedPattern (pat: IFSharpPattern) =
-            let pat = pat.IgnoreParentParens()
-            match TuplePatNavigator.GetByPattern(pat) with
-            | null -> pat
-            | pat -> tryGetTopLevelPatternFromUntypedPattern pat
-
-        let pat = tryGetTopLevelPatternFromUntypedPattern refPat
-        if isNull (BindingNavigator.GetByParameterPattern(pat)) then false else
-
-        let references = List()
-        let searchPattern = SearchPattern.FIND_USAGES ||| SearchPattern.FIND_RELATED_ELEMENTS
-        let searchDomain = refPat.DeclaredElement.GetSearchDomain()
-
-        refPat.GetPsiServices().AsyncFinder.Find([| refPat.DeclaredElement |], searchDomain, references.ConsumeReferences(),
-                searchPattern, NullProgressIndicator.Create())
-
-        match Seq.tryHead references with
-        | None -> false
-        | Some reference -> reference.GetTreeNode().GetTreeStartOffset() = refExpr.GetTreeStartOffset()
-
     let isApplicable (expr: IFSharpExpression) =
         if not (FSharpPostfixTemplates.canBecomeStatement expr) then false else
 
         let fcsType, displayContext = ForPostfixTemplate.getExpressionType expr
-        isNotNull displayContext && fcsType |> isApplicableType expr ||
-
-        let refExpr = expr.As<IReferenceExpr>()
-        isApplicableDeclaredElement refExpr
+        isNotNull displayContext && fcsType |> isApplicableType expr
 
     override x.CreateBehavior(info) = ForPostfixTemplateBehavior(info :?> ForPostfixTemplateInfo) :> _
 

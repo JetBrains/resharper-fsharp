@@ -1,7 +1,6 @@
 ﻿// ${COMPLETE_ITEM:for}
 module Module
 
-let f (x, y) =
-    for a in x do
-      {caret}
+let f (x: #seq<string>) =
+    x.{caret}
     ()
