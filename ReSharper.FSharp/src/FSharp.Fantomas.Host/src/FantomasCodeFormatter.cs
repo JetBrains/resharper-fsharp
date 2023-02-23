@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Fantomas.Core;
+using FSharp.Compiler.Text;
 using JetBrains.Diagnostics;
 using JetBrains.Extension;
 using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol;
@@ -24,6 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     private static readonly Version Version45 = Version.Parse("4.5");
     private static readonly Version Version46 = Version.Parse("4.6");
+    private static readonly Version Version60 = Version.Parse("6.0");
 
     private static Type GetCodeFormatter() =>
       FantomasAssembly
@@ -100,12 +103,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       return Type.GetType(qualifiedName).NotNull($"{qualifiedName} must exist");
     }
 
-    private static Type GetFormatConfigType() =>
-      FantomasAssembly
+    private static Type GetFormatConfigType()
+    {
+      var formatConfig = FantomasAssembly
         .GetType($"{FantomasAssemblyName}.FormatConfig")
-        .NotNull("FormatConfig must exist")
-        .GetNestedType("FormatConfig")
-        .NotNull();
+        .NotNull("FormatConfig must exist");
+
+      return CurrentVersion >= Version60
+        ? formatConfig
+        : formatConfig
+          .GetNestedType("FormatConfig")
+          .NotNull();
+    }
 
     private static readonly Type CodeFormatterType = GetCodeFormatter();
     private static readonly Type FSharpParsingOptionsType = GetFSharpParsingOptions();
@@ -119,8 +128,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       CreateFSharpParsingOptions = FSharpParsingOptionsType?.GetConstructors().Single();
 
     private static readonly MethodInfo FormatSelectionMethod = CodeFormatterType.GetMethod("FormatSelectionAsync");
-    private static readonly MethodInfo FormatDocumentMethod = CodeFormatterType.GetMethod("FormatDocumentAsync");
     private static readonly MethodInfo MakeRangeMethod = CodeFormatterType.GetMethod("MakeRange");
+    private static readonly MethodInfo MakePositionMethod = CodeFormatterType.GetMethod("MakePosition");
     private static readonly MethodInfo SourceOriginConstructor = GetSourceOriginStringConstructor();
 
     private static readonly MethodInfo CreateOptionMethod =
@@ -173,14 +182,41 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         .Result.Replace("\r\n", args.NewLineText);
     }
 
-    public static string FormatDocument(RdFantomasFormatDocumentArgs args) =>
-      FSharpAsync.StartAsTask(
-          FormatDocumentMethod.Invoke(null, GetFormatDocumentOptions(args)) as FSharpAsync<string>,
-          null, null)
-        .Result.Replace("\r\n", args.NewLineText);
+    public static RdFormatResult FormatDocument(RdFantomasFormatDocumentArgs args)
+    {
+      var formatDocumentOptions = GetFormatDocumentOptions(args);
+      var formatDocumentAsync = CodeFormatterType.InvokeMember("FormatDocumentAsync",
+        BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.Public, Type.DefaultBinder, null,
+        formatDocumentOptions);
+      var formatResult = FSharpAsync.StartAsTask((dynamic)formatDocumentAsync, null, null).Result;
+
+      if (CurrentVersion < Version60)
+        return new RdFormatResult(formatResult.Replace("\r\n", args.NewLineText), null);
+
+      var formattedCode = formatResult.Code;
+      var newCursorPosition = formatResult.Cursor == null
+        ? null
+        : new RdFcsPos(formatResult.Cursor.Value.Line - 1, formatResult.Cursor.Value.Column);
+      return new RdFormatResult(formattedCode.Replace("\r\n", args.NewLineText), newCursorPosition);
+    }
 
     private static object[] GetFormatDocumentOptions(RdFantomasFormatDocumentArgs args)
     {
+      if (CurrentVersion >= Version60)
+      {
+        var cursorPosition = args.CursorPosition is { } pos
+          ? MakePositionMethod.Invoke(null, new object[] { pos.Row + 1, pos.Column })
+          : null;
+
+        return new[]
+        {
+          args.FileName.EndsWith(".fsi"), // isSignature
+          args.Source,
+          cursorPosition,
+          ConvertToFormatConfig(args.FormatConfig),
+        };
+      }
+
       if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version)
         return new[]
         {
@@ -234,6 +270,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
       var formatConfig = FSharpValue.MakeRecord(FormatConfigType, formatConfigValues, null);
 
+      if (CurrentVersion >= Version60) return formatConfig;
       return CurrentVersion >= FantomasProtocolConstants.Fantomas5Version
         ? CreateOptionMethod.Invoke(null, new[] { formatConfig }) //FSharpOption<FormatConfig>
         : formatConfig;

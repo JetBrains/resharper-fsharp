@@ -25,17 +25,28 @@ object RdFantomasModel : Root() {
     field("endCol", int)
   }
 
+  private val rdFcsPos = structdef {
+    field("row", int)
+    field("column", int)
+  }
+
+  private val rdFormatResult = structdef {
+    field("code", string)
+    field("cursorPosition", rdFcsPos.nullable)
+  }
+
   private val rdFantomasFormatArgs = basestruct {
     field("fileName", string)
     field("source", string)
     field("formatConfig", array(string))
     field("parsingOptions", rdFcsParsingOptions)
     field("newLineText", string)
+    field("cursorPosition", rdFcsPos.nullable)
   }
 
   init {
     call("getFormatConfigFields", void, array(string))
-    call("formatDocument", structdef("rdFantomasFormatDocumentArgs") extends rdFantomasFormatArgs {}, string)
+    call("formatDocument", structdef("rdFantomasFormatDocumentArgs") extends rdFantomasFormatArgs {}, rdFormatResult)
     call("formatSelection", structdef("rdFantomasFormatSelectionArgs") extends rdFantomasFormatArgs {
       field("range", rdFcsRange)
     }, string)

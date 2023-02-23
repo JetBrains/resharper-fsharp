@@ -4,6 +4,7 @@ open JetBrains.Application.Infra
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.DocumentModel.Impl
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -11,11 +12,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
-open JetBrains.ReSharper.Resources.Shell
+open JetBrains.TextControl
 open JetBrains.Util.Text
+open JetBrains.TextControl.CodeWithMe
+open JetBrains.Util.dataStructures.TypedIntrinsics
 
 [<CodeCleanupModule>]
-type FSharpReformatCode() =
+type FSharpReformatCode(textControlManager: ITextControlManager, codeCleanupService: CodeCleanupService) =
     let REFORMAT_CODE_DESCRIPTOR = CodeCleanupOptionDescriptor<bool>(
         "FSReformatCode",
         CodeCleanupLanguage("F#", 2),
@@ -64,24 +67,32 @@ type FSharpReformatCode() =
             let modificationSide = TextModificationSide.NotSpecified
             let newLineText = sourceFile.DetectLineEnding().GetPresentation()
             let parsingOptions = fsFile.CheckerService.FcsProjectProvider.GetParsingOptions(sourceFile)
+            let textControl = textControlManager.LastFocusedTextControlPerClient.ForCurrentClient().NotNull()
 
-            let change =
-                if isNotNull rangeMarker then
-                    try
-                        let range = ofDocumentRange rangeMarker.DocumentRange
-                        let formatted =
-                            fantomasHost.FormatSelection(filePath, range, text, settings, parsingOptions, newLineText)
-                        let offset = rangeMarker.DocumentRange.StartOffset.Offset
-                        let oldLength = rangeMarker.DocumentRange.Length
-                        Some(DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide))
-                    with _ -> None
-                else
-                    let formatted = fantomasHost.FormatDocument(filePath, text, settings, parsingOptions, newLineText)
-                    Some(DocumentChange(document, 0, text.Length, formatted, stamp, modificationSide))
+            if isNotNull rangeMarker then
+                try
+                    let range = ofDocumentRange rangeMarker.DocumentRange
+                    let formatted = fantomasHost.FormatSelection(filePath, range, text, settings, parsingOptions, newLineText)
+                    let offset = rangeMarker.DocumentRange.StartOffset.Offset
+                    let oldLength = rangeMarker.DocumentRange.Length
+                    let documentChange = DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide)
+                    document.ChangeDocument(documentChange, TimeStamp.NextValue)
+                    sourceFile.GetPsiServices().Files.CommitAllDocuments()
+                with _ -> ()
+            else
+                let cursorPosition = textControl.Caret.Position.Value.ToDocLineColumn();
+                let formatResult = fantomasHost.FormatDocument(filePath, text, settings, parsingOptions, newLineText, cursorPosition)
+                let newCursorPosition = formatResult.CursorPosition
 
-            match change with
-            | Some(change) ->
-                use cookie = WriteLockCookie.Create()
-                document.ChangeDocument(change, TimeStamp.NextValue)
+                document.ReplaceText(document.DocumentRange, formatResult.Code)
                 sourceFile.GetPsiServices().Files.CommitAllDocuments()
-            | _ -> ()
+
+                if isNull newCursorPosition then () else
+
+                // move cursor after current document transaction
+                let moveCursorLifetime = new LifetimeDefinition()
+                codeCleanupService.WholeFileCleanupCompletedAfterSave.Advise(moveCursorLifetime.Lifetime, fun _ ->
+                    moveCursorLifetime.Terminate()
+                    textControl.Caret.MoveTo(Int32<DocLine>.op_Explicit(newCursorPosition.Row),
+                                             Int32<DocColumn>.op_Explicit(newCursorPosition.Column),
+                                             CaretVisualPlacement.Generic))
