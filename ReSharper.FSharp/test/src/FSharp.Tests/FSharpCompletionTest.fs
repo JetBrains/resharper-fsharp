@@ -206,6 +206,7 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``For - Not available - Bool 02``() = x.DoNamedTest()
     [<Test>] member x.``For - Not available - Int 01``() = x.DoNamedTest()
     [<Test>] member x.``For - Not available - Int 02``() = x.DoNamedTest()
+    [<Test>] member x.``For - Seq 01``() = x.DoNamedTest()
     [<Test>] member x.``For - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``For - Type context - Arg 01``() = x.DoNamedTest()
     [<Test>] member x.``For - Type context - Arg 02``() = x.DoNamedTest()
@@ -226,6 +227,7 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``For - Type parameter 02``() = x.DoNamedTest()
     [<Test>] member x.``For - Type parameter 03``() = x.DoNamedTest()
     [<Test>] member x.``For - Type parameter 04``() = x.DoNamedTest()
+    [<Test>] member x.``For - Type parameter 05 - Eof``() = x.DoNamedTest()
 
     [<Test>] member x.``Let - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Decl 02``() = x.DoNamedTest()

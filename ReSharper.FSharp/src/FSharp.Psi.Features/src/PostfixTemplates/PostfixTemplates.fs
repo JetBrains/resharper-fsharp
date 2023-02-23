@@ -93,12 +93,12 @@ module FSharpPostfixTemplates =
 
         let isLetExprApplicable (letExpr: ILetOrUseExpr) =
             isNotNull letExpr &&
-            isLastMeaningfulNodeOnLine letExpr &&
+            isLastMeaningfulNodeOnLine expr &&
             letExpr.Indent <= expr.Indent 
 
         let isSequentialExprApplicable (seqExpr: ISequentialExpr) =
             isNotNull seqExpr &&
-            isLastMeaningfulNodeOnLine seqExpr &&
+            isLastMeaningfulNodeOnLine expr &&
             isFirstMeaningfulNodeOnLine expr
 
         let isExprStmtApplicable (exprStmt: IDoLikeStatement) =
