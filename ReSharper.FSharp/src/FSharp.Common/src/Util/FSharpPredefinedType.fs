@@ -132,27 +132,27 @@ let tryGetPredefinedAbbreviations(clrTypeName: IClrTypeName, names: outref<strin
 
 
 let isOption (fcsType: FSharpType) =
-    fcsType.StrippedType.BasicQualifiedName = fsOptionTypeName.FullName
+    fcsType.ErasedType.BasicQualifiedName = fsOptionTypeName.FullName
 
 let isValueOption (fcsType: FSharpType) =
-    fcsType.StrippedType.BasicQualifiedName = fsValueOptionTypeName.FullName
+    fcsType.ErasedType.BasicQualifiedName = fsValueOptionTypeName.FullName
 
 let isChoice (fcsType: FSharpType) =
-    fcsType.StrippedType.BasicQualifiedName.StartsWith("Microsoft.FSharp.Core.FSharpChoice`", StringComparison.Ordinal)
+    fcsType.ErasedType.BasicQualifiedName.StartsWith("Microsoft.FSharp.Core.FSharpChoice`", StringComparison.Ordinal)
 
 [<Extension; CompiledName("IsUnit")>]
 let isUnit (fcsType: FSharpType) =
-    try fcsType.StrippedType.BasicQualifiedName = unitTypeName.FullName
+    try fcsType.ErasedType.BasicQualifiedName = unitTypeName.FullName
     with _ -> false
 
 [<Extension; CompiledName("IsNativePtr")>]
 let isNativePtr (fcsType: FSharpType) =
-    try fcsType.StrippedType.BasicQualifiedName = StandardTypeNames.IntPtr
+    try fcsType.ErasedType.BasicQualifiedName = StandardTypeNames.IntPtr
     with _ -> false
 
 let isReadOnly (fcsType: FSharpType) =
     if fcsType.HasTypeDefinition && fcsType.TypeDefinition.IsArrayType then false else
 
-    let name = fcsType.StrippedType.BasicQualifiedName
+    let name = fcsType.ErasedType.BasicQualifiedName
     startsWith "Microsoft.FSharp.Collections.FSharpList`" name ||
     startsWith "System.String" name

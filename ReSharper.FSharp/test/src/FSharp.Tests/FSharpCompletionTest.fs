@@ -33,12 +33,14 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Basic 05 - Attribute suffix``() = x.DoNamedTest()
     [<Test>] member x.``Basic 06 - Attribute suffix``() = x.DoNamedTest()
 
-    [<Test>] member x.``Bind - Rqa module 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Bind - Rqa module 01``() = x.DoNamedTest()
     [<Test>] member x.``Bind - Rqa module 02``() = x.DoNamedTest()
     [<Test>] member x.``Bind - Rqa module 03``() = x.DoNamedTest()
     [<Test>] member x.``Bind - Rqa module 04``() = x.DoNamedTest()
-    [<Test>] member x.``Bind - Qualifier - Enum case 01``() = x.DoNamedTest()
-    [<Test>] member x.``Bind - Qualifier - Enum case 02 - Escape``() = x.DoNamedTest()
+    [<Test>] member x.``Bind - Rqa module 05``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 02 - Escape``() = x.DoNamedTest()
+    [<Test>] member x.``Bind - Qualifier - Enum case 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Local val - Binary op 01``() = x.DoNamedTest()
     [<Test>] member x.``Local val - Binary op 02``() = x.DoNamedTest()

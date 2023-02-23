@@ -102,6 +102,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Enum 02 - Without first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 03 - Case attributes``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 04 - Private repr``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
 
@@ -660,6 +661,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Pattern - ListCons 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - ListCons 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - ListCons 03 - Let``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - ListCons 04 - Let``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - Null 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - QuoteExpr 01``() = x.DoNamedTest()

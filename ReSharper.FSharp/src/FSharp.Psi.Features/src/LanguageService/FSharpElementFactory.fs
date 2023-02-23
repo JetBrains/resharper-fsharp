@@ -75,7 +75,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         if PrettyNaming.IsLogicalOpName logicalName then
             sprintf "( %s )" name
         else
-            PrettyNaming.AddBackticksToIdentifierIfNeeded name
+            PrettyNaming.NormalizeIdentifierBackticks name
 
     let createMemberDecl logicalName typeParameters parameters addSpaceBeforeParams =
         let typeParametersSource =
@@ -179,7 +179,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
 
         member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, preferNoParens, displayContext) =
             let printParam (name, fcsType: FSharpType) =
-                let name = PrettyNaming.AddBackticksToIdentifierIfNeeded name
+                let name = PrettyNaming.NormalizeIdentifierBackticks name
                 if not addTypes then name else
 
                 let fcsType = fcsType.Format(displayContext)

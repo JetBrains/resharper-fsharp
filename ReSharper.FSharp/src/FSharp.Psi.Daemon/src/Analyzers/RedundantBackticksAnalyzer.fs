@@ -40,6 +40,6 @@ type RedundantBackticksAnalyzer() =
         if text.Length = withoutBackticks.Length || withoutBackticks = "_" ||
                 reservedKeywords.Contains(withoutBackticks) then () else
 
-        let escaped = PrettyNaming.AddBackticksToIdentifierIfNeeded withoutBackticks
+        let escaped = PrettyNaming.NormalizeIdentifierBackticks withoutBackticks
         if escaped.Length = withoutBackticks.Length then
             consumer.AddHighlighting(RedundantBackticksWarning(identifier))

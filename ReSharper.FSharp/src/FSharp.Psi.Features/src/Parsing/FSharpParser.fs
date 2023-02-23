@@ -22,9 +22,9 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
     let tryCreateTreeBuilder lexer lifetime =
         Option.map (fun (parseResults: FSharpParseFileResults) ->
             match parseResults.ParseTree  with
-            | ParsedInput.ImplFile(ParsedImplFileInput(modules = decls)) ->
+            | ParsedInput.ImplFile(ParsedImplFileInput(contents = decls)) ->
                 FSharpImplTreeBuilder(lexer, document, decls, lifetime, path) :> FSharpTreeBuilderBase
-            | ParsedInput.SigFile(ParsedSigFileInput(modules = sigs)) ->
+            | ParsedInput.SigFile(ParsedSigFileInput(contents = sigs)) ->
                 FSharpSigTreeBuilder(lexer, document, sigs, lifetime, path) :> FSharpTreeBuilderBase)
 
     let createFakeBuilder lexer lifetime =

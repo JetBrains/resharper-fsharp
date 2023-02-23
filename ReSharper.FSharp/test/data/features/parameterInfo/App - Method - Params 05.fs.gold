@@ -1,7 +1,7 @@
 ﻿ParameterInfo is available
 --- All invocables: ----
-(a: 'a, params b: int[]) : unit
-Parameter: 1 'params b: int[]'
+(a: 'a, params b: int array) : unit
+Parameter: 1 'params b: int array'
 
 --- Accepted invocables: ---
-(a: 'a, params b: int[]) : unit
+(a: 'a, params b: int array) : unit

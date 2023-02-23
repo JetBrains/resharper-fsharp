@@ -9,4 +9,5 @@ match A with
 | B |a|(0) -> ()
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: This union case expects 2 arguments in tupled form
+(0): ReSharper Underlined Error Highlighting: This union case expects 2 arguments in tupled form, but was given 1. The missing field arguments may be any of:
+	int

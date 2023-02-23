@@ -15,19 +15,19 @@ Class.M([|1; 2|])
 Known type of argument: int16
 
 Available overloads:
- - Class.M([<System.ParamArray>] ints: int[]) : unit // Argument 'ints' doesn't match
- - Class.M([<System.ParamArray>] ints: int[]) : unit // Argument at index 1 doesn't match
+ - Class.M([<System.ParamArray>] ints: int array) : unit // Argument 'ints' doesn't match
+ - Class.M([<System.ParamArray>] ints: int array) : unit // Argument at index 1 doesn't match
 (1): ReSharper Underlined Error Highlighting: No overloads match for method 'M'.
 
 Known type of argument: uint32
 
 Available overloads:
- - Class.M([<System.ParamArray>] ints: int[]) : unit // Argument 'ints' doesn't match
- - Class.M([<System.ParamArray>] ints: int[]) : unit // Argument at index 1 doesn't match
+ - Class.M([<System.ParamArray>] ints: int array) : unit // Argument 'ints' doesn't match
+ - Class.M([<System.ParamArray>] ints: int array) : unit // Argument at index 1 doesn't match
 (2): ReSharper Underlined Error Highlighting: No overloads match for method 'M'.
 
 Known type of argument: int list
 
 Available overloads:
- - Class.M([<System.ParamArray>] ints: int[]) : unit // Argument 'ints' doesn't match
- - Class.M([<System.ParamArray>] ints: int[]) : unit // Argument at index 1 doesn't match
+ - Class.M([<System.ParamArray>] ints: int array) : unit // Argument 'ints' doesn't match
+ - Class.M([<System.ParamArray>] ints: int array) : unit // Argument at index 1 doesn't match

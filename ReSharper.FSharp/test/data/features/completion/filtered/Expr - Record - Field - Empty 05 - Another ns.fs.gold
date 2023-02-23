@@ -160,7 +160,7 @@ abs    ^T
 acos    ^T
 and
 array
-array2D    'T[,]
+array2D    'T array2d
 as
 asin    ^T
 assert

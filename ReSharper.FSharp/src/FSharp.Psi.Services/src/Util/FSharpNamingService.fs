@@ -273,7 +273,7 @@ module FSharpNamingService =
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
     let mangleNameIfNecessary name =
-        PrettyNaming.AddBackticksToIdentifierIfNeeded name
+        PrettyNaming.NormalizeIdentifierBackticks name
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =

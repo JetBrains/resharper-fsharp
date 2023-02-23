@@ -59,7 +59,7 @@ type FcsErrorLookupItem(item: DeclarationListItem) =
     inherit TextLookupItemBase()
 
     override x.Image = null
-    override x.Text = item.Name
+    override x.Text = item.NameInList
     override x.Accept(_, _, _, _, _, _) = ()
 
     interface IDescriptionProvidingLookupItem with
@@ -91,7 +91,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
     override x.Text =
         let name = x.FcsSymbol.DisplayNameCore
         let name = if context.IsInAttributeContext then name.DropAttributeSuffix() else name
-        PrettyNaming.AddBackticksToIdentifierIfNeeded name
+        PrettyNaming.NormalizeIdentifierBackticks name
 
     override x.DisplayTypeName =
         try
@@ -134,7 +134,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
                 let moduleToOpen = getModuleToOpen typeElement
                 ModuleToImport.DeclaredElement(moduleToOpen) else
 
-            let ns = ns |> Array.map PrettyNaming.AddBackticksToIdentifierIfNeeded |> String.concat "."
+            let ns = ns |> Array.map PrettyNaming.NormalizeIdentifierBackticks |> String.concat "."
             ModuleToImport.FullName(ns)
 
         let offset = context.Ranges.InsertRange.StartOffset
