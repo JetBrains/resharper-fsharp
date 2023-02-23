@@ -2,7 +2,7 @@
 module Module
 
 let f x =
-    for _ in x do
-      (){caret}
+    for a in x do
+      {caret}
 
     ()

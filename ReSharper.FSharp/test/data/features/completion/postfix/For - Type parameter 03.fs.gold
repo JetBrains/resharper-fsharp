@@ -3,7 +3,7 @@ module Module
 
 let f x =
     if true then
-        for _ in x do
-          (){caret}
+        for a in x do
+          {caret}
 
     ()

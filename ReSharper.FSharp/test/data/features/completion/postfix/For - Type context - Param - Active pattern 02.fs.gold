@@ -1,0 +1,10 @@
+﻿
+CompareTo
+Equals
+GetHashCode
+GetType
+GetTypeCode
+ToString
+let
+match
+not{caret}

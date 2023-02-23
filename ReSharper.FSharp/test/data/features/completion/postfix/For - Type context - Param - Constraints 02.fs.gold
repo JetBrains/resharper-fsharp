@@ -2,6 +2,6 @@
 module Module
 
 let f (x: #seq<_>) =
-    for _ in x do
-      (){caret}
+    for b in x do
+      {caret}
     ()
