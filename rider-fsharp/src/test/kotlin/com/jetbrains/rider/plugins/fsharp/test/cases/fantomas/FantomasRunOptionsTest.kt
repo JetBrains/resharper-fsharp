@@ -26,9 +26,7 @@ import org.testng.annotations.Test
 import java.io.PrintStream
 import java.nio.file.Paths
 import java.time.Duration
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.createDirectory
+import kotlin.io.path.*
 
 @Test
 @TestEnvironment(coreVersion = CoreVersion.DOT_NET_6, reuseSolution = false)
@@ -127,9 +125,14 @@ class FantomasRunOptionsTest : EditorTestBase() {
       dotnetToolsInvalidated = true
     }
 
-    getDotnetCliHome().delete(true)
-    getDotnetCliHome().createDirectory()
-    flushFileChanges(project)
+    val dotnetCliHome = getDotnetCliHome()
+    if (dotnetCliHome.listDirectoryEntries().any { it.name != ".nuget" }) {
+      withDotnetToolsUpdate {
+        dotnetCliHome.delete(true)
+        dotnetCliHome.createDirectory()
+        flushFileChanges(project)
+      }
+    }
   }
 
   @Test
