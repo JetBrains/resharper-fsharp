@@ -27,10 +27,25 @@ module FSharpPostfixTemplates =
         let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
         isNotNull typedExpr
 
-    let rec getContainingAppExprFromLastArg (expr: IFSharpExpression) =
+    let rec getContainingAppExprFromLastArg allowNewLines (expr: IFSharpExpression) =
         match PrefixAppExprNavigator.GetByArgumentExpression(expr) with
-        | null -> expr
-        | appExpr -> getContainingAppExprFromLastArg appExpr
+        | null ->
+            match BinaryAppExprNavigator.GetByRightArgument(expr) with
+            | null -> expr
+            | binaryAppExpr when not allowNewLines ->
+                let leftArg = binaryAppExpr.LeftArgument
+                let rightArg = binaryAppExpr.RightArgument
+
+                let formatter = expr.Language.LanguageServiceNotNull().CodeFormatter
+                if isNotNull leftArg && isNotNull rightArg &&
+                        not (FormatterImplHelper.HasLineFeedsTo(leftArg, rightArg, formatter)) then
+                    binaryAppExpr :> _
+                else
+                    expr
+
+            | binaryAppExpr -> binaryAppExpr
+
+        | appExpr -> getContainingAppExprFromLastArg allowNewLines appExpr
 
     let getContainingTypeExpression (typeName: ITypeReferenceName) =
         let namedTypeUsage = NamedTypeUsageNavigator.GetByReferenceName(typeName)
@@ -47,7 +62,7 @@ module FSharpPostfixTemplates =
 
         let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)
         if isNotNull typedExpr then
-            getContainingAppExprFromLastArg typedExpr else
+            getContainingAppExprFromLastArg true typedExpr else
 
         null
 
@@ -58,14 +73,16 @@ module FSharpPostfixTemplates =
         else
             expr
 
-    let canBecomeStatement (expr: IFSharpExpression) : bool =
+    let canBecomeStatement (initialExpr: IFSharpExpression) : bool =
         let expr = 
-            expr
-            |> getContainingAppExprFromLastArg
+            initialExpr
+            |> (getContainingAppExprFromLastArg false)
             |> getContainingTupleExprFromLastItem
 
         if isNull expr then false else
-        if not (FSharpIntroduceVariable.CanIntroduceVar(expr, true)) then false else
+
+        if not (FSharpIntroduceVariable.CanIntroduceVar(expr, true) &&
+                FSharpIntroduceVariable.CanIntroduceVar(initialExpr, true)) then false else
 
         let formatter = expr.Language.LanguageServiceNotNull().CodeFormatter
 
@@ -83,6 +100,11 @@ module FSharpPostfixTemplates =
         let isParentApplicable (parent: ITreeNode) =
             isNotNull parent &&
             isLastMeaningfulNodeOnLine parent
+
+        let isBinaryExprApplicable (parent: ITreeNode) =
+            isNotNull parent &&
+            isLastMeaningfulNodeOnLine expr &&
+            isFirstMeaningfulNodeOnLine expr
 
         let isLambdaExprApplicable (lambdaExpr: ILambdaExpr) =
             isNotNull lambdaExpr &&
@@ -109,7 +131,7 @@ module FSharpPostfixTemplates =
         isBlockLike ArrayOrListExprNavigator.GetByExpression isParentApplicable ||
         isBlockLike ComputationExprNavigator.GetByExpression isParentApplicable ||
         isBlockLike BindingNavigator.GetByExpression isParentApplicable ||
-        isBlockLike BinaryAppExprNavigator.GetByArgument isParentApplicable ||
+        isBlockLike BinaryAppExprNavigator.GetByArgument isBinaryExprApplicable ||
         isBlockLike DoLikeExprNavigator.GetByExpression isParentApplicable ||
         isBlockLike DoLikeStatementNavigator.GetByExpression isExprStmtApplicable ||
         isBlockLike ForEachExprNavigator.GetByDoExpression isParentApplicable ||

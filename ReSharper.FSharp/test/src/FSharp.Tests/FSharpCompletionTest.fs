@@ -236,7 +236,9 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``Let - Expr - App 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Expr - App 02``() = x.DoNamedTest()
     [<Test>] member x.``Let - Expr - App 03``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Expr - App 04``() = x.DoNamedTest()
     [<Test>] member x.``Let - Expr - Op - Pipe 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Expr - Op - Pipe 02``() = x.DoNamedTest()
     [<Test>] member x.``Let - Expr - Ref 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Expr - Ref 02 - Ctor``() = x.DoNamedTest()
     [<Test>] member x.``Let - Expr 01``() = x.DoNamedTest()
@@ -255,8 +257,12 @@ type FSharpPostfixCompletionTest() =
     [<TestDefines("DEFINE")>]
     [<Test>] member x.``Let - Preprocessor 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Match - Context - App 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - App 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Binary 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Binary 03``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Binary 04``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Eof 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Eof 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - If 01``() = x.DoNamedTest()
@@ -285,6 +291,7 @@ type FSharpPostfixCompletionTest() =
 
     [<Test>] member x.``Not available - Let - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Let - Namespace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Match 01``() = x.DoNamedTest()
 
 
 [<AbstractClass; FSharpTest>]
