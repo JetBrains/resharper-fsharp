@@ -12,7 +12,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
-open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.Util.Text
 open JetBrains.Util.dataStructures.TypedIntrinsics
@@ -36,7 +35,7 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
             | CodeCleanupService.DefaultProfileType.REFORMAT
             | CodeCleanupService.DefaultProfileType.CODE_STYLE ->
                 profile.SetSetting<bool>(REFORMAT_CODE_DESCRIPTOR, true)
-            | _ -> 
+            | _ ->
                 Assertion.Fail($"Unexpected cleanup profile type: {nameof(profileType)}")
 
         member x.IsAvailable(sourceFile: IPsiSourceFile) =
@@ -45,7 +44,7 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
         member x.IsAvailable(profile: CodeCleanupProfile) =
             profile.GetSetting(REFORMAT_CODE_DESCRIPTOR)
 
-        member x.Process(sourceFile, rangeMarker, _, _, _) =
+        member x.Process<caret>(sourceFile, rangeMarker, _, _, _) =
             let fsFile = sourceFile.FSharpFile
             if isNull fsFile then () else
 
@@ -75,7 +74,6 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
                     let offset = rangeMarker.DocumentRange.StartOffset.Offset
                     let oldLength = rangeMarker.DocumentRange.Length
                     let documentChange = DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide)
-                    use _ = WriteLockCookie.Create()
                     document.ChangeDocument(documentChange, TimeStamp.NextValue)
                     sourceFile.GetPsiServices().Files.CommitAllDocuments()
                 with _ -> ()

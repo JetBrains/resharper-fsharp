@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Fantomas.Core;
-using FSharp.Compiler.Text;
 using JetBrains.Diagnostics;
 using JetBrains.Extension;
 using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol;
@@ -127,7 +125,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private static readonly ConstructorInfo
       CreateFSharpParsingOptions = FSharpParsingOptionsType?.GetConstructors().Single();
 
-    private static readonly MethodInfo FormatSelectionMethod = CodeFormatterType.GetMethod("FormatSelectionAsync");
     private static readonly MethodInfo MakeRangeMethod = CodeFormatterType.GetMethod("MakeRange");
     private static readonly MethodInfo MakePositionMethod = CodeFormatterType.GetMethod("MakePosition");
     private static readonly MethodInfo SourceOriginConstructor = GetSourceOriginStringConstructor();
@@ -161,24 +158,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
       if (CurrentVersion >= FantomasProtocolConstants.Fantomas5Version)
         return FSharpAsync.StartAsTask(
-            FormatSelectionMethod.Invoke(null, new[]
-            {
-              args.FileName.EndsWith(".fsi"), // isSignature
-              args.Source,
-              range,
-              ConvertToFormatConfig(args.FormatConfig)
-            }) as dynamic, null, null) // FSharpAsync<Tuple<string, Range>>
+            CodeFormatterType.InvokeMember("FormatSelectionAsync",
+              BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.Public, Type.DefaultBinder, null, new[]
+              {
+                args.FileName.EndsWith(".fsi"), // isSignature
+                args.Source,
+                range,
+                ConvertToFormatConfig(args.FormatConfig)
+              }) as dynamic, null, null) // FSharpAsync<Tuple<string, Range>>
           .Result.Item1.Replace("\r\n", args.NewLineText);
 
       return FSharpAsync.StartAsTask(
-          FormatSelectionMethod.Invoke(null, new[]
-          {
-            args.FileName, range,
-            SourceOriginConstructor.Invoke(null, new object[] { args.Source }),
-            ConvertToFormatConfig(args.FormatConfig),
-            CreateFSharpParsingOptions.Invoke(GetParsingOptions(args.ParsingOptions).ToArray()),
-            Checker
-          }) as FSharpAsync<string>, null, null)
+          CodeFormatterType.InvokeMember("FormatSelectionAsync",
+            BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.Public, Type.DefaultBinder, null, new[]
+            {
+              args.FileName, range,
+              SourceOriginConstructor.Invoke(null, new object[] { args.Source }),
+              ConvertToFormatConfig(args.FormatConfig),
+              CreateFSharpParsingOptions.Invoke(GetParsingOptions(args.ParsingOptions).ToArray()),
+              Checker
+            }) as FSharpAsync<string>, null, null)
         .Result.Replace("\r\n", args.NewLineText);
     }
 
@@ -212,8 +211,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         {
           args.FileName.EndsWith(".fsi"), // isSignature
           args.Source,
-          cursorPosition,
           ConvertToFormatConfig(args.FormatConfig),
+          cursorPosition
         };
       }
 
