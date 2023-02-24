@@ -42,7 +42,11 @@ and MatchPostfixTemplateBehavior(info) =
             use disableFormatter = new DisableCodeFormatter()
 
             let expr = x.GetExpression(context)
-            let expr = FSharpPostfixTemplates.getContainingTupleExprFromLastItem expr
+            let expr =
+                expr
+                |> FSharpPostfixTemplates.getContainingAppExprFromLastArg false
+                |> FSharpPostfixTemplates.getContainingTupleExprFromLastItem
+
             FSharpPostfixTemplates.convertToBlockLikeExpr expr context
 
             let matchExpr = ModificationUtil.ReplaceChild(expr, expr.CreateElementFactory().CreateMatchExpr(expr))

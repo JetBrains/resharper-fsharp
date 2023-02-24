@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:match}
+module Module
+
+do
+    match List.singleton 1 with
+    | {caret}
