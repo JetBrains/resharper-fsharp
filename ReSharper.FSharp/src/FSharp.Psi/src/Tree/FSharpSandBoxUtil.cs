@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -6,27 +7,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public static class FSharpSandBoxUtil
   {
-    public static TNode TryGetOriginalNodeThroughSandBox<TNode>([NotNull] this TNode sandboxNode)
-      where TNode : class, IFSharpTreeNode
+    public static TNode TryGetOriginalNodeThroughSandBox<TNode>([NotNull] this IReferenceExpr initialRefExpr, 
+      [NotNull] TNode wholeNode)
+      where TNode : class, IFSharpExpression
     {
       // todo: simplify getting the node from the original file
       // ParentThroughSandBox doesn't work due to ContextType == Replace,
       // it tries to get Parent of the whole original file.
 
-      if (sandboxNode.GetContainingFile()?.Parent is not ISandBox { ContextNode: IFSharpFile fsFile })
+      // x.{caret}
+      // x.le{caret}
+      // f x.{caret}
+      // f x.le{caret}
+
+      if (initialRefExpr.GetContainingFile()?.Parent is not ISandBox { ContextNode: IFSharpFile fsFile })
         return null;
 
-      var sandboxNodeRange = sandboxNode.GetTreeTextRange();
-      var sandboxNodeRangePlusOne = sandboxNode.GetTreeTextRange().ExtendRight(1);
+      var token = fsFile.FindTokenAt(initialRefExpr.Delimiter.GetTreeStartOffset());
+      if (token == null) return null;
 
-      var token = fsFile.FindTokenAt(sandboxNode.GetTreeEndOffset() - 1);
+      var range = new TreeTextRange(wholeNode.GetTreeStartOffset(), token.Parent.NotNull().GetTreeEndOffset());
       foreach (var treeNode in token.ContainingNodes<TNode>(true))
       {
         var nodeRange = treeNode.GetTreeTextRange();
-        if (nodeRange == sandboxNodeRange || nodeRange == sandboxNodeRangePlusOne)
+        if (nodeRange == range)
           return treeNode;
 
-        if (nodeRange.Length > sandboxNodeRange.Length)
+        if (nodeRange.Length > range.Length)
           return null;
       }
 

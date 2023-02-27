@@ -64,14 +64,25 @@ module ForPostfixTemplate =
         else
             tryGetEnumerableTypeArg contextExpr fcsType
 
-    let getExpressionType (expr: IFSharpExpression) =
-        let refExpr = expr.As<IReferenceExpr>()
-        if isNull refExpr then Unchecked.defaultof<_> else
+    let getExpressionType (wholeExpr: IFSharpExpression) (initialExpr: IFSharpExpression) =
+        let getRefExprQualifierType (refExpr: IReferenceExpr) =
+            let expr = refExpr.Qualifier
+            if isNull expr then Unchecked.defaultof<_>, Unchecked.defaultof<_> else
 
-        let expr = refExpr.Qualifier
-        if isNull expr then Unchecked.defaultof<_> else
+            expr.TryGetFcsType(), expr.TryGetFcsDisplayContext()
 
-        expr.TryGetFcsType(), expr.TryGetFcsDisplayContext()
+        let wholeRefExpr = wholeExpr.As<IReferenceExpr>()
+        if isNotNull wholeRefExpr then
+            getRefExprQualifierType wholeRefExpr else
+
+        let initialRefExpr = initialExpr.As<IReferenceExpr>()
+        if isNull initialRefExpr then Unchecked.defaultof<_>, Unchecked.defaultof<_> else
+
+        let originalNode = initialRefExpr.TryGetOriginalNodeThroughSandBox(wholeExpr)
+        if isNotNull originalNode then
+            originalNode.TryGetFcsType(), originalNode.TryGetFcsDisplayContext() else
+
+        Unchecked.defaultof<_>, Unchecked.defaultof<_>
 
 
 [<PostfixTemplate("for", "Iterates over enumerable collection", "for _ in expr do ()")>]
@@ -89,16 +100,26 @@ type ForPostfixTemplate() =
     let isApplicable (expr: IFSharpExpression) =
         if not (FSharpPostfixTemplates.canBecomeStatement expr) then false else
 
-        let fcsType, displayContext = ForPostfixTemplate.getExpressionType expr
-        isNotNull displayContext && fcsType |> isApplicableType expr
+        let wholeExpr =
+            expr
+            |> FSharpPostfixTemplates.getContainingAppExprFromLastArg false
+            |> FSharpPostfixTemplates.getContainingTupleExprFromLastItem
+
+        let fcsType, displayContext = ForPostfixTemplate.getExpressionType wholeExpr expr
+        isNotNull displayContext && isApplicableType wholeExpr fcsType
 
     override x.CreateBehavior(info) = ForPostfixTemplateBehavior(info :?> ForPostfixTemplateInfo) :> _
 
     override x.CreateInfo(context) =
         let expr = context.Expression.As<IReferenceExpr>()
 
-        let fcsType, displayContext = ForPostfixTemplate.getExpressionType expr
-        let enumeratedType = ForPostfixTemplate.getEnumeratedType expr fcsType
+        let wholeExpr =
+            expr
+            |> FSharpPostfixTemplates.getContainingAppExprFromLastArg false
+            |> FSharpPostfixTemplates.getContainingTupleExprFromLastItem
+
+        let fcsType, displayContext = ForPostfixTemplate.getExpressionType wholeExpr expr
+        let enumeratedType = ForPostfixTemplate.getEnumeratedType wholeExpr fcsType
 
         ForPostfixTemplateInfo(context, enumeratedType, displayContext) :> _
 
@@ -128,6 +149,11 @@ and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
             use disableFormatter = new DisableCodeFormatter()
 
             let expr = x.GetExpression(context)
+            let expr =
+                expr
+                |> FSharpPostfixTemplates.getContainingAppExprFromLastArg false
+                |> FSharpPostfixTemplates.getContainingTupleExprFromLastItem
+
             FSharpPostfixTemplates.convertToBlockLikeExpr expr context
             let forEachExpr = expr.CreateElementFactory().CreateForEachExpr(expr)
             ModificationUtil.ReplaceChild(expr, forEachExpr) :> ITreeNode)
@@ -140,9 +166,13 @@ and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
 
         let forEachExpr = node :?> IForEachExpr
 
+        let fcsType =
+            forEachExpr.InExpression.TryGetFcsType()
+            |> ForPostfixTemplate.getEnumeratedType forEachExpr
+
         let names =
             let namesCollection = FSharpNamingService.createEmptyNamesCollection forEachExpr
-            match info.EnumeratedType with
+            match fcsType with
             | None -> ()
             | Some fcsType ->
                 let exprType = fcsType.MapType(forEachExpr)
@@ -173,7 +203,7 @@ and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
 
             BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, endOffset).Invoke(textControl)
 
-        match info.EnumeratedType with
+        match fcsType with
         | None -> dummy ()
         | Some fcsType ->
 

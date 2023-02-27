@@ -192,6 +192,13 @@ type FSharpPostfixCompletionTest() =
         FSharpTestPopup.setOccurrence occurrenceName false this.Solution this.TestLifetime
         base.ExecuteCodeCompletion(suffix, textControl, intellisenseManager, automatic, settingsStore)
 
+    [<Test>] member x.``For - App 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``For - App 02``() = x.DoNamedTest()
+    [<Test>] member x.``For - App 03``() = x.DoNamedTest()
+    [<Test>] member x.``For - App 04``() = x.DoNamedTest()
+    [<Test>] member x.``For - App 05``() = x.DoNamedTest()
+    [<Test>] member x.``For - App 06``() = x.DoNamedTest()
+    [<Test>] member x.``For - App 07``() = x.DoNamedTest()
     [<Test>] member x.``For - Array - Literal 01``() = x.DoNamedTest()
     [<Test>] member x.``For - Array - Literal 02``() = x.DoNamedTest()
     [<Test>] member x.``For - Array 01``() = x.DoNamedTest()
