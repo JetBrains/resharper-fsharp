@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:for}
+module Module
+
+for s in List.map string [1] do
+  {caret}

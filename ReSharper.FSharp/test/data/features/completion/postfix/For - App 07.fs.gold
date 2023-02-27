@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:for}
+module Module
+
+for s in List.singleton "" do
+  {caret}
