@@ -28,6 +28,7 @@ type FSharpRegexInjectionProvider
     override _.SupportedOriginalLanguage = FSharpLanguage.Instance
     override _.ProvidedLanguage = ClrRegexLanguage.Instance
     override _.SupportsInjectionComment = true
+    override _.SupportsInjectionIntention = false
 
 
 [<SolutionComponent>]
