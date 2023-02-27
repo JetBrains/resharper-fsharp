@@ -165,16 +165,12 @@ type CopyAndUpdatePostfixTemplate() =
 
     override x.CreateBehavior(info) = CopyAndUpdatePostfixTemplateBehavior(info) :> _
 
-    override x.TryCreateInfo(context) =
-        let context = context.AllExpressions[0]
+    override this.CreateInfo(context) =
+        CopyAndUpdatePostfixTemplateInfo(context) :> _
 
-        let fsExpr =
-            context.Expression.As<IFSharpExpression>()
-
-        if not (isApplicable fsExpr) then
-            null
-        else
-            CopyAndUpdatePostfixTemplateInfo(context) :> _
+    override this.IsApplicable(node) =
+        let expr = node.As<IFSharpExpression>()
+        isApplicable expr
 
     override this.IsEnabled(solution) = 
         let configurations =
