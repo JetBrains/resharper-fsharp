@@ -15,7 +15,6 @@ open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.Util.Text
-open JetBrains.Util.dataStructures.TypedIntrinsics
 
 [<CodeCleanupModule>]
 type FSharpReformatCode(textControlManager: ITextControlManager) =
@@ -36,7 +35,7 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
             | CodeCleanupService.DefaultProfileType.REFORMAT
             | CodeCleanupService.DefaultProfileType.CODE_STYLE ->
                 profile.SetSetting<bool>(REFORMAT_CODE_DESCRIPTOR, true)
-            | _ -> 
+            | _ ->
                 Assertion.Fail($"Unexpected cleanup profile type: {nameof(profileType)}")
 
         member x.IsAvailable(sourceFile: IPsiSourceFile) =
@@ -95,6 +94,6 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
                 let codeCleanupService = solution.GetComponent<CodeCleanupService>()
                 codeCleanupService.WholeFileCleanupCompletedAfterSave.Advise(moveCursorLifetime.Lifetime, fun _ ->
                     moveCursorLifetime.Terminate()
-                    textControl.Caret.MoveTo(Int32<DocLine>.op_Explicit(newCursorPosition.Row),
-                                             Int32<DocColumn>.op_Explicit(newCursorPosition.Column),
+                    textControl.Caret.MoveTo(docLine newCursorPosition.Row,
+                                             docColumn newCursorPosition.Column,
                                              CaretVisualPlacement.Generic))
