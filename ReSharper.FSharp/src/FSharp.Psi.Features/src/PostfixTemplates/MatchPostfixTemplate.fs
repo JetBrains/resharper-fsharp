@@ -25,6 +25,8 @@ type MatchPostfixTemplate() =
         let expr = node.As<IFSharpExpression>()
         FSharpPostfixTemplates.canBecomeStatement expr
 
+    override this.IsEnabled _ = true
+
 
 and MatchPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
     inherit PostfixTemplateInfo("match", expressionContext)

@@ -118,22 +118,19 @@ type ForPostfixTemplate() =
             |> FSharpPostfixTemplates.getContainingAppExprFromLastArg false
             |> FSharpPostfixTemplates.getContainingTupleExprFromLastItem
 
-        let fcsType, displayContext = ForPostfixTemplate.getExpressionType wholeExpr expr
-        let enumeratedType = ForPostfixTemplate.getEnumeratedType wholeExpr fcsType
-
-        ForPostfixTemplateInfo(context, enumeratedType, displayContext) :> _
+        let _, displayContext = ForPostfixTemplate.getExpressionType wholeExpr expr
+        ForPostfixTemplateInfo(context, displayContext) :> _
 
     override this.IsApplicable(node) =
         let expr = node.As<IFSharpExpression>()
         isApplicable expr
 
+    override this.IsEnabled _ = true
 
-and ForPostfixTemplateInfo(expressionContext: PostfixExpressionContext, enumeratedType: FSharpType option,
-        displayContext: FSharpDisplayContext) =
+and ForPostfixTemplateInfo(expressionContext: PostfixExpressionContext, displayContext: FSharpDisplayContext) =
     inherit PostfixTemplateInfo("for", expressionContext)
 
     member val DisplayContext = displayContext
-    member val EnumeratedType = enumeratedType
 
 
 and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
