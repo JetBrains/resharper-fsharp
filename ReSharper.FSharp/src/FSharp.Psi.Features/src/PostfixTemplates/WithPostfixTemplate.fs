@@ -115,6 +115,7 @@ and WithPostfixTemplateBehavior(info) =
         let occurrences = 
             records
             |> Array.ofList
+            |> Array.rev
             |> Array.map (fun context ->
                 // todo: shorten texts
                 let range = context.CopyExpr.GetDocumentRange()
