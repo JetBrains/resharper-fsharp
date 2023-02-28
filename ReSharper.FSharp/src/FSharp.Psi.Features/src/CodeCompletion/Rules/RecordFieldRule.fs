@@ -14,10 +14,12 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExpectedTypes
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
 
@@ -25,9 +27,12 @@ open JetBrains.ReSharper.Psi.Tree
 type RecordFieldRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
-    let relevance =
+    let matchedFieldRelevance =
         CLRLookupItemRelevance.ExpectedTypeMatchInitializer |||
         CLRLookupItemRelevance.ExpectedTypeMatch |||
+        CLRLookupItemRelevance.FieldsAndProperties
+
+    let fieldRelevance =
         CLRLookupItemRelevance.FieldsAndProperties
 
     let getRecordExprFromFieldReference (reference: FSharpSymbolReference) =
@@ -60,7 +65,7 @@ type RecordFieldRule() =
             if not fcsEntity.IsFSharpRecord then None else
 
             Some(fcsEntity, expr)
-    
+
         let rec getRecordEntity (reference: FSharpSymbolReference) =
             match reference with
             | :? RecordCtorReference as reference ->
@@ -81,6 +86,12 @@ type RecordFieldRule() =
                 | :? IReferenceExpr as refExpr ->
                     let computationExpr = ComputationExprNavigator.GetByExpression(refExpr)
                     getRecordFromExprType computationExpr
+                    |> Option.orElseWith (fun _ ->
+                        if isNull computationExpr then None else
+
+                        let expr = computationExpr.TryGetOriginalRecordExprThroughSandBox()
+                        if isNotNull expr && not refExpr.IsQualified then Some (Unchecked.defaultof<_>, computationExpr) else None
+                    )
                 | _ ->
                     let recordExpr = getRecordExprFromFieldReference ref
                     if isNotNull recordExpr then getRecordEntity recordExpr.Reference else None
@@ -96,34 +107,61 @@ type RecordFieldRule() =
         | None -> ()
         | Some(fcsEntity, expr) ->
 
+        let fcsEntity =
+            if isNull fcsEntity then None else Some fcsEntity
+
         let displayContext = FSharpDisplayContext.Empty.WithShortTypeNames(true)
 
-        let fieldNames = 
-            fcsEntity.FSharpFields
-            |> Seq.map (fun field -> field.Name)
-            |> HashSet
+        let fieldNames =
+            fcsEntity
+            |> Option.map (fun fcsEntity ->
+                fcsEntity.FSharpFields
+                |> Seq.map (fun field -> field.Name)
+                |> HashSet
+            )
 
         let usedNames =
             let bindings = 
                 match expr with
                 | :? IRecordExpr as recordExpr -> recordExpr.FieldBindings
                 | _ -> TreeNodeCollection.Empty
-            
+
             bindings
             |> Seq.choose (fun fieldBinding -> Option.ofObj fieldBinding.ReferenceName)
             |> Seq.map (fun referenceName -> referenceName.ShortName)
             |> HashSet
 
+        let removedFields = List()
+
         collector.RemoveWhere(fun item ->
             match item with
             | :? FcsLookupItem as fcsItem ->
                 match fcsItem.FcsSymbol with
-                | :? FSharpField as field -> fieldNames.Contains(field.Name)
+                | :? FSharpField as field ->
+                    match fieldNames with
+                    | Some fieldNames ->
+                        fieldNames.Contains(field.Name)
+                    | None ->
+                        match field.DeclaringEntity with
+                        | None -> false
+                        | Some fcsEntity ->
+                            if fcsEntity.IsFSharpRecord then
+                                removedFields.Add(field)
+                                true
+                            else
+                                false
                 | _ -> false
             | _ -> false
         )
 
-        for field in fcsEntity.FSharpFields do
+        let fields = 
+            match fcsEntity with
+            | None -> removedFields :> IList<_>
+            | Some fcsEntity -> fcsEntity.FSharpFields
+
+        let emphasize = fcsEntity.IsSome
+
+        for field in fields do
             let name = field.Name
             if usedNames.Contains(name) then () else
 
@@ -132,10 +170,30 @@ type RecordFieldRule() =
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->
                         let typeText = field.FieldType.Format(displayContext)
-                        TextPresentation(info, typeText, true, PsiSymbolsThemedIcons.Field.Id) :> _)
+                        TextPresentation(info, typeText, emphasize, PsiSymbolsThemedIcons.Field.Id) :> _)
                     .WithBehavior(fun _ -> TextualBehavior(info))
                     .WithMatcher(fun _ -> TextualMatcher(info) :> _)
-                    .WithRelevance(relevance)
 
-            item.Placement.Location <- PlacementLocation.Top
+            let item =
+                if emphasize then
+                    item.WithRelevance(if emphasize then matchedFieldRelevance else fieldRelevance)
+                else
+                    item
+
+            let tailNodeTypes =
+                [| FSharpTokenType.WHITESPACE
+                   FSharpTokenType.EQUALS
+                   FSharpTokenType.WHITESPACE
+                   TailType.CaretTokenNodeType.Instance
+                   FSharpTokenType.WHITESPACE |]
+
+            item.SetTailType(SimpleTailType(" = ", tailNodeTypes, SkipTypings = [|" = "; "= "|]))
+
+            if emphasize then
+                item.Placement.Location <- PlacementLocation.Top
+
+            let solution = context.BasicContext.Solution
+            LookupItemUtil.SubscribeAfterComplete(item, fun textControl _ _ _ _ _ ->
+                textControl.RescheduleCompletion(solution))
+
             collector.Add(item)

@@ -111,6 +111,10 @@ type FSharpCompletionTest() =
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "SpaceBeforeUppercaseInvocation", "true")>]
     [<Test>] member x.``Pattern - Union case 09 - Space``() = x.DoNamedTest()
 
+    [<Test>] member x.``Record Field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record Field 02``() = x.DoNamedTest()
+    [<Test>] member x.``Record Field 03``() = x.DoNamedTest()
+
     [<Test>] member x.``To recursive - Escape 01``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Local 01``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Local 02``() = x.DoNamedTest()
@@ -444,6 +448,7 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Expr - Record - Field - Empty 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field - Empty 04``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field - Empty 05 - Another ns``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Empty 06``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field - Unfinished 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field - Unfinished 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field - Unfinished 03``() = x.DoNamedTest()
