@@ -1,19 +1,16 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
-open FSharp.Compiler.Symbols
-open JetBrains.Application.Environment
-open JetBrains.Application.Environment.Helpers
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Transactions
@@ -22,143 +19,83 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.UI.RichText
 
-module private Helpers =
+module WithPostfixTemplate =
     let isRecord (expr: IFSharpExpression) =
         let fcsType = expr.TryGetFcsType()
         if isNull fcsType then false else
 
-        let fcsType = Util.FSharpSymbolUtil.getAbbreviatedType fcsType
+        let fcsType = FSharpSymbolUtil.getAbbreviatedType fcsType
         if not fcsType.HasTypeDefinition then false else
 
         fcsType.TypeDefinition.IsFSharpRecord
 
-    let fieldBelongsToRecord (fsf: FSharpField) =
-        fsf.DeclaringEntity
-        |> Option.map (fun f -> f.IsFSharpRecord)
-        |> Option.defaultValue false
-
     type RecordExprContext =
-        { Records: IReferenceExpr list }
+         { CopyExpr: IFSharpExpression
+           Fields: IReferenceExpr list }
 
-        static member Default = { Records = [] }
+    let tryGetContext (refExpr: IReferenceExpr) =
+        // get 'expr' from 'expr.__' reparsed expr
+        let expr = refExpr.Qualifier.NotNull()
 
-    let rec tryGetContext2 (refExpr: IReferenceExpr) =
-        let rec loop (acc: RecordExprContext) (refExpr: IReferenceExpr) =
-            match refExpr.Qualifier with
-            | null -> Some acc
-            | :? IReferenceExpr as prev when isRecord prev ->
-                loop { acc with Records = refExpr :: acc.Records } prev
-            // Some other expr, e.g. Class(r).field1.field2
-            | _ -> Some acc
+        let rec loop (acc: RecordExprContext list) (expr: IFSharpExpression) =
+            match expr with
+            | :? IReferenceExpr as refExpr ->
+                let qualifierExpr = refExpr.Qualifier
+                if isNotNull qualifierExpr && isRecord qualifierExpr then
+                    let acc = { CopyExpr = qualifierExpr; Fields = refExpr :: acc.Head.Fields } :: acc
+                    loop acc qualifierExpr
+                else
+                    acc
 
-        loop RecordExprContext.Default refExpr
+            | _ -> acc
+
+        loop [{ CopyExpr = expr; Fields = [] }] expr
 
     /// Gets the innermost record expr in the generated recursive record expr
-    let rec getInnermostRecordExpr (recordExpr: IRecordExpr) =
-        // couldnt find a way to create a IRecordFieldBindingList with a single element
-        // so i can only traverse by IRecordFieldBinding in children directly
-        recordExpr.Children()
-        |> Seq.tryPick (function :? IRecordFieldBinding as b -> Some b | _ -> None)
-        |> Option.map (fun binding ->
-            let innerExpression = binding.Expression
-            match innerExpression with
-            | null -> recordExpr
-            | :? IRecordExpr as innerRecordExpr -> getInnermostRecordExpr innerRecordExpr
-            | :? IPrefixAppExpr -> recordExpr
-            | _ -> failwith "non recordexpr inner expression" 
-        )
+    let rec getInnermostRecordExpr (recordExpr: IRecordExpr) : IRecordExpr =
+        recordExpr.FieldBindingsEnumerable
+        |> Seq.tryHead
+        |> Option.map (fun fieldBinding -> 
+            match fieldBinding.Expression with
+            | :? IRecordExpr as recordExpr -> getInnermostRecordExpr recordExpr
+            | _ -> recordExpr)
         |> Option.defaultValue recordExpr
 
     /// Creates recursive record expr from IReferenceExpr list
-    let createRecordExpr (fields: IReferenceExpr list) (factory:IFSharpElementFactory) : IRecordExpr =
-        let rec loop (xs:IReferenceExpr list) : IRecordExpr =
-            match xs with
-            | [] -> failwith "this should never happen"
-            | head :: tail ->
-                let currentRecordExpr = factory.CreateExpr("{ x with P = 1 }") :?> IRecordExpr
-                ModificationUtil.ReplaceChild( currentRecordExpr.CopyInfoExpression, head.Qualifier ) |> ignore
-                let fieldBindingExpr = factory.CreateRecordFieldBinding(head.ShortName,false)
-                // either delete or add field binding
-                match tail with
-                | [] ->
-                    ModificationUtil.DeleteChild(currentRecordExpr.FieldBindingList)
-                | _ -> 
-                    let innerBinding = loop tail
-                    ModificationUtil.ReplaceChild(fieldBindingExpr.Expression, innerBinding) |> ignore
-                    ModificationUtil.ReplaceChild(currentRecordExpr.FieldBindingList, fieldBindingExpr) |> ignore
+    let createRecordExpr (copyExpr: IFSharpExpression) (fields: IReferenceExpr list) (factory: IFSharpElementFactory) : IRecordExpr =
+        let recordExpr = factory.CreateExpr("{ x with P = 1 }") :?> IRecordExpr
+        ModificationUtil.ReplaceChild(recordExpr.CopyInfoExpression, copyExpr.Copy()) |> ignore
 
-                currentRecordExpr
+        let innerRecordExpr = 
+            (recordExpr, fields) ||> Seq.fold (fun recordExpr refExpr ->
+                 let fieldBinding = recordExpr.FieldBindings[0]
+                 fieldBinding.ReferenceName.SetName(refExpr.ShortName) |> ignore
 
-        loop fields 
+                 let innerRecordExpr = factory.CreateExpr("{ x with P = 1 }") :?> IRecordExpr
+                 innerRecordExpr.SetCopyInfoExpression(refExpr.Copy()) |> ignore
+                 let newRecordExpr = fieldBinding.SetExpression(innerRecordExpr) :?> IRecordExpr
 
-    /// Popup titles and respective record exprs to generate
-    type PopupContext =
-        { TitleAndExprList: (string*IRecordExpr) list; PrevFields: IReferenceExpr list; }
-        static member Default = { TitleAndExprList = [] ; PrevFields = [] }
+                 newRecordExpr
+            )
 
-    let createPopupMenu (popupContext: PopupContext) =
-        popupContext.TitleAndExprList
-        |> Seq.map (fun (title, _) ->
-            WorkflowPopupMenuOccurrence(
-                RichText(title),
-                RichText.Empty,
-                title,
-                (fun appData -> [||])
-            ))
-        |> Array.ofSeq
+        ModificationUtil.DeleteChild(innerRecordExpr.FieldBindings[0])
 
-    /// Creates popup titles and respective record expressions 
-    let createPopupContext (ctx:RecordExprContext) (factory: IFSharpElementFactory): PopupContext =
-        let defaultTitle = ctx.Records |> List.item (ctx.Records.Length - 2) |> (fun f -> f.Names)
-
-        let rec loop (acc:PopupContext) (list: IReferenceExpr list) =
-            match list with
-            | [] -> acc
-            | head :: tail ->
-                let recordExpr = createRecordExpr (head :: acc.PrevFields) factory
-
-                let currTitle =
-                    defaultTitle
-                    |> Seq.skip (ctx.Records.Length - acc.PrevFields.Length - 1)
-                    |> String.concat "."
-
-                let acc' =
-                    {
-                        PopupContext.TitleAndExprList = (currTitle , recordExpr) :: acc.TitleAndExprList
-                        PopupContext.PrevFields = head :: acc.PrevFields }
-                loop acc' tail
-
-        loop PopupContext.Default (ctx.Records |> List.rev)
+        recordExpr
 
 
 [<PostfixTemplate("with", "Copies and updates the record field", "{ record with field }")>]
 type WithPostfixTemplate() =
     inherit FSharpPostfixTemplateBase()
 
-    let isApplicable (expr: IFSharpExpression) =
-        let refExpr = expr.As<IReferenceExpr>()
-
-        if isNull refExpr then false else
-
-        match Helpers.tryGetContext2 refExpr with
-        | None -> false
-        | Some { Records = [] } -> false
-        | Some _ -> true
-
     override x.CreateBehavior(info) = WithPostfixTemplateBehavior(info) :> _
-
-    override this.CreateInfo(context) =
-        WithPostfixTemplateInfo(context) :> _
+    override this.CreateInfo(context) = WithPostfixTemplateInfo(context) :> _
 
     override this.IsApplicable(node) =
-        let expr = node.As<IFSharpExpression>()
-        isApplicable expr
+        let refExpr = node.As<IReferenceExpr>()
+        if isNull refExpr then false else
 
-    override this.IsEnabled(solution) = 
-        let configurations = solution.GetComponent<RunsProducts.ProductConfigurations>()
-        configurations.IsInternalMode() ||
-
-        base.IsEnabled(solution)
+        let qualifierExpr = refExpr.Qualifier
+        isNotNull qualifierExpr && WithPostfixTemplate.isRecord qualifierExpr
 
 
 and WithPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
@@ -169,43 +106,42 @@ and WithPostfixTemplateBehavior(info) =
     inherit FSharpPostfixTemplateBehaviorBase(info)
 
     override x.ExpandPostfix(context) =
-        let psiModule = context.PostfixContext.PsiModule
-        let psiServices = psiModule.GetPsiServices()
+        let node = context.Expression :?> IReferenceExpr
+        let factory = node.CreateElementFactory()
+        let psiServices = node.GetPsiServices()
 
-        let popupMenu = psiServices.Solution.GetComponent<WorkflowPopupMenu>()
-        let textControl = info.ExecutionContext.TextControl
-        let lifetime = psiServices.Solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
+        let records = WithPostfixTemplate.tryGetContext node
 
-        let showPopup occurrences id =
-            popupMenu.ShowPopup(lifetime, occurrences, CustomHighlightingKind.Other, textControl, null, id)
+        let occurrences = 
+            records
+            |> Array.ofList
+            |> Array.map (fun context ->
+                // todo: shorten texts
+                let range = context.CopyExpr.GetDocumentRange()
+                WorkflowPopupMenuOccurrence(RichText(context.CopyExpr.GetText()), null, [context], [range])
+            )
+
+        let selectedOccurrence =
+            let textControl = info.ExecutionContext.TextControl
+            let popupMenu = psiServices.Solution.GetComponent<WorkflowPopupMenu>()
+            popupMenu.ShowPopup(textControl.Lifetime, occurrences, CustomHighlightingKind.Other, textControl, null)
+
+        if isNull selectedOccurrence then null else
+
+        let record = Seq.head selectedOccurrence.Entities
+        let recordExpr = WithPostfixTemplate.createRecordExpr record.CopyExpr record.Fields factory
 
         psiServices.Transactions.Execute(x.ExpandCommandName, fun _ ->
-            let node = context.Expression :?> IReferenceExpr
-            let factory = node.CreateElementFactory()
+             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
+             use disableFormatter = new DisableCodeFormatter()
 
-            match node |> Helpers.tryGetContext2 with
-            | None -> context.Expression // something failed, do nothing
-            | Some ctx ->
-
-            let popupContext = Helpers.createPopupContext ctx factory
-            let popupMenu = popupContext |> Helpers.createPopupMenu
-            let chosenPopup = showPopup popupMenu (nameof WithPostfixTemplate)
-
-            use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-            use disableFormatter = new DisableCodeFormatter()
-
-            match chosenPopup with
-            | null -> context.Expression
-            | occ ->
-                popupContext.TitleAndExprList
-                |> Seq.tryFind (fun (title, _) -> title = occ.Name.Text)
-                |> Option.map (fun (_, expr) -> ModificationUtil.ReplaceChild(node, expr) :> ITreeNode)
-                |> Option.defaultValue context.Expression
+             ModificationUtil.ReplaceChild(node, recordExpr) :> ITreeNode
         )
 
     override x.AfterComplete(textControl, node, _) =
         let recordExpr = node :?> IRecordExpr
 
-        let innermostExpr = Helpers.getInnermostRecordExpr recordExpr
+        let innermostExpr = WithPostfixTemplate.getInnermostRecordExpr recordExpr
         let range = innermostExpr.GetNavigationRange()
         textControl.Caret.MoveTo(range.EndOffset - 2, CaretVisualPlacement.DontScrollIfVisible)
+        textControl.RescheduleCompletion(node.GetSolution())

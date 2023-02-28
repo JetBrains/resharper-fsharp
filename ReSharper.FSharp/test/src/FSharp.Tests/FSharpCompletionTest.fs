@@ -300,6 +300,14 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``Not available - Let - Namespace 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Match 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``With 01``() = x.DoNamedTest()
+    [<Test>] member x.``With 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``With 03``() = x.DoNamedTest()
+    [<Test>] member x.``With 04``() = x.DoNamedTest()
+    [<Test>] member x.``With 05``() = x.DoNamedTest()
+    [<Test>] member x.``With 06``() = x.DoNamedTest()
+    [<Test>] member x.``With 07``() = x.DoNamedTest()
+
 
 [<AbstractClass; FSharpTest>]
 type FSharpKeywordCompletionTestBase() =
