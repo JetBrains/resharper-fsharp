@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
-open JetBrains.Diagnostics
+open JetBrains.Application.Threading
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
@@ -33,13 +33,10 @@ module WithPostfixTemplate =
          { CopyExpr: IFSharpExpression
            Fields: IReferenceExpr list }
 
-    let tryGetContext (refExpr: IReferenceExpr) =
-        // get 'expr' from 'expr.__' reparsed expr
-        let expr = refExpr.Qualifier.NotNull()
-
+    let tryGetContext (expr: IFSharpExpression) =
         let rec loop (acc: RecordExprContext list) (expr: IFSharpExpression) =
             match expr with
-            | :? IReferenceExpr as refExpr ->
+            | :? IReferenceExpr as refExpr when FSharpPostfixTemplates.isSingleLine refExpr ->
                 let qualifierExpr = refExpr.Qualifier
                 if isNotNull qualifierExpr && isRecord qualifierExpr then
                     let acc = { CopyExpr = qualifierExpr; Fields = refExpr :: acc.Head.Fields } :: acc
@@ -97,6 +94,8 @@ type WithPostfixTemplate() =
         let qualifierExpr = refExpr.Qualifier
         isNotNull qualifierExpr && WithPostfixTemplate.isRecord qualifierExpr
 
+    override this.IsEnabled _ = true
+
 
 and WithPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
     inherit PostfixTemplateInfo("with", expressionContext)
@@ -106,43 +105,53 @@ and WithPostfixTemplateBehavior(info) =
     inherit FSharpPostfixTemplateBehaviorBase(info)
 
     override x.ExpandPostfix(context) =
-        let node = context.Expression :?> IReferenceExpr
-        let factory = node.CreateElementFactory()
-        let psiServices = node.GetPsiServices()
+        let node = context.Expression
+        node.GetPsiServices().Transactions.Execute(x.ExpandCommandName, fun _ ->
+            use writeCookie = WriteLockCookie.Create(node.IsPhysical())
+            use disableFormatter = new DisableCodeFormatter()
 
-        let records = WithPostfixTemplate.tryGetContext node
-
-        let occurrences = 
-            records
-            |> Array.ofList
-            |> Array.rev
-            |> Array.map (fun context ->
-                // todo: shorten texts
-                let range = context.CopyExpr.GetDocumentRange()
-                WorkflowPopupMenuOccurrence(RichText(context.CopyExpr.GetText()), null, [context], [range])
-            )
-
-        let selectedOccurrence =
-            let textControl = info.ExecutionContext.TextControl
-            let popupMenu = psiServices.Solution.GetComponent<WorkflowPopupMenu>()
-            popupMenu.ShowPopup(textControl.Lifetime, occurrences, CustomHighlightingKind.Other, textControl, null)
-
-        if isNull selectedOccurrence then null else
-
-        let record = Seq.head selectedOccurrence.Entities
-        let recordExpr = WithPostfixTemplate.createRecordExpr record.CopyExpr record.Fields factory
-
-        psiServices.Transactions.Execute(x.ExpandCommandName, fun _ ->
-             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-             use disableFormatter = new DisableCodeFormatter()
-
-             ModificationUtil.ReplaceChild(node, recordExpr) :> ITreeNode
+            x.GetExpression(context)
         )
 
     override x.AfterComplete(textControl, node, _) =
-        let recordExpr = node :?> IRecordExpr
+        let expr = node :?> IFSharpExpression
+        let factory = expr.CreateElementFactory()
+        let psiServices = expr.GetPsiServices()
+        let solution = expr.GetSolution()
 
-        let innermostExpr = WithPostfixTemplate.getInnermostRecordExpr recordExpr
-        let range = innermostExpr.GetNavigationRange()
-        textControl.Caret.MoveTo(range.EndOffset - 2, CaretVisualPlacement.DontScrollIfVisible)
-        textControl.RescheduleCompletion(node.GetSolution())
+        let records = WithPostfixTemplate.tryGetContext expr
+
+        solution.Locks.ExecuteOrQueueReadLockEx(nameof WithPostfixTemplate, fun _ ->
+            let occurrences = 
+                records
+                |> Array.ofList
+                |> Array.rev
+                |> Array.map (fun context ->
+                    // todo: shorten texts
+                    let range = context.CopyExpr.GetDocumentRange()
+                    WorkflowPopupMenuOccurrence(RichText(context.CopyExpr.GetText()), null, [context], [range])
+                )
+
+            let selectedOccurrence =
+                let textControl = info.ExecutionContext.TextControl
+                let popupMenu = psiServices.Solution.GetComponent<WorkflowPopupMenu>()
+                popupMenu.ShowPopup(textControl.Lifetime, occurrences, CustomHighlightingKind.Other, textControl, null)
+
+            if isNull selectedOccurrence then () else
+
+            let record = Seq.head selectedOccurrence.Entities
+            let recordExpr = WithPostfixTemplate.createRecordExpr record.CopyExpr record.Fields factory
+
+            let recordExpr = 
+                psiServices.Transactions.Execute(nameof WithPostfixTemplate, fun _ ->
+                     use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+                     use disableFormatter = new DisableCodeFormatter()
+
+                     ModificationUtil.ReplaceChild(expr, recordExpr)
+                )
+
+            let innermostExpr = WithPostfixTemplate.getInnermostRecordExpr recordExpr
+            let range = innermostExpr.GetNavigationRange()
+            textControl.Caret.MoveTo(range.EndOffset - 2, CaretVisualPlacement.DontScrollIfVisible)
+            textControl.RescheduleCompletion(solution)
+        ) |> ignore
