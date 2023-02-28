@@ -22,6 +22,10 @@ open JetBrains.Util
 module FSharpPostfixTemplates =
     type FormatterImplHelper = JetBrains.ReSharper.Psi.Impl.CodeStyle.FormatterImplHelper
 
+    let isSingleLine (expr: IFSharpExpression) =
+        let formatter = expr.Language.LanguageServiceNotNull().CodeFormatter
+        not (FormatterImplHelper.HasLineFeedsTo(expr.FirstChild, expr.LastChild, formatter))
+
     let isApplicableTypeUsage (typeUsage: ITypeUsage) =
         let typeUsage = skipIntermediateParentsOfSameType<ITypeUsage> typeUsage
         let typedExpr = TypedLikeExprNavigator.GetByTypeUsage(typeUsage)

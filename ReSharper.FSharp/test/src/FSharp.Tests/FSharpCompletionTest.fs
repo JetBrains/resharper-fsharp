@@ -311,6 +311,7 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``With 05``() = x.DoNamedTest()
     [<Test>] member x.``With 06``() = x.DoNamedTest()
     [<Test>] member x.``With 07``() = x.DoNamedTest()
+    [<Test>] member x.``With 08``() = x.DoNamedTest()
 
 
 [<AbstractClass; FSharpTest>]

@@ -32,9 +32,6 @@ type RecordFieldRule() =
         CLRLookupItemRelevance.ExpectedTypeMatch |||
         CLRLookupItemRelevance.FieldsAndProperties
 
-    let fieldRelevance =
-        CLRLookupItemRelevance.FieldsAndProperties
-
     let getRecordExprFromFieldReference (reference: FSharpSymbolReference) =
         let referenceName = reference.GetElement().As<IExpressionReferenceName>()
         let fieldBinding = RecordFieldBindingNavigator.GetByReferenceName(referenceName)
@@ -175,10 +172,7 @@ type RecordFieldRule() =
                     .WithMatcher(fun _ -> TextualMatcher(info) :> _)
 
             let item =
-                if emphasize then
-                    item.WithRelevance(if emphasize then matchedFieldRelevance else fieldRelevance)
-                else
-                    item
+                if emphasize then item.WithRelevance(matchedFieldRelevance) else item
 
             let tailNodeTypes =
                 [| FSharpTokenType.WHITESPACE
