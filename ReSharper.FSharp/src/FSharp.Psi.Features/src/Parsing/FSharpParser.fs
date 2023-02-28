@@ -56,6 +56,9 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
                                      ResolvedSymbolsCache = symbolsCache,
                                      LanguageType = language)
 
+    static member val SandBoxPath = VirtualFileSystemPath.Parse("Sandbox.fs", InteractionContext.SolutionContext)
+    static member val SandBoxSignaturePath = VirtualFileSystemPath.Parse("Sandbox.fsi", InteractionContext.SolutionContext)
+    
     new (lexer, [<NotNull>] sourceFile: IPsiSourceFile, checkerService, symbolsCache) =
         // During rename of type + file the source file returns the new path,
         // but the parsing/project options still have the old one. It doesn't seem to affect anything.
@@ -74,9 +77,6 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
                 FSharpParser.SandBoxPath
 
         FSharpParser(lexer, document, path, sourceFile, checkerService, symbolsCache)
-
-    static member val SandBoxPath = VirtualFileSystemPath.Parse("Sandbox.fs", InteractionContext.SolutionContext)
-    static member val SandBoxSignaturePath = VirtualFileSystemPath.Parse("Sandbox.fsi", InteractionContext.SolutionContext)
 
     interface IFSharpParser with
         member this.ParseFSharpFile(noCache) = parseFile noCache
