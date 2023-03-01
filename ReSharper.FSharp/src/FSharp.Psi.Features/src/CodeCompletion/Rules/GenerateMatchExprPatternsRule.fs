@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
-open System.Collections.Generic
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
@@ -22,6 +21,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.UI.RichText
+open JetBrains.Util
 
 module GenerateMatchExprPatternsInfo =
     let [<Literal>] Id = "Match values"
@@ -60,7 +60,7 @@ type GenerateMatchExprPatternsBehavior(info) =
 
             let value, nodes, _ = MatchTree.ofMatchExpr matchExpr
 
-            let deconstructions = Dictionary()
+            let deconstructions = OneToListMap()
             MatchTree.markToLevelDeconstructions deconstructions value
 
             MatchTree.generateClauses matchExpr value nodes deconstructions

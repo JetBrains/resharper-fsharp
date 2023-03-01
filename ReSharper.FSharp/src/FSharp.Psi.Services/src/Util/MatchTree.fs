@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
+open JetBrains.Util
 
 // todo: isInstPat
 
@@ -70,6 +71,32 @@ and MatchNode =
         { Value = value
           Pattern = pattern }
 
+    override this.ToString() =
+        match this.Pattern, this.Value.Type with
+        | ((MatchTest.Discard _ | MatchTest.Named _), _), _ -> "_"
+        | (MatchTest.Value value, _), MatchType.Bool _ -> string value.BoolValue
+
+        | (MatchTest.Tuple _, nodes), _ ->
+            let items =
+                nodes
+                |> List.map string
+                |> String.concat ", "
+            $"({items})"
+
+        | (MatchTest.Union index, [{Pattern = (MatchTest.Discard _, _)}]), MatchType.Union unionInstance ->
+            $"{unionInstance.Entity.UnionCases[index].DisplayName} _"
+
+        | (MatchTest.Union _, [node]), _ -> string node
+
+        | (MatchTest.UnionCase, nodes), MatchType.UnionCase(case, _) ->
+            let items =
+                nodes
+                |> List.map string
+                |> String.concat ", "
+            $"{case.DisplayName}({items})"
+
+        | _ -> "other case"
+
 and Pattern = MatchTest * MatchNode list
 
 [<RequireQualifiedAccess>]
@@ -79,7 +106,7 @@ type Deconstruction =
     | ActivePattern of activePattern: FSharpActivePatternGroup
     | InnerPatterns
 
-type Deconstructions = IDictionary<MatchTest list, Deconstruction>
+type Deconstructions = OneToListMap<MatchTest list, Deconstruction>
 
 
 module MatchType =
@@ -152,7 +179,6 @@ module MatchTest =
             existingGroup.Name = group.Name &&
             existingGroup.DeclaringEntity = group.DeclaringEntity
 
-        
         | (MatchTest.Union existingIndex, [existingCaseNode]), (MatchTest.Union index, []) ->
             existingIndex = index &&
 
@@ -176,7 +202,7 @@ module MatchTest =
         // todo: add test with different lengths
         | (MatchTest.Tuple isStruct1, nodes1), (MatchTest.Tuple isStruct2, nodes2) ->
             isStruct1 = isStruct2 &&
-            List.forall2 matches nodes2 nodes1 
+            List.forall2 matches nodes2 nodes1
 
         | (MatchTest.List true, _), (MatchTest.List true, _) -> true
 
@@ -201,13 +227,29 @@ module MatchTest =
                 MatchNode.Create(itemValue, matchPattern)
             )
             |> List.ofSeq
-        
-        match deconstructions.TryGetValue(value.Path) with
-        | true, Deconstruction.Discard skipInBind -> MatchTest.Discard skipInBind, []
-        | true, Deconstruction.Named name -> MatchTest.Named(Some name), []
-        | true, Deconstruction.ActivePattern group -> MatchTest.ActivePatternCase(0, group), []
 
-        | true, Deconstruction.InnerPatterns ->
+        let values = deconstructions.GetValuesSafe(value.Path)
+
+        let deconstruction =
+            let mutable named = None
+            values
+            |> Seq.tryFind (fun d ->
+                match d with
+                | Deconstruction.Discard _ -> false
+                | Deconstruction.Named _ ->
+                    named <- Some d
+                    false
+                | _ -> true
+            )
+            |> Option.orElse named
+            |> Option.orElseWith (fun _ -> Seq.tryHead values)
+
+        match deconstruction with
+        | Some(Deconstruction.Discard skipInBind) -> MatchTest.Discard skipInBind, []
+        | Some(Deconstruction.Named name) -> MatchTest.Named(Some name), []
+        | Some(Deconstruction.ActivePattern group) -> MatchTest.ActivePatternCase(0, group), []
+
+        | Some(Deconstruction.InnerPatterns) ->
             match value.Type with
             | MatchType.Bool _ ->
                 MatchTest.Value(ConstantValue.Bool(true, context.GetPsiModule())), []
@@ -375,7 +417,7 @@ module MatchNode =
             factory.CreatePattern("[]", false) |> replaceWithPattern oldPat |> ignore
 
         | MatchTest.Record, nodes ->
-            let fieldNodes = 
+            let fieldNodes =
                 nodes
                 |> List.filter (fun node ->
                     match node.Pattern with
@@ -394,7 +436,7 @@ module MatchNode =
             let recordPat = factory.CreatePattern($"{{ {recordFieldsText} }}", false)
             let recordPat = replaceWithPattern oldPat recordPat :?> IRecordPat
             let fieldPats = recordPat.FieldPatterns |> Seq.map (fun p -> p.As<IFieldPat>().Pattern)
-            
+
             Seq.iter2 (bind usedNames) fieldPats fieldNodes
 
         | _ -> ()
@@ -419,11 +461,10 @@ module MatchNode =
             | MatchTest.Error -> MatchTest.Error
             | MatchTest.ActivePatternCase(index, group) -> MatchTest.ActivePatternCase(index, group)
             | MatchTest.Record -> MatchTest.Record
-        
+
         let pattern = test, nodes
         MatchNode.Create(node.Value, pattern)
 
-    
     let tryRejectDiscardPattern (rejected: List<MatchNode>) wholeNode (node: MatchNode) (context: ITreeNode) =
         let nodePattern = node.Pattern
 
@@ -459,13 +500,13 @@ module MatchNode =
                 rejected |> Seq.exists (MatchTest.matches wholeNode)
 
             | _ ->
-            
-            let tests = 
+
+            let tests =
                 match valueType with
                 | MatchType.Bool _ ->
                     [ MatchTest.Value(ConstantValue.Bool(true, context.GetPsiModule()))
                       MatchTest.Value(ConstantValue.Bool(false, context.GetPsiModule())) ]
-                
+
                 | MatchType.Enum(_, fields) ->
                     fields
                     |> Array.map (snd >> MatchTest.Value)
@@ -482,7 +523,7 @@ module MatchNode =
             tests
             |> List.forall (fun test ->
                node.Pattern <- test, []
-               rejected |> Seq.exists (MatchTest.matches wholeNode) 
+               rejected |> Seq.exists (MatchTest.matches wholeNode)
             )
 
         if allRejected then
@@ -663,7 +704,7 @@ let getMatchExprMatchType (matchExpr: IMatchExpr) : MatchType =
 
     match expr with
     | :? ITupleExpr as tupleExpr ->
-        let types = 
+        let types =
             [| for expr in tupleExpr.Expressions -> expr.TryGetFcsType() |]
             |> Array.map (MatchType.ofFcsType matchExpr)
         MatchType.Tuple(tupleExpr.IsStruct, types)
@@ -673,8 +714,7 @@ let getMatchExprMatchType (matchExpr: IMatchExpr) : MatchType =
 
 let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (pat: IFSharpPattern) skipOnNull =
     let addDeconstruction path deconstruction =
-        if not (deconstructions.ContainsKey(path)) then
-            deconstructions[path] <- deconstruction
+        deconstructions.Add(path, deconstruction)
 
     let getUnionCaseIndex (union: FcsEntityInstance) (unionCase: FSharpUnionCase) =
         let equals (t1: FSharpType) (t2: FSharpType) =
@@ -684,7 +724,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
             // todo: fix checking Equals in tests
             t1.HasTypeDefinition && t2.HasTypeDefinition &&
             t1.TypeDefinition.XmlDocSig = t2.TypeDefinition.XmlDocSig
-    
+
         if isNull unionCase || not (equals unionCase.ReturnType union.FcsType) then None else
         union.Entity.UnionCases |> Seq.tryFindIndex (fun uc -> uc.XmlDocSig = unionCase.XmlDocSig)
 
@@ -703,7 +743,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
         MatchNode.Create(itemValue, matchPattern)
 
     let makeNamedFieldPatternNodes parentPath substitution (fields: IList<FSharpField>) (fieldPatterns: IFieldPat seq) =
-        let matchedPatterns = Array.create fields.Count null 
+        let matchedPatterns = Array.create fields.Count null
         fieldPatterns
         |> Seq.iter (fun pat ->
             match pat.Reference.GetFcsSymbol() with
@@ -716,7 +756,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
             | _ -> ()
         )
 
-        let fieldNodes = 
+        let fieldNodes =
             (fields, matchedPatterns)
             ||> Seq.mapi2 (makeFieldNode true parentPath substitution)
             |> List.ofSeq
@@ -849,7 +889,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
             | :? INamedUnionCaseFieldsPat as namedPatListPat ->
                 addDeconstruction casePath Deconstruction.InnerPatterns
 
-                let fieldPatterns = Array.create unionCase.Fields.Count null 
+                let fieldPatterns = Array.create unionCase.Fields.Count null
                 namedPatListPat.FieldPatterns
                 |> Seq.iter (fun pat ->
                     match pat.Reference.GetFcsSymbol() with
@@ -862,7 +902,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
                     | _ -> ()
                 )
 
-                let fieldNodes = 
+                let fieldNodes =
                     unionCase.Fields
                     |> Seq.mapi (fun i fcsField -> makeFieldNode true casePath unionEntityInstance.Substitution i fcsField fieldPatterns[i])
                     |> List.ofSeq
@@ -885,14 +925,14 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
         MatchTest.List false, []
 
     | :? IAndsPat as andsPat, _ ->
-        let nodes = 
+        let nodes =
             andsPat.Patterns
             |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat false))
             |> List.ofSeq
         MatchTest.And, nodes
 
     | :? IOrPat as orPat, _ ->
-        let nodes = 
+        let nodes =
             orPat.Patterns
             |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat false))
             |> List.ofSeq
@@ -926,7 +966,7 @@ let ofMatchExpr (matchExpr: IMatchExpr) =
     let matchValue = { Type = matchType; Path = [] }
 
     let matchNodes = List()
-    let deconstructions = Dictionary()
+    let deconstructions = OneToListMap()
 
     for clause in matchExpr.ClausesEnumerable do
         if isNull clause.Pattern then () else
@@ -945,7 +985,7 @@ let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
         if nodes |> Seq.exists (MatchTest.matches node) then
             () else
 
-        let matchClause = 
+        let matchClause =
             addNodesAfter matchExpr.LastChild [
                 NewLine(matchExpr.GetLineEnding())
                 let indent = matchExpr.Indent
@@ -986,14 +1026,14 @@ let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
         tryAddClause node
 
 let markToLevelDeconstructions (deconstructions: Deconstructions) (value: MatchValue) =
-    deconstructions[value.Path] <- Deconstruction.InnerPatterns
+    deconstructions.Add(value.Path, Deconstruction.InnerPatterns)
 
     match value.Type with
     | MatchType.Tuple(_, matchTypes) ->
         matchTypes
         |> Array.iteri (fun i _ ->
             let itemPath = MatchTest.TupleItem i :: value.Path
-            deconstructions[itemPath] <- Deconstruction.InnerPatterns
+            deconstructions.Add(itemPath, Deconstruction.InnerPatterns)
         )
 
     | _ ->
