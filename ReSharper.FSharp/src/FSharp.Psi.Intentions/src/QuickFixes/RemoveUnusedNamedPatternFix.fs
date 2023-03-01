@@ -5,25 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Psi.Tree
-
-module RemoveUnusedNamedPatternFix =
-    let replaceWithWildPat (pat: IFSharpPattern) =
-        if isIdentifierOrKeyword (pat.GetPreviousToken()) then
-            ModificationUtil.AddChildBefore(pat, Whitespace()) |> ignore
-
-        if isIdentifierOrKeyword (pat.GetNextToken()) then
-            ModificationUtil.AddChildAfter(pat, Whitespace()) |> ignore
-
-        for pat in pat.GetPartialDeclarations() do
-            let sourceFile = pat.GetSourceFile()
-            let psiModule = pat.GetPsiModule()
-            replace pat (pat.GetFSharpLanguageService().CreateElementFactory(sourceFile, psiModule).CreateWildPat())
 
 type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
     inherit FSharpQuickFixBase()
@@ -49,7 +31,10 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
             match parent with
             | :? IRecordPat
             | :? INamedUnionCaseFieldsPat ->
-                RemoveUnusedNamedPatternFix.replaceWithWildPat fieldPat.Pattern
+                let sourceFile = fieldPat.Pattern.GetSourceFile()
+                let psiModule = fieldPat.Pattern.GetPsiModule()
+                let wildPat = fieldPat.Pattern.GetFSharpLanguageService().CreateElementFactory(sourceFile, psiModule).CreateWildPat()
+                replace fieldPat.Pattern wildPat
             | _ -> ()
                 
             null
@@ -57,25 +42,19 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
             let nextFieldPat = fieldPatterns.[indexPat + 1]
             let fieldPatNode = fieldPat.Pattern
             let isLastFieldPatOnLine = fieldPatNode.EndLine <> nextFieldPat.EndLine
-            let rangeToDelete =
-                let rangeStart =
-                    if isLastFieldPatOnLine then
-                        getFirstMatchingNodeBefore isInlineSpace fieldPat |> getThisOrPrevNewLine
-                    else
-                        fieldPat
-                        
-                let rangeEnd = nextFieldPat.PrevSibling
-                
-                TreeRange(rangeStart, rangeEnd)
-
-            ModificationUtil.DeleteChildRange(rangeToDelete)
+           
+            let rangeStart =
+                if isLastFieldPatOnLine then
+                    getFirstMatchingNodeBefore isInlineSpace fieldPat |> getThisOrPrevNewLine
+                else
+                    fieldPat
+                    
+            let rangeEnd = nextFieldPat.PrevSibling
+            deleteChildRange rangeStart rangeEnd
             null
         else
             let prevFieldPat = fieldPatterns.[indexPat - 1]
-            let rangeToDelete =
-                let rangeStart = prevFieldPat.NextSibling
-                let rangeEnd = fieldPat
-                TreeRange(rangeStart, rangeEnd)
-                
-            ModificationUtil.DeleteChildRange(rangeToDelete)
+            let rangeStart = prevFieldPat.NextSibling
+            let rangeEnd = fieldPat 
+            deleteChildRange rangeStart rangeEnd
             null
