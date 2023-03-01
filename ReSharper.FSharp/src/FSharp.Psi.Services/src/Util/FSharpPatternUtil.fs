@@ -96,22 +96,29 @@ module ParentTraversal =
         | Tuple of item: int * tuplePat: ITuplePat
         | Or of orPat: IOrPat
         | And of andPat: IAndsPat
+        | As of asPat: IAsPat
 
     let makeTuplePatPath pat =
         let rec tryMakePatPath path (IgnoreParenPat fsPattern: IFSharpPattern) =
-            match fsPattern.Parent with
-            | :? ITuplePat as tuplePat ->
+            let asPat = AsPatNavigator.GetByLeftPattern(fsPattern)
+            if isNotNull asPat then
+                tryMakePatPath (PatternParentTraverseStep.As(asPat) :: path) asPat else
+
+            let tuplePat = TuplePatNavigator.GetByPattern(fsPattern)
+            if isNotNull tuplePat then
                 let item = tuplePat.Patterns.IndexOf(fsPattern)
                 Assertion.Assert(item <> -1, "item <> -1")
-                tryMakePatPath (PatternParentTraverseStep.Tuple(item, tuplePat) :: path) tuplePat
+                tryMakePatPath (PatternParentTraverseStep.Tuple(item, tuplePat) :: path) tuplePat else
 
-            | :? IOrPat as orPat ->
-                tryMakePatPath (PatternParentTraverseStep.Or(orPat) :: path) orPat
+            let orPat = OrPatNavigator.GetByPattern(fsPattern)
+            if isNotNull orPat then
+                tryMakePatPath (PatternParentTraverseStep.Or(orPat) :: path) orPat else
 
-            | :? IAndsPat as andsPat ->
-                tryMakePatPath (PatternParentTraverseStep.And(andsPat) :: path) andsPat
+            let andsPat = AndsPatNavigator.GetByPattern(fsPattern)
+            if isNotNull andsPat then
+                tryMakePatPath (PatternParentTraverseStep.And(andsPat) :: path) andsPat else
 
-            | _ -> fsPattern, path
+            fsPattern, path
 
         tryMakePatPath [] pat
 
@@ -121,7 +128,7 @@ module ParentTraversal =
         | step :: rest ->
 
         match expr, step with
-        | _, (PatternParentTraverseStep.Or _ | PatternParentTraverseStep.And _) ->
+        | _, (PatternParentTraverseStep.Or _ | PatternParentTraverseStep.And _ | PatternParentTraverseStep.As _) ->
             tryTraverseExprPath rest expr
 
         | :? ITupleExpr as tupleExpr, PatternParentTraverseStep.Tuple(n, _) ->
@@ -130,3 +137,11 @@ module ParentTraversal =
             tryTraverseExprPath rest tupleItems[n]
 
         | _ -> null
+
+    let tryFindSourceExpr (pat: IFSharpPattern) =
+        let pat, path = makeTuplePatPath pat
+        let matchClause = MatchClauseNavigator.GetByPattern(pat)
+        let matchExpr = MatchExprNavigator.GetByClause(matchClause)
+        if isNull matchExpr then null else
+
+        tryTraverseExprPath path matchExpr.Expression

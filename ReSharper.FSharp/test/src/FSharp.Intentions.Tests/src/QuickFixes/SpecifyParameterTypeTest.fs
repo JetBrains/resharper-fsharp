@@ -52,7 +52,13 @@ type SpecifyParameterBaseTypeTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/specifyBaseType"
 
+    [<Test>] member x.``Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr 04``() = x.DoNamedTest()
     [<Test>] member x.``Param 01``() = x.DoNamedTest()
     [<Test>] member x.``Param 02 - No base interface``() = x.DoNamedTest()
     [<Test>] member x.``Param 03 - Base type``() = x.DoNamedTest()
     [<Test>] member x.``Param 04 - Base type``() = x.DoNamedTest()
+    [<Test>] member x.``Param 05``() = x.DoNamedTest()
+    [<Test>] member x.``Param 06``() = x.DoNamedTest()

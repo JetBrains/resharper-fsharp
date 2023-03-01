@@ -7,31 +7,34 @@ open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.UI.RichText
 
-type SpecifyParameterBaseTypeFix(error: IndeterminateTypeRuntimeCoercionError) =
+module SpecifyParameterBaseTypeFix =
+    let rec getPatternReference (isInstPat: IFSharpPattern) =
+        let asPat = AsPatNavigator.GetByLeftPattern(isInstPat)
+        if isNotNull asPat then getPatternReference asPat else
+
+        let expr = FSharpPatternUtil.ParentTraversal.tryFindSourceExpr isInstPat
+        expr.As<IReferenceExpr>()
+
+
+type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage) =
     inherit FSharpQuickFixBase()
 
-    let isInstPat = error.IsInstPat
+    let pat =
+        if not refExpr.IsSimpleName then null else
+
+          refExpr.Reference.Resolve().DeclaredElement.As<ILocalReferencePat>()
+
     let mutable baseType: (FSharpType * FSharpDisplayContext) option = None
 
-    let rec getDeclPat (isInstPat: IFSharpPattern) =
-        let asPat = AsPatNavigator.GetByLeftPattern(isInstPat)
-        if isNotNull asPat then getDeclPat asPat else
-
-        let matchClause = MatchClauseNavigator.GetByPattern(isInstPat)
-        let matchExpr = MatchExprNavigator.GetByClause(matchClause)
-        let refExpr = matchExpr.Expression.As<IReferenceExpr>()
-
-        let reference = refExpr.Reference
-        reference.Resolve().DeclaredElement.As<ILocalReferencePat>()
-
-    let getFcsEntity (isInstPat: IIsInstPat) =
-        let namedTypeUsage = isInstPat.TypeUsage.As<INamedTypeUsage>()
+    let getFcsEntity (typeUsage: ITypeUsage) =
+        let namedTypeUsage = typeUsage.As<INamedTypeUsage>()
         if isNull namedTypeUsage then None else
 
         let reference = namedTypeUsage.ReferenceName.Reference
@@ -70,7 +73,7 @@ type SpecifyParameterBaseTypeFix(error: IndeterminateTypeRuntimeCoercionError) =
                 | None ->
                     if not fcsEntity.IsInterface then acc else
 
-                    isInstPat.CheckerService.ResolveNameAtLocation(isInstPat, ["obj"], false, "SpecifyParameterBaseTypeFix.getSuperTypes")
+                    pat.CheckerService.ResolveNameAtLocation(pat, ["obj"], false, "SpecifyParameterBaseTypeFix.getSuperTypes")
                     |> Option.map (fun symbolUse ->
                         match symbolUse.Symbol with
                         | :? FSharpEntity as fcsEntity -> loop (types, level + 1) (fcsEntity.AsType())
@@ -86,22 +89,25 @@ type SpecifyParameterBaseTypeFix(error: IndeterminateTypeRuntimeCoercionError) =
         |> List.rev
         |> List.tail
 
+    new (error: IndeterminateTypeRuntimeCoercionPatternError) =
+        let patternReferenceExpr = SpecifyParameterBaseTypeFix.getPatternReference error.IsInstPat
+        SpecifyParameterBaseTypeFix(patternReferenceExpr, error.IsInstPat.TypeUsage)
+
+    new (error: IndeterminateTypeRuntimeCoercionExpressionError) =
+        let refExpr = error.TypeTestExpr.Expression.As<IReferenceExpr>()
+        SpecifyParameterBaseTypeFix(refExpr, error.TypeTestExpr.TypeUsage)
+
+
     override this.Text =
-        let pat = getDeclPat isInstPat
         $"Annotate '{pat.SourceName}' type"
 
     override this.IsAvailable _ =
-        let pat = getDeclPat isInstPat
+        isNotNull pat &&
 
-        let pat =
-            let refPat = pat.IgnoreParentParens()
-            match TuplePatNavigator.GetByPattern(refPat).IgnoreParentParens() with
-            | null -> refPat
-            | tuplePat -> tuplePat
-
+        let pat, _ = FSharpPatternUtil.ParentTraversal.makeTuplePatPath pat
         isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(pat)) &&
 
-        getFcsEntity isInstPat
+        getFcsEntity typeUsage
         |> Option.map (fun (fcsEntity, _) ->
             isNotNull fcsEntity && fcsEntity.GenericParameters.Count = 0 &&
             (fcsEntity.IsClass || fcsEntity.IsInterface) &&
@@ -112,14 +118,13 @@ type SpecifyParameterBaseTypeFix(error: IndeterminateTypeRuntimeCoercionError) =
         |> Option.defaultValue false
 
     override this.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(isInstPat.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
 
-        let pat = getDeclPat isInstPat
         let baseType, displayContext = baseType.Value
         SpecifyTypes.specifyParameterType displayContext baseType pat
 
     override this.Execute(solution, textControl) =
-        let fcsEntity, displayContext = getFcsEntity isInstPat |> Option.get
+        let fcsEntity, displayContext = getFcsEntity typeUsage |> Option.get
         let superTypes = getSuperTypes fcsEntity
         baseType <- this.SelectType(superTypes, displayContext, solution, textControl)
 
