@@ -1,6 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open System.Collections.Generic
+open JetBrains.Application.Environment
+open JetBrains.Application.Environment.Helpers
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
@@ -67,5 +69,9 @@ type AddMissingPatternsFix(warning: MatchIncompleteWarning) =
 
 type AddMissingInnerPatternsFix(warning: MatchIncompleteWarning) =
     inherit AddMissingMatchClausesFixBase(warning)
+
+    override this.IsAvailable _ =
+        let productConfigurations = Shell.Instance.GetComponent<RunsProducts.ProductConfigurations>()
+        productConfigurations.IsInternalMode()
 
     override this.Text = "Add missing inner patterns"
