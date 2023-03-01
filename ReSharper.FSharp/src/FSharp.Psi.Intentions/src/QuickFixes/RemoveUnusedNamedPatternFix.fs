@@ -41,7 +41,7 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
 
         use writeLock = WriteLockCookie.Create(fieldPat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-
+        
         let indexPat = fieldPatterns.IndexOf(fieldPat)
         
         if fieldPatterns.Count = 1 then
@@ -49,19 +49,25 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
             match parent with
             | :? IRecordPat
             | :? INamedUnionCaseFieldsPat ->
-                RemoveUnusedNamedPatternFix.replaceWithWildPat warning.Pat
+                RemoveUnusedNamedPatternFix.replaceWithWildPat fieldPat.Pattern
             | _ -> ()
                 
             null
-            
         elif indexPat < fieldPatterns.Count - 1 then
             let nextFieldPat = fieldPatterns.[indexPat + 1]
-            
+            let fieldPatNode = fieldPat.Pattern
+            let isLastFieldPatOnLine = fieldPatNode.EndLine <> nextFieldPat.EndLine
             let rangeToDelete =
-                let rangeStart = fieldPat
-                let rangeEnd =
-                    nextFieldPat.PrevSibling
+                let rangeStart =
+                    if isLastFieldPatOnLine then
+                        getFirstMatchingNodeBefore isInlineSpace fieldPat |> getThisOrPrevNewLine
+                    else
+                        fieldPat
+                        
+                let rangeEnd = nextFieldPat.PrevSibling
+                
                 TreeRange(rangeStart, rangeEnd)
+
             ModificationUtil.DeleteChildRange(rangeToDelete)
             null
         else
@@ -69,6 +75,7 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
             let rangeToDelete =
                 let rangeStart = prevFieldPat.NextSibling
                 let rangeEnd = fieldPat
-                TreeRange(rangeStart, rangeEnd)    
+                TreeRange(rangeStart, rangeEnd)
+                
             ModificationUtil.DeleteChildRange(rangeToDelete)
             null
