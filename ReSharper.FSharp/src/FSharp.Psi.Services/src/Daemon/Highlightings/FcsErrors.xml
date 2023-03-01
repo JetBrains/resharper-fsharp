@@ -17,7 +17,7 @@
     <Group name="F# Errors" key="FSharpErrors"/>
   </StaticSeverityGroups>
 
-  <Error staticGroup="FSharpErrors" name="IndeterminateTypeRuntimeCoercion" ID="FS0008: Runtime coercion or type test involves an indeterminate type">
+  <Error staticGroup="FSharpErrors" name="IndeterminateTypeRuntimeCoercionPattern" ID="FS0008: Runtime coercion or type test involves an indeterminate type">
     <Parameter type="IIsInstPat" name="isInstPat"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">
@@ -27,6 +27,18 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>SpecifyParameterBaseTypeFix</QuickFix>
   </Error>
+
+  <Error staticGroup="FSharpErrors" name="IndeterminateTypeRuntimeCoercionExpression" ID="FS0008: Runtime coercion or type test involves an indeterminate type">
+    <Parameter type="ITypeTestExpr" name="typeTestExpr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message resourceName="Message" resourceType="Strings">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>typeTestExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>SpecifyParameterBaseTypeFix</QuickFix>
+  </Error>
+
 
   <Warning compilerGroup="FSharpErrors" name="UseBindingsIllegalInModules" ID="FS0524: 'use' bindings illegal in modules">
     <Parameter type="ILetBindingsDeclaration" name="letBindings"/>

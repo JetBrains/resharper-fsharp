@@ -233,7 +233,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode FieldNotMutableError range
 
         | IndeterminateRuntimeCoercion ->
-            createHighlightingFromNodeWithMessage IndeterminateTypeRuntimeCoercionError range error
+            let isInstPat = nodeSelectionProvider.GetExpressionInRange<IIsInstPat>(fsFile, range, false, null)
+            if isNotNull isInstPat then
+                IndeterminateTypeRuntimeCoercionPatternError(isInstPat, error.Message) else
+
+            let typeTestExpr = nodeSelectionProvider.GetExpressionInRange<ITypeTestExpr>(fsFile, range, false, null)
+            if isNotNull typeTestExpr then
+                IndeterminateTypeRuntimeCoercionExpressionError(typeTestExpr, error.Message) else
+
+            createGenericHighlighting error range
 
         | RuntimeCoercionSourceSealed ->
             match fsFile.GetNode<IFSharpPattern>(range) with
