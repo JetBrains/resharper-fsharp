@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.MatchTree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Util
 
 [<AbstractClass>]
 type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
@@ -60,7 +61,7 @@ type AddMissingPatternsFix(warning: MatchIncompleteWarning) =
             ()
 
     override this.GetGenerationDeconstructions(value, _) =
-        let deconstructions = Dictionary()
+        let deconstructions = OneToListMap()
         markToLevelDeconstructions deconstructions value
         deconstructions
 
