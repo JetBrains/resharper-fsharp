@@ -1,12 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ContextActions
 
 open System.IO
-open System.Linq
 open System.Text
 open FSharp.Compiler.Symbols
 open JetBrains.Application.UI.PopupLayout
 open JetBrains.ReSharper.Feature.Services.Navigation
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.DocumentManagers.Transactions.ProjectHostActions.Ordering
@@ -34,7 +32,7 @@ open JetBrains.ReSharper.Resources.Shell
 type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
-    let mkSignatureFile (fsharpFile: IFSharpFile) : IFSharpFile =
+    let mkSignatureFile (fsharpFile: IFSharpFile): IFSharpFile  =
         let factory : IFSharpElementFactory = fsharpFile.CreateElementFactory(extension = FSharpSignatureProjectFileType.FsiExtension)
         let signatureFile : IFSharpFile = factory.CreateEmptyFile()
         let lineEnding = fsharpFile.GetLineEnding()
@@ -43,72 +41,62 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
         let rec createModuleMemberSig (indentation: int) (moduleDecl: IModuleLikeDeclaration) (moduleMember: IModuleMember) : IFSharpTreeNode =
             match moduleMember with
             | :? ITypeDeclarationGroup as typeGroup ->
-                let sigTypeDeclGroups =
-                    // TODO: Update type into and keyword for second IFSharpTypeDeclaration in a group.
-                    
+                // Filter out the IFSharpTypeDeclaration where we support the TypeRepresentation for now.
+                let supportedTypeDeclarations =
                     typeGroup.TypeDeclarations
                     |> Seq.choose (function
                         | :? IFSharpTypeDeclaration as typeDecl ->
-                            // TODO: update and keyword
-                            (*
-                            ModificationUtil.ReplaceChild(
-                                sigTypeGroup.TypeDeclarations.[1].TypeKeyword,
-                                (FSharpTokenType.AND.CreateLeafElement()))
-                            *)
-                            
-                            // Resharper implementation
-                            //typeDecl.MemberDeclarations
-                            
-                            // Untyped tree like 
-                            // typeDecl.TypeMembers
-                            let sigMembers =
-                                typeDecl.TypeMembers
-                                |> Seq.choose (createMemberDeclaration >> Option.ofObj)
-
                             match typeDecl.TypeRepresentation with
-                            // TODO: checkout delegates
-                            | :? ITypeAbbreviationRepresentation as abbr ->
-                                let sigTypeGroup = factory.CreateModuleMember($"type {getName typeDecl} = int")
-                                match sigTypeGroup with
-                                | :? ITypeDeclarationGroup as sigTypeGroup ->
-                                    let sigDecl = sigTypeGroup.TypeDeclarations.[0] :?> IFSharpTypeDeclaration
-                                    
-
-
-                                    ModificationUtil.DeleteChildRange(sigDecl.EqualsToken.NextSibling, sigDecl.LastChild)
-                                    addNodesAfter sigDecl.EqualsToken [
-                                        Whitespace()
-                                        abbr.Copy()
-                                    ]
-                                    |> ignore
-                                    Some sigTypeGroup
-                                | _ -> None
-                            | :? ISimpleTypeRepresentation as repr ->
-                                let sigTypeGroup = factory.CreateModuleMember($"type {getName typeDecl} = int")
-                                match sigTypeGroup with
-                                | :? ITypeDeclarationGroup as sigTypeGroup ->
-                                    let sigDecl = sigTypeGroup.TypeDeclarations.[0] :?> IFSharpTypeDeclaration
-                                    ModificationUtil.DeleteChildRange(sigDecl.EqualsToken.NextSibling, sigDecl.LastChild)
-                                    addNodesAfter sigDecl.EqualsToken [
-                                        NewLine(lineEnding)
-                                        Whitespace(indentation + moduleDecl.GetIndentSize())
-                                        repr.Copy()
-                                        for sigMember in sigMembers do
-                                            NewLine(lineEnding)
-                                            Whitespace(indentation + moduleDecl.GetIndentSize())
-                                            sigMember
-                                    ]
-                                    |> ignore
-                                    Some sigTypeGroup
-                                | _ -> None
+                            | :? ITypeAbbreviationRepresentation
+                            | :? ISimpleTypeRepresentation -> Some typeDecl
                             | _ -> None
-                            
-                        
-                        
-                        | _ -> None) // TODO: address this
+                        | _ -> None)
+                    |> Seq.mapi (fun idx typeDecl ->
+                        let kw = if idx = 0 then "type" else "and"
+                        {| SignatureIdx = idx ; TypeDeclaration = typeDecl; SourceText = $"{kw} {getName typeDecl} = int" |})
+                    |> Seq.toArray
 
-                sigTypeDeclGroups.FirstOrDefault()
-                    // TODO : ITypeExtensionDeclaration
+                if Array.isEmpty supportedTypeDeclarations then null else
+
+                let sourceText = supportedTypeDeclarations |> Array.map (fun info -> info.SourceText) |> String.concat "\n"
+                let sigTypeDeclarationGroup = factory.CreateModuleMember(sourceText) :?> ITypeDeclarationGroup
+
+                if isNull sigTypeDeclarationGroup then null else
+
+                for info in supportedTypeDeclarations do
+                    let typeDecl: IFSharpTypeDeclaration = info.TypeDeclaration
+                    let sigTypeDecl = sigTypeDeclarationGroup.TypeDeclarations.[info.SignatureIdx] :?> IFSharpTypeDeclaration
+                    if isNull sigTypeDecl then () else
+
+                    let sigMembers =
+                        typeDecl.TypeMembers
+                        |> Seq.choose (createMemberDeclaration >> Option.ofObj)
+
+                    match typeDecl.TypeRepresentation with
+                    | :? ITypeAbbreviationRepresentation as abbr ->
+                        ModificationUtil.DeleteChildRange(sigTypeDecl.EqualsToken.NextSibling, sigTypeDecl.LastChild)
+                        addNodesAfter sigTypeDecl.EqualsToken [
+                            Whitespace()
+                            abbr.Copy()
+                            // TODO: there technically could be members here.
+                            // Although I think this would need the `with` keyword.
+                        ] |> ignore
+                    | :? ISimpleTypeRepresentation as repr ->
+                        ModificationUtil.DeleteChildRange(sigTypeDecl.EqualsToken.NextSibling, sigTypeDecl.LastChild)
+                        addNodesAfter sigTypeDecl.EqualsToken [
+                            NewLine(lineEnding)
+                            Whitespace(indentation + moduleDecl.GetIndentSize())
+                            repr.Copy()
+                            for sigMember in sigMembers do
+                                NewLine(lineEnding)
+                                Whitespace(indentation + moduleDecl.GetIndentSize())
+                                sigMember
+                        ] |> ignore
+                    | repr ->
+                        // This pattern match should match the types we filtered out earlier for supportedTypeDeclarations
+                        failwith $"Unexpected representation {repr.GetType()}"
+
+                sigTypeDeclarationGroup
 
             | :? INestedModuleDeclaration as nestedNestedModule ->
                 let nestedSigModule = factory.CreateNestedModule(nestedNestedModule.NameIdentifier.Name)
@@ -127,7 +115,7 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
         and processModuleLikeDeclaration (indentation: int) (moduleDecl: IModuleLikeDeclaration) (moduleSig: IModuleLikeDeclaration) : IFSharpTreeNode =
             for moduleMember in moduleDecl.Members do
                 let signatureMember = createModuleMemberSig indentation moduleDecl moduleMember
-                
+
                 if isNotNull signatureMember then
                     // newline + indentation whitespace
                     addNodesAfter moduleSig.LastChild [
@@ -155,19 +143,18 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
                         sb.Append(memberDecl.AccessModifier.GetText()) |> ignore
 
                     sb.Append(getName memberDecl) |> ignore
-                    sb.Append(": ") |> ignore 
-                    
+                    sb.Append(": ") |> ignore
+
                     let symbolUse = memberDecl.GetFcsSymbolUse()
                     if isNotNull symbolUse then
                         let mfv = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
                         if isNotNull mfv then
                             sb.Append(mfv.FullType.Format(symbolUse.DisplayContext)) |> ignore
-                    
+
                     sb.ToString()
 
                 factory.CreateTypeMemberSignature(sourceString)
             | _ -> null
-                    
 
         for decl in fsharpFile.ModuleDeclarations do
             let signatureModule : IModuleLikeDeclaration =
@@ -182,13 +169,13 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
                 | decl -> failwithf $"Unexpected declaration, got: %A{decl}"
 
             ModificationUtil.AddChildAfter(signatureModule.LastChild, NewLine(lineEnding)) |> ignore
-            let signatureModule = processModuleLikeDeclaration 0 decl signatureModule 
+            let signatureModule = processModuleLikeDeclaration 0 decl signatureModule
             ModificationUtil.AddChild(signatureFile, signatureModule) |> ignore
 
         signatureFile
 
     override this.Text = "Generate signature file for current file"
-    
+
     override this.IsAvailable _ =
         let solution = dataProvider.Solution
         let isSettingEnabled = solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.GenerateSignatureFile)
@@ -198,7 +185,7 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
         // TODO: don't check has pair in unit test
         let hasSignature = fcsService.FcsProjectProvider.HasPairFile dataProvider.SourceFile
         not hasSignature
-        
+
     override this.ExecutePsiTransaction(solution, _) =
         let projectFile = dataProvider.SourceFile.ToProjectFile()
         let fsharpFile = projectFile.GetPrimaryPsiFile().AsFSharpFile()
@@ -211,7 +198,7 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
             let virtualPath = FileSystemPath.TryParse(fsiFile).ToVirtualFileSystemPath()
             let relativeTo = RelativeTo(projectFile, RelativeToType.Before)
             let projectFile = transactionCookie.AddFile(projectFile.ParentFolder, virtualPath, context = OrderingContext(relativeTo))
-            
+
             if (not Shell.Instance.IsTestShell) then
                 let navigationOptions = NavigationOptions.FromWindowContext(Shell.Instance.GetComponent<IMainWindowPopupWindowContext>().Source, "")
                 NavigationManager
@@ -224,7 +211,7 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
         )
 
         null
-        
+
         // First test name would be: ``ModuleStructure 01`` , ``NamespaceStructure 01``
-        
+
         // TODO: raise parser issue.
