@@ -99,6 +99,23 @@ and MatchNode =
         | (MatchTest.As _, [node1; node2]), _ ->
             $"{string node1} as {string node2}"
 
+        | (MatchTest.ActivePatternCase(index, group), nodes), _ ->
+            let nodes = 
+                nodes
+                |> List.tryExactlyOne
+                |> Option.map string
+                |> Option.defaultWith (fun _ ->
+                    let items =
+                        nodes
+                        |> List.map string
+                        |> String.concat ", "
+                    $"{(group.Names[index])}({items})"
+                )
+
+            $"{(group.Names[index])} {nodes}"
+
+        | (MatchTest.Error _, _), _ -> "error"
+
         | _ -> "other case"
 
 and Pattern = MatchTest * MatchNode list
@@ -174,11 +191,25 @@ module MatchType =
 
 
 module MatchTest =
+    let rec ignores (node: MatchNode) =
+        match node.Pattern with
+        | MatchTest.Discard _, _
+        | MatchTest.Named _, _ -> true
+
+        | MatchTest.Tuple _, nodes ->
+            nodes |> List.forall ignores
+
+        | _ -> false
+
     let rec matches (node: MatchNode) (existingNode: MatchNode) : bool =
         match existingNode.Pattern, node.Pattern with
         | (MatchTest.Discard _, _), _ -> true
         | (MatchTest.Named _, _), _ -> true
         | (MatchTest.Value existingValue, _), (MatchTest.Value value, _) -> existingValue.Equals(value)
+
+        | (MatchTest.ActivePatternCase(_, existingGroup), [activePatternPatNode]), _ when
+                existingGroup.Names.Count = 1 && existingGroup.IsTotal ->
+            ignores activePatternPatNode
 
         | (MatchTest.ActivePatternCase(existingIndex, existingGroup), _), (MatchTest.ActivePatternCase(index, group), _) ->
             existingIndex = index &&
@@ -221,7 +252,7 @@ module MatchTest =
 
         | _ -> false
 
-    let rec initialPattern (deconstructions: Deconstructions) (context: ITreeNode) (value: MatchValue) =
+    let rec initialPattern (deconstructions: Deconstructions) (context: ITreeNode) allowActivePatterns (value: MatchValue) =
         let makeInitialFieldPatterns substitution path (fields: FSharpField seq) =
             fields
             |> Seq.mapi (fun i field ->
@@ -231,7 +262,7 @@ module MatchTest =
                 let fieldFcsType = field.FieldType.Instantiate(substitution)
                 let fieldType = MatchType.ofFcsType context fieldFcsType
                 let itemValue = { Type = fieldType; Path = path }
-                let matchPattern = initialPattern deconstructions context itemValue
+                let matchPattern = initialPattern deconstructions context allowActivePatterns itemValue
                 MatchNode.Create(itemValue, matchPattern)
             )
             |> List.ofSeq
@@ -239,6 +270,12 @@ module MatchTest =
         let values = deconstructions.GetValuesSafe(value.Path)
 
         let deconstruction =
+            let values = 
+                if not allowActivePatterns then
+                    values |> Seq.filter (function Deconstruction.ActivePattern _ -> false | _ -> true)
+                else
+                    values
+
             let mutable named = None
             values
             |> Seq.tryFind (fun d ->
@@ -271,7 +308,7 @@ module MatchTest =
                     |> Seq.mapi (fun i itemType ->
                         let path = MatchTest.TupleItem i :: value.Path
                         let itemValue = { Type = itemType; Path = path }
-                        let matchPattern = initialPattern deconstructions context itemValue
+                        let matchPattern = initialPattern deconstructions context allowActivePatterns itemValue
                         MatchNode.Create(itemValue, matchPattern)
                     )
                     |> List.ofSeq
@@ -287,7 +324,7 @@ module MatchTest =
 
                 let casePattern =
                     if unionCase.HasFields then
-                        initialPattern deconstructions context caseValue
+                        initialPattern deconstructions context allowActivePatterns caseValue
                     else
                         MatchTest.Discard false, []
 
@@ -327,7 +364,7 @@ module MatchTest =
                         let fieldValue = { Type = fieldType; Path = fieldPath }
                         let fieldPattern =
                             if deconstructions.ContainsKey(fieldPath) then
-                                initialPattern deconstructions context fieldValue
+                                initialPattern deconstructions context allowActivePatterns fieldValue
                             else
                                 let defaultItemName = if isSingleField then "Item" else $"Item{i + 1}"
                                 let name = if field.Name <> defaultItemName then Some field.Name else None
@@ -479,15 +516,9 @@ module MatchNode =
 
         let valueType = node.Value.Type
 
-        let ignores (node: MatchNode) =
-            match fst node.Pattern with
-            | MatchTest.Discard _
-            | MatchTest.Named _ -> true
-            | _ -> false
-
         let ignoresNestedValues (types: IList<_>) (nodes: MatchNode list) =
             types.Count = nodes.Length &&
-            nodes |> List.forall ignores
+            nodes |> List.forall MatchTest.ignores
 
         let allRejected =
             match valueType, nodePattern with
@@ -591,7 +622,7 @@ module MatchNode =
         loop node
 
     /// Return true if successfully incremented the value
-    let rec increment (deconstructions: Deconstructions) (context: ITreeNode) (node: MatchNode) =
+    let rec increment (deconstructions: Deconstructions) (context: ITreeNode) allowActivePatterns (node: MatchNode) =
         match node.Pattern with
         | MatchTest.Value value, _ ->
             match node.Value.Type with
@@ -623,7 +654,7 @@ module MatchNode =
         | MatchTest.Tuple _, nodes ->
             let changedIndex =
                 nodes
-                |> List.tryFindIndexBack (increment deconstructions context)
+                |> List.tryFindIndexBack (increment deconstructions context allowActivePatterns)
 
             match changedIndex with
             | None ->
@@ -633,7 +664,7 @@ module MatchNode =
                 nodes
                 |> List.skip (index + 1)
                 |> List.iter (fun node ->
-                    node.Pattern <- MatchTest.initialPattern deconstructions context node.Value
+                    node.Pattern <- MatchTest.initialPattern deconstructions context allowActivePatterns node.Value
                 )
                 true
 
@@ -649,7 +680,7 @@ module MatchNode =
                 false
 
         | MatchTest.Union index, [caseNode] ->
-            increment deconstructions context caseNode ||
+            increment deconstructions context allowActivePatterns caseNode ||
 
             match node.Value.Type with
             | MatchType.Union unionEntityInstance ->
@@ -660,7 +691,7 @@ module MatchNode =
                     let unionPath = unionTest :: node.Value.Path
                     let caseMatchType = MatchType.UnionCase(unionCases[newIndex], unionEntityInstance)
                     let caseValue = { Type = caseMatchType; Path = unionPath }
-                    let casePattern = MatchTest.initialPattern deconstructions context caseValue
+                    let casePattern = MatchTest.initialPattern deconstructions context allowActivePatterns caseValue
 
                     node.Pattern <- unionTest, [MatchNode.Create(caseValue, casePattern)]
                     true
@@ -672,10 +703,10 @@ module MatchNode =
 
         | MatchTest.UnionCase, nodes
         | MatchTest.Record, nodes ->
-            match List.tryFindIndexBack (increment deconstructions context) nodes with
+            match List.tryFindIndexBack (increment deconstructions context allowActivePatterns) nodes with
             | None -> false
             | Some index ->
-                match MatchTest.initialPattern deconstructions context node.Value with
+                match MatchTest.initialPattern deconstructions context allowActivePatterns node.Value with
                 | MatchTest.UnionCase, newNodes
                 | MatchTest.Record, newNodes ->
                     (nodes, newNodes)
@@ -690,7 +721,7 @@ module MatchNode =
                     false
 
         | MatchTest.Field _, [node] ->
-            increment deconstructions context node
+            increment deconstructions context allowActivePatterns node
 
         | MatchTest.List isEmpty, _ ->
             if isEmpty then
@@ -704,7 +735,7 @@ module MatchNode =
     let incrementAndTryReject (deconstructions: Deconstructions) (rejected: List<MatchNode>) (context: ITreeNode)
             (node: MatchNode) =
         tryRecordRejectedDiscard rejected node context
-        increment deconstructions context node
+        increment deconstructions context false node
 
 
 let getMatchExprMatchType (matchExpr: IMatchExpr) : MatchType =
@@ -721,7 +752,7 @@ let getMatchExprMatchType (matchExpr: IMatchExpr) : MatchType =
         let fcsType = expr.TryGetFcsType()
         MatchType.ofFcsType matchExpr fcsType
 
-let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (pat: IFSharpPattern) skipOnNull =
+let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) skipOnNull (pat: IFSharpPattern) =
     let addDeconstruction path deconstruction =
         deconstructions.Add(path, deconstruction)
 
@@ -748,7 +779,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
         let fieldFcsType = field.FieldType.Instantiate(substitution)
         let fieldType = MatchType.ofFcsType pat fieldFcsType
         let itemValue = { Type = fieldType; Path = path }
-        let matchPattern = getMatchPattern deconstructions itemValue pat discardOnError
+        let matchPattern = getMatchPattern deconstructions itemValue discardOnError pat
         MatchNode.Create(itemValue, matchPattern)
 
     let makeNamedFieldPatternNodes parentPath substitution (fields: IList<FSharpField>) (fieldPatterns: IFieldPat seq) =
@@ -791,7 +822,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
                 let itemTest = MatchTest.TupleItem i
                 let itemPath = itemTest :: value.Path
                 let itemValue = { Type = itemType; Path = itemPath }
-                let matchPattern = getMatchPattern deconstructions itemValue itemPat false
+                let matchPattern = getMatchPattern deconstructions itemValue false itemPat
                 MatchNode.Create(itemValue, matchPattern)
             )
             |> List.ofSeq
@@ -799,8 +830,8 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
         MatchTest.Tuple tuplePat.IsStruct, itemNodes
 
     | :? IAsPat as asPat, _ ->
-        let leftPat = getMatchPattern deconstructions value asPat.LeftPattern skipOnNull
-        let rightPat = getMatchPattern deconstructions value asPat.RightPattern skipOnNull
+        let leftPat = getMatchPattern deconstructions value skipOnNull asPat.LeftPattern
+        let rightPat = getMatchPattern deconstructions value skipOnNull asPat.RightPattern
 
         // todo: value type may change
         // match obj with
@@ -859,6 +890,20 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
 
             | _ ->
                 MatchTest.Error, []
+
+    | :? IParametersOwnerPat as paramOwnerPat, _ when
+            isNotNull (paramOwnerPat.Reference.GetFcsSymbol().As<FSharpActivePatternCase>()) ->
+        let case = paramOwnerPat.Reference.GetFcsSymbol().As<FSharpActivePatternCase>()
+        addDeconstruction value.Path (Deconstruction.ActivePattern case.Group)
+
+        let patternNodes = 
+            paramOwnerPat.ParametersEnumerable
+            |> Seq.tryLast
+            |> Option.map (getMatchPattern deconstructions value skipOnNull)
+            |> Option.map (fun pattern -> MatchNode.Create(value, pattern))
+            |> Option.toList
+
+        MatchTest.ActivePatternCase(case.Index, case.Group), patternNodes
 
     | :? IParametersOwnerPat as paramOwnerPat, MatchType.Union unionEntityInstance ->
         let unionCase = paramOwnerPat.Reference.GetFcsSymbol().As<FSharpUnionCase>()
@@ -948,14 +993,14 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
     | :? IAndsPat as andsPat, _ ->
         let nodes =
             andsPat.Patterns
-            |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat false))
+            |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value false pat))
             |> List.ofSeq
         MatchTest.And, nodes
 
     | :? IOrPat as orPat, _ ->
         let nodes =
             orPat.Patterns
-            |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value pat false))
+            |> Seq.map (fun pat -> MatchNode.Create(value, getMatchPattern deconstructions value false pat))
             |> List.ofSeq
         MatchTest.Or, nodes
 
@@ -974,7 +1019,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
         test, fieldNodes
 
     | :? IFieldPat as fieldPat, _ ->
-        getMatchPattern deconstructions value fieldPat.Pattern skipOnNull
+        getMatchPattern deconstructions value skipOnNull fieldPat.Pattern
 
     | null, _ when skipOnNull ->
         addDeconstruction value.Path (Deconstruction.Discard true)
@@ -992,7 +1037,7 @@ let ofMatchExpr (matchExpr: IMatchExpr) =
     for clause in matchExpr.ClausesEnumerable do
         if isNull clause.Pattern then () else
 
-        let pattern = getMatchPattern deconstructions matchValue clause.Pattern false
+        let pattern = getMatchPattern deconstructions matchValue false clause.Pattern
         if isNull clause.WhenExpressionClause then
             matchNodes.Add(MatchNode.Create(matchValue, pattern))
 
@@ -1018,7 +1063,7 @@ let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
         let usedNames = HashSet()
         MatchNode.bind usedNames matchClause.Pattern node
 
-    let matchPattern = MatchTest.initialPattern deconstructions matchExpr value
+    let matchPattern = MatchTest.initialPattern deconstructions matchExpr true value
     let node = MatchNode.Create(value, matchPattern)
 
     let firstClause = Seq.tryHead matchExpr.ClausesEnumerable
@@ -1043,7 +1088,7 @@ let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
         addNodeAfter matchExpr.LastChild (NewLine(matchExpr.GetLineEnding()))
 
     tryAddClause node
-    while MatchNode.increment deconstructions matchExpr node do
+    while MatchNode.increment deconstructions matchExpr true node do
         tryAddClause node
 
 let markToLevelDeconstructions (deconstructions: Deconstructions) (value: MatchValue) =

@@ -90,6 +90,17 @@ type AddMissingPatternsFixTest() =
     [<Test>] member x.``As 03``() = x.DoNamedTest()
     [<Test>] member x.``As 04``() = x.DoNamedTest()
 
+    [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Active pattern 02``() = x.DoNamedTest()
+    [<Test>] member x.``Active pattern 03``() = x.DoNamedTest()
+    [<Test>] member x.``Active pattern 04``() = x.DoNamedTest()
+    [<Test>] member x.``Active pattern 05``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Active pattern 06``() = x.DoNamedTest()
+    [<Test>] member x.``Active pattern 07``() = x.DoNamedTest()
+    [<Test>] member x.``Active pattern 08``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Active pattern 09``() = x.DoNamedTest()
+    [<Test>] member x.``Active pattern 10``() = x.DoNamedTest()
+
     [<Test>] member x.``Array 01``() = x.DoNamedTest()
     [<Test>] member x.``Array 02``() = x.DoNamedTest()
     [<Test>] member x.``Array 03``() = x.DoNamedTest()
