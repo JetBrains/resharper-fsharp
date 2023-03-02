@@ -59,16 +59,16 @@ type DumpCurrentFcsFileAction() =
 
         member this.Execute(context, _) =
             let editorContext = context.GetData(JetBrains.DocumentModel.DataContext.DocumentModelDataConstants.EDITOR_CONTEXT)
-            if isNull editorContext then
-                ()
-            else
-                let sourceFile = context.GetData(JetBrains.ReSharper.Psi.DataContext.PsiDataConstants.SOURCE_FILE)
-                let file = if isNull sourceFile then null else sourceFile.GetPsiFile(editorContext.CaretOffset)
-                if not (isNull file) then
-                    Dumper.DumpToNotepad(fun writer ->
-                            let treeNode = file :> ITreeNode
-                            writer.WriteLine("Language: {0}", file.Language :> obj)
-                            DebugUtil.DumpPsi(writer, treeNode))
+            if isNull editorContext then () else
+
+            let sourceFile = context.GetData(JetBrains.ReSharper.Psi.DataContext.PsiDataConstants.SOURCE_FILE)
+            let file = if isNull sourceFile then null else sourceFile.GetPsiFile(editorContext.CaretOffset)
+            
+            if isNull file then () else
+            Dumper.DumpToNotepad(fun writer ->
+                let treeNode = file :> ITreeNode
+                writer.WriteLine("Language: {0}", file.Language :> obj)
+                DebugUtil.DumpPsi(writer, treeNode))
 
 
 [<ActionGroup(ActionGroupInsertStyles.Submenu ||| ActionGroupInsertStyles.Separated, Text = "F#")>]
