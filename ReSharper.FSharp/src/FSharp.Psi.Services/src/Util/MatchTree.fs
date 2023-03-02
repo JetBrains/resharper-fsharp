@@ -56,6 +56,7 @@ type MatchTest =
     | And
     | Or
     | Error
+    | As
     | ActivePatternCase of index: int * group: FSharpActivePatternGroup
     | Record
 
@@ -94,6 +95,9 @@ and MatchNode =
                 |> List.map string
                 |> String.concat ", "
             $"{case.DisplayName}({items})"
+
+        | (MatchTest.As _, [node1; node2]), _ ->
+            $"{string node1} as {string node2}"
 
         | _ -> "other case"
 
@@ -209,6 +213,8 @@ module MatchTest =
         | (MatchTest.List true, _), (MatchTest.List true, _) -> true
 
         | (MatchTest.Or, nodes), _ -> List.exists (matches node) nodes
+
+        | (MatchTest.As, nodes), _ -> List.forall (matches node) nodes
 
         | (MatchTest.Record, fields1), (MatchTest.Record, fields2) ->
             List.forall2 matches fields2 fields1
@@ -463,6 +469,7 @@ module MatchNode =
             | MatchTest.Error -> MatchTest.Error
             | MatchTest.ActivePatternCase(index, group) -> MatchTest.ActivePatternCase(index, group)
             | MatchTest.Record -> MatchTest.Record
+            | MatchTest.As -> MatchTest.As
 
         let pattern = test, nodes
         MatchNode.Create(node.Value, pattern)
@@ -790,6 +797,18 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) (
             |> List.ofSeq
 
         MatchTest.Tuple tuplePat.IsStruct, itemNodes
+
+    | :? IAsPat as asPat, _ ->
+        let leftPat = getMatchPattern deconstructions value asPat.LeftPattern skipOnNull
+        let rightPat = getMatchPattern deconstructions value asPat.RightPattern skipOnNull
+
+        // todo: value type may change
+        // match obj with
+        // | :? Union as (Union.CaseA _) -> ()
+
+        let leftNode = MatchNode.Create(value, leftPat)
+        let rightNode = MatchNode.Create(value, rightPat)
+        MatchTest.As, [leftNode; rightNode]
 
     | _, MatchType.Tuple(_, types) ->
         addDeconstruction value.Path Deconstruction.InnerPatterns
