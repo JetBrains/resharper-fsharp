@@ -73,7 +73,7 @@ We suggest that you read docs on the two SDKs that this plugin uses:
 * [ReSharper SDK](https://www.jetbrains.com/help/resharper/sdk/welcome.html)
 * [IntelliJ IDEA SDK](https://www.jetbrains.org/intellij/sdk/docs/welcome.html)
 
-You can find some tips and tricks about the ReSharper.Host plugin (the *backend*) in the `ReSharper.FSharp\docs` folder of this repository.
+You can find some tips and tricks about the ReSharper.Host plugin (the *backend*) in the [ReSharper.FSharp/docs](ReSharper.FSharp/docs) folder of this repository.
 
 ## Development notes
 
