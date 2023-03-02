@@ -1,0 +1,8 @@
+﻿module Say
+
+let (|String|) x = string x
+
+match true{caret} with
+| String "" -> ()
+| true -> failwith "todo"
+| false -> failwith "todo"

@@ -1,0 +1,8 @@
+﻿module Say
+
+let (|Id|) x = x
+
+match true, true{caret} with
+| true, Id x -> ()
+| false, true -> failwith "todo"
+| false, false -> failwith "todo"

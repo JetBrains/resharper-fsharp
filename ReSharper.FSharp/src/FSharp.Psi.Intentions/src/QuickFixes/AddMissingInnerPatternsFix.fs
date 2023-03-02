@@ -54,7 +54,7 @@ type AddMissingPatternsFix(warning: MatchIncompleteWarning) =
     let matchExpr = warning.Expr.As<IMatchExpr>()
 
     override this.MarkAdditionalUsedNodes(value, deconstructions, usedNodes) =
-        let matchPattern = MatchTest.initialPattern deconstructions matchExpr value
+        let matchPattern = MatchTest.initialPattern deconstructions matchExpr false value
         let node = MatchNode.Create(value, matchPattern)
 
         while MatchNode.incrementAndTryReject deconstructions usedNodes matchExpr node do
