@@ -73,6 +73,7 @@ We suggest that you read docs on the two SDKs that this plugin uses:
 * [ReSharper SDK](https://www.jetbrains.com/help/resharper/sdk/welcome.html)
 * [IntelliJ IDEA SDK](https://www.jetbrains.org/intellij/sdk/docs/welcome.html)
 
+You can also find some tips and tricks in the `docs` folder of this repository.
 
 ## Development notes
 
