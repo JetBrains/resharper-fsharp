@@ -139,6 +139,8 @@ module MatchType =
                 |> Array.ofSeq
             MatchType.Enum(fcsEntity, fieldLiterals) else
 
+        if fcsEntity.IsArrayType then MatchType.Other fcsType else
+
         // todo: list
         let entityFqn = fcsEntity.BasicQualifiedName
         match entityFqn with

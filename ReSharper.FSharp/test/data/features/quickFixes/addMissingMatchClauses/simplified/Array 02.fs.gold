@@ -1,0 +1,5 @@
+﻿module Say
+
+match true, [|1|]{caret} with
+| true, _ -> ()
+| false, int32s -> failwith "todo"
