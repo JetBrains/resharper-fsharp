@@ -85,6 +85,10 @@ type AddMissingPatternsFixTest() =
     [<Test>] member x.``Indent 02``() = x.DoNamedTest()
     [<Test>] member x.``Indent 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Array 01``() = x.DoNamedTest()
+    [<Test>] member x.``Array 02``() = x.DoNamedTest()
+    [<Test>] member x.``Array 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Bool 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
