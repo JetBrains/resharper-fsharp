@@ -1043,6 +1043,16 @@ let ofMatchExpr (matchExpr: IMatchExpr) =
 
     matchValue, matchNodes, deconstructions
 
+let moveSubsequentCommentToMatchClause (matchExpr: IMatchLikeExpr) (matchClause: IMatchClause) =
+    let nextToken = matchExpr.GetNextToken()
+    if not (isInlineSpaceOrComment nextToken) then () else
+
+    let lastWhitespaceOrComment = getLastMatchingNodeAfter isInlineSpaceOrComment nextToken
+    if not (isInlineSpaceOrComment lastWhitespaceOrComment) then () else
+
+    let range = TreeRange(nextToken, lastWhitespaceOrComment)
+    ModificationUtil.AddChildRangeAfter(matchClause, range) |> ignore
+    ModificationUtil.DeleteChildRange(range)
 
 let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
     let factory = matchExpr.CreateElementFactory()
@@ -1090,6 +1100,9 @@ let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
     tryAddClause node
     while MatchNode.increment deconstructions matchExpr true node do
         tryAddClause node
+
+    lastClause |> Option.iter (moveSubsequentCommentToMatchClause matchExpr)
+
 
 let markToLevelDeconstructions (deconstructions: Deconstructions) (value: MatchValue) =
     deconstructions.Add(value.Path, Deconstruction.InnerPatterns)

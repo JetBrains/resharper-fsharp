@@ -78,6 +78,12 @@ type AddMissingPatternsFixTest() =
     [<Test; NotAvailable>] member x.``Not available - Bar 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Single line 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Comment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Comment 02 - Eof``() = x.DoNamedTest()
+    [<Test>] member x.``Comment 03``() = x.DoNamedTest()
+    [<Test>] member x.``Comment 04 - Space``() = x.DoNamedTest()
+    [<Test>] member x.``Comment 05``() = x.DoNamedTest()
+
     [<Test>] member x.``Empty line 01``() = x.DoNamedTest()
     [<Test>] member x.``Empty line 02``() = x.DoNamedTest()
 

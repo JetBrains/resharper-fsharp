@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -52,6 +53,8 @@ type AddMatchAllClauseFix(expr: IMatchLikeExpr, generatedExpr: GeneratedClauseEx
                 Whitespace()
             ] |> ignore
 
+        let lastClause = expr.ClausesEnumerable |> Seq.tryLast
+
         let clause =
             addNodesAfter expr.LastChild [
                 if addToNewLine then
@@ -79,6 +82,8 @@ type AddMatchAllClauseFix(expr: IMatchLikeExpr, generatedExpr: GeneratedClauseEx
                 | Some _ -> typeName
 
             clause.SetExpression(factory.CreateExpr($"{typeName}() |> raise")) |> ignore
+
+        lastClause |> Option.iter (MatchTree.moveSubsequentCommentToMatchClause expr)
 
         Action<_>(fun textControl ->
             let range = clause.Expression.GetNavigationRange()
