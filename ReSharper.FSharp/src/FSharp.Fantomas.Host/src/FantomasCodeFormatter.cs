@@ -189,6 +189,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         formatDocumentOptions);
       var formatResult = FSharpAsync.StartAsTask((dynamic)formatDocumentAsync, null, null).Result;
 
+      // Prior to version 6, Fantomas returns formatted code,
+      // in version 6, the return FormatResult value includes the formatted code and the new cursor position.
+      // https://github.com/fsprojects/fantomas/issues/2727
       if (CurrentVersion < Version60)
         return new RdFormatResult(formatResult.Replace("\r\n", args.NewLineText), null);
 
