@@ -9,7 +9,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.UI.RichText
@@ -136,10 +137,20 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
         let occurrences =
             typeNames
             |> List.map (fun (fcsType, isImmediateSuperType) ->
+                let icon =
+                    let mapType = fcsType.MapType(refExpr).As<IDeclaredType>()
+                    if isNull mapType then null else
+
+                    let typeElement = mapType.GetTypeElement()
+                    if isNull typeElement then null else
+
+                    let iconManager = solution.GetComponent<PsiIconManager>()
+                    iconManager.GetImage(typeElement, refExpr.Language, true)
+
                 let richText = RichText(fcsType.Format(displayContext))
                 if isImmediateSuperType then
                     richText.SetStyle(JetFontStyles.Bold, 0, richText.Length)
-                WorkflowPopupMenuOccurrence(richText, RichText.Empty, (fcsType, displayContext)))
+                WorkflowPopupMenuOccurrence(richText, RichText.Empty, (fcsType, displayContext), icon))
             |> List.toArray
 
         let occurrence =
