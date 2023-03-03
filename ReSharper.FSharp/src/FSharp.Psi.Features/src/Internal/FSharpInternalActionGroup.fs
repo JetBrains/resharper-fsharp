@@ -5,10 +5,12 @@ open JetBrains.Application.Diagnostics
 open JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu
 open JetBrains.Application.UI.Actions.InternalMenu
 open JetBrains.Application.UI.ActionsRevised.Menu
+open JetBrains.DocumentModel.DataContext
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Tree
@@ -58,11 +60,11 @@ type DumpCurrentFileAction() =
             isNotNull (context.GetData(ProjectModelDataConstants.PROJECT))
 
         member this.Execute(context, _) =
-            let editorContext = context.GetData(JetBrains.DocumentModel.DataContext.DocumentModelDataConstants.EDITOR_CONTEXT)
+            let editorContext = context.GetData(DocumentModelDataConstants.EDITOR_CONTEXT)
             if isNull editorContext then () else
 
-            let sourceFile = context.GetData(JetBrains.ReSharper.Psi.DataContext.PsiDataConstants.SOURCE_FILE)
-            let file = if isNull sourceFile then null else sourceFile.GetPsiFile(editorContext.CaretOffset)
+            let sourceFile = context.GetData(PsiDataConstants.SOURCE_FILE)
+            let file = if isNull sourceFile then null else sourceFile.GetPrimaryPsiFile()
             
             if isNull file then () else
             Dumper.DumpToNotepad(fun writer ->
