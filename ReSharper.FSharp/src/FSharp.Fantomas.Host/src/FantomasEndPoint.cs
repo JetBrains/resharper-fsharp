@@ -47,7 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private static string FormatSelection(RdFantomasFormatSelectionArgs args) =>
       FantomasCodeFormatter.FormatSelection(args);
 
-    private static string FormatDocument(RdFantomasFormatDocumentArgs args) =>
+    private static RdFormatResult FormatDocument(RdFantomasFormatDocumentArgs args) =>
       FantomasCodeFormatter.FormatDocument(args);
 
     protected override void Run(Lifetime lifetime, RdSimpleDispatcher dispatcher) => dispatcher.Run();
