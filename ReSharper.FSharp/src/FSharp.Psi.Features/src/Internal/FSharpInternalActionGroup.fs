@@ -54,7 +54,7 @@ type DumpCurrentFileAction() =
 
     interface IExecutableAction with
         member this.Update(context, _, _) =
-            isNotNull (context.GetData(ProjectModelDataConstants.PROJECT))
+            isNotNull (context.GetData(DocumentModelDataConstants.EDITOR_CONTEXT))
 
         member this.Execute(context, _) =
             let editorContext = context.GetData(DocumentModelDataConstants.EDITOR_CONTEXT)
