@@ -26,3 +26,5 @@ type AddMatchAllClauseFixTest() =
     [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 03``() = x.DoNamedTest()
+
+    [<Test>] member x.``Comment 01``() = x.DoNamedTest()
