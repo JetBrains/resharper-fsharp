@@ -37,6 +37,9 @@ type AddIgnoreTest() =
     [<Test>] member x.``New line - Match 02``() = x.DoNamedTest()
     [<Test>] member x.``New line - Match 03 - Single line``() = x.DoNamedTest()
 
+    [<Test>] member x.``Parens 01``() = x.DoNamedTest()
+    [<Test>] member x.``Parens 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Single line - Multiple clauses 01``() = x.DoNamedTest()
     [<Test>] member x.``Single line - Multiple clauses 02``() = x.DoNamedTest()
     [<Test>] member x.``Single line - Single clause 01``() = x.DoNamedTest()
