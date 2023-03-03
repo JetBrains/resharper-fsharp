@@ -50,8 +50,10 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
     let toRdFcsRange (range: range) =
         RdFcsRange(range.FileName, range.StartLine, range.StartColumn, range.EndLine, range.EndColumn)
 
-    let toRdFcsPos (caretPosition: DocumentCoords) =
-        RdFcsPos(int caretPosition.Line, int caretPosition.Column)
+    let toRdFcsPos (caretPosition: DocumentCoords option) =
+        match caretPosition with
+        | Some caretPosition -> RdFcsPos(int caretPosition.Line, int caretPosition.Column)
+        | None -> null
 
     let toRdFormatSettings (settings: FSharpFormatSettingsKey) =
         [| for field in formatConfigFields ->
@@ -87,7 +89,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
 
         connection.Execute(fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
 
-    member x.FormatDocument(filePath, source, settings, options, newLineText, cursorPosition: DocumentCoords) =
+    member x.FormatDocument(filePath, source, settings, options, newLineText, cursorPosition: DocumentCoords option) =
         connect()
         let args =
             RdFantomasFormatDocumentArgs(filePath, source, toRdFormatSettings settings, toRdFcsParsingOptions options,

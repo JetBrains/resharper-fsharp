@@ -79,8 +79,8 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
                     sourceFile.GetPsiServices().Files.CommitAllDocuments()
                 with _ -> ()
             else
-                let textControl = textControlManager.VisibleTextControls |> Seq.find (fun c -> c.Document == document)
-                let cursorPosition = textControl.Caret.Position.Value.ToDocLineColumn()
+                let textControl = textControlManager.VisibleTextControls |> Seq.tryFind (fun c -> c.Document == document)
+                let cursorPosition = textControl |> Option.map (fun c -> c.Caret.Position.Value.ToDocLineColumn())
                 let formatResult = fantomasHost.FormatDocument(filePath, text, settings, parsingOptions, newLineText, cursorPosition)
                 let newCursorPosition = formatResult.CursorPosition
 
@@ -94,6 +94,6 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
                 let codeCleanupService = solution.GetComponent<CodeCleanupService>()
                 codeCleanupService.WholeFileCleanupCompletedAfterSave.Advise(moveCursorLifetime.Lifetime, fun _ ->
                     moveCursorLifetime.Terminate()
-                    textControl.Caret.MoveTo(docLine newCursorPosition.Row,
-                                             docColumn newCursorPosition.Column,
-                                             CaretVisualPlacement.Generic))
+                    textControl.Value.Caret.MoveTo(docLine newCursorPosition.Row,
+                                                   docColumn newCursorPosition.Column,
+                                                   CaretVisualPlacement.Generic))
