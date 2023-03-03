@@ -2,7 +2,7 @@
 
 let (|Pair|) x = x, x
 
-match true, true{caret} with
+match true, true with
 | true, Pair _ -> ()
-| false, true -> failwith "todo"
+| false, true -> {selstart}failwith "todo"{selend}
 | false, false -> failwith "todo"

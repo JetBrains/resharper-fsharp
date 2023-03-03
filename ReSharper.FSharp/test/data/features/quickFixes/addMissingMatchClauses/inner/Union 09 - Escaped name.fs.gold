@@ -4,6 +4,6 @@ type U =
     | A
     | B of ``type``: int
 
-match A{caret} with
+match A with
 | A -> ()
-| B ``type`` -> failwith "todo"
+| B ``type`` -> {selstart}failwith "todo"{selend}

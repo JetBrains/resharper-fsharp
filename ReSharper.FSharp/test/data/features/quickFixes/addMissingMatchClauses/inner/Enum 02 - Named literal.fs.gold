@@ -1,4 +1,4 @@
-module Say
+﻿module Say
 
 type E =
     | A = 1
@@ -6,6 +6,6 @@ type E =
 
 let [<Literal>] A = E.A
 
-match E.A{caret} with
+match E.A with
 | A -> ()
-| E.B -> failwith "todo"
+| E.B -> {selstart}failwith "todo"{selend}

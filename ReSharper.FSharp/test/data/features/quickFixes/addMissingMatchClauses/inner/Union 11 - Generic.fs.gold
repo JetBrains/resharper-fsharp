@@ -4,6 +4,6 @@ type U<'T> =
     | A
     | B of 'T
 
-match B 1{caret} with
+match B 1 with
 | A -> ()
-| B i -> failwith "todo"
+| B i -> {selstart}failwith "todo"{selend}

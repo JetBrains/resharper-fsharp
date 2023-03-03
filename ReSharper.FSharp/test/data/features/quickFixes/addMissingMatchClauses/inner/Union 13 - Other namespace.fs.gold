@@ -10,7 +10,7 @@ namespace Ns2
 open Ns1
 
 module Module =    
-    match Ns1.U.A{caret} with
+    match Ns1.U.A with
     | Ns1.U.A -> ()
-    | B -> failwith "todo"
+    | B -> {selstart}failwith "todo"{selend}
     | C -> failwith "todo"

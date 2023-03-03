@@ -1,7 +1,7 @@
 ﻿module Say
 
 (fun _ ->
-    match Some(){caret} with
+    match Some() with
     | None -> () (* *) 
-    | Some value -> failwith "todo")
+    | Some value -> {selstart}failwith "todo"{selend})
 |> ignore

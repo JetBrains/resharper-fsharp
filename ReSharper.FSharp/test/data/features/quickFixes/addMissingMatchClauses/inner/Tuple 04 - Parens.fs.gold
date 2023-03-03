@@ -1,7 +1,7 @@
 ﻿module Say
 
-match true, true{caret} with
+match true, true with
 | (true, true) -> ()
-| true, false -> failwith "todo"
+| true, false -> {selstart}failwith "todo"{selend}
 | false, true -> failwith "todo"
 | false, false -> failwith "todo"

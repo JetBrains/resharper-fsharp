@@ -9,6 +9,6 @@ type U2 =
     | A2
     | B2 of U1
 
-match A2{caret} with
+match A2 with
 | B2(Id _ as A1 b) -> ()
-| A2 -> failwith "todo"
+| A2 -> {selstart}failwith "todo"{selend}

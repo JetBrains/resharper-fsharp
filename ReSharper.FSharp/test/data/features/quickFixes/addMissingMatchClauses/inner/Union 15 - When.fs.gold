@@ -1,7 +1,7 @@
 ﻿module Say
 
-match None{caret} with
+match None with
 | Some true when true -> ()
-| None -> failwith "todo"
+| None -> {selstart}failwith "todo"{selend}
 | Some true -> failwith "todo"
 | Some false -> failwith "todo"

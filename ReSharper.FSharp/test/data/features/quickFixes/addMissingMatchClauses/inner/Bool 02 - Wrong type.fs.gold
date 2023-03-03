@@ -1,6 +1,6 @@
-module Say
+﻿module Say
 
-match true{caret} with
+match true with
 | "" -> ()
-| true -> failwith "todo"
+| true -> {selstart}failwith "todo"{selend}
 | false -> failwith "todo"

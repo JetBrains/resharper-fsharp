@@ -1,7 +1,7 @@
-module Say
+﻿module Say
 
 let [<Literal>] True = true
 
-match true{caret} with
+match true with
 | True -> ()
-| false -> failwith "todo"
+| false -> {selstart}failwith "todo"{selend}

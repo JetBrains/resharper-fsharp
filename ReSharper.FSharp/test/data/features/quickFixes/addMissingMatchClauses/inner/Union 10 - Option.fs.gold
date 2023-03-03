@@ -1,5 +1,5 @@
 ﻿module Say
 
-match Some true{caret} with
+match Some true with
 | None -> ()
-| Some value -> failwith "todo"
+| Some value -> {selstart}failwith "todo"{selend}

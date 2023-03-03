@@ -3,7 +3,7 @@
 type U =
     | A of bool * bool
 
-match None{caret} with
+match None with
 | Some (A (x, true)) -> ()
-| None -> failwith "todo"
+| None -> {selstart}failwith "todo"{selend}
 | Some value -> failwith "todo"
