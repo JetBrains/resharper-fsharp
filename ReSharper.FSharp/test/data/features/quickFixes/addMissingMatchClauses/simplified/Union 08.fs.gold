@@ -4,7 +4,7 @@ type U =
     | A
     | B of bool * bool
 
-match A{caret} with
+match A with
 | B (x, true) -> ()
-| A -> failwith "todo"
+| A -> {selstart}failwith "todo"{selend}
 | B(b, b1) -> failwith "todo"

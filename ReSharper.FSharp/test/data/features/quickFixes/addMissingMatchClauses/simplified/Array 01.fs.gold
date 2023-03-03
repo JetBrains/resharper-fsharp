@@ -1,5 +1,5 @@
 ﻿module Say
 
-match [|1|]{caret} with
+match [|1|] with
 | [|2|] -> ()
-| int32s -> failwith "todo"
+| int32s -> {selstart}failwith "todo"{selend}

@@ -4,7 +4,7 @@ type U =
     | A
     | B of int * named: bool
 
-match A{caret} with
+match A with
 | B(named = true) -> ()
-| A -> failwith "todo"
+| A -> {selstart}failwith "todo"{selend}
 | B(_, false) -> failwith "todo"

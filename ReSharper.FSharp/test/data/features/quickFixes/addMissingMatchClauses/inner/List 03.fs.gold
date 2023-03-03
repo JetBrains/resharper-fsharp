@@ -1,6 +1,6 @@
 ﻿module Say
 
-match [""]{caret} with
+match [""] with
 | _ :: _ -> ()
-| [] -> failwith "todo"
+| [] -> {selstart}failwith "todo"{selend}
 | l -> failwith "todo"

@@ -4,6 +4,6 @@ type U =
     | A
     | B of string[]
 
-match A{caret} with
+match A with
 | A -> ()
-| B strings -> failwith "todo"
+| B strings -> {selstart}failwith "todo"{selend}

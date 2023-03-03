@@ -6,8 +6,8 @@ type U =
 
 let t = A, A
 
-match t{caret} with
+match t with
 | A, A -> ()
-| A, B ``type`` -> failwith "todo"
+| A, B ``type`` -> {selstart}failwith "todo"{selend}
 | B ``type``, A -> failwith "todo"
 | B ``type``, B type1 -> failwith "todo"

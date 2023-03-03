@@ -4,7 +4,7 @@ type R =
     { F1: int
       F2: int }
 
-match None{caret} with
+match None with
 | Some { F1 = 1 } -> ()
-| None -> failwith "todo"
+| None -> {selstart}failwith "todo"{selend}
 | Some { F1 = i } -> failwith "todo"

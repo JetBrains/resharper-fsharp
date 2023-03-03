@@ -4,8 +4,8 @@ type U =
     | A of bool * bool
     | B of bool
 
-match None{caret} with
+match None with
 | Some (A (x, true)) -> ()
 | Some (B true) -> ()
-| None -> failwith "todo"
+| None -> {selstart}failwith "todo"{selend}
 | Some value -> failwith "todo"

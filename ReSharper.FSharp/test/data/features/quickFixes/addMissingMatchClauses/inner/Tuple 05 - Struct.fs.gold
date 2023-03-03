@@ -1,8 +1,8 @@
 ﻿module Say
 
-match struct (true, true){caret} with
+match struct (true, true) with
 | struct (true, true) -> ()
 | false, false -> ()
-| struct (true, false) -> failwith "todo"
+| struct (true, false) -> {selstart}failwith "todo"{selend}
 | struct (false, true) -> failwith "todo"
 | struct (false, false) -> failwith "todo"

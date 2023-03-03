@@ -1,8 +1,8 @@
 ﻿module Say
 
-match true, None, true{caret} with
+match true, None, true with
 | true, Some true -> ()
-| true, None, true -> failwith "todo"
+| true, None, true -> {selstart}failwith "todo"{selend}
 | true, None, false -> failwith "todo"
 | true, Some value, true -> failwith "todo"
 | true, Some value, false -> failwith "todo"

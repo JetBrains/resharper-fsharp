@@ -1,8 +1,8 @@
 ﻿module Say
 
 do
-    match Some(){caret} with
+    match Some() with
     | None -> () // todo
-    | Some value -> failwith "todo"
+    | Some value -> {selstart}failwith "todo"{selend}
 
     ()

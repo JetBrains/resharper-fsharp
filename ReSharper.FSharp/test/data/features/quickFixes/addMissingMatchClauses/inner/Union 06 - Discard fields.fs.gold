@@ -5,9 +5,9 @@ type U =
     | B of bool
     | C of bool * bool
 
-match A{caret} with
+match A with
 | B true -> ()
 | C(true, _) -> ()
-| A -> failwith "todo"
+| A -> {selstart}failwith "todo"{selend}
 | B false -> failwith "todo"
 | C(false, _) -> failwith "todo"

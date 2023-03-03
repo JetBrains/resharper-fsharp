@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open System
 open System.Collections.Generic
 open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
@@ -10,7 +11,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.MatchTree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.TextControl
 open JetBrains.Util
 
 [<AbstractClass>]
@@ -35,17 +38,30 @@ type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
         isNotNull firstClause.Bar &&
         firstClause.Indent = matchExpr.Indent
 
-    override this.ExecutePsiTransaction _ =
+    override this.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(matchExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
         use pinCheckResultsCookie = matchExpr.FSharpFile.PinTypeCheckResults(true, this.Text)
 
         let value, nodes, deconstructions = MatchTree.ofMatchExpr matchExpr
 
+        let lastClause = matchExpr.ClausesEnumerable |> Seq.tryLast
+
         this.MarkAdditionalUsedNodes(value, deconstructions, nodes)
 
         let deconstructions = this.GetGenerationDeconstructions(value, deconstructions)
         MatchTree.generateClauses matchExpr value nodes deconstructions
+
+        Action<_>(fun textControl ->
+            lastClause
+            |> Option.iter (fun (clause: IMatchClause) ->
+                let newClause = clause.GetNextMeaningfulSibling().As<IMatchClause>()
+                if isNotNull newClause then
+                    let range = newClause.Expression.GetNavigationRange()
+                    textControl.Caret.MoveTo(range.EndOffset, CaretVisualPlacement.DontScrollIfVisible)
+                    textControl.Selection.SetRange(range)
+            )
+        )
 
 
 type AddMissingPatternsFix(warning: MatchIncompleteWarning) =

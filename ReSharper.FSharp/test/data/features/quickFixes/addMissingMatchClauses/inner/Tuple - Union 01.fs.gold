@@ -5,8 +5,8 @@ type U =
     | B of named: int
 
 let t = A, A
-match t{caret} with
+match t with
 | A, A -> ()
-| A, B named -> failwith "todo"
+| A, B named -> {selstart}failwith "todo"{selend}
 | B named, A -> failwith "todo"
 | B named, B named1 -> failwith "todo"

@@ -3,7 +3,7 @@
 type U =
     | A of bool
 
-match A{caret} true, true with
+match A true, true with
 | A true, true -> ()
 | A false, true -> ()
-| A b, false -> failwith "todo"
+| A b, false -> {selstart}failwith "todo"{selend}

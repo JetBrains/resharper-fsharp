@@ -5,8 +5,8 @@ type E =
     | B = 2
     | C = 3
 
-match E.A{caret} with
+match E.A with
 | E.A & E.B -> ()
-| E.A -> failwith "todo"
+| E.A -> {selstart}failwith "todo"{selend}
 | E.B -> failwith "todo"
 | E.C -> failwith "todo"

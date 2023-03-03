@@ -2,7 +2,7 @@
 
 let (|A|B|``C D``|) x = if true then A else ``C D``
 
-match true{caret} with
+match true with
 | A -> ()
-| B -> failwith "todo"
+| B -> {selstart}failwith "todo"{selend}
 | ``C D`` -> failwith "todo"

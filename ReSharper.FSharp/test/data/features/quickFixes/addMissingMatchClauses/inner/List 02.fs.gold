@@ -1,5 +1,5 @@
 ﻿module Say
 
-match []{caret} with
+match [] with
 | [] -> ()
-| objects -> failwith "todo"
+| objects -> {selstart}failwith "todo"{selend}

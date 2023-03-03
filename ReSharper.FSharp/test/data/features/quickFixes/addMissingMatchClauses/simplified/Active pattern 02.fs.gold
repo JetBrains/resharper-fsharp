@@ -2,7 +2,7 @@
 
 let (|Id|) x = x
 
-match true, true{caret} with
+match true, true with
 | true, Id x -> ()
-| false, true -> failwith "todo"
+| false, true -> {selstart}failwith "todo"{selend}
 | false, false -> failwith "todo"

@@ -2,7 +2,7 @@
 
 let (|String|) x = string x
 
-match true, true{caret} with
+match true, true with
 | true, String s -> ()
-| false, true -> failwith "todo"
+| false, true -> {selstart}failwith "todo"{selend}
 | false, false -> failwith "todo"

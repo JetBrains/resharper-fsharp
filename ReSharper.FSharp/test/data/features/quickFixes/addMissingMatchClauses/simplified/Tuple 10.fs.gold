@@ -1,6 +1,6 @@
 ﻿module Say
 
-match true, true{caret} with
+match true, true with
 | true, true -> failwith "todo"
 | _, false -> failwith "todo"
-| false, true -> failwith "todo"
+| false, true -> {selstart}failwith "todo"{selend}

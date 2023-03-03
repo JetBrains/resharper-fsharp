@@ -4,6 +4,6 @@ type U =
     | A
     | B of int * int * named: int
 
-match A{caret} with
+match A with
 | A -> ()
-| B(i, i1, named) -> failwith "todo"
+| B(i, i1, named) -> {selstart}failwith "todo"{selend}

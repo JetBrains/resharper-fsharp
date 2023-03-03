@@ -1,9 +1,9 @@
-module Say
+﻿module Say
 
 type E =
     | A = 1
     | B = 2
 
-match E.A{caret} with
+match E.A with
 | E.A -> ()
-| E.B -> failwith "todo"
+| E.B -> {selstart}failwith "todo"{selend}

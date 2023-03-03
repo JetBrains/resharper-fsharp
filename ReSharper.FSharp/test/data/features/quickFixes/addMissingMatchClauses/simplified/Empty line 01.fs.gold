@@ -7,10 +7,10 @@ type U =
     | D
 
 do
-    match A{caret} with
+    match A with
     | A -> ()
 
     | B -> ()
 
-    | C -> failwith "todo"
+    | C -> {selstart}failwith "todo"{selend}
     | D -> failwith "todo"

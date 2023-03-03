@@ -9,8 +9,8 @@ type E =
 type U =
     | A of E
 
-match A E.A{caret} with
+match A E.A with
 | A E.A -> ()
 | A (E.B) -> ()
 | A ((E.C)) -> ()
-| A D -> failwith "todo"
+| A D -> {selstart}failwith "todo"{selend}

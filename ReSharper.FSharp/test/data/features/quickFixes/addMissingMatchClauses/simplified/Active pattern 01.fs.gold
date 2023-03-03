@@ -1,8 +1,8 @@
-module Say
+﻿module Say
 
 let (|Id|) x = x
 
-match true{caret} with
+match true with
 | Id true -> ()
-| true -> failwith "todo"
+| true -> {selstart}failwith "todo"{selend}
 | false -> failwith "todo"

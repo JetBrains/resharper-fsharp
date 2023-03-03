@@ -6,9 +6,9 @@ type U =
     | C
 
 do
-    match A{caret} with
+    match A with
     | A ->
         ()
 
-    | B -> failwith "todo"
+    | B -> {selstart}failwith "todo"{selend}
     | C -> failwith "todo"
