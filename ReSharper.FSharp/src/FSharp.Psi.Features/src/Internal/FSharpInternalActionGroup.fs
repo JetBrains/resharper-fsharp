@@ -47,8 +47,8 @@ type DumpCurrentFcsProjectAction() =
                     | _ -> ())
             
             
-[<Action("FSharp_Internal_DumpCurrentFcsFile", "Dump current FCS file")>]
-type DumpCurrentFcsFileAction() =
+[<Action("FSharp_Internal_DumpCurrentFile", "Dump current file")>]
+type DumpCurrentFileAction() =
 
     [<DefaultValue>]
     val mutable myTextControl: JetBrains.TextControl.ITextControl
@@ -75,7 +75,7 @@ type DumpCurrentFcsFileAction() =
 type FSharpInternalActionGroup(
         _dumpFcsProjectsAction: DumpFcsProjectsAction,
         _dumpCurrentFcsProjectAction: DumpCurrentFcsProjectAction,
-        _dumpCurrentFcsFileAction: DumpCurrentFcsFileAction) =
+        _dumpCurrentFileAction: DumpCurrentFileAction) =
     interface IAction
     interface IInsertLast<IntoInternalMenu>
 
