@@ -52,9 +52,6 @@ type DumpCurrentFcsProjectAction() =
 [<Action("FSharp_Internal_DumpCurrentFile", "Dump current file")>]
 type DumpCurrentFileAction() =
 
-    [<DefaultValue>]
-    val mutable myTextControl: JetBrains.TextControl.ITextControl
-
     interface IExecutableAction with
         member this.Update(context, _, _) =
             isNotNull (context.GetData(ProjectModelDataConstants.PROJECT))
