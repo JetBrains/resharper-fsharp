@@ -195,6 +195,19 @@ class FantomasRunOptionsTest : EditorTestBase() {
   )
 
   @Test
+  fun `local tool 6_0 with cursor`() {
+    withOpenedEditor("Simple.fs", "LargeFile.fs") {
+      withFantomasLocalTool("fantomas", "6.0.0-alpha-004") {
+        executeWithGold(testGoldFile) {
+          reformatCode()
+          checkFantomasVersion("6.0.0.0")
+          dumpOpenedDocument(it, project!!, true)
+        }
+      }
+    }
+  }
+
+  @Test
   fun `global tool`() {
     executeWithGold(testGoldFile) {
       withOpenedEditor("Program.fs") {
