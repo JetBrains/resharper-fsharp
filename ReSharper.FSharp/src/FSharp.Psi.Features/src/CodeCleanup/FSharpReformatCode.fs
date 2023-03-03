@@ -79,7 +79,8 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
                     sourceFile.GetPsiServices().Files.CommitAllDocuments()
                 with _ -> ()
             else
-                let textControl = textControlManager.VisibleTextControls |> Seq.tryFind (fun c -> c.Document == document)
+                let textControl = textControlManager.VisibleTextControls
+                                  |> Seq.tryFind (fun c -> c.Document == document && c.Window.IsFocused.Value)
                 let cursorPosition = textControl |> Option.map (fun c -> c.Caret.Position.Value.ToDocLineColumn())
                 let formatResult = fantomasHost.FormatDocument(filePath, text, settings, parsingOptions, newLineText, cursorPosition)
                 let newCursorPosition = formatResult.CursorPosition
