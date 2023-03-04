@@ -149,6 +149,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         ? GetTypeConstraintFlags(name, GetTypeParameterConstraints(name))
         : TypeParameterConstraintFlags.None;
 
+    public override bool IsNullableContextEnabledForTypeParameter(int index) => false;
+
     private static TypeParameterConstraintFlags GetTypeConstraintFlags(string typeParamName,
       IEnumerable<ITypeConstraint> constraints)
     {

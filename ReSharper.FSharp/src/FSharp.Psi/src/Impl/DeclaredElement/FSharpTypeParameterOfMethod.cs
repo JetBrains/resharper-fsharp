@@ -124,13 +124,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         {
           if (fcsConstraint.IsReferenceTypeConstraint || fcsConstraint.IsSupportsNullConstraint)
             result |= TypeParameterConstraintFlags.ReferenceType;
-          
+
           else if (fcsConstraint.IsNonNullableValueTypeConstraint)
             result |= TypeParameterConstraintFlags.ValueType;
-          
+
           else if (fcsConstraint.IsRequiresDefaultConstructorConstraint)
             result |= TypeParameterConstraintFlags.Constructor;
-          
+
           else if (fcsConstraint.IsUnmanagedConstraint)
             result |= TypeParameterConstraintFlags.Unmanaged;
         }
@@ -138,6 +138,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         return result;
       }
     }
+
+    public NullableAnnotation NullableAnnotation => NullableAnnotation.Unknown;
 
     public IParametersOwner OwnerFunction => Method;
     public IMethod OwnerMethod => (IMethod) Method;
