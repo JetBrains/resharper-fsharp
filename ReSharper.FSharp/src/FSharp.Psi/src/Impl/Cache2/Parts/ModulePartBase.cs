@@ -53,6 +53,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override string GetTypeParameterName(int index) => throw new InvalidOperationException();
     public override TypeParameterVariance GetTypeParameterVariance(int index) => throw new InvalidOperationException();
     public override IEnumerable<IType> GetTypeParameterSuperTypes(int index) => throw new InvalidOperationException();
+    public override bool IsNullableContextEnabledForTypeParameter(int index) => throw new InvalidOperationException();
+
 
     public override TypeParameterConstraintFlags GetTypeParameterConstraintFlags(int index) =>
       throw new InvalidOperationException();
