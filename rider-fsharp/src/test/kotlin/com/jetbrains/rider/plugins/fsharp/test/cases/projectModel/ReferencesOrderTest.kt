@@ -3,12 +3,11 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.BaseTestWithSolution
-import com.jetbrains.rider.test.enums.CoreVersion
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class ReferencesOrder : BaseTestWithSolution() {
   override fun getSolutionDirectoryName() = "ReferencesOrder"
 

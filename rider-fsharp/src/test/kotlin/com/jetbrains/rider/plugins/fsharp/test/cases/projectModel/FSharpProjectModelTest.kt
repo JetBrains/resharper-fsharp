@@ -2,8 +2,7 @@ import com.jetbrains.rider.plugins.fsharp.test.fcsHost
 import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
-import com.jetbrains.rider.test.enums.CoreVersion
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.TestProjectModelContext
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.*
@@ -50,8 +49,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @Test
   @TestEnvironment(
     solution = "FSharpProjectTree",
-    toolset = ToolsetVersion.TOOLSET_16_CORE,
-    coreVersion = CoreVersion.DOT_NET_5
+    sdkVersion = SdkVersion.DOT_NET_5
   )
   fun testFSharpProjectStructure() {
     doTestDumpProjectsView {
@@ -153,11 +151,11 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
 
   @Test
   @Issues(Issue("RIDER-69084"), Issue("RIDER-69562"))
-  @TestEnvironment(coreVersion = CoreVersion.LATEST_STABLE, toolset = ToolsetVersion.TOOLSET_17_CORE)
+  @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
   fun testFSharpDirectoryManipulation() {
     doTestDumpProjectsView {
       dump2("1. Create project", checkSlnFile = false, compareProjFile = true) {
-        addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplateIds.currentCore.fsharp_classLibrary)
+        addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplateIds.currentSdk.fsharp_classLibrary)
       }
       dump2("2. Create folder 'NewFolder'", checkSlnFile = false, compareProjFile = true) {
         addNewFolder(arrayOf("Solution", "ClassLibrary"), "NewFolder")
@@ -180,8 +178,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @Test
   @TestEnvironment(
     solution = "FsprojWithTwoFiles",
-    toolset = ToolsetVersion.TOOLSET_16_CORE,
-    coreVersion = CoreVersion.DOT_NET_5
+    sdkVersion = SdkVersion.DOT_NET_5
   )
   fun testManualFsprojChange() {
     doTestDumpProjectsView {

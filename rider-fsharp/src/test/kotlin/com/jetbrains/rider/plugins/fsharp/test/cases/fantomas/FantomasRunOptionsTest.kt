@@ -6,17 +6,15 @@ import com.intellij.util.io.delete
 import com.intellij.util.io.write
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rdclient.util.idea.waitAndPump
-import com.jetbrains.rider.plugins.fsharp.test.fcsHost
-import com.jetbrains.rider.plugins.fsharp.test.flushFileChanges
-import com.jetbrains.rider.plugins.fsharp.test.runProcessWaitForExit
-import com.jetbrains.rider.plugins.fsharp.test.withSetting
+import com.jetbrains.rider.plugins.fsharp.test.*
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.protocol.protocolManager
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBe
 import com.jetbrains.rider.test.base.EditorTestBase
-import com.jetbrains.rider.test.base.PrepareTestEnvironment
-import com.jetbrains.rider.test.enums.CoreVersion
+import com.jetbrains.rider.test.env.Environment
+import com.jetbrains.rider.test.env.dotNetSdk
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.*
@@ -29,7 +27,7 @@ import java.time.Duration
 import kotlin.io.path.*
 
 @Test
-@TestEnvironment(coreVersion = CoreVersion.DOT_NET_6, reuseSolution = false)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class FantomasRunOptionsTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "FormatCodeApp"
   override val restoreNuGetPackages = false
@@ -97,7 +95,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
 
       withDotnetToolsUpdate {
         runProcessWaitForExit(
-          Path(PrepareTestEnvironment.dotnetCoreCliPath),
+          Environment.dotNetSdk(testMethod.environment.sdkVersion).root.toPath(),
           listOf("tool", "install", "fantomas-tool", "-g", "--version", globalVersion),
           env
         )
@@ -111,7 +109,9 @@ class FantomasRunOptionsTest : EditorTestBase() {
   @BeforeTest(alwaysRun = true)
   fun prepareDotnetCliHome() {
     application.protocolManager.protocolHosts.forEach {
-      setReSharperEnvVar("DOTNET_CLI_HOME", getDotnetCliHome().absolutePathString(), it)
+      editFSharpBackendSettings(it) {
+        dotnetCliHomeEnvVar = getDotnetCliHome().absolutePathString()
+      }
     }
   }
 

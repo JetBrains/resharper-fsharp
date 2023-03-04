@@ -6,15 +6,15 @@ import com.jetbrains.rider.plugins.fsharp.test.fcsHost
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
-import com.jetbrains.rider.test.enums.CoreVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
-import com.jetbrains.rider.util.idea.lifetime
+import com.jetbrains.rd.platform.util.lifetime
 import org.testng.annotations.Test
 import java.io.File
 import java.time.Duration
 
 @Test
-@TestEnvironment(coreVersion = CoreVersion.LATEST_STABLE)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class FileSystemShimTest : BaseTestWithSolution() {
   override fun getSolutionDirectoryName() = "CoreConsoleApp"
 

@@ -5,11 +5,10 @@ import com.jetbrains.rider.plugins.fsharp.test.withCultureInfo
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldContains
 import com.jetbrains.rider.test.base.DocumentationTestBase
-import com.jetbrains.rider.test.enums.CoreVersion
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import org.testng.annotations.Test
 
-@TestEnvironment(solution = "CoreConsoleApp", coreVersion = CoreVersion.DOT_NET_6)
+@TestEnvironment(solution = "CoreConsoleApp", sdkVersion = SdkVersion.DOT_NET_6)
 class FSharpHoverDocTest : DocumentationTestBase() {
   @Test
   fun `test hover docs for EntryPoint`() = doTest("Program.fs", "Program.fs")
@@ -36,16 +35,14 @@ class FSharpHoverDocTest : DocumentationTestBase() {
   @Test
   @TestEnvironment(
     solution = "SwaggerProviderCSharp",
-    toolset = ToolsetVersion.TOOLSET_17_CORE,
-    coreVersion = CoreVersion.DOT_NET_6
+    sdkVersion = SdkVersion.DOT_NET_6
   )
   fun `provided method in csharp`() = doTest("CSharpLibrary.cs", "CSharpLibrary.cs")
 
   @Test
   @TestEnvironment(
     solution = "SwaggerProviderCSharp",
-    toolset = ToolsetVersion.TOOLSET_17_CORE,
-    coreVersion = CoreVersion.DOT_NET_6
+    sdkVersion = SdkVersion.DOT_NET_6
   )
   fun `provided abbreviation in csharp`() = doTestWithTypeProviders("OpenAPI Provider for")
 
@@ -56,6 +53,7 @@ class FSharpHoverDocTest : DocumentationTestBase() {
     }
   }
 
+  @Suppress("SameParameterValue")
   private fun doTestWithTypeProviders(summary: String) {
     doTestWithMarkupModel("CSharpLibrary.cs", "CSharpLibrary.cs") {
       waitForDaemon()

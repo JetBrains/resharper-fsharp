@@ -5,14 +5,14 @@ import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.withEditorConfig
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.EditorTestBase
-import com.jetbrains.rider.test.enums.CoreVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.reformatCode
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(coreVersion = CoreVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class FantomasTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "FormatCodeApp"
 
