@@ -10,16 +10,23 @@ type RemoveUnusedNamedPatternFixTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/removeUnusedNamedPattern"
     
-    [<Test>] member x.``Unused record named pattern first position`` () = x.DoNamedTest()
-    
-    [<Test>] member x.``Unused record named pattern middle position`` () = x.DoNamedTest()
-    
-    [<Test>] member x.``Unused record named pattern last position`` () = x.DoNamedTest()
-    
-    [<Test>] member x.``Unused record named pattern with a single field`` () = x.DoNamedTest()
-    
-    [<Test>] member x.``Unused union case named pattern last position`` () = x.DoNamedTest()
-    
-    [<Test>] member x.``Unused union case named pattern first position`` () = x.DoNamedTest()
-    
-    [<Test>] member x.``Unused union case named pattern middle position`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern 1`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern 2`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern 3`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern 4`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern 5`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern 6`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern 7`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern 8`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern 9`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused record named pattern 10`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 1`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 2`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 3`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 4`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 5`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 6`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 7`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 8`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 9`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 10`` () = x.DoNamedTest()

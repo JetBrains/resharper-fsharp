@@ -3,8 +3,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.JavaScript.Impl.Tree.JsDoc
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
@@ -29,12 +31,14 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
         if fieldPatterns.Count = 1 then
             let parent = fieldPatterns.[0].Parent
             match parent with
-            | :? IRecordPat
-            | :? INamedUnionCaseFieldsPat ->
-                let sourceFile = fieldPat.Pattern.GetSourceFile()
-                let psiModule = fieldPat.Pattern.GetPsiModule()
-                let wildPat = fieldPat.Pattern.GetFSharpLanguageService().CreateElementFactory(sourceFile, psiModule).CreateWildPat()
-                replace fieldPat.Pattern wildPat
+            | :? IRecordPat as recordPat ->
+                let factory = recordPat.CreateElementFactory()
+                let wildPat = factory.CreateWildPat()
+                replace recordPat wildPat
+            | :? INamedUnionCaseFieldsPat as fieldPat ->
+                let factory = fieldPat.CreateElementFactory()
+                let wildPat = factory.CreateWildPat()
+                replace (fieldPat.IgnoreParentChameleonExpr()) wildPat
             | _ -> ()
                 
             null
@@ -51,6 +55,7 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
                     
             let rangeEnd = nextFieldPat.PrevSibling
             deleteChildRange rangeStart rangeEnd
+            addNodeBefore fieldPat (NewLine(null))
             null
         else
             let prevFieldPat = fieldPatterns.[indexPat - 1]
