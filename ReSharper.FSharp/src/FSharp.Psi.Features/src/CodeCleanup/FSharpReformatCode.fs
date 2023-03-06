@@ -88,7 +88,7 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
                 document.ReplaceText(document.DocumentRange, formatResult.Code)
                 sourceFile.GetPsiServices().Files.CommitAllDocuments()
 
-                if isNull newCursorPosition then () else
+                if isNull textControl || isNull newCursorPosition then () else
 
                 // move cursor after current document transaction
                 let moveCursorLifetime = new LifetimeDefinition()
