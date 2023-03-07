@@ -1,0 +1,47 @@
+Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExpressionStatement
+      IChameleonExpression
+        IMatchExpr
+          FSharpTokenType+MatchTokenElement(type:MATCH, text:match)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:x)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+WithTokenElement(type:WITH, text:with)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          IMatchClause
+            FSharpTokenType+BarTokenElement(type:BAR, text:|)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+            IParametersOwnerPat
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+              NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+              Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
+              INamedUnionCaseFieldsPat
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                IFieldPat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:y)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  ILiteralPat
+                    FSharpToken(type:INT32, text:8)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+                Whitespace(type:WHITE_SPACE, text:                ) spaces:"                "
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:                    ) spaces:"                    "
+            FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:                        ) spaces:"                        "
+            IUnitExpr
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
