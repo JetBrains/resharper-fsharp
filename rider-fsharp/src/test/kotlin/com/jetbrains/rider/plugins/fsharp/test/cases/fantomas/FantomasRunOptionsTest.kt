@@ -5,8 +5,6 @@ import com.intellij.util.io.createFile
 import com.intellij.util.io.delete
 import com.intellij.util.io.write
 import com.jetbrains.rd.platform.util.lifetime
-import com.jetbrains.rdclient.testFramework.executeWithGold
-import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rdclient.util.idea.waitAndPump
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
 import com.jetbrains.rider.plugins.fsharp.test.flushFileChanges
@@ -19,8 +17,10 @@ import com.jetbrains.rider.test.asserts.shouldBe
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.base.PrepareTestEnvironment
 import com.jetbrains.rider.test.enums.CoreVersion
+import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.waitForDaemon
 import org.testng.annotations.BeforeTest
 import org.testng.annotations.Test
 import java.io.PrintStream
@@ -116,6 +116,8 @@ class FantomasRunOptionsTest : EditorTestBase() {
   }
 
   override fun beforeDoTestWithDocuments() {
+    super.beforeDoTestWithDocuments()
+
     fantomasNotifications.clear()
 
     project.fcsHost.fantomasNotificationFired.advise(testLifetimeDef.lifetime) {
@@ -196,8 +198,8 @@ class FantomasRunOptionsTest : EditorTestBase() {
 
   @Test
   fun `local tool 6_0 with cursor`() {
-    withOpenedEditor("Simple.fs", "LargeFile.fs") {
-      withFantomasLocalTool("fantomas", "6.0.0-alpha-004") {
+    withFantomasLocalTool("fantomas", "6.0.0-alpha-004") {
+      withOpenedEditor("Simple.fs", "LargeFile.fs") {
         executeWithGold(testGoldFile) {
           reformatCode()
           checkFantomasVersion("6.0.0.0")
