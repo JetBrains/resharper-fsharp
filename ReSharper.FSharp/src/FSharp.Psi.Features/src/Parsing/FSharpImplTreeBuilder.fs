@@ -308,7 +308,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
     member x.ProcessMemberBinding(mark, SynBinding(_, _, _, _, attrLists, _, valData, headPat, returnInfo, expr, _, _, _), range, accessorsStart: pos option) : CompositeNodeType =
         let elType =
             match headPat with
-            | SynPat.LongIdent(LongIdentWithDots(lid, _), accessorId, typeParamsOpt, memberParams, _, range) ->
+            | SynPat.LongIdent(SynLongIdent(id = lid), accessorId, typeParamsOpt, memberParams, _, range) ->
                 match lid with
                 | [_] ->
                     match valData with
@@ -606,7 +606,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 x.ProcessParam(pat, isLocal, markMember)
                 x.Done(range, mark, ElementType.FIELD_PAT)
 
-            x.Done(argsMark, ElementType.NAMED_UNION_CASE_FIELDS_PAT)
+            x.Done(argsRange, argsMark, ElementType.NAMED_UNION_CASE_FIELDS_PAT)
 
     member x.ProcessMemberParams(args: SynArgPats, isLocal, markMember) =
         match args with
