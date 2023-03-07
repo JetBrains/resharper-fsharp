@@ -5,10 +5,15 @@ open JetBrains.Application.Diagnostics
 open JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu
 open JetBrains.Application.UI.Actions.InternalMenu
 open JetBrains.Application.UI.ActionsRevised.Menu
+open JetBrains.DocumentModel.DataContext
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.DataContext
+open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Files
+open JetBrains.ReSharper.Psi.Tree
 
 [<Action("FSharp_Internal_DumpFcsProjects", "Dump all FCS projects")>]
 type DumpFcsProjectsAction() =
@@ -42,12 +47,34 @@ type DumpCurrentFcsProjectAction() =
                     match fcsProjectProvider.GetFcsProject(psiModule) with
                     | Some fcsProject -> writer.WriteLine(fcsProject.TestDump(writer))
                     | _ -> ())
+            
+            
+[<Action("FSharp_Internal_DumpCurrentFile", "Dump current file")>]
+type DumpCurrentFileAction() =
+
+    interface IExecutableAction with
+        member this.Update(context, _, _) =
+            isNotNull (context.GetData(DocumentModelDataConstants.EDITOR_CONTEXT))
+
+        member this.Execute(context, _) =
+            let editorContext = context.GetData(DocumentModelDataConstants.EDITOR_CONTEXT)
+            if isNull editorContext then () else
+
+            let sourceFile = context.GetData(PsiDataConstants.SOURCE_FILE)
+            let file = if isNull sourceFile then null else sourceFile.GetPrimaryPsiFile()
+            
+            if isNull file then () else
+            Dumper.DumpToNotepad(fun writer ->
+                let treeNode = file :> ITreeNode
+                writer.WriteLine("Language: {0}", file.Language :> obj)
+                DebugUtil.DumpPsi(writer, treeNode))
 
 
 [<ActionGroup(ActionGroupInsertStyles.Submenu ||| ActionGroupInsertStyles.Separated, Text = "F#")>]
 type FSharpInternalActionGroup(
         _dumpFcsProjectsAction: DumpFcsProjectsAction,
-        _dumpCurrentFcsProjectAction: DumpCurrentFcsProjectAction) =
+        _dumpCurrentFcsProjectAction: DumpCurrentFcsProjectAction,
+        _dumpCurrentFileAction: DumpCurrentFileAction) =
     interface IAction
     interface IInsertLast<IntoInternalMenu>
 
