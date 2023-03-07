@@ -1,4 +1,4 @@
-type R = | R of a: int * b: int * c: int
-match R(0, 1, 2) with
+type R = | R of a: int * b
+match R(0, 1) with
 | R(a = a
-    b = b; c = c{caret}) -> ()
+    b = b{caret}) -> ()

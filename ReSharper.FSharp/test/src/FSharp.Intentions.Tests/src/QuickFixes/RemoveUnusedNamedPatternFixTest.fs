@@ -30,3 +30,4 @@ type RemoveUnusedNamedPatternFixTest() =
     [<Test>] member x.``Unused union case named pattern 8`` () = x.DoNamedTest()
     [<Test>] member x.``Unused union case named pattern 9`` () = x.DoNamedTest()
     [<Test>] member x.``Unused union case named pattern 10`` () = x.DoNamedTest()
+    [<Test>] member x.``Unused union case named pattern 11`` () = x.DoNamedTest()
