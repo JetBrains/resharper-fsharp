@@ -35,7 +35,7 @@ IFSharpImplFile
                 ITopReferencePat
                   IExpressionReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:namedFieldPat2)
-            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
