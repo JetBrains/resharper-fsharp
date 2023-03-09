@@ -410,6 +410,11 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         if experimentalFeatures.TryRecoverFcsProjects.Value then
             tryRecoverFcsProjects ()
         else
+            for KeyValue(_, (psiModule, fcsProject, _)) in recentlyDeletedProjects do
+                fcsProjectInvalidated.Fire((psiModule, fcsProject))
+                fcsAssemblyReaderShim.InvalidateModule(psiModule)
+                checkerService.InvalidateFcsProject(fcsProject.ProjectOptions)
+
             recentlyDeletedProjects.Clear()
 
         logger.Trace("Done invalidating dirty modules")

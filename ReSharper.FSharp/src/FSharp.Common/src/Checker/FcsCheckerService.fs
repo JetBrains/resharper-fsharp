@@ -51,6 +51,10 @@ type FcsProject =
         writer.WriteLine($"Stamp: {projectOptions.Stamp}")
         writer.WriteLine($"Load time: {projectOptions.LoadTime}")
 
+        writer.WriteLine("Source files:")
+        for sourceFile in projectOptions.SourceFiles do
+            writer.WriteLine($"  {sourceFile}")
+
         writer.WriteLine("Other options:")
         for option in projectOptions.OtherOptions do
             writer.WriteLine($"  {option}")
