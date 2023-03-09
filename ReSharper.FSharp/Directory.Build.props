@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FSharpCompilerServiceVersion>2023.1.1</FSharpCompilerServiceVersion>
+    <FSharpCompilerServiceVersion>2023.1.2</FSharpCompilerServiceVersion>
     <FSharpCoreVersion>6.0.6</FSharpCoreVersion>
     <FantomasBundledVersion>5.2.1</FantomasBundledVersion>
   </PropertyGroup>
