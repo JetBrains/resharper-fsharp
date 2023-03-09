@@ -69,7 +69,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
 
         let toolset = toolset.GetDotNetCoreToolset()
         let getScriptOptionsAsync =
-            if isNull toolset then
+            if isNotNull toolset then
                 let sdkRootFolder = toolset.Cli.SdkRootFolder
                 let sdkFolderPath = sdkRootFolder / toolset.Sdk.FolderName
                 checkerService.Checker.GetProjectOptionsFromScript(path, source,
