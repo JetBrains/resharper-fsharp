@@ -91,7 +91,11 @@ type GenerateMatchExprPatternsRule() =
         not context.IsQualified &&
 
         let matchExpr = getMatchExpr context
-        isNotNull matchExpr && matchExpr.Clauses.Count = 1
+        isNotNull matchExpr &&
+
+        matchExpr.ClausesEnumerable
+        |> Seq.tryExactlyOne
+        |> Option.exists (fun clause -> isNull clause.WhenExpressionClause && isNull clause.RArrow)
 
     override this.AddLookupItems(context, collector) =
         let info = GenerateMatchExprPatternsInfo(Ranges = context.Ranges)
