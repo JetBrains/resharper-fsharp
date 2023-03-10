@@ -63,6 +63,8 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Match - Bool 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Bool 03``() = x.DoNamedTest()
     [<Test>] member x.``Match - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Not available 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Not available 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - Enum - Matched type 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Enum - Rqa 01``() = x.DoNamedTest()
