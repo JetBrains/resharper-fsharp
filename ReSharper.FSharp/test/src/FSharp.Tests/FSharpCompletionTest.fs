@@ -1,6 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System
+open System.Linq.Expressions
+open JetBrains.ReSharper.Feature.Services.CSharp.CodeCompletion.Settings
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -495,3 +497,26 @@ type FSharpRegexCompletionTest() =
 
     [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Type provider 01``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type FSharpCodeCompletionTypingTest() =
+    inherit CodeCompletionTypingTestBase<CSharpCompletingCharactersSettingsKey, CSharpAutopopupEnabledSettingsKey>()
+
+    override x.RelativeTestDataPath = "features/completion/typing"
+
+    member this.Quote(e:Expression<System.Func<_, _>>) = e
+
+    override this.GetCompleteOnSpaceSetting() = this.Quote(fun key -> key.CompleteOnSpace)
+    override this.GetDoNotCompleteOnSetting() = this.Quote(fun key -> key.NonCompletingCharacters)
+    override this.GetAutopopupTypeSetting() = this.Quote(fun key -> key.OnIdent)
+
+    [<Test>] member x.``Space - Pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Space - Pattern 02``() = x.DoNamedTest()
+    [<Test>] member x.``Space - Pattern 03``() = x.DoNamedTest()
+    [<Test>] member x.``Space - Pattern 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Space - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Space - Record 02``() = x.DoNamedTest()
+    [<Test>] member x.``Space - Record 03``() = x.DoNamedTest()
+    [<Test>] member x.``Space - Record 04``() = x.DoNamedTest()
