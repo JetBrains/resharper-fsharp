@@ -167,16 +167,3 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
         member x.IsFinal = false
         member x.SupportedCompletionMode = CompletionMode.Single
         member x.SupportedEvaluationMode = EvaluationMode.Full
-
-
-[<SolutionComponent>]
-type FSharpAutocompletionStrategy() =
-    interface IAutomaticCodeCompletionStrategy with
-        member x.Language = FSharpLanguage.Instance :> _
-        member x.AcceptsFile(file, _) = file :? IFSharpFile
-
-        member x.AcceptTyping(char, _, _) = char.IsLetterFast() || char = '.'
-        member x.ProcessSubsequentTyping(char, _) = char.IsIdentifierPart()
-
-        member x.IsEnabledInSettings(_, _) = AutopopupType.SoftAutopopup
-        member x.ForceHideCompletion = false

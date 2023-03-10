@@ -10,6 +10,8 @@
     <Compile Include="src\CodeCompletion\FSharpCompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FcsLookupItem.fs" />
+    <Compile Include="src\CodeCompletion\Strategies\FSharpAutocompletionStrategy.fs" />
+    <Compile Include="src\CodeCompletion\Strategies\FSharpOnSpaceAutopopupStrategy.fs" />
     <Compile Include="src\CodeCompletion\Rules\GenerateLambdaRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\ToRecursiveFunctionRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\FSharpRelevanceRule.fs" />

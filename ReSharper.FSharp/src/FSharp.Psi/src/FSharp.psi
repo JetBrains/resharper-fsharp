@@ -302,7 +302,7 @@ attribPat options { stubBase="FSharpPatternBase"; } extras {
 
 orPat options { stubBase="FSharpPatternBase"; }:
   fSharpPattern<PATTERN1, Pattern1>
-  BAR
+  BAR<BAR, Bar>
   fSharpPattern<PATTERN2, Pattern2>;
 
 andsPat options { stubBase="FSharpPatternBase"; }:
