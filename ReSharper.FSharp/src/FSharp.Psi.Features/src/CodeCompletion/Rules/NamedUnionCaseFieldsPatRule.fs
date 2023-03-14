@@ -71,6 +71,12 @@ type NamedUnionCaseFieldsPatRule() =
 
     // Assumption: A(a = foo; {caret})
     let getFieldsAfterSemicolon (context: FSharpCodeCompletionContext) =
+        let (|ParametersOwnerWithSingleParameter|_|) (pat: ITreeNode) =
+            match pat with
+            | :? IParametersOwnerPat as ownerPat when ownerPat.Parameters.Count = 1 ->
+                Some ownerPat.Parameters.[0]
+            | _ -> None
+        
         let potentialNamedUnionCaseFieldsPat =
             if isSemicolon context.TokenBeforeCaret then
                 context.TokenBeforeCaret.Parent
@@ -78,8 +84,27 @@ type NamedUnionCaseFieldsPatRule() =
                 // This is rather weird though
                 // I was expecting the PrevSibling to be the semicolon instead.
                 match context.TokenBeforeCaret.PrevSibling with
-                | :? IParametersOwnerPat as ownerPat when ownerPat.Parameters.Count = 1 ->
-                    ownerPat.Parameters.[0]
+                | ParametersOwnerWithSingleParameter pat -> pat
+                // Incomplete match clause without body
+                // For example: | A(a = a1;) ->
+                | :? IMatchClause as clause ->
+                    match clause.Pattern with
+                    | ParametersOwnerWithSingleParameter pat -> pat
+                    | _ -> null
+                // Incomplete match expr
+                | :? ILetBindingsDeclaration as letBindings ->
+                    match Seq.tryLast letBindings.Bindings with
+                    | Some binding ->
+                        match binding.Expression with
+                        | :? IMatchExpr as matchExpr ->
+                            match Seq.tryLast matchExpr.Clauses with
+                            | Some clause ->
+                                match clause.Pattern with
+                                | ParametersOwnerWithSingleParameter pat -> pat
+                                | _ -> null
+                            | _ -> null
+                        | _ -> null
+                    | _ -> null
                 | _ -> null
             else
                 null
@@ -118,7 +143,8 @@ type NamedUnionCaseFieldsPatRule() =
                         TextPresentation(info, fieldName, true, PsiSymbolsThemedIcons.Field.Id) :> _)
                     .WithBehavior(fun _ -> TextualBehavior(info) :> _)
                     .WithMatcher(fun _ -> TextualMatcher(info) :> _)
-                    .WithRelevance(CLRLookupItemRelevance.NamedArguments ||| CLRLookupItemRelevance.FieldsAndProperties)
+                    // Force the items to be on top in the list.
+                    .WithRelevance(CLRLookupItemRelevance.ExpectedTypeMatch)
                     .WithHighSelectionPriority()
 
             let tailNodeTypes =
@@ -128,7 +154,6 @@ type NamedUnionCaseFieldsPatRule() =
                    TailType.CaretTokenNodeType.Instance |]
 
             item.SetTailType(SimpleTailType(" = ", tailNodeTypes, SkipTypings = [|" = "; "= "|]))
-            item.Placement.Location <- PlacementLocation.Top
             
             collector.Add(item)
 
