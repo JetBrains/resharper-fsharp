@@ -60,7 +60,7 @@ type NamedUnionCaseFieldsPatRule() =
         if isNull reference then Array.empty else
 
         let exprRefName = reference.GetElement().As<IExpressionReferenceName>()
-        if isNull exprRefName then Array.empty else
+        if isNull exprRefName || exprRefName.IsQualified then Array.empty else
         let refPat = ReferencePatNavigator.GetByReferenceName(exprRefName)
         if isNull refPat then Array.empty else
 
