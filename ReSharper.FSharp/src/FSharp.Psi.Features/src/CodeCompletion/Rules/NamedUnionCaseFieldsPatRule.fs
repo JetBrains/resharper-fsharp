@@ -65,7 +65,7 @@ type NamedUnionCaseFieldsPatRule() =
         if isNull refPat then Array.empty else
 
         // I'm assuming that the parent of the fake refPat is a IParenPat for now.
-        let parentPat = refPat.Parent :?> IParenPat
+        let parentPat = ParenPatNavigator.GetByPattern(refPat)
         if isNull parentPat then Array.empty else
         getFieldsFromParametersOwnerPat parentPat Set.empty
 
