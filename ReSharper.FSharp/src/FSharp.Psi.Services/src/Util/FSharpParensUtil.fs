@@ -374,7 +374,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
         isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(getQualifiedExpr context)) ||
 
         let isQualifier = isNotNull (QualifiedExprNavigator.GetByQualifier(context))
-        isQualifier && isIndexerLikeAppExpr appExpr && isIndexerLikeAppExpr appExpr.FunctionExpression || 
+        isQualifier && isIndexerLikeAppExpr appExpr || 
 
         checkPrecedence context expr
 
