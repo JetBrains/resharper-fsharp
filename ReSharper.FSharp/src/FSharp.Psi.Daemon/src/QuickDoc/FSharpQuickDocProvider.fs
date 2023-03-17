@@ -1,6 +1,5 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.QuickDoc
 
-open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Tokenization
 open JetBrains.Application.DataContext
@@ -17,9 +16,26 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFSharpIdentifier) =
-    let [<Literal>] opName = "FSharpQuickDocProvider"
+module FSharpQuickDoc =
+    let getFSharpToolTipText (token: IFSharpIdentifier) : ToolTipText option =
+        match token.FSharpFile.GetParseAndCheckResults(true, "FSharpQuickDoc") with
+        | None -> None
+        | Some results ->
 
+        // todo: fix getting qualifiers
+        let tokenNames = [token.Name]
+
+        let sourceFile = token.GetSourceFile()
+        let coords = sourceFile.Document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
+        let lineText = sourceFile.Document.GetLineText(coords.Line)
+
+        // todo: provide tooltip for #r strings in fsx, should pass String tag
+        let line = int coords.Line + 1
+        let column = int coords.Column
+        Some(results.CheckResults.GetToolTip(line, column, lineText, tokenNames, FSharpTokenTag.Identifier))
+
+
+type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFSharpIdentifier) =
     let richTextEscapeToHtml (text: RichText) =
         (RichText.Empty, text.GetFormattedParts()) ||> Seq.fold (fun result part ->
             result.Append(part.Text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\n", "<br>"), part.Style))
@@ -39,50 +55,40 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
         else
             (asDefinition header).Append(body)
 
-    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: IFSharpIdentifier) =
-        // todo: fix getting qualifiers
-        let tokenNames = [token.Name]
-
-        let sourceFile = token.GetSourceFile()
-        let coords = sourceFile.Document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
-        let lineText = sourceFile.Document.GetLineText(coords.Line)
-
-        // todo: provide tooltip for #r strings in fsx, should pass String tag
-        checkResults.GetToolTip(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier)
-
     member x.CreateRichTextTooltip() =
-        match identifier.FSharpFile.GetParseAndCheckResults(true, opName) with
-        | None -> RichText()
-        | Some results ->
+        FSharpQuickDoc.getFSharpToolTipText identifier
+        |> Option.map (fun (ToolTipText layouts) ->
+            if layouts.IsEmpty then null else
 
-        let (ToolTipText layouts) = FSharpQuickDocPresenter.GetFSharpToolTipText(results.CheckResults, identifier)
-        layouts |> List.collect (function
-            | ToolTipElement.None -> []
-            | ToolTipElement.CompositionError errorText -> [ RichText(errorText) ]
+            layouts |> List.collect (function
+                | ToolTipElement.None -> []
+                | ToolTipElement.CompositionError errorText -> [ RichText(errorText) ]
 
-            | ToolTipElement.Group(overloads) ->
-                overloads |> List.map (fun overload ->
-                    let header =
-                        [ if not (isEmpty overload.MainDescription) then
-                            yield overload.MainDescription |> richText
+                | ToolTipElement.Group(overloads) ->
+                    overloads |> List.map (fun overload ->
+                        let header =
+                            [ if not (isEmpty overload.MainDescription) then
+                                yield overload.MainDescription |> richText
 
-                          if not overload.TypeMapping.IsEmpty then
-                            yield overload.TypeMapping |> List.map richText |> richTextJoin "\n" ]
-                        |> richTextJoin "\n\n"
+                              if not overload.TypeMapping.IsEmpty then
+                                yield overload.TypeMapping |> List.map richText |> richTextJoin "\n" ]
+                            |> richTextJoin "\n\n"
 
-                    let body =
-                        [ match xmlDocService.GetXmlDoc(overload.XmlDoc) with
-                          | null -> ()
-                          | xmlDocText -> yield xmlDocText.RichText
+                        let body =
+                            [ match xmlDocService.GetXmlDoc(overload.XmlDoc) with
+                              | null -> ()
+                              | xmlDocText -> yield xmlDocText.RichText
 
-                          match overload.Remarks with
-                          | Some remarks when not (isEmpty remarks) ->
-                            yield remarks |> richText |> asContent
-                          | _ -> () ]
-                        |> richTextJoin "\n\n"
+                              match overload.Remarks with
+                              | Some remarks when not (isEmpty remarks) ->
+                                yield remarks |> richText |> asContent
+                              | _ -> () ]
+                            |> richTextJoin "\n\n"
 
-                    createToolTip header body))
-        |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
+                        createToolTip header body))
+            |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
+        )
+        |> Option.defaultValue null
 
     interface IQuickDocPresenter with
         member this.GetHtml _ =
@@ -96,7 +102,7 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
 
 [<QuickDocProvider(-1000)>]
 type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
-    member private x.tryFindFSharpFile(context: IDataContext) =
+    let tryFindFSharpFile (context: IDataContext) =
         let editorContext = context.GetData(DocumentModelDataConstants.EDITOR_CONTEXT)
         if isNull editorContext then null else
 
@@ -105,16 +111,25 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
 
         sourceFile.GetPsiFile(editorContext.CaretOffset).AsFSharpFile()
 
+    let tryFindToken (context: IDataContext) : IFSharpIdentifier option =
+        let sourceFile = context.GetData(PsiDataConstants.SOURCE_FILE)
+        if isNull sourceFile then None else
+
+        context.GetData(PsiDataConstants.SELECTED_TREE_NODES)
+        |> Seq.choose (function
+            | :? IFSharpIdentifier as node when node.GetSourceFile() = sourceFile -> Some node
+            | _ -> None
+        )
+        |> Seq.tryExactlyOne
+
     interface IQuickDocProvider with
         member this.CanNavigate(context) =
-            this.tryFindFSharpFile(context) != null
+            tryFindToken context
+            |> Option.bind FSharpQuickDoc.getFSharpToolTipText
+            |> Option.map (fun (ToolTipText layouts) -> not layouts.IsEmpty)
+            |> Option.defaultValue false
 
         member this.Resolve(context, resolved) =
-            let sourceFile = context.GetData(PsiDataConstants.SOURCE_FILE)
-            if isNull sourceFile then () else
-
-            context.GetData(PsiDataConstants.SELECTED_TREE_NODES)
-            |> Seq.filter (fun node -> node :? IFSharpIdentifier && node.GetSourceFile() = sourceFile)
-            |> Seq.tryExactlyOne
+            tryFindToken context
             |> Option.iter (fun token ->
                 resolved.Invoke(FSharpQuickDocPresenter(xmlDocService, token :?> _), FSharpLanguage.Instance))
