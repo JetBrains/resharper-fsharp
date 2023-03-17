@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.Application.Processes;
 using JetBrains.Application.Threading;
-using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.MsBuildHost;
 using JetBrains.ProjectModel;
@@ -37,22 +36,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       myLocks = locks;
     }
 
+    [CanBeNull]
     public TypeProvidersExternalProcess Create(Lifetime lifetime,
       [CanBeNull] string requestingProjectOutputPath, bool isInternalMode)
     {
       var toolset = myToolset.GetDotNetCoreToolset();
-
-      return new TypeProvidersExternalProcess(lifetime,
-        myLogger,
-        myShellLocks,
-        mySolutionProcessStartInfoPatcher,
-        GetProcessRuntime(requestingProjectOutputPath),
-        toolset,
-        isInternalMode);
-    }
-
-    private JetProcessRuntimeRequest GetProcessRuntime([CanBeNull] string requestingProjectOutputPath)
-    {
       var buildTool = myToolset.GetBuildTool();
 
       var runtimeType = buildTool!.UseDotNetCoreForLaunch
@@ -62,17 +50,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       if (requestingProjectOutputPath != null)
       {
         var path = VirtualFileSystemPath.Parse(requestingProjectOutputPath, InteractionContext.SolutionContext);
+        var isCanceled = false;
 
         FSharpAsyncUtil.UsingReadLockInsideFcs(myLocks, () =>
         {
-          // todo: don't assert not null, the project may already be unloaded when this lambda executes
-          var project = myOutputAssemblies.TryGetProjectByOutputAssemblyLocation(path).NotNull();
+          var project = myOutputAssemblies.TryGetProjectByOutputAssemblyLocation(path);
+          if (project == null)
+          {
+            isCanceled = true;
+            return;
+          }
 
           foreach (var configuration in project.ProjectProperties.GetActiveConfigurations<IProjectConfiguration>())
             if (configuration.PropertiesCollection.TryGetValue("FscToolExe", out var fscTool) &&
                 fscTool is "fsc.exe" or "fsharpc")
               runtimeType = JetProcessRuntimeType.FullFramework;
         });
+
+        if (isCanceled) return null;
       }
 
       var mutator = MsBuildConnectionFactory.GetEnvironmentVariablesMutator(buildTool);
@@ -81,7 +76,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         ? JetProcessRuntimeRequest.CreateCore(mutator, true)
         : JetProcessRuntimeRequest.CreateFramework(mutator: mutator);
 
-      return runtimeRequest;
+      return new TypeProvidersExternalProcess(lifetime,
+        myLogger,
+        myShellLocks,
+        mySolutionProcessStartInfoPatcher,
+        runtimeRequest,
+        toolset,
+        isInternalMode);
     }
   }
 }
