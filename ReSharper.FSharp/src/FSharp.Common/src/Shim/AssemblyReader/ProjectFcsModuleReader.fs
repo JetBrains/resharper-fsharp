@@ -94,9 +94,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let typeDefs = ConcurrentDictionary<IClrTypeName, FcsTypeDef>() // todo: use non-concurrent, add locks
     let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
 
-    let mutable currentTypeName: IClrTypeName = null
-    let mutable currentTypeUnresolvedUsedNames: ISet<string> = null
-
     let readData f =
         FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun _ ->
             use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
@@ -112,6 +109,23 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         match projectProperties.ActiveConfigurations.TryGetConfiguration(targetFrameworkId) with
         | :? IManagedProjectConfiguration as cfg -> cfg.OutputType = ProjectOutputType.LIBRARY
         | _ -> false
+
+    let mkDummyModuleDef () : ILModuleDef =
+        // Should only be used as a recovery when the module is already invalid (e.g. the project is unloaded, etc)
+        assert not (psiModule.IsValid())
+
+        let name = psiModule.Name
+        let typeDefs = mkILTypeDefs []
+        let flags = 0
+        let exportedTypes = mkILExportedTypes []
+
+        mkILSimpleModule
+            name name true
+            ProjectFcsModuleReader.DummyValues.subsystemVersion
+            ProjectFcsModuleReader.DummyValues.useHighEntropyVA
+            typeDefs
+            None None flags exportedTypes
+            ProjectFcsModuleReader.DummyValues.metadataVersion
 
     let mkDummyTypeDef (name: string) =
         let attributes = enum 0
@@ -212,7 +226,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         getAssemblyScopeRef assemblyName
 
-    
+
     let internTypeRef (typeRefCache: IDictionary<_, _>) scopeRef (clrTypeName: IClrTypeName) enclosing name =
         let typeRef = ILTypeRef.Create(scopeRef, enclosing, name)
         typeRefCache[clrTypeName.GetPersistent()] <- typeRef
@@ -291,10 +305,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             match declaredType.Resolve() with
             | :? EmptyResolveResult ->
                 match declaredType with
-                | :? ISimplifiedIdTypeInfo as simpleTypeInfo ->
-                    let shortName = simpleTypeInfo.GetShortName()
-                    if isNotNull shortName then
-                        currentTypeUnresolvedUsedNames.Add(shortName) |> ignore
+                | :? ISimplifiedIdTypeInfo -> () // todo: record unresolved names
                 | _ -> ()
 
                 // todo: add per-module singletons for predefines types
@@ -836,12 +847,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let usingTypeElement (typeName: IClrTypeName) defaultValue f =
         let mutable result = Unchecked.defaultof<_>
         readData (fun _ ->
+            if not (psiModule.IsValid()) then
+                result <- defaultValue else
+
             let typeElement = symbolScope.GetTypeElementByCLRName(typeName)
             if isNull typeElement then
                 result <- defaultValue else
-
-            currentTypeName <- typeName
-            currentTypeUnresolvedUsedNames <- HashSet()
 
             result <- f typeElement
         )
@@ -901,7 +912,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             match typeElement with
             | :? IEnum as enum -> mkEnumInstanceValue enum :: fields
             | _ -> fields
-        
+
         table.Fields <- fields
         fields
 
@@ -1122,10 +1133,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | NotNull typeDef -> typeDef.TypeDef
         | _ ->
 
-        currentTypeName <- clrTypeName
-        currentTypeUnresolvedUsedNames <- HashSet()
-
         readData (fun _ ->
+            if not (psiModule.IsValid()) then () else
+
             match symbolScope.GetTypeElementByCLRName(clrTypeName) with
             | null ->
                 // The type doesn't exist in the module anymore.
@@ -1156,9 +1166,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                     { TypeDef = typeDef
                       Members = Unchecked.defaultof<_> }
 
-                currentTypeName <- null
-                currentTypeUnresolvedUsedNames <- null
-
                 clrNamesByShortNames.Add(typeElement.ShortName, clrTypeName)
                 typeDefs[clrTypeName] <- fcsTypeDef
             )
@@ -1179,13 +1186,16 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
     interface IProjectFcsModuleReader with
-        // todo: concurrent access
         member this.ILModuleDef =
+            use lock = locker.UsingWriteLock()
+
             match moduleDef with
             | Some(moduleDef) -> moduleDef
             | None ->
 
             readData (fun _ ->
+                if not (psiModule.IsValid()) then () else
+
                 let project = psiModule.ContainingProjectModule :?> IProject
                 let moduleName = project.Name
                 let assemblyName = project.GetOutputAssemblyName(psiModule.TargetFrameworkId)
@@ -1243,7 +1253,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
                 moduleDef <- Some(newModuleDef)
             )
-            moduleDef.Value
+
+            match moduleDef with
+            | None -> mkDummyModuleDef ()
+            | Some value -> value
 
         member this.Dispose() =
             match realModuleReader with

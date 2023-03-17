@@ -65,6 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
         FSharpAsyncUtil.UsingReadLockInsideFcs(myLocks, () =>
         {
+          // todo: don't assert not null, the project may already be unloaded when this lambda executes
           var project = myOutputAssemblies.TryGetProjectByOutputAssemblyLocation(path).NotNull();
 
           foreach (var configuration in project.ProjectProperties.GetActiveConfigurations<IProjectConfiguration>())
