@@ -30,7 +30,7 @@ type IProxyExtensionTypingProvider =
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         experimentalFeatures: FSharpExperimentalFeaturesProvider, fcsProjectProvider: IFcsProjectProvider,
         scriptPsiModulesProvider: FSharpScriptPsiModulesProvider, outputAssemblies: OutputAssemblies,
-        typeProvidersLoadersFactory: TypeProvidersExternalProcessFactory,
+        typeProvidersProcessFactory: TypeProvidersExternalProcessFactory,
         productConfigurations: RunsProducts.ProductConfigurations) as this =
     let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let defaultShim = ExtensionTyping.Provider
@@ -49,24 +49,26 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         if isConnectionAlive() then typeProvidersHostLifetime.Terminate()
 
     let connect requestingProjectOutputPath =
-        if isConnectionAlive () then () else
+        if isConnectionAlive () then true else
 
         lock createProcessLockObj (fun () ->
-            if isConnectionAlive () then () else
+            if isConnectionAlive () then true else
 
             typeProvidersHostLifetime <- Lifetime.Define(lifetime)
             let isInternalMode = productConfigurations.IsInternalMode()
-            let newConnection =
-                typeProvidersLoadersFactory
-                    .Create(
+            let externalProcess =
+                typeProvidersProcessFactory.Create(
                         typeProvidersHostLifetime.Lifetime,
                         requestingProjectOutputPath,
                         isInternalMode)
-                    .Run()
+
+            if isNull externalProcess then false else
+            let newConnection = externalProcess.Run()
 
             typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, scriptPsiModulesProvider,
                                                          outputAssemblies, generativeTypeProvidersInMemoryAnalysisEnabled.Value) :?> _
-            connection <- newConnection)
+            connection <- newConnection
+            true)
 
     do
         lifetime.Bracket((fun () -> ExtensionTyping.Provider <- this),
@@ -85,7 +87,7 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
                     resolutionEnvironment, isInvalidationSupported, isInteractive,
                     systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath, logError, m)
             else
-                connect (Option.toObj resolutionEnvironment.OutputFile)
+                if not (connect (Option.toObj resolutionEnvironment.OutputFile)) then [] else
                 try
                     typeProvidersManager.GetOrCreate(runTimeAssemblyFileName, designTimeAssemblyNameString,
                         resolutionEnvironment, isInvalidationSupported, isInteractive, systemRuntimeContainsType,
