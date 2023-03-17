@@ -203,6 +203,8 @@ type FSharpCompletionTest() =
     [<Test>] member x.``NamedUnionCaseFieldsPat - 01`` () = x.DoNamedTest()
     [<Test>] member x.``NamedUnionCaseFieldsPat - 02`` () = x.DoNamedTest()
     [<Test>] member x.``NamedUnionCaseFieldsPat - 03`` () = x.DoNamedTest()
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 04`` () = x.DoNamedTest()
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 05`` () = x.DoNamedTest()
 
 [<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.PostfixTemplates)>]
 type FSharpPostfixCompletionTest() =
