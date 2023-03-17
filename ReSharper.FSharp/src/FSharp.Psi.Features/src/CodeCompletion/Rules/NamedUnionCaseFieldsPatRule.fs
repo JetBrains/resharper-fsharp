@@ -1,8 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
-open System.Collections.Generic
-open System.Linq
-open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
@@ -14,25 +11,18 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExpectedTypes
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.UI.RichText
-
-type NamedUnionCaseFieldItem(text,identity, ranges) =
-    inherit TextualInfo(text,identity, Ranges = ranges)
-    override this.IsRiderAsync = false
 
 [<Language(typeof<FSharpLanguage>)>]
 type NamedUnionCaseFieldsPatRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
-    
+
     // Find the parameterOwner `A` in `A()` or `A(a = a; )`
     // Filter out the already used fields
     let getFieldsFromParametersOwnerPat (parameterPat: IFSharpPattern) (filterFields: Set<string>) =
@@ -46,13 +36,13 @@ type NamedUnionCaseFieldsPatRule() =
             fcsUnionCase.Fields
             |> Seq.choose (fun field -> if field.IsNameGenerated then None else Some field.Name)
             |> Seq.toArray
-        
+
         // Only give auto completion to the fields only when all of them are named.
         if fieldNames.Length <> fcsUnionCase.Fields.Count then Array.empty else
         if Set.isEmpty filterFields then fieldNames else
         fieldNames
         |> Array.except filterFields
-    
+
     // The current scope is to have A({caret}) captured.
     // A fake identifier will be inserted in the reparseContext.
     let getFieldsFromReference (context: FSharpCodeCompletionContext) =
@@ -62,11 +52,8 @@ type NamedUnionCaseFieldsPatRule() =
         let exprRefName = reference.GetElement().As<IExpressionReferenceName>()
         if isNull exprRefName || exprRefName.IsQualified then Array.empty else
         let refPat = ReferencePatNavigator.GetByReferenceName(exprRefName)
-        if isNull refPat then Array.empty else
-
         // I'm assuming that the parent of the fake refPat is a IParenPat for now.
         let parentPat = ParenPatNavigator.GetByPattern(refPat)
-        if isNull parentPat then Array.empty else
         getFieldsFromParametersOwnerPat parentPat Set.empty
 
     // Assumption: A(a = foo; {caret})
@@ -76,7 +63,7 @@ type NamedUnionCaseFieldsPatRule() =
             | :? IParametersOwnerPat as ownerPat when ownerPat.Parameters.Count = 1 ->
                 Some ownerPat.Parameters.[0]
             | _ -> None
-        
+
         let potentialNamedUnionCaseFieldsPat =
             if isSemicolon context.TokenBeforeCaret then
                 context.TokenBeforeCaret.Parent
@@ -130,12 +117,12 @@ type NamedUnionCaseFieldsPatRule() =
     override this.IsAvailable(context) =
         let fieldNames = getFields context
         not (Array.isEmpty fieldNames)
-    
+
     override this.AddLookupItems(context, collector) =
         let fieldNames = getFields context
         assert (not (Array.isEmpty fieldNames))
         for fieldName in fieldNames do
-            let info = NamedUnionCaseFieldItem(fieldName, fieldName, context.Ranges)
+            let info = TextualInfo(fieldName, fieldName, Ranges = context.Ranges)
             let item =
                 LookupItemFactory
                     .CreateLookupItem(info)
@@ -145,7 +132,6 @@ type NamedUnionCaseFieldsPatRule() =
                     .WithMatcher(fun _ -> TextualMatcher(info) :> _)
                     // Force the items to be on top in the list.
                     .WithRelevance(CLRLookupItemRelevance.ExpectedTypeMatch)
-                    .WithHighSelectionPriority()
 
             let tailNodeTypes =
                 [| FSharpTokenType.WHITESPACE
@@ -154,7 +140,7 @@ type NamedUnionCaseFieldsPatRule() =
                    TailType.CaretTokenNodeType.Instance |]
 
             item.SetTailType(SimpleTailType(" = ", tailNodeTypes, SkipTypings = [|" = "; "= "|]))
-            
+
             collector.Add(item)
 
         true
