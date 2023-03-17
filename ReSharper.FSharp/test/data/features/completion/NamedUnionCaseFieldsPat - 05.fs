@@ -9,3 +9,5 @@ type Foo =
 let a (b: Foo) =
     match b with
     | Bar(a = apple; {caret}) ->
+
+do ()
