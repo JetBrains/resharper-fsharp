@@ -38,3 +38,9 @@ fun None -> None
 fun A.b -> b
 fun b -> A.b
 fun A.b -> A.b
+
+let (|One|Other|) x =
+    match x with
+    | 1 -> One
+    | x -> x |> fun a -> Other a
+

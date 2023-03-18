@@ -131,6 +131,7 @@ type LambdaAnalyzer() =
 
         match replacementExprSymbol with
         | ValueSome (:? FSharpEntity as entity) when (getAbbreviatedEntity entity).IsDelegate -> null
+        | ValueSome (:? FSharpActivePatternCase) -> null
         | _ ->
 
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
