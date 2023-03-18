@@ -86,7 +86,7 @@ class TypeProvidersCacheTest : BaseTestWithSolution() {
     }
   }
 
-  @Test(description = "RIDER-73091", enabled = false)
+  @Test(description = "RIDER-73091")
   fun script() {
     checkTypeProviders(File(testGoldFile.path + "_before"), "TypeProviderLibrary/Script.fsx")
 
