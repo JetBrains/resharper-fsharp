@@ -245,6 +245,7 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
             | _ -> addOpenToOpensGroup rest ns
 
     let moduleDecl, searchAnchor = findModuleToInsertTo fsFile offset settings moduleToImport
+    if isNull moduleDecl then () else // can happen when the node is not in a proper tree, i.e. during generation
 
     let qualifiedElementList = moduleToImport.GetQualifiedElementList(moduleDecl, true)
     let firstModule = qualifiedElementList |> List.tryHead |> Option.toObj

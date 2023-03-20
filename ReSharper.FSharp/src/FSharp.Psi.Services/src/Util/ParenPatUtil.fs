@@ -3,6 +3,8 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.ParenPatUtil
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -195,10 +197,14 @@ let escapesTuplePatParamDecl (context: IFSharpPattern) (innerPattern: IFSharpPat
 let addParens (pattern: IFSharpPattern) =
     use writeLockCookie = WriteLockCookie.Create(pattern.IsPhysical())
 
-    let parenPattern = pattern.CreateElementFactory().CreatePattern("(_)", false) :?> IParenPat
-    let patternCopy = pattern.Copy()
-    let parenPattern = ModificationUtil.ReplaceChild(pattern, parenPattern)
-    parenPattern.SetPattern(patternCopy)
+    let parenPat = box (ElementType.PAREN_PAT.Create()) :?> IParenPat
+    SandBox.CreateSandBoxFor(parenPat, pattern.GetPsiModule())
+
+    ModificationUtil.AddChild(parenPat, FSharpTokenType.LPAREN.CreateLeafElement()) |> ignore
+    ModificationUtil.AddChild(parenPat, pattern.Copy()) |> ignore
+    ModificationUtil.AddChild(parenPat, FSharpTokenType.RPAREN.CreateLeafElement()) |> ignore
+    let parenPattern = ModificationUtil.ReplaceChild(pattern, parenPat)
+    parenPattern.Pattern
 
 let addParensIfNeeded (pattern: IFSharpPattern) =
     if isNull pattern then pattern else
