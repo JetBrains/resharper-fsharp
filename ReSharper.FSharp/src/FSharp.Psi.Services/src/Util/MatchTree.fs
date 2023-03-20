@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -379,112 +380,150 @@ module MatchTest =
                 MatchTest.Named None, []
 
 module MatchNode =
-    let rec bind (usedNames: ISet<string>) (oldPat: IFSharpPattern) (node: MatchNode) =
-        let factory = oldPat.CreateElementFactory()
+    type BindContext =
+        { Context: ITreeNode
+          Factory: IFSharpElementFactory
+          IdentifierPattern: IReferencePat
+          CachedPatterns: IDictionary<string, IFSharpPattern>
+          SeenTypes: ISet<FSharpEntity> }
 
-        let replaceWithPattern existingPattern (newPat: IFSharpPattern) =
-            let newPat = ModificationUtil.ReplaceChild(existingPattern, newPat)
-            ParenPatUtil.addParensIfNeeded newPat
+        static member Create(context: ITreeNode) =
+            let factory = context.CreateElementFactory()
+            { Context = context
+              Factory = factory
+              IdentifierPattern = factory.CreatePattern("a", false) :?> IReferencePat
+              CachedPatterns = Dictionary()
+              SeenTypes = HashSet() }
 
-        let replaceTuplePat isStruct existingPattern nodes =
-            let tupleItemsText = nodes |> List.map (fun _ -> "_") |> String.concat ", "
-            let tuplePatText = if isStruct then $"struct ({tupleItemsText})" else tupleItemsText
-            let tuplePat = factory.CreatePattern(tuplePatText, false)
-            let tuplePat = replaceWithPattern existingPattern tuplePat :?> ITuplePat
 
-            Seq.iter2 (bind usedNames) tuplePat.Patterns nodes
+    let bind (context: BindContext) (usedNames: ISet<string>) (oldPat: IFSharpPattern) (node: MatchNode) =
+        let createIdentifierPattern name =
+            let pat = context.IdentifierPattern.Copy()
+            pat.ReferenceName.SetName(name) |> ignore
+            pat
 
-        match node.Pattern with
-        | MatchTest.Named name, _ ->
-            let names =
-                // todo: ignore `value` name in option/voption
-                let namesCollection = FSharpNamingService.createEmptyNamesCollection oldPat
-                match name with
-                | Some name ->
-                    FSharpNamingService.addNames name oldPat namesCollection
-                | _ ->
-                    match node.Value.Type.FcsType with
-                    | Some fcsType -> FSharpNamingService.addNamesForType (fcsType.MapType(oldPat)) namesCollection
-                    | _ -> namesCollection
-                |> FSharpNamingService.prepareNamesCollection usedNames oldPat
+        let createPattern text =
+            context.CachedPatterns.GetOrCreateValue(text, fun text -> context.Factory.CreatePattern(text, false)).Copy()
 
-            let name =
-                if names.Count <> 0 then
-                    let name = names[0]
-                    usedNames.Add(name.RemoveBackticks()) |> ignore
-                    name
-                else
-                    "_"
+        let markSeenType (fcsEntity: FSharpEntity) =
+            context.SeenTypes.Add(fcsEntity) |> ignore
 
-            factory.CreatePattern(name, false) |> replaceWithPattern oldPat |> ignore
+        let rec bind (context: ITreeNode) (usedNames: ISet<string>) (oldPat: IFSharpPattern) (node: MatchNode) =
+            let replaceWithPattern existingPattern (newPat: IFSharpPattern) =
+                let newPat = ModificationUtil.ReplaceChild(existingPattern, newPat)
+                ParenPatUtil.addParensIfNeeded newPat
 
-        | MatchTest.ActivePatternCase(index, group), _ ->
-            let text = FSharpNamingService.mangleNameIfNecessary group.Names[index]
-            factory.CreatePattern(text, false) |> replaceWithPattern oldPat |> ignore
+            let replaceTuplePat isStruct existingPattern nodes =
+                let tupleItemsText = nodes |> List.map (fun _ -> "_") |> String.concat ", "
+                let tuplePatText = if isStruct then $"struct ({tupleItemsText})" else tupleItemsText
+                let tuplePat = createPattern tuplePatText
+                let tuplePat = replaceWithPattern existingPattern tuplePat :?> ITuplePat
 
-        | MatchTest.Tuple isStruct, nodes ->
-            replaceTuplePat isStruct oldPat nodes
-
-        | MatchTest.Union _, [{ Value = { Type = MatchType.UnionCase(unionCase, _) } } as node] ->
-            let patText = if not unionCase.HasFields then unionCase.Name else $"{unionCase.Name} _"
-            let pat = factory.CreatePattern(patText, false) |> replaceWithPattern oldPat :?> IReferenceNameOwnerPat
-            FSharpPatternUtil.bindFcsSymbolToReference pat pat.ReferenceName unionCase "get pattern"
-
-            if not unionCase.HasFields then () else
-
-            let unionCasePat = pat :?> IParametersOwnerPat
-            let paramsPat = unionCasePat.Parameters[0]
+                Seq.iter2 (bind context usedNames) tuplePat.Patterns nodes
 
             match node.Pattern with
-            | MatchTest.UnionCase, nodes ->
-                match nodes with
-                | [] -> ()
-                | [node] -> bind usedNames paramsPat node
-                | nodes -> replaceTuplePat false paramsPat nodes
+            | MatchTest.Named name, _ ->
+                let names =
+                    // todo: ignore `value` name in option/voption
+                    let namesCollection = FSharpNamingService.createEmptyNamesCollection context
+                    match name with
+                    | Some name ->
+                        FSharpNamingService.addNames name oldPat namesCollection
+                    | _ ->
+                        match node.Value.Type.FcsType with
+                        | Some fcsType -> FSharpNamingService.addNamesForType (fcsType.MapType(oldPat)) namesCollection
+                        | _ -> namesCollection
+                    |> FSharpNamingService.prepareNamesCollection usedNames oldPat
+
+                let name =
+                    if names.Count <> 0 then
+                        let name = names[0]
+                        let name = FSharpNamingService.mangleNameIfNecessary name
+                        usedNames.Add(name.RemoveBackticks()) |> ignore
+                        name
+                    else
+                        "_"
+
+                createIdentifierPattern name |> replaceWithPattern oldPat |> ignore
+
+            | MatchTest.ActivePatternCase(index, group), _ ->
+                let text = FSharpNamingService.mangleNameIfNecessary group.Names[index]
+                createPattern text |> replaceWithPattern oldPat |> ignore
+
+            | MatchTest.Tuple isStruct, nodes ->
+                replaceTuplePat isStruct oldPat nodes
+
+            | MatchTest.Union _, [{ Value = { Type = MatchType.UnionCase(unionCase, _) } } as casNode] ->
+                match node.Value.Type with
+                | MatchType.Union unionInstance ->
+                    markSeenType unionInstance.Entity
+                | _ -> ()
+
+                let patText = if not unionCase.HasFields then unionCase.Name else $"{unionCase.Name} _"
+                let pat = createPattern patText |> replaceWithPattern oldPat :?> IReferenceNameOwnerPat
+                FSharpPatternUtil.bindFcsSymbolToReference pat pat.ReferenceName unionCase "get pattern"
+
+                if not unionCase.HasFields then () else
+
+                let unionCasePat = pat :?> IParametersOwnerPat
+                let paramsPat = unionCasePat.Parameters[0]
+
+                match casNode.Pattern with
+                | MatchTest.UnionCase, nodes ->
+                    match nodes with
+                    | [] -> ()
+                    | [node] -> bind context usedNames paramsPat node
+                    | nodes -> replaceTuplePat false paramsPat nodes
+                | _ -> ()
+
+            | MatchTest.Value value, _ when value.IsBoolean() ->
+                match value.BoolValue with
+                | true -> createPattern "true" |> replaceWithPattern oldPat |> ignore
+                | false -> createPattern "false" |> replaceWithPattern oldPat |> ignore
+
+            | MatchTest.Value constantValue, _ ->
+                match node.Value.Type with
+                | MatchType.Enum(_, fields) ->
+                    let field, _ = fields |> Array.find (snd >> ((=) constantValue))
+                    let patText = field.DisplayNameCore
+                    let pat = createPattern patText |> replaceWithPattern oldPat :?> IReferenceNameOwnerPat
+                    FSharpPatternUtil.bindFcsSymbolToReference pat pat.ReferenceName field "get pattern"
+                    match node.Value.Type with
+                    | MatchType.Enum(enumEntity, _) ->
+                        markSeenType enumEntity
+                    | _ -> ()
+
+                | valueType -> failwith $"Unexpected value type: {valueType}"
+
+            | MatchTest.List true, _ ->
+                createPattern "[]" |> replaceWithPattern oldPat |> ignore
+
+            | MatchTest.Record, nodes ->
+                let fieldNodes =
+                    nodes
+                    |> List.filter (fun node ->
+                        match node.Pattern with
+                        | MatchTest.Discard true, _ -> false
+                        | _ -> true)
+
+                let recordFieldsText =
+                    fieldNodes
+                    |> List.map (fun node ->
+                        match node.Value.Path with
+                        | MatchTest.Field(_, name) :: _ -> $"{name} = _"
+                        | _ -> failwith $"Unexpected node: {node}"
+                    )
+                    |> String.concat "; "
+
+                let recordPat = createPattern $"{{ {recordFieldsText} }}"
+                let recordPat = replaceWithPattern oldPat recordPat :?> IRecordPat
+                let fieldPats = recordPat.FieldPatterns |> Seq.map (fun p -> p.As<IFieldPat>().Pattern)
+
+                Seq.iter2 (bind context usedNames) fieldPats fieldNodes
+
             | _ -> ()
 
-        | MatchTest.Value value, _ when value.IsBoolean() ->
-            match value.BoolValue with
-            | true -> factory.CreatePattern("true", false) |> replaceWithPattern oldPat |> ignore
-            | false -> factory.CreatePattern("false", false) |> replaceWithPattern oldPat |> ignore
-
-        | MatchTest.Value constantValue, _ ->
-            match node.Value.Type with
-            | MatchType.Enum(_, fields) ->
-                let field, _ = fields |> Array.find (snd >> ((=) constantValue))
-                let patText = field.DisplayNameCore
-                let pat = factory.CreatePattern(patText, false) |> replaceWithPattern oldPat :?> IReferenceNameOwnerPat
-                FSharpPatternUtil.bindFcsSymbolToReference pat pat.ReferenceName field "get pattern"
-
-            | valueType -> failwith $"Unexpected value type: {valueType}"
-
-        | MatchTest.List true, _ ->
-            factory.CreatePattern("[]", false) |> replaceWithPattern oldPat |> ignore
-
-        | MatchTest.Record, nodes ->
-            let fieldNodes =
-                nodes
-                |> List.filter (fun node ->
-                    match node.Pattern with
-                    | MatchTest.Discard true, _ -> false
-                    | _ -> true)
-
-            let recordFieldsText =
-                fieldNodes
-                |> List.map (fun node ->
-                    match node.Value.Path with
-                    | MatchTest.Field(_, name) :: _ -> $"{name} = _"
-                    | _ -> failwith $"Unexpected node: {node}"
-                )
-                |> String.concat "; "
-
-            let recordPat = factory.CreatePattern($"{{ {recordFieldsText} }}", false)
-            let recordPat = replaceWithPattern oldPat recordPat :?> IRecordPat
-            let fieldPats = recordPat.FieldPatterns |> Seq.map (fun p -> p.As<IFieldPat>().Pattern)
-
-            Seq.iter2 (bind usedNames) fieldPats fieldNodes
-
-        | _ -> ()
+        bind context.Context usedNames oldPat node
 
     let rec duplicate (node: MatchNode) : MatchNode =
         let test, nodes = node.Pattern
@@ -1057,21 +1096,41 @@ let moveSubsequentCommentToMatchClause (matchExpr: IMatchLikeExpr) (matchClause:
 let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
     let factory = matchExpr.CreateElementFactory()
 
+    let lineEnding = matchExpr.GetLineEnding()
+    let indent = matchExpr.Indent
+
+    let unitExpr = factory.CreateExpr("()")
+    let sandBoxMatchExpr = factory.CreateMatchExpr(unitExpr).Copy()
+    ModificationUtil.DeleteChildRange(TreeRange(sandBoxMatchExpr.WithKeyword.NextSibling, sandBoxMatchExpr.LastChild))
+
+    let bindContext = MatchNode.BindContext.Create(matchExpr)
+
+    let createMatchClause =
+        let matchClause = factory.CreateMatchClause()
+        fun () ->
+            let file = matchClause.GetContainingFile().Copy()
+            SandBox.CreateSandBoxFor(file, matchExpr.GetPsiModule())
+            file
+                .As<IFSharpFile>()
+                .ModuleDeclarations[0]
+                .Members[0].As<IExpressionStatement>()
+                .Expression.As<IMatchExpr>()
+                .Clauses[0]
+
     let tryAddClause (node: MatchNode) =
         if nodes |> Seq.exists (MatchTest.matches node) then
             () else
 
-        let matchClause =
-            addNodesAfter matchExpr.LastChild [
-                NewLine(matchExpr.GetLineEnding())
-                let indent = matchExpr.Indent
-                if indent > 0 then
-                    Whitespace(indent)
-                factory.CreateMatchClause()
-            ] :?> IMatchClause
-
+        let matchClause = createMatchClause ()
         let usedNames = HashSet()
-        MatchNode.bind usedNames matchClause.Pattern node
+        MatchNode.bind bindContext usedNames matchClause.Pattern node
+
+        addNodesAfter sandBoxMatchExpr.LastChild [
+            NewLine(lineEnding)
+            if indent > 0 then
+                Whitespace(indent)
+            matchClause
+        ] |> ignore
 
     let matchPattern = MatchTest.initialPattern deconstructions matchExpr true value
     let node = MatchNode.Create(value, matchPattern)
@@ -1095,11 +1154,36 @@ let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
         | _ -> false
 
     if addEmptyLineBeforeClauses then
-        addNodeAfter matchExpr.LastChild (NewLine(matchExpr.GetLineEnding()))
+        addNodeAfter matchExpr.LastChild (NewLine(lineEnding))
 
     tryAddClause node
     while MatchNode.increment deconstructions matchExpr true node do
         tryAddClause node
+
+
+    let tempMatchClause = ModificationUtil.AddChild(matchExpr, bindContext.Factory.CreateMatchClause())
+
+    for fcsEntity in bindContext.SeenTypes do
+        let case: FSharpSymbol option = 
+            if fcsEntity.IsFSharpUnion then
+                fcsEntity.UnionCases
+                |> Seq.tryHead
+                |> Option.map (fun case -> case :> FSharpSymbol)
+            elif fcsEntity.IsEnum then
+                fcsEntity.FSharpFields
+                |> Seq.tryFind (fun fcsField -> fcsField.LiteralValue.IsSome)
+                |> Option.map (fun case -> case :> FSharpSymbol)
+            else
+                None
+
+        case
+        |> Option.iter (fun fcsSymbol ->
+            FSharpPatternUtil.bindFcsSymbol tempMatchClause.Pattern fcsSymbol "get pattern" |> ignore
+        )
+
+    let newClauses = TreeRange(sandBoxMatchExpr.WithKeyword.NextSibling, sandBoxMatchExpr.LastChild) |> Seq.toArray
+    LowLevelModificationUtil.ReplaceChildRange(tempMatchClause, tempMatchClause, newClauses)
+
 
     lastClause |> Option.iter (moveSubsequentCommentToMatchClause matchExpr)
 
