@@ -110,7 +110,7 @@
     <QuickFix>AddUnderscorePrefixFix</QuickFix>
   </Warning>
 
-  <Warning compilerGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0001: 'unit' type expected">
+  <Warning compilerGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0020: 'unit' type expected">
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">

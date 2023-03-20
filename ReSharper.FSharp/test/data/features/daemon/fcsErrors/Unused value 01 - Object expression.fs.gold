@@ -5,4 +5,4 @@ open System
 |{ new IDisposable with member x.Dispose() = () }|(0)
 
 ---------------------------------------------------------
-(0): ReSharper Warning [FS0001]: The result of this expression has type 'IDisposable' and is implicitly ignored. Consider using 'ignore' to discard this value explicitly, e.g. 'expr |> ignore', or 'let' to bind the result to a name, e.g. 'let result = expr'.
+(0): ReSharper Warning [FS0020]: The result of this expression has type 'IDisposable' and is implicitly ignored. Consider using 'ignore' to discard this value explicitly, e.g. 'expr |> ignore', or 'let' to bind the result to a name, e.g. 'let result = expr'.
