@@ -175,7 +175,9 @@ type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, it
             |> List.choose (getOption id)
             |> otherOptions.AddRange
 
-            [ FSharpProperties.NoWarn, None; MSBuildProjectUtil.WarningsAsErrorsProperty, Some("warnaserror") ]
+            [ FSharpProperties.NoWarn, None
+              MSBuildProjectUtil.WarningsAsErrorsProperty, Some("warnaserror")
+              MSBuildProjectUtil.WarningsNotAsErrorsProperty, Some("warnaserror-") ]
             |> List.choose (getOption (fun v -> (FcsProjectBuilder.splitAndTrim FcsProjectBuilder.itemsDelimiters v).Join(",")))
             |> otherOptions.AddRange
 
