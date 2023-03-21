@@ -35,7 +35,6 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
   public int myParenLevel;
   public int myTokenLength;
   public int myBrackLevel;
-  public boolean myIsAfterUnfinishedIdent;
 
   public Stack<FSharpLexerInterpolatedStringState> myInterpolatedStringStates = new Stack<>();
 
@@ -117,11 +116,6 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     return false;
   }
 
-  private void UnfinishedIdent()
-  {
-    myIsAfterUnfinishedIdent = true;
-  }
-
   public static int ToState(FSharpLexerInterpolatedStringState interpolatedStringState)
   {
     switch (interpolatedStringState.getKind())
@@ -136,8 +130,7 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
   public boolean isRestartableState() {
     return myInterpolatedStringStates.isEmpty() &&
            myNestedCommentLevel == 0 &&
-           myBrackLevel == 0 &&
-           !myIsAfterUnfinishedIdent;
+           myBrackLevel == 0;
   }
 
   private void InitBlockComment() {

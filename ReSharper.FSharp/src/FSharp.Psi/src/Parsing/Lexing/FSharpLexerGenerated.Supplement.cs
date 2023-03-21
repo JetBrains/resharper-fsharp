@@ -171,10 +171,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       return false;
     }
 
-    private void UnfinishedIdent()
-    {
-    }
-
     public static int ToState(FSharpLexerInterpolatedStringState interpolatedStringState) =>
       interpolatedStringState.Kind switch
       {
