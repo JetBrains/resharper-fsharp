@@ -295,16 +295,31 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
   @Test
   fun testUnfinishedIdent() {
     doTest(
-      "``value\n",
+      "``value \n\"\"",
       """
-            |RESERVED_SYMBOLIC_SEQUENCE ('`')
-            |RESERVED_SYMBOLIC_SEQUENCE ('`')
-            |IDENT ('value')
+            |RESERVED_SYMBOLIC_SEQUENCE ('``value ')
             |NEW_LINE ('\n')
+            |STRING ('""')
             """.trimMargin()
     )
   }
 
+  @Test
+  fun testUnfinishedIdent2() {
+    doTest(
+      "```` \n ``` \n \"\"",
+      """
+            |RESERVED_SYMBOLIC_SEQUENCE ('````')
+            |WHITESPACE (' ')
+            |NEW_LINE ('\n')
+            |WHITESPACE (' ')
+            |RESERVED_SYMBOLIC_SEQUENCE ('``` ')
+            |NEW_LINE ('\n')
+            |WHITESPACE (' ')
+            |STRING ('""')
+            """.trimMargin()
+    )
+  }
 
   @Test
   fun testEndOfLineComment() {

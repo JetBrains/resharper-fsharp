@@ -30,7 +30,6 @@ class FSharpLexer : FlexAdapter(_FSharpLexer()), RestartableLexer {
       flex.myParenLevel = 0
       flex.myTokenLength = 0
       flex.myBrackLevel = 0
-      flex.myIsAfterUnfinishedIdent = false
     }
     super.start(buffer, startOffset, endOffset, initialState)
   }
