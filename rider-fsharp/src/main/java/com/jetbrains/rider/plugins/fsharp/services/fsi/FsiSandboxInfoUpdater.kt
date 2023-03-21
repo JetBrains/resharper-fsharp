@@ -3,16 +3,18 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessOutputTypes
-import com.intellij.openapi.editor.event.EditorFactoryEvent
-import com.intellij.openapi.editor.event.EditorFactoryListener
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.jetbrains.rd.ide.model.RdTextRange
 import com.jetbrains.rd.lang.toRdLanguageOrThrow
 import com.jetbrains.rd.platform.util.application
+import com.jetbrains.rd.platform.util.subscribe
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rd.util.lifetime.LifetimeDefinition
+import com.jetbrains.rdclient.editors.FrontendTextControlHost
+import com.jetbrains.rdclient.editors.FrontendTextControlHostListener
 import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
 import com.jetbrains.rdclient.util.idea.fromOffset
 import com.jetbrains.rider.editors.RiderTextControlHost
@@ -76,7 +78,7 @@ class FsiSandboxInfoUpdater(
           val sandboxInfo = createFSharpSandbox(sandboxText, false, emptyList())
 
           sandboxManager.markAsSandbox(consoleEditor, sandboxInfo)
-          RiderTextControlHost.getInstance(project).rebindEditor(consoleEditor)
+          (FrontendTextControlHost.getInstance(project) as RiderTextControlHost).rebindEditor(consoleEditor)
         }
       }
     }
@@ -118,17 +120,14 @@ class FsiSandboxInfoUpdater(
 fun withGenericSandBoxing(sandboxInfo: SandboxInfo, project: Project, block: () -> Unit) {
   application.assertIsDispatchThread()
 
-  val textControlHost = RiderTextControlHost.getInstance(project)
+  val textControlHost = (FrontendTextControlHost.getInstance(project) as RiderTextControlHost)
 
   var localInfo: SandboxInfo? = sandboxInfo
   Lifetime.using { lt ->
-    textControlHost.addPrioritizedEditorFactoryListener(lt, object : EditorFactoryListener {
-      override fun editorReleased(event: EditorFactoryEvent) {
-      }
-
-      override fun editorCreated(event: EditorFactoryEvent) {
+    project.messageBus.subscribe(lt, FrontendTextControlHostListener.TOPIC, object : FrontendTextControlHostListener {
+      override fun beforeEditorBound(editor: Editor) {
         if (localInfo != null)
-          SandboxManager.getInstance().markAsSandbox(event.editor, sandboxInfo)
+          SandboxManager.getInstance().markAsSandbox(editor, sandboxInfo)
       }
     })
 
