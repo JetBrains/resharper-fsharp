@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Include="ZoneMarker.fs" />
+    <Compile Include="ReadLockCookieUtil.fs" />
     <Compile Include="Service\DelegatingFileSystemShimTest.fs" />
     <Compile Include="Service\NameResolutionTest.fs" />
     <Compile Include="Service\StructureTest.fs" />

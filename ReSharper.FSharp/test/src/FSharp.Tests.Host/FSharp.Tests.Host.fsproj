@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="ReadLockCookieUtil.fs" />
     <Compile Include="FSharpTestHost.fs" />
   </ItemGroup>
 

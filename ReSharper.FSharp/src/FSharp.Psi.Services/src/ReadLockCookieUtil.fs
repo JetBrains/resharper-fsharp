@@ -1,0 +1,3 @@
+namespace JetBrains.ReSharper.Resources.Shell
+
+type ReadLockCookie = NonCSharpInteropReadLockCookie
