@@ -3,7 +3,6 @@ package com.jetbrains.rider.settings
 import com.intellij.lang.Language
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
 
 class FSharpCodeStyleSettingsProvider : FSharpCodeStyleSettingsProviderBase(FSharpLanguage)
 

@@ -343,7 +343,7 @@ type FSharpKeywordsProvider() =
         add false FSharpKeywordsProvider.alwaysSuggestedKeywords
         add true (FSharpKeywordsProvider.suggestKeywords context |> Seq.map (fun k -> k, ""))
 
-        if context.BasicContext.File.Language.Is<FSharpScriptLanguage>() then
+        if context.BasicContext.File.GetSourceFile().LanguageType.Is<FSharpScriptProjectFileType>() then
             for keyword in scriptKeywords do
                 let item = FSharpKeywordLookupItem(keyword, "", false)
                 item.InitializeRanges(context.Ranges, context.BasicContext)

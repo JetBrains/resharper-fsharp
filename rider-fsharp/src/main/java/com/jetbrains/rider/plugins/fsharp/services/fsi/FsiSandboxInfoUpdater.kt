@@ -19,7 +19,7 @@ import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
 import com.jetbrains.rdclient.util.idea.fromOffset
 import com.jetbrains.rider.editors.RiderTextControlHost
 import com.jetbrains.rider.editors.sandboxes.SandboxManager
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.model.ExtraInfo
 import com.jetbrains.rider.model.SandboxInfo
 import com.jetbrains.rider.plugins.fsharp.RdFsiPrepareCommandsArgs
@@ -151,7 +151,7 @@ fun createFSharpSandbox(
     emptyList(),
     true,
     emptyList(),
-    FSharpScriptLanguage.toRdLanguageOrThrow(),
+    FSharpLanguage.toRdLanguageOrThrow(),
     addSemicolon = false,
     disableTypingActions = true,
     disableTypingAssists = disableTypingAssists,

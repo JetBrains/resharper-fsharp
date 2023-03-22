@@ -38,7 +38,7 @@ import com.intellij.xdebugger.attach.XAttachDebuggerProvider
 import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.debugger.DotNetDebugProcess
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.plugins.fsharp.RdFsiRuntime
 import com.jetbrains.rider.plugins.fsharp.RdFsiSessionInfo
@@ -262,7 +262,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
 
     withGenericSandBoxing(createFSharpSandbox("do ()\n\n", false, emptyList()), project) {
       val consoleView = LanguageConsoleBuilder().gutterContentProvider(inputSeparatorGutterContentProvider)
-        .build(project, FSharpScriptLanguage)
+        .build(project, FSharpLanguage)
 
       val consoleEditorBorder = BorderFactory.createMatteBorder(
         2, 0, 0, 0, consoleView.consoleEditor.colorsScheme.getColor(EditorColors.INDENT_GUIDE_COLOR)

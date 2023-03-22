@@ -49,4 +49,4 @@ type FSharpSignatureProjectFileLanguageService(projectFileType, fsCheckerService
 type FSharpScriptProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService) =
     inherit FSharpProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService)
 
-    override x.PsiLanguageType = FSharpScriptLanguage.Instance :> _
+    override x.PsiLanguageType = FSharpLanguage.Instance :> _

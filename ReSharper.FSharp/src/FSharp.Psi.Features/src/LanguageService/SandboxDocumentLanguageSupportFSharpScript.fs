@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 
-[<Language(typeof<FSharpScriptLanguage>)>]
+[<Language(typeof<FSharpLanguage>)>]
 type SandboxDocumentLanguageSupportFSharpScript() =
     interface ISandboxDocumentLanguageSupport with
         member x.DocumentFileExtension = FSharpScriptProjectFileType.FsxExtension

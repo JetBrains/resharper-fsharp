@@ -10,7 +10,6 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -68,7 +67,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
 
             let skipFsiModules =
                 // Workaround for FSI_0123 modules generated in sandboxes
-                fsFile.Language.Is<FSharpScriptLanguage>() &&
+                fsFile.GetSourceFile().LanguageType.Is<FSharpScriptProjectFileType>() &&
                 fsFile.GetPsiModule() :? SandboxPsiModule
 
             let isFsiModuleToSkip (item: RiderDeclarationListItems) =
