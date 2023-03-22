@@ -6,14 +6,19 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
 // todo: add F# specific settings
 
 [<SolutionComponent>]
-type FSharpOnSpaceAutoPopupStrategy() =
+type FSharpOnSpaceAutopopupStrategy() =
+
+    abstract member Language: PsiLanguageType
+    default this.Language = FSharpLanguage.Instance
+
     interface IAutomaticCodeCompletionStrategy with
-        member this.Language = FSharpLanguage.Instance
+        member this.Language = this.Language
         member this.ForceHideCompletion = true
         member this.ProcessSubsequentTyping(_, _) = false
         member this.IsEnabledInSettings(_, _) = AutopopupType.SoftAutopopup
@@ -50,3 +55,9 @@ type FSharpOnSpaceAutoPopupStrategy() =
 
                 | _ -> false
             )
+
+[<SolutionComponent>]
+type FSharpScriptOnSpaceAutopopupStrategy() =
+    inherit FSharpOnSpaceAutopopupStrategy()
+
+    override this.Language = FSharpScriptLanguage.Instance
