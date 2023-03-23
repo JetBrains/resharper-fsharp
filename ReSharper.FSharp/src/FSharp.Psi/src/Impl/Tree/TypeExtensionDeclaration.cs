@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [CanBeNull] private TypeAugmentation myTypeAugmentation;
     public FSharpSymbolReference Reference { get; protected set; }
 
-    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
+    public override IFSharpIdentifier NameIdentifier => Identifier;
     protected override string DeclaredElementName => TypeAugmentation.CompiledName;
 
     protected override void ClearCachedData()

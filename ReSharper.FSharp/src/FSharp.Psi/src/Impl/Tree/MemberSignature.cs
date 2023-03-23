@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class MemberSignature
   {
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
 
     protected override IDeclaredElement CreateDeclaredElement()

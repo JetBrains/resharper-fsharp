@@ -9,6 +9,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public string Name => NameIdentifier.GetSourceName();
     public ITokenNode IdentifierToken => Identifier;
     public TreeTextRange NameRange => this.GetTreeTextRange();
-    public IFSharpIdentifierLikeNode NameIdentifier => Identifier as IFSharpIdentifierLikeNode;
+    public IFSharpIdentifier NameIdentifier => Identifier as IFSharpIdentifier;
   }
 }

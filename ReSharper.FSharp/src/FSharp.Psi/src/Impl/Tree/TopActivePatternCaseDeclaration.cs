@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override string CompiledName => NameIdentifier.GetSourceName();
-    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
+    public override IFSharpIdentifier NameIdentifier => Identifier;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public override IDeclaredElement DeclaredElement

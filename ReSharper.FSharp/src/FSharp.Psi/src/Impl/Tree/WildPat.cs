@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class WildPat
   {
     public override string SourceName => "_";
-    public override IFSharpIdentifierLikeNode NameIdentifier => null;
+    public override IFSharpIdentifier NameIdentifier => null;
 
     public bool IsDeclaration => true;
     public override IEnumerable<IFSharpPattern> NestedPatterns => new[] {this};

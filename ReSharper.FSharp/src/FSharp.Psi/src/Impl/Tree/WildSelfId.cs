@@ -4,6 +4,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class WildSelfId
   {
-    public override IFSharpIdentifierLikeNode NameIdentifier => null;
+    public override IFSharpIdentifier NameIdentifier => null;
   }
 }

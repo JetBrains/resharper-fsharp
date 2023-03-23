@@ -5,7 +5,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class InterfaceImplementation
   {
-    public IFSharpIdentifierLikeNode NameIdentifier => TypeName?.Identifier;
+    public IFSharpIdentifier NameIdentifier => TypeName?.Identifier;
     public FSharpEntity FcsEntity => TypeName?.Reference.GetFcsSymbol() as FSharpEntity;
   }
 }

@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
 
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     protected override FSharpSymbolUse GetSymbolDeclaration(TreeTextRange identifierRange) =>
       ObjExprNavigator.GetByMember(this) != null

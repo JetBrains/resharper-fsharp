@@ -167,11 +167,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string GetSourceName([CanBeNull] this IIdentifier identifier) =>
       identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
-    public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifierLikeNode identifier) =>
+    public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier) =>
       // todo: fix navigating inside escaped names
       identifier?.NameRange ?? TreeTextRange.InvalidRange;
 
-    public static TreeTextRange GetNameIdentifierRange([CanBeNull] this IFSharpIdentifierLikeNode identifier) =>
+    public static TreeTextRange GetNameIdentifierRange([CanBeNull] this IFSharpIdentifier identifier) =>
       identifier?.GetNameRange() ?? TreeTextRange.InvalidRange;
 
     [NotNull]
@@ -562,7 +562,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool HasAttribute(this TreeNodeCollection<IAttribute> attributes, [NotNull] string shortName) =>
       GetAttribute(attributes, shortName) != null;
 
-    public static void ReplaceIdentifier([CanBeNull] this IFSharpIdentifierLikeNode fsIdentifier, string name)
+    public static void ReplaceIdentifier([CanBeNull] this IFSharpIdentifier fsIdentifier, string name)
     {
       var token = fsIdentifier?.IdentifierToken;
       if (token == null)

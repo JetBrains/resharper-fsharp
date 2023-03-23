@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public string QualifiedName => FSharpImplUtil.GetQualifiedName(QualifierReferenceName, Identifier);
     public override string CompiledName => Identifier.GetCompiledName();
 
-    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
+    public override IFSharpIdentifier NameIdentifier => Identifier;
 
     public DocumentRange GetDeclaredNameDocumentRange()
     {

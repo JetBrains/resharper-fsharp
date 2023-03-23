@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   internal partial class LocalReferencePat
   {
-    public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
+    public override IFSharpIdentifier NameIdentifier => ReferenceName?.Identifier;
 
     public bool IsDeclaration => this.IsDeclaration();
 

@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override string DeclaredElementName => CalcImplicitName();
     public override string SourceName => CompiledName;
 
-    public override IFSharpIdentifierLikeNode NameIdentifier => null;
+    public override IFSharpIdentifier NameIdentifier => null;
 
     public override TreeTextRange GetNameRange() => new(TreeOffset.Zero);
   }

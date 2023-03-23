@@ -67,7 +67,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   internal partial class LocalDeclaration
   {
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
   }
 
   internal abstract class LocalPatternDeclarationBase : LocalDeclarationBase, IFSharpPatternDeclaredElement

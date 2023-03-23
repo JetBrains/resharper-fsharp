@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     private ITypeReferenceName NamedTypeReferenceName =>
       TypeUsage is INamedTypeUsage namedTypeUsage ? namedTypeUsage.ReferenceName : null;
 
-    public override IFSharpIdentifierLikeNode NameIdentifier =>
+    public override IFSharpIdentifier NameIdentifier =>
       NamedTypeReferenceName is { } referenceName && TypeReferenceCanBeUnionCaseDeclaration(referenceName)
         ? referenceName.Identifier
         : null;

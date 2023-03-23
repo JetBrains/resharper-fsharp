@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public IFSharpIdentifierLikeNode NameIdentifier => null;
+    public IFSharpIdentifier NameIdentifier => null;
     public TreeTextRange GetNameRange() => TreeTextRange.InvalidRange;
     public TreeTextRange GetNameIdentifierRange() => TreeTextRange.InvalidRange;
     public XmlDocBlock XmlDocBlock => null;

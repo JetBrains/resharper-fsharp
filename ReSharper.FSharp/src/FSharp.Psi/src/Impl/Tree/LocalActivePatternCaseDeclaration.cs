@@ -4,7 +4,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class LocalActivePatternCaseDeclaration
   {
-    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
+    public override IFSharpIdentifier NameIdentifier => Identifier;
     public int Index => this.GetIndex();
   }
 }

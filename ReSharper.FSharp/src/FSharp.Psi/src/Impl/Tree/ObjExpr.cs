@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ObjExpr
   {
-    public override IFSharpIdentifierLikeNode NameIdentifier => TypeName.Identifier;
+    public override IFSharpIdentifier NameIdentifier => TypeName.Identifier;
 
     protected override string DeclaredElementName =>
       GetSourceFile() is { } sourceFile && sourceFile.GetLocation() is var path && !path.IsEmpty
