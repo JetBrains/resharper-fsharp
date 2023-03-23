@@ -119,10 +119,8 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
         |> Seq.choose (function
             | :? IFSharpIdentifier as node when node.GetSourceFile() = sourceFile ->
                 let activePatternCaseName = ActivePatternCaseNameNavigator.GetByIdentifier(node)
-                if isNotNull activePatternCaseName then
-                    let activePatternId = ActivePatternIdNavigator.GetByCase(activePatternCaseName)
-                    if isNotNull activePatternId then Some (activePatternId :> IFSharpIdentifier) else Some node
-                else Some node
+                let activePatternId = ActivePatternIdNavigator.GetByCase(activePatternCaseName)
+                if isNotNull activePatternId then Some (activePatternId :> IFSharpIdentifier) else Some node
             | _ -> None
         )
         |> Seq.tryExactlyOne
