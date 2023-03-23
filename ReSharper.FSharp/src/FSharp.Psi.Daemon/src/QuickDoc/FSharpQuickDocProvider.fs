@@ -24,15 +24,9 @@ module FSharpQuickDoc =
 
         // todo: fix getting qualifiers
         let tokenNames = [token.Name]
-        let treeEndOffset =
-            match token.Parent with
-            | :? IActivePatternNamedCaseDeclaration ->
-                let barTreeNode = token.Parent.Parent.Children() |> Seq.findBack(isBar)
-                barTreeNode.GetTreeEndOffset()
-            | _ -> token.GetTreeEndOffset()
 
         let sourceFile = token.GetSourceFile()
-        let coords = sourceFile.Document.GetCoordsByOffset(treeEndOffset.Offset)
+        let coords = sourceFile.Document.GetCoordsByOffset(token.NameRange.EndOffset.Offset)
         let lineText = sourceFile.Document.GetLineText(coords.Line)
 
         // todo: provide tooltip for #r strings in fsx, should pass String tag
@@ -123,7 +117,12 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
 
         context.GetData(PsiDataConstants.SELECTED_TREE_NODES)
         |> Seq.choose (function
-            | :? IFSharpIdentifier as node when node.GetSourceFile() = sourceFile -> Some node
+            | :? IFSharpIdentifier as node when node.GetSourceFile() = sourceFile ->
+                let activePatternCaseName = ActivePatternCaseNameNavigator.GetByIdentifier(node)
+                if isNotNull activePatternCaseName then
+                    let activePatternId = ActivePatternIdNavigator.GetByCase(activePatternCaseName)
+                    if isNotNull activePatternId then Some (activePatternId :> IFSharpIdentifier) else Some node
+                else Some node
             | _ -> None
         )
         |> Seq.tryExactlyOne
