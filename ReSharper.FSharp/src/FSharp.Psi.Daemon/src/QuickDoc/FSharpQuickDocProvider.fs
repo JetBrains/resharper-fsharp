@@ -26,7 +26,7 @@ module FSharpQuickDoc =
         let tokenNames = [token.Name]
         let treeEndOffset =
             match token.Parent with
-            | :? ITopActivePatternCaseDeclaration as iTop when isNotNull iTop  ->
+            | :? IActivePatternNamedCaseDeclaration ->
                 let barTreeNode = token.Parent.Parent.Children() |> Seq.findBack(isBar)
                 barTreeNode.GetTreeEndOffset()
             | _ -> token.GetTreeEndOffset()
