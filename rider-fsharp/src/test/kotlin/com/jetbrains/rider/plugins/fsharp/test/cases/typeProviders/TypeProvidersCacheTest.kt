@@ -4,8 +4,8 @@ import com.jetbrains.rider.plugins.fsharp.test.dumpTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.base.BaseTestWithSolution
-import com.jetbrains.rider.test.enums.CoreVersion
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.env.enums.BuildTool
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.reloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
@@ -16,7 +16,7 @@ import org.testng.annotations.Test
 import java.io.File
 
 @Test
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
 class TypeProvidersCacheTest : BaseTestWithSolution() {
   override fun getSolutionDirectoryName() = "TypeProviderLibrary"
   override val restoreNuGetPackages = true

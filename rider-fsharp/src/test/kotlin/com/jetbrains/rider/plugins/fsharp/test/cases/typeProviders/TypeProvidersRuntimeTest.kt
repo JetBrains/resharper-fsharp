@@ -8,8 +8,8 @@ import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
-import com.jetbrains.rider.test.enums.CoreVersion
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.env.enums.BuildTool
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.markupAdapter
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
@@ -21,36 +21,31 @@ class TypeProvidersRuntimeTest : BaseTestWithSolution() {
 
   @Test
   @TestEnvironment(
-    toolset = ToolsetVersion.TOOLSET_16,
-    coreVersion = CoreVersion.DOT_NET_CORE_3_1,
+    sdkVersion = SdkVersion.DOT_NET_CORE_3_1,
+    buildTool = BuildTool.FULL, 
     solution = "TypeProviderLibrary"
   )
   fun framework461() = doTest(".NET Framework 4.8")
 
-  @Test(enabled = false)
-  @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_2_1)
-  fun core21() = doTest(".NET Core 3.1")
-
   @Test
-  @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_3_1)
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
   fun core31() = doTest(".NET Core 3.1")
 
   @Test
-  @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_5)
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
   fun net5() = doTest(".NET 5")
 
   @Test
-  @TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_6)
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
   fun net6() = doTest(".NET 6")
 
   @Test
-  @TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_7)
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7)
   fun net7() = doTest(".NET 7")
 
   @Test(enabled = false)
   @TestEnvironment(
-    toolset = ToolsetVersion.TOOLSET_16_CORE,
-    coreVersion = CoreVersion.DOT_NET_CORE_3_1,
+    sdkVersion = SdkVersion.DOT_NET_CORE_3_1,
     solution = "FscTypeProviderLibrary"
   )
   fun fsc() = doTest(".NET Framework 4.8")

@@ -4,8 +4,7 @@ import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.base.BaseTestWithSolution
-import com.jetbrains.rider.test.enums.CoreVersion
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
 import com.jetbrains.rider.test.waitForDaemon
@@ -14,7 +13,6 @@ import org.testng.annotations.Test
 import java.io.File
 
 @Test
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16)
 class TypeProvidersCSharpTest : BaseTestWithSolution() {
   override fun getSolutionDirectoryName() = "YamlProviderCSharp"
   override val restoreNuGetPackages = true
@@ -42,8 +40,7 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
   @Test
   @TestEnvironment(
     solution = "SwaggerProviderCSharp",
-    toolset = ToolsetVersion.TOOLSET_17_CORE,
-    coreVersion = CoreVersion.DOT_NET_6
+    sdkVersion = SdkVersion.DOT_NET_6
   )
   fun changeStaticArg() {
     withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
@@ -95,14 +92,15 @@ class TypeProvidersCSharpTest : BaseTestWithSolution() {
   }
 
   @Test
-  @TestEnvironment(solution = "YamlProviderCSharp", toolset = ToolsetVersion.TOOLSET_16)
+  @TestEnvironment(solution = "YamlProviderCSharp")
   fun `provided type abbreviation completion`() =
     doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
 
   @Test
-  @TestEnvironment(solution = "YamlProviderCSharp", toolset = ToolsetVersion.TOOLSET_16)
+  @TestEnvironment(solution = "YamlProviderCSharp")
   fun `provided nested type completion`() = doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
 
+  @Suppress("SameParameterValue")
   private fun doTestDumpLookupItems(relativePath: String, sourceFileName: String) {
     withOpenedEditor(relativePath, sourceFileName) {
       waitForDaemon()

@@ -6,17 +6,13 @@ import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.EditorTestBase
-import com.jetbrains.rider.test.enums.CoreVersion
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 import java.time.Duration
 
 @Test
-@TestEnvironment(
-  toolset = ToolsetVersion.TOOLSET_17_CORE,
-  coreVersion = CoreVersion.DOT_NET_6
-)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class TypeProvidersFeaturesTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "SwaggerProviderCSharp"
   override val restoreNuGetPackages = true
@@ -54,6 +50,7 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
   @Test
   fun `provided nested type rename disabled`() = doRenameUnavailableTest()
 
+  @Suppress("SameParameterValue")
   private fun doNavigationTest(declarationFileName: String) {
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
       waitForDaemon()

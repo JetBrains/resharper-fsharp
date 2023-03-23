@@ -5,19 +5,18 @@ import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.templates.sdk.ClassLibProjectTemplateTestBase
 import com.jetbrains.rider.test.base.templates.sdk.ConsoleAppProjectTemplateTestBase
 import com.jetbrains.rider.test.base.templates.sdk.XUnitProjectTemplateTestBase
-import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.enums.PlatformType
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplateIds
 import com.jetbrains.rider.test.scriptingApi.TemplateIdWithVersion
 
 @Suppress("unused")
 @Mute("Unable to load project and obtain project information from MsBuild.", [PlatformType.LINUX_ARM64])
-@TestEnvironment(coreVersion = CoreVersion.DOT_NET_7, toolset = ToolsetVersion.TOOLSET_17_CORE)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7)
 object Net70 {
   class ClassLibProjectTemplateTest : ClassLibProjectTemplateTestBase() {
     override val templateId: TemplateIdWithVersion
-      get() = ProjectTemplateIds.currentCore.fsharp_classLibrary
+      get() = ProjectTemplateIds.currentSdk.fsharp_classLibrary
     override val expectedNumOfAnalyzedFiles: Int = 1
     override val expectedNumOfSkippedFiles: Int = 0
     override val targetFramework: String = "net7.0"
@@ -30,7 +29,7 @@ object Net70 {
 
   class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase() {
     override val templateId: TemplateIdWithVersion
-      get() = ProjectTemplateIds.currentCore.fsharp_consoleApplication
+      get() = ProjectTemplateIds.currentSdk.fsharp_consoleApplication
     override val expectedNumOfAnalyzedFiles: Int = 3
     override val expectedNumOfSkippedFiles: Int = 0
     override val breakpointLine: Int = 2
@@ -44,7 +43,7 @@ object Net70 {
 
   class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase() {
     override val templateId: TemplateIdWithVersion
-      get() = ProjectTemplateIds.currentCore.fsharp_xUnit
+      get() = ProjectTemplateIds.currentSdk.fsharp_xUnit
     override val expectedNumOfAnalyzedFiles: Int = 1
     override val expectedNumOfSkippedFiles: Int = 0
     override val sessionElements: Int = 3

@@ -2,14 +2,13 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.debugger
 
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.DebuggerTestBase
-import com.jetbrains.rider.test.enums.CoreVersion
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.toggleBreakpoint
 import com.jetbrains.rider.test.scriptingApi.waitForPause
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_17_CORE, coreVersion = CoreVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class AsyncDebuggerTest : DebuggerTestBase() {
   override val projectName = "AsyncProgram"
   override fun getSolutionDirectoryName() = projectName
