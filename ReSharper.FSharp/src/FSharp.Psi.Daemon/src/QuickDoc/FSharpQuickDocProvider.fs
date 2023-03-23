@@ -24,9 +24,16 @@ module FSharpQuickDoc =
 
         // todo: fix getting qualifiers
         let tokenNames = [token.Name]
+        let treeEndOffset =
+            if (isNull token.Parent) then token.GetTreeEndOffset() else
+            if (isNull token.Parent.Parent) then token.GetTreeEndOffset() else
+            let barTreeNode = token.Parent.Parent.Children() |> Seq.tryFindBack(isBar)
+            match barTreeNode with
+            | Some n -> n.GetTreeEndOffset()
+            | None -> token.GetTreeEndOffset()
 
         let sourceFile = token.GetSourceFile()
-        let coords = sourceFile.Document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
+        let coords = sourceFile.Document.GetCoordsByOffset(treeEndOffset.Offset)
         let lineText = sourceFile.Document.GetLineText(coords.Line)
 
         // todo: provide tooltip for #r strings in fsx, should pass String tag
