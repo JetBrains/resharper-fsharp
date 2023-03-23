@@ -25,12 +25,11 @@ module FSharpQuickDoc =
         // todo: fix getting qualifiers
         let tokenNames = [token.Name]
         let treeEndOffset =
-            if (isNull token.Parent) then token.GetTreeEndOffset() else
-            if (isNull token.Parent.Parent) then token.GetTreeEndOffset() else
-            let barTreeNode = token.Parent.Parent.Children() |> Seq.tryFindBack(isBar)
-            match barTreeNode with
-            | Some n -> n.GetTreeEndOffset()
-            | None -> token.GetTreeEndOffset()
+            match token.Parent with
+            | :? ITopActivePatternCaseDeclaration as iTop when isNotNull iTop  ->
+                let barTreeNode = token.Parent.Parent.Children() |> Seq.findBack(isBar)
+                barTreeNode.GetTreeEndOffset()
+            | _ -> token.GetTreeEndOffset()
 
         let sourceFile = token.GetSourceFile()
         let coords = sourceFile.Document.GetCoordsByOffset(treeEndOffset.Offset)
