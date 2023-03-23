@@ -10,8 +10,6 @@
     <Compile Include="src\ReadLockCookieUtil.fs" />
     <Compile Include="src\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
-    <Compile Include="src\Tooltips\FSharpIdentifierTooltipProvider.fs" />
-    <Compile Include="src\Tooltips\ZoneMarker.fs" />
     <Compile Include="src\QuickDoc\FSharpQuickDocProvider.fs" />
     <Compile Include="src\Stages\FcsErrorsStageProcessBase.fs" />
     <Compile Include="src\Stages\FSharpCompilerWarningProcessor.fs" />
