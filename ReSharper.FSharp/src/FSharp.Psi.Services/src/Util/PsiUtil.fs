@@ -157,9 +157,6 @@ let isFiltered (node: ITreeNode) =
 let isSemicolon (node: ITreeNode) =
     getTokenType node == FSharpTokenType.SEMICOLON
     
-let isBar (node: ITreeNode) =
-    getTokenType node == FSharpTokenType.BAR
-
 let isIdentifierOrKeyword (node: ITreeNode) =
     let tokenType = getTokenType node
     isNotNull tokenType && (tokenType.IsIdentifier || tokenType.IsKeyword)
