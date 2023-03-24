@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Refactorings.Workflow
 open JetBrains.Util
 
@@ -23,6 +24,9 @@ type FSharpRefactoringLanguageService() =
 
 and FSharpRefactoringsHelper() =
     inherit RefactoringsHelper()
+
+    override this.CanIntroduceFieldFrom(_: IExpression) = false
+    override this.CanIntroduceFieldFrom(_: ILocalVariable) = false
 
     override this.CanInlineField _ = false
 
