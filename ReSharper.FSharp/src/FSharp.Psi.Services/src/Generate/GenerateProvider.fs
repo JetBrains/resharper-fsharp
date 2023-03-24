@@ -22,45 +22,6 @@ open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
-[<AllowNullLiteral>]
-type FSharpGeneratorContext(kind, typeDecl: IFSharpTypeDeclaration) =
-    inherit GeneratorContextBase(kind)
-
-    let mutable selectedRange = TreeTextRange.InvalidRange
-
-    member x.TypeDeclaration = typeDecl
-
-    override x.Language = FSharpLanguage.Instance :> _
-
-    override x.Root = typeDecl :> _
-    override val Anchor = null with get, set
-
-    override x.PsiModule = typeDecl.GetPsiModule()
-    override this.Solution = typeDecl.GetSolution()
-
-    override x.GetSelectionTreeRange() = selectedRange
-
-    override x.CreatePointer() =
-        FSharpGeneratorWorkflowPointer(x) :> _
-
-    member x.AddGeneratedMembers(nodes, lastNode) =
-        selectedRange <- GenerateOverrides.getGeneratedSelectionTreeRange lastNode nodes
-
-    static member Create(kind, treeNode: ITreeNode, anchor) =
-        if isNull treeNode || treeNode.IsFSharpSigFile() then null else
-
-        let typeDeclaration = treeNode.As<IFSharpTypeDeclaration>()
-        if isNull typeDeclaration || isNull typeDeclaration.DeclaredElement then null else
-
-        FSharpGeneratorContext(kind, typeDeclaration, Anchor = anchor)
-
-
-and FSharpGeneratorWorkflowPointer(context: FSharpGeneratorContext) =
-    interface IGeneratorContextPointer with
-        // todo: use actual pointers
-        member x.TryRestoreContext() = context :> _
-
-
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpGeneratorContextFactory() =
     interface IGeneratorContextFactory with
@@ -74,11 +35,15 @@ type FSharpGeneratorContextFactory() =
                     | group -> group.TypeDeclarations.FirstOrDefault().As<IFSharpTypeDeclaration>()
                 | typeDeclaration -> typeDeclaration
 
+            let treeNode = psiView.GetSelectedTreeNode()
+            if isNull treeNode then null else
+
             let anchor = GenerateOverrides.getAnchorNode psiView
-            FSharpGeneratorContext.Create(kind, typeDeclaration, anchor) :> _
+            FSharpGeneratorContext.Create(kind, treeNode, typeDeclaration, anchor) :> _
 
         member x.TryCreate(kind, treeNode, anchor) =
-            FSharpGeneratorContext.Create(kind, treeNode, anchor) :> _
+            let typeDecl = treeNode.As<IFSharpTypeDeclaration>()
+            FSharpGeneratorContext.Create(kind, treeNode, typeDecl, anchor) :> _
 
         member x.TryCreate(_: string, _: IDeclaredElement): IGeneratorContext = null
 
@@ -118,6 +83,8 @@ type FSharpOverridableMembersProvider() =
 
     override x.Populate(context: FSharpGeneratorContext) =
         let typeDeclaration = context.TypeDeclaration
+        if isNull typeDeclaration then () else
+
         let typeElement = typeDeclaration.DeclaredElement
         if not (canHaveOverrides typeElement) then () else
 
@@ -221,6 +188,9 @@ type FSharpOverridableMembersProvider() =
 [<GeneratorBuilder(GeneratorStandardKinds.MissingMembers, typeof<FSharpLanguage>)>]
 type FSharpOverridingMembersBuilder() =
     inherit GeneratorBuilderBase<FSharpGeneratorContext>()
+
+    override this.IsAvailable(context: FSharpGeneratorContext): bool =
+        isNotNull context.TypeDeclaration && isNotNull context.TypeDeclaration.DeclaredElement
 
     override x.Process(context: FSharpGeneratorContext, _: IProgressIndicator) =
         use writeCookie = WriteLockCookie.Create(true)
@@ -336,4 +306,6 @@ type FSharpOverridingMembersBuilder() =
 
         GenerateOverrides.addEmptyLineAfterIfNeeded lastNode
 
-        context.AddGeneratedMembers(anchor.RightSiblings(), lastNode)
+        let nodes = anchor.RightSiblings()
+        let selectedRange = GenerateOverrides.getGeneratedSelectionTreeRange lastNode nodes
+        context.SetSelectedRange(selectedRange)
