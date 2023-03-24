@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Threading;
+using JetBrains.Core;
 using JetBrains.Lifetimes;
 using JetBrains.Threading;
-using JetBrains.Util.Logging;
 using Microsoft.FSharp.Control;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     private static readonly Action ourDefaultInterruptCheck =
       () => Interruption.Current.CheckAndThrow();
 
-    private static readonly ConcurrentQueue<Task> myReadRequests = new();
+    private static readonly ConcurrentQueue<Action> myReadRequests = new();
 
     /// <summary>
     /// Try to execute <paramref name="action"/> using read lock on the current thread.
@@ -33,33 +33,39 @@ namespace JetBrains.ReSharper.Plugins.FSharp
         return;
 
       // Could not get a read lock. Queue a request to be processed by a thread calling FCS.
-      var finished = false;
-      while (!finished)
+      var tcs = new TaskCompletionSource<Unit>();
+      myReadRequests.Enqueue(() =>
       {
-        var task = new Task(action);
-        myReadRequests.Enqueue(task);
-
         try
         {
-          // Don't return the control until the request is processed.
-          task.Wait();
-          finished = true;
+          action();
+          tcs.SetResult(Unit.Instance);
         }
-        catch (Exception e) when (e.IsOperationCanceled())
+        catch (Exception e) when (!e.IsOperationCanceled())
         {
+          tcs.SetException(e);
         }
-        catch (Exception e)
-        {
-          Logger.LogException(e);
-          throw;
-        }
-      }
+      });
+
+      tcs.Task.Wait();
     }
 
     public static void ProcessEnqueuedReadRequests()
     {
+      Interruption.Current.CheckAndThrow();
       while (myReadRequests.TryDequeue(out var request))
-        request.RunSynchronously();
+      {
+        try
+        {
+          request();
+        }
+        catch (Exception e) when (e.IsOperationCanceled())
+        {
+          myReadRequests.Enqueue(request);
+          throw;
+        }
+        Interruption.Current.CheckAndThrow();
+      }
     }
 
     [CanBeNull]
@@ -77,8 +83,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
         var finished = task.Wait(InterruptCheckTimeout, cancellationToken);
         if (finished) break;
 
-        if (myReadRequests.TryDequeue(out var request))
-          request.RunSynchronously();
+        ProcessEnqueuedReadRequests();
 
         interruptChecker();
       }
