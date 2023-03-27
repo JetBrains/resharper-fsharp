@@ -3,7 +3,7 @@
     TO: [R] U u = U.|B|; RANGE: (60,61) @ Union case 02 - Singleton.cs
     Menu item (enabled) :
       icon: UsageRead
-      text: Class1.Class1      <font color="FF8B0000">U u = U.**B**;</font><font color="06C"> (5)</font>
+      text: Class1.Class1      <font color="FFD5A286">U u = U.**B**;</font><font color="06C"> (5)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: U u = U.**B**;
     Navigation result:
@@ -11,7 +11,7 @@
     TO: [R] var isB = u.|IsB|; RANGE: (80,83) @ Union case 02 - Singleton.cs
     Menu item (enabled) :
       icon: UsageRead
-      text: Class1.Class1      <font color="FF8B0000">var isB = u.**IsB**;</font><font color="06C"> (6)</font>
+      text: Class1.Class1      <font color="FFD5A286">var isB = u.**IsB**;</font><font color="06C"> (6)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: var isB = u.**IsB**;
     Navigation result:
@@ -27,7 +27,7 @@
     TO: [O] let b = |B| RANGE: (86,87) @ Union case 02 - Singleton.fs
     Menu item (enabled) :
       icon: UsageInstanceCreation
-      text: Module.b      <font color="FF8B0000">let b = **B</font>**<font color="06C"> (8)</font>
+      text: Module.b      <font color="FFD5A286">let b = **B</font>**<font color="06C"> (8)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: let b = **B**
     Navigation result:

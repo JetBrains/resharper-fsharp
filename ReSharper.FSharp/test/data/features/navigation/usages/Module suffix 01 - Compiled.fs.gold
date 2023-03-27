@@ -3,7 +3,7 @@
     TO: [O] |List|.append |> ignore RANGE: (17,21) @ Module suffix 01 - Compiled.fs
     Menu item (enabled) :
       icon: UsageOther
-      text: Module      **<font color="FF8B0000">List**.append |> ignore</font><font color="06C"> (3)</font>
+      text: Module      **<font color="FFD5A286">List**.append |> ignore</font><font color="06C"> (3)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: **List**.append |> ignore
     Navigation result:
@@ -11,7 +11,7 @@
     TO: [O] |List|.append |> ignore RANGE: (40,44) @ Module suffix 01 - Compiled.fs
     Menu item (enabled) :
       icon: UsageOther
-      text: Module      **<font color="FF8B0000">List**.append |> ignore</font><font color="06C"> (4)</font>
+      text: Module      **<font color="FFD5A286">List**.append |> ignore</font><font color="06C"> (4)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: **List**.append |> ignore
     Navigation result:

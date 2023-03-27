@@ -3,7 +3,7 @@
     TO: [R] ar.|F| RANGE: (42,43) @ Anon record 03 - Getter.fs
     Menu item (enabled) :
       icon: UsageRead
-      text: Module      <font color="FF8B0000">ar.**F</font>**<font color="06C"> (4)</font>
+      text: Module      <font color="FFD5A286">ar.**F</font>**<font color="06C"> (4)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: ar.**F**
     Navigation result:
@@ -18,7 +18,7 @@
     TO: [W] let ar = {| |F| = 1 |} RANGE: (29,30) @ Anon record 03 - Getter.fs
     Menu item (enabled) :
       icon: UsageWrite
-      text: Module.ar      <font color="FF8B0000">let ar = {| **F** = 1 |}</font><font color="06C"> (3)</font>
+      text: Module.ar      <font color="FFD5A286">let ar = {| **F** = 1 |}</font><font color="06C"> (3)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: let ar = {| **F** = 1 |}
     Navigation result:

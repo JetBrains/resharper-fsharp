@@ -3,7 +3,7 @@
     TO: [O] ||>| ignore RANGE: (21,23) @ Operator 01 - Pipe.fs
     Menu item (enabled) :
       icon: UsageOther
-      text: Module      **<font color="FF8B0000">|>** ignore</font><font color="06C"> (4)</font>
+      text: Module      **<font color="FFD5A286">|>** ignore</font><font color="06C"> (4)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: **|>** ignore
     Navigation result:
@@ -11,7 +11,7 @@
     TO: [O] ||>| ignore RANGE: (32,34) @ Operator 01 - Pipe.fs
     Menu item (enabled) :
       icon: UsageOther
-      text: Module      **<font color="FF8B0000">|>** ignore</font><font color="06C"> (5)</font>
+      text: Module      **<font color="FFD5A286">|>** ignore</font><font color="06C"> (5)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: **|>** ignore
     Navigation result:

@@ -3,7 +3,7 @@
     TO: [O] |Ok| 123 RANGE: (17,19) @ Compiled union case.fs
     Menu item (enabled) :
       icon: UsageInstanceCreation
-      text: Module      **<font color="FF8B0000">Ok** 123</font><font color="06C"> (3)</font>
+      text: Module      **<font color="FFD5A286">Ok** 123</font><font color="06C"> (3)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: **Ok** 123
     Navigation result:
@@ -11,7 +11,7 @@
     TO: [O] |Ok| 123 RANGE: (25,27) @ Compiled union case.fs
     Menu item (enabled) :
       icon: UsageInstanceCreation
-      text: Module      **<font color="FF8B0000">Ok** 123</font><font color="06C"> (4)</font>
+      text: Module      **<font color="FFD5A286">Ok** 123</font><font color="06C"> (4)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: **Ok** 123
     Navigation result:

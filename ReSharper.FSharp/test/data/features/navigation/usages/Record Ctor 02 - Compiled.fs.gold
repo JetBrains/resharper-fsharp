@@ -3,7 +3,7 @@
     TO: [O] let r1: Record = |{ Field = 1 }| RANGE: (34,47) @ Record Ctor 02 - Compiled.fs
     Menu item (enabled) :
       icon: UsageInstanceCreation
-      text: Module.r1      <font color="FF8B0000">let r1: Record = **{ Field = 1 }</font>**<font color="06C"> (3)</font>
+      text: Module.r1      <font color="FFD5A286">let r1: Record = **{ Field = 1 }</font>**<font color="06C"> (3)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: let r1: Record = **{ Field = 1 }**
     Navigation result:
@@ -19,7 +19,7 @@
     TO: [O] let r1: |Record| = { Field = 1 } RANGE: (25,31) @ Record Ctor 02 - Compiled.fs
     Menu item (enabled) :
       icon: UsageOther
-      text: Module.r1      <font color="FF8B0000">let r1: **Record** = { Field = 1 }</font><font color="06C"> (3)</font>
+      text: Module.r1      <font color="FFD5A286">let r1: **Record** = { Field = 1 }</font><font color="06C"> (3)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: let r1: **Record** = { Field = 1 }
     Navigation result:
@@ -27,7 +27,7 @@
     TO: [O] let r2 = |{ r1 with Field = 2 }| RANGE: (58,79) @ Record Ctor 02 - Compiled.fs
     Menu item (enabled) :
       icon: UsageInstanceCreation
-      text: Module.r2      <font color="FF8B0000">let r2 = **{ r1 with Field = 2 }</font>**<font color="06C"> (4)</font>
+      text: Module.r2      <font color="FFD5A286">let r2 = **{ r1 with Field = 2 }</font>**<font color="06C"> (4)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: let r2 = **{ r1 with Field = 2 }**
     Navigation result:

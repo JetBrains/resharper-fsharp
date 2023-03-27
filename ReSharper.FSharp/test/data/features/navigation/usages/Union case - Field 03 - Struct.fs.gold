@@ -3,7 +3,7 @@
     TO: [O] U u = U.NewA(|_a|: 123); RANGE: (65,67) @ Union case - Field 03 - Struct.cs
     Menu item (enabled) :
       icon: UsageOther
-      text: Class1.Class1      <font color="FF8B0000">U u = U.NewA(**_a**: 123);</font><font color="06C"> (5)</font>
+      text: Class1.Class1      <font color="FFD5A286">U u = U.NewA(**_a**: 123);</font><font color="06C"> (5)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: U u = U.NewA(**_a**: 123);
     Navigation result:
@@ -19,7 +19,7 @@
     TO: [R] var a = u.|a|; RANGE: (90,91) @ Union case - Field 03 - Struct.cs
     Menu item (enabled) :
       icon: UsageRead
-      text: Class1.Class1      <font color="FF8B0000">var a = u.**a**;</font><font color="06C"> (6)</font>
+      text: Class1.Class1      <font color="FFD5A286">var a = u.**a**;</font><font color="06C"> (6)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: var a = u.**a**;
     Navigation result:
@@ -35,7 +35,7 @@
     TO: [O] | A (|a| = 123) -> () RANGE: (135,136) @ Union case - Field 03 - Struct.fs
     Menu item (enabled) :
       icon: UsagePatternChecking
-      text: Module      <font color="FF8B0000">| A (**a** = 123) -> ()</font><font color="06C"> (10)</font>
+      text: Module      <font color="FFD5A286">| A (**a** = 123) -> ()</font><font color="06C"> (10)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: | A (**a** = 123) -> ()
     Navigation result:
@@ -50,7 +50,7 @@
     TO: [W] match A(|a| = 123) with RANGE: (111,112) @ Union case - Field 03 - Struct.fs
     Menu item (enabled) :
       icon: UsageWrite
-      text: Module      <font color="FF8B0000">match A(**a** = 123) with</font><font color="06C"> (9)</font>
+      text: Module      <font color="FFD5A286">match A(**a** = 123) with</font><font color="06C"> (9)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: match A(**a** = 123) with
     Navigation result:

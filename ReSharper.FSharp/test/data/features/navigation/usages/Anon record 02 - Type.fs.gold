@@ -3,7 +3,7 @@
     TO: [W] {| |F| = 1 |} RANGE: (43,44) @ Anon record 02 - Type.fs
     Menu item (enabled) :
       icon: UsageWrite
-      text: Module      <font color="FF8B0000">{| **F** = 1 |}</font><font color="06C"> (4)</font>
+      text: Module      <font color="FFD5A286">{| **F** = 1 |}</font><font color="06C"> (4)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: {| **F** = 1 |}
     Navigation result:
@@ -11,7 +11,7 @@
     TO: [R] type R = {| |F|: int |} RANGE: (29,30) @ Anon record 02 - Type.fs
     Menu item (enabled) :
       icon: UsageRead
-      text: Module.R      <font color="FF8B0000">type R = {| **F**: int |}</font><font color="06C"> (3)</font>
+      text: Module.R      <font color="FFD5A286">type R = {| **F**: int |}</font><font color="06C"> (3)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: type R = {| **F**: int |}
     Navigation result:
