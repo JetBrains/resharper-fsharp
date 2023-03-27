@@ -1,2 +1,2 @@
-/// Some Doc on Partial ActivePattern
-let ({caret}|IsThree|_|) x = if x = 3 then Some x else None
+/// Some Doc on ActivePattern
+let ({caret}|Even|Odd|) input = if input % 2 = 0 then Even else Odd
