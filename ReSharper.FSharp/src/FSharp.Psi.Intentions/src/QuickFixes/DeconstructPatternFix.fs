@@ -34,5 +34,5 @@ type DeconstructPatternFix(error: UnionCaseExpectsTupledArgumentsError) =
     override x.ExecutePsiTransaction(_, _) =
         match deconstruction with
         | Some(pattern, deconstruction) ->
-            FSharpDeconstruction.deconstruct false null deconstruction pattern
+            FSharpDeconstruction.deconstruct true null deconstruction pattern
         | _ -> failwithf ""

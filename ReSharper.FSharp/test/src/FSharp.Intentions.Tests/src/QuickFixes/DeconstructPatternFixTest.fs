@@ -9,3 +9,4 @@ type DeconstructPatternFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/deconstruct"
 
     [<Test>] member x.``Union case fields 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union case fields 02 - Used``() = x.DoNamedTest()

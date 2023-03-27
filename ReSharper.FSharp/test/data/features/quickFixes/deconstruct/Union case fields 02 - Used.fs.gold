@@ -1,0 +1,6 @@
+﻿type U =
+    | A
+    | B of int * int
+
+match A with
+| B({selstart}i{selend}, i1) -> ignore b
