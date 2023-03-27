@@ -137,6 +137,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService, settingsStore: ISett
 
         let dataModel = workflow.RenameDataModel
         match dataModel.InitialDeclaredElement with
+        | :? IPathDeclaredElement -> null
         | null -> createPage workflow :> _
         | element ->
 
