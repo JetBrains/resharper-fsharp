@@ -1,5 +1,6 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.QuickDoc
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickDoc
 
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open System
 open JetBrains.Application.Components
 open JetBrains.Application.DataContext
@@ -15,9 +16,12 @@ open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
 open NUnit.Framework
 
-type TemporaryQuickDocTestBase() =
+[<FSharpTest>]
+type QuickDocTest() =
     inherit BaseTestWithTextControl()
-
+        
+    override x.RelativeTestDataPath = "features/quickdoc"
+    
     override this.DoTest(lifetime, _) =
         let textControl = this.OpenTextControl(lifetime)
         let solution = this.Solution
@@ -48,9 +52,51 @@ type TemporaryQuickDocTestBase() =
                 Assert.NotNull(html)
 
                 let startIdx = html.Text.IndexOf("  <head>", StringComparison.Ordinal)
-                let endIdx = html.Text.IndexOf("</head>", StringComparison.Ordinal) + "</head>".Length
-                Assert.AreEqual(String.CompareOrdinal(html.Text, endIdx, "\n<body>", 0, "\n<body>".Length), 0)
+                if startIdx >= 0 then
+                    let endIdx = html.Text.IndexOf("</head>", StringComparison.Ordinal) + "</head>".Length
+                    Assert.AreEqual(String.CompareOrdinal(html.Text, endIdx, "\n<body>", 0, "\n<body>".Length), 0)
 
-                writer.Write(html.Text.Remove(startIdx, endIdx - startIdx + 1))
+                    writer.Write(html.Text.Remove(startIdx, endIdx - startIdx + 1))
+                else writer.Write(html.Text)
             )
         )
+    
+    [<Test>] member x.``ActivePattern 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``ActivePattern 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``ActivePattern 03``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Partial ActivePattern 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Partial ActivePattern 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Partial ActivePattern 03``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Let Binding 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Let Binding 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Let Binding 03``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Let Binding 04``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Let Binding 05``() = x.DoNamedTest()
+    
+    [<Test>] member x.``DiscriminatedUnion 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``DiscriminatedUnion 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``DiscriminatedUnion 03``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Record 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Record 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Class 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Class 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Top Level Module 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Nested Module 01``() = x.DoNamedTest()

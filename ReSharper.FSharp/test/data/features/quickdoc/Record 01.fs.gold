@@ -1,3 +1,3 @@
-﻿<html>
-<body>
-<div style="float:right" align="right"><a href="http://goto/">go to</a></div><div class="headers"><dl class="headers"><dt>public sealed class <b> Record 01.Bar</b></dt></dl></div>Some comment on record</body></html>
+﻿<div class='definition'><pre style='word-wrap: break-word; white-space: pre-wrap;'>type Bar =<br>  {<br>    SomeField: int<br>  }</pre></div><h1>Summary</h1><div class="section_body">  Some comment on record </div>
+
+<div class='content'>Full name: Record 01.Bar</div>
