@@ -1,0 +1,3 @@
+﻿<div class='definition'><pre style='word-wrap: break-word; white-space: pre-wrap;'>val (|IsThree|_|) : x: int -&gt; int option</pre></div><h1>Summary</h1><div class="section_body">  Some comment </div>
+
+<div class='content'>Full name: Partial ActivePattern 03.(|IsThree|_|)</div>

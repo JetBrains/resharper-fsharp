@@ -1,0 +1,3 @@
+﻿<div class='definition'><pre style='word-wrap: break-word; white-space: pre-wrap;'>type Bar =<br>  | Case1 of int * string<br>  | Case2 of string</pre></div><h1>Summary</h1><div class="section_body">  Some comment on the disc union </div>
+
+<div class='content'>Full name: DiscriminatedUnion 01.Bar</div>
