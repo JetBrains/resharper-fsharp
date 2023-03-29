@@ -15,4 +15,8 @@ abstract class FSharpCodeStyleSettingsProviderBase(private val lang: Language) :
   override fun getHelpTopic() = "Settings_Code_Style_FSHARP"
   override fun getConfigurableDisplayName() = lang.displayName
   override fun getPagesId() = mapOf("FSharpCodeStylePage" to "Formatting Style", "FantomasPage" to "Fantomas")
+  override fun filterPages(filterTag: String) =
+    if (filterTag == IRiderViewModelConfigurable.EditorConfigFilterTag)
+      mapOf("FSharpCodeStylePage" to "Formatting Style")
+    else super.filterPages(filterTag)
 }

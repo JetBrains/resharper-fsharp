@@ -7,6 +7,7 @@ open JetBrains.Application.UI.Options
 open JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Psi.EditorConfig
 open JetBrains.ReSharper.Resources.Resources.Icons
 
 [<CodePreviewPreparatorComponent>]
@@ -63,7 +64,8 @@ type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, con
            x.GetItem(fun key -> key.NeverOutdentPipeOperators) |] :> _
 
 
-[<OptionsPage("FSharpCodeStylePage", "Formatting Style", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
+[<OptionsPage("FSharpCodeStylePage", "Formatting Style", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>,
+              FilterTags = [|ConfigFileUtils.EditorConfigName|])>]
 type FSharpCodeStylePage(lifetime, smartContext: OptionsSettingsSmartContext, env,
                          schema: FSharpCodeStylePageSchema, preview, componentContainer: IComponentContainer) =
     inherit CodeStylePage(lifetime, smartContext, env, schema, preview, componentContainer)
