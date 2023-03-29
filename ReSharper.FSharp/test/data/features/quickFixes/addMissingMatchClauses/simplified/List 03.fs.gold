@@ -1,5 +1,6 @@
-﻿module Say
+module Say
 
 match [] with
-| _ :: _ -> ()
+| [1] -> ()
 | [] -> {selstart}failwith "todo"{selend}
+| int32s -> failwith "todo"

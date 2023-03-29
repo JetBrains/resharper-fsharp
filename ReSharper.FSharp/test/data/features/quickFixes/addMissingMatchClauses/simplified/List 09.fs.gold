@@ -1,5 +1,6 @@
 ﻿module Say
 
 match [] with
-| _ :: _ -> ()
+| true :: _ -> ()
 | [] -> {selstart}failwith "todo"{selend}
+| booleans -> failwith "todo"

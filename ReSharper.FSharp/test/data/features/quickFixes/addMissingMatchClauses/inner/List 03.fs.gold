@@ -3,4 +3,3 @@
 match [""] with
 | _ :: _ -> ()
 | [] -> {selstart}failwith "todo"{selend}
-| l -> failwith "todo"
