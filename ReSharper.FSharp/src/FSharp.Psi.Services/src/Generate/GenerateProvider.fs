@@ -28,19 +28,19 @@ type FSharpGeneratorContextFactory() =
         member x.TryCreate(kind: string, psiDocumentRangeView: IPsiDocumentRangeView): IGeneratorContext =
             let psiView = psiDocumentRangeView.View<FSharpLanguage>()
             
-            let walkUp () =
+            let tryGetPreviousTypeDecl () =
                 let selectedTreeNode = psiView.GetSelectedTreeNode<IFSharpTreeNode>()
                 match selectedTreeNode.GetPreviousMeaningfulSibling() with
-                    | :? ITypeDeclarationGroup as group ->
-                        group.TypeDeclarations.FirstOrDefault().As<IFSharpTypeDeclaration>()
-                    | :? IFSharpTypeDeclaration as t -> t
-                    | _ -> null
+                | :? ITypeDeclarationGroup as group ->
+                    group.TypeDeclarations.FirstOrDefault().As<IFSharpTypeDeclaration>()
+                | :? IFSharpTypeDeclaration as t -> t
+                | _ -> null
             
             let typeDeclaration: IFSharpTypeDeclaration =
                 match psiView.GetSelectedTreeNode<IFSharpTypeDeclaration>() with
                 | null ->
                     match psiView.GetSelectedTreeNode<ITypeDeclarationGroup>() with
-                    | null -> walkUp ()
+                    | null -> tryGetPreviousTypeDecl ()
                     | group -> group.TypeDeclarations.FirstOrDefault().As<IFSharpTypeDeclaration>()
                 | typeDeclaration -> typeDeclaration
 
