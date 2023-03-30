@@ -33,8 +33,6 @@ type FSharpGeneratorContextFactory() =
                 let previousMeaningfulToken = selectedTreeNode.GetPreviousMeaningfulToken()
                 let node =  previousMeaningfulToken.GetContainingNode<IFSharpTypeDeclaration>()
                 match node with
-                | :? ITypeDeclarationGroup as group ->
-                    group.TypeDeclarations.FirstOrDefault().As<IFSharpTypeDeclaration>()
                 | :? IFSharpTypeDeclaration as t -> t
                 | _ -> null
             
