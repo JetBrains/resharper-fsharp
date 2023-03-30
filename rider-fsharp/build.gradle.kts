@@ -359,7 +359,13 @@ tasks {
         }
         val rerunSuccessfulTests = false
         outputs.upToDateWhen { !rerunSuccessfulTests }
-        ignoreFailures = true
+
+        val runningOnGithubActions = when (ext.properties["running.on.github.actions"]) {
+            "true" -> true
+            else -> false
+        }
+        logger.lifecycle("Running on GitHub Actions: $runningOnGithubActions")
+        ignoreFailures = !runningOnGithubActions
     }
 
     val writeDotNetSdkPathProps = create("writeDotNetSdkPathProps") {

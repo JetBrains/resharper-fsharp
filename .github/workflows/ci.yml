@@ -46,14 +46,10 @@ jobs:
         working-directory: ./ReSharper.FSharp
         run: dotnet build -p:RunningOnGitHubActions=true
 
-      - name: Test ReSharper.FSharp
-        working-directory: ./ReSharper.FSharp
-        run: dotnet test --no-build
-
-      - name: Build Plugin Frontend
+      - name: Frontend Tests
         working-directory: ./rider-fsharp
         if: ${{ success() }} || ${{ failure() }}
-        run: ./gradlew buildPlugin
+        run: ./gradlew test "-Prunning.on.github.actions=true"
 
       - name: Stop Gradle Daemon # to collect Gradle cache
         working-directory: ./rider-fsharp
