@@ -1,0 +1,7 @@
+﻿module Say
+
+match [] with
+| [_] -> ()
+| true :: _ :: _ -> ()
+| false :: _ :: _ -> ()
+| [] -> {selstart}failwith "todo"{selend}

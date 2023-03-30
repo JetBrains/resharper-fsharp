@@ -1,0 +1,8 @@
+﻿module Say
+
+let (|Id|) x = x
+
+match [] with
+| _ :: _ :: Id _ -> ()
+| [] -> {selstart}failwith "todo"{selend}
+| objects -> failwith "todo"
