@@ -2,7 +2,7 @@ import com.jetbrains.rd.generator.gradle.RdGenExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.intellij.IntelliJPluginConstants
-import org.jetbrains.intellij.tasks.IntelliJInstrumentCodeTask
+import org.jetbrains.intellij.tasks.InstrumentCodeTask
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   id("com.jetbrains.rdgen") version "2022.3.1"
-  id("org.jetbrains.intellij") version "1.11.0" // https://github.com/JetBrains/gradle-intellij-plugin/releases
+  id("org.jetbrains.intellij") version "1.13.3" // https://github.com/JetBrains/gradle-intellij-plugin/releases
   id("org.jetbrains.grammarkit") version "2021.2.2"
   id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
   kotlin("jvm") version "1.8.0"
@@ -205,7 +205,7 @@ tasks {
     }
   }
 
-  withType<IntelliJInstrumentCodeTask> {
+  withType<InstrumentCodeTask> {
     val bundledMavenArtifacts = file("build/maven-artifacts")
     if (bundledMavenArtifacts.exists()) {
       logger.lifecycle("Use ant compiler artifacts from local folder: $bundledMavenArtifacts")
