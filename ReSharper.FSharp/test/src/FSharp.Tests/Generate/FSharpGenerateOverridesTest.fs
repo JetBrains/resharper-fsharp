@@ -54,6 +54,9 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Anchor - Whitespace 10``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Whitespace 11``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Whitespace 12``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - Whitespace 13``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - Whitespace 14``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - Whitespace 15``() = x.DoNamedTest()
 
     [<Test>] member x.``Anchor - Union Case 01``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Union Case 02 - Modifier``() = x.DoNamedTest()
