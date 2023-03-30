@@ -31,10 +31,7 @@ type FSharpGeneratorContextFactory() =
             let tryGetPreviousTypeDecl () =
                 let selectedTreeNode = psiView.GetSelectedTreeNode<IFSharpTreeNode>()
                 let previousMeaningfulToken = selectedTreeNode.GetPreviousMeaningfulToken()
-                let node =  previousMeaningfulToken.GetContainingNode<IFSharpTypeDeclaration>()
-                match node with
-                | :? IFSharpTypeDeclaration as t -> t
-                | _ -> null
+                previousMeaningfulToken.GetContainingNode<IFSharpTypeDeclaration>()
             
             let typeDeclaration: IFSharpTypeDeclaration =
                 match psiView.GetSelectedTreeNode<IFSharpTypeDeclaration>() with
