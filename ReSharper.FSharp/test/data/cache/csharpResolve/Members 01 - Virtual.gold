@@ -1,0 +1,54 @@
+﻿public class C1 : T1
+{
+    public override void M1(int i) => base.M1(i);
+    public override int P1 => base.P1;
+    
+    public |override|(0) void M2(int i) => base.M2(i);
+    public |override|(1) int P2 => base.P2;
+}
+
+public class C2 : T2
+{
+    public override void M1(int i) => base.M1(i);
+    public override int P1 => base.P1;
+    
+    public |override|(2) void M2(int i) => base.M2(i);
+    public |override|(3) int P2 => base.P2;
+}
+
+public class C3 : T3
+{
+    public override void M1(int i) => |base.M1|(4)(i);
+    public override int P1 => |base.P1|(5);
+    
+    public |override|(6) void M2(int i) => base.M2(i);
+    public |override|(7) int P2 => base.P2;
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: There is no suitable method for override
+(1): ReSharper Underlined Error Highlighting: There is no suitable property for override
+(2): ReSharper Underlined Error Highlighting: There is no suitable method for override
+(3): ReSharper Underlined Error Highlighting: There is no suitable property for override
+(4): ReSharper Underlined Error Highlighting: Cannot call an abstract base method 'void T3.M1(int)'
+(5): ReSharper Underlined Error Highlighting: Cannot call an abstract base property 'int T3.P1'
+(6): ReSharper Underlined Error Highlighting: There is no suitable method for override
+(7): ReSharper Underlined Error Highlighting: There is no suitable property for override
+M:T1.M1(System.Int32)
+M:T1.M1(System.Int32)
+P:T1.P1
+M:T1.M2(System.Int32)
+M:T1.M2(System.Int32)
+P:T1.P2
+M:T2.M1(System.Int32)
+M:T2.M1(System.Int32)
+P:T2.P1
+M:T2.M2(System.Int32)
+M:T2.M2(System.Int32)
+P:T2.P2
+M:T3.M1(System.Int32)
+M:T3.M1(System.Int32)
+P:T3.P1
+M:T3.M2(System.Int32)
+M:T3.M2(System.Int32)
+P:T3.P2
