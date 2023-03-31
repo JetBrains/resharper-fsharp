@@ -13,5 +13,6 @@ type A() =
 and B() =
     class end
 
-
     override this.ToString() = {selstart}failwith "todo"{selend}
+
+    

@@ -36,15 +36,16 @@ type FSharpGeneratorContextFactory() =
             let typeDeclaration: IFSharpTypeDeclaration =
                 match psiView.GetSelectedTreeNode<IFSharpTypeDeclaration>() with
                 | null ->
-                    match psiView.GetSelectedTreeNode<ITypeDeclarationGroup>() with
+                    let selectedTreeNode = psiView.GetSelectedTreeNode<IFSharpTreeNode>()
+                    match selectedTreeNode.GetContainingNode<IFSharpTypeDeclaration>() with
                     | null -> tryGetPreviousTypeDecl ()
-                    | group -> group.TypeDeclarations.FirstOrDefault().As<IFSharpTypeDeclaration>()
+                    | typeDeclaration -> typeDeclaration
                 | typeDeclaration -> typeDeclaration
 
             let treeNode = psiView.GetSelectedTreeNode()
             if isNull treeNode then null else
 
-            let anchor = GenerateOverrides.getAnchorNode psiView
+            let anchor = GenerateOverrides.getAnchorNode psiView typeDeclaration
             FSharpGeneratorContext.Create(kind, treeNode, typeDeclaration, anchor) :> _
 
         member x.TryCreate(kind, treeNode, anchor) =

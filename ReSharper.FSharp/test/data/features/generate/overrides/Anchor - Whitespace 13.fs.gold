@@ -10,8 +10,9 @@
 type A() =
     class end
 
-
     override this.ToString() = {selstart}failwith "todo"{selend}
+
+    
 
 and B() =
     class end

@@ -10,3 +10,4 @@
 type X = | Foo of int
 
          override this.ToString() = {selstart}failwith "todo"{selend}
+
