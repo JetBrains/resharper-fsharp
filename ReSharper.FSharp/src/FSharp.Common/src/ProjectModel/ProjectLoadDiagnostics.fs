@@ -25,8 +25,8 @@ and FSharpTargetsDiagnosticMessage(projectMark, message) =
 
     static let platformName platform =
         match platform with
-        | PlatformUtil.Platform.MacOsX -> "mac"
-        | PlatformUtil.Platform.Linux -> "linux"
+        | JetPlatform.MacOsX -> "mac"
+        | JetPlatform.Linux -> "linux"
         | _ -> "windows"
 
     new (projectMark: IProjectMark) =
