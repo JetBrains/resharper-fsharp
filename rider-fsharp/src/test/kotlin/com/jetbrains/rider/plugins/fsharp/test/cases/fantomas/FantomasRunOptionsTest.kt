@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
+import com.intellij.openapi.project.Project
 import com.intellij.util.application
 import com.intellij.util.io.createFile
 import com.intellij.util.io.delete
@@ -9,6 +10,7 @@ import com.jetbrains.rdclient.util.idea.waitAndPump
 import com.jetbrains.rider.plugins.fsharp.test.*
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.protocol.protocolManager
+import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBe
 import com.jetbrains.rider.test.base.EditorTestBase
@@ -17,17 +19,20 @@ import com.jetbrains.rider.test.env.dotNetSdk
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.frameworkLogger
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
+import com.jetbrains.rider.test.scriptingApi.reformatCode
+import com.jetbrains.rider.test.scriptingApi.restoreNuGet
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.test.waitForDaemon
-import org.testng.annotations.BeforeTest
 import org.testng.annotations.Test
+import java.io.File
 import java.io.PrintStream
 import java.nio.file.Paths
 import java.time.Duration
 import kotlin.io.path.*
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6, reuseSolution = false)
 class FantomasRunOptionsTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "FormatCodeApp"
   override val restoreNuGetPackages = false
@@ -95,7 +100,7 @@ class FantomasRunOptionsTest : EditorTestBase() {
 
       withDotnetToolsUpdate {
         runProcessWaitForExit(
-          Environment.dotNetSdk(testMethod.environment.sdkVersion).root.toPath(),
+          Environment.dotNetSdk(testMethod.environment.sdkVersion).dotnetExecutable.toPath(),
           listOf("tool", "install", "fantomas-tool", "-g", "--version", globalVersion),
           env
         )
@@ -106,13 +111,13 @@ class FantomasRunOptionsTest : EditorTestBase() {
     }
   }
 
-  @BeforeTest(alwaysRun = true)
-  fun prepareDotnetCliHome() {
+  override fun openSolution(solutionFile: File, params: OpenSolutionParams): Project {
     application.protocolManager.protocolHosts.forEach {
       editFSharpBackendSettings(it) {
         dotnetCliHomeEnvVar = getDotnetCliHome().absolutePathString()
       }
     }
+    return super.openSolution(solutionFile, params)
   }
 
   override fun beforeDoTestWithDocuments() {
