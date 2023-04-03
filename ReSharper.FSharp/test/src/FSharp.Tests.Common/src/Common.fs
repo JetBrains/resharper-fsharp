@@ -157,9 +157,36 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         checkerService.FcsProjectProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
-    let getFcsProject (psiModule: IPsiModule) =
+    let mutable currentFcsProject = None
+
+    let getNewFcsProject (psiModule: IPsiModule) =
         let fcsProject = fcsProjectBuilder.BuildFcsProject(psiModule, psiModule.ContainingProjectModule.As<IProject>())
         fcsProjectBuilder.AddReferences(fcsProject, getReferencedModules psiModule)
+
+    // todo: referenced projects
+    // todo: unify with FcsProjectProvider check
+    let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
+        let getReferencedProjectOutputs (options: FSharpProjectOptions) =
+            options.ReferencedProjects |> Array.map (fun project -> project.OutputFile)
+
+        let newOptions = newProject.ProjectOptions
+        let oldOptions = oldProject.ProjectOptions
+
+        newOptions.ProjectFileName = oldOptions.ProjectFileName &&
+        newOptions.SourceFiles = oldOptions.SourceFiles &&
+        newOptions.OtherOptions = oldOptions.OtherOptions &&
+        getReferencedProjectOutputs newOptions = getReferencedProjectOutputs oldOptions
+
+    let getFcsProject (psiModule: IPsiModule) =
+        lock this (fun _ ->
+            let newFcsProject = getNewFcsProject psiModule
+            match currentFcsProject with
+            | Some oldFcsProject when areSameForChecking newFcsProject oldFcsProject ->
+                oldFcsProject
+            | _ ->
+                currentFcsProject <- Some(newFcsProject)
+                newFcsProject
+        )
 
     let getProjectOptions (sourceFile: IPsiSourceFile) =
         let fcsProject = getFcsProject sourceFile.PsiModule

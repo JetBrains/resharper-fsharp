@@ -1,0 +1,11 @@
+﻿// ${COMPLETE_ITEM:i, i1, i2}
+module Module
+
+[<RequireQualifiedAccess>]
+type U<'T> =
+    | A
+    | B of int * int * 'T
+
+match U<int>.A with
+| U.B(i, i1, i2){caret}
+| U.A -> ()

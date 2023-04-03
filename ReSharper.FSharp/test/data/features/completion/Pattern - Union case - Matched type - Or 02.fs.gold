@@ -8,4 +8,4 @@ type U =
 
 match U.A with
 | U.A
-| U.B i{caret}
+| U.B{caret}

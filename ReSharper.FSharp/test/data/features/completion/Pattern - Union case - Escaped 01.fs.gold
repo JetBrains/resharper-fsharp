@@ -6,4 +6,4 @@ type U =
     | ``B C`` of int
 
 match A with
-| ``B C`` i{caret}
+| ``B C``{caret}

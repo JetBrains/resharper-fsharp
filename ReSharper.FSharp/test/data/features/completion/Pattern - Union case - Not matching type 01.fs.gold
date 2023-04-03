@@ -2,4 +2,4 @@
 module Module
 
 match 1 with
-| Some value{caret}
+| Some{caret}

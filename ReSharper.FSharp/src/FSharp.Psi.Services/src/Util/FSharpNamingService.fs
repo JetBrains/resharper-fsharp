@@ -201,8 +201,9 @@ module FSharpNamingService =
 
             let addNames (pats: IEnumerable<IFSharpPattern>) =
                 getPatternsNames pat pats |> names.AddRange
-            
-            match pat.Parent with
+
+            let parent = pat.Parent.As<IFSharpPattern>()
+            match parent with
             | :? ITuplePat as tuplePat -> addNames tuplePat.PatternsEnumerable
             | :? IAndsPat as andsPat -> addNames andsPat.PatternsEnumerable
             | :? IArrayOrListPat as asPat -> addNames asPat.PatternsEnumerable
@@ -210,13 +211,9 @@ module FSharpNamingService =
             | :? IListConsPat as listConsPat -> addNames [listConsPat.HeadPattern; listConsPat.TailPattern]
             | :? IAsPat as asPat -> addNames [asPat.LeftPattern; asPat.RightPattern]
             | :? IParametersOwnerPat as parametersOwnerPat -> addNames parametersOwnerPat.ParametersEnumerable
-
-            | :? IReferencePat as refPat ->
-                names.Add(refPat.SourceName) |> ignore
-                loop refPat
-
-            | :? IFSharpPattern as fsPat -> loop fsPat
             | _ -> ()
+
+            loop parent
 
         loop contextPattern
         names
@@ -462,7 +459,7 @@ type FSharpNamingService(language: FSharpLanguage) =
         | _ -> EmptyList.Instance :> _
 
     member x.AddExtraNames(namesCollection: INamesCollection, fsPattern: IFSharpPattern) =
-        let pat, path = FSharpPatternUtil.ParentTraversal.makeTuplePatPath fsPattern
+        let pat, path = FSharpPatternUtil.ParentTraversal.makePatPath fsPattern
 
         let entryOptions =
             EntryOptions(subrootPolicy = SubrootPolicy.Decompose, emphasis = Emphasis.Good,

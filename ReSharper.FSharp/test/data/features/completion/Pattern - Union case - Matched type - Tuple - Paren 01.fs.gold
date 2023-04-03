@@ -7,4 +7,4 @@ type U =
     | B of int
 
 match (1, U.A) with
-| _, U.B i{caret}
+| _, U.B{caret}

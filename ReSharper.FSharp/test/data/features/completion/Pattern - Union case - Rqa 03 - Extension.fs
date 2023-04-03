@@ -1,4 +1,4 @@
-// ${COMPLETE_ITEM:A}
+// ${COMPLETE_ITEM:U.A}
 module Module
 
 [<RequireQualifiedAccess>]

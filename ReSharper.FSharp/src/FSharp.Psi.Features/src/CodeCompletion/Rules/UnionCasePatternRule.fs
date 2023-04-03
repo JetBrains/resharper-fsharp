@@ -2,11 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
-open JetBrains.Application.UI.Controls.JetPopupMenu
 open JetBrains.DocumentModel
-open JetBrains.Application.Threading
-open JetBrains.Lifetimes
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
@@ -15,11 +11,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.Util
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruction
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -27,12 +21,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
-open JetBrains.UI.RichText
 
 module UnionCasePatternInfo =
     let [<Literal>] Id = "Union case pattern"
@@ -62,15 +54,8 @@ type EnumCaseLikePatternInfo<'T when 'T :> FSharpSymbol>(text, symbol: 'T, fcsEn
     override this.IsRiderAsync = false
 
 
-type UnionCasePatternInfo(text, fcsUnionCase, fcsEntityInstance, context) =
-    inherit EnumCaseLikePatternInfo<FSharpUnionCase>(text, fcsUnionCase, fcsEntityInstance, context)
-
-
 type EnumCaseLikePatternBehavior<'T when 'T :> FSharpSymbol>(info: EnumCaseLikePatternInfo<'T>) =
     inherit TextualBehavior<EnumCaseLikePatternInfo<'T>>(info)
-
-    abstract Deconstruct: IFSharpPattern * ITextControl * ISolution * IPsiServices -> unit
-    default this.Deconstruct(_, _, _, _) = ()
 
     override this.Accept(textControl, nameRange, _, _, solution, _) =
         use writeCookie = WriteLockCookie.Create(true)
@@ -93,117 +78,21 @@ type EnumCaseLikePatternBehavior<'T when 'T :> FSharpSymbol>(info: EnumCaseLikeP
             FSharpPatternUtil.bindFcsSymbol pat info.Case UnionCasePatternInfo.Id
 
         textControl.Caret.MoveTo(pat.GetNavigationRange().EndOffset, CaretVisualPlacement.DontScrollIfVisible)
-        this.Deconstruct(pat, textControl, solution, psiServices)
 
 
 type UnionCasePatternBehavior(info) =
     inherit EnumCaseLikePatternBehavior<FSharpUnionCase>(info)
-
-    override this.Deconstruct(pat, textControl, solution, psiServices) =
-        if not info.Case.HasFields || not (pat :? IReferencePat) then () else
-
-        let fields = FSharpDeconstructionImpl.createUnionCaseFields pat info.Case info.EntityInstance
-        let fieldsDeconstruction: IFSharpDeconstruction =
-            DeconstructionFromUnionCaseFields(info.Case.Name, fields) :> _
-
-        let singleField = Seq.tryExactlyOne info.Case.Fields
-
-        let singleFieldDeconstruction =
-            singleField
-            |> Option.map (fun fcsField -> fcsField.FieldType.Instantiate(info.EntityInstance.Substitution))
-            |> Option.bind (FSharpDeconstruction.tryGetDeconstruction pat)
-            |> Option.map (fun deconstruction -> singleField.Value.DisplayNameCore, deconstruction)
-
-        let fieldsDeconstructionText =
-            singleFieldDeconstruction
-            |> Option.map (fun (name, _) -> $"Use named pattern for '{name}'")
-            |> Option.defaultValue fieldsDeconstruction.Text
-
-        let deconstruct (deconstruction: IFSharpDeconstruction) (parametersOwnerPat: IParametersOwnerPat) =
-            use prohibitTypeCheckCookie = ProhibitTypeCheckCookie.Create()
-            use writeCookie = WriteLockCookie.Create(parametersOwnerPat.IsPhysical())
-            use cookie =
-                CompilationContextCookie.GetOrCreate(parametersOwnerPat.GetPsiModule().GetContextFromModule())
-            use transactionCookie =
-                PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, UnionCasePatternInfo.Id)
-
-            let pat = parametersOwnerPat.ParametersEnumerable.FirstOrDefault()
-            let action = FSharpDeconstruction.deconstruct false parametersOwnerPat deconstruction pat
-            if isNotNull action then
-                action.Invoke(textControl)
-
-        if Shell.Instance.IsTestShell then
-            let pat = FSharpPatternUtil.toParameterOwnerPat pat UnionCasePatternInfo.Id
-            deconstruct fieldsDeconstruction pat else
-
-        let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
-        solution.Locks.ExecuteOrQueueReadLockEx(lifetime, UnionCasePatternInfo.Id, fun _ ->
-            let jetPopupMenus = solution.GetComponent<JetPopupMenus>()
-            jetPopupMenus.ShowModal(JetPopupMenu.ShowWhen.NoItemsBannerIfNoItems, fun lifetime jetPopupMenu ->
-                let textControlLockLifetimeDefinition = Lifetime.Define(lifetime)
-                textControl.LockTextControl(textControlLockLifetimeDefinition.Lifetime, solution.Locks)
-
-                // Adding null item keys is not allowed, wrap them into anon records as a workaround.
-                // Inlining the list to AddRange changes anon record types due to allowed implicit casts on method args.
-                let items =
-                    [ {| Deconstruction = fieldsDeconstruction; Text = fieldsDeconstructionText |}
-
-                      match singleFieldDeconstruction with
-                      | None _ -> ()
-                      | Some (_, deconstruction) ->
-                          {| Deconstruction = deconstruction; Text = deconstruction.Text |}
-
-                      {| Deconstruction = null; Text = null |} ]
-
-                jetPopupMenu.ItemKeys.AddRange(List.map box items)
-
-                let (|Deconstruction|) (obj: obj) =
-                    let deconstructionItem = obj :?> {| Deconstruction: IFSharpDeconstruction; Text: string |}
-                    deconstructionItem.Deconstruction, deconstructionItem.Text 
-
-                jetPopupMenu.DescribeItem.Advise(lifetime, fun args ->
-                    let (Deconstruction (deconstruction, text)) = args.Key
-
-                    let text =
-                        match deconstruction, singleField with
-                        | null, None -> "Ignore fields"
-                        | null, Some _ -> "Ignore field"
-                        | _ -> text
-
-                    args.Descriptor.Text <- RichText(text)
-                    args.Descriptor.Style <- MenuItemStyle.Enabled)
-
-                jetPopupMenu.ItemClicked.Advise(lifetime, fun (Deconstruction (deconstruction, _)) ->
-                    use readLockCookie = ReadLockCookie.Create()
-
-                    textControlLockLifetimeDefinition.Terminate()
-                    psiServices.Files.AssertAllDocumentAreCommitted()
-
-                    let pat = FSharpPatternUtil.toParameterOwnerPat pat UnionCasePatternInfo.Id
-                    if isNotNull deconstruction then
-                        deconstruct deconstruction pat
-                    else
-                        let endOffset = pat.GetNavigationRange().EndOffset
-                        textControl.Caret.MoveTo(endOffset, CaretVisualPlacement.DontScrollIfVisible))
-
-                jetPopupMenu.PopupWindowContextSource <- textControl.PopupWindowContextFactory.ForCaret()))
 
 
 [<Language(typeof<FSharpLanguage>)>]
 type UnionCasePatternRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
-    // todo: always allow going from left, only allow going from right is left part type matches
-    let rec skipParentOrPats (pat: IFSharpPattern) =
-        match OrPatNavigator.GetByPattern(pat) with
-        | null -> pat
-        | orPat -> skipParentOrPats orPat
-
     let getExpectedUnionOrEnumType (referenceName: IExpressionReferenceName) =
         if referenceName.IsQualified then None else
 
         let referencePat = ReferencePatNavigator.GetByReferenceName(referenceName)
-        let pat, path = FSharpPatternUtil.ParentTraversal.makeTuplePatPath referencePat
+        let pat, path = FSharpPatternUtil.ParentTraversal.makePatPath referencePat
         let matchClause = MatchClauseNavigator.GetByPattern(pat)
         let matchExpr = MatchExprNavigator.GetByClause(matchClause)
         if isNull matchExpr then None else
@@ -304,7 +193,7 @@ type UnionCasePatternRule() =
                     .WithRelevance(CLRLookupItemRelevance.Methods)
 
             if matchesType then
-                markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
+                markRelevance item (CLRLookupItemRelevance.ExpectedTypeMatch ||| CLRLookupItemRelevance.ExpectedTypeMatchStaticMember)
                 item.Placement.Location <- PlacementLocation.Top
 
             item
@@ -312,7 +201,7 @@ type UnionCasePatternRule() =
         let createUnionCaseItem (fcsEntityInstance: FcsEntityInstance) (returnType: FSharpType) displayContext name
                 symbol matchesType =
             let fcsType = returnType.Instantiate(fcsEntityInstance.Substitution)
-            let info = UnionCasePatternInfo(name, symbol, fcsEntityInstance, context, Ranges = context.Ranges)
+            let info = EnumCaseLikePatternInfo(name, symbol, fcsEntityInstance, context, Ranges = context.Ranges)
             let behavior = UnionCasePatternBehavior(info)
             createItem info behavior fcsType displayContext matchesType
 

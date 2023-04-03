@@ -116,6 +116,16 @@ type FSharpCompletionTest() =
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "SpaceBeforeUppercaseInvocation", "true")>]
     [<Test>] member x.``Pattern - Union case 09 - Space``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - Union case fields - Escaped 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case fields - Escaped 02 - Rqa``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case fields - Matched type - Or 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case fields - Matched type - Or 02``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case fields - Matched type - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case fields - Matched type - Tuple 02``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case fields - Matched type - Tuple 03``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case fields - Not matching type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case fields - Qualified 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Record Field 01``() = x.DoNamedTest()
     [<Test>] member x.``Record Field 02``() = x.DoNamedTest()
     [<Test>] member x.``Record Field 03``() = x.DoNamedTest()

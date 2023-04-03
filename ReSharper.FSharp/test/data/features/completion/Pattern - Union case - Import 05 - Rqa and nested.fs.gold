@@ -11,4 +11,4 @@ module Rqa =
 open Rqa.Nested
 
 match Rqa.Nested.A with
-| B i{caret}
+| B{caret}

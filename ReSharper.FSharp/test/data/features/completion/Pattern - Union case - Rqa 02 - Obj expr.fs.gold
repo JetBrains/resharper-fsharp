@@ -1,4 +1,4 @@
-﻿// ${COMPLETE_ITEM:A}
+﻿// ${COMPLETE_ITEM:U.A}
 module Module
 
 [<RequireQualifiedAccess>]
@@ -9,5 +9,5 @@ type U =
         { new System.IDisposable with
             member this.Dispose() =
                 match A(1, 2) with
-                | A(i, i1){caret}
+                | A{caret}
         }

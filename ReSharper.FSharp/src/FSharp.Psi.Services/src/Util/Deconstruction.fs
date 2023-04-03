@@ -37,7 +37,9 @@ type IFSharpDeconstruction =
 
     abstract Text: string
 
-    abstract DeconstructInnerPatterns: pat: IFSharpPattern * usedNames: ISet<string> -> IFSharpPattern * IFSharpPattern * string list list
+    abstract DeconstructInnerPatterns:
+        pat: IFSharpPattern * usedNames: ISet<string> ->
+            IFSharpPattern * IFSharpPattern * string list list
 
 module FSharpDeconstructionImpl =
     let createUnionCaseFields (context: ITreeNode) (fcsUnionCase: FSharpUnionCase)
@@ -62,39 +64,40 @@ module FSharpDeconstructionImpl =
             references.Any()
         | _ -> false
 
+    let getComponentNames (context: ITreeNode) usedNames (components: IDeconstructionComponent list) =
+        let isSingle = components.Length = 1
+
+        components
+        |> List.mapi (fun i tupleComponent ->
+            let defaultItemName = if isSingle then "Item" else $"Item{i + 1}"
+            FSharpNamingService.createEmptyNamesCollection context
+            |> (fun namesCollection ->
+                match tupleComponent with
+                | :? SingleValueDeconstructionComponent as valueComponent ->
+                    let name = valueComponent.Name
+                    if name <> defaultItemName then
+                        FSharpNamingService.addNames name context namesCollection |> ignore
+                | _ -> ()
+                namesCollection)
+            |> FSharpNamingService.addNamesForType tupleComponent.Type
+            |> (fun namesCollection ->
+                match tupleComponent with
+                | :? SingleValueDeconstructionComponent ->
+                    (namesCollection, []) ||> List.fold (fun _ name ->
+                        FSharpNamingService.addNames name context namesCollection)
+                | _ -> namesCollection)
+            |> FSharpNamingService.prepareNamesCollection usedNames context
+            |> fun names ->
+                let names = List.ofSeq names @ [(if isSingle then "item" else $"item{i + 1}"); "_"]
+                usedNames.Add(names.Head.RemoveBackticks()) |> ignore
+                List.distinct names)
+
     let createInnerPattern (pat: IFSharpPattern) (deconstruction: IFSharpDeconstruction) isStruct usedNames =
         let binding, _ = pat.GetBinding(true)
         let factory = pat.CreateElementFactory()
 
-        let components = deconstruction.Components |> List.ofSeq
-        let isSingle = components.Length = 1
-
-        let names =
-            components
-            |> List.mapi (fun i tupleComponent ->
-                let defaultItemName = if isSingle then "Item" else $"Item{i + 1}"
-                FSharpNamingService.createEmptyNamesCollection pat
-                |> (fun namesCollection ->
-                    match tupleComponent with
-                    | :? SingleValueDeconstructionComponent as valueComponent ->
-                        let name = valueComponent.Name
-                        if name <> defaultItemName then
-                            FSharpNamingService.addNames name pat namesCollection |> ignore
-                    | _ -> ()
-                    namesCollection)
-                |> FSharpNamingService.addNamesForType tupleComponent.Type
-                |> (fun namesCollection ->
-                    match tupleComponent with
-                    | :? SingleValueDeconstructionComponent ->
-                        (namesCollection, []) ||> List.fold (fun _ name ->
-                            FSharpNamingService.addNames name pat namesCollection)
-                    | _ -> namesCollection)
-                |> FSharpNamingService.prepareNamesCollection usedNames pat
-                |> fun names ->
-                    let names = List.ofSeq names @ [(if isSingle then "item" else $"item{i + 1}"); "_"]
-                    usedNames.Add(names.Head.RemoveBackticks()) |> ignore
-                    List.distinct names)
-
+        let components: IDeconstructionComponent list = deconstruction.Components |> List.ofSeq
+        let names = getComponentNames pat usedNames components
         let isTopLevel = binding :? ITopBinding
         let patternText = names |> Seq.map Seq.head |> String.concat ", "
         let patternText = if isStruct then $"struct ({patternText})" else patternText

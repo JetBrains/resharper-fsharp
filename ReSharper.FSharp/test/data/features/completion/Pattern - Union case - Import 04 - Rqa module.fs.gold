@@ -8,4 +8,4 @@ module Nested =
         | B of int
 
 match Nested.U.A with
-| Nested.B i{caret}
+| Nested.B{caret}

@@ -9,4 +9,4 @@ module Nested =
 open Nested
 
 match Nested.U.A with
-| B i{caret}
+| B{caret}

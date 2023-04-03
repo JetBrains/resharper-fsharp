@@ -6,4 +6,4 @@ type U =
     | B of int * hey: string
 
 match A with
-| B(i, hey){caret}
+| B{caret}

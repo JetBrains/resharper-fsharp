@@ -9,4 +9,4 @@ type U =
 let t = U.A, 1
 
 match t with
-| U.B i{caret}
+| U.B{caret}

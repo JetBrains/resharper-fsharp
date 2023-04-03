@@ -1,0 +1,10 @@
+﻿// ${COMPLETE_ITEM:i, foo}
+module Module
+
+type U<'T> =
+    | A
+    | B of int * 'T
+
+
+match 1 with
+| U.B({caret})

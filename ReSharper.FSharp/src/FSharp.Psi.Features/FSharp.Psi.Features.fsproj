@@ -16,6 +16,7 @@
     <Compile Include="src\CodeCompletion\Rules\ToRecursiveFunctionRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\FSharpRelevanceRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\UnionCasePatternRule.fs" />
+    <Compile Include="src\CodeCompletion\Rules\UnionCaseFieldsRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\RecordFieldRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\RemoveReparsePatternRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\ImportRule.fs" />

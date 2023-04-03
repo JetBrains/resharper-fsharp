@@ -1168,6 +1168,10 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) s
 
     | _ -> MatchTest.Error, []
 
+let ofMatchClause (value: MatchValue) (matchClause: IMatchClause) =
+    let deconstructions = OneToListMap()
+    getMatchPattern deconstructions value false matchClause.Pattern
+
 let ofMatchExpr (matchExpr: IMatchExpr) =
     let matchType = getMatchExprMatchType matchExpr
     let matchValue = { Type = matchType; Path = [] }

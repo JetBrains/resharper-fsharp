@@ -7,4 +7,4 @@ type U =
     | B of int
 
 match U.A with
-| U.B i{caret}
+| U.B{caret}

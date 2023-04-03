@@ -1,4 +1,4 @@
-﻿// ${COMPLETE_ITEM:A}
+﻿// ${COMPLETE_ITEM:U.A}
 module Module
 
 [<RequireQualifiedAccess>]
@@ -7,4 +7,4 @@ type U =
 
     static member P =
         match A(1, 2) with
-        | A(i, i1){caret}
+        | A{caret}

@@ -74,6 +74,19 @@ type FSharpOnSpaceAutopopupStrategy() =
 
                 | _ -> false
 
+            | TokenType FSharpTokenType.IDENTIFIER identifier ->
+                match identifier.Parent with
+                | :? IExpressionReferenceName as referenceName ->
+                    referenceName.Identifier == identifier &&
+
+                    let refPat = LocalReferencePatNavigator.GetByReferenceName(referenceName)
+                    isNotNull refPat &&
+
+                    isNull refPat.Binding &&
+                    isNull (BindingNavigator.GetByParameterPattern(refPat))
+
+                | _ -> false
+
             | _ -> false
         )
 

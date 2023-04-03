@@ -105,7 +105,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
     override this.IsAvailable _ =
         isNotNull pat &&
 
-        let pat, _ = FSharpPatternUtil.ParentTraversal.makeTuplePatPath pat
+        let pat, _ = FSharpPatternUtil.ParentTraversal.makePatPath pat
         isNotNull (ParametersPatternDeclarationNavigator.GetByPattern(pat)) &&
 
         getFcsEntity typeUsage

@@ -7,5 +7,5 @@ type U =
     | Bb of int
 
 match U.A with
-| U.Bb i{caret}
+| U.Bb{caret}
 | U.Bb i -> ()
