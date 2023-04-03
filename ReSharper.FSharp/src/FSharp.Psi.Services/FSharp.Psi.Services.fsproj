@@ -64,6 +64,7 @@
     <Compile Include="src\Generate\FSharpGeneratorContext.fs" />
     <Compile Include="src\Generate\GenerateOverrides.fs" />
     <Compile Include="src\Generate\GenerateProvider.fs" />
+    <Compile Include="src\Generate\GenerateSignatureProvider.fs" />
     <Compile Include="src\Refactorings\Rename.fs" />
     <Compile Include="src\Refactorings\IntroduceVariable.fs" />
     <Compile Include="src\Refactorings\FSharpInlineVariable.fs" />
