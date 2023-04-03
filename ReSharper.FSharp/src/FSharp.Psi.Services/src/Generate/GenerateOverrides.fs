@@ -199,7 +199,7 @@ let getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeDeclaration): ITreeN
     let selectedTreeNode = psiView.GetSelectedTreeNode()
     if canInsertAtNode selectedTreeNode then
         let lastMeaningFullTokenOfTypeDel = typeDecl.FindLastTokenIn().GetPreviousMeaningfulToken(true)
-        if selectedTreeNode.GetDocumentEndOffset().Offset <= lastMeaningFullTokenOfTypeDel.GetDocumentEndOffset().Offset
+        if typeDecl.Contains(selectedTreeNode)
         then selectedTreeNode else lastMeaningFullTokenOfTypeDel
     else    
     let objectTypeRepr = psiView.GetSelectedTreeNode<IObjectModelTypeRepresentation>()
