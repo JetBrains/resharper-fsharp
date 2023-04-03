@@ -26,7 +26,7 @@ type FSharpGeneratorContext(kind, [<NotNull>] treeNode: ITreeNode, [<CanBeNull>]
 
     override x.Language = FSharpLanguage.Instance :> _
 
-    override x.Root = typeDecl :> _
+    override x.Root = treeNode
     override val Anchor = null with get, set
 
     override x.PsiModule = treeNode.GetPsiModule()

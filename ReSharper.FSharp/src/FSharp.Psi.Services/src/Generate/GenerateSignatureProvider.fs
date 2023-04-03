@@ -1,37 +1,61 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ContextActions
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 
-open System.IO
 open System.Text
 open FSharp.Compiler.Symbols
+open JetBrains.ReSharper.Feature.Services.Generate
+open JetBrains.ReSharper.Feature.Services.Generate.Workflows
+open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.Transactions
+open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp
+open System.IO
 open JetBrains.Application.UI.PopupLayout
 open JetBrains.ReSharper.Feature.Services.Navigation
-open JetBrains.ReSharper.Psi.Naming
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.DocumentManagers.Transactions.ProjectHostActions.Ordering
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.RdBackend.Common.Features.ProjectModel
-open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
-open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open  JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Feature.Services.Generate.Actions
+open JetBrains.ReSharper.Feature.Services.Resources
+open JetBrains.ReSharper.Psi.Naming
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
-// extract value -> ctrl alt v
-// undo that -> ctrl alt n
+module FSharpGeneratorKinds =
+    let [<Literal>] SignatureFile = "SignatureFile"
 
-// TODO: what about attributes, type parameters, delegates, exceptions
+type FSharpGeneratorSignatureElement(fsFile: IFSharpFile) =
+    inherit GeneratorElementBase()
 
-// FSharpTokenType.AND.CreateLeafElement()
+    override this.GetPresentationObject() = fsFile
+    override this.Matches(_searchText, matcher) = matcher.Matches(this.TestDescriptor)
+    override this.TestDescriptor = "Generate signature file title" // fsFile.GetSourceFile().Name
+    
+    interface IGeneratorElementPresenter with
+        member this.InitGeneratorPresenter(presenter) =
+            presenter.Present<FSharpGeneratorSignatureElement>(fun value item structureelement state ->
+                item.RichText <-
+                    // Text seen in the popup of the selectable item.
+                    JetBrains.UI.RichText.RichText(fsFile.GetSourceFile().Name)
+                item.Images.Add(PsiServicesThemedIcons.HasImplementations.Id))
 
-[<ContextAction(Group = "F#", Name = "Generate signature file for current file", Priority = 1s,
-                Description = "Generate signature file for current file.")>]
-type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) =
-    inherit FSharpContextActionBase(dataProvider)
+[<GeneratorElementProvider(FSharpGeneratorKinds.SignatureFile, typeof<FSharpLanguage>)>]
+type FSharpGenerateSignatureProvider() =
+    inherit GeneratorProviderBase<FSharpGeneratorContext>()
 
+    override this.Populate(context: FSharpGeneratorContext): unit =
+        let node = context.Root :?> IFSharpTreeNode
+        context.ProvidedElements.Add(FSharpGeneratorSignatureElement(node.FSharpFile))
+
+[<GeneratorBuilder(FSharpGeneratorKinds.SignatureFile, typeof<FSharpLanguage>)>]
+type FSharpGenerateSignatureBuilder() =
+    inherit GeneratorBuilderBase<FSharpGeneratorContext>()
+    
+    // TODO: what about attributes, type parameters, delegates, exceptions
+    
     let mkSignatureFile (fsharpFile: IFSharpFile): IFSharpFile  =
         let factory : IFSharpElementFactory = fsharpFile.CreateElementFactory(extension = FSharpSignatureProjectFileType.FsiExtension)
         let signatureFile : IFSharpFile = factory.CreateEmptyFile()
@@ -174,26 +198,31 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
 
         signatureFile
 
-    override this.Text = "Generate signature file for current file"
-
-    override this.IsAvailable _ =
-        let solution = dataProvider.Solution
+    override this.IsAvailable(context: FSharpGeneratorContext): bool =
+        let node = context.Root :?> IFSharpTreeNode
+        let currentFSharpFile = node.FSharpFile
+        if currentFSharpFile.IsFSharpSigFile() then false else
+        let solution = node.GetSolution()
         let isSettingEnabled = solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.GenerateSignatureFile)
         if not isSettingEnabled then false else
-        let currentFSharpFile = dataProvider.PsiFile
         let fcsService = currentFSharpFile.FcsCheckerService
         // TODO: don't check has pair in unit test
-        let hasSignature = fcsService.FcsProjectProvider.HasPairFile dataProvider.SourceFile
+        let hasSignature = fcsService.FcsProjectProvider.HasPairFile (node.GetSourceFile())
         not hasSignature
 
-    override this.ExecutePsiTransaction(solution, _) =
-        let projectFile = dataProvider.SourceFile.ToProjectFile()
-        let fsharpFile = projectFile.GetPrimaryPsiFile().AsFSharpFile()
-        let physicalPath = dataProvider.SourceFile.ToProjectFile().Location.FileAccessPath
-        let fsiFile = Path.ChangeExtension(physicalPath, ".fsi")
-        let signatureFile = mkSignatureFile fsharpFile
-        File.WriteAllText(fsiFile, signatureFile.GetText())
+    override this.Process(context) =
+        let node = context.Root :?> IFSharpTreeNode
+        use writeCookie = WriteLockCookie.Create(node.IsPhysical())
+        use transactionCookie =
+            PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(node.GetPsiServices(), FSharpGeneratorKinds.SignatureFile)
 
+        let currentFSharpFile = node.FSharpFile
+        let projectFile = node.GetSourceFile().ToProjectFile()
+        let physicalPath = projectFile.Location.FileAccessPath
+        let fsiFile = Path.ChangeExtension(physicalPath, ".fsi")
+        let signatureFile = mkSignatureFile currentFSharpFile
+        File.WriteAllText(fsiFile, signatureFile.GetText())
+        let solution = node.GetSolution()
         solution.InvokeUnderTransaction(fun transactionCookie ->
             let virtualPath = FileSystemPath.TryParse(fsiFile).ToVirtualFileSystemPath()
             let relativeTo = RelativeTo(projectFile, RelativeToType.Before)
@@ -210,8 +239,23 @@ type GenerateSignatureFileAction(dataProvider: FSharpContextActionDataProvider) 
                     |> ignore
         )
 
-        null
+type FSharpGenerateSignatureWorkflow() =
+    inherit GenerateCodeWorkflowBase(
+        FSharpGeneratorKinds.SignatureFile,
+        PsiServicesThemedIcons.Implements.Id,
+        // Seen in the dropdown menu when alt + insert is pressed.
+        "Generate signature file",
+        GenerateActionGroup.CLR_LANGUAGE,
+        // Title of the window that opens up when the workflow is started.
+        "Generate signature file",
+        // Description of the window that opens up when the workflow is started.
+        $"Generate a signature file for the current file.",
+        FSharpGeneratorKinds.SignatureFile)
 
-        // First test name would be: ``ModuleStructure 01`` , ``NamespaceStructure 01``
+    override this.Order = 10. // See GeneratorStandardOrder.cs
 
-        // TODO: raise parser issue.
+[<GenerateProvider>]
+type FSharpGenerateSignatureWorkflowProvider() =
+    interface IGenerateImplementationsWorkflowProvider with
+        member this.CreateWorkflow _ =
+            [| FSharpGenerateSignatureWorkflow() |]
