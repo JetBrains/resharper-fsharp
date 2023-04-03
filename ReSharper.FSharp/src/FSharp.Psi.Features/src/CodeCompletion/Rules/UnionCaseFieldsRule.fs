@@ -126,11 +126,8 @@ type UnionCaseFieldsPatternRule() =
                     |> Seq.tryHead
                     |> Option.bind loop
 
-                | MatchType.Union expectedUnionInstance ->
-                    let expectedUnionEntity = expectedUnionInstance.Entity
-                    let unionEntity = unionCase.ReturnType.TypeDefinition
-                    if expectedUnionEntity.XmlDocSig <> unionEntity.XmlDocSig then None else
-
+                | MatchType.Union expectedUnionInstance when
+                        expectedUnionInstance.Entity = unionCase.ReturnType.TypeDefinition ->
                     Some expectedUnionInstance
 
                 | _ -> None
