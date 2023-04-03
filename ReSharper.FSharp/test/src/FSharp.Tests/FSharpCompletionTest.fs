@@ -521,3 +521,8 @@ type FSharpCodeCompletionTypingTest() =
     [<Test>] member x.``Space - Record 02``() = x.DoNamedTest()
     [<Test>] member x.``Space - Record 03``() = x.DoNamedTest()
     [<Test>] member x.``Space - Record 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``LParen - Pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``LParen - Pattern 02``() = x.DoNamedTest()
+    [<Test>] member x.``LParen - Pattern 03``() = x.DoNamedTest()
+    [<Test>] member x.``LParen - Pattern 04``() = x.DoNamedTest()
