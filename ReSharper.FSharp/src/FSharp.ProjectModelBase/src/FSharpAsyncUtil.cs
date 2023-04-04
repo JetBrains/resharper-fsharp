@@ -1,11 +1,13 @@
 using System;
-using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Threading;
+using JetBrains.Collections.Viewable;
 using JetBrains.Core;
 using JetBrains.Lifetimes;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Threading;
 using Microsoft.FSharp.Control;
 
@@ -18,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     private static readonly Action ourDefaultInterruptCheck =
       () => Interruption.Current.CheckAndThrow();
 
-    private static readonly ConcurrentQueue<Action> myReadRequests = new();
+    private static readonly FSharpReadLockRequestsQueue myReadRequests = new();
 
     /// <summary>
     /// Try to execute <paramref name="action"/> using read lock on the current thread.
@@ -78,12 +80,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       var cancellationToken = lifetimeDefinition.Lifetime.ToCancellationToken();
       var task = FSharpAsync.StartAsTask(async, null, cancellationToken);
 
+      task.ContinueWith(_ => myReadRequests.WakeUp(), CancellationToken.None,
+        TaskContinuationOptions.ExecuteSynchronously, SynchronousScheduler.Instance);
+
+      if (Shell.Instance.GetComponent<IShellLocks>().IsReadAccessAllowed())
+        ShellLifetimes.ReadActivityLifetime.OnTermination(() => myReadRequests.WakeUp());
+
       while (!task.IsCompleted)
       {
-        var finished = task.Wait(InterruptCheckTimeout, cancellationToken);
-        if (finished) break;
+        var action = myReadRequests.ExtractOrBlock(InterruptCheckTimeout, task);
+        action?.Invoke();
 
-        ProcessEnqueuedReadRequests();
+        if (task.IsCompleted)
+          break;
 
         interruptChecker();
       }
