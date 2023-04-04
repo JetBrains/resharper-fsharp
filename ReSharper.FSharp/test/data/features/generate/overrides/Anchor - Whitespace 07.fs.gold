@@ -1,0 +1,15 @@
+﻿Provided elements:
+ 0: ToString():System.String
+ 1: Equals(System.Object):System.Boolean
+ 2: GetHashCode():System.Int32
+ 3: Finalize():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:ToString():System.String}
+
+type T =
+    | C of int
+
+    override this.ToString() = {selstart}failwith "todo"{selend}
+    
+
