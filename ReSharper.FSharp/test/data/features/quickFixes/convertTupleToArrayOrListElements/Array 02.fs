@@ -1,2 +1,2 @@
-let _: int list = [ a, b{caret} ]
+let _: int[] = [| a, b{caret} |]
 
