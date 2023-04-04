@@ -1,5 +1,57 @@
 # Release notes
 
+### 2023.1
+
+### Code completion
+
+* **New**: When starting a `match` expression, the new 'Match values' suggestion generates all cases for union, enum, bool and tuple values
+* **New**: postfix templates:
+  * `match`: rewrites the expressions and adds boilerplate needed to start a `match` expression
+  * `for`: makes it easier to iterate over a sequence, suggests name for the loop variable, and suggests deconstrucing it
+  * `with`: simplifies updating possibly nested record values, with initial implementation by [@ieviev](https://github.com/ieviev) ([#436](https://github.com/JetBrains/resharper-fsharp/pull/436))
+* **New**: automatically insert ` = ` when completing record fields
+* **New**: show completion popup automatically when writing subsequent record fields and starting a new match branch
+
+### Code analysis
+
+* **New**: Automatically inject Regex language inside string literals, with initial implementation by [@saul](https://github.com/saul) ([#134](https://github.com/JetBrains/resharper-fsharp/pull/134))
+* **New**: support `WarningsNotAsWarnings` property
+* **Fix**: Abstract properties with setters could be seen incorrectly by some features
+* **Fix**: lambda analyzer would suggest simplifying invocations of methods with optional parameters, and active patterns
+* **Fix**: some `xint` literals weren't highlighted properly, by [@En3Tho](https://github.com/En3Tho) ([#474](https://github.com/JetBrains/resharper-fsharp/commit/01ba40511c876744790c6dd63fb58ae73bd207f3))
+* **Fix**: 'Parameter info' now shows correct signature for delegates
+* **Fix**: 'Parameter info' could use wrong parameter documentation
+* **Fix**: `base` wouldn't be highlighted in some cases
+* **Fix**: syntax highlighting didn't work for F# files included as content
+* **Fix**: escaping of reserved keywords was considered redundant
+* **Fix**: using `open type` could break 'Import type' completion and quick fix
+* **Fix**: redundant parens analyzer now takes dymamic invocations and more indexer-like expressions into account
+* **Fix**: better generics analysis is now used in redundant qualifier analyzer
+* **Fix**: an empty tooltip could be shown when hovering punctuation symbols
+* **Fix**: tooltips could be unavailable on multi-tarteting projects
+* **Fix**: syntax highlighting could be broken after editing an unfinished escaped name
+* **Improve**: redundant attribute analisys is updated for upcoming F# 8
+
+### Quick fixes
+
+* **New**: **FS0025**: new quick fix for generating missing branches in `match` expressions
+* **New**: **FS0008**: a new quick fix annotates a parameter value with the base type when type checking it inside the function
+* **New**: **FS0725**, **FS3191**: remove unexpected argument patterns, by [@edgarfgp](https://github.com/edgarfgp) ([#444](https://github.com/JetBrains/resharper-fsharp/pull/444))
+* **New**: **FS0810**: add a setter to a property
+* **Improve**: **FS0025**: Add missing `|` when generating `_` branch in a `match` expression
+* **Improve**: **FS0001**: suggest fixing single tuple list to list of items (e.g. `[1,2,3]` to `[1;2;3]`) in more cases
+* **Improve**: better check if parens are needed when simplifying a lambda expression
+* **Fix**: **FS0365**, **FS0366**: fix broken overrides generation on empty type declaration bodies
+
+### Misc
+
+* **New**: deconstruction of `KeyValue` active pattern is suggested in 'Introduce Variable', `for` postfix template, and 'Deconstruct' context action
+* **Improve**: keep the cursor on the correct place when reformatting code, thanks to the new Fantomas Cursor API
+* **New**: auto-detect available Fantomas settings and their defaults
+* **Improve**: use Server GC in Fantomas process
+* **Fix**: 'Inline variable' refactoring worked incorrectly when inlining a named literal into a pattern
+* **Fix**: 'Extend selection' feature wouldn't select closing paren in union case patterns, by [@nojaf](https://github.com/nojaf) ([#496](https://github.com/JetBrains/resharper-fsharp/pull/496))
+
 ## 2022.3
 
 ### Type providers
