@@ -854,10 +854,11 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) s
             let t1 = t1.ErasedType
             let t2 = t2.ErasedType
 
-            t1.HasTypeDefinition = t2.HasTypeDefinition
+            t1.HasTypeDefinition = t2.HasTypeDefinition &&
+            t1.TypeDefinition = t2.TypeDefinition
 
         if isNull unionCase || not (equals unionCase.ReturnType union.FcsType) then None else
-        union.Entity.UnionCases |> Seq.tryFindIndex ((=) unionCase)
+        union.Entity.UnionCases |> Seq.tryFindIndex (fun uc -> uc.XmlDocSig = unionCase.XmlDocSig)
 
     let addTupleItemDeconstructions parentPath testCtor count =
         for i in 0 .. count do
