@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="netstandard" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
   </ItemGroup>
 
