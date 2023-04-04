@@ -20,7 +20,7 @@
 * **Fix**: lambda analyzer would suggest simplifying invocations of methods with optional parameters, and active patterns
 * **Fix**: some `xint` literals weren't highlighted properly, by [@En3Tho](https://github.com/En3Tho) ([#474](https://github.com/JetBrains/resharper-fsharp/commit/01ba40511c876744790c6dd63fb58ae73bd207f3))
 * **Fix**: 'Parameter info' now shows correct signature for delegates
-* **Fix**: 'Parameter info' could use wrong parameter documentation
+* **Fix**: 'Parameter info' could use wrong parameter documentation on extension methods
 * **Fix**: `base` wouldn't be highlighted in some cases
 * **Fix**: syntax highlighting didn't work for F# files included as content
 * **Fix**: escaping of reserved keywords was considered redundant
