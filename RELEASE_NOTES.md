@@ -11,6 +11,7 @@
   * `with`: simplifies updating possibly nested record values, with initial implementation by [@ieviev](https://github.com/ieviev) ([#436](https://github.com/JetBrains/resharper-fsharp/pull/436))
 * **New**: automatically insert ` = ` when completing record fields
 * **New**: show completion popup automatically when writing subsequent record fields and starting a new match branch
+* **New**: deconstruction of `KeyValue` active pattern is suggested in `for` and `let` postfix templates, 'Introduce Variable' refactoring, and 'Deconstruct' context action
 
 ### Code analysis
 
@@ -18,7 +19,7 @@
 * **New**: support `WarningsNotAsWarnings` property
 * **Fix**: Abstract properties with setters could be seen incorrectly by some features
 * **Fix**: lambda analyzer would suggest simplifying invocations of methods with optional parameters, and active patterns
-* **Fix**: some `xint` literals weren't highlighted properly, by [@En3Tho](https://github.com/En3Tho) ([#474](https://github.com/JetBrains/resharper-fsharp/commit/01ba40511c876744790c6dd63fb58ae73bd207f3))
+* **Fix**: some `xint` literals weren't highlighted properly, by [@En3Tho](https://github.com/En3Tho) ([#474](https://github.com/JetBrains/resharper-fsharp/pull/474))
 * **Fix**: 'Parameter info' now shows correct signature for delegates
 * **Fix**: 'Parameter info' could use wrong parameter documentation on extension methods
 * **Fix**: `base` wouldn't be highlighted in some cases
@@ -45,7 +46,6 @@
 
 ### Misc
 
-* **New**: deconstruction of `KeyValue` active pattern is suggested in 'Introduce Variable', `for` postfix template, and 'Deconstruct' context action
 * **Improve**: keep the cursor on the correct place when reformatting code, thanks to the new Fantomas Cursor API
 * **New**: auto-detect available Fantomas settings and their defaults
 * **Improve**: use Server GC in Fantomas process
