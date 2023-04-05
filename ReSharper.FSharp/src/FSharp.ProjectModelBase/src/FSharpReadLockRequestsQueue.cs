@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
 {
@@ -13,7 +14,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     public void Enqueue(Action action)
     {
       lock (mySyncObject)
+      {
         myQueue.Enqueue(action);
+        Monitor.Pulse(mySyncObject);
+      }
     }
 
     public bool TryDequeue(out Action result)
@@ -27,6 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       }
     }
 
+    [CanBeNull]
     public Action ExtractOrBlock(int timeout, Task fcsTask = null)
     {
       lock (mySyncObject)
