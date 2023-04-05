@@ -25,12 +25,12 @@
 * **Fix**: syntax highlighting didn't work for F# files included as content
 * **Fix**: escaping of reserved keywords was considered redundant
 * **Fix**: using `open type` could break 'Import type' completion and quick fix
-* **Fix**: redundant parens analyzer now takes dymamic invocations and more indexer-like expressions into account
+* **Fix**: redundant parens analyzer now takes dynamic invocations and more indexer-like expressions into account
 * **Fix**: better generics analysis is now used in redundant qualifier analyzer
 * **Fix**: an empty tooltip could be shown when hovering punctuation symbols
 * **Fix**: tooltips could be unavailable on multi-tarteting projects
 * **Fix**: syntax highlighting could be broken after editing an unfinished escaped name
-* **Improve**: redundant attribute analisys is updated for upcoming F# 8
+* **Improve**: redundant attribute analysis is updated for upcoming F# 8
 
 ### Quick fixes
 
