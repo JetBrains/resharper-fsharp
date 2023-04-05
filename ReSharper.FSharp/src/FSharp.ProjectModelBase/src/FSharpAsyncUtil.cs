@@ -84,7 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
         TaskContinuationOptions.ExecuteSynchronously, SynchronousScheduler.Instance);
 
       if (Shell.Instance.GetComponent<IShellLocks>().IsReadAccessAllowed())
-        ShellLifetimes.ReadActivityLifetime.OnTermination(() => myReadRequests.WakeUp());
+        ShellLifetimes.ReadActivityLifetime.TryOnTermination(() => myReadRequests.WakeUp());
 
       while (!task.IsCompleted)
       {
