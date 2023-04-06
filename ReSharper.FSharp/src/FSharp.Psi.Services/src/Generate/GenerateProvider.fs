@@ -219,17 +219,31 @@ type FSharpOverridingMembersBuilder() =
             let deleteTypeRepr (typeDecl: IFSharpTypeDeclaration) : ITreeNode =
                 let equalsToken = typeDecl.EqualsToken.NotNull()
 
-                let anchor =
+                let equalsAnchor =
                     let afterComment = getLastMatchingNodeAfter isInlineSpaceOrComment equalsToken
                     let afterSpace = getLastMatchingNodeAfter isInlineSpace equalsToken
                     if afterComment != afterSpace then afterComment else equalsToken :> _
                 
-                deleteChildRange anchor.NextSibling typeRepr
+                let prev = typeRepr.GetPreviousNonWhitespaceToken()
+                if prev.IsCommentToken() then
+                    deleteChildRange prev.NextSibling typeRepr
+                    prev
+                else
+                    deleteChildRange equalsAnchor.NextSibling typeRepr
+                    equalsAnchor
 
-                equalsToken :> _
-            
             let anchor =
-                if ClassRepresentationUtil.isEmptyClassRepr typeRepr then
+                let isEmptyClassRepr =
+                    match typeRepr with
+                        | :? IClassRepresentation as classRepr ->
+                            let classKeyword = classRepr.BeginKeyword
+                            let endKeyword = classRepr.EndKeyword
+
+                            isNotNull classKeyword &&
+                            isNotNull endKeyword &&
+                            classKeyword.GetNextNonWhitespaceToken() == endKeyword
+                        | _ -> false
+                if isEmptyClassRepr then
                     deleteTypeRepr typeDecl
                 else
                     context.Anchor

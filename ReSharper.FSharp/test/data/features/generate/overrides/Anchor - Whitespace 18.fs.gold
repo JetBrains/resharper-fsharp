@@ -7,6 +7,7 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String}
 
-type T() = // comment
+type A() =
+  override this.ToString() = {selstart}failwith "todo"{selend} // some comment
 
-  override this.ToString() = {selstart}failwith "todo"{selend}
+  
