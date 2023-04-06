@@ -214,13 +214,31 @@ type FSharpOverridingMembersBuilder() =
         | _ -> ()
 
         let anchor: ITreeNode =
-            let anchor = context.Anchor
+            let typeRepr = typeDecl.TypeRepresentation
+            
+            let deleteTypeRepr (typeDecl: IFSharpTypeDeclaration) : ITreeNode =
+                let equalsToken = typeDecl.EqualsToken.NotNull()
+
+                let anchor =
+                    let afterComment = getLastMatchingNodeAfter isInlineSpaceOrComment equalsToken
+                    let afterSpace = getLastMatchingNodeAfter isInlineSpace equalsToken
+                    if afterComment != afterSpace then afterComment else equalsToken :> _
+                
+                deleteChildRange anchor.NextSibling typeRepr
+
+                equalsToken :> _
+            
+            let anchor =
+                if ClassRepresentationUtil.isEmptyClassRepr typeRepr then
+                    deleteTypeRepr typeDecl
+                else
+                    context.Anchor
+
             if isNotNull anchor then anchor else
 
             let typeMembers = typeDecl.TypeMembers
             if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
 
-            let typeRepr = typeDecl.TypeRepresentation
             if isNull typeRepr then
                 typeDecl.EqualsToken.NotNull() else
 
@@ -232,16 +250,7 @@ type FSharpOverridingMembersBuilder() =
 
             if objModelTypeRepr :? IStructRepresentation then objModelTypeRepr :> _ else
 
-            let equalsToken = typeDecl.EqualsToken.NotNull()
-
-            let anchor =
-                let afterComment = getLastMatchingNodeAfter isInlineSpaceOrComment equalsToken
-                let afterSpace = getLastMatchingNodeAfter isInlineSpace equalsToken
-                if afterComment != afterSpace then afterComment else equalsToken :> _
-
-            deleteChildRange anchor.NextSibling typeRepr
-
-            equalsToken :> _
+            objModelTypeRepr
 
         let (anchor: ITreeNode), indent =
             let getIdentForUnion (unionRepr: IUnionRepresentation) =
@@ -273,6 +282,7 @@ type FSharpOverridingMembersBuilder() =
 
                     match typeDecl.TypeRepresentation with
                     | :? IUnionRepresentation as unionRepr -> getIdentForUnion unionRepr
+                    | :? IClassRepresentation -> typeDecl.Indent + typeDecl.GetIndentSize()
                     | _ ->
                     
                     let typeRepr = typeDecl.TypeRepresentation

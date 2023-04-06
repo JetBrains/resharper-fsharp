@@ -8,9 +8,10 @@
 // ${SELECT0:ToString():System.String}
 
 type A() =
-  class end
+  class
+    // some comment
+  end
 
-and B() =
   override this.ToString() = {selstart}failwith "todo"{selend}
 
   
