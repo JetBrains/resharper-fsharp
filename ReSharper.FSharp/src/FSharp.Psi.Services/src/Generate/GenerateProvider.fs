@@ -210,6 +210,7 @@ type FSharpOverridingMembersBuilder() =
             let caseDecl = unionRepr.Cases.FirstOrDefault()
             if isNotNull caseDecl then
                 EnumCaseLikeDeclarationUtil.addBarIfNeeded caseDecl
+                EnumCaseLikeDeclarationUtil.addNewLineIfNeeded typeDecl unionRepr
         | _ -> ()
 
         let anchor: ITreeNode =
@@ -243,10 +244,17 @@ type FSharpOverridingMembersBuilder() =
             equalsToken :> _
 
         let (anchor: ITreeNode), indent =
+            let getIdentForUnion (unionRepr: IUnionRepresentation) =
+                if typeDecl.StartLine <> unionRepr.StartLine then unionRepr.Indent else
+                typeDecl.Indent + typeDecl.GetIndentSize()
+            
             match anchor with
             | :? IStructRepresentation as structRepr ->
                 structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
 
+            | :? IUnionRepresentation as unionRepr ->
+                anchor, getIdentForUnion unionRepr
+                
             | :? ITokenNode as token ->
                 let parent = token.Parent
                 match parent with
@@ -263,6 +271,10 @@ type FSharpOverridingMembersBuilder() =
                     | Some memberDecl -> memberDecl.Indent
                     | _ ->
 
+                    match typeDecl.TypeRepresentation with
+                    | :? IUnionRepresentation as unionRepr -> getIdentForUnion unionRepr
+                    | _ ->
+                    
                     let typeRepr = typeDecl.TypeRepresentation
                     if isNotNull typeRepr then typeRepr.Indent else
 

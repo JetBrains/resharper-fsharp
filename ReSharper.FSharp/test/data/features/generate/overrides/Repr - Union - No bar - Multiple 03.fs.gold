@@ -7,8 +7,8 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String}
 
-type X = 
-  | Foo of int
+type U =
+    | C1 of int
+    | C2
 
-  override this.ToString() = {selstart}failwith "todo"{selend}
-
+    override this.ToString() = {selstart}failwith "todo"{selend}
