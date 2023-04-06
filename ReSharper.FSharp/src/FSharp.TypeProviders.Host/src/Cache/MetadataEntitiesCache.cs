@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Collections;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Utils;
 #if NETFRAMEWORK
-using JetBrains.Collections;
 #endif
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;

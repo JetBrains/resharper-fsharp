@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ExtraGeneratedSource Include="..\..\..\..\..\Obj\Obj.Plugins\Plugins\fsharp-support\ReSharper.FSharp\src\FSharp.Fantomas.Host\FSharp.Fantomas.Host.csproj\GeneratedAssemblyLevelAttributes.Generated.cs" Link="Gen\Attributes.cs" />
+  </ItemGroup>
+</Project>

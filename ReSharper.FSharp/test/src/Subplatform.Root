@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SubplatformInfo xmlns="urn:schemas-jetbrains-com:build-subplatform-info" CompanyNameHuman="JetBrains" IsGitSubplatform="true">
+    <SubplatformInfo.SubplatformReferences>
+        <SubplatformReference Name="Rider\Rider.Backend" />
+        <SubplatformReference Name="Plugins\fsharp-support\ReSharper.FSharp\src" />
+        <SubplatformReference Name="Psi.Features\test\Framework" />
+    </SubplatformInfo.SubplatformReferences>
+</SubplatformInfo>
