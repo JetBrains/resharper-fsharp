@@ -40,7 +40,7 @@ let addBarIfNeeded (caseDeclaration: IEnumCaseLikeDeclaration) =
         (reduceIndent caseDeclaration.PrevSibling || reduceIndent typeRepr.PrevSibling) |> ignore
 
 let addNewLineIfNeeded (typeDecl: IFSharpTypeDeclaration) (typeRepr: IEnumLikeTypeRepresentation) =
-    if typeDecl.StartLine <> typeRepr.StartLine || isNull typeRepr.FirstChild then () else
+    if typeDecl.StartLine <> typeRepr.StartLine then () else
 
     use cookie = WriteLockCookie.Create(typeRepr.IsPhysical())
     addNodesBefore typeRepr.FirstChild [
