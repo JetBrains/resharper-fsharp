@@ -9,7 +9,6 @@
 
 type A() =
   // some comment
-
   override this.ToString() = {selstart}failwith "todo"{selend}
 
   

@@ -132,7 +132,8 @@ let noEmptyLineAnchors =
         FSharpTokenType.STRUCT,
         FSharpTokenType.CLASS,
         FSharpTokenType.WITH,
-        FSharpTokenType.EQUALS)
+        FSharpTokenType.EQUALS,
+        FSharpTokenType.LINE_COMMENT)
 
 let getThisOrPreviousMeaningfulSibling (node: ITreeNode) =
     if isNotNull node && node.IsFiltered() then node.GetPreviousMeaningfulSibling() else node
