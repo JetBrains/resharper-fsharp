@@ -1,4 +1,5 @@
 import com.jetbrains.rd.generator.gradle.RdGenExtension
+import com.jetbrains.rd.generator.gradle.RdGenTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.intellij.IntelliJPluginConstants
@@ -88,6 +89,13 @@ extra["rdLibDirectory"] = rdLibDirectory
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 val primaryTargetFramework = "net472"
 val outputRelativePath = "bin/$buildConfiguration/$primaryTargetFramework"
+val ktOutputRelativePath = "src/main/java/com/jetbrains/rider/plugins/fsharp/protocol"
+
+val productMonorepoDir = getProductMonorepoRoot()
+val monorepoPreGeneratedRootDir by lazy { productMonorepoDir?.resolve("Plugins/_ReSharperFSharp.Pregenerated") ?: error("Building not in monorepo") }
+val monorepoPreGeneratedFrontendDir by lazy {  monorepoPreGeneratedRootDir.resolve("Frontend") }
+val monorepoPreGeneratedBackendDir by lazy {  monorepoPreGeneratedRootDir.resolve("BackendModel") }
+val ktOutputMonorepoRoot by lazy { monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath) }
 
 val libFiles = listOf(
   "FSharp.Common/$outputRelativePath/FSharp.Core.dll",
@@ -156,23 +164,50 @@ tasks {
   }
 
   configure<RdGenExtension> {
-    val csOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.ProjectModelBase/src/Protocol")
-    val ktOutput = File(repoRoot, "rider-fsharp/src/main/java/com/jetbrains/rider/plugins/fsharp/protocol")
+    val inMonorepo = productMonorepoDir != null
+    logger.info("Configuring rdgen with inMonorepo=$inMonorepo")
 
-    val typeProviderClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Client")
-    val typeProviderServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Server")
+    val csOutput =
+      if (inMonorepo) File(monorepoPreGeneratedBackendDir, "FSharp.ProjectModelBase/src/Protocol")
+      else File(repoRoot, "ReSharper.FSharp/src/FSharp.ProjectModelBase/src/Protocol")
+    val ktOutput =
+      if (inMonorepo) File(monorepoPreGeneratedFrontendDir, ktOutputRelativePath)
+      else File(repoRoot, "rider-fsharp/$ktOutputRelativePath")
 
-    val fantomasServerOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.Fantomas.Protocol/src/Server")
-    val fantomasClientOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.Fantomas.Protocol/src/Client")
+    val typeProviderClientOutput =
+      if (inMonorepo) File(monorepoPreGeneratedBackendDir, "FSharp.TypeProviders.Protocol/src/Client")
+      else File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Client")
+    val typeProviderServerOutput =
+      if (inMonorepo) File(monorepoPreGeneratedBackendDir, "FSharp.TypeProviders.Protocol/src/Server")
+      else File(repoRoot, "ReSharper.FSharp/src/FSharp.TypeProviders.Protocol/src/Server")
+
+    val fantomasServerOutput =
+      if (inMonorepo) File(monorepoPreGeneratedBackendDir, "FSharp.Fantomas.Protocol/src/Server")
+      else File(repoRoot, "ReSharper.FSharp/src/FSharp.Fantomas.Protocol/src/Server")
+    val fantomasClientOutput =
+      if (inMonorepo) File(monorepoPreGeneratedBackendDir, "FSharp.Fantomas.Protocol/src/Client")
+      else File(repoRoot, "ReSharper.FSharp/src/FSharp.Fantomas.Protocol/src/Client")
 
     verbose = true
     hashFolder = "build/rdgen"
     logger.info("Configuring rdgen params")
-    classpath({
-      logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${rdLibDirectory().canonicalPath}")
-      rdLibDirectory().resolve("rider-model.jar").canonicalPath
-    })
-    sources(File(repoRoot, "rider-fsharp/protocol/src/kotlin/model"))
+    // *** Classpath and sources ***
+    if (inMonorepo) {
+      sources(
+        listOf(
+          File("$productMonorepoDir/Rider/Frontend/rider/model/sources"),
+          File("$productMonorepoDir/Rider/ultimate/remote-dev/rd-ide-model-sources"),
+          File(repoRoot, "rider-fsharp/protocol/src/kotlin/model")
+        )
+      )
+    }
+    else {
+      classpath({
+        logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${rdLibDirectory().canonicalPath}")
+        rdLibDirectory().resolve("rider-model.jar").canonicalPath
+      })
+      sources(File(repoRoot, "rider-fsharp/protocol/src/kotlin/model"))
+    }
     packages = "model"
 
     generator {
@@ -181,6 +216,7 @@ tasks {
       root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
       namespace = "com.jetbrains.rider.model"
       directory = "$ktOutput"
+      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
     }
 
     generator {
@@ -189,6 +225,7 @@ tasks {
       root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
       namespace = "JetBrains.Rider.Model"
       directory = "$csOutput"
+      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
     }
 
     generator {
@@ -197,6 +234,7 @@ tasks {
       root = "model.RdFSharpTypeProvidersModel"
       namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Client"
       directory = "$typeProviderClientOutput"
+      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
     }
     generator {
       language = "csharp"
@@ -204,6 +242,7 @@ tasks {
       root = "model.RdFSharpTypeProvidersModel"
       namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Server"
       directory = "$typeProviderServerOutput"
+      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
     }
 
     generator {
@@ -212,6 +251,7 @@ tasks {
       root = "model.RdFantomasModel"
       namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client"
       directory = "$fantomasClientOutput"
+      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
     }
     generator {
       language = "csharp"
@@ -219,6 +259,7 @@ tasks {
       root = "model.RdFantomasModel"
       namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server"
       directory = "$fantomasServerOutput"
+      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
     }
   }
 
@@ -403,4 +444,17 @@ tasks {
     }
   }
   defaultTasks(prepare)
+}
+
+fun getProductMonorepoRoot(): File? {
+  var currentDir = repoRoot
+
+  while (currentDir.parent != null) {
+    if (currentDir.listFiles()?.any { it.name == ".dotnet-products.root.marker" } == true) {
+      return currentDir
+    }
+    currentDir = currentDir.parentFile
+  }
+
+  return null
 }

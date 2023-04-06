@@ -9,14 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj"/>
+        <ProjectReference Include="$(MSBuildThisFileDirectory)\src\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)"/>
-        <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)"/>
+        <PackageReference Include="FSharp.Core" />
+        <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
     </ItemGroup>
-
-    <Import Project="$(RdBackendCommonSubplatform)" Condition="Exists('$(RdBackendCommonSubplatform)')"/>
 
 </Project>

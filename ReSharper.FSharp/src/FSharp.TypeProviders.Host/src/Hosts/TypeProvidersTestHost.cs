@@ -2,6 +2,7 @@
 using JetBrains.Core;
 using JetBrains.Rd.Tasks;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
 {
@@ -18,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
       processModel.Dump.Set(Dump);
     }
 
-    private static string RuntimeVersion(Unit _) => RuntimeInformation.FrameworkDescription;
+    private static string RuntimeVersion(Unit _) => PlatformUtil.CurrentFrameworkDescription;
 
     private string Dump(Unit _) =>
       string.Join("\n\n",
