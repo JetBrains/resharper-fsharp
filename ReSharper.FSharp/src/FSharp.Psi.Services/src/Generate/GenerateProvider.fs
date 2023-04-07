@@ -214,7 +214,7 @@ type FSharpOverridingMembersBuilder() =
                 |> List.map (fun f -> reduceIndent f.PrevSibling)
                 |> ignore
         
-        if typeDecl.StartLine <> typeRepr.StartLine then () else
+        if isNull typeRepr || typeDecl.StartLine <> typeRepr.StartLine then () else
 
         use cookie = WriteLockCookie.Create(typeRepr.IsPhysical())
         addNodesBefore typeRepr.FirstChild [
@@ -241,10 +241,7 @@ type FSharpOverridingMembersBuilder() =
             if isNotNull caseDecl then
                 EnumCaseLikeDeclarationUtil.addBarIfNeeded caseDecl
                 addNewLineIfNeeded typeDecl unionRepr
-        | :? IRecordRepresentation as recordRepr -> addNewLineIfNeeded typeDecl recordRepr
-        | :? IClassRepresentation as classRepr -> addNewLineIfNeeded typeDecl classRepr
-        | :? IStructRepresentation as structRepr -> addNewLineIfNeeded typeDecl structRepr
-        | _ -> ()
+        | typeRepr -> addNewLineIfNeeded typeDecl typeRepr
 
         let anchor: ITreeNode =
             let typeRepr = typeDecl.TypeRepresentation
@@ -320,15 +317,7 @@ type FSharpOverridingMembersBuilder() =
                     | Some memberDecl -> memberDecl.Indent
                     | _ ->
 
-                    match typeDecl.TypeRepresentation with
-                    | :? IUnionRepresentation
-                    | :? IRecordRepresentation
-                    | :? IStructRepresentation
-                    | :? IClassRepresentation -> typeDecl.Indent + typeDecl.GetIndentSize()
-                    | _ ->
-                    
-                    let typeRepr = typeDecl.TypeRepresentation
-                    if isNotNull typeRepr then typeRepr.Indent else
+                    if isNotNull typeDecl.TypeRepresentation then typeDecl.Indent + typeDecl.GetIndentSize() else
 
                     let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl).NotNull()
                     typeDeclarationGroup.Indent + typeDecl.GetIndentSize()
