@@ -241,8 +241,9 @@ type FSharpOverridingMembersBuilder() =
             if isNotNull caseDecl then
                 EnumCaseLikeDeclarationUtil.addBarIfNeeded caseDecl
                 addNewLineIfNeeded typeDecl unionRepr
-        | :? IRecordRepresentation as recordRepr ->
-            addNewLineIfNeeded typeDecl recordRepr
+        | :? IRecordRepresentation as recordRepr -> addNewLineIfNeeded typeDecl recordRepr
+        | :? IClassRepresentation as classRepr -> addNewLineIfNeeded typeDecl classRepr
+        | :? IStructRepresentation as structRepr -> addNewLineIfNeeded typeDecl structRepr
         | _ -> ()
 
         let anchor: ITreeNode =
@@ -322,6 +323,7 @@ type FSharpOverridingMembersBuilder() =
                     match typeDecl.TypeRepresentation with
                     | :? IUnionRepresentation
                     | :? IRecordRepresentation
+                    | :? IStructRepresentation
                     | :? IClassRepresentation -> typeDecl.Indent + typeDecl.GetIndentSize()
                     | _ ->
                     

@@ -1,7 +1,5 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String}
 
-type T =
-  struct
-  end
-  {caret}
+type C = struct{caret} // some comment
+  end 
