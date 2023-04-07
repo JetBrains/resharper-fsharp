@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -196,6 +197,35 @@ type FSharpOverridableMembersProvider() =
 type FSharpOverridingMembersBuilder() =
     inherit GeneratorBuilderBase<FSharpGeneratorContext>()
 
+    let addNewLineIfNeeded (typeDecl: IFSharpTypeDeclaration) (typeRepr: ITypeRepresentation) =
+        let deindentFields (recordRepr: IRecordRepresentation) =
+            let fields = recordRepr.FieldDeclarations |> List.ofSeq
+            if fields.Length <= 1 then () else
+                
+            let firstIndent = fields[0].Indent
+            let secondIndent = fields[1].Indent
+            if secondIndent > firstIndent then
+                let indentDiff = secondIndent - firstIndent
+                let reduceIndent (node: ITreeNode) =
+                    if isInlineSpace node && node.GetTextLength() > indentDiff then
+                        let newSpace = Whitespace(node.GetTextLength() - indentDiff)
+                        replace node newSpace
+                fields[1..]
+                |> List.map (fun f -> reduceIndent f.PrevSibling)
+                |> ignore
+        
+        if typeDecl.StartLine <> typeRepr.StartLine then () else
+
+        use cookie = WriteLockCookie.Create(typeRepr.IsPhysical())
+        addNodesBefore typeRepr.FirstChild [
+            NewLine(typeRepr.GetLineEnding())
+            Whitespace(typeDecl.Indent + typeDecl.GetIndentSize())
+        ] |> ignore
+        
+        match typeRepr with
+        | :? IRecordRepresentation as recordRepr -> deindentFields recordRepr
+        | _ -> ()
+
     override this.IsAvailable(context: FSharpGeneratorContext): bool =
         isNotNull context.TypeDeclaration && isNotNull context.TypeDeclaration.DeclaredElement
 
@@ -210,7 +240,9 @@ type FSharpOverridingMembersBuilder() =
             let caseDecl = unionRepr.Cases.FirstOrDefault()
             if isNotNull caseDecl then
                 EnumCaseLikeDeclarationUtil.addBarIfNeeded caseDecl
-                EnumCaseLikeDeclarationUtil.addNewLineIfNeeded typeDecl unionRepr
+                addNewLineIfNeeded typeDecl unionRepr
+        | :? IRecordRepresentation as recordRepr ->
+            addNewLineIfNeeded typeDecl recordRepr
         | _ -> ()
 
         let anchor: ITreeNode =
@@ -289,6 +321,7 @@ type FSharpOverridingMembersBuilder() =
 
                     match typeDecl.TypeRepresentation with
                     | :? IUnionRepresentation
+                    | :? IRecordRepresentation
                     | :? IClassRepresentation -> typeDecl.Indent + typeDecl.GetIndentSize()
                     | _ ->
                     

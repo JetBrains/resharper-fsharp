@@ -38,12 +38,3 @@ let addBarIfNeeded (caseDeclaration: IEnumCaseLikeDeclaration) =
                 false
 
         (reduceIndent caseDeclaration.PrevSibling || reduceIndent typeRepr.PrevSibling) |> ignore
-
-let addNewLineIfNeeded (typeDecl: IFSharpTypeDeclaration) (typeRepr: IEnumLikeTypeRepresentation) =
-    if typeDecl.StartLine <> typeRepr.StartLine then () else
-
-    use cookie = WriteLockCookie.Create(typeRepr.IsPhysical())
-    addNodesBefore typeRepr.FirstChild [
-        NewLine(typeRepr.GetLineEnding())
-        Whitespace(typeDecl.Indent + typeDecl.GetIndentSize())
-    ] |> ignore
