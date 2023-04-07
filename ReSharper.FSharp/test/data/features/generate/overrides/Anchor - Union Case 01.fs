@@ -2,4 +2,4 @@
 // ${SELECT0:ToString():System.String}
 
 type T =
-    | C of {caret}int
+  | C of {caret}int

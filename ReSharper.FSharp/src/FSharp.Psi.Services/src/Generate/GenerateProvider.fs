@@ -267,26 +267,19 @@ type FSharpOverridingMembersBuilder() =
             objModelTypeRepr
 
         let (anchor: ITreeNode), indent =
-            let getIdentForUnion (unionRepr: IUnionRepresentation) =
-                if typeDecl.StartLine <> unionRepr.StartLine then unionRepr.Indent else
-                typeDecl.Indent + typeDecl.GetIndentSize()
-            
             match anchor with
             | :? IStructRepresentation as structRepr ->
                 structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
 
-            | :? IUnionRepresentation as unionRepr ->
-                anchor, getIdentForUnion unionRepr
-                
-            | :? ITokenNode as token ->
-                let parent = token.Parent
+            | treeNode ->
+                let parent = treeNode.Parent
                 match parent with
-                | :? IObjectModelTypeRepresentation as repr when token != repr.EndKeyword ->
+                | :? IObjectModelTypeRepresentation as repr when treeNode != repr.EndKeyword ->
                     let indent =
                         match repr.TypeMembersEnumerable |> Seq.tryHead with
                         | Some memberDecl -> memberDecl.Indent
                         | _ -> repr.BeginKeyword.Indent + typeDecl.GetIndentSize()
-                    token, indent
+                    treeNode, indent
                 | _ ->
 
                 let indent = 
@@ -295,7 +288,7 @@ type FSharpOverridingMembersBuilder() =
                     | _ ->
 
                     match typeDecl.TypeRepresentation with
-                    | :? IUnionRepresentation as unionRepr -> getIdentForUnion unionRepr
+                    | :? IUnionRepresentation
                     | :? IClassRepresentation -> typeDecl.Indent + typeDecl.GetIndentSize()
                     | _ ->
                     
@@ -306,8 +299,6 @@ type FSharpOverridingMembersBuilder() =
                     typeDeclarationGroup.Indent + typeDecl.GetIndentSize()
 
                 anchor, indent
-
-            | _ -> anchor, anchor.Indent
 
         let anchor =
             if isAtEmptyLine anchor then

@@ -2,5 +2,5 @@
 // ${SELECT0:ToString():System.String}
 
 type U {caret}=
-      C1 of int
-    | C2
+    C1 of int
+  | C2
