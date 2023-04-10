@@ -265,14 +265,14 @@ type FSharpOverridingMembersBuilder() =
             let anchor =
                 let isEmptyClassRepr =
                     match typeRepr with
-                        | :? IClassRepresentation as classRepr ->
-                            let classKeyword = classRepr.BeginKeyword
-                            let endKeyword = classRepr.EndKeyword
+                    | :? IClassRepresentation as classRepr ->
+                        let classKeyword = classRepr.BeginKeyword
+                        let endKeyword = classRepr.EndKeyword
 
-                            isNotNull classKeyword &&
-                            isNotNull endKeyword &&
-                            classKeyword.GetNextNonWhitespaceToken() == endKeyword
-                        | _ -> false
+                        isNotNull classKeyword &&
+                        isNotNull endKeyword &&
+                        classKeyword.GetNextNonWhitespaceToken() == endKeyword
+                    | _ -> false
                 if isEmptyClassRepr then
                     deleteTypeRepr typeDecl
                 else
