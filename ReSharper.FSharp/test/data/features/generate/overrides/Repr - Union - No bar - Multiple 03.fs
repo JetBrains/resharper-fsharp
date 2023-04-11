@@ -1,5 +1,6 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String}
 
-type T =
-  | C of {caret}int
+type U {caret}=
+    C1 of int
+  | C2

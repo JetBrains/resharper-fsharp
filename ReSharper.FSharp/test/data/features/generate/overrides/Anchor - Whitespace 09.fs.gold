@@ -8,8 +8,5 @@
 // ${SELECT0:ToString():System.String}
 
 type T() =
-    class
-    end
-
-    override this.ToString() = {selstart}failwith "todo"{selend}
+  override this.ToString() = {selstart}failwith "todo"{selend}
     

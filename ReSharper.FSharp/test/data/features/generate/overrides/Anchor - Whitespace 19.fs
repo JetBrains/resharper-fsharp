@@ -2,12 +2,7 @@
 // ${SELECT0:ToString():System.String}
 
 type A() =
-  class end
-
-and B() =
+  // some comment
   class end
 
   {caret}
-
-and C() =
-  class end

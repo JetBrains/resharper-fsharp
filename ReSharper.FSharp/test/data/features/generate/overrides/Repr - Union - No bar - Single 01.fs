@@ -2,4 +2,4 @@
 // ${SELECT0:ToString():System.String}
 
 type U =
-    C of int{caret}
+  C of int{caret}

@@ -7,9 +7,11 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String}
 
-type T =
-  | C of int
+type R = 
+  { F: int }
 
   override this.ToString() = {selstart}failwith "todo"{selend}
-  
+  override this.GetHashCode() = failwith "todo"
 
+  member this.P = [ 1
+                    2 ]

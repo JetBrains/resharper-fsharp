@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -196,6 +197,31 @@ type FSharpOverridableMembersProvider() =
 type FSharpOverridingMembersBuilder() =
     inherit GeneratorBuilderBase<FSharpGeneratorContext>()
 
+    let addNewLineIfNeeded (typeDecl: IFSharpTypeDeclaration) (typeRepr: ITypeRepresentation) =
+        if isNull typeRepr || typeDecl.StartLine <> typeRepr.StartLine then () else
+
+        let currentIndent = typeRepr.Indent
+        let desiredIndent = typeDecl.Indent + typeDecl.GetIndentSize()
+        
+        addNodesBefore typeRepr.FirstChild [
+            NewLine(typeRepr.GetLineEnding())
+            Whitespace(currentIndent)
+        ] |> ignore
+        
+        // to have good indents for begin/end keywords which might start out on different indents
+        shiftNode (-currentIndent) typeRepr
+        shiftNode desiredIndent typeRepr
+        
+        typeDecl.TypeMembers
+        |> Seq.iter (fun m ->
+            match m.GetPreviousToken() with
+            | :? Whitespace as whitespace ->
+                let diff = m.Indent - desiredIndent
+                if diff > 0 then
+                    shiftWhitespaceBefore -diff whitespace
+                    shiftNode -diff m
+            | _ -> ())
+
     override this.IsAvailable(context: FSharpGeneratorContext): bool =
         isNotNull context.TypeDeclaration && isNotNull context.TypeDeclaration.DeclaredElement
 
@@ -210,16 +236,49 @@ type FSharpOverridingMembersBuilder() =
             let caseDecl = unionRepr.Cases.FirstOrDefault()
             if isNotNull caseDecl then
                 EnumCaseLikeDeclarationUtil.addBarIfNeeded caseDecl
-        | _ -> ()
+                addNewLineIfNeeded typeDecl unionRepr
+        | typeRepr -> addNewLineIfNeeded typeDecl typeRepr
 
         let anchor: ITreeNode =
-            let anchor = context.Anchor
+            let typeRepr = typeDecl.TypeRepresentation
+            
+            let deleteTypeRepr (typeDecl: IFSharpTypeDeclaration) : ITreeNode =
+                let equalsToken = typeDecl.EqualsToken.NotNull()
+
+                let equalsAnchor =
+                    let afterComment = getLastMatchingNodeAfter isInlineSpaceOrComment equalsToken
+                    let afterSpace = getLastMatchingNodeAfter isInlineSpace equalsToken
+                    if afterComment != afterSpace then afterComment else equalsToken :> _
+                
+                let prev = typeRepr.GetPreviousNonWhitespaceToken()
+                if prev.IsCommentToken() then
+                    deleteChildRange prev.NextSibling typeRepr
+                    prev
+                else
+                    deleteChildRange equalsAnchor.NextSibling typeRepr
+                    equalsAnchor
+
+            let anchor =
+                let isEmptyClassRepr =
+                    match typeRepr with
+                    | :? IClassRepresentation as classRepr ->
+                        let classKeyword = classRepr.BeginKeyword
+                        let endKeyword = classRepr.EndKeyword
+
+                        isNotNull classKeyword &&
+                        isNotNull endKeyword &&
+                        classKeyword.GetNextNonWhitespaceToken() == endKeyword
+                    | _ -> false
+                if isEmptyClassRepr then
+                    deleteTypeRepr typeDecl
+                else
+                    context.Anchor
+
             if isNotNull anchor then anchor else
 
             let typeMembers = typeDecl.TypeMembers
             if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
 
-            let typeRepr = typeDecl.TypeRepresentation
             if isNull typeRepr then
                 typeDecl.EqualsToken.NotNull() else
 
@@ -231,31 +290,22 @@ type FSharpOverridingMembersBuilder() =
 
             if objModelTypeRepr :? IStructRepresentation then objModelTypeRepr :> _ else
 
-            let equalsToken = typeDecl.EqualsToken.NotNull()
-
-            let anchor =
-                let afterComment = getLastMatchingNodeAfter isInlineSpaceOrComment equalsToken
-                let afterSpace = getLastMatchingNodeAfter isInlineSpace equalsToken
-                if afterComment != afterSpace then afterComment else equalsToken :> _
-
-            deleteChildRange anchor.NextSibling typeRepr
-
-            equalsToken :> _
+            objModelTypeRepr
 
         let (anchor: ITreeNode), indent =
             match anchor with
             | :? IStructRepresentation as structRepr ->
                 structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
 
-            | :? ITokenNode as token ->
-                let parent = token.Parent
+            | treeNode ->
+                let parent = treeNode.Parent
                 match parent with
-                | :? IObjectModelTypeRepresentation as repr when token != repr.EndKeyword ->
+                | :? IObjectModelTypeRepresentation as repr when treeNode != repr.EndKeyword ->
                     let indent =
                         match repr.TypeMembersEnumerable |> Seq.tryHead with
                         | Some memberDecl -> memberDecl.Indent
                         | _ -> repr.BeginKeyword.Indent + typeDecl.GetIndentSize()
-                    token, indent
+                    treeNode, indent
                 | _ ->
 
                 let indent = 
@@ -263,15 +313,12 @@ type FSharpOverridingMembersBuilder() =
                     | Some memberDecl -> memberDecl.Indent
                     | _ ->
 
-                    let typeRepr = typeDecl.TypeRepresentation
-                    if isNotNull typeRepr then typeRepr.Indent else
+                    if isNotNull typeDecl.TypeRepresentation then typeDecl.Indent + typeDecl.GetIndentSize() else
 
                     let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl).NotNull()
                     typeDeclarationGroup.Indent + typeDecl.GetIndentSize()
 
                 anchor, indent
-
-            | _ -> anchor, anchor.Indent
 
         let anchor =
             if isAtEmptyLine anchor then

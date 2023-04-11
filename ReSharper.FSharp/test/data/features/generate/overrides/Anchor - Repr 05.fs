@@ -1,5 +1,4 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String}
 
-type T =
-  | C of {caret}int
+type MyRecord = { Field1: int;{caret} Field2: int }

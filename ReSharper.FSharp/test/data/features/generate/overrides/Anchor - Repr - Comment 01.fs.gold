@@ -7,9 +7,8 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String}
 
-type T =
-  | C of int
-
-  override this.ToString() = {selstart}failwith "todo"{selend}
-  
-
+type T() =
+  class
+    // some comment
+    override this.ToString() = {selstart}failwith "todo"{selend}
+  end
