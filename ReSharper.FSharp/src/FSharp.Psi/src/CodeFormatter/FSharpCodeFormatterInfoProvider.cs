@@ -15,6 +15,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Format;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -141,17 +142,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       Describe<ContinuousIndentRule>()
         .Name("ContinuousIndent")
-        .Where(Node().In(continuousIndentNodes).Or().In(ElementType.PREFIX_APP_EXPR).Satisfies((node, _) =>
-          !(node.Parent is IPrefixAppExpr)))
-        .AddException(Node().In(ElementType.ATTRIBUTE_LIST))
-        .AddException(Node().In(FSharpTokenType.LINE_COMMENT).Satisfies((node, _) => node is DocComment))
-        .AddException(Node().In(ElementType.COMPUTATION_EXPR).Satisfies((node, context) =>
-          !node.HasNewLineBefore(context.CodeFormatter)))
+        .Where(Node().In(continuousIndentNodes.Union(ElementType.PREFIX_APP_EXPR)).Satisfies((node, _) =>
+          node.Node is not IPrefixAppExpr || node.Parent.NodeOrNull is not IPrefixAppExpr))
+        .AddException(Node().In(ElementType.ATTRIBUTE_LIST, FSharpTokenType.XML_DOC_BLOCK))
+        .AddException(Node().In(FSharpTokenType.LINE_COMMENT).Satisfies((node, _) => node.NodeOrNull is DocComment))
         .AddException(
           // todo: add setting
           Parent().In(ElementType.MATCH_CLAUSE).Satisfies(IsLastNodeOfItsType),
-          Node().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET).Satisfies((node, context) =>
-            AreAligned(node, node.Parent, context.CodeFormatter)))
+          Node().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET).Satisfies((node, _) =>
+            AreAligned(node, node.Parent)))
+        .AddException(Node().In(ElementType.COMPUTATION_EXPR).Satisfies((node, _) =>
+          !node.HasNewLineBefore()))
         .Build();
 
       // External: starts/ends at first/last node in interval
@@ -192,7 +193,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
                   if (ElementBitsets.MODULE_MEMBER_BIT_SET[i.NodeType])
                     return i == node && !foundComment || ourNodeIsComment;
 
-                  if (!i.IsWhitespaceToken())
+                  if (!i.IsWhitespace)
                   {
                     foundComment = false;
                     if (ourNodeIsComment)
@@ -205,10 +206,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .CloseNodeGetter((node, _) => GetLastNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET, node))
         .Calculate((node, context) => // node is Left()/Node()
         {
-          var treeNode = (ITreeNode) node;
           // Formatter engine passes nulls once for caching internal/external intervals as an optimization.
-          if (treeNode == null || context == null)
+          if (node == null || context == null)
             return new ConstantOptionNode(new IndentOptionValue(IndentType.StartAtExternal | IndentType.EndAtExternal));
+
+          var treeNode = (VirtNode) node;
 
           var closingNode = GetLastNodeOfTypeSet(ElementBitsets.MODULE_MEMBER_BIT_SET, treeNode);
           if (closingNode.GetTreeStartOffset() > context.LastNode.GetTreeStartOffset())
@@ -217,7 +219,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
                 new IndentOptionValue(
                   IndentType.AbsoluteIndent | IndentType.StartAtExternal | IndentType.EndAtExternal |
                   IndentType.NonSticky | IndentType.NonAdjustable,
-                  0, closingNode.CalcLineIndent(context.CodeFormatter, true)));
+                  0, closingNode.CalcLineIndent(context.TabWidth, true)));
 
           // todo: try using the following for nodes without further indent:
           //     IndentType.NoIndentAtExternal
@@ -232,8 +234,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Where(
           Parent().In(ElementBitsets.ENUM_LIKE_TYPE_REPRESENTATION_BIT_SET),
           Left().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies((node, _) =>
-            AccessModifiers[node.GetPreviousMeaningfulSibling()?.GetTokenType()]))
-        .CloseNodeGetter((node, _) => node.Parent?.LastChild)
+            AccessModifiers[node.GetPreviousMeaningfulSibling().GetTokenType()]))
+        .CloseNodeGetter((node, _) => node.Parent.LastChild)
         .Return(IndentType.External)
         .Build();
 
@@ -279,12 +281,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
     }
 
-    public static ITreeNode GetLastNodeOfTypeSet(NodeTypeSet nodeTypeSet, ITreeNode node)
+    public static VirtNode GetLastNodeOfTypeSet(NodeTypeSet nodeTypeSet, VirtNode node)
     {
       var parent = node.Parent;
-      if (parent == null) return null;
+      if (parent == null) return node.Null;
 
-      ITreeNode result = null;
+      VirtNode result = node.Null;
 
       for (var i = parent.FirstChild; i != null; i = i.NextSibling)
         if (nodeTypeSet[i.NodeType])
@@ -339,7 +341,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<IndentingRule>().Name("EnumCaseLikeDeclarations")
         .Where(Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET),
           Left().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies(IsFirstNodeOfItsType))
-        .CloseNodeGetter((node, _) => node.Parent?.LastChild)
+        .CloseNodeGetter((node, _) => node.Parent.LastChild)
         .Return(IndentType.AlignThrough) // through => including the last node (till => without the last one)
         .Build();
 
@@ -365,8 +367,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<IndentingRule>()
         .Name("RecordReprAccessibility")
         .Where(Node().In(ElementType.RECORD_REPRESENTATION).Satisfies((node, context) =>
-          ((RecordRepresentation)node).AccessModifier != null &&
-          ((RecordRepresentation)node).LeftBrace.HasNewLineBefore(context.CodeFormatter)))
+          ((RecordRepresentation)node.Node).AccessModifier != null &&
+          ((RecordRepresentation)node.Node).LeftBrace.HasNewLineBefore(context.CodeFormatter)))
         .Return(IndentType.AlignThrough)
         .Build();
     }
@@ -374,7 +376,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     private void DescribeNestedAlignment<T>(string title, NodeType nodeType) =>
       Describe<IndentingRule>()
         .Name(title)
-        .Where(Node().In(nodeType).Satisfies((node, _) => !(node.Parent is T)))
+        .Where(Node().In(nodeType).Satisfies((node, _) => node.Parent.NodeOrNull is not T))
         .Return(IndentType.AlignThrough)
         .Build();
 
@@ -383,7 +385,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<IndentingRule>()
         .Name("ListLikePatLikeAlignment")
         .Where(parentPattern, nodeParent)
-        .CloseNodeGetter((node, _) => childrenGetter((TParent) node.Parent).LastOrDefault())
+        .CloseNodeGetter((node, context) => new VirtNode(context, childrenGetter((TParent) node.Parent.NodeOrNull).LastOrDefault()))
         .Return(IndentType.AlignThrough)
         .Build();
 
@@ -463,7 +465,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Group(SpaceRuleGroup)
         .Where(
           Parent().In(ElementBitsets.ARRAY_OR_LIST_PAT_BIT_SET).Satisfies((node, _) =>
-            !(node is IArrayOrListPat arrayOrListPat && arrayOrListPat.PatternsEnumerable.IsEmpty())))
+            !(node.NodeOrNull is IArrayOrListPat arrayOrListPat && arrayOrListPat.PatternsEnumerable.IsEmpty())))
         .Return(IntervalFormatType.Space)
         .Build();
 
@@ -483,7 +485,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Where(
           Parent()
             .In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET)
-            .Satisfies((node, _) => ((ISimpleTypeRepresentation) node).AccessModifier != null),
+            .Satisfies((node, _) => ((ISimpleTypeRepresentation) node.Node).AccessModifier != null),
           Right().In(ElementBitsets.ENUM_CASE_LIKE_DECLARATION_BIT_SET).Satisfies(IsFirstNodeOfItsType))
         .Switch(settings => settings.LineBreakAfterTypeReprAccessModifier,
           When(true).Return(IntervalFormatType.NewLine))
@@ -516,7 +518,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Where(
           Left()
             .HasType(ElementType.RECORD_FIELD_BINDING)
-            .Satisfies((node, _) => ((IRecordFieldBinding) node).Semicolon != null),
+            .Satisfies((node, _) => ((IRecordFieldBinding) node.Node).Semicolon != null),
           Right().HasType(ElementType.RECORD_FIELD_BINDING))
         .Return(IntervalFormatType.Space)
         .Build();
@@ -527,7 +529,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Where(
           Left()
             .HasType(ElementType.RECORD_FIELD_BINDING)
-            .Satisfies((node, _) => ((IRecordFieldBinding) node).Semicolon == null),
+            .Satisfies((node, _) => ((IRecordFieldBinding) node.Node).Semicolon == null),
           Right().HasType(ElementType.RECORD_FIELD_BINDING))
         .Return(IntervalFormatType.NewLine)
         .Build();
@@ -583,10 +585,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Where(Node().In(ElementBitsets.MODULE_MEMBER_BIT_SET))
         .MinBlankLines(it => it.BlankLinesAroundDifferentModuleMemberKinds)
         .AdditionalCheckForBlankLineAfter((node, _) =>
-          node.GetNextMeaningfulSibling()?.NodeType is var nodeType &&
+          node.GetNextMeaningfulSibling().NodeType is var nodeType &&
           nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType])
         .AdditionalCheckForBlankLineBefore((node, _) =>
-          node.GetPreviousMeaningfulSibling()?.NodeType is var nodeType &&
+          node.GetPreviousMeaningfulSibling().NodeType is var nodeType &&
           nodeType != node.NodeType && ElementBitsets.MODULE_MEMBER_BIT_SET[nodeType])
         .Build()
         .Name("BlankLinesBeforeFirstTopLevelModuleMember")
@@ -632,7 +634,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       IBuilderAction<IBlankWithSinglePattern> declarationPattern,
       ChildBuilder<IBlankWithSinglePattern, NodePatternBlank> equalsBeforeNodesPattern) =>
       DescribeLineBreakInNode(name, declarationPattern, equalsBeforeNodesPattern.Satisfies((node, _) =>
-          node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.EQUALS),
+          node.GetPreviousMeaningfulSibling().GetTokenType() == FSharpTokenType.EQUALS),
         key => key.DeclarationBodyOnTheSameLine, key => key.KeepExistingLineBreakBeforeDeclarationBody);
 
     private void DescribeLineBreakInNode(string name,
@@ -694,13 +696,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
     }
 
-    private static bool IndentElseExpr(ITreeNode elseExpr, CodeFormattingContext context) =>
-      elseExpr.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter) && !(elseExpr is IElifExpr);
+    private static bool IndentElseExpr(VirtNode elseExpr, CodeFormattingContext context) =>
+      elseExpr.GetPreviousMeaningfulSibling().IsFirstOnLine() && elseExpr.NodeOrNull is not IElifExpr;
 
-    private static bool AreAligned(ITreeNode first, ITreeNode second, IWhitespaceChecker whitespaceChecker) =>
-      first.CalcLineIndent(whitespaceChecker) == second.CalcLineIndent(whitespaceChecker);
+    private static bool AreAligned(VirtNode first, VirtNode second) =>
+      first.CalcLineIndent() == second.CalcLineIndent();
 
-    private static bool IsPipeOperator(ITreeNode node, CodeFormattingContext context) =>
-      node is IReferenceExpr refExpr && FSharpPredefinedType.PipeOperatorNames.Contains(refExpr.ShortName);
+    private static bool IsPipeOperator(VirtNode node, CodeFormattingContext context) =>
+      node.NodeOrNull is IReferenceExpr refExpr && FSharpPredefinedType.PipeOperatorNames.Contains(refExpr.ShortName);
   }
 }

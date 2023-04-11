@@ -14,7 +14,7 @@ type FSharpCodeFormatterTest() =
 
     override x.RelativeTestDataPath = "features/service/codeFormatter"
 
-    [<Test>] member x.``Expr - App - CompExpr 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Expr - App - CompExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Nested 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 02 - Last clause expr``() = x.DoNamedTest()

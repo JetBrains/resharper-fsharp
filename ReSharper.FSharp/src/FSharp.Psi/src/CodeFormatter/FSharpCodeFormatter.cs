@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Services.Formatter;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Format;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
@@ -48,10 +49,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       myFormatterInfoProvider = formatterInfoProvider;
     }
 
-    protected override CodeFormattingContext CreateFormatterContext(CodeFormatProfile profile, ITreeNode firstNode,
-      ITreeNode lastNode, AdditionalFormatterParameters parameters, ICustomFormatterInfoProvider provider) =>
-      new(this, firstNode, lastNode, profile, FormatterLoggerProvider.FormatterLogger,
-        parameters);
+    protected override CodeFormattingContext CreateFormatterContext(AdditionalFormatterParameters parameters,
+      ICustomFormatterInfoProvider provider, int tabWidth, SingleLangChangeAccu changeAccu, FormatTask[] formatTasks) =>
+      new(this, FormatterLoggerProvider.FormatterLogger, parameters, tabWidth, changeAccu, formatTasks);
 
     public override MinimalSeparatorType GetMinimalSeparatorByNodeTypes(TokenNodeType leftTokenType,
       TokenNodeType rightTokenType)
@@ -73,7 +73,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
     public override bool IsNewLine(ITreeNode treeNode) => treeNode is NewLine;
 
-    public override ITreeNode CreateSpace(string indent, ITreeNode replacedSpace) => new Whitespace(indent);
+    public override ITreeNode CreateSpace(string indent, NodeType replacedOrLeftSiblingType) => new Whitespace(indent);
 
     public override ITreeNode CreateNewLine(LineEnding lineEnding, NodeType lineBreakType = null) =>
       new NewLine(lineEnding.GetPresentation());
