@@ -1,0 +1,3 @@
+FSharpFile
+  FSharpStringLiteralExpression
+    PsiElement(UNFINISHED_STRING)('"1 2\n\n3')

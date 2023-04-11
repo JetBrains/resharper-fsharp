@@ -1,0 +1,7 @@
+FSharpFile
+  FSharpStringLiteralExpression
+    PsiElement(STRING)('"123"')
+  PsiWhiteSpace(' ')
+  PsiElement(PLUS)('+')
+  PsiWhiteSpace(' ')
+  PsiElement(IDENT)('x')

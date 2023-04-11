@@ -1,0 +1,38 @@
+FSharpFile
+  FSharpInterpolatedStringLiteralExpression
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(REGULAR_INTERPOLATED_STRING)('$"1"')
+  PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
+  FSharpInterpolatedStringLiteralExpression
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(REGULAR_INTERPOLATED_STRING_START)('$"1 {')
+    PsiElement(INT32)('2')
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(REGULAR_INTERPOLATED_STRING_END)('} 3"')
+  PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
+  FSharpInterpolatedStringLiteralExpression
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(VERBATIM_INTERPOLATED_STRING_START)('$@"1 {')
+    PsiElement(INT32)('2')
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(VERBATIM_INTERPOLATED_STRING_END)('} 3"')
+  PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
+  FSharpInterpolatedStringLiteralExpression
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(VERBATIM_INTERPOLATED_STRING)('$@"1"')
+  PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
+  FSharpInterpolatedStringLiteralExpression
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(TRIPLE_QUOTED_STRING)('$"""1"""')
+  PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
+  FSharpInterpolatedStringLiteralExpression
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(TRIPLE_QUOTE_INTERPOLATED_STRING_START)('$"""1 {')
+    PsiElement(INT32)('2')
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(TRIPLE_QUOTED_STRING_END)('} 3"""')

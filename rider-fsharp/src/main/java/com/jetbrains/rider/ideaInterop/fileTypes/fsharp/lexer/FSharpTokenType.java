@@ -1,5 +1,6 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer;
 
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
@@ -99,7 +100,7 @@ public interface FSharpTokenType {
   IElementType VERBATIM_INTERPOLATED_STRING_MIDDLE = createToken("VERBATIM_INTERPOLATED_STRING_MIDDLE");
   IElementType VERBATIM_INTERPOLATED_STRING_END = createToken("VERBATIM_INTERPOLATED_STRING_END");
   IElementType NEW_LINE = createToken("NEW_LINE");
-  IElementType WHITESPACE = createToken("WHITESPACE");
+  IElementType WHITESPACE = TokenType.WHITE_SPACE;
   IElementType KEYWORD_STRING_SOURCE_DIRECTORY = createToken("KEYWORD_STRING_SOURCE_DIRECTORY");
   IElementType KEYWORD_STRING_SOURCE_FILE = createToken("KEYWORD_STRING_SOURCE_FILE");
   IElementType KEYWORD_STRING_LINE = createToken("KEYWORD_STRING_LINE");
@@ -260,15 +261,29 @@ public interface FSharpTokenType {
     UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING
   );
 
+  TokenSet ALL_STRINGS = TokenSet.orSet(STRINGS, INTERPOLATED_STRINGS);
+
+  TokenSet INTERPOLATED_STRING_STARTS = TokenSet.create(
+    REGULAR_INTERPOLATED_STRING_START,
+    VERBATIM_INTERPOLATED_STRING_START,
+    TRIPLE_QUOTE_INTERPOLATED_STRING_START
+  );
+
   TokenSet INTERPOLATED_STRING_ENDS = TokenSet.create(
     REGULAR_INTERPOLATED_STRING_END,
     VERBATIM_INTERPOLATED_STRING_END,
     TRIPLE_QUOTE_INTERPOLATED_STRING_END
   );
 
-  TokenSet COMMENTS = TokenSet.create(
+  TokenSet BLOCK_COMMENTS = TokenSet.create(
     SHEBANG,
     BLOCK_COMMENT
+  );
+
+  TokenSet COMMENTS = TokenSet.create(
+    SHEBANG,
+    BLOCK_COMMENT,
+    LINE_COMMENT
   );
 
   TokenSet IDENT_KEYWORDS = TokenSet.create(

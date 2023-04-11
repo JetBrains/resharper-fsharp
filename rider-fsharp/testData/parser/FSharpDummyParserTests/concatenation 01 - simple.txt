@@ -1,0 +1,18 @@
+FSharpFile
+  FSharpExpression
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')
+    PsiElement(PLUS)('+')
+    PsiComment(BLOCK_COMMENT)('(*comment*)')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')
+  PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
+  FSharpExpression
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')
+    PsiComment(BLOCK_COMMENT)('(*comment*)')
+    PsiElement(PLUS)('+')
+    PsiWhiteSpace(' ')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')
