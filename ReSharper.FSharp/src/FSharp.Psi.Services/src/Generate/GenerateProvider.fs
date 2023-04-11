@@ -217,7 +217,9 @@ type FSharpOverridingMembersBuilder() =
             match m.GetPreviousToken() with
             | :? Whitespace as whitespace ->
                 let diff = m.Indent - desiredIndent
-                if diff > 0 then shiftWhitespaceBefore -diff whitespace
+                if diff > 0 then
+                    shiftWhitespaceBefore -diff whitespace
+                    shiftNode -diff m
             | _ -> ())
 
     override this.IsAvailable(context: FSharpGeneratorContext): bool =
