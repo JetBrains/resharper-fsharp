@@ -203,7 +203,6 @@ type FSharpOverridingMembersBuilder() =
         let currentIndent = typeRepr.Indent
         let desiredIndent = typeDecl.Indent + typeDecl.GetIndentSize()
         
-        use cookie = WriteLockCookie.Create(typeRepr.IsPhysical())
         addNodesBefore typeRepr.FirstChild [
             NewLine(typeRepr.GetLineEnding())
             Whitespace(currentIndent)
