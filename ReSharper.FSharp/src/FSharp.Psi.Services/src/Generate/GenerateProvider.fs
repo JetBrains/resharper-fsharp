@@ -211,6 +211,14 @@ type FSharpOverridingMembersBuilder() =
         // to have good indents for begin/end keywords which might start out on different indents
         shiftNode (-currentIndent) typeRepr
         shiftNode desiredIndent typeRepr
+        
+        typeDecl.TypeMembers
+        |> Seq.iter (fun m ->
+            match m.GetPreviousToken() with
+            | :? Whitespace as whitespace ->
+                let diff = m.Indent - desiredIndent
+                if diff > 0 then shiftWhitespaceBefore -diff whitespace
+            | _ -> ())
 
     override this.IsAvailable(context: FSharpGeneratorContext): bool =
         isNotNull context.TypeDeclaration && isNotNull context.TypeDeclaration.DeclaredElement
