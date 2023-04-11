@@ -198,33 +198,20 @@ type FSharpOverridingMembersBuilder() =
     inherit GeneratorBuilderBase<FSharpGeneratorContext>()
 
     let addNewLineIfNeeded (typeDecl: IFSharpTypeDeclaration) (typeRepr: ITypeRepresentation) =
-        let deindentFields (recordRepr: IRecordRepresentation) =
-            let fields = recordRepr.FieldDeclarations |> List.ofSeq
-            if fields.Length <= 1 then () else
-                
-            let firstIndent = fields[0].Indent
-            let secondIndent = fields[1].Indent
-            if secondIndent > firstIndent then
-                let indentDiff = secondIndent - firstIndent
-                let reduceIndent (node: ITreeNode) =
-                    if isInlineSpace node && node.GetTextLength() > indentDiff then
-                        let newSpace = Whitespace(node.GetTextLength() - indentDiff)
-                        replace node newSpace
-                fields[1..]
-                |> List.map (fun f -> reduceIndent f.PrevSibling)
-                |> ignore
-        
         if isNull typeRepr || typeDecl.StartLine <> typeRepr.StartLine then () else
 
+        let currentIndent = typeRepr.Indent
+        let desiredIndent = typeDecl.Indent + typeDecl.GetIndentSize()
+        
         use cookie = WriteLockCookie.Create(typeRepr.IsPhysical())
         addNodesBefore typeRepr.FirstChild [
             NewLine(typeRepr.GetLineEnding())
-            Whitespace(typeDecl.Indent + typeDecl.GetIndentSize())
+            Whitespace(currentIndent)
         ] |> ignore
         
-        match typeRepr with
-        | :? IRecordRepresentation as recordRepr -> deindentFields recordRepr
-        | _ -> ()
+        // to have good indents for begin/end keywords which might start out on different indents
+        shiftNode (-currentIndent) typeRepr
+        shiftNode desiredIndent typeRepr
 
     override this.IsAvailable(context: FSharpGeneratorContext): bool =
         isNotNull context.TypeDeclaration && isNotNull context.TypeDeclaration.DeclaredElement
