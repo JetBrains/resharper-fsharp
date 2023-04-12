@@ -133,7 +133,11 @@ class FantomasRunOptionsTest : EditorTestBase() {
     }
 
     val dotnetCliHome = getDotnetCliHome()
-    if (dotnetCliHome.listDirectoryEntries().any { it.name != ".nuget" }) {
+    if (!dotnetCliHome.exists()){
+        dotnetCliHome.createDirectory()
+        flushFileChanges(project)
+    }
+    else if (dotnetCliHome.listDirectoryEntries().any { it.name != ".nuget" }) {
       withDotnetToolsUpdate {
         dotnetCliHome.delete(true)
         dotnetCliHome.createDirectory()
