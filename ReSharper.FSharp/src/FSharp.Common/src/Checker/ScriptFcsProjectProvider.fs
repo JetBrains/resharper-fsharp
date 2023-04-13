@@ -5,6 +5,7 @@ open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains.DataFlow
+open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
@@ -69,9 +70,9 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
 
         let toolset = toolset.GetDotNetCoreToolset()
         let getScriptOptionsAsync =
-            if isNotNull toolset then
-                let sdkRootFolder = toolset.Cli.SdkRootFolder
-                let sdkFolderPath = sdkRootFolder / toolset.Sdk.FolderName
+            if isNotNull toolset && isNotNull toolset.Sdk then
+                let sdkRootFolder = toolset.Cli.NotNull("cli").SdkRootFolder.NotNull("sdkRootFolder")
+                let sdkFolderPath = sdkRootFolder / toolset.Sdk.NotNull("sdk").FolderName.NotNull("sdkFolderName")
                 checkerService.Checker.GetProjectOptionsFromScript(path, source,
                     otherFlags = otherFlags.Value.Value,
                     assumeDotNetFramework = targetNetFramework,
