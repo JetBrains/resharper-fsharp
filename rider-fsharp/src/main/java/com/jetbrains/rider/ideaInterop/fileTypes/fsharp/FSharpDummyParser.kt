@@ -33,19 +33,19 @@ class FSharpDummyParser : PsiParser {
 
   private fun PsiBuilder.parseConcatenation() =
     parse {
-      val currentIndent = getCurrentLineOffset()
+      //val currentIndent = getCurrentLineOffset()
 
       if (!parseStringExpression()) null
-      else if (!scanOrRollback { tryParseConcatenationPartAhead(currentIndent) }) null
+      else if (!scanOrRollback { tryParseConcatenationPartAhead() }) null
       else {
         whileMakingProgress {
-          scanOrRollback { tryParseConcatenationPartAhead(currentIndent) }
+          scanOrRollback { tryParseConcatenationPartAhead() }
         }
         FSharpElementTypes.DUMMY_EXPRESSION
       }
     }
 
-  private fun PsiBuilder.tryParseConcatenationPartAhead(requiredStringIndent: Int): Boolean {
+  private fun PsiBuilder.tryParseConcatenationPartAhead(): Boolean {
     val hasSpaceBeforePlus = rawLookup(-1)?.let { isWhitespaceOrComment(it) } ?: false
 
     if (tokenType != FSharpTokenType.PLUS) return false
@@ -55,21 +55,21 @@ class FSharpDummyParser : PsiParser {
     // since "123" +"123" is not allowed
     if (hasSpaceBeforePlus && currentOffset - afterPlusTokenIndent == 0) return false
 
-    val secondStringOperandIndent = getCurrentLineOffset()
+    //val secondStringOperandIndent = getCurrentLineOffset()
     // since
     //    "123"
     // + "123"
     // is not allowed
-    if (secondStringOperandIndent < requiredStringIndent) return false
+    //if (secondStringOperandIndent < requiredStringIndent) return false
 
     // since
     //    "123"
     // more than one space after plus
     // +  "123"
     // is not allowed
-    if (secondStringOperandIndent == requiredStringIndent &&
-      secondStringOperandIndent - afterPlusTokenIndent > 1
-    ) return false
+    //if (secondStringOperandIndent == requiredStringIndent &&
+    //  secondStringOperandIndent - afterPlusTokenIndent > 1
+    //) return false
 
     return parseStringExpression()
   }

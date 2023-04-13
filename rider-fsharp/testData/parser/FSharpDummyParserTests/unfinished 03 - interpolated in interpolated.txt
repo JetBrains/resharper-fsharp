@@ -1,0 +1,15 @@
+FSharpFile
+  FSharpInterpolatedStringLiteralExpression
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(TRIPLE_QUOTE_INTERPOLATED_STRING_START)('$"""{')
+    PsiWhiteSpace(' ')
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(REGULAR_INTERPOLATED_STRING_START)('$"{')
+    PsiWhiteSpace(' ')
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(REGULAR_INTERPOLATED_STRING_END)('}"')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('""')
+    PsiWhiteSpace('\n')
+    PsiWhiteSpace('\n')
+    PsiElement(INT32)('1')

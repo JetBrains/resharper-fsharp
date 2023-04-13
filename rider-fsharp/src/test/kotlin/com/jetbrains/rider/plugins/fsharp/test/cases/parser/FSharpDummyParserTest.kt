@@ -9,10 +9,12 @@ class FSharpDummyParserTests : RiderFrontendParserTest("", "fs", FSharpParserDef
   fun `test concatenation 03 - multiline`() = doTest()
   //TODO: compromise to avoid fair parsing
   fun `test concatenation 04 - multiline with wrong offset 01`() = doTest()
+  //TODO: compromise to avoid fair parsing
   fun `test concatenation 04 - multiline with wrong offset 02`() = doTest()
   fun `test concatenation 05 - with ident`() = doTest()
   fun `test concatenation 06 - unfinished`() = doTest()
   fun `test concatenation 07 - multiline string`() = doTest()
+  //TODO: compromise to avoid fair parsing
   fun `test concatenation 08 - multiline string with wrong offset`() = doTest()
   fun `test concatenation 09 - with interpolated`() = doTest()
 
@@ -25,4 +27,5 @@ class FSharpDummyParserTests : RiderFrontendParserTest("", "fs", FSharpParserDef
   fun `test unfinished 01 - regular`() = doTest()
   fun `test unfinished 02 - interpolated 01`() = doTest()
   fun `test unfinished 02 - interpolated 02`() = doTest()
+  fun `test unfinished 03 - interpolated in interpolated`() = doTest()
 }

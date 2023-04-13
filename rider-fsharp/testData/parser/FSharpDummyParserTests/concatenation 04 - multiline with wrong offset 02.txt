@@ -6,11 +6,12 @@ FSharpFile
   PsiElement(EQUALS)('=')
   PsiWhiteSpace('\n')
   PsiWhiteSpace('     ')
-  FSharpStringLiteralExpression
-    PsiElement(STRING)('"123"')
-  PsiWhiteSpace('\n')
-  PsiWhiteSpace('  ')
-  PsiElement(PLUS)('+')
-  PsiWhiteSpace('  ')
-  FSharpStringLiteralExpression
-    PsiElement(STRING)('"123"')
+  FSharpExpression
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')
+    PsiWhiteSpace('\n')
+    PsiWhiteSpace('  ')
+    PsiElement(PLUS)('+')
+    PsiWhiteSpace('  ')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')

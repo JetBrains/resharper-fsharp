@@ -1,6 +1,5 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer;
 
-import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
@@ -100,7 +99,7 @@ public interface FSharpTokenType {
   IElementType VERBATIM_INTERPOLATED_STRING_MIDDLE = createToken("VERBATIM_INTERPOLATED_STRING_MIDDLE");
   IElementType VERBATIM_INTERPOLATED_STRING_END = createToken("VERBATIM_INTERPOLATED_STRING_END");
   IElementType NEW_LINE = createToken("NEW_LINE");
-  IElementType WHITESPACE = TokenType.WHITE_SPACE;
+  IElementType WHITESPACE = createToken("WHITESPACE");
   IElementType KEYWORD_STRING_SOURCE_DIRECTORY = createToken("KEYWORD_STRING_SOURCE_DIRECTORY");
   IElementType KEYWORD_STRING_SOURCE_FILE = createToken("KEYWORD_STRING_SOURCE_FILE");
   IElementType KEYWORD_STRING_LINE = createToken("KEYWORD_STRING_LINE");
@@ -276,12 +275,11 @@ public interface FSharpTokenType {
   );
 
   TokenSet BLOCK_COMMENTS = TokenSet.create(
-    SHEBANG,
+    SHEBANG, //TODO: remove?
     BLOCK_COMMENT
   );
 
   TokenSet COMMENTS = TokenSet.create(
-    SHEBANG,
     BLOCK_COMMENT,
     LINE_COMMENT
   );

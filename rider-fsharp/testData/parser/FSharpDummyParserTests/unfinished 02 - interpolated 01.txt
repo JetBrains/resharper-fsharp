@@ -6,4 +6,4 @@ FSharpFile
     PsiElement(INT32)('1')
     PsiWhiteSpace('\n')
     FSharpStringLiteralExpression
-      PsiElement(UNFINISHED_STRING)('"')
+      PsiElement(UNFINISHED_STRING)('"\n\n1')
