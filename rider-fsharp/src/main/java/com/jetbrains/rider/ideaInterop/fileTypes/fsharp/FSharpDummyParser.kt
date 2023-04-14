@@ -49,11 +49,11 @@ class FSharpDummyParser : PsiParser {
     val hasSpaceBeforePlus = rawLookup(-1)?.let { isWhitespaceOrComment(it) } ?: false
 
     if (tokenType != FSharpTokenType.PLUS) return false
-    val afterPlusTokenIndent = getCurrentLineOffset() + 1
+    val afterPlusTokenOffset = getCurrentLineOffset() + 1
     advanceLexer() // eat plus token
 
     // since "123" +"123" is not allowed
-    if (hasSpaceBeforePlus && currentOffset - afterPlusTokenIndent == 0) return false
+    if (hasSpaceBeforePlus && currentOffset - afterPlusTokenOffset == 0) return false
 
     //val secondStringOperandIndent = getCurrentLineOffset()
     // since
@@ -102,9 +102,9 @@ class FSharpDummyParser : PsiParser {
     when (tokenType) {
       in FSharpTokenType.STRINGS -> {
         val lastEndOfLineIndex = tokenText!!.lastIndexOf('\n')
-        val stringStartIndent = currentOffset
+        val stringStartOffset = currentOffset
         advanceLexer()
-        if (lastEndOfLineIndex != -1) currentLineStart = stringStartIndent + lastEndOfLineIndex + 1
+        if (lastEndOfLineIndex != -1) currentLineStart = stringStartOffset + lastEndOfLineIndex + 1
       }
 
       else -> advanceLexer()
