@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Diagnostic
 open System
 open System.Collections.Generic
 open JetBrains.Application
+open JetBrains.HabitatDetector
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Diagnostic
 open JetBrains.ProjectModel.ProjectsHost.Impl
