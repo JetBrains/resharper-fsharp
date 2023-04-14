@@ -2,6 +2,7 @@
 
 open JetBrains.Annotations
 open System.Diagnostics.CodeAnalysis
+open System.Text.RegularExpressions
 
 type A() =
     [<RegexPattern>]
@@ -11,25 +12,29 @@ type A() =
 
 let f ([<RegexPattern>] x: string) = ()
 f ("|[|(2)123|]|(3)")
+f "|[|(4)123|]|(5)"
 
 let f1 =
     fun _ ->
         fun ([<RegexPattern>] x: string) -> ()
-f1 "[123]" "|[|(4)123|]|(5)"
+f1 "[123]" "|[|(6)123|]|(7)"
 
 let g (x: string) = ()
 g ("[123]")
 
 [<RegexPattern>]
-let x = "|[|(6)123|]|(7)"
+let x = "|[|(8)123|]|(9)"
 
 [<StringSyntax("regex")>]
-let y = "|[|(8)123|]|(9)"
+let y = "|[|(10)123|]|(11)"
 
 let _ =
     ()
-    let _ = "|[|(10)123|]|(11)" //language=regex
+    let _ = "|[|(12)123|]|(13)" //language=regex
     ()
+
+Regex(pattern = "|[|(14)123|]|(15)")
+Regex((pattern = "[123]"))
 
 ---------------------------------------------------------
 (0): ReSharper Regex Set: 
@@ -44,3 +49,7 @@ let _ =
 (9): ReSharper Regex Set: 
 (10): ReSharper Regex Set: 
 (11): ReSharper Regex Set: 
+(12): ReSharper Regex Set: 
+(13): ReSharper Regex Set: 
+(14): ReSharper Regex Set: 
+(15): ReSharper Regex Set: 
