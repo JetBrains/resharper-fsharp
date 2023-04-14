@@ -200,26 +200,51 @@ type FSharpOverridingMembersBuilder() =
     let addNewLineIfNeeded (typeDecl: IFSharpTypeDeclaration) (typeRepr: ITypeRepresentation) =
         if isNull typeRepr || typeDecl.StartLine <> typeRepr.StartLine then () else
 
-        let currentIndent = typeRepr.Indent
-        let desiredIndent = typeDecl.Indent + typeDecl.GetIndentSize()
+        let indentSize = typeDecl.GetIndentSize()
+        let desiredIndent = typeDecl.Indent + indentSize
         
         addNodesBefore typeRepr.FirstChild [
             NewLine(typeRepr.GetLineEnding())
-            Whitespace(currentIndent)
+            Whitespace(desiredIndent)
         ] |> ignore
         
-        // to have good indents for begin/end keywords which might start out on different indents
-        shiftNode (-currentIndent) typeRepr
-        shiftNode desiredIndent typeRepr
+        let normalizeReprEnd (beginToken: ITokenNode) (endToken: ITokenNode) =
+            if beginToken.Indent > endToken.Indent then
+                let diff = beginToken.Indent - endToken.Indent
+                addNodeBefore endToken (Whitespace(diff))
         
+        match typeRepr with
+        | :? IClassRepresentation as classRepr ->
+            normalizeReprEnd classRepr.BeginKeyword classRepr.EndKeyword
+        | :? IStructRepresentation as structRepr ->
+            normalizeReprEnd structRepr.BeginKeyword structRepr.EndKeyword
+        | :? IRecordRepresentation as recordRepr ->
+            normalizeReprEnd recordRepr.LeftBrace recordRepr.RightBrace
+
+            if recordRepr.FieldDeclarations.Count > 1 then
+                recordRepr.FieldDeclarations
+                |> Seq.indexed
+                |> Seq.skip 1
+                |> Seq.iter (fun (idx, f) ->
+                    let prevField = recordRepr.FieldDeclarations[idx - 1]
+                    if f.StartLine <> prevField.StartLine && f.Indent > recordRepr.FieldDeclarations[0].Indent then
+                        let diff = f.Indent - recordRepr.FieldDeclarations[0].Indent
+                        shiftWithWhitespaceBefore -diff f)
+        | _ -> ()
+
+        // members might need deindenting after the representation start was moved to it's own line
         typeDecl.TypeMembers
         |> Seq.iter (fun m ->
-            match m.GetPreviousToken() with
-            | :? Whitespace as whitespace ->
-                let diff = m.Indent - desiredIndent
-                if diff > 0 then
-                    shiftWhitespaceBefore -diff whitespace
-                    shiftNode -diff m
+            let diff = m.Indent - desiredIndent
+            if diff > 0 then shiftWithWhitespaceBefore -diff m)
+
+        // members between representation start/end might need further indentation
+        typeRepr.GetMemberDeclarations()
+        |> Seq.iter (fun m ->
+            match m with
+            | :? IRecordFieldDeclaration
+            | :? IMemberDeclaration when typeRepr.Contains(m) ->
+                if m.Indent = desiredIndent then shiftWithWhitespaceBefore indentSize m
             | _ -> ())
 
     override this.IsAvailable(context: FSharpGeneratorContext): bool =

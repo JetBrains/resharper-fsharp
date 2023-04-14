@@ -456,7 +456,7 @@ let shiftNode shift (expr: #ITreeNode) =
             if shift > 0 then
                 ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
 
-let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
+let shiftWithWhitespaceBefore shift (expr: ITreeNode) =
     match expr.PrevSibling with
     | :? Whitespace as whitespace ->
         if not (whitespace.NextSibling.IsWhitespaceToken()) then
