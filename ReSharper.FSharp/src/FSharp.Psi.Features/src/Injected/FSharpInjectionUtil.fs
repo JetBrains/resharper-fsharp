@@ -5,7 +5,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeAnnotations
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
 let getAnnotationInfo<'AnnotationProvider, 'TAnnotationInfo
 when 'AnnotationProvider :> CodeAnnotationInfoProvider<IAttributesOwner, 'TAnnotationInfo>>
