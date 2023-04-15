@@ -35,3 +35,4 @@ let _ =
 
 Regex(pattern = "[123]")
 Regex((pattern = "[123]"))
+id (pattern = "[123]")
