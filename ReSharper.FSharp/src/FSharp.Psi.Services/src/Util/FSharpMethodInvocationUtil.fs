@@ -26,7 +26,7 @@ let isNamedArgReference (expr: IFSharpExpression) =
     | :? FSharpField as fsField -> fsField.IsUnionCaseField
     | _ -> false
 
-/// Has the form 'name = expr'
+/// Has the 'name = expr' form
 let hasNamedArgStructure (app: IBinaryAppExpr) =
     isNotNull app && app.ShortName = "=" &&
 
