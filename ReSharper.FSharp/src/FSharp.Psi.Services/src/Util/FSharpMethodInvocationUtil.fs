@@ -26,6 +26,7 @@ let isNamedArgReference (expr: IFSharpExpression) =
     | :? FSharpField as fsField -> fsField.IsUnionCaseField
     | _ -> false
 
+/// Has the form 'name = expr'
 let hasNamedArgStructure (app: IBinaryAppExpr) =
     isNotNull app && app.ShortName = "=" &&
 
@@ -39,6 +40,10 @@ let isTopLevelArg (expr: IFSharpExpression) =
     let parenExpr = ParenExprNavigator.GetByInnerExpression(argExpr)
     let argOwner = FSharpArgumentOwnerNavigator.GetByArgumentExpression(parenExpr)
     isNotNull argOwner
+
+/// IBinaryAppExpr used exactly as a named argument (without taking into account resolve)
+let inline isNamedArgSyntactically (app: IBinaryAppExpr) =
+    hasNamedArgStructure app && isTopLevelArg app
 
 let tryGetNamedArg (expr: IFSharpExpression) =
     match tryGetNamedArgRefExpr expr with

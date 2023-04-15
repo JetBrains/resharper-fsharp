@@ -19,7 +19,7 @@ when 'AnnotationProvider :> CodeAnnotationInfoProvider<IAttributesOwner, 'TAnnot
 let getAttributesOwner (expr: IFSharpExpression) =
     let argument =
         match BinaryAppExprNavigator.GetByRightArgument(expr) with
-        | binaryExpr when hasNamedArgStructure binaryExpr && isTopLevelArg binaryExpr ->
+        | binaryExpr when isNamedArgSyntactically binaryExpr ->
             binaryExpr :> IFSharpExpression
         | _ -> expr
 
