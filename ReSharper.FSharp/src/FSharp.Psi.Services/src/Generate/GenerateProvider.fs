@@ -257,13 +257,9 @@ type FSharpOverridingMembersBuilder() =
         declarations
         |> Seq.iter (fun m ->
             match m with
-            | :? IValFieldDeclaration
-            | :? IAbstractMemberDeclaration
+            | :? IFSharpTypeMemberDeclaration
             | :? IConstructorDeclaration
-            | :? IRecordFieldDeclaration
-            | :? ILetBindingsDeclaration
-            | :? IInterfaceImplementation
-            | :? IMemberDeclaration ->
+            | :? IRecordFieldDeclaration ->
                 if m.Indent <= desiredIndent then
                     let diff = desiredIndent - m.Indent
                     shiftWithWhitespaceBefore (diff + indentSize) m
