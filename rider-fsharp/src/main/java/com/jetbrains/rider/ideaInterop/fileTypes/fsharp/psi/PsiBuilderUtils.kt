@@ -28,6 +28,13 @@ inline fun PsiBuilder.parse(nodeType: IElementType, action: PsiBuilder.() -> Uni
   }
 }
 
+inline fun PsiBuilder.parseEvenEmpty(nodeType: IElementType, action: PsiBuilder.() -> Unit): Boolean {
+  val mark = mark()
+  action()
+  mark.done(nodeType)
+  return true
+}
+
 /**
  * Parse node of returned type, or just scan, if action returns null.
  * Returns true if builder was advanced
@@ -48,27 +55,6 @@ inline fun PsiBuilder.parse(action: () -> IElementType?): Boolean {
     mark.done(elementType)
     true
   }
-}
-
-/**
- * Parse node of returned type, or just scan, if action returns false.
- * Returns true if node was parsed (and builder was advanced)
- * */
-inline fun PsiBuilder.tryParse(type: IElementType, action: () -> Boolean): Boolean {
-  val mark = mark()
-  val positionBefore = rawTokenIndex()
-
-  if (!action()) {
-    mark.drop()
-    return false
-  }
-  if (positionBefore == rawTokenIndex()) {
-    mark.drop()
-    return false
-  }
-
-  mark.done(type)
-  return true
 }
 
 /** Scans lexer. Allows to rollback, if action returns true. Returns true if lexer was advanced */

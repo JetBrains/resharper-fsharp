@@ -4,6 +4,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition
 import com.jetbrains.rider.test.RiderFrontendParserTest
 
 class FSharpDummyParserTests : RiderFrontendParserTest("", "fs", FSharpParserDefinition()) {
+  fun `test empty`() = doTest()
   fun `test concatenation 01 - simple`() = doTest()
   fun `test concatenation 02 - space before plus`() = doTest()
   fun `test concatenation 03 - multiline`() = doTest()

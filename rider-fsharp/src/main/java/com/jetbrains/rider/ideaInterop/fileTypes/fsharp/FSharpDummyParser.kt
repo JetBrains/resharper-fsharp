@@ -7,6 +7,7 @@ import com.intellij.psi.tree.IElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpElementTypes
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.parse
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.parseEvenEmpty
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.scanOrRollback
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.whileMakingProgress
 
@@ -20,7 +21,7 @@ class FSharpDummyParser : PsiParser {
   }
 
   private fun PsiBuilder.parseFile(fileElementType: IElementType) {
-    parse(fileElementType) {
+    parseEvenEmpty(fileElementType) {
       whileMakingProgress {
         if (!parseDummyExpression()) advanceLexerWithNewLineCounting()
         true
