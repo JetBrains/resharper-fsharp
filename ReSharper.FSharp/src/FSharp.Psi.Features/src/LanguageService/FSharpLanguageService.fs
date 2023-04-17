@@ -110,8 +110,7 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
 
             let isNamedArg () =
                 let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr)
-                FSharpMethodInvocationUtil.hasNamedArgStructure binaryAppExpr &&
-                FSharpMethodInvocationUtil.isTopLevelArg binaryAppExpr
+                FSharpMethodInvocationUtil.isNamedArgSyntactically binaryAppExpr
 
             if isInstanceFieldOrProperty declaredElement && isNamedArg () then
                 ReferenceAccessType.WRITE else

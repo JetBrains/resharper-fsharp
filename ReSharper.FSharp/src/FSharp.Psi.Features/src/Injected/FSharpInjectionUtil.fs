@@ -16,10 +16,16 @@ when 'AnnotationProvider :> CodeAnnotationInfoProvider<IAttributesOwner, 'TAnnot
         .GetInfo(attributesOwner)
 
 let getAttributesOwner (expr: IFSharpExpression) =
-    let argsOwner = getArgsOwner expr
+    let argument =
+        match BinaryAppExprNavigator.GetByRightArgument(expr) with
+        | binaryExpr when isNamedArgSyntactically binaryExpr ->
+            binaryExpr :> IFSharpExpression
+        | _ -> expr
+
+    let argsOwner = getArgsOwner argument
 
     if isNotNull argsOwner then
-        let parameter = expr.As<IArgument>().MatchingParameter
+        let parameter = argument.As<IArgument>().MatchingParameter
         if isNull parameter then ValueNone else
         parameter.Element :> IAttributesOwner |> ValueOption.ofObj
     else
