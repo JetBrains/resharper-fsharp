@@ -2,6 +2,7 @@
 
 open JetBrains.Annotations
 open System.Diagnostics.CodeAnalysis
+open System.Text.RegularExpressions
 
 type A() =
     [<RegexPattern>]
@@ -11,6 +12,7 @@ type A() =
 
 let f ([<RegexPattern>] x: string) = ()
 f ("[123]")
+f "[123]"
 
 let f1 =
     fun _ ->
@@ -30,3 +32,7 @@ let _ =
     ()
     let _ = "[123]" //language=regex
     ()
+
+Regex(pattern = "[123]")
+Regex((pattern = "[123]"))
+id (pattern = "[123]")
