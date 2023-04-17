@@ -198,7 +198,7 @@ type FSharpOverridingMembersBuilder() =
     inherit GeneratorBuilderBase<FSharpGeneratorContext>()
 
     let addNewLineIfNeeded (typeDecl: IFSharpTypeDeclaration) (typeRepr: ITypeRepresentation) =
-        if isNull typeRepr || typeDecl.StartLine <> typeRepr.StartLine then () else
+        if isNull typeRepr || typeDecl.Identifier.StartLine <> typeRepr.StartLine then () else
 
         let indentSize = typeDecl.GetIndentSize()
         let desiredIndent = typeDecl.Indent + indentSize
@@ -238,13 +238,35 @@ type FSharpOverridingMembersBuilder() =
             let diff = m.Indent - desiredIndent
             if diff > 0 then shiftWithWhitespaceBefore -diff m)
 
+        let typeMembers =
+            match typeRepr with
+            | :? IObjectModelTypeRepresentation as repr ->
+                repr.TypeMembersEnumerable
+                |> Seq.filter (
+                    function
+                    | :? ILetBindingsDeclaration
+                    | :? IInterfaceImplementation -> true
+                    | _ -> false)
+                |> Seq.map (fun m -> m :> ITreeNode)
+            | _ -> List.empty
+        
+        let membersDecls = typeRepr.GetMemberDeclarations() |> Seq.map (fun m -> m :> ITreeNode)
+        let declarations = Seq.append typeMembers membersDecls
+
         // members between representation start/end might need further indentation
-        typeRepr.GetMemberDeclarations()
+        declarations
         |> Seq.iter (fun m ->
             match m with
+            | :? IValFieldDeclaration
+            | :? IAbstractMemberDeclaration
+            | :? IConstructorDeclaration
             | :? IRecordFieldDeclaration
-            | :? IMemberDeclaration when typeRepr.Contains(m) ->
-                if m.Indent = desiredIndent then shiftWithWhitespaceBefore indentSize m
+            | :? ILetBindingsDeclaration
+            | :? IInterfaceImplementation
+            | :? IMemberDeclaration ->
+                if m.Indent <= desiredIndent then
+                    let diff = desiredIndent - m.Indent
+                    shiftWithWhitespaceBefore (diff + indentSize) m
             | _ -> ())
 
     override this.IsAvailable(context: FSharpGeneratorContext): bool =

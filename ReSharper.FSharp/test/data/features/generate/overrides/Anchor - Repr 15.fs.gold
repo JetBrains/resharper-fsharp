@@ -1,0 +1,16 @@
+﻿Provided elements:
+ 0: ToString():System.String
+ 1: Equals(System.Object):System.Boolean
+ 2: GetHashCode():System.Int32
+ 3: Finalize():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:ToString():System.String}
+
+// ${KIND:Overrides}
+
+type C() = 
+  class
+    override this.ToString() = {selstart}failwith "todo"{selend}
+    new(_: int) = C()
+  end
