@@ -214,10 +214,8 @@ type FSharpOverridingMembersBuilder() =
                 addNodeBefore endToken (Whitespace(diff))
         
         match typeRepr with
-        | :? IClassRepresentation as classRepr ->
-            normalizeReprEnd classRepr.BeginKeyword classRepr.EndKeyword
-        | :? IStructRepresentation as structRepr ->
-            normalizeReprEnd structRepr.BeginKeyword structRepr.EndKeyword
+        | :? IObjectModelTypeRepresentation as objRepr ->
+            normalizeReprEnd objRepr.BeginKeyword objRepr.EndKeyword
         | :? IRecordRepresentation as recordRepr ->
             normalizeReprEnd recordRepr.LeftBrace recordRepr.RightBrace
             let fieldDeclarations = recordRepr.FieldDeclarations 
