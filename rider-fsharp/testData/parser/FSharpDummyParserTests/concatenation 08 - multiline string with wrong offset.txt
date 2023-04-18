@@ -1,0 +1,15 @@
+FSharpFile
+  PsiElement(LET)('let')
+  PsiWhiteSpace(' ')
+  PsiElement(UNDERSCORE)('_')
+  PsiWhiteSpace(' ')
+  PsiElement(EQUALS)('=')
+  PsiWhiteSpace(' ')
+  FSharpExpression
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"\n\n123"')
+    PsiWhiteSpace(' ')
+    PsiElement(PLUS)('+')
+    PsiWhiteSpace(' ')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')

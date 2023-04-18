@@ -1,0 +1,27 @@
+FSharpFile
+  PsiElement(LET)('let')
+  PsiWhiteSpace(' ')
+  PsiElement(UNDERSCORE)('_')
+  PsiWhiteSpace(' ')
+  PsiElement(EQUALS)('=')
+  PsiWhiteSpace('\n')
+  PsiWhiteSpace('    ')
+  PsiElement(IDENT)('id')
+  PsiWhiteSpace(' ')
+  FSharpExpression
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')
+    PsiWhiteSpace(' ')
+    PsiElement(PLUS)('+')
+    PsiWhiteSpace('\n')
+    PsiWhiteSpace('\n')
+    PsiWhiteSpace('       ')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')
+    PsiWhiteSpace('\n')
+    PsiWhiteSpace('\n')
+    PsiWhiteSpace('     ')
+    PsiElement(PLUS)('+')
+    PsiWhiteSpace(' ')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')

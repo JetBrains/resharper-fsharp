@@ -1,0 +1,13 @@
+FSharpFile
+  FSharpExpression
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')
+    PsiWhiteSpace(' ')
+    PsiElement(PLUS)('+')
+    PsiWhiteSpace(' ')
+    FSharpInterpolatedStringLiteralExpression
+      FSharpInterpolatedStringLiteralExpressionPart
+        PsiElement(REGULAR_INTERPOLATED_STRING_START)('$"1 {')
+      PsiElement(INT32)('2')
+      FSharpInterpolatedStringLiteralExpressionPart
+        PsiElement(REGULAR_INTERPOLATED_STRING_END)('} 3"')

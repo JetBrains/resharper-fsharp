@@ -28,23 +28,20 @@ type FSharpGeneratorContextFactory() =
     interface IGeneratorContextFactory with
         member x.TryCreate(kind: string, psiDocumentRangeView: IPsiDocumentRangeView): IGeneratorContext =
             let psiView = psiDocumentRangeView.View<FSharpLanguage>()
-            
-            let tryGetPreviousTypeDecl () =
-                let selectedTreeNode = psiView.GetSelectedTreeNode<IFSharpTreeNode>()
-                let previousMeaningfulToken = selectedTreeNode.GetPreviousMeaningfulToken()
-                previousMeaningfulToken.GetContainingNode<IFSharpTypeDeclaration>()
-            
-            let typeDeclaration: IFSharpTypeDeclaration =
-                match psiView.GetSelectedTreeNode<IFSharpTypeDeclaration>() with
-                | null ->
-                    let selectedTreeNode = psiView.GetSelectedTreeNode<IFSharpTreeNode>()
-                    match selectedTreeNode.GetContainingNode<IFSharpTypeDeclaration>() with
-                    | null -> tryGetPreviousTypeDecl ()
-                    | typeDeclaration -> typeDeclaration
-                | typeDeclaration -> typeDeclaration
 
             let treeNode = psiView.GetSelectedTreeNode()
             if isNull treeNode then null else
+
+            let tryGetPreviousTypeDecl (treeNode: ITreeNode) =
+                let prevToken = treeNode.GetPreviousMeaningfulToken()
+                if isNull prevToken then null else
+
+                prevToken.GetContainingNode<IFSharpTypeDeclaration>()
+
+            let typeDeclaration =
+                match psiView.GetSelectedTreeNode<IFSharpTypeDeclaration>() with
+                | null -> tryGetPreviousTypeDecl treeNode
+                | typeDeclaration -> typeDeclaration
 
             let anchor = GenerateOverrides.getAnchorNode psiView typeDeclaration
             FSharpGeneratorContext.Create(kind, treeNode, typeDeclaration, anchor) :> _
@@ -154,7 +151,7 @@ type FSharpOverridableMembersProvider() =
 
                     let xmlDocId =
                         match mfv.GetDeclaredElement(psiModule).As<ITypeMember>() with
-                        | null -> mfv.GetXmlDocId() 
+                        | null -> mfv.GetXmlDocId()
                         | typeMember -> XMLDocUtil.GetTypeMemberXmlDocId(typeMember, typeMember.ShortName)
 
                     if ownMembersIds.Contains(xmlDocId) then None else
@@ -202,12 +199,12 @@ type FSharpOverridingMembersBuilder() =
 
         let indentSize = typeDecl.GetIndentSize()
         let desiredIndent = typeDecl.Indent + indentSize
-        
+
         addNodesBefore typeRepr.FirstChild [
             NewLine(typeRepr.GetLineEnding())
             Whitespace(desiredIndent)
         ] |> ignore
-        
+
         let normalizeReprEnd (beginToken: ITokenNode) (endToken: ITokenNode) =
             if beginToken.Indent > endToken.Indent then
                 let diff = beginToken.Indent - endToken.Indent
@@ -215,7 +212,7 @@ type FSharpOverridingMembersBuilder() =
             elif endToken.Indent > beginToken.Indent && isFirstMeaningfulNodeOnLine endToken then
                 let diff = endToken.Indent - beginToken.Indent
                 shiftWithWhitespaceBefore -diff endToken
-        
+
         match typeRepr with
         | :? IObjectModelTypeRepresentation as objRepr ->
             normalizeReprEnd objRepr.BeginKeyword objRepr.EndKeyword
@@ -249,7 +246,7 @@ type FSharpOverridingMembersBuilder() =
         let declNodes =
             typeDecl.Children() |> Seq.filter (fun c -> c :? ICommentNode || c :? ITypeBodyMemberDeclaration)
         deindent desiredIndent declNodes
-        
+
         reprNodes
         |> Seq.iter (fun m ->
             if m.Indent <= desiredIndent then
@@ -281,7 +278,7 @@ type FSharpOverridingMembersBuilder() =
 
         let anchor: ITreeNode =
             let typeRepr = typeDecl.TypeRepresentation
-            
+
             let deleteTypeRepr (typeDecl: IFSharpTypeDeclaration) : ITreeNode =
                 let equalsToken = typeDecl.EqualsToken.NotNull()
 
@@ -289,7 +286,7 @@ type FSharpOverridingMembersBuilder() =
                     let afterComment = getLastMatchingNodeAfter isInlineSpaceOrComment equalsToken
                     let afterSpace = getLastMatchingNodeAfter isInlineSpace equalsToken
                     if afterComment != afterSpace then afterComment else equalsToken :> _
-                
+
                 let prev = typeRepr.GetPreviousNonWhitespaceToken()
                 if prev.IsCommentToken() then
                     deleteChildRange prev.NextSibling typeRepr
@@ -348,7 +345,7 @@ type FSharpOverridingMembersBuilder() =
                     treeNode, indent
                 | _ ->
 
-                let indent = 
+                let indent =
                     match typeDecl.TypeMembersEnumerable |> Seq.tryHead with
                     | Some memberDecl -> memberDecl.Indent
                     | _ ->
@@ -391,7 +388,7 @@ type FSharpOverridingMembersBuilder() =
                   if isNotNull prop.Setter && mfv.HasSetterMethod then
                       FSharpGeneratorElement(prop.Setter, { e.MfvInstance with Mfv = mfv.SetterMethod }, e.AddTypes) ])
 
-        let lastNode = 
+        let lastNode =
             inputElements
             |> Seq.cast
             |> Seq.map (GenerateOverrides.generateMember typeDecl indent)

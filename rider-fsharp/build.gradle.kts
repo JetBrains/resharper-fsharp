@@ -16,6 +16,12 @@ plugins {
   kotlin("jvm") version "1.8.0"
 }
 
+dependencies {
+  testImplementation("junit:junit:4.13.2")
+  testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.9.2")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.2")
+}
+
 apply {
   plugin("kotlin")
 }
@@ -303,11 +309,18 @@ tasks {
     dependsOn(generateFSharpLexer, rdgen)
   }
 
-  withType<Test> {
+  val parserTest by register<Test>("parserTest") {
+    useJUnitPlatform()
+  }
+
+  named<Test>("test") {
+    dependsOn(parserTest)
     useTestNG {
       groupByInstances = true
     }
+  }
 
+  withType<Test> {
     testLogging {
       showStandardStreams = true
       exceptionFormat = TestExceptionFormat.FULL
