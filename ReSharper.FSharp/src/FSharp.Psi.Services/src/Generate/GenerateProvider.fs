@@ -220,15 +220,15 @@ type FSharpOverridingMembersBuilder() =
             normalizeReprEnd structRepr.BeginKeyword structRepr.EndKeyword
         | :? IRecordRepresentation as recordRepr ->
             normalizeReprEnd recordRepr.LeftBrace recordRepr.RightBrace
-
-            if recordRepr.FieldDeclarations.Count > 1 then
-                recordRepr.FieldDeclarations
+            let fieldDeclarations = recordRepr.FieldDeclarations 
+            if fieldDeclarations.Count > 1 then
+                fieldDeclarations
                 |> Seq.indexed
                 |> Seq.skip 1
                 |> Seq.iter (fun (idx, f) ->
-                    let prevField = recordRepr.FieldDeclarations[idx - 1]
-                    if f.StartLine <> prevField.StartLine && f.Indent > recordRepr.FieldDeclarations[0].Indent then
-                        let diff = f.Indent - recordRepr.FieldDeclarations[0].Indent
+                    let prevField = fieldDeclarations[idx - 1]
+                    if f.StartLine <> prevField.StartLine && f.Indent > fieldDeclarations[0].Indent then
+                        let diff = f.Indent - fieldDeclarations[0].Indent
                         shiftWithWhitespaceBefore -diff f)
         | _ -> ()
 
