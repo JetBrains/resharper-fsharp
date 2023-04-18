@@ -212,7 +212,7 @@ type FSharpOverridingMembersBuilder() =
             if beginToken.Indent > endToken.Indent then
                 let diff = beginToken.Indent - endToken.Indent
                 addNodeBefore endToken (Whitespace(diff))
-            else if endToken.Indent > beginToken.Indent && isFirstMeaningfulNodeOnLine endToken then
+            elif endToken.Indent > beginToken.Indent && isFirstMeaningfulNodeOnLine endToken then
                 let diff = endToken.Indent - beginToken.Indent
                 shiftWithWhitespaceBefore -diff endToken
         
