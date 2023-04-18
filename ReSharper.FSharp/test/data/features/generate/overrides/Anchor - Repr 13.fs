@@ -4,5 +4,6 @@
 // ${KIND:Overrides}
 
 type C() = class{caret}
+  // comment
   let f = 23
 end

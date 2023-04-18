@@ -212,6 +212,9 @@ type FSharpOverridingMembersBuilder() =
             if beginToken.Indent > endToken.Indent then
                 let diff = beginToken.Indent - endToken.Indent
                 addNodeBefore endToken (Whitespace(diff))
+            else if endToken.Indent > beginToken.Indent && isFirstMeaningfulNodeOnLine endToken then
+                let diff = endToken.Indent - beginToken.Indent
+                shiftWithWhitespaceBefore -diff endToken
         
         match typeRepr with
         | :? IObjectModelTypeRepresentation as objRepr ->
@@ -230,38 +233,34 @@ type FSharpOverridingMembersBuilder() =
                         shiftWithWhitespaceBefore -diff f)
         | _ -> ()
 
-        // members might need deindenting after the representation start was moved to it's own line
-        typeDecl.TypeMembers
-        |> Seq.iter (fun m ->
-            let diff = m.Indent - desiredIndent
-            if diff > 0 then shiftWithWhitespaceBefore -diff m)
+        let deindent indentationTarget (nodes: seq<ITreeNode>) =
+            nodes
+            |> Seq.iter (fun m ->
+                let diff = m.Indent - indentationTarget
+                if diff > 0  && isFirstMeaningfulNodeOnLine m then shiftWithWhitespaceBefore -diff m)
 
-        let typeMembers =
-            match typeRepr with
-            | :? IObjectModelTypeRepresentation as repr ->
-                repr.TypeMembersEnumerable
-                |> Seq.filter (
-                    function
-                    | :? ILetBindingsDeclaration
-                    | :? IInterfaceImplementation -> true
-                    | _ -> false)
-                |> Seq.map (fun m -> m :> ITreeNode)
-            | _ -> List.empty
+        // members etc. might need indenting or deindenting after the representation start was moved to it's own line
+        let reprNodes =
+            typeRepr.Children()
+            |> Seq.filter
+                   (fun c -> c :? ICommentNode || c :? ITypeBodyMemberDeclaration || c :? IRecordFieldDeclarationList)
+        deindent (desiredIndent + indentSize) reprNodes
+
+        let declNodes =
+            typeDecl.Children() |> Seq.filter (fun c -> c :? ICommentNode || c :? ITypeBodyMemberDeclaration)
+        deindent desiredIndent declNodes
         
-        let membersDecls = typeRepr.GetMemberDeclarations() |> Seq.map (fun m -> m :> ITreeNode)
-        let declarations = Seq.append typeMembers membersDecls
-
-        // members between representation start/end might need further indentation
-        declarations
+        reprNodes
         |> Seq.iter (fun m ->
-            match m with
-            | :? IFSharpTypeMemberDeclaration
-            | :? IConstructorDeclaration
-            | :? IRecordFieldDeclaration ->
-                if m.Indent <= desiredIndent then
-                    let diff = desiredIndent - m.Indent
-                    shiftWithWhitespaceBefore (diff + indentSize) m
-            | _ -> ())
+            if m.Indent <= desiredIndent then
+                let diff = desiredIndent - m.Indent
+                shiftWithWhitespaceBefore (diff + indentSize) m)
+        
+        declNodes
+        |> Seq.iter (fun m ->
+            if m.Indent <= desiredIndent then
+                let diff = desiredIndent - m.Indent
+                shiftWithWhitespaceBefore diff m)
 
     override this.IsAvailable(context: FSharpGeneratorContext): bool =
         isNotNull context.TypeDeclaration && isNotNull context.TypeDeclaration.DeclaredElement

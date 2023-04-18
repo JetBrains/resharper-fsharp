@@ -12,6 +12,7 @@ type C() =
     override this.ToString() = {selstart}failwith "todo"{selend}
 
     member this.X = [ 1
-                      2
+                      // comment 1
+                      2 // comment 2
                       3 ]
   end

@@ -5,5 +5,6 @@
 
 [<AbstractClass>]
 type C() = class{caret}
+// comment
 abstract member X: int
 end

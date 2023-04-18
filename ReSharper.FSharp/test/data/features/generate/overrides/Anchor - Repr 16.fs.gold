@@ -13,5 +13,6 @@
 type C() = 
   class
     override this.ToString() = {selstart}failwith "todo"{selend}
+    // comment
     abstract member X: int
   end

@@ -9,9 +9,9 @@
 
 // ${KIND:Overrides}
 
-type C() = 
-  class
-    override this.ToString() = {selstart}failwith "todo"{selend}
-    // comment
-    let f = 23
-  end
+type R = 
+  { F: int }
+
+  override this.ToString() = {selstart}failwith "todo"{selend}
+  // comment 1
+  member this.P = 1 // comment 2
