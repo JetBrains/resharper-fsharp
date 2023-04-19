@@ -27,7 +27,7 @@ FSharpFile
   PsiWhiteSpace('\n')
   FSharpInterpolatedStringLiteralExpression
     FSharpInterpolatedStringLiteralExpressionPart
-      PsiElement(TRIPLE_QUOTED_STRING)('$"""1"""')
+      PsiElement(TRIPLE_QUOTE_INTERPOLATED_STRING)('$"""1"""')
   PsiWhiteSpace('\n')
   PsiWhiteSpace('\n')
   FSharpInterpolatedStringLiteralExpression
