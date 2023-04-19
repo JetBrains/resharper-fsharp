@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -236,15 +237,28 @@ type FSharpOverridingMembersBuilder() =
                 let diff = m.Indent - indentationTarget
                 if diff > 0  && isFirstMeaningfulNodeOnLine m then shiftWithWhitespaceBefore -diff m)
 
-        // members etc. might need indenting or deindenting after the representation start was moved to it's own line
         let reprNodes =
-            typeRepr.Children()
-            |> Seq.filter
-                   (fun c -> c :? ICommentNode || c :? ITypeBodyMemberDeclaration || c :? IRecordFieldDeclarationList)
+            let children = typeRepr.Children() |> Seq.toList
+            let startIdx = children |> List.tryFindIndex (fun c -> c.NodeType = FSharpTokenType.CLASS
+                                                                    || c.NodeType = FSharpTokenType.STRUCT
+                                                                    || c.NodeType = FSharpTokenType.LBRACE)
+            let endIdx =
+                children
+                |> List.tryFindIndexBack
+                       (fun c -> c.NodeType = FSharpTokenType.END || c.NodeType = FSharpTokenType.RBRACE)
+            match (startIdx, endIdx) with
+            | Some s, Some e when s >= 0 && e > s ->
+                let first, last = s + 1, e - 1
+                children[first .. last] |> List.filter (isWhitespace >> not)
+            | _ -> List.empty
         deindent (desiredIndent + indentSize) reprNodes
 
         let declNodes =
-            typeDecl.Children() |> Seq.filter (fun c -> c :? ICommentNode || c :? ITypeBodyMemberDeclaration)
+            let children = typeDecl.Children() |> Seq.toList
+            let idx = children |> List.tryFindIndex(fun c -> c :? ITypeRepresentation)
+            match idx with
+            | Some idx when idx >= 0 -> List.skip (idx + 1) children |> List.filter (isWhitespace >> not)
+            | _ -> List.empty
         deindent desiredIndent declNodes
 
         reprNodes
