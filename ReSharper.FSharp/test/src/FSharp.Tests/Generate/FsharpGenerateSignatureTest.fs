@@ -19,12 +19,13 @@ type FsharpGenerateSignatureTest() =
         this.SetAsyncBehaviorAllowed(lifetime)
         base.DoTest(lifetime, testProject)
 
-    override this.DumpTextControl(_, dumpCaret, dumpSelection) =
+    override this.DumpTextControl(textControl, dumpCaret, dumpSelection) =
         let editorManager = this.Solution.GetComponent<IEditorManager>()
         let fsiPath = this.GetCaretPosition().FileName.ChangeExtension("fsi")
-        let textControl = editorManager.OpenFileAsync(fsiPath, OpenFileOptions.DefaultActivate).Result.NotNull()
-        this.TestLifetime.OnTermination(fun _ -> editorManager.CloseTextControl(textControl)) |> ignore
+        let fsiTextControl = editorManager.OpenFileAsync(fsiPath, OpenFileOptions.DefaultActivate).Result.NotNull()
+        textControl.Lifetime.OnTermination(fun _ -> editorManager.CloseTextControl(fsiTextControl)) |> ignore
 
-        base.DumpTextControl(textControl, dumpCaret, dumpSelection)
+        base.DumpTextControl(fsiTextControl, dumpCaret, dumpSelection)
 
     [<Test>] member x.``Sample Test`` () = x.DoNamedTest()
+    [<Test>] member x.``Sample Test 02`` () = x.DoNamedTest()
