@@ -27,5 +27,5 @@ type FsharpGenerateSignatureTest() =
 
         base.DumpTextControl(fsiTextControl, dumpCaret, dumpSelection)
 
-    [<Test>] member x.``Sample Test`` () = x.DoNamedTest()
-    [<Test>] member x.``Sample Test 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Module structure 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Namespace structure 01`` () = x.DoNamedTest()
