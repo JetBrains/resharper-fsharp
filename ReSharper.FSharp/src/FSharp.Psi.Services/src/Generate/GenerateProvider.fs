@@ -235,16 +235,31 @@ type FSharpOverridingMembersBuilder() =
                 recordRepr.LeftBrace, recordRepr.RightBrace
             | _ -> null, null
 
+        let rec deindentEmptyLines indentationTarget (nodes: seq<ITreeNode>) =
+            nodes
+            |> Seq.iter
+                (fun n ->
+                    if isAtEmptyLine n then
+                        let nextToken =  n.GetNextToken()
+                        if isNotNull nextToken then
+                            let diff = nextToken.Indent - indentationTarget
+                            match n with
+                            | :? Whitespace as whitespace -> if diff > 0 then shiftWhitespaceBefore -diff whitespace
+                            | _ -> ()
+                    else
+                        deindentEmptyLines indentationTarget (n.Children()))
+
         let deindent indentationTarget (nodes: seq<ITreeNode>) =
             nodes
             |> Seq.iter (fun m ->
                 let diff = m.Indent - indentationTarget
-                if diff > 0  && isFirstMeaningfulNodeOnLine m then shiftWithWhitespaceBefore -diff m)
+                if diff > 0  && isFirstMeaningfulNodeOnLine m then shiftWithWhitespaceBefore -diff m
+                deindentEmptyLines indentationTarget nodes)
 
         let reprNodes =
             if isNotNull beginToken && isNotNull endToken then
                 TreeRange(beginToken.NextSibling, endToken.PrevSibling)
-                |> Seq.filter (isWhitespace >> not)
+                |> Seq.filter (fun n -> isAtEmptyLine n || not(isWhitespace n))
             else
                 TreeRange.Empty
         deindent (desiredIndent + indentSize) reprNodes
@@ -252,7 +267,7 @@ type FSharpOverridingMembersBuilder() =
         let declNodes =
             typeDecl.Children()
             |> Seq.skipWhile ((!=) typeRepr)
-            |> Seq.filter (isWhitespace >> not)
+            |> Seq.filter (fun n -> isAtEmptyLine n || not(isWhitespace n))
         deindent desiredIndent declNodes
 
         reprNodes
