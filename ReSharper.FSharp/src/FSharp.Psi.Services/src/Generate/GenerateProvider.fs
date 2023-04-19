@@ -254,12 +254,7 @@ type FSharpOverridingMembersBuilder() =
             | _ -> List.empty
         deindent (desiredIndent + indentSize) reprNodes
 
-        let declNodes =
-            let children = typeDecl.Children() |> Seq.toList
-            let idx = children |> List.tryFindIndex(fun c -> c :? ITypeRepresentation)
-            match idx with
-            | Some idx when idx >= 0 -> List.skip (idx + 1) children |> List.filter (isWhitespace >> not)
-            | _ -> List.empty
+        let declNodes = typeDecl.Children() |> Seq.skipWhile ((!=) typeRepr) |> Seq.filter (isWhitespace >> not)
         deindent desiredIndent declNodes
 
         reprNodes
