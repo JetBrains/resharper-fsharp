@@ -215,22 +215,25 @@ type FSharpOverridingMembersBuilder() =
                 let diff = endToken.Indent - beginToken.Indent
                 shiftWithWhitespaceBefore -diff endToken
 
-        match typeRepr with
-        | :? IObjectModelTypeRepresentation as objRepr ->
-            normalizeReprEnd objRepr.BeginKeyword objRepr.EndKeyword
-        | :? IRecordRepresentation as recordRepr ->
-            normalizeReprEnd recordRepr.LeftBrace recordRepr.RightBrace
-            let fieldDeclarations = recordRepr.FieldDeclarations 
-            if fieldDeclarations.Count > 1 then
-                fieldDeclarations
-                |> Seq.indexed
-                |> Seq.skip 1
-                |> Seq.iter (fun (idx, f) ->
-                    let prevField = fieldDeclarations[idx - 1]
-                    if f.StartLine <> prevField.StartLine && f.Indent > fieldDeclarations[0].Indent then
-                        let diff = f.Indent - fieldDeclarations[0].Indent
-                        shiftWithWhitespaceBefore -diff f)
-        | _ -> ()
+        let beginToken, endToken =
+            match typeRepr with
+            | :? IObjectModelTypeRepresentation as objRepr ->
+                normalizeReprEnd objRepr.BeginKeyword objRepr.EndKeyword
+                objRepr.BeginKeyword, objRepr.EndKeyword
+            | :? IRecordRepresentation as recordRepr ->
+                normalizeReprEnd recordRepr.LeftBrace recordRepr.RightBrace
+                let fieldDeclarations = recordRepr.FieldDeclarations 
+                if fieldDeclarations.Count > 1 then
+                    fieldDeclarations
+                    |> Seq.indexed
+                    |> Seq.skip 1
+                    |> Seq.iter (fun (idx, f) ->
+                        let prevField = fieldDeclarations[idx - 1]
+                        if f.StartLine <> prevField.StartLine && f.Indent > fieldDeclarations[0].Indent then
+                            let diff = f.Indent - fieldDeclarations[0].Indent
+                            shiftWithWhitespaceBefore -diff f)
+                recordRepr.LeftBrace, recordRepr.RightBrace
+            | _ -> null, null
 
         let deindent indentationTarget (nodes: seq<ITreeNode>) =
             nodes
@@ -239,22 +242,17 @@ type FSharpOverridingMembersBuilder() =
                 if diff > 0  && isFirstMeaningfulNodeOnLine m then shiftWithWhitespaceBefore -diff m)
 
         let reprNodes =
-            let children = typeRepr.Children() |> Seq.toList
-            let startIdx = children |> List.tryFindIndex (fun c -> c.NodeType = FSharpTokenType.CLASS
-                                                                    || c.NodeType = FSharpTokenType.STRUCT
-                                                                    || c.NodeType = FSharpTokenType.LBRACE)
-            let endIdx =
-                children
-                |> List.tryFindIndexBack
-                       (fun c -> c.NodeType = FSharpTokenType.END || c.NodeType = FSharpTokenType.RBRACE)
-            match (startIdx, endIdx) with
-            | Some s, Some e when s >= 0 && e > s ->
-                let first, last = s + 1, e - 1
-                children[first .. last] |> List.filter (isWhitespace >> not)
-            | _ -> List.empty
+            if isNotNull beginToken && isNotNull endToken then
+                TreeRange(beginToken.NextSibling, endToken.PrevSibling)
+                |> Seq.filter (isWhitespace >> not)
+            else
+                TreeRange.Empty
         deindent (desiredIndent + indentSize) reprNodes
 
-        let declNodes = typeDecl.Children() |> Seq.skipWhile ((!=) typeRepr) |> Seq.filter (isWhitespace >> not)
+        let declNodes =
+            typeDecl.Children()
+            |> Seq.skipWhile ((!=) typeRepr)
+            |> Seq.filter (isWhitespace >> not)
         deindent desiredIndent declNodes
 
         reprNodes
