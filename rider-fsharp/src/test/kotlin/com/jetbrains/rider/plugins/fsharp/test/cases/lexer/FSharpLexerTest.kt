@@ -1313,12 +1313,12 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Triple quote 01`() {
-    doTest("$\"\"\" \"}} \"\"\"", """TRIPLE_QUOTED_STRING ('${'$'}""${'"'} "}} ""${'"'}')""");
+    doTest("$\"\"\" \"}} \"\"\"", """TRIPLE_QUOTE_INTERPOLATED_STRING ('${'$'}""${'"'} "}} ""${'"'}')""");
   }
 
   @Test
   fun `testStrings - Interpolated - Triple quote 02`() {
-    doTest("$\"\"\" \"\"}} \"\"\"", """TRIPLE_QUOTED_STRING ('${'$'}""${'"'} ""}} ""${'"'}')""");
+    doTest("$\"\"\" \"\"}} \"\"\"", """TRIPLE_QUOTE_INTERPOLATED_STRING ('${'$'}""${'"'} ""}} ""${'"'}')""");
   }
 
   @Test
