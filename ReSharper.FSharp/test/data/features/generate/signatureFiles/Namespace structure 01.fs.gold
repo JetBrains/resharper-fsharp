@@ -1,0 +1,6 @@
+﻿Provided elements:
+ 0: Generate signature file title
+
+{caret}namespace Foo
+
+open System
