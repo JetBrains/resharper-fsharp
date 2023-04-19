@@ -1,28 +1,28 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 
+open System.IO
 open System.Text
 open FSharp.Compiler.Symbols
-open JetBrains.ReSharper.Feature.Services.Generate
-open JetBrains.ReSharper.Feature.Services.Generate.Workflows
-open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.Transactions
-open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp
-open System.IO
+open JetBrains.Application.Threading
 open JetBrains.Application.UI.PopupLayout
-open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.DocumentManagers.Transactions.ProjectHostActions.Ordering
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.RdBackend.Common.Features.ProjectModel
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Feature.Services.Generate.Actions
+open JetBrains.ReSharper.Feature.Services.Generate.Workflows
+open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Feature.Services.Resources
-open JetBrains.ReSharper.Psi.Naming
+open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Naming
+open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 
 module FSharpGeneratorKinds =
     let [<Literal>] SignatureFile = "SignatureFile"
@@ -202,9 +202,11 @@ type FSharpGenerateSignatureBuilder() =
         let node = context.Root :?> IFSharpTreeNode
         let currentFSharpFile = node.FSharpFile
         if currentFSharpFile.IsFSharpSigFile() then false else
+
         let solution = node.GetSolution()
         let isSettingEnabled = solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.GenerateSignatureFile)
         if not isSettingEnabled then false else
+
         let fcsService = currentFSharpFile.FcsCheckerService
         // TODO: don't check has pair in unit test
         let hasSignature = fcsService.FcsProjectProvider.HasPairFile (node.GetSourceFile())
@@ -213,22 +215,22 @@ type FSharpGenerateSignatureBuilder() =
     override this.Process(context) =
         let node = context.Root :?> IFSharpTreeNode
         use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-        use transactionCookie =
-            PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(node.GetPsiServices(), FSharpGeneratorKinds.SignatureFile)
 
-        let currentFSharpFile = node.FSharpFile
         let projectFile = node.GetSourceFile().ToProjectFile()
         let physicalPath = projectFile.Location.FileAccessPath
         let fsiFile = Path.ChangeExtension(physicalPath, ".fsi")
-        let signatureFile = mkSignatureFile currentFSharpFile
+        let signatureFile = mkSignatureFile node.FSharpFile
         File.WriteAllText(fsiFile, signatureFile.GetText())
-        let solution = node.GetSolution()
-        solution.InvokeUnderTransaction(fun transactionCookie ->
-            let virtualPath = FileSystemPath.TryParse(fsiFile).ToVirtualFileSystemPath()
-            let relativeTo = RelativeTo(projectFile, RelativeToType.Before)
-            let projectFile = transactionCookie.AddFile(projectFile.ParentFolder, virtualPath, context = OrderingContext(relativeTo))
 
-            if (not Shell.Instance.IsTestShell) then
+        let solution = context.Solution
+        solution.Locks.ExecuteOrQueue(FSharpGeneratorKinds.SignatureFile, fun _ ->
+            solution.InvokeUnderTransaction(fun transactionCookie ->
+                let virtualPath = FileSystemPath.TryParse(fsiFile).ToVirtualFileSystemPath()
+                let relativeTo = RelativeTo(projectFile, RelativeToType.Before)
+                let projectFile = transactionCookie.AddFile(projectFile.ParentFolder, virtualPath, context = OrderingContext(relativeTo))
+
+                if Shell.Instance.IsTestShell then () else
+
                 let navigationOptions = NavigationOptions.FromWindowContext(Shell.Instance.GetComponent<IMainWindowPopupWindowContext>().Source, "")
                 NavigationManager
                     .GetInstance(solution)
@@ -237,7 +239,8 @@ type FSharpGenerateSignatureBuilder() =
                         navigationOptions
                     )
                     |> ignore
-        )
+            )
+        ) |> ignore
 
 type FSharpGenerateSignatureWorkflow() =
     inherit GenerateCodeWorkflowBase(
