@@ -2,12 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Include="Library.fs" />
-        <Folder Include="NewSub" />
-        <Folder Include="NewFolder" />
+        <Folder Include="NewSub\" />
+        <Folder Include="NewFolder\" />
     </ItemGroup>
 
 </Project>
