@@ -10,7 +10,9 @@ import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.framework.TestProjectModelDumpFilesProfile
 import com.jetbrains.rider.test.framework.executeWithGold
+import com.jetbrains.rider.test.maskAllAccordingDumpFilesProfile
 import com.jetbrains.rider.test.scriptingApi.createDataContextFor
 import com.jetbrains.rider.test.scriptingApi.dumpSolutionExplorerTree
 import com.jetbrains.rider.test.scriptingApi.prepareProjectView
@@ -142,7 +144,7 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   private fun doTest(action: (FSharpMoveProviderExtension) -> Unit) {
     prepareProjectView(project)
     executeWithGold(testGoldFile) {
-      it.append(dumpSolutionExplorerTree(project))
+      it.append(dumpSolutionExplorerTree(project).maskAllAccordingDumpFilesProfile(TestProjectModelDumpFilesProfile()))
     }
     action(FSharpMoveProviderExtension(project))
   }
