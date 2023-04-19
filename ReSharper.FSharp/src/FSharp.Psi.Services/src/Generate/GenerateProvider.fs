@@ -207,7 +207,8 @@ type FSharpOverridingMembersBuilder() =
         ] |> ignore
 
         let normalizeReprEnd (beginToken: ITokenNode) (endToken: ITokenNode) =
-            if beginToken.Indent > endToken.Indent then
+            if isNull beginToken || isNull endToken then ()
+            elif beginToken.Indent > endToken.Indent then
                 let diff = beginToken.Indent - endToken.Indent
                 addNodeBefore endToken (Whitespace(diff))
             elif endToken.Indent > beginToken.Indent && isFirstMeaningfulNodeOnLine endToken then
