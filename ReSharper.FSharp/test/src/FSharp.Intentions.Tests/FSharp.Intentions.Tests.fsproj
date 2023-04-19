@@ -49,7 +49,6 @@
     <Compile Include="src\Intentions\LetToUseTest.fs" />
     <Compile Include="src\Intentions\RenameFileToMatchTypeNameTest.fs" />
     <Compile Include="src\Intentions\DeconstructPatternTest.fs" />
-    <Compile Include="src\Intentions\GenerateSignatureFileTest.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixTestBase.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetTest.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
