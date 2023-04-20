@@ -76,9 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
     internal FSharpMetadata Metadata { get; set; }
 
-    private readonly Stack<MetadataEntity> myState = new();
-
-    private MetadataEntity CurrentEntity => myState.Peek();
+    private readonly Stack<FSharpMetadataEntity> myState = new();
 
     private static readonly Reader<int> ReadIntFunc = reader => reader.ReadPackedInt();
     private static readonly Reader<bool> ReadBoolFunc = reader => reader.ReadBoolean();
@@ -234,40 +232,58 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var index = ReadPackedInt();
       var typeParameters = ReadArray(reader => reader.ReadTypeParameterSpec());
       var logicalName = ReadUniqueString();
-
-      myState.Push(new MetadataEntity {Index = index, LogicalName = logicalName});
-
       var compiledName = ReadOption(ReadUniqueStringFunc);
       var range = ReadRange();
       var publicPath = ReadOption(reader => reader.ReadPublicPath());
       var accessibility = ReadAccessibility();
       var representationAccessibility = ReadAccessibility();
       var attributes = ReadAttributes();
-      var typeRepresentation = ReadTypeRepresentation();
+      var typeRepresentationFunc = ReadTypeRepresentation();
       var typeAbbreviation = ReadOption(ReadTypeFunc);
       var typeAugmentation = ReadTypeAugmentation();
       var xmlDocId = ReadUniqueString(); // Should be empty string.
       var typeKind = ReadTypeKind();
+      var flags = (EntityFlags) ReadInt64();
 
-      var entityFlags = (EntityFlags) ReadInt64() & ~EntityFlags.ReservedBit;
+      var entityFlags = flags & ~EntityFlags.ReservedBit;
       var isModuleOrNamespace = (entityFlags & EntityFlags.IsModuleOrNamespace) != 0;
+      var reprIsProvidedIlType = flags & EntityFlags.ReservedBit;
 
       var compilationPath = ReadOption(reader => reader.ReadCompilationPath());
-      CurrentEntity.CompilationPath = compilationPath?.Value;
 
-      var moduleType = ReadModuleType();
+      var entity = FSharpMetadataEntityModule.create(index, logicalName, compiledName, typeParameters.Length, compilationPath);
+      myState.Push(entity);
+
+      var moduleType = ReadModuleType(entity);
       var exceptionRepresentation = ReadExceptionRepresentation();
       var possibleXmlDoc = ReadPossibleXmlDoc();
 
-      if (isModuleOrNamespace && CurrentEntity.EntityKind != EntityKind.Namespace)
-        Metadata.CreateModule(CurrentEntity);
+      var typeRepresentation = typeRepresentationFunc(reprIsProvidedIlType != 0);
+
+      if (isModuleOrNamespace)
+      {
+        if (entity.EntityKind != EntityKind.Namespace)
+        {
+          entity.Representation =
+            FSharpCompiledTypeRepresentation.NewModule(entity.EntityKind == EntityKind.ModuleWithSuffix);
+          Metadata.AddEntity(entity);
+        }
+      }
+      else
+      {
+        if (typeAbbreviation == null)
+        {
+          entity.Representation = typeRepresentation;
+          Metadata.AddEntity(entity);
+        }
+      }
 
       myState.Pop();
 
       return null;
     }
 
-    private object ReadUnionCaseSpec()
+    private string ReadUnionCaseSpec()
     {
       var fields = ReadFieldsTable();
       var returnType = ReadType();
@@ -277,7 +293,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var xmlDocId = ReadUniqueString();
       var accessibility = ReadAccessibility();
 
-      return null;
+      return name;
     }
 
     private object ReadTypeObjectModelData()
@@ -486,7 +502,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return null;
     }
 
-    private object ReadModuleType()
+    private object ReadModuleType(FSharpMetadataEntity metadataEntity)
     {
       // from u_lazy:
       var chunkLength = ReadInt32();
@@ -498,7 +514,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var ovalsIdx1 = ReadInt32();
       var ovalsIdx2 = ReadInt32();
 
-      CurrentEntity.EntityKind = ReadEntityKind();
+      metadataEntity.EntityKind = ReadEntityKind();
 
       ReadArray(reader => reader.ReadValue());
       ReadArray(reader => reader.ReadEntitySpec());
@@ -537,13 +553,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     }
 
     [NotNull]
-    private Func<bool, object> ReadTypeRepresentation()
+    private Func<bool, FSharpCompiledTypeRepresentation> ReadTypeRepresentation()
     {
       var tag1 = ReadByte();
       CheckTagValue(nameof(tag1), tag1, 1);
 
       if (tag1 == 0)
-        return IgnoreBoolFunc;
+        return _ => FSharpCompiledTypeRepresentation.Other;
 
       if (tag1 == 1)
       {
@@ -552,13 +568,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         if (tag2 == 0)
         {
           ReadFieldsTable();
-          return IgnoreBoolFunc;
+          return _ => FSharpCompiledTypeRepresentation.Other;
         }
 
         if (tag2 == 1)
         {
-          ReadArray(reader => reader.ReadUnionCaseSpec());
-          return IgnoreBoolFunc;
+          var caseNames = ReadArray(reader => reader.ReadUnionCaseSpec());
+          return _ => FSharpCompiledTypeRepresentation.NewUnion(caseNames);
         }
 
         if (tag2 == 2)
@@ -576,13 +592,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         if (tag2 == 3)
         {
           ReadTypeObjectModelData();
-          return IgnoreBoolFunc;
+          return _ => FSharpCompiledTypeRepresentation.Other;
         }
 
         if (tag2 == 4)
         {
           ReadType();
-          return IgnoreBoolFunc;
+          return _ => FSharpCompiledTypeRepresentation.Other;
         }
 
         throw new InvalidOperationException();

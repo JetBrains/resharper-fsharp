@@ -25,17 +25,9 @@ let isCompiledRecord (property: IAttributesOwner) =
 let isCompiledFSharpField (property: IProperty) =
     getCompilationMappingFlag property = SourceConstructFlags.Field
 
-[<Extension; CompiledName("IsCompiledUnion")>]
-let isCompiledUnion (property: IAttributesOwner) =
-    getCompilationMappingFlag property = SourceConstructFlags.SumType
-
 [<Extension; CompiledName("IsCompiledUnionCase")>]
 let isCompiledUnionCase (property: IAttributesOwner) =
     getCompilationMappingFlag property = SourceConstructFlags.UnionCase
-
-[<Extension; CompiledName("IsCompiledModule")>]
-let isCompiledModule (property: IAttributesOwner) =
-    getCompilationMappingFlag property = SourceConstructFlags.Module
 
 [<Extension; CompiledName("IsCompiledException")>]
 let isCompiledException (property: IAttributesOwner) =

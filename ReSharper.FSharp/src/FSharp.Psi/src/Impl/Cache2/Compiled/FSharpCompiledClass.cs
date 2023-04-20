@@ -5,9 +5,9 @@ using JetBrains.ReSharper.Psi.Impl.Reflection2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 {
-  public class FSharpCompiledModule : FSharpCompiledClassBase
+  public class FSharpCompiledClass : FSharpCompiledClassBase
   {
-    public FSharpCompiledModule(FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
+    public FSharpCompiledClass(FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
       [NotNull] IReflectionBuilder builder, [NotNull] IMetadataTypeInfo info) : base(entity, parent, builder, info)
     {
     }

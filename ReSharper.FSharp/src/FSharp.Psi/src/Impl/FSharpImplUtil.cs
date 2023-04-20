@@ -314,7 +314,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       typeElement switch
       {
         IFSharpTypeElement fsTypeElement => fsTypeElement.GetPart<IUnionPart>() != null,
-        ICompiledElement compiled when compiled.IsFromFSharpAssembly() => compiled.IsCompiledUnion(),
+        IFSharpCompiledTypeElement fsCompiledTypeElement => fsCompiledTypeElement.Representation.IsUnion,
         _ => false
       };
 
