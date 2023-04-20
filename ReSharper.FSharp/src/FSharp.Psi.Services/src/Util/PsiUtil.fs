@@ -449,9 +449,7 @@ let shiftNode shift (expr: #ITreeNode) =
         match nextSibling with
         | :? NewLine -> ()
         | :? Whitespace as whitespace ->
-            // Skip empty lines
-            if not (whitespace.NextSibling.IsWhitespaceToken()) then
-                shiftWhitespaceBefore shift whitespace
+            shiftWhitespaceBefore shift whitespace
         | _ ->
             if shift > 0 then
                 ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
