@@ -1,0 +1,7 @@
+﻿Provided elements:
+ 0: Generate signature file title
+
+{caret}module Foo
+
+module Bar =
+  open System
