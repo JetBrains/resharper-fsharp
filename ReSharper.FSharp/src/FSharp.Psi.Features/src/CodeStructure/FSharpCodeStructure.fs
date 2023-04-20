@@ -15,9 +15,16 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.Rider.Backend.Features.CodeStructure
 open JetBrains.UI.Icons
 open JetBrains.UI.RichText
 open JetBrains.Util
+
+[<SolutionComponent>]
+type FSharpExtendedFileStructureLanguage() =
+    interface IExtendedFileStructureLanguage with
+        member this.IsValid(languageType) = languageType.Is<FSharpLanguage>()
+
 
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
 [<Language(typeof<FSharpLanguage>)>]
