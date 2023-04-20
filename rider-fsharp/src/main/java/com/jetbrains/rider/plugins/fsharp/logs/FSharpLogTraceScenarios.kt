@@ -2,7 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.logs
 
 import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 
-object FSharpLogTraceScenarios {
+class FSharpLogTraceScenarios {
   object FSharpProjectModel : LogTraceScenario(
     "JetBrains.ReSharper.Plugins.FSharp.Checker.FcsCheckerService",
     "JetBrains.ReSharper.Plugins.FSharp.Checker.FcsProjectProvider",

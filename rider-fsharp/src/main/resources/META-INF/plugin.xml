@@ -9,8 +9,8 @@
 
   <depends>com.intellij.modules.rider</depends>
   <extensions defaultExtensionNs="com.intellij">
-    <fileType name="F#" language="F#" extensions="fs;fsi;ml;mli" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType" />
-    <fileType name="F# Script" language="F#" extensions="fsx;fsscript" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType" />
+    <fileType name="F#" language="F#" extensions="fs;fsi;ml;mli" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType" fieldName="INSTANCE"/>
+    <fileType name="F# Script" language="F#" extensions="fsx;fsscript" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType" fieldName="INSTANCE"/>
 
     <lang.parserDefinition language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition" />
     <lang.syntaxHighlighter language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighter"/>
