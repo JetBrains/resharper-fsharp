@@ -1,0 +1,3 @@
+﻿// ${COMPLETE_ITEM:Extension (in System.Runtime.CompilerServices)}
+[<System.Runtime.CompilerServices.Extension{caret}>]
+module M

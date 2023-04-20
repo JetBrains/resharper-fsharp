@@ -7,12 +7,14 @@ using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -689,6 +691,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static bool RequiresQualifiedAccess([NotNull] this ITypeElement typeElement) =>
       typeElement.GetAccessType() == ModuleMembersAccessKind.RequiresQualifiedAccess;
+
+    public static bool IsAutoImported([NotNull] this IClrDeclaredElement declaredElement)
+    {
+      var psiModule = declaredElement.Module;
+      var autoOpenCache = psiModule.GetSolution().GetComponent<FSharpAssemblyAutoOpenCache>();
+      var autoOpenedModules = autoOpenCache.GetAutoOpenedModules(psiModule);
+
+      // todo: assembly level auto open modules
+      var ns = GetNamespace(declaredElement);
+      return ns != null && autoOpenedModules.Contains(ns.QualifiedName);
+    }
+
+    [CanBeNull]
+    public static INamespace GetNamespace([NotNull] this IClrDeclaredElement declaredElement)
+    {
+      if (declaredElement is ITypeElement typeElement)
+        return typeElement.GetContainingNamespace();
+
+      if (declaredElement.GetContainingType() is { } containingType)
+        return containingType.GetContainingNamespace();
+
+      if (declaredElement is INamespace ns)
+        return ns.GetContainingNamespace();
+
+      return null;
+    }
 
     [CanBeNull]
     private static T GetOutermostNode<T, TMatchingNode>([CanBeNull] this T node, bool singleLevel = false)

@@ -12,5 +12,5 @@ type ReplaceWithAbbreviatedTypeTest() =
     [<Test>] member x.``Simple 02 - Comment``() = x.DoNamedTest()
 
     [<Test>] member x.``Type parameters 01``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Type parameters 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type parameters 02``() = x.DoNamedTest()
     [<Test>] member x.``Type parameters 03``() = x.DoNamedTest()

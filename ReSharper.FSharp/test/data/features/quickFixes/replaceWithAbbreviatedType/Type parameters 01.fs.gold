@@ -1,6 +1,4 @@
-﻿open Microsoft.FSharp.Collections
-
-type list = list<int>
+﻿type list = list<int>
 
 type List<'T>{caret} with
     member x.P = 1

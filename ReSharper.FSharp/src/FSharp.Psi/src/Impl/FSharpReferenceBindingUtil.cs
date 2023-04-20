@@ -39,21 +39,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string SuggestShortReferenceName(string sourceName, PsiLanguageType language) =>
       NamingManager.GetNamingLanguageService(language).MangleNameIfNecessary(sourceName);
 
-    [CanBeNull]
-    private static INamespace GetNamespace([NotNull] IClrDeclaredElement declaredElement)
-    {
-      if (declaredElement is ITypeElement typeElement)
-        return typeElement.GetContainingNamespace();
-
-      if (declaredElement.GetContainingType() is { } containingType)
-        return containingType.GetContainingNamespace();
-
-      if (declaredElement is INamespace ns)
-        return ns.GetContainingNamespace();
-
-      return null;
-    }
-
     private static bool RequiresFullyQualifiedName([NotNull] IReference reference)
     {
       // Can't insert 'open' before top-level module declaration.
@@ -67,7 +52,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (!RequiresFullyQualifiedName(reference))
         return;
 
-      var ns = GetNamespace(declaredElement);
+      if (declaredElement.IsAutoImported())
+        return;
+
+      var ns = declaredElement.GetNamespace();
       if (ns == null || ns.IsRootNamespace)
         return;
 

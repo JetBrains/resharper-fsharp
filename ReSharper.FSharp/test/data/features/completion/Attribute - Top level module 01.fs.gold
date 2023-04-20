@@ -1,0 +1,3 @@
+﻿// ${COMPLETE_ITEM:RequireQualifiedAccess}
+[<RequireQualifiedAccess{caret}>]
+module M

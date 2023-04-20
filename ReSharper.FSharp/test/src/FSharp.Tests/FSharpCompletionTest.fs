@@ -27,6 +27,8 @@ type FSharpCompletionTest() =
 
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 02``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute - Top level module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute - Top level module 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Basic 01 - Replace``() = x.DoNamedTest()
     [<Test>] member x.``Basic 02 - Insert``() = x.DoNamedTest()

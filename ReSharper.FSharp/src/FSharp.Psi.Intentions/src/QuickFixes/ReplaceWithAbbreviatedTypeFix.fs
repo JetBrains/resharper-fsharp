@@ -23,10 +23,6 @@ type ReplaceWithAbbreviatedTypeFix(error: TypeAbbreviationsCannotHaveAugmentatio
     override this.IsAvailable _ =
         isValid typeDecl &&
 
-        // todo: fix parameter list range
-        let typeParamDeclList = typeDecl.TypeParameterDeclarationList
-        (isNull typeParamDeclList || typeParamDeclList.TypeParametersEnumerable.IsEmpty()) &&
-
         let fcsEntity = typeDecl.GetFcsSymbol().As<FSharpEntity>()
         isNotNull fcsEntity
 

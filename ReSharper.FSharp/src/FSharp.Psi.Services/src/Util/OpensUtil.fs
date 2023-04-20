@@ -319,6 +319,8 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
     insertAfterAnchor ns anchor indent
 
 let addOpens (reference: FSharpSymbolReference) (typeElement: ITypeElement) =
+    if typeElement.IsAutoImported() then reference else
+
     let referenceOwner = reference.GetElement()
     use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
 
