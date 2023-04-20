@@ -218,6 +218,28 @@ class FantomasRunOptionsTest : EditorTestBase() {
     }
   }
 
+  private fun doEditorConfigEnumTest(fantomasVersion: String, settings: String) {
+    withEditorConfig(project) {
+      withFantomasLocalTool("fantomas", fantomasVersion) {
+        withOpenedEditor("EditorConfig.fs", "Brackets.fs") {
+          withEditorConfigFile(settings) {
+            reformatCode()
+            executeWithGold(testGoldFile) {
+              dumpOpenedDocument(it, project!!, false)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Test(description = "Doesn't support experimental_stroustrup, 'cramped' should be used instead")
+  fun `editorconfig enum values 01`() =
+    doEditorConfigEnumTest("6.0.1", "fsharp_multiline_bracket_style=experimental_stroustrup")
+
+  @Test(description = "Supports stroustrup")
+  fun `editorconfig enum values 02`() = doEditorConfigEnumTest("6.0.1", "fsharp_multiline_bracket_style=stroustrup")
+
   @Test
   fun `global tool`() {
     executeWithGold(testGoldFile) {

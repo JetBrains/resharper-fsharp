@@ -3,9 +3,12 @@ package com.jetbrains.rider.plugins.fsharp.test
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.util.io.createFile
+import com.intellij.util.io.write
 import com.jetbrains.rdclient.protocol.IProtocolHost
 import com.jetbrains.rdclient.protocol.protocolHost
 import com.jetbrains.rider.RiderEnvironment
@@ -18,8 +21,11 @@ import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.BackendSettingsEditorBase
 import com.jetbrains.rider.test.scriptingApi.dumpSevereHighlighters
 import com.jetbrains.rider.test.scriptingApi.editBackendSettings
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import java.io.PrintStream
 import java.nio.file.Path
+import java.nio.file.Paths
+import kotlin.io.path.deleteIfExists
 
 fun com.intellij.openapi.editor.Editor.dumpTypeProviders(stream: PrintStream) {
   with(stream) {
@@ -58,6 +64,24 @@ fun BaseTestWithSolution.withNonFSharpProjectReferences(function: () -> Unit) {
 
 fun withEditorConfig(project: Project, function: () -> Unit) {
   withSetting(project, "CodeStyle/EditorConfig/EnableEditorConfigSupport", "true", "false", function)
+}
+
+fun EditorImpl.withEditorConfigFile(text: String, function: () -> Unit) {
+  val editorconfigPath = Paths.get(virtualFile.path, "..", ".editorconfig")
+  editorconfigPath.deleteIfExists()
+  val file = editorconfigPath.createFile()
+
+  file.write(
+    """
+      root=true
+
+      [*.fs]
+      $text
+    """.trimIndent()
+  )
+  flushFileChanges(project!!)
+  waitForDaemon(project!!)
+  function()
 }
 
 //TODO: move to test framework
