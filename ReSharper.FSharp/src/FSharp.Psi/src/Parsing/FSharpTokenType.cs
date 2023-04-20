@@ -134,15 +134,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       public override LeafElementBase Create(string text) => new FSharpComment(this, text);
     }
 
-    private sealed class XmlDocBlockNodeType : FSharpCompositeNodeType
-    {
-      public XmlDocBlockNodeType(int nodeTypeIndex) : base("XML_DOC_BLOCK", nodeTypeIndex)
-      {
-      }
-
-      public override CompositeElement Create() => new XmlDocBlock();
-    }
-
     public const int WHITESPACE_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 1;
     public static readonly TokenNodeType WHITESPACE = new WhitespaceNodeType(WHITESPACE_NODE_TYPE_INDEX);
 
@@ -157,9 +148,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     public const int CHAMELEON_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 5;
     public static readonly TokenNodeType CHAMELEON = new FSharpTokenNodeType("CHAMELEON", CHAMELEON_NODE_TYPE_INDEX);
-
-    public const int XML_DOC_BLOCK_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 6;
-    public static readonly CompositeNodeType XML_DOC_BLOCK = new XmlDocBlockNodeType(XML_DOC_BLOCK_NODE_TYPE_INDEX);
 
     public static readonly NodeTypeSet RightBraces;
     public static readonly NodeTypeSet LeftBraces;

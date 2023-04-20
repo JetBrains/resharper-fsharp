@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -99,6 +100,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   public partial class XmlDocBlock : FSharpCompositeElement
   {
     public override bool IsFiltered() => true;
-    public override NodeType NodeType => FSharpTokenType.XML_DOC_BLOCK;
+    public override NodeType NodeType => XmlDocBlockNodeType.Instance;
   }
 }
