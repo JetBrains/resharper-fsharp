@@ -7,6 +7,7 @@ using JetBrains.Application.Settings.Calculated.Interface;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -144,7 +145,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Name("ContinuousIndent")
         .Where(Node().In(continuousIndentNodes.Union(ElementType.PREFIX_APP_EXPR)).Satisfies((node, _) =>
           node.Node is not IPrefixAppExpr || node.Parent.NodeOrNull is not IPrefixAppExpr))
-        .AddException(Node().In(ElementType.ATTRIBUTE_LIST, FSharpTokenType.XML_DOC_BLOCK))
+        .AddException(Node().In(ElementType.ATTRIBUTE_LIST, DocCommentBlockNodeType.Instance))
         .AddException(Node().In(FSharpTokenType.LINE_COMMENT).Satisfies((node, _) => node.NodeOrNull is DocComment))
         .AddException(
           // todo: add setting

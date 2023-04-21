@@ -7,6 +7,7 @@ open FSharp.Compiler.SyntaxTrivia
 open FSharp.Compiler.Text
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -179,7 +180,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             let mark =
                 if xmlDoc.HasDeclaration then
                     let mark = x.Mark(xmlDoc.Range)
-                    x.MarkAndDone(xmlDoc.Range, FSharpTokenType.XML_DOC_BLOCK)
+                    x.MarkAndDone(xmlDoc.Range, DocCommentBlockNodeType.Instance)
                     mark
                 else x.Mark()
 
