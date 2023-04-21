@@ -1,142 +1,18 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
-import com.intellij.util.application
-import com.intellij.util.io.createFile
-import com.intellij.util.io.delete
-import com.intellij.util.io.write
-import com.jetbrains.rd.platform.util.lifetime
-import com.jetbrains.rdclient.util.idea.waitAndPump
-import com.jetbrains.rider.plugins.fsharp.test.fcsHost
-import com.jetbrains.rider.plugins.fsharp.test.flushFileChanges
-import com.jetbrains.rider.plugins.fsharp.test.runProcessWaitForExit
-import com.jetbrains.rider.plugins.fsharp.test.withSetting
-import com.jetbrains.rider.projectView.solutionDirectory
-import com.jetbrains.rider.protocol.protocolManager
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.asserts.shouldBe
-import com.jetbrains.rider.test.base.EditorTestBase
-import com.jetbrains.rider.test.base.PrepareTestEnvironment
-import com.jetbrains.rider.test.enums.CoreVersion
+import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.framework.frameworkLogger
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
+import com.jetbrains.rider.test.scriptingApi.reformatCode
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.test.waitForDaemon
 import org.testng.annotations.BeforeTest
 import org.testng.annotations.Test
-import java.io.PrintStream
-import java.nio.file.Paths
-import java.time.Duration
-import kotlin.io.path.*
 
 @Test
-@TestEnvironment(coreVersion = CoreVersion.DOT_NET_6, reuseSolution = false)
-class FantomasRunOptionsTest : EditorTestBase() {
-  override fun getSolutionDirectoryName() = "FormatCodeApp"
-  override val restoreNuGetPackages = false
-
-  private fun getDotnetCliHome() = Path(tempTestDirectory.parent, "dotnetHomeCli")
-  private val fantomasNotifications = ArrayList<String>()
-  private val bundledVersion = "5.2.1.0"
-  private val globalVersion = "4.7.2.0"
-  private var dotnetToolsInvalidated = false
-
-  private fun dumpRunOptions() = project.fcsHost.dumpFantomasRunOptions.sync(Unit)
-  private fun checkFantomasVersion(version: String) = project.fcsHost.fantomasVersion.sync(Unit).shouldBe(version)
-  private fun dumpNotifications(stream: PrintStream, expectedCount: Int) {
-    stream.println("\n\nNotifications:")
-    waitAndPump(project.lifetime,
-      { fantomasNotifications.size >= expectedCount },
-      Duration.ofSeconds(30),
-      { "Didn't wait for notifications. Expected $expectedCount, but was ${fantomasNotifications.size}" })
-
-    fantomasNotifications.forEach { stream.println(it) }
-  }
-
-  private fun withFantomasSetting(value: String, function: () -> Unit) {
-    withSetting(project, "FSharp/FSharpFantomasOptions/Location/@EntryValue", value, "AutoDetected") {
-      function()
-    }
-  }
-
-  private fun withDotnetToolsUpdate(function: () -> Unit) {
-    dotnetToolsInvalidated = false
-    function()
-    flushFileChanges(project)
-    waitAndPump(Duration.ofSeconds(15), { dotnetToolsInvalidated == true }, { "Dotnet tools wasn't changed." })
-  }
-
-  private fun withFantomasLocalTool(name: String, version: String, restore: Boolean = true, function: () -> Unit) {
-    val manifestFile = Paths.get(project.solutionDirectory.absolutePath, ".config", "dotnet-tools.json")
-    frameworkLogger.info("Create '$manifestFile'")
-    val file = manifestFile.createFile()
-
-    try {
-      withDotnetToolsUpdate {
-        val toolsJson = """"$name": { "version": "$version", "commands": [ "fantomas" ] }"""
-        file.write("""{ "version": 1, "isRoot": true, "tools": { $toolsJson } }""")
-      }
-      if (restore) {
-        withDotnetToolsUpdate {
-          // Trigger dotnet tools restore
-          // TODO: use separate dotnet tools restore API
-          restoreNuGet(project)
-        }
-      }
-      function()
-    } finally {
-      withDotnetToolsUpdate {
-        file.delete()
-        project.fcsHost.terminateFantomasHost.sync(Unit)
-      }
-    }
-  }
-
-  private fun withFantomasGlobalTool(function: () -> Unit) {
-    try {
-      val env = mapOf("DOTNET_CLI_HOME" to getDotnetCliHome().absolutePathString())
-
-      withDotnetToolsUpdate {
-        runProcessWaitForExit(
-          Path(PrepareTestEnvironment.dotnetCoreCliPath),
-          listOf("tool", "install", "fantomas-tool", "-g", "--version", globalVersion),
-          env
-        )
-      }
-      function()
-    } finally {
-      project.fcsHost.terminateFantomasHost.sync(Unit)
-    }
-  }
-
-  @BeforeTest(alwaysRun = true)
-  fun prepareDotnetCliHome() {
-    application.protocolManager.protocolHosts.forEach {
-      setReSharperEnvVar("DOTNET_CLI_HOME", getDotnetCliHome().absolutePathString(), it)
-    }
-  }
-
-  override fun beforeDoTestWithDocuments() {
-    super.beforeDoTestWithDocuments()
-
-    fantomasNotifications.clear()
-
-    project.fcsHost.fantomasNotificationFired.advise(testLifetimeDef.lifetime) {
-      fantomasNotifications.add(it)
-    }
-    project.fcsHost.dotnetToolInvalidated.advise(testLifetimeDef.lifetime) {
-      dotnetToolsInvalidated = true
-    }
-
-    val dotnetCliHome = getDotnetCliHome()
-    if (dotnetCliHome.listDirectoryEntries().any { it.name != ".nuget" }) {
-      withDotnetToolsUpdate {
-        dotnetCliHome.delete(true)
-        dotnetCliHome.createDirectory()
-        flushFileChanges(project)
-      }
-    }
-  }
-
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7, reuseSolution = false)
+class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
   @Test
   fun default() {
     executeWithGold(testGoldFile) {

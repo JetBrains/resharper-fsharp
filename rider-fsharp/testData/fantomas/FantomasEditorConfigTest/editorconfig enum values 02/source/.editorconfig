@@ -1,0 +1,4 @@
+root=true
+
+[*.fs]
+fsharp_multiline_bracket_style=stroustrup
