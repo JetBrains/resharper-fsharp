@@ -16,13 +16,13 @@ import java.io.File
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7, reuseSolution = false)
 class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
   override fun getSolutionDirectoryName() = "FormatCodeApp"
-  override fun prepareSolution(sourceSolutionDirName: String, projFiles: List<File>) {
+  override fun beforeDoTestWithDocuments() {
+    super.beforeDoTestWithDocuments()
+
     val sourceEditorConfigFile = File(testCaseSourceDirectory, ".editorconfig")
     val slnEditorConfigFile = File(tempTestDirectory, ".editorconfig")
     sourceEditorConfigFile.copyTo(slnEditorConfigFile, true)
     flushFileChanges(project)
-
-    super.prepareSolution(sourceSolutionDirName, projFiles)
   }
 
   private fun doEditorConfigEnumTest(fantomasVersion: String) {
