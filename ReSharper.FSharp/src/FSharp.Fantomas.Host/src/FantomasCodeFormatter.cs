@@ -261,7 +261,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
                 {
                   int => int.Parse(valueData),
                   bool => bool.Parse(valueData),
-                  { } => ConvertEnumValue(valueData)
+                  { } defaultEnumValue => TryConvertEnumValue(valueData, defaultEnumValue)
                 }))
           .ToDictionary(x => x.Name, x => x.Value);
 
@@ -278,18 +278,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         : formatConfig;
     }
 
-    // TODO: alternatively, we can reuse the logic from
-    // https://github.com/fsprojects/fantomas/blob/master/src/Fantomas.Extras/EditorConfig.fs
-    // such as `parseOptionsFromEditorConfig`,
-    // or take the OfConfigString methods of discriminated unions as a contract
-    // https://github.com/fsprojects/fantomas/blob/master/src/Fantomas/FormatConfig.fs
-    private static object ConvertEnumValue(string setting)
+    private static object TryConvertEnumValue(string userValue, object defaultValue)
     {
-      var camelCaseSetting = StringUtil.MakeUpperCamelCaseName(setting);
+      var camelCaseSetting = StringUtil.MakeUpperCamelCaseName(userValue);
 
       return FormatConfigDUs.TryGetValue(camelCaseSetting, out var unionCase)
         ? FSharpValue.MakeUnion(unionCase, null, FSharpOption<BindingFlags>.None)
-        : throw new ArgumentOutOfRangeException($"Unknown Fantomas FormatSetting {setting}");
+        : defaultValue;
     }
   }
 }
