@@ -257,8 +257,7 @@ type FSharpOverridingMembersBuilder() =
                 if not (isFirstMeaningfulNodeOnLine node) then () else
 
                 let diff = node.Indent - (desiredIndent + additionalIndent)
-                if diff <> 0 then
-                    shiftWithWhitespaceBefore -diff node
+                shiftWithWhitespaceBefore -diff node
 
         reindentRange indentSize (TreeRange(getNextSibling beginToken, getPrevSibling endToken))
         reindentRange 0 (TreeRange(typeDecl.TypeRepresentation, typeDecl.LastChild))
