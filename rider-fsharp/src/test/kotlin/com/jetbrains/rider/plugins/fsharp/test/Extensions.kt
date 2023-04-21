@@ -21,7 +21,7 @@ import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.BackendSettingsEditorBase
 import com.jetbrains.rider.test.scriptingApi.dumpSevereHighlighters
 import com.jetbrains.rider.test.scriptingApi.editBackendSettings
-import com.jetbrains.rider.test.scriptingApi.waitForDaemon
+import com.jetbrains.rider.test.waitForNextDaemon
 import java.io.PrintStream
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -80,7 +80,7 @@ fun EditorImpl.withEditorConfigFile(text: String, function: () -> Unit) {
     """.trimIndent()
   )
   flushFileChanges(project!!)
-  waitForDaemon(project!!)
+  waitForNextDaemon()
   function()
 }
 
