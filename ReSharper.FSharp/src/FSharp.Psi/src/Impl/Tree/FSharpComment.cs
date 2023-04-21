@@ -100,6 +100,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   public partial class XmlDocBlock : FSharpCompositeElement
   {
     public override bool IsFiltered() => true;
-    public override NodeType NodeType => XmlDocBlockNodeType.Instance;
+    public override NodeType NodeType => DocCommentBlockNodeType.Instance;
   }
 }

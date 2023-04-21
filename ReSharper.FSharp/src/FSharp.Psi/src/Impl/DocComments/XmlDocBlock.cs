@@ -4,11 +4,11 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
 {
-  public class XmlDocBlockNodeType : FSharpCompositeNodeType
+  public class DocCommentBlockNodeType : FSharpCompositeNodeType
   {
-    public static readonly CompositeNodeType Instance = new XmlDocBlockNodeType();
+    public static readonly CompositeNodeType Instance = new DocCommentBlockNodeType();
 
-    private XmlDocBlockNodeType() : base("XML_DOC_BLOCK", 1900)
+    private DocCommentBlockNodeType() : base("XML_DOC_BLOCK", 1900)
     {
     }
 

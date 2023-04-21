@@ -127,7 +127,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
     member x.MarkXmlDocOwner(xmlDoc: XmlDoc, expectedType: TokenNodeType, declarationRange: range) =
         let mark = x.MarkTokenOrRange(expectedType, declarationRange)
         if xmlDoc.HasDeclaration then
-            x.MarkAndDone(xmlDoc.Range, XmlDocBlockNodeType.Instance)
+            x.MarkAndDone(xmlDoc.Range, DocCommentBlockNodeType.Instance)
         mark
 
     member x.ProcessReferenceName(lid: Ident list) =

@@ -145,7 +145,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Name("ContinuousIndent")
         .Where(Node().In(continuousIndentNodes.Union(ElementType.PREFIX_APP_EXPR)).Satisfies((node, _) =>
           node.Node is not IPrefixAppExpr || node.Parent.NodeOrNull is not IPrefixAppExpr))
-        .AddException(Node().In(ElementType.ATTRIBUTE_LIST, XmlDocBlockNodeType.Instance))
+        .AddException(Node().In(ElementType.ATTRIBUTE_LIST, DocCommentBlockNodeType.Instance))
         .AddException(Node().In(FSharpTokenType.LINE_COMMENT).Satisfies((node, _) => node.NodeOrNull is DocComment))
         .AddException(
           // todo: add setting
