@@ -9,11 +9,11 @@ import org.testng.annotations.Test
 
 @Test
 @TestEnvironment(solution = "CoreConsoleApp", sdkVersion = SdkVersion.DOT_NET_7)
-class UrlInStringsTest: BaseTestWithMarkup() {
+class UrlInStringsTest : BaseTestWithMarkup() {
   private fun doTest() {
     doTestWithMarkupModel("Program.fs", "Program.fs") {
       waitForDaemon()
-      printStream.print(getHighlighters(project!!, this))
+      printStream.print(getHighlighters(project!!, this) { true })
     }
   }
 
