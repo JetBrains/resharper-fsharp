@@ -10,7 +10,7 @@ object FSharpElementTypes {
   )
 
   val STRING_LITERAL_EXPRESSION = createCompositeElementType(
-    "STRING_LITERAL_EXPRESSION", ::FSharpStringLiteralExpressionImpl
+    "STRING_LITERAL_EXPRESSION", ::FSharpFSharpStringLiteralExpressionImpl
   )
 
   val INTERPOLATED_STRING_LITERAL_EXPRESSION_PART = createCompositeElementType(
