@@ -200,10 +200,8 @@ type FSharpOverridingMembersBuilder() =
         let currentIndent = typeRepr.Indent
         let desiredIndent = typeDecl.Indent + typeDecl.GetIndentSize()
 
-        addNodesBefore typeRepr.FirstChild [
-            NewLine(typeRepr.GetLineEnding())
-            Whitespace(currentIndent)
-        ] |> ignore
+        addNodeBefore typeRepr (NewLine(typeRepr.GetLineEnding()))
+        addNodeBefore typeRepr.FirstChild (Whitespace(desiredIndent))
 
         // to have good indents for begin/end keywords which might start out on different indents
         shiftNode (-currentIndent) typeRepr
