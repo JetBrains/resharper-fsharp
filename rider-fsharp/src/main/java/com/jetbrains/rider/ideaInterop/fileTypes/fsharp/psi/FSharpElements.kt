@@ -3,7 +3,7 @@ package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.jetbrains.rider.ideaInterop.fileTypes.common.psi.ClrLanguageStringLiteralExpression
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenNodeType
 
 interface FSharpElement : PsiElement
 
@@ -16,7 +16,7 @@ interface FSharpStringLiteralExpression : FSharpElement, ClrLanguageStringLitera
 }
 
 interface FSharpInterpolatedStringLiteralExpressionPart : FSharpElement {
-  val tokenType: FSharpTokenType
+  val tokenType: FSharpTokenNodeType
 }
 
 interface FSharpInterpolatedStringLiteralExpression : FSharpStringLiteralExpression
