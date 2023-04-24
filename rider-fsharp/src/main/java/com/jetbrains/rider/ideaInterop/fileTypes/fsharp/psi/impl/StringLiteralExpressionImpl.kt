@@ -7,7 +7,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralType
 
-class FSharpFSharpStringLiteralExpressionImpl(type: FSharpElementType) : FSharpStringLiteralExpressionBase(type) {
+class FSharpStringLiteralExpressionImpl(type: FSharpElementType) : FSharpStringLiteralExpressionBase(type) {
   override fun isValidHost(): Boolean {
     return when (stringTokenType) {
       FSharpTokenType.UNFINISHED_STRING,
