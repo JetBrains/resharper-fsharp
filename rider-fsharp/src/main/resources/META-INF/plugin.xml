@@ -60,24 +60,28 @@
     <projectConfigurable parentId="Errors" instance="com.jetbrains.rider.settings.FSharpInspectionsPage" />
 
     <intentionAction>
+      <language>F#</language>
       <className>com.jetbrains.rider.plugins.fsharp.services.fsi.SendLineToFsiIntentionAction</className>
       <category>F#</category>
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
     </intentionAction>
 
     <intentionAction>
+      <language>F#</language>
       <className>com.jetbrains.rider.plugins.fsharp.services.fsi.SendSelectionToFsiIntentionAction</className>
       <category>F#</category>
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
     </intentionAction>
 
     <intentionAction>
+      <language>F#</language>
       <className>com.jetbrains.rider.plugins.fsharp.services.fsi.DebugLineInFsiIntentionAction</className>
       <category>F#</category>
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
     </intentionAction>
 
     <intentionAction>
+      <language>F#</language>
       <className>com.jetbrains.rider.plugins.fsharp.services.fsi.DebugSelectionInFsiIntentionAction</className>
       <category>F#</category>
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
