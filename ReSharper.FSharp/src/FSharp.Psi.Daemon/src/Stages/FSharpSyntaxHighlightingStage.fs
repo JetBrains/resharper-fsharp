@@ -1,12 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
-open JetBrains.ReSharper.Daemon.CSharp.Syntax
 open JetBrains.ReSharper.Daemon.Syntax
 open JetBrains.ReSharper.Daemon.SyntaxHighlighting
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Syntax
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Util.XmlDocUtil
 open JetBrains.ReSharper.Psi
 
 type FSharpSyntaxHighlighting() =
@@ -38,7 +39,8 @@ type FSharpSyntaxHighlightingProcessor() =
         match element with
         | :? IFSharpDocCommentBlock as block ->
             let xmlFile = block.GetXmlPsi().XmlFile
-            xmlFile.ProcessDescendants(XmlDocSyntaxHighlightingVisitor(), context); //TODO: F# implementation
+            let syntaxHighlightingVisitor = FSharpXmlDocSyntaxHighlightingVisitor(xmlFile.IsSimpleSummaryDoc)
+            xmlFile.ProcessDescendants(syntaxHighlightingVisitor, context)
         | _ -> ()
 
 
