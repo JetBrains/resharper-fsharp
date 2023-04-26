@@ -57,4 +57,4 @@ jobs:
 
       - name: Stop Gradle Daemon # to collect Gradle cache
         working-directory: ./rider-fsharp
-        run: ./gradlew --stop
+        run: ./gradlew --stop 
