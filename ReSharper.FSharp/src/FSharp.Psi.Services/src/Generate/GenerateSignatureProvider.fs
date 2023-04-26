@@ -173,7 +173,20 @@ type FSharpGenerateSignatureBuilder() =
                     if isNotNull symbolUse then
                         let mfv = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
                         if isNotNull mfv then
-                            sb.Append(mfv.FullType.Format(symbolUse.DisplayContext)) |> ignore
+                            if memberDecl.IsStatic then
+                                sb.Append(mfv.FullType.Format(symbolUse.DisplayContext)) |> ignore
+                            else
+                                // mfv.FullType will contain the type of the instance, so we cannot use that.
+                                let parameters =
+                                    mfv.CurriedParameterGroups
+                                    |> Seq.map (fun parameterGroup ->
+                                        parameterGroup
+                                        |> Seq.map (fun parameter -> parameter.Type.Format(symbolUse.DisplayContext))
+                                        |> String.concat " * "
+                                    )
+                                    |> String.concat " -> "
+                                let returnType = mfv.ReturnParameter.Type.Format(symbolUse.DisplayContext)
+                                sb.Append($"{parameters} -> {returnType}") |> ignore
 
                     sb.ToString()
 

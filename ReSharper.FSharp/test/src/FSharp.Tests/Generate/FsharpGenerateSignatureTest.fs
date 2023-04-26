@@ -36,3 +36,4 @@ type FsharpGenerateSignatureTest() =
     [<Test>] member x.``Union 02`` () = x.DoNamedTest()
     [<Test>] member x.``Nested module 01`` () = x.DoNamedTest()
     [<Test>] member x.``Recursive types 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Instance Member 01`` () = x.DoNamedTest()
