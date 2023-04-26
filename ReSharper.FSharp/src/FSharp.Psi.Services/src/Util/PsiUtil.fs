@@ -464,6 +464,11 @@ let shiftWithWhitespaceBefore shift (node: ITreeNode) =
     | _ ->
         if shift > 0 then
             ModificationUtil.AddChildBefore(node, Whitespace(shift)) |> ignore
+        elif shift < 0 then
+            match node.FirstChild with
+            | :? Whitespace as whitespace ->
+                shiftWhitespaceBefore shift whitespace
+            | _ -> ()
 
     shiftNode shift node
 

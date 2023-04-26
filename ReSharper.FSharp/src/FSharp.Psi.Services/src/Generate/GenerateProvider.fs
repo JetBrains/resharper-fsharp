@@ -199,10 +199,9 @@ type FSharpOverridingMembersBuilder() =
         let indentSize = typeDecl.GetIndentSize()
         let desiredIndent = typeDecl.Indent + indentSize
 
-        addNodesBefore typeRepr.FirstChild [
-            NewLine(typeRepr.GetLineEnding())
-            Whitespace(typeRepr.Indent)
-        ] |> ignore
+        let origTypeReprIndent = typeRepr.Indent
+        addNodeBefore typeRepr (NewLine(typeRepr.GetLineEnding()))
+        addNodeBefore typeRepr.FirstChild (Whitespace(origTypeReprIndent))
 
         let normalizeRepr (objRepr: IObjectModelTypeRepresentation) =
             if isNull objRepr.BeginKeyword then () else
@@ -210,7 +209,7 @@ type FSharpOverridingMembersBuilder() =
             let diff =
                 if objRepr.BeginKeyword.Indent > desiredIndent then -(objRepr.BeginKeyword.Indent - desiredIndent)
                 else (desiredIndent - objRepr.BeginKeyword.Indent)
-            shiftNode diff objRepr
+            shiftWithWhitespaceBefore diff objRepr
 
         let normalizeReprEnd (beginToken: ITokenNode) (endToken: ITokenNode) =
             if isNull beginToken || isNull endToken then () else
@@ -240,14 +239,14 @@ type FSharpOverridingMembersBuilder() =
                 objRepr.BeginKeyword, objRepr.EndKeyword
 
             | :? IRecordRepresentation as recordRepr ->
-                let diff = recordRepr.Indent - desiredIndent
-                if diff > 0 then shiftNode -diff recordRepr
+                let diff = origTypeReprIndent - desiredIndent
+                if diff > 0 then shiftWithWhitespaceBefore -diff recordRepr
                 normalizeReprEnd recordRepr.LeftBrace recordRepr.RightBrace
                 recordRepr.LeftBrace, recordRepr.RightBrace
 
             | :? IUnionRepresentation as unionRepr ->
-                let diff = unionRepr.Indent - desiredIndent
-                if diff > 0 then shiftNode -diff unionRepr
+                let diff = origTypeReprIndent - desiredIndent
+                if diff > 0 then shiftWithWhitespaceBefore -diff unionRepr
                 null, null
 
             | _ -> null, null
@@ -256,11 +255,15 @@ type FSharpOverridingMembersBuilder() =
             for node in range do
                 if not (isFirstMeaningfulNodeOnLine node) then () else
 
-                let diff = node.Indent - (desiredIndent + additionalIndent)
+                let diff =
+                    if node = typeRepr then
+                        origTypeReprIndent - (desiredIndent + additionalIndent)
+                    else
+                        node.Indent - (desiredIndent + additionalIndent)
                 shiftWithWhitespaceBefore -diff node
 
         reindentRange indentSize (TreeRange(getNextSibling beginToken, getPrevSibling endToken))
-        reindentRange 0 (TreeRange(typeDecl.TypeRepresentation, typeDecl.LastChild))
+        reindentRange 0 (TreeRange(typeDecl.TypeRepresentation.NextSibling, typeDecl.LastChild))
 
     override this.IsAvailable(context: FSharpGeneratorContext): bool =
         isNotNull context.TypeDeclaration && isNotNull context.TypeDeclaration.DeclaredElement
