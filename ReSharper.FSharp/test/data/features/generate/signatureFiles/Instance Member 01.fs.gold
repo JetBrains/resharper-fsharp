@@ -1,0 +1,10 @@
+﻿Provided elements:
+ 0: Generate signature file title
+
+{caret}module Foo
+
+type X =
+  {
+        Y: int
+    }
+  member A: int -> int -> int
