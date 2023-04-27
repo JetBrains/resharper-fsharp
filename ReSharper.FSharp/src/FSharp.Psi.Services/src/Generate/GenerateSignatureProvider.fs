@@ -72,6 +72,7 @@ type FSharpGenerateSignatureBuilder() =
                         | :? IFSharpTypeDeclaration as typeDecl ->
                             match typeDecl.TypeRepresentation with
                             | :? ITypeAbbreviationRepresentation
+                            | :? IStructRepresentation
                             | :? ISimpleTypeRepresentation -> Some typeDecl
                             | _ -> None
                         | _ -> None)
@@ -106,6 +107,17 @@ type FSharpGenerateSignatureBuilder() =
                             // Although I think this would need the `with` keyword.
                         ] |> ignore
                     | :? ISimpleTypeRepresentation as repr ->
+                        ModificationUtil.DeleteChildRange(sigTypeDecl.EqualsToken.NextSibling, sigTypeDecl.LastChild)
+                        addNodesAfter sigTypeDecl.EqualsToken [
+                            NewLine(lineEnding)
+                            Whitespace(indentation + moduleDecl.GetIndentSize())
+                            repr.Copy()
+                            for sigMember in sigMembers do
+                                NewLine(lineEnding)
+                                Whitespace(indentation + moduleDecl.GetIndentSize())
+                                sigMember
+                        ] |> ignore
+                    | :? IStructRepresentation as repr ->
                         ModificationUtil.DeleteChildRange(sigTypeDecl.EqualsToken.NextSibling, sigTypeDecl.LastChild)
                         addNodesAfter sigTypeDecl.EqualsToken [
                             NewLine(lineEnding)
