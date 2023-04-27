@@ -1,0 +1,9 @@
+﻿Provided elements:
+ 0: Generate signature file title
+
+{caret}module Foo
+
+type Bar =
+  struct
+        val X: int
+    end
