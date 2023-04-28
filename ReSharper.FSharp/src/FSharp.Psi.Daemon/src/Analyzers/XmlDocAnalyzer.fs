@@ -8,9 +8,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util.XmlDocUtil
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Psi.Xml.Impl.Tree
 open JetBrains.ReSharper.Psi.Xml.Tree
 open JetBrains.ReSharper.Psi.Xml.XmlDocComments
 
@@ -101,11 +101,7 @@ type XmlDocBlockAnalyzer(xmlAnalysisManager: XmlAnalysisManager) =
         let xmlPsi = xmlDocBlock.GetXmlPsi()
         let xmlDocOwner = xmlDocBlock.Parent
 
-        if not (xmlPsi.XmlFile.FindNextNode(fun x ->
-             match x with
-             | :? XmlWhitespaceToken -> TreeNodeActionType.CONTINUE
-             | _ -> TreeNodeActionType.ACCEPT
-         ) :? IXmlTag) then () else
+        if xmlPsi.XmlFile.IsSimpleSummaryDoc then () else
 
         checkXmlSyntax xmlPsi data consumer
         checkParameters xmlPsi xmlDocOwner consumer

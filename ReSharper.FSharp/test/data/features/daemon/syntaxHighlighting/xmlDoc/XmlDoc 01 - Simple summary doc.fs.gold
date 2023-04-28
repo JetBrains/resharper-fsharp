@@ -1,0 +1,16 @@
+﻿module M
+
+/// It's <|paramref|(0) |name|(1)=|"a"|(2)/>
+/// a<b>c
+/// <tag1></tag2>
+/// <|param|(3) |name|(4)=|"a"|(5)> a </|param|(6)>
+let f a = 3
+
+---------------------------------------------------------
+(0): ReSharper C# Doc Comment Tag Name: 
+(1): ReSharper C# Doc Comment Attribute: 
+(2): ReSharper C# Doc Comment Attribute Value: 
+(3): ReSharper C# Doc Comment Tag Name: 
+(4): ReSharper C# Doc Comment Attribute: 
+(5): ReSharper C# Doc Comment Attribute Value: 
+(6): ReSharper C# Doc Comment Tag Name: 
