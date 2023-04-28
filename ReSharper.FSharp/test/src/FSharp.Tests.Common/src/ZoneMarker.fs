@@ -12,13 +12,7 @@ type IFSharpTestsZone =
     inherit ITestsEnvZone
 
 [<ZoneActivator>]
-type PsiFeatureTestZoneActivator() =
-    interface IActivate<PsiFeatureTestZone>
-
-[<ZoneActivator>]
 type FSharpZoneActivator() =
+    interface IActivate<PsiFeatureTestZone>
     interface IActivate<ILanguageFSharpZone>
-
-[<ZoneActivator>]
-type SyntaxHighlightingZoneActivator() =
     interface IActivate<ISyntaxHighlightingZone>
