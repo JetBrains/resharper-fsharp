@@ -1,0 +1,5 @@
+// <frontend:INFORMATION>https://jetbrains.com</frontend:INFORMATION>
+let <backend:INFORMATION>url1</backend:INFORMATION> = "<frontend:INFORMATION>https://jetbrains.com</frontend:INFORMATION>"
+let <backend:INFORMATION>url2</backend:INFORMATION> = <backend:INFORMATION>$</backend:INFORMATION>"<frontend:INFORMATION>https://jetbrains.com</frontend:INFORMATION>"
+
+let <backend:INFORMATION>nonUrl</backend:INFORMATION> = "123"
