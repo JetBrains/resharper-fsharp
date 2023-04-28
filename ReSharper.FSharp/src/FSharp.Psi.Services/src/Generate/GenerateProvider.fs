@@ -256,7 +256,7 @@ type FSharpOverridingMembersBuilder() =
                 if not (isFirstMeaningfulNodeOnLine node) then () else
 
                 let diff =
-                    if node = typeRepr then
+                    if node == typeRepr then
                         origTypeReprIndent - (desiredIndent + additionalIndent)
                     else
                         node.Indent - (desiredIndent + additionalIndent)
