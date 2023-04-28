@@ -4,9 +4,7 @@ open System.Text.RegularExpressions
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.CSharp.Util.Literals
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex
@@ -17,13 +15,6 @@ open JetBrains.Text
 
 [<SolutionComponent>]
 type FSharpLiteralInjectionTarget() =
-
-    let tryOpenChameleon (node: ITreeNode) =
-        match node with
-        | :? IChameleonExpression as expr when expr.IsLiteralExpression() ->
-            expr.FirstChild |> ignore
-        | _ -> ()
-
     interface IInjectionTargetLanguage with
         override _.ShouldInjectByAnnotation(_, prefix, postfix) =
             prefix <- null
@@ -43,8 +34,6 @@ type FSharpLiteralInjectionTarget() =
         override _.SupportsRegeneration = false
 
         override _.IsInjectionAllowed(node) =
-            tryOpenChameleon node
-
             let tokenType = node.GetTokenType()
 
             FSharpTokenType.Strings[tokenType] &&
