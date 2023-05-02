@@ -166,7 +166,7 @@ type FSharpGenerateSignatureBuilder() =
 
                 let sigStrings =
                     Seq.map sourceString letBindingsDeclaration.Bindings
-                    |> String.concat System.Environment.NewLine
+                    |> String.concat "\n"
                 
                 factory.CreateTypeMemberSignature(sigStrings)
             | _ -> null
