@@ -3,9 +3,9 @@
 module Foo
 
 open System
-    let c = Math.PI
-    let d = 23
-    let e = "bar"
-    let f x y = x * y
-    let g x = x
+let c = Math.PI
+let d = 23
+let e = "bar"
+let f x y = x * y
+let g x = x
 {caret}
