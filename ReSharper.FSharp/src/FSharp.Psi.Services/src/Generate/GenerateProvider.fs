@@ -200,8 +200,10 @@ type FSharpOverridingMembersBuilder() =
         let desiredIndent = typeDecl.Indent + indentSize
 
         let origTypeReprIndent = typeRepr.Indent
-        addNodeBefore typeRepr (NewLine(typeRepr.GetLineEnding()))
-        addNodeBefore typeRepr.FirstChild (Whitespace(origTypeReprIndent))
+        addNodesBefore typeRepr [
+            NewLine(typeRepr.GetLineEnding())
+            Whitespace(origTypeReprIndent)
+        ] |> ignore
 
         let normalizeRepr (objRepr: IObjectModelTypeRepresentation) =
             if isNull objRepr.BeginKeyword then () else
