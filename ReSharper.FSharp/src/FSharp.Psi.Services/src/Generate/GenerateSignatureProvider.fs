@@ -146,6 +146,29 @@ type FSharpGenerateSignatureBuilder() =
                 processModuleLikeDeclaration (indentation + moduleDecl.GetIndentSize()) nestedNestedModule nestedSigModule
             | :? IOpenStatement as openStatement ->
                 openStatement.Copy()
+            | :? ILetBindingsDeclaration as letBindingsDeclaration ->
+                
+                let sourceString (binding: IBinding) =
+                    let sb = StringBuilder()
+
+                    sb.Append("val ") |> ignore
+                    sb.Append(binding.HeadPattern.GetText()) |> ignore
+                    sb.Append(": ") |> ignore
+                    
+                    let refPat = binding.HeadPattern.As<IReferencePat>()
+                    if isNotNull refPat then
+                        let symbolUse = refPat.GetFcsSymbolUse()
+                        if isNotNull symbolUse then
+                            let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+                            sb.Append(mfv.FullType.Format(symbolUse.DisplayContext)) |> ignore
+                  
+                    sb.ToString()
+
+                let sigStrings =
+                    Seq.map sourceString letBindingsDeclaration.Bindings
+                    |> String.concat System.Environment.NewLine
+                
+                factory.CreateTypeMemberSignature(sigStrings)
             | _ -> null
 
         and processModuleLikeDeclaration (indentation: int) (moduleDecl: IModuleLikeDeclaration) (moduleSig: IModuleLikeDeclaration) : IFSharpTreeNode =
