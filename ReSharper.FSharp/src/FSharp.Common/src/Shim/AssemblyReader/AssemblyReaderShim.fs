@@ -82,7 +82,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     let isEnabled () =
         FSharpExperimentalFeatureCookie.IsEnabled(ExperimentalFeature.AssemblyReaderShim) ||
-        fsOptionsProvider.NonFSharpProjectInMemoryAnalysis.Value
+        fsOptionsProvider.NonFSharpProjectInMemoryReferences.Value
 
     do
         if isEnabledForAssemblies then

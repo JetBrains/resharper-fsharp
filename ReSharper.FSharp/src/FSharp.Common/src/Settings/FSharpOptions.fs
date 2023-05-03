@@ -26,7 +26,7 @@ type FSharpSettings() = class end
 module FSharpOptions =
     let [<Literal>] skipImplementationAnalysis = "Skip implementation files analysis when possible"
     let [<Literal>] parallelProjectReferencesAnalysis = "Analyze project references in parallel"
-    let [<Literal>] nonFSharpProjectInMemoryAnalysis = "Analyze C#/VB projects without build"
+    let [<Literal>] nonFSharpProjectInMemoryReferences = "Analyze C# and VB.NET project references in-memory"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
 
@@ -39,8 +39,8 @@ type FSharpOptions =
       [<SettingsEntry(false, parallelProjectReferencesAnalysis); DefaultValue>]
       mutable ParallelProjectReferencesAnalysis: bool
 
-      [<SettingsEntry(false, nonFSharpProjectInMemoryAnalysis); DefaultValue>]
-      mutable NonFSharpProjectInMemoryAnalysis: bool
+      [<SettingsEntry(false, nonFSharpProjectInMemoryReferences); DefaultValue>]
+      mutable NonFSharpProjectInMemoryReferences: bool
 
       [<SettingsEntry(true, outOfScopeCompletion); DefaultValue>]
       mutable EnableOutOfScopeCompletion: bool
@@ -152,7 +152,7 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSc
 type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
 
-    member val NonFSharpProjectInMemoryAnalysis = base.GetValueProperty<bool>("NonFSharpProjectInMemoryAnalysis")
+    member val NonFSharpProjectInMemoryReferences = base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences")
 
 
 [<SolutionInstanceComponent>]
@@ -206,20 +206,20 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         this.AddBoolOptionWithComment((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
         this.AddBoolOptionWithComment((fun key -> key.ParallelProjectReferencesAnalysis), parallelProjectReferencesAnalysis, "Requires restart") |> ignore
         this.AddBoolOptionWithComment((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Requires restart") |> ignore
-        
+
         do
             use indent = this.Indent()
             [ this.AddBoolOptionWithComment((fun key -> key.GenerativeTypeProvidersInMemoryAnalysis), FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis, "Requires restart") ]
             |> Seq.iter (fun checkbox ->
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.OutOfProcessTypeProviders), fun t -> t :> obj))
-            
-        
+
+        this.AddBoolOptionWithComment((fun key -> key.NonFSharpProjectInMemoryReferences), nonFSharpProjectInMemoryReferences, "Requires restart") |> ignore
+
         if configurations.IsInternalMode() then
             this.AddHeader("Experimental features")
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
             this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
-            this.AddBoolOptionWithComment((fun key -> key.NonFSharpProjectInMemoryAnalysis), nonFSharpProjectInMemoryAnalysis, "Requires restart") |> ignore
 
 
 [<ShellComponent>]
