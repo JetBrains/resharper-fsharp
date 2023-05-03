@@ -1,6 +1,5 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 
-open System.Linq
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Progress
@@ -194,30 +193,79 @@ type FSharpOverridableMembersProvider() =
 type FSharpOverridingMembersBuilder() =
     inherit GeneratorBuilderBase<FSharpGeneratorContext>()
 
-    let addNewLineIfNeeded (typeDecl: IFSharpTypeDeclaration) (typeRepr: ITypeRepresentation) =
-        if isNull typeRepr || typeDecl.StartLine <> typeRepr.StartLine then () else
+    let addNewLineBeforeReprIfNeeded (typeDecl: IFSharpTypeDeclaration) (typeRepr: ITypeRepresentation) =
+        if isNull typeRepr || typeDecl.Identifier.StartLine <> typeRepr.StartLine then () else
 
-        let currentIndent = typeRepr.Indent
-        let desiredIndent = typeDecl.Indent + typeDecl.GetIndentSize()
+        let indentSize = typeDecl.GetIndentSize()
+        let desiredIndent = typeDecl.Indent + indentSize
 
-        addNodesBefore typeRepr.FirstChild [
+        let origTypeReprIndent = typeRepr.Indent
+        addNodesBefore typeRepr [
             NewLine(typeRepr.GetLineEnding())
-            Whitespace(currentIndent)
+            Whitespace(origTypeReprIndent)
         ] |> ignore
 
-        // to have good indents for begin/end keywords which might start out on different indents
-        shiftNode (-currentIndent) typeRepr
-        shiftNode desiredIndent typeRepr
+        let normalizeRepr (objRepr: IObjectModelTypeRepresentation) =
+            if isNull objRepr.BeginKeyword then () else
 
-        typeDecl.TypeMembers
-        |> Seq.iter (fun m ->
-            match m.GetPreviousToken() with
-            | :? Whitespace as whitespace ->
-                let diff = m.Indent - desiredIndent
-                if diff > 0 then
-                    shiftWhitespaceBefore -diff whitespace
-                    shiftNode -diff m
-            | _ -> ())
+            let diff =
+                if objRepr.BeginKeyword.Indent > desiredIndent then -(objRepr.BeginKeyword.Indent - desiredIndent)
+                else (desiredIndent - objRepr.BeginKeyword.Indent)
+            shiftWithWhitespaceBefore diff objRepr
+
+        let normalizeReprEnd (beginToken: ITokenNode) (endToken: ITokenNode) =
+            if isNull beginToken || isNull endToken then () else
+
+            if beginToken.Indent > endToken.Indent then
+                let diff = beginToken.Indent - endToken.Indent
+                addNodeBefore endToken (Whitespace(diff))
+
+            elif endToken.Indent > beginToken.Indent && isFirstMeaningfulNodeOnLine endToken then
+                let diff = endToken.Indent - beginToken.Indent
+                shiftWithWhitespaceBefore -diff endToken
+
+        let shiftToNext (token: ITokenNode) =
+            if isNull token then () else
+
+            let next = token.GetNextMeaningfulToken()
+            let diff = if isNull next then 0 else token.Indent - next.Indent
+            if diff > 0 then shiftWithWhitespaceBefore -diff token
+
+        let beginToken, endToken =
+            match typeRepr with
+            | :? IObjectModelTypeRepresentation as objRepr ->
+                // at this point the body of the repr can be before or after the begin keyword
+                shiftToNext objRepr.BeginKeyword
+                normalizeRepr objRepr
+                normalizeReprEnd objRepr.BeginKeyword objRepr.EndKeyword
+                objRepr.BeginKeyword, objRepr.EndKeyword
+
+            | :? IRecordRepresentation as recordRepr ->
+                let diff = origTypeReprIndent - desiredIndent
+                if diff > 0 then shiftWithWhitespaceBefore -diff recordRepr
+                normalizeReprEnd recordRepr.LeftBrace recordRepr.RightBrace
+                recordRepr.LeftBrace, recordRepr.RightBrace
+
+            | :? IUnionRepresentation as unionRepr ->
+                let diff = origTypeReprIndent - desiredIndent
+                if diff > 0 then shiftWithWhitespaceBefore -diff unionRepr
+                null, null
+
+            | _ -> null, null
+
+        let reindentRange additionalIndent (range: TreeRange) =
+            for node in range do
+                if not (isFirstMeaningfulNodeOnLine node) then () else
+
+                let diff =
+                    if node == typeRepr then
+                        origTypeReprIndent - (desiredIndent + additionalIndent)
+                    else
+                        node.Indent - (desiredIndent + additionalIndent)
+                shiftWithWhitespaceBefore -diff node
+
+        reindentRange indentSize (TreeRange(getNextSibling beginToken, getPrevSibling endToken))
+        reindentRange 0 (TreeRange(typeDecl.TypeRepresentation.NextSibling, typeDecl.LastChild))
 
     override this.IsAvailable(context: FSharpGeneratorContext): bool =
         isNotNull context.TypeDeclaration && isNotNull context.TypeDeclaration.DeclaredElement
@@ -227,18 +275,18 @@ type FSharpOverridingMembersBuilder() =
         use disableFormatter = new DisableCodeFormatter()
 
         let typeDecl = context.Root :?> IFSharpTypeDeclaration
+        let typeRepr = typeDecl.TypeRepresentation
 
-        match typeDecl.TypeRepresentation with
+        match typeRepr with
         | :? IUnionRepresentation as unionRepr ->
-            let caseDecl = unionRepr.Cases.FirstOrDefault()
-            if isNotNull caseDecl then
-                EnumCaseLikeDeclarationUtil.addBarIfNeeded caseDecl
-                addNewLineIfNeeded typeDecl unionRepr
-        | typeRepr -> addNewLineIfNeeded typeDecl typeRepr
+            unionRepr.UnionCasesEnumerable
+            |> Seq.tryHead
+            |> Option.iter EnumCaseLikeDeclarationUtil.addBarIfNeeded 
+        | _ -> ()
+
+        addNewLineBeforeReprIfNeeded typeDecl typeRepr
 
         let anchor: ITreeNode =
-            let typeRepr = typeDecl.TypeRepresentation
-
             let deleteTypeRepr (typeDecl: IFSharpTypeDeclaration) : ITreeNode =
                 let equalsToken = typeDecl.EqualsToken.NotNull()
 
@@ -262,10 +310,10 @@ type FSharpOverridingMembersBuilder() =
                         let classKeyword = classRepr.BeginKeyword
                         let endKeyword = classRepr.EndKeyword
 
-                        isNotNull classKeyword &&
-                        isNotNull endKeyword &&
+                        isNotNull classKeyword && isNotNull endKeyword &&
                         classKeyword.GetNextNonWhitespaceToken() == endKeyword
                     | _ -> false
+
                 if isEmptyClassRepr then
                     deleteTypeRepr typeDecl
                 else
@@ -284,8 +332,6 @@ type FSharpOverridingMembersBuilder() =
 
             let typeMembers = objModelTypeRepr.TypeMembers
             if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
-
-            if objModelTypeRepr :? IStructRepresentation then objModelTypeRepr :> _ else
 
             objModelTypeRepr
 
@@ -310,7 +356,7 @@ type FSharpOverridingMembersBuilder() =
                     | Some memberDecl -> memberDecl.Indent
                     | _ ->
 
-                    if isNotNull typeDecl.TypeRepresentation then typeDecl.Indent + typeDecl.GetIndentSize() else
+                    if isNotNull typeRepr then typeDecl.Indent + typeDecl.GetIndentSize() else
 
                     let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl).NotNull()
                     typeDeclarationGroup.Indent + typeDecl.GetIndentSize()

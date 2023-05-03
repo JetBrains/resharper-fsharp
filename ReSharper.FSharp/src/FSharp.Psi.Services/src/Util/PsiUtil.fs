@@ -449,23 +449,28 @@ let shiftNode shift (expr: #ITreeNode) =
         match nextSibling with
         | :? NewLine -> ()
         | :? Whitespace as whitespace ->
-            // Skip empty lines
-            if not (whitespace.NextSibling.IsWhitespaceToken()) then
-                shiftWhitespaceBefore shift whitespace
+            shiftWhitespaceBefore shift whitespace
         | _ ->
             if shift > 0 then
                 ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
 
-let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
-    match expr.PrevSibling with
+let shiftWithWhitespaceBefore shift (node: ITreeNode) =
+    if isWhitespace node then () else
+
+    match node.PrevSibling with
     | :? Whitespace as whitespace ->
         if not (whitespace.NextSibling.IsWhitespaceToken()) then
             shiftWhitespaceBefore shift whitespace
     | _ ->
         if shift > 0 then
-            ModificationUtil.AddChildBefore(expr, Whitespace(shift)) |> ignore
+            ModificationUtil.AddChildBefore(node, Whitespace(shift)) |> ignore
+        elif shift < 0 then
+            match node.GetPreviousToken() with
+            | :? Whitespace as whitespace ->
+                shiftWhitespaceBefore shift whitespace
+            | _ -> ()
 
-    shiftNode shift expr
+    shiftNode shift node
 
 
 let withNewLineAndIndentBefore (indent: int) (node: IFSharpTreeNode) =
