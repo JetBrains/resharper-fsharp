@@ -50,7 +50,6 @@
     <Compile Include="src\CodeCleanup\FantomasHost.fs" />
     <Compile Include="src\CodeCleanup\FSharpReformatCode.fs" />
     <Compile Include="src\CodeCleanup\OptimizeImports.fs" />
-    <Compile Include="src\CodeCleanup\ZoneMarker.fs" />
     <Compile Include="src\CodeStyle\FSharpCodeStylePage.fs" />
     <Compile Include="src\CodeStyle\FantomasPage.fs" />
     <Compile Include="src\Fsi\FsiSandboxUtil.fs" />
