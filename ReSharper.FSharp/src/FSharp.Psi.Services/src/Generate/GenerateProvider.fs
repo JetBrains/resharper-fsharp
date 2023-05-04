@@ -336,6 +336,15 @@ type FSharpOverridingMembersBuilder() =
             objModelTypeRepr
 
         let (anchor: ITreeNode), indent =
+            let tryGetLastLet (typeMembersEnumerable: TreeNodeEnumerable<ITypeBodyMemberDeclaration>) =
+                let letBindings =
+                    typeMembersEnumerable
+                    |> Seq.takeWhile (fun x -> x :? ILetBindingsDeclaration)
+                    |> Seq.tryLast
+                match letBindings with
+                | Some b -> Some b
+                | None -> None
+
             match anchor with
             | :? IStructRepresentation as structRepr ->
                 structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
@@ -348,6 +357,10 @@ type FSharpOverridingMembersBuilder() =
                         match repr.TypeMembersEnumerable |> Seq.tryHead with
                         | Some memberDecl -> memberDecl.Indent
                         | _ -> repr.BeginKeyword.Indent + typeDecl.GetIndentSize()
+                    let treeNode =
+                        match repr.TypeMembersEnumerable |> tryGetLastLet with
+                        | Some memberDecl -> memberDecl :> ITreeNode
+                        | _ -> treeNode
                     treeNode, indent
                 | _ ->
 

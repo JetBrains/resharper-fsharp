@@ -11,7 +11,10 @@
 
 type C() = 
   class
-    override this.ToString() = {selstart}failwith "todo"{selend}
     
     let f x = x
+
+    override this.ToString() = {selstart}failwith "todo"{selend}
+
+    member _.Func(x) = x
   end

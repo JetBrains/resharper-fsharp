@@ -11,7 +11,8 @@
 
 type C() = 
   class
-    override this.ToString() = {selstart}failwith "todo"{selend}
     // comment
     let f = 23
+
+    override this.ToString() = {selstart}failwith "todo"{selend}
   end
