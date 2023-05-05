@@ -4,6 +4,7 @@
 // ${KIND:Overrides}
 
 type T() =
-  class
-    do (){caret}
+  class{caret}
+    do ()
+    member this.P = 1
   end
