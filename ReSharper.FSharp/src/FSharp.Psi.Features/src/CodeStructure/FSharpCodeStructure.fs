@@ -26,7 +26,6 @@ type FSharpExtendedFileStructureLanguage() =
         member this.IsValid(languageType) = languageType.Is<FSharpLanguage>()
 
 
-[<ProjectFileType(typeof<FSharpProjectFileType>)>]
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpCodeStructureProvider() =
     let typeExtensionIconId = compose PsiSymbolsThemedIcons.Class.Id FSharpIcons.ExtensionOverlay.Id
@@ -104,13 +103,10 @@ type FSharpCodeStructureProvider() =
         for memberDecl in typeDecl.TypeMembers do
             processNode structureElement null memberDecl
 
-    interface IProjectFileCodeStructureProvider with
-        member x.Build(sourceFile, _) =
-            let fsFile = sourceFile.FSharpFile
-            if isNull fsFile then null else
-
-            let root = CodeStructureRootElement(fsFile)
-            processNode root null fsFile
+    interface IPsiFileCodeStructureProvider with
+        member x.Build(file, _) =
+            let root = CodeStructureRootElement(file)
+            processNode root null file
             root
 
 
