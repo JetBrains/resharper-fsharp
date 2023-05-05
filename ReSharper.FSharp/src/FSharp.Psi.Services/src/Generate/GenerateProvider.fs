@@ -336,21 +336,13 @@ type FSharpOverridingMembersBuilder() =
             objModelTypeRepr
 
         let (anchor: ITreeNode), indent =
-            let tryGetLastLet (typeMembersEnumerable: TreeNodeEnumerable<ITypeBodyMemberDeclaration>) =
-                let letBindings =
-                    typeMembersEnumerable
-                    |> Seq.takeWhile (fun x -> x :? ILetBindingsDeclaration)
-                    |> Seq.tryLast
-                match letBindings with
-                | Some b -> Some b
-                | None -> None
-
             match anchor with
             | :? IStructRepresentation as structRepr ->
                 structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
 
             | treeNode ->
-                let parent = treeNode.Parent
+                let parent =
+                    if isNotNull typeRepr && typeRepr.Contains(treeNode) then typeRepr :> ITreeNode else treeNode.Parent
                 match parent with
                 | :? IObjectModelTypeRepresentation as repr when treeNode != repr.EndKeyword ->
                     let indent =
@@ -358,8 +350,12 @@ type FSharpOverridingMembersBuilder() =
                         | Some memberDecl -> memberDecl.Indent
                         | _ -> repr.BeginKeyword.Indent + typeDecl.GetIndentSize()
                     let treeNode =
-                        match repr.TypeMembersEnumerable |> tryGetLastLet with
-                        | Some memberDecl -> memberDecl :> ITreeNode
+                        let doOrLastLet =
+                            repr.TypeMembersEnumerable
+                            |> Seq.takeWhile (fun x -> x :? ILetBindingsDeclaration || x :? IDoStatement)
+                            |> Seq.tryLast
+                        match doOrLastLet with
+                        | Some node -> node :> ITreeNode
                         | _ -> treeNode
                     treeNode, indent
                 | _ ->
