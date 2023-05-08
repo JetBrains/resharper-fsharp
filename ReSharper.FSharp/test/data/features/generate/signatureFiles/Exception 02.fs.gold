@@ -1,0 +1,7 @@
+﻿Provided elements:
+ 0: Generate signature file title
+
+{caret}module Foo
+
+exception A of int * string with
+  member B: string -> int

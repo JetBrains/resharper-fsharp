@@ -170,7 +170,22 @@ type FSharpGenerateSignatureBuilder() =
                 
                 factory.CreateTypeMemberSignature(sigStrings)
             | :? IExceptionDeclaration as exceptionDeclaration ->
-                exceptionDeclaration.Copy()
+                let sigExceptionDeclaration = exceptionDeclaration.Copy()
+                if not (Seq.isEmpty exceptionDeclaration.MemberDeclarations) then
+                    let sigMembers =
+                        exceptionDeclaration.TypeMembers
+                        |> Seq.choose (createMemberDeclaration >> Option.ofObj)
+
+                    ModificationUtil.DeleteChildRange(sigExceptionDeclaration.WithKeyword.NextSibling, sigExceptionDeclaration.LastChild)
+
+                    addNodesAfter sigExceptionDeclaration.WithKeyword [
+                        for sigMember in sigMembers do
+                            NewLine(lineEnding)
+                            Whitespace(indentation + moduleDecl.GetIndentSize())
+                            sigMember
+                    ] |> ignore
+                    
+                sigExceptionDeclaration
             | _ -> null
 
         and processModuleLikeDeclaration (indentation: int) (moduleDecl: IModuleLikeDeclaration) (moduleSig: IModuleLikeDeclaration) : IFSharpTreeNode =
