@@ -28,6 +28,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
             for memberSig in memberSigs do
                 x.ProcessModuleMemberSignature(memberSig, parentRange)
 
+            // Workaround until https://github.com/dotnet/fsharp/pull/15117 is available.
             if memberSigs.IsEmpty then
                 x.AdvanceToTokenOrRangeEnd(FSharpTokenType.END, parentRange)
                 x.Advance()

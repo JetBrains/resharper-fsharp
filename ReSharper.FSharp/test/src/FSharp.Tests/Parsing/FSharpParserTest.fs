@@ -758,6 +758,8 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Type member - XmlDoc 03 - Constructor``() = x.DoNamedTest()
 
     [<Test>] member x.``Hash directive 01``() = x.DoNamedTest()
+    [<Test; Ignore "Needs upstream fix, see https://github.com/dotnet/fsharp/pull/15117">]
+    member x.``Nested Module 01``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
