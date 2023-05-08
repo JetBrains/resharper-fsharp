@@ -73,7 +73,8 @@ type FSharpGenerateSignatureBuilder() =
                             match typeDecl.TypeRepresentation with
                             | :? ITypeAbbreviationRepresentation
                             | :? IStructRepresentation
-                            | :? ISimpleTypeRepresentation -> Some typeDecl
+                            | :? ISimpleTypeRepresentation
+                            | :? IDelegateRepresentation -> Some typeDecl
                             | _ -> None
                         | _ -> None)
                     |> Seq.mapi (fun idx typeDecl ->
@@ -127,6 +128,12 @@ type FSharpGenerateSignatureBuilder() =
                                 NewLine(lineEnding)
                                 Whitespace(indentation + moduleDecl.GetIndentSize())
                                 sigMember
+                        ] |> ignore
+                    | :? IDelegateRepresentation as repr ->
+                        ModificationUtil.DeleteChildRange(sigTypeDecl.EqualsToken.NextSibling, sigTypeDecl.LastChild)
+                        addNodesAfter sigTypeDecl.EqualsToken [
+                            Whitespace()
+                            repr.Copy()
                         ] |> ignore
                     | repr ->
                         // This pattern match should match the types we filtered out earlier for supportedTypeDeclarations
