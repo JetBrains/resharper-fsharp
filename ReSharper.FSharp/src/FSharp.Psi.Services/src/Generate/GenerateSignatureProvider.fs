@@ -19,6 +19,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
@@ -366,5 +367,12 @@ type FSharpGenerateSignatureWorkflow() =
 [<GenerateProvider>]
 type FSharpGenerateSignatureWorkflowProvider() =
     interface IGenerateImplementationsWorkflowProvider with
-        member this.CreateWorkflow _ =
-            [| FSharpGenerateSignatureWorkflow() |]
+        member this.CreateWorkflow dataContext =
+            if dataContext.IsEmpty then Seq.empty else
+            let node = dataContext.GetData<IPsiSourceFile>(PsiDataConstants.SOURCE_FILE)
+            if isNull node then Seq.empty else
+            let solution = node.GetSolution()
+            if not (solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.GenerateSignatureFile)) then
+                Seq.empty
+            else
+                [| FSharpGenerateSignatureWorkflow() |]
