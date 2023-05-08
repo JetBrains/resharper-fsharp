@@ -16,6 +16,8 @@
         <injectionConfig config="fsharpInjections.xml" />
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
+    <sql.resolveExtension implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections.FSharpSqlDapperParameterResolveExtension"/>
+    <database.parameterPatternProvider implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections.FSharpSqlParametersProvider"/>
     <multiHostInjector implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections.FSharpConcatenationToInjectorAdapter" order="first" />
     <concatenationAwareInjector implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections.FSharpConcatenationAwareInjector" />
     <fileType name="F#" language="F#" extensions="fs;fsi;ml;mli" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType" fieldName="INSTANCE"/>
