@@ -86,7 +86,7 @@ type FSharpGenerateSignatureBuilder() =
 
                 if Array.isEmpty supportedTypeDeclarations then null else
 
-                let sourceText = supportedTypeDeclarations |> Array.map (fun info -> info.SourceText) |> String.concat "\n"
+                let sourceText = supportedTypeDeclarations |> Array.map (fun info -> info.SourceText) |> String.concat lineEnding
                 let sigTypeDeclarationGroup = factory.CreateModuleMember(sourceText) :?> ITypeDeclarationGroup
 
                 if isNull sigTypeDeclarationGroup then null else
@@ -187,7 +187,7 @@ type FSharpGenerateSignatureBuilder() =
 
                 let sigStrings =
                     Seq.map sourceString letBindingsDeclaration.Bindings
-                    |> String.concat "\n"
+                    |> String.concat lineEnding
                 
                 factory.CreateTypeMemberSignature(sigStrings)
             | :? IExceptionDeclaration as exceptionDeclaration ->
