@@ -192,7 +192,12 @@ type FSharpGenerateSignatureBuilder() =
                 factory.CreateTypeMemberSignature(sigStrings)
             | :? IExceptionDeclaration as exceptionDeclaration ->
                 let sigExceptionDeclaration = exceptionDeclaration.Copy()
-                if not (Seq.isEmpty exceptionDeclaration.MemberDeclarations) then
+                let memberDeclarations =
+                    exceptionDeclaration.MemberDeclarations
+                    |> Seq.filter (function | :? IExceptionFieldDeclaration -> false | _ -> true)
+                    |> Seq.toArray
+
+                if memberDeclarations.Length > 0 then
                     let sigMembers =
                         exceptionDeclaration.TypeMembers
                         |> Seq.choose (createMemberDeclaration >> Option.ofObj)
