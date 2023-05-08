@@ -421,6 +421,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             let file = createFileWithModule source
             file.ModuleDeclarations.[0].Members.[0]
 
-        member this.CreateTypeMemberSignature(source) =
+        member this.CreateTypeMember(source) =
             (getTypeDecl source).TypeMembers.[0]
             :> IFSharpTypeMemberDeclaration

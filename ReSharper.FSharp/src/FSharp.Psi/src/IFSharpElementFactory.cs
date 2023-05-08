@@ -72,6 +72,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     INestedModuleDeclaration CreateNestedModule(string name);
 
     IModuleMember CreateModuleMember(string source);
-    IFSharpTypeMemberDeclaration CreateTypeMemberSignature(string source);
+    IFSharpTypeMemberDeclaration CreateTypeMember(string source);
   }
 }
