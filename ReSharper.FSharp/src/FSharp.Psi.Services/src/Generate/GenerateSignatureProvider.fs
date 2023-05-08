@@ -106,8 +106,6 @@ type FSharpGenerateSignatureBuilder() =
                         addNodesAfter sigTypeDecl.EqualsToken [
                             Whitespace()
                             abbr.Copy()
-                            // TODO: there technically could be members here.
-                            // Although I think this would need the `with` keyword.
                         ] |> ignore
                     | :? ISimpleTypeRepresentation as repr ->
                         ModificationUtil.DeleteChildRange(sigTypeDecl.EqualsToken.NextSibling, sigTypeDecl.LastChild)
