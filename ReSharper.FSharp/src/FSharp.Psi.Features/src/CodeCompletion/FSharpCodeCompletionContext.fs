@@ -8,6 +8,7 @@ open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -53,7 +54,7 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
             let document = documentFactory.CreateSimpleDocumentFromText(source, moniker)
 
             // todo: reparse as sig?
-            let parser = fsFile.GetFSharpLanguageService().CreateParser(document, fsFile.GetSourceFile(), true)
+            let parser = fsFile.GetFSharpLanguageService().CreateParser(document, fsFile.GetSourceFile(), FSharpProjectFileType.FsExtension)
             let newFile =
                 try
                     let newFile =

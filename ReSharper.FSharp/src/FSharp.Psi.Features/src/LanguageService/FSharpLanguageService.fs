@@ -142,8 +142,9 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
     override x.GetTypeConversionRule(_, _) = ClrPredefinedTypeConversionRule.INSTANCE
 
     interface IFSharpLanguageService with
-        member x.CreateParser(document: IDocument, sourceFile, [<Optional; DefaultParameterValue(false)>] useFsExtension) =
+        member x.CreateParser(document: IDocument, sourceFile, [<Optional; DefaultParameterValue(null)>] overrideExtension) =
             let lexer = TokenBuffer(lexerFactory.CreateLexer(document.Buffer)).CreateLexer()
-            FSharpParser(lexer, document, sourceFile, checkerService, null, useFsExtension) :> _
+            FSharpParser(lexer, document, sourceFile, checkerService, null, overrideExtension) :> _
 
-        member x.CreateElementFactory(sourceFile, psiModule) = FSharpElementFactory(x, sourceFile, psiModule) :> _
+        member x.CreateElementFactory(sourceFile, psiModule, [<Optional; DefaultParameterValue(null)>] extension) =
+            FSharpElementFactory(x, sourceFile, psiModule, extension) :> _
