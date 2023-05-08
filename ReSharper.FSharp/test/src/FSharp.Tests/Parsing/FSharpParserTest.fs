@@ -687,9 +687,6 @@ type FSharpSignatureParserTest() =
     /// Use this test case to dump the psi tree for a given file, see `_.fsi`. 
     [<Test; Explicit>] member x.``_``() = x.DoNamedTest()
 
-    /// Use this test case to dump the psi tree for a given file, see `_.fsi`. 
-    [<Test; Explicit>] member x.``_``() = x.DoNamedTest()
-
     [<Test>] member x.``Type decl - Union 01 - After nested module``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 02 - FullType``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate``() = x.DoNamedTest()

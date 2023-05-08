@@ -188,7 +188,7 @@ type FSharpGenerateSignatureBuilder() =
                     Seq.map sourceString letBindingsDeclaration.Bindings
                     |> String.concat lineEnding
                 
-                factory.CreateTypeMemberSignature(sigStrings)
+                factory.CreateTypeMember(sigStrings)
             | :? IExceptionDeclaration as exceptionDeclaration ->
                 let sigExceptionDeclaration = exceptionDeclaration.Copy()
 
@@ -263,7 +263,7 @@ type FSharpGenerateSignatureBuilder() =
 
                     sb.ToString()
 
-                factory.CreateTypeMemberSignature(sourceString)
+                factory.CreateTypeMember(sourceString)
             | _ -> null
 
         and createPrimaryConstructorSignature (typeName: string) (primaryConstructorDeclaration: IPrimaryConstructorDeclaration) : ITreeNode seq =
@@ -279,7 +279,7 @@ type FSharpGenerateSignatureBuilder() =
                     |> String.concat " * "
                 )
                 |> String.concat " -> "
-            factory.CreateTypeMemberSignature $"new: {parameters} -> {typeName}"
+            factory.CreateTypeMember $"new: {parameters} -> {typeName}"
             :> ITreeNode
             |> Seq.singleton
 
