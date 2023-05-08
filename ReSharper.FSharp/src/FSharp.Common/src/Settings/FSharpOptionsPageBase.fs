@@ -20,11 +20,11 @@ type FSharpOptionsPageBase(lifetime, optionsPageContext, settings) =
     member x.AddString(text: string, getter: Expression<Func<_,_>>) =
         x.AddString(text, settings.GetValueProperty(lifetime, getter))
 
-    member x.AddDescription(text) =
+    member x.AddDescription(text: string) =
         use indent = x.Indent()
         x.AddRichText(RichText(text)) |> ignore
 
-    member x.AddBool(text, property: IProperty<_>) =
+    member x.AddBool(text: string, property: IProperty<_>) =
         x.AddBoolOption(property, RichText(text), text) |> ignore
 
     member x.AddHeader(text: string) =
