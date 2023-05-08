@@ -684,6 +684,9 @@ type FSharpSignatureParserTest() =
 
     override x.RelativeTestDataPath = "parsing/signatures"
 
+    /// Use this test case to dump the psi tree for a given file, see `_.fsi`. 
+    [<Test; Explicit>] member x.``_``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Union 01 - After nested module``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 02 - FullType``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate``() = x.DoNamedTest()
@@ -755,6 +758,8 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Type member - XmlDoc 03 - Constructor``() = x.DoNamedTest()
 
     [<Test>] member x.``Hash directive 01``() = x.DoNamedTest()
+    [<Test; Ignore "Needs upstream fix, see https://github.com/dotnet/fsharp/pull/15117">]
+    member x.``Nested Module 01``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

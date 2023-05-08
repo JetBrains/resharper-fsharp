@@ -18,15 +18,21 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime, path) =
     member x.ProcessTopLevelSignature(SynModuleOrNamespaceSig(lid, _, isModule, sigDecls, XmlDoc xmlDoc, attrs, _, range, _)) =
         let mark, elementType = x.StartTopLevelDeclaration(lid, attrs, isModule, xmlDoc, range)
         for sigDecl in sigDecls do
-            x.ProcessModuleMemberSignature(sigDecl)
+            x.ProcessModuleMemberSignature(sigDecl, range)
         x.FinishTopLevelDeclaration(mark, range, elementType)
 
-    member x.ProcessModuleMemberSignature(moduleMember) =
+    member x.ProcessModuleMemberSignature(moduleMember, parentRange) =
         match moduleMember with
         | SynModuleSigDecl.NestedModule(SynComponentInfo(attrs, _, _, _, XmlDoc xmlDoc, _, _, _), _, memberSigs, range, _) ->
             let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             for memberSig in memberSigs do
-                x.ProcessModuleMemberSignature(memberSig)
+                x.ProcessModuleMemberSignature(memberSig, parentRange)
+
+            // Workaround until https://github.com/dotnet/fsharp/pull/15117 is available.
+            if memberSigs.IsEmpty then
+                x.AdvanceToTokenOrRangeEnd(FSharpTokenType.END, parentRange)
+                x.Advance()
+
             x.Done(mark, ElementType.NESTED_MODULE_DECLARATION)
 
         | SynModuleSigDecl.Types(typeSigs, range) ->

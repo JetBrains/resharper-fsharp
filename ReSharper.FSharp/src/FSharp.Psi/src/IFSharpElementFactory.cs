@@ -1,6 +1,7 @@
 ﻿using System;
 using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -64,5 +65,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     ITypeParameterDeclarationList CreateTypeParameterOfTypeList(FSharpList<string> names);
 
     IAccessorsNamesClause CreateAccessorsNamesClause(bool withGetter, bool withSetter);
+
+    IFSharpFile CreateEmptyFile();
+    INamedModuleDeclaration CreateModule(string name);
+    INamespaceDeclaration CreateNamespace(string name);
+    INestedModuleDeclaration CreateNestedModule(string name);
+
+    IModuleMember CreateModuleMember(string source);
+    IFSharpTypeMemberDeclaration CreateTypeMember(string source);
   }
 }

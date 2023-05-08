@@ -99,7 +99,7 @@ namedNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
   topLevelNamedDeclarationName
   moduleMember<MODULE_MEMBER, Members>*;
 
-globalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
+globalNamespaceDeclaration options { stubBase="NamedNamespaceDeclaration"; }:
   NAMESPACE<NAMESPACE, ModuleOrNamespaceKeyword>
   REC<REC, RecKeyword>?
   GLOBAL<GLOBAL, GlobalKeyword>

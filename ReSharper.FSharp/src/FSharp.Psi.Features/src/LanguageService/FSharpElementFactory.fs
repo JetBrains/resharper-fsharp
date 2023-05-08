@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
+open System.Runtime.InteropServices
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
 open JetBrains.Diagnostics
@@ -19,7 +20,8 @@ open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: IPsiSourceFile, psiModule: IPsiModule) =
+type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: IPsiSourceFile, psiModule: IPsiModule,
+                          [<Optional; DefaultParameterValue(null)>] extension: string) =
     let [<Literal>] moniker = "F# element factory"
 
     let getNamingService () =
@@ -31,14 +33,19 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
 
     let createFile source =
         let document = createDocument source
-        let parser = languageService.CreateParser(document, sourceFile)
+        let parser = languageService.CreateParser(document, sourceFile, extension)
 
         let fsFile = parser.ParseFSharpFile(noCache = true, StandaloneDocument = document)
         SandBox.CreateSandBoxFor(fsFile, psiModule)
         fsFile
 
+    let createFileWithModule source =
+        createFile $"module X
+{source}
+"
+
     let getModuleDeclaration source =
-        let fsFile = createFile source
+        let fsFile = createFileWithModule source
         fsFile.ModuleDeclarations.First()
 
     let getModuleMember source =
@@ -395,3 +402,25 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             let source = $"member val P = 3 with {accessors}"
             let t = getTypeDecl source
             t.MemberDeclarations[0].As<IAutoPropertyDeclaration>().AccessorsClause
+
+        member this.CreateEmptyFile() = createFile ""
+
+        member this.CreateModule(name) =
+            let file = createFile $"module {name}"
+            file.ModuleDeclarations.[0] :?> INamedModuleDeclaration
+
+        member this.CreateNamespace(name) =
+            let file = createFile $"namespace {name}"
+            file.ModuleDeclarations.[0] :?> INamespaceDeclaration
+
+        member this.CreateNestedModule(name) =
+            let file = createFileWithModule $"module {name} = begin end"
+            file.ModuleDeclarations.[0].Members.[0] :?> INestedModuleDeclaration
+
+        member this.CreateModuleMember(source) =
+            let file = createFileWithModule source
+            file.ModuleDeclarations.[0].Members.[0]
+
+        member this.CreateTypeMember(source) =
+            (getTypeDecl source).TypeMembers.[0]
+            :> IFSharpTypeMemberDeclaration
