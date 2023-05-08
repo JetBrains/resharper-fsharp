@@ -54,7 +54,7 @@ type FSharpGenerateSignatureProvider() =
 type FSharpGenerateSignatureBuilder() =
     inherit GeneratorBuilderBase<FSharpGeneratorContext>()
     
-    // TODO: what about attributes, type parameters, delegates, exceptions
+    // TODO: what about attributes, type parameters
     
     let mkSignatureFile (fsharpFile: IFSharpFile): IFSharpFile  =
         let factory : IFSharpElementFactory = fsharpFile.CreateElementFactory(extension = FSharpSignatureProjectFileType.FsiExtension)
@@ -74,7 +74,9 @@ type FSharpGenerateSignatureBuilder() =
                             | :? ITypeAbbreviationRepresentation
                             | :? IStructRepresentation
                             | :? ISimpleTypeRepresentation
-                            | :? IDelegateRepresentation -> Some typeDecl
+                            | :? IDelegateRepresentation
+                            // Regular classes have no representation.
+                            | null -> Some typeDecl
                             | _ -> None
                         | _ -> None)
                     |> Seq.mapi (fun idx typeDecl ->
@@ -134,6 +136,18 @@ type FSharpGenerateSignatureBuilder() =
                         addNodesAfter sigTypeDecl.EqualsToken [
                             Whitespace()
                             repr.Copy()
+                        ] |> ignore
+                    | null ->
+                        ModificationUtil.DeleteChildRange(sigTypeDecl.EqualsToken.NextSibling, sigTypeDecl.LastChild)
+                        addNodesAfter sigTypeDecl.EqualsToken [
+                            NewLine(lineEnding)
+                            Whitespace(indentation + moduleDecl.GetIndentSize())
+                            if isNotNull typeDecl.PrimaryConstructorDeclaration then
+                                createPrimaryConstructorSignature (getName typeDecl) typeDecl.PrimaryConstructorDeclaration
+                            for sigMember in sigMembers do
+                                NewLine(lineEnding)
+                                Whitespace(indentation + moduleDecl.GetIndentSize())
+                                sigMember
                         ] |> ignore
                     | repr ->
                         // This pattern match should match the types we filtered out earlier for supportedTypeDeclarations
@@ -252,6 +266,15 @@ type FSharpGenerateSignatureBuilder() =
                 factory.CreateTypeMemberSignature(sourceString)
             | _ -> null
 
+        and createPrimaryConstructorSignature (typeName: string) (primaryConstructorDeclaration: IPrimaryConstructorDeclaration) : IFSharpTreeNode =
+            let signature =
+                match primaryConstructorDeclaration.ParameterPatterns with
+                | :? IUnitPat ->
+                    $"new: unit -> {typeName}"
+                | _ -> failwithf "todo"
+
+            factory.CreateTypeMemberSignature(signature)
+        
         for decl in fsharpFile.ModuleDeclarations do
             let signatureModule : IModuleLikeDeclaration =
                 match decl with
