@@ -341,13 +341,22 @@ type FSharpOverridingMembersBuilder() =
                 structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
 
             | treeNode ->
-                let parent = treeNode.Parent
+                let parent =
+                    if isNotNull typeRepr && typeRepr.Contains(treeNode) then typeRepr :> ITreeNode else treeNode.Parent
                 match parent with
                 | :? IObjectModelTypeRepresentation as repr when treeNode != repr.EndKeyword ->
                     let indent =
                         match repr.TypeMembersEnumerable |> Seq.tryHead with
                         | Some memberDecl -> memberDecl.Indent
                         | _ -> repr.BeginKeyword.Indent + typeDecl.GetIndentSize()
+                    let treeNode =
+                        let doOrLastLet =
+                            repr.TypeMembersEnumerable
+                            |> Seq.takeWhile (fun x -> x :? ILetBindingsDeclaration || x :? IDoStatement)
+                            |> Seq.tryLast
+                        match doOrLastLet with
+                        | Some node -> node :> ITreeNode
+                        | _ -> treeNode
                     treeNode, indent
                 | _ ->
 

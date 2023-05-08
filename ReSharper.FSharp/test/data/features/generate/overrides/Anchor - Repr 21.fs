@@ -6,4 +6,6 @@
 type C() = class{caret}
              
              let f x = x
+
+             member _.Func(x) = x
            end

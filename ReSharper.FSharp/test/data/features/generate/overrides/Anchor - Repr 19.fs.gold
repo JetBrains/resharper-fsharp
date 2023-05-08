@@ -10,9 +10,10 @@
 
 type C(y: int) = 
   class
-    override this.ToString() = {selstart}failwith "todo"{selend}
     // comment 1
     let x = y // comment 2
+
+    override this.ToString() = {selstart}failwith "todo"{selend}
 
   end
   // comment 3
