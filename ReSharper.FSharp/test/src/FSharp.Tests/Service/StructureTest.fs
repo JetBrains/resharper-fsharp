@@ -30,6 +30,9 @@ type FSharpStructureTest() =
     [<Test>] member x.``Class bindings 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 01``() = x.DoNamedTest()
 
+    [<FSharpSignatureTest>]
+    [<Test>] member x.``Signature 01``() = x.DoNamedTest()
+
     override x.DoTest(_: Lifetime, project: IProject) =
         let items = project.GetSubItems(x.TestName)
         let projectFile = items.FirstOrDefault().As<IProjectFile>().NotNull()

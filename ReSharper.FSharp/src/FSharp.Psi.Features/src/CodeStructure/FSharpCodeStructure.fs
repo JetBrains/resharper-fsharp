@@ -89,6 +89,11 @@ type FSharpCodeStructureProvider() =
             for binding in Seq.cast<ITopBinding> letBindings.Bindings do
                 FSharpDeclarationCodeStructureElement(binding, parent, null) |> ignore
 
+        | :? IBindingSignature as bindingSig ->
+            let refPat = bindingSig.HeadPattern.As<IReferencePat>()
+            if isNotNull refPat then
+                FSharpDeclarationCodeStructureElement(refPat, parent, null) |> ignore
+
         | :? ITypeDeclarationGroup as declarationGroup ->
             for typeDeclaration in declarationGroup.TypeDeclarations do
                 processNode parent null typeDeclaration
