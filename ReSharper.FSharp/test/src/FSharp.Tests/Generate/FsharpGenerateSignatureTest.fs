@@ -40,3 +40,4 @@ type FsharpGenerateSignatureTest() =
     [<Test>] member x.``Instance Member 01`` () = x.DoNamedTest()
     [<Test>] member x.``Instance Member 02`` () = x.DoNamedTest()
     [<Test>] member x.``Struct 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Exception 01`` () = x.DoNamedTest()

@@ -169,6 +169,8 @@ type FSharpGenerateSignatureBuilder() =
                     |> String.concat "\n"
                 
                 factory.CreateTypeMemberSignature(sigStrings)
+            | :? IExceptionDeclaration as exceptionDeclaration ->
+                exceptionDeclaration.Copy()
             | _ -> null
 
         and processModuleLikeDeclaration (indentation: int) (moduleDecl: IModuleLikeDeclaration) (moduleSig: IModuleLikeDeclaration) : IFSharpTreeNode =
