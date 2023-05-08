@@ -270,27 +270,21 @@ type FSharpGenerateSignatureBuilder() =
             | _ -> null
 
         and createPrimaryConstructorSignature (typeName: string) (primaryConstructorDeclaration: IPrimaryConstructorDeclaration) : ITreeNode seq =
-            match primaryConstructorDeclaration.ParameterPatterns with
-            | :? IUnitPat ->
-                factory.CreateTypeMemberSignature $"new: unit -> {typeName}"
-                :> ITreeNode
-                |> Seq.singleton 
-            | _ ->
-                let symbolUse = primaryConstructorDeclaration.GetFcsSymbolUse()
-                if isNull symbolUse then Seq.empty else
-                let mfv = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
-                if isNull mfv then Seq.empty else
-                let parameters =
-                    mfv.CurriedParameterGroups
-                    |> Seq.map (fun parameterGroup ->
-                        parameterGroup
-                        |> Seq.map (fun parameter -> parameter.Type.Format(symbolUse.DisplayContext))
-                        |> String.concat " * "
-                    )
-                    |> String.concat " -> "
-                factory.CreateTypeMemberSignature $"new: {parameters} -> {typeName}"
-                :> ITreeNode
-                |> Seq.singleton 
+            let symbolUse = primaryConstructorDeclaration.GetFcsSymbolUse()
+            if isNull symbolUse then Seq.empty else
+            let mfv = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
+            if isNull mfv then Seq.empty else
+            let parameters =
+                mfv.CurriedParameterGroups
+                |> Seq.map (fun parameterGroup ->
+                    parameterGroup
+                    |> Seq.map (fun parameter -> parameter.Type.Format(symbolUse.DisplayContext))
+                    |> String.concat " * "
+                )
+                |> String.concat " -> "
+            factory.CreateTypeMemberSignature $"new: {parameters} -> {typeName}"
+            :> ITreeNode
+            |> Seq.singleton
 
         for decl in fsharpFile.ModuleDeclarations do
             let signatureModule : IModuleLikeDeclaration =
