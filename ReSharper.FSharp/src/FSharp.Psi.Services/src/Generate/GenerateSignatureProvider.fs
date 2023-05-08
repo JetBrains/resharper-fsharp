@@ -191,12 +191,8 @@ type FSharpGenerateSignatureBuilder() =
                 factory.CreateTypeMemberSignature(sigStrings)
             | :? IExceptionDeclaration as exceptionDeclaration ->
                 let sigExceptionDeclaration = exceptionDeclaration.Copy()
-                let memberDeclarations =
-                    exceptionDeclaration.MemberDeclarations
-                    |> Seq.filter (function | :? IExceptionFieldDeclaration -> false | _ -> true)
-                    |> Seq.toArray
 
-                if memberDeclarations.Length > 0 then
+                if not exceptionDeclaration.TypeMembers.IsEmpty then
                     let sigMembers =
                         exceptionDeclaration.TypeMembers
                         |> Seq.choose (createMemberDeclaration >> Option.ofObj)
@@ -209,7 +205,7 @@ type FSharpGenerateSignatureBuilder() =
                             Whitespace(indentation + moduleDecl.GetIndentSize())
                             sigMember
                     ] |> ignore
-                    
+
                 sigExceptionDeclaration
             | _ -> null
 
