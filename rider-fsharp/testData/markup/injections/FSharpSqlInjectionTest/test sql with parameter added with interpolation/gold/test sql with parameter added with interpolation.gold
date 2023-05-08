@@ -1,0 +1,2 @@
+let name = "'Alice'"
+let s = $"<frontend:INJECTED_FRAGMENT>select * from people where name = </frontend:INJECTED_FRAGMENT>{name}"

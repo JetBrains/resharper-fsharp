@@ -1,0 +1,1 @@
+let s = "<frontend:INJECTED_FRAGMENT>select * from table</frontend:INJECTED_FRAGMENT>" + "<frontend:INJECTED_FRAGMENT> where something=2</frontend:INJECTED_FRAGMENT>"

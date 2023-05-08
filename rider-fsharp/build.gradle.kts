@@ -68,7 +68,15 @@ intellij {
 
   // rider-plugins-appender: workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
   // org.intellij.intelliLang needed for tests with language injection marks
-  plugins.set(listOf("rider-plugins-appender", "org.intellij.intelliLang"))
+  plugins.set(
+    listOf(
+      "rider-plugins-appender",
+      "org.intellij.intelliLang",
+      "DatabaseTools",
+      "css-impl",
+      "javascript-impl"
+    )
+  )
 }
 
 val repoRoot = projectDir.parentFile!!

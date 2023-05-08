@@ -1,0 +1,14 @@
+using System;
+using System.Data.SqlClient;
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+            var c = new SqlCommand("<frontend:INJECTED_FRAGMENT>SELECT * FROM people WHERE age=@UserId</frontend:INJECTED_FRAGMENT>");
+            c.Parameters.Add(new SqlParameter("@UserId", "foo"));
+        }
+    }
+}

@@ -1,0 +1,20 @@
+using System;
+using System.Data.SqlClient;
+using <backend:ERROR>Dapper</backend:ERROR>;
+
+namespace ExecuteScalarEx
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var cs = @"Server=localhost\\SQLEXPRESS;Database=testdb;Trusted_Connection=True;";
+            <backend:ERROR>using</backend:ERROR> var con = new SqlConnection(cs);
+            con.Open();
+            var parameters = new { UserName = "Alice", Age=65535 };
+            var sql = "<frontend:INJECTED_FRAGMENT>select * from people where name = @UserName and age = @Age</frontend:INJECTED_FRAGMENT>";
+            var result = con.<backend:ERROR>Query</backend:ERROR>(sql, parameters);
+            Console.WriteLine(<backend:ERROR>result</backend:ERROR>);
+        }
+    }
+}

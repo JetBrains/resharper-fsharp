@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="LanguageInjectionConfiguration">
+  <injection language="SQL" injector-id="F#">
+    <display-name>"SQL in F# (select/delete/insert/update/create)"</display-name>
+    <place><![CDATA[fsharpSqlInStringPattern()]]></place>
+  </injection>
+</component>

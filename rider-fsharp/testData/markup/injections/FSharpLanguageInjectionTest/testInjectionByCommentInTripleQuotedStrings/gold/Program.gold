@@ -1,0 +1,18 @@
+(* language=json *)
+let s1 = """<frontend:INJECTED_FRAGMENT>
+         [ {
+              "key": null
+           } ]
+         </frontend:INJECTED_FRAGMENT>"""
+
+let s2 = (*language=xml*) """<frontend:INJECTED_FRAGMENT>
+                          <tag1>
+                            <tag2 attr="value"/>
+                          </tag1>
+                          </frontend:INJECTED_FRAGMENT>"""
+
+// language=sql
+let s3 = """<frontend:INJECTED_FRAGMENT>INSERT INTO Person (42, "Joe", "Doe")</frontend:INJECTED_FRAGMENT>"""
+
+(* language=js *)
+let s4 = """alert("Hello")

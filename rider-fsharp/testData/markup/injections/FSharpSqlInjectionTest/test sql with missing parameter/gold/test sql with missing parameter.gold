@@ -1,0 +1,10 @@
+namespace ConsoleApplicationWithDatabase
+{
+  internal class Program
+  {
+    public static void Main(string[] args)
+    {
+      string s = "<frontend:INJECTED_FRAGMENT>select * from people where name =<frontend:ERROR> </frontend:ERROR></frontend:INJECTED_FRAGMENT>";
+    }
+  }
+}

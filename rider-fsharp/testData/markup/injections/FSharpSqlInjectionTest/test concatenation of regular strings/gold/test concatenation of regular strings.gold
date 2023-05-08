@@ -1,0 +1,1 @@
+let s = "<frontend:INJECTED_FRAGMENT>SELECT * FROM people where </frontend:INJECTED_FRAGMENT>" + "<frontend:INJECTED_FRAGMENT>name = 2</frontend:INJECTED_FRAGMENT>"

@@ -1,0 +1,5 @@
+let f (s1: string) (s2: string) = ()
+let g (s1: string, s2: string) = ()
+
+let sql1 = f "<frontend:INJECTED_FRAGMENT>Select * from sqlite_master</frontend:INJECTED_FRAGMENT>" "<frontend:INJECTED_FRAGMENT>select * from sqlite_master</frontend:INJECTED_FRAGMENT>"
+let sql2 = g ("<frontend:INJECTED_FRAGMENT>Select * from sqlite_master</frontend:INJECTED_FRAGMENT>", "<frontend:INJECTED_FRAGMENT>select * from sqlite_master</frontend:INJECTED_FRAGMENT>")

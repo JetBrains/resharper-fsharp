@@ -1,0 +1,7 @@
+// language=json
+let s1 = "<frontend:INJECTED_FRAGMENT>[ { \"key\": \"value\" } ]</frontend:INJECTED_FRAGMENT>"
+
+let s2 = (*language=xml*) "<frontend:INJECTED_FRAGMENT><tag1><tag2 attr=\"value\"/></tag1></frontend:INJECTED_FRAGMENT>"
+
+// language=json
+let s3 = "[ { \"unfinished\":

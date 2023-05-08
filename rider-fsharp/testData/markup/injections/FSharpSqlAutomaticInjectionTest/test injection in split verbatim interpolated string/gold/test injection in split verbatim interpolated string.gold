@@ -1,0 +1,4 @@
+let = $@"<frontend:INJECTED_FRAGMENT>select</frontend:INJECTED_FRAGMENT>"
+    + $@"<frontend:INJECTED_FRAGMENT> * </frontend:INJECTED_FRAGMENT>"
+    + @$"<frontend:INJECTED_FRAGMENT>FROM</frontend:INJECTED_FRAGMENT>"
+    + @$"<frontend:INJECTED_FRAGMENT> table</frontend:INJECTED_FRAGMENT>"

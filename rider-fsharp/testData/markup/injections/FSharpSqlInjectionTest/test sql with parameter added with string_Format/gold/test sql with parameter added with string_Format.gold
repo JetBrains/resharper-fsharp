@@ -1,0 +1,2 @@
+let name = "'Alice'"
+let s = System.Console.WriteLine("<frontend:INJECTED_FRAGMENT>select * from people where name = </frontend:INJECTED_FRAGMENT>{0}", name)

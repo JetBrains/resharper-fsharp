@@ -1,0 +1,10 @@
+// language=json
+var s1 = $"<frontend:INJECTED_FRAGMENT>[ ]</frontend:INJECTED_FRAGMENT>"
+
+// language=json
+var s2 = $"<frontend:INJECTED_FRAGMENT>[ {{ \"key\": \"</frontend:INJECTED_FRAGMENT>{42}<frontend:INJECTED_FRAGMENT>\" }} ]</frontend:INJECTED_FRAGMENT>"
+
+var s3 = (*language=xml*) $"<frontend:INJECTED_FRAGMENT><tag1><tag2 attr=\"</frontend:INJECTED_FRAGMENT>{s1}<frontend:INJECTED_FRAGMENT>\"/></tag1></frontend:INJECTED_FRAGMENT>"
+
+// language=css
+var s3 = $".unfinished {

@@ -1,0 +1,11 @@
+// lang=json
+let s1 = "<frontend:INJECTED_FRAGMENT>{ \"key\": \ \ж \r\n \xD \u000D \U0000000D \"value\" }</frontend:INJECTED_FRAGMENT>"
+
+// lang=json
+let s2 = $"<frontend:INJECTED_FRAGMENT>{{ \"key\": \r\n \xD \u000D \U0000000D \"</frontend:INJECTED_FRAGMENT>{args[0]}<frontend:INJECTED_FRAGMENT>\" }}</frontend:INJECTED_FRAGMENT>"
+
+// lang=json
+let s3 = @"<frontend:INJECTED_FRAGMENT>{ ""key"": ""{args[0]}"" }</frontend:INJECTED_FRAGMENT>"
+
+// lang=json
+let s4 = $@"<frontend:INJECTED_FRAGMENT>{{ ""key"": ""</frontend:INJECTED_FRAGMENT>{args[0]}<frontend:INJECTED_FRAGMENT>"" }}</frontend:INJECTED_FRAGMENT>"

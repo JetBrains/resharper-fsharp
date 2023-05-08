@@ -110,7 +110,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
           try
           {
-            var result = Convert.ToInt32(literalText, (int) literalBase);
+            var result = Convert.ToInt32(literalText, (int)literalBase);
             return ConstantValue.Create(result, GetPsiModule().GetPredefinedType().Int);
           }
           catch (Exception)
@@ -147,5 +147,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Decimal = 10,
       Hexadecimal = 16
     }
+
+    public bool IsValidHost =>
+      Literal?.GetTokenType() is { IsStringLiteral: true } tokenType &&
+      tokenType != FSharpTokenType.CHARACTER_LITERAL &&
+      tokenType != FSharpTokenType.VERBATIM_BYTEARRAY &&
+      tokenType != FSharpTokenType.BYTEARRAY;
   }
 }

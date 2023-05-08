@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeAnnotations
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
 let getAnnotationInfo<'AnnotationProvider, 'TAnnotationInfo
 when 'AnnotationProvider :> CodeAnnotationInfoProvider<IAttributesOwner, 'TAnnotationInfo>>
@@ -37,3 +38,12 @@ let getAttributesOwner (expr: IFSharpExpression) =
 
     if isNull declaration then ValueNone else
     declaration.DeclaredElement.As<IAttributesOwner>() |> ValueOption.ofObj
+
+let checkForTypeProvider (expr: IConstExpr) =
+    let providedTypeName =
+        ExprStaticConstantTypeUsageNavigator.GetByExpression(expr)
+        |> PrefixAppTypeArgumentListNavigator.GetByTypeUsage
+        |> TypeReferenceNameNavigator.GetByTypeArgumentList
+
+    if isNotNull providedTypeName then ValueSome (providedTypeName.Identifier.GetSourceName())
+    else ValueNone

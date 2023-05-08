@@ -1,0 +1,1 @@
+let s = @"<frontend:INJECTED_FRAGMENT>select * from hello</frontend:INJECTED_FRAGMENT>"

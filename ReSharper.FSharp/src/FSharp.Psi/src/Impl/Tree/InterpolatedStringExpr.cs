@@ -27,5 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? startOffset.ExtendRight(+1)
         : startOffset.Shift(+1).ExtendRight(+1);
     }
+
+    public bool IsValidHost => true;
   }
 }

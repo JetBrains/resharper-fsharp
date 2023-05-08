@@ -1,0 +1,18 @@
+(* language=json *)
+let s1 = $"""<frontend:INJECTED_FRAGMENT>
+         [ {{
+              "key": </frontend:INJECTED_FRAGMENT>{args[0]}<frontend:INJECTED_FRAGMENT>
+           }} ]
+         </frontend:INJECTED_FRAGMENT>"""
+
+let s2 = (*language=xml*) $"""<frontend:INJECTED_FRAGMENT>
+                          <tag1>
+                            <tag2 attr="</frontend:INJECTED_FRAGMENT>{0}<frontend:INJECTED_FRAGMENT>"/>
+                          </tag1>
+                          </frontend:INJECTED_FRAGMENT>"""
+
+// language=css
+let s3 = $"""<frontend:INJECTED_FRAGMENT>.my-awesome-class </frontend:INJECTED_FRAGMENT>{}"""
+
+(* language=js *)
+let s4 = $"""alert("Hello")

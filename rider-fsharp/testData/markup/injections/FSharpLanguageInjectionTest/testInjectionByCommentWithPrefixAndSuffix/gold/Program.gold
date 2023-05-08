@@ -1,0 +1,2 @@
+// language=json prefix="  {  " postfix="  }  "
+let s1 = "<frontend:INJECTED_FRAGMENT>\"key\": \"value\"</frontend:INJECTED_FRAGMENT>"
