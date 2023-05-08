@@ -143,7 +143,7 @@ type FSharpGenerateSignatureBuilder() =
                             NewLine(lineEnding)
                             Whitespace(indentation + moduleDecl.GetIndentSize())
                             if isNotNull typeDecl.PrimaryConstructorDeclaration then
-                                createPrimaryConstructorSignature (getName typeDecl) typeDecl.PrimaryConstructorDeclaration
+                                yield! createPrimaryConstructorSignature (getName typeDecl) typeDecl.PrimaryConstructorDeclaration
                             for sigMember in sigMembers do
                                 NewLine(lineEnding)
                                 Whitespace(indentation + moduleDecl.GetIndentSize())
@@ -266,15 +266,29 @@ type FSharpGenerateSignatureBuilder() =
                 factory.CreateTypeMemberSignature(sourceString)
             | _ -> null
 
-        and createPrimaryConstructorSignature (typeName: string) (primaryConstructorDeclaration: IPrimaryConstructorDeclaration) : IFSharpTreeNode =
-            let signature =
-                match primaryConstructorDeclaration.ParameterPatterns with
-                | :? IUnitPat ->
-                    $"new: unit -> {typeName}"
-                | _ -> failwithf "todo"
+        and createPrimaryConstructorSignature (typeName: string) (primaryConstructorDeclaration: IPrimaryConstructorDeclaration) : ITreeNode seq =
+            match primaryConstructorDeclaration.ParameterPatterns with
+            | :? IUnitPat ->
+                factory.CreateTypeMemberSignature $"new: unit -> {typeName}"
+                :> ITreeNode
+                |> Seq.singleton 
+            | _ ->
+                let symbolUse = primaryConstructorDeclaration.GetFcsSymbolUse()
+                if isNull symbolUse then Seq.empty else
+                let mfv = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
+                if isNull mfv then Seq.empty else
+                let parameters =
+                    mfv.CurriedParameterGroups
+                    |> Seq.map (fun parameterGroup ->
+                        parameterGroup
+                        |> Seq.map (fun parameter -> parameter.Type.Format(symbolUse.DisplayContext))
+                        |> String.concat " * "
+                    )
+                    |> String.concat " -> "
+                factory.CreateTypeMemberSignature $"new: {parameters} -> {typeName}"
+                :> ITreeNode
+                |> Seq.singleton 
 
-            factory.CreateTypeMemberSignature(signature)
-        
         for decl in fsharpFile.ModuleDeclarations do
             let signatureModule : IModuleLikeDeclaration =
                 match decl with
