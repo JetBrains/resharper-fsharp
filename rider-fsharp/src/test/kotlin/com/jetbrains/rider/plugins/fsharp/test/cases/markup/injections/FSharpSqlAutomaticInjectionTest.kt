@@ -22,7 +22,6 @@ class FSharpSqlAutomaticInjectionTest : RiderSqlInjectionTestBase() {
   @Test
   fun `test that sql gets injected in concatenation`() = doTest()
 
-  //TODO: support identifiers in concatenations
   @Test
   fun `test that sql gets injected in complex concatenation`() = doTest()
 

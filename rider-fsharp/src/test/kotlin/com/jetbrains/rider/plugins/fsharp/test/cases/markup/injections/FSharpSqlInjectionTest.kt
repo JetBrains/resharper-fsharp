@@ -19,7 +19,6 @@ class FSharpSqlInjectionTest : RiderSqlInjectionTestBase() {
   @Test
   fun `test sql with parameter added with interpolation`() = doTest()
 
-  //TODO: support identifiers in concatenations
   @Test
   fun `test sql with parameters added with different ways`() = doTest()
 
