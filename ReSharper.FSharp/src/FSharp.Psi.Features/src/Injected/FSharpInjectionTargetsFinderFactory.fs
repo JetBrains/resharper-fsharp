@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected.FSharpInjectionAnnotationUtil
 
 type FSharpInjectionTargetsFinder() =
-    let vsCodeCompatibleInjections = [|"html"; "css"; "sql"; "js"; "javascript"; "json"; "jsx"|]
+    let vsCodeCompatibleInjections = [|"html"; "css"; "sql"; "javascript"; "json"; "jsx"|]
     let normalizeLanguage = function
         | "js" | "jsx" -> "javascript"
         | language -> language

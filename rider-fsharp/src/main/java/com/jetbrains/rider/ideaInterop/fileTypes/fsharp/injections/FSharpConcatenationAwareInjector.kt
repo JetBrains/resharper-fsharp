@@ -42,7 +42,6 @@ class FSharpConcatenationAwareInjector :
       return when (part) {
         is FSharpInterpolatedStringLiteralExpressionPart -> {
           val partLength = part.textLength
-
           val partText = part.text
 
           if (part.tokenType in INTERPOLATED_STRINGS_WITHOUT_INTERPOLATIONS)
