@@ -171,15 +171,18 @@ type FSharpGenerateSignatureBuilder() =
                 let sourceString (binding: IBinding) =
                     let sb = StringBuilder()
 
-                    sb.Append("val ") |> ignore
-                    sb.Append(binding.HeadPattern.GetText()) |> ignore
-                    sb.Append(": ") |> ignore
-                    
                     let refPat = binding.HeadPattern.As<IReferencePat>()
                     if isNotNull refPat then
                         let symbolUse = refPat.GetFcsSymbolUse()
                         if isNotNull symbolUse then
                             let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+
+                            mfv.Attributes
+                            |> Seq.iter (fun a -> sb.Append($"{a.Format(symbolUse.DisplayContext)}{lineEnding}") |> ignore)
+
+                            sb.Append("val ") |> ignore
+                            sb.Append(binding.HeadPattern.GetText()) |> ignore
+                            sb.Append(": ") |> ignore
                             sb.Append(mfv.FullType.Format(symbolUse.DisplayContext)) |> ignore
                   
                     sb.ToString()
@@ -188,7 +191,7 @@ type FSharpGenerateSignatureBuilder() =
                     Seq.map sourceString letBindingsDeclaration.Bindings
                     |> String.concat lineEnding
                 
-                factory.CreateTypeMember(sigStrings)
+                factory.CreateModuleMember(sigStrings)
             | :? IExceptionDeclaration as exceptionDeclaration ->
                 let sigExceptionDeclaration = exceptionDeclaration.Copy()
 
