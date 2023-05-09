@@ -7,5 +7,6 @@ let c = Math.PI
 let d = 23
 let e = "bar"
 let f x y = x * y
+[<System.Obsolete>]
 let g x = x
 {caret}
