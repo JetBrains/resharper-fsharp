@@ -17,6 +17,10 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Curried - Comment 02``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Comment 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``App - Curried - Custom op 01``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Custom op 02``() = x.DoNamedTest()
+    [<Test>] member x.``App - Curried - Custom op 03``() = x.DoNamedTest()
+
     [<Test>] member x.``App - Curried - Nested 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Nested 02``() = x.DoNamedTest()
     [<Test>] member x.``App - Curried - Nested 03``() = x.DoNamedTest()
