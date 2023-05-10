@@ -62,8 +62,6 @@ type FSharpInjectionTargetsFinder() =
                              let language = normalizeLanguage ref.ShortName
                              if Array.contains language possibleInjectorFunctionNames then
                                  consumer.Consume(expr, language, "", "")
-                             elif language.EndsWith("Color", StringComparison.InvariantCultureIgnoreCase) then
-                                 consumer.Consume(expr, "css", "{ color: ", " }")
                          | _ -> ()
 
                 | :? IChameleonNode as c when not c.IsOpened -> descendants.SkipThisNode()
