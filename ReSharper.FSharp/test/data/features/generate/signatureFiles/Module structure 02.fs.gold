@@ -8,6 +8,11 @@ val c: float
 val d: int
 val e: string
 val f: int -> int -> int
-[<Obsolete ("foo")>]
-[<NonSerialized>]
+[<BAttribute(MyEnum.A)>]
+[<System.Obsolete "foo">]
+[<System.NonSerialized>]
 val g: 'a -> 'a
+[<Literal>]
+val Hello: string
+[<CompiledName(Hello)>]
+val hello: int
