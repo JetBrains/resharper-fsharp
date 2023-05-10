@@ -1,3 +1,0 @@
-let s = $"<frontend:INJECTED_FRAGMENT>select * from hello</frontend:INJECTED_FRAGMENT>"
-let s = $"<frontend:INJECTED_FRAGMENT>select * from table % </frontend:INJECTED_FRAGMENT>{5}<frontend:INJECTED_FRAGMENT> </frontend:INJECTED_FRAGMENT>"
-let s = $"<frontend:INJECTED_FRAGMENT>select * from table </frontend:INJECTED_FRAGMENT>%d{5}<frontend:INJECTED_FRAGMENT> </frontend:INJECTED_FRAGMENT>"

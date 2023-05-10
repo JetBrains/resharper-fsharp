@@ -1,0 +1,14 @@
+FSharpFile
+  FSharpStringLiteralExpression
+    PsiElement(STRING)('"123"')
+  PsiWhiteSpace(' ')
+  PsiElement(PLUS)('+')
+  PsiWhiteSpace(' ')
+  PsiElement(RESERVED_LITERAL_FORMATS)('2.ToString')
+  PsiElement(LPAREN)('(')
+  PsiElement(RPAREN)(')')
+  PsiWhiteSpace(' ')
+  PsiElement(PLUS)('+')
+  PsiWhiteSpace(' ')
+  FSharpStringLiteralExpression
+    PsiElement(STRING)('"456"')

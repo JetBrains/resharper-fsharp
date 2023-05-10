@@ -15,7 +15,7 @@ class FSharpInterpolatedStringLiteralExpressionImpl(type: FSharpElementType) :
     val firstChild = firstChild
     val lastChild = lastChild
     return firstChild is FSharpInterpolatedStringLiteralExpressionPart && (
-      (firstChild.tokenType in FSharpTokenType.INTERPOLATED_STRINGS_WITHOUT_INTERPOLATIONS)
+      (firstChild.tokenType in FSharpTokenType.INTERPOLATED_STRINGS_WITHOUT_INSERTIONS)
         ||
         (firstChild.tokenType in FSharpTokenType.INTERPOLATED_STRING_STARTS &&
           lastChild is FSharpInterpolatedStringLiteralExpressionPart &&

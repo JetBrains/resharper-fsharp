@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected.FSharpInjectionAnnotationUtil
 
 type FSharpInjectionTargetsFinder() =
-    let vsCodeCompatibleInjections = [|"html"; "css"; "sql"; "javascript"; "json"; "jsx"|]
+    let possibleInjectorFunctionNames = [|"html"; "css"; "sql"; "javascript"; "json"; "jsx"|]
     let normalizeLanguage = function
         | "js" | "jsx" -> "javascript"
         | language -> language
@@ -47,17 +47,17 @@ type FSharpInjectionTargetsFinder() =
                     // support VSCode-compatible injection functions
                     // https://github.com/alfonsogarciacaro/vscode-template-fsharp-highlight
                     let prefixApp = PrefixAppExprNavigator.GetByArgumentExpression(expr.IgnoreParentParens())
-                    //TODO: support concatenations?
                     if isNull prefixApp then () else
                     match prefixApp.FunctionExpression.IgnoreInnerParens() with
-                    | :? IReferenceExpr as ref ->
-                        if isSimpleQualifiedName ref && Array.contains ref.ShortName vsCodeCompatibleInjections then
-                            consumer.Consume(expr, normalizeLanguage ref.ShortName, "", "")
+                    | :? IReferenceExpr as ref when isSimpleQualifiedName ref ->
+                        let language = normalizeLanguage ref.ShortName
+                        if Array.contains language possibleInjectorFunctionNames then
+                            consumer.Consume(expr, language, "", "")
                     | _ ->
 
                     match expr with
                     | :? IConstExpr as expr ->
-                        match checkForTypeProvider expr with
+                        match tryGetTypeProviderName expr with
                         | ValueSome "SqlCommandProvider" ->
                             consumer.Consume(expr, "sql", "", "")
                         | ValueSome "JsonProvider" when expr.GetText().Contains("{") ->

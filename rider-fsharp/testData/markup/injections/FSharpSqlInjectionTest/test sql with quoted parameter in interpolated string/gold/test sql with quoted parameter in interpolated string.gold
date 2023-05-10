@@ -1,4 +1,0 @@
-let s = "<frontend:INJECTED_FRAGMENT>select name from people</frontend:INJECTED_FRAGMENT>"
-let s2 = "<frontend:INJECTED_FRAGMENT>select name1 from people</frontend:INJECTED_FRAGMENT>"
-let columnName = "name"
-let s1 = $"<frontend:INJECTED_FRAGMENT>select \"</frontend:INJECTED_FRAGMENT>{columnName}<frontend:INJECTED_FRAGMENT>\" from people</frontend:INJECTED_FRAGMENT>"

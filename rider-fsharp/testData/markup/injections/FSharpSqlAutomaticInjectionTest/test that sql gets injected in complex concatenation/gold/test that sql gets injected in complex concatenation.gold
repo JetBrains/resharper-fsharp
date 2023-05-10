@@ -1,2 +1,0 @@
-let meaning = "42"
-let s = "<frontend:INJECTED_FRAGMENT>select * from table where something=</frontend:INJECTED_FRAGMENT>" + 2.ToString() + $" and meaning={meaning}"

@@ -42,34 +42,10 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   fun testInjectionByCommentInTripleQuotedInterpolatedStrings() = doTest()
 
   @Test
-  fun testInjectionByAlternativeComment() = doTest()
-
-  @Test
-  fun testInjectionByCommentWithPrefixAndSuffix() = doTest()
-
-  @Test
   fun testEscapeSequences() = doTest()
 
   @Test
-  fun testInjectionByAnnotationInRegularStrings() = doTest()
-
-  @Test
-  fun testInjectionByAnnotationInVerbatimStrings() = doTest()
-
-  @Test
-  fun testInjectionByAnnotationInRegularInterpolatedStrings() = doTest()
-
-  @Test
-  fun testInjectionByAnnotationInVerbatimInterpolatedStrings() = doTest()
-
-  @Test
-  fun testInjectionByAnnotationInTripleQuotedStrings() = doTest()
-
-  @Test
-  fun testInjectionByAnnotationInTripleQuotedInterpolatedStrings() = doTest()
-
-  @Test
-  fun testInjectionByAnnotationWithPrefixAndSuffix() = doTest()
+  fun testInjectionByAnnotation() = doTest()
 
   @Test
   fun testInjectionByFunction() = doTest()

@@ -9,7 +9,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.escaping.FSharp
 
 fun FSharpStringLiteralExpression.getRangeTrimQuotes(): TextRange {
   val literalType = literalType
-  val startOffset = when (literalType) {
+  val startQuotesLength = when (literalType) {
     FSharpStringLiteralType.RegularString,
     FSharpStringLiteralType.ByteArray -> 1
 
@@ -22,7 +22,7 @@ fun FSharpStringLiteralExpression.getRangeTrimQuotes(): TextRange {
     FSharpStringLiteralType.TripleQuoteInterpolatedString -> 4
   }
 
-  val endOffset = when (literalType) {
+  val endQuotesLength = when (literalType) {
     FSharpStringLiteralType.RegularString,
     FSharpStringLiteralType.VerbatimString,
     FSharpStringLiteralType.RegularInterpolatedString,
@@ -34,8 +34,8 @@ fun FSharpStringLiteralExpression.getRangeTrimQuotes(): TextRange {
     FSharpStringLiteralType.TripleQuoteInterpolatedString -> 3
   }
 
-  val start = (textRange.startOffset + startOffset).coerceAtMost(textRange.endOffset)
-  val end = (textRange.endOffset - endOffset).coerceAtLeast(textRange.startOffset)
+  val start = (textRange.startOffset + startQuotesLength).coerceAtMost(textRange.endOffset)
+  val end = (textRange.endOffset - endQuotesLength).coerceAtLeast(textRange.startOffset)
   return TextRange(start, end)
 }
 

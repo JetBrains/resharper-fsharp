@@ -1,4 +1,5 @@
 using System;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Injections;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -148,10 +149,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Hexadecimal = 16
     }
 
-    public bool IsValidHost =>
-      Literal?.GetTokenType() is { IsStringLiteral: true } tokenType &&
-      tokenType != FSharpTokenType.CHARACTER_LITERAL &&
-      tokenType != FSharpTokenType.VERBATIM_BYTEARRAY &&
-      tokenType != FSharpTokenType.BYTEARRAY;
+    bool IInjectionHostNode.IsValidHost =>
+      Literal?.GetTokenType() is { } tokenType &&
+      (tokenType == FSharpTokenType.STRING ||
+       tokenType == FSharpTokenType.VERBATIM_STRING ||
+       tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING);
   }
 }

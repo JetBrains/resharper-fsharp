@@ -11,8 +11,12 @@ let s2 = (*language=xml*) $"""<frontend:INJECTED_FRAGMENT>
                           </tag1>
                           </frontend:INJECTED_FRAGMENT>"""
 
-// language=css
-let s3 = $"""<frontend:INJECTED_FRAGMENT>.my-awesome-class </frontend:INJECTED_FRAGMENT>{}"""
+//lang=css
+let s3 = $"""<frontend:INJECTED_FRAGMENT>
+         .my-class {{
+           font-size: </frontend:INJECTED_FRAGMENT>{args[0]}<frontend:INJECTED_FRAGMENT>
+         }}
+         </frontend:INJECTED_FRAGMENT>"""
 
 (* language=js *)
 let s4 = $"""alert("Hello")

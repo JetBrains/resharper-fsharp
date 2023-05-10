@@ -1,3 +1,0 @@
-// language=sql
-let s = "<frontend:INJECTED_FRAGMENT>select hello</frontend:INJECTED_FRAGMENT>"
-let s1 = "select hello"

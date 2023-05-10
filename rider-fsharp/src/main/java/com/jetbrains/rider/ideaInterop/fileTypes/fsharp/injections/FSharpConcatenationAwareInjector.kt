@@ -44,7 +44,7 @@ class FSharpConcatenationAwareInjector :
           val partLength = part.textLength
           val partText = part.text
 
-          if (part.tokenType in INTERPOLATED_STRINGS_WITHOUT_INTERPOLATIONS)
+          if (part.tokenType in INTERPOLATED_STRINGS_WITHOUT_INSERTIONS)
             return wholeLiteralRange
 
           val startOffsetInPart =

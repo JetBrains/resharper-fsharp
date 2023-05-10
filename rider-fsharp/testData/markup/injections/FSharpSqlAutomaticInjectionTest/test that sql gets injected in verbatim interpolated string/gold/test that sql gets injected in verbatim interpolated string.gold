@@ -1,2 +1,0 @@
-let s1 = $@"<frontend:INJECTED_FRAGMENT>select * from hello</frontend:INJECTED_FRAGMENT>"
-let s2 = @$"<frontend:INJECTED_FRAGMENT>select * from hello</frontend:INJECTED_FRAGMENT>"

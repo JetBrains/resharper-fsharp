@@ -88,7 +88,7 @@ type FSharpRegexNodeProvider() =
                     let checkAttributesResult = checkForAttributes expr
                     if checkAttributesResult.IsSome then checkAttributesResult else
 
-                    match checkForTypeProvider expr with
+                    match tryGetTypeProviderName expr with
                     | ValueSome "Regex" -> ValueSome RegexOptions.None
                     | _ -> ValueNone
 

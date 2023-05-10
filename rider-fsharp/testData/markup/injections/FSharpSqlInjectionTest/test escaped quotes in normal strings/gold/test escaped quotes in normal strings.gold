@@ -1,1 +1,0 @@
-let s = "<frontend:INJECTED_FRAGMENT>select * from \"people\" where \"name\" = 'Alice'</frontend:INJECTED_FRAGMENT>"

@@ -1,4 +1,0 @@
-let = $"select"
-    + $" * "
-    + $"FROM"
-    + $" table"

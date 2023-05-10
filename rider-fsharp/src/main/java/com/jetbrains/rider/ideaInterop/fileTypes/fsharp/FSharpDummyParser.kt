@@ -75,6 +75,8 @@ class FSharpDummyParser : PsiParser {
   private fun PsiBuilder.parseStringExpression() =
     parseInterpolatedStringExpression() || parseAnyStringExpression()
 
+  // We want to support concatenation with simple identifiers, similar to C#
+  // for example, "select * from table where columnId = " + columnId
   private fun PsiBuilder.parseConcatenationOperand() =
     tryEatAnyToken(FSharpTokenType.IDENT) || parseStringExpression()
 

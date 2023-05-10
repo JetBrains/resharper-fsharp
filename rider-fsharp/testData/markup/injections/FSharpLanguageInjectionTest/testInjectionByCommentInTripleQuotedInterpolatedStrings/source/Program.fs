@@ -11,8 +11,12 @@ let s2 = (*language=xml*) $"""
                           </tag1>
                           """
 
-// language=css
-let s3 = $""".my-awesome-class {}"""
+//lang=css
+let s3 = $"""
+         .my-class {{
+           font-size: {args[0]}
+         }}
+         """
 
 (* language=js *)
 let s4 = $"""alert("Hello")

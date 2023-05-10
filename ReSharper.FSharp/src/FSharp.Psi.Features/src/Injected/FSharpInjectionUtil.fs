@@ -39,7 +39,7 @@ let getAttributesOwner (expr: IFSharpExpression) =
     if isNull declaration then ValueNone else
     declaration.DeclaredElement.As<IAttributesOwner>() |> ValueOption.ofObj
 
-let checkForTypeProvider (expr: IConstExpr) =
+let tryGetTypeProviderName (expr: IConstExpr) =
     let providedTypeName =
         ExprStaticConstantTypeUsageNavigator.GetByExpression(expr)
         |> PrefixAppTypeArgumentListNavigator.GetByTypeUsage

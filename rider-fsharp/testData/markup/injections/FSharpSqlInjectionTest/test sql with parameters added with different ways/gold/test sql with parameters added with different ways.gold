@@ -1,3 +1,0 @@
-let name = "'Alice'"
-let age = 20
-let s = "<frontend:INJECTED_FRAGMENT>select * from people where name = </frontend:INJECTED_FRAGMENT>" + name + $"<frontend:INJECTED_FRAGMENT> and age = </frontend:INJECTED_FRAGMENT>{20}"
