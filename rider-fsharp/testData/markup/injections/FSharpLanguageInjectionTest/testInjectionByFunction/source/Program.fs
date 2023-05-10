@@ -1,7 +1,6 @@
 module Test
 
-type Sql = SqlCommandProvider<"1 + 1">
-type Sql1 = SqlCommandProvider<"select * from table">
+type Sql1 = SqlCommandProvider<"select">
 type Json = JsonProvider<"{ 1 }">
 type Json1 = JsonProvider<"data.txt">
 type Xml = XmlProvider<"<xml/>">

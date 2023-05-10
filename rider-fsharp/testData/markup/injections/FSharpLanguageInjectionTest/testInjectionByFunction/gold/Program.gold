@@ -1,10 +1,9 @@
 module Test
 
-type Sql = SqlCommandProvider<"1 + 1">
-type Sql1 = SqlCommandProvider<"<frontend:INJECTED_FRAGMENT>select * from table</frontend:INJECTED_FRAGMENT>">
-type Json = JsonProvider<"{ 1 }">
+type Sql1 = SqlCommandProvider<"<frontend:INJECTED_FRAGMENT>select</frontend:INJECTED_FRAGMENT>">
+type Json = JsonProvider<"<frontend:INJECTED_FRAGMENT>{ 1 }</frontend:INJECTED_FRAGMENT>">
 type Json1 = JsonProvider<"data.txt">
-type Xml = XmlProvider<"<xml/>">
+type Xml = XmlProvider<"<frontend:INJECTED_FRAGMENT><xml/></frontend:INJECTED_FRAGMENT>">
 type Xml1 = XmlProvider<"data.txt">
 
 let _ =
