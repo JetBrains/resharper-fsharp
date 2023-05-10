@@ -1,0 +1,19 @@
+﻿Provided elements:
+ 0: ToString():System.String
+ 1: Equals(System.Object):System.Boolean
+ 2: GetHashCode():System.Int32
+ 3: Finalize():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:ToString():System.String}
+
+[<AbstractClass>]
+type A<'T1>() =
+    abstract P: 'T1
+
+[<AbstractClass>]
+type T() =
+    inherit A<int>()
+
+    override this.P = 1
+    override this.ToString() = {selstart}failwith "todo"{selend}
