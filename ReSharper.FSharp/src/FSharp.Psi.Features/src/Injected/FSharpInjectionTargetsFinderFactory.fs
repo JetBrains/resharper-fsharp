@@ -46,22 +46,22 @@ type FSharpInjectionTargetsFinder() =
                     | _ ->
 
                     let prefixApp = PrefixAppExprNavigator.GetByArgumentExpression(expr.IgnoreParentParens())
-                    if isNull prefixApp then
-                        match tryGetTypeProviderName (expr.As<IConstExpr>()) with
-                        | ValueSome "SqlCommandProvider" ->
-                            consumer.Consume(expr, "sql", "", "")
-                        | ValueSome "JsonProvider" when expr.GetText().Contains("{") ->
-                            consumer.Consume(expr, "json", "", "")
-                        | ValueSome "XmlProvider" when expr.GetText().Contains("<") ->
-                            consumer.Consume(expr, "xml", "", "")
+                    if isNotNull prefixApp then
+                        // support injection functions
+                        // https://github.com/alfonsogarciacaro/vscode-template-fsharp-highlight
+                        match prefixApp.FunctionExpression.IgnoreInnerParens() with
+                        | :? IReferenceExpr as ref when isSimpleQualifiedName ref ->
+                            let language = normalizeLanguage ref.ShortName
+                            if Array.contains language possibleInjectorFunctionNames then
+                                consumer.Consume(expr, language, "", "")
                         | _ -> ()
-                    // support injection functions
-                    // https://github.com/alfonsogarciacaro/vscode-template-fsharp-highlight
-                    else match prefixApp.FunctionExpression.IgnoreInnerParens() with
-                         | :? IReferenceExpr as ref when isSimpleQualifiedName ref ->
-                             let language = normalizeLanguage ref.ShortName
-                             if Array.contains language possibleInjectorFunctionNames then
-                                 consumer.Consume(expr, language, "", "")
+                    else match tryGetTypeProviderName (expr.As<IConstExpr>()) with
+                         | ValueSome "SqlCommandProvider" ->
+                             consumer.Consume(expr, "sql", "", "")
+                         | ValueSome "JsonProvider" when expr.GetText().Contains("{") ->
+                             consumer.Consume(expr, "json", "", "")
+                         | ValueSome "XmlProvider" when expr.GetText().Contains("<") ->
+                             consumer.Consume(expr, "xml", "", "")
                          | _ -> ()
 
                 | :? IChameleonNode as c when not c.IsOpened -> descendants.SkipThisNode()
