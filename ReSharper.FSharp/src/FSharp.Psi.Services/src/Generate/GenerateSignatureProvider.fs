@@ -177,8 +177,8 @@ type FSharpGenerateSignatureBuilder() =
                         if isNotNull symbolUse then
                             let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
 
-                            mfv.Attributes
-                            |> Seq.iter (fun a -> sb.Append($"{a.Format(symbolUse.DisplayContext)}{lineEnding}") |> ignore)
+                            binding.Attributes
+                            |> Seq.iter (fun a -> sb.Append($"[<{a.GetText()}>]{lineEnding}") |> ignore)
 
                             sb.Append("val ") |> ignore
                             sb.Append(binding.HeadPattern.GetText()) |> ignore
