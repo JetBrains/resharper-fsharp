@@ -8,5 +8,6 @@ val c: float
 val d: int
 val e: string
 val f: int -> int -> int
-[<Obsolete>]
+[<Obsolete ("foo")>]
+[<NonSerialized>]
 val g: 'a -> 'a
