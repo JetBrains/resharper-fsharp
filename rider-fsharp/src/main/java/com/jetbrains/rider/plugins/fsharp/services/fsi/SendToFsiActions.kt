@@ -40,6 +40,8 @@ open class SendToFsiActionBase(
   private val sendSelectionText: String
 ) : AnAction(), DumbAware {
 
+  override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
   override fun actionPerformed(e: AnActionEvent) {
     val editor = CommonDataKeys.EDITOR.getData(e.dataContext)!!
     val file = CommonDataKeys.PSI_FILE.getData(e.dataContext)!!
