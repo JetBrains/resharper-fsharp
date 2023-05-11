@@ -1,4 +1,4 @@
-﻿# 319 ITEMS #
+﻿# 320 ITEMS #
 
 #I
 #else
@@ -279,6 +279,7 @@ round    ^T
 sbyte    sbyte
 seq    seq<'T>
 set    Set<'T>
+sig
 sign    int
 sin    ^T
 single    single

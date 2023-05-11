@@ -830,6 +830,8 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessTypeAsTypeReferenceName(rhsType)
             x.Done(range, mark, ElementType.OR_TYPE_USAGE)
 
+        | SynType.FromParseError _ -> ()
+
     member x.MarkTypes(synType1, synType2, range: range, elementType) =
         let mark = x.Mark(range)
         x.ProcessType(synType1)

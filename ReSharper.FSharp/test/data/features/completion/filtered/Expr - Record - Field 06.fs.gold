@@ -1,4 +1,4 @@
-﻿# 109 ITEMS #
+﻿# 110 ITEMS #
 
 + SecondProp    string
 #I
@@ -95,6 +95,7 @@ private
 public
 rec
 return
+sig
 static
 struct
 then

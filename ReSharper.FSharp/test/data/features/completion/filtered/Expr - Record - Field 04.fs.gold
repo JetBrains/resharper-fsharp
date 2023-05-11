@@ -1,4 +1,4 @@
-﻿# 65 ITEMS #
+﻿# 66 ITEMS #
 
 + F1    int
 + F2    int
@@ -51,6 +51,7 @@ private
 public
 rec
 return
+sig
 static
 struct
 then
