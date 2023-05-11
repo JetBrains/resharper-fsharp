@@ -1,4 +1,5 @@
 using System;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Injections;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -110,7 +111,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
           try
           {
-            var result = Convert.ToInt32(literalText, (int) literalBase);
+            var result = Convert.ToInt32(literalText, (int)literalBase);
             return ConstantValue.Create(result, GetPsiModule().GetPredefinedType().Int);
           }
           catch (Exception)
@@ -147,5 +148,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Decimal = 10,
       Hexadecimal = 16
     }
+
+    bool IInjectionHostNode.IsValidHost =>
+      Literal?.GetTokenType() is { } tokenType &&
+      (tokenType == FSharpTokenType.STRING ||
+       tokenType == FSharpTokenType.VERBATIM_STRING ||
+       tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING);
   }
 }

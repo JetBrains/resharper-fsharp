@@ -1,0 +1,61 @@
+let f (s1: string) (s2: string) = ()
+let g (s1: string, s2: string) = ()
+let meaning = "42"
+
+let sql1 = f "<frontend:INJECTED_FRAGMENT>Select * from sqlite_master</frontend:INJECTED_FRAGMENT>" "<frontend:INJECTED_FRAGMENT>select * from sqlite_master</frontend:INJECTED_FRAGMENT>"
+let sql2 = g ("<frontend:INJECTED_FRAGMENT>Select * from sqlite_master</frontend:INJECTED_FRAGMENT>", "<frontend:INJECTED_FRAGMENT>select * from sqlite_master</frontend:INJECTED_FRAGMENT>")
+
+let _ = $"<frontend:INJECTED_FRAGMENT>select * from hello</frontend:INJECTED_FRAGMENT>"
+let _ = $"<frontend:INJECTED_FRAGMENT>select * from table % </frontend:INJECTED_FRAGMENT>{5}<frontend:INJECTED_FRAGMENT> </frontend:INJECTED_FRAGMENT>"
+let _ = $"<frontend:INJECTED_FRAGMENT>select * from table </frontend:INJECTED_FRAGMENT>%d{5}<frontend:INJECTED_FRAGMENT> </frontend:INJECTED_FRAGMENT>"
+let _ = $"<frontend:INJECTED_FRAGMENT>select * from table %0d</frontend:INJECTED_FRAGMENT>{5}<frontend:INJECTED_FRAGMENT> </frontend:INJECTED_FRAGMENT>"
+
+let _ = @"<frontend:INJECTED_FRAGMENT>select * from hello</frontend:INJECTED_FRAGMENT>"
+let _ = $@"<frontend:INJECTED_FRAGMENT>select * from hello</frontend:INJECTED_FRAGMENT>"
+let _ = @$"<frontend:INJECTED_FRAGMENT>select * from hello</frontend:INJECTED_FRAGMENT>"
+
+let _ = "<frontend:INJECTED_FRAGMENT>select * from table</frontend:INJECTED_FRAGMENT>" + "<frontend:INJECTED_FRAGMENT> where something=2</frontend:INJECTED_FRAGMENT>"
+let _ = "<frontend:INJECTED_FRAGMENT>select * from table where something=</frontend:INJECTED_FRAGMENT>" + meaning + $"<frontend:INJECTED_FRAGMENT> and meaning=</frontend:INJECTED_FRAGMENT>{meaning}"
+let _ = "<frontend:INJECTED_FRAGMENT>select * from table where something=</frontend:INJECTED_FRAGMENT>" + 2.ToString() + " and meaning=meaning"
+let _ = $"<frontend:INJECTED_FRAGMENT>SELECT * FROM people where </frontend:INJECTED_FRAGMENT>" + $"<frontend:INJECTED_FRAGMENT>name = 2</frontend:INJECTED_FRAGMENT>"
+let _ = @"<frontend:INJECTED_FRAGMENT>SELECT * FROM people where </frontend:INJECTED_FRAGMENT>" + @"<frontend:INJECTED_FRAGMENT>name = 2</frontend:INJECTED_FRAGMENT>"
+let _ = $@"<frontend:INJECTED_FRAGMENT>SELECT * FROM people where </frontend:INJECTED_FRAGMENT>" + $@"<frontend:INJECTED_FRAGMENT>name = 2</frontend:INJECTED_FRAGMENT>"
+let _ = "<frontend:INJECTED_FRAGMENT>select * from \"people\" where \"name\" = 'Alice'</frontend:INJECTED_FRAGMENT>"
+let _ = $"<frontend:INJECTED_FRAGMENT>select * from \"people\" where \"name\" = 'Alice'</frontend:INJECTED_FRAGMENT>"
+let _ = @"<frontend:INJECTED_FRAGMENT>select * from ""people"" where ""name"" = 'Alice'</frontend:INJECTED_FRAGMENT>"
+let _ = """<frontend:INJECTED_FRAGMENT>select * from ""people"" where ""name"" = 'Alice'</frontend:INJECTED_FRAGMENT>"""
+
+
+let _ = "<frontend:INJECTED_FRAGMENT>select</frontend:INJECTED_FRAGMENT>"
+     + "<frontend:INJECTED_FRAGMENT> * </frontend:INJECTED_FRAGMENT>"
+      + "<frontend:INJECTED_FRAGMENT>FROM</frontend:INJECTED_FRAGMENT>"
+      + "<frontend:INJECTED_FRAGMENT> table</frontend:INJECTED_FRAGMENT>"
+
+let _ = @"<frontend:INJECTED_FRAGMENT>select</frontend:INJECTED_FRAGMENT>"
+      + @"<frontend:INJECTED_FRAGMENT> * </frontend:INJECTED_FRAGMENT>"
+      + @"<frontend:INJECTED_FRAGMENT>FROM</frontend:INJECTED_FRAGMENT>"
+      + @"<frontend:INJECTED_FRAGMENT> table</frontend:INJECTED_FRAGMENT>"
+
+let _= $"<frontend:INJECTED_FRAGMENT>select</frontend:INJECTED_FRAGMENT>"
+     + $"<frontend:INJECTED_FRAGMENT> * </frontend:INJECTED_FRAGMENT>"
+     + $"<frontend:INJECTED_FRAGMENT>FROM</frontend:INJECTED_FRAGMENT>"
+     + $"<frontend:INJECTED_FRAGMENT> table</frontend:INJECTED_FRAGMENT>"
+
+let _ = $@"<frontend:INJECTED_FRAGMENT>select</frontend:INJECTED_FRAGMENT>"
+      + $@"<frontend:INJECTED_FRAGMENT> * </frontend:INJECTED_FRAGMENT>"
+      + @$"<frontend:INJECTED_FRAGMENT>FROM</frontend:INJECTED_FRAGMENT>"
+      + @$"<frontend:INJECTED_FRAGMENT> table</frontend:INJECTED_FRAGMENT>"
+
+let _ = """<frontend:INJECTED_FRAGMENT>select</frontend:INJECTED_FRAGMENT>"""
+      + $"<frontend:INJECTED_FRAGMENT> * </frontend:INJECTED_FRAGMENT>"
+      + $"""<frontend:INJECTED_FRAGMENT>FROM</frontend:INJECTED_FRAGMENT>"""
+      + @"<frontend:INJECTED_FRAGMENT> table</frontend:INJECTED_FRAGMENT>"
+
+let _ = "<frontend:INJECTED_FRAGMENT>select * </frontend:INJECTED_FRAGMENT>\<frontend:INJECTED_FRAGMENT>
+from </frontend:INJECTED_FRAGMENT>\<frontend:INJECTED_FRAGMENT>
+people where name = 'Alice'</frontend:INJECTED_FRAGMENT>"
+
+System.Console.WriteLine("<frontend:INJECTED_FRAGMENT>select * from people where name = </frontend:INJECTED_FRAGMENT>{0}", name)
+System.Console.WriteLine("<frontend:INJECTED_FRAGMENT>select * from people where name = </frontend:INJECTED_FRAGMENT>{0}<frontend:INJECTED_FRAGMENT> or name = </frontend:INJECTED_FRAGMENT>{1}", name, name)
+
+$"""<frontend:INJECTED_FRAGMENT> select * from people where name = {{Name}} or name = </frontend:INJECTED_FRAGMENT>{name}<frontend:INJECTED_FRAGMENT> </frontend:INJECTED_FRAGMENT>"""

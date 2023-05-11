@@ -1,4 +1,5 @@
 using JetBrains.DocumentModel;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Injections;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -27,5 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? startOffset.ExtendRight(+1)
         : startOffset.Shift(+1).ExtendRight(+1);
     }
+
+    bool IInjectionHostNode.IsValidHost => true;
   }
 }

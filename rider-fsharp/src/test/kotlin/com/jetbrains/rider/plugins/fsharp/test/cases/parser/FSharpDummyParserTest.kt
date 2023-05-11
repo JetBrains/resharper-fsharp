@@ -18,6 +18,7 @@ class FSharpDummyParserTests : RiderFrontendParserTest("", "fs", FSharpParserDef
   //TODO: compromise to avoid proper parsing
   fun `test concatenation 08 - multiline string with wrong offset`() = doTest()
   fun `test concatenation 09 - with interpolated`() = doTest()
+  fun `test concatenation 10 - with expression`() = doTest()
 
   fun `test regular strings 01`() = doTest()
   fun `test regular strings 02 - unfinished`() = doTest()

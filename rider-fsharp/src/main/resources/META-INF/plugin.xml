@@ -7,8 +7,18 @@
 
   <version>0.9999</version>
 
-  <depends>com.intellij.modules.rider</depends>
-  <extensions defaultExtensionNs="com.intellij">
+    <depends>com.intellij.modules.rider</depends>
+    <depends>org.intellij.intelliLang</depends>
+    <depends>rider.intellij.plugin.appender</depends>
+    <extensions defaultExtensionNs="org.intellij.intelliLang">
+        <languageSupport
+                implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections.FSharpInjectionSupport"/>
+        <injectionConfig config="fsharpInjections.xml" />
+    </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+    <sql.resolveExtension implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections.FSharpSqlDapperParameterResolveExtension"/>
+    <multiHostInjector implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections.FSharpConcatenationToInjectorAdapter" order="first" />
+    <concatenationAwareInjector implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections.FSharpConcatenationAwareInjector" />
     <fileType name="F#" language="F#" extensions="fs;fsi;ml;mli" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType" fieldName="INSTANCE"/>
     <fileType name="F# Script" language="F#" extensions="fsx;fsscript" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType" fieldName="INSTANCE"/>
 

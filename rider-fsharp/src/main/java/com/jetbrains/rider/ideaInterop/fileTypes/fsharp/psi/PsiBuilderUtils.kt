@@ -69,3 +69,9 @@ inline fun PsiBuilder.scanOrRollback(action: () -> Boolean): Boolean {
   mark.drop()
   return positionBefore != rawTokenIndex()
 }
+
+fun PsiBuilder.tryEatAnyToken(vararg tokens: IElementType) =
+  if (tokenType in tokens) {
+    advanceLexer()
+    true
+  } else false
