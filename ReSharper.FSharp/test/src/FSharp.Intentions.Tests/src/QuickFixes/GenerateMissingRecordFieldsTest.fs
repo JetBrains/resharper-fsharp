@@ -38,6 +38,9 @@ type GenerateMissingRecordFieldsTest() =
 
     [<Test>] member x.``Empty function``() = x.DoNamedTest()
 
+    [<Test>] member x.``Unresolved field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Unresolved field 02``() = x.DoNamedTest()
+
     // The quickfix should apply if the empty record is the final statement of a function binding, as that's what the
     // annotated return type pertains to.
     [<Test; NotAvailable>] member x.``Empty function statement no-op``() = x.DoNamedTest()
