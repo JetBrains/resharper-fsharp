@@ -12,6 +12,8 @@ let _ =
     json "{ field: 1 }"
     js "console.log"
     javascript "console.log"
+    jsx "console.log"
+    tsx "console.log"
     f "123"
 
 css $".body {123}"

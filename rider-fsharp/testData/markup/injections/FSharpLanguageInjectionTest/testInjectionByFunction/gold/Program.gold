@@ -12,6 +12,8 @@ let _ =
     json "<frontend:INJECTED_FRAGMENT>{ field: 1 }</frontend:INJECTED_FRAGMENT>"
     js "<frontend:INJECTED_FRAGMENT>console.log</frontend:INJECTED_FRAGMENT>"
     javascript "<frontend:INJECTED_FRAGMENT>console.log</frontend:INJECTED_FRAGMENT>"
+    jsx "<frontend:INJECTED_FRAGMENT>console.log</frontend:INJECTED_FRAGMENT>"
+    tsx "<frontend:INJECTED_FRAGMENT>console.log</frontend:INJECTED_FRAGMENT>"
     f "123"
 
 css $"<frontend:INJECTED_FRAGMENT>.body </frontend:INJECTED_FRAGMENT>{123}"

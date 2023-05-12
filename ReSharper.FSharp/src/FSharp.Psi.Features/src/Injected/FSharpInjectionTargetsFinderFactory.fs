@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected
 
-open System
+open System.Collections.Generic
 open JetBrains.Application
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Injections
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -15,9 +15,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected.FSharpInjectionAnnotationUtil
 
 type FSharpInjectionTargetsFinder() =
-    let possibleInjectorFunctionNames = [|"html"; "css"; "sql"; "javascript"; "json"; "jsx"|]
+    let possibleInjectorFunctionNames = HashSet([|"html"; "css"; "sql"; "js"; "javascript"; "json"; "jsx"; "tsx"|])
     let normalizeLanguage = function
-        | "js" | "jsx" -> "javascript"
+        | "js" -> "javascript"
+        | "jsx" -> "ECMAScript 6"
+        | "tsx" -> "TypeScript JSX"
         | language -> language
 
     let checkForAttributes (expr: IFSharpExpression) =
@@ -51,9 +53,9 @@ type FSharpInjectionTargetsFinder() =
                         // https://github.com/alfonsogarciacaro/vscode-template-fsharp-highlight
                         match prefixApp.FunctionExpression.IgnoreInnerParens() with
                         | :? IReferenceExpr as ref when isSimpleQualifiedName ref ->
-                            let language = normalizeLanguage ref.ShortName
-                            if Array.contains language possibleInjectorFunctionNames then
-                                consumer.Consume(expr, language, "", "")
+                            let language = ref.ShortName
+                            if possibleInjectorFunctionNames.Contains(language) then
+                                consumer.Consume(expr, normalizeLanguage language, "", "")
                         | _ -> ()
                     else match tryGetTypeProviderName (expr.As<IConstExpr>()) with
                          | ValueSome "SqlCommandProvider" ->
