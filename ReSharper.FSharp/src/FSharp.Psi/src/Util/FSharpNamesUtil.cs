@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (element is IFSharpDeclaredElement fsDeclaredElement)
         names.Add(fsDeclaredElement.SourceName);
 
-      if (element is IConstructor ctor && ctor.GetContainingType() is { } typeElement)
+      if (element is IConstructor { ContainingType: { } typeElement })
         GetPossibleSourceNames(typeElement, names);
 
       if (element is ITypeElement type)
@@ -49,10 +49,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       if (element is IAttributesOwner attrOwner)
       {
-        if (GetAttributeFirstArgValue(attrOwner, SourceNameAttrTypeName) is string sourceName)
+        if (GetFirstArgStringValue(attrOwner, SourceNameAttrTypeName) is { } sourceName)
           names.Add(sourceName);
 
-        if (GetAttributeFirstArgValue(attrOwner, CompilationMappingAttrTypeName) is { } flagValue)
+        if (GetFirstArgStringValue(attrOwner, CustomOperationAttrTypeName) is { } customOpName)
+          names.Add(customOpName);
+
+        if (GetFirstArgValue(attrOwner, CompilationMappingAttrTypeName) is { } flagValue)
         {
           if ((SourceConstructFlags) flagValue == SourceConstructFlags.UnionCase && element is IMethod &&
               name.StartsWith("New", StringComparison.Ordinal))
@@ -74,12 +77,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         names.AddRange(abbreviations);
     }
 
-    [CanBeNull]
-    public static object GetAttributeFirstArgValue([NotNull] this IAttributesSet attrs, [NotNull] IClrTypeName attrName)
+    private static AttributeValue GetFirstPositionalArg([NotNull] this IAttributesSet attrs, IClrTypeName attrName)
     {
       var instance = attrs.GetAttributeInstances(attrName, false).FirstOrDefault();
-      var parameter = instance?.PositionParameters().FirstOrDefault();
-      return parameter?.ConstantValue.Value;
+      return instance?.PositionParameters().FirstOrDefault();
+    }
+
+    [CanBeNull]
+    public static object GetFirstArgValue([NotNull] this IAttributesSet attrs, [NotNull] IClrTypeName attrName)
+    {
+      var positionalArg = GetFirstPositionalArg(attrs, attrName);
+      return positionalArg?.ConstantValue.Value;
+    }
+
+    [CanBeNull]
+    public static string GetFirstArgStringValue([NotNull] this IAttributesSet attrs,
+      [NotNull] IClrTypeName attrName)
+    {
+      var positionalArg = GetFirstPositionalArg(attrs, attrName);
+      return positionalArg?.ConstantValue.StringValue;
     }
   }
 }
