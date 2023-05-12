@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       if (metadataAssembly.AssemblyName?.Name == "FSharp.Core")
       {
         var sigdataPath = FSharpAssemblyUtil.GetFSharpCoreSigdataPath(metadataAssembly);
-        return sigdataPath.ExistsFile && HasFSharpSignatureAttribute(metadataAssembly);
+        return !sigdataPath.IsEmpty && sigdataPath.ExistsFile && HasFSharpSignatureAttribute(metadataAssembly);
       }
 
       return false;
