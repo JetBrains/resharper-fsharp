@@ -7,4 +7,6 @@ type X =
   {
         Y: int
     }
+  /// comment that should be preserved
+  [<System.Obsolete "foo">]
   member A: int -> int -> int

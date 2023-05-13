@@ -8,11 +8,13 @@ val c: float
 val d: int
 val e: string
 val f: int -> int -> int
+/// comment that should be preserved
 [<BAttribute(MyEnum.A)>]
 [<System.Obsolete "foo">]
 [<System.NonSerialized>]
 val g: 'a -> 'a
-[<Literal>]
-val Hello: string
+[<Literal>] val Hello: string
 [<CompiledName(Hello)>]
 val hello: int
+[<A; B>]
+val h: int

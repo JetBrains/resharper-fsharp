@@ -3,6 +3,8 @@
 
 {caret}module Foo
 
+/// comment that should be preserved
+[<System.Obsolete "foo">]
 type Bar =
   struct
         val X: int
