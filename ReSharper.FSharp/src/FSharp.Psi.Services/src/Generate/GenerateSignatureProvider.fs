@@ -79,7 +79,7 @@ type FSharpGenerateSignatureBuilder() =
             if not attributeLists.IsEmpty then
                 let nodesToAdd = [
                     for attributeList in attributeLists do
-                        Whitespace(indentation) :> ITreeNode
+                        Whitespace(indentation) :> ITreeNode    // Todo: refactor to not add whitespace before anchor
                         attributeList :> ITreeNode
                         let last =
                             attributeList.NextTokens()
@@ -94,6 +94,22 @@ type FSharpGenerateSignatureBuilder() =
                 ]
                 addNodesBefore anchor nodesToAdd |> ignore
             else ()
+
+        let genAttributes (attributeLists: TreeNodeCollection<IAttributeList>) =
+            seq {
+                for attributeList in attributeLists do
+                    attributeList :> ITreeNode
+                    let last =
+                        attributeList.NextTokens()
+                        |> Seq.takeWhile (fun x -> isNewLine x || isWhitespaceOrComment x)
+                        |> Seq.tryLast
+                    match last with
+                    | Some l ->
+                        let treeRange = TreeRange(getNextSibling attributeList, l)
+                        if treeRange.ToTreeNodeCollection().Any(isNewLine) then
+                            NewLine(lineEnding) :> ITreeNode else Whitespace(1) :> ITreeNode
+                    | _ -> ()
+            }
 
         let rec createModuleMemberSig (indentation: int) (moduleDecl: IModuleLikeDeclaration) (moduleMember: IModuleMember) : IFSharpTreeNode =
             match moduleMember with
@@ -132,7 +148,8 @@ type FSharpGenerateSignatureBuilder() =
                     let indentForMembers = sigTypeDecl.Indent + moduleDecl.GetIndentSize()
                     let sigMembers =
                         typeDecl.TypeMembers
-                        |> Seq.choose (createMemberDeclaration indentForMembers >> Option.ofObj)
+                        |> Seq.map(createMemberDeclaration indentForMembers)
+                        |> Seq.filter(Seq.isEmpty >> not)
 
                     addXmlDocBlock sigTypeDecl.Indent sigTypeDecl typeDecl.XmlDocBlock
                     addAttributes sigTypeDecl.Indent typeDecl.AttributeLists sigTypeDecl.TypeKeyword
@@ -150,9 +167,9 @@ type FSharpGenerateSignatureBuilder() =
                             NewLine(lineEnding)
                             Whitespace(indentation + moduleDecl.GetIndentSize())
                             repr
-                            for sigMember in sigMembers do
+                            for sigMemberNodes in sigMembers do
                                 NewLine(lineEnding)
-                                sigMember
+                                yield! sigMemberNodes
                         ] |> ignore
                     | :? IStructRepresentation as repr ->
                         ModificationUtil.DeleteChildRange(sigTypeDecl.EqualsToken.NextSibling, sigTypeDecl.LastChild)
@@ -160,9 +177,9 @@ type FSharpGenerateSignatureBuilder() =
                             NewLine(lineEnding)
                             Whitespace(indentation + moduleDecl.GetIndentSize())
                             repr
-                            for sigMember in sigMembers do
+                            for sigMemberNodes in sigMembers do
                                 NewLine(lineEnding)
-                                sigMember
+                                yield! sigMemberNodes
                         ] |> ignore
                     | :? IDelegateRepresentation as repr ->
                         ModificationUtil.DeleteChildRange(sigTypeDecl.EqualsToken.NextSibling, sigTypeDecl.LastChild)
@@ -177,9 +194,10 @@ type FSharpGenerateSignatureBuilder() =
                             Whitespace(indentation + moduleDecl.GetIndentSize())
                             if isNotNull typeDecl.PrimaryConstructorDeclaration then
                                 yield! createPrimaryConstructorSignature (getName typeDecl) typeDecl.PrimaryConstructorDeclaration
-                            for sigMember in sigMembers do
+                                
+                            for sigMemberNodes in sigMembers do
                                 NewLine(lineEnding)
-                                sigMember
+                                yield! sigMemberNodes
                         ] |> ignore
                     | repr ->
                         // This pattern match should match the types we filtered out earlier for supportedTypeDeclarations
@@ -240,14 +258,15 @@ type FSharpGenerateSignatureBuilder() =
                     let indentForMembers = indentation + moduleDecl.GetIndentSize()
                     let sigMembers =
                         exceptionDeclaration.TypeMembers
-                        |> Seq.choose (createMemberDeclaration indentForMembers >> Option.ofObj)
+                        |> Seq.map(createMemberDeclaration indentForMembers)
+                        |> Seq.filter(Seq.isEmpty >> not)
 
                     ModificationUtil.DeleteChildRange(sigExceptionDeclaration.WithKeyword.NextSibling, sigExceptionDeclaration.LastChild)
 
                     addNodesAfter sigExceptionDeclaration.WithKeyword [
-                        for sigMember in sigMembers do
+                        for sigMemberNodes in sigMembers do
                             NewLine(lineEnding)
-                            sigMember
+                            yield! sigMemberNodes
                     ] |> ignore
 
                 addAttributes sigExceptionDeclaration.Indent sigExceptionDeclaration.AttributeLists sigExceptionDeclaration
@@ -278,7 +297,7 @@ type FSharpGenerateSignatureBuilder() =
 
             moduleSig
 
-        and createMemberDeclaration (indentation: int) (memberDecl: IFSharpTypeMemberDeclaration) : IFSharpTypeMemberDeclaration =
+        and createMemberDeclaration (indentation: int) (memberDecl: IFSharpTypeMemberDeclaration) : seq<ITreeNode> =
             match memberDecl with
             | :? IMemberDeclaration as memberDecl ->
                 let sourceString =
@@ -319,12 +338,22 @@ type FSharpGenerateSignatureBuilder() =
 
                 let typeMember = factory.CreateTypeMember(sourceString)
 
-                // Todo find better indentation approach
-                addNodeBefore typeMember.FirstChild (Whitespace(indentation))
-                addAttributes indentation memberDecl.AttributeLists typeMember.FirstChild
-                addXmlDocBlock indentation typeMember.FirstChild memberDecl.XmlDocBlock
-                typeMember
-            | _ -> null
+                let attributes = genAttributes memberDecl.AttributeLists
+                seq {
+                    if isNotNull memberDecl.XmlDocBlock then
+                        Whitespace(indentation)
+                        memberDecl.XmlDocBlock
+                        NewLine(lineEnding)
+                    for a in attributes do
+                        match a with
+                        | :? IAttributeList -> Whitespace(indentation)
+                        | _ -> ()
+                        a
+                    if Seq.isEmpty attributes || attributes |> Seq.last |> isNewLine then
+                        Whitespace(indentation)
+                    typeMember
+                }
+            | _ -> Seq.empty
 
         // Todo refactor to reuse existing code
         and createPrimaryConstructorSignature (typeName: string) (primaryConstructorDeclaration: IPrimaryConstructorDeclaration) : ITreeNode seq =
