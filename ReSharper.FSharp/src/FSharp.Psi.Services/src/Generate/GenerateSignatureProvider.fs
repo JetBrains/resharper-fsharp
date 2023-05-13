@@ -145,10 +145,9 @@ type FSharpGenerateSignatureBuilder() =
                     let sigTypeDecl = sigTypeDeclarationGroup.TypeDeclarations.[info.SignatureIdx] :?> IFSharpTypeDeclaration
                     if isNull sigTypeDecl then () else
 
-                    let indentForMembers = sigTypeDecl.Indent + moduleDecl.GetIndentSize()
                     let sigMembers =
                         typeDecl.TypeMembers
-                        |> Seq.map(createMemberDeclaration indentForMembers)
+                        |> Seq.map(createMemberDeclaration (indentation + moduleDecl.GetIndentSize()))
                         |> Seq.filter(Seq.isEmpty >> not)
 
                     addXmlDocBlock sigTypeDecl.Indent sigTypeDecl typeDecl.XmlDocBlock
@@ -337,8 +336,8 @@ type FSharpGenerateSignatureBuilder() =
                     sb.ToString()
 
                 let typeMember = factory.CreateTypeMember(sourceString)
-
                 let attributes = genAttributes memberDecl.AttributeLists
+
                 seq {
                     if isNotNull memberDecl.XmlDocBlock then
                         Whitespace(indentation)
