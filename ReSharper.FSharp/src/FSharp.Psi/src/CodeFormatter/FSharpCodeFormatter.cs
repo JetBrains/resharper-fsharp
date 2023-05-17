@@ -98,8 +98,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       return new TreeRange(firstElement, lastElement);
     }
 
-    public override void FormatInsertedNodes(ITreeNode nodeFirst, ITreeNode nodeLast, bool formatSurround) =>
-      FormatterImplHelper.FormatInsertedNodesHelper(this, nodeFirst, nodeLast, formatSurround);
+    public override void FormatInsertedNodes(ITreeNode nodeFirst, ITreeNode nodeLast, bool formatSurround, bool indentSurround = false) =>
+      FormatterImplHelper.FormatInsertedNodesHelper(this, nodeFirst, nodeLast, formatSurround, indentSurround);
 
     public override ITreeRange FormatInsertedRange(ITreeNode nodeFirst, ITreeNode nodeLast, ITreeRange origin) =>
       FormatterImplHelper.FormatInsertedRangeHelper(this, nodeFirst, nodeLast, origin, true);
