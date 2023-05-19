@@ -1,9 +1,9 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl
 
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.LiteralTextEscaper
+import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiLanguageInjectionHost
-import com.intellij.refactoring.suggested.endOffset
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.*
 
@@ -24,10 +24,11 @@ class FSharpInterpolatedStringLiteralExpressionImpl(type: FSharpElementType) :
   }
 
   override fun updateText(text: String): PsiLanguageInjectionHost {
-    FileDocumentManager.getInstance()
-      .getDocument(containingFile.virtualFile)
-      ?.replaceString(startOffset, endOffset, text)
-    return this
+    val dummyFile =
+      PsiFileFactory.getInstance(project).createFileFromText("dummy.fs", FSharpFileType, text) as FSharpFile
+
+    val newStringExpression = dummyFile.firstChild as FSharpInterpolatedStringLiteralExpressionImpl
+    return replace(newStringExpression) as PsiLanguageInjectionHost
   }
 
   override fun createLiteralTextEscaper(): LiteralTextEscaper<out PsiLanguageInjectionHost> =
