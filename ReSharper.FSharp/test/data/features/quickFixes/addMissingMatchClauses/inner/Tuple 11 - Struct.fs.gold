@@ -1,0 +1,8 @@
+﻿module Say
+
+match true, true with
+| struct (false, false) -> ()
+| true, true -> ()
+| true, false -> {selstart}failwith "todo"{selend}
+| false, true -> failwith "todo"
+| false, false -> failwith "todo"

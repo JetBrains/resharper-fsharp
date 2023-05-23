@@ -243,7 +243,7 @@ module MatchTest =
 
         // todo: add test with different lengths
         | (MatchTest.Tuple isStruct1, nodes1), (MatchTest.Tuple isStruct2, nodes2) ->
-            isStruct1 = isStruct2 &&
+            (isStruct2 || not isStruct1) &&
             List.forall2 matches nodes2 nodes1
 
         | (MatchTest.EmptyList, _), (MatchTest.EmptyList, _) -> true
@@ -444,10 +444,9 @@ module MatchNode =
                 let newPat = ModificationUtil.ReplaceChild(existingPattern, newPat)
                 ParenPatUtil.addParensIfNeeded newPat
 
-            let replaceTuplePat isStruct existingPattern nodes =
+            let replaceTuplePat existingPattern nodes =
                 let tupleItemsText = nodes |> List.map (fun _ -> "_") |> String.concat ", "
-                let tuplePatText = if isStruct then $"struct ({tupleItemsText})" else tupleItemsText
-                let tuplePat = createPattern tuplePatText
+                let tuplePat = createPattern tupleItemsText
                 let tuplePat = replaceWithPattern existingPattern tuplePat :?> ITuplePat
 
                 Seq.iter2 (bind context usedNames) tuplePat.Patterns nodes
@@ -487,8 +486,8 @@ module MatchNode =
                 let text = FSharpNamingService.mangleNameIfNecessary group.Names[index]
                 createPattern text |> replaceWithPattern oldPat |> ignore
 
-            | MatchTest.Tuple isStruct, nodes ->
-                replaceTuplePat isStruct oldPat nodes
+            | MatchTest.Tuple _, nodes ->
+                replaceTuplePat oldPat nodes
 
             | MatchTest.Union _, [{ Value = { Type = MatchType.UnionCase(unionCase, _) } } as casNode] ->
                 match node.Value.Type with
@@ -510,7 +509,7 @@ module MatchNode =
                     match nodes with
                     | [] -> ()
                     | [node] -> bind context usedNames paramsPat node
-                    | nodes -> replaceTuplePat false paramsPat nodes
+                    | nodes -> replaceTuplePat paramsPat nodes
                 | _ -> ()
 
             | MatchTest.Value value, _ when value.IsBoolean() ->
