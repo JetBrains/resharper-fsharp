@@ -2,6 +2,7 @@ using System;
 using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -101,7 +102,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private static bool CanBindTo(IDeclaredElement element) =>
       element.PresentationLanguage.Is<FSharpLanguage>() ||
 
-      AssemblyReaderShimModule.IsEnabled(element.GetPsiServices().SettingsStore) &&
+      element.GetSolution().GetComponent<IFcsAssemblyReaderShim>().IsEnabled &&
       AssemblyReaderShimModule.SupportedLanguages.Contains(element.PresentationLanguage);
 
     public override IReference BindTo(IDeclaredElement element, ISubstitution substitution)

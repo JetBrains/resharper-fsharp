@@ -4,9 +4,9 @@ open System
 open System.Linq
 open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.Application
-open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
+open JetBrains.ProjectModel
 open JetBrains.IDE.UI.Extensions.Validation
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -69,7 +69,7 @@ type FSharpAnonRecordFieldAtomicRename(declaredElement, newName) =
 
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpRenameHelper(namingService: FSharpNamingService, settingsStore: ISettingsStore) =
+type FSharpRenameHelper(namingService: FSharpNamingService) =
     inherit RenameHelperBase()
 
     override x.IsLanguageSupported = true
@@ -78,7 +78,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService, settingsStore: ISett
         // Assume the reference is resolved to prevent waiting for FCS type checks.
         newDeclaredElement.PresentationLanguage.Is<FSharpLanguage>() ||
 
-        AssemblyReaderShim.isEnabled settingsStore &&
+        newDeclaredElement.GetSolution().GetComponent<IFcsAssemblyReaderShim>().IsEnabled &&
         AssemblyReaderShim.supportedLanguages.Contains(newDeclaredElement.PresentationLanguage)
 
     override x.IsLocalRename(element: IDeclaredElement) =

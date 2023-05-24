@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
@@ -27,7 +28,7 @@ open JetBrains.Util
 type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer,
         fantomasHost: FantomasHost, dotnetToolsTracker: SolutionDotnetToolsTracker, notifications: UserNotifications,
         assemblyReaderShim: IFcsAssemblyReaderShim, projectProvider: IFcsProjectProvider,
-        psiModules: IPsiModules, projectModelViewHost: ProjectModelViewHost) =
+        psiModules: IPsiModules, projectModelViewHost: ProjectModelViewHost, fsOptionsProvider: FSharpOptionsProvider) =
 
     let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
 
@@ -112,6 +113,10 @@ Actions: {notification.AdditionalCommands
 ----------------------------------------------------
         """
 
+    let updateAssemblyReaderSettings _ =
+        fsOptionsProvider.UpdateAssemblyReaderSetting()
+        JetBrains.Core.Unit.Instance
+
     do
         let fsTestHost = solution.RdFSharpModel().FsharpTestHost
 
@@ -128,6 +133,7 @@ Actions: {notification.AdditionalCommands
         fsTestHost.GetCultureInfoAndSetNew.Set(getCultureInfoAndSetNew)
         fsTestHost.DumpFantomasRunOptions.Set(dumpFantomasRunOptions)
         fsTestHost.TerminateFantomasHost.Set(terminateFantomasHost)
+        fsTestHost.UpdateAssemblyReaderSettings.Set(updateAssemblyReaderSettings)
         dotnetToolsTracker.DotNetToolCache.Change.Advise(lifetime, fun _ -> fsTestHost.DotnetToolInvalidated())
 
         notifications.AllNotifications.AddRemove.Property.Change.Advise(lifetime, fun x ->

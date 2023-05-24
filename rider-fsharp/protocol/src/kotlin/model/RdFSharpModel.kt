@@ -59,6 +59,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
     call("dumpFcsProjectStamp", int, long)
     call("dumpFcsReferencedProjects", int, immutableList(string))
     call("dumpFcsModuleReader", void, string)
+    call("updateAssemblyReaderSettings", void, void)
   }
 
   init {

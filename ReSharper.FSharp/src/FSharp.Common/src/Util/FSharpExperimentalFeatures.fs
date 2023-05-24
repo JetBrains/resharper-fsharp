@@ -35,7 +35,7 @@ type FSharpExperimentalFeatures() =
         match feature with
         | ExperimentalFeature.AssemblyReaderShim ->
             let fsOptions = solution.GetComponent<FSharpOptionsProvider>()
-            fsOptions.NonFSharpProjectInMemoryReferences.Value
+            fsOptions.NonFSharpProjectInMemoryReferences
 
         | _ ->
 

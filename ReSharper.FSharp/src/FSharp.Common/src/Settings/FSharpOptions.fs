@@ -152,8 +152,13 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSc
 type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
 
-    member val NonFSharpProjectInMemoryReferences = base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences")
+    member val NonFSharpProjectInMemoryReferences =
+        base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences").Value
+        with get, set
 
+    member this.UpdateAssemblyReaderSetting() =
+        this.NonFSharpProjectInMemoryReferences <-
+            base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences").Value
 
 [<SolutionInstanceComponent>]
 type FSharpFantomasSettingsProvider(lifetime, solution, settings, settingsSchema) =

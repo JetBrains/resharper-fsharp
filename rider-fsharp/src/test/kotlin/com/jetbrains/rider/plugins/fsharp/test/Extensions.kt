@@ -8,6 +8,7 @@ import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.jetbrains.rdclient.protocol.IProtocolHost
 import com.jetbrains.rdclient.protocol.protocolHost
+import com.jetbrains.rdclient.util.idea.callSynchronously
 import com.jetbrains.rider.RiderEnvironment
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
@@ -52,8 +53,10 @@ fun BaseTestWithSolution.withDisabledOutOfProcessTypeProviders(function: () -> U
 
 fun BaseTestWithSolution.withNonFSharpProjectReferences(function: () -> Unit) {
   withSetting(project, "FSharp/FSharpOptions/NonFSharpProjectInMemoryReferences/@EntryValue", "true", "false") {
+    project.fcsHost.updateAssemblyReaderSettings.sync(Unit)
     function()
   }
+  project.fcsHost.updateAssemblyReaderSettings.sync(Unit)
 }
 
 fun withEditorConfig(project: Project, function: () -> Unit) {

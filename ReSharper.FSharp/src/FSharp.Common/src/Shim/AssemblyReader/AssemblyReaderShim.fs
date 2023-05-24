@@ -58,10 +58,6 @@ module AssemblyReaderShim =
         let extension = path.ExtensionNoDot
         equalsIgnoreCase "dll" extension || equalsIgnoreCase "exe" extension
 
-    [<CompiledName("IsEnabled")>]
-    let isEnabled settingsStore =
-        SettingsUtil.getValue<FSharpOptions, bool> settingsStore "NonFSharpProjectInMemoryAnalysis"
-
     [<CompiledName("SupportedLanguages")>]
     let supportedLanguages =
         [| CSharpLanguage.Instance :> PsiLanguageType
@@ -81,8 +77,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     let isEnabledForAssemblies = false
 
     let isEnabled () =
-        FSharpExperimentalFeatureCookie.IsEnabled(ExperimentalFeature.AssemblyReaderShim) ||
-        fsOptionsProvider.NonFSharpProjectInMemoryReferences.Value
+        fsOptionsProvider.NonFSharpProjectInMemoryReferences ||
+        FSharpExperimentalFeatureCookie.IsEnabled(ExperimentalFeature.AssemblyReaderShim)
 
     do
         if isEnabledForAssemblies then
