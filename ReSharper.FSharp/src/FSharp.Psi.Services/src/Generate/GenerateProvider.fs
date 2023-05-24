@@ -11,12 +11,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -293,6 +295,11 @@ type FSharpOverridingMembersBuilder() =
                 if diff > 0 then shiftWithWhitespaceBefore -diff unionRepr
                 null, null
 
+            | :? ITypeAbbreviationRepresentation as abbrRepr ->
+                let diff = origTypeReprIndent - desiredIndent
+                if diff > 0 then shiftWithWhitespaceBefore -diff abbrRepr
+                null, null
+
             | _ -> null, null
 
         let reindentRange additionalIndent (range: TreeRange) =
@@ -323,7 +330,13 @@ type FSharpOverridingMembersBuilder() =
         | :? IUnionRepresentation as unionRepr ->
             unionRepr.UnionCasesEnumerable
             |> Seq.tryHead
-            |> Option.iter EnumCaseLikeDeclarationUtil.addBarIfNeeded 
+            |> Option.iter EnumCaseLikeDeclarationUtil.addBarIfNeeded
+        | :? ITypeAbbreviationRepresentation as abbrRepr ->
+            if isNotNull abbrRepr.FirstChild then
+                addNodesBefore abbrRepr.FirstChild [
+                    FSharpTokenType.BAR.CreateLeafElement()
+                    Whitespace()
+                ] |> ignore
         | _ -> ()
 
         addNewLineBeforeReprIfNeeded typeDecl typeRepr
