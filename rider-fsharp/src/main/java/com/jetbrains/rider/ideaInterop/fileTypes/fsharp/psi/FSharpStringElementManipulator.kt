@@ -12,7 +12,7 @@ class FSharpStringElementManipulator : ElementManipulator<FSharpStringLiteralExp
 
   private fun escapeRegularString(str: String): String {
     val buffer = StringBuilder()
-    val strLength = str.length
+    val lastCharIndex = str.length - 1
     var isEscaped = false
     str.forEachIndexed { i, ch ->
       when (ch) {
@@ -22,7 +22,7 @@ class FSharpStringElementManipulator : ElementManipulator<FSharpStringLiteralExp
         '\n' -> buffer.append('\n')
         '\u000c' -> buffer.append("\\f")
         '\r' -> buffer.append("\\r")
-        '\\' -> buffer.append(if (!isEscaped && i == strLength - 1) "\\\\" else "\\")
+        '\\' -> buffer.append(if (!isEscaped && i == lastCharIndex) "\\\\" else "\\")
         else -> if (!StringUtil.isPrintableUnicode(ch)) {
           val hexCode: CharSequence = StringUtil.toUpperCase(Integer.toHexString(ch.code))
           buffer.append("\\u")
