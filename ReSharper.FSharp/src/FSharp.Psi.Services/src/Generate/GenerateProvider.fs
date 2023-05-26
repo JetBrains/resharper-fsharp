@@ -333,11 +333,10 @@ type FSharpOverridingMembersBuilder() =
         | :? ITypeAbbreviationRepresentation as abbrRepr when abbrRepr.CanBeUnionCase ->
             let factory = typeDecl.CreateElementFactory()
             let caseName = FSharpNamingService.mangleNameIfNecessary abbrRepr.AbbreviatedTypeOrUnionCase.SourceName
-            let declGroup = factory.CreateModuleMember($"type U = | {caseName}")
+            let declGroup = factory.CreateModuleMember($"type U = | {caseName}") :?> ITypeDeclarationGroup
             let typeDeclaration = declGroup.TypeDeclarations[0] :?> IFSharpTypeDeclaration
             let repr = typeDeclaration.TypeRepresentation
-            let nav = FSharpTypeDeclarationNavigator.GetByTypeRepresentation(abbrRepr)
-            let newRepr = nav.SetTypeRepresentation(repr)
+            let newRepr = typeDecl.SetTypeRepresentation(repr)
             if context.Anchor == abbrRepr then context.Anchor <- newRepr
         | _ -> ()
 
