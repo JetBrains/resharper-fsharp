@@ -19,7 +19,7 @@ Readers by module: 0
 3. Open F# file
 
 Readers by module: 1
-  CSharpProject
+  CSharpProject, IsValid: True
 Readers by path count: 1
 Dependencies to referencing modules:
   CSharpProject
@@ -55,7 +55,7 @@ Readers by module: 0
 7. Open F# file
 
 Readers by module: 1
-  CSharpProject
+  CSharpProject, IsValid: True
 Readers by path count: 1
 Dependencies to referencing modules:
   CSharpProject

@@ -2,7 +2,7 @@
 Init
 
 Readers by module: 1
-  CSharpProject
+  CSharpProject, IsValid: True
 Readers by path count: 1
 Dependencies to referencing modules:
   CSharpProject

@@ -341,11 +341,13 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             use cookie = ReadLockCookie.Create()
             use lock = FcsReadWriteLock.ReadCookie.Create()
 
+            if not (isEnabled ()) then "Shim is disabled" else
+
             let builder = StringBuilder()
 
             builder.AppendLine($"Readers by module: {assemblyReadersByModule.Count}") |> ignore
             for psiModule in assemblyReadersByModule.Keys do
-                builder.AppendLine($"  {psiModule.DisplayName}") |> ignore
+                builder.AppendLine($"  {psiModule.DisplayName}, IsValid: {psiModule.IsValid()}") |> ignore
 
             if assemblyReadersByPath.Count > 0 then
                 builder.AppendLine($"Readers by path count: {assemblyReadersByPath.Count}") |> ignore
@@ -412,7 +414,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         member this.RecordInvalidations with set value =
             recordInvalidations <- value
 
-        member this.MarkTypesDirty(psiModule) =
+        member this.MarkDirty(psiModule) =
             if not (isKnownModule psiModule) then () else
             dirtyTypesInModules.Add(psiModule, "") |> ignore 
 

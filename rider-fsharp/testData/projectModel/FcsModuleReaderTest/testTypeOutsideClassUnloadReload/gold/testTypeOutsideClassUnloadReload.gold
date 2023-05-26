@@ -14,7 +14,7 @@ Readers by module: 0
 2. Open F# file
 
 Readers by module: 1
-  CSharpProject
+  CSharpProject, IsValid: True
 Readers by path count: 1
 Dependencies to referencing modules:
   CSharpProject
@@ -26,7 +26,7 @@ Invalidations since last dump:
 3. Type inside C# file
 
 Readers by module: 1
-  CSharpProject
+  CSharpProject, IsValid: True
 Readers by path count: 1
 Dependencies to referencing modules:
   CSharpProject
@@ -40,7 +40,7 @@ Dirty types in readers:
 4. Open F# file
 
 Readers by module: 1
-  CSharpProject
+  CSharpProject, IsValid: True
 Readers by path count: 1
 Dependencies to referencing modules:
   CSharpProject

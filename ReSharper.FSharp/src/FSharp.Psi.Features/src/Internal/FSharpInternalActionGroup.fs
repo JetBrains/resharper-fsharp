@@ -9,6 +9,7 @@ open JetBrains.DocumentModel.DataContext
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Plugins.FSharp.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -47,8 +48,23 @@ type DumpCurrentFcsProjectAction() =
                     match fcsProjectProvider.GetFcsProject(psiModule) with
                     | Some fcsProject -> writer.WriteLine(fcsProject.TestDump(writer))
                     | _ -> ())
-            
-            
+
+
+[<Action("FSharp_Internal_DumpFcsAssemblyReaderShim", "Dump FCS assembly reader shim")>]
+type DumpFcsAssemblyReaderShimAction() =
+    interface IExecutableAction with
+        member this.Update(context, _, _) =
+            isNotNull (context.GetData(ProjectModelDataConstants.SOLUTION))
+
+        member this.Execute(context, _) =
+            let solution = context.GetData(ProjectModelDataConstants.SOLUTION)
+            let assemblyReaderShim = solution.GetComponent<IFcsAssemblyReaderShim>()
+
+            Dumper.DumpToNotepad(fun writer ->
+                writer.WriteLine(assemblyReaderShim.TestDump)
+            )
+
+
 [<Action("FSharp_Internal_DumpCurrentFile", "Dump current file")>]
 type DumpCurrentFileAction() =
 
@@ -62,7 +78,7 @@ type DumpCurrentFileAction() =
 
             let sourceFile = context.GetData(PsiDataConstants.SOURCE_FILE)
             let file = if isNull sourceFile then null else sourceFile.GetPrimaryPsiFile()
-            
+
             if isNull file then () else
             Dumper.DumpToNotepad(fun writer ->
                 let treeNode = file :> ITreeNode
@@ -74,6 +90,7 @@ type DumpCurrentFileAction() =
 type FSharpInternalActionGroup(
         _dumpFcsProjectsAction: DumpFcsProjectsAction,
         _dumpCurrentFcsProjectAction: DumpCurrentFcsProjectAction,
+        _dumpFcsAssemblyReaderShimAction: DumpFcsAssemblyReaderShimAction,
         _dumpCurrentFileAction: DumpCurrentFileAction) =
     interface IAction
     interface IInsertLast<IntoInternalMenu>
