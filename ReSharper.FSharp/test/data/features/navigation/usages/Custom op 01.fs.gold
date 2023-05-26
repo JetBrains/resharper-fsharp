@@ -1,0 +1,14 @@
+﻿## ShowUsagesProvider activity:
+  Immediate result:
+    TO: [O] |create| "" 1 RANGE: (176,182) @ Custom op 01.fs
+    Navigation result:
+      opened file: Custom op 01.fs
+      ------------------
+
+      FooBuilder() {
+          |CARET|create "" 1
+      } |> ignore
+
+      ------------------
+
+

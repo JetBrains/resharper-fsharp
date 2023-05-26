@@ -1,7 +1,17 @@
 FSharpFile
-  FSharpStringLiteralExpression
-    PsiElement(STRING)('"123"')
-  PsiWhiteSpace(' ')
-  PsiElement(PLUS)('+')
-  PsiWhiteSpace(' ')
-  PsiElement(IDENT)('x')
+  FSharpExpression
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')
+    PsiWhiteSpace(' ')
+    PsiElement(PLUS)('+')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENT)('x')
+    PsiWhiteSpace(' ')
+    PsiElement(PLUS)('+')
+    PsiWhiteSpace(' ')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"123"')
+    PsiWhiteSpace(' ')
+    PsiElement(PLUS)('+')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENT)('y')

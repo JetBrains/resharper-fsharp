@@ -384,7 +384,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (typeElement is FSharpCompiledModule compiledModule)
         return compiledModule.SourceName;
 
-      if (typeElement.GetAttributeFirstArgValue(FSharpPredefinedType.SourceNameAttrTypeName) is string sourceName &&
+      if (typeElement.GetFirstArgValue(FSharpPredefinedType.SourceNameAttrTypeName) is string sourceName &&
           sourceName != SharedImplUtil.MISSING_DECLARATION_NAME)
         return sourceName;
 

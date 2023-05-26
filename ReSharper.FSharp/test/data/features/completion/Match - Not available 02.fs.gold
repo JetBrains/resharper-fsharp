@@ -2862,6 +2862,7 @@ sbyte (in Microsoft.FSharp.Core)
 second (in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
 seq
 set
+sig
 sign
 sin
 single

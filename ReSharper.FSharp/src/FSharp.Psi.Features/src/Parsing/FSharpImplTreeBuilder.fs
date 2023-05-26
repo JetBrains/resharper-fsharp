@@ -1294,19 +1294,19 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         x.PushRange(fieldsRange, ElementType.RECORD_FIELD_BINDING_LIST)
         x.PushStepList(fields, recordFieldBindingListProcessor)
 
-    member x.ProcessAnonRecordFieldBindingList(fields: (Ident * range option * SynExpr) list) =
+    member x.ProcessAnonRecordFieldBindingList(fields: (SynLongIdent * range option * SynExpr) list) =
         let fieldsRange =
             match fields.Head, List.last fields with
-            | (id, _, _), (_, _, value) -> Range.unionRanges id.idRange value.Range
+            | (lid, _, _), (_, _, value) -> Range.unionRanges lid.Range value.Range
 
         x.PushRange(fieldsRange, ElementType.RECORD_FIELD_BINDING_LIST)
         x.PushStepList(fields, anonRecordFieldBindingListProcessor)
 
-    member x.ProcessAnonRecordFieldBinding(IdentRange idRange, _, (ExprRange range as expr)) =
+    member x.ProcessAnonRecordFieldBinding(lid: SynLongIdent, _, (ExprRange range as expr)) =
         // Start node at id range, end at expr range.
-        let mark = x.Mark(idRange)
+        let mark = x.Mark(lid.Range)
         x.PushRangeForMark(range, mark, ElementType.RECORD_FIELD_BINDING)
-        x.MarkAndDone(idRange, ElementType.EXPRESSION_REFERENCE_NAME)
+        x.MarkAndDone(lid.Range, ElementType.EXPRESSION_REFERENCE_NAME)
         x.ProcessExpression(expr)
 
     member x.ProcessRecordFieldBinding(SynExprRecordField((lid, _), equalsRange, expr, blockSep)) =
@@ -1478,7 +1478,7 @@ type RecordBindingListRepresentationProcessor() =
 
 
 type AnonRecordBindingListRepresentationProcessor() =
-    inherit StepProcessorBase<(Ident * range option * SynExpr) list>()
+    inherit StepProcessorBase<(SynLongIdent * range option * SynExpr) list>()
 
     override x.Process(fields, builder) =
         builder.ProcessAnonRecordFieldBindingList(fields)
@@ -1513,7 +1513,7 @@ type RecordFieldBindingListProcessor() =
 
 
 type AnonRecordFieldBindingListProcessor() =
-    inherit StepListProcessorBase<Ident * range option * SynExpr>()
+    inherit StepListProcessorBase<SynLongIdent * range option * SynExpr>()
 
     override x.Process(field, builder) =
         builder.ProcessAnonRecordFieldBinding(field)

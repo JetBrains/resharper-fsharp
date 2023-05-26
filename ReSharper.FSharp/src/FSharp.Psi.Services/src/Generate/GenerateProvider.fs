@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 
+open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Progress
@@ -20,7 +21,6 @@ open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpGeneratorContextFactory() =
@@ -70,6 +70,13 @@ type FSharpGeneratorElement(element, mfvInstance: FcsMfvInstance, addTypes) =
     override x.ToString() = element.ToString()
 
 
+[<Flags>]
+type PropertyOverrideState =
+    | None = 0
+    | Getter = 1
+    | Setter = 2
+
+
 [<GeneratorElementProvider(GeneratorStandardKinds.Overrides, typeof<FSharpLanguage>)>]
 [<GeneratorElementProvider(GeneratorStandardKinds.MissingMembers, typeof<FSharpLanguage>)>]
 type FSharpOverridableMembersProvider() =
@@ -113,7 +120,7 @@ type FSharpOverridableMembersProvider() =
             | Some baseType when baseType.HasTypeDefinition -> loop [] baseType
             | _ -> []
 
-        let ownMembersIds =
+        let ownMembersDescriptors =
             typeElement.GetMembers()
             |> Seq.collect (fun typeMember ->
                 if typeMember :? IFSharpGeneratedElement then Seq.empty else
@@ -140,7 +147,39 @@ type FSharpOverridableMembersProvider() =
                     |> Seq.toList
                 fcsEntityInstance, mfvInstances)
 
-        let alreadyOverriden = HashSet()
+        let alreadyOverriden = Dictionary<OverridableMemberInstance, PropertyOverrideState>()
+
+        let addOverrides (memberInstance: OverridableMemberInstance) =
+            for overridableMemberInstance in OverridableMemberImpl.GetImmediateOverride(memberInstance) do
+                let state = 
+                    match memberInstance.Member with
+                    | :? IProperty as prop ->
+                        (if prop.IsReadable then PropertyOverrideState.Getter else PropertyOverrideState.None) |||
+                        (if prop.IsReadable then PropertyOverrideState.Getter else PropertyOverrideState.None)
+                    | _ -> PropertyOverrideState.None
+
+                let state = 
+                    match alreadyOverriden.TryGetValue(overridableMemberInstance) with
+                    | true, existingState -> existingState ||| state
+                    | _ -> state
+
+                alreadyOverriden[overridableMemberInstance] <- state
+
+        let isOverridden (memberInstance: OverridableMemberInstance) =
+            match alreadyOverriden.TryGetValue(memberInstance) with
+            | false, _ -> false
+            | true, state ->
+
+            let prop = memberInstance.Member.As<IProperty>()
+            isNull prop ||
+
+            (not prop.IsReadable || (state &&& PropertyOverrideState.Getter <> enum 0)) &&
+            (not prop.IsWritable || (state &&& PropertyOverrideState.Setter <> enum 0))
+
+        for KeyValue(_, memberInstance) in memberInstances do
+            let fsTypeMember = memberInstance.Member.As<IFSharpTypeMember>()
+            if isNull fsTypeMember || fsTypeMember.IsVisibleFromFSharp then
+                addOverrides memberInstance
 
         let overridableMemberInstances =
             baseFcsMembers |> List.collect (fun (_, mfvInstances) ->
@@ -153,15 +192,18 @@ type FSharpOverridableMembersProvider() =
                         | null -> mfv.GetXmlDocId()
                         | typeMember -> XMLDocUtil.GetTypeMemberXmlDocId(typeMember, typeMember.ShortName)
 
-                    if ownMembersIds.Contains(xmlDocId) then None else
+                    if ownMembersDescriptors.Contains(xmlDocId) then None else
 
                     let mutable memberInstance = Unchecked.defaultof<_>
                     if not (memberInstances.TryGetValue(xmlDocId, &memberInstance)) then None else
-                    if alreadyOverriden.Contains(memberInstance) then None else
 
-                    OverridableMemberImpl.GetImmediateOverride(memberInstance) |> alreadyOverriden.AddRange
-                    Some (memberInstance.Member, mfvInstance))
-                |> Seq.toList)
+                    if isOverridden memberInstance then None else
+
+                    addOverrides memberInstance
+                    Some (memberInstance.Member, mfvInstance)
+                )
+                |> Seq.toList
+            )
 
         let needsTypesAnnotations =
             overridableMemberInstances
@@ -182,7 +224,7 @@ type FSharpOverridableMembersProvider() =
                   prop.Setter :> IOverridableMember, { mfvInstance with Mfv = mfv.SetterMethod } ])
         |> Seq.map (fun (m, mfvInstance) ->
             FSharpGeneratorElement(m, mfvInstance, needsTypesAnnotations.Contains(mfvInstance.Mfv)))
-        |> Seq.filter (fun i -> not (ownMembersIds.Contains(i.TestDescriptor)))
+        |> Seq.filter (fun i -> not (ownMembersDescriptors.Contains(i.TestDescriptor)))
         |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
         |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)
         |> Seq.iter context.ProvidedElements.Add

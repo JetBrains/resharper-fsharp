@@ -1,0 +1,10 @@
+﻿[<AbstractClass>]
+type A<'T>() =
+    abstract M1: 'T list -> unit
+    abstract M2: int -> unit
+
+type B() =
+    inherit A<int>()
+
+    override this.M1 _ = ()
+    override this.M2(var0) = {selstart}failwith "todo"{selend}

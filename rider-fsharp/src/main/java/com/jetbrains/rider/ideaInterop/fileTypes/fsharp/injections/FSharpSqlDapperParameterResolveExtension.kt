@@ -1,0 +1,6 @@
+package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections
+
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
+import com.jetbrains.rider.plugins.appender.database.common.ClrLanguageSqlDapperParameterResolveExtension
+
+class FSharpSqlDapperParameterResolveExtension : ClrLanguageSqlDapperParameterResolveExtension(FSharpLanguage)

@@ -76,15 +76,6 @@ type FSharpRegexNodeProvider() =
         let isRegexActivePat = isNotNull parametersOwnerPat && parametersOwnerPat.Identifier.GetSourceName() = "Regex"
         if isRegexActivePat then ValueSome RegexOptions.None else ValueNone
 
-    let checkForRegexTypeProvider (expr: IConstExpr) =
-        let providedTypeName =
-            ExprStaticConstantTypeUsageNavigator.GetByExpression(expr)
-            |> PrefixAppTypeArgumentListNavigator.GetByTypeUsage
-            |> TypeReferenceNameNavigator.GetByTypeArgumentList
-
-        let isRegexProvider = isNotNull providedTypeName && providedTypeName.Identifier.GetSourceName() = "Regex"
-        if isRegexProvider then ValueSome RegexOptions.None else ValueNone
-
     interface IInjectionNodeProvider with
         override _.Check(node, _, data) =
             data <- null
@@ -96,7 +87,10 @@ type FSharpRegexNodeProvider() =
                 | :? ILiteralExpr as expr ->
                     let checkAttributesResult = checkForAttributes expr
                     if checkAttributesResult.IsSome then checkAttributesResult else
-                    checkForRegexTypeProvider expr
+
+                    match tryGetTypeProviderName expr with
+                    | ValueSome "Regex" -> ValueSome RegexOptions.None
+                    | _ -> ValueNone
 
                 | :? ILiteralPat as pat -> checkForRegexActivePattern pat
                 | _ -> ValueNone

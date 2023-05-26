@@ -182,6 +182,7 @@ private
 public
 rec
 return
+sig
 static
 struct
 then

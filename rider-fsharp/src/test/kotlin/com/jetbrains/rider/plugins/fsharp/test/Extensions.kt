@@ -51,7 +51,7 @@ fun BaseTestWithSolution.withDisabledOutOfProcessTypeProviders(function: () -> U
 }
 
 fun BaseTestWithSolution.withNonFSharpProjectReferences(function: () -> Unit) {
-  withSetting(project, "FSharp/FSharpOptions/NonFSharpProjectInMemoryAnalysis/@EntryValue", "true", "false") {
+  withSetting(project, "FSharp/FSharpOptions/NonFSharpProjectInMemoryReferences/@EntryValue", "true", "false") {
     function()
   }
 }

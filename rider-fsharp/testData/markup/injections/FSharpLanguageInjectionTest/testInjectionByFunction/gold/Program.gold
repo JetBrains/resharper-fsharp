@@ -1,0 +1,22 @@
+module Test
+
+type Sql1 = SqlCommandProvider<"<frontend:INJECTED_FRAGMENT>select</frontend:INJECTED_FRAGMENT>">
+type Json = JsonProvider<"<frontend:INJECTED_FRAGMENT>{ 1 }</frontend:INJECTED_FRAGMENT>">
+type Json1 = JsonProvider<"data.txt">
+type Xml = XmlProvider<"<frontend:INJECTED_FRAGMENT><xml/></frontend:INJECTED_FRAGMENT>">
+type Xml1 = XmlProvider<"data.txt">
+
+let _ =
+    css "<frontend:INJECTED_FRAGMENT>.body {}</frontend:INJECTED_FRAGMENT>"
+    html "<frontend:INJECTED_FRAGMENT><head><title>1</title></head></frontend:INJECTED_FRAGMENT>"
+    json "<frontend:INJECTED_FRAGMENT>{ field: 1 }</frontend:INJECTED_FRAGMENT>"
+    js "<frontend:INJECTED_FRAGMENT>console.log</frontend:INJECTED_FRAGMENT>"
+    javascript "<frontend:INJECTED_FRAGMENT>console.log</frontend:INJECTED_FRAGMENT>"
+    jsx "<frontend:INJECTED_FRAGMENT>console.log</frontend:INJECTED_FRAGMENT>"
+    tsx "<frontend:INJECTED_FRAGMENT>console.log</frontend:INJECTED_FRAGMENT>"
+    f "123"
+
+css $"<frontend:INJECTED_FRAGMENT>.body </frontend:INJECTED_FRAGMENT>{123}"
+css $@"<frontend:INJECTED_FRAGMENT>.body </frontend:INJECTED_FRAGMENT>{123}"
+css """<frontend:INJECTED_FRAGMENT>.body </frontend:INJECTED_FRAGMENT>{123}"""
+css ($"<frontend:INJECTED_FRAGMENT>.body </frontend:INJECTED_FRAGMENT>{123}")

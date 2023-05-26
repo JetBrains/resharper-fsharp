@@ -1,28 +1,38 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl
 
 import com.intellij.psi.LiteralTextEscaper
+import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiLanguageInjectionHost
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpElementType
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpression
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpressionPart
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.*
 
 class FSharpInterpolatedStringLiteralExpressionImpl(type: FSharpElementType) :
   FSharpStringLiteralExpressionBase(type),
   FSharpInterpolatedStringLiteralExpression {
 
   override fun isValidHost(): Boolean {
-    return true //TODO
+    val firstChild = firstChild
+    val lastChild = lastChild
+    return firstChild is FSharpInterpolatedStringLiteralExpressionPart && (
+      (firstChild.tokenType in FSharpTokenType.INTERPOLATED_STRINGS_WITHOUT_INSERTIONS)
+        ||
+        (firstChild.tokenType in FSharpTokenType.INTERPOLATED_STRING_STARTS &&
+          lastChild is FSharpInterpolatedStringLiteralExpressionPart &&
+          lastChild.tokenType in FSharpTokenType.INTERPOLATED_STRING_ENDS)
+      )
   }
 
-  override fun updateText(newText: String): PsiLanguageInjectionHost {
-    return this //TODO
+  override fun updateText(text: String): PsiLanguageInjectionHost {
+    val dummyFile =
+      PsiFileFactory.getInstance(project).createFileFromText("dummy.fs", FSharpFileType, text) as FSharpFile
+
+    val newStringExpression = dummyFile.firstChild as FSharpInterpolatedStringLiteralExpressionImpl
+    return replace(newStringExpression) as PsiLanguageInjectionHost
   }
 
-  override fun createLiteralTextEscaper(): LiteralTextEscaper<out PsiLanguageInjectionHost> {
-    return LiteralTextEscaper.createSimple(this) //TODO
-  }
+  override fun createLiteralTextEscaper(): LiteralTextEscaper<out PsiLanguageInjectionHost> =
+    this.createSuitableLiteralTextEscaper()
 
   override val literalType: FSharpStringLiteralType
     get() =

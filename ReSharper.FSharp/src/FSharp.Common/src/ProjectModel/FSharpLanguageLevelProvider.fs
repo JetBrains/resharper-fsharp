@@ -228,3 +228,5 @@ type FSharpLanguageSpecificItemsProvider() =
         |> Seq.filter (fun version -> projectProperty.IsAvailable(version, project, targetFrameworkId))
         |> Seq.append specialVersions
         |> Seq.toList :> _
+
+    override this.CreateLanguageLevelComboboxForInspectionTab(_, _) = null

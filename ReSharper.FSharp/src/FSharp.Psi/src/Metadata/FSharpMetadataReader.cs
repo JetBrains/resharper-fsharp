@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       if (metadataResources.IsEmpty() && FSharpAssemblyUtil.IsFSharpCore(assembly.AssemblyName))
       {
         using var stream = FSharpAssemblyUtil.GetFSharpCoreSigdataPath(assembly).OpenFileForReading();
-        ReadMetadata(stream, metadata);
+        ReadMetadata(stream, metadata, assembly);
       }
       else
       {
@@ -52,16 +52,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
           using var stream = metadataResource.CreateResourceReader();
           using var decompressedStream = isCompressed ? new DeflateStream(stream, CompressionMode.Decompress) : stream;
 
-          ReadMetadata(decompressedStream, metadata);
+          ReadMetadata(decompressedStream, metadata, assembly);
         }
       }
 
       return metadata;
     }
 
-    private static void ReadMetadata(Stream stream, FSharpMetadata metadata)
+    private static void ReadMetadata(Stream stream, FSharpMetadata metadata, IMetadataAssembly metadataAssembly)
     {
-      using var reader = new FSharpMetadataStreamReader(stream, Encoding.UTF8) { Metadata = metadata };
+      using var reader = new FSharpMetadataStreamReader(stream, Encoding.UTF8, metadataAssembly) { Metadata = metadata };
       reader.ReadMetadata();
     }
   }
@@ -70,8 +70,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
   internal class FSharpMetadataStreamReader : BinaryReader
   {
-    public FSharpMetadataStreamReader([NotNull] Stream input, [NotNull] Encoding encoding) : base(input, encoding)
+    private readonly IMetadataAssembly myMetadataAssembly;
+
+    public FSharpMetadataStreamReader([NotNull] Stream input, [NotNull] Encoding encoding,
+      IMetadataAssembly metadataAssembly) : base(input, encoding)
     {
+      myMetadataAssembly = metadataAssembly;
     }
 
     internal FSharpMetadata Metadata { get; set; }
@@ -87,8 +91,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private static readonly Reader<object> ReadValueRefFunc = reader => reader.ReadValueRef();
     private static readonly Reader<Range> ReadRangeFunc = reader => reader.ReadRange();
     private static readonly Reader<string> ReadUniqueStringFunc = reader => reader.ReadUniqueString();
-
-    private static readonly Func<bool, object> IgnoreBoolFunc = _ => null;
 
     private string[] myStrings;
     private int[][] myPublicPaths;
@@ -266,7 +268,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         {
           entity.Representation =
             FSharpCompiledTypeRepresentation.NewModule(entity.EntityKind == EntityKind.ModuleWithSuffix);
-          Metadata.AddEntity(entity);
+          Metadata.AddEntity(entity, myMetadataAssembly);
         }
       }
       else
@@ -274,7 +276,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         if (typeAbbreviation == null)
         {
           entity.Representation = typeRepresentation;
-          Metadata.AddEntity(entity);
+          Metadata.AddEntity(entity, myMetadataAssembly);
         }
       }
 

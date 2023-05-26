@@ -34,27 +34,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override HybridCollection<string> GetAllNames() =>
       new(RecordExpr.FieldBindings.Select(b => b.ReferenceName?.ShortName).WhereNotNull());
 
-    public override TreeOffset SymbolOffset
-    {
-      get
-      {
-        foreach (var binding in RecordExpr.FieldBindings)
-          if (binding.ReferenceName?.Identifier is ITokenNode token)
-            return token.GetTreeStartOffset();
-
-        return TreeOffset.InvalidOffset;
-      }
-    }
-
     // todo: unify with FSharpPatternUtil impl
     private static IFSharpPattern IgnoreInnerAsPatsToRight(IFSharpPattern pattern) => 
       pattern is IAsPat asPat ? IgnoreInnerAsPatsToRight(asPat.RightPattern) : pattern;
 
     public override FSharpSymbol GetFcsSymbol()
     {
-      var symbolUse = GetSymbolUse();
-      if (symbolUse?.Symbol is FSharpField field)
-        return field.DeclaringEntity?.Value;
+      foreach (var fieldBinding in RecordExpr.FieldBindings)
+        if (fieldBinding.ReferenceName.Reference.GetFcsSymbol() is FSharpField field)
+          return field.DeclaringEntity?.Value;
 
       // todo: cover other contexts
       var sequentialExpr = SequentialExprNavigator.GetByExpression(RecordExpr.IgnoreParentParens());

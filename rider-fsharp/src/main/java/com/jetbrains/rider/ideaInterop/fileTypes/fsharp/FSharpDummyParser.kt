@@ -5,11 +5,8 @@ import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiParser
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.*
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpElementTypes
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.parse
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.parseEvenEmpty
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.scanOrRollback
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.whileMakingProgress
 
 class FSharpDummyParser : PsiParser {
   override fun parse(root: IElementType, builder: PsiBuilder): ASTNode {
@@ -72,11 +69,16 @@ class FSharpDummyParser : PsiParser {
     //  secondStringOperandIndent - afterPlusTokenIndent > 1
     //) return false
 
-    return parseStringExpression()
+    return parseConcatenationOperand()
   }
 
   private fun PsiBuilder.parseStringExpression() =
     parseInterpolatedStringExpression() || parseAnyStringExpression()
+
+  // We want to support concatenation with simple identifiers, similar to C#
+  // for example, "select * from table where columnId = " + columnId
+  private fun PsiBuilder.parseConcatenationOperand() =
+    tryEatAnyToken(FSharpTokenType.IDENT) || parseStringExpression()
 
   private fun PsiBuilder.parseAnyStringExpression() =
     if (tokenType !in FSharpTokenType.ALL_STRINGS) false

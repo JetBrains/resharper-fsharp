@@ -2,10 +2,12 @@ package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl
 
 import com.intellij.psi.LiteralTextEscaper
 import com.intellij.psi.PsiLanguageInjectionHost
+import com.intellij.psi.impl.source.tree.LeafElement
 import com.intellij.psi.util.elementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.createSuitableLiteralTextEscaper
 
 class FSharpStringLiteralExpressionImpl(type: FSharpElementType) : FSharpStringLiteralExpressionBase(type) {
   override fun isValidHost(): Boolean {
@@ -20,12 +22,14 @@ class FSharpStringLiteralExpressionImpl(type: FSharpElementType) : FSharpStringL
   }
 
   override fun updateText(newText: String): PsiLanguageInjectionHost {
-    return this //TODO
+    val valueNode = firstChild
+    assert(valueNode is LeafElement)
+    (valueNode as LeafElement).replaceWithText(newText)
+    return this
   }
 
-  override fun createLiteralTextEscaper(): LiteralTextEscaper<out PsiLanguageInjectionHost> {
-    return LiteralTextEscaper.createSimple(this) //TODO
-  }
+  override fun createLiteralTextEscaper(): LiteralTextEscaper<out PsiLanguageInjectionHost> =
+    this.createSuitableLiteralTextEscaper()
 
   override val literalType: FSharpStringLiteralType
     get() {

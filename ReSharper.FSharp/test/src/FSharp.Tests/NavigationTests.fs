@@ -38,6 +38,8 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Compiled active pattern case``() = x.DoNamedTest()
     [<Test>] member x.``Compiled union case``() = x.DoNamedTest()
 
+    [<Test>] member x.``Custom op 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Record Ctor 01 - Source``() = x.DoNamedTest()
 
     [<TestReferences("../../../assemblies/FSharpRecord.dll")>]
