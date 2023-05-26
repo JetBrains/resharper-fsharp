@@ -332,9 +332,10 @@ type FSharpOverridingMembersBuilder() =
             |> Option.iter EnumCaseLikeDeclarationUtil.addBarIfNeeded
         | :? ITypeAbbreviationRepresentation as abbrRepr when abbrRepr.CanBeUnionCase ->
             let factory = typeDecl.CreateElementFactory()
-            let declGroup = factory.CreateModuleMember($"type U = | {abbrRepr.AbbreviatedTypeOrUnionCase.DeclaredName}")
+            let caseName = FSharpNamingService.mangleNameIfNecessary abbrRepr.AbbreviatedTypeOrUnionCase.SourceName
+            let declGroup = factory.CreateModuleMember($"type U = | {caseName}")
             let typeDeclaration = declGroup.FirstChild.As<IFSharpTypeDeclaration>()
-            let repr = typeDeclaration.TypeRepresentation.As<IUnionRepresentation>()
+            let repr = typeDeclaration.TypeRepresentation
             let nav = FSharpTypeDeclarationNavigator.GetByTypeRepresentation(abbrRepr)
             let newRepr = nav.SetTypeRepresentation(repr)
             if context.Anchor == abbrRepr then context.Anchor <- newRepr
