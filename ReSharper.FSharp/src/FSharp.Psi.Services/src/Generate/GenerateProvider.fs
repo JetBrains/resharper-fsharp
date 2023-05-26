@@ -334,7 +334,7 @@ type FSharpOverridingMembersBuilder() =
             let factory = typeDecl.CreateElementFactory()
             let caseName = FSharpNamingService.mangleNameIfNecessary abbrRepr.AbbreviatedTypeOrUnionCase.SourceName
             let declGroup = factory.CreateModuleMember($"type U = | {caseName}")
-            let typeDeclaration = declGroup.FirstChild.As<IFSharpTypeDeclaration>()
+            let typeDeclaration = declGroup.TypeDeclarations[0] :?> IFSharpTypeDeclaration
             let repr = typeDeclaration.TypeRepresentation
             let nav = FSharpTypeDeclarationNavigator.GetByTypeRepresentation(abbrRepr)
             let newRepr = nav.SetTypeRepresentation(repr)
