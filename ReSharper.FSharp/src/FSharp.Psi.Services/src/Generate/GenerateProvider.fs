@@ -324,21 +324,23 @@ type FSharpOverridingMembersBuilder() =
         use disableFormatter = new DisableCodeFormatter()
 
         let typeDecl = context.Root :?> IFSharpTypeDeclaration
-        let typeRepr = typeDecl.TypeRepresentation
 
-        match typeRepr with
+        match typeDecl.TypeRepresentation with
         | :? IUnionRepresentation as unionRepr ->
             unionRepr.UnionCasesEnumerable
             |> Seq.tryHead
             |> Option.iter EnumCaseLikeDeclarationUtil.addBarIfNeeded
-        | :? ITypeAbbreviationRepresentation as abbrRepr ->
-            if isNotNull abbrRepr.FirstChild then
-                addNodesBefore abbrRepr.FirstChild [
-                    FSharpTokenType.BAR.CreateLeafElement()
-                    Whitespace()
-                ] |> ignore
+        | :? ITypeAbbreviationRepresentation as abbrRepr when abbrRepr.CanBeUnionCase ->
+            let factory = typeDecl.CreateElementFactory()
+            let declGroup = factory.CreateModuleMember($"type U = | {abbrRepr.AbbreviatedTypeOrUnionCase.DeclaredName}")
+            let typeDeclaration = declGroup.FirstChild.As<IFSharpTypeDeclaration>()
+            let repr = typeDeclaration.TypeRepresentation.As<IUnionRepresentation>()
+            let nav = FSharpTypeDeclarationNavigator.GetByTypeRepresentation(abbrRepr)
+            let newRepr = nav.SetTypeRepresentation(repr)
+            if context.Anchor == abbrRepr then context.Anchor <- newRepr
         | _ -> ()
 
+        let typeRepr = typeDecl.TypeRepresentation
         addNewLineBeforeReprIfNeeded typeDecl typeRepr
 
         let anchor: ITreeNode =
