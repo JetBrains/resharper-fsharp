@@ -290,14 +290,10 @@ type FSharpOverridingMembersBuilder() =
                 normalizeReprEnd recordRepr.LeftBrace recordRepr.RightBrace
                 recordRepr.LeftBrace, recordRepr.RightBrace
 
-            | :? IUnionRepresentation as unionRepr ->
+            | :? IUnionRepresentation
+            | :? ITypeAbbreviationRepresentation as typeRepr ->
                 let diff = origTypeReprIndent - desiredIndent
-                if diff > 0 then shiftWithWhitespaceBefore -diff unionRepr
-                null, null
-
-            | :? ITypeAbbreviationRepresentation as abbrRepr ->
-                let diff = origTypeReprIndent - desiredIndent
-                if diff > 0 then shiftWithWhitespaceBefore -diff abbrRepr
+                if diff > 0 then shiftWithWhitespaceBefore -diff typeRepr
                 null, null
 
             | _ -> null, null
