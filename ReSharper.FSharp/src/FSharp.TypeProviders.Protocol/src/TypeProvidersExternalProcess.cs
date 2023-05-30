@@ -116,7 +116,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     protected override bool Shutdown(RdFSharpTypeProvidersModel model)
     {
-      model.Proto.Scheduler.Queue(() => model.RdTypeProviderProcessModel.Kill.Start(myLifetime, Unit.Instance));
+      model.TryGetProto().NotNull().Scheduler.Queue(() => model.RdTypeProviderProcessModel.Kill.Start(myLifetime, Unit.Instance));
       return true;
     }
 

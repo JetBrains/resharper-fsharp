@@ -72,7 +72,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 
     protected override bool Shutdown(RdFantomasModel model)
     {
-      model.Proto.Scheduler.Queue(() => model.Exit.Fire(Unit.Instance));
+      model.TryGetProto().NotNull().Scheduler.Queue(() => model.Exit.Fire(Unit.Instance));
       return true;
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.ModelCreators;
@@ -108,7 +109,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
           if (Interlocked.CompareExchange(ref isDisposed, 1, 0) == 1) return;
 
           var tpId = typeProviderRdModel.EntityId;
-          processModel.Proto.Scheduler.Queue(() =>
+          processModel.TryGetProto().NotNull().Scheduler.Queue(() =>
           {
             Dispose(tpId);
             processModel.Invalidate.Fire(tpId);
