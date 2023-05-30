@@ -118,7 +118,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
             if not (psiModule.GetPsiServices().CachesState.IsIdle.Value) then
-                shim.MarkTypesDirty(psiModule)
+                shim.MarkDirty(psiModule)
 
             f ()
         )

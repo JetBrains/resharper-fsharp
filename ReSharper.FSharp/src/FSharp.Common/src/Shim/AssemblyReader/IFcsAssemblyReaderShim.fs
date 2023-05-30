@@ -60,7 +60,7 @@ type IFcsAssemblyReaderShim =
 
     abstract InvalidateAll: reason: string -> unit
 
-    abstract MarkTypesDirty: IPsiModule -> unit
+    abstract MarkDirty: IPsiModule -> unit
 
     /// Clears dirty type defs, updating reader timestamps if needed
     abstract InvalidateDirty: unit -> unit
