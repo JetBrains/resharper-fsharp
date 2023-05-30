@@ -11,12 +11,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -288,9 +290,10 @@ type FSharpOverridingMembersBuilder() =
                 normalizeReprEnd recordRepr.LeftBrace recordRepr.RightBrace
                 recordRepr.LeftBrace, recordRepr.RightBrace
 
-            | :? IUnionRepresentation as unionRepr ->
+            | :? IUnionRepresentation
+            | :? ITypeAbbreviationRepresentation as typeRepr ->
                 let diff = origTypeReprIndent - desiredIndent
-                if diff > 0 then shiftWithWhitespaceBefore -diff unionRepr
+                if diff > 0 then shiftWithWhitespaceBefore -diff typeRepr
                 null, null
 
             | _ -> null, null
@@ -317,15 +320,23 @@ type FSharpOverridingMembersBuilder() =
         use disableFormatter = new DisableCodeFormatter()
 
         let typeDecl = context.Root :?> IFSharpTypeDeclaration
-        let typeRepr = typeDecl.TypeRepresentation
 
-        match typeRepr with
+        match typeDecl.TypeRepresentation with
         | :? IUnionRepresentation as unionRepr ->
             unionRepr.UnionCasesEnumerable
             |> Seq.tryHead
-            |> Option.iter EnumCaseLikeDeclarationUtil.addBarIfNeeded 
+            |> Option.iter EnumCaseLikeDeclarationUtil.addBarIfNeeded
+        | :? ITypeAbbreviationRepresentation as abbrRepr when abbrRepr.CanBeUnionCase ->
+            let factory = typeDecl.CreateElementFactory()
+            let caseName = FSharpNamingService.mangleNameIfNecessary abbrRepr.AbbreviatedTypeOrUnionCase.SourceName
+            let declGroup = factory.CreateModuleMember($"type U = | {caseName}") :?> ITypeDeclarationGroup
+            let typeDeclaration = declGroup.TypeDeclarations[0] :?> IFSharpTypeDeclaration
+            let repr = typeDeclaration.TypeRepresentation
+            let newRepr = typeDecl.SetTypeRepresentation(repr)
+            if context.Anchor == abbrRepr then context.Anchor <- newRepr
         | _ -> ()
 
+        let typeRepr = typeDecl.TypeRepresentation
         addNewLineBeforeReprIfNeeded typeDecl typeRepr
 
         let anchor: ITreeNode =
