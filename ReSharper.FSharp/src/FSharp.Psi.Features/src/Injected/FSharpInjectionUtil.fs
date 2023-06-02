@@ -19,13 +19,10 @@ when 'AnnotationProvider :> CodeAnnotationInfoProvider<IAttributesOwner, 'TAnnot
 let getAttributesOwner (expr: IFSharpExpression) =
     match BinaryAppExprNavigator.GetByRightArgument(expr) with
     | binaryExpr when isNamedArgSyntactically binaryExpr ->
-        let namedParam =
-            match tryGetNamedArgRefExpr binaryExpr with
-            | null -> null
-            | namedRef -> namedRef.Reference.Resolve().DeclaredElement
-        match namedParam with
-        | :? IAttributesOwner as x -> x
-        | _ -> null
+        match tryGetNamedArgRefExpr binaryExpr with
+        | null -> null
+        | namedRef ->
+            namedRef.Reference.Resolve().DeclaredElement.As<IAttributesOwner>()
     | _ ->
 
     let matchingParameter = getMatchingParameter expr
