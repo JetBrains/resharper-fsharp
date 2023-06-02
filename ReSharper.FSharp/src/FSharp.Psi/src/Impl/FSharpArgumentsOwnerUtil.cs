@@ -24,9 +24,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
         appliedArg = appliedArg.IgnoreInnerParens();
 
-        return appliedArg is not ITupleExpr tupleExpr
-          ? new List<IArgument>(1) { appliedArg as IArgument }
-          : tupleExpr.Expressions.Take(unionCase.Fields.Count).ToList(t => t as IArgument);
+        return appliedArg is ITupleExpr tupleExpr
+          ? tupleExpr.Expressions.Take(unionCase.Fields.Count).ToList(t => t as IArgument)
+          : new List<IArgument> { appliedArg as IArgument };
       }
 
       if (fcsSymbol is not FSharpMemberOrFunctionOrValue mfv)
