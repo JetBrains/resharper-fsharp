@@ -52,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         var isValid = fcsSymbol switch
         {
           FSharpMemberOrFunctionOrValue mfv => mfv.CurriedParameterGroups.Count >= AppliedExpressions.Count,
-          FSharpUnionCase unionCase => AppliedExpressions.Count <= (unionCase.HasFields ? 1 : 0),
+          FSharpUnionCase unionCase => unionCase.HasFields && AppliedExpressions.Count <= 1,
           _ => false
         };
 
