@@ -23,7 +23,8 @@ open JetBrains.Util
 [<SolutionComponent>]
 type FSharpExtendedFileStructureLanguage() =
     interface IExtendedFileStructureLanguage with
-        member this.IsValid(languageType) = languageType.Is<FSharpLanguage>()
+        member this.IsValid(languageType) =
+            isNotNull languageType && languageType.Is<FSharpLanguage>()
 
 
 [<Language(typeof<FSharpLanguage>)>]
