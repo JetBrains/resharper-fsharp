@@ -53,9 +53,8 @@ type FSharpRegexNodeProvider() =
             | _ -> None)
 
     let checkForAttributes (expr: IFSharpExpression) =
-        match getAttributesOwner expr with
-        | ValueNone -> ValueNone
-        | ValueSome attributesOwner ->
+        let attributesOwner = getAttributesOwner expr
+        if isNull attributesOwner then ValueNone else
 
         let isSuccess =
             let hasAnnotation = getAnnotationInfo<RegexPatternAnnotationProvider, _>(attributesOwner)

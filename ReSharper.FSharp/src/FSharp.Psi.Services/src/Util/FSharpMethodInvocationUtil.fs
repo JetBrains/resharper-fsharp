@@ -77,8 +77,8 @@ let getMatchingParameter (expr: IFSharpExpression) =
     let symbolReference = getReference argsOwner
     if isNull symbolReference then null else
 
-    let mfv = symbolReference.GetFcsSymbol().As<FSharpMemberOrFunctionOrValue>()
-    if isNull mfv then null else
+    let fcsSymbol = symbolReference.GetFcsSymbol()
+    if not (fcsSymbol :? FSharpMemberOrFunctionOrValue) && not (fcsSymbol :? FSharpUnionCase) then null else
 
     let paramOwner = symbolReference.Resolve().DeclaredElement.As<IParametersOwner>()
     if isNull paramOwner then null else
@@ -95,7 +95,10 @@ let getMatchingParameter (expr: IFSharpExpression) =
             | Some paramIndex ->
 
             let invokingExtensionMethod =
-                mfv.IsExtensionMember && Some mfv.ApparentEnclosingEntity <> mfv.DeclaringEntity
+                match fcsSymbol with
+                | :? FSharpMemberOrFunctionOrValue as mfv ->
+                    mfv.IsExtensionMember && Some mfv.ApparentEnclosingEntity <> mfv.DeclaringEntity
+                | _ -> false
 
             let offset = if invokingExtensionMethod then 1 else 0
             let paramIndex = paramIndex + offset

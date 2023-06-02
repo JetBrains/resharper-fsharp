@@ -255,6 +255,9 @@ tasks {
     moveToPlugin(fantomasFiles, "fantomas")
     moveToPlugin(typeProvidersFiles, "typeProviders")
     moveToPlugin(listOf("projectTemplates"), "projectTemplates")
+    from("$resharperPluginPath/src/annotations") {
+      into("${intellij.pluginName.get()}/dotnet/Extensions/com.jetbrains.rider.fsharp/annotations")
+    }
 
     doLast {
       fun validateFiles(files: List<String>, destinationFolder: String) {

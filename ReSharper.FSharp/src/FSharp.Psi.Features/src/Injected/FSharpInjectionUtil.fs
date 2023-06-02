@@ -17,27 +17,26 @@ when 'AnnotationProvider :> CodeAnnotationInfoProvider<IAttributesOwner, 'TAnnot
         .GetInfo(attributesOwner)
 
 let getAttributesOwner (expr: IFSharpExpression) =
-    let argument =
-        match BinaryAppExprNavigator.GetByRightArgument(expr) with
-        | binaryExpr when isNamedArgSyntactically binaryExpr ->
-            binaryExpr :> IFSharpExpression
-        | _ -> expr
+    match BinaryAppExprNavigator.GetByRightArgument(expr) with
+    | binaryExpr when isNamedArgSyntactically binaryExpr ->
+        let namedParam =
+            match tryGetNamedArgRefExpr binaryExpr with
+            | null -> null
+            | namedRef -> namedRef.Reference.Resolve().DeclaredElement
+        match namedParam with
+        | :? IAttributesOwner as x -> x
+        | _ -> null
+    | _ ->
 
-    let argsOwner = getArgsOwner argument
-
-    if isNotNull argsOwner then
-        let parameter = argument.As<IArgument>().MatchingParameter
-        if isNull parameter then ValueNone else
-        parameter.Element :> IAttributesOwner |> ValueOption.ofObj
-    else
+    let matchingParameter = getMatchingParameter expr
+    if isNotNull matchingParameter then matchingParameter :> IAttributesOwner else
 
     let declaration: IDeclaration =
         let typeMemberDecl = MemberDeclarationNavigator.GetByExpression(expr)
         if isNotNull typeMemberDecl then typeMemberDecl else
         TopBindingNavigator.GetByExpression(expr)
 
-    if isNull declaration then ValueNone else
-    declaration.DeclaredElement.As<IAttributesOwner>() |> ValueOption.ofObj
+    if isNull declaration then null else declaration.DeclaredElement.As<IAttributesOwner>()
 
 let tryGetTypeProviderName (expr: IConstExpr) =
     let providedTypeName =
