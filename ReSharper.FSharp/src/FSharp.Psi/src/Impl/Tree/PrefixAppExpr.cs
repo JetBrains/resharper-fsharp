@@ -48,6 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         var reference = referenceExpr.Reference;
         var fcsSymbol = reference.GetFcsSymbol();
 
+        // todo: exceptions
         var isValid = fcsSymbol switch
         {
           FSharpMemberOrFunctionOrValue mfv => mfv.CurriedParameterGroups.Count >= AppliedExpressions.Count,
