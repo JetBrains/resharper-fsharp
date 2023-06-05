@@ -23,10 +23,8 @@ type FSharpInjectionTargetsFinder() =
         | language -> language
 
     let checkForAttributes (expr: IFSharpExpression) =
-        match getAttributesOwner expr with
-        | ValueNone -> ValueNone
-        | ValueSome attributesOwner ->
-
+        let attributesOwner = getAttributesOwner expr
+        if isNull attributesOwner then ValueNone else
         let info = getAnnotationInfo<StringSyntaxAnnotationProvider, string>(attributesOwner)
         if isNotNull info then ValueSome(info, "", "") else
         let info = getAnnotationInfo<LanguageInjectionAnnotationProvider, InjectionAnnotationInfo>(attributesOwner)

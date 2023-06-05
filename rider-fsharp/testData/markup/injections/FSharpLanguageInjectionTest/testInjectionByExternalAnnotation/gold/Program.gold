@@ -1,0 +1,39 @@
+module Test
+
+open Feliz
+
+style.color "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+style.caretColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+style.backgroundColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+style.outlineColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+style.borderColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+style.borderTopColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+style.borderBottomColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+style.borderLeftColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+style.borderRightColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+style.textDecorationColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+
+open Fable.React.Props
+
+BackgroundColor(Item = "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>")
+BackgroundColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+BorderBlockEndColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+BorderBlockStartColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+BorderBottomColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+BorderColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+BorderInlineEndColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+BorderInlineStartColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+BorderLeftColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+BorderRightColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+BorderTopColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+CaretColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+Color "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+ColumnRuleColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+FloodColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+LightingColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+OutlineColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+StopColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+TextDecorationColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+TextEmphasisColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+TextLineThroughColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"
+TextOverlineColor "<frontend:INJECTED_FRAGMENT>red</frontend:INJECTED_FRAGMENT>"

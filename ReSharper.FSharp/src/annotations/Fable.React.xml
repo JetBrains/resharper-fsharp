@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly name="Fable.React">
+    <member name="M:Fable.React.Props.CSSProp.NewBackgroundColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.BackgroundColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewBorderBlockEndColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.BorderBlockEndColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewBorderBlockStartColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.BorderBlockStartColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewBorderBottomColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.BorderBottomColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewBorderColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.BorderColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewBorderInlineEndColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.BorderInlineEndColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewBorderInlineStartColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.BorderInlineStartColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewBorderLeftColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.BorderLeftColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewBorderRightColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.BorderRightColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewBorderTopColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.BorderTopColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewCaretColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.CaretColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.Color.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewColumnRuleColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.ColumnRuleColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewFloodColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.FloodColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewLightingColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.LightingColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewOutlineColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.OutlineColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewStopColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.StopColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewTextDecorationColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.TextDecorationColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewTextEmphasisColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.TextEmphasisColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewTextLineThroughColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.TextLineThroughColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+
+    <member name="M:Fable.React.Props.CSSProp.NewTextOverlineColor(System.Object)">
+        <parameter name="item">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="P:Fable.React.Props.CSSProp.TextOverlineColor.Item">
+        <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+            <argument>css</argument>
+            <property name="Prefix">{color:</property>
+            <property name="Suffix">}</property>
+        </attribute>
+    </member>
+</assembly>

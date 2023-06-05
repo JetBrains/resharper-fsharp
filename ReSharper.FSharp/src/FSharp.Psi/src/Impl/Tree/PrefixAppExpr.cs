@@ -48,12 +48,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         var reference = referenceExpr.Reference;
         var fcsSymbol = reference.GetFcsSymbol();
 
-        // todo: union cases, exceptions
-        if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv))
-          return null;
+        // todo: exceptions
+        var isValid = fcsSymbol switch
+        {
+          FSharpMemberOrFunctionOrValue mfv => mfv.CurriedParameterGroups.Count >= AppliedExpressions.Count,
+          FSharpUnionCase unionCase => unionCase.HasFields && AppliedExpressions.Count <= 1,
+          _ => false
+        };
 
-        var paramGroups = mfv.CurriedParameterGroups;
-        return paramGroups.Count >= AppliedExpressions.Count ? reference : null;
+        return isValid ? reference : null;
       }
     }
 

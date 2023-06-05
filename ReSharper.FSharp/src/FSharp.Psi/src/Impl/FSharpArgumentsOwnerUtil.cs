@@ -13,7 +13,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static IList<IArgument> CalculateParameterArguments(this IFSharpReferenceOwner referenceOwner,
       IEnumerable<IFSharpExpression> appliedExpressions)
     {
-      if (!(referenceOwner.Reference.GetFcsSymbol() is FSharpMemberOrFunctionOrValue mfv))
+      var fcsSymbol = referenceOwner.Reference.GetFcsSymbol();
+
+      if (fcsSymbol is FSharpUnionCase unionCase)
+      {
+        if (!unionCase.HasFields) return EmptyArray<IArgument>.Instance;
+
+        if (appliedExpressions.FirstOrDefault() is not { } appliedArg)
+          return EmptyArray<IArgument>.Instance;
+
+        appliedArg = appliedArg.IgnoreInnerParens();
+
+        return appliedArg is ITupleExpr tupleExpr
+          ? tupleExpr.Expressions.Take(unionCase.Fields.Count).ToList(t => t as IArgument)
+          : new List<IArgument> { appliedArg as IArgument };
+      }
+
+      if (fcsSymbol is not FSharpMemberOrFunctionOrValue mfv)
         return EmptyList<IArgument>.Instance;
 
       var paramGroups = mfv.CurriedParameterGroups;

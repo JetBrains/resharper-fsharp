@@ -448,7 +448,7 @@ type FSharpNamingService(language: FSharpLanguage) =
         // todo: partially applied functions?
         | :? IPrefixAppExpr as appExpr ->
             let invokedFunctionReference = appExpr.InvokedFunctionReference
-            if isNotNull invokedFunctionReference then
+            if isNotNull invokedFunctionReference && invokedFunctionReference.GetFcsSymbol() :? FSharpMemberOrFunctionOrValue then
                 x.SuggestRoots(invokedFunctionReference, null, policyProvider)
 
             else EmptyList.Instance :> _

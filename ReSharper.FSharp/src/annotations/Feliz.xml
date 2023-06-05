@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly name="Feliz">
+    <member name="M:Feliz.style.textDecorationColor(System.String)">
+        <parameter name="color">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="M:Feliz.style.backgroundColor(System.String)">
+        <parameter name="color">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="M:Feliz.style.color(System.String)">
+        <parameter name="color">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="M:Feliz.style.caretColor(System.String)">
+        <parameter name="color">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="M:Feliz.style.outlineColor(System.String)">
+        <parameter name="color">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="M:Feliz.style.borderColor(System.String)">
+        <parameter name="color">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="M:Feliz.style.borderTopColor(System.String)">
+        <parameter name="color">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="M:Feliz.style.borderBottomColor(System.String)">
+        <parameter name="color">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="M:Feliz.style.borderLeftColor(System.String)">
+        <parameter name="color">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+    <member name="M:Feliz.style.borderRightColor(System.String)">
+        <parameter name="color">
+            <attribute ctor="M:JetBrains.Annotations.LanguageInjectionAttribute.#ctor(System.String)">
+                <argument>css</argument>
+                <property name="Prefix">{color:</property>
+                <property name="Suffix">}</property>
+            </attribute>
+        </parameter>
+    </member>
+</assembly>

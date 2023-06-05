@@ -49,4 +49,8 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
 
   @Test
   fun testInjectionByFunction() = doTest()
+
+  @Test
+  @TestEnvironment(solution = "FableApp")
+  fun testInjectionByExternalAnnotation() = doTest()
 }
