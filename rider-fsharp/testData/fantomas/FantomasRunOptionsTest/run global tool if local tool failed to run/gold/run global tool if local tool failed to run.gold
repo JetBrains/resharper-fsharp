@@ -3,7 +3,7 @@ Version to run: (GlobalDotnetTool, 4.7.2)
 AutoDetected: Version = (GlobalDotnetTool, 4.7.2), Status = Ok
 LocalDotnetTool: Version = (LocalDotnetTool, wrong_version), Status = UnsupportedVersion
 GlobalDotnetTool: Version = (GlobalDotnetTool, 4.7.2), Status = Ok
-Bundled: Version = (Bundled, 5.2.1), Status = Ok
+Bundled: Version = (Bundled, 6.0.5), Status = Ok
 
 Notifications:
 
