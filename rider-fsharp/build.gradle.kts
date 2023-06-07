@@ -119,13 +119,16 @@ val typeProvidersFiles = listOf(
   "FSharp.TypeProviders.Host.NetCore/bin/$buildConfiguration/netcoreapp3.1/tploader.unix.runtimeconfig.json"
 )
 
-val fantomasFiles = listOf(
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.FCS.dll",
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Core.dll",
+val fantomasHostFiles = listOf(
   "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.dll",
   "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
   "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.win.runtimeconfig.json",
   "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.unix.runtimeconfig.json"
+)
+
+val fantomasDllFiles = listOf(
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.FCS.dll",
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Core.dll"
 )
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
@@ -236,7 +239,8 @@ tasks {
   withType<PrepareSandboxTask> {
     var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
     files = files.map { "$resharperPluginPath/src/$it" }
-    val fantomasFiles = fantomasFiles.map { "$resharperPluginPath/src/$it" }
+    val fantomasHostFiles = fantomasHostFiles.map { "$resharperPluginPath/src/$it" }
+    val fantomasDllFiles = fantomasDllFiles.map { "$resharperPluginPath/src/$it" }
     val typeProvidersFiles = typeProvidersFiles.map { "$resharperPluginPath/src/$it" }
 
     if (name == IntelliJPluginConstants.PREPARE_TESTING_SANDBOX_TASK_NAME) {
@@ -252,7 +256,8 @@ tasks {
     }
 
     moveToPlugin(files, "dotnet")
-    moveToPlugin(fantomasFiles, "fantomas")
+    moveToPlugin(fantomasHostFiles, "fantomas")
+    moveToPlugin(fantomasDllFiles, "fantomas/dlls")
     moveToPlugin(typeProvidersFiles, "typeProviders")
     moveToPlugin(listOf("projectTemplates"), "projectTemplates")
     from("$resharperPluginPath/src/annotations") {
@@ -268,7 +273,8 @@ tasks {
         }
       }
       validateFiles(files, "dotnet")
-      validateFiles(fantomasFiles, "fantomas")
+      validateFiles(fantomasHostFiles, "fantomas")
+      validateFiles(fantomasDllFiles, "fantomas/dlls")
       validateFiles(typeProvidersFiles, "typeProviders")
     }
   }

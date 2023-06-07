@@ -3,7 +3,7 @@ Version to run: (LocalDotnetTool, 4.7.6)
 
 AutoDetected: Version = (LocalDotnetTool, 4.7.6), Status = Ok
 LocalDotnetTool: Version = (LocalDotnetTool, 4.7.6), Status = Ok
-Bundled: Version = (Bundled, 5.2.1), Status = Ok
+Bundled: Version = (Bundled, 6.0.5), Status = Ok
 Formatted:
 <caret>module Types
 
@@ -16,10 +16,10 @@ type Range =
 Notifications:
 
 --Without local dotnet tool--
-Version to run: (Bundled, 5.2.1)
+Version to run: (Bundled, 6.0.5)
 
-AutoDetected: Version = (Bundled, 5.2.1), Status = Ok
-Bundled: Version = (Bundled, 5.2.1), Status = Ok
+AutoDetected: Version = (Bundled, 6.0.5), Status = Ok
+Bundled: Version = (Bundled, 6.0.5), Status = Ok
 Formatted:
 <caret>module Types
 
