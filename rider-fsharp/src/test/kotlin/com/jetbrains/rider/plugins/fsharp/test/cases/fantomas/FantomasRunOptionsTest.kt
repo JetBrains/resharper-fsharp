@@ -65,15 +65,11 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
   fun `local tool 4_6`() = doLocalToolTest("fantomas-tool", "4.6.0", "4.6.0.0")
 
   @Test
-  fun `local tool 5_0`() = doLocalToolTest(
-    "com/jetbrains/rider/plugins/fsharp/test/cases/fantomasrains/rider/plugins/fsharp/test/cases/fantomas",
-    "5.0.0",
-    "5.2.1.0"
-  )
+  fun `local tool 5_0`() = doLocalToolTest("fantomas", "5.2.1", "5.2.1.0")
 
   @Test
   fun `local tool 6_0 with cursor`() {
-    withFantomasLocalTool("fantomas", "6.0.0-alpha-004") {
+    withFantomasLocalTool("fantomas", "6.0.0") {
       withOpenedEditor("Simple.fs", "LargeFile.fs") {
         executeWithGold(testGoldFile) {
           reformatCode()
