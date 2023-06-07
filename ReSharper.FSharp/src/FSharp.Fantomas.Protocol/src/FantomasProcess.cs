@@ -20,8 +20,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
     private readonly VirtualFileSystemPath mySpecifiedPath;
     protected override string Name => "Fantomas";
 
-    private static readonly FileSystemPath FantomasDirectory =
+    private static readonly FileSystemPath FantomasHostDirectory =
       typeof(FantomasProcess).Assembly.GetPath().Directory.Parent / "fantomas";
+
+    private static readonly FileSystemPath FantomasDllsDirectory = FantomasHostDirectory / "dlls";
 
     protected override RdFantomasModel CreateModel(Lifetime lifetime, IProtocol protocol) => new(lifetime, protocol);
 
@@ -33,8 +35,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 
     protected override ProcessStartInfo GetProcessStartInfo(Lifetime lifetime, int port)
     {
-      var runtimeConfigPath = FantomasDirectory / FantomasProtocolConstants.CoreRuntimeConfigFilename;
-      var launchPath = FantomasDirectory / FantomasProtocolConstants.PROCESS_FILENAME;
+      var runtimeConfigPath = FantomasHostDirectory / FantomasProtocolConstants.CoreRuntimeConfigFilename;
+      var launchPath = FantomasHostDirectory / FantomasProtocolConstants.PROCESS_FILENAME;
       var dotnetArgs = $"--runtimeconfig \"{runtimeConfigPath}\"";
 
       Assertion.Assert(launchPath.ExistsFile, $"can't find '{launchPath}'");
@@ -62,7 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
         },
         {
           "FSHARP_FANTOMAS_ASSEMBLIES_PATH",
-          mySpecifiedPath?.FullPath ?? FantomasDirectory.FullPath
+          mySpecifiedPath?.FullPath ?? FantomasDllsDirectory.FullPath
         },
         {
           "FSHARP_FANTOMAS_VERSION", myVersion
