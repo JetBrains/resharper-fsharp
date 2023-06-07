@@ -34,7 +34,7 @@ class InjectionEscapersTest : BaseTestWithSolution() {
       val element = injectedLanguageManager.findInjectedElementAt(hostFile, offset)
       val quickEditHandler = QuickEditAction().invokeImpl(project, this, hostFile)
       val documentWindow = InjectedLanguageUtil.getDocumentWindow(element!!.containingFile)
-      val unescapedOffset = InjectedLanguageUtil.hostToInjectedUnescaped(documentWindow, offset);
+      val unescapedOffset = InjectedLanguageUtil.hostToInjectedUnescaped(documentWindow, offset)
       val fragmentEditor =
         fileEditorManager.openTextEditor(
           OpenFileDescriptor(
