@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       {
         if (tokenType == FSharpTokenType.CHAMELEON)
           return new ClosedChameleonElement(FSharpTokenType.CHAMELEON, buffer, new TreeOffset(startOffset),
-            new TreeOffset(endOffset));
+            endOffset - startOffset);
 
         if (tokenType is IFixedTokenNodeType)
           return tokenType.Create(null);
