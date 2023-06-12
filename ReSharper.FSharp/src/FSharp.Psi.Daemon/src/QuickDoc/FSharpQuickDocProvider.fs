@@ -40,20 +40,28 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
         (RichText.Empty, text.GetFormattedParts()) ||> Seq.fold (fun result part ->
             result.Append(part.Text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\n", "<br>"), part.Style))
 
-    let asContent (text: RichText) =
-        "<div class='content'>" + richTextEscapeToHtml text + "</div>"
+    let asContent text =
+        RichText("<div class='content'>", TextStyle.Default)
+         .Append(richTextEscapeToHtml text)
+         .Append("</div>", TextStyle.Default)
 
     //todo: move all the html related code to the platform
-    let asDefinition (text: RichText) =
-        "<div class='definition'><pre style='word-wrap: break-word; white-space: pre-wrap;'>" +
-        richTextEscapeToHtml text +
-        "</pre></div>"
+    let asDefinition text =
+        RichText("<div class='definition'><pre>", TextStyle.Default)
+         .Append(richTextEscapeToHtml text)
+         .Append("</pre></div>", TextStyle.Default)
 
-    let createToolTip (header: RichText) (body: RichText) =
-        if body.IsEmpty then
-            asContent header
-        else
-            (asDefinition header).Append(body)
+    let createToolTipLayout header (body: RichText) =
+        (asDefinition header).Append(body)
+
+    let createTooltip (text: RichText) =
+        RichText("<html>
+                   <head>
+                    <style>pre {word-wrap: break-word; white-space: pre-wrap;}</style>
+                   </head>
+                   <body>")
+         .Append(text)
+         .Append("</body></html>")
 
     member x.CreateRichTextTooltip() =
         FSharpQuickDoc.getFSharpToolTipText identifier
@@ -85,9 +93,10 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
                               | _ -> () ]
                             |> richTextJoin "\n\n"
 
-                        createToolTip header body))
-            |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
+                        createToolTipLayout header body))
+            |> richTextJoin ""
         )
+        |> Option.map createTooltip
         |> Option.defaultValue null
 
     interface IQuickDocPresenter with
