@@ -48,6 +48,8 @@ type internal TypeProvidersCache() =
     member x.Add(projectAssembly, tp) =
         addTypeProvider projectAssembly tp
 
+    member x.TryGet(id) = proxyTypeProvidersPerId.TryGetValue(id)
+
     member x.Get(id) =
         match proxyTypeProvidersPerId.TryGetValue(id) with
         | true, provider -> provider
@@ -117,7 +119,10 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
 
     do
         connection.Execute(fun () ->
-            protocol.Invalidate.Advise(lifetime, fun id -> typeProviders.Get(id).OnInvalidate()))
+            protocol.Invalidate.Advise(lifetime, fun id ->
+                match typeProviders.TryGet(id) with
+                | true, provider -> provider.OnInvalidate()
+                | _ -> ()))
 
         fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun (psiModule, fcsProject) ->
             use lock = lock.Push()
