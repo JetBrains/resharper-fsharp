@@ -1,0 +1,11 @@
+---Fragment editor---
+select * from table \n \\u005c\u006e \u005c\u006e \u005c\u005д \u005д\u005д \u005c\u005c \ \\  
+\ 
+{ }
+
+
+---Host editor after editing---
+@"<frontend:INJECTED_FRAGMENT>select * from table \n \\u005c\u006e \u005c\u006e \u005c\u005д \u005д\u005д \u005c\u005c \ \\ </frontend:INJECTED_FRAGMENT>\<frontend:INJECTED_FRAGMENT>
+\ 
+{ }
+ </frontend:INJECTED_FRAGMENT>"
