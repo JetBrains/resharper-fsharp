@@ -63,6 +63,29 @@ class InjectionEscapersTest : BaseTestWithSolution() {
     }
   }
 
+  private fun doFullEditingTest() = doTest { hostEditor, fragmentEditor ->
+    executeWithGold(testGoldFile) { printStream ->
+      printStream.println("---Fragment editor---")
+      printStream.println(getHighlighters(project, fragmentEditor))
+
+      fragmentEditor.typeFromOffset(" ", fragmentEditor.caretModel.offset)
+
+      printStream.println("\n---Host editor after editing---")
+      printStream.print(
+        getHighlighters(project, hostEditor) {
+          it.severity === HighlightInfoType.INJECTED_FRAGMENT_SEVERITY
+        }
+      )
+    }
+  }
+
+  fun `escaping - regular`() = doFullEditingTest()
+  fun `escaping - regular - interpolated`() = doFullEditingTest()
+  fun `escaping - triple quoted`() = doFullEditingTest()
+  fun `escaping - triple quoted - interpolated`() = doFullEditingTest()
+  fun `escaping - verbatim`() = doFullEditingTest()
+  fun `escaping - verbatim - interpolated`() = doFullEditingTest()
+
   fun `backslash - simple`() = doBackslashTest()
   fun `backslash at the end - regular`() = doBackslashTest()
   fun `backslash at the end - verbatim`() = doBackslashTest()
