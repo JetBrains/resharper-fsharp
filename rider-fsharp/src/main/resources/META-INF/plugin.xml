@@ -53,9 +53,9 @@
     <codeFoldingOptionsProvider instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingProvider" />
     <applicationService serviceImplementation="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingSettings"/>
 
-    <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" />
-    <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpOptionsPage" id="FSharp" />
-    <projectConfigurable parentId="FileTemplatesSettingsId" instance="com.jetbrains.rider.settings.RiderFSharpFileTemplatesOptionPage" groupWeight="-20"/>
+    <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" displayName="F# Interactive" />
+    <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpOptionsPage" id="FSharp" displayName="F#" />
+    <projectConfigurable parentId="FileTemplatesSettingsId" instance="com.jetbrains.rider.settings.RiderFSharpFileTemplatesOptionPage" displayName="F#" groupWeight="-20"/>
 
     <projectConfigurable parentId="Errors" instance="com.jetbrains.rider.settings.FSharpInspectionsPage" />
 
