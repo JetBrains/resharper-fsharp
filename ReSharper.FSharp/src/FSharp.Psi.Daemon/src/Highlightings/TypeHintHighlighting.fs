@@ -5,10 +5,10 @@ open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.TextControl.DocumentMarkup.IntraTextAdornments
+open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.UI.RichText
 
-[<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
+[<DaemonAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
 [<StaticSeverityHighlighting(Severity.INFO,
      typeof<HighlightingGroupIds.IntraTextAdornments>,
      AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
@@ -30,7 +30,7 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
     member x.IsValid() = not text.IsEmpty && range.IsEmpty
 
 and [<SolutionComponent>] TypeHintAdornmentProvider() =
-    interface IHighlighterIntraTextAdornmentProvider with
+    interface IHighlighterAdornmentProvider with
         member x.IsValid(highlighter) =
             match highlighter.UserData with
             | :? TypeHintHighlighting as dm -> dm.IsValid()
@@ -40,10 +40,10 @@ and [<SolutionComponent>] TypeHintAdornmentProvider() =
             match highlighter.UserData with
             | :? TypeHintHighlighting as thh ->
                 let data =
-                    IntraTextAdornmentData(thh.Text, null, enum 0, IntraTextPlacement.DefaultBeforeThisChar,
-                        InlayHintsMode.Default)
+                    AdornmentData(thh.Text, null, enum 0, AdornmentPlacement.DefaultBeforeThisChar,
+                        PushToHintMode.Default)
                 
-                { new IIntraTextAdornmentDataModel with
+                { new IAdornmentDataModel with
                     override x.ContextMenuTitle = null
                     override x.ContextMenuItems = null
                     override x.ExecuteNavigation _ = ()
