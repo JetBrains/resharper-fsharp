@@ -39,7 +39,7 @@ type FSharpOptions =
       [<SettingsEntry(false, parallelProjectReferencesAnalysis); DefaultValue>]
       mutable ParallelProjectReferencesAnalysis: bool
 
-      [<SettingsEntry(false, nonFSharpProjectInMemoryReferences); DefaultValue>]
+      [<SettingsEntry(true, nonFSharpProjectInMemoryReferences); DefaultValue>]
       mutable NonFSharpProjectInMemoryReferences: bool
 
       [<SettingsEntry(true, outOfScopeCompletion); DefaultValue>]
