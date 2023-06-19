@@ -8,6 +8,8 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.jetbrains.rd.ide.model.RdTextRange
+import com.jetbrains.rd.ide.model.TextControlId
+import com.jetbrains.rd.ide.model.TextControlModel
 import com.jetbrains.rd.lang.toRdLanguageOrThrow
 import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rd.platform.util.subscribe
@@ -125,7 +127,11 @@ fun withGenericSandBoxing(sandboxInfo: SandboxInfo, project: Project, block: () 
   var localInfo: SandboxInfo? = sandboxInfo
   Lifetime.using { lt ->
     project.messageBus.subscribe(lt, FrontendTextControlHostListener.TOPIC, object : FrontendTextControlHostListener {
-      override fun beforeEditorBound(editor: Editor) {
+      override fun beforeEditorBound(lifetime: Lifetime,
+                                     project: Project,
+                                     textControlId: TextControlId,
+                                     editorModel: TextControlModel,
+                                     editor: Editor) {
         if (localInfo != null)
           SandboxManager.getInstance().markAsSandbox(editor, sandboxInfo)
       }
