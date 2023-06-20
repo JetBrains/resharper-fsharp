@@ -319,7 +319,7 @@ class RelaunchFsiWithDebugAction(private val currentProject: Project? = null) : 
 class ShowFsiSettingsAction(private val currentProject: Project? = null) : AnAction() {
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: currentProject ?: return
-    ShowSettingsUtil.getInstance().showSettingsDialog(project, FSharpBundle.message("Options.fsi.page.title"))
+    ShowSettingsUtil.getInstance().showSettingsDialog(project, "Fsi")
   }
 
   companion object {
