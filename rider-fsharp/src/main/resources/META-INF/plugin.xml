@@ -88,20 +88,20 @@
     <rd.platform.traceScenarioHolder implementation="com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios"/>
   </extensions>
 
-  <actions>
-    <group id="Rider.Plugins.FSharp.FsiGroup" text="F# Interactive" popup="true" icon="/icons/fsharpConsole.png">
-      <action class="com.jetbrains.rider.plugins.fsharp.services.fsi.StartFsiAction" id="Rider.Plugins.FSharp.StartFsi" text="Start New F# Interactive Session..." />
-      <action class="com.jetbrains.rider.plugins.fsharp.services.fsi.SendToFsiAction" id="Rider.Plugins.FSharp.SendToFsi" text="Send to F# Interactive">
+  <actions resource-bundle="messages.FSharpBundle">
+    <group id="Rider.Plugins.FSharp.FsiGroup" popup="true" icon="/icons/fsharpConsole.png">
+      <action class="com.jetbrains.rider.plugins.fsharp.services.fsi.StartFsiAction" id="Rider.Plugins.FSharp.StartFsi"/>
+      <action class="com.jetbrains.rider.plugins.fsharp.services.fsi.SendToFsiAction" id="Rider.Plugins.FSharp.SendToFsi">
         <keyboard-shortcut first-keystroke="control BACK_SLASH" keymap="$default" />
         <keyboard-shortcut first-keystroke="meta BACK_SLASH" keymap="Mac OS X 10.5+" />
       </action>
-      <action class="com.jetbrains.rider.plugins.fsharp.services.fsi.DebugInFsiAction" id="Rider.Plugins.FSharp.DebugInFsi" text="Debug in F# Interactive">
+      <action class="com.jetbrains.rider.plugins.fsharp.services.fsi.DebugInFsiAction" id="Rider.Plugins.FSharp.DebugInFsi">
         <keyboard-shortcut first-keystroke="control alt BACK_SLASH" keymap="$default" />
         <keyboard-shortcut first-keystroke="meta alt BACK_SLASH" keymap="Mac OS X 10.5+" />
       </action>
       <add-to-group group-id="ToolsMenu" anchor="last" />
     </group>
-    <action id="SendFsiRefs" class="com.jetbrains.rider.plugins.fsharp.services.fsi.SendProjectReferencesToFsiAction" text="Send Project References to F# Interactive" icon="/icons/fsharpConsole.png">
+    <action id="SendFsiRefs" class="com.jetbrains.rider.plugins.fsharp.services.fsi.SendProjectReferencesToFsiAction" icon="/icons/fsharpConsole.png">
       <add-to-group group-id="SolutionExplorerPopupMenu.Repl"/>
     </action>
   </actions>

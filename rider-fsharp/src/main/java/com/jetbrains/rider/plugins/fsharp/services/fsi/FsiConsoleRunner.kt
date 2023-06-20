@@ -39,6 +39,7 @@ import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
+import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.plugins.fsharp.RdFsiRuntime
 import com.jetbrains.rider.plugins.fsharp.RdFsiSessionInfo
@@ -58,11 +59,10 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
   AbstractConsoleRunnerWithHistory<LanguageConsoleView>(fsiHost.project, fsiTitle, null) {
 
   companion object {
-    const val fsiTitle = "F# Interactive"
-    private const val debugNotConfiguredTitle = "The session is not configured for debugging"
-    private const val debugNotConfiguredDescription = "F# Interactive should be relaunched."
-    private const val notificationLinks =
-      "<br/>${RelaunchFsiWithDebugAction.link}&nbsp;&nbsp;&nbsp;&nbsp;${ShowFsiSettingsAction.link}"
+    val fsiTitle = FSharpBundle.message("FSI.ConsoleRunner.title")
+    private val debugNotConfiguredTitle = FSharpBundle.message("FSI.notifications.debug.not.configured.title")
+    private val debugNotConfiguredDescription = FSharpBundle.message("FSI.notifications.debug.not.configured.description")
+    private val notificationLinks = "<br/>${RelaunchFsiWithDebugAction.link}&nbsp;&nbsp;&nbsp;&nbsp;${ShowFsiSettingsAction.link}"
 
     private val debugFsiArgs = listOf("--optimize-", "--debug+")
 
@@ -289,14 +289,14 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
   }
 
   private class ResetFsiAction(private val host: FsiHost) :
-    AnAction("Reset F# Interactive", null, AllIcons.Actions.Restart) {
+    AnAction(FSharpBundle.message("FSI.actions.reset.fsi.title"), null, AllIcons.Actions.Restart) {
     override fun actionPerformed(e: AnActionEvent) {
       host.resetFsiConsole(host.consoleRunner?.optimizeForDebug ?: false)
     }
   }
 
   private class OpenSettings(val project: Project) :
-    AnAction("F# Interactive settings", null, AllIcons.General.Settings) {
+    AnAction(FSharpBundle.message("FSI.actions.open.settings.title"), null, AllIcons.General.Settings) {
     override fun actionPerformed(e: AnActionEvent) {
       ShowSettingsUtil.getInstance().showSettingsDialog(project, "Fsi")
     }
@@ -312,18 +312,18 @@ class RelaunchFsiWithDebugAction(private val currentProject: Project? = null) : 
 
   companion object {
     const val actionName = "relaunchWithDebug"
-    const val link = "<a href='$actionName'>Relaunch with debug enabled</a>"
+    val link = "<a href='$actionName'>${FSharpBundle.message("FSI.actions.relaunch.fsi.with.debug.link.text")}</a>"
   }
 }
 
 class ShowFsiSettingsAction(private val currentProject: Project? = null) : AnAction() {
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: currentProject ?: return
-    ShowSettingsUtil.getInstance().showSettingsDialog(project, "F# Interactive")
+    ShowSettingsUtil.getInstance().showSettingsDialog(project, FSharpBundle.message("Options.fsi.page.title"))
   }
 
   companion object {
     const val actionName = "settings"
-    const val link = "<a href='$actionName'>Configure...</a>"
+    val link = "<a href='$actionName'>${FSharpBundle.message("FSI.actions.show.fsi.settings.link.text")}</a>"
   }
 }

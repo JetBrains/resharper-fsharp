@@ -11,6 +11,7 @@ import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiElement
 import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
+import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import icons.ReSharperIcons
 import javax.swing.Icon
 
@@ -18,11 +19,11 @@ object Fsi {
   const val sendToFsiActionId = "Rider.Plugins.FSharp.SendToFsi"
   const val debugInFsiActionId = "Rider.Plugins.FSharp.DebugInFsi"
 
-  const val sendLineText = "Send Line to F# Interactive"
-  const val debugLineText = "Debug Line in F# Interactive"
+  val sendLineText = FSharpBundle.message("FSI.actions.send.line.text")
+  val debugLineText = FSharpBundle.message("FSI.actions.debug.line.text")
 
-  const val sendSelectionText = "Send Selection to F# Interactive"
-  const val debugSelectionText = "Debug Selection in F# Interactive"
+  val sendSelectionText = FSharpBundle.message("FSI.actions.send.selection.text")
+  val debugSelectionText = FSharpBundle.message("FSI.actions.debug.selection.text")
 }
 
 class StartFsiAction : AnAction() {
@@ -95,7 +96,7 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
   BaseElementAtCaretIntentionAction(), ShortcutProvider, Iconable, DumbAware {
   private val isAvailable = !debug || SystemInfo.isWindows
 
-  override fun getFamilyName(): String = "Send to F# Interactive"
+  override fun getFamilyName(): String = FSharpBundle.message("FSI.actions.send.to.fsi.intention.action.text")
   override fun startInWriteAction() = false
 
   override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =

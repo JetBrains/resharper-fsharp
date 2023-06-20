@@ -5,6 +5,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.XmlSerializerUtil
+import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import com.jetbrains.rider.settings.foldings.RiderCodeFoldingOptionsProvider
 import com.jetbrains.rider.settings.foldings.RiderCodeFoldingSettings
 
@@ -15,7 +16,7 @@ class FSharpCodeFoldingProvider : RiderCodeFoldingOptionsProvider<FSharpCodeFold
 class FSharpCodeFoldingSettings : RiderCodeFoldingSettings(), PersistentStateComponent<FSharpCodeFoldingSettings> {
   var collapseHashDirectives by foldingCheckBox(
     "ReSharper F# Hash Directives Block Folding",
-    "F# hash directives blocks",
+    FSharpBundle.message("CodeFolding.collapse.hash.directives.title"),
     true
   )
 
