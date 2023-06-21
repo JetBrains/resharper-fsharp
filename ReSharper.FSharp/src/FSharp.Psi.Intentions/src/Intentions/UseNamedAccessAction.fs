@@ -59,8 +59,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         true
 
     override x.ExecutePsiTransaction(_,_) =
-        let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>()
-        if isNull pattern then null else
+        let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>().NotNull()
         use writeCookie = WriteLockCookie.Create(pattern.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
         
