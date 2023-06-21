@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open type JetBrains.Diagnostics.Assertion
 
 [<ContextAction(Name = "UseNamedAccess", Group = "F#", Description = "Use named access inside a DU pattern")>]
 type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
@@ -28,6 +29,10 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
             | _ -> null
 
         if isNull parenPat then false else
+
+        // Ignore multiline patterns for now
+        if parenPat.StartLine <> parenPat.EndLine then false else
+
         // This should only work when there are multiple items
         tuplePat <- parenPat.Pattern :?> ITuplePat
         if isNull tuplePat then false else
@@ -58,7 +63,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
 
         true
 
-    override x.ExecutePsiTransaction(_,_) =
+    override x.ExecutePsiTransaction _ : unit =
         let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>().NotNull()
         use writeCookie = WriteLockCookie.Create(pattern.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
@@ -83,24 +88,20 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         
         match namedPattern with
         | :? IParametersOwnerPat as ownerPat ->
-            if ownerPat.Parameters.Count <> 1 then null else
-            
-            match ownerPat.Parameters.[0] with
-            | :? INamedUnionCaseFieldsPat as namedUnionCaseFieldsPat ->
-                for name, pat in usedFieldsWithPatterns do
-                    let fieldPat =
-                        namedUnionCaseFieldsPat.FieldPatterns
-                        |> Seq.tryFind (fun fieldPat -> fieldPat.ReferenceName.Identifier.Name = name)
+            if ownerPat.Parameters.Count = 1 then
+                match ownerPat.Parameters.[0] with
+                | :? INamedUnionCaseFieldsPat as namedUnionCaseFieldsPat ->
+                    for name, pat in usedFieldsWithPatterns do
+                        let fieldPat =
+                            namedUnionCaseFieldsPat.FieldPatterns
+                            |> Seq.tryFind (fun fieldPat -> fieldPat.ReferenceName.Identifier.Name = name)
+                        
+                        match fieldPat with
+                        | None -> ()
+                        | Some fieldPat -> ModificationUtil.ReplaceChild(fieldPat.Pattern, pat) |> ignore
                     
-                    match fieldPat with
-                    | None -> ()
-                    | Some fieldPat -> ModificationUtil.ReplaceChild(fieldPat.Pattern, pat) |> ignore
-                
-                ModificationUtil.ReplaceChild(pattern.Parameters.[0], namedUnionCaseFieldsPat)
-                |> ignore
-
-                // TODO: not sure why but the closing right paren seems to be missing!
-                null
-            | _ -> null
-        | _ -> null
+                    ModificationUtil.ReplaceChild(pattern.Parameters.[0], namedUnionCaseFieldsPat)
+                    |> ignore
+                | _ -> ()
+        | _ -> ()
 

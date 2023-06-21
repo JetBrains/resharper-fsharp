@@ -9,3 +9,10 @@ type UseNamedAccess() =
     override x.ExtraPath = "useNamedAccess"
     
     [<Test>] member x.``ParametersOwnerPat 01``() = x.DoNamedTest()
+
+type UseNamedAccessAvailabilityTest() =
+    inherit FSharpContextActionAvailabilityTestBase<UseNamedAccessAction>()
+
+    override x.ExtraPath = "useNamedAccess"
+
+    [<Test>] member x.``Multiline Pattern 01``() = x.DoNamedTest()
