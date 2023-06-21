@@ -76,7 +76,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
                 | :? IWildPat -> None
                 | _ -> Some (name, pat))
             |> Seq.toArray
-        
+
         let factory = pattern.CreateElementFactory()
         let sourceText =
             let fields =
@@ -88,20 +88,20 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         
         match namedPattern with
         | :? IParametersOwnerPat as ownerPat ->
-            if ownerPat.Parameters.Count = 1 then
-                match ownerPat.Parameters.[0] with
-                | :? INamedUnionCaseFieldsPat as namedUnionCaseFieldsPat ->
-                    for name, pat in usedFieldsWithPatterns do
-                        let fieldPat =
-                            namedUnionCaseFieldsPat.FieldPatterns
-                            |> Seq.tryFind (fun fieldPat -> fieldPat.ReferenceName.Identifier.Name = name)
-                        
-                        match fieldPat with
-                        | None -> ()
-                        | Some fieldPat -> ModificationUtil.ReplaceChild(fieldPat.Pattern, pat) |> ignore
-                    
-                    ModificationUtil.ReplaceChild(pattern.Parameters.[0], namedUnionCaseFieldsPat)
-                    |> ignore
-                | _ -> ()
-        | _ -> ()
+            assert (ownerPat.Parameters.Count = 1)
 
+            match ownerPat.Parameters.[0] with
+            | :? INamedUnionCaseFieldsPat as namedUnionCaseFieldsPat ->
+                for name, pat in usedFieldsWithPatterns do
+                    let fieldPat =
+                        namedUnionCaseFieldsPat.FieldPatterns
+                        |> Seq.tryFind (fun fieldPat -> fieldPat.ReferenceName.Identifier.Name = name)
+                    
+                    match fieldPat with
+                    | None -> ()
+                    | Some fieldPat -> ModificationUtil.ReplaceChild(fieldPat.Pattern, pat) |> ignore
+
+                ModificationUtil.ReplaceChild(pattern.Parameters.[0], namedUnionCaseFieldsPat)
+                |> ignore
+            | _ -> ()
+        | _ -> ()
