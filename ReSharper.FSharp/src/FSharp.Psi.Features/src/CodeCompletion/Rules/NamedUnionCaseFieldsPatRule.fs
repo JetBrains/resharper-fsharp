@@ -17,7 +17,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExpectedTypes
 open JetBrains.ReSharper.Psi.Resources
-open JetBrains.ReSharper.Psi.Tree
 
 [<Language(typeof<FSharpLanguage>)>]
 type NamedUnionCaseFieldsPatRule() =
@@ -51,75 +50,26 @@ type NamedUnionCaseFieldsPatRule() =
 
         let exprRefName = reference.GetElement().As<IExpressionReferenceName>()
         if isNull exprRefName || exprRefName.IsQualified then Array.empty else
+        
+        
         let refPat = ReferencePatNavigator.GetByReferenceName(exprRefName)
-        // I'm assuming that the parent of the fake refPat is a IParenPat for now.
-        let parentPat = ParenPatNavigator.GetByPattern(refPat)
+        let parentPat : IFSharpPattern =
+            // Try finding a reference pattern in case there is no existing named access.
+            if isNotNull refPat then
+                ParenPatNavigator.GetByPattern(refPat)
+            else
+                // Otherwise, try and find an incomplete field pat
+                let fieldPat = FieldPatNavigator.GetByReferenceName(exprRefName)
+                NamedUnionCaseFieldsPatNavigator.GetByFieldPattern(fieldPat)
+
         getFieldsFromParametersOwnerPat parentPat Set.empty
 
-    // Assumption: A(a = foo; {caret})
-    let getFieldsAfterSemicolon (context: FSharpCodeCompletionContext) =
-        let (|ParametersOwnerWithSingleParameter|_|) (pat: ITreeNode) =
-            match pat with
-            | :? IParametersOwnerPat as ownerPat when ownerPat.Parameters.Count = 1 ->
-                Some ownerPat.Parameters.[0]
-            | _ -> None
-
-        let potentialNamedUnionCaseFieldsPat =
-            if isSemicolon context.TokenBeforeCaret then
-                context.TokenBeforeCaret.Parent
-            elif isWhitespace context.TokenBeforeCaret then
-                // This is rather weird though
-                // I was expecting the PrevSibling to be the semicolon instead.
-                match context.TokenBeforeCaret.PrevSibling with
-                | ParametersOwnerWithSingleParameter pat -> pat
-                // Incomplete match clause without body
-                // For example: | A(a = a1;) ->
-                | :? IMatchClause as clause ->
-                    match clause.Pattern with
-                    | ParametersOwnerWithSingleParameter pat -> pat
-                    | _ -> null
-                // Incomplete match expr
-                | :? ILetBindingsDeclaration as letBindings ->
-                    match Seq.tryLast letBindings.Bindings with
-                    | Some binding ->
-                        match binding.Expression with
-                        | :? IMatchExpr as matchExpr ->
-                            match Seq.tryLast matchExpr.Clauses with
-                            | Some clause ->
-                                match clause.Pattern with
-                                | ParametersOwnerWithSingleParameter pat -> pat
-                                | _ -> null
-                            | _ -> null
-                        | _ -> null
-                    | _ -> null
-                | _ -> null
-            else
-                null
-
-        if isNull potentialNamedUnionCaseFieldsPat then Array.empty else
-        match potentialNamedUnionCaseFieldsPat with
-        | :? INamedUnionCaseFieldsPat as namedUnionCaseFieldsPat ->
-            let usedFields =
-                namedUnionCaseFieldsPat.FieldPatterns
-                |> Seq.map (fun fieldPat -> fieldPat.ReferenceName.Identifier.Name)
-                |> set
-
-            getFieldsFromParametersOwnerPat namedUnionCaseFieldsPat usedFields
-        | _ -> Array.empty
-
-    let getFields context =
-        let fieldNames = getFieldsFromReference context
-        if not (Array.isEmpty fieldNames) then
-            fieldNames
-        else
-            getFieldsAfterSemicolon context
-
     override this.IsAvailable(context) =
-        let fieldNames = getFields context
+        let fieldNames = getFieldsFromReference context
         not (Array.isEmpty fieldNames)
 
     override this.AddLookupItems(context, collector) =
-        let fieldNames = getFields context
+        let fieldNames = getFieldsFromReference context
         assert (not (Array.isEmpty fieldNames))
         for fieldName in fieldNames do
             let info = TextualInfo(fieldName, fieldName, Ranges = context.Ranges)
