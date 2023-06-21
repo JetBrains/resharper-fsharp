@@ -37,15 +37,16 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         tuplePat <- parenPat.Pattern :?> ITuplePat
         if isNull tuplePat then false else
         
-        let hasUnderscore =
+        let hasReplaceablePatterns =
             tuplePat.Patterns
             |> Seq.exists (fun p ->
                 match p with
-                | :? IWildPat -> true
+                | :? IWildPat
+                | :? ILiteralPat -> true
                 | _ -> false)
     
         // We need something that is currently ignored
-        if not hasUnderscore then false else
+        if not hasReplaceablePatterns then false else
 
         // We need to be sure that the pattern is a DU with all named fields
         let fcsUnionCase = pattern.ReferenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
@@ -73,7 +74,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
             ||> Seq.zip
             |> Seq.choose (fun (name, pat) ->
                 match pat with
-                | :? IWildPat -> None
+                | :? IWildPat-> None
                 | _ -> Some (name, pat))
             |> Seq.toArray
 
