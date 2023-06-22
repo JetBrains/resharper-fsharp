@@ -1,7 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.projectView
 
 import com.intellij.openapi.project.Project
-import com.intellij.workspaceModel.ide.impl.toVirtualFile
+import com.intellij.platform.backend.workspace.virtualFile
 import com.jetbrains.rider.model.RdProjectFileDescriptor
 import com.jetbrains.rider.projectView.ProjectElementView
 import com.jetbrains.rider.projectView.ProjectEntityView
@@ -64,7 +64,7 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
     relativeTo: ProjectElementView,
     orderType: ActionOrderType
   ): Boolean {
-    if (entities.any { it.isProjectFolder() && it.containingProjectEntity()?.url?.toVirtualFile()?.extension == "fsproj" })
+    if (entities.any { it.isProjectFolder() && it.containingProjectEntity()?.url?.virtualFile?.extension == "fsproj" })
       return false
 
     if (orderType == ActionOrderType.None) {
@@ -165,7 +165,7 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
   }
 
   private fun isFSharpNode(entity: ProjectModelEntity): Boolean {
-    return entity.containingProjectEntity()?.url?.toVirtualFile()?.extension == "fsproj" ||
+    return entity.containingProjectEntity()?.url?.virtualFile?.extension == "fsproj" ||
       application.isUnitTestMode // todo: workaround for dummy project?
   }
 
