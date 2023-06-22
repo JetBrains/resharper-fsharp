@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open type JetBrains.Diagnostics.Assertion
 
 [<ContextAction(Name = "UseNamedAccess", Group = "F#", Description = "Use named access inside a DU pattern")>]
@@ -58,13 +59,18 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         use writeCookie = WriteLockCookie.Create(pattern.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
         
+        let rec visit (pat: IFSharpPattern) =
+            match pat.IgnoreInnerParens() with
+            | :? IWildPat-> None
+            | :? ITuplePat as tuplePat ->
+                let hasAnyPatterns = tuplePat.Patterns |> Seq.exists (visit >> Option.isSome)
+                if hasAnyPatterns then Some pat else None
+            | _ -> Some pat
+        
         let usedFieldsWithPatterns: (string * IFSharpPattern)[] =
             (names, tuplePat.PatternsEnumerable)
             ||> Seq.zip
-            |> Seq.choose (fun (name, pat) ->
-                match pat with
-                | :? IWildPat-> None
-                | _ -> Some (name, pat))
+            |> Seq.choose (fun (name, pat) -> visit pat |> Option.map (fun pat -> name, pat))
             |> Seq.toArray
 
         let factory = pattern.CreateElementFactory()

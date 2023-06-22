@@ -10,6 +10,7 @@ type UseNamedAccess() =
     
     [<Test>] member x.``WildCard 01``() = x.DoNamedTest()
     [<Test>] member x.``Constant 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
 
 type UseNamedAccessAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<UseNamedAccessAction>()
