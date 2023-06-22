@@ -36,17 +36,6 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         // This should only work when there are multiple items
         tuplePat <- parenPat.Pattern :?> ITuplePat
         if isNull tuplePat then false else
-        
-        let hasReplaceablePatterns =
-            tuplePat.Patterns
-            |> Seq.exists (fun p ->
-                match p with
-                | :? IWildPat
-                | :? ILiteralPat -> true
-                | _ -> false)
-    
-        // We need something that is currently ignored
-        if not hasReplaceablePatterns then false else
 
         // We need to be sure that the pattern is a DU with all named fields
         let fcsUnionCase = pattern.ReferenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
