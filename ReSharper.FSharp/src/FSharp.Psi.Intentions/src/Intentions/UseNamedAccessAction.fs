@@ -17,7 +17,13 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
     let mutable names = Array.empty
     let mutable tuplePat : ITuplePat = null
 
-    override x.Text = "Use named access"
+    override x.Text = 
+        let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>()
+        if isNull pattern then
+            "Use named fields in pattern"
+        else
+            let unionCaseName = pattern.ReferenceName.Names |> String.concat "."
+            $"Use named fields for '{unionCaseName}'"
 
     override x.IsAvailable _ =
         let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>()
