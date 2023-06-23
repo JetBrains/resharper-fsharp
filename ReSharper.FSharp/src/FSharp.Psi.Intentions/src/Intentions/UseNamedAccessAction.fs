@@ -30,11 +30,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         if isNull pattern then false else
         // We expect a single IParenPat here
         if pattern.Parameters.Count <> 1 then false else
-        let parenPat =
-            match pattern.Parameters.[0] with
-            | :? IParenPat as parenPat -> parenPat
-            | _ -> null
-
+        let parenPat = pattern.ParametersEnumerable.SingleItem.As<IParenPat>()
         if isNull parenPat then false else
 
         // Ignore multiline patterns for now
