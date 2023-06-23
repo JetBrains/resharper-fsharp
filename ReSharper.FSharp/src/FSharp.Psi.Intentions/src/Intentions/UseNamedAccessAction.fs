@@ -15,7 +15,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
     
     let mutable names = Array.empty
-    let mutable tuplePat : ITuplePat = null
+    let mutable patterns : IFSharpPattern seq = Seq.empty
 
     override x.Text = 
         let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>()
@@ -40,9 +40,6 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         // Ignore multiline patterns for now
         if parenPat.StartLine <> parenPat.EndLine then false else
 
-        // This should only work when there are multiple items
-        tuplePat <- parenPat.Pattern :?> ITuplePat
-        if isNull tuplePat then false else
         if isNull pattern.ReferenceName then false else
         // We need to be sure that the pattern is a DU with all named fields
         let fcsUnionCase = pattern.ReferenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
@@ -55,10 +52,16 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         
         // All fields need to be named
         if names.Length <> fcsUnionCase.Fields.Count then false else
-        // The amount of fields needs to match with the tuple length
-        if names.Length <> tuplePat.Patterns.Count then false else
 
-        true
+        // The amount of fields needs to match with the current pattern length
+        match parenPat.Pattern with
+        | :? ITuplePat as tuplePat when names.Length = tuplePat.Patterns.Count ->
+            patterns <- tuplePat.PatternsEnumerable
+            true
+        | singlePat when names.Length = 1 ->
+            patterns <- Seq.singleton singlePat
+            true
+        | _ -> false
 
     override x.ExecutePsiTransaction _ : unit =
         let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>().NotNull()
@@ -74,7 +77,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
             | _ -> Some pat
         
         let usedFieldsWithPatterns: (string * IFSharpPattern)[] =
-            (names, tuplePat.PatternsEnumerable)
+            (names, patterns)
             ||> Seq.zip
             |> Seq.choose (fun (name, pat) -> visit pat |> Option.map (fun pat -> name, pat))
             |> Seq.toArray
