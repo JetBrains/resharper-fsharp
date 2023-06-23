@@ -10,7 +10,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 
 [<ContextAction(Name = "Deconstruct variable", Group = "F#",
-                Description = "Deconstructs pattern into multiple positional components")>]
+                Description = "Deconstructs pattern into multiple positional components",
+                Priority = 1s)>]
 type DeconstructPatternContextAction(provider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(provider)
 
