@@ -19,3 +19,4 @@ type UseNamedAccessAvailabilityTest() =
 
     [<Test>] member x.``Multiline Pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Nameless Fields 01``() = x.DoNamedTest()
+    [<Test>] member x.``Incomplete ReferenceName 01``() = x.DoNamedTest()

@@ -43,7 +43,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         // This should only work when there are multiple items
         tuplePat <- parenPat.Pattern :?> ITuplePat
         if isNull tuplePat then false else
-
+        if isNull pattern.ReferenceName then false else
         // We need to be sure that the pattern is a DU with all named fields
         let fcsUnionCase = pattern.ReferenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
         if isNull fcsUnionCase then false else
