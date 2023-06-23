@@ -19,11 +19,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
 
     override x.Text = 
         let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>()
-        if isNull pattern then
-            "Use named fields in pattern"
-        else
-            let unionCaseName = pattern.ReferenceName.Names |> String.concat "."
-            $"Use named fields for '{unionCaseName}'"
+        $"Use named fields for '{pattern.ReferenceName.ShortName}'"
 
     override x.IsAvailable _ =
         let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>()
