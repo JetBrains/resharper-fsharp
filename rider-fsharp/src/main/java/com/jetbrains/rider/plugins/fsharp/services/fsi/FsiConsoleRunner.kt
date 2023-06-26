@@ -59,9 +59,9 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
   AbstractConsoleRunnerWithHistory<LanguageConsoleView>(fsiHost.project, fsiTitle, null) {
 
   companion object {
-    val fsiTitle = FSharpBundle.message("FSI.ConsoleRunner.title")
-    private val debugNotConfiguredTitle = FSharpBundle.message("FSI.notifications.debug.not.configured.title")
-    private val debugNotConfiguredDescription = FSharpBundle.message("FSI.notifications.debug.not.configured.description")
+    val fsiTitle = FSharpBundle.message("Fsi.ConsoleRunner.title")
+    private val debugNotConfiguredTitle = FSharpBundle.message("Fsi.notifications.debug.not.configured.title")
+    private val debugNotConfiguredDescription = FSharpBundle.message("Fsi.notifications.debug.not.configured.description")
     private val notificationLinks = "<br/>${RelaunchFsiWithDebugAction.link}&nbsp;&nbsp;&nbsp;&nbsp;${ShowFsiSettingsAction.link}"
 
     private val debugFsiArgs = listOf("--optimize-", "--debug+")
@@ -289,14 +289,14 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
   }
 
   private class ResetFsiAction(private val host: FsiHost) :
-    AnAction(FSharpBundle.message("FSI.actions.reset.fsi.title"), null, AllIcons.Actions.Restart) {
+    AnAction(FSharpBundle.message("Fsi.actions.reset.fsi.title"), null, AllIcons.Actions.Restart) {
     override fun actionPerformed(e: AnActionEvent) {
       host.resetFsiConsole(host.consoleRunner?.optimizeForDebug ?: false)
     }
   }
 
   private class OpenSettings(val project: Project) :
-    AnAction(FSharpBundle.message("FSI.actions.open.settings.title"), null, AllIcons.General.Settings) {
+    AnAction(FSharpBundle.message("Fsi.actions.open.settings.title"), null, AllIcons.General.Settings) {
     override fun actionPerformed(e: AnActionEvent) {
       ShowSettingsUtil.getInstance().showSettingsDialog(project, "Fsi")
     }
@@ -312,7 +312,7 @@ class RelaunchFsiWithDebugAction(private val currentProject: Project? = null) : 
 
   companion object {
     const val actionName = "relaunchWithDebug"
-    val link = "<a href='$actionName'>${FSharpBundle.message("FSI.actions.relaunch.fsi.with.debug.link.text")}</a>"
+    val link = "<a href='$actionName'>${FSharpBundle.message("Fsi.actions.relaunch.fsi.with.debug.link.text")}</a>"
   }
 }
 
@@ -324,6 +324,6 @@ class ShowFsiSettingsAction(private val currentProject: Project? = null) : AnAct
 
   companion object {
     const val actionName = "settings"
-    val link = "<a href='$actionName'>${FSharpBundle.message("FSI.actions.show.fsi.settings.link.text")}</a>"
+    val link = "<a href='$actionName'>${FSharpBundle.message("Fsi.actions.show.fsi.settings.link.text")}</a>"
   }
 }

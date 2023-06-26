@@ -104,8 +104,8 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
   }
 
   private fun notifyFsiNotFound(fsiPath: String) {
-    val title = FSharpBundle.message("FSI.notifications.fsi.not.found.title")
-    val content = FSharpBundle.message("FSI.notifications.fsi.not.found.description", fsiPath)
+    val title = FSharpBundle.message("Fsi.notifications.fsi.not.found.title")
+    val content = FSharpBundle.message("Fsi.notifications.fsi.not.found.description", fsiPath)
     val notification = Notification(FsiConsoleRunner.fsiTitle, title, content, NotificationType.WARNING)
     notification.icon = FSharpIcons.FSharpConsole
     Notifications.Bus.notify(notification, project)

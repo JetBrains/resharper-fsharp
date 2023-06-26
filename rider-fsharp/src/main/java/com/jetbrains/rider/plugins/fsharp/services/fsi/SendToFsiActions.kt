@@ -19,11 +19,11 @@ object Fsi {
   const val sendToFsiActionId = "Rider.Plugins.FSharp.SendToFsi"
   const val debugInFsiActionId = "Rider.Plugins.FSharp.DebugInFsi"
 
-  val sendLineText = FSharpBundle.message("FSI.actions.send.line.text")
-  val debugLineText = FSharpBundle.message("FSI.actions.debug.line.text")
+  val sendLineText = FSharpBundle.message("Fsi.actions.send.line.text")
+  val debugLineText = FSharpBundle.message("Fsi.actions.debug.line.text")
 
-  val sendSelectionText = FSharpBundle.message("FSI.actions.send.selection.text")
-  val debugSelectionText = FSharpBundle.message("FSI.actions.debug.selection.text")
+  val sendSelectionText = FSharpBundle.message("Fsi.actions.send.selection.text")
+  val debugSelectionText = FSharpBundle.message("Fsi.actions.debug.selection.text")
 }
 
 class StartFsiAction : AnAction() {
@@ -96,7 +96,7 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
   BaseElementAtCaretIntentionAction(), ShortcutProvider, Iconable, DumbAware {
   private val isAvailable = !debug || SystemInfo.isWindows
 
-  override fun getFamilyName(): String = FSharpBundle.message("FSI.actions.send.to.fsi.intention.action.text")
+  override fun getFamilyName(): String = FSharpBundle.message("Fsi.actions.send.to.fsi.intention.action.text")
   override fun startInWriteAction() = false
 
   override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
