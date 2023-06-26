@@ -7,4 +7,3 @@ abstract class FSharpLanguageBase(name: String) : RiderLanguageBase(name, name) 
 }
 
 object FSharpLanguage : FSharpLanguageBase("F#")
-object FSharpScriptLanguage : FSharpLanguageBase("F# Script")

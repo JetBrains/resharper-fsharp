@@ -7,12 +7,13 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
+import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 
 class CommandHistoryAction(private val consoleRunner: FsiConsoleRunner) :
-  DumbAwareAction("Recent commands", null, AllIcons.Vcs.History) {
+  DumbAwareAction(FSharpBundle.message("Fsi.CommandHistoryAction.popup.title.recent.commands"), null, AllIcons.Vcs.History) {
   companion object {
-    const val copyTitle = "Set recent command"
-    const val executeTitle = "Execute recent command"
+    val copyTitle = FSharpBundle.message("Fsi.CommandHistoryAction.behaviour.copy.to.editor.title")
+    val executeTitle = FSharpBundle.message("Fsi.CommandHistoryAction.behaviour.execute.title")
   }
 
   private val consoleView = consoleRunner.consoleView

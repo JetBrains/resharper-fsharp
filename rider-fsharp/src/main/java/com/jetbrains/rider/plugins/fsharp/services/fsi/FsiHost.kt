@@ -8,13 +8,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.PsiFile
 import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
-import com.jetbrains.rider.plugins.fsharp.RdFsiSessionInfo
-import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
-import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rd.util.reactive.Property
 import com.jetbrains.rd.util.reactive.flowInto
-import com.jetbrains.rider.plugins.fsharp.RdFsiRuntime
+import com.jetbrains.rider.plugins.fsharp.*
 import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
 
@@ -107,8 +104,8 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
   }
 
   private fun notifyFsiNotFound(fsiPath: String) {
-    val title = "Could not start F# Interactive"
-    val content = "The file '$fsiPath' was not found."
+    val title = FSharpBundle.message("Fsi.notifications.fsi.not.found.title")
+    val content = FSharpBundle.message("Fsi.notifications.fsi.not.found.description", fsiPath)
     val notification = Notification(FsiConsoleRunner.fsiTitle, title, content, NotificationType.WARNING)
     notification.icon = FSharpIcons.FSharpConsole
     Notifications.Bus.notify(notification, project)
