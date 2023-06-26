@@ -5,12 +5,12 @@ Color.FromArgb(|green = 150, blue = 234, red = 123|(1)) |> ignore
 Color.FromArgb(|123, blue = 234, green = 150|(2)) |> ignore
 
 ---------------------------------------------------------
-(0): ReSharper Parameter Name Hint: (T) '|   | 
+(0): ReSharper Parameter Name Hint: (T) 'Color  ㅤ
 ARGB:  255, 123, 20, 234
 HEX:  FF, 7B, 14, EA' (E) ''
-(1): ReSharper Parameter Name Hint: (T) '|   | 
+(1): ReSharper Parameter Name Hint: (T) 'Color  ㅤ
 ARGB:  255, 123, 150, 234
 HEX:  FF, 7B, 96, EA' (E) ''
-(2): ReSharper Parameter Name Hint: (T) '|   | 
+(2): ReSharper Parameter Name Hint: (T) 'Color  ㅤ
 ARGB:  255, 123, 150, 234
 HEX:  FF, 7B, 96, EA' (E) ''

@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
-open JetBrains.ReSharper.Daemon.VisualElements
+open JetBrains.ReSharper.Feature.Services.ColorHints
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
@@ -12,7 +12,7 @@ type FSharpColorHighlightingTest() =
     override x.RelativeTestDataPath = "features/daemon/colorHighlighting"
 
     override x.HighlightingPredicate(highlighting, _, _) =
-        highlighting :? ColorHighlighting
+        highlighting :? ColorHintHighlighting
 
     [<Test>] member x.``Methods 01``() = x.DoNamedTest()
     [<Test>] member x.``Methods 02 - Hex``() = x.DoNamedTest()

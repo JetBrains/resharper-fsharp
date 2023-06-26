@@ -1,12 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open JetBrains.Application.Settings
-open JetBrains.ReSharper.Daemon.VisualElements
+open JetBrains.ReSharper.Feature.Services.ColorHints
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-[<ElementProblemAnalyzer(typeof<IReferenceExpr>, HighlightingTypes = [| typeof<ColorHighlighting> |])>]
+[<ElementProblemAnalyzer(typeof<IReferenceExpr>, HighlightingTypes = [| typeof<ColorHintHighlighting> |])>]
 type ColorReferenceAnalyzer() =
     inherit ElementProblemAnalyzer<IReferenceExpr>()
 

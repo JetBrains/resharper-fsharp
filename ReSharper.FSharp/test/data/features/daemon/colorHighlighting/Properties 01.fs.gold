@@ -5,12 +5,12 @@ Color.|MediumVioletRed|(1) |> ignore
 Color.|Chocolate|(2) |> ignore
 
 ---------------------------------------------------------
-(0): ReSharper Parameter Name Hint: (T) '|   | ForestGreen
+(0): ReSharper Parameter Name Hint: (T) 'Color ForestGreen ㅤ
 ARGB:  255, 34, 139, 34
 HEX:  FF, 22, 8B, 22' (E) ''
-(1): ReSharper Parameter Name Hint: (T) '|   | MediumVioletRed
+(1): ReSharper Parameter Name Hint: (T) 'Color MediumVioletRed ㅤ
 ARGB:  255, 199, 21, 133
 HEX:  FF, C7, 15, 85' (E) ''
-(2): ReSharper Parameter Name Hint: (T) '|   | Chocolate
+(2): ReSharper Parameter Name Hint: (T) 'Color Chocolate ㅤ
 ARGB:  255, 210, 105, 30
 HEX:  FF, D2, 69, 1E' (E) ''
