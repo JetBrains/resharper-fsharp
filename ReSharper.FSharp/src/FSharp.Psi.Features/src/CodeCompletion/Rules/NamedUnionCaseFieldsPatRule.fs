@@ -12,7 +12,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExpectedTypes
@@ -40,27 +39,18 @@ type NamedUnionCaseFieldsPatRule() =
         if Set.isEmpty filterFields then fieldNames else
         fieldNames
         |> Array.except filterFields
-
-    let getParametersOwnerPatAndFilteredItemsFromReference (context: FSharpCodeCompletionContext) : IParametersOwnerPat * Set<string> =
-        let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
-        if isNull reference then (null, Set.empty) else
-
-        let exprRefName = reference.GetElement().As<IExpressionReferenceName>()
-        if isNull exprRefName || exprRefName.IsQualified then (null, Set.empty) else
-
-        let refPat = ReferencePatNavigator.GetByReferenceName(exprRefName)
-        let parentPat : IFSharpPattern =
-            // Try finding a reference pattern in case there is no existing named access.
-            if isNotNull refPat then
-                ParenPatNavigator.GetByPattern(refPat)
-            else
-                // Otherwise, try and find an incomplete field pat
-                let fieldPat = FieldPatNavigator.GetByReferenceName(exprRefName)
-                NamedUnionCaseFieldsPatNavigator.GetByFieldPattern(fieldPat)
+    
+    // The current scope is to have A({caret}) captured.
+    // A fake identifier will be inserted in the reparseContext.
+    let getFieldsFromReference (context: FSharpCodeCompletionContext) =
+        let parametersOwnerPat = getParametersOwnerPatFromReference context.ReparsedContext.Reference
+        if isNull parametersOwnerPat then Array.empty else
 
         let filteredItems =
-            match parentPat with
-            | :? INamedUnionCaseFieldsPat as namedUnionCaseFieldsPat ->
+            let namedUnionCaseFieldsPat = parametersOwnerPat.Parameters.SingleItem.As<INamedUnionCaseFieldsPat>()
+            if isNull namedUnionCaseFieldsPat then
+                Set.empty
+            else
                 namedUnionCaseFieldsPat.FieldPatterns
                 |> Seq.choose (fun fieldPat ->
                     if isNull fieldPat.ReferenceName
@@ -69,14 +59,7 @@ type NamedUnionCaseFieldsPatRule() =
                     else
                         Some fieldPat.ReferenceName.Identifier.Name)
                 |> Set.ofSeq
-            | _ -> Set.empty
-        
-        ParametersOwnerPatNavigator.GetByParameter(parentPat), filteredItems
-    
-    // The current scope is to have A({caret}) captured.
-    // A fake identifier will be inserted in the reparseContext.
-    let getFieldsFromReference (context: FSharpCodeCompletionContext) =
-        let parametersOwnerPat, filteredItems = getParametersOwnerPatAndFilteredItemsFromReference context
+
         getFieldsFromParametersOwnerPat parametersOwnerPat filteredItems
 
     override this.IsAvailable(context) =
@@ -84,7 +67,7 @@ type NamedUnionCaseFieldsPatRule() =
         not (Array.isEmpty fieldNames)
 
     override this.TransformItems(context, collector) =
-        let parametersOwnerPat, _ = getParametersOwnerPatAndFilteredItemsFromReference context
+        let parametersOwnerPat = getParametersOwnerPatFromReference context.ReparsedContext.Reference
         let namedUnionCaseFieldsPat = if isNull parametersOwnerPat then null else parametersOwnerPat.Parameters.SingleItem.As<INamedUnionCaseFieldsPat>()
         if isNotNull namedUnionCaseFieldsPat then
             // In this scenario we are already in a named union case field pattern.

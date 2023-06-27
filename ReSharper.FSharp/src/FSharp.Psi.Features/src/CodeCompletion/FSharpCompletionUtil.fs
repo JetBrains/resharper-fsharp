@@ -6,7 +6,10 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.TextControl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
 let (|BasicCompletion|SmartCompletion|ImportCompletion|) completionType =
     if completionType == CodeCompletionType.BasicCompletion then BasicCompletion else
@@ -42,3 +45,22 @@ type ILookupItem with
 
     member this.WithRelevance(relevance: CLRLookupItemRelevance) =
         this.WithRelevance(uint64 relevance)
+
+let getParametersOwnerPatFromReference (reference: IReference) : IParametersOwnerPat =
+    let reference = reference.As<FSharpSymbolReference>()
+    if isNull reference then null else
+
+    let exprRefName = reference.GetElement().As<IExpressionReferenceName>()
+    if isNull exprRefName || exprRefName.IsQualified then null else
+
+    let refPat = ReferencePatNavigator.GetByReferenceName(exprRefName)
+    let parentPat : IFSharpPattern =
+        // Try finding a reference pattern in case there is no existing named access.
+        if isNotNull refPat then
+            ParenPatNavigator.GetByPattern(refPat)
+        else
+            // Otherwise, try and find an incomplete field pat
+            let fieldPat = FieldPatNavigator.GetByReferenceName(exprRefName)
+            NamedUnionCaseFieldsPatNavigator.GetByFieldPattern(fieldPat)
+    
+    ParametersOwnerPatNavigator.GetByParameter(parentPat)

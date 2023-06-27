@@ -33,6 +33,15 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
         let fsContext = context.As<FSharpCodeCompletionContext>()
         if isNull fsContext then null else
 
+        let isNamedUnionCaseFieldsPat =
+            let reference = fsContext.ReparsedContext.Reference
+            let parametersOwnerPat = FSharpCompletionUtil.getParametersOwnerPatFromReference reference
+            if isNull parametersOwnerPat then false else
+            let namedUnionCaseFieldsPat = parametersOwnerPat.Parameters.SingleItem.As<INamedUnionCaseFieldsPat>()
+            isNotNull namedUnionCaseFieldsPat
+
+        if isNamedUnionCaseFieldsPat then null else
+        
         let tokenType = getTokenType fsContext.TokenAtCaret
         let tokenBeforeType = getTokenType fsContext.TokenBeforeCaret
 
