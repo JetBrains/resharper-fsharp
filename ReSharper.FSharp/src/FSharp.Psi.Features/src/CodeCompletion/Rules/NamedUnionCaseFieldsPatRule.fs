@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExpectedTypes
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Resources
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -24,9 +25,11 @@ type NamedUnionCaseFieldsPatRule() =
     // Find the parameterOwner `A` in `A()` or `A(a = a; )`
     // Filter out the already used fields
     let getFieldsFromParametersOwnerPat (parametersOwnerPat: IParametersOwnerPat) (filterFields: Set<string>) =
-        if isNull parametersOwnerPat then Array.empty else
+        let referenceName = parametersOwnerPat.ReferenceName
+        if isNull referenceName then Array.empty else
+
         // We need to figure out if `A` actually is a UnionCase.
-        let fcsUnionCase = parametersOwnerPat.ReferenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
+        let fcsUnionCase = referenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
         if isNull fcsUnionCase then Array.empty else
 
         let fieldNames =
@@ -39,7 +42,7 @@ type NamedUnionCaseFieldsPatRule() =
         if Set.isEmpty filterFields then fieldNames else
         fieldNames
         |> Array.except filterFields
-    
+
     // The current scope is to have A({caret}) captured.
     // A fake identifier will be inserted in the reparseContext.
     let getFieldsFromReference (context: FSharpCodeCompletionContext) =
@@ -48,17 +51,12 @@ type NamedUnionCaseFieldsPatRule() =
 
         let filteredItems =
             let namedUnionCaseFieldsPat = parametersOwnerPat.Parameters.SingleItem.As<INamedUnionCaseFieldsPat>()
-            if isNull namedUnionCaseFieldsPat then
-                Set.empty
-            else
-                namedUnionCaseFieldsPat.FieldPatterns
-                |> Seq.choose (fun fieldPat ->
-                    if isNull fieldPat.ReferenceName
-                       || isNull fieldPat.ReferenceName.Identifier then
-                        None
-                    else
-                        Some fieldPat.ReferenceName.Identifier.Name)
-                |> Set.ofSeq
+            if isNull namedUnionCaseFieldsPat then Set.empty else
+
+            namedUnionCaseFieldsPat.FieldPatterns
+            |> Seq.map (fun fieldPat -> fieldPat.ShortName)
+            |> Seq.filter (fun name -> name <> SharedImplUtil.MISSING_DECLARATION_NAME)
+            |> Set.ofSeq
 
         getFieldsFromParametersOwnerPat parametersOwnerPat filteredItems
 
@@ -83,9 +81,9 @@ type NamedUnionCaseFieldsPatRule() =
                 LookupItemFactory
                     .CreateLookupItem(info)
                     .WithPresentation(fun _ ->
-                        TextPresentation(info, fieldName, true, PsiSymbolsThemedIcons.Field.Id) :> _)
-                    .WithBehavior(fun _ -> TextualBehavior(info) :> _)
-                    .WithMatcher(fun _ -> TextualMatcher(info) :> _)
+                        TextPresentation(info, fieldName, true, PsiSymbolsThemedIcons.Field.Id))
+                    .WithBehavior(fun _ -> TextualBehavior(info))
+                    .WithMatcher(fun _ -> TextualMatcher(info))
                     // Force the items to be on top in the list.
                     .WithRelevance(CLRLookupItemRelevance.ExpectedTypeMatch)
 

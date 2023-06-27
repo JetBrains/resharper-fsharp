@@ -62,11 +62,9 @@ type FSharpOnSpaceAutopopupStrategy() =
 
             | TokenType FSharpTokenType.SEMICOLON semi ->
                 match semi.Parent with
-                | :? IRecordFieldBinding as fieldBinding ->
-                    fieldBinding.Semicolon == semi
-
-                | :? INamedUnionCaseFieldsPat as namedUnionCaseFieldsPat ->
-                    namedUnionCaseFieldsPat.LastChild == semi
+                | :? IRecordFieldBinding
+                | :? INamedUnionCaseFieldsPat as node ->
+                    node.LastChild == semi
                 | _ -> false
 
             | TokenType FSharpTokenType.LBRACE lbrace ->

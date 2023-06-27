@@ -54,7 +54,7 @@ let getParametersOwnerPatFromReference (reference: IReference) : IParametersOwne
     if isNull exprRefName || exprRefName.IsQualified then null else
 
     let refPat = ReferencePatNavigator.GetByReferenceName(exprRefName)
-    let parentPat : IFSharpPattern =
+    let parentPat: IFSharpPattern =
         // Try finding a reference pattern in case there is no existing named access.
         if isNotNull refPat then
             ParenPatNavigator.GetByPattern(refPat)
@@ -62,5 +62,5 @@ let getParametersOwnerPatFromReference (reference: IReference) : IParametersOwne
             // Otherwise, try and find an incomplete field pat
             let fieldPat = FieldPatNavigator.GetByReferenceName(exprRefName)
             NamedUnionCaseFieldsPatNavigator.GetByFieldPattern(fieldPat)
-    
+
     ParametersOwnerPatNavigator.GetByParameter(parentPat)
