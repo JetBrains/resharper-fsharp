@@ -65,6 +65,8 @@ type FSharpOnSpaceAutopopupStrategy() =
                 | :? IRecordFieldBinding as fieldBinding ->
                     fieldBinding.Semicolon == semi
 
+                | :? INamedUnionCaseFieldsPat as namedUnionCaseFieldsPat ->
+                    namedUnionCaseFieldsPat.LastChild == semi
                 | _ -> false
 
             | TokenType FSharpTokenType.LBRACE lbrace ->
