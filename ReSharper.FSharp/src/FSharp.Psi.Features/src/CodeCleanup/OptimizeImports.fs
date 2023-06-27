@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Files
 open JetBrains.Util
 
 [<CodeCleanupModule>]
@@ -17,7 +18,7 @@ type FSharpOptimizeImports() =
         member this.IsAvailableOnSelection = true
 
         member this.IsAvailable(sourceFile: IPsiSourceFile) =
-            sourceFile.PrimaryPsiLanguage :? FSharpLanguage
+            sourceFile.GetDominantPsiFile<FSharpLanguage>() |> isNotNull
 
         member this.IsAvailable(profile: CodeCleanupProfile): bool =
             profile.GetSetting(OptimizeUsings.OptimizeUsingsDescriptor)
