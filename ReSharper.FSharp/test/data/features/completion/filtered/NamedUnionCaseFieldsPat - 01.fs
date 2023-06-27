@@ -1,6 +1,3 @@
-// ${COMPLETE_ITEM:apple}
-// ${COMPLETE_ITEM:banana}
-// ${COMPLETE_ITEM:citrus}
 module Foo
 
 type Foo =

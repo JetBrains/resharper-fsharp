@@ -1,5 +1,3 @@
-// ${COMPLETE_ITEM:banana}
-// ${COMPLETE_ITEM:citrus}
 module Foo
 
 type Foo =
@@ -8,6 +6,4 @@ type Foo =
 
 let a (b: Foo) =
     match b with
-    | Bar(a = apple; {caret}) ->
-
-do ()
+    | Bar(apple = a; {caret}) -> ()

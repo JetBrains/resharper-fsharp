@@ -24,8 +24,7 @@ type NamedUnionCaseFieldsPatRule() =
 
     // Find the parameterOwner `A` in `A()` or `A(a = a; )`
     // Filter out the already used fields
-    let getFieldsFromParametersOwnerPat (parameterPat: IFSharpPattern) (filterFields: Set<string>) =
-        let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(parameterPat)
+    let getFieldsFromParametersOwnerPat (parametersOwnerPat: IParametersOwnerPat) (filterFields: Set<string>) =
         if isNull parametersOwnerPat then Array.empty else
         // We need to figure out if `A` actually is a UnionCase.
         let fcsUnionCase = parametersOwnerPat.ReferenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
@@ -42,16 +41,13 @@ type NamedUnionCaseFieldsPatRule() =
         fieldNames
         |> Array.except filterFields
 
-    // The current scope is to have A({caret}) captured.
-    // A fake identifier will be inserted in the reparseContext.
-    let getFieldsFromReference (context: FSharpCodeCompletionContext) =
+    let getParametersOwnerPatAndFilteredItemsFromReference (context: FSharpCodeCompletionContext) : IParametersOwnerPat * Set<string> =
         let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
-        if isNull reference then Array.empty else
+        if isNull reference then (null, Set.empty) else
 
         let exprRefName = reference.GetElement().As<IExpressionReferenceName>()
-        if isNull exprRefName || exprRefName.IsQualified then Array.empty else
-        
-        
+        if isNull exprRefName || exprRefName.IsQualified then (null, Set.empty) else
+
         let refPat = ReferencePatNavigator.GetByReferenceName(exprRefName)
         let parentPat : IFSharpPattern =
             // Try finding a reference pattern in case there is no existing named access.
@@ -62,15 +58,42 @@ type NamedUnionCaseFieldsPatRule() =
                 let fieldPat = FieldPatNavigator.GetByReferenceName(exprRefName)
                 NamedUnionCaseFieldsPatNavigator.GetByFieldPattern(fieldPat)
 
-        getFieldsFromParametersOwnerPat parentPat Set.empty
+        let filteredItems =
+            match parentPat with
+            | :? INamedUnionCaseFieldsPat as namedUnionCaseFieldsPat ->
+                namedUnionCaseFieldsPat.FieldPatterns
+                |> Seq.choose (fun fieldPat ->
+                    if isNull fieldPat.ReferenceName
+                       || isNull fieldPat.ReferenceName.Identifier then
+                        None
+                    else
+                        Some fieldPat.ReferenceName.Identifier.Name)
+                |> Set.ofSeq
+            | _ -> Set.empty
+        
+        ParametersOwnerPatNavigator.GetByParameter(parentPat), filteredItems
+    
+    // The current scope is to have A({caret}) captured.
+    // A fake identifier will be inserted in the reparseContext.
+    let getFieldsFromReference (context: FSharpCodeCompletionContext) =
+        let parametersOwnerPat, filteredItems = getParametersOwnerPatAndFilteredItemsFromReference context
+        getFieldsFromParametersOwnerPat parametersOwnerPat filteredItems
 
     override this.IsAvailable(context) =
         let fieldNames = getFieldsFromReference context
         not (Array.isEmpty fieldNames)
 
-    override this.AddLookupItems(context, collector) =
+    override this.TransformItems(context, collector) =
+        let parametersOwnerPat, _ = getParametersOwnerPatAndFilteredItemsFromReference context
+        let namedUnionCaseFieldsPat = if isNull parametersOwnerPat then null else parametersOwnerPat.Parameters.SingleItem.As<INamedUnionCaseFieldsPat>()
+        if isNotNull namedUnionCaseFieldsPat then
+            // In this scenario we are already in a named union case field pattern.
+            // Thus there is no need to show any other completions.
+            collector.RemoveWhere(fun item -> true)
+
         let fieldNames = getFieldsFromReference context
         assert (not (Array.isEmpty fieldNames))
+
         for fieldName in fieldNames do
             let info = TextualInfo(fieldName, fieldName, Ranges = context.Ranges)
             let item =
@@ -92,5 +115,3 @@ type NamedUnionCaseFieldsPatRule() =
             item.SetTailType(SimpleTailType(" = ", tailNodeTypes, SkipTypings = [|" = "; "= "|]))
 
             collector.Add(item)
-
-        true
