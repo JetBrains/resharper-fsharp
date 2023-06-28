@@ -141,8 +141,7 @@ type FSharpScriptReferenceCompletionProvider() =
         let filePath = context.BasicContext.SourceFile.GetLocation()
         let completedPath = context.CompletedPath.MakeAbsoluteBasedOn(filePath.Directory)
 
-        let token = context.Token.As<FSharpString>()
-        let tokenType = token.NodeType.As<TokenNodeType>()
+        let token = context.Token
         let hashDirective = token.Parent :?> _
         match getCompletionTarget hashDirective with
         | Some (allowedExtensions, iconId) ->
@@ -159,8 +158,11 @@ type FSharpScriptReferenceCompletionProvider() =
                     FSharpPathLookupItem(path, completedPath, iconId)
                     |> addItem
 
-            let stringContent = getStringContent tokenType (token.GetText())
-            if stringContent.IsNullOrWhitespace() then addItem nugetItem
+            match token, token.NodeType with
+            | :? FSharpString, (:? TokenNodeType as tokenType) ->
+                let stringContent = getStringContent tokenType (token.GetText())
+                if stringContent.IsNullOrWhitespace() then addItem nugetItem
+            | _ -> ()
 
             match context.BasicContext.CodeCompletionType with
             | BasicCompletion ->
