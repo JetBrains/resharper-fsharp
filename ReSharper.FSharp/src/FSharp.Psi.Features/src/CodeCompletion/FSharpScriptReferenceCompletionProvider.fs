@@ -1,5 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open System
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
@@ -11,25 +12,39 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 open JetBrains.Util
 
-type FSharpPathCompletionContext(context, token, completedPath, ranges) =
+type ReferenceLookupItem(text, displayName, reschedule) =
+    inherit TextLookupItem(text)
+
+    override this.GetDisplayName() =
+        displayName
+
+    override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
+        base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill)
+        if reschedule then
+            textControl.RescheduleCompletion(solution)
+
+type FSharpScriptReferenceCompletionContext(context, token, completedPath, ranges) =
     inherit SpecificCodeCompletionContext(context)
 
-    override x.ContextId = "FSharpPathCompletionContext"
+    override x.ContextId = "FSharpScriptReferenceCompletionContext"
     member x.Token = token
     member x.Ranges = ranges
     member x.CompletedPath = completedPath
 
 
 [<IntellisensePart>]
-type FSharpPathCompletionContextProvider() =
+type FSharpScriptReferenceCompletionContextProvider() =
     inherit CodeCompletionContextProviderBase()
 
     override x.IsApplicable(context) =
@@ -44,10 +59,12 @@ type FSharpPathCompletionContextProvider() =
                 let caretOffset = caretOffset.Offset
                 let tokenOffset = token.GetTreeStartOffset().Offset
                 let tokenText = token.GetText()
-                let valueStartOffset = tokenOffset + tokenText.IndexOf("\"") + 1
+                let valueStart = tokenText.IndexOf("\"") + 1
+                let valueStartOffset = tokenOffset + valueStart
                 let tokenEndOffset = tokenOffset + tokenText.Length
 
                 let unfinishedLiteral = tokenText.IndexOf('"') = tokenText.LastIndexOf('"')
+                tokenText.IndexOf("nuget:", valueStart) = -1 &&
                 caretOffset >= valueStartOffset &&
                 (caretOffset < tokenEndOffset || caretOffset = tokenEndOffset && unfinishedLiteral)
             | _ -> false
@@ -89,12 +106,12 @@ type FSharpPathCompletionContextProvider() =
         let ranges = TextLookupRanges(insertRange, replaceRange)
 
         let completedPath = VirtualFileSystemPath.TryParse(argValue.Substring(0, prevSeparatorValueOffset + 1), InteractionContext.SolutionContext)
-        FSharpPathCompletionContext(context, token, completedPath, ranges) :> _
+        FSharpScriptReferenceCompletionContext(context, token, completedPath, ranges) :> _
 
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpPathCompletionProvider() =
-    inherit ItemsProviderOfSpecificContext<FSharpPathCompletionContext>()
+type FSharpScriptReferenceCompletionProvider() =
+    inherit ItemsProviderOfSpecificContext<FSharpScriptReferenceCompletionContext>()
 
     let getCompletionTarget (hashDirective: IHashDirective) =
         if isNull hashDirective then None else
@@ -113,6 +130,9 @@ type FSharpPathCompletionProvider() =
         | "I"    -> Some (Set.empty, null)
         | _ -> None
 
+    let nugetItem =
+        ReferenceLookupItem("nuget: ", "nuget", true).WithRelevance(UInt64.MaxValue).As<TextLookupItemBase>()
+
     override x.IsAvailable _ = true
     override x.GetDefaultRanges(context) = context.Ranges
     override x.GetLookupFocusBehaviour _ = LookupFocusBehaviour.Soft
@@ -121,7 +141,8 @@ type FSharpPathCompletionProvider() =
         let filePath = context.BasicContext.SourceFile.GetLocation()
         let completedPath = context.CompletedPath.MakeAbsoluteBasedOn(filePath.Directory)
 
-        let token = context.Token
+        let token = context.Token.As<FSharpString>()
+        let tokenType = token.NodeType.As<TokenNodeType>()
         let hashDirective = token.Parent :?> _
         match getCompletionTarget hashDirective with
         | Some (allowedExtensions, iconId) ->
@@ -137,6 +158,9 @@ type FSharpPathCompletionProvider() =
                 if isAllowed path then
                     FSharpPathLookupItem(path, completedPath, iconId)
                     |> addItem
+
+            let stringContent = getStringContent tokenType (token.GetText())
+            if stringContent.IsNullOrWhitespace() then addItem nugetItem
 
             match context.BasicContext.CodeCompletionType with
             | BasicCompletion ->
@@ -187,7 +211,7 @@ type FSharpFolderCompletionItem(path: VirtualFileSystemPath) =
 
 
 [<SolutionComponent>]
-type FSharpPathAutocompletionStrategy() =
+type FSharpScriptReferenceAutocompletionStrategy() =
     interface IAutomaticCodeCompletionStrategy with
 
         member x.Language = FSharpLanguage.Instance :> _
