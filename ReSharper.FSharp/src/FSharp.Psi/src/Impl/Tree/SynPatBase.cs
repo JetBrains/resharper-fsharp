@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -215,6 +216,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class FieldPat
   {
     public FSharpSymbolReference Reference => ReferenceName?.Reference;
+    public string ShortName => ReferenceName?.ShortName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
   }
 
   internal static class ReferencePatternUtil

@@ -483,6 +483,15 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Pattern - No reparse ident 01``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Active pattern 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 01`` () = x.DoNamedTest()
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 02`` () = x.DoNamedTest()
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 03`` () = x.DoNamedTest()
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 04`` () = x.DoNamedTest()
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 05`` () = x.DoNamedTest()
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 06`` () = x.DoNamedTest()
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 07`` () = x.DoNamedTest()
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 08`` () = x.DoNamedTest()
+
     override this.BeforeTestStart(_, _, documentText) =
         this.CompleteItem <- FSharpFilteredCompletionTest.GetSetting(documentText, "COMPLETE_ITEM")
 
@@ -538,3 +547,7 @@ type FSharpCodeCompletionTypingTest() =
     [<Test>] member x.``LParen - Pattern 02``() = x.DoNamedTest()
     [<Test>] member x.``LParen - Pattern 03``() = x.DoNamedTest()
     [<Test>] member x.``LParen - Pattern 04``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Space - NamedUnionCaseField 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Space - NamedUnionCaseField 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Space - NamedUnionCaseField 03`` () = x.DoNamedTest()

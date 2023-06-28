@@ -7,4 +7,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     bool IsLocal { get; }
     [CanBeNull] IBindingLikeDeclaration Binding { get; }
   }
+
+  public partial interface IFieldPat
+  {
+    [NotNull] string ShortName { get; }
+  }
 }

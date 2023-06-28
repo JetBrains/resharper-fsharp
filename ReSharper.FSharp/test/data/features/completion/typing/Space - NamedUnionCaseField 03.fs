@@ -1,0 +1,11 @@
+// ${TEXT: }
+// ${DUMP_LOOKUP:true}
+module Module
+
+type A =
+    | B
+    | C of apple: int * banana: string * citrus: char
+
+match B with
+| C(apple = 7; banana = "meh"; citrus = 'e';{caret}) -> ()
+| _ -> ()
