@@ -26,11 +26,11 @@ type NamedUnionCaseFieldsPatRule() =
     // Filter out the already used fields
     let getFieldsFromParametersOwnerPat (parametersOwnerPat: IParametersOwnerPat) (filterFields: Set<string>) =
         let referenceName = parametersOwnerPat.ReferenceName
-        if isNull referenceName then Array.empty else
+        if isNull referenceName then None else
 
         // We need to figure out if `A` actually is a UnionCase.
         let fcsUnionCase = referenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
-        if isNull fcsUnionCase then Array.empty else
+        if isNull fcsUnionCase then None else
 
         let fieldNames =
             fcsUnionCase.Fields
@@ -38,16 +38,17 @@ type NamedUnionCaseFieldsPatRule() =
             |> Seq.toArray
 
         // Only give auto completion to the fields only when all of them are named.
-        if fieldNames.Length <> fcsUnionCase.Fields.Count then Array.empty else
-        if Set.isEmpty filterFields then fieldNames else
+        if fieldNames.Length <> fcsUnionCase.Fields.Count then None else
+        if Set.isEmpty filterFields then Some fieldNames else
         fieldNames
         |> Array.except filterFields
+        |> Some
 
     // The current scope is to have A({caret}) captured.
     // A fake identifier will be inserted in the reparseContext.
     let getFieldsFromReference (context: FSharpCodeCompletionContext) =
         let parametersOwnerPat = getParametersOwnerPatFromReference context.ReparsedContext.Reference
-        if isNull parametersOwnerPat then Array.empty else
+        if isNull parametersOwnerPat then None else
 
         let filteredItems =
             let namedUnionCaseFieldsPat = parametersOwnerPat.Parameters.SingleItem.As<INamedUnionCaseFieldsPat>()
@@ -62,7 +63,7 @@ type NamedUnionCaseFieldsPatRule() =
 
     override this.IsAvailable(context) =
         let fieldNames = getFieldsFromReference context
-        not (Array.isEmpty fieldNames)
+        Option.isSome fieldNames
 
     override this.TransformItems(context, collector) =
         let parametersOwnerPat = getParametersOwnerPatFromReference context.ReparsedContext.Reference
@@ -73,7 +74,9 @@ type NamedUnionCaseFieldsPatRule() =
             collector.RemoveWhere(fun item -> true)
 
         let fieldNames = getFieldsFromReference context
-        assert (not (Array.isEmpty fieldNames))
+        match fieldNames with
+        | None -> ()
+        | Some fieldNames ->
 
         for fieldName in fieldNames do
             let info = TextualInfo(fieldName, fieldName, Ranges = context.Ranges)

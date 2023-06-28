@@ -488,6 +488,7 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``NamedUnionCaseFieldsPat - 03`` () = x.DoNamedTest()
     [<Test>] member x.``NamedUnionCaseFieldsPat - 04`` () = x.DoNamedTest()
     [<Test>] member x.``NamedUnionCaseFieldsPat - 05`` () = x.DoNamedTest()
+    [<Test>] member x.``NamedUnionCaseFieldsPat - 06`` () = x.DoNamedTest()
 
     override this.BeforeTestStart(_, _, documentText) =
         this.CompleteItem <- FSharpFilteredCompletionTest.GetSetting(documentText, "COMPLETE_ITEM")
