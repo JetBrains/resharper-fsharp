@@ -162,7 +162,7 @@ abs    ^T
 abstract
 acos    ^T
 and
-apple    apple
+apple    int
 array
 array2D    'T array2d
 as
@@ -172,7 +172,7 @@ async    AsyncBuilder
 atan    ^T
 atan2    'T2
 b    Foo
-banana    banana
+banana    string
 base
 begin
 bigint
@@ -182,7 +182,7 @@ byref
 byte    byte
 ceil    ^T
 char    char
-citrus    citrus
+citrus    float
 class
 compare    int
 cos    ^T

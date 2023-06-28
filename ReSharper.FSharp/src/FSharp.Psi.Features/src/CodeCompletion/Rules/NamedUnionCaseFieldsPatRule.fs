@@ -32,14 +32,15 @@ type NamedUnionCaseFieldsPatRule() =
         let fcsUnionCase = referenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
         if isNull fcsUnionCase then None else
 
+        let displayContext = referenceName.Reference.GetSymbolUse().DisplayContext
         let fieldNames =
             fcsUnionCase.Fields
-            |> Seq.choose (fun field -> if field.IsNameGenerated then None else Some field.Name)
+            |> Seq.choose (fun field -> if field.IsNameGenerated then None else Some (field.Name, field.FieldType.Format(displayContext)))
             |> Seq.toArray
 
         if Set.isEmpty filterFields then Some fieldNames else
         fieldNames
-        |> Array.except filterFields
+        |> Array.filter (fun (name, _) -> not (filterFields.Contains name))
         |> Some
 
     // The current scope is to have A({caret}) captured.
@@ -76,13 +77,13 @@ type NamedUnionCaseFieldsPatRule() =
         | None -> ()
         | Some fieldNames ->
 
-        for fieldName in fieldNames do
+        for fieldName, fieldType in fieldNames do
             let info = TextualInfo(fieldName, fieldName, Ranges = context.Ranges)
             let item =
                 LookupItemFactory
                     .CreateLookupItem(info)
                     .WithPresentation(fun _ ->
-                        TextPresentation(info, fieldName, true, PsiSymbolsThemedIcons.Field.Id))
+                        TextPresentation(info, fieldType, true, PsiSymbolsThemedIcons.Field.Id))
                     .WithBehavior(fun _ -> TextualBehavior(info))
                     .WithMatcher(fun _ -> TextualMatcher(info))
                     // Force the items to be on top in the list.

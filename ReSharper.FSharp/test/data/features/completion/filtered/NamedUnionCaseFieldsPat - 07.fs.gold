@@ -9,7 +9,7 @@ NativeInterop
 NoComparisonAttribute
 NoDynamicInvocationAttribute
 NoEqualityAttribute
-+ named    named
++ named    int
 nameof    string
 nan    float
 nanf    float32
