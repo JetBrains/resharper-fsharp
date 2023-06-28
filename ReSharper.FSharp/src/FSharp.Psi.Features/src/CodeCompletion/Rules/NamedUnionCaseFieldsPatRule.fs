@@ -37,8 +37,6 @@ type NamedUnionCaseFieldsPatRule() =
             |> Seq.choose (fun field -> if field.IsNameGenerated then None else Some field.Name)
             |> Seq.toArray
 
-        // Only give auto completion to the fields only when all of them are named.
-        if fieldNames.Length <> fcsUnionCase.Fields.Count then None else
         if Set.isEmpty filterFields then Some fieldNames else
         fieldNames
         |> Array.except filterFields
