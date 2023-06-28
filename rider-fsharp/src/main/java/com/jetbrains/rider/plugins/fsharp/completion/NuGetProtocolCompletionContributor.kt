@@ -62,6 +62,7 @@ class NuGetProtocolCompletionContributor : ProtocolCompletionContributor() {
     val versionZone = match.groups["versionZone"]
     
     ensureCompletionIsRunning(helper, context, stringText, cursorPosition, "NuGet:name", `package`, packageZone) ||
-    versionZone != null && ensureCompletionIsRunning(helper, context, stringText, cursorPosition, "NuGet:version|${`package`.value}", version!!, versionZone)
+    versionZone != null && `package`.value.isNotEmpty() && 
+      ensureCompletionIsRunning(helper, context, stringText, cursorPosition, "NuGet:version|${`package`.value}", version!!, versionZone)
   }
 }
