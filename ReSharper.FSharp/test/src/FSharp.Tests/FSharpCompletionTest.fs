@@ -547,3 +547,7 @@ type FSharpCodeCompletionTypingTest() =
     [<Test>] member x.``LParen - Pattern 02``() = x.DoNamedTest()
     [<Test>] member x.``LParen - Pattern 03``() = x.DoNamedTest()
     [<Test>] member x.``LParen - Pattern 04``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Space - NamedUnionCaseField 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Space - NamedUnionCaseField 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Space - NamedUnionCaseField 03`` () = x.DoNamedTest()
