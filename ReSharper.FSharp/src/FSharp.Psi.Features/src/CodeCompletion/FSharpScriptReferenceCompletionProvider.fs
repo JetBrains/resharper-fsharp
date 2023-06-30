@@ -80,7 +80,9 @@ type FSharpScriptReferenceCompletionContextProvider() =
         let caretValueOffset = caretOffset - argOffset - startQuoteLength
         let prefixValue = argValue.Substring(0, caretValueOffset)
         let supportsNuget =
-            hashDirective.HashToken.GetText() = "#r" && "nuget:".StartsWith(prefixValue.TrimStart([|' '|]))
+            match hashDirective.HashToken.GetText() with
+            | "#r" | "#reference" -> "nuget:".StartsWith(prefixValue.TrimStart([|' '|]))
+            | _ -> false
 
         let prevSeparatorValueOffset = prefixValue.LastIndexOfAny(FileSystemDefinition.SeparatorChars)
 
@@ -116,7 +118,7 @@ type FSharpScriptReferenceCompletionProvider() =
         | "l"
         | "load" -> Some (fsExtensions, ProjectModelThemedIcons.Fsharp.Id)
         | "r"
-        | "reference"    -> Some (dllExtensions, ProjectModelThemedIcons.Assembly.Id)
+        | "reference" -> Some (dllExtensions, ProjectModelThemedIcons.Assembly.Id)
         | "I"    -> Some (Set.empty, null)
         | _ -> None
 
