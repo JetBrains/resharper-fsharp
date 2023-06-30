@@ -67,6 +67,7 @@ type FSharpScriptReferenceCompletionContextProvider() =
     override x.GetCompletionContext(context) =
         let fsFile = context.File :?> IFSharpFile
         let token = fsFile.FindTokenAt(context.CaretTreeOffset - 1)
+        let hashDirective = token.Parent :?> IHashDirective
 
         let arg = token.GetText()
         let startQuoteLength = arg.IndexOf('"') + 1
@@ -78,7 +79,9 @@ type FSharpScriptReferenceCompletionContextProvider() =
 
         let caretValueOffset = caretOffset - argOffset - startQuoteLength
         let prefixValue = argValue.Substring(0, caretValueOffset)
-        let supportsNuget = "nuget:".StartsWith(prefixValue.TrimStart([|' '|]))
+        let supportsNuget =
+            hashDirective.HashToken.GetText() = "#r" && "nuget:".StartsWith(prefixValue.TrimStart([|' '|]))
+
         let prevSeparatorValueOffset = prefixValue.LastIndexOfAny(FileSystemDefinition.SeparatorChars)
 
         let rangesStart =
