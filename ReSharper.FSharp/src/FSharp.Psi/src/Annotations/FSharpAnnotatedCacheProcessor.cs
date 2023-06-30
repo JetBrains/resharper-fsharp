@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Utils;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
@@ -12,7 +13,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 {
-  [Language(typeof(FSharpLanguage))]
+  [Language(typeof(FSharpLanguage), Instantiation.DemandAnyThreadSafe)]
   public class FSharpAnnotatedMembersCacheProcessor : IAnnotatedEntitiesCacheProcessor
   {
     public void Process(IFile file, HashSet<string> attributeNames, AnnotatedEntitiesSet context)
