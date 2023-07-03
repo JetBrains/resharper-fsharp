@@ -105,17 +105,13 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     override x.Text = "Add type annotations"
 
     override x.IsAvailable _ =
-        let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
-        if isNull letBindings then false else
-
-        let bindings = letBindings.Bindings
-        if bindings.Count <> 1 then false else
-
-        isAtLetExprKeywordOrReferencePattern dataProvider letBindings && not (isAnnotated bindings[0])
+        let binding = dataProvider.GetSelectedElement<IBinding>()
+        if isNull binding then false else
+        let letBindings = LetBindingsNavigator.GetByBinding(binding)        
+        isAtLetExprKeywordOrReferencePattern dataProvider letBindings && not (isAnnotated binding)
 
     override x.ExecutePsiTransaction _ =
-        let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
-        let binding = letBindings.Bindings |> Seq.exactlyOne
+        let binding = dataProvider.GetSelectedElement<IBinding>()
 
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
