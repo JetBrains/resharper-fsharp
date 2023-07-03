@@ -30,11 +30,11 @@ class NuGetProtocolCompletionContributor : ProtocolCompletionContributor() {
       helper.ensureCompletionIsRunning(context.editor, CompletionType.BASIC, context.invocationCount, completionPrefix, host)
       return true
     }
-    else if (containsExclusive(zoneGroup.range, cursorPosition) && strictGroup.value.isEmpty()) {
+    else if (containsExclusive(zoneGroup.range, cursorPosition)) {
       helper.ensureCompletionIsRunning(context.editor, CompletionType.BASIC, context.invocationCount, "", host)
       return true
     }
-    
+
     return false
   }
 
@@ -60,7 +60,9 @@ class NuGetProtocolCompletionContributor : ProtocolCompletionContributor() {
     val packageZone = match.groups["packageZone"]!!
     val version = match.groups["version"]
     val versionZone = match.groups["versionZone"]
-    
+
+    context.replacementOffset = psiElement.startOffset + stringRange.endOffset
+
     ensureCompletionIsRunning(helper, context, stringText, cursorPosition, "NuGet:name", `package`, packageZone) ||
     versionZone != null && `package`.value.isNotEmpty() && 
       ensureCompletionIsRunning(helper, context, stringText, cursorPosition, "NuGet:version|${`package`.value}", version!!, versionZone)

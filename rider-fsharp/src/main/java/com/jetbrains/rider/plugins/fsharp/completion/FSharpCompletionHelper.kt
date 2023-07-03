@@ -14,7 +14,7 @@ class FSharpCompletionHelper : ICompletionHelper {
     psiElement is FSharpFile && insideReferenceDirective(psiElement, offset)
 
   private fun isValid(character: Char) =
-    Character.isJavaIdentifierStart(character) || character == '.' || Character.isDigit(character)
+    Character.isJavaIdentifierStart(character) || character == '.' || character == '-' || Character.isDigit(character)
 
   override fun getIdentifierPart(documentOffset: Int,
                                  document: Document,

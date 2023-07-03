@@ -140,6 +140,14 @@ let getStringEndingQuotes (tokenType: TokenNodeType) (tokenText: string) =
     let endingQuotesLength = getStringEndingQuotesLength tokenType
     tokenText.Substring(tokenText.Length - endingQuotesLength, endingQuotesLength)
 
+let isUnfinishedString (tokenType: TokenNodeType) (tokenText: string) =
+    assertStringTokenType tokenType
+    let startingQuotesLength = getStringStartingQuotesLength tokenType
+    let endingQuotesLength = getStringEndingQuotesLength tokenType
+
+    tokenText.Length < startingQuotesLength + endingQuotesLength ||
+    getStringEndingQuotes tokenType tokenText |> Seq.exists (fun x -> x <> '"')
+
 let getStringContent (tokenType: TokenNodeType) (tokenText: string) =
     assertStringTokenType tokenType
 

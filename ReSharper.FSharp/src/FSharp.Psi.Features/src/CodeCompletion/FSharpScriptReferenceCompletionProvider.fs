@@ -18,6 +18,7 @@ open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -49,15 +50,17 @@ type FSharpScriptReferenceCompletionContextProvider() =
             if isNull token then false else
 
             match token.GetTokenType() with
-            | tokenType when tokenType.IsStringLiteral && (token.Parent :? IHashDirective) ->
+            | tokenType when (tokenType == FSharpTokenType.STRING ||
+                              tokenType == FSharpTokenType.VERBATIM_STRING ||
+                              tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING) && (token.Parent :? IHashDirective) ->
                 let caretOffset = caretOffset.Offset
                 let tokenOffset = token.GetTreeStartOffset().Offset
                 let tokenText = token.GetText()
-                let valueStart = tokenText.IndexOf("\"") + 1
+                let valueStart = getStringStartingQuotesLength tokenType
                 let valueStartOffset = tokenOffset + valueStart
                 let tokenEndOffset = tokenOffset + tokenText.Length
 
-                let unfinishedLiteral = tokenText.IndexOf('"') = tokenText.LastIndexOf('"')
+                let unfinishedLiteral = isUnfinishedString tokenType tokenText
                 caretOffset >= valueStartOffset &&
                 (caretOffset = valueStartOffset || tokenText.IndexOf("nuget:", valueStart) = -1) &&
                 (caretOffset < tokenEndOffset || caretOffset = tokenEndOffset && unfinishedLiteral)
@@ -70,8 +73,9 @@ type FSharpScriptReferenceCompletionContextProvider() =
         let hashDirective = token.Parent :?> IHashDirective
 
         let arg = token.GetText()
-        let startQuoteLength = arg.IndexOf('"') + 1
-        let argValue = arg.Substring(startQuoteLength).TrimFromEnd("\"")
+        let tokenType = token.GetTokenType()
+        let startQuoteLength = getStringStartingQuotesLength tokenType
+        let argValue = getStringContent tokenType arg
 
         let argOffset = token.GetTreeStartOffset().Offset
         let valueOffset = argOffset + startQuoteLength
@@ -124,12 +128,11 @@ type FSharpScriptReferenceCompletionProvider() =
 
     let getNugetItem (context: FSharpScriptReferenceCompletionContext) =
         let tailNodeTypes =
-           [| FSharpTokenType.COLON
-              FSharpTokenType.WHITESPACE
+           [| FSharpTokenType.WHITESPACE
               TailType.CaretTokenNodeType.Instance |]
 
         let item =
-            let info = TextualInfo("nuget", "nuget", Ranges = context.Ranges)
+            let info = TextualInfo("nuget:", "nuget", Ranges = context.Ranges)
             LookupItemFactory.CreateLookupItem(info)
                 .WithPresentation(fun _ -> TextPresentation(info, "", true))
                 .WithBehavior(fun _ -> TextualBehavior(info))
