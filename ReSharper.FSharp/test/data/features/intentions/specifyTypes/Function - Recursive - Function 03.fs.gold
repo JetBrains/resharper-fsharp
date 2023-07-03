@@ -1,0 +1,7 @@
+﻿module Module
+
+do
+    let rec f{caret} (a: int): unit =
+        ignore<int> a
+
+    and g b = ()

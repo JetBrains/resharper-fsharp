@@ -47,6 +47,8 @@ type SpecifyTypesActionTest() =
 
     [<Test>] member x.``Function - Recursive - Function 01`` () = x.DoNamedTest()
     [<Test>] member x.``Function - Recursive - Function 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Function - Recursive - Function 03`` () = x.DoNamedTest()
+    [<Test>] member x.``Function - Recursive - Function 04`` () = x.DoNamedTest()
 
 
 type SpecifyTypesActionAvailabilityTest() =

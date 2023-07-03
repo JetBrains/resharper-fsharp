@@ -1,0 +1,6 @@
+﻿module Module
+
+do
+    let rec f () = ()
+
+    and g{caret} (b: int): int = ignore<int> b ; 200
