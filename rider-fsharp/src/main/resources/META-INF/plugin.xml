@@ -28,12 +28,12 @@
     <lang.elementManipulator forClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringElementManipulator"/>
     <psi.referenceContributor language="F#" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpWebReferenceContributor" />
 
-    <completion.contributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.NuGetProtocolCompletionContributor" />
     <frontend.completion.helper language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.FSharpCompletionHelper" />
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />
     <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
     <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
-    <completion.contributor language="F#" order="first" implementationClass="com.jetbrains.rider.completion.ProtocolCompletionContributor" />
+    <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ProtocolCompletionContributor" />
+    <completion.contributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.NuGetProtocolCompletionContributor" />
     <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
     <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />

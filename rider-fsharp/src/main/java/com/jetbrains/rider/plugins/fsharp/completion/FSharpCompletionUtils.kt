@@ -1,10 +1,10 @@
 package com.jetbrains.rider.plugins.fsharp.completion
 
-import com.intellij.psi.PsiWhiteSpace
+import com.intellij.lang.ASTNode
+import com.intellij.psi.impl.source.tree.TreeUtil
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpFile
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
-import com.intellij.psi.util.elementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralType
 
 // check for #r "... <caret> ..." 
@@ -16,10 +16,8 @@ fun insideReferenceDirective(file: FSharpFile, offset: Int): Boolean {
     FSharpStringLiteralType.RegularString,
     FSharpStringLiteralType.VerbatimString,
     FSharpStringLiteralType.TripleQuoteString -> {
-      val whiteSpace = string.prevSibling
-      if (whiteSpace !is PsiWhiteSpace) return false
-
-      whiteSpace.prevSibling?.elementType == FSharpTokenType.PP_REFERENCE
+      val previousNode = TreeUtil.skipWhitespaceAndComments(string as ASTNode, false)
+      previousNode?.elementType == FSharpTokenType.PP_REFERENCE
     }
 
     else -> false
