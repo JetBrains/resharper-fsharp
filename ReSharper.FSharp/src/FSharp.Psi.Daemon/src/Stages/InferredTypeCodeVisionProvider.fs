@@ -62,13 +62,13 @@ type InferredTypeCodeVisionProvider() =
             shell.GetComponent<ITooltipManager>().Show(TypeCopiedTooltipText, PopupWindowContextSource(fun _ ->
                 let documentMarkup = documentMarkupManager.TryGetMarkupModel(codeInsightsHighlighting.Range.Document)
                 if isNull documentMarkup then null else
-                let highlighter =
-                    documentMarkup.GetFilteredHighlighters(FSharpInferredTypeHighlighting.ProviderId,
-                        fun h -> highlighting.Equals(h.UserData))
-                    |> Seq.tryHead
-                    |> Option.toObj
 
-                RiderEditorOffsetPopupWindowContext(highlighter) :> _))
+                documentMarkup.GetFilteredHighlighters(FSharpInferredTypeHighlighting.ProviderId,
+                    fun h -> highlighting.Equals(h.UserData))
+                |> Seq.tryHead
+                |> Option.map RiderEditorOffsetPopupWindowContext
+                |> Option.defaultValue null :> _
+            ))
 
         member x.OnExtraActionClick(_, _, _) = ()
 
