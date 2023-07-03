@@ -1,0 +1,4 @@
+﻿module Module
+
+let rec f a = ()
+and g{caret} (b: char): int = ignore<char> b ; 200

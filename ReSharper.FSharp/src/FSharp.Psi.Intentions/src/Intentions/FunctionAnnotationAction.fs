@@ -107,8 +107,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     override x.IsAvailable _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
         if isNull binding then false else
-        let letBindings = LetBindingsNavigator.GetByBinding(binding)        
-        isAtLetExprKeywordOrReferencePattern dataProvider letBindings && not (isAnnotated binding)
+        isAtBindingKeywordOrReferencePattern dataProvider binding && not (isAnnotated binding)
 
     override x.ExecutePsiTransaction _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
