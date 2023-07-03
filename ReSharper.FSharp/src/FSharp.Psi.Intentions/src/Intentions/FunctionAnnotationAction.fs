@@ -8,12 +8,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Util
 
 module SpecifyTypes =
     let specifyBindingReturnType displayContext (mfv: FSharpMemberOrFunctionOrValue) (binding: IBinding) =
@@ -107,6 +109,8 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     override x.IsAvailable _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
         if isNull binding then false else
+        let letBang = LetOrUseExprNavigator.GetByBinding(binding) 
+        if isNotNull letBang && (getTokenType letBang.BindingKeyword) = FSharpTokenType.LET_BANG then false else
         isAtBindingKeywordOrReferencePattern dataProvider binding && not (isAnnotated binding)
 
     override x.ExecutePsiTransaction _ =

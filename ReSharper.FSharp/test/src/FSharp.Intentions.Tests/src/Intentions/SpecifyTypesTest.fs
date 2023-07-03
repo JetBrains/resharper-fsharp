@@ -60,3 +60,4 @@ type SpecifyTypesActionAvailabilityTest() =
     [<Test>] member x.``Let bindings - Module 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Class - member - 01``() = x.DoNamedTest()
+    [<Test>] member x.``LetBang - 01`` () = x.DoNamedTest()
