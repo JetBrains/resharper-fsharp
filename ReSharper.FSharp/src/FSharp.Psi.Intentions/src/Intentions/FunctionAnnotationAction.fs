@@ -104,13 +104,18 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             let pattern = p.Pattern.IgnoreInnerParens()
             pattern :? ITypedPat || pattern :? IUnitPat)
 
+    let hasBangInBindingKeyword (binding: IBinding) =
+        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
+        if isNull letExpr then false else
+        let keywordType = getTokenType letExpr.BindingKeyword
+        keywordType = FSharpTokenType.LET_BANG || keywordType = FSharpTokenType.AND_BANG || keywordType = FSharpTokenType.USE_BANG
+
     override x.Text = "Add type annotations"
 
     override x.IsAvailable _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
         if isNull binding then false else
-        let letBang = LetOrUseExprNavigator.GetByBinding(binding) 
-        if isNotNull letBang && (getTokenType letBang.BindingKeyword) = FSharpTokenType.LET_BANG then false else
+        if hasBangInBindingKeyword binding then false else
         isAtBindingKeywordOrReferencePattern dataProvider binding && not (isAnnotated binding)
 
     override x.ExecutePsiTransaction _ =

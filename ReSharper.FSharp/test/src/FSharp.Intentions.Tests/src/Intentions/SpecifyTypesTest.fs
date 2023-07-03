@@ -61,3 +61,5 @@ type SpecifyTypesActionAvailabilityTest() =
 
     [<Test>] member x.``Class - member - 01``() = x.DoNamedTest()
     [<Test>] member x.``LetBang - 01`` () = x.DoNamedTest()
+    [<Test>] member x.``UseBang - 01`` () = x.DoNamedTest()
+    [<Test>] member x.``AndBang - 01`` () = x.DoNamedTest()
