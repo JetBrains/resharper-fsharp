@@ -212,7 +212,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return TypeFactory.CreatePointerType(providedType.GetElementType().MapType(module));
 
       if (!providedType.IsGenericType)
-        return TypeFactory.CreateTypeByCLRName(proxyProvidedType.GetClrName(), NullableAnnotation.Unknown, module);
+        return TypeFactory.CreateTypeByCLRName(proxyProvidedType.GetClrName(), module, true);
 
       if (providedType.GetGenericTypeDefinition() is not IProxyProvidedType genericTypeDefinition)
       {
@@ -221,7 +221,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       var typeDefinition =
-        TypeFactory.CreateTypeByCLRName(genericTypeDefinition.GetClrName(), NullableAnnotation.Unknown, module);
+        TypeFactory.CreateTypeByCLRName(genericTypeDefinition.GetClrName(), module, true);
 
       var genericProvidedArgs = providedType.GetGenericArguments();
       var genericTypes = new IType[genericProvidedArgs.Length];
@@ -359,6 +359,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [NotNull]
     public static IDeclaredType CreateTypeByClrName([NotNull] this IClrTypeName clrTypeName,
       [NotNull] IPsiModule psiModule) =>
-      TypeFactory.CreateTypeByCLRName(clrTypeName, NullableAnnotation.Unknown, psiModule);
+      TypeFactory.CreateTypeByCLRName(clrTypeName, psiModule, true);
   }
 }

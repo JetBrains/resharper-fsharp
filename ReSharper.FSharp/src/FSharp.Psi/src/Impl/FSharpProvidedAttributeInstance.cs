@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public string GetAttributeShortName() => myClrTypeName.ShortName;
 
-    public IDeclaredType GetAttributeType() => TypeFactory.CreateTypeByCLRName(myData.FullName, myModule);
+    public IDeclaredType GetAttributeType() => TypeFactory.CreateTypeByCLRName(myData.FullName, myModule, true);
 
     public AttributeValue PositionParameter(int paramIndex) =>
       paramIndex < PositionParameterCount
@@ -66,14 +66,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     private AttributeValue ConvertToAttributeValue(RdAttributeArg arg)
     {
-      var elementType = TypeFactory.CreateTypeByCLRName(arg.TypeName, myModule);
+      var elementType = TypeFactory.CreateTypeByCLRName(arg.TypeName, myModule, true);
 
       if (!arg.IsArray) return new AttributeValue(ConstantValue.Create(arg.Unbox(), elementType));
 
       var arrayType = TypeFactory.CreateArrayType(elementType, 1, NullableAnnotation.Unknown);
       return new AttributeValue(arrayType, arg.Values
         .Select(t =>
-          new AttributeValue(ConstantValue.Create(t.Unbox(), TypeFactory.CreateTypeByCLRName(t.TypeName, myModule))))
+          new AttributeValue(ConstantValue.Create(t.Unbox(), TypeFactory.CreateTypeByCLRName(t.TypeName, myModule, true))))
         .ToArray());
     }
   }

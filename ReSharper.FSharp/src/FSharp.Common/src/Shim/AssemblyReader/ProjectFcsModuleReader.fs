@@ -466,7 +466,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 mkType declaredType ]
 
     let mkCompilerGeneratedAttribute (attrTypeName: IClrTypeName) (args: ILAttribElem list): ILAttribute option =
-        let attrType = TypeFactory.CreateTypeByCLRName(attrTypeName, NullableAnnotation.Unknown, psiModule)
+        let attrType = TypeFactory.CreateTypeByCLRName(attrTypeName, psiModule, true)
 
         match attrType.GetTypeElement() with
         | null -> None

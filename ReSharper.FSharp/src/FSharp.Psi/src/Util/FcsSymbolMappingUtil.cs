@@ -220,7 +220,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return caseMember;
 
       var unionClrName = unionTypeElement.GetClrName();
-      var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + caseCompiledName, psiModule);
+      var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + caseCompiledName, psiModule, true);
       return caseDeclaredType.GetTypeElement();
     }
 
