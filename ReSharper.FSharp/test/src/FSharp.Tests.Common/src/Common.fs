@@ -128,8 +128,8 @@ type FSharpExperimentalFeatureAttribute(feature: ExperimentalFeature) =
 
 
 [<SolutionComponent>]
-type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim, scriptModuleProvider) =
-    inherit FcsResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim, scriptModuleProvider)
+type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim, scriptModuleProvider, locks) =
+    inherit FcsResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim, scriptModuleProvider, locks)
 
     override x.Invalidate _ =
         x.PsiModulesCaches.Clear()

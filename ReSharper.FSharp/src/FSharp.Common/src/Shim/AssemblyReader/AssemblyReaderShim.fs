@@ -4,6 +4,7 @@ open System.Collections.Concurrent
 open System.Collections.Generic
 open System.Text
 open FSharp.Compiler.AbstractIL.ILBinaryReader
+open JetBrains.Application.Threading
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.Lifetimes
@@ -70,7 +71,7 @@ module AssemblyReaderShim =
 type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
         cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService,
         fsOptionsProvider: FSharpOptionsProvider, symbolCache: ISymbolCache, solution: ISolution,
-        logger: ILogger) as this =
+        locks: IShellLocks, logger: ILogger) as this =
     inherit AssemblyReaderShimBase(lifetime, changeManager)
 
     // todo: add experimental setting if/when available
@@ -234,7 +235,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     let markDirty (typePart: TypePart) =
         if not (isEnabled ()) then () else
 
-        use lock = FcsReadWriteLock.WriteCookie.Create()
+        use lock = FcsReadWriteLock.WriteCookie.Create(locks)
 
         let typeElement = typePart.TypeElement
         let psiModule = typeElement.Module
@@ -320,12 +321,12 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         member this.IsEnabled = isEnabled ()
 
         member this.GetModuleReader(psiModule) =
-            use lock = FcsReadWriteLock.WriteCookie.Create()
+            use lock = FcsReadWriteLock.WriteCookie.Create(locks)
             invalidateDirty ()
             getOrCreateReaderFromModule psiModule
 
         member this.InvalidateDirty() =
-            use lock = FcsReadWriteLock.WriteCookie.Create()
+            use lock = FcsReadWriteLock.WriteCookie.Create(locks)
             invalidateDirty ()
 
         member this.InvalidateDirty(psiModule) =
@@ -402,7 +403,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             assemblyReadersByPath.ContainsKey(path)
 
         member this.InvalidateAll(reason) =
-            use lock = FcsReadWriteLock.WriteCookie.Create()
+            use lock = FcsReadWriteLock.WriteCookie.Create(locks)
             invalidateAllReason <- Some reason
 
         member this.HasDirtyTypes =

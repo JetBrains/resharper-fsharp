@@ -3,32 +3,41 @@ module JetBrains.ReSharper.Plugins.FSharp.Checker.FcsReadWriteLock
 
 open System
 open System.Threading
+open JetBrains.Application.Threading
 open JetBrains.Diagnostics
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.Util.Concurrency
 
-let private locks = ReentrantWriterPreferenceReadWriteLock()
+let private fcsLocks = ReentrantWriterPreferenceReadWriteLock()
 
 let assertReadAccess () =
-    Assertion.Assert(locks.IsReadLockAcquired(Thread.CurrentThread), "FcsReadWriteLock.assertReadAccess")
+    Assertion.Assert(fcsLocks.IsReadLockAcquired(Thread.CurrentThread), "FcsReadWriteLock.assertReadAccess")
 
 let assertWriteAccess () =
-    Assertion.Assert(locks.IsWriteLockAcquired(Thread.CurrentThread), "FcsReadWriteLock.assertWriteAccess")
+    Assertion.Assert(fcsLocks.IsWriteLockAcquired(Thread.CurrentThread), "FcsReadWriteLock.assertWriteAccess")
 
 
 [<Struct>]
 type ReadCookie =
     interface IDisposable with
-        member this.Dispose() = locks.ReadLock.Release()
+        member this.Dispose() = fcsLocks.ReadLock.Release()
 
     static member Create(): IDisposable =
-        locks.ReadLock.Acquire()
+        fcsLocks.ReadLock.Acquire()
         new ReadCookie()
 
 [<Struct>]
 type WriteCookie =
     interface IDisposable with
-        member this.Dispose() = locks.WriteLock.Release()
+        member this.Dispose() = fcsLocks.WriteLock.Release()
 
-    static member Create(): IDisposable =
-        locks.WriteLock.Acquire()
+    static member Create(locks: IShellLocks): IDisposable =
+        let mutable acquired = false
+
+        while not acquired do
+            if fcsLocks.WriteLock.TryAcquire(0) then
+                acquired <- true
+            elif locks.IsReadAccessAllowed() then
+                FSharpAsyncUtil.ProcessEnqueuedReadRequests()
+
         new WriteCookie()

@@ -5,6 +5,7 @@ using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Application.Progress;
+using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers.impl;
 using JetBrains.Lifetimes;
@@ -24,6 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
   [SolutionComponent]
   public class FcsResolvedSymbolsCache : IPsiSourceFileCache, IFcsResolvedSymbolsCache
   {
+    private readonly IShellLocks myLocks;
     public IPsiModules PsiModules { get; }
     public FcsCheckerService CheckerService { get; }
     public IFcsProjectProvider FcsProjectProvider { get; }
@@ -37,8 +39,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public FcsResolvedSymbolsCache(Lifetime lifetime, FcsCheckerService checkerService, IPsiModules psiModules,
       IFcsProjectProvider fcsProjectProvider, AssemblyReaderShim assemblyReaderShim,
-      FSharpScriptPsiModulesProvider scriptPsiModulesProvider)
+      FSharpScriptPsiModulesProvider scriptPsiModulesProvider, IShellLocks locks)
     {
+      myLocks = locks;
       PsiModules = psiModules;
       CheckerService = checkerService;
       FcsProjectProvider = fcsProjectProvider;
@@ -59,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void Invalidate(IPsiModule psiModule)
     {
-      using var _ = FcsReadWriteLock.WriteCookie.Create();
+      using var _ = FcsReadWriteLock.WriteCookie.Create(myLocks);
       {
         InvalidateReferencingModules(psiModule);
         if (PsiModulesCaches.TryGetValue(psiModule, out var symbols) && symbols.FcsProject is { } fcsProject)
@@ -101,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void MarkAsDirty(IPsiSourceFile sourceFile)
     {
-      using var _ = FcsReadWriteLock.WriteCookie.Create();
+      using var _ = FcsReadWriteLock.WriteCookie.Create(myLocks);
       {
         if (IsApplicable(sourceFile))
           myDirtyFiles.Add(sourceFile);
@@ -135,7 +138,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void Drop(IPsiSourceFile sourceFile)
     {
-      using var _ = FcsReadWriteLock.WriteCookie.Create();
+      using var _ = FcsReadWriteLock.WriteCookie.Create(myLocks);
       {
         if (PsiModulesCaches.IsEmpty())
           return;
@@ -172,7 +175,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void SyncUpdate(bool underTransaction)
     {
-      using var _ = FcsReadWriteLock.WriteCookie.Create();
+      using var _ = FcsReadWriteLock.WriteCookie.Create(myLocks);
         InvalidateDirty();
     }
 
@@ -200,7 +203,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (psiModule.IsMiscFilesProjectModule() && !(psiModule is SandboxPsiModule))
         return FcsModuleResolvedSymbols.Empty;
 
-      using var _ = FcsReadWriteLock.WriteCookie.Create();
+      using var _ = FcsReadWriteLock.WriteCookie.Create(myLocks);
       {
         FcsProjectProvider.InvalidateDirty();
 

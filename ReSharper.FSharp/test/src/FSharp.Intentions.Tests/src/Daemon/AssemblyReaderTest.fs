@@ -20,9 +20,9 @@ open NUnit.Framework
 
 [<SolutionComponent>]
 type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
-        fsOptionsProvider, symbolCache, solution, logger) =
+        fsOptionsProvider, symbolCache, solution, locks, logger) =
     inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
-        fsOptionsProvider, symbolCache, solution, logger)
+        fsOptionsProvider, symbolCache, solution, locks, logger)
 
     let mutable projectPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
     let mutable projectPsiModule = null

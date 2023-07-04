@@ -87,6 +87,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
     /// Used to synchronize project model changes with FSharpItemsContainer
     let projectMarkModules = Dictionary<IPsiModule, IProjectMark>()
+
     let outputPathToPsiModule = Dictionary<VirtualFileSystemPath, IPsiModule>()
 
     /// Bool value forces FCS invalidation even when project options are not changed.
@@ -190,8 +191,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let createReferencedModule psiModule =
         ReferencedModule.create modulePathProvider psiModule
 
-    let createFcsProjectWithoutReferences psiModule: FcsProject =
-        use lock = FcsReadWriteLock.WriteCookie.Create()
+    let createFcsProjectWithoutReferences (psiModule: IPsiModule): FcsProject =
+        use lock = FcsReadWriteLock.WriteCookie.Create(locks)
         let fcsProject = fcsProjectBuilder.BuildFcsProject(psiModule, psiModule.ContainingProjectModule.As())
         fcsProjectsWithoutReferences[psiModule] <- fcsProject
         projectsPsiModules.Add(psiModule.ContainingProjectModule, psiModule) |> ignore
@@ -319,7 +320,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         match getModuleProject psiModule with
         | FSharpProject project ->
-            use lock = FcsReadWriteLock.WriteCookie.Create()
+            use lock = FcsReadWriteLock.WriteCookie.Create(locks)
             let fcsProject = createFcsProject project psiModule
             Some fcsProject
 
@@ -398,7 +399,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             recentlyDeletedProjects.Remove(moduleId) |> ignore
 
     let processDirtyFcsProjects () =
-        use lock = FcsReadWriteLock.WriteCookie.Create()
+        use lock = FcsReadWriteLock.WriteCookie.Create(locks)
         if dirtyModules.IsEmpty() && recentlyDeletedProjects.IsEmpty() then () else
 
         logger.Trace("Start invalidating dirty modules")
@@ -450,7 +451,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     member x.FcsProjectInvalidated = fcsProjectInvalidated
 
     member private this.ProcessFSharpProjectLoaded(projectMark: IProjectMark) =
-        use lock = FcsReadWriteLock.WriteCookie.Create()
+        use lock = FcsReadWriteLock.WriteCookie.Create(locks)
 
         tryGetValue projectMark projectsProjectMarks
         |> Option.iter invalidateProject
@@ -459,7 +460,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
         if isNull change || change.IsClosingSolution then () else
 
-        use lock = FcsReadWriteLock.WriteCookie.Create()
+        use lock = FcsReadWriteLock.WriteCookie.Create(locks)
         match change with
         | :? ProjectReferenceChange as referenceChange ->
             invalidateProject referenceChange.ProjectToModuleReference.OwnerModule
