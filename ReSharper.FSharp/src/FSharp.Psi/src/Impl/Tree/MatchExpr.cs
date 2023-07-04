@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       ClausesEnumerable.FirstOrDefault()?.Expression?.Type() ??
       base.Type();
 
-    public bool HasBangInBindingKeyword
+    public bool IsComputed
     {
       get
       {

@@ -107,7 +107,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     let hasBangInBindingKeyword (binding: IBinding) =
         let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
         if isNull letExpr then false else
-        letExpr.HasBangInBindingKeyword
+        letExpr.IsComputed
 
     override x.Text = "Add type annotations"
 

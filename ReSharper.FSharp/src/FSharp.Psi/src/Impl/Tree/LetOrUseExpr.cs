@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IType Type() =>
       InExpression?.Type() ?? base.Type();
 
-    public bool HasBangInBindingKeyword
+    public bool IsComputed
     {
       get
       {
