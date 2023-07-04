@@ -16,7 +16,7 @@ fun insideReferenceDirective(file: FSharpFile, offset: Int): Boolean {
     FSharpStringLiteralType.RegularString,
     FSharpStringLiteralType.VerbatimString,
     FSharpStringLiteralType.TripleQuoteString -> {
-      val previousNode = TreeUtil.skipWhitespaceAndComments(string as ASTNode, false)
+      val previousNode = TreeUtil.skipWhitespaceAndComments(string.prevSibling as? ASTNode, false)
       previousNode?.elementType == FSharpTokenType.PP_REFERENCE
     }
 
