@@ -1,0 +1,6 @@
+ReSharper textControls:
+TextControl #1:
+script.fsx
+Model id: ProjectModelElementId != 0, FilePath - coreconsoleapp/script.fsx
+Current caret: (0, 11)
+Current selection:  startPosition = (0, 11) endPosition = (0, 11)
