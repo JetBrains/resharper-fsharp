@@ -8,12 +8,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Util
 
 module SpecifyTypes =
     let specifyBindingReturnType displayContext (mfv: FSharpMemberOrFunctionOrValue) (binding: IBinding) =
@@ -102,20 +104,21 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             let pattern = p.Pattern.IgnoreInnerParens()
             pattern :? ITypedPat || pattern :? IUnitPat)
 
+    let hasBangInBindingKeyword (binding: IBinding) =
+        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
+        if isNull letExpr then false else
+        letExpr.IsComputed
+
     override x.Text = "Add type annotations"
 
     override x.IsAvailable _ =
-        let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
-        if isNull letBindings then false else
-
-        let bindings = letBindings.Bindings
-        if bindings.Count <> 1 then false else
-
-        isAtLetExprKeywordOrReferencePattern dataProvider letBindings && not (isAnnotated bindings[0])
+        let binding = dataProvider.GetSelectedElement<IBinding>()
+        if isNull binding then false else
+        if hasBangInBindingKeyword binding then false else
+        isAtBindingKeywordOrReferencePattern dataProvider binding && not (isAnnotated binding)
 
     override x.ExecutePsiTransaction _ =
-        let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
-        let binding = letBindings.Bindings |> Seq.exactlyOne
+        let binding = dataProvider.GetSelectedElement<IBinding>()
 
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()

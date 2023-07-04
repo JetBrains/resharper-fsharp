@@ -45,6 +45,11 @@ type SpecifyTypesActionTest() =
 
     [<Test>] member x.``Function - Caret on let binding``() = x.DoNamedTest()
 
+    [<Test>] member x.``Function - Recursive - Function 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Function - Recursive - Function 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Function - Recursive - Function 03`` () = x.DoNamedTest()
+    [<Test>] member x.``Function - Recursive - Function 04`` () = x.DoNamedTest()
+
 
 type SpecifyTypesActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<FunctionAnnotationAction>()
@@ -55,3 +60,6 @@ type SpecifyTypesActionAvailabilityTest() =
     [<Test>] member x.``Let bindings - Module 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Class - member - 01``() = x.DoNamedTest()
+    [<Test>] member x.``LetBang - 01`` () = x.DoNamedTest()
+    [<Test>] member x.``UseBang - 01`` () = x.DoNamedTest()
+    [<Test>] member x.``AndBang - 01`` () = x.DoNamedTest()

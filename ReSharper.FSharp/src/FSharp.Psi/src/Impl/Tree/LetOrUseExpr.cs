@@ -27,5 +27,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override IType Type() =>
       InExpression?.Type() ?? base.Type();
+
+    public bool IsComputed
+    {
+      get
+      {
+        var tokenType = BindingKeyword?.GetTokenType();
+        return tokenType == FSharpTokenType.USE_BANG || tokenType == FSharpTokenType.LET_BANG || tokenType == FSharpTokenType.AND_BANG;
+      }
+    }
   }
 }
