@@ -107,8 +107,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     let hasBangInBindingKeyword (binding: IBinding) =
         let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
         if isNull letExpr then false else
-        let keywordType = getTokenType letExpr.BindingKeyword
-        keywordType = FSharpTokenType.LET_BANG || keywordType = FSharpTokenType.AND_BANG || keywordType = FSharpTokenType.USE_BANG
+        letExpr.HasBangInBindingKeyword
 
     override x.Text = "Add type annotations"
 

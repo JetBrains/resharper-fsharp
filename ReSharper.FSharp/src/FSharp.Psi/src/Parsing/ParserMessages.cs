@@ -60,6 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_INDEXER_EXPR = "";
     public const string IDS_APP_EXPR = "";
     public const string IDS_QUOTE_EXPR = "";
+    public const string IDS_MATCH_KEYWORD = "";
     public const string IDS_MATCH_CLAUSE_LIST_OWNER_EXPR = "";
     public const string IDS_MATCH_LIKE_EXPR = "";
     public const string IDS_TRY_LIKE_EXPR = "";
