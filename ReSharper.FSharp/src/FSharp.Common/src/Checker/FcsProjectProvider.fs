@@ -642,7 +642,10 @@ type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: Outpu
                         fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedProject project then () else
 
                 if fcsProjectProvider.InvalidateReferencesToProject(project, true) then
-                    psiFiles.IncrementModificationTimestamp(null) // Drop cached values.
-                    daemon.Invalidate() // Request files re-highlighting.
+                    // Drop cached values.
+                    psiFiles.IncrementModificationTimestamp(null)
+
+                    // Request files re-highlighting.
+                    daemon.Invalidate($"Project {project.Name} contains F# generative type providers")
             )
         ))
