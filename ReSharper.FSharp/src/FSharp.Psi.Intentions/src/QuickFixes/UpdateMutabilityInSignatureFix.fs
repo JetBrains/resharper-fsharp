@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 
@@ -11,16 +10,9 @@ type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributes
 
     let tryFindBindingSignature (declaredElement: IFSharpMember) =
         declaredElement.GetDeclarations()
-        |> Seq.tryPick (fun decl ->
-            if not (decl.GetSourceFile().IsFSharpSignatureFile) then
-                None
-            else
-                match decl with
-                | :? ITopReferencePat as bindingSignaturePat ->
-                    match bindingSignaturePat.Parent with
-                    | :? IBindingSignature as bindingSignature -> Some bindingSignature
-                    | _ -> None
-                | _ -> None
+        |> Seq.tryPick (function
+            | :? IReferencePat as pat when pat.IsFSharpSigFile() -> Option.ofObj pat.Binding
+            | _ -> None
         )
 
     let tryFindImplementationBindingInfo (pat: ITopReferencePat) =
@@ -35,6 +27,8 @@ type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributes
 
         Some(binding, fsMember)
 
+    let mutable bindingSignature = null
+
     override x.Text = "Update mutability in signature"
 
     override x.IsAvailable _ =
@@ -43,16 +37,10 @@ type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributes
         | Some (topLevelBinding, declaredElement) ->
             match tryFindBindingSignature declaredElement with
             | None -> false
-            | Some bindingSignature -> topLevelBinding.IsMutable <> bindingSignature.IsMutable
+            | Some signature ->
+                bindingSignature <- signature
+                topLevelBinding.IsMutable <> signature.IsMutable
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(error.Pat.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-
-        match tryFindImplementationBindingInfo error.Pat with
-        | None -> ()
-        | Some (topLevelBinding, declaredElement) ->
-            match tryFindBindingSignature declaredElement with
-            | None -> ()
-            | Some bindingSignature ->
-                bindingSignature.SetIsMutable(topLevelBinding.IsMutable)
+        bindingSignature.SetIsMutable(not bindingSignature.IsMutable)

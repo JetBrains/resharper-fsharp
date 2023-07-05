@@ -13,14 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         if (MutableKeyword != null)
         {
-          if (MutableKeyword.PrevSibling is Whitespace whitespace)
-          {
-            ModificationUtil.DeleteChildRange(whitespace, MutableKeyword);
-          }
-          else
-          {
-            ModificationUtil.DeleteChild(MutableKeyword);
-          }
+          ModificationUtil.DeleteChild(MutableKeyword);
         }
         return;
       }
