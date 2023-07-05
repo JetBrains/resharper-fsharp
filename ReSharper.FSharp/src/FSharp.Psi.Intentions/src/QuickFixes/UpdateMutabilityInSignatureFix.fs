@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -53,7 +53,7 @@ type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributes
     override x.IsAvailable _ =
         match tryFindImplementationBindingInfo error.Pat with
         | None -> false
-        |Some (topLevelBinding, declaredElement) ->
+        | Some (topLevelBinding, declaredElement) ->
             match tryFindBindingSignature error.Pat.DeclaredName declaredElement with
             | None -> false
             | Some bindingSignature -> topLevelBinding.IsMutable <> bindingSignature.IsMutable
@@ -64,7 +64,7 @@ type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributes
 
         match tryFindImplementationBindingInfo error.Pat with
         | None -> ()
-        |Some (topLevelBinding, declaredElement) ->
+        | Some (topLevelBinding, declaredElement) ->
             match tryFindBindingSignature error.Pat.DeclaredName declaredElement with
             | None -> ()
             | Some bindingSignature ->
