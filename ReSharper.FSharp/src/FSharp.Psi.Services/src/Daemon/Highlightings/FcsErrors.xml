@@ -207,7 +207,7 @@
     <QuickFix>RemoveUnnecessaryUpcastFix</QuickFix>
   </Warning>
 
-  <Error staticGroup="FSharpErrors" name="ValueNotContainedMutabilityAttributesDiffer" ID="FS0034: but its signature specifies The mutability attributes differ">
+  <Error staticGroup="FSharpErrors" name="ValueNotContainedMutabilityAttributesDiffer" ID="FS0034: Module contains but its signature specifies The mutability attributes differ">
     <Parameter type="ITopReferencePat" name="pat"/>
     <Parameter type="string" name="fcsMessage"/>
     <Range>pat.GetNavigationRange()</Range>
