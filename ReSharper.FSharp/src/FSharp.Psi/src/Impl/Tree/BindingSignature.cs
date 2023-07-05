@@ -9,15 +9,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public void SetIsMutable(bool value)
     {
-      if (!value && MutableKeyword != null)
+      if (!value)
       {
-        if (MutableKeyword.PrevSibling is Whitespace whitespace)
+        if (MutableKeyword != null)
         {
-          ModificationUtil.DeleteChildRange(whitespace, MutableKeyword);
-        }
-        else
-        {
-          ModificationUtil.DeleteChild(MutableKeyword);
+          if (MutableKeyword.PrevSibling is Whitespace whitespace)
+          {
+            ModificationUtil.DeleteChildRange(whitespace, MutableKeyword);
+          }
+          else
+          {
+            ModificationUtil.DeleteChild(MutableKeyword);
+          }
         }
         return;
       }
