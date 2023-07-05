@@ -31,7 +31,6 @@
     <Compile Include="src\Settings\ZoneMarker.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
-    <Compile Include="src\Util\FSharpXmlDocService.fs" />
     <Compile Include="src\Util\CacheUtil.fs" />
     <Compile Include="src\Util\FSharpHighlightingAttributeIds.fs" />
     <Compile Include="src\Util\FcsExpressionUtil.fs" />

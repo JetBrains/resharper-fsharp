@@ -12,7 +12,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.Files
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
 open JetBrains.Util
 
@@ -75,7 +74,7 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
                             |> richTextJoin "\n\n"
 
                         let body =
-                            [ match xmlDocService.GetXmlDoc(overload.XmlDoc) with
+                            [ match xmlDocService.GetXmlDoc(overload.XmlDoc, overload.Symbol, identifier.GetPsiModule()) with
                               | null -> ()
                               | xmlDocText -> yield xmlDocText.RichText
 

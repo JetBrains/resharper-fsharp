@@ -9,6 +9,7 @@ open JetBrains.Application.UI.Components.Theming
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.QuickDoc.Render
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Util
@@ -58,40 +59,45 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
                 Some index
             | _ -> None)
 
-    let getXmlNode fsXmlDoc =
+    let getXmlNode fsXmlDoc (symbol: FSharpSymbol option) (psiModule: IPsiModule) =
         let xmlNode =
             match fsXmlDoc with
             | FSharpXmlDoc.FromXmlText(xmlDoc) ->
                 let xmlDocument = XmlDocument()
                 try
                     xmlDocument.LoadXml("<root>" + xmlDoc.GetXmlText() + "</root>")
-                    ValueSome(xmlDocument.SelectSingleNode("root"))
+                    Some(xmlDocument.SelectSingleNode("root"))
                 with e ->
                     xmlDocument.LoadXml("<summary>" + e.Message + "</summary>")
-                    ValueSome(xmlDocument)
+                    Some xmlDocument
 
-            | FSharpXmlDoc.FromXmlFile (dllFile, memberName) ->
-                getIndex dllFile
-                |> ValueOption.OfOption
-                |> ValueOption.bind (fun index ->
-                    index.GetXml(memberName)
-                    |> fst
-                    |> ValueOption.ofObj)
+            | FSharpXmlDoc.FromXmlFile(dllFile, memberName) ->
+                symbol
+                |> Option.bind (fun symbol -> symbol.GetDeclaredElement(psiModule) |> Option.ofObj)
+                |> Option.map (fun declaredElement -> declaredElement.GetXMLDoc(false))
+                |> Option.orElseWith (fun _ ->
+                    getIndex dllFile
+                    |> Option.bind (fun index ->
+                        index.GetXml(memberName)
+                        |> fst
+                        |> Option.ofObj
+                    )
+                )
 
-            | FSharpXmlDoc.None -> ValueNone
+            | FSharpXmlDoc.None -> None
 
-        xmlNode |> ValueOption.filter (fun x -> not (x.InnerText.IsNullOrWhitespace()))
-
-    [<CanBeNull>]
-    member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc) =
-        getXmlNode fsXmlDoc
-        |> ValueOption.map formatXmlDoc
-        |> ValueOption.map RichTextBlock
-        |> ValueOption.toObj
+        xmlNode |> Option.filter (fun x -> not (x.InnerText.IsNullOrWhitespace()))
 
     [<CanBeNull>]
-    member x.GetXmlDocSummary(fsXmlDoc: FSharpXmlDoc) =
-        getXmlNode fsXmlDoc
-        |> ValueOption.map XMLDocUtil.ExtractSummary
-        |> ValueOption.map (fun x -> XmlDocRichTextPresenter.Run(x, false, FSharpLanguage.Instance))
-        |> ValueOption.toObj
+    member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc, symbol: FSharpSymbol option, psiModule: IPsiModule) =
+        getXmlNode fsXmlDoc symbol psiModule
+        |> Option.map formatXmlDoc
+        |> Option.map RichTextBlock
+        |> Option.toObj
+
+    [<CanBeNull>]
+    member x.GetXmlDocSummary(fsXmlDoc: FSharpXmlDoc, symbol: FSharpSymbol option, psiModule: IPsiModule) =
+        getXmlNode fsXmlDoc symbol psiModule
+        |> Option.map XMLDocUtil.ExtractSummary
+        |> Option.map (fun x -> XmlDocRichTextPresenter.Run(x, false, FSharpLanguage.Instance))
+        |> Option.toObj

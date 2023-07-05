@@ -48,7 +48,7 @@ type EnumCaseLikePatternInfo<'T when 'T :> FSharpSymbol>(text, symbol: 'T, fcsEn
             toolTipText
             |> FcsLookupCandidate.getOverloads
             |> List.tryHead
-            |> Option.map (FcsLookupCandidate.getDescription context.XmlDocService)
+            |> Option.map (FcsLookupCandidate.getDescription context.XmlDocService context.PsiModule)
             |> Option.defaultValue null
 
     override this.IsRiderAsync = false

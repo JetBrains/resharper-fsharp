@@ -93,6 +93,7 @@ and ParameterInfoTupledArguments =
 type IFSharpParameterInfoContext =
     inherit IParameterInfoContext
 
+    abstract PsiModule: IPsiModule
     abstract CheckResults: FSharpCheckFileResults
     abstract FcsRange: range
     abstract MainSymbol: FSharpSymbol
@@ -158,7 +159,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
             | ToolTipText [ ToolTipElement.Group [ elementData ] ] ->
                 let referenceOwner = fsContext.Reference.GetElement()
                 let xmlDocService = referenceOwner.GetSolution().GetComponent<FSharpXmlDocService>().NotNull()
-                xmlDocService.GetXmlDocSummary(elementData.XmlDoc)
+                xmlDocService.GetXmlDocSummary(elementData.XmlDoc, Some symbol, fsContext.PsiModule)
             | _ -> null
 
         member this.GetParametersInfo(paramInfos, paramArrayIndex) =
@@ -484,6 +485,7 @@ type FcsActivePatternMfvParameterInfoCandidate(apc: FSharpActivePatternCase, mfv
 type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caretOffset: DocumentOffset, context: 'TNode,
         reference: FSharpSymbolReference, symbolUses: FSharpSymbolUse list, checkResults,
         referenceEndOffset: DocumentOffset, mainSymbol: FSharpSymbol) as this =
+    let psiModule = context.GetPsiModule()
     let documentRange = DocumentRange(&referenceEndOffset)
     let fcsRange = FSharpRangeUtil.ofDocumentRange documentRange
 
@@ -706,6 +708,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
         member this.FcsRange = fcsRange
         member this.MainSymbol = mainSymbol
         member this.Reference = reference
+        member this.PsiModule = psiModule
 
 
 [<AllowNullLiteral>]
