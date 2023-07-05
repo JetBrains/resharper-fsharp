@@ -9,32 +9,18 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributesDifferError) =
     inherit FSharpQuickFixBase()
 
-    let tryFindBindingSignature (implementationDeclaredName: string) (declaredElement: IFSharpMember) =
-        let parentDeclarations = declaredElement.ContainingType.GetDeclarations()
-
-        // Find the parent signature counter part
-        let signatureNameModuleDeclaration =
-            parentDeclarations
-            |> Seq.tryPick (fun d ->
-                match d with
-                | :? INamedModuleDeclaration as signatureModule when
-                    signatureModule.GetSourceFile().IsFSharpSignatureFile -> Some signatureModule
-                | _ -> None)
-
-        signatureNameModuleDeclaration
-        |> Option.bind (fun signatureModule ->
-            signatureModule.Members
-            |> Seq.tryPick (fun sigMember ->
-                match sigMember with
-                | :? IBindingSignature as bindingSignature ->
-                    match bindingSignature.HeadPattern with
-                    | :? ITopReferencePat as bindingNamePat
-                        // This is a bit lucky to work.
-                        // There must be something more clever we can try
-                        when bindingNamePat.DeclaredName = implementationDeclaredName ->
-                        Some bindingSignature
+    let tryFindBindingSignature (declaredElement: IFSharpMember) =
+        declaredElement.GetDeclarations()
+        |> Seq.tryPick (fun decl ->
+            if not (decl.GetSourceFile().IsFSharpSignatureFile) then
+                None
+            else
+                match decl with
+                | :? ITopReferencePat as bindingSignaturePat ->
+                    match bindingSignaturePat.Parent with
+                    | :? IBindingSignature as bindingSignature -> Some bindingSignature
                     | _ -> None
-                | _ -> None)
+                | _ -> None
         )
 
     let tryFindImplementationBindingInfo (pat: ITopReferencePat) =
@@ -55,7 +41,7 @@ type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributes
         match tryFindImplementationBindingInfo error.Pat with
         | None -> false
         | Some (topLevelBinding, declaredElement) ->
-            match tryFindBindingSignature error.Pat.DeclaredName declaredElement with
+            match tryFindBindingSignature declaredElement with
             | None -> false
             | Some bindingSignature -> topLevelBinding.IsMutable <> bindingSignature.IsMutable
 
@@ -66,7 +52,7 @@ type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributes
         match tryFindImplementationBindingInfo error.Pat with
         | None -> ()
         | Some (topLevelBinding, declaredElement) ->
-            match tryFindBindingSignature error.Pat.DeclaredName declaredElement with
+            match tryFindBindingSignature declaredElement with
             | None -> ()
             | Some bindingSignature ->
                 bindingSignature.SetIsMutable(topLevelBinding.IsMutable)
