@@ -1,0 +1,7 @@
+Idea editors:
+Editor #1
+Name: Text
+Model id: file=Script.fsx projectModelId!=0
+Virtual file: Script.fsx
+Current caret: (1, 14)
+Current selection:  startPosition = (1, 14) endPosition = (1, 14)

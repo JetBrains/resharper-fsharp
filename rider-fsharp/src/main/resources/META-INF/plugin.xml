@@ -32,6 +32,8 @@
     <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
     <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ProtocolCompletionContributor" />
+    <completion.contributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.NuGetProtocolCompletionContributor" />
+    <frontend.completion.helper language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.FSharpCompletionHelper" />
     <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
     <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />

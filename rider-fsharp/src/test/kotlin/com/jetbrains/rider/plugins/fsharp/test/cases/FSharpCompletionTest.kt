@@ -37,8 +37,8 @@ class FSharpCompletionTest : CompletionTestBase() {
   @Test
   fun qualified02() = doTestChooseItem("a")
 
-  private fun doTestTyping(typed: String) {
-    dumpOpenedEditor("Program.fs", "Program.fs") {
+  private fun doTestTyping(typed: String, fileName: String = "Program.fs") {
+    dumpOpenedEditor(fileName, fileName) {
       waitForDaemon()
       typeWithLatency(typed)
       callBasicCompletion()
@@ -47,12 +47,24 @@ class FSharpCompletionTest : CompletionTestBase() {
     }
   }
 
-  private fun doTestChooseItem(item: String) {
-    dumpOpenedEditor("Program.fs", "Program.fs") {
+  private fun doTestChooseItem(item: String, fileName: String = "Program.fs") {
+    dumpOpenedEditor(fileName, fileName) {
       waitForDaemon()
       callBasicCompletion()
       waitForCompletion()
       completeWithTab(item)
     }
   }
+
+  @Test
+  fun `nuget reference - simple`() = doTestTyping("nu", "Script.fsx")
+  fun `nuget reference - reference`() = doTestTyping("nu", "Script.fsx")
+  fun `nuget reference - triple quoted string`() = doTestTyping("nu", "Script.fsx")
+  fun `nuget reference - verbatim string`() = doTestTyping("nu", "Script.fsx")
+  fun `nuget reference - package name`() = doTestTyping("JetBrains.Annotatio", "Script.fsx")
+  fun `nuget reference - version`() = doTestTyping("-", "Script.fsx")
+  fun `nuget reference - replace whole package`() = doTestTyping("FSharp.", "Script.fsx")
+  fun `nuget reference - replace path 01`() = doTestChooseItem("nuget:", "Script.fsx")
+  fun `nuget reference - replace path 02`() = doTestChooseItem("nuget:", "Script.fsx")
+  fun `nuget reference - replace path part`() = doTestChooseItem("Folder3/", "Script.fsx")
 }

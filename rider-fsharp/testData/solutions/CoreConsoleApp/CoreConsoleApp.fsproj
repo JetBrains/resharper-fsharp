@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Script.fsx" />
     <Compile Include="CodeFolding.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
