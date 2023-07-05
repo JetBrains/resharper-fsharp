@@ -43,6 +43,7 @@ module FSharpErrors =
     let [<Literal>] MatchIncomplete = 25
     let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] ValNotMutable = 27
+    let [<Literal>] ValueNotContainedMutability = 34
     let [<Literal>] VarBoundTwice = 38
     let [<Literal>] UndefinedName = 39
     let [<Literal>] ErrorFromAddingConstraint = 43
@@ -315,6 +316,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
             ValueNotMutableError(refExpr) :> _
 
+        | ValueNotContainedMutability ->
+            if error.Message.EndsWith("The mutability attributes differ") then
+                createHighlightingFromNodeWithMessage ValueNotContainedMutabilityAttributesDifferError range error
+            else
+                createGenericHighlighting error range
+        
         | UnitTypeExpected ->
             createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedWarning range error
 
