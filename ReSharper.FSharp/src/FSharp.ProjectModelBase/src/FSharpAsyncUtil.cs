@@ -17,17 +17,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp
   {
     private const int InterruptCheckTimeout = 30;
 
-    private static readonly Action ourDefaultInterruptCheck =
+    private static readonly Action DefaultInterruptCheck =
       () => Interruption.Current.CheckAndThrow();
 
-    private static readonly FSharpReadLockRequestsQueue myReadRequests = new();
+    private static readonly FSharpReadLockRequestsQueue ReadRequests = new();
 
     /// <summary>
     /// Try to execute <paramref name="action"/> using read lock on the current thread.
     /// If not possible, queue a request to a thread calling FCS, possibly after a change on the main thread.
     /// When processing the request, the relevant psi module or declared element may already be removed and invalid.
     /// </summary>
-    public static void UsingReadLockInsideFcs(IShellLocks locks, Action action)
+    public static void UsingReadLockInsideFcs(IShellLocks locks, Action action, Func<bool> upToDateCheck = null)
     {
       // Try to acquire read lock on the current thread.
       // It should be possible, unless there's a write lock request that prevents it.
@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
       // Could not get a read lock. Queue a request to be processed by a thread calling FCS.
       var tcs = new TaskCompletionSource<Unit>();
-      myReadRequests.Enqueue(() =>
+      ReadRequests.Enqueue(() =>
       {
         try
         {
@@ -47,6 +47,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp
         {
           tcs.SetException(e);
         }
+      }, () =>
+      {
+        if (upToDateCheck == null || upToDateCheck())
+          return true;
+
+        tcs.SetResult(Unit.Instance);
+        return false;
       });
 
       tcs.Task.Wait();
@@ -55,15 +62,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     public static void ProcessEnqueuedReadRequests()
     {
       Interruption.Current.CheckAndThrow();
-      while (myReadRequests.TryDequeue(out var request))
+      while (ReadRequests.TryDequeue(out var request))
       {
         try
         {
-          request();
+          request.Invoke();
         }
         catch (Exception e) when (e.IsOperationCanceled())
         {
-          myReadRequests.Enqueue(request);
+          ReadRequests.Enqueue(request.Action, request.UpToDateCheck);
           throw;
         }
         Interruption.Current.CheckAndThrow();
@@ -74,21 +81,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     public static TResult RunAsTask<TResult>([NotNull] this FSharpAsync<TResult> async,
       [CanBeNull] Action interruptChecker = null)
     {
-      interruptChecker ??= ourDefaultInterruptCheck;
+      interruptChecker ??= DefaultInterruptCheck;
 
       using var lifetimeDefinition = new LifetimeDefinition();
       var cancellationToken = lifetimeDefinition.Lifetime.ToCancellationToken();
       var task = FSharpAsync.StartAsTask(async, null, cancellationToken);
 
-      task.ContinueWith(_ => myReadRequests.WakeUp(), CancellationToken.None,
+      task.ContinueWith(_ => ReadRequests.WakeUp(), CancellationToken.None,
         TaskContinuationOptions.ExecuteSynchronously, SynchronousScheduler.Instance);
 
       if (Shell.Instance.GetComponent<IShellLocks>().IsReadAccessAllowed())
-        ShellLifetimes.ReadActivityLifetime.TryOnTermination(() => myReadRequests.WakeUp());
+        ShellLifetimes.ReadActivityLifetime.TryOnTermination(() => ReadRequests.WakeUp());
 
       while (!task.IsCompleted)
       {
-        var action = myReadRequests.ExtractOrBlock(InterruptCheckTimeout, task);
+        var action = ReadRequests.ExtractOrBlock(InterruptCheckTimeout, task);
         action?.Invoke();
 
         if (task.IsCompleted)

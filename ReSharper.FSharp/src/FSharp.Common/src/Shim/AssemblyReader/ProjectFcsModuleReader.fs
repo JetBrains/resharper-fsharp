@@ -100,6 +100,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         cookie.Value
 
+    let mutable isInvalidating = false
+
     let mutable isDirty = false
     let mutable upToDateChecked = null
 
@@ -114,13 +116,16 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
 
     let readData f =
-        FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun _ ->
-            use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
+        FSharpAsyncUtil.UsingReadLockInsideFcs(locks,
+            (fun _ ->
+                use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
-            if not (psiModule.GetPsiServices().CachesState.IsIdle.Value) then
-                shim.MarkDirty(psiModule)
+                if not (psiModule.GetPsiServices().CachesState.IsIdle.Value) then
+                    shim.MarkDirty(psiModule)
 
-            f ()
+                f ()
+            ),
+            fun _ -> not isInvalidating
         )
 
     let isDll (project: IProject) (targetFrameworkId: TargetFrameworkId) =
@@ -864,17 +869,16 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         ILPropertyDef(name, attrs, setter, getter, callConv, propertyType, init, args, customAttrs)
 
     let usingTypeElement (typeName: IClrTypeName) defaultValue f =
-        let mutable result = Unchecked.defaultof<_>
+        let mutable result = defaultValue
         readData (fun _ ->
-            if not (psiModule.IsValid()) then
-                result <- defaultValue else
+            if not (psiModule.IsValid()) then () else
 
             let typeElement = symbolScope.GetTypeElementByCLRName(typeName)
-            if isNull typeElement then
-                result <- defaultValue else
+            if isNull typeElement then () else
 
             result <- f typeElement
         )
+
         result
 
     let getOrCreateMembers (typeName: IClrTypeName) defaultValue (getMemberTable: FcsTypeDefMembers -> 'Table) createTable =
@@ -1194,15 +1198,20 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | _ -> mkDummyTypeDef clrTypeName.ShortName
 
     member this.InvalidateTypeDef(clrTypeName: IClrTypeName) =
-        use lock = usingWriteLock ()
-        typeDefs.TryRemove(clrTypeName) |> ignore
-        shim.Logger.Trace("Invalidate TypeDef: {0}: {1}", path, clrTypeName)
+        try
+            isInvalidating <- true
 
-        // todo: invalidate timestamp on seen-by-FCS type changes only
-        // todo: add test for adding/removing not-seen-by-FCS types
-        moduleDef <- None
-        timestamp <- DateTime.UtcNow
-        shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
+            use lock = usingWriteLock ()
+            typeDefs.TryRemove(clrTypeName) |> ignore
+            shim.Logger.Trace("Invalidate TypeDef: {0}: {1}", path, clrTypeName)
+
+            // todo: invalidate timestamp on seen-by-FCS type changes only
+            // todo: add test for adding/removing not-seen-by-FCS types
+            moduleDef <- None
+            timestamp <- DateTime.UtcNow
+            shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
+        finally
+            isInvalidating <- false
 
     interface IProjectFcsModuleReader with
         member this.ILModuleDef =
@@ -1294,12 +1303,17 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         member val RealModuleReader = None with get, set
 
         member this.InvalidateTypeDefs(shortName) =
-            use _ = usingWriteLock ()
-            shim.Logger.Trace("Invalidate types by short name: {0}: {1} ", path, shortName)
-            for clrTypeName in clrNamesByShortNames.GetValuesSafe(shortName) do
-                this.InvalidateTypeDef(clrTypeName)
-            isDirty <- true
-            upToDateChecked <- null
+            try
+                isInvalidating <- true
+
+                use _ = usingWriteLock ()
+                shim.Logger.Trace("Invalidate types by short name: {0}: {1} ", path, shortName)
+                for clrTypeName in clrNamesByShortNames.GetValuesSafe(shortName) do
+                    this.InvalidateTypeDef(clrTypeName)
+                isDirty <- true
+                upToDateChecked <- null
+            finally
+                isInvalidating <- false
 
         member this.UpdateTimestamp() =
             use _ = usingWriteLock ()
@@ -1310,18 +1324,28 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
         member this.InvalidateAllTypeDefs() =
-            use _ = usingWriteLock ()
-            shim.Logger.Trace("Invalidate all type defs: {0}", path)
-            typeDefs.Clear()
-            moduleDef <- None
-            timestamp <- DateTime.UtcNow
-            shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
+            try
+                isInvalidating <- true
+
+                use _ = usingWriteLock ()
+                shim.Logger.Trace("Invalidate all type defs: {0}", path)
+                typeDefs.Clear()
+                moduleDef <- None
+                timestamp <- DateTime.UtcNow
+                shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
+            finally
+                isInvalidating <- false
 
         member this.MarkDirty() =
-            use _ = usingWriteLock ()
-            shim.Logger.Trace("Mark dirty: {0}", path)
-            isDirty <- true
-            upToDateChecked <- null
+            try
+                isInvalidating <- true
+
+                use _ = usingWriteLock ()
+                shim.Logger.Trace("Mark dirty: {0}", path)
+                isDirty <- true
+                upToDateChecked <- null
+            finally
+                isInvalidating <- false
 
 
 type PreTypeDef(clrTypeName: IClrTypeName, reader: ProjectFcsModuleReader) =
