@@ -39,14 +39,15 @@ type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributes
 
     let tryFindImplementationBindingInfo (pat: ITopReferencePat) =
         if isNull pat then None else
-        let topLevelBinding = TopBindingNavigator.GetByHeadPattern(pat)
-        if isNull topLevelBinding then None else
-        let declaredElement = topLevelBinding.DeclaredElement :?> IFSharpMember
-        if isNull declaredElement then None else
-        let mfv = declaredElement.Mfv
+
+        match pat.Binding, pat.DeclaredElement.As<IFSharpMember>() with
+        | null, _ | _, null -> None
+        | binding, fsMember ->
+
+        let mfv = fsMember.Mfv
         if isNull mfv then None else
-        if not mfv.HasSignatureFile then None else
-        Some (topLevelBinding, declaredElement)
+
+        Some(binding, fsMember)
 
     override x.Text = "Update mutability in signature"
 
