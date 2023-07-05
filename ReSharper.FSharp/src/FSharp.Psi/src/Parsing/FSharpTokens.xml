@@ -96,7 +96,7 @@
         <Token name="RQUOTE_UNTYPED" representation="@@>" />
         <Token name="LQUOTE_TYPED" representation="&lt;@" />
         <Token name="RQUOTE_TYPED" representation="@>" />
-        
+
         <Token name="AMP" representation="&amp;" />
         <Token name="BAR" representation="|" />
         <Token name="COMMA" representation="," />
@@ -151,7 +151,7 @@
         <Token name="QMARK_QMARK" representation="??" />
         <Token name="STAR" representation="*" />
     </Tokens>
-    
+
     <Tokens NodeType="FSharpTokenNodeType">
         <Token name="IDENTIFIER" />
         <Token name="SYMBOLIC_OP" />

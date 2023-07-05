@@ -469,6 +469,12 @@ interface arrayOrListExpr:
   arrayExpr |
   listExpr;
 
+interface computableExpr:
+  letOrUseExpr |
+  matchExpr |
+  doExpr |
+  yieldOrReturnExpr;
+
 setExpr options { stubBase="UnitExpressionBase"; }:
   fSharpExpression<LEFT_EXPR, LeftExpression>
   LARROW<LARROW, LArrow>
