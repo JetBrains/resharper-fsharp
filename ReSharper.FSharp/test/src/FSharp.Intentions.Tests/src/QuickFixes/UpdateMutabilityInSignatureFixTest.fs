@@ -14,3 +14,5 @@ type UpdateMutabilityInSignatureFixTest() =
     [<Test>] member x.``Add Mutability - 02`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Remove Mutability - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Remove Mutability - 02`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Patterns - 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Patterns - 02`` () = x.DoNamedTestWithSignature()

@@ -1,0 +1,4 @@
+﻿module A
+
+val mutable a: int
+val mutable b: int
