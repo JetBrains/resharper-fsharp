@@ -118,6 +118,7 @@
     <Compile Include="src\QuickFixes\RemovePatternArgumentFixTest.fs" />
     <Compile Include="src\QuickFixes\AddSetterFixTest.fs" />
     <Compile Include="src\QuickFixes\UpdateMutabilityInSignatureFixTest.fs" />
+    <Compile Include="src\QuickFixes\UpdateCompiledNameInSignatureFixTest.fs" />
     <Compile Include="src\QuickDoc\QuickDocTest.fs" />
   </ItemGroup>
 

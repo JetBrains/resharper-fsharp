@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.QuickFixes.SignatureFixUtil
 
 type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributesDifferError) =
     inherit FSharpQuickFixBase()
@@ -12,9 +12,9 @@ type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributes
     override x.Text = $"Update mutability for {error.Pat.Identifier.Name} in signature"
 
     override x.IsAvailable _ =
-        match SignatureFixUtil.tryFindBindingPairFromTopReferencePat error.Pat with
+        match tryFindBindingPairFromTopReferencePat error.Pat with
         | None -> false
-        | Some (topLevelBinding, signature) ->
+        | Some (BindingPair(implBinding = topLevelBinding; sigBinding = signature)) ->
             bindingSignature <- signature
             topLevelBinding.IsMutable <> signature.IsMutable
 
