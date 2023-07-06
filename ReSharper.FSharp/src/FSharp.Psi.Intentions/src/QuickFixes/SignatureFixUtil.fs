@@ -123,3 +123,18 @@ let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) 
     if signatureFieldCount > implementationRecordRepr.FieldDeclarations.Count then
         [ implementationRecordRepr.FieldDeclarations.Count .. (signatureFieldCount - 1) ]
         |> List.iter (fun idx -> signatureRecordRepr.FieldDeclarations.Item idx |> deleteChild)
+
+/// <returns>ImplementationBinding * SignatureBinding</returns>
+/// <param name="pat">Implementation top reference pattern.</param>
+let tryFindBindingPairFromTopReferencePat (pat: ITopReferencePat) =
+    match pat.Binding, pat.DeclaredElement.As<IFSharpMember>() with
+    | null, _ | _, null -> None
+    | implBinding, fsMember ->
+
+    fsMember.GetDeclarations()
+    |> Seq.tryPick (function
+        | :? IReferencePat as pat when pat.IsFSharpSigFile() ->
+            Option.ofObj pat.Binding
+            |> Option.map (fun sigBinding -> implBinding, sigBinding)
+        | _ -> None
+    )
