@@ -1,4 +1,5 @@
 ﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -9,7 +10,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public void SetIsMutable(bool value)
     {
       if (!value)
-        throw new System.NotImplementedException();
+      {
+        if (MutableKeyword != null)
+        {
+          ModificationUtil.DeleteChild(MutableKeyword);
+        }
+        return;
+      }
 
       var headPat = HeadPattern;
       if (headPat != null)
