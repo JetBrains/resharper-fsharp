@@ -29,7 +29,7 @@ type UpdateMutabilityInSignatureFix(error: ValueNotContainedMutabilityAttributes
 
     let mutable bindingSignature = null
 
-    override x.Text = "Update mutability in signature"
+    override x.Text = $"Update mutability for {error.Pat.Identifier.Name} in signature"
 
     override x.IsAvailable _ =
         match tryFindImplementationBindingInfo error.Pat with
