@@ -16,3 +16,5 @@ type UpdateMutabilityInSignatureFixTest() =
     [<Test>] member x.``Remove Mutability - 02`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Patterns - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Patterns - 02`` () = x.DoNamedTestWithSignature()
+    [<Test; NoHighlightingFound>] member x.``Not available - Record Patterns 01`` () = x.DoNamedTestWithSignature()
+    [<Test; NoHighlightingFound>] member x.``Not available - UnionCase Patterns 01`` () = x.DoNamedTestWithSignature()
