@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -32,8 +33,7 @@ type UpdateLiteralConstantFix(error: ValueNotContainedMutabilityLiteralConstantV
                     | _ -> None
                 )
 
-    let mutable sigBinding = null
-    let mutable implExpr = null
+    let mutable sigRefPat = null
 
     override x.Text = $"Update literal constant {error.Pat.Identifier.Name} in signature"
 
@@ -48,14 +48,23 @@ type UpdateLiteralConstantFix(error: ValueNotContainedMutabilityLiteralConstantV
             | None -> false
             | Some s ->
                 match s.HeadPattern with
-                | :? IReferencePat as sigRefPat ->
-                    sigBinding <- sigRefPat.Binding
-                    implExpr <- error.Pat.Binding.Expression
+                | :? IReferencePat as sRefPat ->
+                    sigRefPat <- sRefPat
                     true
                 | _ -> false
 
     override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(sigBinding.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(sigRefPat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        // Todo update type in sig if needed
-        sigBinding.SetExpression(implExpr.Copy()) |> ignore
+        
+        let sigSymbolUse = sigRefPat.GetFcsSymbolUse()
+        let implSymbolUse = error.Pat.As<IReferencePat>().GetFcsSymbolUse()
+        let implMfv = implSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+        let sigMfv = sigSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+        if implMfv.FullType.BasicQualifiedName <> sigMfv.FullType.BasicQualifiedName then
+            let returnTypeString = implMfv.ReturnParameter.Type.Format(sigSymbolUse.DisplayContext)
+            let factory = sigRefPat.CreateElementFactory()
+            let typeUsage = factory.CreateTypeUsage(returnTypeString, TypeUsageContext.TopLevel)
+            sigRefPat.Binding.ReturnTypeInfo.SetReturnType(typeUsage) |> ignore
+
+        sigRefPat.Binding.SetExpression(error.Pat.Binding.Expression.Copy()) |> ignore
