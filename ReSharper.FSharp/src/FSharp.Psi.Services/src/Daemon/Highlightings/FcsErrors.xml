@@ -226,7 +226,7 @@
       <Argument>fcsMessage</Argument>
     </Message>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>SyncLiteralConstantFix</QuickFix>
+    <QuickFix>UpdateLiteralConstantFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="VarBoundTwice" ID="FS0038: Pattern bound twice">
