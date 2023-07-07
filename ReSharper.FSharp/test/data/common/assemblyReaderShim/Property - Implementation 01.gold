@@ -1,0 +1,19 @@
+﻿module Module
+
+
+{ new Interface with
+    member _.Prop with get() = |""|(0) } |> ignore
+
+type T() =
+    interface Interface with
+        member this.Prop = |""|(1)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int'    
+but here has type
+    'string'    
+(1): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int'    
+but here has type
+    'string'    

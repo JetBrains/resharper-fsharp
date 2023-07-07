@@ -112,6 +112,7 @@ type AssemblyReaderTest() =
     [<Test; Explicit "Can't reference attribute in net451">]
     member x.``Method - Param 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Property - Implementation 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Duplicate 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Explicit impl 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 01``() = x.DoNamedTest()

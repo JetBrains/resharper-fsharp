@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.Util;
+using Range = FSharp.Compiler.Text.Range;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -21,9 +24,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       var mfv = OwnerMember?.GetFcsSymbol() as FSharpMemberOrFunctionOrValue;
       var members = mfv?.DeclaringEntity?.Value.MembersFunctionsAndValues;
+      if (members == null) return null;
 
-      var range = mfv?.DeclarationLocation;
-      return members?.FirstOrDefault(m => m.LogicalName == CompiledName && m.DeclarationLocation.Equals(range));
+      var range = TryGetMfvDeclarationLocation(mfv);
+      var matchingMembers = members.Where(m => m.LogicalName == CompiledName).ToList();
+      if (matchingMembers.IsEmpty())
+        return mfv;
+
+      if (matchingMembers.Count == 1)
+        return matchingMembers[0];
+
+      return matchingMembers.FirstOrDefault(m => TryGetMfvDeclarationLocation(m).Equals(range)) ??
+             matchingMembers.FirstOrDefault();
+
+      Range? TryGetMfvDeclarationLocation(FSharpMemberOrFunctionOrValue m)
+      {
+        try
+        {
+          return m.DeclarationLocation;
+        }
+        catch (Exception)
+        {
+          return null;
+        }
+      }
     }
 
     protected override IDeclaredElement CreateDeclaredElement() => CreateDeclaredElement(GetFcsSymbol());
