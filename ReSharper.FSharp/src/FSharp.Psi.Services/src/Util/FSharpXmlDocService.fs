@@ -74,7 +74,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
             | FSharpXmlDoc.FromXmlFile(dllFile, memberName) ->
                 symbol
                 |> Option.bind (fun symbol -> symbol.GetDeclaredElement(psiModule) |> Option.ofObj)
-                |> Option.map (fun declaredElement -> declaredElement.GetXMLDoc(false))
+                |> Option.bind (fun declaredElement -> declaredElement.GetXMLDoc(false) |> Option.ofObj)
                 |> Option.orElseWith (fun _ ->
                     getIndex dllFile
                     |> Option.bind (fun index ->
