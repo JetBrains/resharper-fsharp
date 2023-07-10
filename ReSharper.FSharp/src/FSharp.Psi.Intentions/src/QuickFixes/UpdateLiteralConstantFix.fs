@@ -19,19 +19,18 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
     let tryFindSigBindingSignature sigMembers =
         sigMembers
         |>  Seq.tryPick(fun m ->
-                let bindingSignature = m.As<IBindingSignature>()
-                match bindingSignature with
-                | null -> None
-                | _ ->
-                    match error.Pat.Binding.HeadPattern with
-                    | :? IReferencePat as implPat ->
-                        match bindingSignature.HeadPattern with
-                        | :? IReferencePat as sigRefPat when
-                            implPat.DeclaredName = sigRefPat.DeclaredName
-                            -> Some bindingSignature
-                        | _ -> None
+            let bindingSignature = m.As<IBindingSignature>()
+            match bindingSignature with
+            | null -> None
+            | _ ->
+                match error.Pat.Binding.HeadPattern with
+                | :? IReferencePat as implPat ->
+                    match bindingSignature.HeadPattern with
+                    | :? IReferencePat as sigRefPat when
+                        implPat.DeclaredName = sigRefPat.DeclaredName -> Some bindingSignature
                     | _ -> None
-                )
+                | _ -> None
+            )
 
     let mutable sigRefPat = null
 
