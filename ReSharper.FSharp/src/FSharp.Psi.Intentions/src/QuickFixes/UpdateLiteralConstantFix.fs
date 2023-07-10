@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Resources.Shell
 
 type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
     inherit FSharpQuickFixBase()
+    let errorRefPat = error.Pat.As<IReferencePat>()
     
     let tryFindSigFile (topRefPat: ITopReferencePat) =
         let containing = topRefPat.GetContainingTypeDeclaration()
@@ -38,26 +39,33 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
 
     override x.IsAvailable _ =
         // Todo reuse/extend SignatureFixUtil
-        match tryFindSigFile error.Pat with
-        | None -> false
-        | Some sigFile ->
-            let sigMembers = sigFile.As<IModuleDeclaration>().Members
-            let sigBindingSignature = tryFindSigBindingSignature sigMembers
-            match sigBindingSignature with
+        if isNotNull errorRefPat then
+            match tryFindSigFile error.Pat with
             | None -> false
-            | Some s ->
-                match s.HeadPattern with
-                | :? IReferencePat as sRefPat ->
-                    sigRefPat <- sRefPat
-                    true
-                | _ -> false
+            | Some sigFile ->
+                let sigMembers = sigFile.As<IModuleDeclaration>().Members
+                let sigBindingSignature = tryFindSigBindingSignature sigMembers
+                match sigBindingSignature with
+                | None -> false
+                | Some s ->
+                    match s.HeadPattern with
+                    | :? IReferencePat as sRefPat ->
+                        sigRefPat <- sRefPat
+                        let implSymbolUse = errorRefPat.GetFcsSymbolUse()
+                        let implMfv = implSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+                        sRefPat.CheckerService.ResolveNameAtLocation(
+                            sRefPat, [ implMfv.ReturnParameter.Type.TypeDefinition.DisplayName ], false, null)
+                        |> Option.isSome
+                    | _ -> false
+        else
+            false
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(sigRefPat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
         
         let sigSymbolUse = sigRefPat.GetFcsSymbolUse()
-        let implSymbolUse = error.Pat.As<IReferencePat>().GetFcsSymbolUse()
+        let implSymbolUse = errorRefPat.GetFcsSymbolUse()
         let implMfv = implSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
         let sigMfv = sigSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
         if implMfv.FullType.BasicQualifiedName <> sigMfv.FullType.BasicQualifiedName then

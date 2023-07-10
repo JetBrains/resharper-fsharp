@@ -13,3 +13,6 @@ type UpdateLiteralConstantFixTest() =
     [<Test>] member x.``Update Literal Constant - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Update Literal Constant - 02`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Update Literal Constant - 03`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Update Literal Constant - 04`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Update Literal Constant - 05`` () = x.DoNamedTestWithSignature()
+    [<Test; NotAvailable>] member x.``Do not update Literal Constant - 01`` () = x.DoNamedTestWithSignature()
