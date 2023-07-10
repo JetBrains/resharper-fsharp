@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type UpdateLiteralConstantFix(error: ValueNotContainedMutabilityLiteralConstantValuesDifferError) =
+type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
     inherit FSharpQuickFixBase()
     
     let tryFindSigFile (topRefPat: ITopReferencePat) =
