@@ -33,6 +33,10 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
                 | _ -> None
             )
 
+    let isField =
+        let refExpr = error.Pat.Binding.Expression.As<IReferenceExpr>()
+        isNotNull refExpr && refExpr.Reference.GetFcsSymbol() :? FSharpField
+            
     let mutable sigRefPat = null
 
     override x.Text = $"Update literal constant {error.Pat.Identifier.Name} in signature"
@@ -41,7 +45,6 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
         // Todo reuse/extend SignatureFixUtil
         if isNotNull errorRefPat then
             match tryFindSigFile error.Pat with
-            | None -> false
             | Some sigFile ->
                 let sigMembers = sigFile.As<IModuleDeclaration>().Members
                 let sigBindingSignature = tryFindSigBindingSignature sigMembers
@@ -51,12 +54,22 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
                     match s.HeadPattern with
                     | :? IReferencePat as sRefPat ->
                         sigRefPat <- sRefPat
-                        let implSymbolUse = errorRefPat.GetFcsSymbolUse()
-                        let implMfv = implSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
-                        sRefPat.CheckerService.ResolveNameAtLocation(
-                            sRefPat, [ implMfv.ReturnParameter.Type.TypeDefinition.DisplayName ], false, null)
-                        |> Option.isSome
+                        
+                        if isField then
+                            let implSymbolUse = errorRefPat.GetFcsSymbolUse()
+                            let implMfv = implSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+                            sRefPat.CheckerService.ResolveNameAtLocation(
+                                sRefPat, [ implMfv.ReturnParameter.Type.TypeDefinition.DisplayName ], false, null)
+                            |> Option.isSome
+                        elif error.Pat.Binding.Expression :? IReferenceExpr then
+                            let exprText = error.Pat.Binding.Expression.GetText()
+                            sRefPat.CheckerService.ResolveNameAtLocation(sRefPat, [ exprText ], false, null)
+                            |> Option.isSome
+                        else
+                            true
+
                     | _ -> false
+            | _ -> false
         else
             false
 
