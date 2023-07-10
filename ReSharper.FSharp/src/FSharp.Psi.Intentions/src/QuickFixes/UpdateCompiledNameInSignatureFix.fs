@@ -17,6 +17,8 @@ type UpdateCompiledNameInSignatureFix(error: ValueNotContainedMutabilityCompiled
 
     let mutable bindingImplementation = null
     let mutable bindingSignature = null
+    let mutable signatureCompiledNameAttribute = None
+    let mutable implementationCompiledNamedAttribute = None
     
     let tryFindCompiledNameAttribute (binding: IBindingLikeDeclaration) =
         binding.Attributes
@@ -30,16 +32,17 @@ type UpdateCompiledNameInSignatureFix(error: ValueNotContainedMutabilityCompiled
         | Some (BindingPair(implementation, implMember, signature, sigMember)) ->
             bindingImplementation <- implementation
             bindingSignature <- signature
+            signatureCompiledNameAttribute <-tryFindCompiledNameAttribute signature
+            implementationCompiledNamedAttribute <- tryFindCompiledNameAttribute implementation
             implMember.Mfv.CompiledName <> sigMember.Mfv.CompiledName
+            && (implementationCompiledNamedAttribute.IsSome || signatureCompiledNameAttribute.IsSome)
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(error.Pat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let signatureCompiledNameAttribute = tryFindCompiledNameAttribute bindingSignature
-        let implementationCompiledNamedAttribute = tryFindCompiledNameAttribute bindingImplementation
         match implementationCompiledNamedAttribute, signatureCompiledNameAttribute with
-        | None, None -> failwith "both don't have the attribute, add the attribute to the signature" // weird situation though
+        | None, None -> () // This error will not be raised unless one side has a CompiledNameAttribute.
         | Some value, None ->
             if bindingSignature.Attributes.IsEmpty then
                 // We create an elementFactory with the implementation file because the CreateEmptyAttributeList is tied to implementation files only.
@@ -52,5 +55,12 @@ type UpdateCompiledNameInSignatureFix(error: ValueNotContainedMutabilityCompiled
                 ] |> ignore
             else
                 FSharpAttributesUtil.addAttributeAfter (Seq.last bindingSignature.Attributes) value
-        | None, Some value -> failwith "add the attribute to the signature"
-        | Some value, Some value1 -> failwith "update the value of the signature"
+        | None, Some sigAttr ->
+            let parentAttributeList = AttributeListNavigator.GetByAttribute(sigAttr)
+            if parentAttributeList.Attributes.Count = 1 then
+                deleteChild parentAttributeList
+            else
+                deleteChild sigAttr
+        | Some implAttr, Some sigAttr ->
+            sigAttr.SetArgExpression(implAttr.ArgExpression)
+            |> ignore
