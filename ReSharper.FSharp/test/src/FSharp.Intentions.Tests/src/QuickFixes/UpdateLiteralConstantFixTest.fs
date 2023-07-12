@@ -21,6 +21,10 @@ type UpdateLiteralConstantFixTest() =
     [<Test>] member x.``Update with module symbol - 01`` () = x.DoNamedTestWithSignature()
     [<FSharpLanguageLevel(FSharpLanguageLevel.Preview)>]
     [<Test>] member x.``Update with complex expr - 01`` () = x.DoNamedTestWithSignature()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.Preview)>]
+    [<Test>] member x.``Update with complex expr - 02`` () = x.DoNamedTestWithSignature()
     [<Test; NotAvailable>] member x.``No update for unknown type - 01`` () = x.DoNamedTestWithSignature()
     [<Test; NotAvailable>] member x.``No update with unknown module symbol - 01`` () = x.DoNamedTestWithSignature()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.Preview)>]
+    [<Test; NotAvailable>] member x.``No update with unknown module symbol - 02`` () = x.DoNamedTestWithSignature()
     [<Test; NotAvailable>] member x.``No update with unknown other literal - 01`` () = x.DoNamedTestWithSignature()

@@ -38,6 +38,15 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
 
     let mutable sigRefPat = null
 
+    let rec isImplExprValidInSig (implExpression: IFSharpExpression) =
+        match implExpression with
+        | :? IReferenceExpr as refExpr ->
+            refExpr.Reference.ResolveWithFcs(sigRefPat, System.String.Empty, false, refExpr.IsQualified)
+            |> Option.isSome
+        | :? IBinaryAppExpr as binExpr ->
+            isImplExprValidInSig binExpr.LeftArgument && isImplExprValidInSig binExpr.RightArgument
+        | _ -> true
+
     override x.Text = $"Update literal constant {errorRefPat.Identifier.Name} in signature"
 
     override x.IsAvailable _ =
@@ -54,14 +63,8 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
                 match s.HeadPattern with
                 | :? IReferencePat as sRefPat ->
                     sigRefPat <- sRefPat
-                    let refExpr = errorRefPat.Binding.Expression.As<IReferenceExpr>()
-                    if isNull refExpr then true else
-                    
-                    refExpr.Reference.ResolveWithFcs(sRefPat, System.String.Empty, false, refExpr.IsQualified)
-                    |> Option.isSome
-                
+                    isImplExprValidInSig errorRefPat.Binding.Expression
                 | _ -> false
-        
         | _ -> false
 
     override x.ExecutePsiTransaction _ =
