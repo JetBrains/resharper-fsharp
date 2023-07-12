@@ -12,6 +12,7 @@ type UpdateLiteralConstantFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/updateLiteralConstantValueToSignatureFix"
 
     [<Test>] member x.``Update Literal Constant - 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Update Literal Constant - 02`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Update including type - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Update with inline comments - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Update with complex expr in sig - 01`` () = x.DoNamedTestWithSignature()
