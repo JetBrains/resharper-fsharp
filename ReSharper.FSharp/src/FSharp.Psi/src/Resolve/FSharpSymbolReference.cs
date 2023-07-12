@@ -129,6 +129,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     /// Does not reuse existing file resolve results, does complete lookup by name.
     public FSharpOption<FSharpSymbolUse> ResolveWithFcs([NotNull] string opName, bool resolveExpr, bool qualified)
     {
+      var context = GetElement().FSharpIdentifier;
+
+      return ResolveWithFcs(context, opName, resolveExpr, qualified);
+    }
+
+    /// Does not reuse existing file resolve results, does complete lookup by name.
+    public FSharpOption<FSharpSymbolUse> ResolveWithFcs([NotNull] IFSharpTreeNode context, [NotNull] string opName,
+      bool resolveExpr, bool qualified)
+    {
       var referenceOwner = GetElement();
       var checkerService = referenceOwner.CheckerService;
 
@@ -136,7 +145,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ? qualifiableReferenceOwner.Names
         : new[] {GetName()};
 
-      return checkerService.ResolveNameAtLocation(referenceOwner.FSharpIdentifier, names, resolveExpr, opName);
+      return checkerService.ResolveNameAtLocation(context, names, resolveExpr, opName);
     }
   }
 }
